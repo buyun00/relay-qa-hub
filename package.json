@@ -1,0 +1,16 @@
+{
+  "name": "@relay-qa-hub/root",
+  "version": "0.1.0-debug",
+  "private": true,
+  "description": "Independent, mobile-first QA defect closed-loop system with Relay as an optional executor.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "packageManager": "npm@12.0.2",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
