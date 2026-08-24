@@ -3,11 +3,11 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P0`
-- Current pointer: `P0.1`
+- Current pointer: `P0.2`
 - Current gate: `G0-CONTRACT-READY`
 - Critical path: `G0 -> G1 -> G2 -> G3 -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P0.1`
-- Next atomic action: `记录 Relay 工作树基线并初始化独立 Git/npm workspace`
+- Active work packages: `P0.2`
+- Next atomic action: `编写 ADR-0001 至 ADR-0006，并建立不可破坏原则映射`
 - Completed gates: `0 / 11`
 - Last green commit: `none`
 - Last deployed commit: `none`
@@ -17,7 +17,7 @@
 - Last backup verified: `none`
 - Last restore drill: `none`
 - Blockers: `none`
-- Updated at: `2026-08-24T16:43:57+08:00`
+- Updated at: `2026-08-24T16:49:48+08:00`
 
 ## Gate status
 
@@ -40,8 +40,8 @@
 
 | ID | Status | Owner/agent | Depends on | Output | Verification | Evidence | Commit | Updated |
 |---|---|---|---|---|---|---|---|---|
-| P0.1 | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | G0-PLAN-READY | 独立 repo/workspace | Git/目录隔离检查 |  |  | 2026-08-24T16:43:57+08:00 |
-| P0.2 | PLANNED | unassigned | P0.1 | ADR 集 | ADR 完整性检查 |  |  | 2026-08-24 |
+| P0.1 | DONE | root (GPT-5.6 Sol/ultra) | G0-PLAN-READY | 独立 repo/workspace | `npm ci`; Git/目录隔离与 Relay 状态指纹检查通过 | [`docs/evidence/P0.1-bootstrap.md`](docs/evidence/P0.1-bootstrap.md) | `dbb4ab6c4ba7dacf94021a33b99ecb93577ae646` | 2026-08-24T16:49:48+08:00 |
+| P0.2 | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P0.1 | ADR 集 | ADR 完整性检查 |  |  | 2026-08-24T16:49:48+08:00 |
 | P0.3 | PLANNED | unassigned | P0.2 | OpenAPI/Event/Relay contracts | schema lint + 场景走查 |  |  | 2026-08-24 |
 | P0.4 | PLANNED | unassigned | P0.3 | 最小运行骨架 | lint/typecheck/test/build/health |  |  | 2026-08-24 |
 | P1.1 | PLANNED | unassigned | G0 | schema/migrations | migration/integrity/concurrency |  |  | 2026-08-24 |
@@ -80,12 +80,13 @@
 
 ## Active work
 
-- `P0.1` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-24T16:43:57+08:00`; next atomic action: `记录 Relay 工作树基线并初始化独立 Git/npm workspace`。
+- `P0.2` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-24T16:49:48+08:00`; next atomic action: `编写 ADR-0001 至 ADR-0006，并建立不可破坏原则映射`。
 
 ## Completed evidence
 
 - 规划阶段完成三条并行只读审计：QA 领域/状态机、移动 PWA/运维、Relay 集成契约。
 - 新建独立目录 `D:\Relay-QA-Hub`；规划阶段未修改现有 Relay 工作树。
+- P0.1 建立独立 Git/npm workspaces；Relay 前后状态指纹完全一致；证据与本地提交见 `docs/evidence/P0.1-bootstrap.md` / `dbb4ab6`。
 
 ## Blockers
 

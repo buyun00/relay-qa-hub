@@ -9,6 +9,9 @@
   "engines": {
     "node": ">=22.13"
   },
+  "scripts": {
+    "check:adrs": "node scripts/check-adrs.mjs"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
