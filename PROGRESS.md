@@ -3,21 +3,21 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P1`
-- Current pointer: `P1.1`
+- Current pointer: `P1.2`
 - Current gate: `G1-INDEPENDENT-FOUNDATION`
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P1.1, P3.1, P3.2`
-- Next atomic action: `P1.1 focused/default/full verify 与 post-fix independent 64/64 均绿；精确暂存 storage、root lint ignore、P1.1 evidence 和当前 PROGRESS，检查 staged diff 后本地 commit；取得 hash 后才标 DONE 并移动唯一 pointer 到 P1.2`
+- Active work packages: `P1.2, P3.1, P3.2`
+- Next atomic action: `P1.2 在纯 Domain 包冻结 Bug/RepairAttempt/BuildRequirement/Verification 的命令与合法迁移矩阵，先补合法/非法/authority/version 决策测试，再实现返回同事务 Event+Outbox effect plan 的纯状态机`
 - Completed gates: `1 / 11`
-- Last green commit: `e27049cd614dafea1baf63c50ae67abdb992b030`
+- Last green commit: `71c7afbe14262f68059a06af490167b7d3854ab4`
 - Last deployed commit: `none`
-- Schema version: `contract 1.1.0; database v2 under P1.1 verification`
+- Schema version: `contract 1.1.0; database v2 verified at P1.1`
 - Production URL: `not deployed`
 - Last production verification: `none`
 - Last backup verified: `none`
 - Last restore drill: `none`
 - Blockers: `Android Gradle project verification/real-device evidence pending; active Poco is identified but binds IPAddress.Any, has no auth/qa.snapshot extension, and has no safe runtime proof; API37 runtime absent`
-- Updated at: `2026-08-25T04:48:16+08:00`
+- Updated at: `2026-08-25T04:49:11+08:00`
 
 ## Gate status
 
@@ -44,8 +44,8 @@
 | P0.2  | DONE        | root (GPT-5.6 Sol/ultra) | P0.1                | ADR 集                                               | `npm run check:adrs`：6/6 ADR、4/4 必需章节、10/10 原则映射通过                                    | [`docs/evidence/P0.2-adrs.md`](docs/evidence/P0.2-adrs.md)            | `55e052113ef86002ba17389e46a510485dfff116` | 2026-08-24T16:54:25+08:00 |
 | P0.3  | DONE        | root (GPT-5.6 Sol/ultra) | P0.2                | OpenAPI/Event/Relay contracts                        | 9 schemas、12+12 场景、35 operations、19 errors、24-file breaking baseline；独立复验通过           | [`docs/evidence/P0.3-contracts.md`](docs/evidence/P0.3-contracts.md)  | `525f81b3c87749e00b4118c866fb26a68c88175c` | 2026-08-24T17:33:24+08:00 |
 | P0.4  | DONE        | root (GPT-5.6 Sol/ultra) | P0.3                | 最小运行骨架                                         | clean `npm ci`; full `verify`; actual health/SIGINT/restart; Relay fingerprint                     | [`docs/evidence/P0.4-skeleton.md`](docs/evidence/P0.4-skeleton.md)    | `a873df7e9f07d37e1116ab7ff06734eb1bde0281` | 2026-08-24T18:01:36+08:00 |
-| P1.1  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | G0                  | schema/migrations                                    | migration/integrity/concurrency                                                                    | 41 focused DML、storage `56/56`、full `npm run verify` exit 0；post-fix independent 5 temp DB / `64/64`、FK/integrity green、Blocker/High/Medium=`0/0/0`；等待本地 commit | [`docs/evidence/P1.1-storage.md`](docs/evidence/P1.1-storage.md) |           | 2026-08-25T04:48:16+08:00 |
-| P1.2  | PLANNED     | unassigned               | P1.1                | domain state machine                                 | transition/guard/version tests                                                                     |                                                                       |                                            | 2026-08-24                |
+| P1.1  | DONE        | root (GPT-5.6 Sol/ultra) | G0                  | schema/migrations                                    | migration/integrity/concurrency                                                                    | 41 focused DML、storage `56/56`、full `npm run verify` exit 0；post-fix independent 5 temp DB / `64/64`、FK/integrity green、Blocker/High/Medium=`0/0/0` | [`docs/evidence/P1.1-storage.md`](docs/evidence/P1.1-storage.md) | `71c7afbe14262f68059a06af490167b7d3854ab4` | 2026-08-25T04:49:11+08:00 |
+| P1.2  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P1.1                | domain state machine                                 | transition/guard/version tests                                                                     | red-first pure-domain matrix starting; no implementation completion claim |                                            | 2026-08-25T04:49:11+08:00 |
 | P1.3  | PLANNED     | unassigned               | P1.1                | outbox/inbox                                         | crash/retry/order/replay tests                                                                     |                                                                       |                                            | 2026-08-24                |
 | P1.4  | PLANNED     | unassigned               | P1.1                | health/log/config                                    | dependency fault tests                                                                             |                                                                       |                                            | 2026-08-24                |
 | P2.1  | PLANNED     | unassigned               | G1                  | user auth/invite QR                                  | auth/session/CSRF tests                                                                            |                                                                       |                                            | 2026-08-24                |
@@ -87,7 +87,7 @@
 
 ## Active work
 
-- `P1.1` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T01:53:02+08:00`; updated: `2026-08-25T04:48:16+08:00`; next atomic action: `精确暂存 P1.1 文件，运行 git diff --cached --check 并审阅 staged name/status/stat；本地 commit 后记录 hash/time，才将 P1.1 标 DONE 并把唯一 pointer/atomic action 切到 P1.2`。
+- `P1.2` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T04:49:11+08:00`; updated: `2026-08-25T04:49:11+08:00`; next atomic action: `完整读取现有 Domain vocabulary 与 frozen transition/authority contracts；由独占测试车道先写 Bug/RepairAttempt/BuildRequirement/Verification 的合法、非法、stale-version、Relay-no-human-authority 决策矩阵；根车道实现纯 effect plan`。
 - `P3.1` — owner: `poco_capability_spike (GPT-5.6 Sol/ultra)`; started: `2026-08-25T01:53:02+08:00`; updated: `2026-08-25T02:19:38+08:00`; state: `VERIFYING`; next atomic action: `保留静态审计证据；P3.8 产生 provenance-bound Loopback QA game APK 后补 127.0.0.1/LAN-negative/恶意方法/runtime proof，期间不修改 Unity/Relay`。
 - `P3.2` — owner: `p3_2_medium_closure (GPT-5.6 Sol/ultra)`; started: `2026-08-25T01:53:02+08:00`; updated: `2026-08-25T04:42:55+08:00`; state: `VERIFYING`; next atomic action: `在 Room completeCreateBug 中 exact 校验 operation.idempotencyKey= submission:<receipt.clientSubmissionId>:commit 并补反例；增加真实持久 Room/WorkManager/Keystore 可行贯通测试，或将未贯通边界从 evidence 明确降级，随后重跑独立 clean/MuMu/hash`。
 
@@ -102,6 +102,7 @@
 - G0 后产品架构按用户决策改为 App-first：P0/后端成果原样保留；`apps/web` 降级到 P7.4 post-MVP；P3 重排为 Android 主客户端和 Poco QA Bridge。
 - P3.0 冻结 additive contract `1.1.0`：51 payload、145 behavior、54 operations、26 errors、13-file strict baseline；完整 verify、确定性生成、Android metadata/device preflight、Relay 指纹和两条独立 Blocker/High=`0/0` 签核通过。证据与提交见 `docs/evidence/P3.0-app-first-contracts.md` / `e27049c`。当前唯一 root pointer 转为 P1.1，P3.1/P3.2 为互斥并行车道。
 - P1.1 第一次 post-fix 独立重放委派曾被系统误分类并在执行前中止，未产生数据库结论；改写为纯本地数据库业务一致性验收后完成 5 个临时库 `64/64` 正反向 DML、FK/integrity green 和 Blocker/High/Medium=`0/0/0`，因此该临时执行阻断已解除。
+- P1.1 已于 `2026-08-25T04:49:11+08:00` 完成：数据库 v2、Worker、41 focused DML、storage `56/56`、full verify、独立 `64/64`/`0/0/0` 与证据齐全；本地提交 `71c7afbe14262f68059a06af490167b7d3854ab4`，未 push。唯一 root pointer 已按规则移到 P1.2。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 
