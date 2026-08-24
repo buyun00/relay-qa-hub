@@ -10,6 +10,7 @@ These accepted records freeze the P0 architecture boundary for Relay QA Hub. Lat
 | [ADR-0004](ADR-0004-content-addressed-evidence.md) | Evidence uses quarantine, resumable upload, and content-addressed blobs |
 | [ADR-0005](ADR-0005-reliable-integration-messaging.md) | Integration uses transactional Outbox/Inbox, signed webhooks, and reconciliation |
 | [ADR-0006](ADR-0006-authentication-rbac-and-shared-devices.md) | Authentication, project RBAC, machine scopes, and shared-device isolation are first-class |
+| [ADR-0007](ADR-0007-app-first-android-and-poco-bridge.md) | Native Android is the primary client; Web is post-MVP; Poco is a loopback-only read-only enrichment bridge |
 
 ## Immutable-principle coverage
 

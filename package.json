@@ -11,6 +11,8 @@
   },
   "scripts": {
     "check:adrs": "node scripts/check-adrs.mjs",
+    "check:android-toolchain": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Test-AndroidToolchain.ps1",
+    "check:plan": "node scripts/check-plan-progress.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "generate:contracts": "node packages/contracts/scripts/generate-openapi.mjs",
     "check:contracts": "node packages/contracts/scripts/validate-contracts.mjs",
@@ -26,7 +28,7 @@
     "start:api": "npm run start --workspace @relay-qa-hub/api",
     "start:worker": "npm run start --workspace @relay-qa-hub/worker",
     "dev:web": "npm run dev --workspace @relay-qa-hub/web",
-    "verify": "npm run check:adrs && npm run check:boundaries && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
+    "verify": "npm run check:adrs && npm run check:plan && npm run check:boundaries && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "12.1.0",

@@ -23,5 +23,12 @@ qa-hub-data/
 
 .idea/
 .vscode/
+.gradle/
+**/.gradle/
+**/build/
+**/local.properties
+*.jks
+*.keystore
+keystore.properties
 .DS_Store
 Thumbs.db

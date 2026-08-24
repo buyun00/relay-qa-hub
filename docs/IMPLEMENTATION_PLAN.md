@@ -1,6 +1,6 @@
 # Relay QA Hub 独立产品实施总计划
 
-> 文档版本：1.0  
+> 文档版本：1.2
 > 制定日期：2026-08-24  
 > 目标版本：`0.1.0-debug`  
 > 权威进度指针：[`../PROGRESS.md`](../PROGRESS.md)  
@@ -9,20 +9,24 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P0
-  current_gate: G0-CONTRACT-READY
-  status: ready_to_execute
-  gates_completed: 0
+  current_phase: P3
+  current_gate: G3-ANDROID-APP-READY
+  status: executing
+  gates_completed: 1
   gates_total: 11
-  last_verified_commit: null
-  last_verified_at: null
-  next_action: 执行 P0.1，初始化独立仓库并冻结领域与集成契约
-  blockers: []
+  last_verified_commit: a873df7e9f07d37e1116ab7ff06734eb1bde0281
+  last_verified_at: 2026-08-24T18:01:36+08:00
+  next_action: 执行 P3.0 App-first contract delta；随后并行启动 P3.1 Poco capability spike 与 P3.2 Android native foundation
+  blockers:
+    - Android Studio/SDK/JDK/adb absent; blocks P3.2+ APK verification
+    - Actual vendored Poco project/version not yet identified; blocks P3.1/P3.7/P3.8 real capability proof
 ```
 
 ## 1. 决策摘要
 
 QA Hub 是一个独立、手机优先的缺陷闭环系统。它必须在 Relay 完全不可用时仍能完成提单、分诊、人工分配、修复登记、构建关联、验收、失败重开和关闭。
+
+G0 完成后用户将客户端架构正式改为 App-first：原生 Android App 是唯一主要人机客户端；独立 QA Hub API/数据库继续是唯一业务事实源；Relay 仍只是可选修复执行器。现有 Web 骨架保留为 post-MVP 桌面管理/只读诊断资产，不再发展为 PWA、安装入口或离线取证主客户端。
 
 Relay 只通过一键派发和可靠事件回写参与某些修复尝试：
 
@@ -51,29 +55,29 @@ QA Bug
 ### 2.1 第一版必须交付
 
 - 项目、模块、成员、角色和项目级权限。
-- 手机快速上报、图片/录像/音频/日志附件、离线草稿和断点续传。
+- Android 原生 App 中完成快速上报、编辑、列表/筛选、去重提示、评论、附件、分配、状态、验收、审计、通知、离线队列和断点续传。
 - Bug、Occurrence、RepairAttempt、Build、Verification、Event 完整模型。
 - 分诊、分配、人工修复、Relay 修复、外部修复、待构建、待验收、失败重开和关闭。
 - 唯一编号、传输幂等、相似 Bug 候选、追加发生记录。
-- “待我处理”“待我验收”“由我报告”和全量检索/筛选。
-- 一键交给 Relay、继续原 Relay 任务、自动回写交付和构建进度。
-- 站内通知、PWA Web Push、超时提醒和共享测试机模式。
+- App 首页原生提供“待我处理”“待我验收”“由我报告”和全量检索/筛选，不使用 WebView 包壳。
+- App 内一键交给 Relay、继续原 Relay 任务并展示自动回写的交付和构建进度。
+- 站内 Inbox、Android 通知、超时提醒和共享测试机模式。
 - 追加式审计、健康检查、结构化日志、备份、隔离恢复和回滚。
-- 真实 Android/iPhone/Windows 浏览器测试和独立 HTTPS canary。
+- Android 12/12L/13/14/15/16 App/Poco 矩阵和独立 HTTPS canary；12L 可非阻塞探测，其余按 P9 真机要求执行。
 
 ### 2.2 第一版明确不做
 
 - Sprint、需求、工时、OKR 等通用项目管理。
 - 取代 GitLab、Relay、Unity Worker、构建系统或发布系统。
 - 静默后台录屏、后台摄像头/麦克风监听。
+- 将 Web/PWA、WebView 包壳或浏览器离线捕获作为 MVP 主客户端。
 - 未经人工确认的语义自动合并或自动关闭。
 - 多活、多区域和跨数据中心容灾。
 - 依赖轻语账号、ID、状态、Cookie、API 或同步。
 
 ### 2.3 后续候选
 
-- Unity Reporter SDK：日志、异常、场景、网络、性能和最近操作环形缓冲。
-- 受控 Android Companion：显式 MediaProjection 录屏、悬浮打标、可靠后台上传。
+- post-MVP 桌面批量管理/只读诊断 Web；不承担现场移动流转或离线取证。
 - PostgreSQL、多实例、对象存储和企业 OIDC。
 - AI 辅助归类、相似候选解释和摘要；始终保留人工决定权。
 
@@ -321,18 +325,23 @@ D:\Relay-QA-Hub-Data\            可配置持久目录，生产前核对磁盘�
 
 ### 7.2 建议技术栈
 
-最终版本在 P0 通过 ADR 锁定；默认起点：
+最终版本在 P0 通过 ADR 锁定；已验证起点：
 
-- Node.js `>=22.13`、TypeScript strict。
+- Node.js `>=24.19 <25`、TypeScript strict。
 - npm workspaces 单仓库。
-- `apps/web`：React 手机优先 PWA、Vite/Workbox 或同等稳定方案。
+- `apps/web`：保留现有 React/Vite 骨架，post-MVP 仅作桌面批量管理/只读诊断；不再投入 PWA 安装、Service Worker 或浏览器离线捕获。
 - `apps/api`：Fastify 或同等轻量 Node API，OpenAPI + Zod schema。
 - `apps/worker`：通知、重复候选、Outbox/Inbox、Relay/Build adapter。
+- `apps/android`：原生 Kotlin + Jetpack Compose 主客户端；Room 本地队列/缓存、WorkManager 受约束上传重试、前台服务承载 MediaProjection/悬浮球、最小 Poco SimpleRPC/Kotlin 只读 adapter。
 - `packages/domain`：状态机和守卫，禁止依赖 Web/DB。
 - `packages/contracts`：OpenAPI/事件 schema 和生成类型。
 - `packages/storage`：Repository、SQLite 和附件存储接口。
 - SQLite WAL 单节点首发；短事务、busy timeout、乐观锁、在线备份。
 - Vitest/node:test、Playwright、契约测试和真实设备手工矩阵。
+
+Android 基线冻结为 `minSdk=31`（Android 12，自动覆盖 12L/API 32）、`compileSdk=36`、`targetSdk=36`，纯 Kotlin/JVM/Android，不引入 NDK、CMake 或本地 C++。仓库生成并固定 Gradle Wrapper；本机开发使用 Android Studio bundled JDK，不要求单独安装系统 Java。主机预检于 2026-08-24 确认 Android Studio、`%LOCALAPPDATA%\Android\Sdk`、PATH 中的 `adb/java` 均不存在，因此当前只能进行 contracts、Poco 只读 spike 和脚手架设计，不能宣称 APK build/test 已通过。解除条件与安全安装边界记录在 `docs/ANDROID_SETUP.md`。
+
+模拟器只使用已启用的 Windows Hypervisor Platform/WHPX；绝不为了 AEHD/HAXM 关闭 Hyper-V，因为 Relay worker 正在依赖 Hyper-V。需要的组件为 SDK Platform 36、Build-Tools、Platform-Tools、Command-line Tools、Emulator；API 35/31 system image 可选。NDK 只有未来明确引入 JNI/本地库时才按 Gradle 锁定版本安装。Android 12 MuMu 只能补测试，不能替代 Android 12 真机对悬浮窗、MediaProjection、系统回收和 Poco `127.0.0.1` 的 Gate 证据；adb 可用后必须保存 `adb shell getprop ro.build.version.sdk`，不能只信 MuMu 产品标签。
 
 迁移 PostgreSQL 的触发条件：持续写锁、需要多实例、跨机容灾或数据量/并发实测超出约定。Repository 接口必须预留，但首版不提前引入分布式复杂度。
 
@@ -341,6 +350,7 @@ D:\Relay-QA-Hub-Data\            可配置持久目录，生产前核对磁盘�
 ```text
 apps/
   api/
+  android/
   web/
   worker/
 packages/
@@ -427,7 +437,7 @@ GET    /health/deps
 
 因此：
 
-- QA Hub 浏览器绝不直接调用 Relay 4317。
+- Android App 和任何 QA Hub 浏览器绝不直接调用 Relay 4317；客户端只调用 QA Hub API，M2M 仅存在于服务端 integration worker。
 - 生产自动回写不依赖现有 UI SSE。
 - 不复用 `project_management_*` 字段或轻语完成链路。
 - 不向 Relay 同步大视频；Relay 只拉取被选中的图片和小型日志。
@@ -525,41 +535,55 @@ X-Relay-Signature: sha256=<HMAC(timestamp + "." + rawBody)>
 
 迟到事件必须检查当前 Attempt generation 和 handling mode，不能覆盖已经转人工或被取代的 Attempt。
 
-## 10. 手机 PWA、离线与通知
+## 10. Android 原生主客户端、离线、取证与通知
 
-### 10.1 PWA 基础
+### 10.1 App-first 业务体验
 
-- Manifest 包含稳定 `id`、`start_url`、192/512/maskable 图标、主题色和独立窗口。
-- Service Worker 提供离线应用壳、受控缓存版本和更新提示。
-- 不缓存鉴权 API、敏感附件或其他用户数据。
-- Android 可安装；iOS 添加到主屏幕后启用相应能力。
+- Android App 是唯一主要人机客户端，首页原生实现缺陷创建/编辑、列表/筛选、相似候选、评论、附件、分配、状态、验收、审计、通知，以及“一键交给 Relay”和 Relay 回执；禁止 WebView 包壳。
+- QA Hub API/数据库是唯一事实源。Room 只保存按账号/项目隔离的缓存、草稿和本地操作队列；上线后以服务端版本/事件对账，不能在本地决定最终状态或验收。
+- Relay 离线时，App 到 QA Hub 的提单、分诊、人工修复登记、Build 关联、验收、失败重开和关闭仍完整可用。
+- 共享测试机采用短会话、显式用户/项目上下文、退出撤销通知并清除本账号 Room/媒体/token 命名空间。
 
-### 10.2 30 秒快速上报
+### 10.2 Room 队列、WorkManager 与附件
 
-- 扫码预填项目、Build 和 Test Cycle。
-- 单手操作；360 CSS px 无横向滚动。
-- 最小字段：标题、现象、复现步骤、严重度。
-- 拍照、录像、录音、相册/文件选择。
-- 自动保存草稿，旋转、切后台和软键盘不丢内容。
-- 展示相似候选后允许追加 Occurrence。
+- 草稿、媒体、upload session、chunk ack 和待提交动作进入 Room；每个业务提交持久化稳定 `clientSubmissionId`，映射到 canonical `Idempotency-Key`。
+- WorkManager 只承担有网络/电量/存储约束的上传和对账重试；UI 与用户手动重试也是基线。MediaProjection 会话绝不由 WorkManager 或进程重启恢复。
+- 上传流程固定为 `/uploads/init -> chunks -> finalize -> bind -> Bug/Occurrence`；响应必须返回 attachment ID 和最终 QA item ID。相同 key/payload 重放返回同一结果，同 key 异 payload 409。
+- UI 明确区分“仅本机、等待网络、上传中、失败可重试、已提交、需要重新登录”，禁止把排队或本地保存显示为服务端成功。
+- 本地媒体使用 app-private storage 与 Android Keystore 支持的加密；成功后按策略清理，失败/草稿保留期可配置且可手动删除。
 
-### 10.3 离线与续传
+### 10.3 悬浮球、MediaProjection 与系统降级
 
-- IndexedDB 按用户/项目命名空间保存结构化草稿和 Blob。
-- 本地 Outbox 使用稳定 `clientSubmissionId`。
-- 联网后先续传证据，再原子创建 Bug/Occurrence。
-- Background Sync 只作为增强；基线是在应用打开、`online` 事件和手动按钮重试。
-- UI 明确区分“仅保存在本机”“上传中”“已提交”，禁止假成功。
+- `SYSTEM_ALERT_WINDOW` 必须经系统设置显式授权并在每次显示前检查；球可拖动、贴边收起。权限撤销时立即移除悬浮球并停止捕获。
+- 用户显式开始“测试取证会话”并同意 MediaProjection 后，以 `mediaProjection` 类型前台服务和持续通知维持；不得无感、永久或开机自动截图/录屏。
+- Android 14+ 每会话重新同意；token/MediaProjection/virtual display 按单次约束使用，创建前注册 `onStop()`，旋转使用 resize/setSurface。锁屏、用户/系统停止、权限撤销、服务或进程被杀时释放所有 capture 资源并在 UI 解释。
+- 悬浮球单击=隐藏悬浮球后采集系统截图与 Poco enrichment 并打开极简草稿；双击=保存待补充草稿；长按=显式开始/停止短录屏。手势可配置且有节流、互斥、触觉/视觉反馈和防误触。
+- 硬件截图降级使用 Sharesheet `ACTION_SEND image/*`，其次由用户通过 Photo Picker 选择；不得扫描相册。Android 14 Activity screenshot callback 仅提示本 App 可见 Activity 的截图事件，不提供或冒充其他 App 的截图图像。
+- 显著显示捕获状态和立即停止入口；尊重 `FLAG_SECURE`/系统黑屏或拒绝，不绕过、不假成功。提示通知栏、密码、支付、聊天等敏感画面误采风险；通知权限不足以保证显著状态时阻止 capture 并降级到 Share/Picker。
 
-建议可配置初始上限：图片 25 MiB、视频 300 MiB、单 Bug 500 MiB。生产前依据磁盘和网络实测确认。
+### 10.4 Poco QA Bridge
 
-### 10.4 通知
+- Android App 内实现最小 Poco SimpleRPC/Kotlin 客户端。协议是 4 字节 little-endian Int32 长度头加 UTF-8 JSON-RPC 2.0；分配缓冲前拒绝负数/零/超限/截断帧。优先连接配置的 `127.0.0.1` 端口，并兼容探测 Poco 默认 `5001..5005`；以 `GetSDKVersion` 验证标准 Poco，但不能据此推断 Invoke capability。每步都有短超时、总 deadline、取消即关 socket、响应/解压大小上限和无 Poco fallback。
+- 点击悬浮球后先隐藏球，再以同一 `captureId`/timestamp 启动系统画面与 Poco enrichment：MediaProjection 用户所见系统画面（主证据）、Poco `Screenshot` 干净 Unity framebuffer（若可得）、`Dump(true)` 可见 UI hierarchy（压缩/裁剪/上限）、`GetScreenSize`/`GetSDKVersion`/`GetDebugProfilingData`（若可得）和自定义 `qa.snapshot`（若 capability 存在）。Poco 重操作在 Unity 主线程可能串行，标准 RPC 也不保证同一帧，因此每个 artifact 记录 start/end/skew，不能宣称原子同帧。任何 Poco 失败都不阻断普通截图草稿；UI 显示“已获取 Unity 上下文 / 部分 / 未连接”，并持久化 `enrichmentStatus=complete|partial|unavailable`。
+- capability spike 必须先从实际内置 Poco 源码/assembly/version 证明是否支持 `PocoListenersBase`、`PocoMethod` 和 Invoke 扩展。上游在 Invoke 引入前后都可能返回 `GetSDKVersion=6`，所以必须静态检查相关类型/字段/RPCParser 分支并真实探测 `qa.snapshot`。支持时，测试包可提供 `QaPocoSnapshotProvider : PocoListenersBase`，用 `[PocoMethod("qa.snapshot")]` 暴露只读方法并绑定到 `PocoManager.pocoListenersBase`；旧版仅使用标准 Screenshot/Dump，把 `qa.snapshot` 作为小型、可审计兼容补丁，不能假装原生支持。
+- `qa.snapshot` 请求携带 `captureId`、`nonce`、`deadlineMs`、`schemaVersion`，响应回显同一 captureId，并返回带 schemaVersion 的 JSON：build/version/gitSha、scene、game time、脱敏测试用户 ID、关卡/模式、关键网络环境、有限最近错误和项目自定义字段。字段逐步可选；业务状态不硬编码进 App。
+- 安全前提：QA/Debug 构建必须把 Poco 从源码默认的 `AsyncTcpServer(IPAddress.Any, port)` 限制为 `IPAddress.Loopback/127.0.0.1`，禁止 LAN 暴露。只做 App allowlist 不足以防恶意同机客户端；Unity server 也必须只注册 `GetSDKVersion`、`Screenshot`、`Dump`、`GetScreenSize`、`GetDebugProfilingData` 和 listener 限定为 `qa.snapshot` 的 Invoke，拒绝 SetText/touch/SendMessage/RotateObject 等操作方法。若实际版本无法安全限制回环和服务端只读面，只能在受控测试机临时使用，并阻断 `G3-ANDROID-APP-READY`。
+- 录屏期间不持续 Dump 全层级，只在用户打点或停止录屏时拉取一次。Unity ReadPixels/Poco Screenshot/Dump 必须至少采样 100 次，由 QA 测试自行计算 P50/P95，并测主线程与帧时间影响；标准 profiling 仅是最近值，不能冒充分位统计。超时或超限立刻降级。
+- 系统画面、Unity framebuffer、hierarchy 和 snapshot 以同一 captureId 组成证据包。敏感字段默认不采集，错误日志同时限制条数与字节数；nonce/deadline 过期、captureId 不匹配或 schema 不支持的响应被拒绝。
 
-- 业务事务同时写 notification outbox。
-- 站内 Inbox 必达，Push 可失败且不阻断业务。
-- 事件：待分诊、被分配、待补充、修复已交付、待验收、超时、重新打开。
-- Push 深链到 Bug，锁屏只显示最少信息。
-- 订阅失效自动清理，支持静默期和个人偏好。
+Poco 协议/安全基线以官方上游源码为准：[SimpleRPC Python framing](https://github.com/AirtestProject/Poco/blob/master/poco/utils/simplerpc/transport/tcp/protocol.py)、[Unity TcpServer/framing](https://github.com/AirtestProject/Poco-SDK/blob/master/Unity3D/TcpServer.cs)、[PocoManager RPC/端口注册](https://github.com/AirtestProject/Poco-SDK/blob/master/Unity3D/PocoManager.cs)、[PocoListenerUtils](https://github.com/AirtestProject/Poco-SDK/blob/master/Unity3D/PocoListenerUtils.cs)、[PocoMethodAttribute](https://github.com/AirtestProject/Poco-SDK/blob/master/Unity3D/PocoMethodAttribute.cs) 和 [Unity3D driver/Invoke 文档](https://poco.readthedocs.io/en/latest/source/doc/drivers/unity3d.html)。实际 vendored Poco 优先于上游 `master`，必须保存版本/文件 SHA 并现场验证。
+
+### 10.5 Android 通知
+
+- 业务事务同时写 notification outbox，站内 Inbox 是事实源；Android 通知可失败且不回滚业务。
+- 事件覆盖待分诊、被分配、待补充、修复已交付、待构建、待验收、超时和重新打开；点击深链到原生 App 对应 item。
+- 锁屏只显示最少信息；订阅失效自动清理，支持静默期、个人偏好和共享测试机退出撤销。
+
+### 10.6 post-MVP Web
+
+现有 `apps/web` 代码和 P0.4 提交完整保留，但从 MVP 关键路径移除，归入 P7.4 的 post-MVP 桌面批量管理/只读诊断台。后续不继续开发 PWA 安装、Service Worker、浏览器离线草稿或浏览器截图/录屏；Web 不称 PWA，也不替代原生 App 的现场流转。
+
+Android 平台基线以官方文档为准：[`SYSTEM_ALERT_WINDOW`](https://developer.android.com/reference/android/Manifest.permission#SYSTEM_ALERT_WINDOW)、[MediaProjection](https://developer.android.com/media/grow/media-projection)、[mediaProjection 前台服务类型](https://developer.android.com/develop/background-work/services/fgs/service-types)、[用户停止前台服务](https://developer.android.com/develop/background-work/services/fgs/handle-user-stopping)、[接收 Sharesheet 内容](https://developer.android.com/develop/ui/compose/sharing/receive)、[Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker)、[Android 14 截图检测](https://developer.android.com/about/versions/14/features/screenshot-detection)、[`FLAG_SECURE`](https://developer.android.com/reference/android/view/Display#FLAG_SECURE)、[Android Keystore](https://developer.android.com/privacy-and-security/keystore) 和 [app-specific storage](https://developer.android.com/training/data-storage/app-specific)。
 
 ## 11. 安全、隐私与审计
 
@@ -571,7 +595,7 @@ X-Relay-Signature: sha256=<HMAC(timestamp + "." + rawBody)>
 - CSP、HSTS、Referrer-Policy、`nosniff`、下载 disposition 和文件名净化。
 - 速率限制：登录、报告、搜索、上传 init/chunk/finalize、Webhook。
 - 日志禁止包含 Cookie、Authorization、密码、Token、正文、原始附件和未脱敏账号。
-- 共享手机退出时撤销本设备 Push、清理当前用户 IndexedDB/Cache/内存预览。
+- 共享手机退出时撤销本设备 Android 通知订阅，清理当前用户的 Room、app-private 媒体、token 和内存预览；post-MVP Web 若未来启用，另行清理其浏览器命名空间。
 - 关键状态写入审计失败时，业务事务应 fail closed。
 
 ## 12. 进度与并行协议
@@ -595,6 +619,8 @@ PLANNED | IN_PROGRESS | BLOCKED | VERIFYING | DONE | DEFERRED
 9. 每个 Gate 后运行全量集成验证，再决定是否继续下阶段。
 
 ## 13. 分阶段实施计划
+
+App-first 核心关键路径为 `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`，即 Backend/API -> Android App -> Relay adapter -> E2E/发布。P0/G0 历史保持不变；P3 未开始的 Web/PWA 计划由原生 Android 计划取代。
 
 ### P0 - G0：计划、ADR 与独立骨架
 
@@ -748,37 +774,67 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 
 Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
-### P3 - G3：手机提单、证据和分诊
+### P3 - G3：Android 原生主客户端与 Poco QA Bridge
 
-#### P3.1 PWA 壳和移动布局
+#### P3.0 App-first contract delta
 
-要做：Manifest、Service Worker、安装/更新提示、离线壳、360px 单手布局。
+根代理基于 P0.3 的 `1.0.0` 历史基线发布追加 contract 版本，冻结 native auth/短会话、首页列表/筛选/评论/分配/状态/验收/审计/通知读取与写入、上传 finalize 返回 `attachmentId`、附件 bind、`clientSubmissionId -> Idempotency-Key`、最终 QA item ID、Relay handoff/receipt 读模型、capture bundle 和 Poco enrichment schema。新增版本、OpenAPI 示例、错误、executable scenarios 与 breaking 检查，不改写 P0.3 提交。
 
-验证：Android Chrome 安装、iOS 主屏幕、Windows Edge/Chrome；断网打开壳；无旧资源长期卡住。
+验证：Android 所需 API 没有隐式 Web session 或 Relay 依赖；`init -> chunks -> finalize -> bind -> create/append` 可重放；同 key 异 payload 409；跨账号/项目拒绝；captureId/enrichmentStatus/QA item ID 响应无歧义。P3.0 全绿后才能开始原生业务实现。
 
-#### P3.2 安全上传和断点续传
+#### P3.1 Poco capability 与安全 spike
 
-要做：quarantine、分块、Hash、MIME/魔数、病毒扫描、finalize、孤儿清理、安全预览。
+只读定位实际被测 Unity 内置 Poco 的 package/assembly/source/version/文件 SHA，核实 4-byte little-endian frame 与 JSON-RPC shape、`GetSDKVersion`/`Screenshot`/`Dump(true)`/`GetScreenSize`/`GetDebugProfilingData`、5001..5005 回退，以及 `PocoListenersBase`/`PocoMethod`/Invoke 是否真实存在。`GetSDKVersion=6` 不能证明 Invoke；必须检查 vendored 源码并做真实 probe。证明当前监听地址和已注册 RPC；若源码是 `AsyncTcpServer(IPAddress.Any, port)` 或注册操作方法，给出最小 Loopback+server read-only 补丁和回滚边界。此 spike 可与 P3.2 并行，不修改 Relay。
 
-验证：
+验证：保存实际版本/commit 或 vendored SHA 与源码行证据；127.0.0.1 握手成功；LAN IP 连接失败；5001 占用或非 Poco 服务时安全回退/不误判 5002..5005；恶意同机客户端的操作 RPC 被 server 拒绝；旧版/无扩展机制被准确标注而非假装支持。未找到权威 Unity 工程路径时记录 blocker/解除条件，但不阻断 P1/P2/P3.2 的 fake 实现。
 
-- 弱网、Wi-Fi/蜂窝切换、锁屏、杀浏览器、服务重启后从确认块继续。
-- 空文件、超限、伪造 MIME、路径穿越、恶意 SVG/HTML、重复/缺块、并发 finalize fail closed。
-- 最终 Blob 仅一份，Hash 一致，无游离业务附件。
+#### P3.2 Android native foundation
 
-#### P3.3 离线草稿和幂等提交
+在独立 `apps/android` 建立 Kotlin/Jetpack Compose 主客户端、原生导航/首页、版本化 API client、Room 账号/项目隔离缓存与队列、WorkManager 约束重试、Keystore 支持的本地加密、fake QA Hub 和 unit/instrumented test 基础。不是 WebView，也不 import Relay。
 
-要做：IndexedDB 草稿、本地 Outbox、联网重试、账号隔离、配额反馈。
+验证：工具链 preflight 先 fail honestly/后 pass；SDK 安装后 clean Gradle build、lint/unit、进程重启、账号切换/退出清理、schema 版本升级/降级拒绝、fake API offline/reconcile 全绿；`minSdk=31`、`compileSdk=36`、`targetSdk=36` 有 version catalog/module 证据。SDK/JDK 缺失时本步骤不得标 DONE 或声称 APK 已构建。
 
-验证：飞行模式填写/拍照，杀浏览器重开仍存在；双标签/连点/超时重试仅创建一个 Bug。
+#### P3.3 后端证据与移动 API
 
-#### P3.4 Bug/Occurrence 和分诊 UI
+实现 quarantine、分块、Hash、MIME/魔数、病毒扫描、finalize、bind、孤儿清理、安全预览，以及 Android 首页所需分页/筛选/评论/分配/状态/验收/审计/通知 API。Domain/RBAC/audit 仍是服务端守卫，App 不可绕过。
 
-要做：30 秒报告页、列表、详情、时间线、模块/严重度/优先级/负责人、待补充/重复/拒绝/暂缓。
+验证：空/超限/伪 MIME、路径穿越、恶意 SVG/HTML、重复/缺块、并发 finalize、跨项目 bind 和 IDOR fail closed；最终 Blob 仅一份；分页/筛选与详情一致。
 
-验证：真实 Android 扫码到提交成功 <=30 秒；同 Bug 可追加 Occurrence；手机/桌面筛选一致。
+#### P3.4 Room/WorkManager 离线附件队列
 
-Gate `G3-MOBILE-INTAKE`：真实手机、真实附件目录和传输故障矩阵通过。
+实现草稿、媒体、upload session/chunk ack、业务动作和 auth-refresh 状态机；网络恢复后续传，响应丢失后以同一 key 对账，服务端 ID 回写本地 item。上传成功按策略清理，失败/草稿保留可配置。
+
+验证：飞行模式、Wi-Fi/蜂窝切换、进程/App 被杀、服务重启、登录过期、重复点击和响应丢失最终只产生一个 attachment/QA item；20 MiB 图片和短录屏续传成功，不产生孤儿。
+
+#### P3.5 原生全流转首页
+
+实现创建/编辑、列表/筛选、去重候选、评论、附件、分配、主状态、人工/外部修复、Build、验收、审计时间线、通知 Inbox，以及 Relay 一键派发/回执展示位。P3 阶段使用 fake Relay；P5 再接真实 adapter。
+
+验证：App 内完整人工闭环；Relay 关闭仍可上报到验收关闭；30 秒快速提单；修复人与验收、版本冲突、重复候选人工决定和未通过 Verification 禁止关闭均成立。
+
+#### P3.6 悬浮球、MediaProjection 与系统分享
+
+实现 SAW 明示授权、拖动/贴边收起、显式取证会话、mediaProjection 前台服务/通知、Android 14+ 单次授权与 onStop 清理、单击/双击/长按、防误触、Sharesheet receiver、Photo Picker 和 `FLAG_SECURE` 安全降级。单击先隐藏悬浮球，再创建 captureId 并行调用 P3.7 enrichment。
+
+验证：拖动不触发、双击不连带单击、长按恰一次；权限拒绝/撤销、旋转、锁屏、来电/弹窗、Task Manager Stop、服务/App 被杀都不自动恢复捕获；普通截图草稿始终可提交。
+
+#### P3.7 Android Poco 只读 adapter 与证据包
+
+实现 allowlist-only 的最小 SimpleRPC/Kotlin client：配置端口优先、127.0.0.1:5001..5005 能力探测、GetSDKVersion 标准握手、4-byte little-endian frame 校验、短超时/总 deadline/取消即关 socket、响应与解压上限。以同一 captureId 关联系统画面、Poco Screenshot、Dump(true)、screen/version/profiling 和可选 `qa.snapshot`，记录每项 start/end/skew 并产生 `complete|partial|unavailable`；不实现 SetText/touch/SendMessage。
+
+验证：负数/零/超长/截断 frame、错 JSON-RPC id、非法 JSON、Poco 不存在/旧版/非 Poco 占端口/超时/取消/超大 hierarchy/Unity 崩溃均快速降级且不阻断草稿；captureId/nonce/deadline/schema 不匹配被拒；录屏仅打点或停止时 Dump，一次 capture 的结果按时间稳定关联但不冒充同帧原子快照。
+
+#### P3.8 Unity qa.snapshot 最小兼容层
+
+在实际 Poco capability 证据基础上，仅对内部 QA/Debug 测试包新增薄层：支持扩展的版本实现 `QaPocoSnapshotProvider : PocoListenersBase`、`[PocoMethod("qa.snapshot")]` 并绑定 `PocoManager.pocoListenersBase`；旧版采用最小兼容 patch 或只保留标准 Screenshot/Dump。监听必须改为 Loopback，server 注册表必须移除操作 RPC，返回版本化、大小受限、默认脱敏且回显 captureId 的 JSON；IL2CPP stripping 使用 `[Preserve]`/最小 link.xml 保护 provider，不实现完整 Reporter 或业务控制。
+
+验证：Mono/IL2CPP、横竖屏、弱机下可用；恶意同机客户端、过期 nonce/deadline、超大/敏感字段被拒；127.0.0.1 可连且 Wi-Fi/LAN 地址不可连。若无法限制 Loopback，阻断 G3 debug-ready。
+
+#### P3.9 App/Poco 真机、性能与安全矩阵
+
+至少覆盖 Android 12/API 31（MuMu + 一台真机）、Android 13/14/15/16 真机、Pixel/AOSP 与一个强省电 OEM；Android 12L/API 32 可作为非阻塞兼容探测。交叉权限回收、方向/分辨率、锁屏、来电/弹窗、断网、重复、20 MiB 图片/短录屏、App/Unity crash、5001 占用、Poco 不存在/旧版、超时/超大 Dump、IL2CPP、弱机、恶意同机客户端和 `FLAG_SECURE`。测量 Unity ReadPixels/Screenshot/Dump 的 P50/P95 延迟、主线程和帧影响。MuMu API level 必须以 adb `getprop ro.build.version.sdk` 为证据，且不能替代 Android 12 真机的 overlay/MediaProjection/系统回收/Poco 回环验证。
+
+Gate `G3-ANDROID-APP-READY`：P3.0-P3.9 全绿；Android App 是可安装的原生主要客户端并跑通 Relay 离线人工闭环；普通截图在 Poco 任意失败下可提交；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。此 Gate 是 App-first 核心关键路径。
 
 ### P4 - G4：人工修复和验收闭环
 
@@ -805,7 +861,7 @@ Gate `G3-MOBILE-INTAKE`：真实手机、真实附件目录和传输故障矩阵
 - 验收失败保留全部历史并回到 `ready`。
 - 关闭后新版本复现可重开，旧版本复现默认只追加 Occurrence。
 
-Gate `G4-HUMAN-CLOSED-LOOP`：在 Relay 完全离线状态跑通一条真实人工 Bug。
+Gate `G4-HUMAN-CLOSED-LOOP`：在 Relay 完全离线状态，通过 Android App 跑通一条真实人工 Bug。
 
 ### P5 - G5：Relay 一键派发与可靠回写
 
@@ -813,7 +869,7 @@ Gate `G4-HUMAN-CLOSED-LOOP`：在 Relay 完全离线状态跑通一条真实人�
 
 要做：版本化 contract、M2M、Outbox、附件选择、fake server、错误/重试/对账测试。
 
-验证：QA 侧在不改 Relay 的情况下完成 contract tests；浏览器看不到 M2M 凭据。
+验证：QA 侧在不改 Relay 的情况下完成 contract tests；Android App 和任何浏览器都看不到服务端 M2M 凭据。
 
 #### P5.2 Relay 侧最小 Integration API
 
@@ -840,7 +896,7 @@ Gate `G4-HUMAN-CLOSED-LOOP`：在 Relay 完全离线状态跑通一条真实人�
 
 #### P5.4 状态投影和继续原任务
 
-要做：delivery evidence 校验、Build 投影、needs_input/blocked/failed、验收失败 action 幂等追加 Turn。
+要做：delivery evidence 校验、Build 投影、needs_input/blocked/failed、验收失败 action 幂等追加 Turn，并在 Android App 原生页面展示 handoff/receipt/对账状态。
 
 验证：
 
@@ -864,11 +920,11 @@ Gate `G5-RELAY-INTEGRATED`：真实 QA Bug 一键创建 Relay Task，交付后�
 
 验证：completed 只在 Job/项目/分支/完整 SHA/mode 均匹配时接受；失败后同 Job 恢复可继续推进。
 
-#### P6.2 Inbox、Push 和提醒
+#### P6.2 Inbox、Android 通知和提醒
 
-要做：站内 Inbox、Web Push、订阅轮换、静默期、待办深链、超时升级。
+要做：站内 Inbox、Android notification/push token 轮换、静默期、原生待办深链、超时升级；Push 失败不影响 Inbox 事实。
 
-验证：服务崩溃重启后通知不丢不重；过时提醒被取消；Android/iOS 主屏幕真实 Push；拒绝权限时可靠降级。
+验证：服务/App 崩溃重启后通知不丢不重；过时提醒被取消；Android 12/13/14/15/16 真机通知；拒绝通知权限时 App Inbox 可靠降级。
 
 Gate `G6-BUILD-VERIFICATION`：真实构建完成后指定验收人收到通知并进入待验收。
 
@@ -884,13 +940,17 @@ Gate `G6-BUILD-VERIFICATION`：真实构建完成后指定验收人收到通知�
 
 要做：待我处理/验收/补充、由我报告、模块、版本、负责人、严重度、状态、发生次数、保存视图。
 
-验证：复杂组合筛选可重放、分页稳定、无重复/遗漏；移动/桌面结果一致。
+验证：复杂组合筛选可重放、分页稳定、无重复/遗漏；Android App 与 API 查询结果一致。
 
 #### P7.3 统计
 
 要做：新 Bug、回归、重复率、交付到验收时长、重新打开率、版本分布；导出 CSV/Excel 只读快照。
 
 验证：指标能从事实表重算；导出不能反向覆盖 QA Hub。
+
+#### P7.4 post-MVP 桌面管理/诊断 Web
+
+状态：`DEFERRED`，不属于 `0.1.0-debug` App-first 关键路径。完整保留 P0.4 `apps/web` 资产；未来若恢复投入，只实现大屏批量管理或只读诊断，并先移除“PWA/手机主客户端/离线取证”产品表述。不得用它替代 Android 真机 Gate。
 
 Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态、版本和待办。
 
@@ -921,25 +981,26 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
-### P9 - G9：真实设备和 E2E
+### P9 - G9：Android/Poco 真实设备和 E2E
 
 #### P9.1 真实设备矩阵
 
 测试槽位：
 
-| 平台 | 普通网页 | 安装 PWA | 媒体 | 离线 | 续传 | Push |
+| 槽位 | 原生全流转 | Capture/Share | Poco 标准 RPC | qa.snapshot | 离线/续传 | 通知 |
 |---|---:|---:|---:|---:|---:|---:|
-| 最低支持 Android + Chrome | 必测 | 必测 | 必测 | 必测 | 必测 | 必测 |
-| 当前主流 Android + Chrome | 必测 | 必测 | 必测 | 必测 | 必测 | 必测 |
-| 国产 Android + 厂商浏览器 | 必测 | 探测 | 必测 | 必测 | 必测 | 探测 |
-| 最低支持 iPhone + Safari | 必测 | 必测 | 必测 | 必测 | 必测 | 主屏幕必测 |
-| 当前主流 iPhone + Safari | 必测 | 必测 | 必测 | 必测 | 必测 | 必测 |
-| Android/iOS 微信内置浏览器 | 必测 | 明确降级 | 必测 | 必测 | 必测 | 明确降级 |
-| Windows 11 Edge/Chrome | 必测 | 必测 | 文件替代 | 必测 | 必测 | 必测 |
+| Android 12 / API 31 MuMu | 自动化/补测 | 补测 | 回环补测 | capability 决定 | 必测 | 补测 |
+| Android 12 / API 31 真机 | 必测 | 必测 | 127.0.0.1/LAN 必测 | capability 决定 | 必测 | 必测 |
+| Android 12L / API 32 | 非阻塞兼容探测 | 探测 | 探测 | capability 决定 | 探测 | 探测 |
+| Android 13 / API 33 真机 | 必测 | Task Manager Stop 必测 | 必测 | capability 决定 | 必测 | 必测 |
+| Android 14 / API 34 真机 | 必测 | 每会话授权/token 反例必测 | 必测 | capability 决定 | 必测 | 必测 |
+| Android 15 / API 35 真机 | 必测 | FGS/BOOT 限制必测 | 必测 | capability 决定 | 必测 | 必测 |
+| Android 16 / API 36 真机 | 必测 | targetSdk 36 行为必测 | 必测 | capability 决定 | 必测 | 必测 |
+| 强省电 OEM 真机 | 必测 | 权限回收/kill 必测 | 回环/LAN 必测 | capability 决定 | 必测 | 必测 |
 
-每个槽位交叉：Wi-Fi、蜂窝、切换、飞行模式、弱网、锁屏、后台、杀浏览器、拒绝权限、磁盘不足、接近上限视频、双击、刷新、双标签、共享手机退出、360x640、横屏、字体 200%、深色模式。
+每个槽位交叉 Wi-Fi/蜂窝/切换/飞行模式/弱网、锁屏/后台/App kill/Unity crash、权限拒绝/撤销、磁盘不足、20 MiB 图片/短录屏、单/双/长按、横竖屏/分辨率/字体 200%/深色模式、5001 占用与 5002..5005 回退、超时/超大 hierarchy、IL2CPP/弱机/恶意同机客户端/`FLAG_SECURE`。MuMu 的真实 API level 在 adb 可用后用 `getprop ro.build.version.sdk` 记录；模拟器只补自动化，不替代 Android 12 真机或其他必测真机。
 
-Gate `G9-REAL-DEVICE`：保存设备/OS/浏览器完整版本、录屏、request ID 和结果；不能用 DevTools 模拟替代。
+Gate `G9-REAL-DEVICE`：保存 Android/设备/Unity/Poco/App 完整版本、APK/AAB SHA、录屏、request ID/item ID、P50/P95 和结果；不能用 DevTools、MuMu 标签或模拟器替代真机证据。
 
 ### P10 - G10：独立生产 Canary 与 Debug 上线
 
@@ -956,10 +1017,10 @@ Gate `G9-REAL-DEVICE`：保存设备/OS/浏览器完整版本、录屏、request
 
 #### P10.3 真实 Canary
 
-在真实 HTTPS、真实数据目录、真实通知和真实 Relay 上完成：
+使用已记录 SHA 的 Android App，在真实 HTTPS、真实数据目录、真实通知和真实 Relay 上完成：
 
 ```text
-登录 -> 离线草稿 -> 断点上传 -> 提单 -> 分诊 ->
+原生登录 -> 悬浮球系统截图+Poco enrichment -> 离线草稿 -> 断点上传 -> 提单 -> 分诊 ->
 人工修复 -> 验收失败重开 -> 验收通过 ->
 Relay 一键派发 -> 自动交付/构建标记 -> 待验收 ->
 搜索/筛选 -> 备份 -> 隔离恢复抽查
@@ -980,10 +1041,12 @@ P0 contracts 冻结后：
 | 车道 | 独占目录/工作 | 可并行阶段 | 汇合点 |
 |---|---|---|---|
 | A Domain/API | `packages/domain`, API handlers；主代理独占迁移/contracts | P1/P2/P4 | G4 |
-| B Mobile/PWA | `apps/web`, PWA, IndexedDB, UI；使用 mock contracts | P3/P4 | G4 |
+| B Android App | `apps/android`；Compose、Room、WorkManager、capture、Poco client、原生流转 UI；使用 fake contracts | P3.2/P3.4-P3.7/P4；P3.0 后启动 | G3/G4 |
 | C Evidence/Reliability | storage、upload、outbox/inbox、worker | P1/P3/P6 | G6 |
 | D Integrations/Test | relay-client、build-client、fake servers、contract/e2e | P5/P6 | G6 |
 | E Ops/Security | runbooks、health、backup、service scripts、安全测试 | P2/P8/P10 | G8/G10 |
+| F Poco QA Bridge | 实际 Unity QA/Debug 测试包中的最小 loopback/provider 兼容层；先只读审计，后独占明确文件 | P3.1/P3.8 | G3 |
+| W post-MVP Web | `apps/web`；仅未来桌面批量管理/只读诊断 | P7.4 DEFERRED | 不阻塞 0.1 |
 
 并行纪律：
 
@@ -1004,13 +1067,15 @@ P0 contracts 冻结后：
 - API integration、CSRF/IDOR/幂等/乐观锁测试。
 - 上传对抗、续传、Hash、病毒扫描和孤儿清理测试。
 - Relay fake/真实 contract、Webhook 签名/乱序/重试/对账测试。
-- PWA service worker、offline、IndexedDB、Push fallback 测试。
-- Playwright 桌面/移动 viewport E2E。
+- Android Compose/Room/WorkManager、权限/手势/lifecycle、fake API、幂等队列、加密保留和 URI/MIME 对抗测试。
+- Poco protocol fixtures、allowlist、timeout/cancel/size、captureId/nonce/deadline/schema 与 loopback/LAN 安全测试。
+- post-MVP Web 不新增 PWA/Service Worker/offline 测试投入；现有 P0.4 build 仅作为保留资产回归。
 - 备份校验和隔离恢复脚本测试。
 
 ### 必须手工或真实环境验证
 
-- 真实 Android/iPhone PWA 安装、相机/录像/上传、离线恢复、Push。
+- Android 12/13/14/15/16 原生 App 安装、全流转、MediaProjection/overlay/Share/Picker、离线恢复与通知；12L 为非阻塞探测。
+- Poco 真实回环连接、LAN 不可达、标准/旧版/qa.snapshot、IL2CPP/弱机和 ReadPixels/Dump 性能矩阵。
 - 真实借用设备退出后的本地数据清理。
 - 真实 Relay 一键派发和 delivery evidence。
 - 真实 Build/CDN identity 和待验收通知。
@@ -1024,8 +1089,8 @@ P0 contracts 冻结后：
 1. `BUILD`：锁文件、lint、typecheck、unit、API、migration、build。
 2. `DATA`：migration 前备份，新旧版本 schema 兼容。
 3. `SECURITY`：认证、RBAC、CSRF、IDOR、上传、限流、Header。
-4. `MOBILE`：真实设备 P0/P1 用例通过。
-5. `RESILIENCE`：浏览器/服务重启、重复提交、Push/Relay/Build 故障无丢失。
+4. `ANDROID`：G3/G9 原生 App、capture、Poco loopback 和真机矩阵通过，记录 APK/AAB SHA。
+5. `RESILIENCE`：App/服务/Unity 重启、重复提交、通知/Relay/Build 故障无丢失。
 6. `OPS`：watchdog、告警、磁盘、日志轮转、备份年龄正常。
 7. `RESTORE`：当前 release 备份在隔离端口恢复成功。
 8. `CANARY`：真实 HTTPS 在 Wi-Fi/蜂窝完成 E2E。
@@ -1033,6 +1098,8 @@ P0 contracts 冻结后：
 10. `APPROVAL`：QA、开发、运维确认。
 
 独立 QA Hub 部署不需要等待 Relay Active Turns 为零；只有同批次修改/重载 Relay adapter 时，才执行 Relay 专属空闲门禁。
+
+Android App 是主工件且 `G3-ANDROID-APP-READY` 位于关键路径；没有真实 APK/AAB、真机/Poco/离线证据时，服务端临时端口或保留的 Web 壳都不能代替 App-first 完成。
 
 ## 17. 完成定义
 
@@ -1043,7 +1110,8 @@ QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 - 一键交给 Relay 幂等，自动回写可靠，Relay 不可自动关闭 Bug。
 - 人工、Relay、外部三种修复模式均有真实 E2E。
 - 修复人与验收、交付与构建、构建与精确 Commit 的边界可证明。
-- 手机 30 秒上报、离线草稿、断点续传和通知在真实设备通过。
+- Android App 原生首页覆盖全部现场流转；30 秒上报、Room 离线草稿、WorkManager 断点续传和通知在真实设备通过。
+- 悬浮球系统画面是主证据，Poco enrichment 可用/部分/未连接均真实显示且不阻断普通缺陷；Poco 仅回环只读。
 - 重复提交不重复建单，相似候选不自动合并。
 - 权限、审计、附件安全、备份、恢复、监控和回滚门禁通过。
 - 生产 URL、部署 SHA、schema、最近备份、最近恢复演练和回滚点写入 `PROGRESS.md`。
@@ -1052,14 +1120,17 @@ QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 
 | 风险 | 应对 |
 |---|---|
-| 现有 Relay API 无 M2M 授权 | 新建 scoped integration routes；浏览器不直连 Relay |
+| 现有 Relay API 无 M2M 授权 | 新建 scoped integration routes；Android/Web 客户端都不直连 Relay，M2M 凭据只在服务端 |
 | SSE 超 250 条可能漏事件 | durable webhook outbox + inbox + reconcile API |
 | 创建幂等无 payload hash | handoff/action canonical hash + DB unique |
 | 后续 Turn 无幂等 | 新增 `qa_turn_requests` 动作键 |
 | Relay 上传接口暴露本机路径 | QA 保管证据，Relay 受控拉取，响应白名单 |
 | Relay 工作树已有大量用户改动 | 独立目录开发；Relay 阶段逐文件审计，禁止破坏性 Git |
 | SQLite 写竞争或附件膨胀 | WAL/短事务/指标/磁盘阈值；达到触发条件迁移 PostgreSQL |
-| PWA 后台能力不一致 | IndexedDB/打开应用重试为基线，Background Sync/Push 渐进增强 |
+| Android SDK/JDK 当前未安装 | P3.0/P3.1/P1/P2 继续；按 `docs/ANDROID_SETUP.md` 安装 Studio+SDK36 并使用 bundled JDK，preflight 绿前不宣称 APK build |
+| Android 截图权限或生命周期被误解 | 每次显式 MediaProjection 同意、前台服务通知、onStop 清理、Sharesheet/Photo Picker 降级；禁止静默捕获和相册扫描 |
+| App 误采敏感内容或 Poco 暴露控制面 | 显著状态/停止入口、尊重 FLAG_SECURE、本地加密/保留；Poco 仅 loopback+只读 allowlist，LAN 暴露阻断 Gate |
+| Poco 不存在、旧版或自定义扩展不兼容 | 先做实际版本 capability spike；标准 Screenshot/Dump fallback，qa.snapshot 薄兼容层，不实现完整 Reporter |
 | 借用手机数据串用 | 短会话、默认无 Push、退出清理本地命名空间 |
 | Relay 迟到事件覆盖人工处理 | Attempt generation、handling mode 和 event order 守卫 |
 | Build 完成但不含修复 Commit | 精确 SHA/manifest identity，Release Manager 覆盖需审计 |
@@ -1074,4 +1145,5 @@ QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 3. 将本文决策拆成 ADR，并冻结 contracts。
 4. 建立本机可运行的 Web/API/Worker/Domain/Contracts/Storage 骨架。
 5. 验证空库健康、全量基础命令和 Relay 工作区未变化。
-6. 通过 `G0-CONTRACT-READY` 后，按 A/B/C/D/E 车道并行。
+6. App-first 决策后执行 P3.0 contract delta；通过后并行启动 P3.1 Poco spike、P3.2 Android foundation 与 P1/P2 backend。
+7. Android SDK/JDK preflight 未通过时，继续 contracts/backend/Poco 只读审计，但 P3.2+ 不得标 build/test green；绝不为模拟器关闭 Hyper-V。
