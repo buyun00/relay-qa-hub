@@ -9,18 +9,18 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P3
-  current_gate: G3-ANDROID-APP-READY
+  current_phase: P1
+  current_gate: G1-INDEPENDENT-FOUNDATION
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: a873df7e9f07d37e1116ab7ff06734eb1bde0281
-  last_verified_at: 2026-08-24T18:01:36+08:00
-  next_action: 执行 P3.0 App-first contract delta；随后并行启动 P3.1 Poco capability spike 与 P3.2 Android native foundation
+  last_verified_commit: 71c7afbe14262f68059a06af490167b7d3854ab4
+  last_verified_at: 2026-08-25T04:49:11+08:00
+  next_action: 以 PROGRESS.md 的唯一 P1.2 root pointer 完成纯 Domain command/transition/effect-plan 实现；P3.1/P3.2 为互斥并行车道
   blockers:
-    - apps/android 自有 Gradle 工程尚未生成；API35 MuMu 已连接但 Android 15+ 真机证据仍缺失，未构建前不得宣称 QA Hub APK 通过
-    - API37 运行环境/真机证据尚缺；不阻断 P3.0/P3.2 编译，但阻断 target37 行为 Gate
-    - Actual vendored Poco project/version not yet identified; blocks P3.1/P3.7/P3.8 real capability proof
+    - apps/android 自有工程已完成 P3.2 技术终审；API35 MuMu 已连接，Android 15+ 真机证据仍缺失
+    - API37 运行环境/真机证据尚缺；不阻断 P1/P3.2 编译，但阻断 target37 行为 Gate
+    - Active vendored Poco 已定位，但当前 IPAddress.Any/无认证/无 qa.snapshot extension，且没有 provenance-bound 安全 runtime；阻断 P3.1 live proof/P3.8/G3
 ```
 
 ## 1. 决策摘要

@@ -15,7 +15,7 @@ test-results/
 *.log
 
 .data/
-data/
+/data/
 qa-hub-data/
 *.sqlite
 *.sqlite-shm
