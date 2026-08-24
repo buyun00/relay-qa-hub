@@ -1,0 +1,187 @@
+import { Worker } from "node:worker_threads";
+
+import type {
+  InsertedBugIdentity,
+  MigrationReport,
+  NewBugStorageRecord,
+  SqliteIntegrityReport,
+} from "./sqlite.js";
+
+export interface SqliteStorageWorkerOptions {
+  readonly databaseFile: string;
+  readonly busyTimeoutMs: number;
+  readonly backupRoot?: string;
+  /** @internal Enables migration stress-test commands. Never set in an application process. */
+  readonly allowUnsafeTestCommands?: boolean;
+}
+
+interface WorkerResponse {
+  readonly id: number;
+  readonly ok: boolean;
+  readonly value?: unknown;
+  readonly error?: { readonly code: string; readonly message: string };
+}
+
+interface PendingRequest {
+  readonly resolve: (value: unknown) => void;
+  readonly reject: (error: Error) => void;
+}
+
+export interface SqliteWorkerInitialization {
+  readonly migration: MigrationReport;
+  readonly migrationDigest: string;
+}
+
+export class SqliteStorageWorkerError extends Error {
+  constructor(
+    readonly code: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = "SqliteStorageWorkerError";
+  }
+}
+
+function workerEntryUrl(): URL {
+  return import.meta.url.endsWith(".ts")
+    ? new URL("../dist/sqlite-worker-entry.js", import.meta.url)
+    : new URL("./sqlite-worker-entry.js", import.meta.url);
+}
+
+export class SqliteStorageWorker {
+  readonly initialization: Promise<SqliteWorkerInitialization>;
+
+  private readonly worker: Worker;
+  private readonly allowUnsafeTestCommands: boolean;
+  private readonly pending = new Map<number, PendingRequest>();
+  private nextRequestId = 1;
+  private closed = false;
+  private terminalError: Error | undefined;
+
+  constructor(options: SqliteStorageWorkerOptions) {
+    this.allowUnsafeTestCommands = options.allowUnsafeTestCommands === true;
+    this.worker = new Worker(workerEntryUrl(), { workerData: options });
+    this.worker.on("message", (message: WorkerResponse) => this.onMessage(message));
+    this.worker.on("error", (error) => this.terminateWithError(error));
+    this.worker.on("exit", (code) => {
+      if (!this.closed) {
+        this.terminateWithError(
+          new SqliteStorageWorkerError(
+            "SQLITE_WORKER_EXITED",
+            `SQLite worker exited with code ${code}`,
+          ),
+        );
+      }
+    });
+    this.initialization = this.request<SqliteWorkerInitialization>("initialize").catch(
+      async (error: unknown) => {
+        const terminalError =
+          error instanceof Error
+            ? error
+            : new SqliteStorageWorkerError(
+                "SQLITE_WORKER_INITIALIZATION_FAILED",
+                "SQLite worker initialization failed",
+              );
+        this.terminateWithError(terminalError);
+        await this.worker.terminate();
+        throw error;
+      },
+    );
+  }
+
+  /** @internal Migration concurrency probe only; production callers must use a complete UnitOfWork. */
+  async createBugForMigrationTest(record: NewBugStorageRecord): Promise<InsertedBugIdentity> {
+    if (!this.allowUnsafeTestCommands) {
+      throw new SqliteStorageWorkerError(
+        "SQLITE_TEST_COMMAND_DISABLED",
+        "Unsafe SQLite worker test commands are disabled",
+      );
+    }
+    await this.initialization;
+    return this.request<InsertedBugIdentity>("testCreateBug", record);
+  }
+
+  /** @internal Forces an unexpected worker exit for terminal-state regression tests. */
+  async terminateForMigrationTest(): Promise<void> {
+    if (!this.allowUnsafeTestCommands) {
+      throw new SqliteStorageWorkerError(
+        "SQLITE_TEST_COMMAND_DISABLED",
+        "Unsafe SQLite worker test commands are disabled",
+      );
+    }
+    await this.initialization;
+    await this.worker.terminate();
+  }
+
+  async integrity(): Promise<SqliteIntegrityReport> {
+    await this.initialization;
+    return this.request<SqliteIntegrityReport>("integrity");
+  }
+
+  async close(): Promise<void> {
+    if (this.closed) return;
+    await this.initialization;
+    await this.request("close");
+    this.closed = true;
+    await this.worker.terminate();
+  }
+
+  private request<T>(operation: string, payload?: unknown): Promise<T> {
+    if (this.terminalError !== undefined) {
+      return Promise.reject(this.terminalError);
+    }
+    if (this.closed) {
+      return Promise.reject(
+        new SqliteStorageWorkerError("SQLITE_WORKER_CLOSED", "SQLite worker is closed"),
+      );
+    }
+    const id = this.nextRequestId++;
+    return new Promise<T>((resolve, reject) => {
+      this.pending.set(id, {
+        resolve: (value) => resolve(value as T),
+        reject,
+      });
+      try {
+        this.worker.postMessage({ id, operation, payload });
+      } catch (error) {
+        this.pending.delete(id);
+        reject(
+          error instanceof Error
+            ? error
+            : new SqliteStorageWorkerError(
+                "SQLITE_WORKER_POST_FAILED",
+                "Could not send the SQLite worker request",
+              ),
+        );
+      }
+    });
+  }
+
+  private onMessage(message: WorkerResponse): void {
+    const pending = this.pending.get(message.id);
+    if (!pending) return;
+    this.pending.delete(message.id);
+    if (message.ok) {
+      pending.resolve(message.value);
+    } else {
+      pending.reject(
+        new SqliteStorageWorkerError(
+          message.error?.code ?? "SQLITE_WORKER_FAILED",
+          message.error?.message ?? "SQLite worker failed",
+        ),
+      );
+    }
+  }
+
+  private failAll(error: Error): void {
+    for (const pending of this.pending.values()) pending.reject(error);
+    this.pending.clear();
+  }
+
+  private terminateWithError(error: Error): void {
+    if (this.terminalError !== undefined) return;
+    this.terminalError = error;
+    this.closed = true;
+    this.failAll(error);
+  }
+}

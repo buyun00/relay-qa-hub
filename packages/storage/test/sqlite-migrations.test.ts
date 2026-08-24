@@ -1,0 +1,814 @@
+import assert from "node:assert/strict";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { DatabaseSync, type SQLInputValue } from "node:sqlite";
+import test from "node:test";
+
+import { SQLITE_SCHEMA_VERSION } from "../src/sqlite-migrations.ts";
+import {
+  QA_HUB_SQLITE_APPLICATION_ID,
+  SqliteStorageError,
+  currentSqliteSchemaVersion,
+  insertBugWithNextNumber,
+  migrateSqliteDatabase,
+  openSqliteDatabaseForWorker,
+  verifySqliteIntegrity,
+  type InsertedBugIdentity,
+  type NewBugStorageRecord,
+} from "../src/sqlite.ts";
+import { SqliteStorageWorker } from "../src/sqlite-worker.ts";
+
+const STAMP = "2026-08-25T00:00:00.000Z";
+
+interface DatabaseFixture {
+  readonly database: DatabaseSync;
+  readonly databaseFile: string;
+  readonly root: string;
+}
+
+interface TenantFixture {
+  readonly accountId: string;
+  readonly projectId: string;
+  readonly projectKey: string;
+  readonly userId: string;
+}
+
+function identifier(sequence: number): string {
+  return `00000000-0000-4000-8000-${String(sequence).padStart(12, "0")}`;
+}
+
+function closeDatabase(database: DatabaseSync): void {
+  try {
+    database.close();
+  } catch {
+    // Tests may deliberately close a connection before inspecting a backup.
+  }
+}
+
+async function withDatabase(
+  work: (fixture: DatabaseFixture) => Promise<void> | void,
+): Promise<void> {
+  const root = mkdtempSync(join(tmpdir(), "relay-qa-hub-sqlite-"));
+  const databaseFile = join(root, "db", "qa-hub.sqlite");
+  const database = openSqliteDatabaseForWorker({ databaseFile, busyTimeoutMs: 2_000 });
+  try {
+    await work({ database, databaseFile, root });
+  } finally {
+    closeDatabase(database);
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+function numberColumn(
+  database: DatabaseSync,
+  sql: string,
+  field: string,
+  ...parameters: SQLInputValue[]
+): number {
+  const value = database.prepare(sql).get(...parameters)?.[field];
+  if (typeof value !== "number" || !Number.isSafeInteger(value)) {
+    throw new TypeError(`${field} must be returned as a safe integer`);
+  }
+  return value;
+}
+
+function storageErrorWithCode(code: SqliteStorageError["code"]): (error: unknown) => boolean {
+  return (error: unknown): boolean => {
+    assert.ok(error instanceof SqliteStorageError);
+    assert.equal(error.code, code);
+    return true;
+  };
+}
+
+function transaction<T>(database: DatabaseSync, work: () => T): T {
+  database.exec("BEGIN IMMEDIATE");
+  try {
+    const value = work();
+    database.exec("COMMIT");
+    return value;
+  } catch (error) {
+    if (database.isTransaction) database.exec("ROLLBACK");
+    throw error;
+  }
+}
+
+function seedTenant(database: DatabaseSync, sequence: number, projectKey: string): TenantFixture {
+  const accountId = identifier(sequence);
+  const userId = identifier(sequence + 1);
+  const projectId = identifier(sequence + 2);
+
+  database
+    .prepare(
+      `INSERT INTO accounts(
+        id, slug, display_name, status, created_at, updated_at, version
+      ) VALUES (?, ?, ?, 'active', ?, ?, 1)`,
+    )
+    .run(accountId, `tenant-${sequence}`, `Tenant ${sequence}`, STAMP, STAMP);
+  database
+    .prepare(
+      `INSERT INTO users(
+        id, account_id, email, display_name, status, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`,
+    )
+    .run(
+      userId,
+      accountId,
+      `tester-${sequence}@example.invalid`,
+      `Tester ${sequence}`,
+      STAMP,
+      STAMP,
+    );
+  database
+    .prepare(
+      `INSERT INTO projects(
+        id, account_id, project_key, name, status, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`,
+    )
+    .run(projectId, accountId, projectKey, `Project ${projectKey}`, STAMP, STAMP);
+
+  return { accountId, projectId, projectKey, userId };
+}
+
+function createBug(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  title = "Preexisting migration bug",
+): InsertedBugIdentity {
+  return transaction(database, () =>
+    insertBugWithNextNumber(database, {
+      id: bugId,
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      title,
+      description: "Migration and isolation test description",
+      expectedBehavior: "The durable record remains valid",
+      severity: "S2",
+      priority: "P2",
+      reporterId: tenant.userId,
+      createdAt: STAMP,
+    }),
+  );
+}
+
+function insertSystemEvent(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  eventId: string,
+  aggregateSequence = 1,
+): void {
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id,
+        aggregate_type, aggregate_id, aggregate_sequence, resource_type,
+        resource_id, resource_version_after, correlation_id, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'bug.reported', 'qa_hub', 'user', ?,
+        'bug', ?, ?, 'bug', ?, 1, ?, '{}', ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      bugId,
+      aggregateSequence,
+      bugId,
+      eventId,
+      STAMP,
+    );
+}
+
+function insertBuildDecisionEvent(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  requirementId: string,
+  eventId: string,
+): void {
+  const requestDigest = "b".repeat(64);
+  const deliveredCommitSha = "a".repeat(40);
+  const payload = JSON.stringify({
+    repairAttemptId: attemptId,
+    buildRequirementId: requirementId,
+    sourceDeliveryVersion: 1,
+    deliveredCommitSha,
+    requirement: "required",
+    decisionBasis: "code_requires_build",
+    decisionReason: null,
+    actorId: tenant.userId,
+    deliveryRequestDigest: requestDigest,
+    policyVersion: "1.0.0",
+    serverPolicyEvaluatedAtDelivery: true,
+    authorizedNoBuildExemptionAtDelivery: false,
+    noCodeDecisionValidatedAtDelivery: false,
+    committed: true,
+    atomicWithDelivery: true,
+  });
+
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'repair.delivered', 'qa_hub', 'user', ?,
+        'repair_attempt', ?, 1, 'build_requirement', ?, 1, ?, ?, ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      attemptId,
+      requirementId,
+      requestDigest,
+      eventId,
+      payload,
+      STAMP,
+    );
+}
+
+function insertRepairAttempt(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+): void {
+  database
+    .prepare(
+      `INSERT INTO repair_attempts(
+        id, account_id, project_id, bug_id, sequence, mode, status,
+        assignee_id, commit_sha, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 1, 'human', 'delivered', ?, ?, ?, ?, 1)`,
+    )
+    .run(
+      attemptId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      "a".repeat(40),
+      STAMP,
+      STAMP,
+    );
+}
+
+interface BuildRequirementInput {
+  readonly deliveredCommitSha: string | null;
+  readonly decisionBasis:
+    "code_requires_build" | "no_code_delivery" | "authorized_no_build_exemption";
+  readonly decisionReason: string | null;
+  readonly linkedBuildId?: string | null;
+  readonly linkId?: string | null;
+  readonly requirement: "required" | "not_required";
+  readonly version: 1 | 2;
+}
+
+function insertBuildRequirement(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  eventId: string,
+  requirementId: string,
+  input: BuildRequirementInput,
+): void {
+  database
+    .prepare(
+      `INSERT INTO build_requirements(
+        id, account_id, project_id, bug_id, repair_attempt_id,
+        source_delivery_version, delivered_commit_sha, requirement, decision_basis,
+        decision_reason, decision_actor_id, decision_audit_event_id,
+        delivery_request_digest, linked_build_id, link_id, policy_version,
+        bug_version_at_delivery, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, '1.0.0', 1, ?, ?, ?)`,
+    )
+    .run(
+      requirementId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      attemptId,
+      input.deliveredCommitSha,
+      input.requirement,
+      input.decisionBasis,
+      input.decisionReason,
+      tenant.userId,
+      eventId,
+      "b".repeat(64),
+      input.linkedBuildId ?? null,
+      input.linkId ?? null,
+      STAMP,
+      STAMP,
+      input.version,
+    );
+}
+
+test("empty migration is repeatable and enables WAL, foreign keys, and integrity checks", async () => {
+  await withDatabase(async ({ database, databaseFile }) => {
+    const first = await migrateSqliteDatabase(database, databaseFile);
+    assert.deepEqual(first, {
+      fromVersion: 0,
+      toVersion: SQLITE_SCHEMA_VERSION,
+      appliedVersions: [1, 2],
+      backupPath: null,
+    });
+    assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);
+    assert.equal(
+      numberColumn(database, "PRAGMA application_id", "application_id"),
+      QA_HUB_SQLITE_APPLICATION_ID,
+    );
+    assert.equal(numberColumn(database, "PRAGMA foreign_keys", "foreign_keys"), 1);
+    assert.equal(
+      String(database.prepare("PRAGMA journal_mode").get()?.journal_mode).toLowerCase(),
+      "wal",
+    );
+    assert.deepEqual(verifySqliteIntegrity(database), {
+      foreignKeyViolations: [],
+      integrityMessages: ["ok"],
+      ok: true,
+    });
+
+    const second = await migrateSqliteDatabase(database, databaseFile);
+    assert.deepEqual(second, {
+      fromVersion: SQLITE_SCHEMA_VERSION,
+      toVersion: SQLITE_SCHEMA_VERSION,
+      appliedVersions: [],
+      backupPath: null,
+    });
+    assert.equal(
+      numberColumn(database, "SELECT count(*) AS count FROM schema_migrations", "count"),
+      SQLITE_SCHEMA_VERSION,
+    );
+  });
+});
+
+test("v1 to v2 migration creates a backup and backfills full-text search", async () => {
+  await withDatabase(async ({ database, databaseFile, root }) => {
+    const v1 = await migrateSqliteDatabase(database, databaseFile, { targetVersion: 1 });
+    assert.deepEqual(v1.appliedVersions, [1]);
+    const tenant = seedTenant(database, 100, "MIG");
+    const bugId = identifier(110);
+    createBug(database, tenant, bugId, "Preexisting searchable migration record");
+
+    const backupRoot = join(root, "verified-backups");
+    const upgrade = await migrateSqliteDatabase(database, databaseFile, { backupRoot });
+    assert.deepEqual(upgrade.appliedVersions, [2]);
+    assert.equal(upgrade.fromVersion, 1);
+    assert.equal(upgrade.toVersion, 2);
+    assert.ok(upgrade.backupPath);
+    assert.ok(existsSync(upgrade.backupPath));
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM bugs_fts WHERE bugs_fts MATCH ?",
+        "count",
+        "searchable",
+      ),
+      1,
+    );
+
+    const backupDatabase = new DatabaseSync(upgrade.backupPath, { readOnly: true });
+    try {
+      assert.equal(numberColumn(backupDatabase, "PRAGMA user_version", "user_version"), 1);
+      assert.equal(numberColumn(backupDatabase, "SELECT count(*) AS count FROM bugs", "count"), 1);
+      assert.equal(
+        numberColumn(
+          backupDatabase,
+          "SELECT count(*) AS count FROM sqlite_schema WHERE name = 'bugs_fts'",
+          "count",
+        ),
+        0,
+      );
+    } finally {
+      backupDatabase.close();
+    }
+  });
+});
+
+test("two worker upgraders re-read locked history and apply v2 exactly once", async () => {
+  const root = mkdtempSync(join(tmpdir(), "relay-qa-hub-upgrade-race-"));
+  const databaseFile = join(root, "db", "qa-hub.sqlite");
+  const seedDatabase = openSqliteDatabaseForWorker({
+    databaseFile,
+    busyTimeoutMs: 5_000,
+  });
+  let first: SqliteStorageWorker | undefined;
+  let second: SqliteStorageWorker | undefined;
+  try {
+    await migrateSqliteDatabase(seedDatabase, databaseFile, { targetVersion: 1 });
+    seedDatabase.close();
+
+    first = new SqliteStorageWorker({
+      databaseFile,
+      busyTimeoutMs: 5_000,
+      backupRoot: join(root, "first-backups"),
+    });
+    second = new SqliteStorageWorker({
+      databaseFile,
+      busyTimeoutMs: 5_000,
+      backupRoot: join(root, "second-backups"),
+    });
+    const reports = await Promise.all([first.initialization, second.initialization]);
+    assert.equal(
+      reports
+        .flatMap(({ migration }) => migration.appliedVersions)
+        .filter((version) => version === 2).length,
+      1,
+    );
+    assert.ok(reports.every(({ migration }) => migration.toVersion === 2));
+    assert.ok(
+      reports
+        .map(({ migration }) => migration.backupPath)
+        .filter((path): path is string => path !== null)
+        .every((path) => existsSync(path)),
+    );
+    assert.deepEqual(await first.integrity(), {
+      foreignKeyViolations: [],
+      integrityMessages: ["ok"],
+      ok: true,
+    });
+  } finally {
+    await Promise.allSettled([first?.close(), second?.close()]);
+    closeDatabase(seedDatabase);
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("migration checksum drift is rejected before application code can continue", async () => {
+  await withDatabase(async ({ database, databaseFile }) => {
+    await migrateSqliteDatabase(database, databaseFile);
+    database.exec("DROP TRIGGER schema_migrations_no_update");
+    database
+      .prepare("UPDATE schema_migrations SET checksum = ? WHERE version = 1")
+      .run("f".repeat(64));
+
+    await assert.rejects(
+      migrateSqliteDatabase(database, databaseFile),
+      storageErrorWithCode("SQLITE_MIGRATION_CHECKSUM_MISMATCH"),
+    );
+  });
+});
+
+test("future on-disk schemas and requested downgrades are rejected explicitly", async () => {
+  await withDatabase(async ({ database, databaseFile }) => {
+    await migrateSqliteDatabase(database, databaseFile);
+    const futureVersion = SQLITE_SCHEMA_VERSION + 1;
+    database
+      .prepare(
+        `INSERT INTO schema_migrations(version, name, checksum, applied_at, duration_ms)
+         VALUES (?, 'future_schema', ?, ?, 0)`,
+      )
+      .run(futureVersion, "e".repeat(64), STAMP);
+    database.exec(`PRAGMA user_version = ${futureVersion}`);
+
+    await assert.rejects(
+      migrateSqliteDatabase(database, databaseFile),
+      storageErrorWithCode("SQLITE_SCHEMA_FUTURE_VERSION"),
+    );
+  });
+
+  await withDatabase(async ({ database, databaseFile }) => {
+    await migrateSqliteDatabase(database, databaseFile);
+    await assert.rejects(
+      migrateSqliteDatabase(database, databaseFile, { targetVersion: 1 }),
+      storageErrorWithCode("SQLITE_SCHEMA_DOWNGRADE_REJECTED"),
+    );
+  });
+});
+
+test("a conflict late in a migration rolls back every object and history change", async () => {
+  await withDatabase(async ({ database, databaseFile, root }) => {
+    await migrateSqliteDatabase(database, databaseFile, { targetVersion: 1 });
+    const tenant = seedTenant(database, 200, "RBK");
+    createBug(database, tenant, identifier(210), "Rollback searchable record");
+    database.exec(String.raw`
+      CREATE TRIGGER bugs_fts_update
+      AFTER UPDATE OF title ON bugs
+      BEGIN
+        SELECT 1;
+      END;
+    `);
+
+    await assert.rejects(
+      migrateSqliteDatabase(database, databaseFile, {
+        backupRoot: join(root, "failed-upgrade-backups"),
+      }),
+      /trigger bugs_fts_update already exists/i,
+    );
+    assert.equal(currentSqliteSchemaVersion(database), 1);
+    assert.deepEqual(
+      database
+        .prepare(
+          `SELECT type, name FROM sqlite_schema
+           WHERE name LIKE 'bugs_fts%' ORDER BY type, name`,
+        )
+        .all()
+        .map((row) => ({ type: String(row.type), name: String(row.name) })),
+      [{ type: "trigger", name: "bugs_fts_update" }],
+    );
+    assert.equal(
+      numberColumn(database, "SELECT count(*) AS count FROM schema_migrations", "count"),
+      1,
+    );
+    assert.deepEqual(verifySqliteIntegrity(database).integrityMessages, ["ok"]);
+
+    database.exec("DROP TRIGGER bugs_fts_update");
+    const recovered = await migrateSqliteDatabase(database, databaseFile, {
+      backupRoot: join(root, "recovered-upgrade-backups"),
+    });
+    assert.deepEqual(recovered.appliedVersions, [2]);
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM bugs_fts WHERE bugs_fts MATCH 'rollback'",
+        "count",
+      ),
+      1,
+    );
+  });
+});
+
+test("composite foreign keys reject cross-account and cross-project records", async () => {
+  await withDatabase(async ({ database, databaseFile }) => {
+    await migrateSqliteDatabase(database, databaseFile);
+    const tenantA = seedTenant(database, 300, "TENA");
+    const tenantB = seedTenant(database, 400, "TENB");
+
+    assert.throws(
+      () =>
+        database
+          .prepare(
+            `INSERT INTO bugs(
+              id, account_id, project_id, number, key, title, description,
+              expected_behavior, state, severity, priority, reporter_id,
+              occurrence_count, reopen_count, created_at, updated_at, version
+            ) VALUES (
+              ?, ?, ?, 1, 'TENA-1', 'Foreign project bug', 'Must be rejected',
+              'No cross-scope row', 'reported', 'S2', 'P2', ?, 1, 0, ?, ?, 1
+            )`,
+          )
+          .run(identifier(310), tenantA.accountId, tenantB.projectId, tenantA.userId, STAMP, STAMP),
+      /FOREIGN KEY constraint failed/i,
+    );
+    assert.equal(numberColumn(database, "SELECT count(*) AS count FROM bugs", "count"), 0);
+
+    const valid = createBug(database, tenantA, identifier(311));
+    assert.equal(valid.key, "TENA-1");
+    assert.deepEqual(verifySqliteIntegrity(database).foreignKeyViolations, []);
+  });
+});
+
+test("events are append-only at the database boundary", async () => {
+  await withDatabase(async ({ database, databaseFile }) => {
+    await migrateSqliteDatabase(database, databaseFile);
+    const tenant = seedTenant(database, 500, "EVT");
+    const bugId = identifier(510);
+    const eventId = identifier(511);
+    createBug(database, tenant, bugId);
+    insertSystemEvent(database, tenant, bugId, eventId);
+
+    assert.throws(
+      () =>
+        database
+          .prepare("UPDATE events SET payload_json = ? WHERE id = ?")
+          .run('{"tampered":true}', eventId),
+      /events are append-only/i,
+    );
+    assert.throws(
+      () => database.prepare("DELETE FROM events WHERE id = ?").run(eventId),
+      /events are append-only/i,
+    );
+    assert.equal(
+      database.prepare("SELECT payload_json FROM events WHERE id = ?").get(eventId)?.payload_json,
+      "{}",
+    );
+  });
+});
+
+test("BuildRequirement rejects impossible states and freezes its decision audit", async () => {
+  await withDatabase(async ({ database, databaseFile }) => {
+    await migrateSqliteDatabase(database, databaseFile);
+    const tenant = seedTenant(database, 600, "BLD");
+    const bugId = identifier(610);
+    const attemptId = identifier(611);
+    const eventId = identifier(612);
+    const requirementId = identifier(613);
+    createBug(database, tenant, bugId);
+    insertRepairAttempt(database, tenant, bugId, attemptId);
+    insertBuildDecisionEvent(database, tenant, bugId, attemptId, requirementId, eventId);
+
+    assert.throws(
+      () =>
+        insertBuildRequirement(database, tenant, bugId, attemptId, eventId, requirementId, {
+          deliveredCommitSha: null,
+          requirement: "required",
+          decisionBasis: "code_requires_build",
+          decisionReason: null,
+          version: 1,
+        }),
+      /CHECK constraint failed|typed delivery audit/i,
+    );
+    assert.throws(
+      () =>
+        insertBuildRequirement(database, tenant, bugId, attemptId, eventId, requirementId, {
+          deliveredCommitSha: "a".repeat(40),
+          requirement: "not_required",
+          decisionBasis: "no_code_delivery",
+          decisionReason: "No executable change",
+          version: 1,
+        }),
+      /CHECK constraint failed|typed delivery audit/i,
+    );
+    assert.throws(
+      () =>
+        insertBuildRequirement(database, tenant, bugId, attemptId, eventId, requirementId, {
+          deliveredCommitSha: "a".repeat(40),
+          requirement: "required",
+          decisionBasis: "code_requires_build",
+          decisionReason: null,
+          version: 2,
+        }),
+      /CHECK constraint failed|typed delivery audit/i,
+    );
+
+    insertBuildRequirement(database, tenant, bugId, attemptId, eventId, requirementId, {
+      deliveredCommitSha: "a".repeat(40),
+      requirement: "required",
+      decisionBasis: "code_requires_build",
+      decisionReason: null,
+      version: 1,
+    });
+    assert.throws(
+      () =>
+        database
+          .prepare("UPDATE build_requirements SET delivery_request_digest = ? WHERE id = ?")
+          .run("c".repeat(64), requirementId),
+      /immutable/i,
+    );
+    assert.equal(
+      database
+        .prepare("SELECT delivery_request_digest FROM build_requirements WHERE id = ?")
+        .get(requirementId)?.delivery_request_digest,
+      "b".repeat(64),
+    );
+  });
+});
+
+test("dedicated worker serializes 50 concurrent bug creates into unique project numbers", async () => {
+  const root = mkdtempSync(join(tmpdir(), "relay-qa-hub-worker-"));
+  const databaseFile = join(root, "db", "qa-hub.sqlite");
+  const seedDatabase = openSqliteDatabaseForWorker({
+    databaseFile,
+    busyTimeoutMs: 5_000,
+  });
+  let worker: SqliteStorageWorker | undefined;
+  let workerClosed = false;
+  try {
+    await migrateSqliteDatabase(seedDatabase, databaseFile);
+    const tenant = seedTenant(seedDatabase, 700, "CON");
+    seedDatabase.close();
+
+    worker = new SqliteStorageWorker({
+      databaseFile,
+      busyTimeoutMs: 5_000,
+      backupRoot: join(root, "migration-backups"),
+      allowUnsafeTestCommands: true,
+    });
+    const initialization = await worker.initialization;
+    assert.deepEqual(initialization.migration.appliedVersions, []);
+    assert.match(initialization.migrationDigest, /^[0-9a-f]{64}$/);
+
+    const requests: readonly NewBugStorageRecord[] = Array.from({ length: 50 }, (_, index) => ({
+      id: identifier(800 + index),
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      title: `Concurrent bug ${index + 1}`,
+      description: "Concurrent worker allocation test",
+      expectedBehavior: "Every request gets exactly one unique project number",
+      severity: "S2",
+      priority: "P2",
+      reporterId: tenant.userId,
+      createdAt: STAMP,
+    }));
+    const identities = await Promise.all(
+      requests.map((record) => worker!.createBugForMigrationTest(record)),
+    );
+    assert.deepEqual(
+      identities.map(({ number }) => number).sort((left, right) => left - right),
+      Array.from({ length: 50 }, (_, index) => index + 1),
+    );
+    assert.equal(new Set(identities.map(({ key }) => key)).size, 50);
+    assert.deepEqual(await worker.integrity(), {
+      foreignKeyViolations: [],
+      integrityMessages: ["ok"],
+      ok: true,
+    });
+
+    await worker.close();
+    workerClosed = true;
+
+    const verificationDatabase = new DatabaseSync(databaseFile, { readOnly: true });
+    try {
+      assert.equal(
+        numberColumn(
+          verificationDatabase,
+          "SELECT count(*) AS count FROM bugs WHERE account_id = ? AND project_id = ?",
+          "count",
+          tenant.accountId,
+          tenant.projectId,
+        ),
+        50,
+      );
+      const numberSummary = verificationDatabase
+        .prepare(
+          `SELECT min(number) AS minimum, max(number) AS maximum,
+                  count(DISTINCT number) AS distinct_count
+           FROM bugs WHERE account_id = ? AND project_id = ?`,
+        )
+        .get(tenant.accountId, tenant.projectId);
+      assert.equal(numberSummary?.minimum, 1);
+      assert.equal(numberSummary?.maximum, 50);
+      assert.equal(numberSummary?.distinct_count, 50);
+      assert.equal(
+        numberColumn(
+          verificationDatabase,
+          `SELECT last_number AS value FROM project_bug_counters
+           WHERE account_id = ? AND project_id = ?`,
+          "value",
+          tenant.accountId,
+          tenant.projectId,
+        ),
+        50,
+      );
+      assert.equal(
+        numberColumn(
+          verificationDatabase,
+          "SELECT count(*) AS count FROM bugs_fts WHERE bugs_fts MATCH 'concurrent'",
+          "count",
+        ),
+        50,
+      );
+    } finally {
+      verificationDatabase.close();
+    }
+  } finally {
+    closeDatabase(seedDatabase);
+    if (worker && !workerClosed) await worker.close().catch(() => undefined);
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("an unexpected worker exit is terminal and every later request fails promptly", async () => {
+  const root = mkdtempSync(join(tmpdir(), "relay-qa-hub-worker-terminal-"));
+  const databaseFile = join(root, "db", "qa-hub.sqlite");
+  const seedDatabase = openSqliteDatabaseForWorker({
+    databaseFile,
+    busyTimeoutMs: 5_000,
+  });
+  let worker: SqliteStorageWorker | undefined;
+  let timeout: NodeJS.Timeout | undefined;
+  try {
+    await migrateSqliteDatabase(seedDatabase, databaseFile);
+    seedDatabase.close();
+    worker = new SqliteStorageWorker({
+      databaseFile,
+      busyTimeoutMs: 5_000,
+      allowUnsafeTestCommands: true,
+    });
+    await worker.initialization;
+    await worker.terminateForMigrationTest();
+
+    const promptFailure = Promise.race([
+      worker.integrity(),
+      new Promise<never>((_resolve, reject) => {
+        timeout = setTimeout(
+          () => reject(new Error("SQLite worker request hung after terminal exit")),
+          500,
+        );
+      }),
+    ]);
+    await assert.rejects(
+      promptFailure,
+      (error: unknown) =>
+        error instanceof Error && "code" in error && error.code === "SQLITE_WORKER_EXITED",
+    );
+  } finally {
+    if (timeout !== undefined) clearTimeout(timeout);
+    closeDatabase(seedDatabase);
+    if (worker) await worker.close().catch(() => undefined);
+    rmSync(root, { recursive: true, force: true });
+  }
+});
