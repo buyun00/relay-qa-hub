@@ -3,11 +3,11 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P0`
-- Current pointer: `P0.3`
+- Current pointer: `P0.4`
 - Current gate: `G0-CONTRACT-READY`
 - Critical path: `G0 -> G1 -> G2 -> G3 -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P0.3`
-- Next atomic action: `冻结 OpenAPI、状态迁移、错误、事件 envelope 与 Relay Handoff/Webhook schemas`
+- Active work packages: `P0.4 (VERIFYING)`
+- Next atomic action: `提交已全量验证的 P0.4 骨架并写入 G0 证据`
 - Completed gates: `0 / 11`
 - Last green commit: `none`
 - Last deployed commit: `none`
@@ -17,7 +17,7 @@
 - Last backup verified: `none`
 - Last restore drill: `none`
 - Blockers: `none`
-- Updated at: `2026-08-24T16:54:25+08:00`
+- Updated at: `2026-08-24T18:01:00+08:00`
 
 ## Gate status
 
@@ -42,8 +42,8 @@
 |---|---|---|---|---|---|---|---|---|
 | P0.1 | DONE | root (GPT-5.6 Sol/ultra) | G0-PLAN-READY | 独立 repo/workspace | `npm ci`; Git/目录隔离与 Relay 状态指纹检查通过 | [`docs/evidence/P0.1-bootstrap.md`](docs/evidence/P0.1-bootstrap.md) | `dbb4ab6c4ba7dacf94021a33b99ecb93577ae646` | 2026-08-24T16:49:48+08:00 |
 | P0.2 | DONE | root (GPT-5.6 Sol/ultra) | P0.1 | ADR 集 | `npm run check:adrs`：6/6 ADR、4/4 必需章节、10/10 原则映射通过 | [`docs/evidence/P0.2-adrs.md`](docs/evidence/P0.2-adrs.md) | `55e052113ef86002ba17389e46a510485dfff116` | 2026-08-24T16:54:25+08:00 |
-| P0.3 | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P0.2 | OpenAPI/Event/Relay contracts | schema lint + 场景走查 |  |  | 2026-08-24T16:54:25+08:00 |
-| P0.4 | PLANNED | unassigned | P0.3 | 最小运行骨架 | lint/typecheck/test/build/health |  |  | 2026-08-24 |
+| P0.3 | DONE | root (GPT-5.6 Sol/ultra) | P0.2 | OpenAPI/Event/Relay contracts | 9 schemas、12+12 场景、35 operations、19 errors、24-file breaking baseline；独立复验通过 | [`docs/evidence/P0.3-contracts.md`](docs/evidence/P0.3-contracts.md) | `525f81b3c87749e00b4118c866fb26a68c88175c` | 2026-08-24T17:33:24+08:00 |
+| P0.4 | VERIFYING | root (GPT-5.6 Sol/ultra) | P0.3 | 最小运行骨架 | clean `npm ci`; full `verify`; actual health/SIGINT/restart; Relay fingerprint | pending commit record |  | 2026-08-24T18:01:00+08:00 |
 | P1.1 | PLANNED | unassigned | G0 | schema/migrations | migration/integrity/concurrency |  |  | 2026-08-24 |
 | P1.2 | PLANNED | unassigned | P1.1 | domain state machine | transition/guard/version tests |  |  | 2026-08-24 |
 | P1.3 | PLANNED | unassigned | P1.1 | outbox/inbox | crash/retry/order/replay tests |  |  | 2026-08-24 |
@@ -80,7 +80,7 @@
 
 ## Active work
 
-- `P0.3` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-24T16:54:25+08:00`; next atomic action: `冻结 OpenAPI、状态迁移、错误、事件 envelope 与 Relay Handoff/Webhook schemas`。
+- `P0.4 (VERIFYING)` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-24T17:33:24+08:00`; validation is green; next atomic action: `提交骨架并固化 G0 证据`。
 
 ## Completed evidence
 
@@ -88,6 +88,7 @@
 - 新建独立目录 `D:\Relay-QA-Hub`；规划阶段未修改现有 Relay 工作树。
 - P0.1 建立独立 Git/npm workspaces；Relay 前后状态指纹完全一致；证据与本地提交见 `docs/evidence/P0.1-bootstrap.md` / `dbb4ab6`。
 - P0.2 冻结 6 份 ADR 并完成十条不可破坏原则映射；证据与提交见 `docs/evidence/P0.2-adrs.md` / `55e0521`。
+- P0.3 冻结 OpenAPI/Event/Relay/Build/Upload contracts；两轮独立反例审查后无阻断/高优先级；证据与提交见 `docs/evidence/P0.3-contracts.md` / `525f81b`。
 
 ## Blockers
 

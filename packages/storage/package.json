@@ -1,0 +1,32 @@
+{
+  "name": "@relay-qa-hub/storage",
+  "version": "0.1.0-debug",
+  "private": true,
+  "description": "Storage ports and configuration boundary for the independent Relay QA Hub data store.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "test": "tsx --test test/storage.test.ts"
+  },
+  "engines": {
+    "node": ">=24.19 <25"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.4",
+    "tsx": "4.23.12",
+    "typescript": "7.0.2"
+  }
+}

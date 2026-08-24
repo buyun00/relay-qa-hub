@@ -1,0 +1,33 @@
+{
+  "name": "@relay-qa-hub/api",
+  "version": "0.1.0-debug",
+  "private": true,
+  "description": "Independent Fastify API process for Relay QA Hub.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24.19 <25"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.json && node --test test/api.test.mjs",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "fastify": "5.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.4",
+    "typescript": "7.0.2"
+  }
+}

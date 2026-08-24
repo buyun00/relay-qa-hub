@@ -1,0 +1,38 @@
+{
+  "name": "@relay-qa-hub/web",
+  "version": "0.1.0-debug",
+  "private": true,
+  "description": "Mobile-first PWA shell for the independent Relay QA Hub source of truth.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24.19 <25"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --strictPort"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.10.4",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "@vitejs/plugin-react": "6.1.0",
+    "eslint": "10.9.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.67.0",
+    "vite": "8.2.2",
+    "vite-plugin-pwa": "1.3.0",
+    "vitest": "4.1.11"
+  }
+}

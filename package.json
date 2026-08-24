@@ -7,18 +7,40 @@
   "type": "module",
   "packageManager": "npm@12.0.2",
   "engines": {
-    "node": ">=22.13"
+    "node": ">=24.19 <25"
   },
   "scripts": {
     "check:adrs": "node scripts/check-adrs.mjs",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
     "generate:contracts": "node packages/contracts/scripts/generate-openapi.mjs",
     "check:contracts": "node packages/contracts/scripts/validate-contracts.mjs",
-    "check:contract-breaking": "node packages/contracts/scripts/check-breaking.mjs"
+    "check:contract-breaking": "node packages/contracts/scripts/check-breaking.mjs",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,css,html}\"",
+    "lint": "eslint . --ignore-pattern apps/web && npm run lint --workspace @relay-qa-hub/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:unit": "node --test tests/unit/*.test.mjs && npm run test --workspaces --if-present",
+    "test:contract": "npm run check:contracts && npm run check:contract-breaking",
+    "test:e2e": "npm run build --workspace @relay-qa-hub/api && node --test tests/e2e/skeleton.test.mjs",
+    "test": "npm run test:unit && npm run test:contract && npm run test:e2e",
+    "build": "npm run build --workspaces --if-present",
+    "start:api": "npm run start --workspace @relay-qa-hub/api",
+    "start:worker": "npm run start --workspace @relay-qa-hub/worker",
+    "dev:web": "npm run dev --workspace @relay-qa-hub/web",
+    "verify": "npm run check:adrs && npm run check:boundaries && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "12.1.0",
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.10.4",
     "ajv": "8.20.0",
-    "ajv-formats": "3.0.1"
+    "ajv-formats": "3.0.1",
+    "eslint": "10.9.0",
+    "globals": "17.11.0",
+    "prettier": "3.9.6",
+    "tsx": "4.23.12",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.67.0",
+    "vitest": "4.1.11"
   },
   "workspaces": [
     "apps/*",
