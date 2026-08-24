@@ -1,0 +1,3075 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json",
+  "title": "QA Hub App-first additive contracts",
+  "$defs": {
+    "uuid": {
+      "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid"
+    },
+    "dateTime": {
+      "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime"
+    },
+    "sha256": {
+      "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/sha256"
+    },
+    "attachmentReadinessInvariant": {
+      "type": "object",
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": { "scanStatus": { "const": "clean" } },
+            "required": ["scanStatus"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "readyToBind": { "const": true } }
+          },
+          "else": {
+            "type": "object",
+            "properties": {
+              "readyToBind": { "const": false },
+              "bindingStatus": { "const": "unbound" }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "readyToBind": { "const": false } },
+            "required": ["readyToBind"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "bindingStatus": { "const": "unbound" } }
+          }
+        }
+      ]
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "requestId"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "UNAUTHENTICATED",
+            "INTEGRATION_SIGNATURE_INVALID",
+            "FORBIDDEN",
+            "NOT_FOUND",
+            "PAYLOAD_TOO_LARGE",
+            "INVALID_TRANSITION",
+            "ACTIVE_REPAIR_EXISTS",
+            "IDEMPOTENCY_PAYLOAD_MISMATCH",
+            "INTEGRATION_EVENT_CONFLICT",
+            "VERSION_CONFLICT",
+            "GUARD_FAILED",
+            "UPLOAD_INVALID",
+            "RATE_LIMITED",
+            "RELAY_DELIVERY_EVIDENCE_INVALID",
+            "BUILD_IDENTITY_MISMATCH",
+            "INTEGRATION_AUTOMATION_FORBIDDEN",
+            "INTERNAL_ERROR",
+            "SERVICE_UNAVAILABLE",
+            "AUTHENTICATION_FAILED",
+            "REAUTHENTICATION_REQUIRED",
+            "CLIENT_SUBMISSION_ID_MISMATCH",
+            "ATTACHMENT_BINDING_CONFLICT",
+            "CAPTURE_BUNDLE_INVALID",
+            "NOT_ACCEPTABLE",
+            "UNSUPPORTED_MEDIA_TYPE"
+          ]
+        },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "requestId": { "$ref": "#/$defs/uuid" },
+        "details": {
+          "type": "object",
+          "maxProperties": 30,
+          "additionalProperties": true
+        }
+      }
+    },
+    "nativeDeviceMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manufacturer", "model", "androidApi", "androidRelease", "qaAppVersion"],
+      "properties": {
+        "manufacturer": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "model": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "androidApi": { "type": "integer", "minimum": 35, "maximum": 100 },
+        "androidRelease": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "qaAppVersion": { "type": "string", "minLength": 1, "maxLength": 100 }
+      }
+    },
+    "nativeLoginRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clientActionId",
+        "login",
+        "password",
+        "installationId",
+        "sharedDevice",
+        "device"
+      ],
+      "properties": {
+        "clientActionId": { "$ref": "#/$defs/uuid" },
+        "login": { "type": "string", "minLength": 1, "maxLength": 320 },
+        "password": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "writeOnly": true
+        },
+        "installationId": { "$ref": "#/$defs/uuid" },
+        "sharedDevice": { "type": "boolean" },
+        "device": { "$ref": "#/$defs/nativeDeviceMetadata" }
+      }
+    },
+    "nativeRefreshRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clientActionId", "refreshToken", "installationId"],
+      "properties": {
+        "clientActionId": { "$ref": "#/$defs/uuid" },
+        "refreshToken": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 4096,
+          "writeOnly": true
+        },
+        "installationId": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "sessionUser": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "sessionProject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "key", "name", "roles"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "active": { "type": "boolean" },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "viewer",
+              "reporter",
+              "developer",
+              "verifier",
+              "triager",
+              "release_manager",
+              "project_admin"
+            ]
+          }
+        }
+      }
+    },
+    "visibleProject": {
+      "allOf": [
+        { "$ref": "#/$defs/sessionProject" },
+        {
+          "type": "object",
+          "required": ["active"],
+          "properties": { "active": { "const": true } }
+        }
+      ]
+    },
+    "nativeSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "accountId",
+        "installationId",
+        "user",
+        "projects",
+        "sharedDevice",
+        "pushAllowed",
+        "idleExpiresAt",
+        "absoluteExpiresAt",
+        "version"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "accountId": { "$ref": "#/$defs/uuid" },
+        "installationId": { "$ref": "#/$defs/uuid" },
+        "user": { "$ref": "#/$defs/sessionUser" },
+        "projects": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/sessionProject" }
+        },
+        "sharedDevice": { "type": "boolean" },
+        "pushAllowed": { "type": "boolean" },
+        "idleExpiresAt": { "$ref": "#/$defs/dateTime" },
+        "absoluteExpiresAt": { "$ref": "#/$defs/dateTime" },
+        "version": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "sharedDevice": { "const": true } }, "required": ["sharedDevice"] },
+          "then": { "properties": { "pushAllowed": { "const": false } } }
+        }
+      ]
+    },
+    "nativeSessionTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issuedAt", "accessToken", "accessExpiresAt", "refreshToken", "refreshExpiresAt", "session", "replayed"],
+      "properties": {
+        "issuedAt": { "$ref": "#/$defs/dateTime" },
+        "accessToken": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 4096,
+          "readOnly": true
+        },
+        "accessExpiresAt": { "$ref": "#/$defs/dateTime" },
+        "refreshToken": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 4096,
+          "readOnly": true
+        },
+        "refreshExpiresAt": { "$ref": "#/$defs/dateTime" },
+        "session": { "$ref": "#/$defs/nativeSession" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "revokeNativeSessionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clientActionId", "expectedVersion", "installationId", "clearNotificationDevice"],
+      "properties": {
+        "clientActionId": { "$ref": "#/$defs/uuid" },
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "installationId": { "$ref": "#/$defs/uuid" },
+        "clearNotificationDevice": { "const": true }
+      }
+    },
+    "projectList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshotSequence", "items", "nextCursor"],
+      "properties": {
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/visibleProject" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "projectMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["userId", "projectId", "displayName", "roles", "active"],
+      "properties": {
+        "userId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "roles": { "$ref": "#/$defs/sessionProject/properties/roles" },
+        "active": { "type": "boolean" }
+      }
+    },
+    "projectMemberList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "snapshotSequence", "items", "nextCursor"],
+      "properties": {
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/$defs/projectMember" } },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "projectModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "projectId", "name", "active"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "active": { "type": "boolean" }
+      }
+    },
+    "projectModuleList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "items"],
+      "properties": {
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "items": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/projectModule" } }
+      }
+    },
+    "qaItemReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "key"],
+      "properties": {
+        "type": { "const": "bug" },
+        "id": { "$ref": "#/$defs/uuid" },
+        "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$" }
+      }
+    },
+    "nativeBug": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "projectId",
+        "number",
+        "key",
+        "title",
+        "description",
+        "expectedBehavior",
+        "moduleId",
+        "state",
+        "severity",
+        "priority",
+        "reporterId",
+        "ownerId",
+        "verificationOwnerId",
+        "duplicateOfBugId",
+        "occurrenceCount",
+        "reopenCount",
+        "version",
+        "createdAt",
+        "updatedAt",
+        "closedAt"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "number": { "type": "integer", "minimum": 1 },
+        "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "expectedBehavior": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "moduleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "state": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/bugState" },
+        "severity": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/severity" },
+        "priority": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/priority" },
+        "reporterId": { "$ref": "#/$defs/uuid" },
+        "ownerId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "verificationOwnerId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "duplicateOfBugId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "occurrenceCount": { "type": "integer", "minimum": 1 },
+        "reopenCount": { "type": "integer", "minimum": 0 },
+        "version": { "type": "integer", "minimum": 1 },
+        "createdAt": { "$ref": "#/$defs/dateTime" },
+        "updatedAt": { "$ref": "#/$defs/dateTime" },
+        "closedAt": { "oneOf": [{ "$ref": "#/$defs/dateTime" }, { "type": "null" }] }
+      }
+    },
+    "nativeBugList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshotSequence", "items", "nextCursor"],
+      "properties": {
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/$defs/nativeBug" } },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "comment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "bugId", "projectId", "authorId", "body", "attachmentIds", "createdAt", "version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "authorId": { "$ref": "#/$defs/uuid" },
+        "body": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "createdAt": { "$ref": "#/$defs/dateTime" },
+        "editedAt": {
+          "oneOf": [{ "$ref": "#/$defs/dateTime" }, { "type": "null" }]
+        },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "commentList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "nextCursor"],
+      "properties": {
+        "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/comment" } },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "addCommentRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["submissionContractVersion", "expectedVersion", "clientSubmissionId", "body", "attachmentIds"],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "body": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "addCommentResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clientSubmissionId",
+        "qaItem",
+        "comment",
+        "attachmentIds",
+        "captureBundleId",
+        "bugVersion",
+        "eventId",
+        "replayed"
+      ],
+      "properties": {
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "qaItem": { "$ref": "#/$defs/qaItemReference" },
+        "comment": { "$ref": "#/$defs/comment" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "bugVersion": { "type": "integer", "minimum": 1 },
+        "eventId": { "$ref": "#/$defs/uuid" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "supersedeRepairAttemptRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "successor", "reason"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "successor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "mode", "assigneeId"],
+          "properties": {
+            "id": { "$ref": "#/$defs/uuid" },
+            "mode": {
+              "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/repairMode"
+            },
+            "assigneeId": { "$ref": "#/$defs/uuid" },
+            "summary": { "type": "string", "minLength": 1, "maxLength": 10000 }
+          }
+        },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+      }
+    },
+    "supersedeRepairAttemptResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supersededAttempt",
+        "successorAttempt",
+        "bug",
+        "eventId",
+        "replayed"
+      ],
+      "properties": {
+        "supersededAttempt": {
+          "$ref": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "successorAttempt": {
+          "$ref": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "bug": { "$ref": "#/$defs/nativeBug" },
+        "eventId": { "$ref": "#/$defs/uuid" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "deliverRepairAttemptRequest": {
+      "allOf": [
+        {
+          "$ref": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/deliverAttemptRequest"
+        },
+        {
+          "type": "object",
+          "if": {
+            "type": "object",
+            "properties": { "deliveryKind": { "const": "no_code" } },
+            "required": ["deliveryKind"]
+          },
+          "then": {
+            "type": "object",
+            "not": {
+              "anyOf": [
+                { "type": "object", "required": ["branch"] },
+                { "type": "object", "required": ["commitSha"] },
+                { "type": "object", "required": ["mergeRequestUrl"] },
+                { "type": "object", "required": ["patchUrl"] }
+              ]
+            }
+          },
+          "else": {
+            "type": "object",
+            "required": ["branch", "commitSha"],
+            "not": { "type": "object", "required": ["noCodeReason"] }
+          }
+        }
+      ]
+    },
+    "linkBuildRepairRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expectedVersion",
+        "expectedBugVersion",
+        "expectedBuildRequirementVersion",
+        "repairAttemptId",
+        "deliveredCommitSha",
+        "evidenceType"
+      ],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "expectedBugVersion": { "type": "integer", "minimum": 1 },
+        "expectedBuildRequirementVersion": { "type": "integer", "minimum": 1 },
+        "repairAttemptId": { "$ref": "#/$defs/uuid" },
+        "deliveredCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "evidenceType": {
+          "type": "string",
+          "enum": ["manifest", "release_manager_override"]
+        },
+        "overrideReason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "evidenceType": { "const": "release_manager_override" } },
+            "required": ["evidenceType"]
+          },
+          "then": { "required": ["overrideReason"] },
+          "else": { "not": { "required": ["overrideReason"] } }
+        }
+      ]
+    },
+    "buildRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "projectId",
+        "bugId",
+        "repairAttemptId",
+        "sourceDeliveryVersion",
+        "deliveredCommitSha",
+        "requirement",
+        "decisionBasis",
+        "decisionReason",
+        "decisionActorId",
+        "decisionAuditEventId",
+        "linkedBuildId",
+        "linkId",
+        "policyVersion",
+        "bugVersionAtDelivery",
+        "createdAt",
+        "updatedAt",
+        "version"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "repairAttemptId": { "$ref": "#/$defs/uuid" },
+        "sourceDeliveryVersion": { "type": "integer", "minimum": 1 },
+        "deliveredCommitSha": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            { "type": "null" }
+          ]
+        },
+        "requirement": { "type": "string", "enum": ["required", "not_required"] },
+        "decisionBasis": {
+          "type": "string",
+          "enum": [
+            "code_requires_build",
+            "no_code_delivery",
+            "authorized_no_build_exemption"
+          ]
+        },
+        "decisionReason": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 5000 },
+            { "type": "null" }
+          ]
+        },
+        "decisionActorId": { "$ref": "#/$defs/uuid" },
+        "decisionAuditEventId": { "$ref": "#/$defs/uuid" },
+        "linkedBuildId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "linkId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "policyVersion": { "const": "1.0.0" },
+        "bugVersionAtDelivery": { "type": "integer", "minimum": 1 },
+        "createdAt": { "$ref": "#/$defs/dateTime" },
+        "updatedAt": { "$ref": "#/$defs/dateTime" },
+        "version": { "type": "integer", "minimum": 1 }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "deliveredCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "requirement": { "const": "required" },
+            "decisionBasis": { "const": "code_requires_build" },
+            "decisionReason": { "const": null },
+            "decisionActorId": { "$ref": "#/$defs/uuid" },
+            "linkedBuildId": { "const": null },
+            "linkId": { "const": null },
+            "version": { "const": 1 }
+          },
+          "required": [
+            "deliveredCommitSha",
+            "requirement",
+            "decisionBasis",
+            "decisionReason",
+            "decisionActorId",
+            "decisionAuditEventId",
+            "linkedBuildId",
+            "linkId",
+            "version"
+          ]
+        },
+        {
+          "properties": {
+            "deliveredCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "requirement": { "const": "required" },
+            "decisionBasis": { "const": "code_requires_build" },
+            "decisionReason": { "const": null },
+            "decisionActorId": { "$ref": "#/$defs/uuid" },
+            "linkedBuildId": { "$ref": "#/$defs/uuid" },
+            "linkId": { "$ref": "#/$defs/uuid" },
+            "version": { "const": 2 }
+          },
+          "required": [
+            "deliveredCommitSha",
+            "requirement",
+            "decisionBasis",
+            "decisionReason",
+            "decisionActorId",
+            "decisionAuditEventId",
+            "linkedBuildId",
+            "linkId",
+            "version"
+          ]
+        },
+        {
+          "properties": {
+            "deliveredCommitSha": { "const": null },
+            "requirement": { "const": "not_required" },
+            "decisionBasis": { "const": "no_code_delivery" },
+            "decisionReason": { "type": "string", "minLength": 1, "maxLength": 5000 },
+            "decisionActorId": { "$ref": "#/$defs/uuid" },
+            "linkedBuildId": { "const": null },
+            "linkId": { "const": null },
+            "version": { "const": 1 }
+          },
+          "required": [
+            "deliveredCommitSha",
+            "requirement",
+            "decisionBasis",
+            "decisionReason",
+            "decisionActorId",
+            "decisionAuditEventId",
+            "linkedBuildId",
+            "linkId",
+            "version"
+          ]
+        },
+        {
+          "properties": {
+            "deliveredCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "requirement": { "const": "not_required" },
+            "decisionBasis": { "const": "authorized_no_build_exemption" },
+            "decisionReason": { "type": "string", "minLength": 1, "maxLength": 5000 },
+            "decisionActorId": { "$ref": "#/$defs/uuid" },
+            "linkedBuildId": { "const": null },
+            "linkId": { "const": null },
+            "version": { "const": 1 }
+          },
+          "required": [
+            "deliveredCommitSha",
+            "requirement",
+            "decisionBasis",
+            "decisionReason",
+            "decisionActorId",
+            "decisionAuditEventId",
+            "linkedBuildId",
+            "linkId",
+            "version"
+          ]
+        }
+      ]
+    },
+    "buildRepairLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "buildId",
+        "repairAttemptId",
+        "bugId",
+        "projectId",
+        "buildRequirementId",
+        "buildRequirementVersion",
+        "deliveredCommitSha",
+        "evidenceType",
+        "evidenceDecision",
+        "overrideReason",
+        "evidenceActorId",
+        "evidenceAuditEventId",
+        "evidencePolicyVersion",
+        "linkedAt",
+        "version"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "buildId": { "$ref": "#/$defs/uuid" },
+        "repairAttemptId": { "$ref": "#/$defs/uuid" },
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "buildRequirementId": { "$ref": "#/$defs/uuid" },
+        "buildRequirementVersion": { "type": "integer", "minimum": 1 },
+        "deliveredCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "evidenceType": { "type": "string", "enum": ["manifest", "release_manager_override"] },
+        "evidenceDecision": {
+          "type": "string",
+          "enum": ["manifest_verified", "release_manager_authorized"]
+        },
+        "overrideReason": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 5000 },
+            { "type": "null" }
+          ]
+        },
+        "evidenceActorId": { "$ref": "#/$defs/uuid" },
+        "evidenceAuditEventId": { "$ref": "#/$defs/uuid" },
+        "evidencePolicyVersion": { "const": "1.0.0" },
+        "linkedAt": { "$ref": "#/$defs/dateTime" },
+        "version": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "evidenceType": { "const": "manifest" } },
+            "required": ["evidenceType"]
+          },
+          "then": {
+            "properties": {
+              "evidenceDecision": { "const": "manifest_verified" },
+              "overrideReason": { "const": null }
+            }
+          },
+          "else": {
+            "properties": {
+              "evidenceDecision": { "const": "release_manager_authorized" },
+              "overrideReason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+            }
+          }
+        }
+      ]
+    },
+    "linkBuildRepairResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["build", "bug", "buildRequirement", "repairLink", "eventId", "replayed"],
+      "properties": {
+        "build": { "$ref": "https://qa-hub.local/contracts/build.schema.json#/$defs/build" },
+        "bug": { "$ref": "#/$defs/nativeBug" },
+        "buildRequirement": { "$ref": "#/$defs/buildRequirement" },
+        "repairLink": { "$ref": "#/$defs/buildRepairLink" },
+        "eventId": { "$ref": "#/$defs/uuid" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "recordVerificationResultRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submissionContractVersion",
+        "clientSubmissionId",
+        "expectedVersion",
+        "status",
+        "resultSummary",
+        "attachmentIds"
+      ],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "status": { "type": "string", "enum": ["passed", "failed", "blocked"] },
+        "resultSummary": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "failureReason": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "blockedReason": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "$ref": "#/$defs/uuid" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
+          "then": { "required": ["failureReason"] },
+          "else": { "not": { "required": ["failureReason"] } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "blocked" } }, "required": ["status"] },
+          "then": { "required": ["blockedReason"] },
+          "else": { "not": { "required": ["blockedReason"] } }
+        }
+      ]
+    },
+    "recordVerificationResultResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clientSubmissionId",
+        "qaItem",
+        "verification",
+        "repairAttempt",
+        "bug",
+        "attachmentIds",
+        "captureBundleId",
+        "eventId",
+        "replayed"
+      ],
+      "properties": {
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "qaItem": { "$ref": "#/$defs/qaItemReference" },
+        "verification": {
+          "$ref": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/verification"
+        },
+        "repairAttempt": {
+          "$ref": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "bug": { "$ref": "#/$defs/nativeBug" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "eventId": { "$ref": "#/$defs/uuid" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "nativeOccurrenceEnvironment": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 6,
+      "x-max-utf8-bytes": 256,
+      "x-sensitive-key-policy": "Only the six enumerated, non-secret Android QA metadata fields are accepted; arbitrary Unity state, credentials, player coordinates, and free-form keys are forbidden.",
+      "properties": {
+        "qaAppVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[0-9]+(?:\\.[0-9]+){0,3}(?:-[0-9A-Za-z][0-9A-Za-z.-]{0,63})?(?:\\+[0-9A-Za-z][0-9A-Za-z.-]{0,63})?$"
+        },
+        "testSessionId": {
+          "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }]
+        },
+        "buildId": {
+          "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }]
+        },
+        "networkType": {
+          "type": "string",
+          "enum": ["wifi", "cellular", "ethernet", "vpn", "offline", "other", "unknown"]
+        },
+        "networkMetered": { "type": ["boolean", "null"] },
+        "orientation": {
+          "type": "string",
+          "enum": ["portrait", "landscape", "square", "unknown"]
+        }
+      }
+    },
+    "nativeOccurrenceDraft": {
+      "allOf": [
+        { "$ref": "https://qa-hub.local/contracts/bug.schema.json#/$defs/occurrenceDraft" },
+        {
+          "type": "object",
+          "properties": {
+            "environment": { "$ref": "#/$defs/nativeOccurrenceEnvironment" }
+          }
+        }
+      ]
+    },
+    "nativeCreateBugRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submissionContractVersion",
+        "projectId",
+        "clientSubmissionId",
+        "title",
+        "description",
+        "expectedBehavior",
+        "severity",
+        "priority",
+        "occurrence"
+      ],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "expectedBehavior": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "moduleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "severity": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/severity" },
+        "priority": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/priority" },
+        "occurrence": { "$ref": "#/$defs/nativeOccurrenceDraft" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "createBugRequest": {
+      "$ref": "#/$defs/nativeCreateBugRequest"
+    },
+    "createBugResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clientSubmissionId",
+        "qaItem",
+        "disposition",
+        "bug",
+        "occurrenceId",
+        "attachmentIds",
+        "captureBundleId",
+        "eventId",
+        "replayed"
+      ],
+      "properties": {
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "qaItem": { "$ref": "#/$defs/qaItemReference" },
+        "disposition": { "const": "created" },
+        "bug": { "$ref": "#/$defs/nativeBug" },
+        "occurrenceId": { "$ref": "#/$defs/uuid" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "eventId": { "$ref": "#/$defs/uuid" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "nativeAddOccurrenceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["submissionContractVersion", "expectedVersion", "clientSubmissionId", "occurrence"],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "occurrence": { "$ref": "#/$defs/nativeOccurrenceDraft" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "addOccurrenceRequest": {
+      "$ref": "#/$defs/nativeAddOccurrenceRequest"
+    },
+    "addOccurrenceResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clientSubmissionId",
+        "qaItem",
+        "disposition",
+        "projectId",
+        "bugId",
+        "bugKey",
+        "occurrenceId",
+        "attachmentIds",
+        "captureBundleId",
+        "eventId",
+        "bugVersion",
+        "replayed"
+      ],
+      "properties": {
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "qaItem": { "$ref": "#/$defs/qaItemReference" },
+        "disposition": { "const": "appended" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "bugKey": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$" },
+        "occurrenceId": { "$ref": "#/$defs/uuid" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "eventId": { "$ref": "#/$defs/uuid" },
+        "bugVersion": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "occurrenceSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "bugId",
+        "reporterId",
+        "observedAt",
+        "platform",
+        "appVersion",
+        "resourceVersion",
+        "gitSha",
+        "deviceModel",
+        "osVersion",
+        "steps",
+        "actualBehavior",
+        "frequency",
+        "errorSignature",
+        "environment",
+        "attachmentIds",
+        "captureBundleId",
+        "createdAt"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "reporterId": { "$ref": "#/$defs/uuid" },
+        "observedAt": { "$ref": "#/$defs/dateTime" },
+        "platform": {
+          "type": "string",
+          "enum": ["android", "ios", "windows", "macos", "linux", "web", "other"]
+        },
+        "appVersion": { "type": ["string", "null"], "maxLength": 100 },
+        "resourceVersion": { "type": ["string", "null"], "maxLength": 100 },
+        "gitSha": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "deviceModel": { "type": ["string", "null"], "maxLength": 200 },
+        "osVersion": { "type": ["string", "null"], "maxLength": 100 },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        },
+        "actualBehavior": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "frequency": { "type": ["string", "null"], "maxLength": 100 },
+        "errorSignature": { "type": ["string", "null"], "maxLength": 500 },
+        "environment": {
+          "oneOf": [
+            { "$ref": "#/$defs/nativeOccurrenceEnvironment" },
+            { "type": "null" }
+          ]
+        },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "captureBundleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "createdAt": { "$ref": "#/$defs/dateTime" }
+      }
+    },
+    "nativeAuditPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 16,
+      "x-max-utf8-bytes": 4096,
+      "x-sensitive-key-policy": "Only the enumerated server-built audit projection fields are exposed; raw request bodies, secrets, local paths, attachment bytes, and arbitrary nested event payloads are forbidden.",
+      "properties": {
+        "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "status": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "relatedBugId": { "$ref": "#/$defs/uuid" },
+        "repairAttemptId": { "$ref": "#/$defs/uuid" },
+        "buildId": { "$ref": "#/$defs/uuid" },
+        "verificationId": { "$ref": "#/$defs/uuid" },
+        "attachmentId": { "$ref": "#/$defs/uuid" },
+        "captureId": { "$ref": "#/$defs/uuid" },
+        "handoffId": { "$ref": "#/$defs/uuid" },
+        "commentId": { "$ref": "#/$defs/uuid" },
+        "occurrenceId": { "$ref": "#/$defs/uuid" },
+        "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "attachmentCount": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "fromVersion": { "type": "integer", "minimum": 1 },
+        "toVersion": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "nativeAuditAggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "version"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["bug", "repair_attempt", "build", "verification", "upload", "notification", "integration"]
+        },
+        "id": { "$ref": "#/$defs/uuid" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "nativeAuditActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "type": "string", "enum": ["user", "service", "system"] },
+        "id": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "enum": ["user", "service"] } }, "required": ["type"] },
+          "then": { "properties": { "id": { "$ref": "#/$defs/uuid" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "system" } }, "required": ["type"] },
+          "then": { "properties": { "id": { "const": null } } }
+        }
+      ]
+    },
+    "nativeAuditEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projectionVersion",
+        "redactionPolicyVersion",
+        "id",
+        "type",
+        "source",
+        "projectId",
+        "bugId",
+        "aggregate",
+        "sequence",
+        "actor",
+        "correlationId",
+        "occurredAt",
+        "payload"
+      ],
+      "properties": {
+        "projectionVersion": { "const": "1.1.0" },
+        "redactionPolicyVersion": { "const": "1.0.0" },
+        "id": { "$ref": "#/$defs/uuid" },
+        "type": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+          "maxLength": 120
+        },
+        "source": { "type": "string", "enum": ["qa_hub", "relay", "build"] },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "aggregate": { "$ref": "#/$defs/nativeAuditAggregate" },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "actor": { "$ref": "#/$defs/nativeAuditActor" },
+        "correlationId": { "$ref": "#/$defs/uuid" },
+        "causationId": {
+          "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }]
+        },
+        "occurredAt": { "$ref": "#/$defs/dateTime" },
+        "fromState": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/bugState" },
+            { "type": "null" }
+          ]
+        },
+        "toState": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/bugState" },
+            { "type": "null" }
+          ]
+        },
+        "payload": { "$ref": "#/$defs/nativeAuditPayload" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "source": { "enum": ["relay", "build"] } },
+            "required": ["source"]
+          },
+          "then": {
+            "properties": {
+              "type": { "not": { "type": "string", "pattern": "^(bug|verification)\\." } },
+              "fromState": { "type": "null" },
+              "toState": { "type": "null" },
+              "payload": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "not": { "type": "string", "enum": ["accepted", "verified", "closed", "passed", "rejected"] }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              { "properties": { "fromState": { "not": { "type": "null" } } }, "required": ["fromState"] },
+              { "properties": { "toState": { "not": { "type": "null" } } }, "required": ["toState"] }
+            ]
+          },
+          "then": {
+            "properties": {
+              "source": { "const": "qa_hub" },
+              "actor": { "type": "object", "properties": { "type": { "const": "user" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              { "properties": { "type": { "const": "bug.closed" } }, "required": ["type"] },
+              { "properties": { "toState": { "const": "closed" } }, "required": ["toState"] }
+            ]
+          },
+          "then": {
+            "properties": {
+              "source": { "const": "qa_hub" },
+              "actor": { "type": "object", "properties": { "type": { "const": "user" } } },
+              "payload": { "type": "object", "required": ["verificationId"] }
+            }
+          }
+        }
+      ]
+    },
+    "nativeAuditEventList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "bugId", "snapshotSequence", "items", "nextCursor"],
+      "properties": {
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nativeAuditEvent" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "workflowProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bugId",
+        "bugVersion",
+        "snapshotSequence",
+        "truncated",
+        "nextCursor",
+        "occurrences",
+        "repairAttempts",
+        "verifications",
+        "builds",
+        "relayReceipts"
+      ],
+      "properties": {
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "bugVersion": { "type": "integer", "minimum": 1 },
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "truncated": { "type": "boolean" },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 },
+        "occurrences": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/occurrenceSummary" }
+        },
+        "repairAttempts": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/repairAttempt" }
+        },
+        "verifications": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/verification" }
+        },
+        "builds": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "https://qa-hub.local/contracts/build.schema.json#/$defs/build" }
+        },
+        "relayReceipts": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relayReceipt" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "truncated": { "const": true } }, "required": ["truncated"] },
+          "then": { "properties": { "nextCursor": { "type": "string", "minLength": 1, "maxLength": 500 } } },
+          "else": { "properties": { "nextCursor": { "const": null } } }
+        }
+      ]
+    },
+    "nativeBugCommentList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bugId", "projectId", "snapshotSequence", "items", "nextCursor"],
+      "properties": {
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/comment" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "nativeInitUploadRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submissionContractVersion",
+        "projectId",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "uploadAttempt",
+        "filename",
+        "mediaType",
+        "expectedSize",
+        "sha256"
+      ],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "uploadAttempt": { "type": "integer", "minimum": 1 },
+        "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "expectedSize": { "type": "integer", "minimum": 1, "maximum": 524288000 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "captureId": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "initUploadRequest": {
+      "$ref": "#/$defs/nativeInitUploadRequest"
+    },
+    "initUploadResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "projectId",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "uploadAttempt",
+        "status",
+        "filename",
+        "mediaType",
+        "captureId",
+        "expectedSize",
+        "chunkSize",
+        "sha256",
+        "expectedChunkCount",
+        "receivedBytes",
+        "attachmentId",
+        "expiresAt",
+        "confirmedChunks",
+        "version",
+        "replayed"
+      ],
+      "properties": {
+        "sessionId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "uploadAttempt": { "type": "integer", "minimum": 1 },
+        "status": { "const": "open" },
+        "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "captureId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "expectedSize": { "type": "integer", "minimum": 1, "maximum": 524288000 },
+        "chunkSize": { "type": "integer", "minimum": 262144, "maximum": 8388608 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "expectedChunkCount": { "type": "integer", "minimum": 1, "maximum": 2000 },
+        "receivedBytes": { "const": 0 },
+        "attachmentId": { "const": null },
+        "expiresAt": { "$ref": "#/$defs/dateTime" },
+        "confirmedChunks": {
+          "type": "array",
+          "maxItems": 2000,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "version": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "finalizeUploadRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submissionContractVersion",
+        "expectedVersion",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "uploadAttempt",
+        "sha256",
+        "expectedSize"
+      ],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "uploadAttempt": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "expectedSize": { "type": "integer", "minimum": 1, "maximum": 524288000 }
+      }
+    },
+    "finalizeUploadResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "projectId",
+        "clientSubmissionId",
+        "uploadAttempt",
+        "attachmentId",
+        "clientAttachmentId",
+        "filename",
+        "mediaType",
+        "captureId",
+        "sha256",
+        "size",
+        "scanStatus",
+        "readyToBind",
+        "bindingStatus",
+        "version",
+        "replayed"
+      ],
+      "properties": {
+        "sessionId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "uploadAttempt": { "type": "integer", "minimum": 1 },
+        "attachmentId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "captureId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "size": { "type": "integer", "minimum": 1 },
+        "scanStatus": { "type": "string", "enum": ["pending", "clean", "rejected", "unavailable"] },
+        "readyToBind": { "type": "boolean" },
+        "bindingStatus": { "const": "unbound" },
+        "version": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      },
+      "allOf": [{ "$ref": "#/$defs/attachmentReadinessInvariant" }]
+    },
+    "uploadSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "projectId",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "uploadAttempt",
+        "status",
+        "filename",
+        "mediaType",
+        "captureId",
+        "expectedSize",
+        "chunkSize",
+        "sha256",
+        "expectedChunkCount",
+        "receivedBytes",
+        "confirmedChunks",
+        "attachmentId",
+        "expiresAt",
+        "version"
+      ],
+      "properties": {
+        "sessionId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "uploadAttempt": { "type": "integer", "minimum": 1 },
+        "status": { "type": "string", "enum": ["open", "finalizing", "finalized", "expired", "rejected"] },
+        "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "captureId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "expectedSize": { "type": "integer", "minimum": 1, "maximum": 524288000 },
+        "chunkSize": { "type": "integer", "minimum": 262144, "maximum": 8388608 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "expectedChunkCount": { "type": "integer", "minimum": 1, "maximum": 2000 },
+        "receivedBytes": { "type": "integer", "minimum": 0, "maximum": 524288000 },
+        "confirmedChunks": {
+          "type": "array",
+          "maxItems": 2000,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "attachmentId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "expiresAt": { "$ref": "#/$defs/dateTime" },
+        "version": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": { "status": { "enum": ["finalized", "rejected"] } },
+            "required": ["status"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "attachmentId": { "$ref": "#/$defs/uuid" } }
+          },
+          "else": {
+            "type": "object",
+            "properties": { "attachmentId": { "const": null } }
+          }
+        }
+      ]
+    },
+    "attachmentMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attachmentId",
+        "projectId",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "captureId",
+        "filename",
+        "mediaType",
+        "size",
+        "sha256",
+        "scanStatus",
+        "readyToBind",
+        "bindingStatus",
+        "version"
+      ],
+      "properties": {
+        "attachmentId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "clientAttachmentId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "captureId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "size": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "scanStatus": { "type": "string", "enum": ["pending", "clean", "rejected", "unavailable"] },
+        "readyToBind": { "type": "boolean" },
+        "bindingStatus": { "type": "string", "enum": ["unbound", "reserved", "claimed"] },
+        "version": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [{ "$ref": "#/$defs/attachmentReadinessInvariant" }]
+    },
+    "attachmentMetadataList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "nextCursor"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/attachmentMetadata" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "nativeBugAttachmentList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bugId", "projectId", "snapshotSequence", "items", "nextCursor"],
+      "properties": {
+        "bugId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/attachmentMetadata" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "attachmentBindingRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submissionContractVersion",
+        "expectedVersion",
+        "projectId",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "leaseGeneration",
+        "intent"
+      ],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "leaseGeneration": { "type": "integer", "minimum": 1 },
+        "intent": {
+          "type": "string",
+          "enum": ["bug_create", "occurrence_append", "comment_append", "verification_result"]
+        },
+        "targetQaItemId": { "$ref": "#/$defs/uuid" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "intent": { "enum": ["occurrence_append", "comment_append", "verification_result"] } },
+            "required": ["intent"]
+          },
+          "then": { "required": ["targetQaItemId"] }
+        },
+        {
+          "if": { "properties": { "intent": { "const": "bug_create" } }, "required": ["intent"] },
+          "then": { "not": { "required": ["targetQaItemId"] } }
+        }
+      ]
+    },
+    "attachmentBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bindingId",
+        "attachmentId",
+        "projectId",
+        "clientSubmissionId",
+        "clientAttachmentId",
+        "leaseGeneration",
+        "intent",
+        "targetQaItemId",
+        "status",
+        "expiresAt",
+        "version",
+        "replayed"
+      ],
+      "properties": {
+        "bindingId": { "$ref": "#/$defs/uuid" },
+        "attachmentId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "leaseGeneration": { "type": "integer", "minimum": 1 },
+        "intent": { "$ref": "#/$defs/attachmentBindingRequest/properties/intent" },
+        "targetQaItemId": {
+          "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }]
+        },
+        "status": { "type": "string", "enum": ["reserved", "claimed"] },
+        "expiresAt": {
+          "oneOf": [{ "$ref": "#/$defs/dateTime" }, { "type": "null" }],
+          "description": "Reservation TTL while status is reserved; null after an atomic claim."
+        },
+        "version": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": { "status": { "const": "reserved" } },
+            "required": ["status"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "expiresAt": { "$ref": "#/$defs/dateTime" } }
+          },
+          "else": {
+            "type": "object",
+            "properties": {
+              "expiresAt": { "const": null },
+              "targetQaItemId": { "$ref": "#/$defs/uuid" }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "status": { "const": "reserved" },
+              "intent": { "const": "bug_create" }
+            },
+            "required": ["status", "intent"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "targetQaItemId": { "const": null } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "status": { "const": "reserved" },
+              "intent": {
+                "enum": ["occurrence_append", "comment_append", "verification_result"]
+              }
+            },
+            "required": ["status", "intent"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "targetQaItemId": { "$ref": "#/$defs/uuid" } }
+          }
+        }
+      ]
+    },
+    "attachmentReservation": {
+      "allOf": [
+        { "$ref": "#/$defs/attachmentBinding" },
+        {
+          "type": "object",
+          "properties": {
+            "status": { "const": "reserved" },
+            "expiresAt": { "$ref": "#/$defs/dateTime" }
+          },
+          "required": ["status", "expiresAt"]
+        }
+      ]
+    },
+    "captureArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "captureId",
+        "clientAttachmentId",
+        "attachmentId",
+        "kind",
+        "status",
+        "startedAt",
+        "endedAt",
+        "skewMs",
+        "truncated",
+        "failureReason"
+      ],
+      "properties": {
+        "captureId": { "$ref": "#/$defs/uuid" },
+        "clientAttachmentId": {
+          "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }]
+        },
+        "attachmentId": {
+          "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "system_screenshot",
+            "system_recording",
+            "poco_screenshot",
+            "poco_hierarchy",
+            "poco_profiling",
+            "poco_snapshot"
+          ]
+        },
+        "status": { "type": "string", "enum": ["succeeded", "failed", "skipped"] },
+        "startedAt": { "$ref": "#/$defs/dateTime" },
+        "endedAt": { "$ref": "#/$defs/dateTime" },
+        "skewMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Absolute start-time skew from captureBundle.capturedAt (the user capture event); artifacts are not claimed to be same-frame atomic and a recording has its own startedAt/endedAt duration."
+        },
+        "truncated": { "type": "boolean" },
+        "failureReason": { "type": ["string", "null"], "maxLength": 300 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "succeeded" } }, "required": ["status"] },
+          "then": {
+            "properties": {
+              "clientAttachmentId": { "$ref": "#/$defs/uuid" },
+              "attachmentId": { "$ref": "#/$defs/uuid" },
+              "failureReason": { "const": null }
+            }
+          },
+          "else": {
+            "properties": {
+              "clientAttachmentId": { "const": null },
+              "attachmentId": { "const": null }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
+          "then": { "properties": { "failureReason": { "type": "string", "minLength": 1, "maxLength": 300 } } }
+        }
+      ]
+    },
+    "pocoMethod": {
+      "type": "string",
+      "enum": [
+        "GetSDKVersion",
+        "Screenshot",
+        "Dump",
+        "GetScreenSize",
+        "GetDebugProfilingData",
+        "qa.snapshot"
+      ]
+    },
+    "pocoScreenSize": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1, "maximum": 32768 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 32768 }
+      }
+    },
+    "pocoEnrichmentDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempted",
+        "connectedPort",
+        "sdkVersion",
+        "snapshotCapability",
+        "screenSize",
+        "allowedReadOnlyMethods",
+        "negotiatedMethods",
+        "succeededMethods",
+        "failureReason"
+      ],
+      "properties": {
+        "attempted": { "type": "boolean" },
+        "connectedPort": { "type": ["integer", "null"], "minimum": 1, "maximum": 65535 },
+        "sdkVersion": { "type": ["string", "null"], "maxLength": 100 },
+        "snapshotCapability": {
+          "type": "string",
+          "enum": ["not_probed", "standard_only", "qa_snapshot_available"]
+        },
+        "screenSize": {
+          "oneOf": [{ "$ref": "#/$defs/pocoScreenSize" }, { "type": "null" }]
+        },
+        "allowedReadOnlyMethods": {
+          "const": [
+            "GetSDKVersion",
+            "Screenshot",
+            "Dump",
+            "GetScreenSize",
+            "GetDebugProfilingData",
+            "qa.snapshot"
+          ]
+        },
+        "negotiatedMethods": {
+          "type": "array",
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/pocoMethod" }
+        },
+        "succeededMethods": {
+          "type": "array",
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/pocoMethod" }
+        },
+        "failureReason": {
+          "type": ["string", "null"],
+          "enum": [
+            null,
+            "not_running",
+            "connection_refused",
+            "timeout",
+            "cancelled",
+            "invalid_frame",
+            "oversized_response",
+            "unsupported_version",
+            "unity_stopped",
+            "unknown"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": { "attempted": { "const": false } },
+            "required": ["attempted"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "connectedPort": { "const": null },
+              "sdkVersion": { "const": null },
+              "snapshotCapability": { "const": "not_probed" },
+              "screenSize": { "const": null },
+              "negotiatedMethods": { "type": "array", "maxItems": 0 },
+              "succeededMethods": { "type": "array", "maxItems": 0 },
+              "failureReason": { "const": null }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": {
+                "type": "array",
+                "contains": { "const": "GetScreenSize" }
+              }
+            },
+            "required": ["succeededMethods"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "screenSize": { "$ref": "#/$defs/pocoScreenSize" } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "succeededMethods": { "type": "array", "minItems": 1 } },
+            "required": ["succeededMethods"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "attempted": { "const": true },
+              "connectedPort": { "type": "integer", "minimum": 1, "maximum": 65535 }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": {
+                "type": "array",
+                "contains": { "const": "GetSDKVersion" }
+              }
+            },
+            "required": ["succeededMethods"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "sdkVersion": { "type": "string", "minLength": 1, "maxLength": 100 } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "negotiatedMethods": {
+                "type": "array",
+                "contains": { "const": "qa.snapshot" }
+              }
+            },
+            "required": ["negotiatedMethods"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "snapshotCapability": { "const": "qa_snapshot_available" } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "screenSize": { "$ref": "#/$defs/pocoScreenSize" } },
+            "required": ["screenSize"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": { "type": "array", "contains": { "const": "GetScreenSize" } }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "sdkVersion": { "type": "string", "minLength": 1 } },
+            "required": ["sdkVersion"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "connectedPort": { "type": "integer" } },
+            "required": ["connectedPort"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": {
+                "type": "array",
+                "contains": {
+                  "enum": ["Screenshot", "Dump", "GetScreenSize", "GetDebugProfilingData", "qa.snapshot"]
+                }
+              }
+            },
+            "required": ["succeededMethods"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "negotiatedMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } },
+              "succeededMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "snapshotCapability": { "const": "qa_snapshot_available" } },
+            "required": ["snapshotCapability"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "negotiatedMethods": { "type": "array", "contains": { "const": "qa.snapshot" } }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "snapshotCapability": { "const": "standard_only" } },
+            "required": ["snapshotCapability"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } },
+              "negotiatedMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "qa.snapshot" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "snapshotCapability": { "const": "not_probed" } },
+            "required": ["snapshotCapability"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "connectedPort": { "const": null },
+              "sdkVersion": { "const": null },
+              "screenSize": { "const": null },
+              "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "GetSDKVersion" } } }
+            }
+          }
+        },
+        {
+          "if": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } } }, "required": ["succeededMethods"] },
+          "then": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } } } }
+        },
+        {
+          "if": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "Screenshot" } } }, "required": ["succeededMethods"] },
+          "then": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "Screenshot" } } } }
+        },
+        {
+          "if": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "Dump" } } }, "required": ["succeededMethods"] },
+          "then": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "Dump" } } } }
+        },
+        {
+          "if": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "GetScreenSize" } } }, "required": ["succeededMethods"] },
+          "then": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "GetScreenSize" } } } }
+        },
+        {
+          "if": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "GetDebugProfilingData" } } }, "required": ["succeededMethods"] },
+          "then": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "GetDebugProfilingData" } } } }
+        },
+        {
+          "if": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "qa.snapshot" } } }, "required": ["succeededMethods"] },
+          "then": {
+            "type": "object",
+            "properties": {
+              "negotiatedMethods": { "type": "array", "contains": { "const": "qa.snapshot" } },
+              "snapshotCapability": { "const": "qa_snapshot_available" }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "negotiatedMethods": {
+                "type": "array",
+                "contains": {
+                  "enum": ["Screenshot", "Dump", "GetScreenSize", "GetDebugProfilingData", "qa.snapshot"]
+                }
+              }
+            },
+            "required": ["negotiatedMethods"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "succeededMethods": {
+                "type": "array",
+                "contains": { "const": "GetSDKVersion" }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "failureReason": { "type": "string" },
+              "succeededMethods": { "type": "array", "minItems": 1 }
+            },
+            "required": ["failureReason", "succeededMethods"]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "GetSDKVersion" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "Screenshot" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "Screenshot" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "Dump" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "Dump" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "GetScreenSize" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "GetScreenSize" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "GetDebugProfilingData" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "GetDebugProfilingData" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "qa.snapshot" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "qa.snapshot" } } }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "pocoEnrichment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "attempted",
+        "connectedPort",
+        "sdkVersion",
+        "snapshotCapability",
+        "screenSize",
+        "allowedReadOnlyMethods",
+        "negotiatedMethods",
+        "succeededMethods",
+        "failureReason"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unavailable", "partial", "complete"],
+          "description": "Server-derived from negotiatedMethods and succeededMethods; the client cannot promote it."
+        },
+        "attempted": { "type": "boolean" },
+        "connectedPort": { "type": ["integer", "null"], "minimum": 1, "maximum": 65535 },
+        "sdkVersion": { "type": ["string", "null"], "maxLength": 100 },
+        "snapshotCapability": { "$ref": "#/$defs/pocoEnrichmentDraft/properties/snapshotCapability" },
+        "screenSize": { "$ref": "#/$defs/pocoEnrichmentDraft/properties/screenSize" },
+        "allowedReadOnlyMethods": { "$ref": "#/$defs/pocoEnrichmentDraft/properties/allowedReadOnlyMethods" },
+        "negotiatedMethods": { "$ref": "#/$defs/pocoEnrichmentDraft/properties/negotiatedMethods" },
+        "succeededMethods": { "$ref": "#/$defs/pocoEnrichmentDraft/properties/succeededMethods" },
+        "failureReason": { "$ref": "#/$defs/pocoEnrichmentDraft/properties/failureReason" }
+      },
+      "allOf": [
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/0" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/1" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/2" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/3" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/4" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/5" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/6" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/7" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/8" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/9" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/10" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/11" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/12" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/13" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/14" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/15" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/16" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/17" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/18" },
+        { "$ref": "#/$defs/pocoEnrichmentDraft/allOf/19" },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "status": { "const": "complete" } },
+            "required": ["status"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "attempted": { "const": true },
+              "negotiatedMethods": {
+                "type": "array",
+                "allOf": [
+                  { "contains": { "const": "GetSDKVersion" } },
+                  { "contains": { "const": "Screenshot" } },
+                  { "contains": { "const": "Dump" } }
+                ]
+              },
+              "succeededMethods": {
+                "type": "array",
+                "allOf": [
+                  { "contains": { "const": "GetSDKVersion" } },
+                  { "contains": { "const": "Screenshot" } },
+                  { "contains": { "const": "Dump" } }
+                ]
+              },
+              "failureReason": { "const": null }
+            },
+            "allOf": [
+              {
+                "if": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } } } },
+                "then": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } } } }
+              },
+              {
+                "if": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "Screenshot" } } } },
+                "then": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "Screenshot" } } } }
+              },
+              {
+                "if": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "Dump" } } } },
+                "then": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "Dump" } } } }
+              },
+              {
+                "if": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "GetScreenSize" } } } },
+                "then": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "GetScreenSize" } } } }
+              },
+              {
+                "if": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "GetDebugProfilingData" } } } },
+                "then": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "GetDebugProfilingData" } } } }
+              },
+              {
+                "if": { "type": "object", "properties": { "negotiatedMethods": { "type": "array", "contains": { "const": "qa.snapshot" } } } },
+                "then": { "type": "object", "properties": { "succeededMethods": { "type": "array", "contains": { "const": "qa.snapshot" } } } }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "status": { "const": "unavailable" } },
+            "required": ["status"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "succeededMethods": { "type": "array", "maxItems": 0 } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "status": { "const": "partial" } },
+            "required": ["status"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "attempted": { "const": true },
+              "succeededMethods": { "type": "array", "minItems": 1 }
+            },
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "GetSDKVersion" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "GetSDKVersion" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "Screenshot" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "Screenshot" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "Dump" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "Dump" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "GetScreenSize" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "GetScreenSize" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "GetDebugProfilingData" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "GetDebugProfilingData" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "negotiatedMethods": { "type": "array", "contains": { "const": "qa.snapshot" } },
+                  "succeededMethods": { "type": "array", "not": { "type": "array", "contains": { "const": "qa.snapshot" } } }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "succeededMethods": {
+                    "type": "array",
+                    "not": {
+                      "type": "array",
+                      "contains": {
+                        "enum": ["Screenshot", "Dump", "GetDebugProfilingData", "qa.snapshot"]
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "succeededMethods": {
+                    "type": "array",
+                    "not": { "type": "array", "contains": { "const": "Screenshot" } }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "succeededMethods": {
+                    "type": "array",
+                    "not": { "type": "array", "contains": { "const": "Dump" } }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "attempted": { "const": false } },
+            "required": ["attempted"]
+          },
+          "then": { "type": "object", "properties": { "status": { "const": "unavailable" } } }
+        }
+      ]
+    },
+    "captureDeviceMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manufacturer", "model", "androidApi", "androidRelease", "qaAppVersion", "networkType"],
+      "properties": {
+        "manufacturer": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "model": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "androidApi": { "type": "integer", "minimum": 35, "maximum": 100 },
+        "androidRelease": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "qaAppVersion": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "buildId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "testSessionId": { "type": ["string", "null"], "maxLength": 200 },
+        "networkType": { "type": "string", "enum": ["offline", "wifi", "cellular", "ethernet", "vpn", "other"] }
+      }
+    },
+    "captureBundleDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "captureId",
+        "clientSubmissionId",
+        "projectId",
+        "capturedAt",
+        "source",
+        "primaryEvidenceClientAttachmentId",
+        "primaryEvidenceAttachmentId",
+        "artifacts",
+        "poco",
+        "deviceMetadata"
+      ],
+      "properties": {
+        "captureId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "capturedAt": { "$ref": "#/$defs/dateTime" },
+        "source": {
+          "type": "string",
+          "enum": [
+            "overlay_single_tap",
+            "overlay_double_tap",
+            "recording_marker",
+            "recording_stop",
+            "android_share",
+            "photo_picker"
+          ]
+        },
+        "primaryEvidenceClientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "primaryEvidenceAttachmentId": { "$ref": "#/$defs/uuid" },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/captureArtifact" },
+          "allOf": [
+            {
+              "contains": { "type": "object", "properties": { "kind": { "const": "system_screenshot" } }, "required": ["kind"] },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": { "type": "object", "properties": { "kind": { "const": "system_recording" } }, "required": ["kind"] },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": { "type": "object", "properties": { "kind": { "const": "poco_screenshot" } }, "required": ["kind"] },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": { "type": "object", "properties": { "kind": { "const": "poco_hierarchy" } }, "required": ["kind"] },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": { "type": "object", "properties": { "kind": { "const": "poco_profiling" } }, "required": ["kind"] },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": { "type": "object", "properties": { "kind": { "const": "poco_snapshot" } }, "required": ["kind"] },
+              "minContains": 0,
+              "maxContains": 1
+            }
+          ]
+        },
+        "poco": { "$ref": "#/$defs/pocoEnrichmentDraft" },
+        "deviceMetadata": { "$ref": "#/$defs/captureDeviceMetadata" }
+      }
+    },
+    "captureBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "captureId",
+        "clientSubmissionId",
+        "projectId",
+        "capturedAt",
+        "source",
+        "primaryEvidenceClientAttachmentId",
+        "primaryEvidenceAttachmentId",
+        "artifacts",
+        "enrichmentStatus",
+        "poco",
+        "deviceMetadata"
+      ],
+      "properties": {
+        "captureId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "capturedAt": { "$ref": "#/$defs/dateTime" },
+        "source": { "$ref": "#/$defs/captureBundleDraft/properties/source" },
+        "primaryEvidenceClientAttachmentId": { "$ref": "#/$defs/uuid" },
+        "primaryEvidenceAttachmentId": { "$ref": "#/$defs/uuid" },
+        "artifacts": { "$ref": "#/$defs/captureBundleDraft/properties/artifacts" },
+        "enrichmentStatus": {
+          "type": "string",
+          "enum": ["unavailable", "partial", "complete"],
+          "description": "Server-derived and equal to poco.status."
+        },
+        "poco": { "$ref": "#/$defs/pocoEnrichment" },
+        "deviceMetadata": { "$ref": "#/$defs/captureDeviceMetadata" }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "enrichmentStatus": { "const": "unavailable" },
+            "poco": {
+              "type": "object",
+              "properties": { "status": { "const": "unavailable" } },
+              "required": ["status"]
+            }
+          }
+        },
+        {
+          "properties": {
+            "enrichmentStatus": { "const": "partial" },
+            "poco": {
+              "type": "object",
+              "properties": { "status": { "const": "partial" } },
+              "required": ["status"]
+            }
+          }
+        },
+        {
+          "properties": {
+            "enrichmentStatus": { "const": "complete" },
+            "poco": {
+              "type": "object",
+              "properties": { "status": { "const": "complete" } },
+              "required": ["status"]
+            }
+          }
+        }
+      ]
+    },
+    "createCaptureBundleRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["submissionContractVersion", "projectId", "clientSubmissionId", "capture"],
+      "properties": {
+        "submissionContractVersion": { "const": "1.1.0" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "clientSubmissionId": { "$ref": "#/$defs/uuid" },
+        "capture": { "$ref": "#/$defs/captureBundleDraft" }
+      }
+    },
+    "captureBundleResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captureBundle", "replayed"],
+      "properties": {
+        "captureBundle": { "$ref": "#/$defs/captureBundle" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "pocoSnapshotRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captureId", "nonce", "deadlineMs", "schemaVersion"],
+      "properties": {
+        "captureId": { "$ref": "#/$defs/uuid" },
+        "nonce": { "type": "string", "minLength": 16, "maxLength": 128, "pattern": "^[A-Za-z0-9_-]+$" },
+        "deadlineMs": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 5000,
+          "description": "Relative remaining time budget in monotonic milliseconds at the moment the Unity listener receives the request."
+        },
+        "schemaVersion": { "const": "1.0.0" }
+      }
+    },
+    "pocoSnapshotData": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "All project fields are optional and progressively adoptable. The containing response correlation envelope remains required.",
+      "properties": {
+        "buildVersion": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "gitSha": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "scene": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "gameTimeSeconds": { "type": "number", "minimum": 0 },
+        "pseudonymousTestUserId": { "type": ["string", "null"], "maxLength": 128 },
+        "level": { "type": ["string", "null"], "maxLength": 200 },
+        "mode": { "type": ["string", "null"], "maxLength": 200 },
+        "networkEnvironment": { "type": ["string", "null"], "maxLength": 200 },
+        "recentErrors": {
+          "type": "array",
+          "maxItems": 20,
+          "x-max-utf8-bytes": 32768,
+          "description": "Redacted recent errors only. The combined UTF-8 bytes of all entries must not exceed 32768.",
+          "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        },
+        "customFields": {
+          "type": "object",
+          "maxProperties": 30,
+          "x-sensitive-key-policy": "case-insensitive denylist: password, passwd, secret, token, authorization, cookie, credential, email, phone, session",
+          "propertyNames": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[A-Za-z0-9_.-]+$" },
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string", "maxLength": 1000 },
+              { "type": "number" },
+              { "type": "boolean" },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    },
+    "pocoSnapshotResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captureId", "nonce", "schemaVersion", "generatedAt", "redactionPolicyVersion", "sensitiveFieldsOmitted", "snapshot"],
+      "properties": {
+        "captureId": { "$ref": "#/$defs/uuid" },
+        "nonce": { "$ref": "#/$defs/pocoSnapshotRequest/properties/nonce" },
+        "schemaVersion": { "$ref": "#/$defs/pocoSnapshotRequest/properties/schemaVersion" },
+        "generatedAt": { "$ref": "#/$defs/dateTime" },
+        "redactionPolicyVersion": { "const": "1.0.0" },
+        "sensitiveFieldsOmitted": { "const": true },
+        "snapshot": { "$ref": "#/$defs/pocoSnapshotData" }
+      }
+    },
+    "nativeNotification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "accountId",
+        "projectId",
+        "userId",
+        "type",
+        "title",
+        "bugId",
+        "createdAt",
+        "readAt",
+        "version"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "accountId": { "$ref": "#/$defs/uuid" },
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "userId": { "$ref": "#/$defs/uuid" },
+        "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "bugId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "createdAt": { "$ref": "#/$defs/dateTime" },
+        "readAt": { "oneOf": [{ "$ref": "#/$defs/dateTime" }, { "type": "null" }] },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "nativeNotificationList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshotSequence", "items", "nextCursor", "unreadCount"],
+      "properties": {
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "#/$defs/nativeNotification" } },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 },
+        "unreadCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "nativeBuildList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "snapshotSequence", "items", "nextCursor"],
+      "properties": {
+        "projectId": { "$ref": "#/$defs/uuid" },
+        "snapshotSequence": { "type": "integer", "minimum": 0 },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "https://qa-hub.local/contracts/build.schema.json#/$defs/build" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "registerNotificationDeviceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clientActionId",
+        "installationId",
+        "provider",
+        "platform",
+        "token",
+        "tokenIssuedAt",
+        "expectedVersion",
+        "qaAppVersion"
+      ],
+      "properties": {
+        "clientActionId": { "$ref": "#/$defs/uuid" },
+        "installationId": { "$ref": "#/$defs/uuid" },
+        "provider": { "const": "fcm" },
+        "platform": { "const": "android" },
+        "token": { "type": "string", "minLength": 16, "maxLength": 4096, "writeOnly": true },
+        "tokenIssuedAt": { "$ref": "#/$defs/dateTime" },
+        "expectedVersion": {
+          "oneOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }],
+          "description": "null only for first registration; token rotation must carry the current device binding version."
+        },
+        "qaAppVersion": { "type": "string", "minLength": 1, "maxLength": 100 }
+      }
+    },
+    "notificationDevice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "accountId",
+        "installationId",
+        "userId",
+        "provider",
+        "platform",
+        "sharedDevice",
+        "tokenIssuedAt",
+        "serverReceivedAt",
+        "createdAt",
+        "version",
+        "replayed"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "accountId": { "$ref": "#/$defs/uuid" },
+        "installationId": { "$ref": "#/$defs/uuid" },
+        "userId": { "$ref": "#/$defs/uuid" },
+        "provider": { "const": "fcm" },
+        "platform": { "const": "android" },
+        "sharedDevice": { "const": false },
+        "tokenIssuedAt": { "$ref": "#/$defs/dateTime" },
+        "serverReceivedAt": { "$ref": "#/$defs/dateTime" },
+        "createdAt": { "$ref": "#/$defs/dateTime" },
+        "version": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "revokeNotificationDeviceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clientActionId", "expectedVersion", "installationId"],
+      "properties": {
+        "clientActionId": { "$ref": "#/$defs/uuid" },
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "installationId": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "relayDispatchAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "qaItem",
+        "repairAttemptId",
+        "handoffId",
+        "relayInstanceId",
+        "outboxMessageId",
+        "requestId",
+        "status",
+        "replayed"
+      ],
+      "properties": {
+        "qaItem": { "$ref": "#/$defs/qaItemReference" },
+        "repairAttemptId": { "$ref": "#/$defs/uuid" },
+        "handoffId": { "$ref": "#/$defs/uuid" },
+        "relayInstanceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$" },
+        "outboxMessageId": { "$ref": "#/$defs/uuid" },
+        "requestId": { "$ref": "#/$defs/uuid" },
+        "status": { "const": "queued" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "relayReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "qaItem",
+        "repairAttemptId",
+        "handoffId",
+        "relayInstanceId",
+        "relayTaskId",
+        "handoffStatus",
+        "buildRequirement",
+        "buildEvidenceStatus",
+        "deliveredCommitSha",
+        "buildId",
+        "externalRevision",
+        "requiresHumanVerification",
+        "automationAuthority",
+        "lastEventAt",
+        "failureSummary",
+        "version"
+      ],
+      "properties": {
+        "qaItem": { "$ref": "#/$defs/qaItemReference" },
+        "repairAttemptId": { "$ref": "#/$defs/uuid" },
+        "handoffId": { "$ref": "#/$defs/uuid" },
+        "relayInstanceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$" },
+        "relayTaskId": { "type": ["string", "null"], "maxLength": 200 },
+        "handoffStatus": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "submitted",
+            "running",
+            "needs_input",
+            "blocked",
+            "failed",
+            "fix_delivered",
+            "awaiting_build",
+            "awaiting_verification"
+          ]
+        },
+        "externalRevision": { "type": "integer", "minimum": 0 },
+        "buildRequirement": { "type": "string", "enum": ["not_required", "required"] },
+        "buildEvidenceStatus": {
+          "type": "string",
+          "enum": ["not_required", "pending", "exact_commit_eligible"]
+        },
+        "requiresHumanVerification": { "const": true },
+        "automationAuthority": { "const": "delivery_build_projection_only" },
+        "deliveredCommitSha": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "buildId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "lastEventAt": { "$ref": "#/$defs/dateTime" },
+        "failureSummary": { "type": ["string", "null"], "maxLength": 2000 },
+        "version": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "handoffStatus": {
+                "enum": ["submitted", "running", "needs_input", "blocked", "failed", "fix_delivered", "awaiting_build", "awaiting_verification"]
+              }
+            },
+            "required": ["handoffStatus"]
+          },
+          "then": {
+            "properties": { "relayTaskId": { "type": "string", "minLength": 1, "maxLength": 200 } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "handoffStatus": {
+                "enum": ["queued", "submitted", "running", "needs_input", "blocked", "failed"]
+              }
+            },
+            "required": ["handoffStatus"]
+          },
+          "then": {
+            "properties": { "deliveredCommitSha": { "const": null } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "handoffStatus": {
+                "enum": ["fix_delivered", "awaiting_build", "awaiting_verification"]
+              }
+            },
+            "required": ["handoffStatus"]
+          },
+          "then": {
+            "required": ["deliveredCommitSha"],
+            "properties": { "deliveredCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "buildRequirement": { "const": "not_required" } },
+            "required": ["buildRequirement"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "buildEvidenceStatus": { "const": "not_required" },
+              "buildId": { "const": null }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "buildRequirement": { "const": "required" } },
+            "required": ["buildRequirement"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "buildEvidenceStatus": { "enum": ["pending", "exact_commit_eligible"] }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "buildEvidenceStatus": { "const": "not_required" } },
+            "required": ["buildEvidenceStatus"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "buildRequirement": { "const": "not_required" },
+              "buildId": { "const": null }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "buildEvidenceStatus": { "const": "pending" } },
+            "required": ["buildEvidenceStatus"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "buildRequirement": { "const": "required" } }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "buildEvidenceStatus": { "const": "exact_commit_eligible" } },
+            "required": ["buildEvidenceStatus"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "buildRequirement": { "const": "required" },
+              "buildId": { "$ref": "#/$defs/uuid" }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "handoffStatus": { "const": "awaiting_build" } },
+            "required": ["handoffStatus"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "buildRequirement": { "const": "required" },
+              "buildEvidenceStatus": { "const": "pending" }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "handoffStatus": { "const": "awaiting_verification" } },
+            "required": ["handoffStatus"]
+          },
+          "then": {
+            "type": "object",
+            "oneOf": [
+              {
+                "properties": {
+                  "buildRequirement": { "const": "not_required" },
+                  "buildEvidenceStatus": { "const": "not_required" },
+                  "buildId": { "const": null }
+                }
+              },
+              {
+                "required": ["buildId"],
+                "properties": {
+                  "buildRequirement": { "const": "required" },
+                  "buildEvidenceStatus": { "const": "exact_commit_eligible" },
+                  "buildId": { "$ref": "#/$defs/uuid" }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": { "handoffStatus": { "const": "failed" } },
+            "required": ["handoffStatus"]
+          },
+          "then": {
+            "type": "object",
+            "properties": { "failureSummary": { "type": "string", "minLength": 1, "maxLength": 2000 } }
+          },
+          "else": {
+            "type": "object",
+            "properties": { "failureSummary": { "const": null } }
+          }
+        }
+      ]
+    }
+  }
+}

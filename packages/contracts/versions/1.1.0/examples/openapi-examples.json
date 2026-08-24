@@ -1,0 +1,1445 @@
+{
+  "version": "1.1.0",
+  "operations": {
+    "createNativeSession": {
+      "status": 201,
+      "request": {
+        "clientActionId": "10000000-0000-4000-8000-000000000010",
+        "login": "qa.tester@example.invalid",
+        "password": "example-only-not-a-real-secret",
+        "installationId": "10000000-0000-4000-8000-000000000001",
+        "sharedDevice": false,
+        "device": {
+          "manufacturer": "Google",
+          "model": "Pixel QA",
+          "androidApi": 36,
+          "androidRelease": "16",
+          "qaAppVersion": "0.1.0-debug"
+        }
+      },
+      "response": {
+        "issuedAt": "2026-08-24T11:00:00Z",
+        "accessToken": "example-access-token-00000000000000000000",
+        "accessExpiresAt": "2026-08-24T11:15:00Z",
+        "refreshToken": "example-refresh-token-000000000000000000",
+        "refreshExpiresAt": "2026-09-23T11:00:00Z",
+        "session": {
+          "id": "10000000-0000-4000-8000-000000000002",
+          "accountId": "10000000-0000-4000-8000-000000000020",
+          "installationId": "10000000-0000-4000-8000-000000000001",
+          "user": {
+            "id": "10000000-0000-4000-8000-000000000003",
+            "displayName": "QA Tester"
+          },
+          "projects": [
+            {
+              "id": "10000000-0000-4000-8000-000000000004",
+              "key": "OZDQP",
+              "name": "OZDQP",
+              "active": true,
+              "roles": ["viewer", "reporter", "verifier"]
+            }
+          ],
+          "sharedDevice": false,
+          "pushAllowed": true,
+          "idleExpiresAt": "2026-08-24T11:15:00Z",
+          "absoluteExpiresAt": "2026-09-23T11:00:00Z",
+          "version": 1
+        },
+        "replayed": false
+      }
+    },
+    "refreshNativeSession": {
+      "status": 200,
+      "request": {
+        "clientActionId": "10000000-0000-4000-8000-000000000011",
+        "refreshToken": "example-refresh-token-000000000000000000",
+        "installationId": "10000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "issuedAt": "2026-08-24T11:10:00Z",
+        "accessToken": "rotated-access-token-00000000000000000000",
+        "accessExpiresAt": "2026-08-24T11:25:00Z",
+        "refreshToken": "rotated-refresh-token-000000000000000000",
+        "refreshExpiresAt": "2026-09-23T11:00:00Z",
+        "session": {
+          "id": "10000000-0000-4000-8000-000000000002",
+          "accountId": "10000000-0000-4000-8000-000000000020",
+          "installationId": "10000000-0000-4000-8000-000000000001",
+          "user": {
+            "id": "10000000-0000-4000-8000-000000000003",
+            "displayName": "QA Tester"
+          },
+          "projects": [
+            {
+              "id": "10000000-0000-4000-8000-000000000004",
+              "key": "OZDQP",
+              "name": "OZDQP",
+              "active": true,
+              "roles": ["viewer", "reporter", "verifier"]
+            }
+          ],
+          "sharedDevice": false,
+          "pushAllowed": true,
+          "idleExpiresAt": "2026-08-24T11:25:00Z",
+          "absoluteExpiresAt": "2026-09-23T11:00:00Z",
+          "version": 2
+        },
+        "replayed": false
+      }
+    },
+    "getNativeSession": {
+      "status": 200,
+      "response": {
+        "id": "10000000-0000-4000-8000-000000000002",
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "installationId": "10000000-0000-4000-8000-000000000001",
+        "user": {
+          "id": "10000000-0000-4000-8000-000000000003",
+          "displayName": "QA Tester"
+        },
+        "projects": [
+          {
+            "id": "10000000-0000-4000-8000-000000000004",
+            "key": "OZDQP",
+            "name": "OZDQP",
+            "active": true,
+            "roles": ["viewer", "reporter", "verifier"]
+          }
+        ],
+        "sharedDevice": false,
+        "pushAllowed": true,
+        "idleExpiresAt": "2026-08-24T11:25:00Z",
+        "absoluteExpiresAt": "2026-09-23T11:00:00Z",
+        "version": 2
+      }
+    },
+    "revokeNativeSession": {
+      "status": 204,
+      "request": {
+        "clientActionId": "10000000-0000-4000-8000-000000000012",
+        "expectedVersion": 2,
+        "installationId": "10000000-0000-4000-8000-000000000001",
+        "clearNotificationDevice": true
+      }
+    },
+    "listVisibleProjects": {
+      "status": 200,
+      "query": {
+        "cursor": null,
+        "limit": 50
+      },
+      "response": {
+        "snapshotSequence": 7,
+        "items": [
+          {
+            "id": "10000000-0000-4000-8000-000000000004",
+            "key": "OZDQP",
+            "name": "OZDQP",
+            "active": true,
+            "roles": ["viewer", "reporter", "verifier"]
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "listProjectMembers": {
+      "status": 200,
+      "pathParameters": {
+        "projectId": "10000000-0000-4000-8000-000000000004"
+      },
+      "query": { "cursor": null, "limit": 50 },
+      "response": {
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "snapshotSequence": 7,
+        "items": [
+          {
+            "userId": "10000000-0000-4000-8000-000000000003",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "displayName": "QA Tester",
+            "roles": ["viewer", "reporter", "verifier"],
+            "active": true
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "listProjectModules": {
+      "status": 200,
+      "pathParameters": {
+        "projectId": "10000000-0000-4000-8000-000000000004"
+      },
+      "response": {
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "items": [
+          {
+            "id": "10000000-0000-4000-8000-000000000005",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "name": "Login",
+            "active": true
+          }
+        ]
+      }
+    },
+    "getBugWorkflowProjection": {
+      "status": 200,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "query": { "cursor": null, "limitPerCollection": 50 },
+      "response": {
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "bugVersion": 2,
+        "snapshotSequence": 12,
+        "truncated": false,
+        "nextCursor": null,
+        "occurrences": [
+          {
+            "id": "80000000-0000-4000-8000-000000000001",
+            "bugId": "70000000-0000-4000-8000-000000000001",
+            "reporterId": "10000000-0000-4000-8000-000000000003",
+            "observedAt": "2026-08-24T10:00:00Z",
+            "platform": "android",
+            "appVersion": "0.1.0-debug",
+            "resourceVersion": "qa-build-20260824",
+            "gitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "deviceModel": "Pixel QA",
+            "osVersion": "Android 15 / API 35",
+            "steps": ["Rotate the device", "Open login"],
+            "actualBehavior": "The action is covered.",
+            "frequency": "always",
+            "errorSignature": null,
+            "environment": {
+              "qaAppVersion": "0.1.0-debug",
+              "networkType": "wifi",
+              "networkMetered": false,
+              "orientation": "landscape"
+            },
+            "attachmentIds": ["50000000-0000-4000-8000-000000000001"],
+            "captureBundleId": "60000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-08-24T10:05:00Z"
+          }
+        ],
+        "repairAttempts": [],
+        "verifications": [],
+        "builds": [],
+        "relayReceipts": []
+      }
+    },
+    "listProjectBuilds": {
+      "status": 200,
+      "pathParameters": {
+        "projectId": "10000000-0000-4000-8000-000000000004"
+      },
+      "query": { "status": null, "cursor": null, "limit": 50 },
+      "response": {
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "snapshotSequence": 12,
+        "items": [
+          {
+            "id": "b0000000-0000-4000-8000-000000000001",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "provider": "manual",
+            "externalId": "qa-build-20260824",
+            "versionName": "0.1.0-debug",
+            "channel": "qa",
+            "projectKey": "OZDQP",
+            "branch": "main",
+            "sourceCommitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "mode": "debug",
+            "status": "ready",
+            "manifest": {
+              "commitShas": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+              "artifactSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "version": 1
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "listBugEvents": {
+      "status": 200,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "query": {
+        "afterSequence": 0,
+        "cursor": null,
+        "limit": 50
+      },
+      "response": {
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "snapshotSequence": 12,
+        "items": [
+          {
+            "projectionVersion": "1.1.0",
+            "redactionPolicyVersion": "1.0.0",
+            "id": "90000000-0000-4000-8000-000000000001",
+            "type": "bug.created",
+            "source": "qa_hub",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "bugId": "70000000-0000-4000-8000-000000000001",
+            "aggregate": {
+              "type": "bug",
+              "id": "70000000-0000-4000-8000-000000000001",
+              "version": 1
+            },
+            "sequence": 1,
+            "actor": {
+              "type": "user",
+              "id": "10000000-0000-4000-8000-000000000003"
+            },
+            "correlationId": "20000000-0000-4000-8000-000000000001",
+            "causationId": null,
+            "occurredAt": "2026-08-24T10:05:00Z",
+            "fromState": null,
+            "toState": "reported",
+            "payload": {
+              "summary": "Bug created from Android evidence.",
+              "occurrenceId": "80000000-0000-4000-8000-000000000001",
+              "attachmentCount": 1,
+              "toVersion": 1
+            }
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "listBugComments": {
+      "status": 200,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "query": { "cursor": null, "limit": 50 },
+      "response": {
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "snapshotSequence": 12,
+        "items": [
+          {
+            "id": "14000000-0000-4000-8000-000000000001",
+            "bugId": "70000000-0000-4000-8000-000000000001",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "authorId": "10000000-0000-4000-8000-000000000003",
+            "body": "Reproduced on the API 35 emulator lane.",
+            "attachmentIds": [],
+            "createdAt": "2026-08-24T10:30:00Z",
+            "version": 1
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "addBugComment": {
+      "status": 201,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "expectedVersion": 1,
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000003",
+        "body": "Reproduced on the current Android build.",
+        "attachmentIds": []
+      },
+      "response": {
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000003",
+        "qaItem": {
+          "type": "bug",
+          "id": "70000000-0000-4000-8000-000000000001",
+          "key": "OZDQP-1024"
+        },
+        "comment": {
+          "id": "81000000-0000-4000-8000-000000000001",
+          "bugId": "70000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "authorId": "10000000-0000-4000-8000-000000000003",
+          "body": "Reproduced on the current Android build.",
+          "attachmentIds": [],
+          "createdAt": "2026-08-24T10:20:00Z",
+          "version": 1
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "bugVersion": 2,
+        "eventId": "90000000-0000-4000-8000-000000000003",
+        "replayed": false
+      }
+    },
+    "initUpload": {
+      "status": 201,
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "uploadAttempt": 1,
+        "filename": "system-screenshot.png",
+        "mediaType": "image/png",
+        "expectedSize": 1048576,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "captureId": "60000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "sessionId": "40000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "uploadAttempt": 1,
+        "status": "open",
+        "filename": "system-screenshot.png",
+        "mediaType": "image/png",
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "expectedSize": 1048576,
+        "chunkSize": 1048576,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "expectedChunkCount": 1,
+        "receivedBytes": 0,
+        "attachmentId": null,
+        "expiresAt": "2026-08-24T12:00:00Z",
+        "confirmedChunks": [],
+        "version": 1,
+        "replayed": false
+      }
+    },
+    "finalizeUpload": {
+      "status": 200,
+      "pathParameters": {
+        "sessionId": "40000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "expectedVersion": 2,
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "uploadAttempt": 1,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "expectedSize": 1048576
+      },
+      "response": {
+        "sessionId": "40000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "uploadAttempt": 1,
+        "attachmentId": "50000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "filename": "system-screenshot.png",
+        "mediaType": "image/png",
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 1048576,
+        "scanStatus": "clean",
+        "readyToBind": true,
+        "bindingStatus": "unbound",
+        "version": 3,
+        "replayed": false
+      }
+    },
+    "getUploadSession": {
+      "status": 200,
+      "pathParameters": {
+        "sessionId": "40000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "sessionId": "40000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "uploadAttempt": 1,
+        "status": "finalized",
+        "filename": "system-screenshot.png",
+        "mediaType": "image/png",
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "expectedSize": 1048576,
+        "chunkSize": 1048576,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "expectedChunkCount": 1,
+        "receivedBytes": 1048576,
+        "confirmedChunks": [0],
+        "attachmentId": "50000000-0000-4000-8000-000000000001",
+        "expiresAt": "2026-08-24T12:00:00Z",
+        "version": 3
+      }
+    },
+    "getAttachmentMetadata": {
+      "status": 200,
+      "pathParameters": {
+        "attachmentId": "50000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "attachmentId": "50000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "filename": "system-screenshot.png",
+        "mediaType": "image/png",
+        "size": 1048576,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "scanStatus": "clean",
+        "readyToBind": true,
+        "bindingStatus": "unbound",
+        "version": 3
+      }
+    },
+    "listBugAttachments": {
+      "status": 200,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "query": { "cursor": null, "limit": 50 },
+      "response": {
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "snapshotSequence": 12,
+        "items": [
+          {
+            "attachmentId": "50000000-0000-4000-8000-000000000001",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+            "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+            "captureId": "60000000-0000-4000-8000-000000000001",
+            "filename": "system-screenshot.png",
+            "mediaType": "image/png",
+            "size": 1048576,
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "scanStatus": "clean",
+            "readyToBind": true,
+            "bindingStatus": "claimed",
+            "version": 5
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    "bindAttachmentReservation": {
+      "status": 200,
+      "pathParameters": {
+        "attachmentId": "50000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "expectedVersion": 3,
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "leaseGeneration": 1,
+        "intent": "bug_create"
+      },
+      "response": {
+        "bindingId": "50000000-0000-4000-8000-000000000002",
+        "attachmentId": "50000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+        "leaseGeneration": 1,
+        "intent": "bug_create",
+        "targetQaItemId": null,
+        "status": "reserved",
+        "expiresAt": "2026-08-25T10:00:00Z",
+        "version": 4,
+        "replayed": false
+      }
+    },
+    "createCaptureBundle": {
+      "status": 201,
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "capture": {
+          "captureId": "60000000-0000-4000-8000-000000000001",
+          "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "source": "overlay_single_tap",
+          "primaryEvidenceClientAttachmentId": "30000000-0000-4000-8000-000000000001",
+          "primaryEvidenceAttachmentId": "50000000-0000-4000-8000-000000000001",
+          "artifacts": [
+            {
+              "captureId": "60000000-0000-4000-8000-000000000001",
+              "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+              "attachmentId": "50000000-0000-4000-8000-000000000001",
+              "kind": "system_screenshot",
+              "status": "succeeded",
+              "startedAt": "2026-08-24T10:00:00Z",
+              "endedAt": "2026-08-24T10:00:00.120Z",
+              "skewMs": 0,
+              "truncated": false,
+              "failureReason": null
+            }
+          ],
+          "poco": {
+            "attempted": true,
+            "connectedPort": null,
+            "sdkVersion": null,
+            "snapshotCapability": "not_probed",
+            "screenSize": null,
+            "allowedReadOnlyMethods": [
+              "GetSDKVersion",
+              "Screenshot",
+              "Dump",
+              "GetScreenSize",
+              "GetDebugProfilingData",
+              "qa.snapshot"
+            ],
+            "negotiatedMethods": [],
+            "succeededMethods": [],
+            "failureReason": "connection_refused"
+          },
+          "deviceMetadata": {
+            "manufacturer": "Google",
+            "model": "Pixel QA",
+            "androidApi": 36,
+            "androidRelease": "16",
+            "qaAppVersion": "0.1.0-debug",
+            "buildId": null,
+            "testSessionId": null,
+            "networkType": "wifi"
+          }
+        }
+      },
+      "response": {
+        "captureBundle": {
+          "captureId": "60000000-0000-4000-8000-000000000001",
+          "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "source": "overlay_single_tap",
+          "primaryEvidenceClientAttachmentId": "30000000-0000-4000-8000-000000000001",
+          "primaryEvidenceAttachmentId": "50000000-0000-4000-8000-000000000001",
+          "artifacts": [
+            {
+              "captureId": "60000000-0000-4000-8000-000000000001",
+              "clientAttachmentId": "30000000-0000-4000-8000-000000000001",
+              "attachmentId": "50000000-0000-4000-8000-000000000001",
+              "kind": "system_screenshot",
+              "status": "succeeded",
+              "startedAt": "2026-08-24T10:00:00Z",
+              "endedAt": "2026-08-24T10:00:00.120Z",
+              "skewMs": 0,
+              "truncated": false,
+              "failureReason": null
+            }
+          ],
+          "enrichmentStatus": "unavailable",
+          "poco": {
+            "status": "unavailable",
+            "attempted": true,
+            "connectedPort": null,
+            "sdkVersion": null,
+            "snapshotCapability": "not_probed",
+            "screenSize": null,
+            "allowedReadOnlyMethods": [
+              "GetSDKVersion",
+              "Screenshot",
+              "Dump",
+              "GetScreenSize",
+              "GetDebugProfilingData",
+              "qa.snapshot"
+            ],
+            "negotiatedMethods": [],
+            "succeededMethods": [],
+            "failureReason": "connection_refused"
+          },
+          "deviceMetadata": {
+            "manufacturer": "Google",
+            "model": "Pixel QA",
+            "androidApi": 36,
+            "androidRelease": "16",
+            "qaAppVersion": "0.1.0-debug",
+            "buildId": null,
+            "testSessionId": null,
+            "networkType": "wifi"
+          }
+        },
+        "replayed": false
+      }
+    },
+    "getCaptureBundle": {
+      "status": 200,
+      "pathParameters": {
+        "captureId": "60000000-0000-4000-8000-000000000002"
+      },
+      "response": {
+        "captureId": "60000000-0000-4000-8000-000000000002",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000004",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "capturedAt": "2026-08-24T10:40:00Z",
+        "source": "android_share",
+        "primaryEvidenceClientAttachmentId": "30000000-0000-4000-8000-000000000002",
+        "primaryEvidenceAttachmentId": "50000000-0000-4000-8000-000000000003",
+        "artifacts": [
+          {
+            "captureId": "60000000-0000-4000-8000-000000000002",
+            "clientAttachmentId": "30000000-0000-4000-8000-000000000002",
+            "attachmentId": "50000000-0000-4000-8000-000000000003",
+            "kind": "system_screenshot",
+            "status": "succeeded",
+            "startedAt": "2026-08-24T10:40:00Z",
+            "endedAt": "2026-08-24T10:40:00.100Z",
+            "skewMs": 0,
+            "truncated": false,
+            "failureReason": null
+          }
+        ],
+        "enrichmentStatus": "unavailable",
+        "poco": {
+          "status": "unavailable",
+          "attempted": false,
+          "connectedPort": null,
+          "sdkVersion": null,
+          "snapshotCapability": "not_probed",
+          "screenSize": null,
+          "allowedReadOnlyMethods": [
+            "GetSDKVersion",
+            "Screenshot",
+            "Dump",
+            "GetScreenSize",
+            "GetDebugProfilingData",
+            "qa.snapshot"
+          ],
+          "negotiatedMethods": [],
+          "succeededMethods": [],
+          "failureReason": null
+        },
+        "deviceMetadata": {
+          "manufacturer": "Google",
+          "model": "Pixel QA",
+          "androidApi": 35,
+          "androidRelease": "15",
+          "qaAppVersion": "0.1.0-debug",
+          "buildId": null,
+          "testSessionId": null,
+          "networkType": "wifi"
+        }
+      }
+    },
+    "registerAndroidNotificationDevice": {
+      "status": 201,
+      "request": {
+        "clientActionId": "10000000-0000-4000-8000-000000000013",
+        "installationId": "10000000-0000-4000-8000-000000000001",
+        "provider": "fcm",
+        "platform": "android",
+        "token": "example-fcm-token-00000000000000000000",
+        "tokenIssuedAt": "2026-08-24T10:50:00Z",
+        "expectedVersion": null,
+        "qaAppVersion": "0.1.0-debug"
+      },
+      "response": {
+        "id": "11000000-0000-4000-8000-000000000001",
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "installationId": "10000000-0000-4000-8000-000000000001",
+        "userId": "10000000-0000-4000-8000-000000000003",
+        "provider": "fcm",
+        "platform": "android",
+        "sharedDevice": false,
+        "tokenIssuedAt": "2026-08-24T10:50:00Z",
+        "serverReceivedAt": "2026-08-24T10:50:01Z",
+        "createdAt": "2026-08-24T10:50:01Z",
+        "version": 1,
+        "replayed": false
+      }
+    },
+    "revokeAndroidNotificationDevice": {
+      "status": 204,
+      "pathParameters": {
+        "deviceId": "11000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "clientActionId": "10000000-0000-4000-8000-000000000014",
+        "expectedVersion": 1,
+        "installationId": "10000000-0000-4000-8000-000000000001"
+      }
+    },
+    "listNotifications": {
+      "status": 200,
+      "query": { "projectId": null, "unreadOnly": false, "cursor": null, "limit": 50 },
+      "response": {
+        "snapshotSequence": 15,
+        "items": [
+          {
+            "id": "13000000-0000-4000-8000-000000000001",
+            "accountId": "10000000-0000-4000-8000-000000000020",
+            "projectId": "10000000-0000-4000-8000-000000000004",
+            "userId": "10000000-0000-4000-8000-000000000003",
+            "type": "bug.assigned",
+            "title": "OZDQP-1024 assigned to you",
+            "bugId": "70000000-0000-4000-8000-000000000001",
+            "createdAt": "2026-08-24T10:45:00Z",
+            "readAt": null,
+            "version": 1
+          }
+        ],
+        "nextCursor": null,
+        "unreadCount": 1
+      }
+    },
+    "markNotificationRead": {
+      "status": 200,
+      "pathParameters": {
+        "notificationId": "13000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 1
+      },
+      "response": {
+        "id": "13000000-0000-4000-8000-000000000001",
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "userId": "10000000-0000-4000-8000-000000000003",
+        "type": "bug.assigned",
+        "title": "OZDQP-1024 assigned to you",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "createdAt": "2026-08-24T10:45:00Z",
+        "readAt": "2026-08-24T10:50:00Z",
+        "version": 2
+      }
+    },
+    "listBugs": {
+      "status": 200,
+      "query": {
+        "projectId": null,
+        "state": [],
+        "ownerId": null,
+        "verificationOwnerId": null,
+        "reporterId": null,
+        "moduleId": null,
+        "severity": null,
+        "priority": null,
+        "q": null,
+        "updatedAfter": null,
+        "cursor": null,
+        "limit": 50,
+        "sort": "updated_desc"
+      },
+      "response": {
+        "snapshotSequence": 12,
+        "items": [
+          { "id": "70000000-0000-4000-8000-000000000001", "projectId": "10000000-0000-4000-8000-000000000004", "number": 1024, "key": "OZDQP-1024", "title": "Login button is obscured", "description": "The lower action area is covered after rotation.", "expectedBehavior": "The login action remains visible.", "moduleId": "10000000-0000-4000-8000-000000000005", "state": "reported", "severity": "S1", "priority": "P1", "reporterId": "10000000-0000-4000-8000-000000000003", "ownerId": null, "verificationOwnerId": null, "duplicateOfBugId": null, "occurrenceCount": 1, "reopenCount": 0, "version": 1, "createdAt": "2026-08-24T10:05:00Z", "updatedAt": "2026-08-24T10:05:00Z", "closedAt": null }
+        ],
+        "nextCursor": null
+      }
+    },
+    "getBug": {
+      "status": 200,
+      "pathParameters": { "bugId": "70000000-0000-4000-8000-000000000001" },
+      "response": { "id": "70000000-0000-4000-8000-000000000001", "projectId": "10000000-0000-4000-8000-000000000004", "number": 1024, "key": "OZDQP-1024", "title": "Login button is obscured", "description": "The lower action area is covered after rotation.", "expectedBehavior": "The login action remains visible.", "moduleId": "10000000-0000-4000-8000-000000000005", "state": "reported", "severity": "S1", "priority": "P1", "reporterId": "10000000-0000-4000-8000-000000000003", "ownerId": null, "verificationOwnerId": null, "duplicateOfBugId": null, "occurrenceCount": 1, "reopenCount": 0, "version": 1, "createdAt": "2026-08-24T10:05:00Z", "updatedAt": "2026-08-24T10:05:00Z", "closedAt": null }
+    },
+    "updateBug": {
+      "status": 200,
+      "pathParameters": { "bugId": "70000000-0000-4000-8000-000000000001" },
+      "response": { "id": "70000000-0000-4000-8000-000000000001", "projectId": "10000000-0000-4000-8000-000000000004", "number": 1024, "key": "OZDQP-1024", "title": "Login button is obscured", "description": "The lower action area is covered after rotation.", "expectedBehavior": "The login action remains visible.", "moduleId": "10000000-0000-4000-8000-000000000005", "state": "reported", "severity": "S1", "priority": "P1", "reporterId": "10000000-0000-4000-8000-000000000003", "ownerId": null, "verificationOwnerId": null, "duplicateOfBugId": null, "occurrenceCount": 1, "reopenCount": 0, "version": 2, "createdAt": "2026-08-24T10:05:00Z", "updatedAt": "2026-08-24T10:15:00Z", "closedAt": null }
+    },
+    "transitionBug": {
+      "status": 200,
+      "pathParameters": { "bugId": "70000000-0000-4000-8000-000000000001" },
+      "response": { "id": "70000000-0000-4000-8000-000000000001", "projectId": "10000000-0000-4000-8000-000000000004", "number": 1024, "key": "OZDQP-1024", "title": "Login button is obscured", "description": "The lower action area is covered after rotation.", "expectedBehavior": "The login action remains visible.", "moduleId": "10000000-0000-4000-8000-000000000005", "state": "ready", "severity": "S1", "priority": "P1", "reporterId": "10000000-0000-4000-8000-000000000003", "ownerId": null, "verificationOwnerId": null, "duplicateOfBugId": null, "occurrenceCount": 1, "reopenCount": 0, "version": 2, "createdAt": "2026-08-24T10:05:00Z", "updatedAt": "2026-08-24T10:16:00Z", "closedAt": null }
+    },
+    "markBugDuplicate": {
+      "status": 200,
+      "pathParameters": { "bugId": "70000000-0000-4000-8000-000000000001" },
+      "response": { "id": "70000000-0000-4000-8000-000000000001", "projectId": "10000000-0000-4000-8000-000000000004", "number": 1024, "key": "OZDQP-1024", "title": "Login button is obscured", "description": "The lower action area is covered after rotation.", "expectedBehavior": "The login action remains visible.", "moduleId": "10000000-0000-4000-8000-000000000005", "state": "duplicate", "severity": "S1", "priority": "P1", "reporterId": "10000000-0000-4000-8000-000000000003", "ownerId": null, "verificationOwnerId": null, "duplicateOfBugId": "70000000-0000-4000-8000-000000000099", "occurrenceCount": 1, "reopenCount": 0, "version": 2, "createdAt": "2026-08-24T10:05:00Z", "updatedAt": "2026-08-24T10:17:00Z", "closedAt": "2026-08-24T10:17:00Z" }
+    },
+    "createBug": {
+      "status": 201,
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "title": "Login button is obscured",
+        "description": "The lower action area is covered after rotation.",
+        "expectedBehavior": "The login action remains visible.",
+        "moduleId": "10000000-0000-4000-8000-000000000005",
+        "severity": "S1",
+        "priority": "P1",
+        "occurrence": {
+          "observedAt": "2026-08-24T10:00:00Z",
+          "platform": "android",
+          "steps": ["Rotate the device", "Open login"],
+          "actualBehavior": "The action is covered.",
+          "environment": {
+            "qaAppVersion": "0.1.0-debug",
+            "networkType": "wifi",
+            "networkMetered": false,
+            "orientation": "landscape"
+          }
+        },
+        "attachmentIds": ["50000000-0000-4000-8000-000000000001"],
+        "captureBundleId": "60000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000001",
+        "qaItem": {
+          "type": "bug",
+          "id": "70000000-0000-4000-8000-000000000001",
+          "key": "OZDQP-1024"
+        },
+        "disposition": "created",
+        "bug": {
+          "id": "70000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "number": 1024,
+          "key": "OZDQP-1024",
+          "title": "Login button is obscured",
+          "description": "The lower action area is covered after rotation.",
+          "expectedBehavior": "The login action remains visible.",
+          "moduleId": "10000000-0000-4000-8000-000000000005",
+          "state": "reported",
+          "severity": "S1",
+          "priority": "P1",
+          "reporterId": "10000000-0000-4000-8000-000000000003",
+          "ownerId": null,
+          "verificationOwnerId": null,
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 1,
+          "createdAt": "2026-08-24T10:05:00Z",
+          "updatedAt": "2026-08-24T10:05:00Z",
+          "closedAt": null
+        },
+        "occurrenceId": "80000000-0000-4000-8000-000000000001",
+        "attachmentIds": ["50000000-0000-4000-8000-000000000001"],
+        "captureBundleId": "60000000-0000-4000-8000-000000000001",
+        "eventId": "90000000-0000-4000-8000-000000000001",
+        "replayed": false
+      }
+    },
+    "addOccurrence": {
+      "status": 201,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "expectedVersion": 1,
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000002",
+        "occurrence": {
+          "observedAt": "2026-08-24T10:10:00Z",
+          "platform": "android",
+          "steps": ["Rotate the device", "Open login again"],
+          "actualBehavior": "The action remains covered.",
+          "environment": {
+            "qaAppVersion": "0.1.0-debug",
+            "networkType": "wifi",
+            "networkMetered": false,
+            "orientation": "landscape"
+          }
+        },
+        "attachmentIds": []
+      },
+      "response": {
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000002",
+        "qaItem": {
+          "type": "bug",
+          "id": "70000000-0000-4000-8000-000000000001",
+          "key": "OZDQP-1024"
+        },
+        "disposition": "appended",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "bugKey": "OZDQP-1024",
+        "occurrenceId": "80000000-0000-4000-8000-000000000002",
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "90000000-0000-4000-8000-000000000002",
+        "bugVersion": 2,
+        "replayed": false
+      }
+    },
+    "createRepairAttempt": {
+      "status": 201,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 2,
+        "mode": "human",
+        "assigneeId": "10000000-0000-4000-8000-000000000006",
+        "summary": "Correct the rotated login layout."
+      },
+      "response": {
+        "id": "a0000000-0000-4000-8000-000000000001",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "sequence": 1,
+        "mode": "human",
+        "status": "planned",
+        "assigneeId": "10000000-0000-4000-8000-000000000006",
+        "parentAttemptId": null,
+        "summary": "Correct the rotated login layout.",
+        "branch": null,
+        "commitSha": null,
+        "mergeRequestUrl": null,
+        "targetBuildId": null,
+        "version": 1
+      }
+    },
+    "startRepairAttempt": {
+      "status": 200,
+      "pathParameters": {
+        "attemptId": "a0000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 1
+      },
+      "response": {
+        "id": "a0000000-0000-4000-8000-000000000001",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "sequence": 1,
+        "mode": "human",
+        "status": "running",
+        "assigneeId": "10000000-0000-4000-8000-000000000006",
+        "parentAttemptId": null,
+        "summary": "Correct the rotated login layout.",
+        "branch": null,
+        "commitSha": null,
+        "mergeRequestUrl": null,
+        "targetBuildId": null,
+        "version": 2
+      }
+    },
+    "deliverRepairAttempt": {
+      "status": 200,
+      "pathParameters": {
+        "attemptId": "a0000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 2,
+        "summary": "Delivered the login layout correction.",
+        "deliveryKind": "code",
+        "branch": "main",
+        "commitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "response": {
+        "id": "a0000000-0000-4000-8000-000000000001",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "sequence": 1,
+        "mode": "human",
+        "status": "delivered",
+        "assigneeId": "10000000-0000-4000-8000-000000000006",
+        "parentAttemptId": null,
+        "summary": "Delivered the login layout correction.",
+        "branch": "main",
+        "commitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mergeRequestUrl": null,
+        "targetBuildId": null,
+        "version": 3
+      }
+    },
+    "failRepairAttempt": {
+      "status": 200,
+      "pathParameters": {
+        "attemptId": "a0000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 2,
+        "reason": "The proposed correction could not be completed."
+      },
+      "response": {
+        "id": "a0000000-0000-4000-8000-000000000001",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "sequence": 1,
+        "mode": "human",
+        "status": "failed",
+        "assigneeId": "10000000-0000-4000-8000-000000000006",
+        "parentAttemptId": null,
+        "summary": "The proposed correction could not be completed.",
+        "branch": null,
+        "commitSha": null,
+        "mergeRequestUrl": null,
+        "targetBuildId": null,
+        "version": 3
+      }
+    },
+    "supersedeRepairAttempt": {
+      "status": 200,
+      "pathParameters": {
+        "attemptId": "a0000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 2,
+        "successor": {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "mode": "relay",
+          "assigneeId": "10000000-0000-4000-8000-000000000006",
+          "summary": "Continue with a new Relay repair strategy."
+        },
+        "reason": "Switch to a new repair strategy."
+      },
+      "response": {
+        "supersededAttempt": {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "bugId": "70000000-0000-4000-8000-000000000001",
+          "sequence": 1,
+          "mode": "human",
+          "status": "superseded",
+          "assigneeId": "10000000-0000-4000-8000-000000000006",
+          "parentAttemptId": null,
+          "summary": "Switch to a new repair strategy.",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "successorAttempt": {
+          "id": "a0000000-0000-4000-8000-000000000002",
+          "bugId": "70000000-0000-4000-8000-000000000001",
+          "sequence": 2,
+          "mode": "relay",
+          "status": "planned",
+          "assigneeId": "10000000-0000-4000-8000-000000000006",
+          "parentAttemptId": "a0000000-0000-4000-8000-000000000001",
+          "summary": "Continue with a new Relay repair strategy.",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 1
+        },
+        "bug": {
+          "id": "70000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "number": 1024,
+          "key": "OZDQP-1024",
+          "title": "Login button is obscured",
+          "description": "The lower action area is covered after rotation.",
+          "expectedBehavior": "The login action remains visible.",
+          "moduleId": "10000000-0000-4000-8000-000000000005",
+          "state": "in_progress",
+          "severity": "S1",
+          "priority": "P1",
+          "reporterId": "10000000-0000-4000-8000-000000000003",
+          "ownerId": null,
+          "verificationOwnerId": null,
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 4,
+          "createdAt": "2026-08-24T10:05:00Z",
+          "updatedAt": "2026-08-24T10:41:00Z",
+          "closedAt": null
+        },
+        "eventId": "90000000-0000-4000-8000-000000000006",
+        "replayed": false
+      }
+    },
+    "createVerification": {
+      "status": 201,
+      "pathParameters": {
+        "bugId": "70000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 5,
+        "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+        "buildId": "b0000000-0000-4000-8000-000000000001",
+        "verifierId": "10000000-0000-4000-8000-000000000003",
+        "criteria": "Login action remains visible after rotation."
+      },
+      "response": {
+        "id": "12000000-0000-4000-8000-000000000001",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+        "buildId": "b0000000-0000-4000-8000-000000000001",
+        "status": "requested",
+        "verifierId": "10000000-0000-4000-8000-000000000003",
+        "criteriaSnapshot": "Login action remains visible after rotation.",
+        "resultSummary": null,
+        "version": 1
+      }
+    },
+    "startVerification": {
+      "status": 200,
+      "pathParameters": {
+        "verificationId": "12000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 1
+      },
+      "response": {
+        "id": "12000000-0000-4000-8000-000000000001",
+        "bugId": "70000000-0000-4000-8000-000000000001",
+        "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+        "buildId": "b0000000-0000-4000-8000-000000000001",
+        "status": "in_progress",
+        "verifierId": "10000000-0000-4000-8000-000000000003",
+        "criteriaSnapshot": "Login action remains visible after rotation.",
+        "resultSummary": null,
+        "version": 2
+      }
+    },
+    "registerBuild": {
+      "status": 201,
+      "pathParameters": {
+        "projectId": "10000000-0000-4000-8000-000000000004"
+      },
+      "request": {
+        "provider": "manual",
+        "externalId": "qa-build-1024",
+        "version": "0.1.0-debug",
+        "channel": "qa",
+        "projectKey": "OZDQP",
+        "branch": "main",
+        "sourceCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mode": "debug",
+        "status": "ready",
+        "resourceVersion": "1024",
+        "downloadUrl": "https://downloads.example.invalid/qa-build-1024.apk",
+        "manifest": {
+          "commitShas": ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+          "artifactSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "providerPayloadDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
+      },
+      "response": {
+        "id": "b0000000-0000-4000-8000-000000000001",
+        "projectId": "10000000-0000-4000-8000-000000000004",
+        "provider": "manual",
+        "externalId": "qa-build-1024",
+        "versionName": "0.1.0-debug",
+        "channel": "qa",
+        "projectKey": "OZDQP",
+        "branch": "main",
+        "sourceCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mode": "debug",
+        "status": "ready",
+        "manifest": {
+          "commitShas": ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+          "artifactSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        "version": 1
+      }
+    },
+    "linkBuildRepair": {
+      "status": 200,
+      "pathParameters": {
+        "buildId": "b0000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 1,
+        "expectedBugVersion": 4,
+        "expectedBuildRequirementVersion": 1,
+        "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+        "deliveredCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "evidenceType": "manifest"
+      },
+      "response": {
+        "build": {
+          "id": "b0000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "provider": "manual",
+          "externalId": "qa-build-1024",
+          "versionName": "0.1.0-debug",
+          "channel": "qa",
+          "projectKey": "OZDQP",
+          "branch": "main",
+          "sourceCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "mode": "debug",
+          "status": "ready",
+          "manifest": {
+            "commitShas": ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+            "artifactSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          "version": 2
+        },
+        "bug": {
+          "id": "70000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "number": 1024,
+          "key": "OZDQP-1024",
+          "title": "Login button is obscured",
+          "description": "The lower action area is covered after rotation.",
+          "expectedBehavior": "The login action remains visible.",
+          "moduleId": "10000000-0000-4000-8000-000000000005",
+          "state": "ready_for_verification",
+          "severity": "S1",
+          "priority": "P1",
+          "reporterId": "10000000-0000-4000-8000-000000000003",
+          "ownerId": null,
+          "verificationOwnerId": "10000000-0000-4000-8000-000000000003",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 2,
+          "reopenCount": 0,
+          "version": 5,
+          "createdAt": "2026-08-24T10:05:00Z",
+          "updatedAt": "2026-08-24T10:55:00Z",
+          "closedAt": null
+        },
+        "buildRequirement": {
+          "id": "b2000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "bugId": "70000000-0000-4000-8000-000000000001",
+          "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+          "sourceDeliveryVersion": 3,
+      "deliveredCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "requirement": "required",
+      "decisionBasis": "code_requires_build",
+      "decisionReason": null,
+      "decisionActorId": "10000000-0000-4000-8000-000000000003",
+      "decisionAuditEventId": "90000000-0000-4000-8000-000000000007",
+      "linkedBuildId": "b0000000-0000-4000-8000-000000000001",
+          "linkId": "b1000000-0000-4000-8000-000000000001",
+          "policyVersion": "1.0.0",
+          "bugVersionAtDelivery": 4,
+          "createdAt": "2026-08-24T10:30:00Z",
+          "updatedAt": "2026-08-24T10:55:00Z",
+          "version": 2
+        },
+        "repairLink": {
+          "id": "b1000000-0000-4000-8000-000000000001",
+          "buildId": "b0000000-0000-4000-8000-000000000001",
+          "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+          "bugId": "70000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "buildRequirementId": "b2000000-0000-4000-8000-000000000001",
+          "buildRequirementVersion": 2,
+      "deliveredCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evidenceType": "manifest",
+      "evidenceDecision": "manifest_verified",
+      "overrideReason": null,
+      "evidenceActorId": "10000000-0000-4000-8000-000000000003",
+      "evidenceAuditEventId": "90000000-0000-4000-8000-000000000005",
+      "evidencePolicyVersion": "1.0.0",
+      "linkedAt": "2026-08-24T10:55:00Z",
+          "version": 1
+        },
+        "eventId": "90000000-0000-4000-8000-000000000005",
+        "replayed": false
+      }
+    },
+    "recordVerificationResult": {
+      "status": 200,
+      "pathParameters": {
+        "verificationId": "12000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "submissionContractVersion": "1.1.0",
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000005",
+        "expectedVersion": 2,
+        "status": "failed",
+        "resultSummary": "The obscured action is still reproducible.",
+        "failureReason": "Login action remains covered after rotation.",
+        "attachmentIds": ["50000000-0000-4000-8000-000000000001"],
+        "captureBundleId": "60000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "clientSubmissionId": "20000000-0000-4000-8000-000000000005",
+        "qaItem": {
+          "type": "bug",
+          "id": "70000000-0000-4000-8000-000000000001",
+          "key": "OZDQP-1024"
+        },
+        "verification": {
+          "id": "12000000-0000-4000-8000-000000000001",
+          "bugId": "70000000-0000-4000-8000-000000000001",
+          "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+          "buildId": "b0000000-0000-4000-8000-000000000001",
+          "status": "failed",
+          "verifierId": "10000000-0000-4000-8000-000000000003",
+          "criteriaSnapshot": "Login action remains visible after rotation.",
+          "resultSummary": "The obscured action is still reproducible.",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "a0000000-0000-4000-8000-000000000001",
+          "bugId": "70000000-0000-4000-8000-000000000001",
+          "sequence": 1,
+          "mode": "human",
+          "status": "verification_failed",
+          "assigneeId": "10000000-0000-4000-8000-000000000006",
+          "parentAttemptId": null,
+          "summary": "Delivered the login layout correction.",
+          "branch": "main",
+          "commitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 4
+        },
+        "bug": {
+          "id": "70000000-0000-4000-8000-000000000001",
+          "projectId": "10000000-0000-4000-8000-000000000004",
+          "number": 1024,
+          "key": "OZDQP-1024",
+          "title": "Login button is obscured",
+          "description": "The lower action area is covered after rotation.",
+          "expectedBehavior": "The login action remains visible.",
+          "moduleId": "10000000-0000-4000-8000-000000000005",
+          "state": "ready",
+          "severity": "S1",
+          "priority": "P1",
+          "reporterId": "10000000-0000-4000-8000-000000000003",
+          "ownerId": null,
+          "verificationOwnerId": "10000000-0000-4000-8000-000000000003",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 2,
+          "reopenCount": 0,
+          "version": 7,
+          "createdAt": "2026-08-24T10:05:00Z",
+          "updatedAt": "2026-08-24T11:00:00Z",
+          "closedAt": null
+        },
+        "attachmentIds": ["50000000-0000-4000-8000-000000000001"],
+        "captureBundleId": "60000000-0000-4000-8000-000000000001",
+        "eventId": "90000000-0000-4000-8000-000000000004",
+        "replayed": false
+      }
+    },
+    "dispatchRepairAttemptToRelay": {
+      "status": 202,
+      "pathParameters": {
+        "attemptId": "a0000000-0000-4000-8000-000000000001"
+      },
+      "request": {
+        "expectedVersion": 1,
+        "handoffId": "a0000000-0000-4000-8000-000000000002",
+        "selectedAttachmentIds": ["50000000-0000-4000-8000-000000000001"]
+      },
+      "response": {
+        "qaItem": {
+          "type": "bug",
+          "id": "70000000-0000-4000-8000-000000000001",
+          "key": "OZDQP-1024"
+        },
+        "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+        "handoffId": "a0000000-0000-4000-8000-000000000002",
+        "relayInstanceId": "relay-local",
+        "outboxMessageId": "a0000000-0000-4000-8000-000000000004",
+        "requestId": "a0000000-0000-4000-8000-000000000003",
+        "status": "queued",
+        "replayed": false
+      }
+    },
+    "getRelayReceipt": {
+      "status": 200,
+      "pathParameters": {
+        "attemptId": "a0000000-0000-4000-8000-000000000001"
+      },
+      "response": {
+        "qaItem": {
+          "type": "bug",
+          "id": "70000000-0000-4000-8000-000000000001",
+          "key": "OZDQP-1024"
+        },
+        "repairAttemptId": "a0000000-0000-4000-8000-000000000001",
+        "handoffId": "a0000000-0000-4000-8000-000000000002",
+        "relayInstanceId": "relay-local",
+        "relayTaskId": "relay-task-42",
+        "handoffStatus": "awaiting_verification",
+        "buildRequirement": "required",
+        "buildEvidenceStatus": "exact_commit_eligible",
+        "externalRevision": 7,
+        "requiresHumanVerification": true,
+        "automationAuthority": "delivery_build_projection_only",
+        "deliveredCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "buildId": "b0000000-0000-4000-8000-000000000001",
+        "lastEventAt": "2026-08-24T10:30:00Z",
+        "failureSummary": null,
+        "version": 7
+      }
+    }
+  }
+}

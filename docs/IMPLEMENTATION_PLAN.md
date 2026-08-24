@@ -18,7 +18,8 @@ qa_hub_progress:
   last_verified_at: 2026-08-24T18:01:36+08:00
   next_action: 执行 P3.0 App-first contract delta；随后并行启动 P3.1 Poco capability spike 与 P3.2 Android native foundation
   blockers:
-    - Android Studio/SDK/JDK/adb absent; blocks P3.2+ APK verification
+    - apps/android 自有 Gradle 工程尚未生成；API35 MuMu 已连接但 Android 15+ 真机证据仍缺失，未构建前不得宣称 QA Hub APK 通过
+    - API37 运行环境/真机证据尚缺；不阻断 P3.0/P3.2 编译，但阻断 target37 行为 Gate
     - Actual vendored Poco project/version not yet identified; blocks P3.1/P3.7/P3.8 real capability proof
 ```
 
@@ -63,7 +64,7 @@ QA Bug
 - App 内一键交给 Relay、继续原 Relay 任务并展示自动回写的交付和构建进度。
 - 站内 Inbox、Android 通知、超时提醒和共享测试机模式。
 - 追加式审计、健康检查、结构化日志、备份、隔离恢复和回滚。
-- Android 12/12L/13/14/15/16 App/Poco 矩阵和独立 HTTPS canary；12L 可非阻塞探测，其余按 P9 真机要求执行。
+- Android 15/16/17 App/Poco 矩阵和独立 HTTPS canary；Android 15/API 35 是最低支持层，Android 16/API 36 是运行兼容层，Android 17/API 37 是默认编译/目标与行为 Gate，按 P9 真机要求执行。
 
 ### 2.2 第一版明确不做
 
@@ -83,17 +84,17 @@ QA Bug
 
 ## 3. 用户、角色与权限
 
-| 角色 | 核心权限 |
-|---|---|
-| `viewer` | 查看获授权项目、Bug 和附件 |
-| `reporter` | 创建 Bug/Occurrence、补充自己的证据、响应待补充 |
-| `developer` | 领取/接受修复、维护 RepairAttempt、提交交付证据、一键交给 Relay |
-| `verifier` | 领取验收、填写通过/失败/阻塞和证据 |
-| `triager` | 模块、严重度、优先级、负责人、验收人、重复/拒绝/暂缓/重开 |
-| `release_manager` | 登记 Build、确认构建包含 Commit、处理构建异常 |
-| `project_admin` | 项目成员、角色、模块、策略、集成、通知、保留策略 |
-| `system_admin` | 系统配置、恢复、密钥轮换；不自动拥有业务验收权 |
-| `integration_service` | 仅写允许的 Relay/构建事件，不能验收、关闭、判重复或拒绝 |
+| 角色                  | 核心权限                                                        |
+| --------------------- | --------------------------------------------------------------- |
+| `viewer`              | 查看获授权项目、Bug 和附件                                      |
+| `reporter`            | 创建 Bug/Occurrence、补充自己的证据、响应待补充                 |
+| `developer`           | 领取/接受修复、维护 RepairAttempt、提交交付证据、一键交给 Relay |
+| `verifier`            | 领取验收、填写通过/失败/阻塞和证据                              |
+| `triager`             | 模块、严重度、优先级、负责人、验收人、重复/拒绝/暂缓/重开       |
+| `release_manager`     | 登记 Build、确认构建包含 Commit、处理构建异常                   |
+| `project_admin`       | 项目成员、角色、模块、策略、集成、通知、保留策略                |
+| `system_admin`        | 系统配置、恢复、密钥轮换；不自动拥有业务验收权                  |
+| `integration_service` | 仅写允许的 Relay/构建事件，不能验收、关闭、判重复或拒绝         |
 
 强制权限守卫：
 
@@ -263,19 +264,19 @@ rejected               不处理
 duplicate              重复
 ```
 
-| 迁移 | 必要守卫 | 结果 |
-|---|---|---|
-| 创建 -> `reported` | Bug、首个 Occurrence、Event 原子创建 | 分诊 Inbox 增加 |
-| `reported -> ready` | 模块、严重度、优先级、验收要求完整 | 可领取/分配 |
-| `reported -> needs_info` | 缺失内容和责任人明确 | 通知报告人 |
-| `reported/ready -> duplicate` | 同项目 canonical Bug、无环 | 追加关系和审计 |
-| `ready -> in_progress` | 原子创建/启动 RepairAttempt | 记录处理方式和负责人 |
-| `in_progress -> awaiting_build` | Attempt 已交付且要求构建 | 进入发布待办 |
-| `in_progress -> ready_for_verification` | Attempt 已交付且无需构建或已有可测 Build | 创建 Verification |
-| `awaiting_build -> ready_for_verification` | Build 包含精确 Commit，或有审计覆盖 | 通知验收人 |
-| `ready_for_verification -> closed` | 最新 Verification=`passed` | 保存验收证据 |
-| 验收失败 -> `ready` | Verification=`failed` | Attempt=`verification_failed`，保留历史 |
-| 关闭后新版本复现 -> `ready` | 新 Occurrence 版本晚于已验收版本 | `reopen_count + 1` |
+| 迁移                                       | 必要守卫                                 | 结果                                    |
+| ------------------------------------------ | ---------------------------------------- | --------------------------------------- |
+| 创建 -> `reported`                         | Bug、首个 Occurrence、Event 原子创建     | 分诊 Inbox 增加                         |
+| `reported -> ready`                        | 模块、严重度、优先级、验收要求完整       | 可领取/分配                             |
+| `reported -> needs_info`                   | 缺失内容和责任人明确                     | 通知报告人                              |
+| `reported/ready -> duplicate`              | 同项目 canonical Bug、无环               | 追加关系和审计                          |
+| `ready -> in_progress`                     | 原子创建/启动 RepairAttempt              | 记录处理方式和负责人                    |
+| `in_progress -> awaiting_build`            | Attempt 已交付且要求构建                 | 进入发布待办                            |
+| `in_progress -> ready_for_verification`    | Attempt 已交付且无需构建或已有可测 Build | 创建 Verification                       |
+| `awaiting_build -> ready_for_verification` | Build 包含精确 Commit，或有审计覆盖      | 通知验收人                              |
+| `ready_for_verification -> closed`         | 最新 Verification=`passed`               | 保存验收证据                            |
+| 验收失败 -> `ready`                        | Verification=`failed`                    | Attempt=`verification_failed`，保留历史 |
+| 关闭后新版本复现 -> `ready`                | 新 Occurrence 版本晚于已验收版本         | `reopen_count + 1`                      |
 
 `needs_input`、Relay 阻塞和构建失败优先表现为 Attempt/Build 徽标，避免主状态组合爆炸。
 
@@ -339,9 +340,13 @@ D:\Relay-QA-Hub-Data\            可配置持久目录，生产前核对磁盘�
 - SQLite WAL 单节点首发；短事务、busy timeout、乐观锁、在线备份。
 - Vitest/node:test、Playwright、契约测试和真实设备手工矩阵。
 
-Android 基线冻结为 `minSdk=31`（Android 12，自动覆盖 12L/API 32）、`compileSdk=36`、`targetSdk=36`，纯 Kotlin/JVM/Android，不引入 NDK、CMake 或本地 C++。仓库生成并固定 Gradle Wrapper；本机开发使用 Android Studio bundled JDK，不要求单独安装系统 Java。主机预检于 2026-08-24 确认 Android Studio、`%LOCALAPPDATA%\Android\Sdk`、PATH 中的 `adb/java` 均不存在，因此当前只能进行 contracts、Poco 只读 spike 和脚手架设计，不能宣称 APK build/test 已通过。解除条件与安全安装边界记录在 `docs/ANDROID_SETUP.md`。
+Android 基线冻结为 `minSdk=35`（Android 15）、`compileSdk=37`、`targetSdk=37`、AGP `9.1.1`、Gradle Wrapper `9.3.1`、Build-Tools `36.0.0`，纯 Kotlin/JVM/Android，不引入 NDK、CMake 或本地 C++。Android 16/API 36 仅是运行兼容测试层，不是默认编译目标。仓库生成并固定 Wrapper/version catalog；本机开发使用 Android Studio bundled JDK，不要求单独安装系统 Java。`2026-08-24T19:27:07+08:00` 修正后的 preflight 已从 `platforms/android-37.0/source.properties` 识别稳定 API `37.0`、`PreviewSdkInt=0` 和真实 `android.jar`，并确认 Studio 2026.1.3、JBR 25.0.2、Platform-Tools 37.0.1、Build-Tools 36.0.0、Command-line Tools、Emulator、license、WHPX 可用。`19:33+08:00` 已连接的 MuMu 实测是 Android 15/API 35、SELinux Permissive，可承担最低版本 API35 emulator lane。当前尚无 Android Gradle 工程或 QA Hub APK，也没有真实设备 Gate 证据，因此仍不能宣称 APK/device test 已通过；边界记录在 `docs/ANDROID_SETUP.md`。
 
-模拟器只使用已启用的 Windows Hypervisor Platform/WHPX；绝不为了 AEHD/HAXM 关闭 Hyper-V，因为 Relay worker 正在依赖 Hyper-V。需要的组件为 SDK Platform 36、Build-Tools、Platform-Tools、Command-line Tools、Emulator；API 35/31 system image 可选。NDK 只有未来明确引入 JNI/本地库时才按 Gradle 锁定版本安装。Android 12 MuMu 只能补测试，不能替代 Android 12 真机对悬浮窗、MediaProjection、系统回收和 Poco `127.0.0.1` 的 Gate 证据；adb 可用后必须保存 `adb shell getprop ro.build.version.sdk`，不能只信 MuMu 产品标签。
+模拟器只使用已启用的 Windows Hypervisor Platform/WHPX；绝不为了 AEHD/HAXM 关闭 Hyper-V，因为 Relay worker 正在依赖 Hyper-V。需要的组件为稳定 SDK Platform 37（目录名可为 `android-37.0`，必须以 metadata 判断）、Build-Tools 36.0.0、Platform-Tools、Command-line Tools、Emulator；system image 缺失不阻断当前 API35 MuMu lane。NDK 只有未来明确引入 JNI/本地库时才按 Gradle 锁定版本安装。adb serial/endpoint 只允许通过开发配置注入，不能硬编码到生产 App。MuMu 只能补测试，不能替代 Android 15+ 真机对悬浮窗、MediaProjection、系统回收和 Poco `127.0.0.1` 的 Gate 证据；必须保存 live `getprop`，不能信产品标签。
+
+QA Hub App 的 APK provenance 与被测 Unity 游戏严格隔离：QA Hub APK 只能从 `D:\Relay-QA-Hub` 自有 `apps/android` Gradle 工程构建，并通过 Android SDK `adb` 安装。用户给出的 Jenkins build URL 和 `http://10.100.5.129:8000/apk` 只属于 Unity 游戏项目，严禁用于构建或下载 QA Hub App。只有 Unity 项目确实发生 QA Hub/Poco bridge 所需改动、且该改动按用户要求提交到 Unity 项目 `main` 后，才可触发该 Jenkins，并从 `/apk` 取得与该提交对应的 Unity APK 用于 MuMu 联调。
+
+Android 17/API 37 行为必须显式设计和验证：QA Hub HTTPS 覆盖默认 Certificate Transparency 与网络库实际 ECH 能力；通知/MediaProjection 前台服务覆盖 API 37 通知与生命周期限制；所有 Compose 页面在 `sw600dp+`、多窗口、旋转与尺寸变化下保持自适应，不依赖方向/宽高比锁定。Poco 同机连接只允许同一 Android profile 内的 `127.0.0.1`；`127/8` 不属于产品的 LAN 访问需求，因此不得仅为 Poco 在 manifest 声明或运行时请求广泛的 `ACCESS_LOCAL_NETWORK`。API 37 实机和模拟器都必须证明无该权限时同 profile 回环仍可用、Wi-Fi/LAN 不可用、work profile/跨 profile 回环按平台预期被阻断。未来若新增局域网设备连接，必须另开产品/隐私决策并单独声明和请求该权限。
 
 迁移 PostgreSQL 的触发条件：持续写锁、需要多实例、跨机容灾或数据量/并发实测超出约定。Repository 接口必须预留，但首版不提前引入分布式复杂度。
 
@@ -518,22 +523,23 @@ X-Relay-Signature: sha256=<HMAC(timestamp + "." + rawBody)>
 
 ### 9.7 状态映射
 
-| Relay 来源 | Handoff 状态 | QA 自动动作 |
-|---|---|---|
-| 创建响应/`turn.queued` | `queued` | 当前处理方式为 Relay 时，Bug=`in_progress` |
-| 开始执行 | `running` | 展示正在处理 |
-| `needs_input` | `needs_input` | 通知报告人/负责人 |
-| `blocked` | `blocked` | 可补充、转人工或重试 |
-| `failed` | `failed` | Bug 回 `ready`，保留 Relay 现场 |
-| `cancelled` | `cancelled` | 只结束本次 Attempt |
-| `turn.delivered` 且远端证据完整 | `delivered` | 记录分支/SHA，进入待构建/待验收 |
-| Build 排队/运行 | 不变 | 更新 Build 进度 |
-| Build completed | `delivered` | 绑定版本，进入待验收并通知 |
-| Build failed | `delivered` | Build 失败，修复交付仍有效 |
-| MR merged | 元数据 | 记录 MR/SHA，不表示验收 |
-| Relay Task closed | `relay_closed` | 不关闭 QA Bug |
+Relay 事件只能更新当前 `RepairAttempt` 的 Relay receipt/投影和通知；不得自动修改 QA Bug 状态或任何 Verification 结果。允许的投影动作固定为 `repair.queued/submitted/running/needs_input/blocked/failed/fix_delivered/awaiting_build/awaiting_verification` 与 `build.pending/exact_commit_eligible`。
 
-迟到事件必须检查当前 Attempt generation 和 handling mode，不能覆盖已经转人工或被取代的 Attempt。
+| Relay 来源                                      | RepairAttempt/receipt 投影 | QA 自动动作                                                     |
+| ----------------------------------------------- | -------------------------- | --------------------------------------------------------------- |
+| 创建响应/`turn.queued`                          | `queued`                   | 记录派发与队列元数据；不改变 Bug/Verification                   |
+| 开始执行                                        | `running`                  | 展示正在处理；不改变 Bug/Verification                           |
+| `needs_input`                                   | `needs_input`              | 通知报告人/负责人；由人工决定补充、转人工或重试                  |
+| `blocked`                                       | `blocked`                  | 记录阻断并通知；不自动改 Bug 状态                               |
+| `failed`                                        | `failed`                   | 记录本次 Attempt 失败并通知；Bug 不自动回 `ready`                |
+| `turn.delivered` 且远端 Commit/分支证据完整     | `fix_delivered`            | 记录交付证据；按 Build 要求进入 `awaiting_build` 或待人工验收投影 |
+| Build 排队/运行                                 | `awaiting_build`           | 更新 Build 进度；不产生 Verification 结果                       |
+| Build completed 且精确包含交付 Commit           | `awaiting_verification`    | 绑定 Build 并通知人工验收；绝不自动验收或关闭                    |
+| Build failed                                    | `fix_delivered`            | 记录 Build 失败；修复交付证据保留，等待人工处置                  |
+| MR merged                                       | 元数据                     | 记录 MR/SHA；不表示 Build、验收或关闭                            |
+| `cancelled`、Relay Task closed 或未知 Relay 状态 | 仅原始审计元数据           | 忽略其对 QA Bug/Verification 的任何状态暗示                      |
+
+迟到事件必须检查当前 Attempt generation 和 handling mode，不能覆盖已经转人工或被取代的 Attempt。`cancelled`、`task.closed` 和未识别的原始状态只存审计元数据，不得扩展投影动作 allowlist。
 
 ## 10. Android 原生主客户端、离线、取证与通知
 
@@ -778,9 +784,9 @@ Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
 #### P3.0 App-first contract delta
 
-根代理基于 P0.3 的 `1.0.0` 历史基线发布追加 contract 版本，冻结 native auth/短会话、首页列表/筛选/评论/分配/状态/验收/审计/通知读取与写入、上传 finalize 返回 `attachmentId`、附件 bind、`clientSubmissionId -> Idempotency-Key`、最终 QA item ID、Relay handoff/receipt 读模型、capture bundle 和 Poco enrichment schema。新增版本、OpenAPI 示例、错误、executable scenarios 与 breaking 检查，不改写 P0.3 提交。
+根代理基于 P0.3 的 `1.0.0` 历史基线发布追加 contract 版本，冻结 native auth/短会话、首页列表/筛选/评论/分配/状态/验收/审计/通知读取与写入、上传 finalize 返回 `attachmentId`、附件 bind、`clientSubmissionId -> Idempotency-Key`、最终 QA item ID、Relay handoff/receipt 读模型、capture bundle 和 Poco enrichment schema。写路径同时冻结：交付创建版本化 BuildRequirement 及不可变 decision audit，明确 `code_requires_build | no_code_delivery | authorized_no_build_exemption`；要求构建时，Build/交付时 Bug 版本/BuildRequirement 三重 CAS 后才原子绑定 exact manifest evidence 或带理由、actor、policy、audit 的 release-manager override，并且只能推进到 `ready_for_verification`；create/result 必须复用该已提交 decision/relation。所有声明 vendor media 的写操作同时保留可达的冻结 `application/json` wire，shape 未变化时 vendor media 复用经正确 rebasing 的基础 schema。1.1 vendor supersede 在同一事务创建唯一、server-sequenced、client-identified successor，继承的 `application/json` 明确保留“旧 Attempt superseded、Bug ready，再 createRepairAttempt(parent=old)”两步兼容语义。新增版本、OpenAPI 示例、错误、executable scenarios 与 breaking 检查，不改写 P0.3 提交。
 
-验证：Android 所需 API 没有隐式 Web session 或 Relay 依赖；`init -> chunks -> finalize -> bind -> create/append` 可重放；同 key 异 payload 409；跨账号/项目拒绝；captureId/enrichmentStatus/QA item ID 响应无歧义。P3.0 全绿后才能开始原生业务实现。
+验证：Android 所需 API 没有隐式 Web session 或 Relay 依赖；`init -> chunks -> finalize -> bind -> create/append` 可重放；同 key 异 payload 409；跨账号/项目拒绝；captureId/enrichmentStatus/QA item ID 响应无歧义；逐操作证明 legacy/vendor request 与 success wire 都可达；`deliver(required) -> register -> link(manifest|audited override) -> createVerification -> start -> human result` 以及 `deliver(code+authorized no-Build exemption) -> createVerification -> start -> human result` 都是连续可达的同一 decision/relation 版本链。foreign artifact/manifest scope、缺 Build/link、stale Bug/requirement、不可能 BuildRequirement wire 状态、伪造 decision/evidence audit、重复 successor、自动验收/关闭均拒绝；vendor/legacy 精确 replay 只在当前可见并重新授权后返回原收据。P3.0 全绿后才能开始原生业务实现。
 
 #### P3.1 Poco capability 与安全 spike
 
@@ -792,7 +798,7 @@ Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
 在独立 `apps/android` 建立 Kotlin/Jetpack Compose 主客户端、原生导航/首页、版本化 API client、Room 账号/项目隔离缓存与队列、WorkManager 约束重试、Keystore 支持的本地加密、fake QA Hub 和 unit/instrumented test 基础。不是 WebView，也不 import Relay。
 
-验证：工具链 preflight 先 fail honestly/后 pass；SDK 安装后 clean Gradle build、lint/unit、进程重启、账号切换/退出清理、schema 版本升级/降级拒绝、fake API offline/reconcile 全绿；`minSdk=31`、`compileSdk=36`、`targetSdk=36` 有 version catalog/module 证据。SDK/JDK 缺失时本步骤不得标 DONE 或声称 APK 已构建。
+验证：工具链 preflight 以 metadata 识别稳定 API 37 并已通过；生成工程后 clean Gradle build、lint/unit、进程重启、账号切换/退出清理、schema 版本升级/降级拒绝、fake API offline/reconcile 全绿；`minSdk=35`、`compileSdk=37`、`targetSdk=37`、AGP `9.1.1`、Gradle `9.3.1`、Build-Tools `36.0.0` 有 version catalog/module/wrapper 证据。工程未生成或 build/test 未跑时本步骤不得标 DONE 或声称 APK 已构建。QA Hub APK 必须出自本仓库 Gradle task 并记录 SHA，不能取自 Unity Jenkins 或 Unity `/apk` 目录。
 
 #### P3.3 后端证据与移动 API
 
@@ -828,11 +834,11 @@ Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
 在实际 Poco capability 证据基础上，仅对内部 QA/Debug 测试包新增薄层：支持扩展的版本实现 `QaPocoSnapshotProvider : PocoListenersBase`、`[PocoMethod("qa.snapshot")]` 并绑定 `PocoManager.pocoListenersBase`；旧版采用最小兼容 patch 或只保留标准 Screenshot/Dump。监听必须改为 Loopback，server 注册表必须移除操作 RPC，返回版本化、大小受限、默认脱敏且回显 captureId 的 JSON；IL2CPP stripping 使用 `[Preserve]`/最小 link.xml 保护 provider，不实现完整 Reporter 或业务控制。
 
-验证：Mono/IL2CPP、横竖屏、弱机下可用；恶意同机客户端、过期 nonce/deadline、超大/敏感字段被拒；127.0.0.1 可连且 Wi-Fi/LAN 地址不可连。若无法限制 Loopback，阻断 G3 debug-ready。
+验证：Mono/IL2CPP、横竖屏、弱机下可用；恶意同机客户端、过期 nonce/deadline、超大/敏感字段被拒；同 profile 的 127.0.0.1 可连且 Wi-Fi/LAN 地址不可连。API 37 下不得为同机 Poco 请求 `ACCESS_LOCAL_NETWORK`，work profile/跨 profile 回环必须失败。若无法限制 Loopback，阻断 G3 debug-ready。
 
 #### P3.9 App/Poco 真机、性能与安全矩阵
 
-至少覆盖 Android 12/API 31（MuMu + 一台真机）、Android 13/14/15/16 真机、Pixel/AOSP 与一个强省电 OEM；Android 12L/API 32 可作为非阻塞兼容探测。交叉权限回收、方向/分辨率、锁屏、来电/弹窗、断网、重复、20 MiB 图片/短录屏、App/Unity crash、5001 占用、Poco 不存在/旧版、超时/超大 Dump、IL2CPP、弱机、恶意同机客户端和 `FLAG_SECURE`。测量 Unity ReadPixels/Screenshot/Dump 的 P50/P95 延迟、主线程和帧影响。MuMu API level 必须以 adb `getprop ro.build.version.sdk` 为证据，且不能替代 Android 12 真机的 overlay/MediaProjection/系统回收/Poco 回环验证。
+至少覆盖 Android 15/API 35（当前 MuMu + 一台真机）、Android 16/API 36、Android 17/API 37、Pixel/AOSP 与一个强省电 OEM；当前 MuMu 已实测为 Android 15/API 35/SELinux Permissive，只承担 API35 emulator lane。交叉权限回收、方向/分辨率、锁屏、来电/弹窗、断网、重复、20 MiB 图片/短录屏、App/Unity crash、5001 占用、Poco 不存在/旧版、超时/超大 Dump、IL2CPP、弱机、恶意同机客户端和 `FLAG_SECURE`。API 37 额外覆盖 `ACCESS_LOCAL_NETWORK` 不声明/不请求的同 profile loopback 正例与 LAN/跨 profile 反例、`sw600dp+` 强制自适应和方向限制失效、CT/ECH、通知自定义视图与 MediaProjection 前台服务行为。测量 Unity ReadPixels/Screenshot/Dump 的 P50/P95 延迟、主线程和帧影响。MuMu API level 必须以 adb `getprop ro.build.version.sdk` 为证据，且不能替代任何真机的 overlay/MediaProjection/系统回收/Poco/SELinux 验证。
 
 Gate `G3-ANDROID-APP-READY`：P3.0-P3.9 全绿；Android App 是可安装的原生主要客户端并跑通 Relay 离线人工闭环；普通截图在 Poco 任意失败下可提交；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。此 Gate 是 App-first 核心关键路径。
 
@@ -924,7 +930,7 @@ Gate `G5-RELAY-INTEGRATED`：真实 QA Bug 一键创建 Relay Task，交付后�
 
 要做：站内 Inbox、Android notification/push token 轮换、静默期、原生待办深链、超时升级；Push 失败不影响 Inbox 事实。
 
-验证：服务/App 崩溃重启后通知不丢不重；过时提醒被取消；Android 12/13/14/15/16 真机通知；拒绝通知权限时 App Inbox 可靠降级。
+验证：服务/App 崩溃重启后通知不丢不重；过时提醒被取消；Android 15/16/17 真机通知；API 37 自定义通知视图大小限制和 MediaProjection 前台服务可见通知满足平台约束；拒绝通知权限时 App Inbox 可靠降级。
 
 Gate `G6-BUILD-VERIFICATION`：真实构建完成后指定验收人收到通知并进入待验收。
 
@@ -987,18 +993,15 @@ Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，�
 
 测试槽位：
 
-| 槽位 | 原生全流转 | Capture/Share | Poco 标准 RPC | qa.snapshot | 离线/续传 | 通知 |
-|---|---:|---:|---:|---:|---:|---:|
-| Android 12 / API 31 MuMu | 自动化/补测 | 补测 | 回环补测 | capability 决定 | 必测 | 补测 |
-| Android 12 / API 31 真机 | 必测 | 必测 | 127.0.0.1/LAN 必测 | capability 决定 | 必测 | 必测 |
-| Android 12L / API 32 | 非阻塞兼容探测 | 探测 | 探测 | capability 决定 | 探测 | 探测 |
-| Android 13 / API 33 真机 | 必测 | Task Manager Stop 必测 | 必测 | capability 决定 | 必测 | 必测 |
-| Android 14 / API 34 真机 | 必测 | 每会话授权/token 反例必测 | 必测 | capability 决定 | 必测 | 必测 |
-| Android 15 / API 35 真机 | 必测 | FGS/BOOT 限制必测 | 必测 | capability 决定 | 必测 | 必测 |
-| Android 16 / API 36 真机 | 必测 | targetSdk 36 行为必测 | 必测 | capability 决定 | 必测 | 必测 |
-| 强省电 OEM 真机 | 必测 | 权限回收/kill 必测 | 回环/LAN 必测 | capability 决定 | 必测 | 必测 |
+| 槽位                     |     原生全流转 |             Capture/Share |                                              Poco 标准 RPC |     qa.snapshot | 离线/续传 |            通知 |
+| ------------------------ | -------------: | ------------------------: | ---------------------------------------------------------: | --------------: | --------: | --------------: |
+| 当前 MuMu / Android 15 / API 35 / Permissive | 自动化/补测 | 补测，不作安全 Gate | 回环功能补测 | capability 决定 | 必测 | 补测 |
+| Android 15 / API 35 真机 |           必测 |         FGS/BOOT 限制必测 |                                                       必测 | capability 决定 |      必测 |            必测 |
+| Android 16 / API 36 真机 |   运行兼容必测 |       API 36 兼容行为必测 |                                                       必测 | capability 决定 |      必测 |            必测 |
+| Android 17 / API 37 真机 | target 37 必测 |   FGS/通知/大屏自适应必测 | 同 profile loopback 成功且无 LAN 权限；LAN/跨 profile 失败 | capability 决定 |      必测 | API 37 限制必测 |
+| 强省电 OEM 真机          |           必测 |        权限回收/kill 必测 |                                              回环/LAN 必测 | capability 决定 |      必测 |            必测 |
 
-每个槽位交叉 Wi-Fi/蜂窝/切换/飞行模式/弱网、锁屏/后台/App kill/Unity crash、权限拒绝/撤销、磁盘不足、20 MiB 图片/短录屏、单/双/长按、横竖屏/分辨率/字体 200%/深色模式、5001 占用与 5002..5005 回退、超时/超大 hierarchy、IL2CPP/弱机/恶意同机客户端/`FLAG_SECURE`。MuMu 的真实 API level 在 adb 可用后用 `getprop ro.build.version.sdk` 记录；模拟器只补自动化，不替代 Android 12 真机或其他必测真机。
+每个槽位交叉 Wi-Fi/蜂窝/切换/飞行模式/弱网、锁屏/后台/App kill/Unity crash、权限拒绝/撤销、磁盘不足、20 MiB 图片/短录屏、单/双/长按、横竖屏/分辨率/字体 200%/深色模式、5001 占用与 5002..5005 回退、超时/超大 hierarchy、IL2CPP/弱机/恶意同机客户端/`FLAG_SECURE`。API 37 还要保存未声明 `ACCESS_LOCAL_NETWORK` 的 manifest 证据、同 profile/跨 profile loopback 结果、LAN 拒绝、`sw600dp+`/多窗口状态保存、默认 CT 与所选网络库 ECH 协商/fallback、通知/FGS 结果。MuMu 的真实 API level 在 adb 可用后用 `getprop ro.build.version.sdk` 记录；模拟器只补自动化，不替代任何必测真机。
 
 Gate `G9-REAL-DEVICE`：保存 Android/设备/Unity/Poco/App 完整版本、APK/AAB SHA、录屏、request ID/item ID、P50/P95 和结果；不能用 DevTools、MuMu 标签或模拟器替代真机证据。
 
@@ -1038,15 +1041,15 @@ Gate `G10-PRODUCTION-CANARY`：真实用户 URL 验证通过并记录最后部�
 
 P0 contracts 冻结后：
 
-| 车道 | 独占目录/工作 | 可并行阶段 | 汇合点 |
-|---|---|---|---|
-| A Domain/API | `packages/domain`, API handlers；主代理独占迁移/contracts | P1/P2/P4 | G4 |
-| B Android App | `apps/android`；Compose、Room、WorkManager、capture、Poco client、原生流转 UI；使用 fake contracts | P3.2/P3.4-P3.7/P4；P3.0 后启动 | G3/G4 |
-| C Evidence/Reliability | storage、upload、outbox/inbox、worker | P1/P3/P6 | G6 |
-| D Integrations/Test | relay-client、build-client、fake servers、contract/e2e | P5/P6 | G6 |
-| E Ops/Security | runbooks、health、backup、service scripts、安全测试 | P2/P8/P10 | G8/G10 |
-| F Poco QA Bridge | 实际 Unity QA/Debug 测试包中的最小 loopback/provider 兼容层；先只读审计，后独占明确文件 | P3.1/P3.8 | G3 |
-| W post-MVP Web | `apps/web`；仅未来桌面批量管理/只读诊断 | P7.4 DEFERRED | 不阻塞 0.1 |
+| 车道                   | 独占目录/工作                                                                                      | 可并行阶段                     | 汇合点     |
+| ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- |
+| A Domain/API           | `packages/domain`, API handlers；主代理独占迁移/contracts                                          | P1/P2/P4                       | G4         |
+| B Android App          | `apps/android`；Compose、Room、WorkManager、capture、Poco client、原生流转 UI；使用 fake contracts | P3.2/P3.4-P3.7/P4；P3.0 后启动 | G3/G4      |
+| C Evidence/Reliability | storage、upload、outbox/inbox、worker                                                              | P1/P3/P6                       | G6         |
+| D Integrations/Test    | relay-client、build-client、fake servers、contract/e2e                                             | P5/P6                          | G6         |
+| E Ops/Security         | runbooks、health、backup、service scripts、安全测试                                                | P2/P8/P10                      | G8/G10     |
+| F Poco QA Bridge       | 实际 Unity QA/Debug 测试包中的最小 loopback/provider 兼容层；先只读审计，后独占明确文件            | P3.1/P3.8                      | G3         |
+| W post-MVP Web         | `apps/web`；仅未来桌面批量管理/只读诊断                                                            | P7.4 DEFERRED                  | 不阻塞 0.1 |
 
 并行纪律：
 
@@ -1074,7 +1077,7 @@ P0 contracts 冻结后：
 
 ### 必须手工或真实环境验证
 
-- Android 12/13/14/15/16 原生 App 安装、全流转、MediaProjection/overlay/Share/Picker、离线恢复与通知；12L 为非阻塞探测。
+- Android 15/16/17 原生 App 安装、全流转、MediaProjection/overlay/Share/Picker、离线恢复与通知；API 35 是最低支持层，API 36 为运行兼容层，API 37 额外覆盖本地网络权限、同/跨 profile 回环、大屏自适应、CT/ECH 与通知/FGS 行为。
 - Poco 真实回环连接、LAN 不可达、标准/旧版/qa.snapshot、IL2CPP/弱机和 ReadPixels/Dump 性能矩阵。
 - 真实借用设备退出后的本地数据清理。
 - 真实 Relay 一键派发和 delivery evidence。
@@ -1118,23 +1121,23 @@ QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 
 ## 18. 最高风险与应对
 
-| 风险 | 应对 |
-|---|---|
-| 现有 Relay API 无 M2M 授权 | 新建 scoped integration routes；Android/Web 客户端都不直连 Relay，M2M 凭据只在服务端 |
-| SSE 超 250 条可能漏事件 | durable webhook outbox + inbox + reconcile API |
-| 创建幂等无 payload hash | handoff/action canonical hash + DB unique |
-| 后续 Turn 无幂等 | 新增 `qa_turn_requests` 动作键 |
-| Relay 上传接口暴露本机路径 | QA 保管证据，Relay 受控拉取，响应白名单 |
-| Relay 工作树已有大量用户改动 | 独立目录开发；Relay 阶段逐文件审计，禁止破坏性 Git |
-| SQLite 写竞争或附件膨胀 | WAL/短事务/指标/磁盘阈值；达到触发条件迁移 PostgreSQL |
-| Android SDK/JDK 当前未安装 | P3.0/P3.1/P1/P2 继续；按 `docs/ANDROID_SETUP.md` 安装 Studio+SDK36 并使用 bundled JDK，preflight 绿前不宣称 APK build |
-| Android 截图权限或生命周期被误解 | 每次显式 MediaProjection 同意、前台服务通知、onStop 清理、Sharesheet/Photo Picker 降级；禁止静默捕获和相册扫描 |
-| App 误采敏感内容或 Poco 暴露控制面 | 显著状态/停止入口、尊重 FLAG_SECURE、本地加密/保留；Poco 仅 loopback+只读 allowlist，LAN 暴露阻断 Gate |
-| Poco 不存在、旧版或自定义扩展不兼容 | 先做实际版本 capability spike；标准 Screenshot/Dump fallback，qa.snapshot 薄兼容层，不实现完整 Reporter |
-| 借用手机数据串用 | 短会话、默认无 Push、退出清理本地命名空间 |
-| Relay 迟到事件覆盖人工处理 | Attempt generation、handling mode 和 event order 守卫 |
-| Build 完成但不含修复 Commit | 精确 SHA/manifest identity，Release Manager 覆盖需审计 |
-| 源码完成被误当上线 | 真实 URL、真实设备、真实恢复和 canary 门禁 |
+| 风险                                | 应对                                                                                                                  |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 现有 Relay API 无 M2M 授权          | 新建 scoped integration routes；Android/Web 客户端都不直连 Relay，M2M 凭据只在服务端                                  |
+| SSE 超 250 条可能漏事件             | durable webhook outbox + inbox + reconcile API                                                                        |
+| 创建幂等无 payload hash             | handoff/action canonical hash + DB unique                                                                             |
+| 后续 Turn 无幂等                    | 新增 `qa_turn_requests` 动作键                                                                                        |
+| Relay 上传接口暴露本机路径          | QA 保管证据，Relay 受控拉取，响应白名单                                                                               |
+| Relay 工作树已有大量用户改动        | 独立目录开发；Relay 阶段逐文件审计，禁止破坏性 Git                                                                    |
+| SQLite 写竞争或附件膨胀             | WAL/短事务/指标/磁盘阈值；达到触发条件迁移 PostgreSQL                                                                 |
+| Android 工具链已绿但工程/设备证据未产生 | P3.0/P3.1/P1/P2 继续；P3.2 生成并 pin AGP 9.1.1 + Gradle 9.3.1 + SDK37/Build-Tools36.0.0；adb 无设备时不宣称 instrumented/真机通过 |
+| Android 截图权限或生命周期被误解    | 每次显式 MediaProjection 同意、前台服务通知、onStop 清理、Sharesheet/Photo Picker 降级；禁止静默捕获和相册扫描        |
+| App 误采敏感内容或 Poco 暴露控制面  | 显著状态/停止入口、尊重 FLAG_SECURE、本地加密/保留；Poco 仅 loopback+只读 allowlist，LAN 暴露阻断 Gate                |
+| Poco 不存在、旧版或自定义扩展不兼容 | 先做实际版本 capability spike；标准 Screenshot/Dump fallback，qa.snapshot 薄兼容层，不实现完整 Reporter               |
+| 借用手机数据串用                    | 短会话、默认无 Push、退出清理本地命名空间                                                                             |
+| Relay 迟到事件覆盖人工处理          | Attempt generation、handling mode 和 event order 守卫                                                                 |
+| Build 完成但不含修复 Commit         | 精确 SHA/manifest identity，Release Manager 覆盖需审计                                                                |
+| 源码完成被误当上线                  | 真实 URL、真实设备、真实恢复和 canary 门禁                                                                            |
 
 ## 19. 开始实施时的第一批动作
 
@@ -1146,4 +1149,4 @@ QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 4. 建立本机可运行的 Web/API/Worker/Domain/Contracts/Storage 骨架。
 5. 验证空库健康、全量基础命令和 Relay 工作区未变化。
 6. App-first 决策后执行 P3.0 contract delta；通过后并行启动 P3.1 Poco spike、P3.2 Android foundation 与 P1/P2 backend。
-7. Android SDK/JDK preflight 未通过时，继续 contracts/backend/Poco 只读审计，但 P3.2+ 不得标 build/test green；绝不为模拟器关闭 Hyper-V。
+7. Android toolchain preflight 已通过；P3.2 生成工程并完成 clean build/lint/unit 前仍不得标 build green，adb 无 MuMu/真机时不得标 instrumented/device green；绝不为模拟器关闭 Hyper-V。

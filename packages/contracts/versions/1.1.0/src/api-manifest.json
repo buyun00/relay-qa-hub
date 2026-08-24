@@ -1,0 +1,875 @@
+{
+  "contractVersion": "1.1.0",
+  "baseContractVersion": "1.0.0",
+  "apiPrefix": "/api/v1",
+  "mediaType": "application/vnd.relay-qa-hub.v1.1+json",
+  "androidPlatform": {
+    "minSdk": 35,
+    "compileSdk": 37,
+    "targetSdk": 37,
+    "pocoEndpoint": "127.0.0.1 in the same Android profile",
+    "accessLocalNetworkPermission": "must not be declared or requested solely for same-profile Poco loopback"
+  },
+  "contentNegotiation": {
+    "androidAccept": "application/vnd.relay-qa-hub.v1.1+json, application/json;q=0.9",
+    "responseAcceptByOperation": {
+      "getAttachment": "application/octet-stream, application/vnd.relay-qa-hub.v1.1+json;q=0.9, application/json;q=0.8",
+      "streamEvents": "text/event-stream, application/vnd.relay-qa-hub.v1.1+json;q=0.9, application/json;q=0.8"
+    },
+    "requestContentTypeByOperation": {
+      "putUploadChunk": "application/octet-stream"
+    },
+    "requestRule": "select Content-Type from the exact request media advertised by that operation; use the 1.1 vendor type for versioned JSON bodies, application/json only when advertised by an inherited JSON body, and application/octet-stream for putUploadChunk",
+    "responseRule": "select Accept from all response media advertised by that operation; JSON operations use the vendor-plus-JSON preference, while getAttachment and streamEvents put their binary or SSE success media first and retain vendor plus legacy JSON fallbacks for structured errors; never invent an application/json success representation for binary or SSE operations",
+    "unsupportedAcceptErrorCode": "NOT_ACCEPTABLE",
+    "unsupportedContentTypeErrorCode": "UNSUPPORTED_MEDIA_TYPE"
+  },
+  "nativeSessionPolicy": {
+    "accessTokenMaxTtlSeconds": 900,
+    "sharedDeviceIdleTimeoutSeconds": 1800,
+    "sharedDeviceAbsoluteSessionSeconds": 28800,
+    "personalRefreshMaxLifetimeSeconds": 2592000,
+    "rotateRefreshTokenOnEveryUse": true,
+    "refreshReuseRevokesTokenFamily": true,
+    "accountIsolationRule": "nativeSession.accountId is the stable tenant partition key for Room cache, offline queue, files, notifications, and idempotency state; a changed accountId clears the prior account partition and requires reauthentication before any queued action can run"
+  },
+  "rbacRoles": [
+    "viewer",
+    "reporter",
+    "developer",
+    "verifier",
+    "triager",
+    "release_manager",
+    "project_admin"
+  ],
+  "nativeRefreshReplayPolicy": {
+    "retentionSeconds": 300,
+    "ordering": "validate token signature/hash, token family, and installation; for a consumed token replay the encrypted response only when operation, Idempotency-Key, canonical payload, and an unexpired snapshot whose expiry is no more than retentionSeconds after the server-recorded consumedAt all match; otherwise revoke the family and require reauthentication",
+    "expiredSnapshotPolicy": "a consumed token whose exact replay snapshot expired revokes the family and returns REAUTHENTICATION_REQUIRED",
+    "newActionWithConsumedToken": "revokes the token family and returns REAUTHENTICATION_REQUIRED"
+  },
+  "offlineLeasePolicy": {
+    "uploadSessionMaxTtlSeconds": 3600,
+    "bindingLeaseMaxTtlSeconds": 86400,
+    "uploadAttemptField": "uploadAttempt",
+    "uploadRestartRule": "uploadAttempt starts at 1 and increments by exactly one only after server-observed time reaches the server-issued expiresAt of the prior session; expiry observations and replacement-session issuance use monotonic server time, while the stable clientAttachmentId and content identity are preserved and a new sessionId is issued",
+    "chunkAccountingRule": "for every accepted chunk, compute SHA-256 over the exact request bytes and require it to equal X-Chunk-SHA256 and the persisted chunk hash; non-final chunks equal chunkSize, the final chunk equals the exact remainder, confirmed chunk indexes are unique, and their byte sum must equal expectedSize before finalize",
+    "finalizeIntegrityRule": "reassemble the persisted chunk bytes in chunkNumber order, compute SHA-256 again, and require exact equality with the immutable init sha256, finalize sha256, persisted-object sha256, expectedSize, and durably readable stored-object size before creating an attachment",
+    "scanRule": "finalize always creates an unbound attachment and may return pending, clean, rejected, or unavailable; readyToBind is true only for clean, mutable metadata observations may advance pending or unavailable to clean or rejected, and bind fails closed until clean",
+    "bindingLeaseGenerationField": "leaseGeneration",
+    "bindingRenewRule": "leaseGeneration starts at 1 and increments by exactly one only after the prior unclaimed reservation expires; first bind and renewal compare expectedVersion to the current aggregate version, return responseVersion=expectedVersion+1, keep the same bindingId and tuple on renewal, use monotonic server-observed time, and never reopen a claimed binding",
+    "commitRule": "the submission commit freezes account, actor, project, clientSubmissionId, intent, and targetQaItemId; inside one transaction it validates every attachment and reservation before mutating any, atomically re-reads clean scan, readyToBind, durable blob readability, current attachment version, current lease generation, reservation time and expiry, then claims every listed clientAttachmentId or claims none"
+  },
+  "occurrenceMetadataPolicy": {
+    "allowedEnvironmentFields": ["qaAppVersion", "testSessionId", "buildId", "networkType", "networkMetered", "orientation"],
+    "maxSerializedUtf8Bytes": 256,
+    "sourceRule": "the App may submit only legally available device, QA version, session, build, network, and orientation metadata; project, observed time, device/OS, tested resource version, and git SHA use their typed occurrence fields rather than arbitrary environment keys",
+    "referenceRule": "a non-null buildId is a server entity reference and must resolve through a typed fact to the same account, project, and resulting Bug before create or append commits; testSessionId is an opaque App-generated correlation identifier and is never dereferenced as server authority",
+    "sensitiveFieldRule": "reject unknown keys, credentials, tokens, account identifiers, player coordinates, arbitrary Unity state, nested objects, and free-form blobs; custom game context belongs only in the bounded redacted Poco qa.snapshot contract"
+  },
+  "auditProjectionPolicy": {
+    "redactionPolicyVersion": "1.0.0",
+    "allowedPayloadFields": ["summary", "reason", "status", "relatedBugId", "repairAttemptId", "buildId", "verificationId", "attachmentId", "captureId", "handoffId", "commentId", "occurrenceId", "commitSha", "attachmentCount", "fromVersion", "toVersion"],
+    "allowedVerificationEventTypes": ["verification.created", "verification.started", "verification.result_recorded"],
+    "maxPayloadSerializedUtf8Bytes": 4096,
+    "projectionRule": "native App audit and SSE projections are server-built from typed durable facts and expose only the enumerated bounded fields; they never echo a durable raw event payload",
+    "referenceRule": "every projected UUID payload reference and aggregate identity is bound by a typed server fact to the same account/project and owning Bug; a syntactically valid UUID is never sufficient authority",
+    "authorityRule": "relay and build sources cannot emit Bug or Verification actions, non-null Bug transitions, or human acceptance/verification/closure statuses; any Bug transition is a QA Hub user action, every projected Verification result or human authority status requires a typed same-account/project/Bug assigned-verifier result proof, and closure additionally requires that proof to be passed and close-authorized",
+    "forbiddenContentRule": "never expose request or response bodies, Authorization or Cookie values, credentials, notification tokens, local paths, raw attachment bytes, arbitrary nested objects, or unredacted account data"
+  },
+  "streamProjectionPolicy": {
+    "maxEventSerializedUtf8Bytes": 65536,
+    "orderingRule": "deliverySequence is a durable account stream ordering independent from nativeAuditEvent.sequence, which remains Bug-local; multiple Bugs may each have event sequence 1 while their deliverySequence values remain strictly increasing",
+    "cursorRule": "each SSE id is an opaque integrity-protected cursor bound to account, actor, current membership revision and exact authorized-project set, normalized filters, deliverySequence, and eventId; clients must not use eventId or Bug-local sequence as Last-Event-ID",
+    "heartbeatRule": "heartbeats are comment-only frames with no id or deliverySequence and never advance resume state",
+    "retentionRule": "a resume sequence below the durable retention floor or above current high-water is rejected and requires a bounded resynchronization rather than silent event loss"
+  },
+  "attachmentDownloadPolicy": {
+    "deliveryMode": "same-origin authenticated proxy only for 0.1; redirects are not emitted",
+    "authorizationRule": "resolve path attachmentId to the authenticated account and an authorized project before blob open; claimed evidence requires a currently visible Bug claim, while an unclaimed reservation is owner-only and valid only during its server-issued lease",
+    "integrityRule": "a fresh current-membership authorization snapshot is bound before blob open; decision id, read snapshot, attachment version, immutable blob version, exact decoded bytes, SHA-256-derived immutable ETag, size, validated media type/magic, scan=clean, readyToBind=true, and durable readability are bound before response",
+    "rangeRule": "support only one RFC 7233 bytes range; valid ranges return 206 with exact slice, Content-Range, Content-Length and immutable ETag; unsatisfiable or malformed ranges return 416 with Content-Range bytes */size; multi-range is rejected",
+    "safeHeadersRule": "all 0.1 attachment bytes use application/octet-stream plus Content-Disposition attachment with a server-sanitized filename, X-Content-Type-Options nosniff, Cache-Control private/no-store, Accept-Ranges bytes, and immutable ETag; original mediaType remains metadata only"
+  },
+  "capturePolicy": {
+    "maxStartSkewMs": 5000,
+    "correlationRule": "all screenshot and Poco artifacts must start within 5 seconds of the server-bound capture timestamp; recording duration is bounded separately and recording enrichment is sampled only at an explicit marker or stop event",
+    "timestampToleranceMs": 1,
+    "maxScreenshotDurationMs": 5000,
+    "maxRecordingDurationMs": 120000,
+    "pocoSucceededMeaning": "an RPC succeeded only when its required bounded evidence is durably persisted and readable; Screenshot, Dump, GetDebugProfilingData, and qa.snapshot map to poco_screenshot, poco_hierarchy, poco_profiling, and poco_snapshot artifacts",
+    "artifactIdentityRule": "each artifact kind occurs at most once per capture and each succeeded artifact has a unique clientAttachmentId and attachmentId; the primary system evidence cannot alias a Poco artifact",
+    "deviceReferenceRule": "capture device.testSessionId is opaque client correlation only; a non-null device.buildId is a server Build reference and must resolve to the authenticated account/project through a typed fact before capture creation",
+    "attachmentFactRule": "before accepting any succeeded artifact, resolve its attachment server-side and require the same authenticated account, actor, project, clientSubmissionId, clientAttachmentId, captureId, clean scan, readyToBind=true, reserved-or-claimed binding, and durable readability; never trust artifact status or identifiers supplied by the client",
+    "decodedSizeLimitsByKind": {
+      "poco_hierarchy": 1048576,
+      "poco_snapshot": 262144,
+      "default": 20971520
+    },
+    "allowedMediaTypesByKind": {
+      "system_screenshot": ["image/png", "image/jpeg", "image/webp"],
+      "system_recording": ["video/mp4", "video/webm"],
+      "poco_screenshot": ["image/png", "image/jpeg", "image/webp"],
+      "poco_hierarchy": ["application/json", "application/gzip"],
+      "poco_profiling": ["application/json", "application/gzip"],
+      "poco_snapshot": ["application/json", "application/gzip"]
+    }
+  },
+  "notificationPolicy": {
+    "tokenIssuedAtMaxFutureSkewSeconds": 300,
+    "orderingAuthority": "expectedVersion compare-and-swap and serverReceivedAt are authoritative; tokenIssuedAt is bounded client metadata and never permanently orders or locks an installation",
+    "secretStorageRule": "FCM tokens and Web Push endpoint/key material are encrypted at rest under least-privilege access; idempotency stores only a server-peppered HMAC digest, and raw values never enter logs, metrics, audit payloads, or replay lookup keys"
+  },
+  "relayProjectionPolicy": {
+    "externalRevision": "strictly monotonic per handoff; lower revisions are ignored, equal revision plus equal canonical payload replays, and equal revision plus different payload conflicts",
+    "authorityCeiling": "Relay uses an allowlist of repair delivery and build projection actions only; it cannot create or change any verification result or QA Bug workflow state, including pass, fail, block, cancel, accept, reject, defer, duplicate, or close",
+    "allowedActions": ["repair.queued", "repair.submitted", "repair.running", "repair.needs_input", "repair.blocked", "repair.failed", "repair.fix_delivered", "repair.awaiting_build", "repair.awaiting_verification", "build.pending", "build.exact_commit_eligible"]
+  },
+  "idempotency": {
+    "scope": "authenticated account + authenticated actor + project + operationId + Idempotency-Key",
+    "operationScopes": {
+      "createPushSubscription": "authenticated account + authenticated actor + subscription endpoint digest + operationId + Idempotency-Key"
+    },
+    "replayAuthorizationRule": "authenticate the actor and authorize the current resource account/project scope before any idempotency lookup or replay; a cross-account, cross-actor, or cross-project lookup returns NOT_FOUND without revealing whether a key exists",
+    "canonicalJson": "UTF-8 JSON with lexicographically sorted object keys and preserved array order",
+    "sensitiveRequestDigest": "HMAC-SHA-256 with a server-only per-environment pepper over the canonical request; raw credentials, refresh tokens, notification tokens, Web Push endpoints/key material, and unkeyed secret digests are never persisted in idempotency storage, logged, emitted to metrics, or written to audit events",
+    "sensitiveOperationIds": ["createNativeSession", "refreshNativeSession", "registerAndroidNotificationDevice", "createPushSubscription"],
+    "binaryChunkHash": "SHA-256 of canonical JSON {idempotencyKey,operationId:'putUploadChunk',scope:{accountId,actorId,projectId,sessionId,chunkNumber},request:{sessionId,chunkNumber,uploadAttempt,ifMatch,contentLength,xChunkSha256,xClientSubmissionId,xClientAttachmentId,bodySha256}}, where bodySha256 is SHA-256 over the exact request bytes and canonical JSON uses lexicographically sorted UTF-8 object keys with preserved array order",
+    "submissionKeyTemplate": "submission:<clientSubmissionId>:commit",
+    "attachmentStageKeyTemplate": "submission:<clientSubmissionId>:attachment:<clientAttachmentId>:upload:<uploadAttempt>:<stage>",
+    "chunkKeyTemplate": "submission:<clientSubmissionId>:attachment:<clientAttachmentId>:upload:<uploadAttempt>:chunk:<chunkNumber>",
+    "bindingKeyTemplate": "submission:<clientSubmissionId>:attachment:<clientAttachmentId>:bind:<leaseGeneration>"
+  },
+  "workflowWritePolicy": {
+    "receiptRule": "every repair, verification, Build registration, and Build-link write authenticates and authorizes the current account/project resource before idempotency, commits the exact domain mutation, one typed audit event, notification outbox effects, and the replayable HTTP receipt atomically, and returns the original receipt on an exact authorized replay",
+    "repairStateRule": "create moves a ready Bug to in_progress with one active planned Attempt; start moves planned to running; delivery moves running to delivered and the Bug to awaiting_build or ready_for_verification; failure moves the Bug to ready and clears the active Attempt; the 1.1 vendor supersede atomically retires the old Attempt and creates exactly one client-identified planned successor, while inherited application/json retains the explicit two-step compatibility flow old->superseded/Bug->ready followed by createRepairAttempt(parentAttemptId=old)",
+    "verificationStateRule": "verification creation requires the latest non-superseded delivered Attempt, exact eligible Build when required, an active verifier, and separation of duties; start moves requested to in_progress; a human passed result closes the Bug, failed marks the Attempt verification_failed and returns the Bug to ready, and blocked leaves the delivered Attempt and Bug ready_for_verification",
+    "representationEquivalenceRule": "the vendor and inherited application/json representations of recordVerificationResult and linkBuildRepair execute the same authorization, compare-and-swap, relation, Build identity, separation-of-duties, audit, outbox, idempotency, and atomic state invariant; supersede is the declared compatibility exception because legacy has no successor draft and therefore performs the safe first half of an explicit two-step replacement rather than silently cloning an old mode or assignee; a smaller legacy response never permits a smaller proof for the operation it represents",
+    "buildAuthorityRule": "Build registration requires release authority and a unique provider/external identity; ready requires a durable artifact fact bound to account, project, Build, provider job, source commit, manifest digest, hash, and URL. Delivery creates BuildRequirement v1 with an immutable typed decision audit: code_requires_build, no_code_delivery, or authorized_no_build_exemption. Required linking atomically CASes the Build, the stored delivery-time Bug version, and BuildRequirement v1, then writes BuildRequirement v2 plus one versioned repair link whose durable evidence decision is either manifest_verified or release_manager_authorized and is bound to its actor and audit event. Verification reuses that exact decision/relation; linking never verifies, accepts, or closes a Bug",
+    "legacyBuildLinkCasRule": "the inherited application/json link request derives expectedBugVersion and expectedBuildRequirementVersion from the immutable server-owned delivery BuildRequirement and performs the same exact CAS as the vendor request; it never locks or advances an arbitrary current compatible Bug version"
+  },
+  "nativeBaseOperationIds": [
+    "createBug",
+    "listBugs",
+    "getBug",
+    "updateBug",
+    "transitionBug",
+    "addOccurrence",
+    "listDuplicateCandidates",
+    "markBugDuplicate",
+    "createRepairAttempt",
+    "startRepairAttempt",
+    "deliverRepairAttempt",
+    "failRepairAttempt",
+    "supersedeRepairAttempt",
+    "dispatchRepairAttemptToRelay",
+    "continueRelayRepairAttempt",
+    "createVerification",
+    "startVerification",
+    "recordVerificationResult",
+    "initUpload",
+    "putUploadChunk",
+    "finalizeUpload",
+    "getAttachment",
+    "listBugEvents",
+    "streamEvents",
+    "listNotifications",
+    "markNotificationRead",
+    "listProjectBuilds",
+    "registerBuild",
+    "linkBuildRepair",
+    "getDependencyHealth"
+  ],
+  "nativeAuthorizationPolicies": {
+    "createBug": { "authorizationPolicy": "resolve the authenticated account, actor, reporter role, and writable project before idempotency; moduleId must resolve inside that project and every capture/attachment claim must belong to the same scoped submission" },
+    "listBugs": { "authorizationPolicy": "derive the visible project set from the current account membership, apply project/module/state/owner/text filters before pagination, and reject any item outside that set", "paginationPolicy": "cursor is integrity protected and bound to account, actor, authorized-project snapshot, normalized filters, sort, and snapshot sequence" },
+    "getBug": { "authorizationPolicy": "resolve path bugId through a server-owned Bug inside the authenticated account and current project membership before returning any field" },
+    "updateBug": { "authorizationPolicy": "resolve path bugId and current version before idempotency; require an authorized role and prove every requested moduleId, ownerId, and verificationOwnerId belongs to the same Bug project" },
+    "transitionBug": { "authorizationPolicy": "resolve path bugId, current state/version, and actor role before idempotency; validate the requested human transition without allowing machine verification, acceptance, or closure" },
+    "addOccurrence": { "authorizationPolicy": "resolve path bugId inside an authorized project before idempotency and bind the occurrence, capture bundle, and claimed attachments to that same Bug/project/submission" },
+    "listDuplicateCandidates": { "authorizationPolicy": "resolve path bugId first; return a bounded, non-paginated top-five list whose candidates are server-filtered to distinct non-self Bugs readable in the same authorized project before scoring" },
+    "markBugDuplicate": { "authorizationPolicy": "resolve both path bugId and canonicalBugId as distinct server-owned Bugs in the same authorized project, verify actor role and expectedVersion, then append the relation atomically" },
+    "createRepairAttempt": { "authorizationPolicy": "resolve path bugId in an authorized project, require developer/triager authority and current Bug version, and reject hidden or already-active repair relations before idempotency" },
+    "startRepairAttempt": { "authorizationPolicy": "resolve path attemptId through its server-owned Bug/project and current attempt version before idempotency; require an authorized human actor" },
+    "deliverRepairAttempt": { "authorizationPolicy": "resolve path attemptId through its Bug/project and current version before idempotency; bind delivered commit and optional Build requirement to server-owned evidence" },
+    "failRepairAttempt": { "authorizationPolicy": "resolve path attemptId through its Bug/project and current version before idempotency; require authorized human failure attribution" },
+    "supersedeRepairAttempt": { "authorizationPolicy": "resolve the current Attempt through its authorized Bug/project and current version before idempotency; for the 1.1 vendor draft require an unused successor id, active assignable assignee, server-derived next sequence and parent=old, then create successor atomically; inherited application/json supersedes only the old Attempt, moves Bug to ready, and requires a later createRepairAttempt with parentAttemptId=old" },
+    "dispatchRepairAttemptToRelay": { "authorizationPolicy": "resolve path attemptId to its authorized Bug, current handoff, Relay instance, version, and selected clean claimed readable attachment facts before idempotency or outbox enqueue" },
+    "continueRelayRepairAttempt": { "authorizationPolicy": "resolve path attemptId and current Relay handoff inside the authorized Bug/project before idempotency; continuation cannot change Bug verification or closure state" },
+    "createVerification": { "authorizationPolicy": "resolve path bugId, eligible repair attempt, Build identity requirement, project membership, verifier role, and current Bug version before idempotency" },
+    "startVerification": { "authorizationPolicy": "resolve path verificationId through its Bug/project and current version before idempotency; require the assigned or otherwise authorized verifier" },
+    "recordVerificationResult": { "authorizationPolicy": "resolve path verificationId through its Bug/project, repair attempt, Build identity, assigned verifier, and current version before idempotency; only a human result can accept or reject" },
+    "initUpload": { "authorizationPolicy": "resolve account, actor, writable project, stable submission/attachment tuple, upload attempt, and immutable content identity before idempotency" },
+    "putUploadChunk": { "authorizationPolicy": "resolve path sessionId inside the authenticated account/actor/project before idempotency and version checks; hash exact bytes before persistence" },
+    "finalizeUpload": { "authorizationPolicy": "resolve path sessionId inside the authenticated account/actor/project before idempotency and atomically verify every persisted chunk, aggregate hash, size, and durable object" },
+    "getAttachment": { "authorizationPolicy": "resolve path attachmentId and its server-owned account/project/claim before opening or streaming bytes; require current read membership plus clean, claimed, durably readable evidence, or the still-valid owner-only reservation; hidden resources return NOT_FOUND and 0.1 never redirects" },
+    "listBugEvents": { "authorizationPolicy": "resolve path bugId inside an authorized project and filter events through that Bug before pagination", "paginationPolicy": "cursor is bound to account, actor, projectId, bugId, afterSequence, filters, and snapshot sequence" },
+    "streamEvents": { "authorizationPolicy": "derive the current account/actor/project visibility set before opening SSE, recheck current Bug membership at emit time, and expose only Bug-owned nativeAuditEvent projections; suppress every event outside it", "paginationPolicy": "resume cursor and Last-Event-ID are integrity protected and bound to account, actor, membership revision, exact authorized-project set, normalized filters, and account-wide deliverySequence; nativeAuditEvent.sequence remains Bug-local" },
+    "listNotifications": { "authorizationPolicy": "filter before pagination to the authenticated account/user and projects in the current membership snapshot; never return or count a foreign notification", "paginationPolicy": "cursor is bound to account, user, authorized-project snapshot, projectId, unreadOnly, and snapshot sequence" },
+    "markNotificationRead": { "authorizationPolicy": "resolve path notificationId inside the authenticated account/user and current project membership before idempotency; exact replay is scoped to the same actor, operation key, and canonical request" },
+    "listProjectBuilds": { "authorizationPolicy": "resolve path projectId inside the authenticated account and current membership before filtering Builds", "paginationPolicy": "cursor is bound to account, actor, projectId, Build status filter, and snapshot sequence" },
+    "registerBuild": { "authorizationPolicy": "resolve path projectId and release authority before idempotency; bind source commit, manifest commits, job identity, and artifact facts to that project" },
+    "linkBuildRepair": { "authorizationPolicy": "resolve path buildId, requested delivered repair attempt, its immutable BuildRequirement v1 plus delivery decision audit, and the delivery-time awaiting_build Bug through the same authorized project before idempotency; vendor CAS values come from the request while legacy values come from the stored requirement. Manifest evidence is bound to account/project/Build/Attempt/commit/manifest digest; release-manager override evidence requires current authority and persists the reason, actor, policy and typed audit identity on the immutable relation. Either representation rejects stale versions before moving only to ready_for_verification" },
+    "getDependencyHealth": { "authorizationPolicy": "require an authenticated current account actor and return only sanitized dependency state without tenant data, credentials, internal endpoints, or secret material" }
+  },
+  "pocoTransport": {
+    "host": "127.0.0.1",
+    "configuredPortPolicy": "try one explicitly configured loopback port first when present, then probe only the ordered fallback ports; do not scan arbitrary ports, LAN addresses, or another Android profile",
+    "orderedFallbackPorts": [5001, 5002, 5003, 5004, 5005],
+    "maxFrameBytes": 29360128,
+    "maxDecodedArtifactBytes": 20971520,
+    "maxDecodedHierarchyBytes": 1048576,
+    "maxSnapshotSerializedBytes": 262144,
+    "minDeadlineMs": 50,
+    "maxDeadlineMs": 5000,
+    "deadlinePolicy": "measure each RPC with a monotonic clock; accept a response only when elapsedMs is within request.deadlineMs and cancellation has not fired; timeout or cancellation yields unavailable or partial enrichment and never blocks the primary system screenshot draft",
+    "allocationPolicy": "reject non-positive, truncated, or oversized frames before allocation or decompression; enforce both encoded-frame and decoded-kind ceilings",
+    "rpcCorrelationRule": "bind every SimpleRPC response frame to the exact non-empty in-flight JSON-RPC request id and allowlisted method before adding the local captureId envelope; stale ids, method mismatches, unsolicited frames, cancellation, or deadline expiry are discarded and never enrich a draft",
+    "requiredStandardProbeRule": "after GetSDKVersion succeeds, always attempt the standard read-only Screenshot and Dump methods concurrently for the capture; old Poco may expose only those standard methods and missing optional GetScreenSize/profiling/qa.snapshot is not invalid. Failures remain in negotiatedMethods but not succeededMethods. Complete requires GetSDKVersion, Screenshot, and Dump plus every other negotiated optional method to succeed; handshake-only or either missing core evidence result is partial, never complete"
+  },
+  "pocoPrivacyPolicy": {
+    "version": "1.0.0",
+    "maxRecentErrorUtf8Bytes": 32768,
+    "serializedByteRule": "compute UTF-8 bytes from the actual decoded qa.snapshot JSON and require the measured decoded and snapshot byte facts to match before enforcing maxSnapshotSerializedBytes; client-reported counters alone are never authoritative",
+    "redactionRule": "the Unity provider must omit sensitive fields by default and mark the response with redactionPolicyVersion plus sensitiveFieldsOmitted=true; the App rejects unredacted payloads, obvious secret assignments in recent errors, email-like test user identifiers, and case-insensitive custom keys containing password, passwd, secret, token, authorization, cookie, credential, email, phone, or session",
+    "retentionRule": "only the bounded redacted snapshot is attached; raw secrets are never persisted or uploaded"
+  },
+  "pocoSnapshotSchemaVersions": ["1.0.0"],
+  "operationPatches": [
+    {
+      "operationId": "listNotifications",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeNotificationList",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "queryParameters": [
+        { "name": "projectId", "required": false, "schema": { "type": "string", "format": "uuid" } },
+        { "name": "unreadOnly", "required": false, "schema": { "type": "boolean", "default": false } },
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ]
+    },
+    {
+      "operationId": "markNotificationRead",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeNotification",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "notification:<path.notificationId>:read:<Idempotency-Key>"
+    },
+    {
+      "operationId": "listBugs",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBugList",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "queryParameters": [
+        { "name": "projectId", "required": false, "schema": { "type": "string", "format": "uuid" } },
+        { "name": "state", "required": false, "style": "form", "explode": true, "schema": { "type": "array", "maxItems": 12, "items": { "$ref": "../../../schemas/common.schema.json#/$defs/bugState" } } },
+        { "name": "ownerId", "required": false, "schema": { "type": "string", "format": "uuid" } },
+        { "name": "verificationOwnerId", "required": false, "schema": { "type": "string", "format": "uuid" } },
+        { "name": "reporterId", "required": false, "schema": { "type": "string", "format": "uuid" } },
+        { "name": "moduleId", "required": false, "schema": { "type": "string", "format": "uuid" } },
+        { "name": "severity", "required": false, "schema": { "$ref": "../../../schemas/common.schema.json#/$defs/severity" } },
+        { "name": "priority", "required": false, "schema": { "$ref": "../../../schemas/common.schema.json#/$defs/priority" } },
+        { "name": "q", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 200 } },
+        { "name": "updatedAfter", "required": false, "schema": { "type": "string", "format": "date-time" } },
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } },
+        { "name": "sort", "required": false, "schema": { "type": "string", "enum": ["updated_desc", "created_desc", "priority_desc"], "default": "updated_desc" } }
+      ]
+    },
+    {
+      "operationId": "getBug",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBug",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json"
+    },
+    {
+      "operationId": "updateBug",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBug",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json"
+    },
+    {
+      "operationId": "transitionBug",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBug",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json"
+    },
+    {
+      "operationId": "markBugDuplicate",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBug",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json"
+    },
+    {
+      "operationId": "createBug",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/createBugRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/createBugResponse",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "submission:<body.clientSubmissionId>:commit",
+      "errorCodes": [
+        "INVALID_REQUEST",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "CLIENT_SUBMISSION_ID_MISMATCH",
+        "ATTACHMENT_BINDING_CONFLICT",
+        "CAPTURE_BUNDLE_INVALID",
+        "UPLOAD_INVALID",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR"
+      ]
+    },
+    {
+      "operationId": "addOccurrence",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/addOccurrenceRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/addOccurrenceResponse",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "submission:<body.clientSubmissionId>:commit",
+      "errorCodes": [
+        "INVALID_REQUEST",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "CLIENT_SUBMISSION_ID_MISMATCH",
+        "ATTACHMENT_BINDING_CONFLICT",
+        "CAPTURE_BUNDLE_INVALID",
+        "UPLOAD_INVALID",
+        "VERSION_CONFLICT",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR"
+      ]
+    },
+    {
+      "operationId": "createRepairAttempt",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:createRepairAttempt:bug:<path.bugId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "startRepairAttempt",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:startRepairAttempt:attempt:<path.attemptId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "deliverRepairAttempt",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/deliverRepairAttemptRequest",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:deliverRepairAttempt:attempt:<path.attemptId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "failRepairAttempt",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:failRepairAttempt:attempt:<path.attemptId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "supersedeRepairAttempt",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/supersedeRepairAttemptRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/supersedeRepairAttemptResponse",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:supersedeRepairAttempt:attempt:<path.attemptId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "createVerification",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:createVerification:bug:<path.bugId>:attempt:<body.repairAttemptId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "startVerification",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:startVerification:verification:<path.verificationId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "registerBuild",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "build:register:project:<path.projectId>:provider:<body.provider>:external:<body.externalId>"
+    },
+    {
+      "operationId": "linkBuildRepair",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/linkBuildRepairRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/linkBuildRepairResponse",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "build:link:<path.buildId>:attempt:<body.repairAttemptId>:v<body.expectedVersion>"
+    },
+    {
+      "operationId": "initUpload",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/initUploadRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/initUploadResponse",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "submission:<body.clientSubmissionId>:attachment:<body.clientAttachmentId>:upload:<body.uploadAttempt>:init",
+      "errorCodes": [
+        "INVALID_REQUEST",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "CLIENT_SUBMISSION_ID_MISMATCH",
+        "PAYLOAD_TOO_LARGE",
+        "UPLOAD_INVALID",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR"
+      ]
+    },
+    {
+      "operationId": "putUploadChunk",
+      "idempotencyKeySource": "submission:<upload.clientSubmissionId>:attachment:<upload.clientAttachmentId>:upload:<upload.uploadAttempt>:chunk:<path.chunkNumber>",
+      "headerParameters": [
+        { "name": "Content-Length", "required": false, "requiredForContractVersion": "1.1.0", "schema": { "type": "integer", "minimum": 1, "maximum": 8388608 } },
+        { "name": "X-Chunk-SHA256", "required": false, "requiredForContractVersion": "1.1.0", "schema": { "type": "string", "pattern": "^[0-9a-f]{64}$" } },
+        { "name": "X-Client-Submission-Id", "required": false, "requiredForContractVersion": "1.1.0", "schema": { "type": "string", "format": "uuid" } },
+        { "name": "X-Client-Attachment-Id", "required": false, "requiredForContractVersion": "1.1.0", "schema": { "type": "string", "format": "uuid" } }
+      ],
+      "successResponseHeaders": {
+        "ETag": {
+          "required": false,
+          "x-required-for-contract-version": "1.1.0",
+          "description": "Strong upload aggregate version to send as If-Match for the next chunk or finalize call.",
+          "schema": { "type": "string", "pattern": "^\"[1-9][0-9]*\"$" }
+        },
+        "X-Upload-Version": {
+          "required": false,
+          "x-required-for-contract-version": "1.1.0",
+          "description": "Integer form of the new upload aggregate version represented by ETag.",
+          "schema": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "versionSemantics": "each newly accepted chunk advances the upload aggregate version and returns ETag/X-Upload-Version; exact idempotent replay returns the original headers; after response loss the client GETs the upload session and resumes from its version and confirmedChunks",
+      "errorCodes": [
+        "INVALID_REQUEST",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "CLIENT_SUBMISSION_ID_MISMATCH",
+        "VERSION_CONFLICT",
+        "PAYLOAD_TOO_LARGE",
+        "UPLOAD_INVALID",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR"
+      ]
+    },
+    {
+      "operationId": "finalizeUpload",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/finalizeUploadRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/finalizeUploadResponse",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "submission:<upload.clientSubmissionId>:attachment:<upload.clientAttachmentId>:upload:<body.uploadAttempt>:finalize",
+      "errorCodes": [
+        "INVALID_REQUEST",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "CLIENT_SUBMISSION_ID_MISMATCH",
+        "VERSION_CONFLICT",
+        "PAYLOAD_TOO_LARGE",
+        "UPLOAD_INVALID",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR"
+      ]
+    },
+    {
+      "operationId": "recordVerificationResult",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/recordVerificationResultRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/recordVerificationResultResponse",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "idempotencyKeySource": "workflow:recordVerificationResult:verification:<path.verificationId>:v<body.expectedVersion>",
+      "errorCodes": [
+        "INVALID_REQUEST",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "CLIENT_SUBMISSION_ID_MISMATCH",
+        "ATTACHMENT_BINDING_CONFLICT",
+        "CAPTURE_BUNDLE_INVALID",
+        "VERSION_CONFLICT",
+        "UPLOAD_INVALID",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR"
+      ]
+    },
+    {
+      "operationId": "getAttachment",
+      "headerParameters": [
+        { "name": "Range", "required": false, "schema": { "type": "string", "maxLength": 200 } }
+      ],
+      "successResponseHeaders": {
+        "Accept-Ranges": { "required": true, "schema": { "type": "string", "const": "bytes" } },
+        "Cache-Control": { "required": true, "schema": { "type": "string", "const": "private, no-store" } },
+        "Content-Length": { "required": true, "schema": { "type": "integer", "minimum": 0 } },
+        "Content-Type": { "required": true, "schema": { "type": "string", "const": "application/octet-stream" } },
+        "Content-Disposition": { "required": true, "schema": { "type": "string", "pattern": "^attachment; filename=\\\"[^\\r\\n\\\"]+\\\"$" } },
+        "ETag": { "required": true, "schema": { "type": "string", "pattern": "^\\\"sha256-[0-9a-f]{64}\\\"$" } },
+        "X-Content-Type-Options": { "required": true, "schema": { "type": "string", "const": "nosniff" } }
+      },
+      "additionalResponses": [
+        {
+          "status": 206,
+          "description": "One authorized byte range from the immutable attachment blob.",
+          "headers": {
+            "Accept-Ranges": { "required": true, "schema": { "type": "string", "const": "bytes" } },
+            "Cache-Control": { "required": true, "schema": { "type": "string", "const": "private, no-store" } },
+            "Content-Range": { "required": true, "schema": { "type": "string", "pattern": "^bytes [0-9]+-[0-9]+/[1-9][0-9]*$" } },
+            "Content-Length": { "required": true, "schema": { "type": "integer", "minimum": 1 } },
+            "Content-Type": { "required": true, "schema": { "type": "string", "const": "application/octet-stream" } },
+            "Content-Disposition": { "required": true, "schema": { "type": "string", "pattern": "^attachment; filename=\\\"[^\\r\\n\\\"]+\\\"$" } },
+            "ETag": { "required": true, "schema": { "type": "string", "pattern": "^\\\"sha256-[0-9a-f]{64}\\\"$" } },
+            "X-Content-Type-Options": { "required": true, "schema": { "type": "string", "const": "nosniff" } }
+          },
+          "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+        },
+        {
+          "status": 416,
+          "description": "The requested single byte range is malformed, multi-range, or outside the immutable blob.",
+          "headers": {
+            "Content-Range": { "required": true, "schema": { "type": "string", "pattern": "^bytes \\*/[0-9]+$" } },
+            "Accept-Ranges": { "required": true, "schema": { "type": "string", "const": "bytes" } },
+            "Cache-Control": { "required": true, "schema": { "type": "string", "const": "private, no-store" } },
+            "X-Content-Type-Options": { "required": true, "schema": { "type": "string", "const": "nosniff" } }
+          }
+        }
+      ]
+    },
+    {
+      "operationId": "listBugEvents",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeAuditEventList",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "queryParameters": [
+        { "name": "afterSequence", "required": false, "schema": { "type": "integer", "minimum": 0 } },
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ]
+    },
+    {
+      "operationId": "streamEvents",
+      "eventDataRef": "../schemas/app-first.schema.json#/$defs/nativeAuditEvent",
+      "eventProjectionPolicy": "native App SSE is the authorized Bug-owned subset of nativeAuditEvent; every frame is server-built from typed durable facts, rechecks current membership at emit time, and exposes only the enumerated bounded fields",
+      "queryParameters": [
+        { "name": "projectId", "required": false, "schema": { "$ref": "../schemas/app-first.schema.json#/$defs/uuid" } },
+        { "name": "eventType", "required": false, "schema": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$", "maxLength": 120 } } },
+        { "name": "afterDeliverySequence", "required": false, "schema": { "type": "integer", "minimum": 0 } },
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } }
+      ],
+      "headerParameters": [
+        { "name": "Last-Event-ID", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } }
+      ]
+    },
+    {
+      "operationId": "listProjectBuilds",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBuildList",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+      "queryParameters": [
+        { "name": "status", "required": false, "schema": { "$ref": "../../../schemas/build.schema.json#/$defs/buildStatus" } },
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ]
+    },
+    {
+      "operationId": "dispatchRepairAttemptToRelay",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/relayDispatchAccepted",
+      "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json"
+    }
+  ],
+  "operations": [
+    {
+      "method": "post",
+      "path": "/auth/native/sessions",
+      "operationId": "createNativeSession",
+      "summary": "Create a short native App session without a browser cookie",
+      "tag": "auth",
+      "security": "none",
+      "status": 201,
+      "versionControl": "none",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/nativeLoginRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeSessionTokens",
+      "idempotencyKeySource": "native-session:<body.installationId>:login:<body.clientActionId>",
+      "idempotencyScope": "resolved account + authenticated actor + installationId + operationId + Idempotency-Key, evaluated only after credentials succeed",
+      "idempotencyReplayAfterAuthentication": true,
+      "sensitiveRequestDigest": "manifest.idempotency.sensitiveRequestDigest",
+      "secretResponse": true,
+      "idempotencyRetentionSeconds": 300,
+      "responseHeaders": {
+        "Cache-Control": { "required": true, "schema": { "type": "string", "const": "no-store" } }
+      },
+      "errorCodes": ["INVALID_REQUEST", "AUTHENTICATION_FAILED", "IDEMPOTENCY_PAYLOAD_MISMATCH", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "post",
+      "path": "/auth/native/sessions/refresh",
+      "operationId": "refreshNativeSession",
+      "summary": "Rotate a native refresh token and issue a short access token",
+      "tag": "auth",
+      "security": "none",
+      "status": 200,
+      "versionControl": "none",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/nativeRefreshRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeSessionTokens",
+      "idempotencyKeySource": "native-session:<body.installationId>:refresh:<body.clientActionId>",
+      "idempotencyScope": "validated refresh-token family + installationId + operationId + Idempotency-Key",
+      "idempotencyReplayAfterAuthentication": true,
+      "sensitiveRequestDigest": "manifest.idempotency.sensitiveRequestDigest",
+      "secretResponse": true,
+      "idempotencyRetentionSeconds": 300,
+      "refreshReplayPolicy": "manifest.nativeRefreshReplayPolicy",
+      "responseHeaders": {
+        "Cache-Control": { "required": true, "schema": { "type": "string", "const": "no-store" } }
+      },
+      "errorCodes": ["INVALID_REQUEST", "REAUTHENTICATION_REQUIRED", "IDEMPOTENCY_PAYLOAD_MISMATCH", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/auth/native/session",
+      "operationId": "getNativeSession",
+      "summary": "Read the current native App session and project context",
+      "tag": "auth",
+      "security": "native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeSession",
+      "authorizationPolicy": "derive the response solely from the validated native access token and current unrevoked session; account, user, installation, roles, and visible projects are server-owned",
+      "errorCodes": ["UNAUTHENTICATED", "REAUTHENTICATION_REQUIRED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "post",
+      "path": "/auth/native/session/revoke",
+      "operationId": "revokeNativeSession",
+      "summary": "Revoke the current native session and its device notification binding",
+      "tag": "auth",
+      "security": "native-write",
+      "status": 204,
+      "versionControl": "body",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/revokeNativeSessionRequest",
+      "idempotencyKeySource": "native-session:<body.installationId>:revoke:<body.clientActionId>",
+      "idempotencyScope": "resolved account + authenticated actor + installationId + operationId + Idempotency-Key",
+      "authorizationPolicy": "resolve the current unrevoked native session, account, actor, installationId, and expectedVersion before idempotency; revoke the access/refresh family and clear the owned notification binding atomically",
+      "errorCodes": ["INVALID_REQUEST", "UNAUTHENTICATED", "REAUTHENTICATION_REQUIRED", "IDEMPOTENCY_PAYLOAD_MISMATCH", "VERSION_CONFLICT", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/projects",
+      "operationId": "listVisibleProjects",
+      "summary": "List only projects visible to the current user",
+      "tag": "projects",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/projectList",
+      "authorizationPolicy": "derive every project and role from the authenticated account/user current membership snapshot; never return or count a foreign or inactive membership",
+      "paginationPolicy": "the optional continuation cursor is bound to account, user, membership snapshot, normalized filters, and snapshot sequence",
+      "queryParameters": [
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ],
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/members",
+      "operationId": "listProjectMembers",
+      "summary": "List assignable members in one authorized project",
+      "tag": "projects",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/projectMemberList",
+      "authorizationPolicy": "resolve path projectId inside the current account and membership snapshot before query; the response projectId and every member projectId must equal the authorized path projectId",
+      "queryParameters": [
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ],
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/modules",
+      "operationId": "listProjectModules",
+      "summary": "List modules in one authorized project",
+      "tag": "projects",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/projectModuleList",
+      "authorizationPolicy": "resolve path projectId inside the current account and membership snapshot before query; the response projectId and every module projectId must equal the authorized path projectId",
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/bugs/{bugId}/workflow",
+      "operationId": "getBugWorkflowProjection",
+      "summary": "Read occurrences, repair attempts, Builds, Verifications, and safe Relay receipts for the native detail screen",
+      "tag": "bugs",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/workflowProjection",
+      "authorizationPolicy": "resolve the path Bug and every occurrence, user, attachment, capture, attempt, verification, Build, and Relay receipt through typed server-owned relations to the same authenticated account, currently authorized project, and Bug before projection",
+      "queryParameters": [
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limitPerCollection", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ],
+      "paginationPolicy": "one integrity-protected opaque cursor binds account, actor, membership revision, projectId, bugId, limitPerCollection, one frozen snapshot, and independent UUID-ascending lastSortKey/hasMore watermarks for occurrences, repairAttempts, verifications, builds, and relayReceipts",
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/bugs/{bugId}/comments",
+      "operationId": "listBugComments",
+      "summary": "List comments visible with the Bug",
+      "tag": "comments",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBugCommentList",
+      "authorizationPolicy": "resolve path bugId to an authorized project before pagination; response bugId/projectId and every comment bugId/projectId must equal that resolved Bug tuple, including empty pages",
+      "queryParameters": [
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ],
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "post",
+      "path": "/bugs/{bugId}/comments",
+      "operationId": "addBugComment",
+      "summary": "Append a comment, evidence bindings, audit event, and notification outbox atomically",
+      "tag": "comments",
+      "security": "session-or-native-write",
+      "status": 201,
+      "versionControl": "body",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/addCommentRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/addCommentResponse",
+      "idempotencyKeySource": "submission:<body.clientSubmissionId>:commit",
+      "authorizationPolicy": "resolve path bugId through its authorized account/project and current expectedVersion before idempotency; bind author, attachment claims, capture bundle, comment, Bug version, and audit event atomically",
+      "errorCodes": ["INVALID_REQUEST", "UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "IDEMPOTENCY_PAYLOAD_MISMATCH", "CLIENT_SUBMISSION_ID_MISMATCH", "ATTACHMENT_BINDING_CONFLICT", "CAPTURE_BUNDLE_INVALID", "VERSION_CONFLICT", "UPLOAD_INVALID", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/uploads/{sessionId}",
+      "operationId": "getUploadSession",
+      "summary": "Reconcile confirmed chunks and current upload state after App or network loss",
+      "tag": "uploads",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/uploadSession",
+      "authorizationPolicy": "resolve path sessionId under the authenticated account, actor, and authorized project; response identity, immutable content hash/layout, byte accounting, expiry, and version come from that same upload aggregate",
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/attachments/{attachmentId}/metadata",
+      "operationId": "getAttachmentMetadata",
+      "summary": "Read finalized attachment scan and binding state without streaming its bytes",
+      "tag": "uploads",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/attachmentMetadata",
+      "authorizationPolicy": "resolve path attachmentId under the authenticated account, actor, and authorized project; return the same attachment and immutable client submission/attachment/content tuple",
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/bugs/{bugId}/attachments",
+      "operationId": "listBugAttachments",
+      "summary": "List authorized attachment metadata for one Bug without streaming evidence bytes",
+      "tag": "uploads",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBugAttachmentList",
+      "authorizationPolicy": "resolve path bugId to an authorized project before pagination; response bugId/projectId must equal the resolved Bug and every item must be linked to that Bug through a server-owned claim relation, including empty pages",
+      "queryParameters": [
+        { "name": "cursor", "required": false, "schema": { "type": "string", "minLength": 1, "maxLength": 500 } },
+        { "name": "limit", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } }
+      ],
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "post",
+      "path": "/attachments/{attachmentId}/bind",
+      "operationId": "bindAttachmentReservation",
+      "summary": "Reserve one finalized attachment for a client submission before its QA item exists",
+      "tag": "uploads",
+      "security": "session-or-native-write",
+      "status": 200,
+      "versionControl": "body",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/attachmentBindingRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/attachmentReservation",
+      "idempotencyKeySource": "submission:<body.clientSubmissionId>:attachment:<body.clientAttachmentId>:bind:<body.leaseGeneration>",
+      "authorizationPolicy": "resolve path attachmentId under the authenticated account, actor, and project before idempotency; require the request tuple and current clean, ready, durable, unclaimed attachment version; this endpoint returns only a reserved lease and cannot claim it",
+      "errorCodes": ["INVALID_REQUEST", "UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "IDEMPOTENCY_PAYLOAD_MISMATCH", "CLIENT_SUBMISSION_ID_MISMATCH", "ATTACHMENT_BINDING_CONFLICT", "VERSION_CONFLICT", "UPLOAD_INVALID", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "post",
+      "path": "/capture-bundles",
+      "operationId": "createCaptureBundle",
+      "summary": "Create a bounded evidence bundle whose Poco enrichment never controls submission success",
+      "tag": "capture",
+      "security": "session-or-native-write",
+      "status": 201,
+      "versionControl": "none",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/createCaptureBundleRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/captureBundleResponse",
+      "idempotencyKeySource": "submission:<body.clientSubmissionId>:capture:<body.capture.captureId>",
+      "authorizationPolicy": "authorize project write access and resolve every succeeded artifact through server-owned attachment facts before idempotency replay or capture creation; require the manifest capturePolicy attachment tuple, readiness, binding, readability, and per-kind decoded-size limits",
+      "errorCodes": ["INVALID_REQUEST", "UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "IDEMPOTENCY_PAYLOAD_MISMATCH", "CLIENT_SUBMISSION_ID_MISMATCH", "CAPTURE_BUNDLE_INVALID", "UPLOAD_INVALID", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/capture-bundles/{captureId}",
+      "operationId": "getCaptureBundle",
+      "summary": "Read an authorized capture bundle and honest enrichment status",
+      "tag": "capture",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/captureBundle",
+      "authorizationPolicy": "resolve path captureId under the authenticated account, actor, and authorized project; response captureId and all evidence identities must come from the same server-owned bundle",
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "post",
+      "path": "/notification-devices",
+      "operationId": "registerAndroidNotificationDevice",
+      "summary": "Register or rotate an Android notification token scoped to one installation and user",
+      "tag": "notifications",
+      "security": "native-write",
+      "status": 201,
+      "versionControl": "body",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/registerNotificationDeviceRequest",
+      "responseRef": "../schemas/app-first.schema.json#/$defs/notificationDevice",
+      "idempotencyKeySource": "notification-device:<body.installationId>:register:<body.clientActionId>",
+      "idempotencyScope": "resolved account + authenticated actor + installationId + operationId + Idempotency-Key",
+      "sensitiveRequestDigest": true,
+      "authorizationPolicy": "derive sharedDevice, pushAllowed, account, user, and installation ownership from the authenticated native session; require sharedDevice=false, pushAllowed=true, and body.installationId=session.installationId; never trust a client-supplied shared-device assertion",
+      "createOrRotatePolicy": "expectedVersion=null creates only when no binding exists; an existing binding plus null conflicts; rotation requires the current integer version; tokenIssuedAt may not exceed server time by more than notificationPolicy.tokenIssuedAtMaxFutureSkewSeconds but does not order rotations; exact replay returns the original version without mutation",
+      "errorCodes": ["INVALID_REQUEST", "UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "IDEMPOTENCY_PAYLOAD_MISMATCH", "VERSION_CONFLICT", "RATE_LIMITED", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "post",
+      "path": "/notification-devices/{deviceId}/revoke",
+      "operationId": "revokeAndroidNotificationDevice",
+      "summary": "Revoke an Android notification token for the current user",
+      "tag": "notifications",
+      "security": "native-write",
+      "status": 204,
+      "versionControl": "body",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/revokeNotificationDeviceRequest",
+      "idempotencyKeySource": "notification-device:<body.installationId>:revoke:<body.clientActionId>",
+      "idempotencyScope": "resolved account + authenticated actor + installationId + operationId + Idempotency-Key",
+      "authorizationPolicy": "resolve path deviceId inside the authenticated account/user and current installation before idempotency; require expectedVersion and atomically disable and clear the encrypted token binding",
+      "errorCodes": ["INVALID_REQUEST", "UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "IDEMPOTENCY_PAYLOAD_MISMATCH", "VERSION_CONFLICT", "INTERNAL_ERROR"]
+    },
+    {
+      "method": "get",
+      "path": "/repair-attempts/{attemptId}/relay-receipt",
+      "operationId": "getRelayReceipt",
+      "summary": "Read a Relay handoff receipt that can report delivery/build state but never QA acceptance",
+      "tag": "relay",
+      "security": "session-or-native-read",
+      "status": 200,
+      "responseRef": "../schemas/app-first.schema.json#/$defs/relayReceipt",
+      "authorizationPolicy": "resolve path attemptId to an authorized Bug and the current handoff; response attemptId, handoffId, Relay instance, and QA item identity must match that server-owned tuple",
+      "errorCodes": ["UNAUTHENTICATED", "FORBIDDEN", "NOT_FOUND", "RATE_LIMITED", "INTERNAL_ERROR"]
+    }
+  ]
+}

@@ -30,7 +30,7 @@ executor. Existing `apps/web` history is preserved but deferred to a post-MVP
 desktop management/read-only diagnostic role; no further PWA installation,
 Service Worker, or browser offline-capture work belongs to the MVP.
 
-Android support starts at API 31, with compile/target API 36, checked-in Gradle
+Android support starts at API 35, with compile/target API 37, checked-in Gradle
 Wrapper, Android Studio bundled JDK, and no NDK/CMake/native C++ dependency.
 Emulators use WHPX without disabling Hyper-V. Missing toolchain components are
 an explicit build-verification blocker, while contracts, backend work, and
@@ -48,11 +48,18 @@ responses degrade enrichment without blocking a normal screenshot defect.
 ## Consequences
 
 G3 becomes `G3-ANDROID-APP-READY` and joins the core path between backend/API and
-the human/Relay flows. A real APK/AAB, Android 12/13/14/15/16 evidence, Room and
+the human/Relay flows. A real APK/AAB, Android 15/16/17 evidence, Room and
 WorkManager failure recovery, explicit capture lifecycle, and Poco loopback/LAN
-negative tests are required. Android 12L is a non-blocking compatibility probe;
-MuMu supplements but cannot replace Android 12 real-device evidence, and its API
-level must be read through adb.
+negative tests are required. MuMu supplies the API 35 emulator lane but cannot
+replace Android 15 real-device evidence, and its API level must be read through
+adb.
+
+For Android 17, same-profile Poco remains loopback-only and does not justify the
+broad `ACCESS_LOCAL_NETWORK` permission. API 37 evidence must prove loopback
+works without it while LAN and cross-profile loopback fail, and must also cover
+large-screen adaptive layouts, default CT/network-library ECH behavior, and
+notification/MediaProjection foreground-service changes. Android 16/API 36 is a
+runtime compatibility layer rather than the default compile target.
 
 The server contracts need an additive App-first revision for native workflow,
 attachment finalize/bind, stable item IDs, capture bundles, and enrichment

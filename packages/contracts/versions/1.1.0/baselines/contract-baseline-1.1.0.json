@@ -1,0 +1,20 @@
+{
+  "contractVersion": "1.1.0",
+  "baseContractVersion": "1.0.0",
+  "frozenAt": "2026-08-24T17:48:23.796Z",
+  "canonicalSha256": {
+    "README.md": "312257f6d21bf45414af6ea50ca5a0eba1c4589a9c17025c826d5af76fd2ccca",
+    "errors/error-codes.json": "f606037bd157e7e4ef52e9d7428cabe28370a488403eea5a74bfb94047be33e4",
+    "examples/critical-scenarios.json": "799e6c87c8ee41d9b4fdc3c5d5ef2bf35be6486da540a98ad8e45862172b8e60",
+    "examples/openapi-examples.json": "ac2835a3f16e8cc076e8b6802f037ce7bb1a48759e885d84eba2f63f5e1adc14",
+    "openapi/openapi.json": "d5a5e24908907fc2ec886b84b86d1ffb16449806b88fec01676bc52238cd58b8",
+    "schemas/app-first.schema.json": "8c25a2bdf959ca7b0bc12d5ad6773c019fccf99e8aae56645173c08f587fd343",
+    "scripts/check-additive.mjs": "b09d1736eba7dcfcdc8714ff75c0fbc0cfe3e16acfeb6f71edec9a81f196f9e2",
+    "scripts/check-breaking.mjs": "57199ca81ae28c0f1eda175ce78ef9a6ad76215bb3b06180ae7e42f293e9113a",
+    "scripts/generate-openapi.mjs": "76a3fd214b2e3ee16373518084c8c8e2959557b24926d4f97c7f705c26f2e306",
+    "scripts/validate-contracts.mjs": "220818beab1efc7658eda3fa0b0639538b3060f8094088f92cce16d3a72eba0b",
+    "semantics/behavior-scenarios.json": "07dfd85f93cf764711889e5b6fca95698dcd1826da3c749066a2f65da45e7cfa",
+    "src/api-manifest.json": "ec6d4202e32a4c79092a8615e6cb17b3ada72ef82a7d2c4099715b92b76ae766",
+    "src/evaluate-app-first-behavior.mjs": "5d3e0c5f08e26970d976edabad39f37b76309d0dd874d6dd998a076e10ccde64"
+  }
+}

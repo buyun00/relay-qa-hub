@@ -1,0 +1,41 @@
+{
+  "version": "1.1.0",
+  "baseVersion": "1.0.0",
+  "errors": [
+    {
+      "code": "AUTHENTICATION_FAILED",
+      "status": 401,
+      "description": "Native credentials were not accepted; the response does not disclose which credential field failed."
+    },
+    {
+      "code": "REAUTHENTICATION_REQUIRED",
+      "status": 401,
+      "description": "The native access or refresh session is expired, revoked, or otherwise unusable. A consumed rotated refresh token is replayable only with the original operation, Idempotency-Key, canonical payload, installation, and an unexpired encrypted response snapshot; every other reuse revokes its token family."
+    },
+    {
+      "code": "CLIENT_SUBMISSION_ID_MISMATCH",
+      "status": 409,
+      "description": "A submission or attachment stage key does not match the canonical clientSubmissionId/clientAttachmentId mapping."
+    },
+    {
+      "code": "ATTACHMENT_BINDING_CONFLICT",
+      "status": 409,
+      "description": "Within the same visible actor and project, the finalized attachment is already reserved or claimed by a different submission, clientAttachmentId, intent, or target tuple. Cross-actor, cross-account, cross-project, or hidden path resources always return NOT_FOUND instead."
+    },
+    {
+      "code": "CAPTURE_BUNDLE_INVALID",
+      "status": 422,
+      "description": "Capture IDs, artifact ownership, timestamps, primary system evidence, or Poco enrichment consistency failed validation."
+    },
+    {
+      "code": "NOT_ACCEPTABLE",
+      "status": 406,
+      "description": "The Accept header does not allow any response media type advertised by this operation, including operation-specific binary or event-stream success representations and structured error fallbacks."
+    },
+    {
+      "code": "UNSUPPORTED_MEDIA_TYPE",
+      "status": 415,
+      "description": "The request Content-Type is not one of the exact request media types advertised by this operation; this includes operation-specific binary bodies, and unknown vendor versions are rejected."
+    }
+  ]
+}

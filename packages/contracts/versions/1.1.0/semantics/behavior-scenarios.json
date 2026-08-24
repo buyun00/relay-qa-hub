@@ -1,0 +1,1491 @@
+{
+  "version": "1.1.0",
+  "inheritsBaseBehaviorVersion": "1.0.0",
+  "requiredBaseScenarioIds": [
+    "same-idempotency-key-and-hash-replays",
+    "same-idempotency-key-different-hash-conflicts",
+    "stale-aggregate-version-conflicts",
+    "machine-cannot-close-bug",
+    "machine-cannot-pass-verification",
+    "exact-build-identity-is-eligible",
+    "wrong-build-sha-is-ineligible",
+    "late-event-for-superseded-attempt-is-ignored",
+    "out-of-order-event-is-ignored",
+    "semantic-similarity-is-candidate-only",
+    "push-outage-keeps-business-and-inbox",
+    "relay-task-close-is-metadata-only"
+  ],
+  "scenarios": [
+    {
+      "id": "submission-commit-key-is-stable",
+      "kind": "stage-key",
+      "input": { "clientSubmissionId": "s1", "stage": "commit" },
+      "expected": "submission:s1:commit"
+    },
+    {
+      "id": "attachment-init-key-includes-upload-attempt",
+      "kind": "stage-key",
+      "input": {
+        "clientSubmissionId": "s1",
+        "clientAttachmentId": "a1",
+        "uploadAttempt": 2,
+        "stage": "init"
+      },
+      "expected": "submission:s1:attachment:a1:upload:2:init"
+    },
+    {
+      "id": "attachment-chunk-key-is-stable-and-indexed",
+      "kind": "stage-key",
+      "input": {
+        "clientSubmissionId": "s1",
+        "clientAttachmentId": "a1",
+        "uploadAttempt": 2,
+        "stage": "chunk",
+        "chunkNumber": 7
+      },
+      "expected": "submission:s1:attachment:a1:upload:2:chunk:7"
+    },
+    {
+      "id": "attachment-bind-key-includes-lease-generation",
+      "kind": "stage-key",
+      "input": {
+        "clientSubmissionId": "s1",
+        "clientAttachmentId": "a1",
+        "leaseGeneration": 3,
+        "stage": "bind"
+      },
+      "expected": "submission:s1:attachment:a1:bind:3"
+    },
+    {
+      "id": "same-stage-key-and-canonical-hash-replays",
+      "kind": "idempotency",
+      "input": {
+        "authorizationResult": "allowed",
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-a",
+        "existingOperationId": "createBug",
+        "incomingOperationId": "createBug",
+        "existingIdempotencyKey": "submission:s1:commit",
+        "incomingIdempotencyKey": "submission:s1:commit",
+        "existingHash": "aaa",
+        "incomingHash": "aaa"
+      },
+      "expected": "replay"
+    },
+    {
+      "id": "same-stage-key-different-chunk-bytes-conflicts",
+      "kind": "idempotency",
+      "input": {
+        "authorizationResult": "allowed",
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-a",
+        "existingOperationId": "putUploadChunk",
+        "incomingOperationId": "putUploadChunk",
+        "existingIdempotencyKey": "submission:s1:attachment:a1:upload:1:chunk:0",
+        "incomingIdempotencyKey": "submission:s1:attachment:a1:upload:1:chunk:0",
+        "existingHash": "raw-a",
+        "incomingHash": "raw-b"
+      },
+      "expected": "IDEMPOTENCY_PAYLOAD_MISMATCH"
+    },
+    {
+      "id": "generic-idempotency-replay-is-actor-scoped",
+      "kind": "idempotency",
+      "input": {
+        "authorizationResult": "allowed",
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-b",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-a",
+        "existingOperationId": "createBug",
+        "incomingOperationId": "createBug",
+        "existingIdempotencyKey": "submission:s1:commit",
+        "incomingIdempotencyKey": "submission:s1:commit",
+        "existingHash": "aaa",
+        "incomingHash": "aaa"
+      },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "generic-idempotency-replay-is-project-scoped",
+      "kind": "idempotency",
+      "input": {
+        "authorizationResult": "allowed",
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-b",
+        "existingOperationId": "createBug",
+        "incomingOperationId": "createBug",
+        "existingIdempotencyKey": "submission:s1:commit",
+        "incomingIdempotencyKey": "submission:s1:commit",
+        "existingHash": "aaa",
+        "incomingHash": "aaa"
+      },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "generic-idempotency-replay-rechecks-current-role-before-lookup",
+      "kind": "idempotency",
+      "input": {
+        "authorizationResult": "FORBIDDEN",
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-a",
+        "existingOperationId": "createBug",
+        "incomingOperationId": "createBug",
+        "existingIdempotencyKey": "submission:s1:commit",
+        "incomingIdempotencyKey": "submission:s1:commit",
+        "existingHash": "aaa",
+        "incomingHash": "aaa"
+      },
+      "expected": "FORBIDDEN"
+    },
+    {
+      "id": "projectless-web-push-replay-uses-endpoint-digest-scope",
+      "kind": "idempotency",
+      "input": {
+        "authorizationResult": "allowed",
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingOperationId": "createPushSubscription",
+        "incomingOperationId": "createPushSubscription",
+        "existingIdempotencyKey": "push-register-a",
+        "incomingIdempotencyKey": "push-register-a",
+        "existingSubscriptionEndpointDigest": "endpoint-digest-a",
+        "incomingSubscriptionEndpointDigest": "endpoint-digest-a",
+        "existingHash": "payload-a",
+        "incomingHash": "payload-a"
+      },
+      "expected": "replay"
+    },
+    {
+      "id": "projectless-web-push-replay-hides-foreign-endpoint",
+      "kind": "idempotency",
+      "input": {
+        "authorizationResult": "allowed",
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingOperationId": "createPushSubscription",
+        "incomingOperationId": "createPushSubscription",
+        "existingIdempotencyKey": "push-register-a",
+        "incomingIdempotencyKey": "push-register-a",
+        "existingSubscriptionEndpointDigest": "endpoint-digest-a",
+        "incomingSubscriptionEndpointDigest": "endpoint-digest-b",
+        "existingHash": "payload-a",
+        "incomingHash": "payload-a"
+      },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "noncanonical-submission-header-is-rejected",
+      "kind": "key-mapping",
+      "input": {
+        "clientSubmissionId": "s1",
+        "clientAttachmentId": "a1",
+        "uploadAttempt": 1,
+        "stage": "init",
+        "suppliedKey": "random-client-key"
+      },
+      "expected": "CLIENT_SUBMISSION_ID_MISMATCH"
+    },
+    {
+      "id": "client-submission-secondary-dedupe-replays",
+      "kind": "submission-dedupe",
+      "input": {
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-a",
+        "existingPayloadHash": "payload-a",
+        "incomingPayloadHash": "payload-a"
+      },
+      "expected": "replay"
+    },
+    {
+      "id": "client-submission-secondary-dedupe-mismatch-conflicts",
+      "kind": "submission-dedupe",
+      "input": {
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-a",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-a",
+        "existingPayloadHash": "payload-a",
+        "incomingPayloadHash": "payload-b"
+      },
+      "expected": "IDEMPOTENCY_PAYLOAD_MISMATCH"
+    },
+    {
+      "id": "cross-account-client-submission-is-hidden",
+      "kind": "submission-dedupe",
+      "input": {
+        "existingAccountId": "account-a",
+        "incomingAccountId": "account-b",
+        "existingActorId": "actor-a",
+        "incomingActorId": "actor-a",
+        "existingProjectId": "project-a",
+        "incomingProjectId": "project-a",
+        "existingPayloadHash": "hash-a",
+        "incomingPayloadHash": "hash-a"
+      },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "login-idempotency-replay-occurs-after-authentication",
+      "kind": "auth-idempotency",
+      "input": {
+        "credentialValidated": true,
+        "authenticationError": "AUTHENTICATION_FAILED",
+        "existingScope": "account-a:installation-a",
+        "incomingScope": "account-a:installation-a",
+        "existingHash": "login-a",
+        "incomingHash": "login-a"
+      },
+      "expected": "encrypted_secret_replay"
+    },
+    {
+      "id": "invalid-login-cannot-probe-secret-idempotency-snapshot",
+      "kind": "auth-idempotency",
+      "input": {
+        "credentialValidated": false,
+        "authenticationError": "AUTHENTICATION_FAILED",
+        "existingScope": "account-a:installation-a",
+        "incomingScope": "unknown:installation-a",
+        "existingHash": "login-a",
+        "incomingHash": "login-a"
+      },
+      "expected": "AUTHENTICATION_FAILED"
+    },
+    {
+      "id": "consumed-refresh-token-exact-lost-response-replays",
+      "kind": "refresh-idempotency",
+      "input": {
+        "tokenSignatureValid": true,
+        "familyFound": true,
+        "installationMatches": true,
+        "tokenState": "consumed",
+        "sameOperation": true,
+        "sameKey": true,
+        "samePayload": true,
+        "snapshotExists": true,
+        "now": "2026-08-24T10:04:00Z",
+        "consumedAt": "2026-08-24T10:00:00Z",
+        "snapshotExpiresAt": "2026-08-24T10:05:00Z"
+      },
+      "expected": "encrypted_secret_replay"
+    },
+    {
+      "id": "consumed-refresh-token-new-action-revokes-family",
+      "kind": "refresh-idempotency",
+      "input": {
+        "tokenSignatureValid": true,
+        "familyFound": true,
+        "installationMatches": true,
+        "tokenState": "consumed",
+        "sameOperation": true,
+        "sameKey": false,
+        "samePayload": true,
+        "snapshotExists": true,
+        "now": "2026-08-24T10:04:00Z",
+        "consumedAt": "2026-08-24T10:00:00Z",
+        "snapshotExpiresAt": "2026-08-24T10:05:00Z"
+      },
+      "expected": "family_revoked_reauthentication_required"
+    },
+    {
+      "id": "consumed-refresh-token-expired-snapshot-revokes-family",
+      "kind": "refresh-idempotency",
+      "input": {
+        "tokenSignatureValid": true,
+        "familyFound": true,
+        "installationMatches": true,
+        "tokenState": "consumed",
+        "sameOperation": true,
+        "sameKey": true,
+        "samePayload": true,
+        "snapshotExists": true,
+        "now": "2026-08-24T10:05:01Z",
+        "consumedAt": "2026-08-24T10:00:00Z",
+        "snapshotExpiresAt": "2026-08-24T10:05:00Z"
+      },
+      "expected": "family_revoked_reauthentication_required"
+    },
+    {
+      "id": "consumed-refresh-token-cannot-extend-replay-snapshot-beyond-retention",
+      "kind": "refresh-idempotency",
+      "input": {
+        "tokenSignatureValid": true,
+        "familyFound": true,
+        "installationMatches": true,
+        "tokenState": "consumed",
+        "sameOperation": true,
+        "sameKey": true,
+        "samePayload": true,
+        "snapshotExists": true,
+        "now": "2026-08-24T10:04:00Z",
+        "consumedAt": "2026-08-24T10:00:00Z",
+        "snapshotExpiresAt": "2027-08-24T10:00:00Z"
+      },
+      "expected": "family_revoked_reauthentication_required"
+    },
+    {
+      "id": "consumed-refresh-token-cannot-replay-before-server-recorded-consumption",
+      "kind": "refresh-idempotency",
+      "input": {
+        "tokenSignatureValid": true,
+        "familyFound": true,
+        "installationMatches": true,
+        "tokenState": "consumed",
+        "sameOperation": true,
+        "sameKey": true,
+        "samePayload": true,
+        "snapshotExists": true,
+        "now": "2026-08-24T09:59:00Z",
+        "consumedAt": "2026-08-24T10:00:00Z",
+        "snapshotExpiresAt": "2026-08-24T10:05:00Z"
+      },
+      "expected": "family_revoked_reauthentication_required"
+    },
+    {
+      "id": "active-refresh-token-rotates",
+      "kind": "refresh-idempotency",
+      "input": {
+        "tokenSignatureValid": true,
+        "familyFound": true,
+        "installationMatches": true,
+        "tokenState": "active"
+      },
+      "expected": "rotate_and_issue"
+    },
+    {
+      "id": "first-native-session-initializes-account-partition",
+      "kind": "native-account-partition",
+      "input": {
+        "currentAccountId": null,
+        "receivedAccountId": "account-a"
+      },
+      "expected": "initialize_account_partition"
+    },
+    {
+      "id": "same-native-account-retains-offline-partition",
+      "kind": "native-account-partition",
+      "input": {
+        "currentAccountId": "account-a",
+        "receivedAccountId": "account-a"
+      },
+      "expected": "retain_account_partition"
+    },
+    {
+      "id": "changed-native-account-clears-old-offline-partition",
+      "kind": "native-account-partition",
+      "input": {
+        "currentAccountId": "account-a",
+        "receivedAccountId": "account-b"
+      },
+      "expected": "clear_partition_and_reauthenticate"
+    },
+    {
+      "id": "submission-create-pipeline-replay-converges",
+      "kind": "pipeline-replay",
+      "input": {
+        "attempts": [
+          { "sessionId": "session-1", "attachmentId": "attachment-1", "bindingId": "binding-1", "qaItemId": "bug-1", "occurrenceId": "occurrence-1" },
+          { "sessionId": "session-1", "attachmentId": "attachment-1", "bindingId": "binding-1", "qaItemId": "bug-1", "occurrenceId": "occurrence-1" }
+        ],
+        "entityCounts": { "sessions": 1, "attachments": 1, "bindings": 1, "bugs": 1, "occurrences": 1 }
+      },
+      "expected": "converged"
+    },
+    {
+      "id": "two-attachment-chunk-reconcile-bind-commit-converges",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s1",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s1","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"init","clientSubmissionId":"s1","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","replayed":true,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s1","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"reconcile","clientSubmissionId":"s1","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":2,"confirmedChunks":[0],"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"finalize","clientSubmissionId":"s1","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s1","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"init","clientSubmissionId":"s1","clientAttachmentId":"a2","uploadAttempt":1,"resourceId":"session-2","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s1","clientAttachmentId":"a2","uploadAttempt":1,"resourceId":"session-2","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYg==","persistedChunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1"},
+          {"stage":"reconcile","clientSubmissionId":"s1","clientAttachmentId":"a2","uploadAttempt":1,"resourceId":"session-2","version":2,"confirmedChunks":[0],"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"finalize","clientSubmissionId":"s1","clientAttachmentId":"a2","uploadAttempt":1,"sessionId":"session-2","resourceId":"attachment-2","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s1","clientAttachmentId":"a2","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-2","resourceId":"binding-2","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"commit","clientSubmissionId":"s1","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"bug-1","occurrenceId":"occurrence-1","claimedClientAttachmentIds":["a1","a2"],"now":"2026-08-24T10:30:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s1","clientAttachmentId":"a1","attachmentId":"attachment-1","version":4,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","storedBytes":100,"persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-1","leaseGeneration":1,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z"},{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s1","clientAttachmentId":"a2","attachmentId":"attachment-2","version":4,"contentHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","storedBytes":100,"persistedObjectHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-2","leaseGeneration":1,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z"}]},
+          {"stage":"commit","clientSubmissionId":"s1","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"bug-1","occurrenceId":"occurrence-1","claimedClientAttachmentIds":["a2","a1"],"now":"2026-08-24T10:30:00Z","replayed":true,"accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s1","clientAttachmentId":"a1","attachmentId":"attachment-1","version":4,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","storedBytes":100,"persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-1","leaseGeneration":1,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z"},{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s1","clientAttachmentId":"a2","attachmentId":"attachment-2","version":4,"contentHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","storedBytes":100,"persistedObjectHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-2","leaseGeneration":1,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z"}]}
+        ],
+        "expectedEntityCounts": { "sessions": 2, "attachments": 2, "bindings": 2, "bugs": 1, "occurrences": 1 }
+      },
+      "expected": "converged"
+    },
+    {
+      "id": "upload-and-binding-expiry-recover-with-generations",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s2",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-old","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:00:00Z","expiresAt":"2026-08-24T09:10:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"upload-expired","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-old","observedAt":"2026-08-24T09:11:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"init","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":2,"restartOfSessionId":"session-old","resourceId":"session-new","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:12:00Z","expiresAt":"2026-08-24T10:12:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":2,"resourceId":"session-new","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"reconcile","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":2,"resourceId":"session-new","version":2,"confirmedChunks":[0],"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"finalize","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":2,"sessionId":"session-new","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":2,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T10:10:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"binding-expired","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":2,"leaseGeneration":1,"resourceId":"binding-1","observedAt":"2026-08-24T10:11:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"bind","clientSubmissionId":"s2","clientAttachmentId":"a1","uploadAttempt":2,"leaseGeneration":2,"expectedVersion":4,"responseVersion":5,"serverNow":"2026-08-24T10:12:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"commit","clientSubmissionId":"s2","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"bug-2","occurrenceId":"occurrence-2","claimedClientAttachmentIds":["a1"],"now":"2026-08-24T10:30:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s2","clientAttachmentId":"a1","attachmentId":"attachment-1","version":5,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","storedBytes":100,"persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-1","leaseGeneration":2,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:12:00Z","expiresAt":"2026-08-24T11:00:00Z"}]}
+        ],
+        "expectedEntityCounts": { "sessions": 2, "attachments": 1, "bindings": 1, "bugs": 1, "occurrences": 1 }
+      },
+      "expected": "converged"
+    },
+    {
+      "id": "upload-session-cannot-be-expired-before-server-issued-deadline",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-upload-early",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T09:05:00Z",
+        "uploadExpiresAt": "2026-08-24T09:10:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-upload-early","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-old","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:00:00Z","expiresAt":"2026-08-24T09:10:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"upload-expired","clientSubmissionId":"s-upload-early","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-old","observedAt":"2026-08-24T09:05:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "UPLOAD_INVALID"
+    },
+    {
+      "id": "replacement-upload-session-cannot-time-travel-before-expiry-observation",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-upload-time-travel",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T09:11:00Z",
+        "uploadExpiresAt": "2026-08-24T10:11:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-upload-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-old","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:00:00Z","expiresAt":"2026-08-24T09:10:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"upload-expired","clientSubmissionId":"s-upload-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-old","observedAt":"2026-08-24T09:11:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"init","clientSubmissionId":"s-upload-time-travel","clientAttachmentId":"a1","uploadAttempt":2,"restartOfSessionId":"session-old","resourceId":"session-new","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:05:00Z","expiresAt":"2026-08-24T10:05:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "UPLOAD_INVALID"
+    },
+    {
+      "id": "expired-upload-session-cannot-accept-another-chunk",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-upload-expired-chunk",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-upload-expired-chunk","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:00:00Z","expiresAt":"2026-08-24T10:00:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-upload-expired-chunk","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "UPLOAD_INVALID"
+    },
+    {
+      "id": "expired-upload-session-cannot-finalize",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-upload-expired-finalize",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-upload-expired-finalize","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:00:00Z","expiresAt":"2026-08-24T10:00:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-upload-expired-finalize","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","serverNow":"2026-08-24T09:30:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"finalize","clientSubmissionId":"s-upload-expired-finalize","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "UPLOAD_INVALID"
+    },
+    {
+      "id": "reconcile-can-observe-multiple-versions-in-one-upload-attempt",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-reconcile",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":200,"chunkSize":100,"contentHash":"5e8fce757305cffe37be059898fa572dc7e198bb8c8eb727bb3af18539140e43","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"reconcile","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":2,"confirmedChunks":[0],"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":1,"expectedVersion":2,"responseVersion":3,"contentLength":100,"chunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYg==","persistedChunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1"},
+          {"stage":"reconcile","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":3,"confirmedChunks":[0,1],"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"finalize","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":3,"responseVersion":4,"totalBytes":200,"aggregateHash":"5e8fce757305cffe37be059898fa572dc7e198bb8c8eb727bb3af18539140e43","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"5e8fce757305cffe37be059898fa572dc7e198bb8c8eb727bb3af18539140e43","persistedObjectSize":200,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":4,"responseVersion":5,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"commit","clientSubmissionId":"s-reconcile","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"bug-1","occurrenceId":"occurrence-1","claimedClientAttachmentIds":["a1"],"now":"2026-08-24T10:30:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s-reconcile","clientAttachmentId":"a1","attachmentId":"attachment-1","version":5,"contentHash":"5e8fce757305cffe37be059898fa572dc7e198bb8c8eb727bb3af18539140e43","storedBytes":200,"persistedObjectHash":"5e8fce757305cffe37be059898fa572dc7e198bb8c8eb727bb3af18539140e43","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-1","leaseGeneration":1,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z"}]}
+        ],
+        "expectedEntityCounts": { "sessions": 1, "attachments": 1, "bindings": 1, "bugs": 1, "occurrences": 1 }
+      },
+      "expected": "converged"
+    },
+    {
+      "id": "commit-intent-and-target-must-match-reservation",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-target",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-target","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-target","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"finalize","clientSubmissionId":"s-target","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s-target","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"comment_append","targetQaItemId":"bug-a","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"commit","clientSubmissionId":"s-target","commitIntent":"occurrence_append","targetQaItemId":"bug-b","qaItemId":"bug-b","occurrenceId":"occurrence-1","claimedClientAttachmentIds":["a1"],"now":"2026-08-24T10:30:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s-target","clientAttachmentId":"a1","attachmentId":"attachment-1","version":4,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","storedBytes":100,"persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-1","leaseGeneration":1,"intent":"comment_append","targetQaItemId":"bug-a","reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z"}]}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "partial-last-chunk-and-pending-scan-converge-after-clean-observation",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-scan",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-scan","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":150,"chunkSize":100,"contentHash":"4a08e81e28d49a4d461ed33c1bfbcacc49647be46610604b8a0530956fba8862","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-scan","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"chunk","clientSubmissionId":"s-scan","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":1,"expectedVersion":2,"responseVersion":3,"contentLength":50,"chunkHash":"c01a9baa0f6b59a5a523eb9bd800dfcd56815f9266aa5f923e9bc1520f6712f2","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmI=","persistedChunkHash":"c01a9baa0f6b59a5a523eb9bd800dfcd56815f9266aa5f923e9bc1520f6712f2"},
+          {"stage":"finalize","clientSubmissionId":"s-scan","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":3,"responseVersion":4,"totalBytes":150,"aggregateHash":"4a08e81e28d49a4d461ed33c1bfbcacc49647be46610604b8a0530956fba8862","scanStatus":"pending","readyToBind":false,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"4a08e81e28d49a4d461ed33c1bfbcacc49647be46610604b8a0530956fba8862","persistedObjectSize":150,"durablyReadable":true},
+          {"stage":"scan-observed","clientSubmissionId":"s-scan","clientAttachmentId":"a1","uploadAttempt":1,"attachmentId":"attachment-1","version":5,"scanStatus":"clean","readyToBind":true,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"bind","clientSubmissionId":"s-scan","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":5,"responseVersion":6,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"commit","clientSubmissionId":"s-scan","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"bug-1","occurrenceId":"occurrence-1","claimedClientAttachmentIds":["a1"],"now":"2026-08-24T10:30:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s-scan","clientAttachmentId":"a1","attachmentId":"attachment-1","version":6,"contentHash":"4a08e81e28d49a4d461ed33c1bfbcacc49647be46610604b8a0530956fba8862","storedBytes":150,"persistedObjectHash":"4a08e81e28d49a4d461ed33c1bfbcacc49647be46610604b8a0530956fba8862","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-1","leaseGeneration":1,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z"}]}
+        ],
+        "expectedEntityCounts": { "sessions": 1, "attachments": 1, "bindings": 1, "bugs": 1, "occurrences": 1 }
+      },
+      "expected": "converged"
+    },
+    {
+      "id": "last-chunk-length-must-match-exact-remainder",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-bad-last",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-bad-last","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":150,"chunkSize":100,"contentHash":"4a08e81e28d49a4d461ed33c1bfbcacc49647be46610604b8a0530956fba8862","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-bad-last","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"chunk","clientSubmissionId":"s-bad-last","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":1,"expectedVersion":2,"responseVersion":3,"contentLength":100,"chunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYg==","persistedChunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "UPLOAD_INVALID"
+    },
+    {
+      "id": "rejected-scan-cannot-be-bound",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-rejected",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-rejected","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-rejected","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"finalize","clientSubmissionId":"s-rejected","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"rejected","readyToBind":false,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s-rejected","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "pipeline_order_invalid"
+    },
+    {
+      "id": "commit-rejects-empty-qa-item-identity",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-empty",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "trace": [
+          {"stage":"commit","clientSubmissionId":"s-empty","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"","occurrenceId":"occurrence-1","claimedClientAttachmentIds":[],"accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[]}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "pipeline_order_invalid"
+    },
+    {
+      "id": "different-client-attachments-cannot-alias-one-upload-session",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-alias",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-alias","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"shared-session","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"init","clientSubmissionId":"s-alias","clientAttachmentId":"a2","uploadAttempt":1,"resourceId":"shared-session","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": { "sessions": 1 }
+      },
+      "expected": "duplicate_entities"
+    },
+    {
+      "id": "binding-resource-id-must-be-nonempty",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-bind-id",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-bind-id","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-bind-id","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"finalize","clientSubmissionId":"s-bind-id","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s-bind-id","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "stale-attachment-version-cannot-reserve-binding",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-stale-bind",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-stale-bind","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-stale-bind","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"finalize","clientSubmissionId":"s-stale-bind","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s-stale-bind","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":2,"responseVersion":3,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "VERSION_CONFLICT"
+    },
+    {
+      "id": "commit-cannot-claim-expired-binding-without-expiry-event",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-expired-commit",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-expired-commit","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-expired-commit","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"finalize","clientSubmissionId":"s-expired-commit","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s-expired-commit","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T10:10:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"commit","clientSubmissionId":"s-expired-commit","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"bug-1","occurrenceId":"occurrence-1","claimedClientAttachmentIds":["a1"],"now":"2026-08-24T10:10:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s-expired-commit","clientAttachmentId":"a1","attachmentId":"attachment-1","version":4,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","storedBytes":100,"persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"durablyReadable":true,"bindingStatus":"reserved","bindingId":"binding-1","leaseGeneration":1,"intent":"bug_create","targetQaItemId":null,"reservedAt":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T10:10:00Z"}]}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "binding-renewal-cannot-time-travel-before-expiry-observation",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s-time-travel",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"finalize","clientSubmissionId":"s-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"sessionId":"session-1","resourceId":"attachment-1","expectedVersion":2,"responseVersion":3,"totalBytes":100,"aggregateHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","scanStatus":"clean","readyToBind":true,"bindingStatus":"unbound","accountId":"account-a","actorId":"actor-a","projectId":"project-a","persistedObjectHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","persistedObjectSize":100,"durablyReadable":true},
+          {"stage":"bind","clientSubmissionId":"s-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":3,"responseVersion":4,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T10:10:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"binding-expired","clientSubmissionId":"s-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"resourceId":"binding-1","observedAt":"2026-08-24T10:11:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"bind","clientSubmissionId":"s-time-travel","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":2,"expectedVersion":4,"responseVersion":5,"serverNow":"2026-08-24T10:05:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "bind-before-finalize-is-rejected",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s3",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s3","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"bind","clientSubmissionId":"s3","clientAttachmentId":"a1","uploadAttempt":1,"leaseGeneration":1,"expectedVersion":1,"responseVersion":2,"serverNow":"2026-08-24T10:00:00Z","expiresAt":"2026-08-24T11:00:00Z","attachmentId":"attachment-1","resourceId":"binding-1","intent":"bug_create","targetQaItemId":null,"accountId":"account-a","actorId":"actor-a","projectId":"project-a"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "pipeline_order_invalid"
+    },
+    {
+      "id": "stale-upload-version-is-rejected",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s4",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s4","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s4","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":2,"responseVersion":3,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "VERSION_CONFLICT"
+    },
+    {
+      "id": "changed-chunk-replay-conflicts",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s5",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s5","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"chunk","clientSubmissionId":"s5","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==","persistedChunkHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e"},
+          {"stage":"chunk","clientSubmissionId":"s5","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","chunkNumber":0,"expectedVersion":1,"responseVersion":2,"contentLength":100,"chunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1","replayed":true,"accountId":"account-a","actorId":"actor-a","projectId":"project-a","contentBytesBase64":"YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYg==","persistedChunkHash":"d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1"}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "IDEMPOTENCY_PAYLOAD_MISMATCH"
+    },
+    {
+      "id": "commit-before-reservation-is-rejected",
+      "kind": "pipeline-trace",
+      "input": {
+        "clientSubmissionId": "s6",
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "serverNow": "2026-08-24T10:00:00Z",
+        "uploadExpiresAt": "2026-08-24T11:00:00Z",
+        "trace": [
+          {"stage":"init","clientSubmissionId":"s6","clientAttachmentId":"a1","uploadAttempt":1,"resourceId":"session-1","version":1,"expectedSize":100,"chunkSize":100,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","accountId":"account-a","actorId":"actor-a","projectId":"project-a"},
+          {"stage":"commit","clientSubmissionId":"s6","commitIntent":"bug_create","targetQaItemId":null,"qaItemId":"bug-1","occurrenceId":"occurrence-1","claimedClientAttachmentIds":["a1"],"now":"2026-08-24T10:30:00Z","accountId":"account-a","actorId":"actor-a","projectId":"project-a","attachmentFacts":[{"accountId":"account-a","actorId":"actor-a","projectId":"project-a","clientSubmissionId":"s6","clientAttachmentId":"a1","version":1,"contentHash":"2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e","storedBytes":100,"bindingStatus":"reserved"}]}
+        ],
+        "expectedEntityCounts": {}
+      },
+      "expected": "pipeline_order_invalid"
+    },
+    {
+      "id": "atomic-attachment-commit-claims-all-after-validation",
+      "kind": "atomic-attachment-commit",
+      "input": {
+        "scope": { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a" },
+        "states": [
+          { "clientAttachmentId": "a1", "attachmentId": "attachment-1", "version": 4, "expectedSize": 100, "contentHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "persistedObjectHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-1", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "bindingReservedAt": 1787565600000, "lastServerTime": 1787565600000, "bindingExpiresAt": "2026-08-24T11:00:00Z" },
+          { "clientAttachmentId": "a2", "attachmentId": "attachment-2", "version": 4, "expectedSize": 100, "contentHash": "d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1", "persistedObjectHash": "d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-2", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "bindingReservedAt": 1787565600000, "lastServerTime": 1787565600000, "bindingExpiresAt": "2026-08-24T11:00:00Z" }
+        ],
+        "action": { "clientSubmissionId": "s-atomic", "commitIntent": "bug_create", "targetQaItemId": null, "claimedClientAttachmentIds": ["a1", "a2"], "now": "2026-08-24T10:30:00Z", "attachmentFacts": [
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "s-atomic", "clientAttachmentId": "a1", "attachmentId": "attachment-1", "version": 4, "contentHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "storedBytes": 100, "persistedObjectHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-1", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "reservedAt": "2026-08-24T10:00:00Z", "expiresAt": "2026-08-24T11:00:00Z" },
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "s-atomic", "clientAttachmentId": "a2", "attachmentId": "attachment-2", "version": 4, "contentHash": "d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1", "storedBytes": 100, "persistedObjectHash": "d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-2", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "reservedAt": "2026-08-24T10:00:00Z", "expiresAt": "2026-08-24T11:00:00Z" }
+        ] }
+      },
+      "expected": { "outcome": "claimed", "claimedCount": 2 }
+    },
+    {
+      "id": "atomic-attachment-commit-second-fact-failure-claims-none",
+      "kind": "atomic-attachment-commit",
+      "input": {
+        "scope": { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a" },
+        "states": [
+          { "clientAttachmentId": "a1", "attachmentId": "attachment-1", "version": 4, "expectedSize": 100, "contentHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "persistedObjectHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-1", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "bindingReservedAt": 1787565600000, "lastServerTime": 1787565600000, "bindingExpiresAt": "2026-08-24T11:00:00Z" },
+          { "clientAttachmentId": "a2", "attachmentId": "attachment-2", "version": 4, "expectedSize": 100, "contentHash": "d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1", "persistedObjectHash": "d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-2", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "bindingReservedAt": 1787565600000, "lastServerTime": 1787565600000, "bindingExpiresAt": "2026-08-24T11:00:00Z" }
+        ],
+        "action": { "clientSubmissionId": "s-atomic", "commitIntent": "bug_create", "targetQaItemId": null, "claimedClientAttachmentIds": ["a1", "a2"], "now": "2026-08-24T10:30:00Z", "attachmentFacts": [
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "s-atomic", "clientAttachmentId": "a1", "attachmentId": "attachment-1", "version": 4, "contentHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "storedBytes": 100, "persistedObjectHash": "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-1", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "reservedAt": "2026-08-24T10:00:00Z", "expiresAt": "2026-08-24T11:00:00Z" },
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "s-atomic", "clientAttachmentId": "a2", "attachmentId": "attachment-2", "version": 4, "contentHash": "d6cbb053abf2933889a0ccbf6ac244623a63a2e3397e991dde09266bdaa932d1", "storedBytes": 100, "persistedObjectHash": "0000000000000000000000000000000000000000000000000000000000000000", "scanStatus": "clean", "readyToBind": true, "durablyReadable": true, "bindingStatus": "reserved", "bindingId": "binding-2", "leaseGeneration": 1, "intent": "bug_create", "targetQaItemId": null, "reservedAt": "2026-08-24T10:00:00Z", "expiresAt": "2026-08-24T11:00:00Z" }
+        ] }
+      },
+      "expected": { "outcome": "ATTACHMENT_BINDING_CONFLICT", "claimedCount": 0 }
+    },
+    {
+      "id": "cross-account-submission-resource-is-hidden",
+      "kind": "resource-scope",
+      "input": { "actorAccountId": "account-b", "resourceAccountId": "account-a", "actorProjectIds": ["project-a"], "resourceProjectId": "project-a", "hasRequiredRole": true },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "cross-project-resource-is-hidden",
+      "kind": "resource-scope",
+      "input": { "actorAccountId": "account-a", "resourceAccountId": "account-a", "actorProjectIds": ["project-a"], "resourceProjectId": "project-b", "hasRequiredRole": true },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "visible-project-insufficient-role-is-forbidden",
+      "kind": "resource-scope",
+      "input": { "actorAccountId": "account-a", "resourceAccountId": "account-a", "actorProjectIds": ["project-a"], "resourceProjectId": "project-a", "hasRequiredRole": false },
+      "expected": "FORBIDDEN"
+    },
+    {
+      "id": "evidence-tuple-is-allowed",
+      "kind": "evidence-resource-tuple",
+      "input": { "actorAccountId": "account-a", "resourceAccountId": "account-a", "actorId": "actor-a", "resourceActorId": "actor-a", "actorProjectId": "project-a", "resourceProjectId": "project-a", "pathResourceId": "attachment-a", "resourceId": "attachment-a", "requestClientSubmissionId": "submission-a", "resourceClientSubmissionId": "submission-a", "requestClientAttachmentId": "client-a", "resourceClientAttachmentId": "client-a", "requestIntent": "bug_create", "resourceIntent": "bug_create", "requestTargetQaItemId": null, "resourceTargetQaItemId": null },
+      "expected": "allowed"
+    },
+    {
+      "id": "foreign-path-attachment-is-hidden",
+      "kind": "evidence-resource-tuple",
+      "input": { "actorAccountId": "account-a", "resourceAccountId": "account-a", "actorId": "actor-a", "resourceActorId": "actor-a", "actorProjectId": "project-a", "resourceProjectId": "project-a", "pathResourceId": "foreign", "resourceId": "attachment-a", "requestClientSubmissionId": "submission-a", "resourceClientSubmissionId": "submission-a", "requestClientAttachmentId": "client-a", "resourceClientAttachmentId": "client-a", "requestIntent": "bug_create", "resourceIntent": "bug_create" },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "visible-target-tuple-mismatch-conflicts",
+      "kind": "evidence-resource-tuple",
+      "input": { "actorAccountId": "account-a", "resourceAccountId": "account-a", "actorId": "actor-a", "resourceActorId": "actor-a", "actorProjectId": "project-a", "resourceProjectId": "project-a", "pathResourceId": "attachment-a", "resourceId": "attachment-a", "requestClientSubmissionId": "submission-a", "resourceClientSubmissionId": "submission-a", "requestClientAttachmentId": "client-a", "resourceClientAttachmentId": "client-a", "requestIntent": "comment_append", "resourceIntent": "comment_append", "requestTargetQaItemId": "bug-a", "resourceTargetQaItemId": "bug-b" },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "attachment-reservation-single-claim",
+      "kind": "attachment-reservation",
+      "input": { "actorAccountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "pathAttachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "serverNow": "2026-08-24T10:00:00Z", "reservation": { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "attachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "status": "reserved", "reservedAt": "2026-08-24T09:59:00Z", "expiresAt": "2026-08-24T11:00:00Z" } },
+      "expected": "claim"
+    },
+    {
+      "id": "foreign-attachment-reservation-conflicts",
+      "kind": "attachment-reservation",
+      "input": { "actorAccountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "pathAttachmentId": "attachment-a", "clientSubmissionId": "submission-b", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "reservation": { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "attachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "status": "reserved" } },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "cross-account-attachment-reservation-is-hidden",
+      "kind": "attachment-reservation",
+      "input": { "actorAccountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "pathAttachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "reservation": { "accountId": "account-b", "actorId": "actor-a", "projectId": "project-a", "attachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "status": "reserved" } },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "expired-attachment-reservation-cannot-be-claimed",
+      "kind": "attachment-reservation",
+      "input": { "actorAccountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "pathAttachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "serverNow": "2026-08-24T11:00:00Z", "reservation": { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "attachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "status": "reserved", "reservedAt": "2026-08-24T09:59:00Z", "expiresAt": "2026-08-24T11:00:00Z" } },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "attachment-reservation-cannot-be-claimed-before-reservation-time",
+      "kind": "attachment-reservation",
+      "input": { "actorAccountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "pathAttachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "serverNow": "2026-08-24T09:58:00Z", "reservation": { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "attachmentId": "attachment-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-a", "intent": "bug_create", "targetQaItemId": null, "status": "reserved", "reservedAt": "2026-08-24T09:59:00Z", "expiresAt": "2026-08-24T11:00:00Z" } },
+      "expected": "ATTACHMENT_BINDING_CONFLICT"
+    },
+    {
+      "id": "create-response-has-unambiguous-bug-identity",
+      "kind": "qa-item-identity",
+      "input": { "operation": "create", "response": { "qaItem": { "type": "bug", "id": "bug-1", "key": "QA-1" }, "bug": { "id": "bug-1", "key": "QA-1" } } },
+      "expected": "unambiguous"
+    },
+    {
+      "id": "create-response-id-mismatch-is-ambiguous",
+      "kind": "qa-item-identity",
+      "input": { "operation": "create", "response": { "qaItem": { "type": "bug", "id": "bug-2", "key": "QA-1" }, "bug": { "id": "bug-1", "key": "QA-1" } } },
+      "expected": "ambiguous"
+    },
+    {
+      "id": "append-response-has-unambiguous-bug-identity",
+      "kind": "qa-item-identity",
+      "input": { "operation": "append", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "response": { "qaItem": { "type": "bug", "id": "bug-1", "key": "QA-1" }, "bugId": "bug-1", "bugKey": "QA-1" } },
+      "expected": "unambiguous"
+    },
+    {
+      "id": "append-response-key-mismatch-is-ambiguous",
+      "kind": "qa-item-identity",
+      "input": { "operation": "append", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "response": { "qaItem": { "type": "bug", "id": "bug-1", "key": "QA-2" }, "bugId": "bug-1", "bugKey": "QA-1" } },
+      "expected": "ambiguous"
+    },
+    {
+      "id": "append-response-internally-consistent-foreign-bug-is-ambiguous",
+      "kind": "qa-item-identity",
+      "input": { "operation": "append", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "response": { "qaItem": { "type": "bug", "id": "bug-2", "key": "QA-2" }, "bugId": "bug-2", "bugKey": "QA-2" } },
+      "expected": "ambiguous"
+    },
+    {
+      "id": "comment-response-is-bound-to-path-bug-identity",
+      "kind": "qa-item-identity",
+      "input": { "operation": "comment", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "response": { "qaItem": { "type": "bug", "id": "bug-1", "key": "QA-1" }, "comment": { "bugId": "bug-1" } } },
+      "expected": "unambiguous"
+    },
+    {
+      "id": "comment-response-cannot-point-at-foreign-bug",
+      "kind": "qa-item-identity",
+      "input": { "operation": "comment", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "response": { "qaItem": { "type": "bug", "id": "bug-2", "key": "QA-2" }, "comment": { "bugId": "bug-2" } } },
+      "expected": "ambiguous"
+    },
+    {
+      "id": "verification-response-has-one-bug-identity",
+      "kind": "qa-item-identity",
+      "input": { "operation": "verification", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "targetVerificationId": "verification-1", "response": { "qaItem": { "type": "bug", "id": "bug-1", "key": "QA-1" }, "bug": { "id": "bug-1", "key": "QA-1" }, "verification": { "id": "verification-1", "bugId": "bug-1" } } },
+      "expected": "unambiguous"
+    },
+    {
+      "id": "verification-response-cannot-mix-bug-identities",
+      "kind": "qa-item-identity",
+      "input": { "operation": "verification", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "targetVerificationId": "verification-1", "response": { "qaItem": { "type": "bug", "id": "bug-1", "key": "QA-1" }, "bug": { "id": "bug-1", "key": "QA-1" }, "verification": { "id": "verification-1", "bugId": "bug-2" } } },
+      "expected": "ambiguous"
+    },
+    {
+      "id": "verification-response-internally-consistent-foreign-resource-is-ambiguous",
+      "kind": "qa-item-identity",
+      "input": { "operation": "verification", "targetQaItemId": "bug-1", "targetQaItemKey": "QA-1", "targetVerificationId": "verification-1", "response": { "qaItem": { "type": "bug", "id": "bug-2", "key": "QA-2" }, "bug": { "id": "bug-2", "key": "QA-2" }, "verification": { "id": "verification-2", "bugId": "bug-2" } } },
+      "expected": "ambiguous"
+    },
+    {
+      "id": "poco-unavailable-is-derived",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "negotiatedMethods": [], "succeededMethods": [] },
+      "expected": "unavailable"
+    },
+    {
+      "id": "poco-partial-is-derived",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "negotiatedMethods": ["GetSDKVersion", "Screenshot", "Dump", "GetScreenSize"], "succeededMethods": ["GetSDKVersion", "Screenshot"] },
+      "expected": "partial"
+    },
+    {
+      "id": "poco-complete-covers-negotiated-capabilities-only",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "negotiatedMethods": ["GetSDKVersion", "Screenshot", "Dump", "GetScreenSize"], "succeededMethods": ["GetSDKVersion", "Screenshot", "Dump", "GetScreenSize"] },
+      "expected": "complete"
+    },
+    {
+      "id": "poco-handshake-only-is-partial-not-complete",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "connectedPort": 5001, "sdkVersion": "legacy", "screenSize": null, "snapshotCapability": "standard_only", "negotiatedMethods": ["GetSDKVersion"], "succeededMethods": ["GetSDKVersion"], "failureReason": null },
+      "expected": "partial"
+    },
+    {
+      "id": "poco-complete-cannot-carry-a-failure-reason",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "connectedPort": 5001, "sdkVersion": "6", "screenSize": null, "snapshotCapability": "standard_only", "negotiatedMethods": ["GetSDKVersion", "Screenshot"], "succeededMethods": ["GetSDKVersion", "Screenshot"], "failureReason": "timeout" },
+      "expected": "invalid"
+    },
+    {
+      "id": "poco-cannot-claim-unnegotiated-capability",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "negotiatedMethods": ["GetSDKVersion"], "succeededMethods": ["GetSDKVersion", "qa.snapshot"] },
+      "expected": "invalid"
+    },
+    {
+      "id": "poco-method-cannot-succeed-before-sdk-handshake",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "negotiatedMethods": ["Screenshot"], "succeededMethods": ["Screenshot"] },
+      "expected": "invalid"
+    },
+    {
+      "id": "poco-capability-cannot-be-negotiated-before-sdk-handshake-succeeds",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "negotiatedMethods": ["GetSDKVersion", "Screenshot"], "succeededMethods": [] },
+      "expected": "invalid"
+    },
+    {
+      "id": "poco-attempted-false-cannot-carry-stale-context",
+      "kind": "enrichment-status",
+      "input": { "attempted": false, "connectedPort": 5001, "negotiatedMethods": [], "succeededMethods": [] },
+      "expected": "invalid"
+    },
+    {
+      "id": "poco-screen-size-requires-method-success",
+      "kind": "enrichment-status",
+      "input": { "attempted": true, "connectedPort": 5001, "sdkVersion": "6", "screenSize": { "width": 100, "height": 100 }, "snapshotCapability": "standard_only", "negotiatedMethods": ["GetSDKVersion"], "succeededMethods": ["GetSDKVersion"] },
+      "expected": "invalid"
+    },
+    {
+      "id": "poco-unavailable-allows-primary-submission",
+      "kind": "capture-consistency",
+      "input": {
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "clientSubmissionId": "submission-a",
+        "attachmentFacts": [
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "captureId": "capture-a", "validatedArtifactKind": "system_screenshot", "mediaType": "image/png", "scanStatus": "clean", "readyToBind": true, "bindingStatus": "reserved", "durablyReadable": true, "storedBytes": 1048576, "decodedBytes": 1048576 }
+        ],
+        "capture": {
+          "captureId": "capture-a",
+          "projectId": "project-a",
+          "clientSubmissionId": "submission-a",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "primaryEvidenceClientAttachmentId": "client-system-a",
+          "primaryEvidenceAttachmentId": "system-a",
+          "artifacts": [
+            { "captureId": "capture-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "kind": "system_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:00Z", "endedAt": "2026-08-24T10:00:00.120Z", "skewMs": 0, "failureReason": null }
+          ],
+          "poco": { "attempted": true, "connectedPort": null, "sdkVersion": null, "screenSize": null, "snapshotCapability": "not_probed", "negotiatedMethods": [], "succeededMethods": [], "failureReason": "connection_refused" }
+        }
+      },
+      "expected": "accepted:unavailable"
+    },
+    {
+      "id": "capture-ended-before-start-is-rejected",
+      "kind": "capture-consistency",
+      "input": {
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "clientSubmissionId": "submission-a",
+        "attachmentFacts": [
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "captureId": "capture-a", "validatedArtifactKind": "system_screenshot", "mediaType": "image/png", "scanStatus": "clean", "readyToBind": true, "bindingStatus": "reserved", "durablyReadable": true, "storedBytes": 1048576, "decodedBytes": 1048576 }
+        ],
+        "capture": {
+          "captureId": "capture-a",
+          "projectId": "project-a",
+          "clientSubmissionId": "submission-a",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "primaryEvidenceClientAttachmentId": "client-system-a",
+          "primaryEvidenceAttachmentId": "system-a",
+          "artifacts": [
+            { "captureId": "capture-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "kind": "system_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:01Z", "endedAt": "2026-08-24T10:00:00Z", "skewMs": 1000, "failureReason": null }
+          ],
+          "poco": { "attempted": false, "negotiatedMethods": [], "succeededMethods": [] }
+        }
+      },
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "capture-reported-skew-must-match-timestamps",
+      "kind": "capture-consistency",
+      "input": {
+        "projectId": "project-a",
+        "clientSubmissionId": "submission-a",
+        "capture": {
+          "captureId": "capture-a",
+          "projectId": "project-a",
+          "clientSubmissionId": "submission-a",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "primaryEvidenceClientAttachmentId": "client-system-a",
+          "primaryEvidenceAttachmentId": "system-a",
+          "artifacts": [
+            { "captureId": "capture-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "kind": "system_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:01Z", "endedAt": "2026-08-24T10:00:01.100Z", "skewMs": 0, "failureReason": null }
+          ],
+          "poco": { "attempted": false, "negotiatedMethods": [], "succeededMethods": [] }
+        }
+      },
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-success-without-persisted-artifact-is-rejected",
+      "kind": "capture-consistency",
+      "input": {
+        "projectId": "project-a",
+        "clientSubmissionId": "submission-a",
+        "capture": {
+          "captureId": "capture-a",
+          "projectId": "project-a",
+          "clientSubmissionId": "submission-a",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "enrichmentStatus": "complete",
+          "primaryEvidenceClientAttachmentId": "client-system-a",
+          "primaryEvidenceAttachmentId": "system-a",
+          "artifacts": [
+            { "captureId": "capture-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "kind": "system_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:00Z", "endedAt": "2026-08-24T10:00:00.100Z", "skewMs": 0, "failureReason": null }
+          ],
+          "poco": { "status": "complete", "attempted": true, "connectedPort": 5001, "sdkVersion": "6", "screenSize": null, "snapshotCapability": "standard_only", "negotiatedMethods": ["GetSDKVersion", "Screenshot"], "succeededMethods": ["GetSDKVersion", "Screenshot"], "failureReason": null }
+        }
+      },
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-persisted-enrichment-is-complete",
+      "kind": "capture-consistency",
+      "input": {
+        "accountId": "account-a",
+        "actorId": "actor-a",
+        "projectId": "project-a",
+        "clientSubmissionId": "submission-a",
+        "attachmentFacts": [
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "captureId": "capture-a", "validatedArtifactKind": "system_screenshot", "mediaType": "image/png", "scanStatus": "clean", "readyToBind": true, "bindingStatus": "reserved", "durablyReadable": true, "storedBytes": 1048576, "decodedBytes": 1048576 },
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-poco-a", "attachmentId": "poco-a", "captureId": "capture-a", "validatedArtifactKind": "poco_screenshot", "mediaType": "image/png", "scanStatus": "clean", "readyToBind": true, "bindingStatus": "reserved", "durablyReadable": true, "storedBytes": 1048576, "decodedBytes": 1048576 },
+          { "accountId": "account-a", "actorId": "actor-a", "projectId": "project-a", "clientSubmissionId": "submission-a", "clientAttachmentId": "client-poco-hierarchy-a", "attachmentId": "poco-hierarchy-a", "captureId": "capture-a", "validatedArtifactKind": "poco_hierarchy", "mediaType": "application/json", "scanStatus": "clean", "readyToBind": true, "bindingStatus": "reserved", "durablyReadable": true, "storedBytes": 1024, "decodedBytes": 1024 }
+        ],
+        "capture": {
+          "captureId": "capture-a",
+          "projectId": "project-a",
+          "clientSubmissionId": "submission-a",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "enrichmentStatus": "complete",
+          "primaryEvidenceClientAttachmentId": "client-system-a",
+          "primaryEvidenceAttachmentId": "system-a",
+          "artifacts": [
+            { "captureId": "capture-a", "clientAttachmentId": "client-system-a", "attachmentId": "system-a", "kind": "system_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:00Z", "endedAt": "2026-08-24T10:00:00.100Z", "skewMs": 0, "failureReason": null },
+            { "captureId": "capture-a", "clientAttachmentId": "client-poco-a", "attachmentId": "poco-a", "kind": "poco_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:00.200Z", "endedAt": "2026-08-24T10:00:00.400Z", "skewMs": 200, "failureReason": null },
+            { "captureId": "capture-a", "clientAttachmentId": "client-poco-hierarchy-a", "attachmentId": "poco-hierarchy-a", "kind": "poco_hierarchy", "status": "succeeded", "startedAt": "2026-08-24T10:00:00.250Z", "endedAt": "2026-08-24T10:00:00.450Z", "skewMs": 250, "failureReason": null }
+          ],
+          "poco": { "status": "complete", "attempted": true, "connectedPort": 5001, "sdkVersion": "6", "screenSize": { "width": 1440, "height": 2560 }, "snapshotCapability": "standard_only", "negotiatedMethods": ["GetSDKVersion", "Screenshot", "Dump", "GetScreenSize"], "succeededMethods": ["GetSDKVersion", "Screenshot", "Dump", "GetScreenSize"], "failureReason": null }
+        }
+      },
+      "expected": "accepted:complete"
+    },
+    {
+      "id": "capture-artifacts-cannot-alias-one-persisted-attachment",
+      "kind": "capture-consistency",
+      "input": {
+        "projectId": "project-a",
+        "clientSubmissionId": "submission-a",
+        "capture": {
+          "captureId": "capture-a",
+          "projectId": "project-a",
+          "clientSubmissionId": "submission-a",
+          "capturedAt": "2026-08-24T10:00:00Z",
+          "enrichmentStatus": "complete",
+          "primaryEvidenceClientAttachmentId": "client-shared",
+          "primaryEvidenceAttachmentId": "attachment-shared",
+          "artifacts": [
+            { "captureId": "capture-a", "clientAttachmentId": "client-shared", "attachmentId": "attachment-shared", "kind": "system_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:00Z", "endedAt": "2026-08-24T10:00:00.100Z", "skewMs": 0, "failureReason": null },
+            { "captureId": "capture-a", "clientAttachmentId": "client-shared", "attachmentId": "attachment-shared", "kind": "poco_screenshot", "status": "succeeded", "startedAt": "2026-08-24T10:00:00.200Z", "endedAt": "2026-08-24T10:00:00.400Z", "skewMs": 200, "failureReason": null }
+          ],
+          "poco": { "status": "complete", "attempted": true, "connectedPort": 5001, "sdkVersion": "6", "screenSize": null, "snapshotCapability": "standard_only", "negotiatedMethods": ["GetSDKVersion", "Screenshot"], "succeededMethods": ["GetSDKVersion", "Screenshot"], "failureReason": null }
+        }
+      },
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "qa-snapshot-correlation-is-accepted-at-bounds",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"qa.snapshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"qa.snapshot"},"responseKind":"snapshot","elapsedMs":999,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":359,"snapshotSerializedBytes":359,"recentErrorCount":2,"recentErrorUtf8Bytes":23,"customFieldCount":3,"redactionApplied":true,"sensitiveValueScanPassed":true,"decodedPayload":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","generatedAt":"2026-08-24T10:00:00Z","redactionPolicyVersion":"1.0.0","sensitiveFieldsOmitted":true,"snapshot":{"buildVersion":"1.2.3","pseudonymousTestUserId":"qa-user-7","recentErrors":["UI timeout","Asset missing"],"customFields":{"chapter":"prologue","difficulty":"hard","retryCount":2}}}},
+      "expected": "accepted"
+    },
+    {
+      "id": "stale-poco-json-rpc-id-is-rejected",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-current","method":"Screenshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-stale","method":"Screenshot"},"responseKind":"artifact","elapsedMs":10,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1024,"snapshotSerializedBytes":0,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-response-method-must-match-in-flight-request",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"Dump"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"Screenshot"},"responseKind":"hierarchy","elapsedMs":10,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1024,"snapshotSerializedBytes":0,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "qa-snapshot-capture-correlation-is-required",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"qa.snapshot"},"response":{"captureId":"capture-b","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"qa.snapshot"},"responseKind":"snapshot","elapsedMs":999,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1024,"snapshotSerializedBytes":1024,"recentErrorCount":2,"customFieldCount":3},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-response-after-monotonic-deadline-is-rejected",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":50,"rpcRequestId":"rpc-1","method":"qa.snapshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"qa.snapshot"},"responseKind":"snapshot","elapsedMs":51,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1024,"snapshotSerializedBytes":1024,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-cancelled-response-is-not-accepted",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"qa.snapshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"qa.snapshot"},"responseKind":"snapshot","elapsedMs":10,"cancelled":true,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1024,"snapshotSerializedBytes":1024,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-success-cannot-have-zero-decoded-bytes",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"qa.snapshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"qa.snapshot"},"responseKind":"snapshot","elapsedMs":10,"cancelled":false,"frameLength":1,"frameBytesReceived":1,"decodedBytes":0,"snapshotSerializedBytes":0,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-frame-overflow-is-rejected-before-allocation",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"Screenshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"Screenshot"},"responseKind":"artifact","elapsedMs":999,"cancelled":false,"frameLength":29360129,"frameBytesReceived":29360129,"decodedBytes":1,"snapshotSerializedBytes":1,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "poco-hierarchy-decoded-overflow-is-rejected",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"Dump"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"Dump"},"responseKind":"hierarchy","elapsedMs":999,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1048577,"snapshotSerializedBytes":1,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "unsupported-poco-snapshot-schema-is-rejected",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.999.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"qa.snapshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.999.0","rpcResponseId":"rpc-1","method":"qa.snapshot"},"responseKind":"snapshot","elapsedMs":999,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1024,"snapshotSerializedBytes":1024,"recentErrorCount":0,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "negative-poco-error-count-is-rejected",
+      "kind": "poco-correlation",
+      "input": {"request":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","deadlineMs":1000,"rpcRequestId":"rpc-1","method":"qa.snapshot"},"response":{"captureId":"capture-a","nonce":"nonce-a","schemaVersion":"1.0.0","rpcResponseId":"rpc-1","method":"qa.snapshot"},"responseKind":"snapshot","elapsedMs":999,"cancelled":false,"frameLength":1024,"frameBytesReceived":1024,"decodedBytes":1024,"snapshotSerializedBytes":1024,"recentErrorCount":-1,"customFieldCount":0},
+      "expected": "CAPTURE_BUNDLE_INVALID"
+    },
+    {
+      "id": "notification-first-registration-uses-null-version",
+      "kind": "notification-registration",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "pushAllowed": true, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": null, "tokenIssuedAt": "2026-08-24T10:00:00Z" }, "existing": null, "exactReplay": false, "now": "2026-08-24T10:00:01Z" },
+      "expected": "created:1"
+    },
+    {
+      "id": "notification-rotation-cas-is-authoritative-over-older-client-time",
+      "kind": "notification-registration",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "pushAllowed": true, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": 2, "tokenIssuedAt": "2026-08-24T09:00:00Z" }, "existing": { "accountId": "account-a", "userId": "user-a", "installationId": "i1", "version": 2 }, "exactReplay": false, "now": "2026-08-24T10:00:01Z" },
+      "expected": "rotated:3"
+    },
+    {
+      "id": "notification-shared-device-is-forbidden",
+      "kind": "notification-registration",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": true, "pushAllowed": false, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": null, "tokenIssuedAt": "2026-08-24T10:00:00Z" }, "existing": null, "exactReplay": false, "now": "2026-08-24T10:00:01Z" },
+      "expected": "FORBIDDEN"
+    },
+    {
+      "id": "notification-future-token-clock-is-rejected",
+      "kind": "notification-registration",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "pushAllowed": true, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": null, "tokenIssuedAt": "2026-08-24T10:06:00Z" }, "existing": null, "exactReplay": false, "now": "2026-08-24T10:00:00Z" },
+      "expected": "INVALID_REQUEST"
+    },
+    {
+      "id": "notification-existing-binding-plus-null-version-conflicts",
+      "kind": "notification-registration",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "pushAllowed": true, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": null, "tokenIssuedAt": "2026-08-24T10:00:00Z" }, "existing": { "accountId": "account-a", "userId": "user-a", "installationId": "i1", "version": 2 }, "exactReplay": false, "now": "2026-08-24T10:00:01Z" },
+      "expected": "VERSION_CONFLICT"
+    },
+    {
+      "id": "notification-exact-replay-does-not-increment-version",
+      "kind": "notification-registration",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "pushAllowed": true, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": 2, "tokenIssuedAt": "2026-08-24T10:00:00Z" }, "existing": { "accountId": "account-a", "userId": "user-a", "installationId": "i1", "version": 2 }, "exactReplay": true, "now": "2026-08-24T10:00:01Z" },
+      "expected": "replay:2"
+    },
+    {
+      "id": "notification-register-hides-foreign-existing-binding",
+      "kind": "notification-registration",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "pushAllowed": true, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": 2, "tokenIssuedAt": "2026-08-24T10:00:00Z" }, "existing": { "accountId": "account-a", "userId": "user-b", "installationId": "i1", "version": 2 }, "exactReplay": false, "now": "2026-08-24T10:00:01Z" },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "notification-revoke-matches-full-resource-tuple",
+      "kind": "notification-revoke",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": 2 }, "pathDeviceId": "device-a", "resourceDeviceId": "device-a", "resourceAccountId": "account-a", "resourceInstallationId": "i1", "resourceUserId": "user-a", "resourceVersion": 2, "exactReplay": false },
+      "expected": "revoked"
+    },
+    {
+      "id": "notification-revoke-clears-encrypted-token-and-index",
+      "kind": "notification-revoke-receipt",
+      "input": {"session":{"accountId":"account-a","user":{"id":"user-a"},"sharedDevice":false,"installationId":"i1"},"request":{"installationId":"i1","expectedVersion":2},"pathDeviceId":"device-a","resourceDeviceId":"device-a","resourceAccountId":"account-a","resourceInstallationId":"i1","resourceUserId":"user-a","resourceVersion":2,"exactReplay":false,"deviceDisabled":true,"encryptedTokenCleared":true,"rawTokenAbsent":true,"activeTokenIndexRemoved":true,"tombstoneCommitted":true,"versionAfter":3},
+      "expected": "revoked"
+    },
+    {
+      "id": "notification-revoke-with-live-token-is-ambiguous",
+      "kind": "notification-revoke-receipt",
+      "input": {"session":{"accountId":"account-a","user":{"id":"user-a"},"sharedDevice":false,"installationId":"i1"},"request":{"installationId":"i1","expectedVersion":2},"pathDeviceId":"device-a","resourceDeviceId":"device-a","resourceAccountId":"account-a","resourceInstallationId":"i1","resourceUserId":"user-a","resourceVersion":2,"exactReplay":false,"deviceDisabled":true,"encryptedTokenCleared":false,"rawTokenAbsent":true,"activeTokenIndexRemoved":true,"tombstoneCommitted":true,"versionAfter":3},
+      "expected": "ambiguous"
+    },
+    {
+      "id": "native-session-revoke-clears-family-and-device-atomically",
+      "kind": "native-session-revoke",
+      "input": {"accountId":"account-a","actorId":"user-a","session":{"accountId":"account-a","installationId":"i1","user":{"id":"user-a"},"version":4},"request":{"installationId":"i1","expectedVersion":4,"clearNotificationDevice":true},"exactReplay":false,"sessionRevoked":true,"accessTokensRejected":true,"refreshFamilyDisabled":true,"refreshSecretsCleared":true,"notificationBindingCleared":true,"auditCommitted":true,"versionAfter":5},
+      "expected": "revoked"
+    },
+    {
+      "id": "native-session-revoke-cannot-leave-refresh-family-active",
+      "kind": "native-session-revoke",
+      "input": {"accountId":"account-a","actorId":"user-a","session":{"accountId":"account-a","installationId":"i1","user":{"id":"user-a"},"version":4},"request":{"installationId":"i1","expectedVersion":4,"clearNotificationDevice":true},"exactReplay":false,"sessionRevoked":true,"accessTokensRejected":true,"refreshFamilyDisabled":false,"refreshSecretsCleared":true,"notificationBindingCleared":true,"auditCommitted":true,"versionAfter":5},
+      "expected": "ambiguous"
+    },
+    {
+      "id": "notification-revoke-hides-cross-account-or-path-resource",
+      "kind": "notification-revoke",
+      "input": { "session": { "accountId": "account-a", "user": { "id": "user-a" }, "sharedDevice": false, "installationId": "i1" }, "request": { "installationId": "i1", "expectedVersion": 2 }, "pathDeviceId": "device-a", "resourceDeviceId": "device-b", "resourceAccountId": "account-b", "resourceInstallationId": "i1", "resourceUserId": "user-a", "resourceVersion": 2, "exactReplay": false },
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "relay-dispatch-accepted-means-outbox-only",
+      "kind": "relay-dispatch",
+      "input": { "outboxCommitted": true, "relayAcknowledged": false },
+      "expected": "queued_not_accepted"
+    },
+    {
+      "id": "relay-no-build-delivery-can-await-human-verification",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-a","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","proposedStatus":"awaiting_verification","currentVerificationStatus":"requested","proposedVerificationStatus":"requested","currentBugState":"ready_for_verification","proposedBugState":"ready_for_verification","currentRevision":6,"incomingRevision":7,"currentPayloadHash":"old","incomingPayloadHash":"new","deliveredCommitSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","buildRequirement":"not_required","buildEvidenceStatus":"not_required","buildId":null,"currentBugId":"bug-1","currentProjectId":"project-1"},
+      "expected": "projection_only"
+    },
+    {
+      "id": "relay-exact-build-delivery-can-await-human-verification",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-a","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","currentBugId":"bug-a","currentProjectId":"project-a","proposedStatus":"awaiting_verification","currentVerificationStatus":"requested","proposedVerificationStatus":"requested","currentBugState":"ready_for_verification","proposedBugState":"ready_for_verification","currentRevision":6,"incomingRevision":7,"currentPayloadHash":"old","incomingPayloadHash":"new","deliveredCommitSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","buildRequirement":"required","buildEvidenceStatus":"exact_commit_eligible","buildId":"build-1","buildFact":{"buildId":"build-1","attemptId":"attempt-a","bugId":"bug-a","projectId":"project-a","status":"ready","sourceCommitSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","manifestCommitShas":["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]}},
+      "expected": "projection_only"
+    },
+    {
+      "id": "relay-stale-revision-is-ignored",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-a","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","proposedStatus":"running","currentVerificationStatus":"requested","proposedVerificationStatus":"requested","currentBugState":"in_progress","proposedBugState":"in_progress","currentRevision":7,"incomingRevision":6,"currentPayloadHash":"current","incomingPayloadHash":"old","currentBugId":"bug-1","currentProjectId":"project-1"},
+      "expected": "stale_ignored"
+    },
+    {
+      "id": "relay-webhook-cannot-cross-attempt-handoff-or-instance",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-b","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","proposedStatus":"running","currentVerificationStatus":"requested","proposedVerificationStatus":"requested","currentBugState":"in_progress","proposedBugState":"in_progress","currentRevision":7,"incomingRevision":8,"currentPayloadHash":"current","incomingPayloadHash":"foreign","currentBugId":"bug-1","currentProjectId":"project-1"},
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "relay-same-revision-different-payload-conflicts",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-a","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","proposedStatus":"running","currentVerificationStatus":"requested","proposedVerificationStatus":"requested","currentBugState":"in_progress","proposedBugState":"in_progress","currentRevision":7,"incomingRevision":7,"currentPayloadHash":"current","incomingPayloadHash":"different","currentBugId":"bug-1","currentProjectId":"project-1"},
+      "expected": "INTEGRATION_EVENT_CONFLICT"
+    },
+    {
+      "id": "relay-build-cannot-pass-verification-or-close",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-a","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","proposedStatus":"awaiting_verification","currentVerificationStatus":"requested","proposedVerificationStatus":"passed","currentBugState":"ready_for_verification","proposedBugState":"closed","currentRevision":6,"incomingRevision":7,"currentPayloadHash":"old","incomingPayloadHash":"new","deliveredCommitSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","buildRequirement":"not_required","buildEvidenceStatus":"not_required","buildId":null,"currentBugId":"bug-1","currentProjectId":"project-1"},
+      "expected": "INTEGRATION_AUTOMATION_FORBIDDEN"
+    },
+    {
+      "id": "relay-exact-build-status-requires-build-id",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-a","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","proposedStatus":"awaiting_verification","currentVerificationStatus":"requested","proposedVerificationStatus":"requested","currentBugState":"ready_for_verification","proposedBugState":"ready_for_verification","currentRevision":6,"incomingRevision":7,"currentPayloadHash":"old","incomingPayloadHash":"new","deliveredCommitSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","buildRequirement":"required","buildEvidenceStatus":"exact_commit_eligible","buildId":null,"currentBugId":"bug-1","currentProjectId":"project-1"},
+      "expected": "BUILD_IDENTITY_MISMATCH"
+    },
+    {
+      "id": "relay-cannot-record-failed-verification",
+      "kind": "machine-action",
+      "input": { "action": "verification.failed" },
+      "expected": "INTEGRATION_AUTOMATION_FORBIDDEN"
+    },
+    {
+      "id": "relay-cannot-record-blocked-verification",
+      "kind": "machine-action",
+      "input": { "action": "verification.blocked" },
+      "expected": "INTEGRATION_AUTOMATION_FORBIDDEN"
+    },
+    {
+      "id": "relay-may-project-exact-build-evidence",
+      "kind": "machine-action",
+      "input": { "action": "build.exact_commit_eligible" },
+      "expected": "allowed"
+    },
+    {
+      "id": "relay-projection-cannot-change-verification-to-failed",
+      "kind": "relay-projection",
+      "input": {"currentAttemptId":"attempt-a","incomingAttemptId":"attempt-a","currentHandoffId":"handoff-a","incomingHandoffId":"handoff-a","currentRelayInstanceId":"relay-local","incomingRelayInstanceId":"relay-local","proposedStatus":"fix_delivered","currentVerificationStatus":"requested","proposedVerificationStatus":"failed","currentBugState":"in_progress","proposedBugState":"in_progress","currentRevision":6,"incomingRevision":7,"currentPayloadHash":"old","incomingPayloadHash":"new","deliveredCommitSha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","buildRequirement":"not_required","buildEvidenceStatus":"not_required","buildId":null,"currentBugId":"bug-1","currentProjectId":"project-1"},
+      "expected": "INTEGRATION_AUTOMATION_FORBIDDEN"
+    },
+    {
+      "id": "versioned-operation-prefers-vendor-media",
+      "kind": "content-negotiation",
+      "input": { "acceptsVendor": true, "acceptsJson": true, "operationAdvertisesVendor": true, "operationAcceptsJson": false },
+      "expected": "vendor"
+    },
+    {
+      "id": "inherited-operation-falls-back-to-json",
+      "kind": "content-negotiation",
+      "input": { "acceptsVendor": true, "acceptsJson": true, "operationAdvertisesVendor": false, "operationAcceptsJson": true },
+      "expected": "application_json"
+    },
+    {
+      "id": "patched-operation-accepts-vendor-only-media-range",
+      "kind": "content-negotiation",
+      "input": { "acceptsVendor": true, "acceptsJson": false, "operationAdvertisesVendor": true, "operationAcceptsJson": false },
+      "expected": "vendor"
+    },
+    {
+      "id": "unsupported-accept-is-typed-not-acceptable",
+      "kind": "content-negotiation",
+      "input": { "acceptsVendor": false, "acceptsJson": false, "operationAdvertisesVendor": true, "operationAcceptsJson": false },
+      "expected": "NOT_ACCEPTABLE"
+    },
+    {
+      "id": "advertised-vendor-request-content-type-is-accepted",
+      "kind": "content-negotiation",
+      "input": { "direction": "request", "contentTypeVendorSupported": true, "contentTypeJson": false, "operationAdvertisesVendor": true, "operationAcceptsJson": true },
+      "expected": "vendor"
+    },
+    {
+      "id": "unknown-vendor-request-content-type-is-rejected",
+      "kind": "content-negotiation",
+      "input": { "direction": "request", "contentTypeVendorSupported": false, "contentTypeJson": false, "operationAdvertisesVendor": true, "operationAcceptsJson": true },
+      "expected": "UNSUPPORTED_MEDIA_TYPE"
+    },
+    {
+      "id": "inherited-json-request-content-type-remains-compatible",
+      "kind": "content-negotiation",
+      "input": { "direction": "request", "contentTypeVendorSupported": false, "contentTypeJson": true, "operationAdvertisesVendor": false, "operationAcceptsJson": true },
+      "expected": "application_json"
+    },
+    {
+      "id": "workflow-cursor-is-bound-to-snapshot-sequence",
+      "kind": "cursor-scope",
+      "input": { "cursorAccountId": "account-a", "accountId": "account-a", "cursorActorId": "actor-a", "actorId": "actor-a", "cursorProjectId": "project-a", "projectId": "project-a", "cursorResourceId": "bug-a", "resourceId": "bug-a", "cursorFilterHash": "filter-a", "filterHash": "filter-a", "cursorSnapshotSequence": 10, "snapshotSequence": 11 },
+      "expected": "INVALID_REQUEST"
+    },
+    {
+      "id": "workflow-cursor-cannot-cross-bug-resource",
+      "kind": "cursor-scope",
+      "input": { "cursorAccountId": "account-a", "accountId": "account-a", "cursorActorId": "actor-a", "actorId": "actor-a", "cursorProjectId": "project-a", "projectId": "project-a", "cursorResourceId": "bug-a", "resourceId": "bug-b", "cursorFilterHash": "filter-a", "filterHash": "filter-a", "cursorSnapshotSequence": 10, "snapshotSequence": 10 },
+      "expected": "INVALID_REQUEST"
+    },
+    {
+      "id": "shared-device-session-expiry-and-revocation",
+      "kind": "shared-device-session",
+      "input": { "revoked": true, "oldAccessRejected": true, "oldRefreshRejected": true, "notificationDeviceRevoked": true, "newActorCannotResumeOldQueue": true },
+      "expected": "cleared"
+    }
+  ]
+}

@@ -1,0 +1,449 @@
+{
+  "version": "1.1.0",
+  "baseVersion": "1.0.0",
+  "scenarios": [
+    {
+      "id": "native-session-short-lived-response",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeSessionTokens",
+      "source": { "operationId": "createNativeSession", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "shared-device-session-cannot-enable-push",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeSessionTokens",
+      "source": { "operationId": "createNativeSession", "direction": "response" },
+      "mutations": [
+        { "op": "replace", "path": "/session/sharedDevice", "value": true }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "android-api-34-is-not-supported",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeLoginRequest",
+      "source": { "operationId": "createNativeSession", "direction": "request" },
+      "mutations": [
+        { "op": "replace", "path": "/device/androidApi", "value": 34 }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "android-api-35-is-the-supported-floor",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeLoginRequest",
+      "source": { "operationId": "createNativeSession", "direction": "request" },
+      "mutations": [
+        { "op": "replace", "path": "/device/androidApi", "value": 35 }
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "capture-device-api-35-is-supported",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createCaptureBundleRequest",
+      "source": { "operationId": "createCaptureBundle", "direction": "request" },
+      "mutations": [
+        { "op": "replace", "path": "/capture/deviceMetadata/androidApi", "value": 35 }
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "capture-device-api-34-is-not-supported",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createCaptureBundleRequest",
+      "source": { "operationId": "createCaptureBundle", "direction": "request" },
+      "mutations": [
+        { "op": "replace", "path": "/capture/deviceMetadata/androidApi", "value": 34 }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "legacy-create-request-remains-frozen",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/createBugRequest",
+      "source": { "baseScenarioId": "mobile-create-bug" },
+      "expectedValid": true
+    },
+    {
+      "id": "native-create-request-with-capture",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createBugRequest",
+      "source": { "operationId": "createBug", "direction": "request" },
+      "expectedValid": true
+    },
+    {
+      "id": "native-occurrence-environment-rejects-password",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createBugRequest",
+      "source": { "operationId": "createBug", "direction": "request" },
+      "mutations": [
+        { "op": "add", "path": "/occurrence/environment/password", "value": "must-not-be-collected" }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "native-occurrence-environment-rejects-player-coordinates",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createBugRequest",
+      "source": { "operationId": "createBug", "direction": "request" },
+      "mutations": [
+        { "op": "add", "path": "/occurrence/environment/playerCoordinates", "value": "10,20" }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "native-occurrence-environment-rejects-nested-state",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/addOccurrenceRequest",
+      "source": { "operationId": "addOccurrence", "direction": "request" },
+      "mutations": [
+        { "op": "replace", "path": "/occurrence/environment/networkType", "value": { "raw": "wifi" } }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "workflow-occurrence-uses-bounded-native-environment",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/workflowProjection",
+      "source": { "operationId": "getBugWorkflowProjection", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "native-audit-list-is-bounded-and-redacted",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeAuditEventList",
+      "source": { "operationId": "listBugEvents", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "native-audit-rejects-authorization-payload",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeAuditEventList",
+      "source": { "operationId": "listBugEvents", "direction": "response" },
+      "mutations": [
+        { "op": "add", "path": "/items/0/payload/authorization", "value": "Bearer must-not-leak" }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "native-audit-rejects-nested-raw-request-body",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeAuditEventList",
+      "source": { "operationId": "listBugEvents", "direction": "response" },
+      "mutations": [
+        { "op": "add", "path": "/items/0/payload/rawRequestBody", "value": { "password": "secret" } }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "create-bug-response-with-item-identity",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createBugResponse",
+      "source": { "operationId": "createBug", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "append-occurrence-response-with-item-identity",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/addOccurrenceResponse",
+      "source": { "operationId": "addOccurrence", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "native-upload-init-identifies-submission-and-attachment",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/initUploadRequest",
+      "source": { "operationId": "initUpload", "direction": "request" },
+      "expectedValid": true
+    },
+    {
+      "id": "native-upload-init-response-echoes-identities",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/initUploadResponse",
+      "source": { "operationId": "initUpload", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "native-upload-finalize-echoes-identities",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/finalizeUploadRequest",
+      "source": { "operationId": "finalizeUpload", "direction": "request" },
+      "expectedValid": true
+    },
+    {
+      "id": "upload-finalize-response-with-attachment-id",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/finalizeUploadResponse",
+      "source": { "operationId": "finalizeUpload", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "upload-finalize-without-attachment-id-is-invalid",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/finalizeUploadResponse",
+      "source": { "operationId": "finalizeUpload", "direction": "response" },
+      "mutations": [{ "op": "remove", "path": "/attachmentId" }],
+      "expectedValid": false
+    },
+    {
+      "id": "upload-finalize-cannot-return-claimed-binding",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/finalizeUploadResponse",
+      "source": { "operationId": "finalizeUpload", "direction": "response" },
+      "mutations": [{ "op": "replace", "path": "/bindingStatus", "value": "claimed" }],
+      "expectedValid": false
+    },
+    {
+      "id": "pending-scan-is-not-ready-to-bind",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/finalizeUploadResponse",
+      "source": { "operationId": "finalizeUpload", "direction": "response" },
+      "mutations": [{ "op": "replace", "path": "/scanStatus", "value": "pending" }],
+      "expectedValid": false
+    },
+    {
+      "id": "attachment-submission-reservation",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/attachmentBindingRequest",
+      "source": { "operationId": "bindAttachmentReservation", "direction": "request" },
+      "expectedValid": true
+    },
+    {
+      "id": "new-bug-reservation-cannot-target-existing-item",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/attachmentBindingRequest",
+      "source": { "operationId": "bindAttachmentReservation", "direction": "request" },
+      "mutations": [
+        { "op": "add", "path": "/targetQaItemId", "value": "70000000-0000-4000-8000-000000000001" }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "attachment-reservation-response-has-ttl",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/attachmentBinding",
+      "source": { "operationId": "bindAttachmentReservation", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "reserved-attachment-binding-requires-ttl",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/attachmentBinding",
+      "source": { "operationId": "bindAttachmentReservation", "direction": "response" },
+      "mutations": [{ "op": "replace", "path": "/expiresAt", "value": null }],
+      "expectedValid": false
+    },
+    {
+      "id": "claimed-attachment-binding-clears-ttl-and-identifies-target",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/attachmentBinding",
+      "source": { "operationId": "bindAttachmentReservation", "direction": "response" },
+      "mutations": [
+        { "op": "replace", "path": "/status", "value": "claimed" },
+        { "op": "replace", "path": "/expiresAt", "value": null },
+        { "op": "replace", "path": "/targetQaItemId", "value": "70000000-0000-4000-8000-000000000001" }
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "pending-attachment-metadata-is-not-bindable",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/attachmentMetadata",
+      "source": { "operationId": "getAttachmentMetadata", "direction": "response" },
+      "mutations": [{ "op": "replace", "path": "/scanStatus", "value": "pending" }],
+      "expectedValid": false
+    },
+    {
+      "id": "capture-bundle-request-reports-facts-not-derived-status",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createCaptureBundleRequest",
+      "source": { "operationId": "createCaptureBundle", "direction": "request" },
+      "expectedValid": true
+    },
+    {
+      "id": "capture-bundle-poco-unavailable",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/captureBundleResponse",
+      "source": { "operationId": "createCaptureBundle", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "failed-poco-artifact-can-have-no-attachment",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/captureArtifact",
+      "payload": {
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "clientAttachmentId": null,
+        "attachmentId": null,
+        "kind": "poco_hierarchy",
+        "status": "failed",
+        "startedAt": "2026-08-24T10:00:00Z",
+        "endedAt": "2026-08-24T10:00:00.100Z",
+        "skewMs": 10,
+        "truncated": false,
+        "failureReason": "timeout"
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "successful-artifact-requires-server-attachment",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/captureArtifact",
+      "source": { "scenarioId": "failed-poco-artifact-can-have-no-attachment" },
+      "mutations": [{ "op": "replace", "path": "/status", "value": "succeeded" }],
+      "expectedValid": false
+    },
+    {
+      "id": "capture-request-cannot-claim-server-enrichment-status",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createCaptureBundleRequest",
+      "source": { "operationId": "createCaptureBundle", "direction": "request" },
+      "mutations": [
+        { "op": "add", "path": "/capture/enrichmentStatus", "value": "complete" }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "qa-snapshot-correlated-response",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/pocoSnapshotResponse",
+      "payload": {
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "nonce": "nonce_0123456789abcdef",
+        "schemaVersion": "1.0.0",
+        "generatedAt": "2026-08-24T10:00:00Z",
+        "redactionPolicyVersion": "1.0.0",
+        "sensitiveFieldsOmitted": true,
+        "snapshot": {
+          "buildVersion": "0.1.0-debug",
+          "gitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "scene": "Login",
+          "gameTimeSeconds": 42.5,
+          "pseudonymousTestUserId": "qa-user-hash",
+          "level": null,
+          "mode": "qa",
+          "networkEnvironment": "staging",
+          "recentErrors": ["bounded example error"],
+          "customFields": { "tutorialStep": 3 }
+        }
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "minimal-qa-snapshot-is-forward-compatible",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/pocoSnapshotResponse",
+      "payload": {
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "nonce": "nonce_0123456789abcdef",
+        "schemaVersion": "1.0.0",
+        "generatedAt": "2026-08-24T10:00:00Z",
+        "redactionPolicyVersion": "1.0.0",
+        "sensitiveFieldsOmitted": true,
+        "snapshot": {}
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "unsupported-qa-snapshot-request-version-is-invalid",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/pocoSnapshotRequest",
+      "payload": {
+        "captureId": "60000000-0000-4000-8000-000000000001",
+        "nonce": "nonce_0123456789abcdef",
+        "deadlineMs": 1000,
+        "schemaVersion": "1.999.0"
+      },
+      "expectedValid": false
+    },
+    {
+      "id": "poco-capability-negotiation-requires-sdk-handshake",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/pocoEnrichment",
+      "payload": {
+        "status": "unavailable",
+        "attempted": true,
+        "connectedPort": null,
+        "sdkVersion": null,
+        "snapshotCapability": "not_probed",
+        "screenSize": null,
+        "allowedReadOnlyMethods": ["GetSDKVersion", "Screenshot", "Dump", "GetScreenSize", "GetDebugProfilingData", "qa.snapshot"],
+        "negotiatedMethods": ["GetSDKVersion", "Screenshot"],
+        "succeededMethods": [],
+        "failureReason": "timeout"
+      },
+      "expectedValid": false
+    },
+    {
+      "id": "qa-snapshot-missing-correlation-is-invalid",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/pocoSnapshotResponse",
+      "source": { "scenarioId": "qa-snapshot-correlated-response" },
+      "mutations": [{ "op": "remove", "path": "/captureId" }],
+      "expectedValid": false
+    },
+    {
+      "id": "qa-snapshot-recent-errors-are-bounded",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/pocoSnapshotResponse",
+      "source": { "scenarioId": "qa-snapshot-correlated-response" },
+      "mutations": [
+        {
+          "op": "replace",
+          "path": "/snapshot/recentErrors",
+          "value": [
+            "e01", "e02", "e03", "e04", "e05", "e06", "e07",
+            "e08", "e09", "e10", "e11", "e12", "e13", "e14",
+            "e15", "e16", "e17", "e18", "e19", "e20", "e21"
+          ]
+        }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "relay-handoff-receipt-safe-read-model",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/relayReceipt",
+      "source": { "operationId": "getRelayReceipt", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "relay-dispatch-response-is-outbox-receipt",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/relayDispatchAccepted",
+      "source": { "operationId": "dispatchRepairAttemptToRelay", "direction": "response" },
+      "expectedValid": true
+    },
+    {
+      "id": "relay-receipt-cannot-remove-human-verification",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/relayReceipt",
+      "source": { "operationId": "getRelayReceipt", "direction": "response" },
+      "mutations": [
+        { "op": "replace", "path": "/requiresHumanVerification", "value": false }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "relay-no-build-awaiting-verification-is-valid",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/relayReceipt",
+      "source": { "operationId": "getRelayReceipt", "direction": "response" },
+      "mutations": [
+        { "op": "replace", "path": "/buildRequirement", "value": "not_required" },
+        { "op": "replace", "path": "/buildEvidenceStatus", "value": "not_required" },
+        { "op": "replace", "path": "/buildId", "value": null }
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "relay-required-build-cannot-use-not-required-evidence",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/relayReceipt",
+      "source": { "operationId": "getRelayReceipt", "direction": "response" },
+      "mutations": [
+        { "op": "replace", "path": "/buildEvidenceStatus", "value": "not_required" },
+        { "op": "replace", "path": "/buildId", "value": null }
+      ],
+      "expectedValid": false
+    },
+    {
+      "id": "relay-exact-build-evidence-requires-build-id",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/relayReceipt",
+      "source": { "operationId": "getRelayReceipt", "direction": "response" },
+      "mutations": [{ "op": "replace", "path": "/buildId", "value": null }],
+      "expectedValid": false
+    },
+    {
+      "id": "verification-result-can-atomically-claim-evidence",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/recordVerificationResultRequest",
+      "source": { "operationId": "recordVerificationResult", "direction": "request" },
+      "expectedValid": true
+    },
+    {
+      "id": "workflow-truncation-requires-next-cursor",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/workflowProjection",
+      "source": { "operationId": "getBugWorkflowProjection", "direction": "response" },
+      "mutations": [{ "op": "replace", "path": "/truncated", "value": true }],
+      "expectedValid": false
+    },
+    {
+      "id": "android-notification-registration-is-personal-device-only",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/registerNotificationDeviceRequest",
+      "payload": {
+        "clientActionId": "10000000-0000-4000-8000-000000000013",
+        "installationId": "10000000-0000-4000-8000-000000000001",
+        "provider": "fcm",
+        "platform": "android",
+        "token": "example-fcm-token-0000000000000000",
+        "tokenIssuedAt": "2026-08-24T10:00:00Z",
+        "expectedVersion": null,
+        "qaAppVersion": "0.1.0-debug"
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "shared-device-notification-registration-is-invalid",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/registerNotificationDeviceRequest",
+      "source": { "scenarioId": "android-notification-registration-is-personal-device-only" },
+      "mutations": [{ "op": "add", "path": "/sharedDevice", "value": true }],
+      "expectedValid": false
+    }
+  ]
+}
