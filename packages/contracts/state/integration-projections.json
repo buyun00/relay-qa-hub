@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "source": "relay",
+  "rules": [
+    {
+      "eventType": "turn.queued",
+      "attemptStatus": "queued",
+      "mayTransitionBugTo": ["in_progress"],
+      "guards": ["attempt.is_current", "attempt.mode == relay"]
+    },
+    {
+      "eventType": "turn.started",
+      "attemptStatus": "running",
+      "mayTransitionBugTo": [],
+      "guards": ["attempt.is_current", "attempt.mode == relay"]
+    },
+    {
+      "eventType": "turn.needs_input",
+      "attemptStatus": "needs_input",
+      "mayTransitionBugTo": [],
+      "guards": ["attempt.is_current", "attempt.mode == relay"]
+    },
+    {
+      "eventType": "turn.blocked",
+      "attemptStatus": "blocked",
+      "mayTransitionBugTo": [],
+      "guards": ["attempt.is_current", "attempt.mode == relay"]
+    },
+    {
+      "eventType": "turn.failed",
+      "attemptStatus": "failed",
+      "mayTransitionBugTo": ["ready"],
+      "guards": ["attempt.is_current", "attempt.mode == relay"]
+    },
+    {
+      "eventType": "turn.cancelled",
+      "attemptStatus": "cancelled",
+      "mayTransitionBugTo": [],
+      "guards": ["attempt.is_current", "attempt.mode == relay"]
+    },
+    {
+      "eventType": "turn.delivered",
+      "attemptStatus": "delivered",
+      "mayTransitionBugTo": ["awaiting_build", "ready_for_verification"],
+      "guards": [
+        "attempt.is_current",
+        "attempt.mode == relay",
+        "delivery.pushed == true",
+        "delivery.verified == true",
+        "delivery.commitSha == delivery.remoteSha"
+      ]
+    },
+    {
+      "eventType": "build.queued",
+      "attemptStatus": null,
+      "mayTransitionBugTo": [],
+      "guards": ["attempt.is_current", "build.identity_matches_attempt"]
+    },
+    {
+      "eventType": "build.running",
+      "attemptStatus": null,
+      "mayTransitionBugTo": [],
+      "guards": ["attempt.is_current", "build.identity_matches_attempt"]
+    },
+    {
+      "eventType": "build.completed",
+      "attemptStatus": null,
+      "mayTransitionBugTo": ["ready_for_verification"],
+      "guards": ["attempt.is_current", "build.contains_exact_delivered_commit"]
+    },
+    {
+      "eventType": "build.failed",
+      "attemptStatus": null,
+      "mayTransitionBugTo": [],
+      "guards": ["attempt.is_current"]
+    },
+    {
+      "eventType": "task.closed",
+      "attemptStatus": null,
+      "mayTransitionBugTo": [],
+      "guards": ["record.metadata_only"]
+    }
+  ],
+  "forbiddenAutomation": [
+    "verification.passed",
+    "bug.closed",
+    "bug.rejected",
+    "bug.duplicate"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/api.schema.json",
+  "title": "QA Hub API projection and health responses",
+  "$defs": {
+    "eventList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "nextCursor"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": { "$ref": "https://qa-hub.local/contracts/event-envelope.schema.json" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "liveHealth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "service", "version", "buildSha", "time"],
+      "properties": {
+        "status": { "const": "ok" },
+        "service": { "const": "relay-qa-hub-api" },
+        "version": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "buildSha": { "type": "string", "pattern": "^(dev|[0-9a-f]{40})$" },
+        "time": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" }
+      }
+    },
+    "readyHealth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "schemaVersion", "checks"],
+      "properties": {
+        "status": { "type": "string", "enum": ["ready", "not_ready"] },
+        "schemaVersion": { "type": ["string", "null"], "maxLength": 100 },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "status"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+              "status": { "type": "string", "enum": ["ok", "degraded", "down"] }
+            }
+          }
+        }
+      }
+    },
+    "dependencyHealth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "database", "evidence", "worker"],
+      "properties": {
+        "status": { "type": "string", "enum": ["ok", "degraded", "down"] },
+        "database": { "type": "string", "enum": ["ok", "degraded", "down"] },
+        "evidence": { "type": "string", "enum": ["ok", "read_only", "low_space", "down"] },
+        "worker": { "type": "string", "enum": ["ok", "stalled", "down"] }
+      }
+    }
+  }
+}

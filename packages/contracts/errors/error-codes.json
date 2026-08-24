@@ -1,0 +1,100 @@
+{
+  "version": "1.0.0",
+  "errors": [
+    {
+      "code": "INVALID_REQUEST",
+      "status": 400,
+      "description": "The request syntax, headers, parameters, or schema are invalid."
+    },
+    {
+      "code": "UNAUTHENTICATED",
+      "status": 401,
+      "description": "No valid QA Hub user or scoped machine identity was supplied."
+    },
+    {
+      "code": "INTEGRATION_SIGNATURE_INVALID",
+      "status": 401,
+      "description": "The webhook signature or replay-window timestamp is invalid."
+    },
+    {
+      "code": "FORBIDDEN",
+      "status": 403,
+      "description": "The authenticated actor lacks the required project role or machine scope."
+    },
+    {
+      "code": "NOT_FOUND",
+      "status": 404,
+      "description": "The resource does not exist or is hidden by the cross-project disclosure policy."
+    },
+    {
+      "code": "PAYLOAD_TOO_LARGE",
+      "status": 413,
+      "description": "The request, evidence item, or aggregate evidence quota is exceeded."
+    },
+    {
+      "code": "INVALID_TRANSITION",
+      "status": 409,
+      "description": "The requested state transition is not valid from the current state."
+    },
+    {
+      "code": "ACTIVE_REPAIR_EXISTS",
+      "status": 409,
+      "description": "A non-superseded active repair attempt already exists for the Bug."
+    },
+    {
+      "code": "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      "status": 409,
+      "description": "The idempotency key was previously used with a different canonical payload."
+    },
+    {
+      "code": "INTEGRATION_EVENT_CONFLICT",
+      "status": 409,
+      "description": "An external event or delivery identifier was replayed with a different body hash."
+    },
+    {
+      "code": "VERSION_CONFLICT",
+      "status": 412,
+      "description": "The expected aggregate version is stale; no concurrent change was overwritten."
+    },
+    {
+      "code": "GUARD_FAILED",
+      "status": 422,
+      "description": "A domain guard such as verification, separation of duties, or exact build identity failed."
+    },
+    {
+      "code": "UPLOAD_INVALID",
+      "status": 422,
+      "description": "Upload size, chunk, hash, MIME, magic, scan, quota, or binding validation failed."
+    },
+    {
+      "code": "RATE_LIMITED",
+      "status": 429,
+      "description": "The actor or source exceeded the configured endpoint rate limit."
+    },
+    {
+      "code": "RELAY_DELIVERY_EVIDENCE_INVALID",
+      "status": 422,
+      "description": "Relay delivery is missing pushed/verified proof or commitSha differs from remoteSha."
+    },
+    {
+      "code": "BUILD_IDENTITY_MISMATCH",
+      "status": 422,
+      "description": "Build provider, job, project, branch, mode, or full source SHA does not match the eligible repair."
+    },
+    {
+      "code": "INTEGRATION_AUTOMATION_FORBIDDEN",
+      "status": 403,
+      "description": "A machine identity attempted a human-only Bug decision such as verification or closure."
+    },
+    {
+      "code": "INTERNAL_ERROR",
+      "status": 500,
+      "description": "An unexpected server failure occurred without exposing sensitive internals."
+    },
+    {
+      "code": "SERVICE_UNAVAILABLE",
+      "status": 503,
+      "description": "The process is live but a required dependency or migration is not ready."
+    }
+  ]
+}

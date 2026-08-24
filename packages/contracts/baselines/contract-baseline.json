@@ -1,0 +1,30 @@
+{
+  "contractVersion": "1.0.0",
+  "frozenAt": "2026-08-24T09:31:43.013Z",
+  "canonicalSha256": {
+    "../../docs/contracts/CRITICAL_SCENARIOS.md": "8871f6b1d845ccccbb690c9718a0d973f558df78c5baf83ebe841d9aaf65db0e",
+    "README.md": "a2f977a45ac1685bbe9fe3ccfb4cfbe56b86531ec38136b76a334921fe7ca123",
+    "errors/error-codes.json": "501812331622744c72680f1e2ad74006cb4c5a6cff67182f918862ae80cead5c",
+    "examples/critical-scenarios.json": "823dad62b850fb03e123de510ddb8b14f7acfffb52ada02b13f6dca5a2a2eff8",
+    "openapi/openapi.json": "f6f494e8859473bf5590a34a84c2a10c4d07e3ad3a2629260f24607826fb8143",
+    "schemas/api.schema.json": "2915c94a342024d1da135439c8f6e48f238f90c4e30de27946df015036e08351",
+    "schemas/bug.schema.json": "d266f0ce36a8d19568b457fd0bb98ec2ec025a071a07bf9e00a3a9f926d5ac19",
+    "schemas/build.schema.json": "309e99895943ea266dbd6d30bee08b33c588b5c318d3bd5927a33f976c95754e",
+    "schemas/common.schema.json": "bd0b291a6215365ba3efe0fd16c6d81b231fc497c504a0960fe5eaa62bb9a390",
+    "schemas/event-envelope.schema.json": "06aa747be53955ec62ad558d467db7e2f56643fddc0da5d5ebd4d59e41976097",
+    "schemas/notification.schema.json": "86c4f9432d44b3ef7e2291f6c10cac5ba76a71d14ebd6b0a953aa9f0f75e6dc5",
+    "schemas/relay.schema.json": "ac5f79a304a33a234093f9d6a2ed437b61ab9ac2f762b68dfe715a91cd8a9cbf",
+    "schemas/upload.schema.json": "b92b22a6a8e57fa198d91426e9710c0b6de37a7c3257fb6a84803dc9583a6201",
+    "schemas/workflow.schema.json": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+    "scripts/check-breaking.mjs": "30140c4d540a0ddc915593cbba2c283355c3f06029db577faa570b67e813e9bc",
+    "scripts/generate-openapi.mjs": "f04bb8cc73b2732f6b2f7c1ce05f1aa7edfb78c2f2510594ec9a12687d51923c",
+    "scripts/validate-contracts.mjs": "2f8a640a8f9c30cc4d21546dee4dc348f167799b10fbd2c3c020fbb2607e454e",
+    "semantics/behavior-scenarios.json": "e815794890ceb8395c03d44905b8b1d33b1d1477be8c59c2d019057d1ad55a9d",
+    "semantics/integration-invariants.json": "54404e00cbe87972c61c2759891e3de5aa8ffb5c48d3c9e74743e43dd3e97232",
+    "src/api-manifest.json": "3746ef8b53fe5a8a98c3c014917c0302aad5c2c91ebe9d8a82bdc6dd2c25a915",
+    "src/evaluate-contract-behavior.mjs": "f8ebd3bde23df6c09d11f93c4330462fba7ca875145e2d2ab54be80140890bd5",
+    "src/validate-integration-semantics.mjs": "04e823dbdfe177ed9f2e66daaa4b386ffcbad14534df8f7e5ff682676b206cba",
+    "state/bug-transitions.json": "a963b26d874375a83b1624f35257e3e1ce555c32d179495b21fc3c52c6e151a8",
+    "state/integration-projections.json": "da5d9ed622ecbb9e8a5b032b2babbadc67768d94e0e334e32a142d90d8ed15b1"
+  }
+}

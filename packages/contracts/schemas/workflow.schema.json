@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/workflow.schema.json",
+  "title": "QA Hub workflow command contracts",
+  "$defs": {
+    "updateBugRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "expectedBehavior": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "moduleId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "severity": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/severity" },
+        "priority": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/priority" },
+        "ownerId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "verificationOwnerId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "anyOf": [
+        { "required": ["title"] },
+        { "required": ["description"] },
+        { "required": ["expectedBehavior"] },
+        { "required": ["moduleId"] },
+        { "required": ["severity"] },
+        { "required": ["priority"] },
+        { "required": ["ownerId"] },
+        { "required": ["verificationOwnerId"] }
+      ]
+    },
+    "addOccurrenceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "clientSubmissionId", "occurrence"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "clientSubmissionId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "occurrence": { "$ref": "https://qa-hub.local/contracts/bug.schema.json#/$defs/occurrenceDraft" },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" }
+        }
+      }
+    },
+    "attemptCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+      }
+    },
+    "attemptReasonCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "reason"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+      }
+    },
+    "deliverAttemptRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "summary", "deliveryKind"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "deliveryKind": { "type": "string", "enum": ["code", "no_code"] },
+        "branch": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "mergeRequestUrl": { "type": "string", "format": "uri" },
+        "patchUrl": { "type": "string", "format": "uri" },
+        "noCodeReason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "deliveryKind": { "const": "code" } }, "required": ["deliveryKind"] },
+          "then": {
+            "anyOf": [
+              { "required": ["branch", "commitSha"] },
+              { "required": ["mergeRequestUrl"] },
+              { "required": ["patchUrl"] }
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "deliveryKind": { "const": "no_code" } }, "required": ["deliveryKind"] },
+          "then": { "required": ["noCodeReason"] }
+        }
+      ]
+    },
+    "dispatchRelayRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "handoffId", "selectedAttachmentIds"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "handoffId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "selectedAttachmentIds": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" }
+        }
+      }
+    },
+    "continueRelayRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "actionId", "prompt", "selectedAttachmentIds"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "actionId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "prompt": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "selectedAttachmentIds": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" }
+        }
+      }
+    },
+    "createVerificationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "repairAttemptId", "buildId", "verifierId", "criteria"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "repairAttemptId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "buildId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "verifierId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "criteria": { "type": "string", "minLength": 1, "maxLength": 10000 }
+      }
+    },
+    "repairAttempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "bugId", "sequence", "mode", "status", "assigneeId", "version"],
+      "properties": {
+        "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "bugId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "mode": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/repairMode" },
+        "status": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/repairStatus" },
+        "assigneeId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "parentAttemptId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "summary": { "type": ["string", "null"], "maxLength": 10000 },
+        "branch": { "type": ["string", "null"], "maxLength": 300 },
+        "commitSha": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "mergeRequestUrl": { "type": ["string", "null"], "format": "uri" },
+        "targetBuildId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "bugId",
+        "repairAttemptId",
+        "buildId",
+        "status",
+        "verifierId",
+        "criteriaSnapshot",
+        "version"
+      ],
+      "properties": {
+        "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "bugId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "repairAttemptId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "buildId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["requested", "in_progress", "passed", "failed", "blocked", "cancelled"]
+        },
+        "verifierId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "criteriaSnapshot": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "resultSummary": { "type": ["string", "null"], "maxLength": 10000 },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "verificationResultResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verification", "bug"],
+      "properties": {
+        "verification": { "$ref": "#/$defs/verification" },
+        "bug": { "$ref": "https://qa-hub.local/contracts/bug.schema.json#/$defs/bug" }
+      }
+    }
+  }
+}

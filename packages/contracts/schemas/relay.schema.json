@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/relay.schema.json",
+  "title": "QA Hub and Relay integration contract",
+  "$defs": {
+    "selectedAttachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attachmentId", "filename", "mediaType", "size", "sha256", "downloadUrl"],
+      "properties": {
+        "attachmentId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": {
+          "type": "string",
+          "enum": ["image/jpeg", "image/png", "image/webp", "text/plain", "application/json", "application/zip"]
+        },
+        "size": { "type": "integer", "minimum": 1, "maximum": 26214400 },
+        "sha256": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/sha256" },
+        "downloadUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Short-lived signed URL; excluded from the canonical request hash."
+        }
+      }
+    },
+    "handoffRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["qaInstanceId", "handoffId", "attemptId", "defect", "selectedAttachments"],
+      "properties": {
+        "qaInstanceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$" },
+        "handoffId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "attemptId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "defect": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "key", "revision", "projectKey", "title", "description", "severity", "verificationCriteria"],
+          "properties": {
+            "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$" },
+            "revision": { "type": "integer", "minimum": 1 },
+            "projectKey": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}$" },
+            "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+            "description": { "type": "string", "minLength": 1, "maxLength": 20000 },
+            "severity": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/severity" },
+            "verificationCriteria": { "type": "string", "minLength": 1, "maxLength": 10000 }
+          }
+        },
+        "selectedAttachments": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/selectedAttachment" }
+        }
+      }
+    },
+    "handoffResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handoffId", "taskId", "initialTurnId", "status", "replayed"],
+      "properties": {
+        "handoffId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "taskId": { "type": "integer", "minimum": 1 },
+        "initialTurnId": { "type": "integer", "minimum": 1 },
+        "status": { "type": "string", "enum": ["queued", "running", "needs_input", "blocked", "failed", "cancelled", "delivered"] },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "continueRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["qaInstanceId", "actionId", "attemptId", "prompt"],
+      "properties": {
+        "qaInstanceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$" },
+        "actionId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "attemptId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "prompt": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "selectedAttachments": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/selectedAttachment" }
+        }
+      }
+    },
+    "deliveryEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pushed", "verified", "commitSha", "remoteSha", "branch"],
+      "properties": {
+        "pushed": { "const": true },
+        "verified": { "const": true },
+        "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "remoteSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "branch": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "mergeRequestUrl": { "type": ["string", "null"], "format": "uri" }
+      }
+    },
+    "webhook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "relayInstanceId",
+        "eventId",
+        "deliveryId",
+        "eventType",
+        "handoffId",
+        "attemptId",
+        "externalRevision",
+        "occurredAt",
+        "payload"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "1.0" },
+        "relayInstanceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$" },
+        "eventId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "deliveryId": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "eventType": {
+          "type": "string",
+          "enum": [
+            "turn.queued",
+            "turn.started",
+            "turn.needs_input",
+            "turn.blocked",
+            "turn.failed",
+            "turn.cancelled",
+            "turn.delivered",
+            "task.closed",
+            "build.queued",
+            "build.running",
+            "build.completed",
+            "build.failed"
+          ]
+        },
+        "handoffId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "attemptId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "externalRevision": { "type": "integer", "minimum": 1 },
+        "occurredAt": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "taskId": { "type": "integer", "minimum": 1 },
+            "turnId": { "type": "integer", "minimum": 1 },
+            "statusReason": { "type": ["string", "null"], "maxLength": 5000 },
+            "deliveryEvidence": { "$ref": "#/$defs/deliveryEvidence" },
+            "buildExternalId": { "type": "string", "minLength": 1, "maxLength": 300 },
+            "buildProjectKey": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}$" },
+            "buildBranch": { "type": "string", "minLength": 1, "maxLength": 300 },
+            "buildMode": { "type": "string", "enum": ["full", "hot_update", "cdn", "debug", "other"] },
+            "sourceCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "eventType": { "const": "turn.delivered" } },
+            "required": ["eventType"]
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "required": ["taskId", "turnId", "deliveryEvidence"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "eventType": { "const": "build.completed" } },
+            "required": ["eventType"]
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "object",
+                "required": [
+                  "buildExternalId",
+                  "buildProjectKey",
+                  "buildBranch",
+                  "buildMode",
+                  "sourceCommitSha"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "same-idempotency-key-and-hash-replays",
+      "kind": "idempotency",
+      "input": { "existingHash": "aaa", "incomingHash": "aaa" },
+      "expected": "replay"
+    },
+    {
+      "id": "same-idempotency-key-different-hash-conflicts",
+      "kind": "idempotency",
+      "input": { "existingHash": "aaa", "incomingHash": "bbb" },
+      "expected": "IDEMPOTENCY_PAYLOAD_MISMATCH"
+    },
+    {
+      "id": "stale-aggregate-version-conflicts",
+      "kind": "version",
+      "input": { "currentVersion": 8, "expectedVersion": 7 },
+      "expected": "VERSION_CONFLICT"
+    },
+    {
+      "id": "machine-cannot-close-bug",
+      "kind": "machine-action",
+      "input": { "action": "bug.closed" },
+      "expected": "INTEGRATION_AUTOMATION_FORBIDDEN"
+    },
+    {
+      "id": "machine-cannot-pass-verification",
+      "kind": "machine-action",
+      "input": { "action": "verification.passed" },
+      "expected": "INTEGRATION_AUTOMATION_FORBIDDEN"
+    },
+    {
+      "id": "exact-build-identity-is-eligible",
+      "kind": "build-identity",
+      "input": {
+        "expected": { "provider": "ozdqp", "externalId": "job-1", "projectKey": "OZDQP", "branch": "codex/fix", "sourceCommitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "mode": "cdn" },
+        "incoming": { "provider": "ozdqp", "externalId": "job-1", "projectKey": "OZDQP", "branch": "codex/fix", "sourceCommitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "mode": "cdn", "status": "ready" }
+      },
+      "expected": "eligible"
+    },
+    {
+      "id": "wrong-build-sha-is-ineligible",
+      "kind": "build-identity",
+      "input": {
+        "expected": { "provider": "ozdqp", "externalId": "job-1", "projectKey": "OZDQP", "branch": "codex/fix", "sourceCommitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "mode": "cdn" },
+        "incoming": { "provider": "ozdqp", "externalId": "job-1", "projectKey": "OZDQP", "branch": "codex/fix", "sourceCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "mode": "cdn", "status": "ready" }
+      },
+      "expected": "BUILD_IDENTITY_MISMATCH"
+    },
+    {
+      "id": "late-event-for-superseded-attempt-is-ignored",
+      "kind": "integration-order",
+      "input": { "currentAttemptId": "attempt-2", "currentMode": "human", "currentRevision": 10, "eventAttemptId": "attempt-1", "eventRevision": 11 },
+      "expected": "ignore"
+    },
+    {
+      "id": "out-of-order-event-is-ignored",
+      "kind": "integration-order",
+      "input": { "currentAttemptId": "attempt-1", "currentMode": "relay", "currentRevision": 10, "eventAttemptId": "attempt-1", "eventRevision": 9 },
+      "expected": "ignore"
+    },
+    {
+      "id": "semantic-similarity-is-candidate-only",
+      "kind": "semantic-duplicate",
+      "input": { "sameClientSubmissionId": false, "similarityScore": 0.99 },
+      "expected": "candidate_only"
+    },
+    {
+      "id": "push-outage-keeps-business-and-inbox",
+      "kind": "notification",
+      "input": { "pushAvailable": false },
+      "expected": "commit_with_inbox"
+    },
+    {
+      "id": "relay-task-close-is-metadata-only",
+      "kind": "relay-task-close",
+      "input": { "eventType": "task.closed" },
+      "expected": "metadata_only"
+    }
+  ]
+}

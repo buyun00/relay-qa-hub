@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/common.schema.json",
+  "title": "QA Hub common contract types",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "bugState": {
+      "type": "string",
+      "enum": [
+        "reported",
+        "needs_info",
+        "ready",
+        "in_progress",
+        "awaiting_build",
+        "ready_for_verification",
+        "closed",
+        "deferred",
+        "rejected",
+        "duplicate"
+      ]
+    },
+    "repairMode": {
+      "type": "string",
+      "enum": ["human", "relay", "external"]
+    },
+    "repairStatus": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "queued",
+        "running",
+        "needs_input",
+        "blocked",
+        "delivered",
+        "failed",
+        "verification_failed",
+        "cancelled",
+        "superseded"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["S0", "S1", "S2", "S3", "S4"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2", "P3", "P4"]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["user", "service", "system"]
+        },
+        "id": {
+          "oneOf": [
+            { "$ref": "#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion"],
+      "properties": {
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "commandResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId", "eventId", "aggregateType", "aggregateId", "version"],
+      "properties": {
+        "requestId": { "type": "string", "minLength": 8 },
+        "eventId": { "$ref": "#/$defs/uuid" },
+        "aggregateType": {
+          "type": "string",
+          "enum": ["bug", "occurrence", "repair_attempt", "build", "verification", "upload", "notification"]
+        },
+        "aggregateId": { "$ref": "#/$defs/uuid" },
+        "version": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "acceptedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId", "outboxMessageId", "status", "replayed"],
+      "properties": {
+        "requestId": { "type": "string", "minLength": 8 },
+        "outboxMessageId": { "$ref": "#/$defs/uuid" },
+        "status": { "const": "accepted" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "requestId"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "UNAUTHENTICATED",
+            "INTEGRATION_SIGNATURE_INVALID",
+            "FORBIDDEN",
+            "NOT_FOUND",
+            "PAYLOAD_TOO_LARGE",
+            "INVALID_TRANSITION",
+            "ACTIVE_REPAIR_EXISTS",
+            "IDEMPOTENCY_PAYLOAD_MISMATCH",
+            "INTEGRATION_EVENT_CONFLICT",
+            "VERSION_CONFLICT",
+            "GUARD_FAILED",
+            "UPLOAD_INVALID",
+            "RATE_LIMITED",
+            "RELAY_DELIVERY_EVIDENCE_INVALID",
+            "BUILD_IDENTITY_MISMATCH",
+            "INTEGRATION_AUTOMATION_FORBIDDEN",
+            "INTERNAL_ERROR",
+            "SERVICE_UNAVAILABLE"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 8
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

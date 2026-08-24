@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/event-envelope.schema.json",
+  "title": "QA Hub durable event envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "type",
+    "source",
+    "projectId",
+    "aggregate",
+    "sequence",
+    "actor",
+    "correlationId",
+    "occurredAt",
+    "payload"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "maxLength": 120
+    },
+    "source": {
+      "type": "string",
+      "enum": ["qa_hub", "relay", "build"]
+    },
+    "projectId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+    "bugId": {
+      "oneOf": [
+        { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        { "type": "null" }
+      ]
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "version"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["bug", "repair_attempt", "build", "verification", "upload", "notification", "integration"]
+        },
+        "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "actor": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/actor" },
+    "idempotencyKey": { "type": ["string", "null"], "minLength": 1, "maxLength": 200 },
+    "correlationId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+    "causationId": {
+      "oneOf": [
+        { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        { "type": "null" }
+      ]
+    },
+    "occurredAt": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+    "fromState": {
+      "oneOf": [
+        { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/bugState" },
+        { "type": "null" }
+      ]
+    },
+    "toState": {
+      "oneOf": [
+        { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/bugState" },
+        { "type": "null" }
+      ]
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

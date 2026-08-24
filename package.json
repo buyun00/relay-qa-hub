@@ -10,7 +10,15 @@
     "node": ">=22.13"
   },
   "scripts": {
-    "check:adrs": "node scripts/check-adrs.mjs"
+    "check:adrs": "node scripts/check-adrs.mjs",
+    "generate:contracts": "node packages/contracts/scripts/generate-openapi.mjs",
+    "check:contracts": "node packages/contracts/scripts/validate-contracts.mjs",
+    "check:contract-breaking": "node packages/contracts/scripts/check-breaking.mjs"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "12.1.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
   },
   "workspaces": [
     "apps/*",

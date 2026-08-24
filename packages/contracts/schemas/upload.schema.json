@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/upload.schema.json",
+  "title": "QA Hub resumable upload contract",
+  "$defs": {
+    "initRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "filename", "mediaType", "expectedSize", "sha256"],
+      "properties": {
+        "projectId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "filename": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "expectedSize": { "type": "integer", "minimum": 1, "maximum": 524288000 },
+        "sha256": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/sha256" }
+      }
+    },
+    "initResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessionId", "chunkSize", "expiresAt", "confirmedChunks", "version"],
+      "properties": {
+        "sessionId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "chunkSize": { "type": "integer", "minimum": 262144, "maximum": 8388608 },
+        "expiresAt": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+        "confirmedChunks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "finalizeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "sha256", "expectedSize"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/sha256" },
+        "expectedSize": { "type": "integer", "minimum": 1, "maximum": 524288000 }
+      }
+    },
+    "finalizeResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessionId", "sha256", "size", "scanStatus", "version", "replayed"],
+      "properties": {
+        "sessionId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "sha256": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/sha256" },
+        "size": { "type": "integer", "minimum": 1 },
+        "scanStatus": { "type": "string", "enum": ["pending", "clean", "rejected", "unavailable"] },
+        "version": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      }
+    }
+  }
+}

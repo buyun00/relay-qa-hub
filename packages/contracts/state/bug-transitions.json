@@ -1,0 +1,107 @@
+{
+  "version": "1.0.0",
+  "states": [
+    "reported",
+    "needs_info",
+    "ready",
+    "in_progress",
+    "awaiting_build",
+    "ready_for_verification",
+    "closed",
+    "deferred",
+    "rejected",
+    "duplicate"
+  ],
+  "transitions": [
+    {
+      "id": "bug.triage.ready",
+      "from": ["reported", "needs_info"],
+      "to": "ready",
+      "actorTypes": ["user"],
+      "guards": ["triage.required_fields_complete", "actor.can_triage"]
+    },
+    {
+      "id": "bug.triage.needs_info",
+      "from": ["reported", "ready"],
+      "to": "needs_info",
+      "actorTypes": ["user"],
+      "guards": ["request.reason_present", "request.responsible_user_present", "actor.can_triage"]
+    },
+    {
+      "id": "bug.mark_duplicate",
+      "from": ["reported", "ready"],
+      "to": "duplicate",
+      "actorTypes": ["user"],
+      "guards": ["canonical.same_project", "canonical.not_self", "canonical.no_cycle", "actor.can_triage"]
+    },
+    {
+      "id": "bug.start_repair",
+      "from": ["ready"],
+      "to": "in_progress",
+      "actorTypes": ["user", "service"],
+      "guards": ["attempt.created_atomically", "attempt.only_one_active", "actor.can_start_repair"]
+    },
+    {
+      "id": "bug.repair_delivered.awaiting_build",
+      "from": ["in_progress"],
+      "to": "awaiting_build",
+      "actorTypes": ["user", "service"],
+      "guards": ["attempt.latest_delivered", "project.requires_build", "delivery.evidence_valid"]
+    },
+    {
+      "id": "bug.repair_delivered.ready_for_verification",
+      "from": ["in_progress"],
+      "to": "ready_for_verification",
+      "actorTypes": ["user", "service"],
+      "guards": ["attempt.latest_delivered", "build.not_required_or_exact_commit_eligible", "verification.created_atomically"]
+    },
+    {
+      "id": "bug.build_ready",
+      "from": ["awaiting_build"],
+      "to": "ready_for_verification",
+      "actorTypes": ["user", "service"],
+      "guards": ["build.ready", "build.contains_exact_delivered_commit", "verification.created_atomically"]
+    },
+    {
+      "id": "bug.verification.passed",
+      "from": ["ready_for_verification"],
+      "to": "closed",
+      "actorTypes": ["user"],
+      "guards": [
+        "verification.latest.status == passed",
+        "verification.binds_latest_non_superseded_delivered_attempt",
+        "verification.build_is_eligible_when_required",
+        "verification.separation_of_duties",
+        "actor.can_verify"
+      ]
+    },
+    {
+      "id": "bug.verification.failed",
+      "from": ["ready_for_verification"],
+      "to": "ready",
+      "actorTypes": ["user"],
+      "guards": ["verification.latest.status == failed", "attempt.marked_verification_failed", "actor.can_verify"]
+    },
+    {
+      "id": "bug.defer",
+      "from": ["reported", "needs_info", "ready"],
+      "to": "deferred",
+      "actorTypes": ["user"],
+      "guards": ["request.reason_present", "actor.can_triage"]
+    },
+    {
+      "id": "bug.reject",
+      "from": ["reported", "needs_info", "ready"],
+      "to": "rejected",
+      "actorTypes": ["user"],
+      "guards": ["request.reason_present", "actor.can_triage"]
+    },
+    {
+      "id": "bug.reopen.newer_occurrence",
+      "from": ["closed"],
+      "to": "ready",
+      "actorTypes": ["user"],
+      "guards": ["occurrence.version_newer_than_verified_build", "reopen_count.incremented", "actor.can_triage"]
+    }
+  ]
+}

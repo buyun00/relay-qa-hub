@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/notification.schema.json",
+  "title": "QA Hub Inbox and Push contracts",
+  "$defs": {
+    "notification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "projectId", "userId", "type", "title", "bugId", "createdAt", "readAt", "version"],
+      "properties": {
+        "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "projectId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "userId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "bugId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "createdAt": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+        "readAt": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+            { "type": "null" }
+          ]
+        },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "notificationList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "nextCursor", "unreadCount"],
+      "properties": {
+        "items": { "type": "array", "items": { "$ref": "#/$defs/notification" } },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 },
+        "unreadCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "readRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "pushSubscriptionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["endpoint", "expirationTime", "keys"],
+      "properties": {
+        "endpoint": { "type": "string", "format": "uri", "maxLength": 2000 },
+        "expirationTime": { "type": ["integer", "null"], "minimum": 0 },
+        "keys": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["p256dh", "auth"],
+          "properties": {
+            "p256dh": { "type": "string", "minLength": 16, "maxLength": 512 },
+            "auth": { "type": "string", "minLength": 8, "maxLength": 256 }
+          }
+        }
+      }
+    },
+    "pushSubscriptionResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "createdAt", "replayed"],
+      "properties": {
+        "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "createdAt": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+        "replayed": { "type": "boolean" }
+      }
+    }
+  }
+}

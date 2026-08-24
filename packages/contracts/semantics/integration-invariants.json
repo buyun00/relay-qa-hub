@@ -1,0 +1,45 @@
+{
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "relay.turn-delivered.remote-sha-equality",
+      "eventType": "turn.delivered",
+      "requiredTrue": [
+        "payload.deliveryEvidence.pushed",
+        "payload.deliveryEvidence.verified"
+      ],
+      "equalFields": [
+        [
+          "payload.deliveryEvidence.commitSha",
+          "payload.deliveryEvidence.remoteSha"
+        ]
+      ],
+      "errorCode": "RELAY_DELIVERY_EVIDENCE_INVALID"
+    },
+    {
+      "id": "relay.build-completed.exact-identity",
+      "eventType": "build.completed",
+      "requiredFields": [
+        "payload.buildExternalId",
+        "payload.buildProjectKey",
+        "payload.buildBranch",
+        "payload.buildMode",
+        "payload.sourceCommitSha"
+      ],
+      "compareToCurrentAttempt": {
+        "payload.buildExternalId": "expectedBuild.externalId",
+        "payload.buildProjectKey": "expectedBuild.projectKey",
+        "payload.buildBranch": "expectedBuild.branch",
+        "payload.buildMode": "expectedBuild.mode",
+        "payload.sourceCommitSha": "repairAttempt.deliveredCommitSha"
+      },
+      "errorCode": "BUILD_IDENTITY_MISMATCH"
+    },
+    {
+      "id": "relay.task-closed.metadata-only",
+      "eventType": "task.closed",
+      "forbidBugTransitions": true,
+      "errorCode": "INTEGRATION_AUTOMATION_FORBIDDEN"
+    }
+  ]
+}

@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qa-hub.local/contracts/bug.schema.json",
+  "title": "QA Hub Bug commands and resources",
+  "$defs": {
+    "occurrenceDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observedAt", "platform", "steps", "actualBehavior"],
+      "properties": {
+        "observedAt": {
+          "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime"
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["android", "ios", "windows", "macos", "linux", "web", "other"]
+        },
+        "appVersion": {
+          "type": ["string", "null"],
+          "maxLength": 100
+        },
+        "resourceVersion": {
+          "type": ["string", "null"],
+          "maxLength": 100
+        },
+        "gitSha": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "deviceModel": {
+          "type": ["string", "null"],
+          "maxLength": 200
+        },
+        "osVersion": {
+          "type": ["string", "null"],
+          "maxLength": 100
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "actualBehavior": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "frequency": {
+          "type": ["string", "null"],
+          "maxLength": 100
+        },
+        "errorSignature": {
+          "type": ["string", "null"],
+          "maxLength": 500
+        },
+        "environment": {
+          "type": "object",
+          "maxProperties": 30,
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        }
+      }
+    },
+    "createBugRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projectId",
+        "clientSubmissionId",
+        "title",
+        "description",
+        "expectedBehavior",
+        "severity",
+        "priority",
+        "occurrence"
+      ],
+      "properties": {
+        "projectId": {
+          "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid"
+        },
+        "clientSubmissionId": {
+          "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "expectedBehavior": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "moduleId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "severity": {
+          "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/severity"
+        },
+        "priority": {
+          "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/priority"
+        },
+        "occurrence": {
+          "$ref": "#/$defs/occurrenceDraft"
+        },
+        "attachmentIds": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid"
+          }
+        }
+      }
+    },
+    "bug": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "projectId",
+        "number",
+        "key",
+        "title",
+        "description",
+        "expectedBehavior",
+        "state",
+        "severity",
+        "priority",
+        "reporterId",
+        "occurrenceCount",
+        "reopenCount",
+        "version",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "projectId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "number": { "type": "integer", "minimum": 1 },
+        "key": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "expectedBehavior": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "state": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/bugState" },
+        "severity": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/severity" },
+        "priority": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/priority" },
+        "reporterId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "ownerId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "verificationOwnerId": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "occurrenceCount": { "type": "integer", "minimum": 1 },
+        "reopenCount": { "type": "integer", "minimum": 0 },
+        "version": { "type": "integer", "minimum": 1 },
+        "createdAt": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+        "updatedAt": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+        "closedAt": {
+          "oneOf": [
+            { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/dateTime" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "createBugResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bug", "occurrenceId", "eventId", "replayed"],
+      "properties": {
+        "bug": { "$ref": "#/$defs/bug" },
+        "occurrenceId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "eventId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "bugList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "nextCursor"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/bug" }
+        },
+        "nextCursor": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "occurrenceCreatedResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bugId", "occurrenceId", "eventId", "bugVersion", "replayed"],
+      "properties": {
+        "bugId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "occurrenceId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "eventId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "bugVersion": { "type": "integer", "minimum": 1 },
+        "replayed": { "type": "boolean" }
+      }
+    },
+    "duplicateCandidateList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidates"],
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["bugId", "bugKey", "score", "reasons"],
+            "properties": {
+              "bugId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+              "bugKey": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$" },
+              "score": { "type": "number", "minimum": 0, "maximum": 1 },
+              "reasons": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1, "maxLength": 300 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "transitionCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "toState"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "toState": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/bugState" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "verificationId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "canonicalBugId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "responsibleUserId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "toState": { "const": "closed" } }, "required": ["toState"] },
+          "then": { "required": ["verificationId"] }
+        },
+        {
+          "if": { "properties": { "toState": { "const": "duplicate" } }, "required": ["toState"] },
+          "then": { "required": ["canonicalBugId", "reason"] }
+        },
+        {
+          "if": { "properties": { "toState": { "const": "needs_info" } }, "required": ["toState"] },
+          "then": { "required": ["responsibleUserId", "reason"] }
+        }
+      ]
+    },
+    "repairAttemptCreate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "mode", "assigneeId"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "mode": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/repairMode" },
+        "assigneeId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "parentAttemptId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
+        "summary": { "type": "string", "maxLength": 5000 }
+      }
+    },
+    "verificationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion", "status", "resultSummary"],
+      "properties": {
+        "expectedVersion": { "type": "integer", "minimum": 1 },
+        "status": { "type": "string", "enum": ["passed", "failed", "blocked"] },
+        "resultSummary": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "failureReason": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "blockedReason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
+          "then": { "required": ["failureReason"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "blocked" } }, "required": ["status"] },
+          "then": { "required": ["blockedReason"] }
+        }
+      ]
+    }
+  }
+}

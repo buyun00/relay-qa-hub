@@ -1,0 +1,253 @@
+{
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "mobile-create-bug",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/createBugRequest",
+      "expectedValid": true,
+      "payload": {
+        "projectId": "0191f0d0-7b2a-7abc-8def-0123456789ab",
+        "clientSubmissionId": "0191f0d0-7b2b-7abc-8def-0123456789ab",
+        "title": "Battle result screen freezes",
+        "description": "The spinner remains after a completed match.",
+        "expectedBehavior": "The result and rewards appear within five seconds.",
+        "moduleId": null,
+        "severity": "S1",
+        "priority": "P1",
+        "occurrence": {
+          "observedAt": "2026-08-24T08:00:00.000Z",
+          "platform": "android",
+          "appVersion": "0.1.0-debug",
+          "resourceVersion": "20260824.1",
+          "gitSha": "1111111111111111111111111111111111111111",
+          "deviceModel": "Pixel 9",
+          "osVersion": "Android 16",
+          "steps": ["Finish a ranked match", "Open the result screen"],
+          "actualBehavior": "The loading spinner never finishes.",
+          "frequency": "3/3",
+          "errorSignature": "ResultPresenter timeout"
+        },
+        "attachmentIds": []
+      }
+    },
+    {
+      "id": "idempotent-create-replay",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/createBugResponse",
+      "expectedValid": true,
+      "payload": {
+        "bug": {
+          "id": "0191f0d0-7b2c-7abc-8def-0123456789ab",
+          "projectId": "0191f0d0-7b2a-7abc-8def-0123456789ab",
+          "number": 1024,
+          "key": "OZDQP-1024",
+          "title": "Battle result screen freezes",
+          "description": "The spinner remains after a completed match.",
+          "expectedBehavior": "The result and rewards appear within five seconds.",
+          "state": "reported",
+          "severity": "S1",
+          "priority": "P1",
+          "reporterId": "0191f0d0-7b2d-7abc-8def-0123456789ab",
+          "ownerId": null,
+          "verificationOwnerId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 1,
+          "createdAt": "2026-08-24T08:00:01.000Z",
+          "updatedAt": "2026-08-24T08:00:01.000Z",
+          "closedAt": null
+        },
+        "occurrenceId": "0191f0d0-7b2e-7abc-8def-0123456789ab",
+        "eventId": "0191f0d0-7b2f-7abc-8def-0123456789ab",
+        "replayed": true
+      }
+    },
+    {
+      "id": "build-completed-with-exact-identity",
+      "schema": "https://qa-hub.local/contracts/build.schema.json#/$defs/providerWebhook",
+      "expectedValid": true,
+      "payload": {
+        "schemaVersion": "1.0",
+        "provider": "ozdqp",
+        "eventId": "0191f0d0-7b39-7abc-8def-0123456789ab",
+        "deliveryId": "ozdqp:event:0191f0d0-7b39-7abc-8def-0123456789ab",
+        "externalId": "20260824-083000-bbbbbbbb",
+        "projectKey": "OZDQP",
+        "branch": "codex/qa-ozdqp-1024",
+        "sourceCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mode": "cdn",
+        "status": "ready",
+        "occurredAt": "2026-08-24T08:45:00.000Z",
+        "payload": {
+          "manifestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        }
+      }
+    },
+    {
+      "id": "close-without-verification-is-rejected",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/transitionCommand",
+      "expectedValid": false,
+      "payload": {
+        "expectedVersion": 7,
+        "toState": "closed",
+        "reason": "Relay task was closed."
+      }
+    },
+    {
+      "id": "create-human-repair-attempt",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/repairAttemptCreate",
+      "expectedValid": true,
+      "payload": {
+        "expectedVersion": 2,
+        "mode": "human",
+        "assigneeId": "0191f0d0-7b30-7abc-8def-0123456789ab",
+        "summary": "Developer will repair without Relay."
+      }
+    },
+    {
+      "id": "human-verification-pass",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/verificationResult",
+      "expectedValid": true,
+      "payload": {
+        "expectedVersion": 2,
+        "status": "passed",
+        "resultSummary": "Retested the exact build on Android and Windows; issue did not reproduce."
+      }
+    },
+    {
+      "id": "append-only-domain-event",
+      "schema": "https://qa-hub.local/contracts/event-envelope.schema.json",
+      "expectedValid": true,
+      "payload": {
+        "schemaVersion": "1.0",
+        "id": "0191f0d0-7b31-7abc-8def-0123456789ab",
+        "type": "bug.transitioned",
+        "source": "qa_hub",
+        "projectId": "0191f0d0-7b2a-7abc-8def-0123456789ab",
+        "bugId": "0191f0d0-7b2c-7abc-8def-0123456789ab",
+        "aggregate": {
+          "type": "bug",
+          "id": "0191f0d0-7b2c-7abc-8def-0123456789ab",
+          "version": 2
+        },
+        "sequence": 2,
+        "actor": {
+          "type": "user",
+          "id": "0191f0d0-7b30-7abc-8def-0123456789ab"
+        },
+        "idempotencyKey": "mobile:0191f0d0-7b2b-7abc-8def-0123456789ab:triage",
+        "correlationId": "0191f0d0-7b32-7abc-8def-0123456789ab",
+        "causationId": null,
+        "occurredAt": "2026-08-24T08:02:00.000Z",
+        "fromState": "reported",
+        "toState": "ready",
+        "payload": {
+          "reason": "Triage fields are complete."
+        }
+      }
+    },
+    {
+      "id": "relay-handoff-with-bounded-evidence",
+      "schema": "https://qa-hub.local/contracts/relay.schema.json#/$defs/handoffRequest",
+      "expectedValid": true,
+      "payload": {
+        "qaInstanceId": "qa-hub-main",
+        "handoffId": "0191f0d0-7b33-7abc-8def-0123456789ab",
+        "attemptId": "0191f0d0-7b36-7abc-8def-0123456789ab",
+        "defect": {
+          "id": "0191f0d0-7b2c-7abc-8def-0123456789ab",
+          "key": "OZDQP-1024",
+          "revision": 3,
+          "projectKey": "OZDQP",
+          "title": "Battle result screen freezes",
+          "description": "The spinner remains after a completed match.",
+          "severity": "S1",
+          "verificationCriteria": "Result and rewards appear within five seconds."
+        },
+        "selectedAttachments": [
+          {
+            "attachmentId": "0191f0d0-7b34-7abc-8def-0123456789ab",
+            "filename": "result-screen.png",
+            "mediaType": "image/png",
+            "size": 123456,
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "downloadUrl": "https://qa.example.test/api/v1/integrations/evidence/0191f0d0-7b34-7abc-8def-0123456789ab?token=redacted"
+          }
+        ]
+      }
+    },
+    {
+      "id": "continue-existing-relay-task",
+      "schema": "https://qa-hub.local/contracts/relay.schema.json#/$defs/continueRequest",
+      "expectedValid": true,
+      "payload": {
+        "qaInstanceId": "qa-hub-main",
+        "actionId": "0191f0d0-7b35-7abc-8def-0123456789ab",
+        "attemptId": "0191f0d0-7b36-7abc-8def-0123456789ab",
+        "prompt": "Verification failed: rewards still do not render after a reconnect.",
+        "selectedAttachments": []
+      }
+    },
+    {
+      "id": "relay-delivered-with-remote-proof",
+      "schema": "https://qa-hub.local/contracts/relay.schema.json#/$defs/webhook",
+      "expectedValid": true,
+      "payload": {
+        "schemaVersion": "1.0",
+        "relayInstanceId": "relay-main",
+        "eventId": "0191f0d0-7b37-7abc-8def-0123456789ab",
+        "deliveryId": "relay-main:event:0191f0d0-7b37-7abc-8def-0123456789ab",
+        "eventType": "turn.delivered",
+        "handoffId": "0191f0d0-7b33-7abc-8def-0123456789ab",
+        "attemptId": "0191f0d0-7b36-7abc-8def-0123456789ab",
+        "externalRevision": 8,
+        "occurredAt": "2026-08-24T08:30:00.000Z",
+        "payload": {
+          "taskId": 42,
+          "turnId": 84,
+          "statusReason": null,
+          "deliveryEvidence": {
+            "pushed": true,
+            "verified": true,
+            "commitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "remoteSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "branch": "codex/qa-ozdqp-1024",
+            "mergeRequestUrl": null
+          }
+        }
+      }
+    },
+    {
+      "id": "relay-task-close-is-metadata-only",
+      "schema": "https://qa-hub.local/contracts/relay.schema.json#/$defs/webhook",
+      "expectedValid": true,
+      "payload": {
+        "schemaVersion": "1.0",
+        "relayInstanceId": "relay-main",
+        "eventId": "0191f0d0-7b38-7abc-8def-0123456789ab",
+        "deliveryId": "relay-main:event:0191f0d0-7b38-7abc-8def-0123456789ab",
+        "eventType": "task.closed",
+        "handoffId": "0191f0d0-7b33-7abc-8def-0123456789ab",
+        "attemptId": "0191f0d0-7b36-7abc-8def-0123456789ab",
+        "externalRevision": 9,
+        "occurredAt": "2026-08-24T08:31:00.000Z",
+        "payload": {
+          "taskId": 42,
+          "turnId": 84,
+          "statusReason": "Relay task archived after delivery."
+        }
+      }
+    },
+    {
+      "id": "resumable-upload-init",
+      "schema": "https://qa-hub.local/contracts/upload.schema.json#/$defs/initRequest",
+      "expectedValid": true,
+      "payload": {
+        "projectId": "0191f0d0-7b2a-7abc-8def-0123456789ab",
+        "filename": "result-screen.mp4",
+        "mediaType": "video/mp4",
+        "expectedSize": 10485760,
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    }
+  ]
+}

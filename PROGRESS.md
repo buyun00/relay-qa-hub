@@ -3,11 +3,11 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P0`
-- Current pointer: `P0.2`
+- Current pointer: `P0.3`
 - Current gate: `G0-CONTRACT-READY`
 - Critical path: `G0 -> G1 -> G2 -> G3 -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P0.2`
-- Next atomic action: `编写 ADR-0001 至 ADR-0006，并建立不可破坏原则映射`
+- Active work packages: `P0.3`
+- Next atomic action: `冻结 OpenAPI、状态迁移、错误、事件 envelope 与 Relay Handoff/Webhook schemas`
 - Completed gates: `0 / 11`
 - Last green commit: `none`
 - Last deployed commit: `none`
@@ -17,7 +17,7 @@
 - Last backup verified: `none`
 - Last restore drill: `none`
 - Blockers: `none`
-- Updated at: `2026-08-24T16:49:48+08:00`
+- Updated at: `2026-08-24T16:54:25+08:00`
 
 ## Gate status
 
@@ -41,8 +41,8 @@
 | ID | Status | Owner/agent | Depends on | Output | Verification | Evidence | Commit | Updated |
 |---|---|---|---|---|---|---|---|---|
 | P0.1 | DONE | root (GPT-5.6 Sol/ultra) | G0-PLAN-READY | 独立 repo/workspace | `npm ci`; Git/目录隔离与 Relay 状态指纹检查通过 | [`docs/evidence/P0.1-bootstrap.md`](docs/evidence/P0.1-bootstrap.md) | `dbb4ab6c4ba7dacf94021a33b99ecb93577ae646` | 2026-08-24T16:49:48+08:00 |
-| P0.2 | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P0.1 | ADR 集 | ADR 完整性检查 |  |  | 2026-08-24T16:49:48+08:00 |
-| P0.3 | PLANNED | unassigned | P0.2 | OpenAPI/Event/Relay contracts | schema lint + 场景走查 |  |  | 2026-08-24 |
+| P0.2 | DONE | root (GPT-5.6 Sol/ultra) | P0.1 | ADR 集 | `npm run check:adrs`：6/6 ADR、4/4 必需章节、10/10 原则映射通过 | [`docs/evidence/P0.2-adrs.md`](docs/evidence/P0.2-adrs.md) | `55e052113ef86002ba17389e46a510485dfff116` | 2026-08-24T16:54:25+08:00 |
+| P0.3 | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P0.2 | OpenAPI/Event/Relay contracts | schema lint + 场景走查 |  |  | 2026-08-24T16:54:25+08:00 |
 | P0.4 | PLANNED | unassigned | P0.3 | 最小运行骨架 | lint/typecheck/test/build/health |  |  | 2026-08-24 |
 | P1.1 | PLANNED | unassigned | G0 | schema/migrations | migration/integrity/concurrency |  |  | 2026-08-24 |
 | P1.2 | PLANNED | unassigned | P1.1 | domain state machine | transition/guard/version tests |  |  | 2026-08-24 |
@@ -80,13 +80,14 @@
 
 ## Active work
 
-- `P0.2` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-24T16:49:48+08:00`; next atomic action: `编写 ADR-0001 至 ADR-0006，并建立不可破坏原则映射`。
+- `P0.3` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-24T16:54:25+08:00`; next atomic action: `冻结 OpenAPI、状态迁移、错误、事件 envelope 与 Relay Handoff/Webhook schemas`。
 
 ## Completed evidence
 
 - 规划阶段完成三条并行只读审计：QA 领域/状态机、移动 PWA/运维、Relay 集成契约。
 - 新建独立目录 `D:\Relay-QA-Hub`；规划阶段未修改现有 Relay 工作树。
 - P0.1 建立独立 Git/npm workspaces；Relay 前后状态指纹完全一致；证据与本地提交见 `docs/evidence/P0.1-bootstrap.md` / `dbb4ab6`。
+- P0.2 冻结 6 份 ADR 并完成十条不可破坏原则映射；证据与提交见 `docs/evidence/P0.2-adrs.md` / `55e0521`。
 
 ## Blockers
 
