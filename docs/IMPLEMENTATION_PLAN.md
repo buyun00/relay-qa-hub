@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P7
-  current_gate: G7-WORKBENCH-READY
+  current_phase: P8
+  current_gate: G8-OPERATIONS-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 3e24a6fab3941fd3b5634751af59754c9342f859
-  last_verified_at: 2026-08-26T05:46:07+08:00
-  next_action: P7.5 VERIFYING；P1.4 已完成 healthy/degraded 真实 health slice，P7.4 普通浏览器功能基线已稳定；按用户顺序只统一刷新一次 current Web 的 Windows x64 package，不重复桌面视觉矩阵
+  last_verified_commit: ed7352b4050d0cb765c55c8af10e0819c7cd128e
+  last_verified_at: 2026-08-26T05:57:13+08:00
+  next_action: P8.3 IN_PROGRESS；P7.5 已完成 current-Web 单次 package 刷新并保持 VERIFYING；下一步只新增 QA Hub 自有 SQLite online backup primitive、manifest/hash/integrity 与一个 corrupt rejection，不暴露普通 restore API
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1041,7 +1041,7 @@ Capture/Poco 摘要 slice 已在提交 `41b0971abe65c4483fa157d696b1ead39b1bda0c
 
 #### P7.5 Windows Electron 桌面壳
 
-状态：`VERIFYING`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现；先前 package 曾与当时 P7.4 普通浏览器基线逐文件一致。P1.3 随后新增 durable Inbox Web 入口，因此当前原子动作按用户顺序只统一刷新一次 current Web 的 Windows x64 package：重新构建 Web、核对 `app.asar/web` 逐文件 hash 并启动到一张真实 Bug 深链。独立 `apps/desktop` 继续复用同一 Web production 资产，主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。toast/tray 视觉点击、installer/signing 继续留作发布尾项，不重复自动化会话的 UIA 探索。
+状态：`VERIFYING`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现。按用户“先稳定普通浏览器 Web，再统一打包”的顺序，repository HEAD `ed7352b4050d0cb765c55c8af10e0819c7cd128e` 已完成一次 current-Web package 刷新：`app.asar/web` 与 `apps/web/dist` 7/7 path+length+SHA 完全一致，实际 package 主实例收到同一真实 SQLite Bug ID 的 second-instance deep-link 并发出 route 信号。证据见 [`docs/evidence/P7.5-current-web-package-refresh.md`](evidence/P7.5-current-web-package-refresh.md)。安全审核阻止了本轮组合式带凭据 API+Electron 命令，因此不冒充本轮 renderer 在线回读；旧的 [`docs/evidence/P7.5-windows-latest-web-package.md`](evidence/P7.5-windows-latest-web-package.md) 保留未改动壳的 full renderer/API 证据。独立 `apps/desktop` 继续复用同一 Web production 资产，只经 QA Hub HTTPS/WSS，不直连 Relay、不引入第二套事实源。toast/tray 视觉点击、installer/signing 继续留作发布尾项。
 
 最小验证：本地构建并运行 Electron；关闭窗口后托盘与进程/连接仍存活；Web 修改一条真实 Bug 后 SQLite 只有同一 Inbox 事实，主进程收到事件并只弹一条 Windows 通知，点击恢复并打开对应详情；显式托盘退出才结束。保留一个断开 socket 后重连/前台补读同一 Inbox 且不重复的失败路径，不扩厂商 Push 或安装矩阵。
 
@@ -1058,6 +1058,8 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 验证：约定并发/数据量下 p95/p99 达标；DB busy、磁盘不足、Push/Relay/Build 下线无数据丢失或假成功。
 
 #### P8.3 备份
+
+当前状态：`IN_PROGRESS`。P7.5 current-Web package 已按用户顺序刷新，唯一 pointer 进入独立事实源的在线备份。当前原子切片只新增 storage-owned SQLite online backup helper、sidecar manifest/hash/integrity 和一个损坏备份拒绝；不写普通 API restore 路由、不覆盖现有 data root，retention scheduler、异盘复制和完整附件盘清单进入收尾/后续原子段。
 
 建议初值：
 
