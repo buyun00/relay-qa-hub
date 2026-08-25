@@ -1,4 +1,4 @@
-import Fastify, { type FastifyInstance } from "fastify";
+import Fastify, { type FastifyInstance, type FastifyReply } from "fastify";
 
 import { API_SERVICE_NAME, API_VERSION, DEVELOPMENT_BUILD_SHA, resolveBuildSha } from "./config.js";
 import {
@@ -35,6 +35,18 @@ import {
   parseMobileCreateCaptureRequest,
   type MobileCaptureStore,
 } from "./mobile-captures.js";
+import {
+  MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
+  MOBILE_BUG_TRANSITION_PATH,
+  MOBILE_RELAY_DISPATCH_PATH,
+  MOBILE_RELAY_RECEIPT_PATH,
+  parseMobileBugReadyRequest,
+  parseMobileRelayAttemptRequest,
+  parseMobileRelayDispatchRequest,
+  requireRelayIdempotencyKey,
+  requireRelayUuid,
+  type MobileRelayStore,
+} from "./mobile-relay.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
 
@@ -54,6 +66,7 @@ export interface CreateApiAppOptions {
   readonly mobileBugStore?: MobileBugStore;
   readonly mobileAttachmentStore?: MobileAttachmentStore;
   readonly mobileCaptureStore?: MobileCaptureStore;
+  readonly mobileRelayStore?: MobileRelayStore;
   readonly debugBearerToken?: string;
   readonly debugActorId?: string;
 }
@@ -100,6 +113,19 @@ const unconfiguredMobileCaptureStore: MobileCaptureStore = {
   getCapture: () => null,
 };
 
+const unconfiguredMobileRelayStore: MobileRelayStore = {
+  transitionBugReady: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  createRelayAttempt: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  dispatchRelay: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  getRelayReceipt: () => null,
+};
+
 function readHeader(value: string | readonly string[] | undefined): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
@@ -126,6 +152,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileBugStore = options.mobileBugStore ?? unconfiguredMobileBugStore;
   const mobileAttachmentStore = options.mobileAttachmentStore ?? unconfiguredMobileAttachmentStore;
   const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
+  const mobileRelayStore = options.mobileRelayStore ?? unconfiguredMobileRelayStore;
   const debugBearerToken = options.debugBearerToken ?? DEFAULT_DEBUG_BEARER_TOKEN;
   const debugActorId = options.debugActorId ?? DEFAULT_DEBUG_ACTOR_ID;
 
@@ -196,6 +223,129 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(bug);
   });
+
+  const relayErrorReply = (
+    error: unknown,
+    reply: FastifyReply,
+  ) => {
+    const code = (error as { code?: unknown })?.code;
+    if (code === "NOT_FOUND") {
+      return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
+    if (code === "VERSION_CONFLICT" || code === "IDEMPOTENCY_PAYLOAD_MISMATCH") {
+      return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
+    if (error instanceof TypeError || code === "INVALID_REQUEST") {
+      return reply.code(400).header("content-type", MOBILE_API_CONTENT_TYPE).send({
+        code: code === "INVALID_REQUEST" ? code : "INVALID_REQUEST",
+      });
+    }
+    throw error;
+  };
+
+  app.post<{ Params: { bugId: string } }>(MOBILE_BUG_TRANSITION_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const body = parseMobileBugReadyRequest(request.body);
+      const idempotencyKey = requireRelayIdempotencyKey(
+        readHeader(request.headers["idempotency-key"]),
+      );
+      if (idempotencyKey !== `workflow:transitionBug:bug:${bugId}:v${body.expectedVersion}:ready`) {
+        throw new TypeError("Idempotency-Key does not match the ready transition");
+      }
+      const result = await mobileRelayStore.transitionBugReady({
+        actorId: debugActorId,
+        bugId,
+        idempotencyKey,
+        request: body,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      return relayErrorReply(error, reply);
+    }
+  });
+
+  app.post<{ Params: { bugId: string } }>(
+    MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const bugId = requireRelayUuid(request.params.bugId, "bugId");
+        const body = parseMobileRelayAttemptRequest(request.body);
+        const idempotencyKey = requireRelayIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (
+          idempotencyKey !==
+          `workflow:createRepairAttempt:bug:${bugId}:v${body.expectedVersion}`
+        ) {
+          throw new TypeError("Idempotency-Key does not match RepairAttempt creation");
+        }
+        const result = await mobileRelayStore.createRelayAttempt({
+          actorId: debugActorId,
+          bugId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.post<{ Params: { attemptId: string } }>(
+    MOBILE_RELAY_DISPATCH_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+        const body = parseMobileRelayDispatchRequest(request.body);
+        const idempotencyKey = requireRelayIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (idempotencyKey !== `relay:dispatch:${body.handoffId}`) {
+          throw new TypeError("Idempotency-Key does not match handoffId");
+        }
+        const result = await mobileRelayStore.dispatchRelay({
+          actorId: debugActorId,
+          attemptId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.code(202).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.get<{ Params: { attemptId: string } }>(
+    MOBILE_RELAY_RECEIPT_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+        const result = await mobileRelayStore.getRelayReceipt({
+          actorId: debugActorId,
+          attemptId,
+        });
+        if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
 
   app.post(MOBILE_CAPTURE_COLLECTION_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {

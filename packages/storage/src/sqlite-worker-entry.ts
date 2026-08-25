@@ -21,6 +21,16 @@ import {
 } from "./mobile-bug-store.js";
 import { createMobileCapture, getMobileCapture, type CreateMobileCaptureInput } from "./mobile-capture-store.js";
 import {
+  createMobileRelayAttempt,
+  dispatchMobileRelay,
+  ensureMobileRelayRoles,
+  getMobileRelayReceipt,
+  transitionMobileBugReady,
+  type CreateMobileRelayAttemptInput,
+  type DispatchMobileRelayInput,
+  type TransitionMobileBugInput,
+} from "./mobile-relay-store.js";
+import {
   canonicalMigrationDigest,
   insertBugWithNextNumber,
   migrateSqliteDatabase,
@@ -47,6 +57,11 @@ interface WorkerRequest {
     | "getMobileBug"
     | "createMobileCapture"
     | "getMobileCapture"
+    | "ensureMobileRelayRoles"
+    | "transitionMobileBugReady"
+    | "createMobileRelayAttempt"
+    | "dispatchMobileRelay"
+    | "getMobileRelayReceipt"
     | "initMobileUpload"
     | "putMobileUploadChunk"
     | "finalizeMobileUpload"
@@ -202,6 +217,41 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly captureId: string;
     };
     return getMobileCapture(requireDatabase(), payload);
+  }
+
+  if (request.operation === "ensureMobileRelayRoles") {
+    return inWriteTransaction((current) => {
+      ensureMobileRelayRoles(current, request.payload as MobileScopeBootstrap);
+      return { ready: true };
+    });
+  }
+
+  if (request.operation === "transitionMobileBugReady") {
+    return inWriteTransaction((current) =>
+      transitionMobileBugReady(current, request.payload as TransitionMobileBugInput),
+    );
+  }
+
+  if (request.operation === "createMobileRelayAttempt") {
+    return inWriteTransaction((current) =>
+      createMobileRelayAttempt(current, request.payload as CreateMobileRelayAttemptInput),
+    );
+  }
+
+  if (request.operation === "dispatchMobileRelay") {
+    return inWriteTransaction((current) =>
+      dispatchMobileRelay(current, request.payload as DispatchMobileRelayInput),
+    );
+  }
+
+  if (request.operation === "getMobileRelayReceipt") {
+    const payload = request.payload as {
+      readonly accountId: string;
+      readonly projectId: string;
+      readonly actorId: string;
+      readonly attemptId: string;
+    };
+    return getMobileRelayReceipt(requireDatabase(), payload);
   }
 
   if (request.operation === "initMobileUpload") {

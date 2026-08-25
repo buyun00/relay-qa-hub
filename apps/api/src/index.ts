@@ -44,6 +44,24 @@ export {
 } from "./mobile-bugs.js";
 
 export {
+  MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
+  MOBILE_BUG_TRANSITION_PATH,
+  MOBILE_RELAY_DISPATCH_PATH,
+  MOBILE_RELAY_RECEIPT_PATH,
+  parseMobileBugReadyRequest,
+  parseMobileRelayAttemptRequest,
+  parseMobileRelayDispatchRequest,
+  requireRelayIdempotencyKey,
+  requireRelayUuid,
+} from "./mobile-relay.js";
+export type {
+  MobileBugReadyRequest,
+  MobileRelayAttemptRequest,
+  MobileRelayDispatchRequest,
+  MobileRelayStore,
+} from "./mobile-relay.js";
+
+export {
   MOBILE_CAPTURE_COLLECTION_PATH,
   MOBILE_CAPTURE_ITEM_PATH,
   MobileCaptureRequestError,

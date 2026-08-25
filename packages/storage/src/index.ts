@@ -243,6 +243,19 @@ export type {
   MobileOccurrenceInput,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
+export {
+  MOBILE_FAKE_RELAY_INSTANCE_ID,
+  MobileRelayStorageError,
+} from "./mobile-relay-store.js";
+export type {
+  CreateMobileRelayAttemptInput,
+  DispatchMobileRelayInput,
+  MobileRelayDispatchAccepted,
+  MobileRelayReceipt,
+  MobileRelayScope,
+  MobileRepairAttemptRecord,
+  TransitionMobileBugInput,
+} from "./mobile-relay-store.js";
 export type {
   BindMobileAttachmentInput,
   FinalizeMobileUploadInput,

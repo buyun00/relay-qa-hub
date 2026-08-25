@@ -1,0 +1,709 @@
+import { createHash, randomUUID } from "node:crypto";
+import type { DatabaseSync } from "node:sqlite";
+
+import type { MobileBugRecord, MobileScopeBootstrap } from "./mobile-bug-store.js";
+
+export const MOBILE_FAKE_RELAY_INSTANCE_ID = "fake-relay-local" as const;
+
+export class MobileRelayStorageError extends Error {
+  constructor(
+    readonly code:
+      | "INVALID_REQUEST"
+      | "NOT_FOUND"
+      | "VERSION_CONFLICT"
+      | "IDEMPOTENCY_PAYLOAD_MISMATCH",
+    message: string,
+  ) {
+    super(message);
+    this.name = "MobileRelayStorageError";
+  }
+}
+
+export interface MobileRelayScope {
+  readonly accountId: string;
+  readonly projectId: string;
+  readonly actorId: string;
+}
+
+export interface TransitionMobileBugInput extends MobileRelayScope {
+  readonly bugId: string;
+  readonly expectedVersion: number;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
+export interface CreateMobileRelayAttemptInput extends MobileRelayScope {
+  readonly bugId: string;
+  readonly expectedVersion: number;
+  readonly assigneeId: string;
+  readonly summary: string | null;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
+export interface MobileRepairAttemptRecord {
+  readonly id: string;
+  readonly bugId: string;
+  readonly sequence: number;
+  readonly mode: "relay";
+  readonly status: "planned";
+  readonly assigneeId: string;
+  readonly parentAttemptId: null;
+  readonly summary: string | null;
+  readonly branch: null;
+  readonly commitSha: null;
+  readonly mergeRequestUrl: null;
+  readonly targetBuildId: null;
+  readonly version: 1;
+}
+
+export interface DispatchMobileRelayInput extends MobileRelayScope {
+  readonly attemptId: string;
+  readonly expectedVersion: number;
+  readonly handoffId: string;
+  readonly selectedAttachmentIds: readonly string[];
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
+export interface MobileRelayDispatchAccepted {
+  readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
+  readonly repairAttemptId: string;
+  readonly handoffId: string;
+  readonly relayInstanceId: typeof MOBILE_FAKE_RELAY_INSTANCE_ID;
+  readonly outboxMessageId: string;
+  readonly requestId: string;
+  readonly status: "queued";
+  readonly replayed: boolean;
+}
+
+export interface MobileRelayReceipt {
+  readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
+  readonly repairAttemptId: string;
+  readonly handoffId: string;
+  readonly relayInstanceId: string;
+  readonly relayTaskId: string | null;
+  readonly handoffStatus:
+    | "queued"
+    | "submitted"
+    | "running"
+    | "needs_input"
+    | "blocked"
+    | "failed"
+    | "fix_delivered"
+    | "awaiting_build"
+    | "awaiting_verification";
+  readonly buildRequirement: "not_required" | "required";
+  readonly buildEvidenceStatus: "not_required" | "pending" | "exact_commit_eligible";
+  readonly deliveredCommitSha: string | null;
+  readonly buildId: string | null;
+  readonly externalRevision: number;
+  readonly requiresHumanVerification: true;
+  readonly automationAuthority: "delivery_build_projection_only";
+  readonly lastEventAt: string;
+  readonly failureSummary: string | null;
+  readonly version: number;
+}
+
+interface BugRow {
+  readonly id: string;
+  readonly project_id: string;
+  readonly number: number;
+  readonly key: string;
+  readonly title: string;
+  readonly description: string;
+  readonly expected_behavior: string;
+  readonly module_id: string | null;
+  readonly state: MobileBugRecord["state"];
+  readonly severity: MobileBugRecord["severity"];
+  readonly priority: MobileBugRecord["priority"];
+  readonly reporter_id: string;
+  readonly owner_id: string | null;
+  readonly verification_owner_id: string | null;
+  readonly duplicate_of_bug_id: string | null;
+  readonly occurrence_count: number;
+  readonly reopen_count: number;
+  readonly version: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly closed_at: string | null;
+}
+
+interface AttemptRow {
+  readonly id: string;
+  readonly bug_id: string;
+  readonly sequence: number;
+  readonly mode: string;
+  readonly status: string;
+  readonly assignee_id: string;
+  readonly parent_attempt_id: string | null;
+  readonly summary: string | null;
+  readonly branch: string | null;
+  readonly commit_sha: string | null;
+  readonly merge_request_url: string | null;
+  readonly target_build_id: string | null;
+  readonly version: number;
+  readonly bug_key?: string;
+  readonly bug_version?: number;
+}
+
+interface ReceiptRow {
+  readonly bug_id: string;
+  readonly bug_key: string;
+  readonly repair_attempt_id: string;
+  readonly handoff_id: string;
+  readonly relay_instance_id: string;
+  readonly relay_task_id: string | null;
+  readonly handoff_status: MobileRelayReceipt["handoffStatus"];
+  readonly build_requirement: MobileRelayReceipt["buildRequirement"];
+  readonly build_evidence_status: MobileRelayReceipt["buildEvidenceStatus"];
+  readonly delivered_commit_sha: string | null;
+  readonly build_id: string | null;
+  readonly external_revision: number;
+  readonly last_event_at: string;
+  readonly failure_summary: string | null;
+  readonly version: number;
+}
+
+function requireTransaction(database: DatabaseSync): void {
+  if (!database.isTransaction) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "mobile Relay storage requires the caller's write transaction",
+    );
+  }
+}
+
+function nextTimestamp(candidate: string, floor: string): string {
+  const candidateMs = Date.parse(candidate);
+  const floorMs = Date.parse(floor);
+  if (!Number.isFinite(candidateMs) || !Number.isFinite(floorMs)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "workflow timestamp is invalid");
+  }
+  return new Date(Math.max(candidateMs, floorMs + 1)).toISOString();
+}
+
+function readBugRow(
+  database: DatabaseSync,
+  scope: MobileRelayScope,
+  bugId: string,
+): BugRow | undefined {
+  return database
+    .prepare(
+      `SELECT id, project_id, number, key, title, description, expected_behavior,
+              module_id, state, severity, priority, reporter_id, owner_id,
+              verification_owner_id, duplicate_of_bug_id, occurrence_count,
+              reopen_count, version, created_at, updated_at, closed_at
+       FROM bugs
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(scope.accountId, scope.projectId, bugId) as BugRow | undefined;
+}
+
+function toBug(row: BugRow): MobileBugRecord {
+  return Object.freeze({
+    id: row.id,
+    projectId: row.project_id,
+    number: row.number,
+    key: row.key,
+    title: row.title,
+    description: row.description,
+    expectedBehavior: row.expected_behavior,
+    moduleId: row.module_id,
+    state: row.state,
+    severity: row.severity,
+    priority: row.priority,
+    reporterId: row.reporter_id,
+    ownerId: row.owner_id,
+    verificationOwnerId: row.verification_owner_id,
+    duplicateOfBugId: row.duplicate_of_bug_id,
+    occurrenceCount: row.occurrence_count,
+    reopenCount: row.reopen_count,
+    version: row.version,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    closedAt: row.closed_at,
+  });
+}
+
+function insertUserEvent(
+  database: DatabaseSync,
+  input: MobileRelayScope & {
+    readonly id: string;
+    readonly bugId: string;
+    readonly type: string;
+    readonly aggregateType: string;
+    readonly aggregateId: string;
+    readonly aggregateSequence: number;
+    readonly resourceType: string;
+    readonly resourceId: string;
+    readonly resourceVersionAfter: number;
+    readonly requestDigest: string;
+    readonly correlationId: string;
+    readonly fromState: string | null;
+    readonly toState: string | null;
+    readonly payload: Readonly<Record<string, unknown>>;
+    readonly createdAt: string;
+  },
+): void {
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, from_state, to_state, payload_json, created_at
+      ) VALUES (?, ?, ?, ?, ?, 'qa_hub', 'user', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(
+      input.id,
+      input.accountId,
+      input.projectId,
+      input.bugId,
+      input.type,
+      input.actorId,
+      input.aggregateType,
+      input.aggregateId,
+      input.aggregateSequence,
+      input.resourceType,
+      input.resourceId,
+      input.resourceVersionAfter,
+      input.requestDigest,
+      input.correlationId,
+      input.fromState,
+      input.toState,
+      JSON.stringify(input.payload),
+      input.createdAt,
+    );
+}
+
+export function ensureMobileRelayRoles(
+  database: DatabaseSync,
+  scope: MobileScopeBootstrap,
+): void {
+  requireTransaction(database);
+  for (const role of ["triager", "developer"] as const) {
+    database
+      .prepare(
+        `INSERT OR IGNORE INTO membership_roles(
+          account_id, project_id, membership_id, role, granted_at
+        ) VALUES (?, ?, ?, ?, ?)`,
+      )
+      .run(scope.accountId, scope.projectId, scope.membershipId, role, scope.createdAt);
+  }
+}
+
+export function transitionMobileBugReady(
+  database: DatabaseSync,
+  input: TransitionMobileBugInput,
+): MobileBugRecord {
+  requireTransaction(database);
+  const bug = readBugRow(database, input, input.bugId);
+  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+  if (bug.version !== input.expectedVersion || bug.state !== "reported") {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug is not reported at the expected version");
+  }
+  const at = nextTimestamp(input.createdAt, bug.updated_at);
+  const eventId = randomUUID();
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: bug.id,
+    type: "bug.triage.ready",
+    aggregateType: "bug",
+    aggregateId: bug.id,
+    aggregateSequence: 2,
+    resourceType: "bug",
+    resourceId: bug.id,
+    resourceVersionAfter: bug.version + 1,
+    correlationId: randomUUID(),
+    fromState: bug.state,
+    toState: "ready",
+    payload: { status: "ready", fromVersion: bug.version, toVersion: bug.version + 1 },
+    createdAt: at,
+  });
+  database
+    .prepare(
+      `UPDATE bugs
+       SET state = 'ready', version = version + 1, updated_at = ?
+       WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+    )
+    .run(at, input.accountId, input.projectId, bug.id, bug.version);
+  const updated = readBugRow(database, input, bug.id);
+  if (!updated) throw new MobileRelayStorageError("NOT_FOUND", "Bug disappeared after transition");
+  return toBug(updated);
+}
+
+function toAttempt(row: AttemptRow): MobileRepairAttemptRecord {
+  if (row.mode !== "relay" || row.status !== "planned" || row.version !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt is not a planned Relay attempt");
+  }
+  return Object.freeze({
+    id: row.id,
+    bugId: row.bug_id,
+    sequence: row.sequence,
+    mode: "relay",
+    status: "planned",
+    assigneeId: row.assignee_id,
+    parentAttemptId: null,
+    summary: row.summary,
+    branch: null,
+    commitSha: null,
+    mergeRequestUrl: null,
+    targetBuildId: null,
+    version: 1,
+  });
+}
+
+export function createMobileRelayAttempt(
+  database: DatabaseSync,
+  input: CreateMobileRelayAttemptInput,
+): MobileRepairAttemptRecord {
+  requireTransaction(database);
+  const bug = readBugRow(database, input, input.bugId);
+  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+  if (bug.version !== input.expectedVersion || bug.state !== "ready") {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug is not ready at the expected version");
+  }
+  if (input.assigneeId !== input.actorId) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "debug Relay assignee must be the actor");
+  }
+  const at = nextTimestamp(input.createdAt, bug.updated_at);
+  const attemptId = randomUUID();
+  const eventId = randomUUID();
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: bug.id,
+    type: "repair_attempt.created",
+    aggregateType: "repair_attempt",
+    aggregateId: attemptId,
+    aggregateSequence: 1,
+    resourceType: "repair_attempt",
+    resourceId: attemptId,
+    resourceVersionAfter: 1,
+    correlationId: randomUUID(),
+    fromState: "ready",
+    toState: "in_progress",
+    payload: {
+      status: "planned",
+      repairAttemptId: attemptId,
+      fromVersion: bug.version,
+      toVersion: bug.version + 1,
+    },
+    createdAt: at,
+  });
+  database
+    .prepare(
+      `INSERT INTO repair_attempts(
+        id, account_id, project_id, bug_id, sequence, mode, status, assignee_id,
+        parent_attempt_id, summary, branch, commit_sha, merge_request_url, patch_url,
+        no_code_reason, target_build_id, created_at, updated_at, version, failure_reason
+      ) VALUES (?, ?, ?, ?, 1, 'relay', 'planned', ?, NULL, ?, NULL, NULL, NULL,
+                NULL, NULL, NULL, ?, ?, 1, NULL)`,
+    )
+    .run(
+      attemptId,
+      input.accountId,
+      input.projectId,
+      bug.id,
+      input.assigneeId,
+      input.summary,
+      at,
+      at,
+    );
+  database
+    .prepare(
+      `UPDATE bugs
+       SET state = 'in_progress', active_repair_attempt_id = ?, version = version + 1,
+           updated_at = ?
+       WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+    )
+    .run(attemptId, at, input.accountId, input.projectId, bug.id, bug.version);
+  const row = database
+    .prepare(
+      `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
+              summary, branch, commit_sha, merge_request_url, target_build_id, version
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, attemptId) as AttemptRow | undefined;
+  if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not created");
+  return toAttempt(row);
+}
+
+function scopeDigest(input: MobileRelayScope): string {
+  return createHash("sha256")
+    .update(JSON.stringify({
+      accountId: input.accountId,
+      actorId: input.actorId,
+      projectId: input.projectId,
+      operationId: "dispatchRepairAttemptToRelay",
+    }))
+    .digest("hex");
+}
+
+function readDispatchReplay(
+  database: DatabaseSync,
+  input: DispatchMobileRelayInput,
+): MobileRelayDispatchAccepted | null {
+  const row = database
+    .prepare(
+      `SELECT request_digest, status, response_json
+       FROM idempotency_records
+       WHERE account_id = ? AND actor_id = ? AND operation_id = 'dispatchRepairAttemptToRelay'
+         AND scope_digest = ? AND idempotency_key = ?`,
+    )
+    .get(input.accountId, input.actorId, scopeDigest(input), input.idempotencyKey) as
+    | { readonly request_digest: string; readonly status: string; readonly response_json: string | null }
+    | undefined;
+  if (!row) return null;
+  if (row.request_digest !== input.requestDigest) {
+    throw new MobileRelayStorageError(
+      "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      "Idempotency-Key was already used with a different Relay handoff payload",
+    );
+  }
+  if (row.status !== "committed" || row.response_json === null) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Relay handoff is not committed");
+  }
+  return Object.freeze({
+    ...(JSON.parse(row.response_json) as MobileRelayDispatchAccepted),
+    replayed: true,
+  });
+}
+
+export function dispatchMobileRelay(
+  database: DatabaseSync,
+  input: DispatchMobileRelayInput,
+): MobileRelayDispatchAccepted {
+  requireTransaction(database);
+  const replay = readDispatchReplay(database, input);
+  if (replay) return replay;
+  if (input.selectedAttachmentIds.length !== 0) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "the first fake Relay slice accepts only an empty attachment selection",
+    );
+  }
+  const attempt = database
+    .prepare(
+      `SELECT attempt.id, attempt.bug_id, attempt.sequence, attempt.mode, attempt.status,
+              attempt.assignee_id, attempt.parent_attempt_id, attempt.summary, attempt.branch,
+              attempt.commit_sha, attempt.merge_request_url, attempt.target_build_id,
+              attempt.version, bug.key AS bug_key, bug.version AS bug_version,
+              attempt.updated_at
+       FROM repair_attempts AS attempt
+       JOIN bugs AS bug
+         ON bug.account_id = attempt.account_id AND bug.project_id = attempt.project_id
+        AND bug.id = attempt.bug_id AND bug.active_repair_attempt_id = attempt.id
+       WHERE attempt.account_id = ? AND attempt.project_id = ? AND attempt.id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.attemptId) as
+    | (AttemptRow & { readonly updated_at: string })
+    | undefined;
+  if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
+  if (
+    attempt.mode !== "relay" ||
+    attempt.status !== "planned" ||
+    attempt.version !== input.expectedVersion
+  ) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt is not a planned Relay attempt at the expected version",
+    );
+  }
+  const at = nextTimestamp(input.createdAt, attempt.updated_at);
+  const idempotencyId = randomUUID();
+  const expiresAt = new Date(Date.parse(at) + 7 * 24 * 60 * 60 * 1_000).toISOString();
+  database
+    .prepare(
+      `INSERT INTO idempotency_records(
+        id, account_id, project_id, actor_id, operation_id, idempotency_key,
+        scope_digest, scope_json, request_digest, status, http_status, response_json,
+        audit_event_id, created_at, expires_at, version
+      ) VALUES (?, ?, ?, ?, 'dispatchRepairAttemptToRelay', ?, ?, ?, ?, 'reserved',
+                NULL, NULL, NULL, ?, ?, 1)`,
+    )
+    .run(
+      idempotencyId,
+      input.accountId,
+      input.projectId,
+      input.actorId,
+      input.idempotencyKey,
+      scopeDigest(input),
+      JSON.stringify({
+        accountId: input.accountId,
+        actorId: input.actorId,
+        projectId: input.projectId,
+        operationId: "dispatchRepairAttemptToRelay",
+      }),
+      input.requestDigest,
+      at,
+      expiresAt,
+    );
+  const eventId = randomUUID();
+  const requestId = randomUUID();
+  const integrationLinkId = randomUUID();
+  const relayReceiptId = randomUUID();
+  const outboxMessageId = randomUUID();
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: attempt.bug_id,
+    type: "repair.handoff_queued",
+    aggregateType: "repair_attempt",
+    aggregateId: attempt.id,
+    aggregateSequence: 2,
+    resourceType: "relay_handoff",
+    resourceId: input.handoffId,
+    resourceVersionAfter: 1,
+    correlationId: requestId,
+    fromState: null,
+    toState: null,
+    payload: {
+      status: "queued",
+      repairAttemptId: attempt.id,
+      handoffId: input.handoffId,
+      attachmentCount: 0,
+    },
+    createdAt: at,
+  });
+  database
+    .prepare(
+      `INSERT INTO integration_links(
+        id, account_id, project_id, integration_type, local_resource_type,
+        local_resource_id, external_resource_type, external_resource_id, state,
+        metadata_json, created_at, updated_at, version
+      ) VALUES (?, ?, ?, 'relay', 'repair_attempt', ?, 'relay_handoff', ?, 'active',
+                ?, ?, ?, 1)`,
+    )
+    .run(
+      integrationLinkId,
+      input.accountId,
+      input.projectId,
+      attempt.id,
+      input.handoffId,
+      JSON.stringify({ relayInstanceId: MOBILE_FAKE_RELAY_INSTANCE_ID }),
+      at,
+      at,
+    );
+  database
+    .prepare(
+      `INSERT INTO relay_receipts(
+        id, account_id, project_id, integration_link_id, bug_id, repair_attempt_id,
+        handoff_id, relay_instance_id, relay_task_id, handoff_status, external_revision,
+        build_requirement, build_evidence_status, delivered_commit_sha, build_id,
+        requires_human_verification, automation_authority, last_event_at, failure_summary,
+        payload_digest, received_at, version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 'queued', 0, 'not_required',
+                'not_required', NULL, NULL, 1, 'delivery_build_projection_only', ?, NULL,
+                ?, ?, 1)`,
+    )
+    .run(
+      relayReceiptId,
+      input.accountId,
+      input.projectId,
+      integrationLinkId,
+      attempt.bug_id,
+      attempt.id,
+      input.handoffId,
+      MOBILE_FAKE_RELAY_INSTANCE_ID,
+      at,
+      input.requestDigest,
+      at,
+    );
+  database
+    .prepare(
+      `INSERT INTO outbox(
+        id, account_id, project_id, aggregate_type, aggregate_id, aggregate_version,
+        destination, dedupe_key, event_id, payload_json, status, attempt_count,
+        next_attempt_at, lease_owner, lease_expires_at, last_error_code, created_at, sent_at
+      ) VALUES (?, ?, ?, 'repair_attempt', ?, 1, ?, ?, ?, ?, 'pending', 0, ?,
+                NULL, NULL, NULL, ?, NULL)`,
+    )
+    .run(
+      outboxMessageId,
+      input.accountId,
+      input.projectId,
+      attempt.id,
+      MOBILE_FAKE_RELAY_INSTANCE_ID,
+      `relay:${input.handoffId}`,
+      eventId,
+      JSON.stringify({
+        bugId: attempt.bug_id,
+        repairAttemptId: attempt.id,
+        handoffId: input.handoffId,
+        selectedAttachmentIds: input.selectedAttachmentIds,
+      }),
+      at,
+      at,
+    );
+  const accepted: MobileRelayDispatchAccepted = Object.freeze({
+    qaItem: { type: "bug" as const, id: attempt.bug_id, key: attempt.bug_key ?? "" },
+    repairAttemptId: attempt.id,
+    handoffId: input.handoffId,
+    relayInstanceId: MOBILE_FAKE_RELAY_INSTANCE_ID,
+    outboxMessageId,
+    requestId,
+    status: "queued",
+    replayed: false,
+  });
+  database
+    .prepare(
+      `UPDATE idempotency_records
+       SET status = 'committed', http_status = 202, response_json = ?,
+           audit_event_id = ?, version = 2
+       WHERE id = ? AND status = 'reserved' AND version = 1`,
+    )
+    .run(
+      JSON.stringify(accepted),
+      eventId,
+      idempotencyId,
+    );
+  return accepted;
+}
+
+export function getMobileRelayReceipt(
+  database: DatabaseSync,
+  input: MobileRelayScope & { readonly attemptId: string },
+): MobileRelayReceipt | null {
+  const row = database
+    .prepare(
+      `SELECT receipt.bug_id, bug.key AS bug_key, receipt.repair_attempt_id,
+              receipt.handoff_id, receipt.relay_instance_id, receipt.relay_task_id,
+              receipt.handoff_status, receipt.build_requirement,
+              receipt.build_evidence_status, receipt.delivered_commit_sha,
+              receipt.build_id, receipt.external_revision, receipt.last_event_at,
+              receipt.failure_summary, receipt.version
+       FROM relay_receipts AS receipt
+       JOIN bugs AS bug
+         ON bug.account_id = receipt.account_id AND bug.project_id = receipt.project_id
+        AND bug.id = receipt.bug_id
+       WHERE receipt.account_id = ? AND receipt.project_id = ?
+         AND receipt.repair_attempt_id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.attemptId) as ReceiptRow | undefined;
+  if (!row) return null;
+  return Object.freeze({
+    qaItem: { type: "bug" as const, id: row.bug_id, key: row.bug_key },
+    repairAttemptId: row.repair_attempt_id,
+    handoffId: row.handoff_id,
+    relayInstanceId: row.relay_instance_id,
+    relayTaskId: row.relay_task_id,
+    handoffStatus: row.handoff_status,
+    buildRequirement: row.build_requirement,
+    buildEvidenceStatus: row.build_evidence_status,
+    deliveredCommitSha: row.delivered_commit_sha,
+    buildId: row.build_id,
+    externalRevision: row.external_revision,
+    requiresHumanVerification: true,
+    automationAuthority: "delivery_build_projection_only",
+    lastEventAt: row.last_event_at,
+    failureSummary: row.failure_summary,
+    version: row.version,
+  });
+}

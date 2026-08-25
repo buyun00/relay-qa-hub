@@ -16,6 +16,7 @@ import com.relayqahub.android.network.CaptureBundleArtifactUpload
 import com.relayqahub.android.network.CaptureBundleDeviceInput
 import com.relayqahub.android.network.CaptureBundlePocoInput
 import com.relayqahub.android.network.QaHubApiContract
+import com.relayqahub.android.network.RelayHandoffFailure
 import com.relayqahub.android.security.NativeCredentials
 import com.relayqahub.android.security.VaultResult
 import com.relayqahub.android.security.nativeSessionScope
@@ -114,6 +115,75 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             pocoSummary = null,
             pocoArtifacts = emptyList(),
         )
+    }
+
+    /**
+     * Runs the smallest App-first Relay handoff slice. The Bug is still created through the
+     * Room queue and normal sync/receipt path; only the subsequent guarded workflow calls are
+     * direct QA Hub requests using the native human token.
+     */
+    fun dispatchToRelay() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                lastAction.value =
+                    "Relay handoff unavailable: configure qaHubDebugAccessToken for a debug build."
+                return@launch
+            }
+
+            lastAction.value = "Creating a no-attachment Bug through the Room queue…"
+            val result = runCatching {
+                appContainer.scopedRepository.seedFoundationScope(scope)
+                when (
+                    appContainer.credentialVault.put(
+                        scope = scope.nativeSessionScope(),
+                        credentials = NativeCredentials(
+                            accessToken = accessToken,
+                            refreshToken = LIVE_SMOKE_UNUSED_REFRESH_TOKEN,
+                            accessTokenExpiresAtEpochMs =
+                                System.currentTimeMillis() + LIVE_SMOKE_CREDENTIAL_TTL_MS,
+                            sharedDeviceSession = false,
+                        ),
+                    )
+                ) {
+                    is VaultResult.Success -> Unit
+                    VaultResult.Missing -> throw RelayHandoffFailure("CREDENTIAL_WRITE_MISSING")
+                    is VaultResult.Unavailable ->
+                        throw RelayHandoffFailure("CREDENTIAL_VAULT_UNAVAILABLE")
+                }
+
+                val submissionId = UUID.randomUUID().toString()
+                val operationId = appContainer.scopedRepository.enqueue(
+                    scope = scope,
+                    request = FoundationCreateBugContract.buildOperation(
+                        projectId = scope.projectId,
+                        submissionId = submissionId,
+                        observedAt = Instant.now().toString(),
+                        qaAppVersion = BuildConfig.VERSION_NAME,
+                    ),
+                )
+                appContainer.syncEngine.run(scope)
+                val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
+                    ?: throw RelayHandoffFailure("BUG_COMMIT_RECEIPT_MISSING")
+                appContainer.relayHandoffClient.dispatchBugToRelay(
+                    bugId = receipt.bugId,
+                    bugKey = receipt.qaItemKey,
+                    actorId = scope.actorId,
+                    accessToken = accessToken,
+                )
+            }
+            result.onSuccess { handoff ->
+                lastAction.value =
+                    "${handoff.bugKey} queued to Relay; receipt=${handoff.handoffStatus}; " +
+                        "requiresHumanVerification=${handoff.requiresHumanVerification}."
+            }.onFailure { failure ->
+                val code = when (failure) {
+                    is RelayHandoffFailure -> failure.code
+                    else -> "UNEXPECTED_RELAY_HANDOFF_FAILURE"
+                }
+                lastAction.value = "Relay handoff failed: $code."
+            }
+        }
     }
 
     fun submitCapturedPng(

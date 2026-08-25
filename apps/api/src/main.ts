@@ -9,6 +9,7 @@ import { createApiServer, type ApiServer } from "./server.js";
 import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-store.js";
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
 import { createSqliteMobileCaptureStore } from "./sqlite-mobile-capture-store.js";
+import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   accountId: "10000000-0000-4000-8000-000000000020",
@@ -47,12 +48,14 @@ async function run(): Promise<void> {
 
   try {
     await worker.ensureMobileScope(MOBILE_SCOPE);
+    await worker.ensureMobileRelayRoles(MOBILE_SCOPE);
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
       mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
       mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
+      mobileRelayStore: createSqliteMobileRelayStore({ worker, scope: MOBILE_SCOPE }),
       debugBearerToken,
       debugActorId: MOBILE_SCOPE.actorId,
     });

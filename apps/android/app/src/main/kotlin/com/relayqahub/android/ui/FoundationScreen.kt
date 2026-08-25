@@ -38,6 +38,7 @@ fun FoundationScreen(
     onStartCaptureSession: () -> Unit,
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
+    onDispatchToRelay: () -> Unit = viewModel::dispatchToRelay,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     FoundationScreen(
@@ -47,6 +48,7 @@ fun FoundationScreen(
         onStartCaptureSession = onStartCaptureSession,
         onCaptureNow = onCaptureNow,
         onStopCaptureSession = onStopCaptureSession,
+        onDispatchToRelay = onDispatchToRelay,
     )
 }
 
@@ -58,6 +60,7 @@ internal fun FoundationScreen(
     onStartCaptureSession: () -> Unit,
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
+    onDispatchToRelay: () -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier
@@ -140,6 +143,14 @@ internal fun FoundationScreen(
                 ) {
                     Text("Run live smoke")
                 }
+            }
+            Button(
+                onClick = onDispatchToRelay,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("dispatch-to-relay"),
+            ) {
+                Text("交给 Relay（新建 Bug）")
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),

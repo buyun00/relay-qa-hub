@@ -22,6 +22,14 @@ import type {
   MobileCaptureCreation,
 } from "./mobile-capture-store.js";
 import type {
+  CreateMobileRelayAttemptInput,
+  DispatchMobileRelayInput,
+  MobileRelayDispatchAccepted,
+  MobileRelayReceipt,
+  MobileRepairAttemptRecord,
+  TransitionMobileBugInput,
+} from "./mobile-relay-store.js";
+import type {
   InsertedBugIdentity,
   MigrationReport,
   NewBugStorageRecord,
@@ -178,6 +186,40 @@ export class SqliteStorageWorker {
   }): Promise<MobileCaptureBundleRecord | null> {
     await this.initialization;
     return this.request<MobileCaptureBundleRecord | null>("getMobileCapture", input);
+  }
+
+  async ensureMobileRelayRoles(scope: MobileScopeBootstrap): Promise<void> {
+    await this.initialization;
+    await this.request("ensureMobileRelayRoles", scope);
+  }
+
+  async transitionMobileBugReady(input: TransitionMobileBugInput): Promise<MobileBugRecord> {
+    await this.initialization;
+    return this.request<MobileBugRecord>("transitionMobileBugReady", input);
+  }
+
+  async createMobileRelayAttempt(
+    input: CreateMobileRelayAttemptInput,
+  ): Promise<MobileRepairAttemptRecord> {
+    await this.initialization;
+    return this.request<MobileRepairAttemptRecord>("createMobileRelayAttempt", input);
+  }
+
+  async dispatchMobileRelay(
+    input: DispatchMobileRelayInput,
+  ): Promise<MobileRelayDispatchAccepted> {
+    await this.initialization;
+    return this.request<MobileRelayDispatchAccepted>("dispatchMobileRelay", input);
+  }
+
+  async getMobileRelayReceipt(input: {
+    readonly accountId: string;
+    readonly projectId: string;
+    readonly actorId: string;
+    readonly attemptId: string;
+  }): Promise<MobileRelayReceipt | null> {
+    await this.initialization;
+    return this.request<MobileRelayReceipt | null>("getMobileRelayReceipt", input);
   }
 
   /** @internal Forces an unexpected worker exit for terminal-state regression tests. */
