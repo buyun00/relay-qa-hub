@@ -2,8 +2,32 @@ import type { DatabaseSync } from "node:sqlite";
 
 import type { MobileBugRecord } from "./mobile-bug-store.js";
 import type { MobileBuildRecord } from "./mobile-build-store.js";
-import type { MobileRelayScope } from "./mobile-relay-store.js";
-import type { MobileVerificationStatus } from "./mobile-verification-store.js";
+import {
+  MobileRelayStorageError,
+  type MobileBuildRequirementRecord,
+  type MobileManualRepairAttemptRecord,
+  type MobileRelayScope,
+} from "./mobile-relay-store.js";
+import type {
+  MobileVerificationRecord,
+  MobileVerificationStatus,
+} from "./mobile-verification-store.js";
+
+const UUID_PATTERN =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
+
+export interface GetMobileHumanWorkflowForBugInput extends MobileRelayScope {
+  readonly bugId: string;
+}
+
+export interface MobileHumanWorkflowForBugProjection {
+  readonly bugId: string;
+  readonly repairAttempt: MobileManualRepairAttemptRecord | null;
+  readonly buildRequirement: MobileBuildRequirementRecord | null;
+  /** The Build reached through the exact immutable build_repair_links row. */
+  readonly build: MobileBuildRecord | null;
+  readonly verification: MobileVerificationRecord | null;
+}
 
 export interface MobileHumanWorkflowProjection {
   readonly projectId: string;
@@ -180,5 +204,340 @@ export function getLatestMobileHumanWorkflow(
       acceptedBugVersion: row.accepted_bug_version,
       acceptedState: "closed" as const,
     }),
+  });
+}
+
+interface HumanWorkflowBugPointerRow {
+  readonly active_repair_attempt_id: string | null;
+  readonly active_verification_id: string | null;
+}
+
+interface HumanWorkflowAttemptRow {
+  readonly id: string;
+  readonly bug_id: string;
+  readonly sequence: number;
+  readonly mode: string;
+  readonly status: string;
+  readonly assignee_id: string;
+  readonly summary: string | null;
+  readonly branch: string | null;
+  readonly commit_sha: string | null;
+  readonly merge_request_url: string | null;
+  readonly version: number;
+}
+
+interface HumanWorkflowRequirementRow {
+  readonly id: string;
+  readonly project_id: string;
+  readonly bug_id: string;
+  readonly repair_attempt_id: string;
+  readonly source_delivery_version: number;
+  readonly delivered_commit_sha: string | null;
+  readonly requirement: MobileBuildRequirementRecord["requirement"];
+  readonly decision_basis: MobileBuildRequirementRecord["decisionBasis"];
+  readonly decision_reason: string | null;
+  readonly decision_actor_id: string;
+  readonly decision_audit_event_id: string;
+  readonly linked_build_id: string | null;
+  readonly link_id: string | null;
+  readonly policy_version: "1.0.0";
+  readonly bug_version_at_delivery: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly version: 1 | 2;
+}
+
+interface HumanWorkflowBuildRow {
+  readonly id: string;
+  readonly project_id: string;
+  readonly provider: MobileBuildRecord["provider"];
+  readonly external_id: string;
+  readonly version_name: string;
+  readonly channel: string;
+  readonly project_key: string;
+  readonly branch: string;
+  readonly source_commit_sha: string;
+  readonly mode: MobileBuildRecord["mode"];
+  readonly status: MobileBuildRecord["status"];
+  readonly manifest_json: string;
+  readonly artifact_sha256: string | null;
+  readonly download_url: string | null;
+  readonly version: number;
+}
+
+interface HumanWorkflowVerificationRow {
+  readonly id: string;
+  readonly bug_id: string;
+  readonly repair_attempt_id: string;
+  readonly build_id: string | null;
+  readonly status: MobileVerificationStatus;
+  readonly verifier_id: string;
+  readonly criteria_snapshot: string;
+  readonly result_summary: string | null;
+  readonly version: number;
+}
+
+function requireWorkflowUuid(value: string, field: string): void {
+  if (!UUID_PATTERN.test(value)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", `${field} must be a UUID`);
+  }
+}
+
+function readAuthorizedBugPointers(
+  database: DatabaseSync,
+  input: GetMobileHumanWorkflowForBugInput,
+): HumanWorkflowBugPointerRow {
+  const bug = database
+    .prepare(
+      `SELECT active_repair_attempt_id, active_verification_id
+       FROM bugs
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId) as HumanWorkflowBugPointerRow | undefined;
+  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+
+  const authorized = database
+    .prepare(
+      `SELECT 1 AS present
+       FROM accounts AS account
+       JOIN projects AS project
+         ON project.account_id = account.id
+        AND project.id = ?
+        AND project.status = 'active'
+       JOIN users AS actor
+         ON actor.account_id = account.id
+        AND actor.id = ?
+        AND actor.status = 'active'
+       JOIN memberships AS membership
+         ON membership.account_id = account.id
+        AND membership.project_id = project.id
+        AND membership.user_id = actor.id
+        AND membership.status = 'active'
+       WHERE account.id = ? AND account.status = 'active'`,
+    )
+    .get(input.projectId, input.actorId, input.accountId) as
+    { readonly present: number } | undefined;
+  if (!authorized) {
+    throw new MobileRelayStorageError(
+      "FORBIDDEN",
+      "actor is not an active member of the requested project",
+    );
+  }
+  return bug;
+}
+
+function readHumanRepairAttempt(
+  database: DatabaseSync,
+  input: GetMobileHumanWorkflowForBugInput,
+  attemptId: string | null,
+): MobileManualRepairAttemptRecord | null {
+  if (attemptId === null) return null;
+  const row = database
+    .prepare(
+      `SELECT id, bug_id, sequence, mode, status, assignee_id,
+              summary, branch, commit_sha, merge_request_url, version
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?
+         AND id = ? AND mode = 'human'`,
+    )
+    .get(input.accountId, input.projectId, input.bugId, attemptId) as
+    HumanWorkflowAttemptRow | undefined;
+  if (!row) return null;
+  if (row.status !== "planned" && row.status !== "running" && row.status !== "delivered") {
+    return null;
+  }
+  return Object.freeze({
+    id: row.id,
+    bugId: row.bug_id,
+    sequence: row.sequence,
+    mode: "human" as const,
+    status: row.status,
+    assigneeId: row.assignee_id,
+    parentAttemptId: null,
+    summary: row.summary,
+    branch: row.branch,
+    commitSha: row.commit_sha,
+    mergeRequestUrl: row.merge_request_url,
+    targetBuildId: null,
+    version: row.version,
+  });
+}
+
+function readBuildRequirement(
+  database: DatabaseSync,
+  input: GetMobileHumanWorkflowForBugInput,
+  repairAttemptId: string | null,
+): MobileBuildRequirementRecord | null {
+  if (repairAttemptId === null) return null;
+  const row = database
+    .prepare(
+      `SELECT id, project_id, bug_id, repair_attempt_id,
+              source_delivery_version, delivered_commit_sha, requirement,
+              decision_basis, decision_reason, decision_actor_id,
+              decision_audit_event_id, linked_build_id, link_id,
+              policy_version, bug_version_at_delivery, created_at,
+              updated_at, version
+       FROM build_requirements
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?
+         AND repair_attempt_id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId, repairAttemptId) as
+    HumanWorkflowRequirementRow | undefined;
+  if (!row) return null;
+  return Object.freeze({
+    id: row.id,
+    projectId: row.project_id,
+    bugId: row.bug_id,
+    repairAttemptId: row.repair_attempt_id,
+    sourceDeliveryVersion: row.source_delivery_version,
+    deliveredCommitSha: row.delivered_commit_sha,
+    requirement: row.requirement,
+    decisionBasis: row.decision_basis,
+    decisionReason: row.decision_reason,
+    decisionActorId: row.decision_actor_id,
+    decisionAuditEventId: row.decision_audit_event_id,
+    linkedBuildId: row.linked_build_id,
+    linkId: row.link_id,
+    policyVersion: row.policy_version,
+    bugVersionAtDelivery: row.bug_version_at_delivery,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    version: row.version,
+  });
+}
+
+function readExactLinkedBuild(
+  database: DatabaseSync,
+  input: GetMobileHumanWorkflowForBugInput,
+  requirement: MobileBuildRequirementRecord | null,
+): MobileBuildRecord | null {
+  if (requirement?.linkedBuildId === null || requirement?.linkId === null) return null;
+  if (!requirement) return null;
+  const link = database
+    .prepare(
+      `SELECT build_id
+       FROM build_repair_links
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND bug_id = ? AND repair_attempt_id = ?
+         AND build_requirement_id = ?
+         AND build_requirement_version = ? AND build_id = ?`,
+    )
+    .get(
+      input.accountId,
+      input.projectId,
+      requirement.linkId,
+      requirement.bugId,
+      requirement.repairAttemptId,
+      requirement.id,
+      requirement.version,
+      requirement.linkedBuildId,
+    ) as { readonly build_id: string } | undefined;
+  if (!link) return null;
+
+  const row = database
+    .prepare(
+      `SELECT id, project_id, provider, external_id, version_name, channel,
+              project_key, branch, source_commit_sha, mode, status,
+              manifest_json, artifact_sha256, download_url, version
+       FROM builds
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, link.build_id) as HumanWorkflowBuildRow | undefined;
+  if (!row) return null;
+
+  let manifest: { readonly commitShas: readonly string[]; readonly artifactSha256: string | null };
+  try {
+    const decoded = JSON.parse(row.manifest_json) as {
+      readonly commitShas?: unknown;
+      readonly artifactSha256?: unknown;
+    };
+    if (
+      !Array.isArray(decoded.commitShas) ||
+      decoded.commitShas.some((value) => typeof value !== "string") ||
+      (decoded.artifactSha256 !== undefined &&
+        decoded.artifactSha256 !== null &&
+        typeof decoded.artifactSha256 !== "string")
+    ) {
+      throw new Error("invalid manifest");
+    }
+    manifest = {
+      commitShas: Object.freeze(decoded.commitShas as string[]),
+      artifactSha256: (decoded.artifactSha256 as string | null | undefined) ?? null,
+    };
+  } catch {
+    throw new MobileRelayStorageError("BUILD_IDENTITY_MISMATCH", "Build manifest JSON is invalid");
+  }
+  return Object.freeze({
+    id: row.id,
+    projectId: row.project_id,
+    provider: row.provider,
+    externalId: row.external_id,
+    versionName: row.version_name,
+    channel: row.channel,
+    projectKey: row.project_key,
+    branch: row.branch,
+    sourceCommitSha: row.source_commit_sha,
+    mode: row.mode,
+    status: row.status,
+    manifest: Object.freeze(manifest),
+    artifactSha256: row.artifact_sha256,
+    downloadUrl: row.download_url,
+    version: row.version,
+  });
+}
+
+function readActiveVerification(
+  database: DatabaseSync,
+  input: GetMobileHumanWorkflowForBugInput,
+  verificationId: string | null,
+): MobileVerificationRecord | null {
+  if (verificationId === null) return null;
+  const row = database
+    .prepare(
+      `SELECT id, bug_id, repair_attempt_id, build_id, status, verifier_id,
+              criteria_snapshot, result_summary, version
+       FROM verifications
+       WHERE account_id = ? AND project_id = ? AND bug_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId, verificationId) as
+    HumanWorkflowVerificationRow | undefined;
+  if (!row) return null;
+  return Object.freeze({
+    id: row.id,
+    bugId: row.bug_id,
+    repairAttemptId: row.repair_attempt_id,
+    buildId: row.build_id,
+    status: row.status,
+    verifierId: row.verifier_id,
+    criteriaSnapshot: row.criteria_snapshot,
+    resultSummary: row.result_summary,
+    version: row.version,
+  });
+}
+
+/**
+ * Read the current human workflow pointers for one Bug. The Build is only
+ * returned through the exact immutable BuildRepairLink named by the active
+ * BuildRequirement; no commit SHA is used to infer a relationship.
+ */
+export function getMobileHumanWorkflowForBug(
+  database: DatabaseSync,
+  input: GetMobileHumanWorkflowForBugInput,
+): MobileHumanWorkflowForBugProjection {
+  requireWorkflowUuid(input.accountId, "accountId");
+  requireWorkflowUuid(input.projectId, "projectId");
+  requireWorkflowUuid(input.actorId, "actorId");
+  requireWorkflowUuid(input.bugId, "bugId");
+
+  const pointers = readAuthorizedBugPointers(database, input);
+  const repairAttempt = readHumanRepairAttempt(database, input, pointers.active_repair_attempt_id);
+  const buildRequirement = readBuildRequirement(database, input, repairAttempt?.id ?? null);
+  const verification = readActiveVerification(database, input, pointers.active_verification_id);
+  return Object.freeze({
+    bugId: input.bugId,
+    repairAttempt,
+    buildRequirement,
+    build: readExactLinkedBuild(database, input, buildRequirement),
+    verification,
   });
 }

@@ -10,6 +10,7 @@ import {
   getBug,
   getBuild,
   getHumanRepairAttempt,
+  getHumanWorkflow,
   getRelayReceipt,
   getVerification,
   linkBuildRepair,
@@ -35,8 +36,8 @@ import {
   type BugListState,
   type BugSeverity,
   type DuplicateCandidate,
+  type BuildRecord,
   type HumanRepairAttempt,
-  type LinkBuildRepairResponse,
   type ProjectMember,
   type ProjectModule,
   type RelayReceipt,
@@ -181,7 +182,7 @@ export default function App() {
     readonly code: string | null;
   } | null>(null);
   const [humanAttempt, setHumanAttempt] = useState<HumanRepairAttempt | null>(null);
-  const [linkedBuild, setLinkedBuild] = useState<LinkBuildRepairResponse | null>(null);
+  const [linkedBuild, setLinkedBuild] = useState<BuildRecord | null>(null);
   const [verification, setVerification] = useState<VerificationRecord | null>(null);
   const [humanWorkflowState, setHumanWorkflowState] = useState<MutationState>("idle");
   const [humanWorkflowError, setHumanWorkflowError] = useState<{
@@ -336,11 +337,28 @@ export default function App() {
         setVerificationResultSummary("");
       }
       try {
-        const [bug, events] = await Promise.all([getBug(bugId), listBugEvents(bugId)]);
+        const [bug, events, humanWorkflow] = await Promise.all([
+          getBug(bugId),
+          listBugEvents(bugId),
+          getHumanWorkflow(bugId),
+        ]);
         setSelectedBug(bug);
         setOwnerSelection(bug.ownerId ?? "");
         setModuleSelection(bug.moduleId ?? "");
         setTimeline(events.items);
+        setHumanAttempt(humanWorkflow.repairAttempt);
+        setLinkedBuild(humanWorkflow.build);
+        setVerification(humanWorkflow.verification);
+        setRepairSummary(humanWorkflow.repairAttempt?.summary ?? "");
+        setRepairBranch(humanWorkflow.repairAttempt?.branch ?? "");
+        setRepairCommitSha(humanWorkflow.repairAttempt?.commitSha ?? "");
+        setBuildExternalId(humanWorkflow.build?.externalId ?? "");
+        setBuildVersion(humanWorkflow.build?.versionName ?? "0.1.0-debug");
+        setBuildDownloadUrl(humanWorkflow.build?.downloadUrl ?? "");
+        setBuildArtifactSha256(humanWorkflow.build?.artifactSha256 ?? "");
+        setBuildCommitSha(humanWorkflow.build?.sourceCommitSha ?? "");
+        setVerificationCriteria(humanWorkflow.verification?.criteriaSnapshot ?? "");
+        setVerificationResultSummary(humanWorkflow.verification?.resultSummary ?? "");
         setDetailState("success");
         return { bug, events: events.items };
       } catch (cause: unknown) {
@@ -628,7 +646,7 @@ export default function App() {
     if (
       selectedBug === null ||
       humanAttempt === null ||
-      humanAttempt.status !== "planned" ||
+      (humanAttempt.status !== "planned" && humanAttempt.status !== "running") ||
       repairSummary.trim().length === 0 ||
       repairBranch.trim().length === 0 ||
       !COMMIT_SHA_PATTERN.test(repairCommitSha.trim())
@@ -639,7 +657,10 @@ export default function App() {
     setHumanWorkflowError(null);
     setHumanWorkflowMessage(null);
     try {
-      const started = await startHumanRepairAttempt(humanAttempt.id, humanAttempt.version);
+      const started =
+        humanAttempt.status === "planned"
+          ? await startHumanRepairAttempt(humanAttempt.id, humanAttempt.version)
+          : humanAttempt;
       const delivered = await deliverHumanRepairAttempt(
         started.id,
         started.version,
@@ -734,7 +755,7 @@ export default function App() {
         setHumanWorkflowError({ status: 200, code: "BUILD_LINK_READBACK_MISMATCH" });
         return;
       }
-      setLinkedBuild(linked);
+      setLinkedBuild(linked.build);
       setHumanWorkflowMessage(`Build 已精确关联：${linked.build.externalId}`);
       setHumanWorkflowState("success");
       await loadBugDetails(selectedBug.id, true, true, true);
@@ -762,6 +783,7 @@ export default function App() {
       humanAttempt === null ||
       humanAttempt.status !== "delivered" ||
       linkedBuild === null ||
+      (verification !== null && verification.status !== "requested") ||
       verificationCriteria.trim().length === 0
     ) {
       return;
@@ -770,20 +792,22 @@ export default function App() {
     setHumanWorkflowError(null);
     setHumanWorkflowMessage(null);
     try {
-      const created = await createVerification({
-        bugId: selectedBug.id,
-        expectedBugVersion: selectedBug.version,
-        repairAttemptId: humanAttempt.id,
-        buildId: linkedBuild.build.id,
-        verifierId: MVP_OWNER_ID,
-        criteria: verificationCriteria.trim(),
-      });
-      const started = await startVerification(created.id, created.version);
+      const requested =
+        verification ??
+        (await createVerification({
+          bugId: selectedBug.id,
+          expectedBugVersion: selectedBug.version,
+          repairAttemptId: humanAttempt.id,
+          buildId: linkedBuild.id,
+          verifierId: MVP_OWNER_ID,
+          criteria: verificationCriteria.trim(),
+        }));
+      const started = await startVerification(requested.id, requested.version);
       const readback = await getVerification(started.id);
       if (
         readback.status !== "in_progress" ||
         readback.bugId !== selectedBug.id ||
-        readback.buildId !== linkedBuild.build.id
+        readback.buildId !== linkedBuild.id
       ) {
         setHumanWorkflowState("error");
         setHumanWorkflowError({ status: 200, code: "VERIFICATION_READBACK_MISMATCH" });
@@ -804,6 +828,7 @@ export default function App() {
     loadBugDetails,
     refreshVisibleBugList,
     selectedBug,
+    verification,
     verificationCriteria,
   ]);
 
@@ -1497,7 +1522,7 @@ export default function App() {
                   </div>
                   <div className="workflow-status">
                     <span>Attempt: {humanAttempt?.status ?? "未创建"}</span>
-                    <span>Build: {linkedBuild?.build.status ?? "未关联"}</span>
+                    <span>Build: {linkedBuild?.status ?? "未关联"}</span>
                     <span>Verification: {verification?.status ?? "未开始"}</span>
                   </div>
                 </div>
@@ -1556,14 +1581,17 @@ export default function App() {
                         className="secondary-button"
                         disabled={
                           humanWorkflowState === "submitting" ||
-                          humanAttempt?.status !== "planned" ||
+                          (humanAttempt?.status !== "planned" &&
+                            humanAttempt?.status !== "running") ||
                           repairBranch.trim().length === 0 ||
                           !COMMIT_SHA_PATTERN.test(repairCommitSha.trim())
                         }
                         onClick={() => void deliverHumanWorkflow()}
                         type="button"
                       >
-                        开始并登记代码交付
+                        {humanAttempt?.status === "running"
+                          ? "继续登记代码交付"
+                          : "开始并登记代码交付"}
                       </button>
                     </div>
                   </div>
@@ -1660,13 +1688,15 @@ export default function App() {
                           humanWorkflowState === "submitting" ||
                           selectedBug.state !== "ready_for_verification" ||
                           linkedBuild === null ||
-                          verification !== null ||
+                          (verification !== null && verification.status !== "requested") ||
                           verificationCriteria.trim().length === 0
                         }
                         onClick={() => void beginVerification()}
                         type="button"
                       >
-                        创建并开始人工验收
+                        {verification?.status === "requested"
+                          ? "继续开始人工验收"
+                          : "创建并开始人工验收"}
                       </button>
                     </div>
                   </div>

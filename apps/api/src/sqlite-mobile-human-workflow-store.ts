@@ -25,5 +25,15 @@ export function createSqliteMobileHumanWorkflowStore(
         actorId: query.actorId,
       });
     },
+
+    async getForBug(query) {
+      requireActor(query.actorId, options.scope);
+      return options.worker.getMobileHumanWorkflowForBug({
+        accountId: options.scope.accountId,
+        projectId: options.scope.projectId,
+        actorId: query.actorId,
+        bugId: query.bugId,
+      });
+    },
   };
 }

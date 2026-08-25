@@ -70,6 +70,7 @@ import {
   type MobileVerificationStore,
 } from "./mobile-verification.js";
 import {
+  MOBILE_BUG_HUMAN_WORKFLOW_PATH,
   MOBILE_HUMAN_WORKFLOW_LATEST_PATH,
   type MobileHumanWorkflowStore,
 } from "./mobile-human-workflows.js";
@@ -260,6 +261,9 @@ const unconfiguredMobileVerificationStore: MobileVerificationStore = {
 
 const unconfiguredMobileHumanWorkflowStore: MobileHumanWorkflowStore = {
   getLatest: () => null,
+  getForBug: () => {
+    throw new Error("MobileHumanWorkflowStore is not configured");
+  },
 };
 
 const unconfiguredMobileCommentStore: MobileCommentStore = {
@@ -1048,6 +1052,22 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
     },
   );
+
+  app.get<{ Params: { bugId: string } }>(MOBILE_BUG_HUMAN_WORKFLOW_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const workflow = await mobileHumanWorkflowStore.getForBug({
+        actorId: debugActorId,
+        bugId,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(workflow);
+    } catch (error: unknown) {
+      return buildErrorReply(error, reply);
+    }
+  });
 
   app.post<{ Params: { bugId: string } }>(MOBILE_BUG_COMMENTS_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {

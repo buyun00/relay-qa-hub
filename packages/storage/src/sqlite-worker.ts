@@ -25,7 +25,11 @@ import type {
   MobileProjectModuleList,
   MobileVisibleProjectList,
 } from "./mobile-project-directory-store.js";
-import type { MobileHumanWorkflowProjection } from "./mobile-human-workflow-store.js";
+import {
+  type GetMobileHumanWorkflowForBugInput,
+  type MobileHumanWorkflowForBugProjection,
+  type MobileHumanWorkflowProjection,
+} from "./mobile-human-workflow-store.js";
 import type {
   CreateMobileCommentInput,
   ListMobileBugEventsInput,
@@ -257,6 +261,13 @@ export class SqliteStorageWorker {
       "getLatestMobileHumanWorkflow",
       input,
     );
+  }
+
+  async getMobileHumanWorkflowForBug(
+    input: GetMobileHumanWorkflowForBugInput,
+  ): Promise<MobileHumanWorkflowForBugProjection> {
+    await this.initialization;
+    return this.request<MobileHumanWorkflowForBugProjection>("getMobileHumanWorkflowForBug", input);
   }
 
   async createMobileComment(input: CreateMobileCommentInput): Promise<MobileCommentCreation> {

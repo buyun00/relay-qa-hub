@@ -256,6 +256,20 @@ export interface LinkBuildRepairResponse {
   readonly replayed: boolean;
 }
 
+export interface HumanWorkflowSnapshot {
+  readonly bugId: string;
+  readonly repairAttempt: HumanRepairAttempt | null;
+  readonly buildRequirement: {
+    readonly id: string;
+    readonly repairAttemptId: string;
+    readonly deliveredCommitSha: string;
+    readonly linkedBuildId: string | null;
+    readonly version: number;
+  } | null;
+  readonly build: BuildRecord | null;
+  readonly verification: VerificationRecord | null;
+}
+
 export interface VerificationRecord {
   readonly id: string;
   readonly bugId: string;
@@ -379,6 +393,17 @@ export async function listProjectModules(projectId: string): Promise<ProjectModu
 export async function getBug(bugId: string): Promise<BugDetail> {
   const body = requireRecord(await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`), "BUG");
   return body as unknown as BugDetail;
+}
+
+export async function getHumanWorkflow(bugId: string): Promise<HumanWorkflowSnapshot> {
+  const body = requireRecord(
+    await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/human-workflow`),
+    "HUMAN_WORKFLOW",
+  );
+  if (body.bugId !== bugId) {
+    throw new QaHubApiError(200, "INVALID_HUMAN_WORKFLOW");
+  }
+  return body as unknown as HumanWorkflowSnapshot;
 }
 
 export async function listDuplicateCandidates(bugId: string): Promise<DuplicateCandidateList> {

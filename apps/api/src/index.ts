@@ -107,7 +107,10 @@ export type {
   MobileVerificationStore,
 } from "./mobile-verification.js";
 
-export { MOBILE_HUMAN_WORKFLOW_LATEST_PATH } from "./mobile-human-workflows.js";
+export {
+  MOBILE_BUG_HUMAN_WORKFLOW_PATH,
+  MOBILE_HUMAN_WORKFLOW_LATEST_PATH,
+} from "./mobile-human-workflows.js";
 export type { MobileHumanWorkflowStore } from "./mobile-human-workflows.js";
 
 export {

@@ -28,7 +28,10 @@ import {
   type ListMobileProjectModulesInput,
   type ListMobileVisibleProjectsInput,
 } from "./mobile-project-directory-store.js";
-import { getLatestMobileHumanWorkflow } from "./mobile-human-workflow-store.js";
+import {
+  getLatestMobileHumanWorkflow,
+  getMobileHumanWorkflowForBug,
+} from "./mobile-human-workflow-store.js";
 import {
   createMobileComment,
   listMobileBugEvents,
@@ -124,6 +127,7 @@ interface WorkerRequest {
     | "listMobileProjectMembers"
     | "listMobileProjectModules"
     | "getLatestMobileHumanWorkflow"
+    | "getMobileHumanWorkflowForBug"
     | "createMobileComment"
     | "listMobileBugEvents"
     | "listMobileDuplicateCandidates"
@@ -313,6 +317,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
         readonly projectId: string;
         readonly actorId: string;
       },
+    );
+  }
+
+  if (request.operation === "getMobileHumanWorkflowForBug") {
+    return getMobileHumanWorkflowForBug(
+      requireDatabase(),
+      request.payload as Parameters<typeof getMobileHumanWorkflowForBug>[1],
     );
   }
 
