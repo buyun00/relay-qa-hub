@@ -19,6 +19,7 @@ import {
   type CreateMobileBugInput,
   type MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
+import { createMobileCapture, getMobileCapture, type CreateMobileCaptureInput } from "./mobile-capture-store.js";
 import {
   canonicalMigrationDigest,
   insertBugWithNextNumber,
@@ -44,6 +45,8 @@ interface WorkerRequest {
     | "ensureMobileScope"
     | "createMobileBug"
     | "getMobileBug"
+    | "createMobileCapture"
+    | "getMobileCapture"
     | "initMobileUpload"
     | "putMobileUploadChunk"
     | "finalizeMobileUpload"
@@ -170,6 +173,35 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly bugId: string;
     };
     return getMobileBug(requireDatabase(), payload, payload.bugId);
+  }
+
+  if (request.operation === "createMobileCapture") {
+    const current = requireDatabase();
+    current.exec("BEGIN IMMEDIATE");
+    try {
+      const payload = request.payload as CreateMobileCaptureInput;
+      const result = createMobileCapture(current, {
+        ...payload,
+        ...(configuration.evidenceRoot === undefined
+          ? {}
+          : { evidenceRoot: configuration.evidenceRoot }),
+      });
+      current.exec("COMMIT");
+      return result;
+    } catch (error) {
+      if (current.isTransaction) current.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
+  if (request.operation === "getMobileCapture") {
+    const payload = request.payload as {
+      readonly accountId: string;
+      readonly projectId: string;
+      readonly actorId: string;
+      readonly captureId: string;
+    };
+    return getMobileCapture(requireDatabase(), payload);
   }
 
   if (request.operation === "initMobileUpload") {

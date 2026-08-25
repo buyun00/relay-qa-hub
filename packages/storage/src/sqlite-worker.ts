@@ -17,6 +17,11 @@ import type {
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
 import type {
+  CreateMobileCaptureInput,
+  MobileCaptureBundleRecord,
+  MobileCaptureCreation,
+} from "./mobile-capture-store.js";
+import type {
   InsertedBugIdentity,
   MigrationReport,
   NewBugStorageRecord,
@@ -158,6 +163,21 @@ export class SqliteStorageWorker {
   }): Promise<MobileBugRecord | null> {
     await this.initialization;
     return this.request<MobileBugRecord | null>("getMobileBug", input);
+  }
+
+  async createMobileCapture(input: CreateMobileCaptureInput): Promise<MobileCaptureCreation> {
+    await this.initialization;
+    return this.request<MobileCaptureCreation>("createMobileCapture", input);
+  }
+
+  async getMobileCapture(input: {
+    readonly accountId: string;
+    readonly projectId: string;
+    readonly actorId: string;
+    readonly captureId: string;
+  }): Promise<MobileCaptureBundleRecord | null> {
+    await this.initialization;
+    return this.request<MobileCaptureBundleRecord | null>("getMobileCapture", input);
   }
 
   /** @internal Forces an unexpected worker exit for terminal-state regression tests. */

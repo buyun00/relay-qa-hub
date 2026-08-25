@@ -253,7 +253,8 @@ function loadCreation(
     .prepare(
       `SELECT submission.bug_id AS bug_id,
               occurrence.id AS occurrence_id,
-              event.id AS event_id
+              event.id AS event_id,
+              occurrence.capture_bundle_id AS capture_bundle_id
        FROM submissions AS submission
        JOIN occurrences AS occurrence
          ON occurrence.account_id = submission.account_id
@@ -273,7 +274,12 @@ function loadCreation(
          AND submission.intent = 'bug_create'`,
     )
     .get(input.accountId, input.projectId, input.actorId, input.clientSubmissionId) as
-    | { readonly bug_id: string; readonly occurrence_id: string; readonly event_id: string }
+    | {
+        readonly bug_id: string;
+        readonly occurrence_id: string;
+        readonly event_id: string;
+        readonly capture_bundle_id: string | null;
+      }
     | undefined;
   if (!effect) return null;
   const bug = readBug(database, input.accountId, input.projectId, effect.bug_id);
@@ -294,7 +300,7 @@ function loadCreation(
     occurrenceId: effect.occurrence_id,
     eventId: effect.event_id,
     attachmentIds: Object.freeze(attachmentIds),
-    captureBundleId: null,
+    captureBundleId: effect.capture_bundle_id,
     replayed,
   });
 }
@@ -399,10 +405,33 @@ export function createMobileBug(
   input: CreateMobileBugInput,
 ): MobileBugCreation {
   requireTransaction(database);
-  if (input.captureBundleId !== null) {
+  const capture = input.captureBundleId
+    ? (database
+        .prepare(
+          `SELECT id, actor_id, client_submission_id, status, version
+           FROM capture_bundles
+           WHERE account_id = ? AND project_id = ? AND id = ?`,
+        )
+        .get(input.accountId, input.projectId, input.captureBundleId) as
+        | {
+            readonly id: string;
+            readonly actor_id: string;
+            readonly client_submission_id: string;
+            readonly status: string;
+            readonly version: number;
+          }
+        | undefined)
+    : undefined;
+  if (
+    input.captureBundleId !== null &&
+    (!capture ||
+      capture.actor_id !== input.actorId ||
+      capture.client_submission_id !== input.clientSubmissionId ||
+      !["uploaded", "bound"].includes(capture.status))
+  ) {
     throw new SqliteStorageError(
-      "SQLITE_MVP_ATTACHMENT_UNSUPPORTED",
-      "the first mobile slice does not yet accept capture bundles",
+      "SQLITE_UPLOAD_INVALID",
+      "capture bundle is not an exact same-scope uploaded capture",
     );
   }
   const prior = database
@@ -447,7 +476,7 @@ export function createMobileBug(
         observed_at, platform, app_version, resource_version, git_sha,
         device_model, os_version, steps_json, actual_behavior, frequency,
         error_signature, environment_json, capture_bundle_id, created_at, version
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, 1)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
     )
     .run(
       occurrenceId,
@@ -470,6 +499,7 @@ export function createMobileBug(
       input.occurrence.environment === undefined
         ? null
         : JSON.stringify(input.occurrence.environment),
+      input.captureBundleId,
       input.createdAt,
     );
   claimBugAttachments(database, input, bugId);
@@ -498,13 +528,32 @@ export function createMobileBug(
       JSON.stringify({ occurrenceId, fromVersion: 1, toVersion: 2 }),
       input.createdAt,
     );
+  if (capture && capture.status === "uploaded") {
+    const createdAtMs = Date.parse(input.createdAt);
+    const updatedAt = new Date(Math.max(createdAtMs, createdAtMs + 1)).toISOString();
+    database
+      .prepare(
+        `UPDATE capture_bundles
+         SET status = 'bound', updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ? AND actor_id = ? AND id = ?
+           AND status = 'uploaded' AND version = ?`,
+      )
+      .run(
+        updatedAt,
+        input.accountId,
+        input.projectId,
+        input.actorId,
+        input.captureBundleId,
+        capture.version,
+      );
+  }
   database
     .prepare(
       `INSERT INTO submissions(
         id, account_id, project_id, actor_id, client_submission_id, intent,
         payload_digest, bug_id, occurrence_id, comment_id, verification_id,
         capture_bundle_id, response_json, committed_at, version
-      ) VALUES (?, ?, ?, ?, ?, 'bug_create', ?, ?, NULL, NULL, NULL, NULL, ?, ?, 1)`,
+      ) VALUES (?, ?, ?, ?, ?, 'bug_create', ?, ?, NULL, NULL, NULL, ?, ?, ?, 1)`,
     )
     .run(
       randomUUID(),
@@ -514,6 +563,7 @@ export function createMobileBug(
       input.clientSubmissionId,
       input.payloadDigest,
       bugId,
+      input.captureBundleId,
       JSON.stringify({
         clientSubmissionId: input.clientSubmissionId,
         projectId: input.projectId,
@@ -521,7 +571,7 @@ export function createMobileBug(
         occurrenceId: null,
         commentId: null,
         verificationId: null,
-        captureBundleId: null,
+        captureBundleId: input.captureBundleId,
       }),
       input.createdAt,
     );

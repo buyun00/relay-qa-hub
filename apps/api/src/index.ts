@@ -42,6 +42,22 @@ export {
   MOBILE_BUG_ITEM_PATH,
   parseMobileCreateBugRequest,
 } from "./mobile-bugs.js";
+
+export {
+  MOBILE_CAPTURE_COLLECTION_PATH,
+  MOBILE_CAPTURE_ITEM_PATH,
+  MobileCaptureRequestError,
+  parseMobileCreateCaptureRequest,
+} from "./mobile-captures.js";
+export type {
+  CreateMobileCaptureCommand,
+  GetMobileCaptureQuery,
+  MobileCaptureArtifactRequest,
+  MobileCaptureRequest,
+  MobileCaptureSource,
+  MobileCaptureStore,
+  MobileCreateCaptureResponse,
+} from "./mobile-captures.js";
 export type {
   CreateMobileBugCommand,
   GetMobileBugQuery,

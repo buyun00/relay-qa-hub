@@ -28,6 +28,13 @@ import {
   type MobileBugStore,
   parseMobileCreateBugRequest,
 } from "./mobile-bugs.js";
+import {
+  MOBILE_CAPTURE_COLLECTION_PATH,
+  MOBILE_CAPTURE_ITEM_PATH,
+  MobileCaptureRequestError,
+  parseMobileCreateCaptureRequest,
+  type MobileCaptureStore,
+} from "./mobile-captures.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
 
@@ -46,6 +53,7 @@ export interface CreateApiAppOptions {
   readonly logger?: boolean;
   readonly mobileBugStore?: MobileBugStore;
   readonly mobileAttachmentStore?: MobileAttachmentStore;
+  readonly mobileCaptureStore?: MobileCaptureStore;
   readonly debugBearerToken?: string;
   readonly debugActorId?: string;
 }
@@ -85,6 +93,13 @@ const unconfiguredMobileAttachmentStore: MobileAttachmentStore = {
   },
 };
 
+const unconfiguredMobileCaptureStore: MobileCaptureStore = {
+  createCapture: () => {
+    throw new Error("MobileCaptureStore is not configured");
+  },
+  getCapture: () => null,
+};
+
 function readHeader(value: string | readonly string[] | undefined): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
@@ -110,6 +125,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const app = Fastify({ logger: options.logger ?? true });
   const mobileBugStore = options.mobileBugStore ?? unconfiguredMobileBugStore;
   const mobileAttachmentStore = options.mobileAttachmentStore ?? unconfiguredMobileAttachmentStore;
+  const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
   const debugBearerToken = options.debugBearerToken ?? DEFAULT_DEBUG_BEARER_TOKEN;
   const debugActorId = options.debugActorId ?? DEFAULT_DEBUG_ACTOR_ID;
 
@@ -179,6 +195,64 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       return reply.code(404).send({ code: "NOT_FOUND" });
     }
     return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(bug);
+  });
+
+  app.post(MOBILE_CAPTURE_COLLECTION_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply
+        .code(401)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "UNAUTHENTICATED" });
+    }
+
+    try {
+      const body = parseMobileCreateCaptureRequest(request.body);
+      const idempotencyKey = readHeader(request.headers["idempotency-key"]);
+      if (idempotencyKey !== `submission:${body.clientSubmissionId}:capture:${body.capture.captureId}`) {
+        throw new MobileCaptureRequestError(
+          "Idempotency-Key does not match the capture identity",
+          "INVALID_REQUEST",
+        );
+      }
+      const response = await mobileCaptureStore.createCapture({
+        actorId: debugActorId,
+        idempotencyKey,
+        request: body,
+      });
+      return reply
+        .code(201)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send(response);
+    } catch (error: unknown) {
+      if (error instanceof MobileCaptureRequestError) {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: error.code });
+      }
+      if (error instanceof TypeError) {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
+
+  app.get<{ Params: { captureId: string } }>(MOBILE_CAPTURE_ITEM_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply
+        .code(401)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "UNAUTHENTICATED" });
+    }
+    const capture = await mobileCaptureStore.getCapture({
+      actorId: debugActorId,
+      captureId: request.params.captureId,
+    });
+    if (capture === null) return reply.code(404).send({ code: "NOT_FOUND" });
+    return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(capture);
   });
 
   app.post(MOBILE_UPLOAD_INIT_PATH, async (request, reply) => {

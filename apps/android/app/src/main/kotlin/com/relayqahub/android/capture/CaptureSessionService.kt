@@ -32,6 +32,8 @@ import com.relayqahub.android.poco.PocoCollectionRequest
 import com.relayqahub.android.poco.PocoConnectionConfig
 import com.relayqahub.android.poco.PocoEnrichmentResult
 import com.relayqahub.android.poco.PocoEnrichmentStatus
+import com.relayqahub.android.poco.PocoArtifact
+import com.relayqahub.android.poco.PocoReadOnlyMethod
 import com.relayqahub.android.poco.PocoSimpleRpcClient
 import java.io.ByteArrayOutputStream
 import java.io.Closeable
@@ -56,6 +58,8 @@ class CaptureSessionService : Service() {
         val requestedAtEpochMs: Long,
         val mode: CapturedDraftMode,
         val openApp: Boolean,
+        val pocoAnchorEpochMs: Long,
+        val pocoAnchorElapsedNanos: Long,
         val pocoEnrichment: Deferred<PocoEnrichmentResult>,
     )
 
@@ -227,6 +231,8 @@ class CaptureSessionService : Service() {
             OverlayPermissionController.restoreAfterCapture(this)
             return
         }
+        val pocoAnchorEpochMs = System.currentTimeMillis()
+        val pocoAnchorElapsedNanos = System.nanoTime()
         val pocoEnrichment = serviceScope.async(start = CoroutineStart.LAZY) {
             PocoSimpleRpcClient(
                 PocoConnectionConfig(configuredPort = BuildConfig.QA_HUB_POCO_PORT),
@@ -239,7 +245,15 @@ class CaptureSessionService : Service() {
                 )
             }
         }
-        val pending = PendingCapture(id, requestedAtEpochMs, mode, openApp, pocoEnrichment)
+        val pending = PendingCapture(
+            captureId = id,
+            requestedAtEpochMs = requestedAtEpochMs,
+            mode = mode,
+            openApp = openApp,
+            pocoAnchorEpochMs = pocoAnchorEpochMs,
+            pocoAnchorElapsedNanos = pocoAnchorElapsedNanos,
+            pocoEnrichment = pocoEnrichment,
+        )
         if (!pendingCapture.compareAndSet(null, pending)) {
             pocoEnrichment.cancel()
             CaptureResultBridge.send(this, CaptureResult.Unavailable("capture_already_pending"))
@@ -284,6 +298,29 @@ class CaptureSessionService : Service() {
                             "POCO_COLLECTION_FAILED",
                         )
                     }
+                    val pocoArtifacts = runCatching {
+                        CaptureArtifactStore(this@CaptureSessionService).persistPocoArtifacts(
+                            captureId = pending.captureId,
+                            capturedAtEpochMs = pending.requestedAtEpochMs,
+                            anchorEpochMs = pending.pocoAnchorEpochMs,
+                            anchorElapsedNanos = pending.pocoAnchorElapsedNanos,
+                            result = poco,
+                        )
+                    }.getOrDefault(emptyList())
+                    val durableMethods = poco.succeededMethods.filter { method ->
+                        method.expectedArtifactKind() == null ||
+                            pocoArtifacts.any { it.kind == method.expectedArtifactKind() }
+                    }
+                    val artifactPersistenceFailed = durableMethods.size != poco.succeededMethods.size
+                    val durableStatus = when {
+                        poco.status == PocoEnrichmentStatus.UNAVAILABLE ->
+                            PocoEnrichmentStatus.UNAVAILABLE
+                        poco.status == PocoEnrichmentStatus.COMPLETE && !artifactPersistenceFailed ->
+                            PocoEnrichmentStatus.COMPLETE
+                        else -> PocoEnrichmentStatus.PARTIAL
+                    }
+                    val screenSize = poco.artifacts[PocoReadOnlyMethod.GET_SCREEN_SIZE]
+                        as? PocoArtifact.ScreenSize
                     CaptureResultBridge.send(
                         this@CaptureSessionService,
                         CaptureResult.Ready(
@@ -294,23 +331,20 @@ class CaptureSessionService : Service() {
                             mode = pending.mode,
                             requestedAtEpochMs = pending.requestedAtEpochMs,
                             poco = CapturePocoSummary(
-                                // The client may have collected every local artifact, but this
-                                // slice only transports a bounded summary. Do not report COMPLETE
-                                // until the artifacts are durably attached to the same captureId.
-                                status = if (poco.status == PocoEnrichmentStatus.COMPLETE) {
-                                    PocoEnrichmentStatus.PARTIAL
-                                } else {
-                                    poco.status
-                                },
+                                status = durableStatus,
                                 port = poco.port,
                                 sdkVersion = poco.sdkVersion,
-                                succeededMethods = poco.succeededMethods.map { it.wireName },
-                                failureCode = if (poco.status == PocoEnrichmentStatus.COMPLETE) {
-                                    "POCO_ARTIFACT_UPLOAD_PENDING"
+                                attemptedMethods = poco.outcomes.map { it.method.wireName },
+                                succeededMethods = durableMethods.map { it.wireName },
+                                screenWidth = screenSize?.width,
+                                screenHeight = screenSize?.height,
+                                failureCode = if (artifactPersistenceFailed) {
+                                    "POCO_ARTIFACT_LOCAL_WRITE_FAILED"
                                 } else {
                                     poco.failureCode
                                 },
                             ),
+                            pocoArtifacts = pocoArtifacts,
                         ),
                     )
                     if (pending.openApp) openAppFromUserCapture()
@@ -395,6 +429,15 @@ class CaptureSessionService : Service() {
         if (notifyUnavailable) {
             CaptureResultBridge.send(this, CaptureResult.Unavailable(reason))
         }
+    }
+
+    private fun PocoReadOnlyMethod.expectedArtifactKind(): CapturePocoArtifactKind? = when (this) {
+        PocoReadOnlyMethod.SCREENSHOT -> CapturePocoArtifactKind.SCREENSHOT
+        PocoReadOnlyMethod.DUMP_VISIBLE -> CapturePocoArtifactKind.HIERARCHY
+        PocoReadOnlyMethod.GET_DEBUG_PROFILING_DATA -> CapturePocoArtifactKind.PROFILING
+        PocoReadOnlyMethod.GET_SDK_VERSION,
+        PocoReadOnlyMethod.GET_SCREEN_SIZE,
+        -> null
     }
 
     private fun openAppFromUserCapture() {

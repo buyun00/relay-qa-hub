@@ -255,3 +255,23 @@ export type {
   MobileUploadSession,
   PutMobileUploadChunkInput,
 } from "./mobile-attachment-store.js";
+export {
+  MOBILE_CAPTURE_ALLOWED_METHODS,
+  createMobileCapture,
+  getMobileCapture,
+} from "./mobile-capture-store.js";
+export type {
+  CreateMobileCaptureInput,
+  MobileCaptureArtifactInput,
+  MobileCaptureArtifactKind,
+  MobileCaptureArtifactRecord,
+  MobileCaptureArtifactStatus,
+  MobileCaptureBundleRecord,
+  MobileCaptureCreation,
+  MobileCaptureDeviceMetadata,
+  MobileCaptureEnrichmentStatus,
+  MobileCapturePocoInput,
+  MobileCapturePocoMethod,
+  MobileCapturePocoRecord,
+  MobileCaptureScreenSize,
+} from "./mobile-capture-store.js";

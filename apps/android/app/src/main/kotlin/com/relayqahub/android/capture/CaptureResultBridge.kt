@@ -17,7 +17,10 @@ data class CapturePocoSummary(
     val status: PocoEnrichmentStatus,
     val port: Int?,
     val sdkVersion: Int?,
+    val attemptedMethods: List<String>,
     val succeededMethods: List<String>,
+    val screenWidth: Int?,
+    val screenHeight: Int?,
     val failureCode: String?,
 )
 
@@ -30,6 +33,7 @@ sealed interface CaptureResult {
         val mode: CapturedDraftMode,
         val requestedAtEpochMs: Long,
         val poco: CapturePocoSummary,
+        val pocoArtifacts: List<CapturePocoArtifactRef>,
     ) : CaptureResult
 
     data class Unavailable(
@@ -55,8 +59,17 @@ object CaptureResultBridge {
     private const val EXTRA_POCO_STATUS = "pocoStatus"
     private const val EXTRA_POCO_PORT = "pocoPort"
     private const val EXTRA_POCO_SDK_VERSION = "pocoSdkVersion"
+    private const val EXTRA_POCO_ATTEMPTED_METHODS = "pocoAttemptedMethods"
     private const val EXTRA_POCO_SUCCEEDED_METHODS = "pocoSucceededMethods"
+    private const val EXTRA_POCO_SCREEN_WIDTH = "pocoScreenWidth"
+    private const val EXTRA_POCO_SCREEN_HEIGHT = "pocoScreenHeight"
     private const val EXTRA_POCO_FAILURE_CODE = "pocoFailureCode"
+    private const val EXTRA_POCO_ARTIFACT_KINDS = "pocoArtifactKinds"
+    private const val EXTRA_POCO_ARTIFACT_PATHS = "pocoArtifactPaths"
+    private const val EXTRA_POCO_ARTIFACT_MEDIA_TYPES = "pocoArtifactMediaTypes"
+    private const val EXTRA_POCO_ARTIFACT_STARTED_AT = "pocoArtifactStartedAt"
+    private const val EXTRA_POCO_ARTIFACT_ENDED_AT = "pocoArtifactEndedAt"
+    private const val EXTRA_POCO_ARTIFACT_TRUNCATED = "pocoArtifactTruncated"
     private const val EXTRA_REASON = "reason"
     private const val EXTRA_ACTIVE = "active"
 
@@ -100,10 +113,40 @@ object CaptureResultBridge {
                 .putExtra(EXTRA_POCO_PORT, result.poco.port ?: -1)
                 .putExtra(EXTRA_POCO_SDK_VERSION, result.poco.sdkVersion ?: -1)
                 .putStringArrayListExtra(
+                    EXTRA_POCO_ATTEMPTED_METHODS,
+                    ArrayList(result.poco.attemptedMethods),
+                )
+                .putStringArrayListExtra(
                     EXTRA_POCO_SUCCEEDED_METHODS,
                     ArrayList(result.poco.succeededMethods),
                 )
+                .putExtra(EXTRA_POCO_SCREEN_WIDTH, result.poco.screenWidth ?: -1)
+                .putExtra(EXTRA_POCO_SCREEN_HEIGHT, result.poco.screenHeight ?: -1)
                 .putExtra(EXTRA_POCO_FAILURE_CODE, result.poco.failureCode)
+                .putStringArrayListExtra(
+                    EXTRA_POCO_ARTIFACT_KINDS,
+                    ArrayList(result.pocoArtifacts.map { it.kind.name }),
+                )
+                .putStringArrayListExtra(
+                    EXTRA_POCO_ARTIFACT_PATHS,
+                    ArrayList(result.pocoArtifacts.map(CapturePocoArtifactRef::privatePath)),
+                )
+                .putStringArrayListExtra(
+                    EXTRA_POCO_ARTIFACT_MEDIA_TYPES,
+                    ArrayList(result.pocoArtifacts.map(CapturePocoArtifactRef::mediaType)),
+                )
+                .putExtra(
+                    EXTRA_POCO_ARTIFACT_STARTED_AT,
+                    result.pocoArtifacts.map(CapturePocoArtifactRef::startedAtEpochMs).toLongArray(),
+                )
+                .putExtra(
+                    EXTRA_POCO_ARTIFACT_ENDED_AT,
+                    result.pocoArtifacts.map(CapturePocoArtifactRef::endedAtEpochMs).toLongArray(),
+                )
+                .putExtra(
+                    EXTRA_POCO_ARTIFACT_TRUNCATED,
+                    result.pocoArtifacts.map(CapturePocoArtifactRef::truncated).toBooleanArray(),
+                )
 
             is CaptureResult.Unavailable -> intent
                 .putExtra(EXTRA_KIND, KIND_UNAVAILABLE)
@@ -135,6 +178,7 @@ object CaptureResultBridge {
                 val pocoStatus = getStringExtra(EXTRA_POCO_STATUS)
                     ?.let { runCatching { PocoEnrichmentStatus.valueOf(it) }.getOrNull() }
                     ?: return null
+                val pocoArtifacts = readPocoArtifactRefs() ?: return null
                 CaptureResult.Ready(
                     captureId = captureId,
                     privatePath = privatePath,
@@ -146,12 +190,20 @@ object CaptureResultBridge {
                         status = pocoStatus,
                         port = getIntExtra(EXTRA_POCO_PORT, -1).takeIf { it in 1..65_535 },
                         sdkVersion = getIntExtra(EXTRA_POCO_SDK_VERSION, -1).takeIf { it > 0 },
+                        attemptedMethods = getStringArrayListExtra(EXTRA_POCO_ATTEMPTED_METHODS)
+                            ?.filter(String::isNotBlank)
+                            .orEmpty(),
                         succeededMethods = getStringArrayListExtra(EXTRA_POCO_SUCCEEDED_METHODS)
                             ?.filter(String::isNotBlank)
                             .orEmpty(),
+                        screenWidth = getIntExtra(EXTRA_POCO_SCREEN_WIDTH, -1)
+                            .takeIf { it in 1..32_768 },
+                        screenHeight = getIntExtra(EXTRA_POCO_SCREEN_HEIGHT, -1)
+                            .takeIf { it in 1..32_768 },
                         failureCode = getStringExtra(EXTRA_POCO_FAILURE_CODE)
                             ?.takeIf(String::isNotBlank),
                     ),
+                    pocoArtifacts = pocoArtifacts,
                 )
             }
 
@@ -164,6 +216,39 @@ object CaptureResultBridge {
             )
 
             else -> null
+        }
+    }
+
+    private fun Intent.readPocoArtifactRefs(): List<CapturePocoArtifactRef>? {
+        val kinds = getStringArrayListExtra(EXTRA_POCO_ARTIFACT_KINDS).orEmpty()
+        val paths = getStringArrayListExtra(EXTRA_POCO_ARTIFACT_PATHS).orEmpty()
+        val mediaTypes = getStringArrayListExtra(EXTRA_POCO_ARTIFACT_MEDIA_TYPES).orEmpty()
+        val started = getLongArrayExtra(EXTRA_POCO_ARTIFACT_STARTED_AT) ?: LongArray(0)
+        val ended = getLongArrayExtra(EXTRA_POCO_ARTIFACT_ENDED_AT) ?: LongArray(0)
+        val truncated = getBooleanArrayExtra(EXTRA_POCO_ARTIFACT_TRUNCATED) ?: BooleanArray(0)
+        val size = kinds.size
+        if (
+            size > CapturePocoArtifactKind.entries.size ||
+            listOf(paths.size, mediaTypes.size, started.size, ended.size, truncated.size)
+                .any { it != size }
+        ) {
+            return null
+        }
+        return kinds.indices.map { index ->
+            val kind = runCatching { CapturePocoArtifactKind.valueOf(kinds[index]) }.getOrNull()
+                ?: return null
+            val path = paths[index].takeIf(String::isNotBlank) ?: return null
+            val mediaType = mediaTypes[index].takeIf(String::isNotBlank) ?: return null
+            val startedAt = started[index].takeIf { it > 0L } ?: return null
+            val endedAt = ended[index].takeIf { it >= startedAt } ?: return null
+            CapturePocoArtifactRef(
+                kind = kind,
+                privatePath = path,
+                mediaType = mediaType,
+                startedAtEpochMs = startedAt,
+                endedAtEpochMs = endedAt,
+                truncated = truncated[index],
+            )
         }
     }
 

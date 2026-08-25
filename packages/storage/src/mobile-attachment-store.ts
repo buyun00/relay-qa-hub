@@ -17,6 +17,7 @@ const MOBILE_MAX_CHUNK_SIZE_BYTES = 8 * 1024 * 1024;
 const MOBILE_UPLOAD_TTL_MS = 60 * 60 * 1000;
 const MOBILE_BINDING_TTL_MS = 15 * 60 * 1000;
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const JPEG_SIGNATURE = Buffer.from([0xff, 0xd8, 0xff]);
 
 export interface MobileAttachmentRoots {
   readonly evidenceRoot: string;
@@ -544,17 +545,48 @@ function finalizedRecord(
   });
 }
 
-function requireSupportedPng(upload: UploadRow, bytes: Buffer): void {
-  if (
-    upload.media_type !== "image/png" ||
-    bytes.length < PNG_SIGNATURE.length ||
-    !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)
-  ) {
-    throw new SqliteStorageError(
-      "SQLITE_UPLOAD_INVALID",
-      "first mobile attachment slice accepts a valid PNG only",
-    );
+function isPng(bytes: Buffer): boolean {
+  if (bytes.length < PNG_SIGNATURE.length || !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) {
+    return false;
   }
+  // A bounded structural check catches arbitrary signature-only payloads while
+  // avoiding a general-purpose media scanner in the mobile upload path.
+  if (bytes.length < 33) return false;
+  const chunkLength = bytes.readUInt32BE(8);
+  return chunkLength >= 13 && bytes.subarray(12, 16).toString("ascii") === "IHDR";
+}
+
+function isJpeg(bytes: Buffer): boolean {
+  return bytes.length >= 4 && bytes.subarray(0, JPEG_SIGNATURE.length).equals(JPEG_SIGNATURE) && bytes.at(-2) === 0xff && bytes.at(-1) === 0xd9;
+}
+
+function isWebp(bytes: Buffer): boolean {
+  return bytes.length >= 12 && bytes.subarray(0, 4).toString("ascii") === "RIFF" && bytes.subarray(8, 12).toString("ascii") === "WEBP";
+}
+
+function requireSupportedContent(upload: UploadRow, bytes: Buffer): void {
+  const valid =
+    (upload.media_type === "image/png" && isPng(bytes)) ||
+    (upload.media_type === "image/jpeg" && isJpeg(bytes)) ||
+    (upload.media_type === "image/webp" && isWebp(bytes));
+  if (valid) return;
+  if (upload.media_type === "application/json") {
+    if (bytes.length > 20_971_520) {
+      throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "JSON attachment exceeds its bounded size");
+    }
+    try {
+      const text = bytes.toString("utf8");
+      if (Buffer.from(text, "utf8").length !== bytes.length) throw new Error("invalid UTF-8");
+      JSON.parse(text);
+      return;
+    } catch {
+      throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "application/json attachment is invalid JSON");
+    }
+  }
+  throw new SqliteStorageError(
+    "SQLITE_UPLOAD_INVALID",
+    "mobile attachment content does not match its declared media type",
+  );
 }
 
 export function finalizeMobileUpload(
@@ -628,7 +660,7 @@ export function finalizeMobileUpload(
   if (bytes.length !== input.expectedSize || sha256(bytes) !== input.sha256) {
     throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "final upload content is invalid");
   }
-  requireSupportedPng(upload, bytes);
+  requireSupportedContent(upload, bytes);
 
   const storageKey = join("sha256", input.sha256.slice(0, 2), input.sha256);
   const storagePath = join(roots.evidenceRoot, storageKey);

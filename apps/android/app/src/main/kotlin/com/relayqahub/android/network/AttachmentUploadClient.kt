@@ -14,6 +14,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 
 data class AttachmentUploadReceipt(
@@ -24,6 +25,49 @@ data class AttachmentUploadReceipt(
     val bindingStatus: String,
     val uploadVersion: Int,
     val bindingVersion: Int,
+    val responseJson: String,
+)
+
+data class CaptureAttachmentReceipt(
+    val clientAttachmentId: String,
+    val attachmentId: String,
+    val filename: String,
+    val mediaType: String,
+    val size: Int,
+    val sha256: String,
+)
+
+data class CaptureBundleArtifactUpload(
+    val kind: String,
+    val attachment: CaptureAttachmentReceipt,
+    val startedAtEpochMs: Long,
+    val endedAtEpochMs: Long,
+    val truncated: Boolean,
+)
+
+data class CaptureBundlePocoInput(
+    val attempted: Boolean,
+    val connectedPort: Int?,
+    val sdkVersion: String?,
+    val screenWidth: Int?,
+    val screenHeight: Int?,
+    val negotiatedMethods: List<String>,
+    val succeededMethods: List<String>,
+    val failureReason: String?,
+)
+
+data class CaptureBundleDeviceInput(
+    val manufacturer: String,
+    val model: String,
+    val androidApi: Int,
+    val androidRelease: String,
+    val qaAppVersion: String,
+)
+
+data class CaptureBundleReceipt(
+    val captureId: String,
+    val enrichmentStatus: String,
+    val artifactAttachmentIds: List<String>,
     val responseJson: String,
 )
 
@@ -244,6 +288,312 @@ class AttachmentUploadClient(
         )
     }
 
+    suspend fun uploadCaptureArtifact(
+        scope: AccountProjectScope,
+        clientSubmissionId: String,
+        clientAttachmentId: String,
+        filename: String,
+        mediaType: String,
+        contentBytes: ByteArray,
+        accessToken: String,
+        captureId: String,
+    ): CaptureAttachmentReceipt = withContext(Dispatchers.IO) {
+        requireUuid(scope.projectId, "projectId")
+        requireUuid(clientSubmissionId, "clientSubmissionId")
+        requireUuid(clientAttachmentId, "clientAttachmentId")
+        requireUuid(captureId, "captureId")
+        require(filename.isNotBlank() && filename.length <= 255)
+        require(mediaType in CAPTURE_ARTIFACT_MEDIA_TYPES)
+        require(contentBytes.isNotEmpty() && contentBytes.size <= MAX_SINGLE_CHUNK_ARTIFACT_BYTES)
+        require(accessToken.isNotBlank())
+
+        val sha256 = contentBytes.sha256Hex()
+        val initKey =
+            "submission:$clientSubmissionId:attachment:$clientAttachmentId:" +
+                "upload:$UPLOAD_ATTEMPT:init"
+        val init = executeJson(
+            request = jsonRequest(
+                relativePath = "/uploads/init",
+                method = "POST",
+                body = JSONObject()
+                    .put("submissionContractVersion", QaHubApiContract.VERSION)
+                    .put("projectId", scope.projectId)
+                    .put("clientSubmissionId", clientSubmissionId)
+                    .put("clientAttachmentId", clientAttachmentId)
+                    .put("uploadAttempt", UPLOAD_ATTEMPT)
+                    .put("filename", filename)
+                    .put("mediaType", mediaType)
+                    .put("expectedSize", contentBytes.size)
+                    .put("sha256", sha256)
+                    .put("captureId", captureId)
+                    .toString(),
+                accessToken = accessToken,
+                idempotencyKey = initKey,
+            ),
+            expectedStatus = 201,
+            stage = "ARTIFACT_INIT",
+        )
+        val sessionId = init.requiredUuid("sessionId")
+        init.requireString("projectId", scope.projectId)
+        init.requireString("clientSubmissionId", clientSubmissionId)
+        init.requireString("clientAttachmentId", clientAttachmentId)
+        init.requireString("filename", filename)
+        init.requireString("mediaType", mediaType)
+        init.requireString("captureId", captureId)
+        init.requireString("sha256", sha256)
+        init.requireInt("expectedSize", contentBytes.size)
+        init.requireInt("expectedChunkCount", 1)
+        init.requireInt("version", INIT_VERSION)
+
+        val chunkKey =
+            "submission:$clientSubmissionId:attachment:$clientAttachmentId:" +
+                "upload:$UPLOAD_ATTEMPT:chunk:0"
+        val chunkRequest = Request.Builder()
+            .url(resolve("/uploads/$sessionId/chunks/0"))
+            .header("Accept", QaHubApiContract.JSON_ACCEPT)
+            .header("Authorization", "Bearer $accessToken")
+            .header("Idempotency-Key", chunkKey)
+            .header("If-Match", quotedVersion(INIT_VERSION))
+            .header("Content-Length", contentBytes.size.toString())
+            .header("X-Chunk-SHA256", sha256)
+            .header("X-Client-Submission-Id", clientSubmissionId)
+            .header("X-Client-Attachment-Id", clientAttachmentId)
+            .put(contentBytes.toRequestBody(OCTET_STREAM_MEDIA_TYPE))
+            .build()
+        httpClient.newCall(chunkRequest).execute().use { response ->
+            if (response.code != 204) throw response.asUploadFailure("ARTIFACT_CHUNK")
+            if (response.header("ETag") != quotedVersion(CHUNK_VERSION)) {
+                throw AttachmentUploadFailure("ARTIFACT_CHUNK_ETAG_MISMATCH")
+            }
+        }
+
+        val finalizeKey =
+            "submission:$clientSubmissionId:attachment:$clientAttachmentId:" +
+                "upload:$UPLOAD_ATTEMPT:finalize"
+        val finalized = executeJson(
+            request = jsonRequest(
+                relativePath = "/uploads/$sessionId/finalize",
+                method = "POST",
+                body = JSONObject()
+                    .put("submissionContractVersion", QaHubApiContract.VERSION)
+                    .put("expectedVersion", CHUNK_VERSION)
+                    .put("clientSubmissionId", clientSubmissionId)
+                    .put("clientAttachmentId", clientAttachmentId)
+                    .put("uploadAttempt", UPLOAD_ATTEMPT)
+                    .put("sha256", sha256)
+                    .put("expectedSize", contentBytes.size)
+                    .toString(),
+                accessToken = accessToken,
+                idempotencyKey = finalizeKey,
+            ),
+            expectedStatus = 200,
+            stage = "ARTIFACT_FINALIZE",
+        )
+        val attachmentId = finalized.requiredUuid("attachmentId")
+        finalized.requireString("sessionId", sessionId)
+        finalized.requireString("projectId", scope.projectId)
+        finalized.requireString("clientSubmissionId", clientSubmissionId)
+        finalized.requireString("clientAttachmentId", clientAttachmentId)
+        finalized.requireString("filename", filename)
+        finalized.requireString("mediaType", mediaType)
+        finalized.requireString("captureId", captureId)
+        finalized.requireString("sha256", sha256)
+        finalized.requireInt("size", contentBytes.size)
+        finalized.requireString("scanStatus", "clean")
+        finalized.requireInt("version", FINALIZE_VERSION)
+        CaptureAttachmentReceipt(
+            clientAttachmentId = clientAttachmentId,
+            attachmentId = attachmentId,
+            filename = filename,
+            mediaType = mediaType,
+            size = contentBytes.size,
+            sha256 = sha256,
+        )
+    }
+
+    suspend fun createCaptureBundleAndReadBack(
+        scope: AccountProjectScope,
+        clientSubmissionId: String,
+        captureId: String,
+        capturedAtEpochMs: Long,
+        primaryAttachment: AttachmentUploadReceipt,
+        artifacts: List<CaptureBundleArtifactUpload>,
+        poco: CaptureBundlePocoInput,
+        device: CaptureBundleDeviceInput,
+        accessToken: String,
+    ): CaptureBundleReceipt = withContext(Dispatchers.IO) {
+        requireUuid(scope.projectId, "projectId")
+        requireUuid(clientSubmissionId, "clientSubmissionId")
+        requireUuid(captureId, "captureId")
+        require(primaryAttachment.clientSubmissionId == clientSubmissionId)
+        require(capturedAtEpochMs > 0L)
+        require(artifacts.map { it.kind }.distinct().size == artifacts.size)
+        require(poco.succeededMethods.all(poco.negotiatedMethods::contains))
+        val capturedAt = java.time.Instant.ofEpochMilli(capturedAtEpochMs).toString()
+        val systemArtifact = JSONObject()
+            .put("captureId", captureId)
+            .put("clientAttachmentId", primaryAttachment.clientAttachmentId)
+            .put("attachmentId", primaryAttachment.attachmentId)
+            .put("kind", "system_screenshot")
+            .put("status", "succeeded")
+            .put("startedAt", capturedAt)
+            .put("endedAt", capturedAt)
+            .put("skewMs", 0)
+            .put("truncated", false)
+            .put("failureReason", JSONObject.NULL)
+        val artifactArray = JSONArray().put(systemArtifact)
+        artifacts.forEach { artifact ->
+            require(artifact.kind in POCO_ARTIFACT_KINDS)
+            require(artifact.endedAtEpochMs >= artifact.startedAtEpochMs)
+            val skewMs = kotlin.math.abs(artifact.startedAtEpochMs - capturedAtEpochMs)
+            require(skewMs <= MAX_CAPTURE_SKEW_MS)
+            artifactArray.put(
+                JSONObject()
+                    .put("captureId", captureId)
+                    .put("clientAttachmentId", artifact.attachment.clientAttachmentId)
+                    .put("attachmentId", artifact.attachment.attachmentId)
+                    .put("kind", artifact.kind)
+                    .put("status", "succeeded")
+                    .put(
+                        "startedAt",
+                        java.time.Instant.ofEpochMilli(artifact.startedAtEpochMs).toString(),
+                    )
+                    .put(
+                        "endedAt",
+                        java.time.Instant.ofEpochMilli(artifact.endedAtEpochMs).toString(),
+                    )
+                    .put("skewMs", skewMs)
+                    .put("truncated", artifact.truncated)
+                    .put("failureReason", JSONObject.NULL),
+            )
+        }
+        val screenSize = if (poco.screenWidth != null && poco.screenHeight != null) {
+            JSONObject().put("width", poco.screenWidth).put("height", poco.screenHeight)
+        } else {
+            JSONObject.NULL
+        }
+        val pocoJson = JSONObject()
+            .put("attempted", poco.attempted)
+            .put("connectedPort", poco.connectedPort ?: JSONObject.NULL)
+            .put("sdkVersion", poco.sdkVersion ?: JSONObject.NULL)
+            .put(
+                "snapshotCapability",
+                if (poco.connectedPort == null) "not_probed" else "standard_only",
+            )
+            .put("screenSize", screenSize)
+            .put("allowedReadOnlyMethods", JSONArray(ALLOWED_POCO_METHODS))
+            .put("negotiatedMethods", JSONArray(poco.negotiatedMethods))
+            .put("succeededMethods", JSONArray(poco.succeededMethods))
+            .put("failureReason", poco.failureReason ?: JSONObject.NULL)
+        val capture = JSONObject()
+            .put("captureId", captureId)
+            .put("clientSubmissionId", clientSubmissionId)
+            .put("projectId", scope.projectId)
+            .put("capturedAt", capturedAt)
+            .put("source", "overlay_single_tap")
+            .put("primaryEvidenceClientAttachmentId", primaryAttachment.clientAttachmentId)
+            .put("primaryEvidenceAttachmentId", primaryAttachment.attachmentId)
+            .put("artifacts", artifactArray)
+            .put("poco", pocoJson)
+            .put(
+                "deviceMetadata",
+                JSONObject()
+                    .put("manufacturer", device.manufacturer)
+                    .put("model", device.model)
+                    .put("androidApi", device.androidApi)
+                    .put("androidRelease", device.androidRelease)
+                    .put("qaAppVersion", device.qaAppVersion)
+                    .put("buildId", JSONObject.NULL)
+                    .put("testSessionId", JSONObject.NULL)
+                    .put("networkType", "other"),
+            )
+        val requestBody = JSONObject()
+            .put("submissionContractVersion", QaHubApiContract.VERSION)
+            .put("projectId", scope.projectId)
+            .put("clientSubmissionId", clientSubmissionId)
+            .put("capture", capture)
+            .toString()
+        val idempotencyKey = "submission:$clientSubmissionId:capture:$captureId"
+        val created = executeJson(
+            request = jsonRequest(
+                relativePath = "/capture-bundles",
+                method = "POST",
+                body = requestBody,
+                accessToken = accessToken,
+                idempotencyKey = idempotencyKey,
+            ),
+            expectedStatus = 201,
+            stage = "CAPTURE_CREATE",
+        )
+        val createdBundle = created.getJSONObject("captureBundle")
+        val expectedAttachmentIds = artifacts.map { it.attachment.attachmentId }
+        val createdReceipt = validateCaptureBundle(
+            bundle = createdBundle,
+            scope = scope,
+            clientSubmissionId = clientSubmissionId,
+            captureId = captureId,
+            primaryAttachment = primaryAttachment,
+            artifactAttachmentIds = expectedAttachmentIds,
+        )
+        val readRequest = Request.Builder()
+            .url(resolve("/capture-bundles/$captureId"))
+            .header("Accept", QaHubApiContract.JSON_ACCEPT)
+            .header("Authorization", "Bearer $accessToken")
+            .get()
+            .build()
+        val readBack = executeJson(readRequest, expectedStatus = 200, stage = "CAPTURE_READ")
+        val readReceipt = validateCaptureBundle(
+            bundle = readBack,
+            scope = scope,
+            clientSubmissionId = clientSubmissionId,
+            captureId = captureId,
+            primaryAttachment = primaryAttachment,
+            artifactAttachmentIds = expectedAttachmentIds,
+        )
+        require(createdReceipt.enrichmentStatus == readReceipt.enrichmentStatus)
+        readReceipt.copy(responseJson = readBack.toString())
+    }
+
+    private fun validateCaptureBundle(
+        bundle: JSONObject,
+        scope: AccountProjectScope,
+        clientSubmissionId: String,
+        captureId: String,
+        primaryAttachment: AttachmentUploadReceipt,
+        artifactAttachmentIds: List<String>,
+    ): CaptureBundleReceipt {
+        bundle.requireString("captureId", captureId)
+        bundle.requireString("clientSubmissionId", clientSubmissionId)
+        bundle.requireString("projectId", scope.projectId)
+        bundle.requireString(
+            "primaryEvidenceClientAttachmentId",
+            primaryAttachment.clientAttachmentId,
+        )
+        bundle.requireString("primaryEvidenceAttachmentId", primaryAttachment.attachmentId)
+        val enrichmentStatus = bundle.getString("enrichmentStatus")
+        if (enrichmentStatus !in setOf("unavailable", "partial", "complete")) {
+            throw AttachmentUploadFailure("CAPTURE_STATUS_INVALID")
+        }
+        val returnedIds = buildList {
+            val returned = bundle.getJSONArray("artifacts")
+            for (index in 0 until returned.length()) {
+                val artifact = returned.getJSONObject(index)
+                if (artifact.getString("kind") != "system_screenshot") {
+                    add(artifact.requiredUuid("attachmentId"))
+                }
+            }
+        }
+        if (returnedIds.toSet() != artifactAttachmentIds.toSet()) {
+            throw AttachmentUploadFailure("CAPTURE_ARTIFACTS_MISMATCH")
+        }
+        return CaptureBundleReceipt(
+            captureId = captureId,
+            enrichmentStatus = enrichmentStatus,
+            artifactAttachmentIds = returnedIds,
+            responseJson = bundle.toString(),
+        )
+    }
+
     private fun jsonRequest(
         relativePath: String,
         method: String,
@@ -299,6 +649,20 @@ class AttachmentUploadClient(
         const val BIND_VERSION = 4
         const val MAX_SUCCESS_BODY_BYTES = 256 * 1024
         const val MAX_SMOKE_PNG_BYTES = 20 * 1024 * 1024
+        const val MAX_SINGLE_CHUNK_ARTIFACT_BYTES = 8 * 1024 * 1024
+        const val MAX_CAPTURE_SKEW_MS = 5_000L
+        val CAPTURE_ARTIFACT_MEDIA_TYPES =
+            setOf("image/png", "image/jpeg", "image/webp", "application/json")
+        val POCO_ARTIFACT_KINDS =
+            setOf("poco_screenshot", "poco_hierarchy", "poco_profiling")
+        val ALLOWED_POCO_METHODS = listOf(
+            "GetSDKVersion",
+            "Screenshot",
+            "Dump",
+            "GetScreenSize",
+            "GetDebugProfilingData",
+            "qa.snapshot",
+        )
         val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
         val VERSIONED_JSON_MEDIA_TYPE = QaHubApiContract.VERSIONED_JSON.toMediaType()
         val OCTET_STREAM_MEDIA_TYPE = "application/octet-stream".toMediaType()

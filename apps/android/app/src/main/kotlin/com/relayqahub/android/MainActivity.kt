@@ -17,6 +17,7 @@ import com.relayqahub.android.capture.CaptureResult
 import com.relayqahub.android.capture.CaptureResultBridge
 import com.relayqahub.android.capture.CaptureSessionController
 import com.relayqahub.android.capture.CapturedDraftMode
+import com.relayqahub.android.capture.CaptureArtifactStore
 import com.relayqahub.android.overlay.OverlayPermissionController
 import com.relayqahub.android.ui.FoundationScreen
 import com.relayqahub.android.ui.QaHubTheme
@@ -136,15 +137,24 @@ class MainActivity : ComponentActivity() {
 
     private fun submitPrivateCapture(result: CaptureResult.Ready) {
         lifecycleScope.launch {
-            val bytes = withContext(Dispatchers.IO) {
+            val (bytes, pocoArtifacts) = withContext(Dispatchers.IO) {
                 val draftRoot = File(filesDir, "capture-drafts").canonicalFile
                 val captureFile = File(result.privatePath).canonicalFile
                 val relative = captureFile.relativeToOrNull(draftRoot)
                     ?: error("capture path left the app-private draft root")
                 require(!relative.path.startsWith("..")) { "capture path left the private root" }
-                captureFile.readBytes()
+                Pair(
+                    captureFile.readBytes(),
+                    result.pocoArtifacts.map(CaptureArtifactStore(this@MainActivity)::read),
+                )
             }
-            foundationViewModel.submitCapturedPng(result.captureId, bytes, result.poco)
+            foundationViewModel.submitCapturedPng(
+                captureId = result.captureId,
+                capturedAtEpochMs = result.requestedAtEpochMs,
+                pngBytes = bytes,
+                pocoSummary = result.poco,
+                pocoArtifacts = pocoArtifacts,
+            )
         }
     }
 }

@@ -51,9 +51,6 @@ function requireFirstSliceRequest(
   if (request.moduleId != null) {
     throw new TypeError("moduleId is not available in the first mobile slice");
   }
-  if (request.captureBundleId != null) {
-    throw new TypeError("capture bundles require the next mobile slice");
-  }
 }
 
 export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions): MobileBugStore {

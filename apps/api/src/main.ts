@@ -8,6 +8,7 @@ import { DEFAULT_API_HOST, resolvePort } from "./config.js";
 import { createApiServer, type ApiServer } from "./server.js";
 import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-store.js";
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
+import { createSqliteMobileCaptureStore } from "./sqlite-mobile-capture-store.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   accountId: "10000000-0000-4000-8000-000000000020",
@@ -51,6 +52,7 @@ async function run(): Promise<void> {
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
       mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
+      mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
       debugBearerToken,
       debugActorId: MOBILE_SCOPE.actorId,
     });

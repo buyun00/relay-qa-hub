@@ -3,12 +3,18 @@ package com.relayqahub.android
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.relayqahub.android.capture.CapturedPocoArtifact
 import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
 import com.relayqahub.android.capture.CapturePocoSummary
 import com.relayqahub.android.network.AttachmentUploadFailure
+import com.relayqahub.android.network.CaptureAttachmentReceipt
+import com.relayqahub.android.network.CaptureBundleArtifactUpload
+import com.relayqahub.android.network.CaptureBundleDeviceInput
+import com.relayqahub.android.network.CaptureBundlePocoInput
 import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.security.NativeCredentials
 import com.relayqahub.android.security.VaultResult
@@ -103,23 +109,29 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             pngBytes = createLiveSmokePng(),
             filename = LIVE_SMOKE_FILENAME,
             captureId = null,
+            capturedAtEpochMs = null,
             actionLabel = "Live smoke",
             pocoSummary = null,
+            pocoArtifacts = emptyList(),
         )
     }
 
     fun submitCapturedPng(
         captureId: String,
+        capturedAtEpochMs: Long,
         pngBytes: ByteArray,
         pocoSummary: CapturePocoSummary,
+        pocoArtifacts: List<CapturedPocoArtifact>,
     ) {
         val immutableBytes = pngBytes.copyOf()
         submitPngAttachment(
             pngBytes = immutableBytes,
             filename = "capture-$captureId.png",
             captureId = captureId,
+            capturedAtEpochMs = capturedAtEpochMs,
             actionLabel = "Capture",
             pocoSummary = pocoSummary,
+            pocoArtifacts = pocoArtifacts.map(CapturedPocoArtifact::immutableCopy),
         )
     }
 
@@ -148,8 +160,10 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         pngBytes: ByteArray,
         filename: String,
         captureId: String?,
+        capturedAtEpochMs: Long?,
         actionLabel: String,
         pocoSummary: CapturePocoSummary?,
+        pocoArtifacts: List<CapturedPocoArtifact>,
     ) {
         viewModelScope.launch {
             val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
@@ -160,6 +174,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             lastAction.value = "Uploading $actionLabel PNG, then committing it through the Room queue…"
+            var effectivePocoSummary = pocoSummary
             val result = runCatching {
                 appContainer.scopedRepository.seedFoundationScope(scope)
                 when (
@@ -193,6 +208,79 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 )
                 appContainer.scopedRepository.recordAttachmentReservation(scope, uploadReceipt)
 
+                var captureBundleId: String? = null
+                var captureEvidenceSummary = ""
+                if (
+                    captureId != null &&
+                    capturedAtEpochMs != null &&
+                    pocoSummary != null
+                ) {
+                    val uploadedArtifacts = pocoArtifacts.mapNotNull { artifact ->
+                        runCatching {
+                            val receipt =
+                                appContainer.attachmentUploadClient.uploadCaptureArtifact(
+                                    scope = scope,
+                                    clientSubmissionId = submissionId,
+                                    clientAttachmentId = UUID.randomUUID().toString(),
+                                    filename = artifact.captureFilename(captureId),
+                                    mediaType = artifact.mediaType,
+                                    contentBytes = artifact.bytes,
+                                    accessToken = accessToken,
+                                    captureId = captureId,
+                                )
+                            UploadedCaptureArtifact(artifact, receipt)
+                        }.getOrNull()
+                    }
+                    val durableSummary = pocoSummary.withPersistedArtifacts(
+                        persistedKinds = uploadedArtifacts.map { it.source.kind.wireName }.toSet(),
+                    )
+                    effectivePocoSummary = durableSummary
+                    val captureReceipt = runCatching {
+                        appContainer.attachmentUploadClient.createCaptureBundleAndReadBack(
+                            scope = scope,
+                            clientSubmissionId = submissionId,
+                            captureId = captureId,
+                            capturedAtEpochMs = capturedAtEpochMs,
+                            primaryAttachment = uploadReceipt,
+                            artifacts = uploadedArtifacts.map { uploaded ->
+                                CaptureBundleArtifactUpload(
+                                    kind = uploaded.source.kind.wireName,
+                                    attachment = uploaded.receipt,
+                                    startedAtEpochMs = uploaded.source.startedAtEpochMs,
+                                    endedAtEpochMs = uploaded.source.endedAtEpochMs,
+                                    truncated = uploaded.source.truncated,
+                                )
+                            },
+                            poco = durableSummary.toCaptureBundlePocoInput(),
+                            device = CaptureBundleDeviceInput(
+                                manufacturer = Build.MANUFACTURER,
+                                model = Build.MODEL,
+                                androidApi = Build.VERSION.SDK_INT,
+                                androidRelease = Build.VERSION.RELEASE,
+                                qaAppVersion = BuildConfig.VERSION_NAME,
+                            ),
+                            accessToken = accessToken,
+                        )
+                    }.getOrNull()
+                    if (captureReceipt != null) {
+                        captureBundleId = captureReceipt.captureId
+                        effectivePocoSummary = durableSummary.copy(
+                            status = captureReceipt.enrichmentStatus.toPocoEnrichmentStatus(),
+                        )
+                        captureEvidenceSummary =
+                            "; capture bundle ${captureReceipt.captureId} read back with " +
+                                "${captureReceipt.artifactAttachmentIds.size} Poco artifact(s)"
+                    } else {
+                        effectivePocoSummary = durableSummary.copy(
+                            status = durableSummary.status.downgradedAfterBundleFailure(),
+                            failureCode = durableSummary.failureCode
+                                ?: "CAPTURE_BUNDLE_PERSIST_FAILED",
+                        )
+                        captureEvidenceSummary =
+                            "; capture bundle persistence failed, ordinary Bug continued"
+                    }
+                }
+
                 val operationId = appContainer.scopedRepository.enqueue(
                     scope = scope,
                     request = FoundationCreateBugContract.buildOperation(
@@ -201,6 +289,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         observedAt = Instant.now().toString(),
                         qaAppVersion = BuildConfig.VERSION_NAME,
                         attachmentIds = listOf(uploadReceipt.attachmentId),
+                        captureBundleId = captureBundleId,
                     ),
                 )
                 val syncResult = appContainer.syncEngine.run(scope)
@@ -215,7 +304,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         responseJson = receipt.responseJson,
                     )
                     "$actionLabel created ${receipt.qaItemKey}; attachment " +
-                        "${claimed.attachmentId} is ${claimed.bindingStatus}."
+                        "${claimed.attachmentId} is ${claimed.bindingStatus}" +
+                        captureEvidenceSummary + "."
                 } else {
                     "Attachment ${uploadReceipt.attachmentId} is reserved; Bug commit " +
                         "${syncResult.liveSmokeSummary()}."
@@ -229,7 +319,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 }
                 "$actionLabel failed: $code."
             }
-            lastAction.value = actionResult + pocoSummary.pocoDisplaySuffix()
+            lastAction.value = actionResult + effectivePocoSummary.pocoDisplaySuffix()
         }
     }
 
@@ -262,6 +352,109 @@ private fun CapturePocoSummary.pocoEndpointSuffix(): String = buildString {
     if (sdkVersion != null || port != null) append(")")
 }
 
+private data class UploadedCaptureArtifact(
+    val source: CapturedPocoArtifact,
+    val receipt: CaptureAttachmentReceipt,
+)
+
+private fun CapturedPocoArtifact.immutableCopy(): CapturedPocoArtifact = copy(bytes = bytes.copyOf())
+
+private fun CapturedPocoArtifact.captureFilename(captureId: String): String {
+    val extension = when (mediaType) {
+        "image/png" -> "png"
+        "image/jpeg" -> "jpg"
+        "image/webp" -> "webp"
+        "application/json" -> "json"
+        else -> throw LiveSmokeFailure("POCO_ARTIFACT_MEDIA_TYPE_UNSUPPORTED")
+    }
+    return "capture-$captureId-${kind.wireName}.$extension"
+}
+
+private fun CapturePocoSummary.withPersistedArtifacts(
+    persistedKinds: Set<String>,
+): CapturePocoSummary {
+    val durableMethods = succeededMethods.filter { method ->
+        val requiredKind = POCO_METHOD_ARTIFACT_KIND[method]
+        requiredKind == null || requiredKind in persistedKinds
+    }.distinct()
+    val artifactWasLost = durableMethods.size != succeededMethods.distinct().size
+    val handshakeSucceeded = "GetSDKVersion" in durableMethods
+    val durableStatus = when {
+        status == PocoEnrichmentStatus.UNAVAILABLE || !handshakeSucceeded ->
+            PocoEnrichmentStatus.UNAVAILABLE
+        status == PocoEnrichmentStatus.COMPLETE && !artifactWasLost ->
+            PocoEnrichmentStatus.COMPLETE
+        else -> PocoEnrichmentStatus.PARTIAL
+    }
+    return copy(
+        status = durableStatus,
+        port = port.takeIf { handshakeSucceeded },
+        sdkVersion = sdkVersion.takeIf { handshakeSucceeded },
+        succeededMethods = durableMethods,
+        screenWidth = screenWidth.takeIf { "GetScreenSize" in durableMethods },
+        screenHeight = screenHeight.takeIf { "GetScreenSize" in durableMethods },
+        failureCode = when {
+            artifactWasLost -> "POCO_ARTIFACT_UPLOAD_FAILED"
+            durableStatus == PocoEnrichmentStatus.COMPLETE -> null
+            else -> failureCode ?: "POCO_PARTIAL"
+        },
+    )
+}
+
+private fun CapturePocoSummary.toCaptureBundlePocoInput(): CaptureBundlePocoInput {
+    val succeeded = succeededMethods.filter(ALLOWED_POCO_METHODS::contains).distinct()
+    val connected = port != null && sdkVersion != null && "GetSDKVersion" in succeeded
+    val negotiated = if (connected) {
+        (attemptedMethods + succeeded).filter(ALLOWED_POCO_METHODS::contains).distinct()
+    } else {
+        emptyList()
+    }
+    val hasFailedNegotiatedMethod = negotiated.any { it !in succeeded }
+    return CaptureBundlePocoInput(
+        attempted = true,
+        connectedPort = port.takeIf { connected },
+        sdkVersion = sdkVersion?.toString().takeIf { connected },
+        screenWidth = screenWidth.takeIf { "GetScreenSize" in succeeded },
+        screenHeight = screenHeight.takeIf { "GetScreenSize" in succeeded },
+        negotiatedMethods = negotiated,
+        succeededMethods = succeeded,
+        failureReason = when {
+            !connected -> failureCode.toCaptureFailureReason(default = "not_running")
+            hasFailedNegotiatedMethod -> failureCode.toCaptureFailureReason(default = "unknown")
+            else -> null
+        },
+    )
+}
+
+private fun String?.toCaptureFailureReason(default: String): String {
+    val normalized = this?.uppercase().orEmpty()
+    return when {
+        "NOT_RUNNING" in normalized || "UNAVAILABLE" in normalized -> "not_running"
+        "CONNECTION" in normalized || "REFUSED" in normalized -> "connection_refused"
+        "TIMEOUT" in normalized || "DEADLINE" in normalized -> "timeout"
+        "CANCEL" in normalized -> "cancelled"
+        "INVALID_FRAME" in normalized || "JSONRPC" in normalized -> "invalid_frame"
+        "OVERSIZED" in normalized || "TOO_LARGE" in normalized -> "oversized_response"
+        "UNSUPPORTED" in normalized || "SDK_VERSION" in normalized -> "unsupported_version"
+        "UNITY_STOPPED" in normalized -> "unity_stopped"
+        normalized.isBlank() -> default
+        else -> "unknown"
+    }
+}
+
+private fun String.toPocoEnrichmentStatus(): PocoEnrichmentStatus = when (this) {
+    "complete" -> PocoEnrichmentStatus.COMPLETE
+    "partial" -> PocoEnrichmentStatus.PARTIAL
+    "unavailable" -> PocoEnrichmentStatus.UNAVAILABLE
+    else -> throw LiveSmokeFailure("CAPTURE_STATUS_INVALID")
+}
+
+private fun PocoEnrichmentStatus.downgradedAfterBundleFailure(): PocoEnrichmentStatus = when (this) {
+    PocoEnrichmentStatus.COMPLETE -> PocoEnrichmentStatus.PARTIAL
+    PocoEnrichmentStatus.PARTIAL -> PocoEnrichmentStatus.PARTIAL
+    PocoEnrichmentStatus.UNAVAILABLE -> PocoEnrichmentStatus.UNAVAILABLE
+}
+
 private class LiveSmokeFailure(val code: String) : RuntimeException()
 
 private fun SyncRunResult.liveSmokeSummary(): String = when (this) {
@@ -275,6 +468,20 @@ private fun SyncRunResult.liveSmokeSummary(): String = when (this) {
 private const val LIVE_SMOKE_CREDENTIAL_TTL_MS = 5 * 60 * 1_000L
 private const val LIVE_SMOKE_UNUSED_REFRESH_TOKEN = "debug-live-smoke-does-not-refresh"
 private const val LIVE_SMOKE_FILENAME = "android-live-smoke.png"
+private val ALLOWED_POCO_METHODS = setOf(
+    "GetSDKVersion",
+    "Screenshot",
+    "Dump",
+    "GetScreenSize",
+    "GetDebugProfilingData",
+    "qa.snapshot",
+)
+private val POCO_METHOD_ARTIFACT_KIND = mapOf(
+    "Screenshot" to "poco_screenshot",
+    "Dump" to "poco_hierarchy",
+    "GetDebugProfilingData" to "poco_profiling",
+    "qa.snapshot" to "poco_snapshot",
+)
 
 private fun createLiveSmokePng(): ByteArray {
     val bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
@@ -363,6 +570,7 @@ internal object FoundationCreateBugContract {
         observedAt: String,
         qaAppVersion: String,
         attachmentIds: List<String> = emptyList(),
+        captureBundleId: String? = null,
     ): FoundationFakeCreateBugRequest {
         val occurrence = linkedMapOf<String, Any?>(
             "observedAt" to observedAt,
@@ -394,6 +602,7 @@ internal object FoundationCreateBugContract {
             "occurrence" to occurrence,
             "attachmentIds" to attachmentIds,
         )
+        captureBundleId?.let { payload["captureBundleId"] = it }
         return FoundationFakeCreateBugRequest(
             operationKind = OPERATION_KIND,
             httpMethod = HTTP_METHOD,
@@ -409,6 +618,7 @@ internal object FoundationCreateBugContract {
         observedAt: String,
         qaAppVersion: String,
         attachmentIds: List<String> = emptyList(),
+        captureBundleId: String? = null,
     ): NewOfflineOperation {
         val request = buildRequest(
             projectId = projectId,
@@ -416,6 +626,7 @@ internal object FoundationCreateBugContract {
             observedAt = observedAt,
             qaAppVersion = qaAppVersion,
             attachmentIds = attachmentIds,
+            captureBundleId = captureBundleId,
         )
         requireValid(request, expectedProjectId = projectId)
         return NewOfflineOperation(
