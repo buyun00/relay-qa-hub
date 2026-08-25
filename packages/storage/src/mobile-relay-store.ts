@@ -1099,7 +1099,7 @@ export function transitionMobileBugReady(
     type: "bug.triage.ready",
     aggregateType: "bug",
     aggregateId: bug.id,
-    aggregateSequence: bug.version + 1,
+    aggregateSequence: nextBugAggregateSequence(database, input, bug.id),
     resourceType: "bug",
     resourceId: bug.id,
     resourceVersionAfter: bug.version + 1,
