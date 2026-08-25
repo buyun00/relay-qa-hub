@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: c964acb7696a8f1e08961299bb06f71aa0fff554
-  last_verified_at: 2026-08-26T04:28:47+08:00
-  next_action: P2.2 IN_PROGRESS；P2.1 独立本地凭据、HttpOnly cookie session、真实浏览器读取与撤销后 401 已转 VERIFYING；下一步仅让 browser principal 驱动真实 project membership scope，以一个允许和一个跨项目拒绝收口，Windows 打包继续等 Web 功能稳定
+  last_verified_commit: 682ddb208eb9f495c4989f59fffbf3705ddb7a6f
+  last_verified_at: 2026-08-26T04:41:17+08:00
+  next_action: P2.3 IN_PROGRESS；P2.2 第二 browser principal 对成员项目真实读取、对既存非成员项目 403 已转 VERIFYING；下一步只接一条认证浏览器写入 -> 同事务 append-only audit 的真实链及一个审计失败回滚，Windows 打包继续等 Web 功能稳定
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -775,7 +775,7 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 
 - 角色矩阵和项目成员管理；服务身份使用独立 scope。
 
-当前状态：`IN_PROGRESS`。下一原子切片只移除 Web session 对固定 debug actor 的事实依赖：让已认证 browser principal 按真实 membership 读取其项目目录/Bug，同时用第二成员对一个非成员项目返回 `403/404`；保留一条 allow 与一条 deny 即推进，不在本段铺开全角色矩阵。
+当前状态：`VERIFYING`。提交 `682ddb208eb9f495c4989f59fffbf3705ddb7a6f` 已让非固定 browser principal 以真实 account/user/project membership 驱动 Web 当前所需的项目目录、成员、模块、Bug 列表与 overview 五条 GET；普通浏览器第二用户读取成员项目 `LOCAL` 的真实两张 Bug/目录/统计成功，对数据库中确实存在但未加入的 `OTHER` 项目读取 Bug/成员/模块均返回 `403`，既有 `LOCAL` 页面事实保持。证据见 [`docs/evidence/P2.2-browser-membership-smoke.md`](evidence/P2.2-browser-membership-smoke.md)。当前只冻结该最小读 scope；Bug 详情/写操作的逐角色授权、完整角色矩阵、成员管理、service principal 与 IDOR 资源存在性策略进入收尾/后续 slice，不宣称 G2 完成。
 
 验证：
 
@@ -788,6 +788,8 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 
 - actor、request、IP、user-agent、correlation、状态前后、理由和证据引用。
 - 不记录请求正文、Secret 和原始附件。
+
+当前状态：`IN_PROGRESS`。下一原子切片只用一个已认证浏览器管理员执行一条真实 Comment/管理写入，将 session actor、request/correlation 与既有 append-only Event 在同一事务落库并回读；再让一次审计 append 明确失败，证明业务写入不悄悄提交。通过即转 `VERIFYING`，更广的字段矩阵、IP 代理信任与 Unicode 隐私规范化进入收尾。
 
 验证：
 
