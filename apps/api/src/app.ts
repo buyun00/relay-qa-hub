@@ -468,7 +468,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   app.get<{
     Querystring: {
       readonly projectId?: string | readonly string[];
+      readonly q?: string | readonly string[];
       readonly state?: string | readonly string[];
+      readonly severity?: string | readonly string[];
       readonly limit?: string | readonly string[];
     };
   }>(MOBILE_BUG_COLLECTION_PATH, async (request, reply) => {

@@ -110,7 +110,9 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         accountId: options.scope.accountId,
         projectId: options.scope.projectId,
         actorId: options.scope.actorId,
+        ...(query.q === undefined ? {} : { q: query.q }),
         ...(query.state === undefined ? {} : { state: query.state }),
+        ...(query.severity === undefined ? {} : { severity: query.severity }),
         limit: query.limit,
       });
     },

@@ -127,7 +127,9 @@ export interface UpdateMobileBugCommand {
 export interface MobileBugListQuery {
   readonly actorId: string;
   readonly projectId?: string;
+  readonly q?: string;
   readonly state?: MobileBugState;
+  readonly severity?: MobileBugSeverity;
   readonly limit: number;
 }
 
@@ -239,13 +241,27 @@ function queryString(value: Record<string, unknown>, key: string): string | unde
 
 export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery, "actorId"> {
   const query = requireRecord(value, "Bug list query");
-  requireOnlyKeys(query, new Set(["projectId", "state", "limit"]));
+  requireOnlyKeys(query, new Set(["projectId", "q", "state", "severity", "limit"]));
   const projectId = queryString(query, "projectId");
   if (projectId !== undefined) requireUuid(projectId, "projectId");
+
+  const queryValue = queryString(query, "q");
+  const normalizedQuery = queryValue?.trim();
+  if (
+    queryValue !== undefined &&
+    (normalizedQuery === undefined || normalizedQuery.length < 1 || normalizedQuery.length > 200)
+  ) {
+    throw new TypeError("q is invalid");
+  }
 
   const stateValue = queryString(query, "state");
   if (stateValue !== undefined && !BUG_STATES.has(stateValue as MobileBugState)) {
     throw new TypeError("state is invalid");
+  }
+
+  const severityValue = queryString(query, "severity");
+  if (severityValue !== undefined && !SEVERITIES.has(severityValue as MobileBugSeverity)) {
+    throw new TypeError("severity is invalid");
   }
 
   const limitValue = queryString(query, "limit");
@@ -260,7 +276,9 @@ export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery
   }
   return {
     ...(projectId === undefined ? {} : { projectId }),
+    ...(normalizedQuery === undefined ? {} : { q: normalizedQuery }),
     ...(stateValue === undefined ? {} : { state: stateValue as MobileBugState }),
+    ...(severityValue === undefined ? {} : { severity: severityValue as MobileBugSeverity }),
     limit,
   };
 }

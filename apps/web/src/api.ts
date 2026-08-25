@@ -1,9 +1,29 @@
+export type BugListState =
+  | "reported"
+  | "needs_info"
+  | "ready"
+  | "in_progress"
+  | "awaiting_build"
+  | "ready_for_verification"
+  | "closed"
+  | "deferred"
+  | "rejected"
+  | "duplicate";
+
+export type BugSeverity = "S0" | "S1" | "S2" | "S3" | "S4";
+
+export interface BugListFilters {
+  readonly q?: string;
+  readonly state?: BugListState;
+  readonly severity?: BugSeverity;
+}
+
 export interface BugListItem {
   readonly id: string;
   readonly key: string;
   readonly title: string;
-  readonly state: string;
-  readonly severity: string;
+  readonly state: BugListState;
+  readonly severity: BugSeverity;
   readonly priority: string;
   readonly updatedAt: string;
 }
@@ -243,8 +263,15 @@ function requireRecord(value: unknown, label: string): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-export async function listBugs(projectId: string, signal?: AbortSignal): Promise<BugListResponse> {
+export async function listBugs(
+  projectId: string,
+  filters: BugListFilters = {},
+  signal?: AbortSignal,
+): Promise<BugListResponse> {
   const query = new URLSearchParams({ projectId, limit: "20" });
+  if (filters.q !== undefined) query.set("q", filters.q);
+  if (filters.state !== undefined) query.set("state", filters.state);
+  if (filters.severity !== undefined) query.set("severity", filters.severity);
   const body = await requestJson(`/api/v1/bugs?${query.toString()}`, {
     ...(signal === undefined ? {} : { signal }),
   });

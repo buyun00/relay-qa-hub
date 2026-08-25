@@ -1,9 +1,6 @@
-import type { DatabaseSync } from "node:sqlite";
+import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 
-import {
-  MobileRelayStorageError,
-  type MobileRelayScope,
-} from "./mobile-relay-store.js";
+import { MobileRelayStorageError, type MobileRelayScope } from "./mobile-relay-store.js";
 import type { MobileBugRecord } from "./mobile-bug-store.js";
 
 const UUID_PATTERN =
@@ -24,7 +21,9 @@ const BUG_STATES = [
 export type MobileBugListState = (typeof BUG_STATES)[number];
 
 export interface ListMobileBugsInput extends MobileRelayScope {
+  readonly q?: string;
   readonly state?: MobileBugListState;
+  readonly severity?: MobileBugRecord["severity"];
   readonly limit: number;
 }
 
@@ -66,13 +65,28 @@ function requireUuid(value: string, field: string): void {
 
 function requireLimit(value: number): void {
   if (!Number.isSafeInteger(value) || value < 1 || value > 100) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "limit must be an integer from 1 through 100");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "limit must be an integer from 1 through 100",
+    );
   }
 }
 
 function requireState(value: MobileBugListState | undefined): void {
   if (value !== undefined && !(BUG_STATES as readonly string[]).includes(value)) {
     throw new MobileRelayStorageError("INVALID_REQUEST", "state is invalid");
+  }
+}
+
+function requireQuery(value: string | undefined): void {
+  if (value !== undefined && (value.length < 1 || value.length > 200 || value !== value.trim())) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "q is invalid");
+  }
+}
+
+function requireSeverity(value: MobileBugRecord["severity"] | undefined): void {
+  if (value !== undefined && !["S0", "S1", "S2", "S3", "S4"].includes(value)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "severity is invalid");
   }
 }
 
@@ -97,8 +111,7 @@ function requireProjectMembership(database: DatabaseSync, input: ListMobileBugsI
        WHERE account.id = ? AND account.status = 'active'`,
     )
     .get(input.projectId, input.actorId, input.accountId) as
-    | { readonly present: number }
-    | undefined;
+    { readonly present: number } | undefined;
   if (!row) {
     throw new MobileRelayStorageError("FORBIDDEN", "actor has no active project membership");
   }
@@ -130,15 +143,14 @@ function toMobileBug(row: MobileBugListRow): MobileBugRecord {
   });
 }
 
-export function listMobileBugs(
-  database: DatabaseSync,
-  input: ListMobileBugsInput,
-): MobileBugList {
+export function listMobileBugs(database: DatabaseSync, input: ListMobileBugsInput): MobileBugList {
   requireUuid(input.accountId, "accountId");
   requireUuid(input.projectId, "projectId");
   requireUuid(input.actorId, "actorId");
   requireLimit(input.limit);
+  requireQuery(input.q);
   requireState(input.state);
+  requireSeverity(input.severity);
   requireProjectMembership(database, input);
 
   const snapshot = database
@@ -149,33 +161,36 @@ export function listMobileBugs(
     )
     .get(input.accountId, input.projectId) as { readonly snapshot_sequence: number };
 
-  const rows = (
-    input.state === undefined
-      ? database
-          .prepare(
-            `SELECT id, project_id, number, key, title, description, expected_behavior,
-                    module_id, state, severity, priority, reporter_id, owner_id,
-                    verification_owner_id, duplicate_of_bug_id, occurrence_count,
-                    reopen_count, version, created_at, updated_at, closed_at
-             FROM bugs
-             WHERE account_id = ? AND project_id = ?
-             ORDER BY updated_at DESC, number DESC, id DESC
-             LIMIT ?`,
-          )
-          .all(input.accountId, input.projectId, input.limit)
-      : database
-          .prepare(
-            `SELECT id, project_id, number, key, title, description, expected_behavior,
-                    module_id, state, severity, priority, reporter_id, owner_id,
-                    verification_owner_id, duplicate_of_bug_id, occurrence_count,
-                    reopen_count, version, created_at, updated_at, closed_at
-             FROM bugs
-             WHERE account_id = ? AND project_id = ? AND state = ?
-             ORDER BY updated_at DESC, number DESC, id DESC
-             LIMIT ?`,
-          )
-          .all(input.accountId, input.projectId, input.state, input.limit)
-  ) as unknown as MobileBugListRow[];
+  const conditions = ["account_id = ?", "project_id = ?"];
+  const parameters: SQLInputValue[] = [input.accountId, input.projectId];
+  if (input.q !== undefined) {
+    conditions.push(
+      "(instr(lower(key), lower(?)) > 0 OR instr(lower(title), lower(?)) > 0 OR instr(lower(description), lower(?)) > 0 OR instr(lower(expected_behavior), lower(?)) > 0)",
+    );
+    parameters.push(input.q, input.q, input.q, input.q);
+  }
+  if (input.state !== undefined) {
+    conditions.push("state = ?");
+    parameters.push(input.state);
+  }
+  if (input.severity !== undefined) {
+    conditions.push("severity = ?");
+    parameters.push(input.severity);
+  }
+  parameters.push(input.limit);
+
+  const rows = database
+    .prepare(
+      `SELECT id, project_id, number, key, title, description, expected_behavior,
+              module_id, state, severity, priority, reporter_id, owner_id,
+              verification_owner_id, duplicate_of_bug_id, occurrence_count,
+              reopen_count, version, created_at, updated_at, closed_at
+       FROM bugs
+       WHERE ${conditions.join(" AND ")}
+       ORDER BY updated_at DESC, number DESC, id DESC
+       LIMIT ?`,
+    )
+    .all(...parameters) as unknown as MobileBugListRow[];
 
   return Object.freeze({
     snapshotSequence: snapshot.snapshot_sequence,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   addBugComment,
@@ -24,7 +24,10 @@ import {
   updateBugOwner,
   type BugDetail,
   type BugEvent,
+  type BugListFilters,
   type BugListItem,
+  type BugListState,
+  type BugSeverity,
   type HumanRepairAttempt,
   type LinkBuildRepairResponse,
   type RelayReceipt,
@@ -94,6 +97,9 @@ function mutationErrorMessage(error: { readonly status: number; readonly code: s
 
 export default function App() {
   const [projectId, setProjectId] = useState(DEFAULT_PROJECT_ID);
+  const [bugQuery, setBugQuery] = useState("");
+  const [bugStateFilter, setBugStateFilter] = useState<BugListState | "">("");
+  const [bugSeverityFilter, setBugSeverityFilter] = useState<BugSeverity | "">("");
   const [bugs, setBugs] = useState<readonly BugListItem[]>([]);
   const [snapshotSequence, setSnapshotSequence] = useState<number | null>(null);
   const [requestState, setRequestState] = useState<RequestState>("idle");
@@ -154,28 +160,44 @@ export default function App() {
   const [buildCommitSha, setBuildCommitSha] = useState("");
   const [verificationCriteria, setVerificationCriteria] = useState("");
   const [verificationResultSummary, setVerificationResultSummary] = useState("");
+  const listRequestSequence = useRef(0);
 
-  const loadBugList = useCallback(async (nextProjectId: string): Promise<void> => {
-    const normalizedProjectId = nextProjectId.trim();
-    setProjectId(normalizedProjectId);
-    setRequestState("loading");
-    setError(null);
-    try {
-      const response = await listBugs(normalizedProjectId);
-      setBugs(response.items);
-      setSnapshotSequence(response.snapshotSequence);
-      setRequestState("success");
-    } catch (cause: unknown) {
-      setBugs([]);
-      setSnapshotSequence(null);
-      setRequestState("error");
-      if (cause instanceof QaHubApiError) {
-        setError({ status: cause.status, code: cause.code });
-      } else {
-        setError({ status: 0, code: "NETWORK_ERROR" });
+  const loadBugList = useCallback(
+    async (nextProjectId: string, filters: BugListFilters = {}): Promise<void> => {
+      const requestSequence = listRequestSequence.current + 1;
+      listRequestSequence.current = requestSequence;
+      const normalizedProjectId = nextProjectId.trim();
+      setProjectId(normalizedProjectId);
+      setRequestState("loading");
+      setError(null);
+      try {
+        const response = await listBugs(normalizedProjectId, filters);
+        if (listRequestSequence.current !== requestSequence) return;
+        setBugs(response.items);
+        setSnapshotSequence(response.snapshotSequence);
+        setRequestState("success");
+      } catch (cause: unknown) {
+        if (listRequestSequence.current !== requestSequence) return;
+        setBugs([]);
+        setSnapshotSequence(null);
+        setRequestState("error");
+        if (cause instanceof QaHubApiError) {
+          setError({ status: cause.status, code: cause.code });
+        } else {
+          setError({ status: 0, code: "NETWORK_ERROR" });
+        }
       }
-    }
-  }, []);
+    },
+    [],
+  );
+
+  const refreshVisibleBugList = useCallback(async (): Promise<void> => {
+    await loadBugList(projectId, {
+      ...(bugQuery.trim().length === 0 ? {} : { q: bugQuery.trim() }),
+      ...(bugStateFilter === "" ? {} : { state: bugStateFilter }),
+      ...(bugSeverityFilter === "" ? {} : { severity: bugSeverityFilter }),
+    });
+  }, [bugQuery, bugSeverityFilter, bugStateFilter, loadBugList, projectId]);
 
   const loadBugDetails = useCallback(
     async (
@@ -266,7 +288,7 @@ export default function App() {
       const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
       if (refreshed?.bug.state === "ready") {
         setTransitionState("success");
-        await loadBugList(selectedBug.projectId);
+        await refreshVisibleBugList();
       } else {
         setTransitionState("error");
         setTransitionError({ status: 200, code: "STATE_READBACK_MISMATCH" });
@@ -275,7 +297,7 @@ export default function App() {
       setTransitionState("error");
       setTransitionError(mutationError(cause));
     }
-  }, [loadBugDetails, loadBugList, selectedBug]);
+  }, [loadBugDetails, refreshVisibleBugList, selectedBug]);
 
   const submitComment = useCallback(async (): Promise<void> => {
     if (selectedBugId === null || commentBody.trim().length === 0) return;
@@ -342,12 +364,12 @@ export default function App() {
       setRelayReceipt(receipt);
       setRelayState("success");
       await loadBugDetails(selectedBug.id, true, true, true);
-      await loadBugList(selectedBug.projectId);
+      await refreshVisibleBugList();
     } catch (cause: unknown) {
       setRelayState("error");
       setRelayError(mutationError(cause));
     }
-  }, [loadBugDetails, loadBugList, readRelayReceipt, selectedBug]);
+  }, [loadBugDetails, readRelayReceipt, refreshVisibleBugList, selectedBug]);
 
   const refreshRelayReceipt = useCallback(async (): Promise<void> => {
     if (relayReceipt === null) return;
@@ -396,12 +418,12 @@ export default function App() {
       setHumanWorkflowMessage(`人工 RepairAttempt 已创建：${readback.id}`);
       setHumanWorkflowState("success");
       await loadBugDetails(selectedBug.id, true, true, true);
-      await loadBugList(selectedBug.projectId);
+      await refreshVisibleBugList();
     } catch (cause: unknown) {
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
-  }, [loadBugDetails, loadBugList, repairSummary, selectedBug]);
+  }, [loadBugDetails, refreshVisibleBugList, repairSummary, selectedBug]);
 
   const deliverHumanWorkflow = useCallback(async (): Promise<void> => {
     if (
@@ -441,7 +463,7 @@ export default function App() {
       setHumanWorkflowMessage(`代码交付已登记：${readback.commitSha}`);
       setHumanWorkflowState("success");
       await loadBugDetails(selectedBug.id, true, true, true);
-      await loadBugList(selectedBug.projectId);
+      await refreshVisibleBugList();
     } catch (cause: unknown) {
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
@@ -449,7 +471,7 @@ export default function App() {
   }, [
     humanAttempt,
     loadBugDetails,
-    loadBugList,
+    refreshVisibleBugList,
     repairBranch,
     repairCommitSha,
     repairSummary,
@@ -517,7 +539,7 @@ export default function App() {
       setHumanWorkflowMessage(`Build 已精确关联：${linked.build.externalId}`);
       setHumanWorkflowState("success");
       await loadBugDetails(selectedBug.id, true, true, true);
-      await loadBugList(selectedBug.projectId);
+      await refreshVisibleBugList();
     } catch (cause: unknown) {
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
@@ -530,7 +552,7 @@ export default function App() {
     buildVersion,
     humanAttempt,
     loadBugDetails,
-    loadBugList,
+    refreshVisibleBugList,
     selectedBug,
   ]);
 
@@ -572,12 +594,19 @@ export default function App() {
       setHumanWorkflowMessage(`人工验收已开始：${readback.id}`);
       setHumanWorkflowState("success");
       await loadBugDetails(selectedBug.id, true, true, true);
-      await loadBugList(selectedBug.projectId);
+      await refreshVisibleBugList();
     } catch (cause: unknown) {
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
-  }, [humanAttempt, linkedBuild, loadBugDetails, loadBugList, selectedBug, verificationCriteria]);
+  }, [
+    humanAttempt,
+    linkedBuild,
+    loadBugDetails,
+    refreshVisibleBugList,
+    selectedBug,
+    verificationCriteria,
+  ]);
 
   const passVerificationAndClose = useCallback(async (): Promise<void> => {
     if (
@@ -612,12 +641,12 @@ export default function App() {
       setHumanWorkflowMessage(`人工验收通过，${result.bug.key} 已由 QA Hub 关闭。`);
       setHumanWorkflowState("success");
       await loadBugDetails(selectedBug.id, true, true, true);
-      await loadBugList(selectedBug.projectId);
+      await refreshVisibleBugList();
     } catch (cause: unknown) {
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
-  }, [loadBugDetails, loadBugList, selectedBug, verification, verificationResultSummary]);
+  }, [loadBugDetails, refreshVisibleBugList, selectedBug, verification, verificationResultSummary]);
 
   useEffect(() => {
     void loadBugList(DEFAULT_PROJECT_ID);
@@ -689,7 +718,7 @@ export default function App() {
           className="project-form"
           onSubmit={(event) => {
             event.preventDefault();
-            void loadBugList(projectId);
+            void refreshVisibleBugList();
           }}
         >
           <label htmlFor="project-id">项目 ID</label>
@@ -700,18 +729,93 @@ export default function App() {
               spellCheck={false}
               value={projectId}
             />
-            <button className="primary-button" disabled={requestState === "loading"} type="submit">
-              读取 Bug
+            <button
+              className="primary-button"
+              disabled={requestState === "loading"}
+              id="bug-filter-submit"
+              type="submit"
+            >
+              应用筛选
             </button>
           </div>
-          <button
-            className="link-button"
-            onClick={() => void loadBugList(INVALID_PROJECT_ID)}
-            type="button"
-          >
-            验证无效项目错误
-          </button>
+          <div className="filter-grid">
+            <div>
+              <label htmlFor="bug-search">关键词（编号、标题、描述）</label>
+              <input
+                id="bug-search"
+                maxLength={200}
+                onChange={(event) => setBugQuery(event.target.value)}
+                placeholder="例如 LOCAL-1 或 login"
+                value={bugQuery}
+              />
+            </div>
+            <div>
+              <label htmlFor="bug-state-filter">状态</label>
+              <select
+                id="bug-state-filter"
+                onChange={(event) => setBugStateFilter(event.target.value as BugListState | "")}
+                value={bugStateFilter}
+              >
+                <option value="">全部状态</option>
+                <option value="reported">reported</option>
+                <option value="needs_info">needs_info</option>
+                <option value="ready">ready</option>
+                <option value="in_progress">in_progress</option>
+                <option value="awaiting_build">awaiting_build</option>
+                <option value="ready_for_verification">ready_for_verification</option>
+                <option value="closed">closed</option>
+                <option value="deferred">deferred</option>
+                <option value="rejected">rejected</option>
+                <option value="duplicate">duplicate</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="bug-severity-filter">严重度</label>
+              <select
+                id="bug-severity-filter"
+                onChange={(event) => setBugSeverityFilter(event.target.value as BugSeverity | "")}
+                value={bugSeverityFilter}
+              >
+                <option value="">全部严重度</option>
+                <option value="S0">S0</option>
+                <option value="S1">S1</option>
+                <option value="S2">S2</option>
+                <option value="S3">S3</option>
+                <option value="S4">S4</option>
+              </select>
+            </div>
+          </div>
+          <div className="filter-actions">
+            <button
+              className="link-button"
+              id="bug-filter-clear"
+              onClick={() => {
+                setBugQuery("");
+                setBugStateFilter("");
+                setBugSeverityFilter("");
+                void loadBugList(projectId);
+              }}
+              type="button"
+            >
+              清空筛选
+            </button>
+            <button
+              className="link-button"
+              onClick={() => void loadBugList(INVALID_PROJECT_ID)}
+              type="button"
+            >
+              验证无效项目错误
+            </button>
+          </div>
         </form>
+
+        {requestState === "success" &&
+          (bugQuery.trim().length > 0 || bugStateFilter !== "" || bugSeverityFilter !== "") && (
+            <p className="filter-summary">
+              服务端组合筛选：关键词={bugQuery.trim() || "全部"} · 状态=
+              {bugStateFilter || "全部"} · 严重度={bugSeverityFilter || "全部"}
+            </p>
+          )}
 
         {requestState === "error" && error !== null && (
           <p aria-live="assertive" className="api-error">
@@ -754,9 +858,13 @@ export default function App() {
           <p className="api-footnote">来自 QA Hub SQLite 事实源 · snapshot {snapshotSequence}</p>
         )}
 
+        {selectedBug !== null && !bugs.some((bug) => bug.id === selectedBug.id) && (
+          <p className="filter-summary">当前详情位于筛选结果之外；详情事实保持可见。</p>
+        )}
+
         <div aria-label="后续管理台切片" className="next-slices">
-          <span>当前段：人工 RepairAttempt / Build 精确关联 / 人工验收关闭</span>
-          <span>先在浏览器稳定验证；Windows 桌面打包统一后置</span>
+          <span>当前段：服务端关键词 / 状态 / 严重度组合筛选</span>
+          <span>下一段：去重合并；Windows 桌面打包统一后置</span>
         </div>
       </section>
 
