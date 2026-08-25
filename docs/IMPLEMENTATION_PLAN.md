@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 15c668a7d1f6a36a09935ce39f0e6348eb78c73c
-  last_verified_at: 2026-08-25T11:19:01+08:00
-  next_action: P3.6 已证明 MuMu 显式 MediaProjection/悬浮球到 attachment/Bug 及拒绝降级；当前 P3.7 接 bounded Kotlin Poco read-only enrichment，并保持 no-Poco 普通截图建单
+  last_verified_commit: d2950262ca6181d658651a2a53b7834eaa52d657
+  last_verified_at: 2026-08-25T11:59:32+08:00
+  next_action: P3.7 已证明最终 APK 的 loopback SimpleRPC handshake/partial 与 no-Poco screenshot/Bug fallback；当前把 bounded Poco artifacts 按同 captureId 持久化并回读一个真实 artifact
   blockers:
     - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1/G2 仍未正式关闭，但按执行 override 不阻塞 P3 主链路实现
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
