@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: ed7352b4050d0cb765c55c8af10e0819c7cd128e
-  last_verified_at: 2026-08-26T05:57:13+08:00
-  next_action: P8.3 IN_PROGRESS；P7.5 已完成 current-Web 单次 package 刷新并保持 VERIFYING；下一步只新增 QA Hub 自有 SQLite online backup primitive、manifest/hash/integrity 与一个 corrupt rejection，不暴露普通 restore API
+  last_verified_commit: 19a4b03093306d340b059fd3c48c76429c2d348d
+  last_verified_at: 2026-08-26T06:14:06+08:00
+  next_action: P8.4 IN_PROGRESS；P8.3 worker-owned online backup、manifest/hash/integrity 与 corrupt rejection 已转 VERIFYING；下一步只做 create-only 隔离恢复和 existing-target 拒绝，不覆盖任何现有 data root
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1059,7 +1059,7 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 #### P8.3 备份
 
-当前状态：`IN_PROGRESS`。P7.5 current-Web package 已按用户顺序刷新，唯一 pointer 进入独立事实源的在线备份。当前原子切片只新增 storage-owned SQLite online backup helper、sidecar manifest/hash/integrity 和一个损坏备份拒绝；不写普通 API restore 路由、不覆盖现有 data root，retention scheduler、异盘复制和完整附件盘清单进入收尾/后续原子段。
+当前状态：`VERIFYING`。提交 `19a4b03093306d340b059fd3c48c76429c2d348d` 已在现有唯一 SQLite worker 上新增 create-only online backup：隔离真实 facts 生成 1,490,944-byte backup，sidecar 记录 QA Hub application ID、schema v4、SHA-256、integrity/FK 且不含源绝对路径，备份回读 `LOCAL-1/LOCAL-2`。单字节损坏副本被 `SQLITE_BACKUP_INVALID` 拒绝。证据见 [`docs/evidence/P8.3-online-sqlite-backup.md`](evidence/P8.3-online-sqlite-backup.md)。不写普通 API restore 路由、不覆盖现有 data root；backup-root containment、流式 hash、retention scheduler、异盘复制和附件盘清单进入收尾/后续原子段。
 
 建议初值：
 
@@ -1071,6 +1071,8 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 每个备份必须运行 integrity/foreign key、附件引用/Hash 和清单校验。
 
 #### P8.4 隔离恢复
+
+当前状态：`IN_PROGRESS`。下一原子切片只新增非 API 的 restore admission/helper：必须验证 P8.3 sidecar hash、QA Hub application ID/schema/integrity，目标为全新绝对目录且默认拒绝任何既存 target。随后用同一真实 backup 恢复并经 worker 回读 `LOCAL-1/LOCAL-2`；只保留一个 existing-target 拒绝，完整登录/附件/RPO/RTO 与随机备份演练后置。
 
 恢复到独立目录/端口，默认关闭通知和 Relay 集成；验证登录、搜索、Bug、时间线、附件和计数，不覆盖当前生产目录。
 
