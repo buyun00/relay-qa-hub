@@ -14,12 +14,12 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 793366264c70cd8b05eb5443fa1724504510c44e
-  last_verified_at: 2026-08-25T20:40:38+08:00
-  next_action: P7.4 IN_PROGRESS；恢复桌面管理闭环，先接一键 QA Hub Relay handoff -> durable receipt/status，并保留 fake unavailable queued/retry 失败
+  last_verified_commit: 2037591affded204d8c97f8adcc43eca253a1d69
+  last_verified_at: 2026-08-25T21:04:07+08:00
+  next_action: P7.4 IN_PROGRESS；Web 一键 QA Hub Relay handoff/receipt 已真实通过，当前接 exact-SHA Build 关联 -> 人工 Verification/关闭，并保留一个证据失败
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
-    - P7.4 列表、详情、Comment、负责人和状态已经真实浏览器 -> 4319 -> SQLite 验证，当前继续 Relay handoff/receipt；不能误报为 G7 完成
+    - P7.4 列表、详情、Comment、负责人/状态、一键 Relay submitted 与 fake unavailable queued/retry 已真实浏览器 -> 4319 -> SQLite 验证；当前继续 Build/Verification，仍不能误报为 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -1006,7 +1006,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配与 `reported -> ready` 已由桌面浏览器经 4174 server-side auth proxy -> 4319 -> SQLite 验证；原 PWA 插件与 Service Worker 已移除。P7.5 Windows 壳的功能最小链已完成并保持 `VERIFYING` 视觉尾项，当前指针回到本步骤：继续一键 Relay/回执/失败重试 -> Build/人工 Verification/关闭，再补搜索/组合筛选、去重合并与必要设置。每段只保留一条成功与一个关键失败，复杂筛选、批量操作和设置细节进入收尾清单。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff、submitted receipt 与 fake unavailable queued/retry 已由桌面浏览器经 4174 server-side auth proxy -> 4319 -> SQLite 验证；原 PWA 插件与 Service Worker 已移除。P7.5 Windows 壳的功能最小链已完成并保持 `VERIFYING` 视觉尾项，当前指针继续本步骤的 Build 关联与人工 Verification/关闭，再补搜索/组合筛选、去重合并与必要设置。每段只保留一条成功与一个关键失败，复杂筛选、批量操作和设置细节进入收尾清单。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 #### P7.5 Windows Electron 桌面壳
 
