@@ -14,11 +14,11 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 3f7f258
-  last_verified_at: 2026-08-25T19:05:07+08:00
-  next_action: P7.4 IN_PROGRESS；按冻结 updateBug/transition 契约接通桌面负责人分配与状态修改，保留一个 stale expectedVersion 失败
+  last_verified_commit: 77c7f1f
+  last_verified_at: 2026-08-25T19:30:05+08:00
+  next_action: P7.5 IN_PROGRESS；建立复用 apps/web 构建资产的 Electron 壳，先打通单实例、托盘生命周期与一条 durable Inbox -> Windows 通知 -> Bug 深链
   blockers:
-    - 当前 P7.4 负责人/状态切片无外部 blocker；列表、详情、时间线、Comment 已经真实浏览器 -> 4319 -> SQLite 验证，但不能误报为 G7 完成
+    - 当前 P7.5 Electron/Windows notification slice 无外部 blocker；P7.4 列表、详情、Comment、负责人和状态已经真实浏览器 -> 4319 -> SQLite 验证，但不能误报为 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -27,7 +27,7 @@ qa_hub_progress:
 
 QA Hub 是一个独立、双客户端职责分离的缺陷闭环系统。它必须在 Relay 完全不可用时仍能完成提单、分诊、人工分配、修复登记、构建关联、验收、失败重开和关闭。
 
-最新产品边界以独立 QA Hub API/数据库为唯一业务事实源：Android 原生 App 负责现场悬浮球截图、Poco/Unity 上下文、快速提单、附件、离线草稿/重试与轻量提交状态；`apps/web` 是当前 MVP 的桌面正式管理平台，负责完整分诊、管理与人工闭环。Web 不是 PWA，不承担手机截图、离线取证或 WebView 包壳；Android 与 Web 都只访问 QA Hub API，绝不直连 Relay。
+最新产品边界以独立 QA Hub API/数据库为唯一业务事实源：Android 原生 App 负责现场悬浮球截图、Poco/Unity 上下文、快速提单、附件、离线草稿/重试与轻量提交状态；`apps/web` 是当前 MVP 的桌面正式管理页面，负责完整分诊、管理与人工闭环；`apps/desktop` 以 Electron 复用同一份 React/Vite 构建资产，作为 Windows 日常入口并承载托盘、连接与原生通知。普通浏览器入口继续保留。Web 不是 PWA，不承担手机截图、离线取证或 WebView 包壳；Android、浏览器和 Electron 都只访问 QA Hub API，绝不直连 Relay。
 
 Relay 只通过一键派发和可靠事件回写参与某些修复尝试：
 
@@ -46,7 +46,7 @@ QA Bug
 4. 关闭普通 Bug 必须存在针对精确修复尝试和可测构建的通过验收。
 5. 所有写操作必须幂等、受权限控制、带审计，并用乐观锁防止覆盖并发修改。
 6. 除完全相同的客户端提交外，重复候选只提示，不由 AI 自动合并。
-7. 站内 Inbox 是通知事实源；Web Push、邮件或其他通知只是增强渠道。
+7. 站内 Inbox/notification outbox 是通知事实源；socket、Windows 原生通知、FCM、厂商 Push 或邮件都只是携带 notification/event ID 与安全摘要的唤醒渠道，客户端收到后必须回读 Inbox。
 8. 源码完成、临时端口或桌面模拟器不能算交付；必须按门禁验证真实运行状态。
 9. 不重置、清理、暂存、覆盖或丢弃现有 Relay 工作区的任何改动。
 10. 不推送 Git、不发布公网或删除生产数据，除非用户明确授权对应动作。
@@ -57,13 +57,13 @@ QA Bug
 
 - 项目、模块、成员、角色和项目级权限。
 - Android 原生 App 完成快速上报、极简编辑、悬浮球/系统分享取证、Poco enrichment、附件、离线草稿/重试和轻量“我提交的/上传状态/必要通知”。
-- 桌面 Web 正式管理平台完成 Bug 列表/搜索/组合筛选、详情/证据、去重合并、负责人、状态、评论、RepairAttempt、Build、Verification/关闭、Relay 回执/重试、审计与必要设置。
+- 桌面 Web 正式管理平台完成 Bug 列表/搜索/组合筛选、详情/证据、去重合并、负责人、状态、评论、RepairAttempt、Build、Verification/关闭、Relay 回执/重试、审计与必要设置；同一前端同时服务普通浏览器与 Electron Windows 壳。
 - Bug、Occurrence、RepairAttempt、Build、Verification、Event 完整模型。
 - 分诊、分配、人工修复、Relay 修复、外部修复、待构建、待验收、失败重开和关闭。
 - 唯一编号、传输幂等、相似 Bug 候选、追加发生记录。
 - Android 首页原生提供快速采集/提交、离线队列和轻量提交状态，不使用 WebView 包壳。
 - Web 管理台通过 QA Hub API 一键交给 Relay、重试并展示自动回写的交付和构建进度。
-- 站内 Inbox、Android 通知、超时提醒和共享测试机模式。
+- 站内 Inbox/notification outbox、Electron Windows 原生通知、超时提醒和共享测试机模式；Android 系统 Push 不作为当前 MVP 门禁。
 - 追加式审计、健康检查、结构化日志、备份、隔离恢复和回滚。
 - Android 15/16/17 App/Poco 矩阵和独立 HTTPS canary；Android 15/API 35 是最低支持层，Android 16/API 36 是运行兼容层，Android 17/API 37 是默认编译/目标与行为 Gate，按 P9 真机要求执行。
 
@@ -582,13 +582,23 @@ Poco 协议/安全基线以官方上游源码为准：[SimpleRPC Python framing]
 
 ### 10.5 Android 通知
 
-- 业务事务同时写 notification outbox，站内 Inbox 是事实源；Android 通知可失败且不回滚业务。
-- 事件覆盖待分诊、被分配、待补充、修复已交付、待构建、待验收、超时和重新打开；点击深链到原生 App 对应 item。
-- 锁屏只显示最少信息；订阅失效自动清理，支持静默期、个人偏好和共享测试机退出撤销。
+- 业务事务同时写 notification outbox，站内 Inbox 是事实源；任何 Android 提示都只携带 notification/event ID 与安全摘要，收到后回读 Inbox，传输失败不能回滚业务。
+- 当前 MuMu `127.0.0.1:16384` 未发现 `com.google.android.gms`/`com.google.android.gsf`，且 `com.relayqahub.android.debug` 的 `POST_NOTIFICATIONS` 为 `granted=false`。因此既有 Inbox GET 只能证明 durable Inbox，不能称为 FCM、系统 Push 或实时通知完成。
+- 当前 MVP 中 Android 只在 App 前台刷新 Inbox；WorkManager 可做最低频率兜底和重连提示，但不得把至少 15 分钟的周期工作称为实时。Android 13+ 第一次需要系统通知时显式请求 `POST_NOTIFICATIONS`；拒绝仅降级为 App 内 Inbox，不阻塞提单、附件或离线重试。
+- Android 实时唤醒降为后续可选 transport：只有用户从可见 Activity 启动“测试模式/悬浮球”且合规前台服务仍可见时，才可维持认证、可重连的 WebSocket，收到 ID 后回读 Inbox 并发本地通知；Android 15 禁止从无可见界面的后台偷启服务。未来再按真实设备分布接 FCM/厂商 Push，共用 subscription、token rotation、logout revoke 与 quiet-hours 模型，不复制通知业务逻辑。
+- 事件覆盖待分诊、被分配、待补充、修复已交付、待构建、待验收、超时和重新打开；锁屏只显示最少信息，点击深链到原生 App 对应 item。
 
 ### 10.6 桌面正式管理 Web
 
-`apps/web` 重新进入当前 MVP 关键路径并归入 P7.4。当前代码仍只是 P0.4 React/Vite 运行壳，页面明确写着“P0 运行骨架 · 暂未连接业务 API”，不得描述为已有管理平台。它将通过与 Android 共用的 QA Hub API/认证/数据库实现桌面 Bug 列表/搜索/组合筛选、详情/证据、去重、负责人/状态、评论、RepairAttempt、Build、人工验收/关闭、Relay 派发/回执/失败重试、审计，以及项目/人员/角色/模块/Relay 集成等必要设置。它不是 PWA，不开发 Service Worker、浏览器离线草稿、截图/录屏或手机安装入口。
+`apps/web` 重新进入当前 MVP 关键路径并归入 P7.4。它通过与 Android 共用的 QA Hub API/认证/数据库实现桌面 Bug 列表/搜索/组合筛选、详情/证据、去重、负责人/状态、评论、RepairAttempt、Build、人工验收/关闭、Relay 派发/回执/失败重试、审计，以及项目/人员/角色/模块/Relay 集成等必要设置。当前已实证列表、详情、时间线、Comment、分配与 `reported -> ready`，但闭环尚未完成，不能描述为完整管理平台。它不是 PWA，不开发 Service Worker、浏览器离线草稿、截图/录屏或手机安装入口。
+
+### 10.7 Windows Electron 日常入口
+
+- 新建独立 `apps/desktop`，只包含 Electron 主进程、预加载和打包配置；加载本仓库打包后的 `apps/web` 静态资产，不直接加载可变远程前端代码。普通浏览器继续运行同一 React/Vite 页面，两种入口共享 QA Hub HTTPS/WSS API、认证与数据库，不复制业务 UI 或事实源。
+- 当前优先 Electron：本机已有 Node/Web 工具链，而 `cargo`/`rustc`/`cl`/`cmake` 缺失；先接受较大安装体积，只有后续安装包或内存成为实际问题时才评估 Tauri。
+- Windows 生命周期固定为单实例；登录自启动可配置；点击窗口关闭默认隐藏到系统托盘，托盘左键/双击恢复，菜单至少包含打开、连接状态、暂停通知和真正退出。只有显式“退出”才停止后台进程。
+- Electron 主进程维护认证 WSS/WebSocket、心跳与有界指数退避。瞬时 socket 只携带 notification/event ID 与安全摘要；主进程随后回读 durable Inbox、按 notification ID 去重并调用 Windows 原生 Notification。桌面离线后重连必须补读 Inbox；点击通知恢复窗口并深链到对应 Bug，同一事件在网页已打开时也只显示一次。
+- 安全基线固定为 `nodeIntegration=false`、`contextIsolation=true`、`sandbox=true`，只暴露窄 `contextBridge`；禁止任意导航和新窗口，只允许配置的 QA Hub HTTPS/WSS origin；不得关闭 `webSecurity`，不得把 Node API、凭据或任意 IPC 暴露给 renderer。
 
 Android 平台基线以官方文档为准：[`SYSTEM_ALERT_WINDOW`](https://developer.android.com/reference/android/Manifest.permission#SYSTEM_ALERT_WINDOW)、[MediaProjection](https://developer.android.com/media/grow/media-projection)、[mediaProjection 前台服务类型](https://developer.android.com/develop/background-work/services/fgs/service-types)、[用户停止前台服务](https://developer.android.com/develop/background-work/services/fgs/handle-user-stopping)、[接收 Sharesheet 内容](https://developer.android.com/develop/ui/compose/sharing/receive)、[Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker)、[Android 14 截图检测](https://developer.android.com/about/versions/14/features/screenshot-detection)、[`FLAG_SECURE`](https://developer.android.com/reference/android/view/Display#FLAG_SECURE)、[Android Keystore](https://developer.android.com/privacy-and-security/keystore) 和 [app-specific storage](https://developer.android.com/training/data-storage/app-specific)。
 
@@ -953,15 +963,15 @@ MuMu MVP execution override：先只在 QA Hub 自有 API/SQLite/fake/manual pro
 
 验证：completed 只在 Job/项目/分支/完整 SHA/mode 均匹配时接受；失败后同 Job 恢复可继续推进。
 
-#### P6.2 Inbox、Android 通知和提醒
+#### P6.2 Inbox 与通知传输
 
-要做：站内 Inbox、Android notification/push token 轮换、静默期、原生待办深链、超时升级；Push 失败不影响 Inbox 事实。
+要做：站内 Inbox/notification outbox、独立 projector、认证实时提示、静默期、待办深链和超时升级；所有 transport 失败都不影响 Inbox 事实。
 
 MuMu MVP execution override：先消费已有 `build.registered` notification outbox，持久化一条 QA Hub Inbox 事实并由 Android 原生列表 GET 回读；重复消费不得生成第二条 Inbox。系统 Push、权限拒绝、静默期与真机通知不阻塞该首条主链。
 
-该 override slice 已由 MuMu/API35 两次真实 GET 实证通过并转入 `VERIFYING`；Push、mark-read、分页、静默期与后台 projector 留在收尾/正式 Gate，唯一进度指针进入 P7.1。
+该 override slice 已由 MuMu/API35 两次真实 GET 实证通过并转入 `VERIFYING`；它不等于 Push 已完成。当前管理提醒转由 P7.5 Electron 主进程承担：认证 WebSocket 收到 ID -> 回读同一 durable Inbox -> Windows 单条通知，断线重连后补读且不重复。Android 系统 Push/FCM/厂商通道降为后续可选项；mark-read、分页、静默期与后台 projector仍在收尾/正式 Gate。
 
-验证：服务/App 崩溃重启后通知不丢不重；过时提醒被取消；Android 15/16/17 真机通知；API 37 自定义通知视图大小限制和 MediaProjection 前台服务可见通知满足平台约束；拒绝通知权限时 App Inbox 可靠降级。
+验证：Web 修改一条测试 Bug 后只生成一条 outbox/Inbox 事实；Electron 获得真实 socket 提示、回读该 Inbox、Windows 只弹一条且点击回到正确 Bug；断开后重连补读同一 Inbox 不重复。关键失败只证明 socket 断开时 durable Inbox 仍可补读。Android 打开时可回读 Inbox；拒绝通知权限时继续可靠提单，不把 GET/WorkManager 称为实时 Push。
 
 Gate `G6-BUILD-VERIFICATION`：真实构建完成后指定验收人收到通知并进入待验收。
 
@@ -995,7 +1005,13 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error 与 Bug 详情/events/Comment 已由桌面浏览器经 4174 server-side auth proxy -> 4319 -> SQLite 验证；原 PWA 插件与 Service Worker 已移除。当前按最小真实切片继续：分配与状态修改 -> 一键 Relay/回执/失败重试 -> Build/人工 Verification/关闭；随后补搜索/组合筛选、去重合并与必要项目/人员/角色/模块/Relay 设置。每段只保留一条成功与一个关键失败，复杂筛选、批量操作和设置细节进入收尾清单。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配与 `reported -> ready` 已由桌面浏览器经 4174 server-side auth proxy -> 4319 -> SQLite 验证；原 PWA 插件与 Service Worker 已移除。当前安全点先进入 P7.5 Windows 壳；完成一条真实托盘/通知深链后回到本步骤，继续一键 Relay/回执/失败重试 -> Build/人工 Verification/关闭，再补搜索/组合筛选、去重合并与必要设置。每段只保留一条成功与一个关键失败，复杂筛选、批量操作和设置细节进入收尾清单。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+
+#### P7.5 Windows Electron 桌面壳
+
+状态：`IN_PROGRESS`，紧随已验证的 P7.4 最小真实管理页面，完成后回到 P7.4 管理闭环。建立独立 `apps/desktop`，复用 `apps/web` production 资产；实现安全 BrowserWindow、单实例、托盘隐藏/恢复/显式退出、可配置登录自启，以及主进程认证 WebSocket -> Inbox 补读 -> Windows Notification -> Bug 深链。主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。
+
+最小验证：本地构建并运行 Electron；关闭窗口后托盘与进程/连接仍存活；Web 修改一条真实 Bug 后 SQLite 只有同一 Inbox 事实，主进程收到事件并只弹一条 Windows 通知，点击恢复并打开对应详情；显式托盘退出才结束。保留一个断开 socket 后重连/前台补读同一 Inbox 且不重复的失败路径，不扩厂商 Push 或安装矩阵。
 
 Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态、版本和待办。
 
@@ -1088,7 +1104,8 @@ P0 contracts 冻结后：
 | D Integrations/Test    | relay-client、build-client、fake servers、contract/e2e                                             | P5/P6                          | G6         |
 | E Ops/Security         | runbooks、health、backup、service scripts、安全测试                                                | P2/P8/P10                      | G8/G10     |
 | F Poco QA Bridge       | 实际 Unity QA/Debug 测试包中的最小 loopback/provider 兼容层；先只读审计，后独占明确文件            | P3.1/P3.8                      | G3         |
-| W Desktop Web          | `apps/web`；正式桌面管理 UI，只经 QA Hub API 使用同一事实源                                         | P7.4 IN_PROGRESS               | G7/G4/G5/G6 |
+| W Desktop Web          | `apps/web`；浏览器与 Electron 复用的正式桌面管理 UI，只经 QA Hub API 使用同一事实源                  | P7.4 IN_PROGRESS               | G7/G4/G5/G6 |
+| WD Windows Desktop     | `apps/desktop`；Electron 主进程/预加载/托盘/认证 WSS/Inbox 补读/原生通知；不复制 renderer 业务 UI     | P7.5 IN_PROGRESS               | G7/G6       |
 
 并行纪律：
 

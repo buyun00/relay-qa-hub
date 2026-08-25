@@ -3,23 +3,23 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P7`（桌面 Web 正式管理平台恢复为 MVP 主路径；G3-G7 尚未正式关闭）
-- Current pointer: `P7.4`（桌面 Bug 列表、详情、时间线和评论已接通真实 API；当前进入负责人分配与状态修改）
+- Current pointer: `P7.5`（P7.4 最小真实管理页面已接通列表、详情、评论、负责人和状态；当前进入 Electron Windows 壳与 durable Inbox 通知深链）
 - Current gate: `G7-WORKBENCH-READY`（不得把 P0 Web 壳或临时 API 响应误报为 G7 完成）
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G7-WORKBENCH-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P3.1, P3.3, P3.4, P3.5, P3.6, P3.7, P4.1, P4.2, P4.3, P5.1, P5.4, P6.1, P6.2, P7.1, P7.2, P7.4`
-- Current delivery slice: `desktop Web -> same-origin proxy -> 4319 API -> SQLite Bug list/detail/timeline/Comment is real; Android remains field capture/submit only`
-- Minimal verification: `下一切片只证明对一条 reported Bug 经同一 API 分配负责人并修改状态、回读持久结果；保留一个 stale expectedVersion 冲突`
-- Next atomic action: `P7.4 IN_PROGRESS：按冻结 updateBug/transition 契约补最小 SQLite adapter 与 Web 控件，接通负责人分配 + 状态修改，然后进入一键 Relay/回执展示`
+- Active work packages: `P3.1, P3.3, P3.4, P3.5, P3.6, P3.7, P4.1, P4.2, P4.3, P5.1, P5.4, P6.1, P6.2, P7.1, P7.2, P7.4, P7.5`
+- Current delivery slice: `same React/Vite management UI remains browser-accessible; apps/desktop now adds the Windows daily-entry lifecycle and notification transport without a second fact source; Android remains field capture/submit only`
+- Minimal verification: `本地 Electron 单实例运行；关闭窗口后托盘/进程/连接存活；真实 Web Bug 变更 -> 一条 durable Inbox -> 一条 Windows 通知 -> 点击打开对应详情；socket 断开后补读不重复`
+- Next atomic action: `P7.5 IN_PROGRESS：新建 apps/desktop，复用 apps/web build，先实现安全 BrowserWindow、单实例与托盘生命周期，再接真实 WSS/Inbox/Windows 通知深链`
 - Completed gates: `1 / 11`
-- Last green commit: `3f7f258`
+- Last green commit: `77c7f1f`
 - Last deployed commit: `none`
 - Schema version: `contract 1.1.0; database v3 verified at P1.2`
 - Production URL: `not deployed`
 - Last production verification: `none`
 - Last backup verified: `none`
 - Last restore drill: `none`
-- Blockers: `当前 P7.4 负责人/状态切片无外部 blocker；真实 Relay/Unity/Jenkins 均不在授权范围`
-- Updated at: `2026-08-25T19:05:07+08:00`
+- Blockers: `当前 P7.5 Electron/Windows notification slice 无外部 blocker；真实 Relay/Unity/Jenkins 均不在授权范围`
+- Updated at: `2026-08-25T19:34:00+08:00`
 
 ## Gate status
 
@@ -33,7 +33,7 @@
 | G4-HUMAN-CLOSED-LOOP      | PLANNED |                                                                                                                                 |                           |
 | G5-RELAY-INTEGRATED       | PLANNED |                                                                                                                                 |                           |
 | G6-BUILD-VERIFICATION     | PLANNED |                                                                                                                                 |                           |
-| G7-WORKBENCH-READY        | IN_PROGRESS | [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md) + [`docs/evidence/P7.4-desktop-detail-comment.md`](docs/evidence/P7.4-desktop-detail-comment.md)：真实列表、详情、时间线与评论；管理闭环仍未完成 | 2026-08-25T19:05:07+08:00 |
+| G7-WORKBENCH-READY        | IN_PROGRESS | [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md) + [`docs/evidence/P7.4-desktop-detail-comment.md`](docs/evidence/P7.4-desktop-detail-comment.md) + [`docs/evidence/P7.4-desktop-assignment-state.md`](docs/evidence/P7.4-desktop-assignment-state.md)：真实列表、详情、评论、分配与状态；管理闭环仍未完成 | 2026-08-25T19:30:05+08:00 |
 | G8-OPERATIONS-READY       | PLANNED |                                                                                                                                 |                           |
 | G9-REAL-DEVICE            | PLANNED |                                                                                                                                 |                           |
 | G10-PRODUCTION-CANARY     | PLANNED |                                                                                                                                 |                           |
@@ -76,7 +76,8 @@
 | P7.1  | VERIFYING   | root + Luna/max          | G3 (MVP override)   | duplicate candidates                                 | one bounded real candidate + Android hint; one unrelated empty result                              | [`docs/evidence/P7.1-mumu-duplicate-candidates.md`](docs/evidence/P7.1-mumu-duplicate-candidates.md)：MuMu 显示 5 条；无关 LOCAL-7 为 0；未自动 duplicate/验收 | `48a2bee9f5754d7bdad3cd63bd5712c570599d3e` | 2026-08-25T15:42:46+08:00 |
 | P7.2  | VERIFYING   | root + Luna/max          | G4,P7.1             | workbench/filters                                    | one bounded Android list + state filter; one invalid-filter failure                                | [`docs/evidence/P7.2-mumu-bug-workbench.md`](docs/evidence/P7.2-mumu-bug-workbench.md)：MuMu 回读 5 个 reported Bug/snapshot 18；非法 state 400 | `b3bab0ad4946a70276f4807edf473695f0a7b2cc` | 2026-08-25T15:56:07+08:00 |
 | P7.3  | PLANNED     | unassigned               | P7.2                | metrics/export                                       | fact-table recomputation                                                                           |                                                                       |                                            | 2026-08-24                |
-| P7.4  | IN_PROGRESS | root + Luna/max          | P3.3,P7.2           | formal desktop QA management Web                     | real assignment/state update + one stale-version failure                                             | [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md) + [`docs/evidence/P7.4-desktop-detail-comment.md`](docs/evidence/P7.4-desktop-detail-comment.md) | `3f7f258cd63b22c228b0f0d5974528f80f29ebe3` | 2026-08-25T19:05:07+08:00 |
+| P7.4  | IN_PROGRESS | root + Luna/max          | P3.3,P7.2           | formal desktop QA management Web                     | one-click QA Hub Relay handoff/receipt + fake unavailable queued/retry                                | [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md) + [`docs/evidence/P7.4-desktop-detail-comment.md`](docs/evidence/P7.4-desktop-detail-comment.md) + [`docs/evidence/P7.4-desktop-assignment-state.md`](docs/evidence/P7.4-desktop-assignment-state.md) | `77c7f1fdfbb6967dbfe66a3115ca853dfea13833` | 2026-08-25T19:30:05+08:00 |
+| P7.5  | IN_PROGRESS | root + Luna/xhigh        | P7.4,P6.2           | Electron Windows shell + durable Inbox notification  | tray/single-instance + one real Inbox -> Windows notification/deep-link + reconnect dedup           |                                                                       |                                            | 2026-08-25T19:34:00+08:00 |
 | P8.1  | PLANNED     | unassigned               | G6,G7               | security hardening                                   | security suite/secret scan                                                                         |                                                                       |                                            | 2026-08-24                |
 | P8.2  | PLANNED     | unassigned               | P8.1                | performance/fault injection                          | p95/p99 + no-false-success                                                                         |                                                                       |                                            | 2026-08-24                |
 | P8.3  | PLANNED     | unassigned               | P1.1,P3.3           | online backup                                        | integrity/hash/retention tests                                                                     |                                                                       |                                            | 2026-08-24                |
@@ -93,7 +94,8 @@
 - `P3.3` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T09:57:30+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Bug/Occurrence 与单 PNG attachment/bind 已有 MuMu 真证据；full mobile API/scanner/idempotency hardening 转入收尾清单，主链先进入 P3.6`。
 - `P3.4` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:25:29+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Room v4 已保存 final reservation/claim；逐阶段 resume、response-loss 与 multi-chunk 在 capture 主链后补`。
 - `P3.5` — owner: `root + Luna/xhigh`; started: `2026-08-25T17:23:33+08:00`; updated: `2026-08-25T18:30:47+08:00`; state: `VERIFYING`; completed slices: `fresh workflow readback + append-only Comment/comment.created timeline + missing project/Bug 404`；boundary: `Android 管理能力冻结，不再扩完整管理后台，正式管理转 P7.4 Web`。
-- `P7.4` — owner: `root + Luna/max`; started: `2026-08-25T18:30:47+08:00`; updated: `2026-08-25T19:05:07+08:00`; state: `IN_PROGRESS`; completed slices: `真实 desktop list/snapshot + invalid project 400；真实 Bug detail/events + missing Bug 404 + Comment/comment.created 回读`；next atomic action: `接通负责人分配与状态修改，并证明 stale expectedVersion 明确失败`。
+- `P7.4` — owner: `root + Luna/max`; started: `2026-08-25T18:30:47+08:00`; updated: `2026-08-25T19:34:00+08:00`; state: `IN_PROGRESS`; completed slices: `真实 desktop list/snapshot + invalid project 400；Bug detail/events + missing 404 + Comment；负责人分配 + reported->ready + stale 412`；next atomic action: `P7.5 最小桌面壳/通知完成后恢复一键 QA Hub Relay/receipt；Web 不直连 Relay`。
+- `P7.5` — owner: `root + Luna/xhigh`; started: `2026-08-25T19:34:00+08:00`; updated: `2026-08-25T19:34:00+08:00`; state: `IN_PROGRESS`; next atomic action: `新建独立 apps/desktop，以 Electron 安全壳加载 apps/web build，先完成单实例/托盘/显式退出，再接主进程认证 WSS -> Inbox -> Windows Notification -> Bug 深链`。
 - `P3.6` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:57:27+08:00`; updated: `2026-08-25T11:19:01+08:00`; state: `IN_PROGRESS`; next atomic action: `MuMu 已证明显式授权、悬浮球、2560x1440 MediaProjection PNG 到 attachment/Bug 及拒绝降级；录屏、Share/Picker、旋转/真机/API37 进入收尾，不阻塞 P3.7`。
 - `P3.7` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T11:19:01+08:00`; updated: `2026-08-25T12:36:50+08:00`; state: `VERIFYING`; next atomic action: `MuMu MVP 已证明 partial Poco PNG 与 unavailable no-Poco bundle 均同 captureId bound/readable；真实 Unity、qa.snapshot、LAN-negative、真机/API37 由 P3.8/P3.9/P9.1 补证，不阻塞当前 P5.1`。
 - `P4.1` — owner: `root + Luna/max`; started: `2026-08-25T15:56:07+08:00`; updated: `2026-08-25T16:24:37+08:00`; state: `VERIFYING`; next atomic action: `MuMu 已创建/回读 mode=human 的 planned Attempt，并证明缺交付证据 400/无 delivered event；完整转交/supersede/external 后补`。
@@ -102,7 +104,7 @@
 - `P5.1` — owner: `root + Android Luna/xhigh`; started: `2026-08-25T12:36:50+08:00`; updated: `2026-08-25T13:39:53+08:00`; state: `VERIFYING`; completed slice: `MuMu Android -> QA outbox -> independent fake Relay -> submitted receipt/readback 已通过；fake unavailable 保留 queued/retry`；remaining: `附件选择、正式 M2M、真实 Relay 对账`。
 - `P5.4` — owner: `root + Luna/xhigh`; started: `2026-08-25T13:39:53+08:00`; updated: `2026-08-25T14:05:41+08:00`; state: `VERIFYING`; completed slice: `MuMu Android -> signed fake callback -> durable Inbox -> fix_delivered readback 已通过；旧 revision 明确 ignored，Bug/Verification 未变`；remaining: `真实 Relay 事件类型、继续任务与对账`。
 - `P6.1` — owner: `root + Luna/max`; started: `2026-08-25T14:05:41+08:00`; updated: `2026-08-25T15:09:48+08:00`; state: `VERIFYING`; completed slice: `MuMu Android -> QA Hub manual Build POST 201 -> SQLite exact deliveredCommitSha -> Android GET 200；wrong SHA 返回 422 且未落库，Bug/Verification 未变`；remaining: `真实 provider/artifact provenance、失败恢复与正式 G6`。
-- `P6.2` — owner: `root + Luna/xhigh`; started: `2026-08-25T15:09:48+08:00`; updated: `2026-08-25T15:25:34+08:00`; state: `VERIFYING`; completed slice: `build.registered outbox -> durable notifications/Inbox -> MuMu Android GET 已通过；重复 GET 不重复`；remaining: `后台 projector、Push、mark-read、pagination/quiet-hours、真机`。
+- `P6.2` — owner: `root + Luna/xhigh`; started: `2026-08-25T15:09:48+08:00`; updated: `2026-08-25T19:34:00+08:00`; state: `VERIFYING`; completed slice: `build.registered outbox -> durable notifications/Inbox -> MuMu Android GET 已通过；重复 GET 不重复，但不等于 Push`；remaining: `P7.5 Electron 认证 WSS/Inbox 补读/Windows 通知、后台 projector、mark-read、pagination/quiet-hours；Android FCM/厂商 Push 为后续可选`。
 - `P7.1` — owner: `root + Luna/max`; started: `2026-08-25T15:25:34+08:00`; updated: `2026-08-25T15:42:46+08:00`; state: `VERIFYING`; completed slice: `MuMu Android 创建 Bug 后从真实 4319/SQLite 回读最多五条同项目候选；无关 LOCAL-7 为 0，且未自动 duplicate/验收/关闭`；remaining: `FTS/pHash、提交前 draft query、评测集、索引与正式 G7`。
 - `P7.2` — owner: `root + Luna/max`; started: `2026-08-25T15:42:46+08:00`; updated: `2026-08-25T15:56:07+08:00`; state: `VERIFYING`; completed slice: `MuMu Android 从真实 4319 回读五个 reported Bug/snapshot 18；非法 state 返回 400 INVALID_REQUEST`；remaining: `cursor、组合筛选、保存视图、文本搜索和正式 G7`。
 
@@ -143,6 +145,8 @@
 | P6.1 manual provider 使用受控假 download URL，且 `registerBuild` receipt 中保存的 `http_status=200` 与当前 HTTP `201` 不一致 | 不能宣称真实 artifact 可下载；未来复用 generic receipt status 时可能回放错误状态码 | 接真实 provider/artifact 或启用通用 HTTP receipt replayer | 接 immutable provider provenance；把冻结 status 与路由统一为 201 | provider artifact GET 成功；同 key 重放仍返回 201 |
 | P6.2 MVP 当前由 `GET /notifications` 在同一事务内消费 notification outbox | GET 具有写副作用且无人轮询时通知不投影，不能作为后台通知系统完成证据 | 客户端不打开 Inbox、代理重试 GET 或进入 Push 阶段 | 增加 lease/CAS 驱动的独立 notification projector；GET 恢复为纯读 | projector 重启/重复投递后只一条，连续 GET 不产生 DML |
 | P6.2 当前固定第一页并始终返回 `nextCursor=null`，尚无 mark-read/quiet-hours/定向收件人规则 | 超过 50 条会被截断且 unread 无法在 App 内清零；全项目成员可能收到过宽通知 | 通知量超过 limit、用户读消息或引入 assignee/verification owner | 实现稳定 cursor、mark-read CAS、收件人规则和静默期；Push 只消费同一事实 | 51 条分页无漏重；read 后 unread--；非收件人无消息 |
+| 当前 MuMu 无 GMS，`POST_NOTIFICATIONS=false`；既有 Android Inbox GET 不是系统/实时 Push | 误报会掩盖用户实际上收不到后台提醒；Android 15 也禁止后台偷启前台服务 | App 未打开或测试模式未显式启动 | 当前 MVP 由 P7.5 Electron 承担管理提醒；Android 打开即刷新 Inbox，WorkManager 只作低频兜底；可选测试模式 WebSocket/FCM/厂商 Push 后续再做 | MuMu 只保留 Inbox 回读事实；不得以 GET/15 分钟轮询称实时；权限拒绝不阻塞提单 |
+| Electron 首版接受较大安装体积，Tauri 暂缓 | 安装包/常驻内存可能高于理想值 | 实际发布包或工作集超出后续预算 | 先完成 P7.5 真实托盘/通知主链并记录包体/空闲内存；只有实际超预算且 Rust/C++ 工具链可用时再评估 Tauri | Electron smoke 通过；后续用同一业务 UI 对比包体/内存，不重写管理前端 |
 | P7.1 当前只做 trim/lower/空白折叠后的 title+description 精确匹配，并在 Bug 创建后才查询 | 近似重复会漏报，用户不能在提交前避免新增重复 Bug；全项目行扫描不适合大数据量 | 文案轻微变化、图片重复或项目 Bug 量增长 | 增加 additive draft-candidate query、FTS/错误签名/pHash 索引和固定评测集；保持只提示不自动合并 | 一条近似文本/图片候选、一个无关负例、提交前无副作用查询 |
 | P7.2 当前固定 `nextCursor=null`，只实现 project/state/limit 且 Android 固定 reported | 超过首 100 条会截断，复杂工作台维度和保存视图不可用 | Bug 数量增长或用户按负责人/版本/模块组合筛选 | 增加 snapshot-bound cursor、冻结其余 filters 与 saved-view persistence；Android 提供可配置 filter UI | 101 条双页无漏重；组合 filter 与 Android/API 结果一致 |
 | P4.1/P4.2 当前只接通 `mode=human` 的 exact code delivery + manifest Build link；MR/patch/no-code、external、transfer、supersede 尚未接通 | 不能据此宣称全部修复来源或正式 G4 完成 | 用户选择非代码交付、external 或转交/替换负责人 | 在正式 G4 收尾补冻结证据分支与 Attempt 历史操作 | MR/patch/no-code/external 各一条；transfer/supersede 不覆盖历史 |
@@ -152,6 +156,8 @@
 | Android debug 首页仍保留历史管理按钮 | 新架构下可能误导用户把 Android 当完整管理后台 | 使用当前 debug APK | P7.4 主链稳定后从 Android 主导航移除/feature-gate 分配、Build、Verification、Relay 与完整审计，仅保留采集/提交/轻量状态 | Android 首页只出现现场功能；Web 对同一事实完成管理 |
 | P7.4 高级筛选、批量操作与完整设置尚未开始 | 不阻塞首条列表/详情主链，但不能宣称完整 G7 | 首条 Web 页面通过后进入复杂管理需求 | 先逐段打通列表、详情、管理闭环；高级组合、批量和设置细节统一收尾 | 每段一条真实页面/API smoke，最终再做 G7 组合验收 |
 | Bug events 读取层把 mixed aggregate 的 `aggregate.type` 一律写成 `bug` | Web 审计时间线会把 RepairAttempt/Build/Verification 的资源身份标错 | Bug 时间线包含非 Bug 聚合事件 | 读取 `events.aggregate_type`，扩展 typed union 并返回实际类型；不改变 append-only 事实 | 一条真实 mixed timeline 校验 type/id 对，Comment 仍为 `bug` |
+| `bug.updated` 事件隐私 guard 当前只允许将 changed fields/owner 写入 bounded `summary`，不能保存结构化 `changedFields`/`ownerId` | 审计可读但下游机器处理必须解析文案 | Web 修改负责人或其他可变字段 | additive event payload policy 明确允许非敏感 structured diff，并保持字段 allowlist/redaction | owner assign/unassign 各一条，timeline 直接读取结构化值且 secret guard 仍拒绝敏感字段 |
+| 既有 `transitionBugReady` 接收 Idempotency-Key 但尚无 durable HTTP receipt replay | 成功响应丢失后精确重试可能变成版本冲突 | ready transition 成功但客户端未收到响应 | 复用本次 `updateBug` reservation/commit/replay 模式 | 同 key/body 丢响应后返回同一 v3；改 payload 返回 mismatch |
 
 ## Completed evidence
 
@@ -187,6 +193,7 @@
 - P3.5 Comment/audit slice 于 `2026-08-25T18:30:47+08:00` 验证：MuMu/API35 经真实 4319/SQLite 对 `LOCAL-11` 追加 Comment `870beb5c-a9d6-491d-bed6-d866081bbc82` 并回读 `comment.created` event `d974bff7-bce9-4ee1-9886-b7a9dd8fd399`，missing Bug=`404 NOT_FOUND`；混合 aggregate timeline 客户端修复提交为 `c2788b7fe53fa0adb143ca055d5efea11558990e`。证据见 [`docs/evidence/P3.5-mumu-comment-audit.md`](docs/evidence/P3.5-mumu-comment-audit.md)。无令牌 APK/4319/reverse 已清理；P3.5 转 `VERIFYING` 并冻结 Android 管理扩展，唯一 pointer 切到 P7.4 Web。
 - P7.4 desktop Bug list slice 于 `2026-08-25T18:50:22+08:00` 验证并提交为 `f1ed5dc68e7e7fe51d38620cf213a3ba8a2a4284`：真实浏览器经 Vite server-side bearer proxy/4319/SQLite 显示 `LOCAL-12..LOCAL-1` 与 snapshot `48`；哨兵项目在页面明确显示 `400 INVALID_REQUEST`，未伪装为空列表。PWA/Service Worker 已移除，4174/4319 与一次性凭据已清理。证据见 [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md)。P7.4/G7 保持 `IN_PROGRESS`，唯一 pointer 进入详情/时间线/评论；未启动 Android、Relay、Unity 或 Jenkins。
 - P7.4 desktop detail/timeline/Comment slice 于 `2026-08-25T19:05:07+08:00` 验证并提交为 `3f7f258cd63b22c228b0f0d5974528f80f29ebe3`：真实浏览器经 4174/4319/SQLite 回读 `LOCAL-11 closed/v7` 与完整 bounded timeline；同一 Web API client 创建 Comment `1ec28b8e-8ea0-42a5-8a17-45982d8aa7b1` 后回读匹配 `comment.created` event `3f93fc8f-9b20-4246-b4ac-f64895390b8a`，页面显示 12 条；哨兵 Bug 明确显示 `404 NOT_FOUND`。4174/4319、临时 helper 和一次性凭据均已清理。证据见 [`docs/evidence/P7.4-desktop-detail-comment.md`](docs/evidence/P7.4-desktop-detail-comment.md)。P7.4/G7 保持 `IN_PROGRESS`，唯一 pointer 进入负责人/状态；未启动 Android、Relay、Unity 或 Jenkins。
+- P7.4 desktop assignment/state slice 于 `2026-08-25T19:30:05+08:00` 验证并提交为 `77c7f1fdfbb6967dbfe66a3115ca853dfea13833`：真实浏览器经 4174/4319/SQLite 将 `LOCAL-12` 从 `reported/v1/owner=null` 分配到 active QA 成员并回读 `reported/v2`，再转为 `ready/v3`；页面显示成功回读与 `bug.updated #2`、`bug.triage.ready #3`，另一 stale v1 PATCH 返回 `412 VERSION_CONFLICT`。SQLite 同时确认 update receipt=`committed/200`。4174/4319、临时 helper 和一次性凭据均已清理。证据见 [`docs/evidence/P7.4-desktop-assignment-state.md`](docs/evidence/P7.4-desktop-assignment-state.md)。P7.4/G7 保持 `IN_PROGRESS`，唯一 pointer 进入一键 Relay/receipt；未启动 Android、真实 Relay、Unity 或 Jenkins。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 
