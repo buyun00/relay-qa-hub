@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 8c1d821d24b99a2fff939806f0095cf97dd7d908
-  last_verified_at: 2026-08-25T10:25:29+08:00
-  next_action: P3.3 首个 API 到 Android/MuMu 的 Bug/Occurrence 真链路已验证；当前接最小 attachment session/chunk/finalize/bind 与 Room 队列，随后进入 capture/overlay/Poco
+  last_verified_commit: 3382b4046ee38763a6a931d9ff70ba8532206aff
+  last_verified_at: 2026-08-25T10:57:27+08:00
+  next_action: P3.3/P3.4 单 PNG attachment 到 Bug 真链路已验证；当前 P3.6 实现最小 overlay/MediaProjection capture 并复用该上传路径，Poco 保持 optional fallback
   blockers:
     - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1/G2 仍未正式关闭，但按执行 override 不阻塞 P3 主链路实现
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
