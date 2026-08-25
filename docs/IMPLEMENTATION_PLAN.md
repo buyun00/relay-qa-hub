@@ -15,11 +15,11 @@ qa_hub_progress:
   gates_completed: 1
   gates_total: 11
   last_verified_commit: 0478ea64416d6e82ab82e98b705a7f2630acdf44
-  last_verified_at: 2026-08-26T00:26:55+08:00
-  next_action: P7.4 IN_PROGRESS；真实 Edge 已验证 mutation selection 隔离及项目 Bug 列表/目录全有或全无 view generation；只再做一次有界普通浏览器组合签收，通过后统一打包回归 Windows 应用
+  last_verified_at: 2026-08-26T00:37:57+08:00
+  next_action: P7.5 IN_PROGRESS；P7.4 普通 Edge 组合签收已形成 current Web MVP 稳定基线；现在统一打包一次 Windows x64 package 并回归 exact React/Vite 资产
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
-    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类、跨刷新恢复、Edge 详情/mutation selection 及 project view 原子应用已由真实 Web -> 4319 -> SQLite 验证；最终有界浏览器组合签收仍未完成，不能误报为 G7 完成
+    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类、跨刷新恢复、Edge 选择/原子 view 与最终组合签收均已由真实 Web -> 4319 -> SQLite 验证；P7.4 进入 VERIFYING 稳定基线，但 P7.5 latest-Web package/runtime 尚未回归，不能误报 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -1006,11 +1006,11 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后从服务端事实恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路；wrong-SHA Build、非法 severity、self-target duplicate、无权项目与未知 workflow Bug 分别被真实 `422/400/422/403/404` 拒绝且没有错误业务写入。选择一致性证据见 [`docs/evidence/P7.4-desktop-mutation-selection.md`](evidence/P7.4-desktop-mutation-selection.md)；最新原子视图证据见 [`docs/evidence/P7.4-desktop-atomic-project-view.md`](evidence/P7.4-desktop-atomic-project-view.md)：真实 list 已返回三张而真实 modules 上游 `200` 被单侧改为 `503` 时，页面仍保留旧两张 Bug、旧目录与 active project，恢复后才一次提交三张与目录。当前唯一指针只剩一次有界普通 Edge 组合签收；cursor/保存视图/批量、真正 project_admin 设置写入、unlinked Build response-loss 与 additive workflow contract 进入收尾清单。组合签收通过即形成当前 Web MVP 稳定基线，再统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`VERIFYING`，属于 `0.1.0-debug` 当前 Web MVP 稳定基线。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路。最终组合证据见 [`docs/evidence/P7.4-desktop-combined-edge-signoff.md`](evidence/P7.4-desktop-combined-edge-signoff.md)：普通 Edge 在同一 fresh API/SQLite 上完成目录、列表、详情/时间线、owner、`reported -> ready`、Comment 和选择切换，Relay/人工 workflow 控件只渲染未误触发，invalid project `400` 不改变 active project、selected detail 或 durable facts。cursor/保存视图/批量、真正 project_admin 设置写入、standalone invalid-project 保留旧 rows、unlinked Build response-loss 与 additive workflow contract 进入收尾清单，不阻塞 exact Web baseline 的 Windows package/runtime 回归。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 #### P7.5 Windows Electron 桌面壳
 
-状态：`VERIFYING`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现并真实运行，当前指针已回到 P7.4 普通浏览器管理主链。独立 `apps/desktop` 复用 `apps/web` production 资产；安全 BrowserWindow、单实例、托盘隐藏/恢复/显式退出、可配置登录自启，以及主进程认证 WebSocket -> Inbox 补读 -> Windows Notification -> Bug 深链均已接通。主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。证据见 [`docs/evidence/P7.5-windows-desktop-notification.md`](evidence/P7.5-windows-desktop-notification.md)；当前自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，实际 Notification show/Windows 平台投递与同一 `routeToBug()` 深链已分别真实证明。后续不再为每个 Web 切片重复打包；待 P7.4 浏览器功能稳定后统一执行 Windows 打包、安装与桌面回归。
+状态：`IN_PROGRESS`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现并真实运行；P7.4 普通浏览器现已形成稳定基线，当前唯一指针是统一打包/回归该 exact Web 资产。独立 `apps/desktop` 复用 `apps/web` production 资产；安全 BrowserWindow、单实例、托盘隐藏/恢复/显式退出、可配置登录自启，以及主进程认证 WebSocket -> Inbox 补读 -> Windows Notification -> Bug 深链均已接通。主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。证据见 [`docs/evidence/P7.5-windows-desktop-notification.md`](evidence/P7.5-windows-desktop-notification.md)；当前自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，实际 Notification show/Windows 平台投递与同一 `routeToBug()` 深链已分别真实证明。本次只为 Web 稳定点统一构建一次 package，不重复普通浏览器功能矩阵。
 
 最小验证：本地构建并运行 Electron；关闭窗口后托盘与进程/连接仍存活；Web 修改一条真实 Bug 后 SQLite 只有同一 Inbox 事实，主进程收到事件并只弹一条 Windows 通知，点击恢复并打开对应详情；显式托盘退出才结束。保留一个断开 socket 后重连/前台补读同一 Inbox 且不重复的失败路径，不扩厂商 Push 或安装矩阵。
 
