@@ -33,12 +33,20 @@ import com.relayqahub.android.FoundationUiState
 import com.relayqahub.android.FoundationViewModel
 
 @Composable
-fun FoundationScreen(viewModel: FoundationViewModel) {
+fun FoundationScreen(
+    viewModel: FoundationViewModel,
+    onStartCaptureSession: () -> Unit,
+    onCaptureNow: () -> Unit,
+    onStopCaptureSession: () -> Unit,
+) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     FoundationScreen(
         state = state,
         onQueueDraft = viewModel::queueLocalDraft,
         onRunLiveSmoke = viewModel::runLiveSmoke,
+        onStartCaptureSession = onStartCaptureSession,
+        onCaptureNow = onCaptureNow,
+        onStopCaptureSession = onStopCaptureSession,
     )
 }
 
@@ -47,6 +55,9 @@ internal fun FoundationScreen(
     state: FoundationUiState,
     onQueueDraft: () -> Unit,
     onRunLiveSmoke: () -> Unit,
+    onStartCaptureSession: () -> Unit,
+    onCaptureNow: () -> Unit,
+    onStopCaptureSession: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -103,6 +114,11 @@ internal fun FoundationScreen(
                 detail = "Queued and live JSON writes share the additive App-first vendor media type and contract boundary.",
                 value = "Contract ${state.contractVersion}",
             )
+            FoundationCard(
+                title = "Explicit evidence session",
+                detail = "MediaProjection starts only after system consent; the persistent notification and Stop action remain visible.",
+                value = "Overlay capture stays optional; ordinary defects remain available",
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -123,6 +139,35 @@ internal fun FoundationScreen(
                         .testTag("live-smoke"),
                 ) {
                     Text("Run live smoke")
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Button(
+                    onClick = onStartCaptureSession,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("start-capture-session"),
+                ) {
+                    Text("Start capture session")
+                }
+                OutlinedButton(
+                    onClick = onCaptureNow,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("capture-now"),
+                ) {
+                    Text("Capture now")
+                }
+                OutlinedButton(
+                    onClick = onStopCaptureSession,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("stop-capture-session"),
+                ) {
+                    Text("Stop")
                 }
             }
 

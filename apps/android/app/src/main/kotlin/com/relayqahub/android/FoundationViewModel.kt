@@ -97,15 +97,60 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun runLiveSmoke() {
+        submitPngAttachment(
+            pngBytes = createLiveSmokePng(),
+            filename = LIVE_SMOKE_FILENAME,
+            captureId = null,
+            actionLabel = "Live smoke",
+        )
+    }
+
+    fun submitCapturedPng(captureId: String, pngBytes: ByteArray) {
+        val immutableBytes = pngBytes.copyOf()
+        submitPngAttachment(
+            pngBytes = immutableBytes,
+            filename = "capture-$captureId.png",
+            captureId = captureId,
+            actionLabel = "Capture",
+        )
+    }
+
+    fun reportCaptureUnavailable(reason: String) {
+        lastAction.value = "Capture unavailable: $reason. Ordinary defect entry remains available."
+    }
+
+    fun reportCaptureSessionState(active: Boolean) {
+        lastAction.value = if (active) {
+            "Capture session active. Use the visible QA ball or Capture now; Stop is always available."
+        } else {
+            "Capture session stopped. Ordinary defect entry remains available."
+        }
+    }
+
+    fun reportCaptureSessionStarting() {
+        lastAction.value = "Starting the explicitly authorized capture session…"
+    }
+
+    fun reportPendingCaptureSaved(captureId: String, width: Int, height: Int) {
+        lastAction.value =
+            "Pending capture $captureId saved locally (${width}x$height); add details before submit."
+    }
+
+    private fun submitPngAttachment(
+        pngBytes: ByteArray,
+        filename: String,
+        captureId: String?,
+        actionLabel: String,
+    ) {
         viewModelScope.launch {
             val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
             if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
                 lastAction.value =
-                    "Live smoke unavailable: configure qaHubDebugAccessToken for a debug build."
+                    "$actionLabel unavailable: configure qaHubDebugAccessToken for a debug build."
                 return@launch
             }
 
-            lastAction.value = "Uploading a real PNG, then committing it through the Room queue…"
+            lastAction.value = "Uploading $actionLabel PNG, then committing it through the Room queue…"
             val result = runCatching {
                 appContainer.scopedRepository.seedFoundationScope(scope)
                 when (
@@ -132,9 +177,10 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     scope = scope,
                     clientSubmissionId = submissionId,
                     clientAttachmentId = clientAttachmentId,
-                    filename = LIVE_SMOKE_FILENAME,
-                    pngBytes = createLiveSmokePng(),
+                    filename = filename,
+                    pngBytes = pngBytes,
                     accessToken = accessToken,
+                    captureId = captureId,
                 )
                 appContainer.scopedRepository.recordAttachmentReservation(scope, uploadReceipt)
 
@@ -159,7 +205,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         qaItemKey = receipt.qaItemKey,
                         responseJson = receipt.responseJson,
                     )
-                    "Live smoke created ${receipt.qaItemKey}; attachment " +
+                    "$actionLabel created ${receipt.qaItemKey}; attachment " +
                         "${claimed.attachmentId} is ${claimed.bindingStatus}."
                 } else {
                     "Attachment ${uploadReceipt.attachmentId} is reserved; Bug commit " +
@@ -172,7 +218,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     is AttachmentUploadFailure -> failure.code
                     else -> "UNEXPECTED_LOCAL_FAILURE"
                 }
-                "Live smoke failed: $code."
+                "$actionLabel failed: $code."
             }
         }
     }

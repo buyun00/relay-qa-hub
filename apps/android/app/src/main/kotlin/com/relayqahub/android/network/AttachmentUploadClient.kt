@@ -71,10 +71,12 @@ class AttachmentUploadClient(
         filename: String,
         pngBytes: ByteArray,
         accessToken: String,
+        captureId: String? = null,
     ): AttachmentUploadReceipt = withContext(Dispatchers.IO) {
         requireUuid(scope.projectId, "projectId")
         requireUuid(clientSubmissionId, "clientSubmissionId")
         requireUuid(clientAttachmentId, "clientAttachmentId")
+        captureId?.let { requireUuid(it, "captureId") }
         require(filename.isNotBlank() && filename.length <= 255)
         require(pngBytes.isNotEmpty() && pngBytes.size <= MAX_SMOKE_PNG_BYTES)
         require(accessToken.isNotBlank())
@@ -93,6 +95,7 @@ class AttachmentUploadClient(
             .put("mediaType", PNG_MEDIA_TYPE_VALUE)
             .put("expectedSize", pngBytes.size)
             .put("sha256", sha256)
+            .apply { captureId?.let { put("captureId", it) } }
             .toString()
         val init = executeJson(
             request = jsonRequest(
@@ -115,6 +118,11 @@ class AttachmentUploadClient(
         init.requireString("mediaType", PNG_MEDIA_TYPE_VALUE)
         init.requireInt("expectedSize", pngBytes.size)
         init.requireString("sha256", sha256)
+        if (captureId == null) {
+            if (!init.isNull("captureId")) throw AttachmentUploadFailure("INIT_CAPTURE_PRESENT")
+        } else {
+            init.requireString("captureId", captureId)
+        }
         init.requireInt("expectedChunkCount", 1)
         init.requireInt("receivedBytes", 0)
         init.requireInt("version", INIT_VERSION)
@@ -174,6 +182,13 @@ class AttachmentUploadClient(
         finalized.requireString("clientSubmissionId", clientSubmissionId)
         finalized.requireString("clientAttachmentId", clientAttachmentId)
         finalized.requireString("sha256", sha256)
+        if (captureId == null) {
+            if (!finalized.isNull("captureId")) {
+                throw AttachmentUploadFailure("FINALIZE_CAPTURE_PRESENT")
+            }
+        } else {
+            finalized.requireString("captureId", captureId)
+        }
         finalized.requireInt("size", pngBytes.size)
         finalized.requireString("scanStatus", "clean")
         finalized.requireBoolean("readyToBind", true)
