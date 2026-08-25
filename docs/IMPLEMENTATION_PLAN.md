@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P3
-  current_gate: G3-ANDROID-APP-READY
+  current_phase: P7
+  current_gate: G7-WORKBENCH-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 2265c42e1f131bef07cbfefc712dcc6a99704201
-  last_verified_at: 2026-08-26T01:35:29+08:00
-  next_action: P3.6 IN_PROGRESS；P3.4 已用真实 MuMu 证明 app-private PNG -> Room/WorkManager retry -> 同幂等身份 attachment/Bug/final receipt；当前把真实 SAVE_PENDING capture 草稿接入该队列
+  last_verified_commit: e7ace6c2af183290614f183881e775d5ef3bdd19
+  last_verified_at: 2026-08-26T02:12:21+08:00
+  next_action: P7.4 IN_PROGRESS；P3.6 已用真实 MuMu 证明 SAVE_PENDING -> 重启回读 -> 离线显式提交 -> 单一 attachment/Bug receipt；当前先在普通浏览器接通 Android 提交证据的 Web 详情展示，稳定后才统一打 Windows 包
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -843,6 +843,15 @@ post-P4 MVP consolidation：P4.1-P4.3 已分别跑通 human Attempt、exact Buil
 实现 SAW 明示授权、拖动/贴边收起、显式取证会话、mediaProjection 前台服务/通知、Android 14+ 单次授权与 onStop 清理、单击/双击/长按、防误触、Sharesheet receiver、Photo Picker 和 `FLAG_SECURE` 安全降级。单击先隐藏悬浮球，再创建 captureId 并行调用 P3.7 enrichment。
 
 验证：拖动不触发、双击不连带单击、长按恰一次；权限拒绝/撤销、旋转、锁屏、来电/弹窗、Task Manager Stop、服务/App 被杀都不自动恢复捕获；普通截图草稿始终可提交。
+
+MuMu pending-capture MVP slice 已于 `2026-08-26T02:12:21+08:00` 完成：真实悬浮球双击生成
+2560 x 1440 app-private PNG，媒体完成后才原子发布 sidecar；force-stop/cold-start 回读同一
+`captureId`，用户显式提交时 4319/reverse 不可达而进入 `RETRY`，恢复后沿固定
+`clientSubmissionId/clientAttachmentId` 只创建一份 attachment 与 `LOCAL-1`，上传和附件均保留同一
+captureId。实现 commit 为 `e7ace6c2af183290614f183881e775d5ef3bdd19`，证据见
+[`docs/evidence/P3.6-mumu-pending-capture-recovery.md`](evidence/P3.6-mumu-pending-capture-recovery.md)。
+P3.6 转 `VERIFYING`；离线 Poco bundle、录屏、Sharesheet/Photo Picker、加密/retention、旋转、
+`FLAG_SECURE`、真机与 API37 属 G3/G9 收尾，不阻塞浏览器优先的 P7.4 主线。
 
 #### P3.7 Android Poco 只读 adapter 与证据包
 
