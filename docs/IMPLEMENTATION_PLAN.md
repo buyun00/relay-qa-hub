@@ -14,11 +14,11 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 83b198b
-  last_verified_at: 2026-08-25T16:24:37+08:00
-  next_action: P4.2 IN_PROGRESS（MVP execution override）；把 Relay-offline human RepairAttempt 的 exact delivered commit 绑定/回读 QA-owned manual Build；一个 wrong-SHA 绑定明确失败
+  last_verified_commit: 410507d
+  last_verified_at: 2026-08-25T16:53:19+08:00
+  next_action: P4.3 IN_PROGRESS（MVP execution override）；对 exact Build 绑定后的 human RepairAttempt 创建/开始/通过人工 Verification 并关闭 Bug；一个缺失或错误验收证据明确失败
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P4.2 exact delivery/Build link 主链路
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P4.3 human Verification/close 主链路
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -860,11 +860,15 @@ MuMu MVP execution override：先在 Relay 完全离线时由 Android 为真实 
 
 MuMu MVP execution override：复用已有 QA-owned manual Build adapter，先把一个 human RepairAttempt 的证据化 exact delivered commit 绑定/GET 回读；保留一个 wrong-SHA 绑定失败。真实 provider、完整 release authority 与审计矩阵后补，不阻塞 Android 人工闭环主链继续进入 Verification。
 
+已验证 slice：MuMu/API35 Android 经真实 4319/SQLite 把 human Attempt 的 exact delivered commit 注册为 QA-owned manual Build，并用同 SHA 的 manifest/BuildRequirement 建立 repair link；Bug 只进入 `ready_for_verification`，没有 Verification 或自动关闭。wrong SHA 返回 `422 BUILD_IDENTITY_MISMATCH` 且未创建 Build。P4.2 转 `VERIFYING`，唯一指针进入 P4.3。
+
 验证：错误 SHA、仅版本名匹配、失败 Build 都不能用于验收。
 
 #### P4.3 Verification 和失败重开
 
 要做：验收领取、criteria snapshot、通过/失败/阻塞、S0/S1 分离职责、关闭和重开。
+
+MuMu MVP execution override：先对 P4.2 的 exact Attempt/Build 创建并回读一条人工 Verification，显式开始、记录 `passed` 结果并由同一人工操作关闭 Bug；保留一个缺失/错误验收证据不能关闭的失败。失败重开、blocked/cancelled、S0/S1 分离职责与 newer-build reopen 留在正式 Gate 收尾。
 
 验证：
 
