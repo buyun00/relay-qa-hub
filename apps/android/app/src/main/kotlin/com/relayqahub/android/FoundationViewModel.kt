@@ -31,6 +31,8 @@ import com.relayqahub.android.security.VaultResult
 import com.relayqahub.android.security.nativeSessionScope
 import com.relayqahub.android.poco.PocoEnrichmentStatus
 import com.relayqahub.android.work.SyncRunResult
+import com.relayqahub.android.work.OfflineAttachmentDraftContract
+import com.relayqahub.android.work.StagedOfflineAttachment
 import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -47,6 +49,10 @@ data class FoundationUiState(
     val projectName: String = "Preparing native foundation…",
     val cachedItemCount: Int = 0,
     val queuedOperationCount: Int = 0,
+    val latestQaItemId: String? = null,
+    val latestQaItemKey: String? = null,
+    val latestDeliveryState: String? = null,
+    val latestDeliveryError: String? = null,
     val credentialBoundary: String = "Checking Android Keystore…",
     val contractVersion: String = QaHubApiContract.VERSION,
     val lastAction: String = "Ready for offline-first QA work.",
@@ -161,6 +167,10 @@ private data class ScopeUiValues(
     val projectName: String,
     val cachedItemCount: Int,
     val queuedOperationCount: Int,
+    val latestQaItemId: String?,
+    val latestQaItemKey: String?,
+    val latestDeliveryState: String?,
+    val latestDeliveryError: String?,
 )
 
 private data class DeliveryUiValues(
@@ -206,12 +216,17 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         appContainer.scopedRepository.observeProject(scope),
         appContainer.scopedRepository.observeCachedItems(scope),
         appContainer.scopedRepository.observeOutstandingCount(scope),
-    ) { account, project, cachedItems, queuedCount ->
+        appContainer.scopedRepository.observeLatestSubmission(scope),
+    ) { account, project, cachedItems, queuedCount, latestSubmission ->
         ScopeUiValues(
             accountName = account?.displayName ?: "Local account scope",
             projectName = project?.displayName ?: "Local project scope",
             cachedItemCount = cachedItems.size,
             queuedOperationCount = queuedCount,
+            latestQaItemId = latestSubmission.receipt?.qaItemId,
+            latestQaItemKey = latestSubmission.receipt?.qaItemKey,
+            latestDeliveryState = latestSubmission.operation?.state?.name,
+            latestDeliveryError = latestSubmission.operation?.lastErrorCode,
         )
     }
 
@@ -256,6 +271,10 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             projectName = values.projectName,
             cachedItemCount = values.cachedItemCount,
             queuedOperationCount = values.queuedOperationCount,
+            latestQaItemId = values.latestQaItemId,
+            latestQaItemKey = values.latestQaItemKey,
+            latestDeliveryState = values.latestDeliveryState,
+            latestDeliveryError = values.latestDeliveryError,
             credentialBoundary = if (support.available) {
                 "${support.provider} format v${support.formatVersion} available"
             } else {
@@ -310,15 +329,91 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun runLiveSmoke() {
-        submitPngAttachment(
+        queueOfflinePngDraft(
             pngBytes = createLiveSmokePng(),
             filename = LIVE_SMOKE_FILENAME,
-            captureId = null,
-            capturedAtEpochMs = null,
             actionLabel = "Live smoke",
-            pocoSummary = null,
-            pocoArtifacts = emptyList(),
         )
+    }
+
+    private fun queueOfflinePngDraft(
+        pngBytes: ByteArray,
+        filename: String,
+        actionLabel: String,
+    ) {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                lastAction.value =
+                    "$actionLabel unavailable: configure qaHubDebugAccessToken for a debug build."
+                return@launch
+            }
+
+            val submissionId = UUID.randomUUID().toString()
+            val clientAttachmentId = UUID.randomUUID().toString()
+            var filePersisted = false
+            lastAction.value = "Saving $actionLabel PNG before any network call…"
+            val result = runCatching {
+                appContainer.scopedRepository.seedFoundationScope(scope)
+                when (
+                    appContainer.credentialVault.put(
+                        scope = scope.nativeSessionScope(),
+                        credentials = NativeCredentials(
+                            accessToken = accessToken,
+                            refreshToken = LIVE_SMOKE_UNUSED_REFRESH_TOKEN,
+                            accessTokenExpiresAtEpochMs =
+                                System.currentTimeMillis() + LIVE_SMOKE_CREDENTIAL_TTL_MS,
+                            sharedDeviceSession = false,
+                        ),
+                    )
+                ) {
+                    is VaultResult.Success -> Unit
+                    VaultResult.Missing -> throw LiveSmokeFailure("CREDENTIAL_WRITE_MISSING")
+                    is VaultResult.Unavailable ->
+                        throw LiveSmokeFailure("CREDENTIAL_VAULT_UNAVAILABLE")
+                }
+                val metadata = appContainer.offlineAttachmentDraftStore.persist(
+                    submissionId = submissionId,
+                    clientAttachmentId = clientAttachmentId,
+                    pngBytes = pngBytes,
+                )
+                filePersisted = true
+                val operationId = appContainer.scopedRepository.enqueue(
+                    scope = scope,
+                    request = OfflineAttachmentDraftContract.buildOperation(
+                        projectId = scope.projectId,
+                        staged = StagedOfflineAttachment(
+                            submissionId = submissionId,
+                            clientAttachmentId = clientAttachmentId,
+                            filename = filename,
+                            observedAt = Instant.now().toString(),
+                            qaAppVersion = BuildConfig.VERSION_NAME,
+                            expectedSize = metadata.expectedSize,
+                            sha256 = metadata.sha256,
+                        ),
+                    ),
+                )
+                appContainer.syncScheduler.enqueue(scope)
+                operationId
+            }
+            result.onSuccess { operationId ->
+                lastAction.value =
+                    "$actionLabel attachment draft queued (${operationId.take(8)}); " +
+                        "delivery will resume when QA Hub is reachable."
+            }.onFailure { failure ->
+                if (filePersisted) {
+                    runCatching {
+                        appContainer.offlineAttachmentDraftStore.delete(
+                            submissionId,
+                            clientAttachmentId,
+                        )
+                    }
+                }
+                val code = (failure as? LiveSmokeFailure)?.code
+                    ?: "OFFLINE_DRAFT_PERSIST_FAILED"
+                lastAction.value = "$actionLabel failed: $code."
+            }
+        }
     }
 
     /**

@@ -1,11 +1,13 @@
 package com.relayqahub.android.work
 
 import com.relayqahub.android.data.AccountProjectScope
+import com.relayqahub.android.data.AttachmentPipelineReceiptDao
 import com.relayqahub.android.data.OfflineOperationDao
 import com.relayqahub.android.data.OfflineOperationEntity
 import com.relayqahub.android.data.OfflineOperationReceiptEntity
 import com.relayqahub.android.data.QueueState
 import com.relayqahub.android.network.ApiOutcome
+import com.relayqahub.android.network.CreateBugReceipt
 import com.relayqahub.android.network.QaHubApiClient
 import com.relayqahub.android.security.CredentialVault
 import com.relayqahub.android.security.VaultResult
@@ -27,6 +29,9 @@ class OfflineSyncEngine(
     private val operationDao: OfflineOperationDao,
     private val apiClient: QaHubApiClient,
     private val credentialVault: CredentialVault,
+    private val attachmentDraftProcessor: OfflineAttachmentDraftProcessor? = null,
+    private val attachmentReceiptDao: AttachmentPipelineReceiptDao? = null,
+    private val attachmentDraftStore: OfflineAttachmentDraftStore? = null,
     private val clock: () -> Long = System::currentTimeMillis,
 ) {
     suspend fun run(
@@ -91,6 +96,58 @@ class OfflineSyncEngine(
         var sawAuthFailure = false
         var exhaustedRetry = false
         ready.forEach { operation ->
+            if (operation.operationKind == OfflineAttachmentDraftContract.OPERATION_KIND) {
+                when (
+                    val stage = attachmentDraftProcessor?.promote(
+                        scope,
+                        operation,
+                        credentials.accessToken,
+                    ) ?: OfflineAttachmentStageResult.PermanentFailure(
+                        "OFFLINE_ATTACHMENT_PROCESSOR_UNAVAILABLE",
+                    )
+                ) {
+                    OfflineAttachmentStageResult.Promoted -> Unit
+                    is OfflineAttachmentStageResult.AuthExpired -> {
+                        sawAuthFailure = true
+                        record(
+                            scope,
+                            operation,
+                            QueueState.BLOCKED_AUTH,
+                            stage.errorCode,
+                            now,
+                        )
+                    }
+                    is OfflineAttachmentStageResult.PermanentFailure -> record(
+                        scope,
+                        operation,
+                        QueueState.FAILED_PERMANENT,
+                        stage.errorCode,
+                        now,
+                    )
+                    is OfflineAttachmentStageResult.Retryable -> {
+                        val nextPersistentAttempt = operation.attemptCount + 1
+                        if (nextPersistentAttempt >= MAX_OPERATION_ATTEMPTS) {
+                            exhaustedRetry = true
+                            record(
+                                scope,
+                                operation,
+                                QueueState.FAILED_PERMANENT,
+                                "RETRY_EXHAUSTED_${stage.errorCode}",
+                                now,
+                            )
+                        } else {
+                            record(
+                                scope,
+                                operation,
+                                QueueState.RETRY,
+                                stage.errorCode,
+                                now + retryDelayMs(operation.attemptCount),
+                            )
+                        }
+                    }
+                }
+                return@forEach
+            }
             when (val outcome = apiClient.execute(operation, credentials.accessToken)) {
                 is ApiOutcome.Success -> {
                     val receipt = outcome.createBugReceipt
@@ -132,6 +189,7 @@ class OfflineSyncEngine(
                             ),
                             nowEpochMs = clock(),
                         )
+                        completeAttachmentSubmission(operation, receipt)
                     }
                 }
                 is ApiOutcome.AuthExpired -> {
@@ -183,6 +241,42 @@ class OfflineSyncEngine(
                 nowEpochMs = now,
                 exhaustedRetry = exhaustedRetry,
             )
+        }
+    }
+
+    private suspend fun completeAttachmentSubmission(
+        operation: OfflineOperationEntity,
+        receipt: CreateBugReceipt,
+    ) {
+        val receiptDao = attachmentReceiptDao ?: return
+        val staged = receiptDao.listForSubmission(
+            accountId = operation.accountId,
+            projectId = operation.projectId,
+            actorId = operation.actorId,
+            installationId = operation.installationId,
+            sessionId = operation.sessionId,
+            clientSubmissionId = receipt.clientSubmissionId,
+        )
+        if (staged.isEmpty()) return
+        check(
+            receiptDao.markSubmissionClaimed(
+                accountId = operation.accountId,
+                projectId = operation.projectId,
+                actorId = operation.actorId,
+                installationId = operation.installationId,
+                sessionId = operation.sessionId,
+                clientSubmissionId = receipt.clientSubmissionId,
+                qaItemId = receipt.qaItemId,
+                qaItemKey = receipt.qaItemKey,
+                responseJson = receipt.responseJson,
+                updatedAtEpochMs = clock(),
+            ) == staged.size,
+        ) { "Attachment claim receipt lost its scoped reservation" }
+        val store = attachmentDraftStore ?: return
+        staged.forEach { attachment ->
+            runCatching {
+                store.delete(receipt.clientSubmissionId, attachment.clientAttachmentId)
+            }
         }
     }
 

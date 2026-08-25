@@ -5,6 +5,12 @@ import com.relayqahub.android.network.QaHubRelativePath
 import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+
+data class LocalSubmissionSnapshot(
+    val operation: OfflineOperationEntity?,
+    val receipt: OfflineOperationReceiptEntity?,
+)
 
 data class AccountProjectScope(
     val accountId: String,
@@ -39,6 +45,7 @@ class ScopedRepository(
     private val cachedQaItemDao: CachedQaItemDao,
     private val offlineOperationDao: OfflineOperationDao,
     private val attachmentPipelineReceiptDao: AttachmentPipelineReceiptDao,
+    private val submissionReceiptDao: SubmissionReceiptDao,
     private val clock: () -> Long = System::currentTimeMillis,
 ) : AccountDataCleaner {
     fun observeAccount(accountId: String): Flow<AccountEntity?> =
@@ -58,6 +65,25 @@ class ScopedRepository(
             scope.installationId,
             scope.sessionId,
         )
+
+    fun observeLatestSubmission(
+        scope: AccountProjectScope,
+    ): Flow<LocalSubmissionSnapshot> = combine(
+        submissionReceiptDao.observeLatestOperationForScope(
+            scope.accountId,
+            scope.projectId,
+            scope.actorId,
+            scope.installationId,
+            scope.sessionId,
+        ),
+        submissionReceiptDao.observeLatestForScope(
+            scope.accountId,
+            scope.projectId,
+            scope.actorId,
+            scope.installationId,
+            scope.sessionId,
+        ),
+    ) { operation, receipt -> LocalSubmissionSnapshot(operation, receipt) }
 
     suspend fun listBlockedDeviceScopes(): List<AccountProjectScope> =
         offlineOperationDao.listBlockedDeviceScopes()

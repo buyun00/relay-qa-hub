@@ -130,6 +130,20 @@ internal fun FoundationScreen(
                 value = "${state.cachedItemCount} cached • ${state.queuedOperationCount} queued",
             )
             FoundationCard(
+                title = "Latest submission",
+                detail = "The final Room receipt survives process restart and identifies the QA item.",
+                value = state.latestQaItemKey?.let { key ->
+                    "$key • ${state.latestQaItemId}"
+                } ?: "No completed submission yet",
+            )
+            FoundationCard(
+                title = "Offline delivery",
+                detail = "Queued media stays app-private while WorkManager waits or retries.",
+                value = state.latestDeliveryState?.let { deliveryState ->
+                    state.latestDeliveryError?.let { "$deliveryState • $it" } ?: deliveryState
+                } ?: "No queued operation yet",
+            )
+            FoundationCard(
                 title = "Constrained delivery",
                 detail = "WorkManager uses connected-network, battery, unique-work, and exponential backoff gates.",
                 value = "4-run retry ceiling",

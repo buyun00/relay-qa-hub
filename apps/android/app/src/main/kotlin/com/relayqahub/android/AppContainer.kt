@@ -19,6 +19,8 @@ import com.relayqahub.android.security.AndroidKeystoreCredentialVault
 import com.relayqahub.android.security.CredentialVault
 import com.relayqahub.android.security.SessionLifecycleCoordinator
 import com.relayqahub.android.work.OfflineSyncEngine
+import com.relayqahub.android.work.OfflineAttachmentDraftProcessor
+import com.relayqahub.android.work.OfflineAttachmentDraftStore
 import com.relayqahub.android.work.DeviceSecurityResumeCoordinator
 import com.relayqahub.android.work.SyncScheduler
 import java.util.concurrent.TimeUnit
@@ -36,6 +38,7 @@ class AppContainer private constructor(
     val duplicateCandidateClient: DuplicateCandidateClient,
     val inboxClient: InboxClient,
     val humanWorkflowClient: HumanWorkflowClient,
+    val offlineAttachmentDraftStore: OfflineAttachmentDraftStore,
     val credentialVault: CredentialVault,
     val syncEngine: OfflineSyncEngine,
     val syncScheduler: SyncScheduler,
@@ -118,7 +121,9 @@ class AppContainer private constructor(
                 cachedQaItemDao = database.cachedQaItemDao(),
                 offlineOperationDao = database.offlineOperationDao(),
                 attachmentPipelineReceiptDao = database.attachmentPipelineReceiptDao(),
+                submissionReceiptDao = database.submissionReceiptDao(),
             )
+            val offlineAttachmentDraftStore = OfflineAttachmentDraftStore(applicationContext)
             val syncScheduler = SyncScheduler(WorkManager.getInstance(applicationContext))
             return AppContainer(
                 database = database,
@@ -132,11 +137,20 @@ class AppContainer private constructor(
                 duplicateCandidateClient = duplicateCandidateClient,
                 inboxClient = inboxClient,
                 humanWorkflowClient = humanWorkflowClient,
+                offlineAttachmentDraftStore = offlineAttachmentDraftStore,
                 credentialVault = credentialVault,
                 syncEngine = OfflineSyncEngine(
                     operationDao = database.offlineOperationDao(),
                     apiClient = apiClient,
                     credentialVault = credentialVault,
+                    attachmentDraftProcessor = OfflineAttachmentDraftProcessor(
+                        draftDao = database.offlineAttachmentDraftDao(),
+                        scopedRepository = scopedRepository,
+                        uploadClient = attachmentUploadClient,
+                        draftStore = offlineAttachmentDraftStore,
+                    ),
+                    attachmentReceiptDao = database.attachmentPipelineReceiptDao(),
+                    attachmentDraftStore = offlineAttachmentDraftStore,
                 ),
                 syncScheduler = syncScheduler,
                 sessionLifecycle = SessionLifecycleCoordinator(

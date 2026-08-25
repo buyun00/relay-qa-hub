@@ -24,6 +24,8 @@ abstract class QaHubDatabase : RoomDatabase() {
     abstract fun cachedQaItemDao(): CachedQaItemDao
     abstract fun offlineOperationDao(): OfflineOperationDao
     abstract fun attachmentPipelineReceiptDao(): AttachmentPipelineReceiptDao
+    abstract fun submissionReceiptDao(): SubmissionReceiptDao
+    abstract fun offlineAttachmentDraftDao(): OfflineAttachmentDraftDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {

@@ -80,6 +80,108 @@ interface AttachmentPipelineReceiptDao {
         clientSubmissionId: String,
         clientAttachmentId: String,
     ): AttachmentPipelineReceiptEntity?
+
+    @Query(
+        "SELECT * FROM attachment_pipeline_receipts " +
+            "WHERE accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId AND clientSubmissionId = :clientSubmissionId " +
+            "ORDER BY clientAttachmentId",
+    )
+    suspend fun listForSubmission(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        clientSubmissionId: String,
+    ): List<AttachmentPipelineReceiptEntity>
+
+    @Query(
+        "UPDATE attachment_pipeline_receipts SET bindingStatus = 'claimed', " +
+            "qaItemId = :qaItemId, qaItemKey = :qaItemKey, responseJson = :responseJson, " +
+            "updatedAtEpochMs = :updatedAtEpochMs " +
+            "WHERE accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId AND clientSubmissionId = :clientSubmissionId " +
+            "AND bindingStatus = 'reserved'",
+    )
+    suspend fun markSubmissionClaimed(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        clientSubmissionId: String,
+        qaItemId: String,
+        qaItemKey: String,
+        responseJson: String,
+        updatedAtEpochMs: Long,
+    ): Int
+}
+
+@Dao
+interface SubmissionReceiptDao {
+    @Query(
+        "SELECT * FROM offline_operation_receipts " +
+            "WHERE accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId " +
+            "ORDER BY receivedAtEpochMs DESC, operationId DESC LIMIT 1",
+    )
+    fun observeLatestForScope(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+    ): Flow<OfflineOperationReceiptEntity?>
+
+    @Query(
+        "SELECT * FROM offline_operations " +
+            "WHERE accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId " +
+            "ORDER BY createdAtEpochMs DESC, operationId DESC LIMIT 1",
+    )
+    fun observeLatestOperationForScope(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+    ): Flow<OfflineOperationEntity?>
+}
+
+@Dao
+interface OfflineAttachmentDraftDao {
+    @Query(
+        "UPDATE offline_operations SET operationKind = :operationKind, " +
+            "httpMethod = :httpMethod, relativePath = :relativePath, " +
+            "payloadJson = :payloadJson, state = 'PENDING', " +
+            "nextAttemptAtEpochMs = :nowEpochMs, lastErrorCode = NULL, " +
+            "updatedAtEpochMs = :nowEpochMs " +
+            "WHERE operationId = :operationId " +
+            "AND accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId AND idempotencyKey = :idempotencyKey " +
+            "AND state = 'RUNNING' AND operationKind = :expectedOperationKind",
+    )
+    suspend fun promoteToCreateBug(
+        operationId: String,
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        idempotencyKey: String,
+        expectedOperationKind: String,
+        operationKind: String,
+        httpMethod: String,
+        relativePath: String,
+        payloadJson: String,
+        nowEpochMs: Long,
+    ): Int
 }
 
 @Dao
