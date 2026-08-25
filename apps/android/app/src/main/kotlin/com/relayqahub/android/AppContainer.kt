@@ -8,6 +8,7 @@ import com.relayqahub.android.data.ScopedRepository
 import com.relayqahub.android.network.AttachmentUploadClient
 import com.relayqahub.android.network.BuildProjectionClient
 import com.relayqahub.android.network.BugWorkbenchClient
+import com.relayqahub.android.network.CommentTimelineClient
 import com.relayqahub.android.network.DuplicateCandidateClient
 import com.relayqahub.android.network.InboxClient
 import com.relayqahub.android.network.HumanWorkflowClient
@@ -31,6 +32,7 @@ class AppContainer private constructor(
     val repairAttemptClient: RepairAttemptClient,
     val buildProjectionClient: BuildProjectionClient,
     val bugWorkbenchClient: BugWorkbenchClient,
+    val commentTimelineClient: CommentTimelineClient,
     val duplicateCandidateClient: DuplicateCandidateClient,
     val inboxClient: InboxClient,
     val humanWorkflowClient: HumanWorkflowClient,
@@ -91,6 +93,11 @@ class AppContainer private constructor(
                 httpClient = httpClient,
                 allowLoopbackHttp = BuildConfig.DEBUG,
             )
+            val commentTimelineClient = CommentTimelineClient(
+                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                httpClient = httpClient,
+                allowLoopbackHttp = BuildConfig.DEBUG,
+            )
             val duplicateCandidateClient = DuplicateCandidateClient(
                 baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
                 httpClient = httpClient,
@@ -121,6 +128,7 @@ class AppContainer private constructor(
                 repairAttemptClient = repairAttemptClient,
                 buildProjectionClient = buildProjectionClient,
                 bugWorkbenchClient = bugWorkbenchClient,
+                commentTimelineClient = commentTimelineClient,
                 duplicateCandidateClient = duplicateCandidateClient,
                 inboxClient = inboxClient,
                 humanWorkflowClient = humanWorkflowClient,

@@ -71,6 +71,14 @@ import {
   type MobileHumanWorkflowStore,
 } from "./mobile-human-workflows.js";
 import {
+  MOBILE_BUG_COMMENTS_PATH,
+  MOBILE_BUG_EVENTS_PATH,
+  parseMobileAddBugCommentRequest,
+  parseMobileBugEventsLimit,
+  requireMobileCommentIdempotencyKey,
+  type MobileCommentStore,
+} from "./mobile-comments.js";
+import {
   MOBILE_NOTIFICATION_LIST_PATH,
   parseMobileNotificationLimit,
   type MobileNotificationStore,
@@ -126,6 +134,7 @@ export interface CreateApiAppOptions {
   readonly mobileDuplicateStore?: MobileDuplicateStore;
   readonly mobileVerificationStore?: MobileVerificationStore;
   readonly mobileHumanWorkflowStore?: MobileHumanWorkflowStore;
+  readonly mobileCommentStore?: MobileCommentStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
@@ -234,6 +243,15 @@ const unconfiguredMobileHumanWorkflowStore: MobileHumanWorkflowStore = {
   getLatest: () => null,
 };
 
+const unconfiguredMobileCommentStore: MobileCommentStore = {
+  addComment: () => {
+    throw new Error("MobileCommentStore is not configured");
+  },
+  listEvents: () => {
+    throw new Error("MobileCommentStore is not configured");
+  },
+};
+
 const unconfiguredMobileNotificationStore: MobileNotificationStore = {
   listNotifications: () => {
     throw new Error("MobileNotificationStore is not configured");
@@ -280,6 +298,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     options.mobileVerificationStore ?? unconfiguredMobileVerificationStore;
   const mobileHumanWorkflowStore =
     options.mobileHumanWorkflowStore ?? unconfiguredMobileHumanWorkflowStore;
+  const mobileCommentStore = options.mobileCommentStore ?? unconfiguredMobileCommentStore;
   const mobileNotificationStore =
     options.mobileNotificationStore ?? unconfiguredMobileNotificationStore;
   const mobileRelayWebhookStore =
@@ -800,6 +819,63 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
     },
   );
+
+  app.post<{ Params: { bugId: string } }>(
+    MOBILE_BUG_COMMENTS_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const bugId = requireRelayUuid(request.params.bugId, "bugId");
+        const body = parseMobileAddBugCommentRequest(request.body);
+        const idempotencyKey = requireMobileCommentIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+          bugId,
+          body.clientSubmissionId,
+        );
+        const result = await mobileCommentStore.addComment({
+          actorId: debugActorId,
+          bugId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send({
+          comment: {
+            id: result.comment.id,
+            bugId: result.comment.bugId,
+            authorId: result.comment.authorId,
+            body: result.comment.body,
+            clientSubmissionId: result.clientSubmissionId,
+            createdAt: result.comment.createdAt,
+            version: result.comment.version,
+          },
+        });
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.get<{
+    Params: { bugId: string };
+    Querystring: { limit?: string | string[] };
+  }>(MOBILE_BUG_EVENTS_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const result = await mobileCommentStore.listEvents({
+        actorId: debugActorId,
+        bugId,
+        limit: parseMobileBugEventsLimit(request.query.limit),
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      return relayErrorReply(error, reply);
+    }
+  });
 
   app.post<{ Params: { projectId: string } }>(
     MOBILE_BUILD_COLLECTION_PATH,

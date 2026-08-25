@@ -22,6 +22,12 @@ import type {
 } from "./mobile-bug-list-store.js";
 import type { MobileHumanWorkflowProjection } from "./mobile-human-workflow-store.js";
 import type {
+  CreateMobileCommentInput,
+  ListMobileBugEventsInput,
+  MobileBugEvents,
+  MobileCommentCreation,
+} from "./mobile-comment-store.js";
+import type {
   CreateMobileCaptureInput,
   MobileCaptureBundleRecord,
   MobileCaptureCreation,
@@ -226,6 +232,16 @@ export class SqliteStorageWorker {
       "getLatestMobileHumanWorkflow",
       input,
     );
+  }
+
+  async createMobileComment(input: CreateMobileCommentInput): Promise<MobileCommentCreation> {
+    await this.initialization;
+    return this.request<MobileCommentCreation>("createMobileComment", input);
+  }
+
+  async listMobileBugEvents(input: ListMobileBugEventsInput): Promise<MobileBugEvents> {
+    await this.initialization;
+    return this.request<MobileBugEvents>("listMobileBugEvents", input);
   }
 
   async listMobileDuplicateCandidates(

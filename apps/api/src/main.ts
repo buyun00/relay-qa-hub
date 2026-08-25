@@ -16,6 +16,7 @@ import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
 import { createSqliteMobileRelayWebhookStore } from "./sqlite-mobile-relay-webhook-store.js";
 import { createSqliteMobileVerificationStore } from "./sqlite-mobile-verification-store.js";
 import { createSqliteMobileHumanWorkflowStore } from "./sqlite-mobile-human-workflow-store.js";
+import { createSqliteMobileCommentStore } from "./sqlite-mobile-comment-store.js";
 import {
   parseFakeRelayEndpoint,
   startMobileRelayOutboxPump,
@@ -87,6 +88,7 @@ async function run(): Promise<void> {
         worker,
         scope: MOBILE_SCOPE,
       }),
+      mobileCommentStore: createSqliteMobileCommentStore({ worker, scope: MOBILE_SCOPE }),
       mobileDuplicateStore: createSqliteMobileDuplicateStore({ worker, scope: MOBILE_SCOPE }),
       mobileNotificationStore: createSqliteMobileInboxStore({ worker, scope: MOBILE_SCOPE }),
       mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),

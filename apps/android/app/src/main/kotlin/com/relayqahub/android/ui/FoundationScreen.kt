@@ -46,6 +46,7 @@ fun FoundationScreen(
     onDeliverManualRepairAndLinkBuild: () -> Unit = viewModel::deliverManualRepairAndLinkBuild,
     onVerifyManualRepairAndClose: () -> Unit = viewModel::verifyManualRepairAndClose,
     onRefreshLatestHumanWorkflow: () -> Unit = viewModel::refreshLatestHumanWorkflow,
+    onCreateCommentAndReadAudit: () -> Unit = viewModel::createCommentAndReadAudit,
     onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -64,6 +65,7 @@ fun FoundationScreen(
         onDeliverManualRepairAndLinkBuild = onDeliverManualRepairAndLinkBuild,
         onVerifyManualRepairAndClose = onVerifyManualRepairAndClose,
         onRefreshLatestHumanWorkflow = onRefreshLatestHumanWorkflow,
+        onCreateCommentAndReadAudit = onCreateCommentAndReadAudit,
         onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
     )
 }
@@ -84,6 +86,7 @@ internal fun FoundationScreen(
     onDeliverManualRepairAndLinkBuild: () -> Unit = {},
     onVerifyManualRepairAndClose: () -> Unit = {},
     onRefreshLatestHumanWorkflow: () -> Unit = {},
+    onCreateCommentAndReadAudit: () -> Unit = {},
     onCreateBugAndCheckDuplicates: () -> Unit = {},
 ) {
     Scaffold(
@@ -374,6 +377,35 @@ internal fun FoundationScreen(
                     text = "Human workflow readback error: " +
                         "${state.humanWorkflow.errorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("human-workflow-status"),
+                )
+            }
+            Button(
+                onClick = onCreateCommentAndReadAudit,
+                enabled = state.commentAudit.phase != "loading",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("create-comment-audit"),
+            ) {
+                Text("评论并回读审计时间线")
+            }
+            when (state.commentAudit.phase) {
+                "loading" -> Text(
+                    text = "Comment/audit: writing and reading persisted facts…",
+                    modifier = Modifier.testTag("comment-audit-status"),
+                )
+                "loaded" -> Text(
+                    text = "${state.commentAudit.bugKey} Comment=" +
+                        "${state.commentAudit.commentId}; event=" +
+                        "${state.commentAudit.eventType}/${state.commentAudit.eventId}; " +
+                        "timeline=${state.commentAudit.eventCount}; missing=" +
+                        "${state.commentAudit.missingBugRejectionCode}; body=" +
+                        "${state.commentAudit.commentBody}.",
+                    modifier = Modifier.testTag("comment-audit-status"),
+                )
+                "failed" -> Text(
+                    text = "Comment/audit error: " +
+                        "${state.commentAudit.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("comment-audit-status"),
                 )
             }
             Button(

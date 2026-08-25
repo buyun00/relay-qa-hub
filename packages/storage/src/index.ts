@@ -245,6 +245,15 @@ export type {
 } from "./mobile-bug-store.js";
 export { getLatestMobileHumanWorkflow } from "./mobile-human-workflow-store.js";
 export type { MobileHumanWorkflowProjection } from "./mobile-human-workflow-store.js";
+export { createMobileComment, listMobileBugEvents } from "./mobile-comment-store.js";
+export type {
+  CreateMobileCommentInput,
+  ListMobileBugEventsInput,
+  MobileBugEvent,
+  MobileBugEvents,
+  MobileCommentCreation,
+  MobileCommentRecord,
+} from "./mobile-comment-store.js";
 export { listMobileBugs } from "./mobile-bug-list-store.js";
 export type {
   ListMobileBugsInput,

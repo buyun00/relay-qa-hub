@@ -110,6 +110,15 @@ export { MOBILE_HUMAN_WORKFLOW_LATEST_PATH } from "./mobile-human-workflows.js";
 export type { MobileHumanWorkflowStore } from "./mobile-human-workflows.js";
 
 export {
+  MOBILE_BUG_COMMENTS_PATH,
+  MOBILE_BUG_EVENTS_PATH,
+  parseMobileAddBugCommentRequest,
+  parseMobileBugEventsLimit,
+  requireMobileCommentIdempotencyKey,
+} from "./mobile-comments.js";
+export type { MobileAddBugCommentRequest, MobileCommentStore } from "./mobile-comments.js";
+
+export {
   MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
   requireDuplicateBugUuid,
 } from "./mobile-duplicates.js";

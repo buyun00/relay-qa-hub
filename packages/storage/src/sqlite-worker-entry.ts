@@ -25,6 +25,12 @@ import {
 } from "./mobile-bug-list-store.js";
 import { getLatestMobileHumanWorkflow } from "./mobile-human-workflow-store.js";
 import {
+  createMobileComment,
+  listMobileBugEvents,
+  type CreateMobileCommentInput,
+  type ListMobileBugEventsInput,
+} from "./mobile-comment-store.js";
+import {
   createMobileCapture,
   getMobileCapture,
   type CreateMobileCaptureInput,
@@ -106,6 +112,8 @@ interface WorkerRequest {
     | "getMobileBug"
     | "listMobileBugs"
     | "getLatestMobileHumanWorkflow"
+    | "createMobileComment"
+    | "listMobileBugEvents"
     | "listMobileDuplicateCandidates"
     | "createMobileCapture"
     | "getMobileCapture"
@@ -271,6 +279,16 @@ async function execute(request: WorkerRequest): Promise<unknown> {
         readonly actorId: string;
       },
     );
+  }
+
+  if (request.operation === "createMobileComment") {
+    return inWriteTransaction((current) =>
+      createMobileComment(current, request.payload as CreateMobileCommentInput),
+    );
+  }
+
+  if (request.operation === "listMobileBugEvents") {
+    return listMobileBugEvents(requireDatabase(), request.payload as ListMobileBugEventsInput);
   }
 
   if (request.operation === "listMobileDuplicateCandidates") {

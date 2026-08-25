@@ -19,6 +19,7 @@ import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.network.BuildProjectionFailure
 import com.relayqahub.android.network.BuildProjectionResult
 import com.relayqahub.android.network.BugWorkbenchFailure
+import com.relayqahub.android.network.CommentTimelineFailure
 import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
 import com.relayqahub.android.network.HumanWorkflowFailure
@@ -56,6 +57,7 @@ data class FoundationUiState(
     val manualRepair: ManualRepairUiState = ManualRepairUiState(),
     val humanRepairBuild: HumanRepairBuildUiState = HumanRepairBuildUiState(),
     val humanWorkflow: HumanWorkflowUiState = HumanWorkflowUiState(),
+    val commentAudit: CommentAuditUiState = CommentAuditUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
 )
 
@@ -142,6 +144,18 @@ data class HumanWorkflowUiState(
     val errorCode: String? = null,
 )
 
+data class CommentAuditUiState(
+    val phase: String = "idle",
+    val bugKey: String? = null,
+    val commentId: String? = null,
+    val commentBody: String? = null,
+    val eventId: String? = null,
+    val eventType: String? = null,
+    val eventCount: Int = 0,
+    val missingBugRejectionCode: String? = null,
+    val errorCode: String? = null,
+)
+
 private data class ScopeUiValues(
     val accountName: String,
     val projectName: String,
@@ -160,6 +174,17 @@ private data class DeliveryUiValues(
 private data class DiscoveryUiValues(
     val duplicateCandidates: DuplicateCandidateUiState,
     val humanWorkflow: HumanWorkflowUiState,
+    val commentAudit: CommentAuditUiState,
+)
+
+private data class CommentAuditResult(
+    val bugKey: String,
+    val commentId: String,
+    val commentBody: String,
+    val eventId: String,
+    val eventType: String,
+    val eventCount: Int,
+    val missingBugCode: String,
 )
 
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
@@ -174,6 +199,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val humanRepairBuild = MutableStateFlow(HumanRepairBuildUiState())
     private val duplicateCandidates = MutableStateFlow(DuplicateCandidateUiState())
     private val humanWorkflow = MutableStateFlow(HumanWorkflowUiState())
+    private val commentAudit = MutableStateFlow(CommentAuditUiState())
 
     private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
@@ -208,10 +234,12 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val discoveryState = combine(
         duplicateCandidates,
         humanWorkflow,
-    ) { duplicateState, workflowState ->
+        commentAudit,
+    ) { duplicateState, workflowState, commentAuditState ->
         DiscoveryUiValues(
             duplicateCandidates = duplicateState,
             humanWorkflow = workflowState,
+            commentAudit = commentAuditState,
         )
     }
 
@@ -241,6 +269,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             manualRepair = delivery.manualRepair,
             humanRepairBuild = delivery.humanRepairBuild,
             humanWorkflow = discovery.humanWorkflow,
+            commentAudit = discovery.commentAudit,
             duplicateCandidates = discovery.duplicateCandidates,
         )
     }.stateIn(
@@ -788,6 +817,88 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         lastAction.value = "Human workflow readback failed: $code."
     }
 
+    fun createCommentAndReadAudit() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setCommentAuditFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            commentAudit.value = CommentAuditUiState(phase = "loading")
+            lastAction.value = "Appending a Comment and reading the immutable Bug timeline…"
+            runCatching {
+                val missingCode = try {
+                    appContainer.commentTimelineClient.readTimeline(
+                        bugId = MISSING_COMMENT_BUG_ID,
+                        limit = 1,
+                        accessToken = accessToken,
+                    )
+                    throw CommentTimelineFailure("MISSING_BUG_UNEXPECTEDLY_FOUND")
+                } catch (failure: CommentTimelineFailure) {
+                    if (failure.httpStatus != 404) throw failure
+                    failure.code
+                }
+                val workflow = appContainer.humanWorkflowClient.readLatest(
+                    projectId = scope.projectId,
+                    accessToken = accessToken,
+                )
+                val submissionId = UUID.randomUUID().toString()
+                val body = "MuMu native Comment audit ${Instant.now()}"
+                val comment = appContainer.commentTimelineClient.createComment(
+                    bugId = workflow.bugId,
+                    clientSubmissionId = submissionId,
+                    body = body,
+                    accessToken = accessToken,
+                )
+                val timeline = appContainer.commentTimelineClient.readTimeline(
+                    bugId = workflow.bugId,
+                    limit = COMMENT_AUDIT_MVP_LIMIT,
+                    accessToken = accessToken,
+                )
+                val event = timeline.items.firstOrNull {
+                    it.type == "comment.created" && it.commentId == comment.id
+                } ?: throw CommentTimelineFailure("COMMENT_AUDIT_EVENT_MISSING")
+                CommentAuditResult(
+                    bugKey = workflow.bugKey,
+                    commentId = comment.id,
+                    commentBody = comment.body,
+                    eventId = event.id,
+                    eventType = event.type,
+                    eventCount = timeline.items.size,
+                    missingBugCode = missingCode,
+                )
+            }.onSuccess { result ->
+                commentAudit.value = CommentAuditUiState(
+                    phase = "loaded",
+                    bugKey = result.bugKey,
+                    commentId = result.commentId,
+                    commentBody = result.commentBody,
+                    eventId = result.eventId,
+                    eventType = result.eventType,
+                    eventCount = result.eventCount,
+                    missingBugRejectionCode = result.missingBugCode,
+                )
+                lastAction.value =
+                    "${result.bugKey} Comment ${result.commentId} persisted; " +
+                        "audit=${result.eventType}; missing Bug=${result.missingBugCode}."
+            }.onFailure { failure ->
+                setCommentAuditFailure(
+                    when (failure) {
+                        is CommentTimelineFailure -> failure.code
+                        is HumanWorkflowFailure -> failure.code
+                        else -> failure.message?.takeIf(String::isNotBlank)
+                            ?: "UNEXPECTED_COMMENT_AUDIT_FAILURE"
+                    },
+                )
+            }
+        }
+    }
+
+    private fun setCommentAuditFailure(code: String) {
+        commentAudit.value = CommentAuditUiState(phase = "failed", errorCode = code)
+        lastAction.value = "Comment/audit failed: $code."
+    }
+
     fun createBugAndCheckDuplicates() {
         viewModelScope.launch {
             val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
@@ -1076,8 +1187,11 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     companion object {
         const val FOUNDATION_PROJECT_KEY = "LOCAL"
         private const val WORKBENCH_MVP_LIMIT = 20
+        private const val COMMENT_AUDIT_MVP_LIMIT = 20
         private const val MISSING_WORKFLOW_PROJECT_ID =
             "10000000-0000-4000-8000-000000000099"
+        private const val MISSING_COMMENT_BUG_ID =
+            "20000000-0000-4000-8000-000000000099"
         val FOUNDATION_SCOPE = AccountProjectScope(
             accountId = "10000000-0000-4000-8000-000000000020",
             projectId = "10000000-0000-4000-8000-000000000004",
