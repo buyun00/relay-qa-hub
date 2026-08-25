@@ -14,11 +14,11 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 9127a21
-  last_verified_at: 2026-08-25T15:25:34+08:00
-  next_action: P7.1 IN_PROGRESS（MVP execution override）；先让 Android 对真实 Bug 查询并显示 bounded duplicate candidates，保留一个无候选负例；FTS/pHash/评测集后补
+  last_verified_commit: 48a2bee
+  last_verified_at: 2026-08-25T15:42:46+08:00
+  next_action: P7.2 IN_PROGRESS（MVP execution override）；接一个 bounded Bug workbench 列表与 state filter 到 Android，保留一个非法 filter 失败；复杂组合、保存视图和完整分页后补
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P7.1 Android 去重提示主链路
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P7.2 Android workbench 主链路
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -954,13 +954,17 @@ Gate `G6-BUILD-VERIFICATION`：真实构建完成后指定验收人收到通知�
 
 要做：FTS、规范化指纹、错误签名、可选截图 pHash、候选解释。
 
-MuMu MVP execution override：先对一个真实 Bug 返回同项目内 bounded duplicate candidates，并由 Android 原生页面显示候选 key/title/reason；再用一个无关 Bug 证明空候选。FTS、pHash、固定评测集与阈值优化不阻塞该首条主链。
+MuMu MVP execution override：先对一个真实 Bug 返回同项目内 bounded duplicate candidates，并由 Android 原生页面显示候选 key/score/reason；再用一个无关 Bug 证明空候选。FTS、pHash、固定评测集与阈值优化不阻塞该首条主链。
+
+该 override slice 已由 MuMu/API35 实证通过并转入 `VERIFYING`：候选最多五条，无关 `LOCAL-7` 返回空，且 SQLite 中没有 Bug 被自动标记为 duplicate、验收或关闭；唯一进度指针进入 P7.2。
 
 验证：固定数据集 precision/recall 基线；不跨项目；绝不自动语义合并。
 
 #### P7.2 工作台和筛选
 
 要做：待我处理/验收/补充、由我报告、模块、版本、负责人、严重度、状态、发生次数、保存视图。
+
+MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列表和单一 state filter，由 Android 原生工作台真实回读；保留一个非法 filter 明确失败。复杂组合、cursor 分页、保存视图及所有负责人/版本/模块维度留在收尾与正式 Gate。
 
 验证：复杂组合筛选可重放、分页稳定、无重复/遗漏；Android App 与 API 查询结果一致。
 
