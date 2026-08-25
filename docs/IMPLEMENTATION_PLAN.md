@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 437201e66b52ae21d5e4ff08ffb9c962a77cc5a4
-  last_verified_at: 2026-08-26T06:30:26+08:00
-  next_action: P8.5 IN_PROGRESS；P8.4 create-only 隔离恢复、worker integrity/readback 与 existing-target 拒绝已转 VERIFYING；下一步只补 SQLite 引用附件的有界 inventory/hash 与隔离恢复，不覆盖任何现有 evidence root
+  last_verified_commit: c8d3043f1ed8c61ee07ce5aa0222d0e89a9b1306
+  last_verified_at: 2026-08-26T07:03:01+08:00
+  next_action: P8.6 IN_PROGRESS；P8.5 真实 attachment inventory/create-only copy/readback 与 missing-source rejection 已转 VERIFYING；下一步只做同一快照的 DB+附件组合恢复并从隔离 API 回读一条 Bug/附件，测一次 RTO
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1078,7 +1078,11 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 #### P8.5 附件清单与隔离恢复
 
-当前状态：`IN_PROGRESS`。只从 QA Hub SQLite 的附件事实生成有界 inventory（storage key、size、SHA-256），对现有 evidence root 做只读校验；随后将匹配文件 create-only 复制到全新隔离 evidence root 并回读一条真实附件。一个 missing/hash-mismatch 必须明确失败且不得生成“完整” marker。retention scheduler、异盘复制、大文件流式 hash 和完整附件矩阵继续后置。
+当前状态：`VERIFYING`。提交 `b3af66d75ab4d3086a274c33891c2e78cc5761a7` 与修复 `c8d3043f1ed8c61ee07ce5aa0222d0e89a9b1306` 已从真实 QA Hub SQLite 的 `ready/clean` 附件事实生成有界 inventory（storage key、size、SHA-256），并将 MuMu 提交的 145,986-byte PNG create-only 复制到全新隔离 evidence root；目标 SHA-256 仍为 `2e39b408...115ce`，complete marker 绑定 manifest hash。对同一 SQLite 使用空 evidence root 时返回 `ATTACHMENT_RESTORE_SOURCE_INVALID`，只保留 failed marker，未生成 complete marker；source/target canonicalization 拒绝 junction 回指源树，storage key 在 manifest 前冻结为当前 content-addressed 形状。独立复审 Blocker/High=`0/0`。证据见 [`docs/evidence/P8.5-attachment-restore.md`](evidence/P8.5-attachment-restore.md)。retention scheduler、异盘复制、大文件吞吐和完整矩阵继续后置。
+
+#### P8.6 数据库、附件与 API 组合恢复演练
+
+当前状态：`IN_PROGRESS`。从同一隔离 runtime 获取 SQLite backup 与其 SQLite 引用的 attachment inventory，恢复到同一个全新 data root；通知与 Relay 默认关闭，在独立临时端口启动 QA Hub API，只通过受控内存凭据回读一条真实 Bug、附件 metadata 和附件 bytes/hash。记录从 restore 开始到 API readback 的一次实际 RTO；只保留一个缺失附件失败，不扩登录/搜索/全矩阵。RPO 策略、随机抽样、定时器、异盘副本和前一版本回切仍为 G8 尾项。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
