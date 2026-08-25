@@ -19,6 +19,7 @@ import { createSqliteMobileVerificationStore } from "./sqlite-mobile-verificatio
 import { createSqliteMobileHumanWorkflowStore } from "./sqlite-mobile-human-workflow-store.js";
 import { createSqliteMobileCommentStore } from "./sqlite-mobile-comment-store.js";
 import { createSqliteMobileMetricsStore } from "./sqlite-mobile-metrics-store.js";
+import { createSqliteBrowserAuthStore } from "./browser-auth.js";
 import {
   parseFakeRelayEndpoint,
   startMobileRelayOutboxPump,
@@ -51,6 +52,23 @@ function readRelayWebhookSecret(fakeRelayEndpoint: URL | undefined): string | un
   return configured;
 }
 
+function readWebSessionSecret(): string | undefined {
+  const configured = process.env["QA_HUB_WEB_SESSION_SECRET"]?.trim();
+  if (configured === undefined || configured.length === 0) return undefined;
+  if (configured.length < 32) {
+    throw new Error("QA_HUB_WEB_SESSION_SECRET must contain at least 32 characters");
+  }
+  return configured;
+}
+
+function readSecureCookie(): boolean | undefined {
+  const value = process.env["QA_HUB_WEB_SECURE_COOKIE"]?.trim().toLowerCase();
+  if (value === undefined) return undefined;
+  if (value === "false") return false;
+  if (value === "true") return true;
+  throw new Error("QA_HUB_WEB_SECURE_COOKIE must be true or false");
+}
+
 async function closeRuntime(
   server: ApiServer | undefined,
   worker: SqliteStorageWorker,
@@ -77,6 +95,28 @@ async function run(): Promise<void> {
   try {
     await worker.ensureMobileScope(MOBILE_SCOPE);
     await worker.ensureMobileRelayRoles(MOBILE_SCOPE);
+    const webSessionSecret = readWebSessionSecret();
+    const secureCookie = readSecureCookie();
+    const webBootstrapPassword = process.env["QA_HUB_BOOTSTRAP_ADMIN_PASSWORD"];
+    if (webBootstrapPassword !== undefined && webSessionSecret === undefined) {
+      throw new Error("QA_HUB_WEB_SESSION_SECRET is required with QA_HUB_BOOTSTRAP_ADMIN_PASSWORD");
+    }
+    const browserAuthStore =
+      webSessionSecret === undefined
+        ? undefined
+        : createSqliteBrowserAuthStore({
+            worker,
+          });
+    if (browserAuthStore !== undefined && webBootstrapPassword !== undefined) {
+      await browserAuthStore.ensureBrowserAdmin({
+        accountId: MOBILE_SCOPE.accountId,
+        userId: MOBILE_SCOPE.actorId,
+        actorId: MOBILE_SCOPE.actorId,
+        email: `mvp-${MOBILE_SCOPE.actorId.replaceAll("-", "")}@local.invalid`,
+        password: webBootstrapPassword,
+        now: new Date().toISOString(),
+      });
+    }
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
     const fakeRelayEndpoint = parseFakeRelayEndpoint(process.env["QA_HUB_FAKE_RELAY_URL"]);
     const relayWebhookSecret = readRelayWebhookSecret(fakeRelayEndpoint);
@@ -111,6 +151,20 @@ async function run(): Promise<void> {
           }),
       debugBearerToken,
       debugActorId: MOBILE_SCOPE.actorId,
+      ...(browserAuthStore === undefined || webSessionSecret === undefined
+        ? {}
+        : {
+            browserAuth: {
+              store: browserAuthStore,
+              accountId: MOBILE_SCOPE.accountId,
+              userId: MOBILE_SCOPE.actorId,
+              actorId: MOBILE_SCOPE.actorId,
+              adminEmail: `mvp-${MOBILE_SCOPE.actorId.replaceAll("-", "")}@local.invalid`,
+              sessionSecret: webSessionSecret,
+              webOrigin: process.env["QA_HUB_WEB_ORIGIN"]?.trim() || "http://127.0.0.1:4174",
+              ...(secureCookie === undefined ? {} : { secureCookie }),
+            },
+          }),
     });
 
     const shutdown = async (signal: NodeJS.Signals): Promise<void> => {

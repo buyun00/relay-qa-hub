@@ -69,6 +69,16 @@ import {
   type ListMobileNotificationsInput,
 } from "./mobile-inbox-store.js";
 import {
+  ensureBrowserAdmin,
+  loginBrowserSession,
+  resolveBrowserSession,
+  revokeBrowserSession,
+  type EnsureBrowserAdminInput,
+  type LoginBrowserSessionInput,
+  type ResolveBrowserSessionInput,
+  type RevokeBrowserSessionInput,
+} from "./browser-auth-store.js";
+import {
   claimMobileRelayOutbox,
   completeMobileRelayOutbox,
   createMobileManualRepairAttempt,
@@ -130,6 +140,10 @@ interface WorkerRequest {
   readonly operation:
     | "initialize"
     | "ensureMobileScope"
+    | "ensureBrowserAdmin"
+    | "loginBrowserSession"
+    | "resolveBrowserSession"
+    | "revokeBrowserSession"
     | "createMobileBug"
     | "getMobileBug"
     | "listMobileBugs"
@@ -274,6 +288,28 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       if (current.isTransaction) current.exec("ROLLBACK");
       throw error;
     }
+  }
+
+  if (request.operation === "ensureBrowserAdmin") {
+    return inWriteTransaction((current) =>
+      ensureBrowserAdmin(current, request.payload as EnsureBrowserAdminInput),
+    );
+  }
+
+  if (request.operation === "loginBrowserSession") {
+    return inWriteTransaction((current) =>
+      loginBrowserSession(current, request.payload as LoginBrowserSessionInput),
+    );
+  }
+
+  if (request.operation === "resolveBrowserSession") {
+    return resolveBrowserSession(requireDatabase(), request.payload as ResolveBrowserSessionInput);
+  }
+
+  if (request.operation === "revokeBrowserSession") {
+    return inWriteTransaction((current) =>
+      revokeBrowserSession(current, request.payload as RevokeBrowserSessionInput),
+    );
   }
 
   if (request.operation === "createMobileBug") {

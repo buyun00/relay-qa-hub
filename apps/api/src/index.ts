@@ -252,3 +252,26 @@ export {
 
 export { createApiServer } from "./server.js";
 export type { ApiListenOptions, ApiServer } from "./server.js";
+
+export {
+  BROWSER_CSRF_HEADER,
+  BROWSER_LOGIN_PATH,
+  BROWSER_LOGOUT_PATH,
+  BROWSER_ME_PATH,
+  BROWSER_SESSION_COOKIE,
+  BROWSER_SESSION_TTL_MS,
+  browserAuthSession,
+  browserCsrfToken,
+  createSqliteBrowserAuthStore,
+  digestBrowserSessionToken,
+  registerBrowserAuthRoutes,
+} from "./browser-auth.js";
+export type {
+  BrowserAuthOptions,
+  BrowserAuthPrincipal,
+  BrowserAuthStore,
+  EnsureBrowserAdminInput,
+  LoginBrowserSessionInput,
+  ResolveBrowserSessionInput,
+  RevokeBrowserSessionInput,
+} from "./browser-auth.js";

@@ -25,6 +25,7 @@ export default defineConfig({
         changeOrigin: true,
         configure(proxy) {
           proxy.on("proxyReq", (proxyRequest) => {
+            if (process.env.QA_HUB_WEB_AUTH_MODE === "session") return;
             const token = process.env.QA_HUB_MVP_ACCESS_TOKEN?.trim();
             if (token) proxyRequest.setHeader("authorization", `Bearer ${token}`);
           });

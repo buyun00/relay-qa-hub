@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import App from "./App";
+import AuthGate from "./AuthGate";
 import "./app.css";
 
 const rootElement = document.querySelector<HTMLElement>("#root");
@@ -12,6 +12,6 @@ if (rootElement === null) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <AuthGate />
   </StrictMode>,
 );

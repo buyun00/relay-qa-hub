@@ -107,6 +107,14 @@ import {
 } from "./mobile-metrics.js";
 import { startMobileNotificationHintChannel } from "./mobile-notification-hints.js";
 import {
+  authenticateBrowserRequest,
+  BROWSER_LOGIN_PATH,
+  BROWSER_LOGOUT_PATH,
+  BROWSER_ME_PATH,
+  type BrowserAuthOptions,
+  registerBrowserAuthRoutes,
+} from "./browser-auth.js";
+import {
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
@@ -165,6 +173,7 @@ export interface CreateApiAppOptions {
   readonly relayWebhookSecret?: string;
   readonly debugBearerToken?: string;
   readonly debugActorId?: string;
+  readonly browserAuth?: BrowserAuthOptions;
 }
 
 const liveHealthResponseSchema = {
@@ -371,6 +380,36 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const debugActorId = options.debugActorId ?? DEFAULT_DEBUG_ACTOR_ID;
 
   if (debugBearerToken.length === 0) throw new Error("debugBearerToken must not be empty");
+
+  const browserAuth = options.browserAuth;
+  if (browserAuth !== undefined) {
+    app.addHook("preHandler", async (request, reply) => {
+      if (
+        request.url.startsWith(BROWSER_LOGIN_PATH) ||
+        request.url.startsWith(BROWSER_ME_PATH) ||
+        request.url.startsWith(BROWSER_LOGOUT_PATH)
+      ) {
+        return;
+      }
+      if (readHeader(request.headers.authorization) !== undefined) return;
+
+      const principal = await authenticateBrowserRequest(request, reply, browserAuth);
+      if (principal === undefined) {
+        // No cookie means the existing route-level debug/native auth response
+        // remains authoritative. An invalid browser cookie has already been
+        // answered by authenticateBrowserRequest when present.
+        return;
+      }
+      if (principal.accountId !== browserAuth.accountId || principal.actorId !== debugActorId) {
+        return reply
+          .code(401)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "UNAUTHENTICATED" });
+      }
+      request.headers.authorization = `Bearer ${debugBearerToken}`;
+    });
+    registerBrowserAuthRoutes(app, browserAuth);
+  }
 
   if (options.mobileNotificationStore !== undefined) {
     const notificationHintChannel = startMobileNotificationHintChannel({

@@ -92,6 +92,14 @@ import type {
 } from "./mobile-verification-store.js";
 import type { ListMobileNotificationsInput, MobileNotificationList } from "./mobile-inbox-store.js";
 import type {
+  BrowserPrincipal,
+  EnsureBrowserAdminInput,
+  EnsureBrowserAdminResult,
+  LoginBrowserSessionInput,
+  ResolveBrowserSessionInput,
+  RevokeBrowserSessionInput,
+} from "./browser-auth-store.js";
+import type {
   InsertedBugIdentity,
   MigrationReport,
   NewBugStorageRecord,
@@ -197,6 +205,26 @@ export class SqliteStorageWorker {
   async ensureMobileScope(scope: MobileScopeBootstrap): Promise<void> {
     await this.initialization;
     await this.request("ensureMobileScope", scope);
+  }
+
+  async ensureBrowserAdmin(input: EnsureBrowserAdminInput): Promise<EnsureBrowserAdminResult> {
+    await this.initialization;
+    return this.request<EnsureBrowserAdminResult>("ensureBrowserAdmin", input);
+  }
+
+  async loginBrowserSession(input: LoginBrowserSessionInput): Promise<BrowserPrincipal> {
+    await this.initialization;
+    return this.request<BrowserPrincipal>("loginBrowserSession", input);
+  }
+
+  async resolveBrowserSession(input: ResolveBrowserSessionInput): Promise<BrowserPrincipal | null> {
+    await this.initialization;
+    return this.request<BrowserPrincipal | null>("resolveBrowserSession", input);
+  }
+
+  async revokeBrowserSession(input: RevokeBrowserSessionInput): Promise<boolean> {
+    await this.initialization;
+    return this.request<boolean>("revokeBrowserSession", input);
   }
 
   async createMobileBug(input: CreateMobileBugInput): Promise<MobileBugCreation> {

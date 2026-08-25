@@ -41,6 +41,83 @@ button {
   min-height: 100dvh;
 }
 
+.auth-shell,
+.auth-status {
+  display: grid;
+  min-height: 100dvh;
+  padding: 1.25rem;
+  place-items: center;
+}
+
+.auth-card,
+.auth-status {
+  width: min(100%, 28rem);
+  padding: 1.5rem;
+  background: #fffef9;
+  border: 1px solid #c9d2c9;
+  border-radius: 1.25rem;
+  box-shadow: 0 1rem 2.5rem rgb(28 50 47 / 14%);
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1.25rem;
+}
+
+.auth-form label {
+  color: #53645e;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.auth-form input {
+  min-width: 0;
+  padding: 0.75rem;
+  color: #173332;
+  background: #fff;
+  border: 1px solid #b8c6bd;
+  border-radius: 0.65rem;
+  font: inherit;
+}
+
+.auth-form button,
+.auth-status button,
+.session-bar button {
+  padding: 0.65rem 0.9rem;
+  color: #fff;
+  background: #164f4c;
+  border: 0;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.auth-form button:disabled,
+.session-bar button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.auth-error,
+.session-bar__error {
+  color: #9a3328;
+}
+
+.session-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  width: min(100%, 78rem);
+  margin: 0 auto;
+  padding: 0.75rem 1rem 0;
+  color: #53645e;
+  font-size: 0.78rem;
+}
+
 .app-shell {
   width: min(100%, 78rem);
   min-width: 0;

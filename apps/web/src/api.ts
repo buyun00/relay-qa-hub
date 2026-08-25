@@ -10,6 +10,20 @@ export type BugListState =
   | "rejected"
   | "duplicate";
 
+export interface BrowserSessionPrincipal {
+  readonly accountId: string;
+  readonly userId: string;
+  readonly email: string;
+  readonly displayName: string;
+  readonly csrfToken: string;
+}
+
+let browserCsrfToken: string | null = null;
+
+export function setBrowserCsrfToken(value: string | null): void {
+  browserCsrfToken = value;
+}
+
 export type BugSeverity = "S0" | "S1" | "S2" | "S3" | "S4";
 
 export interface BugListFilters {
@@ -591,16 +605,67 @@ function isCaptureBundleSummary(value: unknown, captureId: string): value is Cap
 }
 
 async function requestJson(path: string, init?: RequestInit): Promise<unknown> {
+  const method = (init?.method ?? "GET").toUpperCase();
+  const csrfHeaders =
+    browserCsrfToken !== null && !["GET", "HEAD", "OPTIONS"].includes(method)
+      ? { "X-CSRF-Token": browserCsrfToken }
+      : {};
   const response = await fetch(path, {
     ...init,
+    credentials: "same-origin",
     headers: {
       Accept: "application/vnd.relay-qa-hub.v1.1+json",
+      ...csrfHeaders,
       ...(init?.headers ?? {}),
     },
   });
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) throw new QaHubApiError(response.status, readErrorCode(body));
   return body;
+}
+
+function isBrowserSessionPrincipal(value: unknown): value is BrowserSessionPrincipal {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.accountId === "string" &&
+    typeof record.userId === "string" &&
+    typeof record.email === "string" &&
+    typeof record.displayName === "string" &&
+    typeof record.csrfToken === "string" &&
+    record.csrfToken.length > 0
+  );
+}
+
+export async function getBrowserSession(): Promise<BrowserSessionPrincipal> {
+  const body = await requestJson("/api/v1/auth/me");
+  if (!isBrowserSessionPrincipal(body)) {
+    throw new QaHubApiError(200, "INVALID_AUTH_RESPONSE");
+  }
+  setBrowserCsrfToken(body.csrfToken);
+  return body;
+}
+
+export async function loginBrowserSession(
+  email: string,
+  password: string,
+): Promise<BrowserSessionPrincipal> {
+  setBrowserCsrfToken(null);
+  const body = await requestJson("/api/v1/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!isBrowserSessionPrincipal(body)) {
+    throw new QaHubApiError(200, "INVALID_AUTH_RESPONSE");
+  }
+  setBrowserCsrfToken(body.csrfToken);
+  return body;
+}
+
+export async function logoutBrowserSession(): Promise<void> {
+  await requestJson("/api/v1/auth/logout", { method: "POST" });
+  setBrowserCsrfToken(null);
 }
 
 function requireRecord(value: unknown, label: string): Record<string, unknown> {
@@ -690,6 +755,7 @@ export async function listBugAttachments(bugId: string): Promise<BugAttachmentLi
 
 export async function downloadAttachment(metadata: AttachmentMetadata): Promise<Blob> {
   const response = await fetch(`/api/v1/attachments/${encodeURIComponent(metadata.attachmentId)}`, {
+    credentials: "same-origin",
     headers: { Accept: "application/octet-stream" },
   });
   if (!response.ok) {
@@ -726,7 +792,7 @@ export async function downloadCaptureArtifact(
     `/api/v1/bugs/${encodeURIComponent(bugId)}/capture-bundles/${encodeURIComponent(
       captureId,
     )}/artifacts/${encodeURIComponent(artifactKind)}`,
-    { headers: { Accept: "application/octet-stream" } },
+    { credentials: "same-origin", headers: { Accept: "application/octet-stream" } },
   );
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);

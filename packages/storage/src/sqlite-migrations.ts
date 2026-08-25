@@ -6686,6 +6686,89 @@ BEGIN
 END;
 `;
 
+const BROWSER_SESSION_SCHEMA_SQL = String.raw`
+CREATE TABLE browser_sessions (
+  id TEXT PRIMARY KEY CHECK (length(id) = 36),
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  user_id TEXT NOT NULL CHECK (length(user_id) = 36),
+  token_digest TEXT NOT NULL UNIQUE
+    CHECK (length(token_digest) = 64 AND token_digest = lower(token_digest)),
+  issued_at TEXT NOT NULL CHECK (length(issued_at) >= 20),
+  expires_at TEXT NOT NULL
+    CHECK (length(expires_at) >= 20 AND unixepoch(expires_at) > unixepoch(issued_at)),
+  last_seen_at TEXT NOT NULL
+    CHECK (
+      length(last_seen_at) >= 20
+      AND unixepoch(last_seen_at) >= unixepoch(issued_at)
+      AND unixepoch(last_seen_at) <= unixepoch(expires_at)
+    ),
+  revoked_at TEXT,
+  revoked_reason TEXT CHECK (revoked_reason IS NULL OR length(revoked_reason) BETWEEN 1 AND 200),
+  version INTEGER NOT NULL CHECK (version >= 1),
+  CHECK ((revoked_at IS NULL) = (revoked_reason IS NULL)),
+  FOREIGN KEY (account_id, user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, id),
+  UNIQUE (account_id, id, user_id)
+) STRICT;
+
+CREATE INDEX browser_sessions_principal_active_idx
+  ON browser_sessions(account_id, user_id, revoked_at, expires_at);
+
+CREATE TRIGGER browser_sessions_initial_guard
+BEFORE INSERT ON browser_sessions
+WHEN new.version <> 1
+  OR new.revoked_at IS NOT NULL
+  OR new.revoked_reason IS NOT NULL
+  OR new.last_seen_at IS NOT new.issued_at
+  OR NOT EXISTS (
+    SELECT 1
+    FROM users AS user
+    JOIN accounts AS account ON account.id = user.account_id
+    WHERE user.account_id = new.account_id
+      AND user.id = new.user_id
+      AND user.status = 'active'
+      AND account.status = 'active'
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'browser session must start active and at version one');
+END;
+
+CREATE TRIGGER browser_sessions_transition_guard
+BEFORE UPDATE ON browser_sessions
+WHEN NOT (
+  old.revoked_at IS NULL
+  AND new.id IS old.id
+  AND new.account_id IS old.account_id
+  AND new.user_id IS old.user_id
+  AND new.token_digest IS old.token_digest
+  AND new.issued_at IS old.issued_at
+  AND new.expires_at IS old.expires_at
+  AND unixepoch(new.last_seen_at) >= unixepoch(old.last_seen_at)
+  AND new.version = old.version + 1
+  AND (
+    (
+      new.revoked_at IS NULL
+      AND new.revoked_reason IS NULL
+      AND unixepoch(new.last_seen_at) > unixepoch(old.last_seen_at)
+    )
+    OR (
+      unixepoch(new.revoked_at) IS NOT NULL
+      AND new.revoked_reason IS NOT NULL
+    )
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'invalid browser session CAS transition or revoked-session resurrection');
+END;
+
+CREATE TRIGGER browser_sessions_no_delete
+BEFORE DELETE ON browser_sessions
+BEGIN
+  SELECT RAISE(ABORT, 'browser session security history is append-only');
+END;
+`;
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -6700,6 +6783,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(1, "app_first_core", CORE_SCHEMA_SQL),
   migration(2, "bug_full_text_search", FTS_SCHEMA_SQL),
   migration(3, "domain_audit_alignment", DOMAIN_AUDIT_ALIGNMENT_SQL),
+  migration(4, "browser_sessions", BROWSER_SESSION_SCHEMA_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

@@ -236,6 +236,20 @@ export function parseStorageEnvironment(environment: StorageEnvironment): Storag
 
 export { SqliteStorageWorker, SqliteStorageWorkerError } from "./sqlite-worker.js";
 export type { SqliteStorageWorkerOptions, SqliteWorkerInitialization } from "./sqlite-worker.js";
+export {
+  ensureBrowserAdmin,
+  loginBrowserSession,
+  resolveBrowserSession,
+  revokeBrowserSession,
+} from "./browser-auth-store.js";
+export type {
+  BrowserPrincipal,
+  EnsureBrowserAdminInput,
+  EnsureBrowserAdminResult,
+  LoginBrowserSessionInput,
+  ResolveBrowserSessionInput,
+  RevokeBrowserSessionInput,
+} from "./browser-auth-store.js";
 export type {
   CreateMobileBugInput,
   MobileBugCreation,
