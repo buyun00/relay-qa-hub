@@ -14,11 +14,11 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: f09fa0b
-  last_verified_at: 2026-08-25T13:13:59+08:00
-  next_action: P5.1 IN_PROGRESS；Android 已真实形成 queued handoff/receipt；下一主链切片消费 pending outbox 到独立 fake Relay，并把 submitted 回执持久投影回 Android，仍不修改真实 Relay
+  last_verified_commit: f6ca6a0
+  last_verified_at: 2026-08-25T13:39:53+08:00
+  next_action: P5.4 IN_PROGRESS（MVP execution override）；让独立 fake Relay 发送一条 fix_delivered 回写，QA Hub 持久投影且 Android 可见，同时证明 Bug 不会自动验收/关闭；仍不修改真实 Relay
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G4 仍未正式关闭，但按执行 override 不阻塞 P5.1 fake Relay 消费/回写主链路实现
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G4 仍未正式关闭，但按 execution override 不阻塞 P5.4 QA-side fake callback/writeback 主链路
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -877,7 +877,7 @@ Gate `G4-HUMAN-CLOSED-LOOP`：在 Relay 完全离线状态，通过 Android App 
 
 验证：QA 侧在不改 Relay 的情况下完成 contract tests；Android App 和任何浏览器都看不到服务端 M2M 凭据。
 
-MuMu MVP slice：Android -> QA Hub 的 typed `reported -> ready -> relay attempt -> queued handoff`、durable receipt/outbox 与幂等 payload mismatch 已真实通过；下一原子步骤让独立 fake Relay 实际消费 outbox 并回写 `submitted`，不以当前 queued receipt 冒充真实 Relay 集成完成。
+MuMu MVP slice：Android -> QA Hub 的 typed handoff、durable outbox、独立 fake Relay HTTP 消费与 `submitted` receipt 回写已真实通过；fake Relay 不可达时 Android 普通缺陷仍成功且 outbox 进入 retry。P5.1 保持 `VERIFYING`，因为附件选择、正式 M2M 和真实 Relay 对账尚未完成；不得把 fake executor 冒充 G5 完成。
 
 #### P5.2 Relay 侧最小 Integration API
 
@@ -905,6 +905,8 @@ MuMu MVP slice：Android -> QA Hub 的 typed `reported -> ready -> relay attempt
 #### P5.4 状态投影和继续原任务
 
 要做：delivery evidence 校验、Build 投影、needs_input/blocked/failed、验收失败 action 幂等追加 Turn，并在 Android App 原生页面展示 handoff/receipt/对账状态。
+
+MuMu MVP execution override：P5.2/P5.3 的真实 Relay 改动仍不在当前授权范围；先由独立 fake Relay 向 QA Hub 发送一条 `fix_delivered` 回写，持久更新 receipt 并由 Android 原生页面读取，同时证明 Bug 保持人工验收边界、绝不自动关闭。只保留一个迟到/旧 revision 失败路径，通过后继续 Build/通知主链。
 
 验证：
 
