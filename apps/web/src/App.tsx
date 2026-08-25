@@ -92,6 +92,11 @@ function BrandMark() {
 type RequestState = "idle" | "loading" | "success" | "error";
 type MutationState = "idle" | "submitting" | "success" | "error";
 
+interface BugSelection {
+  readonly bugId: string;
+  readonly generation: number;
+}
+
 function mutationError(cause: unknown): { readonly status: number; readonly code: string | null } {
   if (cause instanceof QaHubApiError) return { status: cause.status, code: cause.code };
   return { status: 0, code: "NETWORK_ERROR" };
@@ -206,6 +211,27 @@ export default function App() {
   const duplicateRequestSequence = useRef(0);
   const detailRequestSequence = useRef(0);
   const selectedBugIdRef = useRef<string | null>(null);
+  const selectionGenerationRef = useRef(0);
+
+  const beginBugSelection = useCallback((bugId: string): BugSelection => {
+    const generation = selectionGenerationRef.current + 1;
+    selectionGenerationRef.current = generation;
+    selectedBugIdRef.current = bugId;
+    return { bugId, generation };
+  }, []);
+
+  const captureSelection = useCallback((bugId?: string): BugSelection | null => {
+    const currentBugId = bugId ?? selectedBugIdRef.current;
+    if (currentBugId === null || selectedBugIdRef.current !== currentBugId) return null;
+    return { bugId: currentBugId, generation: selectionGenerationRef.current };
+  }, []);
+
+  const isCurrentSelection = useCallback((selection: BugSelection): boolean => {
+    return (
+      selectionGenerationRef.current === selection.generation &&
+      selectedBugIdRef.current === selection.bugId
+    );
+  }, []);
 
   const loadProjectSettings = useCallback(async (nextProjectId: string): Promise<boolean> => {
     const requestSequence = settingsRequestSequence.current + 1;
@@ -292,6 +318,7 @@ export default function App() {
     if (!listLoaded || !settingsLoaded) return;
     if (normalizedProjectId !== activeProjectId) {
       detailRequestSequence.current += 1;
+      selectionGenerationRef.current += 1;
       selectedBugIdRef.current = null;
       setSelectedBugId(null);
       setSelectedBug(null);
@@ -316,7 +343,13 @@ export default function App() {
       preserveComment = false,
       preserveRelay = false,
       preserveHuman = false,
+      internalSelection?: BugSelection,
     ): Promise<{ readonly bug: BugDetail; readonly events: readonly BugEvent[] } | null> => {
+      if (internalSelection === undefined) {
+        beginBugSelection(bugId);
+      } else if (!isCurrentSelection(internalSelection) || internalSelection.bugId !== bugId) {
+        return null;
+      }
       const requestSequence = detailRequestSequence.current + 1;
       detailRequestSequence.current = requestSequence;
       selectedBugIdRef.current = bugId;
@@ -415,17 +448,21 @@ export default function App() {
         return null;
       }
     },
-    [],
+    [beginBugSelection, isCurrentSelection],
   );
 
   const assignOwner = useCallback(async (): Promise<void> => {
     if (selectedBug === null) return;
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     const nextOwnerId = ownerSelection.length === 0 ? null : ownerSelection;
     setAssignmentState("submitting");
     setAssignmentError(null);
     try {
       await updateBugOwner(selectedBug.id, selectedBug.version, nextOwnerId);
-      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
+      if (!isCurrentSelection(selection)) return;
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection)) return;
       if (refreshed?.bug.ownerId === nextOwnerId) {
         setAssignmentState("success");
       } else {
@@ -433,51 +470,71 @@ export default function App() {
         setAssignmentError({ status: 200, code: "OWNER_READBACK_MISMATCH" });
       }
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setAssignmentState("error");
       setAssignmentError(mutationError(cause));
     }
-  }, [loadBugDetails, ownerSelection, selectedBug]);
+  }, [captureSelection, isCurrentSelection, loadBugDetails, ownerSelection, selectedBug]);
 
   const assignModule = useCallback(async (): Promise<void> => {
     if (selectedBug === null) return;
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     const nextModuleId = moduleSelection.length === 0 ? null : moduleSelection;
     setModuleAssignmentState("submitting");
     setModuleAssignmentError(null);
     try {
       await updateBugModule(selectedBug.id, selectedBug.version, nextModuleId);
-      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
+      if (!isCurrentSelection(selection)) return;
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection)) return;
       if (refreshed?.bug.moduleId === nextModuleId) {
         setModuleAssignmentState("success");
+        if (!isCurrentSelection(selection)) return;
         await refreshVisibleBugList();
       } else {
         setModuleAssignmentState("error");
         setModuleAssignmentError({ status: 200, code: "MODULE_READBACK_MISMATCH" });
       }
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setModuleAssignmentState("error");
       setModuleAssignmentError(mutationError(cause));
     }
-  }, [loadBugDetails, moduleSelection, refreshVisibleBugList, selectedBug]);
+  }, [
+    captureSelection,
+    isCurrentSelection,
+    loadBugDetails,
+    moduleSelection,
+    refreshVisibleBugList,
+    selectedBug,
+  ]);
 
   const markReady = useCallback(async (): Promise<void> => {
     if (selectedBug === null || selectedBug.state !== "reported") return;
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     setTransitionState("submitting");
     setTransitionError(null);
     try {
       await transitionBugReady(selectedBug.id, selectedBug.version);
-      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
+      if (!isCurrentSelection(selection)) return;
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection)) return;
       if (refreshed?.bug.state === "ready") {
         setTransitionState("success");
+        if (!isCurrentSelection(selection)) return;
         await refreshVisibleBugList();
       } else {
         setTransitionState("error");
         setTransitionError({ status: 200, code: "STATE_READBACK_MISMATCH" });
       }
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setTransitionState("error");
       setTransitionError(mutationError(cause));
     }
-  }, [loadBugDetails, refreshVisibleBugList, selectedBug]);
+  }, [captureSelection, isCurrentSelection, loadBugDetails, refreshVisibleBugList, selectedBug]);
 
   const loadCandidates = useCallback(async (): Promise<void> => {
     if (
@@ -486,6 +543,8 @@ export default function App() {
     ) {
       return;
     }
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     const requestSequence = duplicateRequestSequence.current + 1;
     duplicateRequestSequence.current = requestSequence;
     setDuplicateCandidateState("loading");
@@ -497,15 +556,19 @@ export default function App() {
     setDuplicateMessage(null);
     try {
       const result = await listDuplicateCandidates(selectedBug.id);
-      if (duplicateRequestSequence.current !== requestSequence) return;
+      if (duplicateRequestSequence.current !== requestSequence || !isCurrentSelection(selection)) {
+        return;
+      }
       setDuplicateCandidates(result.candidates);
       setDuplicateCandidateState("success");
     } catch (cause: unknown) {
-      if (duplicateRequestSequence.current !== requestSequence) return;
+      if (duplicateRequestSequence.current !== requestSequence || !isCurrentSelection(selection)) {
+        return;
+      }
       setDuplicateCandidateState("error");
       setDuplicateCandidateError(mutationError(cause));
     }
-  }, [selectedBug]);
+  }, [captureSelection, isCurrentSelection, selectedBug]);
 
   const confirmDuplicate = useCallback(async (): Promise<void> => {
     if (
@@ -516,6 +579,8 @@ export default function App() {
     ) {
       return;
     }
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     const canonicalKey =
       duplicateCandidates.find((candidate) => candidate.bugId === duplicateCanonicalId)?.bugKey ??
       duplicateCanonicalId;
@@ -529,12 +594,14 @@ export default function App() {
         duplicateCanonicalId,
         duplicateReason.trim(),
       );
+      if (!isCurrentSelection(selection)) return;
       if (result.state !== "duplicate" || result.duplicateOfBugId !== duplicateCanonicalId) {
         setDuplicateMutationState("error");
         setDuplicateMutationError({ status: 200, code: "DUPLICATE_READBACK_MISMATCH" });
         return;
       }
-      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection)) return;
       if (
         refreshed?.bug.state !== "duplicate" ||
         refreshed.bug.duplicateOfBugId !== duplicateCanonicalId ||
@@ -546,8 +613,10 @@ export default function App() {
       }
       setDuplicateMutationState("success");
       setDuplicateMessage(`${refreshed.bug.key} 已由人工确认重复，canonical 为 ${canonicalKey}。`);
+      if (!isCurrentSelection(selection)) return;
       await refreshVisibleBugList();
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setDuplicateMutationState("error");
       setDuplicateMutationError(mutationError(cause));
     }
@@ -555,6 +624,8 @@ export default function App() {
     duplicateCandidates,
     duplicateCanonicalId,
     duplicateReason,
+    captureSelection,
+    isCurrentSelection,
     loadBugDetails,
     refreshVisibleBugList,
     selectedBug,
@@ -562,14 +633,18 @@ export default function App() {
 
   const submitComment = useCallback(async (): Promise<void> => {
     if (selectedBugId === null || commentBody.trim().length === 0) return;
+    const selection = captureSelection(selectedBugId);
+    if (selection === null) return;
     const clientSubmissionId = globalThis.crypto.randomUUID();
     setCommentState("submitting");
     setCommentError(null);
     try {
       const result = await addBugComment(selectedBugId, commentBody.trim(), clientSubmissionId);
+      if (!isCurrentSelection(selection)) return;
       setCommentBody("");
       setCommentId(result.comment.id);
-      const refreshed = await loadBugDetails(selectedBugId, true, true, true);
+      const refreshed = await loadBugDetails(selectedBugId, true, true, true, selection);
+      if (!isCurrentSelection(selection)) return;
       const eventConfirmed =
         refreshed?.events.some(
           (event) =>
@@ -582,6 +657,7 @@ export default function App() {
         setCommentError({ status: 200, code: "COMMENT_EVENT_MISSING" });
       }
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setCommentState("error");
       if (cause instanceof QaHubApiError) {
         setCommentError({ status: cause.status, code: cause.code });
@@ -589,7 +665,7 @@ export default function App() {
         setCommentError({ status: 0, code: "NETWORK_ERROR" });
       }
     }
-  }, [commentBody, loadBugDetails, selectedBugId]);
+  }, [captureSelection, commentBody, isCurrentSelection, loadBugDetails, selectedBugId]);
 
   const readRelayReceipt = useCallback(async (attemptId: string): Promise<RelayReceipt> => {
     let receipt = await getRelayReceipt(attemptId);
@@ -602,6 +678,8 @@ export default function App() {
 
   const handoffToRelay = useCallback(async (): Promise<void> => {
     if (selectedBug === null || selectedBug.state !== "ready") return;
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     setRelayState("submitting");
     setRelayReceipt(null);
     setRelayError(null);
@@ -610,6 +688,7 @@ export default function App() {
       const handoffId = globalThis.crypto.randomUUID();
       const accepted = await dispatchRelay(attempt.id, attempt.version, handoffId);
       const receipt = await readRelayReceipt(attempt.id);
+      if (!isCurrentSelection(selection)) return;
       if (
         accepted.qaItem.id !== selectedBug.id ||
         receipt.qaItem.id !== selectedBug.id ||
@@ -624,27 +703,40 @@ export default function App() {
       }
       setRelayReceipt(receipt);
       setRelayState("success");
-      await loadBugDetails(selectedBug.id, true, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection) || refreshed === null) return;
       await refreshVisibleBugList();
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setRelayState("error");
       setRelayError(mutationError(cause));
     }
-  }, [loadBugDetails, readRelayReceipt, refreshVisibleBugList, selectedBug]);
+  }, [
+    captureSelection,
+    isCurrentSelection,
+    loadBugDetails,
+    readRelayReceipt,
+    refreshVisibleBugList,
+    selectedBug,
+  ]);
 
   const refreshRelayReceipt = useCallback(async (): Promise<void> => {
     if (relayReceipt === null) return;
+    const selection = captureSelection(relayReceipt.qaItem.id);
+    if (selection === null) return;
     setRelayState("submitting");
     setRelayError(null);
     try {
       const receipt = await readRelayReceipt(relayReceipt.repairAttemptId);
+      if (!isCurrentSelection(selection)) return;
       setRelayReceipt(receipt);
       setRelayState("success");
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setRelayState("error");
       setRelayError(mutationError(cause));
     }
-  }, [readRelayReceipt, relayReceipt]);
+  }, [captureSelection, isCurrentSelection, readRelayReceipt, relayReceipt]);
 
   const createHumanWorkflow = useCallback(async (): Promise<void> => {
     if (
@@ -654,6 +746,8 @@ export default function App() {
     ) {
       return;
     }
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     setHumanWorkflowState("submitting");
     setHumanWorkflowError(null);
     setHumanWorkflowMessage(null);
@@ -665,6 +759,7 @@ export default function App() {
         repairSummary.trim(),
       );
       const readback = await getHumanRepairAttempt(created.id);
+      if (!isCurrentSelection(selection)) return;
       if (
         readback.id !== created.id ||
         readback.bugId !== selectedBug.id ||
@@ -678,13 +773,22 @@ export default function App() {
       setHumanAttempt(readback);
       setHumanWorkflowMessage(`人工 RepairAttempt 已创建：${readback.id}`);
       setHumanWorkflowState("success");
-      await loadBugDetails(selectedBug.id, true, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection) || refreshed === null) return;
       await refreshVisibleBugList();
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
-  }, [loadBugDetails, refreshVisibleBugList, repairSummary, selectedBug]);
+  }, [
+    captureSelection,
+    isCurrentSelection,
+    loadBugDetails,
+    refreshVisibleBugList,
+    repairSummary,
+    selectedBug,
+  ]);
 
   const deliverHumanWorkflow = useCallback(async (): Promise<void> => {
     if (
@@ -697,6 +801,8 @@ export default function App() {
     ) {
       return;
     }
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     setHumanWorkflowState("submitting");
     setHumanWorkflowError(null);
     setHumanWorkflowMessage(null);
@@ -713,6 +819,7 @@ export default function App() {
         repairCommitSha.trim(),
       );
       const readback = await getHumanRepairAttempt(delivered.id);
+      if (!isCurrentSelection(selection)) return;
       if (
         readback.status !== "delivered" ||
         readback.branch !== repairBranch.trim() ||
@@ -726,14 +833,18 @@ export default function App() {
       setBuildCommitSha(readback.commitSha ?? "");
       setHumanWorkflowMessage(`代码交付已登记：${readback.commitSha}`);
       setHumanWorkflowState("success");
-      await loadBugDetails(selectedBug.id, true, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection) || refreshed === null) return;
       await refreshVisibleBugList();
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
   }, [
+    captureSelection,
     humanAttempt,
+    isCurrentSelection,
     loadBugDetails,
     refreshVisibleBugList,
     repairBranch,
@@ -758,6 +869,8 @@ export default function App() {
     ) {
       return;
     }
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     setHumanWorkflowState("submitting");
     setHumanWorkflowError(null);
     setHumanWorkflowMessage(null);
@@ -773,6 +886,7 @@ export default function App() {
         repairAttemptId: humanAttempt.id,
       });
       const buildReadback = await getBuild(registered.build.id);
+      if (!isCurrentSelection(selection)) return;
       if (
         buildReadback.id !== registered.build.id ||
         buildReadback.status !== "ready" ||
@@ -789,6 +903,7 @@ export default function App() {
         repairAttemptId: humanAttempt.id,
         deliveredCommitSha: humanAttempt.commitSha,
       });
+      if (!isCurrentSelection(selection)) return;
       if (
         linked.bug.id !== selectedBug.id ||
         linked.bug.state !== "ready_for_verification" ||
@@ -802,9 +917,11 @@ export default function App() {
       setLinkedBuild(linked.build);
       setHumanWorkflowMessage(`Build 已精确关联：${linked.build.externalId}`);
       setHumanWorkflowState("success");
-      await loadBugDetails(selectedBug.id, true, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection) || refreshed === null) return;
       await refreshVisibleBugList();
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
@@ -814,7 +931,9 @@ export default function App() {
     buildDownloadUrl,
     buildExternalId,
     buildVersion,
+    captureSelection,
     humanAttempt,
+    isCurrentSelection,
     loadBugDetails,
     refreshVisibleBugList,
     selectedBug,
@@ -832,6 +951,8 @@ export default function App() {
     ) {
       return;
     }
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     setHumanWorkflowState("submitting");
     setHumanWorkflowError(null);
     setHumanWorkflowMessage(null);
@@ -848,6 +969,7 @@ export default function App() {
         }));
       const started = await startVerification(requested.id, requested.version);
       const readback = await getVerification(started.id);
+      if (!isCurrentSelection(selection)) return;
       if (
         readback.status !== "in_progress" ||
         readback.bugId !== selectedBug.id ||
@@ -860,14 +982,18 @@ export default function App() {
       setVerification(readback);
       setHumanWorkflowMessage(`人工验收已开始：${readback.id}`);
       setHumanWorkflowState("success");
-      await loadBugDetails(selectedBug.id, true, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection) || refreshed === null) return;
       await refreshVisibleBugList();
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
   }, [
+    captureSelection,
     humanAttempt,
+    isCurrentSelection,
     linkedBuild,
     loadBugDetails,
     refreshVisibleBugList,
@@ -885,6 +1011,8 @@ export default function App() {
     ) {
       return;
     }
+    const selection = captureSelection(selectedBug.id);
+    if (selection === null) return;
     setHumanWorkflowState("submitting");
     setHumanWorkflowError(null);
     setHumanWorkflowMessage(null);
@@ -895,6 +1023,7 @@ export default function App() {
         verificationResultSummary.trim(),
         globalThis.crypto.randomUUID(),
       );
+      if (!isCurrentSelection(selection)) return;
       if (
         result.qaItem.id !== selectedBug.id ||
         result.verification.id !== verification.id ||
@@ -908,13 +1037,23 @@ export default function App() {
       setVerification(result.verification);
       setHumanWorkflowMessage(`人工验收通过，${result.bug.key} 已由 QA Hub 关闭。`);
       setHumanWorkflowState("success");
-      await loadBugDetails(selectedBug.id, true, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true, selection);
+      if (!isCurrentSelection(selection) || refreshed === null) return;
       await refreshVisibleBugList();
     } catch (cause: unknown) {
+      if (!isCurrentSelection(selection)) return;
       setHumanWorkflowState("error");
       setHumanWorkflowError(mutationError(cause));
     }
-  }, [loadBugDetails, refreshVisibleBugList, selectedBug, verification, verificationResultSummary]);
+  }, [
+    captureSelection,
+    isCurrentSelection,
+    loadBugDetails,
+    refreshVisibleBugList,
+    selectedBug,
+    verification,
+    verificationResultSummary,
+  ]);
 
   useEffect(() => {
     void loadBugList(DEFAULT_PROJECT_ID);
