@@ -1,7 +1,4 @@
-import type {
-  MobileBugEvents,
-  MobileCommentCreation,
-} from "@relay-qa-hub/storage";
+import type { MobileBugEvents, MobileCommentCreation } from "@relay-qa-hub/storage";
 
 export const MOBILE_BUG_COMMENTS_PATH = "/api/v1/bugs/:bugId/comments" as const;
 export const MOBILE_BUG_EVENTS_PATH = "/api/v1/bugs/:bugId/events" as const;
@@ -16,6 +13,7 @@ export interface MobileCommentStore {
     readonly actorId: string;
     readonly bugId: string;
     readonly idempotencyKey: string;
+    readonly correlationId: string;
     readonly request: MobileAddBugCommentRequest;
   }) => MobileCommentCreation | Promise<MobileCommentCreation>;
   readonly listEvents: (query: {
@@ -96,4 +94,14 @@ export function requireMobileCommentIdempotencyKey(
     throw new TypeError("Idempotency-Key does not match the comment submission");
   }
   return value;
+}
+
+export function requireMobileCommentCorrelationId(
+  value: string | undefined,
+  clientSubmissionId: string,
+): string {
+  if (value !== undefined && value !== clientSubmissionId) {
+    throw new TypeError("X-Correlation-ID must match clientSubmissionId");
+  }
+  return clientSubmissionId;
 }

@@ -43,6 +43,7 @@ export function createSqliteMobileCommentStore(
         clientSubmissionId: command.request.clientSubmissionId,
         body: command.request.body,
         payloadDigest: digest({ bugId: command.bugId, request: command.request }),
+        correlationId: command.correlationId,
         idempotencyKey: command.idempotencyKey,
         createdAt: now().toISOString(),
       };

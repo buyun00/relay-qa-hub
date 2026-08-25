@@ -721,7 +721,9 @@ export default function App() {
       const eventConfirmed =
         refreshed?.events.some(
           (event) =>
-            event.type === "comment.created" && event.payload.commentId === result.comment.id,
+            event.type === "comment.created" &&
+            event.payload.commentId === result.comment.id &&
+            event.correlationId === result.correlationId,
         ) === true;
       if (eventConfirmed) {
         setCommentState("success");

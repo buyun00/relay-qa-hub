@@ -84,6 +84,7 @@ import {
   MOBILE_BUG_EVENTS_PATH,
   parseMobileAddBugCommentRequest,
   parseMobileBugEventsLimit,
+  requireMobileCommentCorrelationId,
   requireMobileCommentIdempotencyKey,
   type MobileCommentStore,
 } from "./mobile-comments.js";
@@ -1318,10 +1319,15 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         bugId,
         body.clientSubmissionId,
       );
+      const correlationId = requireMobileCommentCorrelationId(
+        readHeader(request.headers["x-correlation-id"]),
+        body.clientSubmissionId,
+      );
       const result = await mobileCommentStore.addComment({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         bugId,
         idempotencyKey,
+        correlationId,
         request: body,
       });
       return reply
@@ -1337,6 +1343,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
             createdAt: result.comment.createdAt,
             version: result.comment.version,
           },
+          correlationId: result.correlationId,
         });
     } catch (error: unknown) {
       return relayErrorReply(error, reply);
@@ -1353,7 +1360,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     try {
       const bugId = requireRelayUuid(request.params.bugId, "bugId");
       const result = await mobileCommentStore.listEvents({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         bugId,
         limit: parseMobileBugEventsLimit(request.query.limit),
       });

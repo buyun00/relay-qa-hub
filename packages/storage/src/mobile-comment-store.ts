@@ -24,6 +24,7 @@ export interface CreateMobileCommentInput extends MobileRelayScope {
   readonly clientSubmissionId: string;
   readonly body: string;
   readonly payloadDigest: string;
+  readonly correlationId: string;
   readonly idempotencyKey: string;
   readonly createdAt: string;
 }
@@ -32,6 +33,7 @@ export interface MobileCommentCreation {
   readonly clientSubmissionId: string;
   readonly comment: MobileCommentRecord;
   readonly eventId: string;
+  readonly correlationId: string;
   readonly replayed: boolean;
 }
 
@@ -108,10 +110,7 @@ function requireUuid(value: string, field: string): void {
 
 function requireDigest(value: string): void {
   if (!DIGEST_PATTERN.test(value)) {
-    throw new MobileRelayStorageError(
-      "INVALID_REQUEST",
-      "payloadDigest must be a SHA-256 digest",
-    );
+    throw new MobileRelayStorageError("INVALID_REQUEST", "payloadDigest must be a SHA-256 digest");
   }
 }
 
@@ -132,7 +131,10 @@ function requireTimestamp(value: string): void {
 
 function requireLimit(value: number): void {
   if (!Number.isSafeInteger(value) || value < 1 || value > 100) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "limit must be an integer from 1 through 100");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "limit must be an integer from 1 through 100",
+    );
   }
 }
 
@@ -157,8 +159,7 @@ function requireProjectMembership(database: DatabaseSync, input: MobileRelayScop
        WHERE account.id = ? AND account.status = 'active'`,
     )
     .get(input.projectId, input.actorId, input.accountId) as
-    | { readonly present: number }
-    | undefined;
+    { readonly present: number } | undefined;
   if (!row) {
     throw new MobileRelayStorageError("FORBIDDEN", "actor has no active project membership");
   }
@@ -203,19 +204,18 @@ function readCommentBySubmission(
          AND author_id = ? AND client_submission_id = ?`,
     )
     .get(input.accountId, input.projectId, input.actorId, clientSubmissionId) as
-    | { readonly id: string }
-    | undefined;
+    { readonly id: string } | undefined;
   return row ? readComment(database, input, row.id) : null;
 }
 
-function readCommentEventId(
+function readCommentEventIdentity(
   database: DatabaseSync,
   input: MobileRelayScope & { readonly bugId: string },
   commentId: string,
-): string | null {
+): { readonly eventId: string; readonly correlationId: string } | null {
   const row = database
     .prepare(
-      `SELECT id
+      `SELECT id, correlation_id
        FROM events
        WHERE account_id = ? AND project_id = ? AND bug_id = ?
          AND type = 'comment.created'
@@ -224,9 +224,8 @@ function readCommentEventId(
        LIMIT 1`,
     )
     .get(input.accountId, input.projectId, input.bugId, commentId) as
-    | { readonly id: string }
-    | undefined;
-  return row?.id ?? null;
+    { readonly id: string; readonly correlation_id: string } | undefined;
+  return row ? { eventId: row.id, correlationId: row.correlation_id } : null;
 }
 
 function nextBugEventSequence(
@@ -255,14 +254,15 @@ function loadCommentCreation(
   if (!comment || comment.bugId !== input.bugId) {
     throw new MobileRelayStorageError("NOT_FOUND", "comment effect is incomplete");
   }
-  const eventId = readCommentEventId(database, input, comment.id);
-  if (!eventId) {
+  const event = readCommentEventIdentity(database, input, comment.id);
+  if (event === null) {
     throw new MobileRelayStorageError("NOT_FOUND", "comment audit effect is incomplete");
   }
   return Object.freeze({
     clientSubmissionId: input.clientSubmissionId,
     comment,
-    eventId,
+    eventId: event.eventId,
+    correlationId: event.correlationId,
     replayed,
   });
 }
@@ -278,6 +278,7 @@ export function createMobileComment(
   requireUuid(input.clientSubmissionId, "clientSubmissionId");
   requireBody(input.body);
   requireDigest(input.payloadDigest);
+  requireUuid(input.correlationId, "correlationId");
   requireTimestamp(input.createdAt);
   requireProjectMembership(database, input);
 
@@ -354,7 +355,7 @@ export function createMobileComment(
       nextBugEventSequence(database, input),
       commentId,
       input.payloadDigest,
-      randomUUID(),
+      input.correlationId,
       JSON.stringify({ commentId }),
       input.createdAt,
     );

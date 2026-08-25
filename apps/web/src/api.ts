@@ -246,6 +246,7 @@ export interface CommentCreationResponse {
     readonly createdAt: string;
     readonly version: number;
   };
+  readonly correlationId: string;
 }
 
 export interface RelayRepairAttempt {
@@ -920,12 +921,16 @@ export async function addBugComment(
     headers: {
       "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
       "Idempotency-Key": `comment:${bugId}:${clientSubmissionId}`,
+      "X-Correlation-ID": clientSubmissionId,
     },
     body: JSON.stringify({ clientSubmissionId, body }),
   });
   const record = requireRecord(response, "COMMENT");
   if (typeof record.comment !== "object" || record.comment === null) {
     throw new QaHubApiError(201, "INVALID_COMMENT");
+  }
+  if (record.correlationId !== clientSubmissionId) {
+    throw new QaHubApiError(201, "INVALID_COMMENT_CORRELATION");
   }
   return response as CommentCreationResponse;
 }
