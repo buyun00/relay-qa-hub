@@ -9,16 +9,16 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P6
-  current_gate: G6-BUILD-VERIFICATION
+  current_phase: P7
+  current_gate: G7-WORKBENCH-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 0f27085
-  last_verified_at: 2026-08-25T15:09:48+08:00
-  next_action: P6.2 IN_PROGRESS（MVP execution override）；先把 build.registered 通知事实持久化到 QA Hub Inbox 并由 Android 原生列表回读，重复投递不得重复；Push/真机后补
+  last_verified_commit: 9127a21
+  last_verified_at: 2026-08-25T15:25:34+08:00
+  next_action: P7.1 IN_PROGRESS（MVP execution override）；先让 Android 对真实 Bug 查询并显示 bounded duplicate candidates，保留一个无候选负例；FTS/pHash/评测集后补
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G6 仍未正式关闭，但按 execution override 不阻塞 P6.2 QA-owned Inbox 主链路
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P7.1 Android 去重提示主链路
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -942,6 +942,8 @@ MuMu MVP execution override：先只在 QA Hub 自有 API/SQLite/fake/manual pro
 
 MuMu MVP execution override：先消费已有 `build.registered` notification outbox，持久化一条 QA Hub Inbox 事实并由 Android 原生列表 GET 回读；重复消费不得生成第二条 Inbox。系统 Push、权限拒绝、静默期与真机通知不阻塞该首条主链。
 
+该 override slice 已由 MuMu/API35 两次真实 GET 实证通过并转入 `VERIFYING`；Push、mark-read、分页、静默期与后台 projector 留在收尾/正式 Gate，唯一进度指针进入 P7.1。
+
 验证：服务/App 崩溃重启后通知不丢不重；过时提醒被取消；Android 15/16/17 真机通知；API 37 自定义通知视图大小限制和 MediaProjection 前台服务可见通知满足平台约束；拒绝通知权限时 App Inbox 可靠降级。
 
 Gate `G6-BUILD-VERIFICATION`：真实构建完成后指定验收人收到通知并进入待验收。
@@ -951,6 +953,8 @@ Gate `G6-BUILD-VERIFICATION`：真实构建完成后指定验收人收到通知�
 #### P7.1 相似候选
 
 要做：FTS、规范化指纹、错误签名、可选截图 pHash、候选解释。
+
+MuMu MVP execution override：先对一个真实 Bug 返回同项目内 bounded duplicate candidates，并由 Android 原生页面显示候选 key/title/reason；再用一个无关 Bug 证明空候选。FTS、pHash、固定评测集与阈值优化不阻塞该首条主链。
 
 验证：固定数据集 precision/recall 基线；不跨项目；绝不自动语义合并。
 
