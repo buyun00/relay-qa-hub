@@ -11,6 +11,12 @@ val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
     .orElse("https://qa-hub.invalid/api/v1/")
 val qaHubDebugAccessToken = providers.gradleProperty("qaHubDebugAccessToken")
     .orElse("")
+val qaHubPocoPort = providers.gradleProperty("qaHubPocoPort")
+    .orElse("5001")
+    .map { value ->
+        value.toIntOrNull()?.takeIf { it in 1..65_535 }
+            ?: error("qaHubPocoPort must be an integer from 1 through 65535")
+    }
 
 android {
     namespace = "com.relayqahub.android"
@@ -34,6 +40,7 @@ android {
         )
         buildConfigField("String", "QA_HUB_DEBUG_ACCESS_TOKEN", "\"\"")
         buildConfigField("String", "QA_HUB_CONTRACT_VERSION", "\"1.1.0\"")
+        buildConfigField("int", "QA_HUB_POCO_PORT", qaHubPocoPort.get().toString())
     }
 
     buildTypes {

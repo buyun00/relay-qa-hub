@@ -22,25 +22,45 @@ import android.os.IBinder
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.relayqahub.android.BuildConfig
 import com.relayqahub.android.MainActivity
 import com.relayqahub.android.R
 import com.relayqahub.android.overlay.OverlayCaptureBridge
 import com.relayqahub.android.overlay.OverlayCaptureCommand
 import com.relayqahub.android.overlay.OverlayPermissionController
+import com.relayqahub.android.poco.PocoCollectionRequest
+import com.relayqahub.android.poco.PocoConnectionConfig
+import com.relayqahub.android.poco.PocoEnrichmentResult
+import com.relayqahub.android.poco.PocoEnrichmentStatus
+import com.relayqahub.android.poco.PocoSimpleRpcClient
 import java.io.ByteArrayOutputStream
 import java.io.Closeable
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicReference
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class CaptureSessionService : Service() {
     private data class PendingCapture(
         val captureId: String,
+        val requestedAtEpochMs: Long,
         val mode: CapturedDraftMode,
         val openApp: Boolean,
+        val pocoEnrichment: Deferred<PocoEnrichmentResult>,
     )
 
     private val pendingCapture = AtomicReference<PendingCapture?>()
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val projectionCallback = object : MediaProjection.Callback() {
         override fun onStop() {
             endSession("projection_stopped", notifyUnavailable = true)
@@ -69,6 +89,7 @@ class CaptureSessionService : Service() {
             ACTION_START_SESSION -> startAuthorizedSession(intent)
             ACTION_CAPTURE_NOW -> requestCapture(
                 captureId = intent.getStringExtra(EXTRA_CAPTURE_ID),
+                requestedAtEpochMs = intent.getLongExtra(EXTRA_REQUESTED_AT_EPOCH_MS, -1L),
                 mode = CapturedDraftMode.OPEN_DRAFT,
                 openApp = false,
             )
@@ -90,6 +111,7 @@ class CaptureSessionService : Service() {
         endSession("service_destroyed", notifyUnavailable = false)
         overlayRegistration?.close()
         overlayRegistration = null
+        serviceScope.cancel()
         OverlayPermissionController.stop(this)
         frameThread.quitSafely()
         super.onDestroy()
@@ -162,12 +184,14 @@ class CaptureSessionService : Service() {
         when (request.command) {
             OverlayCaptureCommand.CAPTURE_AND_OPEN_DRAFT -> requestCapture(
                 captureId = request.captureId,
+                requestedAtEpochMs = request.requestedAtEpochMs,
                 mode = CapturedDraftMode.OPEN_DRAFT,
                 openApp = true,
             )
 
             OverlayCaptureCommand.CAPTURE_AND_SAVE_PENDING -> requestCapture(
                 captureId = request.captureId,
+                requestedAtEpochMs = request.requestedAtEpochMs,
                 mode = CapturedDraftMode.SAVE_PENDING,
                 openApp = false,
             )
@@ -183,6 +207,7 @@ class CaptureSessionService : Service() {
 
     private fun requestCapture(
         captureId: String?,
+        requestedAtEpochMs: Long,
         mode: CapturedDraftMode,
         openApp: Boolean,
     ) {
@@ -192,15 +217,36 @@ class CaptureSessionService : Service() {
             OverlayPermissionController.restoreAfterCapture(this)
             return
         }
+        if (requestedAtEpochMs <= 0L) {
+            CaptureResultBridge.send(this, CaptureResult.Unavailable("capture_timestamp_invalid"))
+            OverlayPermissionController.restoreAfterCapture(this)
+            return
+        }
         if (mediaProjection == null || imageReader == null) {
             CaptureResultBridge.send(this, CaptureResult.Unavailable("capture_session_not_active"))
             OverlayPermissionController.restoreAfterCapture(this)
             return
         }
-        if (!pendingCapture.compareAndSet(null, PendingCapture(id, mode, openApp))) {
+        val pocoEnrichment = serviceScope.async(start = CoroutineStart.LAZY) {
+            PocoSimpleRpcClient(
+                PocoConnectionConfig(configuredPort = BuildConfig.QA_HUB_POCO_PORT),
+            ).use { client ->
+                client.collect(
+                    PocoCollectionRequest(
+                        captureId = id,
+                        capturedAtEpochMillis = requestedAtEpochMs,
+                    ),
+                )
+            }
+        }
+        val pending = PendingCapture(id, requestedAtEpochMs, mode, openApp, pocoEnrichment)
+        if (!pendingCapture.compareAndSet(null, pending)) {
+            pocoEnrichment.cancel()
             CaptureResultBridge.send(this, CaptureResult.Unavailable("capture_already_pending"))
             OverlayPermissionController.restoreAfterCapture(this)
+            return
         }
+        pocoEnrichment.start()
     }
 
     private fun onImageAvailable(reader: ImageReader) {
@@ -211,6 +257,7 @@ class CaptureSessionService : Service() {
             return
         }
 
+        var resultDispatchedAsynchronously = false
         try {
             val png = image.toPng()
             if (png.size > MAX_CAPTURE_BYTES) {
@@ -222,22 +269,65 @@ class CaptureSessionService : Service() {
                 output.write(png)
                 output.fd.sync()
             }
-            CaptureResultBridge.send(
-                this,
-                CaptureResult.Ready(
-                    captureId = pending.captureId,
-                    privatePath = file.absolutePath,
-                    width = image.width,
-                    height = image.height,
-                    mode = pending.mode,
-                ),
-            )
-            if (pending.openApp) openAppFromUserCapture()
+            val width = image.width
+            val height = image.height
+            resultDispatchedAsynchronously = true
+            serviceScope.launch {
+                try {
+                    val poco = try {
+                        pending.pocoEnrichment.await()
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (_: Throwable) {
+                        PocoEnrichmentResult.unavailable(
+                            PocoCollectionRequest(pending.captureId, pending.requestedAtEpochMs),
+                            "POCO_COLLECTION_FAILED",
+                        )
+                    }
+                    CaptureResultBridge.send(
+                        this@CaptureSessionService,
+                        CaptureResult.Ready(
+                            captureId = pending.captureId,
+                            privatePath = file.absolutePath,
+                            width = width,
+                            height = height,
+                            mode = pending.mode,
+                            requestedAtEpochMs = pending.requestedAtEpochMs,
+                            poco = CapturePocoSummary(
+                                // The client may have collected every local artifact, but this
+                                // slice only transports a bounded summary. Do not report COMPLETE
+                                // until the artifacts are durably attached to the same captureId.
+                                status = if (poco.status == PocoEnrichmentStatus.COMPLETE) {
+                                    PocoEnrichmentStatus.PARTIAL
+                                } else {
+                                    poco.status
+                                },
+                                port = poco.port,
+                                sdkVersion = poco.sdkVersion,
+                                succeededMethods = poco.succeededMethods.map { it.wireName },
+                                failureCode = if (poco.status == PocoEnrichmentStatus.COMPLETE) {
+                                    "POCO_ARTIFACT_UPLOAD_PENDING"
+                                } else {
+                                    poco.failureCode
+                                },
+                            ),
+                        ),
+                    )
+                    if (pending.openApp) openAppFromUserCapture()
+                } finally {
+                    if (currentCoroutineContext().isActive) {
+                        OverlayPermissionController.restoreAfterCapture(this@CaptureSessionService)
+                    }
+                }
+            }
         } catch (_: Throwable) {
+            pending.pocoEnrichment.cancel()
             CaptureResultBridge.send(this, CaptureResult.Unavailable("capture_frame_unavailable"))
         } finally {
             image.close()
-            OverlayPermissionController.restoreAfterCapture(this)
+            if (!resultDispatchedAsynchronously) {
+                OverlayPermissionController.restoreAfterCapture(this)
+            }
         }
     }
 
@@ -290,7 +380,7 @@ class CaptureSessionService : Service() {
     private fun endSession(reason: String, notifyUnavailable: Boolean) {
         if (endingSession) return
         endingSession = true
-        pendingCapture.set(null)
+        pendingCapture.getAndSet(null)?.pocoEnrichment?.cancel()
         imageReader?.setOnImageAvailableListener(null, null)
         virtualDisplay?.release()
         virtualDisplay = null
@@ -355,6 +445,7 @@ class CaptureSessionService : Service() {
         private const val EXTRA_RESULT_CODE = "resultCode"
         private const val EXTRA_RESULT_DATA = "resultData"
         private const val EXTRA_CAPTURE_ID = "captureId"
+        private const val EXTRA_REQUESTED_AT_EPOCH_MS = "requestedAtEpochMs"
         private const val NOTIFICATION_CHANNEL_ID = "qa_capture_session"
         private const val NOTIFICATION_ID = 3701
         private const val STOP_REQUEST_CODE = 3702
@@ -374,10 +465,15 @@ class CaptureSessionService : Service() {
             .putExtra(EXTRA_RESULT_CODE, resultCode)
             .putExtra(EXTRA_RESULT_DATA, resultData)
 
-        fun captureIntent(context: Context, captureId: String): Intent =
+        fun captureIntent(
+            context: Context,
+            captureId: String,
+            requestedAtEpochMs: Long,
+        ): Intent =
             Intent(context, CaptureSessionService::class.java)
                 .setAction(ACTION_CAPTURE_NOW)
                 .putExtra(EXTRA_CAPTURE_ID, captureId)
+                .putExtra(EXTRA_REQUESTED_AT_EPOCH_MS, requestedAtEpochMs)
 
         fun stopIntent(context: Context): Intent =
             Intent(context, CaptureSessionService::class.java).setAction(ACTION_STOP_SESSION)

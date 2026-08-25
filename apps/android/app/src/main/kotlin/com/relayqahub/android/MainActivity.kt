@@ -144,7 +144,7 @@ class MainActivity : ComponentActivity() {
                 require(!relative.path.startsWith("..")) { "capture path left the private root" }
                 captureFile.readBytes()
             }
-            foundationViewModel.submitCapturedPng(result.captureId, bytes)
+            foundationViewModel.submitCapturedPng(result.captureId, bytes, result.poco)
         }
     }
 }

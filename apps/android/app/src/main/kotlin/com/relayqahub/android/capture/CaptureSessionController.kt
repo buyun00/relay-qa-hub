@@ -23,7 +23,11 @@ object CaptureSessionController {
     fun captureNow(context: Context) {
         OverlayPermissionController.hideForCapture(context, showStopControl = false)
         context.startService(
-            CaptureSessionService.captureIntent(context, UUID.randomUUID().toString()),
+            CaptureSessionService.captureIntent(
+                context,
+                UUID.randomUUID().toString(),
+                System.currentTimeMillis(),
+            ),
         )
     }
 

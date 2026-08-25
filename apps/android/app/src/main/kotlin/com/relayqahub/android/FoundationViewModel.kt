@@ -7,11 +7,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
+import com.relayqahub.android.capture.CapturePocoSummary
 import com.relayqahub.android.network.AttachmentUploadFailure
 import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.security.NativeCredentials
 import com.relayqahub.android.security.VaultResult
 import com.relayqahub.android.security.nativeSessionScope
+import com.relayqahub.android.poco.PocoEnrichmentStatus
 import com.relayqahub.android.work.SyncRunResult
 import java.io.ByteArrayOutputStream
 import java.time.Instant
@@ -102,16 +104,22 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             filename = LIVE_SMOKE_FILENAME,
             captureId = null,
             actionLabel = "Live smoke",
+            pocoSummary = null,
         )
     }
 
-    fun submitCapturedPng(captureId: String, pngBytes: ByteArray) {
+    fun submitCapturedPng(
+        captureId: String,
+        pngBytes: ByteArray,
+        pocoSummary: CapturePocoSummary,
+    ) {
         val immutableBytes = pngBytes.copyOf()
         submitPngAttachment(
             pngBytes = immutableBytes,
             filename = "capture-$captureId.png",
             captureId = captureId,
             actionLabel = "Capture",
+            pocoSummary = pocoSummary,
         )
     }
 
@@ -141,6 +149,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         filename: String,
         captureId: String?,
         actionLabel: String,
+        pocoSummary: CapturePocoSummary?,
     ) {
         viewModelScope.launch {
             val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
@@ -212,7 +221,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         "${syncResult.liveSmokeSummary()}."
                 }
             }
-            lastAction.value = result.getOrElse { failure ->
+            val actionResult = result.getOrElse { failure ->
                 val code = when (failure) {
                     is LiveSmokeFailure -> failure.code
                     is AttachmentUploadFailure -> failure.code
@@ -220,6 +229,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 }
                 "$actionLabel failed: $code."
             }
+            lastAction.value = actionResult + pocoSummary.pocoDisplaySuffix()
         }
     }
 
@@ -232,6 +242,24 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             sessionId = "10000000-0000-4000-8000-000000000002",
         )
     }
+}
+
+private fun CapturePocoSummary?.pocoDisplaySuffix(): String = when (this?.status) {
+    null -> ""
+    PocoEnrichmentStatus.COMPLETE ->
+        " Unity context: complete / 已获取 Unity 上下文" + pocoEndpointSuffix() + "."
+    PocoEnrichmentStatus.PARTIAL ->
+        " Unity context: partial / 部分" + pocoEndpointSuffix() + "."
+    PocoEnrichmentStatus.UNAVAILABLE -> " Unity context: unavailable / 未连接."
+}
+
+private fun CapturePocoSummary.pocoEndpointSuffix(): String = buildString {
+    sdkVersion?.let { append(" (SDK ").append(it) }
+    port?.let {
+        if (sdkVersion == null) append(" (") else append(", ")
+        append("127.0.0.1:").append(it)
+    }
+    if (sdkVersion != null || port != null) append(")")
 }
 
 private class LiveSmokeFailure(val code: String) : RuntimeException()

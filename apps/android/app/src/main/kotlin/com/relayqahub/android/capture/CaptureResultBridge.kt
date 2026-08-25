@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.relayqahub.android.poco.PocoEnrichmentStatus
 import java.io.Closeable
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -12,6 +13,14 @@ enum class CapturedDraftMode {
     SAVE_PENDING,
 }
 
+data class CapturePocoSummary(
+    val status: PocoEnrichmentStatus,
+    val port: Int?,
+    val sdkVersion: Int?,
+    val succeededMethods: List<String>,
+    val failureCode: String?,
+)
+
 sealed interface CaptureResult {
     data class Ready(
         val captureId: String,
@@ -19,6 +28,8 @@ sealed interface CaptureResult {
         val width: Int,
         val height: Int,
         val mode: CapturedDraftMode,
+        val requestedAtEpochMs: Long,
+        val poco: CapturePocoSummary,
     ) : CaptureResult
 
     data class Unavailable(
@@ -40,6 +51,12 @@ object CaptureResultBridge {
     private const val EXTRA_WIDTH = "width"
     private const val EXTRA_HEIGHT = "height"
     private const val EXTRA_MODE = "mode"
+    private const val EXTRA_REQUESTED_AT_EPOCH_MS = "requestedAtEpochMs"
+    private const val EXTRA_POCO_STATUS = "pocoStatus"
+    private const val EXTRA_POCO_PORT = "pocoPort"
+    private const val EXTRA_POCO_SDK_VERSION = "pocoSdkVersion"
+    private const val EXTRA_POCO_SUCCEEDED_METHODS = "pocoSucceededMethods"
+    private const val EXTRA_POCO_FAILURE_CODE = "pocoFailureCode"
     private const val EXTRA_REASON = "reason"
     private const val EXTRA_ACTIVE = "active"
 
@@ -78,6 +95,15 @@ object CaptureResultBridge {
                 .putExtra(EXTRA_WIDTH, result.width)
                 .putExtra(EXTRA_HEIGHT, result.height)
                 .putExtra(EXTRA_MODE, result.mode.name)
+                .putExtra(EXTRA_REQUESTED_AT_EPOCH_MS, result.requestedAtEpochMs)
+                .putExtra(EXTRA_POCO_STATUS, result.poco.status.name)
+                .putExtra(EXTRA_POCO_PORT, result.poco.port ?: -1)
+                .putExtra(EXTRA_POCO_SDK_VERSION, result.poco.sdkVersion ?: -1)
+                .putStringArrayListExtra(
+                    EXTRA_POCO_SUCCEEDED_METHODS,
+                    ArrayList(result.poco.succeededMethods),
+                )
+                .putExtra(EXTRA_POCO_FAILURE_CODE, result.poco.failureCode)
 
             is CaptureResult.Unavailable -> intent
                 .putExtra(EXTRA_KIND, KIND_UNAVAILABLE)
@@ -103,7 +129,30 @@ object CaptureResultBridge {
                 val mode = getStringExtra(EXTRA_MODE)
                     ?.let { runCatching { CapturedDraftMode.valueOf(it) }.getOrNull() }
                     ?: return null
-                CaptureResult.Ready(captureId, privatePath, width, height, mode)
+                val requestedAtEpochMs = getLongExtra(EXTRA_REQUESTED_AT_EPOCH_MS, -1L)
+                    .takeIf { it > 0L }
+                    ?: return null
+                val pocoStatus = getStringExtra(EXTRA_POCO_STATUS)
+                    ?.let { runCatching { PocoEnrichmentStatus.valueOf(it) }.getOrNull() }
+                    ?: return null
+                CaptureResult.Ready(
+                    captureId = captureId,
+                    privatePath = privatePath,
+                    width = width,
+                    height = height,
+                    mode = mode,
+                    requestedAtEpochMs = requestedAtEpochMs,
+                    poco = CapturePocoSummary(
+                        status = pocoStatus,
+                        port = getIntExtra(EXTRA_POCO_PORT, -1).takeIf { it in 1..65_535 },
+                        sdkVersion = getIntExtra(EXTRA_POCO_SDK_VERSION, -1).takeIf { it > 0 },
+                        succeededMethods = getStringArrayListExtra(EXTRA_POCO_SUCCEEDED_METHODS)
+                            ?.filter(String::isNotBlank)
+                            .orEmpty(),
+                        failureCode = getStringExtra(EXTRA_POCO_FAILURE_CODE)
+                            ?.takeIf(String::isNotBlank),
+                    ),
+                )
             }
 
             KIND_UNAVAILABLE -> CaptureResult.Unavailable(
