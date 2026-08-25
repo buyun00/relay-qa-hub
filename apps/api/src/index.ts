@@ -1,5 +1,17 @@
-export { LIVE_HEALTH_PATH, createApiApp, createLiveHealth } from "./app.js";
-export type { CreateApiAppOptions, LiveHealth } from "./app.js";
+export {
+  DEPENDENCY_HEALTH_PATH,
+  LIVE_HEALTH_PATH,
+  READY_HEALTH_PATH,
+  createApiApp,
+  createLiveHealth,
+} from "./app.js";
+export type { CreateApiAppOptions, DependencyHealth, LiveHealth, ReadyHealth } from "./app.js";
+export { createSqliteApiHealthProbe } from "./health.js";
+export type {
+  ApiDependencyHealthProbe,
+  ApiDependencyHealthSnapshot,
+  SqliteApiHealthProbeOptions,
+} from "./health.js";
 
 export {
   MAX_MOBILE_CHUNK_SIZE_BYTES,

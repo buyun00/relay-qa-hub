@@ -108,6 +108,11 @@ import {
 } from "./mobile-metrics.js";
 import { startMobileNotificationHintChannel } from "./mobile-notification-hints.js";
 import {
+  unavailableApiDependencyHealthProbe,
+  type ApiDependencyHealthProbe,
+  type ApiDependencyHealthSnapshot,
+} from "./health.js";
+import {
   authenticateBrowserRequest,
   BROWSER_LOGIN_PATH,
   BROWSER_LOGOUT_PATH,
@@ -145,6 +150,8 @@ import {
 } from "./mobile-relay-webhook.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
+export const READY_HEALTH_PATH = "/api/v1/health/ready" as const;
+export const DEPENDENCY_HEALTH_PATH = "/api/v1/health/deps" as const;
 
 const P2_2_BROWSER_MEMBERSHIP_READ_PATHS = new Set<string>([
   MOBILE_PROJECT_COLLECTION_PATH,
@@ -153,6 +160,7 @@ const P2_2_BROWSER_MEMBERSHIP_READ_PATHS = new Set<string>([
   MOBILE_METRICS_OVERVIEW_PATH,
   MOBILE_BUG_COLLECTION_PATH,
 ]);
+const BROWSER_ACCOUNT_HEALTH_READ_PATHS = new Set<string>([DEPENDENCY_HEALTH_PATH]);
 
 function isP2_2BrowserMembershipRead(request: FastifyRequest): boolean {
   const routeUrl = request.routeOptions.url;
@@ -160,6 +168,15 @@ function isP2_2BrowserMembershipRead(request: FastifyRequest): boolean {
     request.method === "GET" &&
     routeUrl !== undefined &&
     P2_2_BROWSER_MEMBERSHIP_READ_PATHS.has(routeUrl)
+  );
+}
+
+function isBrowserAccountHealthRead(request: FastifyRequest): boolean {
+  const routeUrl = request.routeOptions.url;
+  return (
+    request.method === "GET" &&
+    routeUrl !== undefined &&
+    BROWSER_ACCOUNT_HEALTH_READ_PATHS.has(routeUrl)
   );
 }
 
@@ -175,11 +192,28 @@ export interface LiveHealth {
   readonly time: string;
 }
 
+export interface ReadyHealth {
+  readonly status: "ready" | "not_ready";
+  readonly schemaVersion: string | null;
+  readonly checks: readonly {
+    readonly name: "database" | "evidence" | "worker";
+    readonly status: "ok" | "degraded" | "down";
+  }[];
+}
+
+export interface DependencyHealth {
+  readonly status: "ok" | "degraded" | "down";
+  readonly database: "ok" | "degraded" | "down";
+  readonly evidence: "ok" | "read_only" | "low_space" | "down";
+  readonly worker: "ok" | "stalled" | "down";
+}
+
 export interface CreateApiAppOptions {
   readonly version?: string;
   readonly buildSha?: string;
   readonly now?: () => Date;
   readonly logger?: boolean;
+  readonly healthProbe?: ApiDependencyHealthProbe;
   readonly mobileBugStore?: MobileBugStore;
   readonly mobileAttachmentStore?: MobileAttachmentStore;
   readonly mobileCaptureStore?: MobileCaptureStore;
@@ -210,6 +244,40 @@ const liveHealthResponseSchema = {
     version: { type: "string", minLength: 1, maxLength: 100 },
     buildSha: { type: "string", pattern: "^(dev|[0-9a-f]{40})$" },
     time: { type: "string", format: "date-time" },
+  },
+} as const;
+
+const readyHealthResponseSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["status", "schemaVersion", "checks"],
+  properties: {
+    status: { type: "string", enum: ["ready", "not_ready"] },
+    schemaVersion: { anyOf: [{ type: "string", maxLength: 100 }, { type: "null" }] },
+    checks: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name", "status"],
+        properties: {
+          name: { type: "string", enum: ["database", "evidence", "worker"] },
+          status: { type: "string", enum: ["ok", "degraded", "down"] },
+        },
+      },
+    },
+  },
+} as const;
+
+const dependencyHealthResponseSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["status", "database", "evidence", "worker"],
+  properties: {
+    status: { type: "string", enum: ["ok", "degraded", "down"] },
+    database: { type: "string", enum: ["ok", "degraded", "down"] },
+    evidence: { type: "string", enum: ["ok", "read_only", "low_space", "down"] },
+    worker: { type: "string", enum: ["ok", "stalled", "down"] },
   },
 } as const;
 
@@ -379,8 +447,38 @@ export function createLiveHealth(
   };
 }
 
+function createReadyHealth(snapshot: ApiDependencyHealthSnapshot): ReadyHealth {
+  const databaseStatus = snapshot.database;
+  const evidenceStatus =
+    snapshot.evidence === "ok"
+      ? "ok"
+      : snapshot.evidence === "read_only" || snapshot.evidence === "low_space"
+        ? "degraded"
+        : "down";
+  const workerStatus = snapshot.worker === "stalled" ? "degraded" : snapshot.worker;
+  return Object.freeze({
+    status: snapshot.status === "ok" ? "ready" : "not_ready",
+    schemaVersion: snapshot.schemaVersion,
+    checks: Object.freeze([
+      Object.freeze({ name: "database" as const, status: databaseStatus }),
+      Object.freeze({ name: "evidence" as const, status: evidenceStatus }),
+      Object.freeze({ name: "worker" as const, status: workerStatus }),
+    ]),
+  });
+}
+
+function createDependencyHealth(snapshot: ApiDependencyHealthSnapshot): DependencyHealth {
+  return Object.freeze({
+    status: snapshot.status,
+    database: snapshot.database,
+    evidence: snapshot.evidence,
+    worker: snapshot.worker,
+  });
+}
+
 export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance {
   const app = Fastify({ logger: options.logger ?? true });
+  const healthProbe = options.healthProbe ?? unavailableApiDependencyHealthProbe;
   const mobileBugStore = options.mobileBugStore ?? unconfiguredMobileBugStore;
   const mobileAttachmentStore = options.mobileAttachmentStore ?? unconfiguredMobileAttachmentStore;
   const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
@@ -430,7 +528,11 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           .header("content-type", MOBILE_API_CONTENT_TYPE)
           .send({ code: "UNAUTHENTICATED" });
       }
-      if (principal.actorId !== debugActorId && !isP2_2BrowserMembershipRead(request)) {
+      if (
+        principal.actorId !== debugActorId &&
+        !isP2_2BrowserMembershipRead(request) &&
+        !isBrowserAccountHealthRead(request)
+      ) {
         return reply
           .code(403)
           .header("content-type", MOBILE_API_CONTENT_TYPE)
@@ -481,6 +583,41 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       },
     },
     async (): Promise<LiveHealth> => createLiveHealth(options),
+  );
+
+  app.get(
+    READY_HEALTH_PATH,
+    {
+      schema: {
+        response: {
+          200: readyHealthResponseSchema,
+        },
+      },
+    },
+    async (): Promise<ReadyHealth> => createReadyHealth(await healthProbe.check()),
+  );
+
+  app.get(
+    DEPENDENCY_HEALTH_PATH,
+    {
+      schema: {
+        response: {
+          200: dependencyHealthResponseSchema,
+          401: {
+            type: "object",
+            additionalProperties: false,
+            required: ["code"],
+            properties: { code: { const: "UNAUTHENTICATED" } },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "UNAUTHENTICATED" });
+      }
+      return reply.send(createDependencyHealth(await healthProbe.check()));
+    },
   );
 
   app.get<{

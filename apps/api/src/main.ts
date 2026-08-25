@@ -6,6 +6,7 @@ import {
 
 import { DEFAULT_API_HOST, resolvePort } from "./config.js";
 import { createApiServer, type ApiServer } from "./server.js";
+import { createSqliteApiHealthProbe } from "./health.js";
 import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-store.js";
 import { createSqliteMobileBuildStore } from "./sqlite-mobile-build-store.js";
 import { createSqliteMobileDuplicateStore } from "./sqlite-mobile-duplicate-store.js";
@@ -129,6 +130,11 @@ async function run(): Promise<void> {
     const relayWebhookSecret = readRelayWebhookSecret(fakeRelayEndpoint);
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
+      healthProbe: createSqliteApiHealthProbe({
+        worker,
+        evidenceRoot: storage.evidenceRoot,
+        quarantineRoot: storage.quarantineRoot,
+      }),
       mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
       mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
       mobileBuildStore: createSqliteMobileBuildStore({ worker, scope: MOBILE_SCOPE }),
