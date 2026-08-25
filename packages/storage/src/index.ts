@@ -259,6 +259,17 @@ export type {
   SqliteRestoreErrorCode,
 } from "./sqlite-restore.js";
 export {
+  restoreReferencedAttachmentsToIsolatedRoot,
+  AttachmentRestoreError,
+} from "./attachment-restore.js";
+export type {
+  AttachmentInventoryEntry,
+  AttachmentInventoryManifest,
+  AttachmentRestoreErrorCode,
+  RestoreReferencedAttachmentsOptions,
+  RestoreReferencedAttachmentsResult,
+} from "./attachment-restore.js";
+export {
   ensureBrowserAdmin,
   loginBrowserSession,
   resolveBrowserSession,
