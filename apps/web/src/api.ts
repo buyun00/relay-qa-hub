@@ -118,6 +118,87 @@ export interface RelayReceipt {
   readonly version: number;
 }
 
+export interface HumanRepairAttempt {
+  readonly id: string;
+  readonly bugId: string;
+  readonly sequence: number;
+  readonly mode: "human";
+  readonly status: "planned" | "running" | "delivered";
+  readonly assigneeId: string;
+  readonly summary: string | null;
+  readonly branch: string | null;
+  readonly commitSha: string | null;
+  readonly version: number;
+}
+
+export interface BuildRecord {
+  readonly id: string;
+  readonly projectId: string;
+  readonly provider: "manual" | "ozdqp" | "custom";
+  readonly externalId: string;
+  readonly versionName: string;
+  readonly channel: string;
+  readonly projectKey: string;
+  readonly branch: string;
+  readonly sourceCommitSha: string;
+  readonly mode: string;
+  readonly status: string;
+  readonly artifactSha256: string | null;
+  readonly downloadUrl: string | null;
+  readonly version: number;
+}
+
+export interface RegisterBuildResponse {
+  readonly build: BuildRecord;
+  readonly eventId: string;
+  readonly outboxMessageId: string;
+  readonly replayed: boolean;
+}
+
+export interface LinkBuildRepairResponse {
+  readonly build: BuildRecord;
+  readonly bug: BugDetail;
+  readonly buildRequirement: {
+    readonly id: string;
+    readonly repairAttemptId: string;
+    readonly deliveredCommitSha: string;
+    readonly linkedBuildId: string;
+    readonly version: number;
+  };
+  readonly repairLink: {
+    readonly id: string;
+    readonly buildId: string;
+    readonly repairAttemptId: string;
+    readonly deliveredCommitSha: string;
+  };
+  readonly eventId: string;
+  readonly replayed: boolean;
+}
+
+export interface VerificationRecord {
+  readonly id: string;
+  readonly bugId: string;
+  readonly repairAttemptId: string;
+  readonly buildId: string | null;
+  readonly status: "requested" | "in_progress" | "passed" | "failed" | "blocked" | "cancelled";
+  readonly verifierId: string;
+  readonly criteriaSnapshot: string;
+  readonly resultSummary: string | null;
+  readonly version: number;
+}
+
+export interface VerificationResultResponse {
+  readonly clientSubmissionId: string;
+  readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
+  readonly verification: VerificationRecord;
+  readonly repairAttempt: HumanRepairAttempt;
+  readonly bug: BugDetail;
+  readonly attachmentIds: readonly string[];
+  readonly captureBundleId: string | null;
+  readonly eventId: string;
+  readonly replayed: boolean;
+}
+
 export class QaHubApiError extends Error {
   readonly status: number;
   readonly code: string | null;
@@ -281,4 +362,210 @@ export async function getRelayReceipt(attemptId: string): Promise<RelayReceipt> 
     `/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/relay-receipt`,
   );
   return requireRecord(body, "RELAY_RECEIPT") as unknown as RelayReceipt;
+}
+
+export async function createHumanRepairAttempt(
+  bugId: string,
+  expectedVersion: number,
+  assigneeId: string,
+  summary: string,
+): Promise<HumanRepairAttempt> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/repair-attempts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:createRepairAttempt:bug:${bugId}:v${expectedVersion}`,
+    },
+    body: JSON.stringify({ expectedVersion, mode: "human", assigneeId, summary }),
+  });
+  return requireRecord(body, "HUMAN_ATTEMPT") as unknown as HumanRepairAttempt;
+}
+
+export async function getHumanRepairAttempt(attemptId: string): Promise<HumanRepairAttempt> {
+  const body = await requestJson(`/api/v1/repair-attempts/${encodeURIComponent(attemptId)}`);
+  return requireRecord(body, "HUMAN_ATTEMPT") as unknown as HumanRepairAttempt;
+}
+
+export async function startHumanRepairAttempt(
+  attemptId: string,
+  expectedVersion: number,
+): Promise<HumanRepairAttempt> {
+  const body = await requestJson(`/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/start`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:startRepairAttempt:attempt:${attemptId}:v${expectedVersion}`,
+    },
+    body: JSON.stringify({ expectedVersion, reason: "Developer started the Web-managed repair" }),
+  });
+  return requireRecord(body, "HUMAN_ATTEMPT") as unknown as HumanRepairAttempt;
+}
+
+export async function deliverHumanRepairAttempt(
+  attemptId: string,
+  expectedVersion: number,
+  summary: string,
+  branch: string,
+  commitSha: string,
+): Promise<HumanRepairAttempt> {
+  const body = await requestJson(
+    `/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/deliver`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": `workflow:deliverRepairAttempt:attempt:${attemptId}:v${expectedVersion}`,
+      },
+      body: JSON.stringify({ expectedVersion, summary, deliveryKind: "code", branch, commitSha }),
+    },
+  );
+  return requireRecord(body, "HUMAN_ATTEMPT") as unknown as HumanRepairAttempt;
+}
+
+export async function registerManualBuild(input: {
+  readonly projectId: string;
+  readonly externalId: string;
+  readonly version: string;
+  readonly branch: string;
+  readonly sourceCommitSha: string;
+  readonly downloadUrl: string;
+  readonly artifactSha256: string;
+  readonly repairAttemptId: string;
+}): Promise<RegisterBuildResponse> {
+  const body = await requestJson(`/api/v1/projects/${encodeURIComponent(input.projectId)}/builds`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `build:register:project:${input.projectId}:provider:manual:external:${input.externalId}`,
+    },
+    body: JSON.stringify({
+      provider: "manual",
+      externalId: input.externalId,
+      version: input.version,
+      channel: "qa",
+      projectKey: "LOCAL",
+      branch: input.branch,
+      sourceCommitSha: input.sourceCommitSha,
+      mode: "debug",
+      status: "ready",
+      downloadUrl: input.downloadUrl,
+      manifest: {
+        commitShas: [input.sourceCommitSha],
+        artifactSha256: input.artifactSha256,
+      },
+      repairAttemptId: input.repairAttemptId,
+    }),
+  });
+  return requireRecord(body, "BUILD_REGISTRATION") as unknown as RegisterBuildResponse;
+}
+
+export async function getBuild(buildId: string): Promise<BuildRecord> {
+  const body = await requestJson(`/api/v1/builds/${encodeURIComponent(buildId)}`);
+  return requireRecord(body, "BUILD") as unknown as BuildRecord;
+}
+
+export async function linkBuildRepair(input: {
+  readonly buildId: string;
+  readonly expectedBuildVersion: number;
+  readonly expectedBugVersion: number;
+  readonly repairAttemptId: string;
+  readonly deliveredCommitSha: string;
+}): Promise<LinkBuildRepairResponse> {
+  const body = await requestJson(
+    `/api/v1/builds/${encodeURIComponent(input.buildId)}/link-repair`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": `build:link:${input.buildId}:attempt:${input.repairAttemptId}:v${input.expectedBuildVersion}`,
+      },
+      body: JSON.stringify({
+        expectedVersion: input.expectedBuildVersion,
+        expectedBugVersion: input.expectedBugVersion,
+        expectedBuildRequirementVersion: 1,
+        repairAttemptId: input.repairAttemptId,
+        deliveredCommitSha: input.deliveredCommitSha,
+        evidenceType: "manifest",
+      }),
+    },
+  );
+  return requireRecord(body, "BUILD_LINK") as unknown as LinkBuildRepairResponse;
+}
+
+export async function createVerification(input: {
+  readonly bugId: string;
+  readonly expectedBugVersion: number;
+  readonly repairAttemptId: string;
+  readonly buildId: string;
+  readonly verifierId: string;
+  readonly criteria: string;
+}): Promise<VerificationRecord> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(input.bugId)}/verifications`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:createVerification:bug:${input.bugId}:attempt:${input.repairAttemptId}:v${input.expectedBugVersion}`,
+    },
+    body: JSON.stringify({
+      expectedVersion: input.expectedBugVersion,
+      repairAttemptId: input.repairAttemptId,
+      buildId: input.buildId,
+      verifierId: input.verifierId,
+      criteria: input.criteria,
+    }),
+  });
+  return requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+}
+
+export async function getVerification(verificationId: string): Promise<VerificationRecord> {
+  const body = await requestJson(`/api/v1/verifications/${encodeURIComponent(verificationId)}`);
+  return requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+}
+
+export async function startVerification(
+  verificationId: string,
+  expectedVersion: number,
+): Promise<VerificationRecord> {
+  const body = await requestJson(
+    `/api/v1/verifications/${encodeURIComponent(verificationId)}/start`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": `workflow:startVerification:verification:${verificationId}:v${expectedVersion}`,
+      },
+      body: JSON.stringify({
+        expectedVersion,
+        reason: "Human verifier started exact-Build acceptance",
+      }),
+    },
+  );
+  return requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+}
+
+export async function recordVerificationPassed(
+  verificationId: string,
+  expectedVersion: number,
+  resultSummary: string,
+  clientSubmissionId: string,
+): Promise<VerificationResultResponse> {
+  const body = await requestJson(
+    `/api/v1/verifications/${encodeURIComponent(verificationId)}/result`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+        "Idempotency-Key": `workflow:recordVerificationResult:verification:${verificationId}:v${expectedVersion}`,
+      },
+      body: JSON.stringify({
+        submissionContractVersion: "1.1.0",
+        clientSubmissionId,
+        expectedVersion,
+        status: "passed",
+        resultSummary,
+        attachmentIds: [],
+      }),
+    },
+  );
+  return requireRecord(body, "VERIFICATION_RESULT") as unknown as VerificationResultResponse;
 }

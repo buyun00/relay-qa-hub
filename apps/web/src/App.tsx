@@ -2,19 +2,33 @@ import { useCallback, useEffect, useState } from "react";
 
 import {
   addBugComment,
+  createHumanRepairAttempt,
   createRelayAttempt,
+  createVerification,
+  deliverHumanRepairAttempt,
   dispatchRelay,
   getBug,
+  getBuild,
+  getHumanRepairAttempt,
   getRelayReceipt,
+  getVerification,
+  linkBuildRepair,
   listBugEvents,
   listBugs,
   QaHubApiError,
+  recordVerificationPassed,
+  registerManualBuild,
+  startHumanRepairAttempt,
+  startVerification,
   transitionBugReady,
   updateBugOwner,
   type BugDetail,
   type BugEvent,
   type BugListItem,
+  type HumanRepairAttempt,
+  type LinkBuildRepairResponse,
   type RelayReceipt,
+  type VerificationRecord,
 } from "./api";
 import { product } from "./product";
 
@@ -24,6 +38,8 @@ const INVALID_PROJECT_ID = "10000000-0000-4000-8000-000000000099";
 const MISSING_BUG_ID = "20000000-0000-4000-8000-000000000099";
 const MVP_OWNER_ID = "10000000-0000-4000-8000-000000000003";
 const BUG_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+const COMMIT_SHA_PATTERN = /^[0-9a-f]{40}$/u;
+const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 
 interface DesktopBridgeWindow extends Window {
   readonly qaHubDesktop?: {
@@ -119,6 +135,25 @@ export default function App() {
     readonly status: number;
     readonly code: string | null;
   } | null>(null);
+  const [humanAttempt, setHumanAttempt] = useState<HumanRepairAttempt | null>(null);
+  const [linkedBuild, setLinkedBuild] = useState<LinkBuildRepairResponse | null>(null);
+  const [verification, setVerification] = useState<VerificationRecord | null>(null);
+  const [humanWorkflowState, setHumanWorkflowState] = useState<MutationState>("idle");
+  const [humanWorkflowError, setHumanWorkflowError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
+  const [humanWorkflowMessage, setHumanWorkflowMessage] = useState<string | null>(null);
+  const [repairSummary, setRepairSummary] = useState("");
+  const [repairBranch, setRepairBranch] = useState("");
+  const [repairCommitSha, setRepairCommitSha] = useState("");
+  const [buildExternalId, setBuildExternalId] = useState("");
+  const [buildVersion, setBuildVersion] = useState("0.1.0-debug");
+  const [buildDownloadUrl, setBuildDownloadUrl] = useState("");
+  const [buildArtifactSha256, setBuildArtifactSha256] = useState("");
+  const [buildCommitSha, setBuildCommitSha] = useState("");
+  const [verificationCriteria, setVerificationCriteria] = useState("");
+  const [verificationResultSummary, setVerificationResultSummary] = useState("");
 
   const loadBugList = useCallback(async (nextProjectId: string): Promise<void> => {
     const normalizedProjectId = nextProjectId.trim();
@@ -147,6 +182,7 @@ export default function App() {
       bugId: string,
       preserveComment = false,
       preserveRelay = false,
+      preserveHuman = false,
     ): Promise<{ readonly bug: BugDetail; readonly events: readonly BugEvent[] } | null> => {
       setSelectedBugId(bugId);
       setSelectedBug(null);
@@ -162,6 +198,24 @@ export default function App() {
         setRelayState("idle");
         setRelayReceipt(null);
         setRelayError(null);
+      }
+      if (!preserveHuman) {
+        setHumanAttempt(null);
+        setLinkedBuild(null);
+        setVerification(null);
+        setHumanWorkflowState("idle");
+        setHumanWorkflowError(null);
+        setHumanWorkflowMessage(null);
+        setRepairSummary("");
+        setRepairBranch("");
+        setRepairCommitSha("");
+        setBuildExternalId("");
+        setBuildVersion("0.1.0-debug");
+        setBuildDownloadUrl("");
+        setBuildArtifactSha256("");
+        setBuildCommitSha("");
+        setVerificationCriteria("");
+        setVerificationResultSummary("");
       }
       try {
         const [bug, events] = await Promise.all([getBug(bugId), listBugEvents(bugId)]);
@@ -190,7 +244,7 @@ export default function App() {
     setAssignmentError(null);
     try {
       await updateBugOwner(selectedBug.id, selectedBug.version, nextOwnerId);
-      const refreshed = await loadBugDetails(selectedBug.id, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
       if (refreshed?.bug.ownerId === nextOwnerId) {
         setAssignmentState("success");
       } else {
@@ -209,9 +263,10 @@ export default function App() {
     setTransitionError(null);
     try {
       await transitionBugReady(selectedBug.id, selectedBug.version);
-      const refreshed = await loadBugDetails(selectedBug.id, true, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
       if (refreshed?.bug.state === "ready") {
         setTransitionState("success");
+        await loadBugList(selectedBug.projectId);
       } else {
         setTransitionState("error");
         setTransitionError({ status: 200, code: "STATE_READBACK_MISMATCH" });
@@ -220,7 +275,7 @@ export default function App() {
       setTransitionState("error");
       setTransitionError(mutationError(cause));
     }
-  }, [loadBugDetails, selectedBug]);
+  }, [loadBugDetails, loadBugList, selectedBug]);
 
   const submitComment = useCallback(async (): Promise<void> => {
     if (selectedBugId === null || commentBody.trim().length === 0) return;
@@ -231,7 +286,7 @@ export default function App() {
       const result = await addBugComment(selectedBugId, commentBody.trim(), clientSubmissionId);
       setCommentBody("");
       setCommentId(result.comment.id);
-      const refreshed = await loadBugDetails(selectedBugId, true, true);
+      const refreshed = await loadBugDetails(selectedBugId, true, true, true);
       const eventConfirmed =
         refreshed?.events.some(
           (event) =>
@@ -286,12 +341,13 @@ export default function App() {
       }
       setRelayReceipt(receipt);
       setRelayState("success");
-      await loadBugDetails(selectedBug.id, true, true);
+      await loadBugDetails(selectedBug.id, true, true, true);
+      await loadBugList(selectedBug.projectId);
     } catch (cause: unknown) {
       setRelayState("error");
       setRelayError(mutationError(cause));
     }
-  }, [loadBugDetails, readRelayReceipt, selectedBug]);
+  }, [loadBugDetails, loadBugList, readRelayReceipt, selectedBug]);
 
   const refreshRelayReceipt = useCallback(async (): Promise<void> => {
     if (relayReceipt === null) return;
@@ -306,6 +362,262 @@ export default function App() {
       setRelayError(mutationError(cause));
     }
   }, [readRelayReceipt, relayReceipt]);
+
+  const createHumanWorkflow = useCallback(async (): Promise<void> => {
+    if (
+      selectedBug === null ||
+      selectedBug.state !== "ready" ||
+      repairSummary.trim().length === 0
+    ) {
+      return;
+    }
+    setHumanWorkflowState("submitting");
+    setHumanWorkflowError(null);
+    setHumanWorkflowMessage(null);
+    try {
+      const created = await createHumanRepairAttempt(
+        selectedBug.id,
+        selectedBug.version,
+        MVP_OWNER_ID,
+        repairSummary.trim(),
+      );
+      const readback = await getHumanRepairAttempt(created.id);
+      if (
+        readback.id !== created.id ||
+        readback.bugId !== selectedBug.id ||
+        readback.mode !== "human" ||
+        readback.status !== "planned"
+      ) {
+        setHumanWorkflowState("error");
+        setHumanWorkflowError({ status: 200, code: "REPAIR_ATTEMPT_READBACK_MISMATCH" });
+        return;
+      }
+      setHumanAttempt(readback);
+      setHumanWorkflowMessage(`人工 RepairAttempt 已创建：${readback.id}`);
+      setHumanWorkflowState("success");
+      await loadBugDetails(selectedBug.id, true, true, true);
+      await loadBugList(selectedBug.projectId);
+    } catch (cause: unknown) {
+      setHumanWorkflowState("error");
+      setHumanWorkflowError(mutationError(cause));
+    }
+  }, [loadBugDetails, loadBugList, repairSummary, selectedBug]);
+
+  const deliverHumanWorkflow = useCallback(async (): Promise<void> => {
+    if (
+      selectedBug === null ||
+      humanAttempt === null ||
+      humanAttempt.status !== "planned" ||
+      repairSummary.trim().length === 0 ||
+      repairBranch.trim().length === 0 ||
+      !COMMIT_SHA_PATTERN.test(repairCommitSha.trim())
+    ) {
+      return;
+    }
+    setHumanWorkflowState("submitting");
+    setHumanWorkflowError(null);
+    setHumanWorkflowMessage(null);
+    try {
+      const started = await startHumanRepairAttempt(humanAttempt.id, humanAttempt.version);
+      const delivered = await deliverHumanRepairAttempt(
+        started.id,
+        started.version,
+        repairSummary.trim(),
+        repairBranch.trim(),
+        repairCommitSha.trim(),
+      );
+      const readback = await getHumanRepairAttempt(delivered.id);
+      if (
+        readback.status !== "delivered" ||
+        readback.branch !== repairBranch.trim() ||
+        readback.commitSha !== repairCommitSha.trim()
+      ) {
+        setHumanWorkflowState("error");
+        setHumanWorkflowError({ status: 200, code: "CODE_DELIVERY_READBACK_MISMATCH" });
+        return;
+      }
+      setHumanAttempt(readback);
+      setBuildCommitSha(readback.commitSha ?? "");
+      setHumanWorkflowMessage(`代码交付已登记：${readback.commitSha}`);
+      setHumanWorkflowState("success");
+      await loadBugDetails(selectedBug.id, true, true, true);
+      await loadBugList(selectedBug.projectId);
+    } catch (cause: unknown) {
+      setHumanWorkflowState("error");
+      setHumanWorkflowError(mutationError(cause));
+    }
+  }, [
+    humanAttempt,
+    loadBugDetails,
+    loadBugList,
+    repairBranch,
+    repairCommitSha,
+    repairSummary,
+    selectedBug,
+  ]);
+
+  const registerAndLinkBuild = useCallback(async (): Promise<void> => {
+    if (
+      selectedBug === null ||
+      selectedBug.state !== "awaiting_build" ||
+      humanAttempt === null ||
+      humanAttempt.status !== "delivered" ||
+      humanAttempt.branch === null ||
+      humanAttempt.commitSha === null ||
+      buildExternalId.trim().length === 0 ||
+      buildVersion.trim().length === 0 ||
+      buildDownloadUrl.trim().length === 0 ||
+      !COMMIT_SHA_PATTERN.test(buildCommitSha.trim()) ||
+      !SHA256_PATTERN.test(buildArtifactSha256.trim())
+    ) {
+      return;
+    }
+    setHumanWorkflowState("submitting");
+    setHumanWorkflowError(null);
+    setHumanWorkflowMessage(null);
+    try {
+      const registered = await registerManualBuild({
+        projectId: selectedBug.projectId,
+        externalId: buildExternalId.trim(),
+        version: buildVersion.trim(),
+        branch: humanAttempt.branch,
+        sourceCommitSha: buildCommitSha.trim(),
+        downloadUrl: buildDownloadUrl.trim(),
+        artifactSha256: buildArtifactSha256.trim(),
+        repairAttemptId: humanAttempt.id,
+      });
+      const buildReadback = await getBuild(registered.build.id);
+      if (
+        buildReadback.id !== registered.build.id ||
+        buildReadback.status !== "ready" ||
+        buildReadback.sourceCommitSha !== buildCommitSha.trim()
+      ) {
+        setHumanWorkflowState("error");
+        setHumanWorkflowError({ status: 200, code: "BUILD_READBACK_MISMATCH" });
+        return;
+      }
+      const linked = await linkBuildRepair({
+        buildId: buildReadback.id,
+        expectedBuildVersion: buildReadback.version,
+        expectedBugVersion: selectedBug.version,
+        repairAttemptId: humanAttempt.id,
+        deliveredCommitSha: humanAttempt.commitSha,
+      });
+      if (
+        linked.bug.id !== selectedBug.id ||
+        linked.bug.state !== "ready_for_verification" ||
+        linked.repairLink.buildId !== buildReadback.id ||
+        linked.repairLink.deliveredCommitSha !== humanAttempt.commitSha
+      ) {
+        setHumanWorkflowState("error");
+        setHumanWorkflowError({ status: 200, code: "BUILD_LINK_READBACK_MISMATCH" });
+        return;
+      }
+      setLinkedBuild(linked);
+      setHumanWorkflowMessage(`Build 已精确关联：${linked.build.externalId}`);
+      setHumanWorkflowState("success");
+      await loadBugDetails(selectedBug.id, true, true, true);
+      await loadBugList(selectedBug.projectId);
+    } catch (cause: unknown) {
+      setHumanWorkflowState("error");
+      setHumanWorkflowError(mutationError(cause));
+    }
+  }, [
+    buildArtifactSha256,
+    buildCommitSha,
+    buildDownloadUrl,
+    buildExternalId,
+    buildVersion,
+    humanAttempt,
+    loadBugDetails,
+    loadBugList,
+    selectedBug,
+  ]);
+
+  const beginVerification = useCallback(async (): Promise<void> => {
+    if (
+      selectedBug === null ||
+      selectedBug.state !== "ready_for_verification" ||
+      humanAttempt === null ||
+      humanAttempt.status !== "delivered" ||
+      linkedBuild === null ||
+      verificationCriteria.trim().length === 0
+    ) {
+      return;
+    }
+    setHumanWorkflowState("submitting");
+    setHumanWorkflowError(null);
+    setHumanWorkflowMessage(null);
+    try {
+      const created = await createVerification({
+        bugId: selectedBug.id,
+        expectedBugVersion: selectedBug.version,
+        repairAttemptId: humanAttempt.id,
+        buildId: linkedBuild.build.id,
+        verifierId: MVP_OWNER_ID,
+        criteria: verificationCriteria.trim(),
+      });
+      const started = await startVerification(created.id, created.version);
+      const readback = await getVerification(started.id);
+      if (
+        readback.status !== "in_progress" ||
+        readback.bugId !== selectedBug.id ||
+        readback.buildId !== linkedBuild.build.id
+      ) {
+        setHumanWorkflowState("error");
+        setHumanWorkflowError({ status: 200, code: "VERIFICATION_READBACK_MISMATCH" });
+        return;
+      }
+      setVerification(readback);
+      setHumanWorkflowMessage(`人工验收已开始：${readback.id}`);
+      setHumanWorkflowState("success");
+      await loadBugDetails(selectedBug.id, true, true, true);
+      await loadBugList(selectedBug.projectId);
+    } catch (cause: unknown) {
+      setHumanWorkflowState("error");
+      setHumanWorkflowError(mutationError(cause));
+    }
+  }, [humanAttempt, linkedBuild, loadBugDetails, loadBugList, selectedBug, verificationCriteria]);
+
+  const passVerificationAndClose = useCallback(async (): Promise<void> => {
+    if (
+      selectedBug === null ||
+      verification === null ||
+      verification.status !== "in_progress" ||
+      verificationResultSummary.trim().length === 0
+    ) {
+      return;
+    }
+    setHumanWorkflowState("submitting");
+    setHumanWorkflowError(null);
+    setHumanWorkflowMessage(null);
+    try {
+      const result = await recordVerificationPassed(
+        verification.id,
+        verification.version,
+        verificationResultSummary.trim(),
+        globalThis.crypto.randomUUID(),
+      );
+      if (
+        result.qaItem.id !== selectedBug.id ||
+        result.verification.id !== verification.id ||
+        result.verification.status !== "passed" ||
+        result.bug.state !== "closed"
+      ) {
+        setHumanWorkflowState("error");
+        setHumanWorkflowError({ status: 200, code: "VERIFICATION_RESULT_READBACK_MISMATCH" });
+        return;
+      }
+      setVerification(result.verification);
+      setHumanWorkflowMessage(`人工验收通过，${result.bug.key} 已由 QA Hub 关闭。`);
+      setHumanWorkflowState("success");
+      await loadBugDetails(selectedBug.id, true, true, true);
+      await loadBugList(selectedBug.projectId);
+    } catch (cause: unknown) {
+      setHumanWorkflowState("error");
+      setHumanWorkflowError(mutationError(cause));
+    }
+  }, [loadBugDetails, loadBugList, selectedBug, verification, verificationResultSummary]);
 
   useEffect(() => {
     void loadBugList(DEFAULT_PROJECT_ID);
@@ -443,8 +755,8 @@ export default function App() {
         )}
 
         <div aria-label="后续管理台切片" className="next-slices">
-          <span>当前段：交给 Relay / durable 回执 / 自动重试</span>
-          <span>Relay 仍只通过 QA Hub 服务端接入</span>
+          <span>当前段：人工 RepairAttempt / Build 精确关联 / 人工验收关闭</span>
+          <span>先在浏览器稳定验证；Windows 桌面打包统一后置</span>
         </div>
       </section>
 
@@ -615,6 +927,228 @@ export default function App() {
                   Relay 交付/回执失败：{mutationErrorMessage(relayError)}
                 </p>
               )}
+
+              <section aria-label="人工修复、Build 与人工验收" className="human-workflow">
+                <div className="human-workflow__header">
+                  <div>
+                    <p className="card-kicker">QA 人工闭环</p>
+                    <h3>RepairAttempt → 精确 Build → Verification</h3>
+                  </div>
+                  <div className="workflow-status">
+                    <span>Attempt: {humanAttempt?.status ?? "未创建"}</span>
+                    <span>Build: {linkedBuild?.build.status ?? "未关联"}</span>
+                    <span>Verification: {verification?.status ?? "未开始"}</span>
+                  </div>
+                </div>
+
+                <div className="workflow-grid">
+                  <div className="workflow-step">
+                    <strong>1 · 创建人工 RepairAttempt</strong>
+                    <label htmlFor="repair-summary">修复摘要</label>
+                    <textarea
+                      id="repair-summary"
+                      onChange={(event) => setRepairSummary(event.target.value)}
+                      placeholder="描述本次人工修复范围"
+                      rows={2}
+                      value={repairSummary}
+                    />
+                    <div className="workflow-step__controls">
+                      <button
+                        className="secondary-button"
+                        disabled={
+                          humanWorkflowState === "submitting" ||
+                          selectedBug.state !== "ready" ||
+                          humanAttempt !== null ||
+                          repairSummary.trim().length === 0
+                        }
+                        onClick={() => void createHumanWorkflow()}
+                        type="button"
+                      >
+                        创建人工 RepairAttempt
+                      </button>
+                      <small>仅 ready Bug 可创建</small>
+                    </div>
+                  </div>
+
+                  <div className="workflow-step">
+                    <strong>2 · 登记代码交付</strong>
+                    <label htmlFor="repair-branch">Git 分支</label>
+                    <input
+                      disabled={humanAttempt?.status === "delivered"}
+                      id="repair-branch"
+                      onChange={(event) => setRepairBranch(event.target.value)}
+                      placeholder="qa/fix-local-1"
+                      spellCheck={false}
+                      value={repairBranch}
+                    />
+                    <label htmlFor="repair-commit">交付 commit SHA（40 位小写十六进制）</label>
+                    <input
+                      disabled={humanAttempt?.status === "delivered"}
+                      id="repair-commit"
+                      onChange={(event) => setRepairCommitSha(event.target.value)}
+                      placeholder="40 位 commit SHA"
+                      spellCheck={false}
+                      value={repairCommitSha}
+                    />
+                    <div className="workflow-step__controls">
+                      <button
+                        className="secondary-button"
+                        disabled={
+                          humanWorkflowState === "submitting" ||
+                          humanAttempt?.status !== "planned" ||
+                          repairBranch.trim().length === 0 ||
+                          !COMMIT_SHA_PATTERN.test(repairCommitSha.trim())
+                        }
+                        onClick={() => void deliverHumanWorkflow()}
+                        type="button"
+                      >
+                        开始并登记代码交付
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="workflow-step workflow-step--wide">
+                    <strong>3 · 登记并精确关联 Build</strong>
+                    <div className="workflow-fields">
+                      <div>
+                        <label htmlFor="build-external-id">Build 外部 ID</label>
+                        <input
+                          id="build-external-id"
+                          onChange={(event) => setBuildExternalId(event.target.value)}
+                          placeholder="web-smoke-build-001"
+                          spellCheck={false}
+                          value={buildExternalId}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="build-version">版本</label>
+                        <input
+                          id="build-version"
+                          onChange={(event) => setBuildVersion(event.target.value)}
+                          spellCheck={false}
+                          value={buildVersion}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="build-download-url">下载 URL</label>
+                        <input
+                          id="build-download-url"
+                          onChange={(event) => setBuildDownloadUrl(event.target.value)}
+                          placeholder="https://qa-hub.local/builds/001.apk"
+                          spellCheck={false}
+                          value={buildDownloadUrl}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="build-source-commit">Build source commit</label>
+                        <input
+                          id="build-source-commit"
+                          onChange={(event) => setBuildCommitSha(event.target.value)}
+                          placeholder="必须与交付 commit 精确一致"
+                          spellCheck={false}
+                          value={buildCommitSha}
+                        />
+                      </div>
+                      <div className="workflow-fields__wide">
+                        <label htmlFor="build-artifact-sha">产物 SHA-256</label>
+                        <input
+                          id="build-artifact-sha"
+                          onChange={(event) => setBuildArtifactSha256(event.target.value)}
+                          placeholder="64 位 SHA-256"
+                          spellCheck={false}
+                          value={buildArtifactSha256}
+                        />
+                      </div>
+                    </div>
+                    <div className="workflow-step__controls">
+                      <button
+                        className="secondary-button"
+                        disabled={
+                          humanWorkflowState === "submitting" ||
+                          selectedBug.state !== "awaiting_build" ||
+                          humanAttempt?.status !== "delivered" ||
+                          linkedBuild !== null ||
+                          buildExternalId.trim().length === 0 ||
+                          buildDownloadUrl.trim().length === 0 ||
+                          !COMMIT_SHA_PATTERN.test(buildCommitSha.trim()) ||
+                          !SHA256_PATTERN.test(buildArtifactSha256.trim())
+                        }
+                        onClick={() => void registerAndLinkBuild()}
+                        type="button"
+                      >
+                        登记并精确关联 Build
+                      </button>
+                      <small>source commit 不匹配时服务端必须拒绝</small>
+                    </div>
+                  </div>
+
+                  <div className="workflow-step">
+                    <strong>4 · 创建并开始人工验收</strong>
+                    <label htmlFor="verification-criteria">验收标准</label>
+                    <textarea
+                      id="verification-criteria"
+                      onChange={(event) => setVerificationCriteria(event.target.value)}
+                      placeholder="描述在精确 Build 上需要确认的结果"
+                      rows={3}
+                      value={verificationCriteria}
+                    />
+                    <div className="workflow-step__controls">
+                      <button
+                        className="secondary-button"
+                        disabled={
+                          humanWorkflowState === "submitting" ||
+                          selectedBug.state !== "ready_for_verification" ||
+                          linkedBuild === null ||
+                          verification !== null ||
+                          verificationCriteria.trim().length === 0
+                        }
+                        onClick={() => void beginVerification()}
+                        type="button"
+                      >
+                        创建并开始人工验收
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="workflow-step">
+                    <strong>5 · 人工通过并关闭</strong>
+                    <label htmlFor="verification-result">验收结果摘要</label>
+                    <textarea
+                      id="verification-result"
+                      onChange={(event) => setVerificationResultSummary(event.target.value)}
+                      placeholder="记录人工验收结论"
+                      rows={3}
+                      value={verificationResultSummary}
+                    />
+                    <div className="workflow-step__controls">
+                      <button
+                        className="primary-button"
+                        disabled={
+                          humanWorkflowState === "submitting" ||
+                          verification?.status !== "in_progress" ||
+                          verificationResultSummary.trim().length === 0
+                        }
+                        onClick={() => void passVerificationAndClose()}
+                        type="button"
+                      >
+                        人工验收通过并关闭
+                      </button>
+                      <small>只有人工通过才可关闭，Relay 无此权限</small>
+                    </div>
+                  </div>
+                </div>
+
+                {humanWorkflowState === "success" && humanWorkflowMessage !== null && (
+                  <p aria-live="polite" className="success-note">
+                    {humanWorkflowMessage}
+                  </p>
+                )}
+                {humanWorkflowState === "error" && humanWorkflowError !== null && (
+                  <p aria-live="assertive" className="api-error">
+                    人工修复/Build/验收操作失败：{mutationErrorMessage(humanWorkflowError)}
+                  </p>
+                )}
+              </section>
             </article>
 
             <div className="timeline-block">

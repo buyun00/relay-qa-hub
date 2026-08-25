@@ -530,6 +530,110 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+.human-workflow {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d8d4c8;
+}
+
+.human-workflow__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.human-workflow__header h3 {
+  margin: 0;
+}
+
+.workflow-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.workflow-status span {
+  padding: 0.3rem 0.5rem;
+  color: #355c55;
+  background: #e4f0e9;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.workflow-grid {
+  display: grid;
+  min-width: 0;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.workflow-step {
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+  padding: 0.8rem;
+  background: #fbfaf4;
+  border: 1px solid #ded8ca;
+  border-radius: 0.75rem;
+}
+
+.workflow-step > strong {
+  color: #23645e;
+  font-size: 0.8rem;
+}
+
+.workflow-step label {
+  color: #61706b;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.workflow-step input,
+.workflow-step textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0.6rem 0.65rem;
+  color: #173332;
+  background: #fffef9;
+  border: 1px solid #c9d2c9;
+  border-radius: 0.55rem;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.workflow-step textarea {
+  resize: vertical;
+}
+
+.workflow-fields {
+  display: grid;
+  min-width: 0;
+  gap: 0.55rem;
+}
+
+.workflow-fields > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.workflow-step__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+}
+
+.workflow-step__controls small {
+  color: #718079;
+  font-size: 0.68rem;
+}
+
 .boundary-card {
   display: grid;
   gap: 0.75rem;
@@ -652,6 +756,16 @@ footer {
 
   .action-grid article {
     padding: 3.25rem 0.9rem 1rem;
+  }
+
+  .workflow-grid,
+  .workflow-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workflow-step--wide,
+  .workflow-fields__wide {
+    grid-column: 1 / -1;
   }
 }
 
