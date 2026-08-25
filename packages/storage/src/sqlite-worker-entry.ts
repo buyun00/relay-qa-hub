@@ -125,6 +125,7 @@ import {
   verifySqliteIntegrity,
   type NewBugStorageRecord,
 } from "./sqlite.js";
+import { createSqliteOnlineBackup, type CreateSqliteOnlineBackupInput } from "./sqlite-backup.js";
 
 interface WorkerConfiguration {
   readonly databaseFile: string;
@@ -188,6 +189,7 @@ interface WorkerRequest {
     | "listMobileBugAttachments"
     | "getMobileAttachment"
     | "getMobileCaptureArtifact"
+    | "createOnlineBackup"
     | "testCreateBug"
     | "integrity"
     | "close";
@@ -646,6 +648,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 
   if (request.operation === "integrity") {
     return verifySqliteIntegrity(requireDatabase());
+  }
+
+  if (request.operation === "createOnlineBackup") {
+    return createSqliteOnlineBackup({
+      ...(request.payload as CreateSqliteOnlineBackupInput),
+      source: requireDatabase(),
+    });
   }
 
   if (request.operation === "close") {

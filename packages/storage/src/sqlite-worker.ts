@@ -105,6 +105,7 @@ import type {
   NewBugStorageRecord,
   SqliteIntegrityReport,
 } from "./sqlite.js";
+import type { CreateSqliteOnlineBackupInput, SqliteOnlineBackupResult } from "./sqlite-backup.js";
 
 export interface SqliteStorageWorkerOptions {
   readonly databaseFile: string;
@@ -541,6 +542,13 @@ export class SqliteStorageWorker {
   async integrity(): Promise<SqliteIntegrityReport> {
     await this.initialization;
     return this.request<SqliteIntegrityReport>("integrity");
+  }
+
+  async createOnlineBackup(
+    input: CreateSqliteOnlineBackupInput,
+  ): Promise<SqliteOnlineBackupResult> {
+    await this.initialization;
+    return this.request<SqliteOnlineBackupResult>("createOnlineBackup", input);
   }
 
   async close(): Promise<void> {
