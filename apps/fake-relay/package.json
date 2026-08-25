@@ -1,0 +1,14 @@
+{
+  "name": "@relay-qa-hub/fake-relay",
+  "version": "0.1.0-debug",
+  "description": "Independent loopback fake Relay used only for QA Hub handoff smoke tests.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.19 <25"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node --check server.mjs"
+  }
+}

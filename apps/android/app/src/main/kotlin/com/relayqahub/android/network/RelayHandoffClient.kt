@@ -1,8 +1,8 @@
 package com.relayqahub.android.network
 
 import java.io.IOException
-import java.nio.charset.StandardCharsets
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -102,24 +102,31 @@ class RelayHandoffClient(
                 .put("selectedAttachmentIds", JSONArray()),
         )
 
-        val receipt = executeJson(
-            method = "GET",
-            relativePath = "/repair-attempts/$attemptId/relay-receipt",
-            accessToken = accessToken,
-            idempotencyKey = null,
-            expectedStatus = 200,
-            body = null,
-        )
-        val receiptHandoffId = receipt.requireString("handoffId")
+        var receipt: JSONObject? = null
+        for (poll in 0 until RECEIPT_POLL_ATTEMPTS) {
+            val current = executeJson(
+                method = "GET",
+                relativePath = "/repair-attempts/$attemptId/relay-receipt",
+                accessToken = accessToken,
+                idempotencyKey = null,
+                expectedStatus = 200,
+                body = null,
+            )
+            receipt = current
+            if (current.optString("handoffStatus") != "queued") break
+            if (poll + 1 < RECEIPT_POLL_ATTEMPTS) delay(RECEIPT_POLL_DELAY_MS)
+        }
+        val finalReceipt = requireNotNull(receipt)
+        val receiptHandoffId = finalReceipt.requireString("handoffId")
         require(receiptHandoffId == handoffId) { "RELAY_RECEIPT_HANDOFF_MISMATCH" }
-        require(receipt.requireString("repairAttemptId") == attemptId) {
+        require(finalReceipt.requireString("repairAttemptId") == attemptId) {
             "RELAY_RECEIPT_ATTEMPT_MISMATCH"
         }
-        val requiresHumanVerification = receipt.optBoolean("requiresHumanVerification", false)
+        val requiresHumanVerification = finalReceipt.optBoolean("requiresHumanVerification", false)
         require(requiresHumanVerification) { "RELAY_RECEIPT_HUMAN_VERIFICATION_FALSE" }
-        val qaItem = receipt.optJSONObject("qaItem")
+        val qaItem = finalReceipt.optJSONObject("qaItem")
         val responseBugId = qaItem?.optString("id").orEmpty()
-            .ifBlank { receipt.optString("bugId") }
+            .ifBlank { finalReceipt.optString("bugId") }
         require(responseBugId == bugId) { "RELAY_RECEIPT_BUG_MISMATCH" }
 
         RelayHandoffResult(
@@ -127,8 +134,8 @@ class RelayHandoffClient(
             bugKey = qaItem?.optString("key").orEmpty().ifBlank { bugKey },
             repairAttemptId = attemptId,
             handoffId = handoffId,
-            handoffStatus = receipt.requireString("handoffStatus"),
-            relayTaskId = receipt.nullableString("relayTaskId"),
+            handoffStatus = finalReceipt.requireString("handoffStatus"),
+            relayTaskId = finalReceipt.nullableString("relayTaskId"),
             requiresHumanVerification = requiresHumanVerification,
         )
     }
@@ -178,6 +185,8 @@ class RelayHandoffClient(
 
     private companion object {
         const val API_BASE_PATH = "/api/v1/"
+        const val RECEIPT_POLL_ATTEMPTS = 12
+        const val RECEIPT_POLL_DELAY_MS = 250L
         val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
     }
 }

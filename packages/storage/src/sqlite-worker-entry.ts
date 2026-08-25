@@ -19,15 +19,24 @@ import {
   type CreateMobileBugInput,
   type MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
-import { createMobileCapture, getMobileCapture, type CreateMobileCaptureInput } from "./mobile-capture-store.js";
 import {
+  createMobileCapture,
+  getMobileCapture,
+  type CreateMobileCaptureInput,
+} from "./mobile-capture-store.js";
+import {
+  claimMobileRelayOutbox,
+  completeMobileRelayOutbox,
   createMobileRelayAttempt,
   dispatchMobileRelay,
   ensureMobileRelayRoles,
   getMobileRelayReceipt,
+  retryMobileRelayOutbox,
   transitionMobileBugReady,
+  type CompleteMobileRelayOutboxInput,
   type CreateMobileRelayAttemptInput,
   type DispatchMobileRelayInput,
+  type RetryMobileRelayOutboxInput,
   type TransitionMobileBugInput,
 } from "./mobile-relay-store.js";
 import {
@@ -62,6 +71,9 @@ interface WorkerRequest {
     | "createMobileRelayAttempt"
     | "dispatchMobileRelay"
     | "getMobileRelayReceipt"
+    | "claimMobileRelayOutbox"
+    | "completeMobileRelayOutbox"
+    | "retryMobileRelayOutbox"
     | "initMobileUpload"
     | "putMobileUploadChunk"
     | "finalizeMobileUpload"
@@ -252,6 +264,31 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly attemptId: string;
     };
     return getMobileRelayReceipt(requireDatabase(), payload);
+  }
+
+  if (request.operation === "claimMobileRelayOutbox") {
+    return inWriteTransaction((current) =>
+      claimMobileRelayOutbox(
+        current,
+        request.payload as {
+          readonly leaseOwner: string;
+          readonly now: string;
+          readonly leaseExpiresAt: string;
+        },
+      ),
+    );
+  }
+
+  if (request.operation === "completeMobileRelayOutbox") {
+    return inWriteTransaction((current) =>
+      completeMobileRelayOutbox(current, request.payload as CompleteMobileRelayOutboxInput),
+    );
+  }
+
+  if (request.operation === "retryMobileRelayOutbox") {
+    return inWriteTransaction((current) =>
+      retryMobileRelayOutbox(current, request.payload as RetryMobileRelayOutboxInput),
+    );
   }
 
   if (request.operation === "initMobileUpload") {

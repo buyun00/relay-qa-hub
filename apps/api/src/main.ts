@@ -10,6 +10,11 @@ import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-st
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
 import { createSqliteMobileCaptureStore } from "./sqlite-mobile-capture-store.js";
 import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
+import {
+  parseFakeRelayEndpoint,
+  startMobileRelayOutboxPump,
+  type MobileRelayOutboxPump,
+} from "./mobile-relay-outbox.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   accountId: "10000000-0000-4000-8000-000000000020",
@@ -29,7 +34,9 @@ function requireMobileAccessToken(): string {
 async function closeRuntime(
   server: ApiServer | undefined,
   worker: SqliteStorageWorker,
+  relayPump: MobileRelayOutboxPump | undefined,
 ): Promise<void> {
+  await relayPump?.stop();
   await server?.stop();
   await worker.close();
 }
@@ -44,6 +51,7 @@ async function run(): Promise<void> {
     quarantineRoot: storage.quarantineRoot,
   });
   let server: ApiServer | undefined;
+  let relayPump: MobileRelayOutboxPump | undefined;
   let shutdownStarted = false;
 
   try {
@@ -65,7 +73,7 @@ async function run(): Promise<void> {
       shutdownStarted = true;
       server?.app.log.info({ signal }, "stopping Relay QA Hub API");
       try {
-        await closeRuntime(server, worker);
+        await closeRuntime(server, worker, relayPump);
         process.exitCode = 0;
       } catch (error: unknown) {
         server?.app.log.error({ error, signal }, "failed to stop Relay QA Hub API");
@@ -84,6 +92,23 @@ async function run(): Promise<void> {
       { address, databaseFile: storage.databaseFile },
       "Relay QA Hub API started",
     );
+    const fakeRelayEndpoint = parseFakeRelayEndpoint(process.env["QA_HUB_FAKE_RELAY_URL"]);
+    if (fakeRelayEndpoint) {
+      relayPump = startMobileRelayOutboxPump({
+        worker,
+        endpoint: fakeRelayEndpoint,
+        onDelivery: (claim) =>
+          server?.app.log.info(
+            { outboxMessageId: claim.outboxMessageId, handoffId: claim.handoffId },
+            "fake Relay handoff submitted",
+          ),
+        onRetry: (claim, errorCode) =>
+          server?.app.log.warn(
+            { outboxMessageId: claim.outboxMessageId, errorCode },
+            "fake Relay handoff scheduled for retry",
+          ),
+      });
+    }
   } catch (error: unknown) {
     if (server) {
       server.app.log.error({ error }, "Relay QA Hub API failed to start");
@@ -91,7 +116,7 @@ async function run(): Promise<void> {
       console.error("Relay QA Hub API failed to initialize", error);
     }
     process.exitCode = 1;
-    await closeRuntime(server, worker).catch(() => undefined);
+    await closeRuntime(server, worker, relayPump).catch(() => undefined);
   }
 }
 

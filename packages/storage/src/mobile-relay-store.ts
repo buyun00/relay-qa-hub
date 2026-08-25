@@ -4,14 +4,12 @@ import type { DatabaseSync } from "node:sqlite";
 import type { MobileBugRecord, MobileScopeBootstrap } from "./mobile-bug-store.js";
 
 export const MOBILE_FAKE_RELAY_INSTANCE_ID = "fake-relay-local" as const;
+export const MOBILE_FAKE_RELAY_PRINCIPAL_ID = "10000000-0000-4000-8000-000000000007" as const;
 
 export class MobileRelayStorageError extends Error {
   constructor(
     readonly code:
-      | "INVALID_REQUEST"
-      | "NOT_FOUND"
-      | "VERSION_CONFLICT"
-      | "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      "INVALID_REQUEST" | "NOT_FOUND" | "VERSION_CONFLICT" | "IDEMPOTENCY_PAYLOAD_MISMATCH",
     message: string,
   ) {
     super(message);
@@ -106,6 +104,37 @@ export interface MobileRelayReceipt {
   readonly lastEventAt: string;
   readonly failureSummary: string | null;
   readonly version: number;
+}
+
+export interface MobileRelayOutboxClaim {
+  readonly outboxMessageId: string;
+  readonly bugId: string;
+  readonly repairAttemptId: string;
+  readonly handoffId: string;
+  readonly relayInstanceId: typeof MOBILE_FAKE_RELAY_INSTANCE_ID;
+  readonly idempotencyKey: string;
+  readonly payloadDigest: string;
+  readonly selectedAttachmentIds: readonly string[];
+  readonly leaseOwner: string;
+  readonly attemptCount: number;
+}
+
+export interface CompleteMobileRelayOutboxInput {
+  readonly outboxMessageId: string;
+  readonly leaseOwner: string;
+  readonly relayTaskId: string;
+  readonly handoffStatus: "submitted";
+  readonly externalRevision: number;
+  readonly lastEventAt: string;
+  readonly payloadDigest: string;
+  readonly receivedAt: string;
+}
+
+export interface RetryMobileRelayOutboxInput {
+  readonly outboxMessageId: string;
+  readonly leaseOwner: string;
+  readonly errorCode: string;
+  readonly nextAttemptAt: string;
 }
 
 interface BugRow {
@@ -280,10 +309,7 @@ function insertUserEvent(
     );
 }
 
-export function ensureMobileRelayRoles(
-  database: DatabaseSync,
-  scope: MobileScopeBootstrap,
-): void {
+export function ensureMobileRelayRoles(database: DatabaseSync, scope: MobileScopeBootstrap): void {
   requireTransaction(database);
   for (const role of ["triager", "developer"] as const) {
     database
@@ -294,6 +320,19 @@ export function ensureMobileRelayRoles(
       )
       .run(scope.accountId, scope.projectId, scope.membershipId, role, scope.createdAt);
   }
+  database
+    .prepare(
+      `INSERT OR IGNORE INTO service_principals(
+        id, account_id, name, principal_type, credential_digest, status,
+        created_at, revoked_at, version
+      ) VALUES (?, ?, 'Local fake Relay executor', 'relay', ?, 'active', ?, NULL, 1)`,
+    )
+    .run(
+      MOBILE_FAKE_RELAY_PRINCIPAL_ID,
+      scope.accountId,
+      createHash("sha256").update("relay-qa-hub-local-fake-relay-no-credential").digest("hex"),
+      scope.createdAt,
+    );
 }
 
 export function transitionMobileBugReady(
@@ -304,7 +343,10 @@ export function transitionMobileBugReady(
   const bug = readBugRow(database, input, input.bugId);
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
   if (bug.version !== input.expectedVersion || bug.state !== "reported") {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug is not reported at the expected version");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug is not reported at the expected version",
+    );
   }
   const at = nextTimestamp(input.createdAt, bug.updated_at);
   const eventId = randomUUID();
@@ -339,7 +381,10 @@ export function transitionMobileBugReady(
 
 function toAttempt(row: AttemptRow): MobileRepairAttemptRecord {
   if (row.mode !== "relay" || row.status !== "planned" || row.version !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt is not a planned Relay attempt");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt is not a planned Relay attempt",
+    );
   }
   return Object.freeze({
     id: row.id,
@@ -366,7 +411,10 @@ export function createMobileRelayAttempt(
   const bug = readBugRow(database, input, input.bugId);
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
   if (bug.version !== input.expectedVersion || bug.state !== "ready") {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug is not ready at the expected version");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug is not ready at the expected version",
+    );
   }
   if (input.assigneeId !== input.actorId) {
     throw new MobileRelayStorageError("INVALID_REQUEST", "debug Relay assignee must be the actor");
@@ -437,12 +485,14 @@ export function createMobileRelayAttempt(
 
 function scopeDigest(input: MobileRelayScope): string {
   return createHash("sha256")
-    .update(JSON.stringify({
-      accountId: input.accountId,
-      actorId: input.actorId,
-      projectId: input.projectId,
-      operationId: "dispatchRepairAttemptToRelay",
-    }))
+    .update(
+      JSON.stringify({
+        accountId: input.accountId,
+        actorId: input.actorId,
+        projectId: input.projectId,
+        operationId: "dispatchRepairAttemptToRelay",
+      }),
+    )
     .digest("hex");
 }
 
@@ -458,7 +508,11 @@ function readDispatchReplay(
          AND scope_digest = ? AND idempotency_key = ?`,
     )
     .get(input.accountId, input.actorId, scopeDigest(input), input.idempotencyKey) as
-    | { readonly request_digest: string; readonly status: string; readonly response_json: string | null }
+    | {
+        readonly request_digest: string;
+        readonly status: string;
+        readonly response_json: string | null;
+      }
     | undefined;
   if (!row) return null;
   if (row.request_digest !== input.requestDigest) {
@@ -503,8 +557,7 @@ export function dispatchMobileRelay(
        WHERE attempt.account_id = ? AND attempt.project_id = ? AND attempt.id = ?`,
     )
     .get(input.accountId, input.projectId, input.attemptId) as
-    | (AttemptRow & { readonly updated_at: string })
-    | undefined;
+    (AttemptRow & { readonly updated_at: string }) | undefined;
   if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
   if (
     attempt.mode !== "relay" ||
@@ -659,11 +712,7 @@ export function dispatchMobileRelay(
            audit_event_id = ?, version = 2
        WHERE id = ? AND status = 'reserved' AND version = 1`,
     )
-    .run(
-      JSON.stringify(accepted),
-      eventId,
-      idempotencyId,
-    );
+    .run(JSON.stringify(accepted), eventId, idempotencyId);
   return accepted;
 }
 
@@ -706,4 +755,222 @@ export function getMobileRelayReceipt(
     failureSummary: row.failure_summary,
     version: row.version,
   });
+}
+
+interface MobileRelayOutboxRow {
+  readonly id: string;
+  readonly payload_json: string;
+  readonly dedupe_key: string;
+  readonly attempt_count: number;
+  readonly payload_digest: string;
+}
+
+export function claimMobileRelayOutbox(
+  database: DatabaseSync,
+  input: {
+    readonly leaseOwner: string;
+    readonly now: string;
+    readonly leaseExpiresAt: string;
+  },
+): MobileRelayOutboxClaim | null {
+  requireTransaction(database);
+  const row = database
+    .prepare(
+      `SELECT outbox.id, outbox.payload_json, outbox.dedupe_key,
+              outbox.attempt_count, receipt.payload_digest
+       FROM outbox
+       JOIN relay_receipts AS receipt
+         ON receipt.account_id = outbox.account_id
+        AND receipt.project_id = outbox.project_id
+        AND receipt.repair_attempt_id = outbox.aggregate_id
+        AND receipt.relay_instance_id = outbox.destination
+       WHERE outbox.destination = ?
+         AND outbox.status IN ('pending', 'retry')
+         AND outbox.next_attempt_at <= ?
+         AND receipt.handoff_status = 'queued'
+       ORDER BY outbox.next_attempt_at, outbox.id
+       LIMIT 1`,
+    )
+    .get(MOBILE_FAKE_RELAY_INSTANCE_ID, input.now) as MobileRelayOutboxRow | undefined;
+  if (!row) return null;
+
+  const claimed = database
+    .prepare(
+      `UPDATE outbox
+       SET status = 'claimed', attempt_count = attempt_count + 1,
+           lease_owner = ?, lease_expires_at = ?, last_error_code = NULL
+       WHERE id = ? AND status IN ('pending', 'retry') AND next_attempt_at <= ?`,
+    )
+    .run(input.leaseOwner, input.leaseExpiresAt, row.id, input.now);
+  if (claimed.changes !== 1) return null;
+
+  const payload = JSON.parse(row.payload_json) as {
+    readonly bugId?: unknown;
+    readonly repairAttemptId?: unknown;
+    readonly handoffId?: unknown;
+    readonly selectedAttachmentIds?: unknown;
+  };
+  if (
+    typeof payload.bugId !== "string" ||
+    typeof payload.repairAttemptId !== "string" ||
+    typeof payload.handoffId !== "string" ||
+    !Array.isArray(payload.selectedAttachmentIds) ||
+    payload.selectedAttachmentIds.some((value) => typeof value !== "string")
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "fake Relay outbox payload is invalid");
+  }
+  return Object.freeze({
+    outboxMessageId: row.id,
+    bugId: payload.bugId,
+    repairAttemptId: payload.repairAttemptId,
+    handoffId: payload.handoffId,
+    relayInstanceId: MOBILE_FAKE_RELAY_INSTANCE_ID,
+    idempotencyKey: row.dedupe_key,
+    payloadDigest: row.payload_digest,
+    selectedAttachmentIds: Object.freeze([...payload.selectedAttachmentIds]),
+    leaseOwner: input.leaseOwner,
+    attemptCount: row.attempt_count + 1,
+  });
+}
+
+export function completeMobileRelayOutbox(
+  database: DatabaseSync,
+  input: CompleteMobileRelayOutboxInput,
+): MobileRelayReceipt {
+  requireTransaction(database);
+  const row = database
+    .prepare(
+      `SELECT outbox.account_id, outbox.project_id, outbox.aggregate_id,
+              outbox.event_id, receipt.bug_id, receipt.handoff_id,
+              receipt.external_revision, receipt.last_event_at
+       FROM outbox
+       JOIN relay_receipts AS receipt
+         ON receipt.account_id = outbox.account_id
+        AND receipt.project_id = outbox.project_id
+        AND receipt.repair_attempt_id = outbox.aggregate_id
+        AND receipt.relay_instance_id = outbox.destination
+       WHERE outbox.id = ? AND outbox.destination = ? AND outbox.status = 'claimed'
+         AND outbox.lease_owner = ? AND receipt.handoff_status = 'queued'`,
+    )
+    .get(input.outboxMessageId, MOBILE_FAKE_RELAY_INSTANCE_ID, input.leaseOwner) as
+    | {
+        readonly account_id: string;
+        readonly project_id: string;
+        readonly aggregate_id: string;
+        readonly event_id: string;
+        readonly bug_id: string;
+        readonly handoff_id: string;
+        readonly external_revision: number;
+        readonly last_event_at: string;
+      }
+    | undefined;
+  if (!row) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "fake Relay outbox lease is no longer active",
+    );
+  }
+  if (input.externalRevision <= row.external_revision) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "fake Relay receipt revision did not advance",
+    );
+  }
+  const at = nextTimestamp(input.receivedAt, row.last_event_at);
+  const externalAt = nextTimestamp(input.lastEventAt, row.last_event_at);
+  const eventAt = externalAt > at ? externalAt : at;
+  const eventId = randomUUID();
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_service_principal_id, aggregate_type, aggregate_id,
+        aggregate_sequence, resource_type, resource_id, resource_version_after,
+        request_digest, correlation_id, causation_id, from_state, to_state,
+        payload_json, created_at
+      ) VALUES (?, ?, ?, ?, 'repair.submitted', 'relay', 'service', ?,
+                'repair_attempt', ?, 3, 'repair_attempt', ?, 1, ?, ?, ?, NULL,
+                NULL, ?, ?)`,
+    )
+    .run(
+      eventId,
+      row.account_id,
+      row.project_id,
+      row.bug_id,
+      MOBILE_FAKE_RELAY_PRINCIPAL_ID,
+      row.aggregate_id,
+      row.aggregate_id,
+      input.payloadDigest,
+      randomUUID(),
+      row.event_id,
+      JSON.stringify({
+        status: "submitted",
+        repairAttemptId: row.aggregate_id,
+        handoffId: row.handoff_id,
+      }),
+      eventAt,
+    );
+  const receiptUpdate = database
+    .prepare(
+      `UPDATE relay_receipts
+       SET relay_task_id = ?, handoff_status = 'submitted', external_revision = ?,
+           last_event_at = ?, payload_digest = ?, received_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND repair_attempt_id = ?
+         AND handoff_id = ? AND handoff_status = 'queued'`,
+    )
+    .run(
+      input.relayTaskId,
+      input.externalRevision,
+      eventAt,
+      input.payloadDigest,
+      at,
+      row.account_id,
+      row.project_id,
+      row.aggregate_id,
+      row.handoff_id,
+    );
+  const outboxUpdate = database
+    .prepare(
+      `UPDATE outbox
+       SET status = 'sent', lease_owner = NULL, lease_expires_at = NULL,
+           last_error_code = NULL, sent_at = ?
+       WHERE id = ? AND status = 'claimed' AND lease_owner = ?`,
+    )
+    .run(at, input.outboxMessageId, input.leaseOwner);
+  if (receiptUpdate.changes !== 1 || outboxUpdate.changes !== 1) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "fake Relay receipt was not applied exactly once",
+    );
+  }
+  const receipt = getMobileRelayReceipt(database, {
+    accountId: row.account_id,
+    projectId: row.project_id,
+    actorId: MOBILE_FAKE_RELAY_PRINCIPAL_ID,
+    attemptId: row.aggregate_id,
+  });
+  if (!receipt) throw new MobileRelayStorageError("NOT_FOUND", "fake Relay receipt disappeared");
+  return receipt;
+}
+
+export function retryMobileRelayOutbox(
+  database: DatabaseSync,
+  input: RetryMobileRelayOutboxInput,
+): boolean {
+  requireTransaction(database);
+  const result = database
+    .prepare(
+      `UPDATE outbox
+       SET status = 'retry', lease_owner = NULL, lease_expires_at = NULL,
+           last_error_code = ?, next_attempt_at = ?
+       WHERE id = ? AND destination = ? AND status = 'claimed' AND lease_owner = ?`,
+    )
+    .run(
+      input.errorCode,
+      input.nextAttemptAt,
+      input.outboxMessageId,
+      MOBILE_FAKE_RELAY_INSTANCE_ID,
+      input.leaseOwner,
+    );
+  return result.changes === 1;
 }

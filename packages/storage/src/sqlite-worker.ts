@@ -22,11 +22,14 @@ import type {
   MobileCaptureCreation,
 } from "./mobile-capture-store.js";
 import type {
+  CompleteMobileRelayOutboxInput,
   CreateMobileRelayAttemptInput,
   DispatchMobileRelayInput,
+  MobileRelayOutboxClaim,
   MobileRelayDispatchAccepted,
   MobileRelayReceipt,
   MobileRepairAttemptRecord,
+  RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
 } from "./mobile-relay-store.js";
 import type {
@@ -205,9 +208,7 @@ export class SqliteStorageWorker {
     return this.request<MobileRepairAttemptRecord>("createMobileRelayAttempt", input);
   }
 
-  async dispatchMobileRelay(
-    input: DispatchMobileRelayInput,
-  ): Promise<MobileRelayDispatchAccepted> {
+  async dispatchMobileRelay(input: DispatchMobileRelayInput): Promise<MobileRelayDispatchAccepted> {
     await this.initialization;
     return this.request<MobileRelayDispatchAccepted>("dispatchMobileRelay", input);
   }
@@ -220,6 +221,27 @@ export class SqliteStorageWorker {
   }): Promise<MobileRelayReceipt | null> {
     await this.initialization;
     return this.request<MobileRelayReceipt | null>("getMobileRelayReceipt", input);
+  }
+
+  async claimMobileRelayOutbox(input: {
+    readonly leaseOwner: string;
+    readonly now: string;
+    readonly leaseExpiresAt: string;
+  }): Promise<MobileRelayOutboxClaim | null> {
+    await this.initialization;
+    return this.request<MobileRelayOutboxClaim | null>("claimMobileRelayOutbox", input);
+  }
+
+  async completeMobileRelayOutbox(
+    input: CompleteMobileRelayOutboxInput,
+  ): Promise<MobileRelayReceipt> {
+    await this.initialization;
+    return this.request<MobileRelayReceipt>("completeMobileRelayOutbox", input);
+  }
+
+  async retryMobileRelayOutbox(input: RetryMobileRelayOutboxInput): Promise<boolean> {
+    await this.initialization;
+    return this.request<boolean>("retryMobileRelayOutbox", input);
   }
 
   /** @internal Forces an unexpected worker exit for terminal-state regression tests. */

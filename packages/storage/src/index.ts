@@ -245,15 +245,19 @@ export type {
 } from "./mobile-bug-store.js";
 export {
   MOBILE_FAKE_RELAY_INSTANCE_ID,
+  MOBILE_FAKE_RELAY_PRINCIPAL_ID,
   MobileRelayStorageError,
 } from "./mobile-relay-store.js";
 export type {
+  CompleteMobileRelayOutboxInput,
   CreateMobileRelayAttemptInput,
   DispatchMobileRelayInput,
   MobileRelayDispatchAccepted,
+  MobileRelayOutboxClaim,
   MobileRelayReceipt,
   MobileRelayScope,
   MobileRepairAttemptRecord,
+  RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
 } from "./mobile-relay-store.js";
 export type {
