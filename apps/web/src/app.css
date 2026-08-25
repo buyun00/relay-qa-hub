@@ -434,10 +434,63 @@ h1 {
 }
 
 .timeline-block,
-.comment-form {
+.comment-form,
+.duplicate-workflow {
   margin-top: 1.1rem;
   padding-top: 1rem;
   border-top: 1px solid #e1ddd2;
+}
+
+.duplicate-workflow {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.duplicate-workflow > label {
+  color: #53645e;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.duplicate-workflow textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.75rem;
+  resize: vertical;
+  color: #173332;
+  background: #fffef9;
+  border: 1px solid #c9d2c9;
+  border-radius: 0.65rem;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.duplicate-candidate-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.duplicate-candidate {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem;
+  color: #334c47;
+  background: #fbfaf4;
+  border: 1px solid #ded8ca;
+  border-radius: 0.65rem;
+  cursor: pointer;
+}
+
+.duplicate-candidate span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.duplicate-candidate small {
+  color: #718079;
+  font-size: 0.68rem;
 }
 
 .subsection-heading,

@@ -26,6 +26,7 @@ export class MobileRelayStorageError extends Error {
       | "INTEGRATION_AUTOMATION_FORBIDDEN"
       | "RELAY_DELIVERY_EVIDENCE_INVALID"
       | "BUILD_IDENTITY_MISMATCH"
+      | "GUARD_FAILED"
       | "FORBIDDEN",
     message: string,
   ) {

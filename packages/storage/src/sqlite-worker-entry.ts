@@ -39,7 +39,9 @@ import {
 } from "./mobile-build-store.js";
 import {
   listMobileDuplicateCandidates,
+  markMobileBugDuplicate,
   type ListMobileDuplicateCandidatesInput,
+  type MarkMobileBugDuplicateInput,
 } from "./mobile-duplicate-store.js";
 import {
   syncAndListMobileNotifications,
@@ -114,6 +116,7 @@ interface WorkerRequest {
     | "createMobileComment"
     | "listMobileBugEvents"
     | "listMobileDuplicateCandidates"
+    | "markMobileBugDuplicate"
     | "createMobileCapture"
     | "getMobileCapture"
     | "registerMobileBuild"
@@ -295,6 +298,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return listMobileDuplicateCandidates(
       requireDatabase(),
       request.payload as ListMobileDuplicateCandidatesInput,
+    );
+  }
+
+  if (request.operation === "markMobileBugDuplicate") {
+    return inWriteTransaction((current) =>
+      markMobileBugDuplicate(current, request.payload as MarkMobileBugDuplicateInput),
     );
   }
 

@@ -15,6 +15,8 @@ import {
   linkBuildRepair,
   listBugEvents,
   listBugs,
+  listDuplicateCandidates,
+  markBugDuplicate,
   QaHubApiError,
   recordVerificationPassed,
   registerManualBuild,
@@ -28,6 +30,7 @@ import {
   type BugListItem,
   type BugListState,
   type BugSeverity,
+  type DuplicateCandidate,
   type HumanRepairAttempt,
   type LinkBuildRepairResponse,
   type RelayReceipt,
@@ -135,6 +138,20 @@ export default function App() {
     readonly status: number;
     readonly code: string | null;
   } | null>(null);
+  const [duplicateCandidates, setDuplicateCandidates] = useState<readonly DuplicateCandidate[]>([]);
+  const [duplicateCandidateState, setDuplicateCandidateState] = useState<RequestState>("idle");
+  const [duplicateCandidateError, setDuplicateCandidateError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
+  const [duplicateCanonicalId, setDuplicateCanonicalId] = useState<string | null>(null);
+  const [duplicateReason, setDuplicateReason] = useState("");
+  const [duplicateMutationState, setDuplicateMutationState] = useState<MutationState>("idle");
+  const [duplicateMutationError, setDuplicateMutationError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
+  const [duplicateMessage, setDuplicateMessage] = useState<string | null>(null);
   const [relayState, setRelayState] = useState<MutationState>("idle");
   const [relayReceipt, setRelayReceipt] = useState<RelayReceipt | null>(null);
   const [relayError, setRelayError] = useState<{
@@ -161,6 +178,7 @@ export default function App() {
   const [verificationCriteria, setVerificationCriteria] = useState("");
   const [verificationResultSummary, setVerificationResultSummary] = useState("");
   const listRequestSequence = useRef(0);
+  const duplicateRequestSequence = useRef(0);
 
   const loadBugList = useCallback(
     async (nextProjectId: string, filters: BugListFilters = {}): Promise<void> => {
@@ -211,6 +229,15 @@ export default function App() {
       setTimeline([]);
       setDetailState("loading");
       setDetailError(null);
+      duplicateRequestSequence.current += 1;
+      setDuplicateCandidates([]);
+      setDuplicateCandidateState("idle");
+      setDuplicateCandidateError(null);
+      setDuplicateCanonicalId(null);
+      setDuplicateReason("");
+      setDuplicateMutationState("idle");
+      setDuplicateMutationError(null);
+      setDuplicateMessage(null);
       if (!preserveComment) {
         setCommentId(null);
         setCommentState("idle");
@@ -298,6 +325,87 @@ export default function App() {
       setTransitionError(mutationError(cause));
     }
   }, [loadBugDetails, refreshVisibleBugList, selectedBug]);
+
+  const loadCandidates = useCallback(async (): Promise<void> => {
+    if (
+      selectedBug === null ||
+      (selectedBug.state !== "reported" && selectedBug.state !== "ready")
+    ) {
+      return;
+    }
+    const requestSequence = duplicateRequestSequence.current + 1;
+    duplicateRequestSequence.current = requestSequence;
+    setDuplicateCandidateState("loading");
+    setDuplicateCandidateError(null);
+    setDuplicateCandidates([]);
+    setDuplicateCanonicalId(null);
+    setDuplicateMutationState("idle");
+    setDuplicateMutationError(null);
+    setDuplicateMessage(null);
+    try {
+      const result = await listDuplicateCandidates(selectedBug.id);
+      if (duplicateRequestSequence.current !== requestSequence) return;
+      setDuplicateCandidates(result.candidates);
+      setDuplicateCandidateState("success");
+    } catch (cause: unknown) {
+      if (duplicateRequestSequence.current !== requestSequence) return;
+      setDuplicateCandidateState("error");
+      setDuplicateCandidateError(mutationError(cause));
+    }
+  }, [selectedBug]);
+
+  const confirmDuplicate = useCallback(async (): Promise<void> => {
+    if (
+      selectedBug === null ||
+      duplicateCanonicalId === null ||
+      duplicateReason.trim().length === 0 ||
+      (selectedBug.state !== "reported" && selectedBug.state !== "ready")
+    ) {
+      return;
+    }
+    const canonicalKey =
+      duplicateCandidates.find((candidate) => candidate.bugId === duplicateCanonicalId)?.bugKey ??
+      duplicateCanonicalId;
+    setDuplicateMutationState("submitting");
+    setDuplicateMutationError(null);
+    setDuplicateMessage(null);
+    try {
+      const result = await markBugDuplicate(
+        selectedBug.id,
+        selectedBug.version,
+        duplicateCanonicalId,
+        duplicateReason.trim(),
+      );
+      if (result.state !== "duplicate" || result.duplicateOfBugId !== duplicateCanonicalId) {
+        setDuplicateMutationState("error");
+        setDuplicateMutationError({ status: 200, code: "DUPLICATE_READBACK_MISMATCH" });
+        return;
+      }
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
+      if (
+        refreshed?.bug.state !== "duplicate" ||
+        refreshed.bug.duplicateOfBugId !== duplicateCanonicalId ||
+        !refreshed.events.some((event) => event.type === "bug.mark_duplicate")
+      ) {
+        setDuplicateMutationState("error");
+        setDuplicateMutationError({ status: 200, code: "DUPLICATE_EVENT_MISSING" });
+        return;
+      }
+      setDuplicateMutationState("success");
+      setDuplicateMessage(`${refreshed.bug.key} 已由人工确认重复，canonical 为 ${canonicalKey}。`);
+      await refreshVisibleBugList();
+    } catch (cause: unknown) {
+      setDuplicateMutationState("error");
+      setDuplicateMutationError(mutationError(cause));
+    }
+  }, [
+    duplicateCandidates,
+    duplicateCanonicalId,
+    duplicateReason,
+    loadBugDetails,
+    refreshVisibleBugList,
+    selectedBug,
+  ]);
 
   const submitComment = useCallback(async (): Promise<void> => {
     if (selectedBugId === null || commentBody.trim().length === 0) return;
@@ -863,8 +971,8 @@ export default function App() {
         )}
 
         <div aria-label="后续管理台切片" className="next-slices">
-          <span>当前段：服务端关键词 / 状态 / 严重度组合筛选</span>
-          <span>下一段：去重合并；Windows 桌面打包统一后置</span>
+          <span>当前段：候选展示 + 显式人工去重合并</span>
+          <span>下一段：必要设置；Windows 桌面打包统一后置</span>
         </div>
       </section>
 
@@ -969,6 +1077,26 @@ export default function App() {
                   </div>
                 </div>
                 <div className="bug-action">
+                  <span className="bug-action__label">重复候选</span>
+                  <div className="bug-action__controls">
+                    <button
+                      className="secondary-button"
+                      disabled={
+                        duplicateCandidateState === "loading" ||
+                        (selectedBug.state !== "reported" && selectedBug.state !== "ready")
+                      }
+                      id="duplicate-candidates-load"
+                      onClick={() => void loadCandidates()}
+                      type="button"
+                    >
+                      {duplicateCandidateState === "loading" ? "读取中" : "读取重复候选"}
+                    </button>
+                    <span className="bug-action__hint">
+                      只展示候选；必须由用户选择并确认，服务端不会自动合并
+                    </span>
+                  </div>
+                </div>
+                <div className="bug-action">
                   <span className="bug-action__label">可选执行器</span>
                   <div className="bug-action__controls">
                     <button
@@ -1005,6 +1133,80 @@ export default function App() {
               {transitionState === "error" && transitionError !== null && (
                 <p aria-live="assertive" className="api-error">
                   状态更新失败：{mutationErrorMessage(transitionError)}
+                </p>
+              )}
+              {duplicateCandidateState === "error" && duplicateCandidateError !== null && (
+                <p aria-live="assertive" className="api-error" id="duplicate-action-error">
+                  重复候选读取失败：{mutationErrorMessage(duplicateCandidateError)}
+                </p>
+              )}
+              {duplicateCandidateState === "success" && (
+                <section aria-label="人工去重合并" className="duplicate-workflow">
+                  <div className="subsection-heading">
+                    <h3>人工确认重复</h3>
+                    <span>{duplicateCandidates.length} 条候选</span>
+                  </div>
+                  {duplicateCandidates.length === 0 ? (
+                    <p className="empty-state">没有匹配候选；Bug 保持原状态。</p>
+                  ) : (
+                    <div className="duplicate-candidate-list" id="duplicate-candidate-list">
+                      {duplicateCandidates.map((candidate) => (
+                        <label
+                          className="duplicate-candidate"
+                          htmlFor={`duplicate-candidate-${candidate.bugId}`}
+                          key={candidate.bugId}
+                        >
+                          <input
+                            checked={duplicateCanonicalId === candidate.bugId}
+                            id={`duplicate-candidate-${candidate.bugId}`}
+                            name="duplicate-canonical"
+                            onChange={() => setDuplicateCanonicalId(candidate.bugId)}
+                            type="radio"
+                          />
+                          <span>
+                            <strong>{candidate.bugKey}</strong>
+                            <small>
+                              score {candidate.score} · {candidate.reasons.join("；")}
+                            </small>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                  <label htmlFor="duplicate-mark-reason">人工确认原因</label>
+                  <textarea
+                    id="duplicate-mark-reason"
+                    onChange={(event) => setDuplicateReason(event.target.value)}
+                    placeholder="说明为何确认与所选 canonical Bug 重复"
+                    rows={2}
+                    value={duplicateReason}
+                  />
+                  <div className="workflow-step__controls">
+                    <button
+                      className="primary-button"
+                      disabled={
+                        duplicateMutationState === "submitting" ||
+                        duplicateCanonicalId === null ||
+                        duplicateReason.trim().length === 0
+                      }
+                      id="mark-duplicate"
+                      onClick={() => void confirmDuplicate()}
+                      type="button"
+                    >
+                      {duplicateMutationState === "submitting" ? "确认中" : "确认标记为重复"}
+                    </button>
+                    <small>该操作写入 QA Hub 事实与审计，但不是验收或关闭</small>
+                  </div>
+                </section>
+              )}
+              {duplicateMutationState === "success" && duplicateMessage !== null && (
+                <p aria-live="polite" className="success-note" id="duplicate-action-success">
+                  {duplicateMessage}
+                </p>
+              )}
+              {duplicateMutationState === "error" && duplicateMutationError !== null && (
+                <p aria-live="assertive" className="api-error" id="duplicate-action-error">
+                  人工去重失败：{mutationErrorMessage(duplicateMutationError)}
                 </p>
               )}
               {relayReceipt !== null && relayState === "success" && (

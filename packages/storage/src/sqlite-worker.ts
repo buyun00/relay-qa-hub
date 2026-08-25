@@ -36,6 +36,7 @@ import type {
 } from "./mobile-build-store.js";
 import type {
   ListMobileDuplicateCandidatesInput,
+  MarkMobileBugDuplicateInput,
   MobileDuplicateCandidateList,
 } from "./mobile-duplicate-store.js";
 import type {
@@ -244,6 +245,11 @@ export class SqliteStorageWorker {
   ): Promise<MobileDuplicateCandidateList> {
     await this.initialization;
     return this.request<MobileDuplicateCandidateList>("listMobileDuplicateCandidates", input);
+  }
+
+  async markMobileBugDuplicate(input: MarkMobileBugDuplicateInput): Promise<MobileBugRecord> {
+    await this.initialization;
+    return this.request<MobileBugRecord>("markMobileBugDuplicate", input);
   }
 
   async createMobileCapture(input: CreateMobileCaptureInput): Promise<MobileCaptureCreation> {

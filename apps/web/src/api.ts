@@ -50,6 +50,17 @@ export interface BugDetail extends BugListItem {
   readonly closedAt: string | null;
 }
 
+export interface DuplicateCandidate {
+  readonly bugId: string;
+  readonly bugKey: string;
+  readonly score: number;
+  readonly reasons: readonly string[];
+}
+
+export interface DuplicateCandidateList {
+  readonly candidates: readonly DuplicateCandidate[];
+}
+
 export interface BugEvent {
   readonly schemaVersion: "1.0";
   readonly id: string;
@@ -282,6 +293,34 @@ export async function listBugs(
 export async function getBug(bugId: string): Promise<BugDetail> {
   const body = requireRecord(await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`), "BUG");
   return body as unknown as BugDetail;
+}
+
+export async function listDuplicateCandidates(bugId: string): Promise<DuplicateCandidateList> {
+  const body = requireRecord(
+    await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/duplicate-candidates`),
+    "DUPLICATE_CANDIDATES",
+  );
+  if (!Array.isArray(body.candidates)) {
+    throw new QaHubApiError(200, "INVALID_DUPLICATE_CANDIDATES");
+  }
+  return body as unknown as DuplicateCandidateList;
+}
+
+export async function markBugDuplicate(
+  bugId: string,
+  expectedVersion: number,
+  canonicalBugId: string,
+  reason: string,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/mark-duplicate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:markBugDuplicate:bug:${bugId}:v${expectedVersion}:canonical:${canonicalBugId}`,
+    },
+    body: JSON.stringify({ expectedVersion, toState: "duplicate", canonicalBugId, reason }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
 }
 
 export async function updateBugOwner(

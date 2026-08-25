@@ -260,9 +260,10 @@ export type {
   MobileBugList,
   MobileBugListState,
 } from "./mobile-bug-list-store.js";
-export { listMobileDuplicateCandidates } from "./mobile-duplicate-store.js";
+export { listMobileDuplicateCandidates, markMobileBugDuplicate } from "./mobile-duplicate-store.js";
 export type {
   ListMobileDuplicateCandidatesInput,
+  MarkMobileBugDuplicateInput,
   MobileDuplicateCandidate,
   MobileDuplicateCandidateList,
 } from "./mobile-duplicate-store.js";

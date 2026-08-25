@@ -121,12 +121,15 @@ export type { MobileAddBugCommentRequest, MobileCommentStore } from "./mobile-co
 
 export {
   MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
+  MOBILE_BUG_MARK_DUPLICATE_PATH,
+  parseMobileMarkDuplicateRequest,
   requireDuplicateBugUuid,
 } from "./mobile-duplicates.js";
 export type {
   MobileDuplicateCandidate,
   MobileDuplicateCandidateList,
   MobileDuplicateStore,
+  MobileMarkDuplicateRequest,
 } from "./mobile-duplicates.js";
 
 export { MOBILE_NOTIFICATION_LIST_PATH, parseMobileNotificationLimit } from "./mobile-inbox.js";

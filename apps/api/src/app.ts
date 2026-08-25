@@ -52,6 +52,8 @@ import {
 } from "./mobile-builds.js";
 import {
   MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
+  MOBILE_BUG_MARK_DUPLICATE_PATH,
+  parseMobileMarkDuplicateRequest,
   requireDuplicateBugUuid,
   type MobileDuplicateStore,
 } from "./mobile-duplicates.js";
@@ -227,6 +229,9 @@ const unconfiguredMobileBuildStore: MobileBuildStore = {
 
 const unconfiguredMobileDuplicateStore: MobileDuplicateStore = {
   listCandidates: () => {
+    throw new Error("MobileDuplicateStore is not configured");
+  },
+  markDuplicate: () => {
     throw new Error("MobileDuplicateStore is not configured");
   },
 };
@@ -575,6 +580,59 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         }
         if (code === "FORBIDDEN") {
           return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+        }
+        if (error instanceof TypeError || code === "INVALID_REQUEST") {
+          return reply
+            .code(400)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "INVALID_REQUEST" });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post<{ Params: { bugId: string } }>(
+    MOBILE_BUG_MARK_DUPLICATE_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const bugId = requireDuplicateBugUuid(request.params.bugId, "bugId");
+        const body = parseMobileMarkDuplicateRequest(request.body);
+        const idempotencyKey = requireRelayIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (
+          idempotencyKey !==
+          `workflow:markBugDuplicate:bug:${bugId}:v${body.expectedVersion}:canonical:${body.canonicalBugId}`
+        ) {
+          throw new TypeError("Idempotency-Key does not match mark duplicate action");
+        }
+        const result = await mobileDuplicateStore.markDuplicate({
+          actorId: debugActorId,
+          bugId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        const code = (error as { code?: unknown })?.code;
+        if (code === "NOT_FOUND") {
+          return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+        }
+        if (code === "FORBIDDEN") {
+          return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+        }
+        if (code === "VERSION_CONFLICT") {
+          return reply.code(412).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+        }
+        if (code === "IDEMPOTENCY_PAYLOAD_MISMATCH") {
+          return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+        }
+        if (code === "GUARD_FAILED") {
+          return reply.code(422).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
         }
         if (error instanceof TypeError || code === "INVALID_REQUEST") {
           return reply
