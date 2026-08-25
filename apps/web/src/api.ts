@@ -69,6 +69,55 @@ export interface CommentCreationResponse {
   };
 }
 
+export interface RelayRepairAttempt {
+  readonly id: string;
+  readonly bugId: string;
+  readonly sequence: number;
+  readonly mode: "relay";
+  readonly status: "planned";
+  readonly assigneeId: string;
+  readonly version: number;
+}
+
+export interface RelayDispatchAccepted {
+  readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
+  readonly repairAttemptId: string;
+  readonly handoffId: string;
+  readonly relayInstanceId: string;
+  readonly outboxMessageId: string;
+  readonly requestId: string;
+  readonly status: "queued";
+  readonly replayed: boolean;
+}
+
+export interface RelayReceipt {
+  readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
+  readonly repairAttemptId: string;
+  readonly handoffId: string;
+  readonly relayInstanceId: string;
+  readonly relayTaskId: string | null;
+  readonly handoffStatus:
+    | "queued"
+    | "submitted"
+    | "running"
+    | "needs_input"
+    | "blocked"
+    | "failed"
+    | "fix_delivered"
+    | "awaiting_build"
+    | "awaiting_verification";
+  readonly buildRequirement: "not_required" | "required";
+  readonly buildEvidenceStatus: "not_required" | "pending" | "exact_commit_eligible";
+  readonly deliveredCommitSha: string | null;
+  readonly buildId: string | null;
+  readonly externalRevision: number;
+  readonly requiresHumanVerification: true;
+  readonly automationAuthority: "delivery_build_projection_only";
+  readonly lastEventAt: string;
+  readonly failureSummary: string | null;
+  readonly version: number;
+}
+
 export class QaHubApiError extends Error {
   readonly status: number;
   readonly code: string | null;
@@ -185,4 +234,51 @@ export async function addBugComment(
     throw new QaHubApiError(201, "INVALID_COMMENT");
   }
   return response as CommentCreationResponse;
+}
+
+export async function createRelayAttempt(
+  bugId: string,
+  expectedVersion: number,
+  assigneeId: string,
+): Promise<RelayRepairAttempt> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/repair-attempts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:createRepairAttempt:bug:${bugId}:v${expectedVersion}`,
+    },
+    body: JSON.stringify({
+      expectedVersion,
+      mode: "relay",
+      assigneeId,
+      summary: "Desktop QA Hub Relay handoff",
+    }),
+  });
+  return requireRecord(body, "RELAY_ATTEMPT") as unknown as RelayRepairAttempt;
+}
+
+export async function dispatchRelay(
+  attemptId: string,
+  expectedVersion: number,
+  handoffId: string,
+): Promise<RelayDispatchAccepted> {
+  const body = await requestJson(
+    `/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/dispatch/relay`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": `relay:dispatch:${handoffId}`,
+      },
+      body: JSON.stringify({ expectedVersion, handoffId, selectedAttachmentIds: [] }),
+    },
+  );
+  return requireRecord(body, "RELAY_DISPATCH") as unknown as RelayDispatchAccepted;
+}
+
+export async function getRelayReceipt(attemptId: string): Promise<RelayReceipt> {
+  const body = await requestJson(
+    `/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/relay-receipt`,
+  );
+  return requireRecord(body, "RELAY_RECEIPT") as unknown as RelayReceipt;
 }

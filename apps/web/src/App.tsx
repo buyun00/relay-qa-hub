@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 
 import {
   addBugComment,
+  createRelayAttempt,
+  dispatchRelay,
   getBug,
+  getRelayReceipt,
   listBugEvents,
   listBugs,
   QaHubApiError,
@@ -11,6 +14,7 @@ import {
   type BugDetail,
   type BugEvent,
   type BugListItem,
+  type RelayReceipt,
 } from "./api";
 import { product } from "./product";
 
@@ -109,6 +113,12 @@ export default function App() {
     readonly status: number;
     readonly code: string | null;
   } | null>(null);
+  const [relayState, setRelayState] = useState<MutationState>("idle");
+  const [relayReceipt, setRelayReceipt] = useState<RelayReceipt | null>(null);
+  const [relayError, setRelayError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
 
   const loadBugList = useCallback(async (nextProjectId: string): Promise<void> => {
     const normalizedProjectId = nextProjectId.trim();
@@ -136,6 +146,7 @@ export default function App() {
     async (
       bugId: string,
       preserveComment = false,
+      preserveRelay = false,
     ): Promise<{ readonly bug: BugDetail; readonly events: readonly BugEvent[] } | null> => {
       setSelectedBugId(bugId);
       setSelectedBug(null);
@@ -146,6 +157,11 @@ export default function App() {
         setCommentId(null);
         setCommentState("idle");
         setCommentError(null);
+      }
+      if (!preserveRelay) {
+        setRelayState("idle");
+        setRelayReceipt(null);
+        setRelayError(null);
       }
       try {
         const [bug, events] = await Promise.all([getBug(bugId), listBugEvents(bugId)]);
@@ -174,7 +190,7 @@ export default function App() {
     setAssignmentError(null);
     try {
       await updateBugOwner(selectedBug.id, selectedBug.version, nextOwnerId);
-      const refreshed = await loadBugDetails(selectedBug.id, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true);
       if (refreshed?.bug.ownerId === nextOwnerId) {
         setAssignmentState("success");
       } else {
@@ -193,7 +209,7 @@ export default function App() {
     setTransitionError(null);
     try {
       await transitionBugReady(selectedBug.id, selectedBug.version);
-      const refreshed = await loadBugDetails(selectedBug.id, true);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true);
       if (refreshed?.bug.state === "ready") {
         setTransitionState("success");
       } else {
@@ -215,7 +231,7 @@ export default function App() {
       const result = await addBugComment(selectedBugId, commentBody.trim(), clientSubmissionId);
       setCommentBody("");
       setCommentId(result.comment.id);
-      const refreshed = await loadBugDetails(selectedBugId, true);
+      const refreshed = await loadBugDetails(selectedBugId, true, true);
       const eventConfirmed =
         refreshed?.events.some(
           (event) =>
@@ -236,6 +252,60 @@ export default function App() {
       }
     }
   }, [commentBody, loadBugDetails, selectedBugId]);
+
+  const readRelayReceipt = useCallback(async (attemptId: string): Promise<RelayReceipt> => {
+    let receipt = await getRelayReceipt(attemptId);
+    for (let poll = 0; poll < 10 && receipt.handoffStatus === "queued"; poll += 1) {
+      await new Promise((resolve) => window.setTimeout(resolve, 200));
+      receipt = await getRelayReceipt(attemptId);
+    }
+    return receipt;
+  }, []);
+
+  const handoffToRelay = useCallback(async (): Promise<void> => {
+    if (selectedBug === null || selectedBug.state !== "ready") return;
+    setRelayState("submitting");
+    setRelayReceipt(null);
+    setRelayError(null);
+    try {
+      const attempt = await createRelayAttempt(selectedBug.id, selectedBug.version, MVP_OWNER_ID);
+      const handoffId = globalThis.crypto.randomUUID();
+      const accepted = await dispatchRelay(attempt.id, attempt.version, handoffId);
+      const receipt = await readRelayReceipt(attempt.id);
+      if (
+        accepted.qaItem.id !== selectedBug.id ||
+        receipt.qaItem.id !== selectedBug.id ||
+        receipt.repairAttemptId !== attempt.id ||
+        receipt.handoffId !== handoffId ||
+        receipt.requiresHumanVerification !== true ||
+        receipt.automationAuthority !== "delivery_build_projection_only"
+      ) {
+        setRelayState("error");
+        setRelayError({ status: 200, code: "RELAY_RECEIPT_MISMATCH" });
+        return;
+      }
+      setRelayReceipt(receipt);
+      setRelayState("success");
+      await loadBugDetails(selectedBug.id, true, true);
+    } catch (cause: unknown) {
+      setRelayState("error");
+      setRelayError(mutationError(cause));
+    }
+  }, [loadBugDetails, readRelayReceipt, selectedBug]);
+
+  const refreshRelayReceipt = useCallback(async (): Promise<void> => {
+    if (relayReceipt === null) return;
+    setRelayState("submitting");
+    setRelayError(null);
+    try {
+      const receipt = await readRelayReceipt(relayReceipt.repairAttemptId);
+      setRelayReceipt(receipt);
+      setRelayState("success");
+    } catch (cause: unknown) {
+      setRelayState("error");
+      setRelayError(mutationError(cause));
+    }
+  }, [readRelayReceipt, relayReceipt]);
 
   useEffect(() => {
     void loadBugList(DEFAULT_PROJECT_ID);
@@ -373,7 +443,7 @@ export default function App() {
         )}
 
         <div aria-label="后续管理台切片" className="next-slices">
-          <span>下一段：详情 / 证据 / 时间线 / 评论</span>
+          <span>当前段：交给 Relay / durable 回执 / 自动重试</span>
           <span>Relay 仍只通过 QA Hub 服务端接入</span>
         </div>
       </section>
@@ -478,6 +548,24 @@ export default function App() {
                     </span>
                   </div>
                 </div>
+                <div className="bug-action">
+                  <span className="bug-action__label">可选执行器</span>
+                  <div className="bug-action__controls">
+                    <button
+                      className="primary-button"
+                      disabled={relayState === "submitting" || selectedBug.state !== "ready"}
+                      onClick={() => void handoffToRelay()}
+                      type="button"
+                    >
+                      {relayState === "submitting" ? "交付中" : "一键交给 Relay"}
+                    </button>
+                    <span className="bug-action__hint">
+                      {selectedBug.state === "ready"
+                        ? "经 QA Hub 创建 RepairAttempt 并持久派发"
+                        : `需处于 ready；当前为 ${selectedBug.state}`}
+                    </span>
+                  </div>
+                </div>
               </div>
               {assignmentState === "success" && (
                 <p aria-live="polite" className="success-note">
@@ -497,6 +585,34 @@ export default function App() {
               {transitionState === "error" && transitionError !== null && (
                 <p aria-live="assertive" className="api-error">
                   状态更新失败：{mutationErrorMessage(transitionError)}
+                </p>
+              )}
+              {relayReceipt !== null && relayState === "success" && (
+                <div aria-live="polite" className="relay-receipt">
+                  <div className="relay-receipt__heading">
+                    <strong>Relay 回执：{relayReceipt.handoffStatus}</strong>
+                    <button
+                      className="link-button"
+                      onClick={() => void refreshRelayReceipt()}
+                      type="button"
+                    >
+                      刷新回执
+                    </button>
+                  </div>
+                  <p>
+                    handoff {relayReceipt.handoffId} · task {relayReceipt.relayTaskId ?? "待分配"}
+                  </p>
+                  <p>
+                    {relayReceipt.handoffStatus === "queued"
+                      ? "QA Hub 已持久化派发；执行器不可用或尚未接单时由服务端可靠重试。"
+                      : "执行器已回执；后续交付仍必须回到 QA Hub，由人工作出验收/关闭决定。"}
+                  </p>
+                  <strong>仍需人工验收，Relay 无权自动关闭 Bug。</strong>
+                </div>
+              )}
+              {relayState === "error" && relayError !== null && (
+                <p aria-live="assertive" className="api-error">
+                  Relay 交付/回执失败：{mutationErrorMessage(relayError)}
                 </p>
               )}
             </article>
