@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P7
-  current_gate: G7-WORKBENCH-READY
+  current_phase: P2
+  current_gate: G2-AUTH-RBAC-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: b21f9426732db749c351ca47bc5f30e50dda8d56
-  last_verified_at: 2026-08-26T03:53:29+08:00
-  next_action: P2.1 IN_PROGRESS；P7.3 新 Bug/当前状态分布真实浏览器切片转 VERIFYING；下一步接通独立 QA Hub 本地管理员 bootstrap/login 的真实 Web cookie session，只验证登录成功与撤销后 401，Windows 打包继续等 Web 功能稳定
+  last_verified_commit: c964acb7696a8f1e08961299bb06f71aa0fff554
+  last_verified_at: 2026-08-26T04:28:47+08:00
+  next_action: P2.2 IN_PROGRESS；P2.1 独立本地凭据、HttpOnly cookie session、真实浏览器读取与撤销后 401 已转 VERIFYING；下一步仅让 browser principal 驱动真实 project membership scope，以一个允许和一个跨项目拒绝收口，Windows 打包继续等 Web 功能稳定
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -762,7 +762,7 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 - 本地账户首发或 OIDC adapter；一次性管理员初始化；会话撤销、密码重置、限流。
 - 报告邀请 QR：短期、项目/Build/Test Cycle 限权，不赋予列表或管理权限。
 
-当前状态：`IN_PROGRESS`。现有 4174 开发代理注入的随机 debug Bearer 只用于隔离 smoke，不能当作产品登录。下一原子切片先复用 QA Hub 自有 identity/session 表，接通一次性本地管理员 bootstrap、普通浏览器登录、`HttpOnly; SameSite=Lax` session cookie、`GET /auth/me` 与显式 logout/revoke；只保留一条成功和一个撤销后 `401`，暂不扩 OIDC、邀请 QR、密码重置或爆破矩阵。状态变更仍必须经过同一 QA Hub API/DB，不引入 Relay/轻语身份。
+当前状态：`VERIFYING`。提交 `c964acb7696a8f1e08961299bb06f71aa0fff554` 已新增数据库 v4 `browser_sessions`、一次性本地 credential bootstrap、普通浏览器登录、`HttpOnly; SameSite=Lax; Path=/` opaque cookie、`GET /auth/me` 与显式 logout/revoke。4174 以 session mode 运行时不再接收或注入 debug Bearer；普通浏览器实际读取同一 SQLite 的项目、两张 Bug 与统计，logout 后回到登录门，同一已撤销 cookie 再请求返回 `401`。证据见 [`docs/evidence/P2.1-browser-session-smoke.md`](evidence/P2.1-browser-session-smoke.md)。当前仍是固定 MVP account/actor 的渐进桥接，不宣称多用户 RBAC、邀请 QR、OIDC、密码重置、失败锁定或 G2 完成；这些进入 P2.2/收尾。
 
 验证：
 
@@ -774,6 +774,8 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 要做：
 
 - 角色矩阵和项目成员管理；服务身份使用独立 scope。
+
+当前状态：`IN_PROGRESS`。下一原子切片只移除 Web session 对固定 debug actor 的事实依赖：让已认证 browser principal 按真实 membership 读取其项目目录/Bug，同时用第二成员对一个非成员项目返回 `403/404`；保留一条 allow 与一条 deny 即推进，不在本段铺开全角色矩阵。
 
 验证：
 
