@@ -44,6 +44,7 @@ import {
   type VisibleProject,
   type VerificationRecord,
 } from "./api";
+import { EvidencePanel } from "./EvidencePanel";
 import { product } from "./product";
 
 const DEFAULT_PROJECT_ID =
@@ -1557,6 +1558,7 @@ export default function App() {
                   <dd>v{selectedBug.version}</dd>
                 </div>
               </dl>
+              <EvidencePanel bugId={selectedBug.id} bugKey={selectedBug.key} />
               <div aria-label="Bug 管理操作" className="bug-actions">
                 <div className="bug-action">
                   <label htmlFor="bug-owner">负责人</label>

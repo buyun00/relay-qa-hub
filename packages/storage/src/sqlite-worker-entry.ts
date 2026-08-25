@@ -4,11 +4,15 @@ import type { DatabaseSync } from "node:sqlite";
 import {
   bindMobileAttachment,
   finalizeMobileUpload,
+  getMobileAttachment,
   initMobileUpload,
+  listMobileBugAttachments,
   putMobileUploadChunk,
   type BindMobileAttachmentInput,
   type FinalizeMobileUploadInput,
+  type GetMobileAttachmentInput,
   type InitMobileUploadInput,
+  type ListMobileBugAttachmentsInput,
   type MobileAttachmentRoots,
   type PutMobileUploadChunkInput,
 } from "./mobile-attachment-store.js";
@@ -160,6 +164,8 @@ interface WorkerRequest {
     | "putMobileUploadChunk"
     | "finalizeMobileUpload"
     | "bindMobileAttachment"
+    | "listMobileBugAttachments"
+    | "getMobileAttachment"
     | "testCreateBug"
     | "integrity"
     | "close";
@@ -561,6 +567,21 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   if (request.operation === "bindMobileAttachment") {
     return inWriteTransaction((current) =>
       bindMobileAttachment(current, request.payload as BindMobileAttachmentInput),
+    );
+  }
+
+  if (request.operation === "listMobileBugAttachments") {
+    return listMobileBugAttachments(
+      requireDatabase(),
+      request.payload as ListMobileBugAttachmentsInput,
+    );
+  }
+
+  if (request.operation === "getMobileAttachment") {
+    return getMobileAttachment(
+      requireDatabase(),
+      requireAttachmentRoots(),
+      request.payload as GetMobileAttachmentInput,
     );
   }
 

@@ -3,8 +3,12 @@ import { Worker } from "node:worker_threads";
 import type {
   BindMobileAttachmentInput,
   FinalizeMobileUploadInput,
+  GetMobileAttachmentInput,
   InitMobileUploadInput,
+  ListMobileBugAttachmentsInput,
+  MobileAttachmentDownload,
   MobileAttachmentReservation,
+  MobileBugAttachmentList,
   MobileFinalizedAttachment,
   MobileUploadChunkReceipt,
   MobileUploadSession,
@@ -214,6 +218,20 @@ export class SqliteStorageWorker {
   ): Promise<MobileAttachmentReservation> {
     await this.initialization;
     return this.request<MobileAttachmentReservation>("bindMobileAttachment", input);
+  }
+
+  async listMobileBugAttachments(
+    input: ListMobileBugAttachmentsInput,
+  ): Promise<MobileBugAttachmentList | null> {
+    await this.initialization;
+    return this.request<MobileBugAttachmentList | null>("listMobileBugAttachments", input);
+  }
+
+  async getMobileAttachment(
+    input: GetMobileAttachmentInput,
+  ): Promise<MobileAttachmentDownload | null> {
+    await this.initialization;
+    return this.request<MobileAttachmentDownload | null>("getMobileAttachment", input);
   }
 
   async getMobileBug(input: {

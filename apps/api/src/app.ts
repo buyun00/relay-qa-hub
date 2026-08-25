@@ -7,11 +7,14 @@ import { API_SERVICE_NAME, API_VERSION, DEVELOPMENT_BUILD_SHA, resolveBuildSha }
 import {
   MAX_MOBILE_CHUNK_SIZE_BYTES,
   MOBILE_ATTACHMENT_BIND_PATH,
+  MOBILE_ATTACHMENT_ITEM_PATH,
+  MOBILE_BUG_ATTACHMENTS_PATH,
   MOBILE_UPLOAD_CHUNK_PATH,
   MOBILE_UPLOAD_FINALIZE_PATH,
   MOBILE_UPLOAD_INIT_PATH,
   type MobileAttachmentStore,
   parseMobileAttachmentBindingRequest,
+  parseMobileAttachmentListLimit,
   parseMobileChunkNumber,
   parseMobileFinalizeUploadRequest,
   parseMobileInitUploadRequest,
@@ -193,6 +196,12 @@ const unconfiguredMobileAttachmentStore: MobileAttachmentStore = {
     throw new Error("MobileAttachmentStore is not configured");
   },
   bindAttachment: () => {
+    throw new Error("MobileAttachmentStore is not configured");
+  },
+  listBugAttachments: () => {
+    throw new Error("MobileAttachmentStore is not configured");
+  },
+  getAttachment: () => {
     throw new Error("MobileAttachmentStore is not configured");
   },
 };
@@ -645,6 +654,75 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(bug);
   });
+
+  app.get<{
+    Params: { bugId: string };
+    Querystring: { readonly limit?: string | readonly string[] };
+  }>(MOBILE_BUG_ATTACHMENTS_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply
+        .code(401)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "UNAUTHENTICATED" });
+    }
+    try {
+      const result = await mobileAttachmentStore.listBugAttachments({
+        actorId: debugActorId,
+        bugId: requireMobileUuid(request.params.bugId, "bugId"),
+        limit: parseMobileAttachmentListLimit(request.query.limit),
+      });
+      if (result === null) {
+        return reply
+          .code(404)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "NOT_FOUND" });
+      }
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      if (!(error instanceof TypeError)) throw error;
+      return reply
+        .code(400)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "INVALID_REQUEST" });
+    }
+  });
+
+  app.get<{ Params: { attachmentId: string } }>(
+    MOBILE_ATTACHMENT_ITEM_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply
+          .code(401)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "UNAUTHENTICATED" });
+      }
+      try {
+        const download = await mobileAttachmentStore.getAttachment({
+          actorId: debugActorId,
+          attachmentId: requireMobileUuid(request.params.attachmentId, "attachmentId"),
+        });
+        if (download === null) {
+          return reply
+            .code(404)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "NOT_FOUND" });
+        }
+        return reply
+          .header("cache-control", "private, no-store")
+          .header("content-length", download.metadata.size)
+          .header("content-type", download.metadata.mediaType)
+          .header("etag", `"sha256-${download.metadata.sha256}"`)
+          .header("x-content-sha256", download.metadata.sha256)
+          .send(download.bytes);
+      } catch (error: unknown) {
+        if (!(error instanceof TypeError)) throw error;
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+    },
+  );
 
   app.patch<{ Params: { bugId: string } }>(MOBILE_BUG_ITEM_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {

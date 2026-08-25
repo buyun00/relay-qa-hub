@@ -100,6 +100,30 @@ export interface BugDetail extends BugListItem {
   readonly closedAt: string | null;
 }
 
+export interface AttachmentMetadata {
+  readonly attachmentId: string;
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly clientAttachmentId: string;
+  readonly captureId: string | null;
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
+  readonly scanStatus: "clean";
+  readonly readyToBind: true;
+  readonly bindingStatus: "claimed";
+  readonly version: number;
+}
+
+export interface BugAttachmentList {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly AttachmentMetadata[];
+  readonly nextCursor: null;
+}
+
 export interface DuplicateCandidate {
   readonly bugId: string;
   readonly bugKey: string;
@@ -330,6 +354,25 @@ function isProjectScopedList(value: unknown, projectId: string): boolean {
   return response.projectId === projectId && Array.isArray(response.items);
 }
 
+function isAttachmentMetadata(value: unknown): value is AttachmentMetadata {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const item = value as Partial<AttachmentMetadata>;
+  return (
+    typeof item.attachmentId === "string" &&
+    typeof item.projectId === "string" &&
+    typeof item.filename === "string" &&
+    typeof item.mediaType === "string" &&
+    typeof item.size === "number" &&
+    Number.isSafeInteger(item.size) &&
+    item.size > 0 &&
+    typeof item.sha256 === "string" &&
+    /^[0-9a-f]{64}$/u.test(item.sha256) &&
+    item.scanStatus === "clean" &&
+    item.readyToBind === true &&
+    item.bindingStatus === "claimed"
+  );
+}
+
 async function requestJson(path: string, init?: RequestInit): Promise<unknown> {
   const response = await fetch(path, {
     ...init,
@@ -393,6 +436,45 @@ export async function listProjectModules(projectId: string): Promise<ProjectModu
 export async function getBug(bugId: string): Promise<BugDetail> {
   const body = requireRecord(await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`), "BUG");
   return body as unknown as BugDetail;
+}
+
+export async function listBugAttachments(bugId: string): Promise<BugAttachmentList> {
+  const body = requireRecord(
+    await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/attachments?limit=50`),
+    "BUG_ATTACHMENTS",
+  );
+  if (
+    body.bugId !== bugId ||
+    typeof body.projectId !== "string" ||
+    !Number.isSafeInteger(body.snapshotSequence) ||
+    !Array.isArray(body.items) ||
+    !body.items.every(isAttachmentMetadata) ||
+    body.nextCursor !== null
+  ) {
+    throw new QaHubApiError(200, "INVALID_BUG_ATTACHMENTS");
+  }
+  return body as unknown as BugAttachmentList;
+}
+
+export async function downloadAttachment(metadata: AttachmentMetadata): Promise<Blob> {
+  const response = await fetch(`/api/v1/attachments/${encodeURIComponent(metadata.attachmentId)}`, {
+    headers: { Accept: "application/octet-stream" },
+  });
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => null);
+    throw new QaHubApiError(response.status, readErrorCode(body));
+  }
+  const blob = await response.blob();
+  const responseMediaType = response.headers.get("content-type")?.split(";", 1)[0]?.trim();
+  const responseSha256 = response.headers.get("x-content-sha256");
+  if (
+    blob.size !== metadata.size ||
+    responseMediaType !== metadata.mediaType ||
+    responseSha256 !== metadata.sha256
+  ) {
+    throw new QaHubApiError(200, "INVALID_ATTACHMENT_BYTES");
+  }
+  return blob;
 }
 
 export async function getHumanWorkflow(bugId: string): Promise<HumanWorkflowSnapshot> {

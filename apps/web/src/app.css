@@ -466,6 +466,140 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+.evidence-panel {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d8d4c8;
+}
+
+.evidence-panel__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.evidence-panel__heading h3 {
+  margin: 0;
+}
+
+.evidence-panel__count {
+  padding: 0.3rem 0.5rem;
+  color: #355c55;
+  background: #e4f0e9;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.evidence-panel__empty {
+  margin: 0.75rem 0 0;
+  color: #61706b;
+  font-size: 0.78rem;
+}
+
+.evidence-grid {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0.85rem;
+}
+
+.evidence-card {
+  min-width: 0;
+  overflow: hidden;
+  background: #fffef9;
+  border: 1px solid #d8d4c8;
+  border-radius: 0.75rem;
+}
+
+.evidence-card__preview {
+  display: grid;
+  min-height: 10rem;
+  place-items: center;
+  color: #718079;
+  background: #172321;
+  font-size: 0.75rem;
+}
+
+.evidence-card__preview img {
+  display: block;
+  width: 100%;
+  max-height: 32rem;
+  object-fit: contain;
+}
+
+.evidence-card__unavailable {
+  color: #ffcfb3;
+  font-weight: 800;
+}
+
+.evidence-card__body {
+  padding: 0.8rem;
+}
+
+.evidence-card__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.evidence-card__title strong {
+  overflow-wrap: anywhere;
+}
+
+.evidence-card__title span {
+  color: #718079;
+  font-size: 0.68rem;
+}
+
+.evidence-card dl {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.75rem 0 0;
+}
+
+.evidence-card dl div {
+  min-width: 0;
+}
+
+.evidence-card dt {
+  color: #718079;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.evidence-card dd {
+  margin: 0.15rem 0 0;
+  color: #334c47;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.66rem;
+  overflow-wrap: anywhere;
+}
+
+.evidence-card__error {
+  margin: 0.75rem 0 0;
+  color: #a23f2b;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.evidence-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.evidence-card__actions a {
+  color: #23645e;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
 .bug-actions {
   display: grid;
   gap: 1rem;
@@ -946,6 +1080,10 @@ footer {
   .workflow-step--wide,
   .workflow-fields__wide {
     grid-column: 1 / -1;
+  }
+
+  .evidence-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

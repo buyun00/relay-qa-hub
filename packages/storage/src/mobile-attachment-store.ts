@@ -7,7 +7,7 @@ import {
   writeFileSync,
   type PathLike,
 } from "node:fs";
-import { isAbsolute, join } from "node:path";
+import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 
 import { SqliteStorageError } from "./sqlite.js";
@@ -136,6 +136,44 @@ export interface MobileAttachmentReservation {
   readonly replayed: boolean;
 }
 
+export interface ListMobileBugAttachmentsInput extends MobileAttachmentScope {
+  readonly bugId: string;
+  readonly limit: number;
+}
+
+export interface GetMobileAttachmentInput extends MobileAttachmentScope {
+  readonly attachmentId: string;
+}
+
+export interface MobileAttachmentMetadata {
+  readonly attachmentId: string;
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly clientAttachmentId: string;
+  readonly captureId: string | null;
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
+  readonly scanStatus: "clean";
+  readonly readyToBind: true;
+  readonly bindingStatus: "claimed";
+  readonly version: number;
+}
+
+export interface MobileBugAttachmentList {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly MobileAttachmentMetadata[];
+  readonly nextCursor: null;
+}
+
+export interface MobileAttachmentDownload {
+  readonly metadata: MobileAttachmentMetadata;
+  readonly bytes: Uint8Array;
+}
+
 interface UploadChunkRow {
   readonly chunk_index: number;
   readonly size_bytes: number;
@@ -183,6 +221,10 @@ interface AttachmentRow {
   readonly status: string;
   readonly scan_state: string;
   readonly version: number;
+}
+
+interface ClaimedAttachmentRow extends AttachmentRow {
+  readonly storage_key: string;
 }
 
 function requireTransaction(database: DatabaseSync): void {
@@ -546,7 +588,10 @@ function finalizedRecord(
 }
 
 function isPng(bytes: Buffer): boolean {
-  if (bytes.length < PNG_SIGNATURE.length || !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) {
+  if (
+    bytes.length < PNG_SIGNATURE.length ||
+    !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)
+  ) {
     return false;
   }
   // A bounded structural check catches arbitrary signature-only payloads while
@@ -557,11 +602,20 @@ function isPng(bytes: Buffer): boolean {
 }
 
 function isJpeg(bytes: Buffer): boolean {
-  return bytes.length >= 4 && bytes.subarray(0, JPEG_SIGNATURE.length).equals(JPEG_SIGNATURE) && bytes.at(-2) === 0xff && bytes.at(-1) === 0xd9;
+  return (
+    bytes.length >= 4 &&
+    bytes.subarray(0, JPEG_SIGNATURE.length).equals(JPEG_SIGNATURE) &&
+    bytes.at(-2) === 0xff &&
+    bytes.at(-1) === 0xd9
+  );
 }
 
 function isWebp(bytes: Buffer): boolean {
-  return bytes.length >= 12 && bytes.subarray(0, 4).toString("ascii") === "RIFF" && bytes.subarray(8, 12).toString("ascii") === "WEBP";
+  return (
+    bytes.length >= 12 &&
+    bytes.subarray(0, 4).toString("ascii") === "RIFF" &&
+    bytes.subarray(8, 12).toString("ascii") === "WEBP"
+  );
 }
 
 function requireSupportedContent(upload: UploadRow, bytes: Buffer): void {
@@ -572,7 +626,10 @@ function requireSupportedContent(upload: UploadRow, bytes: Buffer): void {
   if (valid) return;
   if (upload.media_type === "application/json") {
     if (bytes.length > 20_971_520) {
-      throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "JSON attachment exceeds its bounded size");
+      throw new SqliteStorageError(
+        "SQLITE_UPLOAD_INVALID",
+        "JSON attachment exceeds its bounded size",
+      );
     }
     try {
       const text = bytes.toString("utf8");
@@ -580,7 +637,10 @@ function requireSupportedContent(upload: UploadRow, bytes: Buffer): void {
       JSON.parse(text);
       return;
     } catch {
-      throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "application/json attachment is invalid JSON");
+      throw new SqliteStorageError(
+        "SQLITE_UPLOAD_INVALID",
+        "application/json attachment is invalid JSON",
+      );
     }
   }
   throw new SqliteStorageError(
@@ -864,4 +924,205 @@ export function bindMobileAttachment(
     version: finalizedUpload.version + 1,
     replayed: false,
   });
+}
+
+function hasActiveAttachmentReadMembership(
+  database: DatabaseSync,
+  input: MobileAttachmentScope,
+): boolean {
+  return (
+    database
+      .prepare(
+        `SELECT 1 AS present
+         FROM accounts AS account
+         JOIN projects AS project
+           ON project.account_id = account.id
+          AND project.id = ?
+          AND project.status = 'active'
+         JOIN users AS actor
+           ON actor.account_id = account.id
+          AND actor.id = ?
+          AND actor.status = 'active'
+         JOIN memberships AS membership
+           ON membership.account_id = account.id
+          AND membership.project_id = project.id
+          AND membership.user_id = actor.id
+          AND membership.status = 'active'
+         WHERE account.id = ? AND account.status = 'active'`,
+      )
+      .get(input.projectId, input.actorId, input.accountId) !== undefined
+  );
+}
+
+function claimedAttachmentMetadata(row: ClaimedAttachmentRow): MobileAttachmentMetadata {
+  return Object.freeze({
+    attachmentId: row.id,
+    projectId: row.project_id,
+    clientSubmissionId: row.client_submission_id,
+    clientAttachmentId: row.client_attachment_id,
+    captureId: row.capture_id,
+    filename: row.file_name,
+    mediaType: row.media_type,
+    size: row.size_bytes,
+    sha256: row.sha256,
+    scanStatus: "clean",
+    readyToBind: true,
+    bindingStatus: "claimed",
+    version: row.version,
+  });
+}
+
+function selectClaimedAttachment(
+  database: DatabaseSync,
+  input: MobileAttachmentScope,
+  attachmentId: string,
+): ClaimedAttachmentRow | null {
+  return (
+    (database
+      .prepare(
+        `SELECT attachment.id, attachment.account_id, attachment.project_id,
+                attachment.actor_id, attachment.client_submission_id,
+                attachment.client_attachment_id, attachment.capture_id,
+                attachment.file_name, attachment.media_type, attachment.size_bytes,
+                attachment.sha256, attachment.status, attachment.scan_state,
+                attachment.version, blob.storage_key
+         FROM attachments AS attachment
+         JOIN blobs AS blob
+           ON blob.account_id = attachment.account_id
+          AND blob.id = attachment.blob_id
+          AND blob.size_bytes = attachment.size_bytes
+          AND blob.sha256 = attachment.sha256
+          AND blob.state = 'ready'
+         JOIN attachment_bindings AS binding
+           ON binding.account_id = attachment.account_id
+          AND binding.project_id = attachment.project_id
+          AND binding.attachment_id = attachment.id
+          AND binding.state = 'claimed'
+          AND binding.target_bug_id IS NOT NULL
+         JOIN bug_attachments AS bug_attachment
+           ON bug_attachment.account_id = binding.account_id
+          AND bug_attachment.project_id = binding.project_id
+          AND bug_attachment.bug_id = binding.target_bug_id
+          AND bug_attachment.attachment_id = binding.attachment_id
+          AND bug_attachment.binding_id = binding.id
+         WHERE attachment.account_id = ? AND attachment.project_id = ?
+           AND attachment.id = ? AND attachment.status = 'ready'
+           AND attachment.scan_state = 'clean'`,
+      )
+      .get(input.accountId, input.projectId, attachmentId) as ClaimedAttachmentRow | undefined) ??
+    null
+  );
+}
+
+export function listMobileBugAttachments(
+  database: DatabaseSync,
+  input: ListMobileBugAttachmentsInput,
+): MobileBugAttachmentList | null {
+  if (!Number.isSafeInteger(input.limit) || input.limit < 1 || input.limit > 100) {
+    throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "attachment list limit is invalid");
+  }
+  if (!hasActiveAttachmentReadMembership(database, input)) return null;
+  const bug = database
+    .prepare(
+      `SELECT id
+       FROM bugs
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId);
+  if (bug === undefined) return null;
+
+  const snapshot = database
+    .prepare(
+      `SELECT COALESCE(MAX(event_position), 0) AS snapshot_sequence
+       FROM events
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId) as {
+    readonly snapshot_sequence: number;
+  };
+  const rows = database
+    .prepare(
+      `SELECT attachment.id, attachment.account_id, attachment.project_id,
+              attachment.actor_id, attachment.client_submission_id,
+              attachment.client_attachment_id, attachment.capture_id,
+              attachment.file_name, attachment.media_type, attachment.size_bytes,
+              attachment.sha256, attachment.status, attachment.scan_state,
+              attachment.version, blob.storage_key
+       FROM bug_attachments AS bug_attachment
+       JOIN attachments AS attachment
+         ON attachment.account_id = bug_attachment.account_id
+        AND attachment.project_id = bug_attachment.project_id
+        AND attachment.id = bug_attachment.attachment_id
+        AND attachment.status = 'ready'
+        AND attachment.scan_state = 'clean'
+       JOIN attachment_bindings AS binding
+         ON binding.account_id = bug_attachment.account_id
+        AND binding.project_id = bug_attachment.project_id
+        AND binding.id = bug_attachment.binding_id
+        AND binding.attachment_id = attachment.id
+        AND binding.target_bug_id = bug_attachment.bug_id
+        AND binding.state = 'claimed'
+       JOIN blobs AS blob
+         ON blob.account_id = attachment.account_id
+        AND blob.id = attachment.blob_id
+        AND blob.size_bytes = attachment.size_bytes
+        AND blob.sha256 = attachment.sha256
+        AND blob.state = 'ready'
+       WHERE bug_attachment.account_id = ? AND bug_attachment.project_id = ?
+         AND bug_attachment.bug_id = ?
+       ORDER BY attachment.created_at, attachment.id
+       LIMIT ?`,
+    )
+    .all(
+      input.accountId,
+      input.projectId,
+      input.bugId,
+      input.limit,
+    ) as unknown as ClaimedAttachmentRow[];
+
+  return Object.freeze({
+    bugId: input.bugId,
+    projectId: input.projectId,
+    snapshotSequence: snapshot.snapshot_sequence,
+    items: Object.freeze(rows.map(claimedAttachmentMetadata)),
+    nextCursor: null,
+  });
+}
+
+function resolveEvidenceFile(root: string, storageKey: string): string | null {
+  const resolvedRoot = resolve(root);
+  const resolvedFile = resolve(resolvedRoot, storageKey);
+  const relativePath = relative(resolvedRoot, resolvedFile);
+  if (
+    relativePath.length === 0 ||
+    relativePath === ".." ||
+    relativePath.startsWith(`..${sep}`) ||
+    isAbsolute(relativePath)
+  ) {
+    return null;
+  }
+  return resolvedFile;
+}
+
+export function getMobileAttachment(
+  database: DatabaseSync,
+  roots: MobileAttachmentRoots,
+  input: GetMobileAttachmentInput,
+): MobileAttachmentDownload | null {
+  requireRoots(roots);
+  if (!hasActiveAttachmentReadMembership(database, input)) return null;
+  const attachment = selectClaimedAttachment(database, input, input.attachmentId);
+  if (attachment === null) return null;
+  const evidencePath = resolveEvidenceFile(roots.evidenceRoot, attachment.storage_key);
+  if (evidencePath === null) return null;
+  try {
+    const bytes = readFileSync(evidencePath);
+    if (bytes.length !== attachment.size_bytes || sha256(bytes) !== attachment.sha256) return null;
+    return Object.freeze({
+      metadata: claimedAttachmentMetadata(attachment),
+      bytes,
+    });
+  } catch {
+    return null;
+  }
 }

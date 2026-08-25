@@ -331,15 +331,21 @@ export type {
 export type {
   BindMobileAttachmentInput,
   FinalizeMobileUploadInput,
+  GetMobileAttachmentInput,
   InitMobileUploadInput,
+  ListMobileBugAttachmentsInput,
+  MobileAttachmentDownload,
+  MobileAttachmentMetadata,
   MobileAttachmentReservation,
   MobileAttachmentRoots,
   MobileAttachmentScope,
+  MobileBugAttachmentList,
   MobileFinalizedAttachment,
   MobileUploadChunkReceipt,
   MobileUploadSession,
   PutMobileUploadChunkInput,
 } from "./mobile-attachment-store.js";
+export { getMobileAttachment, listMobileBugAttachments } from "./mobile-attachment-store.js";
 export {
   MOBILE_CAPTURE_ALLOWED_METHODS,
   createMobileCapture,

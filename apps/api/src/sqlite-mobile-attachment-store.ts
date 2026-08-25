@@ -124,5 +124,27 @@ export function createSqliteMobileAttachmentStore(
         boundAt: now().toISOString(),
       });
     },
+
+    async listBugAttachments(query) {
+      requireActor(query.actorId, options.scope);
+      return options.worker.listMobileBugAttachments({
+        ...scope,
+        bugId: query.bugId,
+        limit: query.limit,
+      });
+    },
+
+    async getAttachment(query) {
+      requireActor(query.actorId, options.scope);
+      const download = await options.worker.getMobileAttachment({
+        ...scope,
+        attachmentId: query.attachmentId,
+      });
+      if (download === null) return null;
+      return {
+        metadata: download.metadata,
+        bytes: Buffer.from(download.bytes),
+      };
+    },
   };
 }

@@ -4,6 +4,8 @@ export const MOBILE_UPLOAD_INIT_PATH = "/api/v1/uploads/init" as const;
 export const MOBILE_UPLOAD_CHUNK_PATH = "/api/v1/uploads/:sessionId/chunks/:chunkNumber" as const;
 export const MOBILE_UPLOAD_FINALIZE_PATH = "/api/v1/uploads/:sessionId/finalize" as const;
 export const MOBILE_ATTACHMENT_BIND_PATH = "/api/v1/attachments/:attachmentId/bind" as const;
+export const MOBILE_ATTACHMENT_ITEM_PATH = "/api/v1/attachments/:attachmentId" as const;
+export const MOBILE_BUG_ATTACHMENTS_PATH = "/api/v1/bugs/:bugId/attachments" as const;
 export const MAX_MOBILE_CHUNK_SIZE_BYTES = 8 * 1024 * 1024;
 
 export type MobileAttachmentIntent =
@@ -99,6 +101,35 @@ export interface MobileAttachmentReservation {
   readonly replayed: boolean;
 }
 
+export interface MobileAttachmentMetadata {
+  readonly attachmentId: string;
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly clientAttachmentId: string;
+  readonly captureId: string | null;
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
+  readonly scanStatus: "clean";
+  readonly readyToBind: true;
+  readonly bindingStatus: "claimed";
+  readonly version: number;
+}
+
+export interface MobileBugAttachmentListResponse {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly MobileAttachmentMetadata[];
+  readonly nextCursor: null;
+}
+
+export interface MobileAttachmentDownload {
+  readonly metadata: MobileAttachmentMetadata;
+  readonly bytes: Buffer;
+}
+
 export interface InitMobileUploadCommand {
   readonly actorId: string;
   readonly idempotencyKey: string;
@@ -135,6 +166,17 @@ export interface BindMobileAttachmentCommand {
   readonly request: MobileAttachmentBindingRequest;
 }
 
+export interface ListMobileBugAttachmentsQuery {
+  readonly actorId: string;
+  readonly bugId: string;
+  readonly limit: number;
+}
+
+export interface GetMobileAttachmentQuery {
+  readonly actorId: string;
+  readonly attachmentId: string;
+}
+
 export interface MobileAttachmentStore {
   readonly initUpload: (
     command: InitMobileUploadCommand,
@@ -148,6 +190,12 @@ export interface MobileAttachmentStore {
   readonly bindAttachment: (
     command: BindMobileAttachmentCommand,
   ) => MobileAttachmentReservation | Promise<MobileAttachmentReservation>;
+  readonly listBugAttachments: (
+    query: ListMobileBugAttachmentsQuery,
+  ) => MobileBugAttachmentListResponse | null | Promise<MobileBugAttachmentListResponse | null>;
+  readonly getAttachment: (
+    query: GetMobileAttachmentQuery,
+  ) => MobileAttachmentDownload | null | Promise<MobileAttachmentDownload | null>;
 }
 
 const UUID_PATTERN =
@@ -338,6 +386,20 @@ export function parseMobileChunkNumber(value: string): number {
   const chunkNumber = Number(value);
   if (!Number.isSafeInteger(chunkNumber)) throw new TypeError("chunkNumber is too large");
   return chunkNumber;
+}
+
+export function parseMobileAttachmentListLimit(
+  value: string | readonly string[] | undefined,
+): number {
+  if (value === undefined) return 50;
+  if (typeof value !== "string" || !/^[1-9][0-9]*$/u.test(value)) {
+    throw new TypeError("limit must be a positive integer");
+  }
+  const limit = Number(value);
+  if (!Number.isSafeInteger(limit) || limit > 100) {
+    throw new TypeError("limit must be between 1 and 100");
+  }
+  return limit;
 }
 
 export function requireMobileIdempotencyKey(value: string | undefined): string {
