@@ -10,6 +10,7 @@ import com.relayqahub.android.network.BuildProjectionClient
 import com.relayqahub.android.network.BugWorkbenchClient
 import com.relayqahub.android.network.DuplicateCandidateClient
 import com.relayqahub.android.network.InboxClient
+import com.relayqahub.android.network.HumanWorkflowClient
 import com.relayqahub.android.network.OkHttpQaHubApiClient
 import com.relayqahub.android.network.RelayHandoffClient
 import com.relayqahub.android.network.RepairAttemptClient
@@ -32,6 +33,7 @@ class AppContainer private constructor(
     val bugWorkbenchClient: BugWorkbenchClient,
     val duplicateCandidateClient: DuplicateCandidateClient,
     val inboxClient: InboxClient,
+    val humanWorkflowClient: HumanWorkflowClient,
     val credentialVault: CredentialVault,
     val syncEngine: OfflineSyncEngine,
     val syncScheduler: SyncScheduler,
@@ -99,6 +101,11 @@ class AppContainer private constructor(
                 httpClient = httpClient,
                 allowLoopbackHttp = BuildConfig.DEBUG,
             )
+            val humanWorkflowClient = HumanWorkflowClient(
+                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                httpClient = httpClient,
+                allowLoopbackHttp = BuildConfig.DEBUG,
+            )
             val scopedRepository = ScopedRepository(
                 accountProjectDao = database.accountProjectDao(),
                 cachedQaItemDao = database.cachedQaItemDao(),
@@ -116,6 +123,7 @@ class AppContainer private constructor(
                 bugWorkbenchClient = bugWorkbenchClient,
                 duplicateCandidateClient = duplicateCandidateClient,
                 inboxClient = inboxClient,
+                humanWorkflowClient = humanWorkflowClient,
                 credentialVault = credentialVault,
                 syncEngine = OfflineSyncEngine(
                     operationDao = database.offlineOperationDao(),

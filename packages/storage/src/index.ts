@@ -243,6 +243,8 @@ export type {
   MobileOccurrenceInput,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
+export { getLatestMobileHumanWorkflow } from "./mobile-human-workflow-store.js";
+export type { MobileHumanWorkflowProjection } from "./mobile-human-workflow-store.js";
 export { listMobileBugs } from "./mobile-bug-list-store.js";
 export type {
   ListMobileBugsInput,

@@ -45,6 +45,7 @@ fun FoundationScreen(
     onCreateManualRepairAttempt: () -> Unit = viewModel::createManualRepairAttempt,
     onDeliverManualRepairAndLinkBuild: () -> Unit = viewModel::deliverManualRepairAndLinkBuild,
     onVerifyManualRepairAndClose: () -> Unit = viewModel::verifyManualRepairAndClose,
+    onRefreshLatestHumanWorkflow: () -> Unit = viewModel::refreshLatestHumanWorkflow,
     onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -62,6 +63,7 @@ fun FoundationScreen(
         onCreateManualRepairAttempt = onCreateManualRepairAttempt,
         onDeliverManualRepairAndLinkBuild = onDeliverManualRepairAndLinkBuild,
         onVerifyManualRepairAndClose = onVerifyManualRepairAndClose,
+        onRefreshLatestHumanWorkflow = onRefreshLatestHumanWorkflow,
         onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
     )
 }
@@ -81,6 +83,7 @@ internal fun FoundationScreen(
     onCreateManualRepairAttempt: () -> Unit = {},
     onDeliverManualRepairAndLinkBuild: () -> Unit = {},
     onVerifyManualRepairAndClose: () -> Unit = {},
+    onRefreshLatestHumanWorkflow: () -> Unit = {},
     onCreateBugAndCheckDuplicates: () -> Unit = {},
 ) {
     Scaffold(
@@ -340,6 +343,37 @@ internal fun FoundationScreen(
                     text = "Human Verification error: " +
                         "${state.humanRepairBuild.verificationErrorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("human-verification-status"),
+                )
+            }
+            Button(
+                onClick = onRefreshLatestHumanWorkflow,
+                enabled = state.humanWorkflow.phase != "loading",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("refresh-human-workflow"),
+            ) {
+                Text("重启后回读最近人工闭环")
+            }
+            when (state.humanWorkflow.phase) {
+                "loading" -> Text(
+                    text = "Human workflow: reading persisted facts…",
+                    modifier = Modifier.testTag("human-workflow-status"),
+                )
+                "loaded" -> Text(
+                    text = "${state.humanWorkflow.bugKey}/" +
+                        "${state.humanWorkflow.bugState}/v${state.humanWorkflow.bugVersion}; " +
+                        "Attempt=${state.humanWorkflow.repairAttemptStatus}; " +
+                        "Build=${state.humanWorkflow.buildStatus}; " +
+                        "Verification=${state.humanWorkflow.verificationStatus}/v" +
+                        "${state.humanWorkflow.verificationVersion}; missing=" +
+                        "${state.humanWorkflow.missingWorkflowRejectionCode}; " +
+                        "result=${state.humanWorkflow.resultSummary}.",
+                    modifier = Modifier.testTag("human-workflow-status"),
+                )
+                "failed" -> Text(
+                    text = "Human workflow readback error: " +
+                        "${state.humanWorkflow.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("human-workflow-status"),
                 )
             }
             Button(

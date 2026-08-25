@@ -23,6 +23,7 @@ import {
   listMobileBugs,
   type ListMobileBugsInput,
 } from "./mobile-bug-list-store.js";
+import { getLatestMobileHumanWorkflow } from "./mobile-human-workflow-store.js";
 import {
   createMobileCapture,
   getMobileCapture,
@@ -104,6 +105,7 @@ interface WorkerRequest {
     | "createMobileBug"
     | "getMobileBug"
     | "listMobileBugs"
+    | "getLatestMobileHumanWorkflow"
     | "listMobileDuplicateCandidates"
     | "createMobileCapture"
     | "getMobileCapture"
@@ -258,6 +260,17 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 
   if (request.operation === "listMobileBugs") {
     return listMobileBugs(requireDatabase(), request.payload as ListMobileBugsInput);
+  }
+
+  if (request.operation === "getLatestMobileHumanWorkflow") {
+    return getLatestMobileHumanWorkflow(
+      requireDatabase(),
+      request.payload as {
+        readonly accountId: string;
+        readonly projectId: string;
+        readonly actorId: string;
+      },
+    );
   }
 
   if (request.operation === "listMobileDuplicateCandidates") {

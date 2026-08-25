@@ -67,6 +67,10 @@ import {
   type MobileVerificationStore,
 } from "./mobile-verification.js";
 import {
+  MOBILE_HUMAN_WORKFLOW_LATEST_PATH,
+  type MobileHumanWorkflowStore,
+} from "./mobile-human-workflows.js";
+import {
   MOBILE_NOTIFICATION_LIST_PATH,
   parseMobileNotificationLimit,
   type MobileNotificationStore,
@@ -121,6 +125,7 @@ export interface CreateApiAppOptions {
   readonly mobileBuildStore?: MobileBuildStore;
   readonly mobileDuplicateStore?: MobileDuplicateStore;
   readonly mobileVerificationStore?: MobileVerificationStore;
+  readonly mobileHumanWorkflowStore?: MobileHumanWorkflowStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
@@ -225,6 +230,10 @@ const unconfiguredMobileVerificationStore: MobileVerificationStore = {
   },
 };
 
+const unconfiguredMobileHumanWorkflowStore: MobileHumanWorkflowStore = {
+  getLatest: () => null,
+};
+
 const unconfiguredMobileNotificationStore: MobileNotificationStore = {
   listNotifications: () => {
     throw new Error("MobileNotificationStore is not configured");
@@ -269,6 +278,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     options.mobileDuplicateStore ?? unconfiguredMobileDuplicateStore;
   const mobileVerificationStore =
     options.mobileVerificationStore ?? unconfiguredMobileVerificationStore;
+  const mobileHumanWorkflowStore =
+    options.mobileHumanWorkflowStore ?? unconfiguredMobileHumanWorkflowStore;
   const mobileNotificationStore =
     options.mobileNotificationStore ?? unconfiguredMobileNotificationStore;
   const mobileRelayWebhookStore =
@@ -764,6 +775,31 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     throw error;
   };
+
+  app.get<{ Params: { projectId: string } }>(
+    MOBILE_HUMAN_WORKFLOW_LATEST_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const projectId = requireBuildUuid(request.params.projectId, "projectId");
+        const workflow = await mobileHumanWorkflowStore.getLatest({
+          actorId: debugActorId,
+          projectId,
+        });
+        if (workflow === null) {
+          return reply
+            .code(404)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "NOT_FOUND" });
+        }
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send({ workflow });
+      } catch (error: unknown) {
+        return buildErrorReply(error, reply);
+      }
+    },
+  );
 
   app.post<{ Params: { projectId: string } }>(
     MOBILE_BUILD_COLLECTION_PATH,

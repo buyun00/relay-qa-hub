@@ -21,6 +21,7 @@ import com.relayqahub.android.network.BuildProjectionResult
 import com.relayqahub.android.network.BugWorkbenchFailure
 import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
+import com.relayqahub.android.network.HumanWorkflowFailure
 import com.relayqahub.android.network.RelayHandoffFailure
 import com.relayqahub.android.network.RelayHandoffResult
 import com.relayqahub.android.network.RepairAttemptFailure
@@ -54,6 +55,7 @@ data class FoundationUiState(
     val bugWorkbench: BugWorkbenchUiState = BugWorkbenchUiState(),
     val manualRepair: ManualRepairUiState = ManualRepairUiState(),
     val humanRepairBuild: HumanRepairBuildUiState = HumanRepairBuildUiState(),
+    val humanWorkflow: HumanWorkflowUiState = HumanWorkflowUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
 )
 
@@ -123,6 +125,23 @@ data class HumanRepairBuildUiState(
     val verificationErrorCode: String? = null,
 )
 
+data class HumanWorkflowUiState(
+    val phase: String = "idle",
+    val bugKey: String? = null,
+    val bugState: String? = null,
+    val bugVersion: Int = 0,
+    val repairAttemptId: String? = null,
+    val repairAttemptStatus: String? = null,
+    val buildId: String? = null,
+    val buildStatus: String? = null,
+    val verificationId: String? = null,
+    val verificationStatus: String? = null,
+    val verificationVersion: Int = 0,
+    val resultSummary: String? = null,
+    val missingWorkflowRejectionCode: String? = null,
+    val errorCode: String? = null,
+)
+
 private data class ScopeUiValues(
     val accountName: String,
     val projectName: String,
@@ -138,6 +157,11 @@ private data class DeliveryUiValues(
     val humanRepairBuild: HumanRepairBuildUiState,
 )
 
+private data class DiscoveryUiValues(
+    val duplicateCandidates: DuplicateCandidateUiState,
+    val humanWorkflow: HumanWorkflowUiState,
+)
+
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
     private val appContainer = (application as QaHubApplication).container
     private val scope = FOUNDATION_SCOPE
@@ -149,6 +173,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val manualRepair = MutableStateFlow(ManualRepairUiState())
     private val humanRepairBuild = MutableStateFlow(HumanRepairBuildUiState())
     private val duplicateCandidates = MutableStateFlow(DuplicateCandidateUiState())
+    private val humanWorkflow = MutableStateFlow(HumanWorkflowUiState())
 
     private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
@@ -180,13 +205,23 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
+    private val discoveryState = combine(
+        duplicateCandidates,
+        humanWorkflow,
+    ) { duplicateState, workflowState ->
+        DiscoveryUiValues(
+            duplicateCandidates = duplicateState,
+            humanWorkflow = workflowState,
+        )
+    }
+
     val uiState = combine(
         scopeState,
         lastAction,
         latestRelayHandoff,
         deliveryState,
-        duplicateCandidates,
-    ) { values, action, handoff, delivery, duplicateState ->
+        discoveryState,
+    ) { values, action, handoff, delivery, discovery ->
         val support = appContainer.credentialVault.support()
         FoundationUiState(
             accountName = values.accountName,
@@ -205,7 +240,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             bugWorkbench = delivery.bugWorkbench,
             manualRepair = delivery.manualRepair,
             humanRepairBuild = delivery.humanRepairBuild,
-            duplicateCandidates = duplicateState,
+            humanWorkflow = discovery.humanWorkflow,
+            duplicateCandidates = discovery.duplicateCandidates,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -690,6 +726,68 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         lastAction.value = "Human Verification failed: $code."
     }
 
+    fun refreshLatestHumanWorkflow() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setHumanWorkflowFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            humanWorkflow.value = HumanWorkflowUiState(phase = "loading")
+            lastAction.value = "Reading the persisted human QA workflow after restart…"
+            runCatching {
+                val missingCode = try {
+                    appContainer.humanWorkflowClient.readLatest(
+                        projectId = MISSING_WORKFLOW_PROJECT_ID,
+                        accessToken = accessToken,
+                    )
+                    throw HumanWorkflowFailure("MISSING_WORKFLOW_UNEXPECTEDLY_FOUND")
+                } catch (failure: HumanWorkflowFailure) {
+                    if (failure.httpStatus != 404) throw failure
+                    failure.code
+                }
+                appContainer.humanWorkflowClient.readLatest(
+                    projectId = scope.projectId,
+                    accessToken = accessToken,
+                ) to missingCode
+            }.onSuccess { (workflow, missingCode) ->
+                humanWorkflow.value = HumanWorkflowUiState(
+                    phase = "loaded",
+                    bugKey = workflow.bugKey,
+                    bugState = workflow.bugState,
+                    bugVersion = workflow.bugVersion,
+                    repairAttemptId = workflow.repairAttemptId,
+                    repairAttemptStatus = workflow.repairAttemptStatus,
+                    buildId = workflow.buildId,
+                    buildStatus = workflow.buildStatus,
+                    verificationId = workflow.verificationId,
+                    verificationStatus = workflow.verificationStatus,
+                    verificationVersion = workflow.verificationVersion,
+                    resultSummary = workflow.resultSummary,
+                    missingWorkflowRejectionCode = missingCode,
+                )
+                lastAction.value =
+                    "${workflow.bugKey} restart readback: Attempt=${workflow.repairAttemptStatus}, " +
+                        "Build=${workflow.buildStatus}, Verification=${workflow.verificationStatus}, " +
+                        "Bug=${workflow.bugState}; missing workflow=$missingCode."
+            }.onFailure { failure ->
+                setHumanWorkflowFailure(
+                    if (failure is HumanWorkflowFailure) {
+                        failure.code
+                    } else {
+                        failure.message?.takeIf(String::isNotBlank)
+                            ?: "UNEXPECTED_HUMAN_WORKFLOW_FAILURE"
+                    },
+                )
+            }
+        }
+    }
+
+    private fun setHumanWorkflowFailure(code: String) {
+        humanWorkflow.value = HumanWorkflowUiState(phase = "failed", errorCode = code)
+        lastAction.value = "Human workflow readback failed: $code."
+    }
+
     fun createBugAndCheckDuplicates() {
         viewModelScope.launch {
             val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
@@ -978,6 +1076,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     companion object {
         const val FOUNDATION_PROJECT_KEY = "LOCAL"
         private const val WORKBENCH_MVP_LIMIT = 20
+        private const val MISSING_WORKFLOW_PROJECT_ID =
+            "10000000-0000-4000-8000-000000000099"
         val FOUNDATION_SCOPE = AccountProjectScope(
             accountId = "10000000-0000-4000-8000-000000000020",
             projectId = "10000000-0000-4000-8000-000000000004",

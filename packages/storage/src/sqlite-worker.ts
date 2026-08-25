@@ -20,6 +20,7 @@ import type {
   ListMobileBugsInput,
   MobileBugList,
 } from "./mobile-bug-list-store.js";
+import type { MobileHumanWorkflowProjection } from "./mobile-human-workflow-store.js";
 import type {
   CreateMobileCaptureInput,
   MobileCaptureBundleRecord,
@@ -213,6 +214,18 @@ export class SqliteStorageWorker {
   async listMobileBugs(input: ListMobileBugsInput): Promise<MobileBugList> {
     await this.initialization;
     return this.request<MobileBugList>("listMobileBugs", input);
+  }
+
+  async getLatestMobileHumanWorkflow(input: {
+    readonly accountId: string;
+    readonly projectId: string;
+    readonly actorId: string;
+  }): Promise<MobileHumanWorkflowProjection | null> {
+    await this.initialization;
+    return this.request<MobileHumanWorkflowProjection | null>(
+      "getLatestMobileHumanWorkflow",
+      input,
+    );
   }
 
   async listMobileDuplicateCandidates(
