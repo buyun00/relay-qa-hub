@@ -9,16 +9,16 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P7
-  current_gate: G7-WORKBENCH-READY
+  current_phase: P4
+  current_gate: G4-HUMAN-CLOSED-LOOP
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 48a2bee
-  last_verified_at: 2026-08-25T15:42:46+08:00
-  next_action: P7.2 IN_PROGRESS（MVP execution override）；接一个 bounded Bug workbench 列表与 state filter 到 Android，保留一个非法 filter 失败；复杂组合、保存视图和完整分页后补
+  last_verified_commit: b3bab0a
+  last_verified_at: 2026-08-25T15:56:07+08:00
+  next_action: P4.1 IN_PROGRESS（MVP execution override）；Relay 完全离线时，由 Android 创建并回读一个 manual RepairAttempt；缺交付证据时明确拒绝进入 delivered
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P7.2 Android workbench 主链路
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P4.1 Relay-offline 人工闭环主链路
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -848,6 +848,8 @@ Gate `G3-ANDROID-APP-READY`：P3.0-P3.9 全绿；Android App 是可安装的原�
 
 要做：领取、分配、进度、交付证据、Commit/MR/外部链接、转交和 supersede。
 
+MuMu MVP execution override：先在 Relay 完全离线时由 Android 为真实 Bug 创建一个 `manual` RepairAttempt 并 GET 回读；再证明缺少交付证据不能标记 delivered。完整转交、supersede、external provider 与多角色矩阵留在收尾/正式 Gate。
+
 验证：Relay 停止时，人工和 external 流程完整可用；缺交付证据不可进入待验收。
 
 #### P4.2 Build 登记与 Commit 包含关系
@@ -965,6 +967,8 @@ MuMu MVP execution override：先对一个真实 Bug 返回同项目内 bounded 
 要做：待我处理/验收/补充、由我报告、模块、版本、负责人、严重度、状态、发生次数、保存视图。
 
 MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列表和单一 state filter，由 Android 原生工作台真实回读；保留一个非法 filter 明确失败。复杂组合、cursor 分页、保存视图及所有负责人/版本/模块维度留在收尾与正式 Gate。
+
+该 override slice 已由 MuMu/API35 实证通过并转入 `VERIFYING`：Android 回读五个 `reported` Bug、snapshot `18`，非法 state 返回 `400 INVALID_REQUEST`；唯一进度指针回到核心人工闭环 P4.1。
 
 验证：复杂组合筛选可重放、分页稳定、无重复/遗漏；Android App 与 API 查询结果一致。
 
