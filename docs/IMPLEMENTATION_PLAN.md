@@ -14,11 +14,11 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: b9c4c6b
-  last_verified_at: 2026-08-25T14:05:41+08:00
-  next_action: P6.1 IN_PROGRESS（MVP execution override）；只在 QA Hub 内实现人工/fake Build provider 的 exact deliveredCommitSha 绑定和 Android 回读；wrong SHA 明确失败，不触发 Unity Jenkins
+  last_verified_commit: 0f27085
+  last_verified_at: 2026-08-25T15:09:48+08:00
+  next_action: P6.2 IN_PROGRESS（MVP execution override）；先把 build.registered 通知事实持久化到 QA Hub Inbox 并由 Android 原生列表回读，重复投递不得重复；Push/真机后补
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G5 仍未正式关闭，但按 execution override 不阻塞 P6.1 QA-owned fake/manual Build 主链路
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G6 仍未正式关闭，但按 execution override 不阻塞 P6.2 QA-owned Inbox 主链路
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -932,11 +932,15 @@ Gate `G5-RELAY-INTEGRATED`：真实 QA Bug 一键创建 Relay Task，交付后�
 
 MuMu MVP execution override：先只在 QA Hub 自有 API/SQLite/fake/manual provider 中把一条成功 Build 精确绑定到 P5.4 的 `deliveredCommitSha`，并由 Android 原生页面回读；保留一个 wrong-SHA 失败。不得触发 Unity Jenkins、不得使用 Unity `/apk`，也不得把 fake/manual provider 冒充真实生产构建流水线。
 
+该 override slice 已由 MuMu/API35 实证通过并转入 `VERIFYING`；真实 OZDQP/Unity provider、构建失败恢复与生产 artifact provenance 留在收尾/正式 Gate，唯一进度指针进入 P6.2。
+
 验证：completed 只在 Job/项目/分支/完整 SHA/mode 均匹配时接受；失败后同 Job 恢复可继续推进。
 
 #### P6.2 Inbox、Android 通知和提醒
 
 要做：站内 Inbox、Android notification/push token 轮换、静默期、原生待办深链、超时升级；Push 失败不影响 Inbox 事实。
+
+MuMu MVP execution override：先消费已有 `build.registered` notification outbox，持久化一条 QA Hub Inbox 事实并由 Android 原生列表 GET 回读；重复消费不得生成第二条 Inbox。系统 Push、权限拒绝、静默期与真机通知不阻塞该首条主链。
 
 验证：服务/App 崩溃重启后通知不丢不重；过时提醒被取消；Android 15/16/17 真机通知；API 37 自定义通知视图大小限制和 MediaProjection 前台服务可见通知满足平台约束；拒绝通知权限时 App Inbox 可靠降级。
 
