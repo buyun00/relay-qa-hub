@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 290281e6f8d45741f484456bc7dfff5c7c1b3089
-  last_verified_at: 2026-08-26T03:19:46+08:00
-  next_action: P7.3 IN_PROGRESS；P7.4 普通浏览器管理与系统截图/Poco artifact 基线转 VERIFYING；下一步只接一条真实 facts -> API -> 浏览器统计切片，先显示新 Bug 与当前状态分布并保留一个非法时间范围 400，Web 功能稳定后才统一打 Windows 包
+  last_verified_commit: b21f9426732db749c351ca47bc5f30e50dda8d56
+  last_verified_at: 2026-08-26T03:53:29+08:00
+  next_action: P2.1 IN_PROGRESS；P7.3 新 Bug/当前状态分布真实浏览器切片转 VERIFYING；下一步接通独立 QA Hub 本地管理员 bootstrap/login 的真实 Web cookie session，只验证登录成功与撤销后 401，Windows 打包继续等 Web 功能稳定
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -762,6 +762,8 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 - 本地账户首发或 OIDC adapter；一次性管理员初始化；会话撤销、密码重置、限流。
 - 报告邀请 QR：短期、项目/Build/Test Cycle 限权，不赋予列表或管理权限。
 
+当前状态：`IN_PROGRESS`。现有 4174 开发代理注入的随机 debug Bearer 只用于隔离 smoke，不能当作产品登录。下一原子切片先复用 QA Hub 自有 identity/session 表，接通一次性本地管理员 bootstrap、普通浏览器登录、`HttpOnly; SameSite=Lax` session cookie、`GET /auth/me` 与显式 logout/revoke；只保留一条成功和一个撤销后 `401`，暂不扩 OIDC、邀请 QR、密码重置或爆破矩阵。状态变更仍必须经过同一 QA Hub API/DB，不引入 Relay/轻语身份。
+
 验证：
 
 - 未登录、过期、撤销、错误密码、爆破和会话固定攻击测试。
@@ -1015,7 +1017,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 要做：新 Bug、回归、重复率、交付到验收时长、重新打开率、版本分布；导出 CSV/Excel 只读快照。
 
-当前状态：`IN_PROGRESS`。P7.4 浏览器管理与 evidence/Poco artifact 基线已经转入 `VERIFYING`；首个原子切片只从现有 QA Hub SQLite 事实计算新 Bug 与当前状态分布，经真实 API 在普通浏览器显示，并用一个非法时间范围返回明确 `400`。回归率、重复率、交付到验收、重开率、版本分布和导出按真实数据逐段补，不用 mock 或 Windows 重打包替代事实验证。
+当前状态：`VERIFYING`。首个原子切片已在提交 `b21f9426732db749c351ca47bc5f30e50dda8d56` 通过：现有 QA Hub SQLite facts 经单例 worker/runtime API 在普通浏览器显示 `newBugCount=2`、当前总数 `2`、`reported=1`、`ready=1` 与 `snapshotSequence=5`；倒置 UTC 时间范围返回 `400 INVALID_REQUEST`，既有 Bug 列表、打开的详情与时间线仍可用。证据见 [`docs/evidence/P7.3-browser-bug-metrics.md`](evidence/P7.3-browser-bug-metrics.md)。回归率、重复率、交付到验收、重开率、版本分布、导出与正式 OpenAPI 冻结进入收尾，不继续扩大当前 slice；唯一 pointer 转 P2.1 浏览器真实登录，Windows 仍统一后置。
 
 验证：指标能从事实表重算；导出不能反向覆盖 QA Hub。
 
