@@ -267,6 +267,12 @@ export type {
   MobileBugList,
   MobileBugListState,
 } from "./mobile-bug-list-store.js";
+export { MOBILE_METRICS_STATES, getMobileMetricsOverview } from "./mobile-metrics-store.js";
+export type {
+  GetMobileMetricsOverviewInput,
+  MobileMetricsOverview,
+  MobileMetricsState,
+} from "./mobile-metrics-store.js";
 export {
   listMobileProjectMembers,
   listMobileProjectModules,

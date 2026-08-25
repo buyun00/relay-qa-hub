@@ -45,6 +45,7 @@ import {
   type VerificationRecord,
 } from "./api";
 import { EvidencePanel } from "./EvidencePanel";
+import { MetricsPanel } from "./MetricsPanel";
 import { product } from "./product";
 
 const DEFAULT_PROJECT_ID =
@@ -1180,6 +1181,8 @@ export default function App() {
         <p>Relay 只可标记修复交付、待构建或待验收，不能验收或关闭 QA Bug。</p>
       </section>
 
+      <MetricsPanel projectId={activeProjectId} />
+
       <section aria-labelledby="bug-list-title" className="workspace-card">
         <div className="section-heading">
           <div>
@@ -1348,7 +1351,7 @@ export default function App() {
 
         <div aria-label="后续管理台切片" className="next-slices">
           <span>已完成：核心闭环、组合筛选、显式人工去重</span>
-          <span>当前段：浏览器选择一致性；Windows 桌面打包统一后置</span>
+          <span>当前段：真实统计概览；Windows 桌面打包统一后置</span>
         </div>
       </section>
 

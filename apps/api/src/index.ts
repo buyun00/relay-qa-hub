@@ -170,6 +170,17 @@ export type {
 } from "./mobile-project-directory.js";
 
 export {
+  MOBILE_METRICS_OVERVIEW_PATH,
+  MOBILE_PROJECT_METRICS_OVERVIEW_PATH,
+  parseMobileMetricsOverviewQuery,
+} from "./mobile-metrics.js";
+export type {
+  MobileMetricsOverview,
+  MobileMetricsOverviewQuery,
+  MobileMetricsStore,
+} from "./mobile-metrics.js";
+
+export {
   MOBILE_NOTIFICATION_HINT_PATH,
   MOBILE_NOTIFICATION_HINT_PROTOCOL,
   startMobileNotificationHintChannel,

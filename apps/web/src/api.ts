@@ -84,6 +84,20 @@ export interface BugListResponse {
   readonly nextCursor: null;
 }
 
+export interface ProjectMetricsOverview {
+  readonly projectId: string;
+  readonly window: {
+    readonly from: string;
+    readonly to: string;
+  };
+  readonly snapshotSequence: number;
+  readonly newBugCount: number;
+  readonly currentStateCounts: readonly {
+    readonly state: BugListState;
+    readonly count: number;
+  }[];
+}
+
 export interface BugDetail extends BugListItem {
   readonly projectId: string;
   readonly number: number;
@@ -388,6 +402,63 @@ function isBugListResponse(value: unknown): value is BugListResponse {
   return Number.isSafeInteger(response.snapshotSequence) && Array.isArray(response.items);
 }
 
+const BUG_LIST_STATES = new Set<BugListState>([
+  "reported",
+  "needs_info",
+  "ready",
+  "in_progress",
+  "awaiting_build",
+  "ready_for_verification",
+  "closed",
+  "deferred",
+  "rejected",
+  "duplicate",
+]);
+
+function isProjectMetricsOverview(
+  value: unknown,
+  projectId: string,
+  from: string,
+  to: string,
+): value is ProjectMetricsOverview {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const overview = value as Record<string, unknown>;
+  const windowValue = overview["window"];
+  if (typeof windowValue !== "object" || windowValue === null || Array.isArray(windowValue)) {
+    return false;
+  }
+  const windowRecord = windowValue as Record<string, unknown>;
+  if (
+    overview["projectId"] !== projectId ||
+    windowRecord["from"] !== from ||
+    windowRecord["to"] !== to ||
+    !Number.isSafeInteger(overview["snapshotSequence"]) ||
+    (overview["snapshotSequence"] as number) < 0 ||
+    !Number.isSafeInteger(overview["newBugCount"]) ||
+    (overview["newBugCount"] as number) < 0 ||
+    !Array.isArray(overview["currentStateCounts"]) ||
+    overview["currentStateCounts"].length !== BUG_LIST_STATES.size
+  ) {
+    return false;
+  }
+  const seenStates = new Set<BugListState>();
+  for (const item of overview["currentStateCounts"]) {
+    if (typeof item !== "object" || item === null || Array.isArray(item)) return false;
+    const row = item as Record<string, unknown>;
+    if (
+      typeof row["state"] !== "string" ||
+      !BUG_LIST_STATES.has(row["state"] as BugListState) ||
+      seenStates.has(row["state"] as BugListState) ||
+      !Number.isSafeInteger(row["count"]) ||
+      (row["count"] as number) < 0
+    ) {
+      return false;
+    }
+    seenStates.add(row["state"] as BugListState);
+  }
+  return seenStates.size === BUG_LIST_STATES.size;
+}
+
 function isVisibleProjectList(value: unknown): value is VisibleProjectList {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const response = value as { readonly snapshotSequence?: unknown; readonly items?: unknown };
@@ -552,6 +623,21 @@ export async function listBugs(
     ...(signal === undefined ? {} : { signal }),
   });
   if (!isBugListResponse(body)) throw new QaHubApiError(200, "INVALID_RESPONSE");
+  return body;
+}
+
+export async function getProjectMetricsOverview(
+  projectId: string,
+  from: string,
+  to: string,
+): Promise<ProjectMetricsOverview> {
+  const query = new URLSearchParams({ from, to });
+  const body = await requestJson(
+    `/api/v1/projects/${encodeURIComponent(projectId)}/metrics/overview?${query.toString()}`,
+  );
+  if (!isProjectMetricsOverview(body, projectId, from, to)) {
+    throw new QaHubApiError(200, "INVALID_METRICS_RESPONSE");
+  }
   return body;
 }
 

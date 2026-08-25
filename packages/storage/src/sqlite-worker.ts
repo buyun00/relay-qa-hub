@@ -24,6 +24,10 @@ import type {
 } from "./mobile-bug-store.js";
 import type { ListMobileBugsInput, MobileBugList } from "./mobile-bug-list-store.js";
 import type {
+  GetMobileMetricsOverviewInput,
+  MobileMetricsOverview,
+} from "./mobile-metrics-store.js";
+import type {
   ListMobileProjectMembersInput,
   ListMobileProjectModulesInput,
   ListMobileVisibleProjectsInput,
@@ -255,6 +259,13 @@ export class SqliteStorageWorker {
   async listMobileBugs(input: ListMobileBugsInput): Promise<MobileBugList> {
     await this.initialization;
     return this.request<MobileBugList>("listMobileBugs", input);
+  }
+
+  async getMobileMetricsOverview(
+    input: GetMobileMetricsOverviewInput,
+  ): Promise<MobileMetricsOverview> {
+    await this.initialization;
+    return this.request<MobileMetricsOverview>("getMobileMetricsOverview", input);
   }
 
   async listMobileVisibleProjects(

@@ -27,6 +27,10 @@ import {
 } from "./mobile-bug-store.js";
 import { listMobileBugs, type ListMobileBugsInput } from "./mobile-bug-list-store.js";
 import {
+  getMobileMetricsOverview,
+  type GetMobileMetricsOverviewInput,
+} from "./mobile-metrics-store.js";
+import {
   listMobileProjectMembers,
   listMobileProjectModules,
   listMobileVisibleProjects,
@@ -129,6 +133,7 @@ interface WorkerRequest {
     | "createMobileBug"
     | "getMobileBug"
     | "listMobileBugs"
+    | "getMobileMetricsOverview"
     | "listMobileVisibleProjects"
     | "listMobileProjectMembers"
     | "listMobileProjectModules"
@@ -295,6 +300,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 
   if (request.operation === "listMobileBugs") {
     return listMobileBugs(requireDatabase(), request.payload as ListMobileBugsInput);
+  }
+
+  if (request.operation === "getMobileMetricsOverview") {
+    return getMobileMetricsOverview(
+      requireDatabase(),
+      request.payload as GetMobileMetricsOverviewInput,
+    );
   }
 
   if (request.operation === "listMobileVisibleProjects") {

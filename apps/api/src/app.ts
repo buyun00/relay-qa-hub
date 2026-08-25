@@ -100,6 +100,11 @@ import {
   requireMobileProjectUuid,
   type MobileProjectDirectoryStore,
 } from "./mobile-project-directory.js";
+import {
+  MOBILE_METRICS_OVERVIEW_PATH,
+  parseMobileMetricsOverviewQuery,
+  type MobileMetricsStore,
+} from "./mobile-metrics.js";
 import { startMobileNotificationHintChannel } from "./mobile-notification-hints.js";
 import {
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
@@ -155,6 +160,7 @@ export interface CreateApiAppOptions {
   readonly mobileCommentStore?: MobileCommentStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
   readonly mobileProjectDirectoryStore?: MobileProjectDirectoryStore;
+  readonly mobileMetricsStore?: MobileMetricsStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
   readonly debugBearerToken?: string;
@@ -307,6 +313,12 @@ const unconfiguredMobileProjectDirectoryStore: MobileProjectDirectoryStore = {
   },
 };
 
+const unconfiguredMobileMetricsStore: MobileMetricsStore = {
+  getOverview: () => {
+    throw new Error("MobileMetricsStore is not configured");
+  },
+};
+
 const unconfiguredMobileRelayWebhookStore: MobileRelayWebhookStore = {
   receiveRelayWebhook: () => {
     throw new Error("MobileRelayWebhookStore is not configured");
@@ -351,6 +363,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     options.mobileNotificationStore ?? unconfiguredMobileNotificationStore;
   const mobileProjectDirectoryStore =
     options.mobileProjectDirectoryStore ?? unconfiguredMobileProjectDirectoryStore;
+  const mobileMetricsStore = options.mobileMetricsStore ?? unconfiguredMobileMetricsStore;
   const mobileRelayWebhookStore =
     options.mobileRelayWebhookStore ?? unconfiguredMobileRelayWebhookStore;
   const relayWebhookSecret = options.relayWebhookSecret ?? "";
@@ -497,6 +510,42 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
     },
   );
+
+  app.get<{
+    Params: { projectId: string };
+    Querystring: {
+      readonly from?: string | readonly string[];
+      readonly to?: string | readonly string[];
+      readonly [key: string]: string | readonly string[] | undefined;
+    };
+  }>(MOBILE_METRICS_OVERVIEW_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
+      const query = parseMobileMetricsOverviewQuery(request.query);
+      const result = await mobileMetricsStore.getOverview({
+        actorId: debugActorId,
+        projectId,
+        from: query.from,
+        to: query.to,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "FORBIDDEN") {
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
 
   app.post(
     MOBILE_RELAY_WEBHOOK_PATH,
