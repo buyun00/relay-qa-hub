@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 0478ea64416d6e82ab82e98b705a7f2630acdf44
-  last_verified_at: 2026-08-26T00:55:56+08:00
-  next_action: P3.4 IN_PROGRESS；普通 Edge Web 稳定基线与 latest-Web Windows package/runtime 已通过；当前只接一条 MuMu 离线草稿 -> 重连 -> 单一 attachment/Bug/final receipt
+  last_verified_commit: 2265c42e1f131bef07cbfefc712dcc6a99704201
+  last_verified_at: 2026-08-26T01:35:29+08:00
+  next_action: P3.6 IN_PROGRESS；P3.4 已用真实 MuMu 证明 app-private PNG -> Room/WorkManager retry -> 同幂等身份 attachment/Bug/final receipt；当前把真实 SAVE_PENDING capture 草稿接入该队列
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -825,6 +825,8 @@ Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 验证：飞行模式、Wi-Fi/蜂窝切换、进程/App 被杀、服务重启、登录过期、重复点击和响应丢失最终只产生一个 attachment/QA item；20 MiB 图片和短录屏续传成功，不产生孤儿。
 
 当前状态：`IN_PROGRESS`。Room v4 final reservation/claim receipt 已通过；当前只做一条 MuMu/API35 最小真实链：断开 4319 后带附件草稿进入 queued/retry，恢复后沿同一 `clientSubmissionId` 完成单一 attachment/Bug 并显示最终 QA item ID。只补阻断该链的 adapter；process-kill、20 MiB、auth expiry 和多网络矩阵进入正式 G3 收尾。
+
+MuMu MVP slice 已于 `2026-08-26T01:35:29+08:00` 完成：一份 PNG 在 4319/reverse 均不可达时显示 `1 queued` / `RETRY • ATTACHMENT_NETWORK_IO`；恢复后 WorkManager 沿同一 submission/attachment 身份完成 `init 201 -> chunk 204 -> finalize 200 -> bind 200 -> Bug 201`，SQLite 只有一份 attachment/Bug/binding 且 App 进程重启后回读同一 QA item ID。实现 commit 为 `2265c42e1f131bef07cbfefc712dcc6a99704201`，证据见 [`docs/evidence/P3.4-mumu-offline-attachment-recovery.md`](evidence/P3.4-mumu-offline-attachment-recovery.md)。P3.4 仍为 `IN_PROGRESS`：逐阶段 upload ack、>8 MiB 多块、auth resume 与 commit-后本地 cleanup 崩溃窗口属正式 G3 收尾。
 
 #### P3.5 历史原生管理切片（已冻结）
 
