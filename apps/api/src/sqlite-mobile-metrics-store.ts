@@ -12,15 +12,6 @@ export interface SqliteMobileMetricsStoreOptions {
   readonly scope: MobileScopeBootstrap;
 }
 
-function requireScope(query: MobileMetricsOverviewQuery, scope: MobileScopeBootstrap): void {
-  if (query.actorId !== scope.actorId) {
-    throw new TypeError("actor does not match the authenticated mobile scope");
-  }
-  if (query.projectId !== scope.projectId) {
-    throw new TypeError("projectId does not match the authenticated mobile scope");
-  }
-}
-
 export function createSqliteMobileMetricsStore(
   options: SqliteMobileMetricsStoreOptions,
 ): MobileMetricsStore {
@@ -32,9 +23,10 @@ export function createSqliteMobileMetricsStore(
 
   return {
     async getOverview(query): Promise<MobileMetricsOverview> {
-      requireScope(query, options.scope);
       const input: GetMobileMetricsOverviewInput = {
-        ...scope,
+        accountId: scope.accountId,
+        actorId: query.actorId,
+        projectId: query.projectId,
         from: query.from,
         to: query.to,
       };

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
 
-import Fastify, { type FastifyInstance, type FastifyReply } from "fastify";
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 
 import { API_SERVICE_NAME, API_VERSION, DEVELOPMENT_BUILD_SHA, resolveBuildSha } from "./config.js";
 import {
@@ -112,6 +112,7 @@ import {
   BROWSER_LOGOUT_PATH,
   BROWSER_ME_PATH,
   type BrowserAuthOptions,
+  getBrowserPrincipal,
   registerBrowserAuthRoutes,
 } from "./browser-auth.js";
 import {
@@ -143,6 +144,27 @@ import {
 } from "./mobile-relay-webhook.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
+
+const P2_2_BROWSER_MEMBERSHIP_READ_PATHS = new Set<string>([
+  MOBILE_PROJECT_COLLECTION_PATH,
+  MOBILE_PROJECT_MEMBERS_PATH,
+  MOBILE_PROJECT_MODULES_PATH,
+  MOBILE_METRICS_OVERVIEW_PATH,
+  MOBILE_BUG_COLLECTION_PATH,
+]);
+
+function isP2_2BrowserMembershipRead(request: FastifyRequest): boolean {
+  const routeUrl = request.routeOptions.url;
+  return (
+    request.method === "GET" &&
+    routeUrl !== undefined &&
+    P2_2_BROWSER_MEMBERSHIP_READ_PATHS.has(routeUrl)
+  );
+}
+
+function authenticatedActorId(request: FastifyRequest, debugActorId: string): string {
+  return getBrowserPrincipal(request)?.actorId ?? debugActorId;
+}
 
 export interface LiveHealth {
   readonly status: "ok";
@@ -400,11 +422,17 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         // answered by authenticateBrowserRequest when present.
         return;
       }
-      if (principal.accountId !== browserAuth.accountId || principal.actorId !== debugActorId) {
+      if (principal.accountId !== browserAuth.accountId) {
         return reply
           .code(401)
           .header("content-type", MOBILE_API_CONTENT_TYPE)
           .send({ code: "UNAUTHENTICATED" });
+      }
+      if (principal.actorId !== debugActorId && !isP2_2BrowserMembershipRead(request)) {
+        return reply
+          .code(403)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "FORBIDDEN" });
       }
       request.headers.authorization = `Bearer ${debugBearerToken}`;
     });
@@ -462,7 +490,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     try {
       const query = parseMobileProjectDirectoryListQuery(request.query);
       const result = await mobileProjectDirectoryStore.listProjects({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         limit: query.limit,
       });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
@@ -495,7 +523,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
       const query = parseMobileProjectDirectoryListQuery(request.query);
       const result = await mobileProjectDirectoryStore.listMembers({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         projectId,
         limit: query.limit,
       });
@@ -527,7 +555,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       try {
         const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
         const result = await mobileProjectDirectoryStore.listModules({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           projectId,
         });
         return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
@@ -565,7 +593,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
       const query = parseMobileMetricsOverviewQuery(request.query);
       const result = await mobileMetricsStore.getOverview({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         projectId,
         from: query.from,
         to: query.to,
@@ -714,7 +742,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     try {
       const query = parseMobileBugListQuery(request.query);
       const result = await mobileBugStore.listBugs({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         ...query,
       });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);

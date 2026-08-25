@@ -100,16 +100,10 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
     },
 
     async listBugs(query: MobileBugListQuery): Promise<MobileBugListResponse> {
-      if (query.actorId !== options.scope.actorId) {
-        throw new TypeError("actor does not match the authenticated mobile scope");
-      }
-      if (query.projectId !== undefined && query.projectId !== options.scope.projectId) {
-        throw new TypeError("projectId does not match the authenticated mobile scope");
-      }
       return options.worker.listMobileBugs({
         accountId: options.scope.accountId,
-        projectId: options.scope.projectId,
-        actorId: options.scope.actorId,
+        projectId: query.projectId ?? options.scope.projectId,
+        actorId: query.actorId,
         ...(query.q === undefined ? {} : { q: query.q }),
         ...(query.state === undefined ? {} : { state: query.state }),
         ...(query.severity === undefined ? {} : { severity: query.severity }),

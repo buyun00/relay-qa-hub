@@ -10,37 +10,28 @@ export interface SqliteMobileProjectDirectoryStoreOptions {
 export function createSqliteMobileProjectDirectoryStore(
   options: SqliteMobileProjectDirectoryStoreOptions,
 ): MobileProjectDirectoryStore {
-  function requireActor(actorId: string): void {
-    if (actorId !== options.scope.actorId) {
-      throw new TypeError("actor does not match the authenticated project directory scope");
-    }
-  }
-
   return {
     async listProjects(query) {
-      requireActor(query.actorId);
       return options.worker.listMobileVisibleProjects({
         accountId: options.scope.accountId,
-        actorId: options.scope.actorId,
+        actorId: query.actorId,
         limit: query.limit,
       });
     },
 
     async listMembers(query) {
-      requireActor(query.actorId);
       return options.worker.listMobileProjectMembers({
         accountId: options.scope.accountId,
-        actorId: options.scope.actorId,
+        actorId: query.actorId,
         projectId: query.projectId,
         limit: query.limit,
       });
     },
 
     async listModules(query) {
-      requireActor(query.actorId);
       return options.worker.listMobileProjectModules({
         accountId: options.scope.accountId,
-        actorId: options.scope.actorId,
+        actorId: query.actorId,
         projectId: query.projectId,
       });
     },
