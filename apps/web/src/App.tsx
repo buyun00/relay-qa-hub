@@ -107,7 +107,8 @@ function mutationErrorMessage(error: { readonly status: number; readonly code: s
 }
 
 export default function App() {
-  const [projectId, setProjectId] = useState(DEFAULT_PROJECT_ID);
+  const [projectDraftId, setProjectDraftId] = useState(DEFAULT_PROJECT_ID);
+  const [activeProjectId, setActiveProjectId] = useState(DEFAULT_PROJECT_ID);
   const [bugQuery, setBugQuery] = useState("");
   const [bugStateFilter, setBugStateFilter] = useState<BugListState | "">("");
   const [bugSeverityFilter, setBugSeverityFilter] = useState<BugSeverity | "">("");
@@ -203,8 +204,10 @@ export default function App() {
   const listRequestSequence = useRef(0);
   const settingsRequestSequence = useRef(0);
   const duplicateRequestSequence = useRef(0);
+  const detailRequestSequence = useRef(0);
+  const selectedBugIdRef = useRef<string | null>(null);
 
-  const loadProjectSettings = useCallback(async (nextProjectId: string): Promise<void> => {
+  const loadProjectSettings = useCallback(async (nextProjectId: string): Promise<boolean> => {
     const requestSequence = settingsRequestSequence.current + 1;
     settingsRequestSequence.current = requestSequence;
     const normalizedProjectId = nextProjectId.trim();
@@ -216,7 +219,7 @@ export default function App() {
         listProjectMembers(normalizedProjectId),
         listProjectModules(normalizedProjectId),
       ]);
-      if (settingsRequestSequence.current !== requestSequence) return;
+      if (settingsRequestSequence.current !== requestSequence) return false;
       if (!projects.items.some((project) => project.id === normalizedProjectId)) {
         throw new QaHubApiError(403, "PROJECT_NOT_VISIBLE");
       }
@@ -225,33 +228,35 @@ export default function App() {
       setProjectModules(modules.items);
       setSettingsSnapshotSequence(Math.max(projects.snapshotSequence, members.snapshotSequence));
       setSettingsState("success");
+      return true;
     } catch (cause: unknown) {
-      if (settingsRequestSequence.current !== requestSequence) return;
+      if (settingsRequestSequence.current !== requestSequence) return false;
       setVisibleProjects([]);
       setProjectMembers([]);
       setProjectModules([]);
       setSettingsSnapshotSequence(null);
       setSettingsState("error");
       setSettingsError(mutationError(cause));
+      return false;
     }
   }, []);
 
   const loadBugList = useCallback(
-    async (nextProjectId: string, filters: BugListFilters = {}): Promise<void> => {
+    async (nextProjectId: string, filters: BugListFilters = {}): Promise<boolean> => {
       const requestSequence = listRequestSequence.current + 1;
       listRequestSequence.current = requestSequence;
       const normalizedProjectId = nextProjectId.trim();
-      setProjectId(normalizedProjectId);
       setRequestState("loading");
       setError(null);
       try {
         const response = await listBugs(normalizedProjectId, filters);
-        if (listRequestSequence.current !== requestSequence) return;
+        if (listRequestSequence.current !== requestSequence) return false;
         setBugs(response.items);
         setSnapshotSequence(response.snapshotSequence);
         setRequestState("success");
+        return true;
       } catch (cause: unknown) {
-        if (listRequestSequence.current !== requestSequence) return;
+        if (listRequestSequence.current !== requestSequence) return false;
         setBugs([]);
         setSnapshotSequence(null);
         setRequestState("error");
@@ -260,22 +265,23 @@ export default function App() {
         } else {
           setError({ status: 0, code: "NETWORK_ERROR" });
         }
+        return false;
       }
     },
     [],
   );
 
   const refreshVisibleBugList = useCallback(async (): Promise<void> => {
-    await loadBugList(projectId, {
+    await loadBugList(activeProjectId, {
       ...(bugQuery.trim().length === 0 ? {} : { q: bugQuery.trim() }),
       ...(bugStateFilter === "" ? {} : { state: bugStateFilter }),
       ...(bugSeverityFilter === "" ? {} : { severity: bugSeverityFilter }),
     });
-  }, [bugQuery, bugSeverityFilter, bugStateFilter, loadBugList, projectId]);
+  }, [activeProjectId, bugQuery, bugSeverityFilter, bugStateFilter, loadBugList]);
 
   const applyProjectView = useCallback(async (): Promise<void> => {
-    const normalizedProjectId = projectId.trim().toLowerCase();
-    await Promise.all([
+    const normalizedProjectId = projectDraftId.trim().toLowerCase();
+    const [listLoaded, settingsLoaded] = await Promise.all([
       loadBugList(normalizedProjectId, {
         ...(bugQuery.trim().length === 0 ? {} : { q: bugQuery.trim() }),
         ...(bugStateFilter === "" ? {} : { state: bugStateFilter }),
@@ -283,7 +289,26 @@ export default function App() {
       }),
       loadProjectSettings(normalizedProjectId),
     ]);
-  }, [bugQuery, bugSeverityFilter, bugStateFilter, loadBugList, loadProjectSettings, projectId]);
+    if (!listLoaded || !settingsLoaded) return;
+    if (normalizedProjectId !== activeProjectId) {
+      detailRequestSequence.current += 1;
+      selectedBugIdRef.current = null;
+      setSelectedBugId(null);
+      setSelectedBug(null);
+      setTimeline([]);
+      setDetailState("idle");
+      setDetailError(null);
+    }
+    setActiveProjectId(normalizedProjectId);
+  }, [
+    activeProjectId,
+    bugQuery,
+    bugSeverityFilter,
+    bugStateFilter,
+    loadBugList,
+    loadProjectSettings,
+    projectDraftId,
+  ]);
 
   const loadBugDetails = useCallback(
     async (
@@ -292,6 +317,9 @@ export default function App() {
       preserveRelay = false,
       preserveHuman = false,
     ): Promise<{ readonly bug: BugDetail; readonly events: readonly BugEvent[] } | null> => {
+      const requestSequence = detailRequestSequence.current + 1;
+      detailRequestSequence.current = requestSequence;
+      selectedBugIdRef.current = bugId;
       setSelectedBugId(bugId);
       setSelectedBug(null);
       setTimeline([]);
@@ -308,6 +336,10 @@ export default function App() {
       setDuplicateMessage(null);
       setModuleAssignmentState("idle");
       setModuleAssignmentError(null);
+      setAssignmentState("idle");
+      setAssignmentError(null);
+      setTransitionState("idle");
+      setTransitionError(null);
       if (!preserveComment) {
         setCommentId(null);
         setCommentState("idle");
@@ -342,6 +374,12 @@ export default function App() {
           listBugEvents(bugId),
           getHumanWorkflow(bugId),
         ]);
+        if (
+          detailRequestSequence.current !== requestSequence ||
+          selectedBugIdRef.current !== bugId
+        ) {
+          return null;
+        }
         setSelectedBug(bug);
         setOwnerSelection(bug.ownerId ?? "");
         setModuleSelection(bug.moduleId ?? "");
@@ -362,6 +400,12 @@ export default function App() {
         setDetailState("success");
         return { bug, events: events.items };
       } catch (cause: unknown) {
+        if (
+          detailRequestSequence.current !== requestSequence ||
+          selectedBugIdRef.current !== bugId
+        ) {
+          return null;
+        }
         setDetailState("error");
         if (cause instanceof QaHubApiError) {
           setDetailError({ status: cause.status, code: cause.code });
@@ -950,9 +994,9 @@ export default function App() {
           <div className="project-form__controls">
             <input
               id="project-id"
-              onChange={(event) => setProjectId(event.target.value)}
+              onChange={(event) => setProjectDraftId(event.target.value)}
               spellCheck={false}
-              value={projectId}
+              value={projectDraftId}
             />
             <button
               className="primary-button"
@@ -1018,7 +1062,7 @@ export default function App() {
                 setBugQuery("");
                 setBugStateFilter("");
                 setBugSeverityFilter("");
-                void loadBugList(projectId);
+                void loadBugList(activeProjectId);
               }}
               type="button"
             >
@@ -1032,6 +1076,9 @@ export default function App() {
               验证无效项目错误
             </button>
           </div>
+          <p className="api-footnote" id="active-project-id">
+            已应用项目：{activeProjectId}
+          </p>
         </form>
 
         {requestState === "success" &&
@@ -1089,7 +1136,7 @@ export default function App() {
 
         <div aria-label="后续管理台切片" className="next-slices">
           <span>已完成：核心闭环、组合筛选、显式人工去重</span>
-          <span>当前段：项目目录与模块归类；Windows 桌面打包统一后置</span>
+          <span>当前段：浏览器选择一致性；Windows 桌面打包统一后置</span>
         </div>
       </section>
 
@@ -1113,7 +1160,7 @@ export default function App() {
             className="secondary-button"
             disabled={settingsState === "loading"}
             id="project-settings-refresh"
-            onClick={() => void loadProjectSettings(projectId)}
+            onClick={() => void loadProjectSettings(activeProjectId)}
             type="button"
           >
             刷新当前项目配置
@@ -1145,7 +1192,7 @@ export default function App() {
                       {project.key} · {project.name}
                     </strong>
                     <small>{project.roles.join(" · ")}</small>
-                    <span>{project.id === projectId ? "当前项目" : "可见项目"}</span>
+                    <span>{project.id === activeProjectId ? "当前项目" : "可见项目"}</span>
                   </div>
                 ))}
               </article>
