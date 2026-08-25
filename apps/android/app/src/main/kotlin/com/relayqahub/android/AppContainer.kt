@@ -7,6 +7,7 @@ import com.relayqahub.android.data.QaHubDatabase
 import com.relayqahub.android.data.ScopedRepository
 import com.relayqahub.android.network.AttachmentUploadClient
 import com.relayqahub.android.network.BuildProjectionClient
+import com.relayqahub.android.network.BugWorkbenchClient
 import com.relayqahub.android.network.DuplicateCandidateClient
 import com.relayqahub.android.network.InboxClient
 import com.relayqahub.android.network.OkHttpQaHubApiClient
@@ -26,6 +27,7 @@ class AppContainer private constructor(
     val attachmentUploadClient: AttachmentUploadClient,
     val relayHandoffClient: RelayHandoffClient,
     val buildProjectionClient: BuildProjectionClient,
+    val bugWorkbenchClient: BugWorkbenchClient,
     val duplicateCandidateClient: DuplicateCandidateClient,
     val inboxClient: InboxClient,
     val credentialVault: CredentialVault,
@@ -75,6 +77,11 @@ class AppContainer private constructor(
                 httpClient = httpClient,
                 allowLoopbackHttp = BuildConfig.DEBUG,
             )
+            val bugWorkbenchClient = BugWorkbenchClient(
+                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                httpClient = httpClient,
+                allowLoopbackHttp = BuildConfig.DEBUG,
+            )
             val duplicateCandidateClient = DuplicateCandidateClient(
                 baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
                 httpClient = httpClient,
@@ -98,6 +105,7 @@ class AppContainer private constructor(
                 attachmentUploadClient = attachmentUploadClient,
                 relayHandoffClient = relayHandoffClient,
                 buildProjectionClient = buildProjectionClient,
+                bugWorkbenchClient = bugWorkbenchClient,
                 duplicateCandidateClient = duplicateCandidateClient,
                 inboxClient = inboxClient,
                 credentialVault = credentialVault,

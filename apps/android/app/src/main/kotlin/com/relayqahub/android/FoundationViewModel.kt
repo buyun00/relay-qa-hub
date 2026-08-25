@@ -18,6 +18,7 @@ import com.relayqahub.android.network.CaptureBundlePocoInput
 import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.network.BuildProjectionFailure
 import com.relayqahub.android.network.BuildProjectionResult
+import com.relayqahub.android.network.BugWorkbenchFailure
 import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
 import com.relayqahub.android.network.RelayHandoffFailure
@@ -49,6 +50,7 @@ data class FoundationUiState(
     val relayHandoff: RelayHandoffResult? = null,
     val buildProjection: BuildProjectionUiState = BuildProjectionUiState(),
     val inbox: InboxUiState = InboxUiState(),
+    val bugWorkbench: BugWorkbenchUiState = BugWorkbenchUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
 )
 
@@ -78,6 +80,16 @@ data class DuplicateCandidateUiState(
     val errorCode: String? = null,
 )
 
+data class BugWorkbenchUiState(
+    val phase: String = "idle",
+    val snapshotSequence: Long = 0,
+    val itemCount: Int = 0,
+    val stateFilter: String = "reported",
+    val firstBugKey: String? = null,
+    val firstTitle: String? = null,
+    val errorCode: String? = null,
+)
+
 private data class ScopeUiValues(
     val accountName: String,
     val projectName: String,
@@ -88,6 +100,7 @@ private data class ScopeUiValues(
 private data class DeliveryUiValues(
     val buildProjection: BuildProjectionUiState,
     val inbox: InboxUiState,
+    val bugWorkbench: BugWorkbenchUiState,
 )
 
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
@@ -97,6 +110,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val latestRelayHandoff = MutableStateFlow<RelayHandoffResult?>(null)
     private val buildProjection = MutableStateFlow(BuildProjectionUiState())
     private val inbox = MutableStateFlow(InboxUiState())
+    private val bugWorkbench = MutableStateFlow(BugWorkbenchUiState())
     private val duplicateCandidates = MutableStateFlow(DuplicateCandidateUiState())
 
     private val scopeState = combine(
@@ -113,8 +127,16 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
-    private val deliveryState = combine(buildProjection, inbox) { projection, inboxState ->
-        DeliveryUiValues(buildProjection = projection, inbox = inboxState)
+    private val deliveryState = combine(
+        buildProjection,
+        inbox,
+        bugWorkbench,
+    ) { projection, inboxState, workbenchState ->
+        DeliveryUiValues(
+            buildProjection = projection,
+            inbox = inboxState,
+            bugWorkbench = workbenchState,
+        )
     }
 
     val uiState = combine(
@@ -139,6 +161,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             relayHandoff = handoff,
             buildProjection = delivery.buildProjection,
             inbox = delivery.inbox,
+            bugWorkbench = delivery.bugWorkbench,
             duplicateCandidates = duplicateState,
         )
     }.stateIn(
@@ -363,6 +386,53 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private fun setInboxFailure(code: String) {
         inbox.value = InboxUiState(phase = "failed", errorCode = code)
         lastAction.value = "QA Inbox read failed: $code."
+    }
+
+    fun refreshBugWorkbench() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setBugWorkbenchFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            bugWorkbench.value = BugWorkbenchUiState(phase = "loading")
+            lastAction.value = "Reading reported Bugs from the QA Hub workbench…"
+            runCatching {
+                appContainer.bugWorkbenchClient.listBugs(
+                    projectId = scope.projectId,
+                    state = "reported",
+                    limit = WORKBENCH_MVP_LIMIT,
+                    accessToken = accessToken,
+                )
+            }.onSuccess { result ->
+                val first = result.items.firstOrNull()
+                bugWorkbench.value = BugWorkbenchUiState(
+                    phase = "loaded",
+                    snapshotSequence = result.snapshotSequence,
+                    itemCount = result.items.size,
+                    firstBugKey = first?.key,
+                    firstTitle = first?.title,
+                )
+                lastAction.value =
+                    "QA workbench read back ${result.items.size} reported Bug(s)."
+            }.onFailure { failure ->
+                setBugWorkbenchFailure(
+                    if (failure is BugWorkbenchFailure) {
+                        failure.code
+                    } else {
+                        "UNEXPECTED_WORKBENCH_FAILURE"
+                    },
+                )
+            }
+        }
+    }
+
+    private fun setBugWorkbenchFailure(code: String) {
+        bugWorkbench.value = BugWorkbenchUiState(
+            phase = "failed",
+            errorCode = code,
+        )
+        lastAction.value = "QA workbench read failed: $code."
     }
 
     fun createBugAndCheckDuplicates() {
@@ -652,6 +722,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     companion object {
         const val FOUNDATION_PROJECT_KEY = "LOCAL"
+        private const val WORKBENCH_MVP_LIMIT = 20
         val FOUNDATION_SCOPE = AccountProjectScope(
             accountId = "10000000-0000-4000-8000-000000000020",
             projectId = "10000000-0000-4000-8000-000000000004",

@@ -30,6 +30,7 @@ import {
   MOBILE_BUG_ITEM_PATH,
   type MobileBugStore,
   parseMobileCreateBugRequest,
+  parseMobileBugListQuery,
 } from "./mobile-bugs.js";
 import {
   MOBILE_CAPTURE_COLLECTION_PATH,
@@ -122,6 +123,9 @@ const liveHealthResponseSchema = {
 
 const unconfiguredMobileBugStore: MobileBugStore = {
   createBug: () => {
+    throw new Error("MobileBugStore is not configured");
+  },
+  listBugs: () => {
     throw new Error("MobileBugStore is not configured");
   },
   getBug: () => null,
@@ -362,6 +366,41 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         .code(400)
         .header("content-type", MOBILE_API_CONTENT_TYPE)
         .send({ code: "INVALID_REQUEST" });
+    }
+  });
+
+  app.get<{
+    Querystring: {
+      readonly projectId?: string | readonly string[];
+      readonly state?: string | readonly string[];
+      readonly limit?: string | readonly string[];
+    };
+  }>(MOBILE_BUG_COLLECTION_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const query = parseMobileBugListQuery(request.query);
+      const result = await mobileBugStore.listBugs({
+        actorId: debugActorId,
+        ...query,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "FORBIDDEN") {
+        return reply
+          .code(403)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
     }
   });
 

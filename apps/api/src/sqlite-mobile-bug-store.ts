@@ -9,8 +9,10 @@ import type {
 
 import type {
   MobileBugStore,
+  MobileBugListQuery,
   MobileCreateBugRequest,
   MobileCreateBugResponse,
+  MobileBugListResponse,
   MobileOccurrenceDraft,
 } from "./mobile-bugs.js";
 
@@ -94,6 +96,22 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         eventId: creation.eventId,
         replayed: creation.replayed,
       };
+    },
+
+    async listBugs(query: MobileBugListQuery): Promise<MobileBugListResponse> {
+      if (query.actorId !== options.scope.actorId) {
+        throw new TypeError("actor does not match the authenticated mobile scope");
+      }
+      if (query.projectId !== undefined && query.projectId !== options.scope.projectId) {
+        throw new TypeError("projectId does not match the authenticated mobile scope");
+      }
+      return options.worker.listMobileBugs({
+        accountId: options.scope.accountId,
+        projectId: options.scope.projectId,
+        actorId: options.scope.actorId,
+        ...(query.state === undefined ? {} : { state: query.state }),
+        limit: query.limit,
+      });
     },
 
     async getBug(query) {

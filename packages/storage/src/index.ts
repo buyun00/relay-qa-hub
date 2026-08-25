@@ -243,6 +243,12 @@ export type {
   MobileOccurrenceInput,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
+export { listMobileBugs } from "./mobile-bug-list-store.js";
+export type {
+  ListMobileBugsInput,
+  MobileBugList,
+  MobileBugListState,
+} from "./mobile-bug-list-store.js";
 export { listMobileDuplicateCandidates } from "./mobile-duplicate-store.js";
 export type {
   ListMobileDuplicateCandidatesInput,

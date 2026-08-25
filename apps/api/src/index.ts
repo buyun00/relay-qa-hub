@@ -40,6 +40,7 @@ export {
   MOBILE_API_MEDIA_TYPE,
   MOBILE_BUG_COLLECTION_PATH,
   MOBILE_BUG_ITEM_PATH,
+  parseMobileBugListQuery,
   parseMobileCreateBugRequest,
 } from "./mobile-bugs.js";
 
@@ -123,6 +124,8 @@ export type {
 export type {
   CreateMobileBugCommand,
   GetMobileBugQuery,
+  MobileBugListQuery,
+  MobileBugListResponse,
   MobileBug,
   MobileBugPriority,
   MobileBugSeverity,

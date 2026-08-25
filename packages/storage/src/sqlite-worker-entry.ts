@@ -20,6 +20,10 @@ import {
   type MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
 import {
+  listMobileBugs,
+  type ListMobileBugsInput,
+} from "./mobile-bug-list-store.js";
+import {
   createMobileCapture,
   getMobileCapture,
   type CreateMobileCaptureInput,
@@ -79,6 +83,7 @@ interface WorkerRequest {
     | "ensureMobileScope"
     | "createMobileBug"
     | "getMobileBug"
+    | "listMobileBugs"
     | "listMobileDuplicateCandidates"
     | "createMobileCapture"
     | "getMobileCapture"
@@ -220,6 +225,10 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly bugId: string;
     };
     return getMobileBug(requireDatabase(), payload, payload.bugId);
+  }
+
+  if (request.operation === "listMobileBugs") {
+    return listMobileBugs(requireDatabase(), request.payload as ListMobileBugsInput);
   }
 
   if (request.operation === "listMobileDuplicateCandidates") {

@@ -105,10 +105,26 @@ export interface GetMobileBugQuery {
   readonly bugId: string;
 }
 
+export interface MobileBugListQuery {
+  readonly actorId: string;
+  readonly projectId?: string;
+  readonly state?: MobileBugState;
+  readonly limit: number;
+}
+
+export interface MobileBugListResponse {
+  readonly snapshotSequence: number;
+  readonly items: readonly MobileBug[];
+  readonly nextCursor: null;
+}
+
 export interface MobileBugStore {
   readonly createBug: (
     command: CreateMobileBugCommand,
   ) => MobileCreateBugResponse | Promise<MobileCreateBugResponse>;
+  readonly listBugs: (
+    query: MobileBugListQuery,
+  ) => MobileBugListResponse | Promise<MobileBugListResponse>;
   readonly getBug: (query: GetMobileBugQuery) => MobileBug | null | Promise<MobileBug | null>;
 }
 
@@ -162,6 +178,18 @@ const PLATFORMS = new Set<MobileOccurrencePlatform>([
   "web",
   "other",
 ]);
+const BUG_STATES = new Set<MobileBugState>([
+  "reported",
+  "needs_info",
+  "ready",
+  "in_progress",
+  "awaiting_build",
+  "ready_for_verification",
+  "closed",
+  "deferred",
+  "rejected",
+  "duplicate",
+]);
 
 function requireRecord(value: unknown, label: string): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -174,6 +202,47 @@ function requireOnlyKeys(value: Record<string, unknown>, allowed: ReadonlySet<st
   for (const key of Object.keys(value)) {
     if (!allowed.has(key)) throw new TypeError(`unexpected property: ${key}`);
   }
+}
+
+function queryString(value: Record<string, unknown>, key: string): string | undefined {
+  const candidate = value[key];
+  if (candidate === undefined) return undefined;
+  if (Array.isArray(candidate)) {
+    if (candidate.length !== 1 || typeof candidate[0] !== "string") {
+      throw new TypeError(`${key} must occur at most once`);
+    }
+    return candidate[0];
+  }
+  if (typeof candidate !== "string") throw new TypeError(`${key} must be a string`);
+  return candidate;
+}
+
+export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery, "actorId"> {
+  const query = requireRecord(value, "Bug list query");
+  requireOnlyKeys(query, new Set(["projectId", "state", "limit"]));
+  const projectId = queryString(query, "projectId");
+  if (projectId !== undefined) requireUuid(projectId, "projectId");
+
+  const stateValue = queryString(query, "state");
+  if (stateValue !== undefined && !BUG_STATES.has(stateValue as MobileBugState)) {
+    throw new TypeError("state is invalid");
+  }
+
+  const limitValue = queryString(query, "limit");
+  const limit = limitValue === undefined ? 20 : Number(limitValue);
+  if (
+    (limitValue !== undefined && !/^\d+$/u.test(limitValue)) ||
+    !Number.isSafeInteger(limit) ||
+    limit < 1 ||
+    limit > 100
+  ) {
+    throw new TypeError("limit must be an integer from 1 through 100");
+  }
+  return {
+    ...(projectId === undefined ? {} : { projectId }),
+    ...(stateValue === undefined ? {} : { state: stateValue as MobileBugState }),
+    limit,
+  };
 }
 
 function requireString(

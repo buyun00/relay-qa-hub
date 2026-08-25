@@ -41,6 +41,7 @@ fun FoundationScreen(
     onDispatchToRelay: () -> Unit = viewModel::dispatchToRelay,
     onAdoptFixAndBindQaBuild: () -> Unit = viewModel::adoptFixAndBindQaBuild,
     onRefreshInbox: () -> Unit = viewModel::refreshInbox,
+    onRefreshBugWorkbench: () -> Unit = viewModel::refreshBugWorkbench,
     onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -54,6 +55,7 @@ fun FoundationScreen(
         onDispatchToRelay = onDispatchToRelay,
         onAdoptFixAndBindQaBuild = onAdoptFixAndBindQaBuild,
         onRefreshInbox = onRefreshInbox,
+        onRefreshBugWorkbench = onRefreshBugWorkbench,
         onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
     )
 }
@@ -69,6 +71,7 @@ internal fun FoundationScreen(
     onDispatchToRelay: () -> Unit = {},
     onAdoptFixAndBindQaBuild: () -> Unit = {},
     onRefreshInbox: () -> Unit = {},
+    onRefreshBugWorkbench: () -> Unit = {},
     onCreateBugAndCheckDuplicates: () -> Unit = {},
 ) {
     Scaffold(
@@ -212,6 +215,34 @@ internal fun FoundationScreen(
                 "failed" -> Text(
                     text = "QA Inbox error: ${state.inbox.errorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("inbox-status"),
+                )
+            }
+            Button(
+                onClick = onRefreshBugWorkbench,
+                enabled = state.bugWorkbench.phase != "loading",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("refresh-bug-workbench"),
+            ) {
+                Text("回读 Bug 工作台（reported）")
+            }
+            when (state.bugWorkbench.phase) {
+                "loading" -> Text(
+                    text = "Bug workbench: loading…",
+                    modifier = Modifier.testTag("bug-workbench-status"),
+                )
+                "loaded" -> Text(
+                    text = "Bug workbench ${state.bugWorkbench.itemCount} " +
+                        "${state.bugWorkbench.stateFilter}; " +
+                        "first=${state.bugWorkbench.firstBugKey ?: "none"}; " +
+                        "title=${state.bugWorkbench.firstTitle ?: "none"}; " +
+                        "snapshot=${state.bugWorkbench.snapshotSequence}.",
+                    modifier = Modifier.testTag("bug-workbench-status"),
+                )
+                "failed" -> Text(
+                    text = "Bug workbench error: " +
+                        "${state.bugWorkbench.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("bug-workbench-status"),
                 )
             }
             Button(

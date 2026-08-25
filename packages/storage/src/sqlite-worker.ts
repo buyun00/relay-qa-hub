@@ -17,6 +17,10 @@ import type {
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
 import type {
+  ListMobileBugsInput,
+  MobileBugList,
+} from "./mobile-bug-list-store.js";
+import type {
   CreateMobileCaptureInput,
   MobileCaptureBundleRecord,
   MobileCaptureCreation,
@@ -189,6 +193,11 @@ export class SqliteStorageWorker {
   }): Promise<MobileBugRecord | null> {
     await this.initialization;
     return this.request<MobileBugRecord | null>("getMobileBug", input);
+  }
+
+  async listMobileBugs(input: ListMobileBugsInput): Promise<MobileBugList> {
+    await this.initialization;
+    return this.request<MobileBugList>("listMobileBugs", input);
   }
 
   async listMobileDuplicateCandidates(
