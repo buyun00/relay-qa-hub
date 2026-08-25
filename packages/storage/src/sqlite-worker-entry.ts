@@ -30,6 +30,10 @@ import {
   type RegisterMobileBuildInput,
 } from "./mobile-build-store.js";
 import {
+  syncAndListMobileNotifications,
+  type ListMobileNotificationsInput,
+} from "./mobile-inbox-store.js";
+import {
   claimMobileRelayOutbox,
   completeMobileRelayOutbox,
   createMobileRelayAttempt,
@@ -75,6 +79,7 @@ interface WorkerRequest {
     | "getMobileCapture"
     | "registerMobileBuild"
     | "getMobileBuild"
+    | "syncAndListMobileNotifications"
     | "ensureMobileRelayRoles"
     | "transitionMobileBugReady"
     | "createMobileRelayAttempt"
@@ -255,6 +260,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly buildId: string;
     };
     return getMobileBuild(requireDatabase(), payload);
+  }
+
+  if (request.operation === "syncAndListMobileNotifications") {
+    return inWriteTransaction((current) =>
+      syncAndListMobileNotifications(current, request.payload as ListMobileNotificationsInput),
+    );
   }
 
   if (request.operation === "ensureMobileRelayRoles") {

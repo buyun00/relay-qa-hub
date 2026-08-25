@@ -40,6 +40,7 @@ fun FoundationScreen(
     onStopCaptureSession: () -> Unit,
     onDispatchToRelay: () -> Unit = viewModel::dispatchToRelay,
     onAdoptFixAndBindQaBuild: () -> Unit = viewModel::adoptFixAndBindQaBuild,
+    onRefreshInbox: () -> Unit = viewModel::refreshInbox,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     FoundationScreen(
@@ -51,6 +52,7 @@ fun FoundationScreen(
         onStopCaptureSession = onStopCaptureSession,
         onDispatchToRelay = onDispatchToRelay,
         onAdoptFixAndBindQaBuild = onAdoptFixAndBindQaBuild,
+        onRefreshInbox = onRefreshInbox,
     )
 }
 
@@ -64,6 +66,7 @@ internal fun FoundationScreen(
     onStopCaptureSession: () -> Unit,
     onDispatchToRelay: () -> Unit = {},
     onAdoptFixAndBindQaBuild: () -> Unit = {},
+    onRefreshInbox: () -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier
@@ -182,6 +185,30 @@ internal fun FoundationScreen(
                 "failed" -> Text(
                     text = "QA Build adoption error: ${buildProjection.errorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("build-projection-status"),
+                )
+            }
+            Button(
+                onClick = onRefreshInbox,
+                enabled = state.inbox.phase != "loading",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("refresh-inbox"),
+            ) {
+                Text("回读 QA Inbox")
+            }
+            when (state.inbox.phase) {
+                "loading" -> Text(
+                    text = "QA Inbox: loading…",
+                    modifier = Modifier.testTag("inbox-status"),
+                )
+                "loaded" -> Text(
+                    text = "QA Inbox ${state.inbox.itemCount} item(s), " +
+                        "${state.inbox.unreadCount} unread; first=${state.inbox.firstTitle ?: "none"}.",
+                    modifier = Modifier.testTag("inbox-status"),
+                )
+                "failed" -> Text(
+                    text = "QA Inbox error: ${state.inbox.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("inbox-status"),
                 )
             }
             Row(

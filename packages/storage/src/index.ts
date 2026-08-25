@@ -286,6 +286,12 @@ export type {
   RegisterMobileBuildInput,
   RegisterMobileBuildResult,
 } from "./mobile-build-store.js";
+export { syncAndListMobileNotifications } from "./mobile-inbox-store.js";
+export type {
+  ListMobileNotificationsInput,
+  MobileNotificationList,
+  MobileNotificationRecord,
+} from "./mobile-inbox-store.js";
 export type {
   CreateMobileCaptureInput,
   MobileCaptureArtifactInput,

@@ -18,6 +18,7 @@ import com.relayqahub.android.network.CaptureBundlePocoInput
 import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.network.BuildProjectionFailure
 import com.relayqahub.android.network.BuildProjectionResult
+import com.relayqahub.android.network.InboxFailure
 import com.relayqahub.android.network.RelayHandoffFailure
 import com.relayqahub.android.network.RelayHandoffResult
 import com.relayqahub.android.security.NativeCredentials
@@ -46,6 +47,7 @@ data class FoundationUiState(
     val lastAction: String = "Ready for offline-first QA work.",
     val relayHandoff: RelayHandoffResult? = null,
     val buildProjection: BuildProjectionUiState = BuildProjectionUiState(),
+    val inbox: InboxUiState = InboxUiState(),
 )
 
 data class BuildProjectionUiState(
@@ -53,6 +55,14 @@ data class BuildProjectionUiState(
     val buildId: String? = null,
     val deliveredCommitSha: String? = null,
     val linked: Boolean = false,
+    val errorCode: String? = null,
+)
+
+data class InboxUiState(
+    val phase: String = "idle",
+    val itemCount: Int = 0,
+    val unreadCount: Int = 0,
+    val firstTitle: String? = null,
     val errorCode: String? = null,
 )
 
@@ -69,6 +79,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val lastAction = MutableStateFlow("Ready for offline-first QA work.")
     private val latestRelayHandoff = MutableStateFlow<RelayHandoffResult?>(null)
     private val buildProjection = MutableStateFlow(BuildProjectionUiState())
+    private val inbox = MutableStateFlow(InboxUiState())
 
     private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
@@ -89,7 +100,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         lastAction,
         latestRelayHandoff,
         buildProjection,
-    ) { values, action, handoff, projection ->
+        inbox,
+    ) { values, action, handoff, projection, inboxState ->
         val support = appContainer.credentialVault.support()
         FoundationUiState(
             accountName = values.accountName,
@@ -104,6 +116,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             lastAction = action,
             relayHandoff = handoff,
             buildProjection = projection,
+            inbox = inboxState,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -294,6 +307,39 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             errorCode = code,
         )
         lastAction.value = "QA Build adoption failed: $code."
+    }
+
+    fun refreshInbox() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setInboxFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            inbox.value = InboxUiState(phase = "loading")
+            lastAction.value = "Reading the durable QA Hub Inbox…"
+            runCatching {
+                appContainer.inboxClient.listNotifications(accessToken)
+            }.onSuccess { result ->
+                inbox.value = InboxUiState(
+                    phase = "loaded",
+                    itemCount = result.items.size,
+                    unreadCount = result.unreadCount,
+                    firstTitle = result.items.firstOrNull()?.title,
+                )
+                lastAction.value =
+                    "QA Inbox read back ${result.items.size} item(s), ${result.unreadCount} unread."
+            }.onFailure { failure ->
+                setInboxFailure(
+                    if (failure is InboxFailure) failure.code else "UNEXPECTED_INBOX_FAILURE",
+                )
+            }
+        }
+    }
+
+    private fun setInboxFailure(code: String) {
+        inbox.value = InboxUiState(phase = "failed", errorCode = code)
+        lastAction.value = "QA Inbox read failed: $code."
     }
 
     fun submitCapturedPng(

@@ -74,6 +74,12 @@ export type {
 } from "./mobile-builds.js";
 
 export {
+  MOBILE_NOTIFICATION_LIST_PATH,
+  parseMobileNotificationLimit,
+} from "./mobile-inbox.js";
+export type { MobileNotificationStore } from "./mobile-inbox.js";
+
+export {
   MAX_RELAY_WEBHOOK_BYTES,
   MOBILE_RELAY_WEBHOOK_PATH,
   MobileRelayWebhookRequestError,

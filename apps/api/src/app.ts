@@ -47,6 +47,11 @@ import {
   type MobileBuildStore,
 } from "./mobile-builds.js";
 import {
+  MOBILE_NOTIFICATION_LIST_PATH,
+  parseMobileNotificationLimit,
+  type MobileNotificationStore,
+} from "./mobile-inbox.js";
+import {
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_RELAY_DISPATCH_PATH,
@@ -89,6 +94,7 @@ export interface CreateApiAppOptions {
   readonly mobileCaptureStore?: MobileCaptureStore;
   readonly mobileRelayStore?: MobileRelayStore;
   readonly mobileBuildStore?: MobileBuildStore;
+  readonly mobileNotificationStore?: MobileNotificationStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
   readonly debugBearerToken?: string;
@@ -157,6 +163,12 @@ const unconfiguredMobileBuildStore: MobileBuildStore = {
   getBuild: () => null,
 };
 
+const unconfiguredMobileNotificationStore: MobileNotificationStore = {
+  listNotifications: () => {
+    throw new Error("MobileNotificationStore is not configured");
+  },
+};
+
 const unconfiguredMobileRelayWebhookStore: MobileRelayWebhookStore = {
   receiveRelayWebhook: () => {
     throw new Error("MobileRelayWebhookStore is not configured");
@@ -191,6 +203,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
   const mobileRelayStore = options.mobileRelayStore ?? unconfiguredMobileRelayStore;
   const mobileBuildStore = options.mobileBuildStore ?? unconfiguredMobileBuildStore;
+  const mobileNotificationStore =
+    options.mobileNotificationStore ?? unconfiguredMobileNotificationStore;
   const mobileRelayWebhookStore =
     options.mobileRelayWebhookStore ?? unconfiguredMobileRelayWebhookStore;
   const relayWebhookSecret = options.relayWebhookSecret ?? "";
@@ -553,6 +567,49 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       return buildErrorReply(error, reply);
     }
   });
+
+  app.get<{ Querystring: { limit?: string | string[] } }>(
+    MOBILE_NOTIFICATION_LIST_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply
+          .code(401)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "UNAUTHENTICATED" });
+      }
+      try {
+        const result = await mobileNotificationStore.listNotifications({
+          actorId: debugActorId,
+          limit: parseMobileNotificationLimit(request.query.limit),
+          now: (options.now ?? (() => new Date()))().toISOString(),
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send({
+          items: result.items.map((item) => ({
+            id: item.id,
+            projectId: item.projectId,
+            userId: item.userId,
+            type: item.type,
+            title: item.title,
+            bugId: null,
+            createdAt: item.createdAt,
+            readAt: item.readAt,
+            version: item.version,
+          })),
+          nextCursor: result.nextCursor,
+          unreadCount: result.unreadCount,
+        });
+      } catch (error: unknown) {
+        const code = (error as { code?: unknown })?.code;
+        if (error instanceof TypeError || code === "INVALID_REQUEST") {
+          return reply
+            .code(400)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "INVALID_REQUEST" });
+        }
+        throw error;
+      }
+    },
+  );
 
   app.post(MOBILE_CAPTURE_COLLECTION_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {

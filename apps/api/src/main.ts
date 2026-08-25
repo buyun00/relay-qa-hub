@@ -8,6 +8,7 @@ import { DEFAULT_API_HOST, resolvePort } from "./config.js";
 import { createApiServer, type ApiServer } from "./server.js";
 import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-store.js";
 import { createSqliteMobileBuildStore } from "./sqlite-mobile-build-store.js";
+import { createSqliteMobileInboxStore } from "./sqlite-mobile-inbox-store.js";
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
 import { createSqliteMobileCaptureStore } from "./sqlite-mobile-capture-store.js";
 import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
@@ -78,6 +79,7 @@ async function run(): Promise<void> {
       mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
       mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
       mobileBuildStore: createSqliteMobileBuildStore({ worker, scope: MOBILE_SCOPE }),
+      mobileNotificationStore: createSqliteMobileInboxStore({ worker, scope: MOBILE_SCOPE }),
       mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
       mobileRelayStore: createSqliteMobileRelayStore({ worker, scope: MOBILE_SCOPE }),
       ...(relayWebhookSecret === undefined

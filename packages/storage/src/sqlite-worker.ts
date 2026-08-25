@@ -40,6 +40,10 @@ import type {
   TransitionMobileBugInput,
 } from "./mobile-relay-store.js";
 import type {
+  ListMobileNotificationsInput,
+  MobileNotificationList,
+} from "./mobile-inbox-store.js";
+import type {
   InsertedBugIdentity,
   MigrationReport,
   NewBugStorageRecord,
@@ -211,6 +215,13 @@ export class SqliteStorageWorker {
   }): Promise<MobileBuildRecord | null> {
     await this.initialization;
     return this.request<MobileBuildRecord | null>("getMobileBuild", input);
+  }
+
+  async syncAndListMobileNotifications(
+    input: ListMobileNotificationsInput,
+  ): Promise<MobileNotificationList> {
+    await this.initialization;
+    return this.request<MobileNotificationList>("syncAndListMobileNotifications", input);
   }
 
   async ensureMobileRelayRoles(scope: MobileScopeBootstrap): Promise<void> {
