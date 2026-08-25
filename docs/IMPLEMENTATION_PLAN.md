@@ -14,12 +14,12 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: c671baf033191ea5fae10cabebe992687b629790
-  last_verified_at: 2026-08-25T23:03:55+08:00
-  next_action: P7.4 IN_PROGRESS；Web proxy/API/SQLite 已真实完成项目/成员角色/模块目录读取和 Bug 模块归类，当前唯一原子段是刷新后从服务端事实恢复人工 RepairAttempt/Build/Verification 向导；Web 功能稳定后才统一打包回归 Windows 应用
+  last_verified_commit: 2788e8723be68eb703893299a79570ddbf715fff
+  last_verified_at: 2026-08-25T23:32:11+08:00
+  next_action: P7.4 IN_PROGRESS；Web proxy/API/SQLite 已真实完成跨刷新/深链的 durable Attempt、精确 Build 与 Verification 恢复；当前唯一原子段是分离 project draft/active context 并给详情读取加 selection sequence guard，Web 功能稳定后才统一打包回归 Windows 应用
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
-    - P7.4 核心人工管理闭环、组合筛选、显式去重及项目目录/Bug 模块归类已由真实 Web proxy -> 4319 -> SQLite 验证；in-app Browser loopback 导航被 ERR_BLOCKED_BY_CLIENT 阻断，尚无本 slice UI click 证据，跨刷新工作流恢复也未完成，仍不能误报为 G7 完成
+    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类及跨刷新工作流恢复已由真实 Web proxy -> 4319 -> SQLite 验证；in-app Browser loopback 导航被 ERR_BLOCKED_BY_CLIENT 阻断，尚无本 slice UI click 证据，剩余 Web 选择一致性也未完成，仍不能误报为 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -1006,7 +1006,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重，以及项目/成员角色/模块目录读取和 Bug 模块归类，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路；wrong-SHA Build、非法 severity、self-target duplicate 与无权项目分别被真实 `422/400/422/403` 拒绝且没有错误业务写入。最新证据见 [`docs/evidence/P7.4-desktop-project-settings.md`](evidence/P7.4-desktop-project-settings.md)。in-app Browser 当前以 `ERR_BLOCKED_BY_CLIENT` 阻断 loopback 导航，因此该 slice 不冒充 UI click/render 已观察；在可访问本机页面的普通浏览器环境仍需补一次可见回归。当前唯一指针是按 Bug 从服务端事实恢复人工 RepairAttempt/Build/Verification 向导，解决刷新、深链和重新选择后无法继续的问题；cursor/保存视图/批量、真正 project_admin 设置写入与严格客户端响应校验进入收尾清单。只有 Web 功能稳定后才统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后从服务端事实恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路；wrong-SHA Build、非法 severity、self-target duplicate、无权项目与未知 workflow Bug 分别被真实 `422/400/422/403/404` 拒绝且没有错误业务写入。最新证据见 [`docs/evidence/P7.4-desktop-workflow-recovery.md`](evidence/P7.4-desktop-workflow-recovery.md)。in-app Browser 当前以 `ERR_BLOCKED_BY_CLIENT` 阻断 loopback 导航，因此该 slice 不冒充 UI click/render 已观察；在可访问本机页面的普通浏览器环境仍需补一次可见回归。当前唯一指针是分离 project draft/active context 并给详情读取加 selection sequence guard，防止未应用项目输入或迟到详情响应污染当前选择；cursor/保存视图/批量、真正 project_admin 设置写入、unlinked Build response-loss 与 additive workflow contract 进入收尾清单。只有 Web 功能稳定后才统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 #### P7.5 Windows Electron 桌面壳
 
