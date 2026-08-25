@@ -14,12 +14,12 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: f4b2afb26436417be81276f708bcca0477d67f81
-  last_verified_at: 2026-08-25T21:51:24+08:00
-  next_action: P7.4 IN_PROGRESS；浏览器已真实完成列表/详情/Comment/分配/状态/Relay回执/人工RepairAttempt/exact-SHA Build/Verification关闭及服务端组合筛选，当前唯一原子段是显式人工去重合并；必要设置随后补，Web 稳定后才统一打包回归 Windows 应用
+  last_verified_commit: 7dc200fcd6d3a23d077cb3ab912f9babdfedb9c7
+  last_verified_at: 2026-08-25T22:21:00+08:00
+  next_action: P7.4 IN_PROGRESS；浏览器已真实完成核心人工管理闭环、服务端组合筛选及显式人工去重合并，当前唯一原子段是项目/成员角色/模块必要设置；Web 功能稳定后才统一打包回归 Windows 应用
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
-    - P7.4 核心人工管理闭环及 keyword/state/severity 组合筛选已真实浏览器 -> 4319 -> SQLite 验证；人工去重合并、必要设置与跨刷新工作流恢复尚未完成，仍不能误报为 G7 完成
+    - P7.4 核心人工管理闭环、keyword/state/severity 组合筛选及显式人工去重合并已真实浏览器 -> 4319 -> SQLite 验证；必要设置与跨刷新工作流恢复尚未完成，仍不能误报为 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -1006,7 +1006,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭，以及 keyword/state/severity 服务端组合筛选均已由普通浏览器经 4174 server-side auth proxy -> 4319 -> SQLite 验证；wrong-SHA Build 被真实 `422` 拒绝且未落库，非法 severity 被真实 `400` 拒绝。证据见 [`docs/evidence/P7.4-desktop-human-build-verification.md`](evidence/P7.4-desktop-human-build-verification.md) 与 [`docs/evidence/P7.4-desktop-combined-filters.md`](evidence/P7.4-desktop-combined-filters.md)。原 PWA 插件与 Service Worker 已移除。当前唯一指针是在普通浏览器展示候选并由用户显式人工去重合并，随后补必要设置；cursor/保存视图/批量等非阻塞项进入收尾清单。只有 Web 功能稳定后才统一打包/回归 Windows 应用。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选，以及候选展示后由用户显式人工去重合并，均已由普通浏览器经 4174 server-side auth proxy -> 4319 -> SQLite 验证；wrong-SHA Build 被真实 `422` 拒绝且未落库，非法 severity 被真实 `400` 拒绝，self-target duplicate 被真实 `422` 拒绝且零写入。证据见 [`docs/evidence/P7.4-desktop-human-build-verification.md`](evidence/P7.4-desktop-human-build-verification.md)、[`docs/evidence/P7.4-desktop-combined-filters.md`](evidence/P7.4-desktop-combined-filters.md) 与 [`docs/evidence/P7.4-desktop-duplicate-merge.md`](evidence/P7.4-desktop-duplicate-merge.md)。原 PWA 插件与 Service Worker 已移除。当前唯一指针是在普通浏览器接通项目/成员角色/模块的必要设置；cursor/保存视图/批量与跨刷新工作流恢复等非阻塞项进入收尾清单。只有 Web 功能稳定后才统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 #### P7.5 Windows Electron 桌面壳
 
