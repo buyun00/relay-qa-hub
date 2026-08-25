@@ -14,12 +14,12 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: fabdf56a2d02444f658879a91c386d5787f28007
-  last_verified_at: 2026-08-25T23:53:01+08:00
-  next_action: P7.4 IN_PROGRESS；真实 Edge 已验证详情 sequence 与 project draft/active 隔离；当前唯一原子段是把 mutation 结果绑定到发起时的 Bug selection generation，Web 功能稳定后才统一打包回归 Windows 应用
+  last_verified_commit: aa001563762810bceb5d267adb51950340a2f7c3
+  last_verified_at: 2026-08-26T00:07:13+08:00
+  next_action: P7.4 IN_PROGRESS；真实 Edge 已验证 in-flight mutation selection generation 隔离；当前唯一原子段是项目 Bug 列表/目录的全有或全无 view generation，Web 功能稳定后才统一打包回归 Windows 应用
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
-    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类、跨刷新恢复及 Edge 详情/project context 已由真实 Web -> 4319 -> SQLite 验证；in-flight mutation selection isolation 与项目双读取原子应用仍未完成，不能误报为 G7 完成
+    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类、跨刷新恢复及 Edge 详情/mutation selection 已由真实 Web -> 4319 -> SQLite 验证；项目双读取原子应用与最终组合签收仍未完成，不能误报为 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -1006,7 +1006,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后从服务端事实恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路；wrong-SHA Build、非法 severity、self-target duplicate、无权项目与未知 workflow Bug 分别被真实 `422/400/422/403/404` 拒绝且没有错误业务写入。最新证据见 [`docs/evidence/P7.4-desktop-selection-context.md`](evidence/P7.4-desktop-selection-context.md)：installed Edge 页面已真实证明迟到详情不覆盖最终选择、未应用 project draft 不参与 mutation refresh、invalid project 400 可见，并有视觉复核截图。当前唯一指针是把 mutation 结果绑定到发起时的 Bug selection generation，防止写入等待期间切换 Bug 后旧 success/error/readback 重新选择或污染新详情；项目列表/目录全有或全无应用、cursor/保存视图/批量、真正 project_admin 设置写入、unlinked Build response-loss 与 additive workflow contract 进入收尾清单。只有 Web 功能稳定后才统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后从服务端事实恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路；wrong-SHA Build、非法 severity、self-target duplicate、无权项目与未知 workflow Bug 分别被真实 `422/400/422/403/404` 拒绝且没有错误业务写入。最新证据见 [`docs/evidence/P7.4-desktop-mutation-selection.md`](evidence/P7.4-desktop-mutation-selection.md)：installed Edge 已证明服务器先完成旧 Bug mutation 后切换 Bug，释放旧响应不会重新选择、写 success/error 或触发旧 readback；SQLite 事实不回滚，用户刷新列表即可见。当前唯一指针是把 project list/settings 结果先聚合再一次提交 view generation，防止一侧失败/迟到或旧 refresh 产生混合项目上下文；cursor/保存视图/批量、真正 project_admin 设置写入、unlinked Build response-loss 与 additive workflow contract 进入收尾清单。只有 Web 功能稳定后才统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 #### P7.5 Windows Electron 桌面壳
 
