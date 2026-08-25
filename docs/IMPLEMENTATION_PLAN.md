@@ -9,18 +9,18 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P3
-  current_gate: G3-ANDROID-APP-READY
+  current_phase: P5
+  current_gate: G5-RELAY-INTEGRATED
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: d2950262ca6181d658651a2a53b7834eaa52d657
-  last_verified_at: 2026-08-25T11:59:32+08:00
-  next_action: P3.7 已证明最终 APK 的 loopback SimpleRPC handshake/partial 与 no-Poco screenshot/Bug fallback；当前把 bounded Poco artifacts 按同 captureId 持久化并回读一个真实 artifact
+  last_verified_commit: f55b7d664dd8c370eb7e080ec1672714edb7ea4c
+  last_verified_at: 2026-08-25T12:36:50+08:00
+  next_action: P5.1 IN_PROGRESS；在不修改 Relay 的前提下启动 QA 侧 fake Relay handoff/receipt 最小垂直切片，真实提交一个 Bug handoff 并持久回读回执
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1/G2 仍未正式关闭，但按执行 override 不阻塞 P3 主链路实现
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G4 仍未正式关闭，但按执行 override 不阻塞 P5.1 QA-side fake Relay 主链路实现
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
-    - API37/真机/Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 MuMu smoke
+    - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
 
 ## 1. 决策摘要

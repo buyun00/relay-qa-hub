@@ -2,24 +2,24 @@
 
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
-- Current phase: `P3`
-- Current pointer: `P3.7`
-- Current gate: `G3-ANDROID-APP-READY`（vertical slice in progress；G1/G2 尚未正式关闭）
+- Current phase: `P5`（MVP vertical slice；G3/G4 尚未正式关闭）
+- Current pointer: `P5.1`
+- Current gate: `G5-RELAY-INTEGRATED`（execution override；不得解读为 G3/G4/G5 已完成）
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P3.1, P3.3, P3.4, P3.6, P3.7`
-- Current delivery slice: `verified MuMu Poco handshake/no-Poco fallback -> persist bounded Poco artifacts under the same captureId`
-- Minimal verification: `下一切片只证明一个 Poco artifact 经真实 Android/4319 持久化并按同 captureId 回读；保留 no-Poco 普通截图成功路径，不扩展 Unity/真机矩阵`
-- Next atomic action: `P3.7 IN_PROGRESS：把已收集的 bounded Poco Screenshot/Dump/profiling 从本地结果接入 attachment/capture-bundle 持久化；同 captureId 成功回读一个 artifact 后立即进入下一主链段`
+- Active work packages: `P3.1, P3.3, P3.4, P3.6, P3.7, P5.1`
+- Current delivery slice: `verified Android/4319/SQLite Poco artifact bundle -> QA-side fake Relay handoff/receipt`
+- Minimal verification: `下一切片只证明一个真实 QA Bug 经独立 QA Hub 服务端提交给 fake Relay、持久化 handoff 并回读 receipt；保留一个不可用/重放失败，不修改真实 Relay`
+- Next atomic action: `P5.1 IN_PROGRESS：在 QA Hub 内实现最小 fake Relay endpoint/client 与 durable handoff receipt，让 Android 已创建的 Bug 一次真实派发/回读；通过后立即继续状态回写主链`
 - Completed gates: `1 / 11`
-- Last green commit: `d2950262ca6181d658651a2a53b7834eaa52d657`
+- Last green commit: `f55b7d664dd8c370eb7e080ec1672714edb7ea4c`
 - Last deployed commit: `none`
 - Schema version: `contract 1.1.0; database v3 verified at P1.2`
 - Production URL: `not deployed`
 - Last production verification: `none`
 - Last backup verified: `none`
 - Last restore drill: `none`
-- Blockers: `当前 MuMu API35 MVP 主链路无外部 blocker；真机/API37/Poco 安全加固为后续 Gate，不阻塞当前可运行切片`
-- Updated at: `2026-08-25T11:59:32+08:00`
+- Blockers: `当前 P5.1 QA-side fake Relay MVP 主链路无外部 blocker；真实 Relay 修改/重载、真机/API37/Poco 安全加固均不在当前原子步骤`
+- Updated at: `2026-08-25T12:36:50+08:00`
 
 ## Gate status
 
@@ -60,13 +60,13 @@
 | P3.4  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P3.2,P3.3           | Room/WorkManager offline attachment queue            | final receipt/claim real smoke；stage resume/process-kill/duplicate/orphan follow-up                | [`docs/evidence/P3.3-attachment-smoke.md`](docs/evidence/P3.3-attachment-smoke.md)：Room v4 final reservation/claim receipt verified；resumable stages pending | `3382b4046ee38763a6a931d9ff70ba8532206aff` | 2026-08-25T10:57:27+08:00 |
 | P3.5  | PLANNED     | unassigned               | P1.2,P2.2,P3.2,P3.3 | native full-workflow home                            | Relay-offline human loop + 30-second intake                                                        |                                                                       |                                            | 2026-08-24                |
 | P3.6  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P3.2                | overlay/MediaProjection/Share/Picker                 | one real MuMu capture -> attachment -> Bug + one permission/fallback failure                       | [`docs/evidence/P3.6-mumu-capture-smoke.md`](docs/evidence/P3.6-mumu-capture-smoke.md)：real 2560x1440 capture + consent denial; recording/Share/Picker/device matrix pending | `15c668a7d1f6a36a09935ce39f0e6348eb78c73c` | 2026-08-25T11:19:01+08:00 |
-| P3.7  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P3.1,P3.2,P3.6      | Kotlin Poco read-only adapter/capture bundle         | one Android loopback SimpleRPC success + no-Poco screenshot/Bug fallback                           | [`docs/evidence/P3.7-mumu-poco-probe.md`](docs/evidence/P3.7-mumu-poco-probe.md)：最终 APK handshake/partial + no-Poco 两条真实建单；artifact persistence pending | `d2950262ca6181d658651a2a53b7834eaa52d657` | 2026-08-25T11:59:32+08:00 |
+| P3.7  | VERIFYING   | root (GPT-5.6 Sol/ultra) | P3.1,P3.2,P3.6      | Kotlin Poco read-only adapter/capture bundle         | one Android loopback SimpleRPC success + same-capture artifact readback + no-Poco screenshot/Bug    | [`docs/evidence/P3.7-mumu-poco-probe.md`](docs/evidence/P3.7-mumu-poco-probe.md) + [`docs/evidence/P3.7-mumu-poco-artifact.md`](docs/evidence/P3.7-mumu-poco-artifact.md)：MuMu stub partial/bound 与 no-Poco unavailable/bound 均真实通过；真实 Unity/security proof pending | `f55b7d664dd8c370eb7e080ec1672714edb7ea4c` | 2026-08-25T12:36:50+08:00 |
 | P3.8  | PLANNED     | unassigned               | P3.1                | Unity qa.snapshot/loopback compatibility layer       | standard/old/Invoke, server allowlist, Mono/IL2CPP, LAN-negative tests                             |                                                                       |                                            | 2026-08-24                |
 | P3.9  | PLANNED     | unassigned               | P3.3-P3.8           | Android/Poco real-device/performance matrix          | API35 MuMu+real; API36/37 compatibility, API37 behaviors, OEM, P50/P95                             | current MuMu covers API35 emulator only; real-device/security gates pending |                                       | 2026-08-24T19:39:16+08:00 |
 | P4.1  | PLANNED     | unassigned               | G3                  | human/external attempts                              | Relay-offline flow                                                                                 |                                                                       |                                            | 2026-08-24                |
 | P4.2  | PLANNED     | unassigned               | P4.1                | builds/commit identity                               | wrong-SHA guard tests                                                                              |                                                                       |                                            | 2026-08-24                |
 | P4.3  | PLANNED     | unassigned               | P4.1,P4.2           | verification/reopen                                  | human closed-loop E2E                                                                              |                                                                       |                                            | 2026-08-24                |
-| P5.1  | PLANNED     | unassigned               | G4                  | QA Relay client/fake                                 | QA-side contract suite                                                                             |                                                                       |                                            | 2026-08-24                |
+| P5.1  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | G4 (MVP override)   | QA Relay client/fake                                 | one real Bug handoff + durable receipt/readback + one unavailable/replay failure                    | current slice starts QA-side only; real Relay remains untouched       |                                            | 2026-08-25T12:36:50+08:00 |
 | P5.2  | PLANNED     | unassigned               | P5.1                | Relay M2M handoff API                                | auth/idempotency/attachment tests                                                                  |                                                                       |                                            | 2026-08-24                |
 | P5.3  | PLANNED     | unassigned               | P5.2                | Relay webhook outbox                                 | signature/retry/order/reconcile tests                                                              |                                                                       |                                            | 2026-08-24                |
 | P5.4  | PLANNED     | unassigned               | P5.2,P5.3           | state projection/continue task                       | real delivery/reopen tests                                                                         |                                                                       |                                            | 2026-08-24                |
@@ -93,13 +93,14 @@
 - `P3.3` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T09:57:30+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Bug/Occurrence 与单 PNG attachment/bind 已有 MuMu 真证据；full mobile API/scanner/idempotency hardening 转入收尾清单，主链先进入 P3.6`。
 - `P3.4` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:25:29+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Room v4 已保存 final reservation/claim；逐阶段 resume、response-loss 与 multi-chunk 在 capture 主链后补`。
 - `P3.6` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:57:27+08:00`; updated: `2026-08-25T11:19:01+08:00`; state: `IN_PROGRESS`; next atomic action: `MuMu 已证明显式授权、悬浮球、2560x1440 MediaProjection PNG 到 attachment/Bug 及拒绝降级；录屏、Share/Picker、旋转/真机/API37 进入收尾，不阻塞 P3.7`。
-- `P3.7` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T11:19:01+08:00`; updated: `2026-08-25T11:59:32+08:00`; state: `IN_PROGRESS`; next atomic action: `最终 APK 已证明 allowlist-only 127.0.0.1 handshake/partial 与 no-Poco screenshot/Bug fallback；现在把 bounded Poco artifacts 按同 captureId 持久化/上传，并真实回读一个 artifact`。
+- `P3.7` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T11:19:01+08:00`; updated: `2026-08-25T12:36:50+08:00`; state: `VERIFYING`; next atomic action: `MuMu MVP 已证明 partial Poco PNG 与 unavailable no-Poco bundle 均同 captureId bound/readable；真实 Unity、qa.snapshot、LAN-negative、真机/API37 由 P3.8/P3.9/P9.1 补证，不阻塞当前 P5.1`。
+- `P5.1` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T12:36:50+08:00`; updated: `2026-08-25T12:36:50+08:00`; state: `IN_PROGRESS`; next atomic action: `只在独立 QA Hub 内实现 fake Relay handoff/receipt 的真实 HTTP+SQLite 垂直切片；先不修改 Relay，不触发 reload`。
 
 ## MuMu MVP execution cadence (2026-08-25 override)
 
 - 当前优先级是打通可运行主链路，不以测试数量、全量边界穷举、性能优化、文档完善或独立终审零发现作为 MuMu API35 MVP 的进入条件。
 - 每个相邻模块只验证四件事：真实启动、实际通信、成功数据通过、一个关键失败明确暴露。通过后立即进入下一段。
-- 当前垂直切片：QA Hub API/SQLite -> Android/MuMu HTTP -> attachment -> 显式 MediaProjection/悬浮球截图 -> Poco optional handshake/no-Poco fallback 均已真实通过；现在补同 captureId Poco artifact 持久化，再进入 Relay optional handoff/receipt。
+- 当前垂直切片：QA Hub API/SQLite -> Android/MuMu HTTP -> attachment -> 显式 MediaProjection/悬浮球截图 -> Poco optional artifact/no-Poco bundle 均已真实通过；唯一 pointer 已进入 QA-side fake Relay handoff/receipt，不修改真实 Relay。
 - API31（已被当前 minSdk=35 产品决策取代）、API37 runtime、真机、广域安全硬化、完整性能矩阵和冗余对抗测试均不阻塞当前 MuMu API35 MVP；仍保留为对应正式 Gate 的发布前证据。
 
 ## 收尾修复清单 / technical debt
@@ -122,7 +123,7 @@
 | 长按短录屏与系统 Sharesheet/Photo Picker 尚未实现 | 录屏取证与硬件截图降级不可用 | 用户长按或 MediaProjection 不适用 | 在 P3.6 收尾实现显式录屏前台状态、ACTION_SEND receiver 与用户选择 Photo Picker | 各一条真实媒体进入同一 attachment pipeline |
 | capture 文件仍为 app-private plaintext，成功后不清理 | 借用测试机可能残留敏感画面 | 截图成功上传或草稿过期 | Keystore-backed encryption + configurable retention/cleanup | 上传成功清理，失败草稿按策略保留 |
 | rotation resize/setSurface、`FLAG_SECURE` 专用说明、API37 BAL/OEM/真机生命周期未验证 | 方向变化可能停帧；系统限制时提示不完整；不能宣称设备 Gate | 旋转、安全窗口、API37/OEM 后台限制或进程回收 | P3.6/P3.9/P9.1 用真实设备补 resize/lifecycle/permission evidence | 一条真实设备 success + 一条 system-stop/secure failure |
-| P3.7 当前只把 Poco 方法结果压缩为本地状态摘要，实际 Screenshot/Dump/profiling artifact 未持久化 | 服务端无法审计或回看 Unity enrichment，不能显示“完整” | Poco 返回任一可用 artifact | 接入既有 attachment/capture-bundle 表与 API，让 artifact 使用同 captureId/clientSubmissionId 上传并绑定 | 一个 artifact 真实上传并按 captureId 回读；无 Poco 仍建单 |
+| P3.7 当前只以 loopback framed stub 证明 Poco PNG artifact；未以 provenance-bound Unity 游戏证明 Dump/profiling/qa.snapshot | 不能据此宣称真实 Unity enrichment 或 Poco 安全 Gate 完成 | 进入 P3.8/P3.9/P9.1 或准备 debug-ready 游戏包 | 在 Loopback-only/只读 Unity 兼容层具备提交身份后，用真实游戏 APK 拉取 bounded artifact 并补 LAN-negative/IL2CPP/真机证据 | 同 captureId 回读 Screenshot+Dump；无 Poco 仍建单；LAN 地址不可连 |
 | Poco collection 取消依靠 250ms read timeout/1.5s 总 deadline，尚未在 Job cancellation 时立即关闭 active socket | 停止会话后连接可能短暂滞留，但不会无限等待 | RPC 正阻塞且用户立即停止 capture session | 给 active socket 注册 cancellation close hook，保留当前 deadline | 挂起 stub 后取消，socket/协程在目标时限内退出且不发 Ready |
 
 ## Completed evidence
@@ -144,6 +145,7 @@
 - P3.3/P3.4 单 PNG attachment 垂直切片于 `2026-08-25T10:57:27+08:00` 验证并提交为 `3382b4046ee38763a6a931d9ff70ba8532206aff`：本仓库 APK 在 MuMu API35 实际完成 `init 201 -> chunk 204 -> finalize 200 -> bind 200 -> Bug 201`，UI 得到 `LOCAL-1`/claimed，SQLite 与内容寻址文件 SHA 回读一致；错 chunk hash 返回 400。证据见 `docs/evidence/P3.3-attachment-smoke.md`。P3.3/P3.4 仍为 `IN_PROGRESS`，唯一 root pointer 已转 P3.6 capture/overlay；未宣称 G3、真机、API37、生产 scanner/encryption 或 resumable queue 完成。
 - P3.6 MuMu capture/overlay 垂直切片于 `2026-08-25T11:19:01+08:00` 验证并提交为 `15c668a7d1f6a36a09935ce39f0e6348eb78c73c`：显式通知/SAW/MediaProjection 授权后，真实悬浮球采集 2560x1440 PNG，以同一 `captureId` 经 attachment 创建 `LOCAL-1`；第二次系统授权拒绝明确降级且未新增 Bug。证据见 `docs/evidence/P3.6-mumu-capture-smoke.md`。P3.6 仍为 `IN_PROGRESS`，唯一 root pointer 已转 P3.7 Poco optional enrichment；未宣称录屏、Share/Picker、G3、真机或 API37 完成。
 - P3.7 bounded Poco probe 于 `2026-08-25T11:59:32+08:00` 验证并提交为 `d2950262ca6181d658651a2a53b7834eaa52d657`：最终本仓库 APK/installed-base SHA=`845EED1305F65545F3FE3A755025424A7C2F9F24A8855C76C866048C16D1ABBA`；MuMu 真实 loopback framed handshake 显示 partial 并创建/回读 `LOCAL-1`，移除 Poco 后仍创建/回读 `LOCAL-2`。证据见 `docs/evidence/P3.7-mumu-poco-probe.md`。P3.7 保持 `IN_PROGRESS`，因为实际 Poco artifacts 尚未按同 captureId 服务端持久化；未使用 Unity/Relay/Jenkins，也未宣称 G3、真机或真实 Poco 安全 Gate 完成。
+- P3.7 Poco artifact MVP slice 于 `2026-08-25T12:36:50+08:00` 验证并提交为 `f55b7d664dd8c370eb7e080ec1672714edb7ea4c`：本仓库 APK/installed-base SHA=`9B0F9D2951E38DFF44EA9BB583B88E0AFD721E059C60416675F893FB2F9E979E`；MuMu/API35 经真实 4319 把 system/Poco PNG 以同 captureId `e4a19eab-b124-441f-b4bd-5b3e3f7f8e96` 持久化并 GET 回读，bundle/Occurrence=`partial/bound`；移除 Poco 后 capture `5628305b-95b6-4d43-8e40-c9ccbea04c0d` 仍以 system-only `unavailable/bound` 创建 `LOCAL-3`。证据见 `docs/evidence/P3.7-mumu-poco-artifact.md`。P3.7 转 `VERIFYING`，唯一 pointer 进入 P5.1；未修改 Unity/Relay、未触发 Jenkins，也未宣称 G3/真实 Poco/真机/API37 完成。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 
