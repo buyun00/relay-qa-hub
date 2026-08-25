@@ -9,16 +9,16 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P5
-  current_gate: G5-RELAY-INTEGRATED
+  current_phase: P6
+  current_gate: G6-BUILD-VERIFICATION
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: f6ca6a0
-  last_verified_at: 2026-08-25T13:39:53+08:00
-  next_action: P5.4 IN_PROGRESS（MVP execution override）；让独立 fake Relay 发送一条 fix_delivered 回写，QA Hub 持久投影且 Android 可见，同时证明 Bug 不会自动验收/关闭；仍不修改真实 Relay
+  last_verified_commit: b9c4c6b
+  last_verified_at: 2026-08-25T14:05:41+08:00
+  next_action: P6.1 IN_PROGRESS（MVP execution override）；只在 QA Hub 内实现人工/fake Build provider 的 exact deliveredCommitSha 绑定和 Android 回读；wrong SHA 明确失败，不触发 Unity Jenkins
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G4 仍未正式关闭，但按 execution override 不阻塞 P5.4 QA-side fake callback/writeback 主链路
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G5 仍未正式关闭，但按 execution override 不阻塞 P6.1 QA-owned fake/manual Build 主链路
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -906,7 +906,9 @@ MuMu MVP slice：Android -> QA Hub 的 typed handoff、durable outbox、独立 f
 
 要做：delivery evidence 校验、Build 投影、needs_input/blocked/failed、验收失败 action 幂等追加 Turn，并在 Android App 原生页面展示 handoff/receipt/对账状态。
 
-MuMu MVP execution override：P5.2/P5.3 的真实 Relay 改动仍不在当前授权范围；先由独立 fake Relay 向 QA Hub 发送一条 `fix_delivered` 回写，持久更新 receipt 并由 Android 原生页面读取，同时证明 Bug 保持人工验收边界、绝不自动关闭。只保留一个迟到/旧 revision 失败路径，通过后继续 Build/通知主链。
+MuMu MVP execution override：P5.2/P5.3 的真实 Relay 改动仍不在当前授权范围；先由独立 fake Relay 向 QA Hub 发送一条 `fix_delivered` 回写，持久更新 receipt 并由 Android 原生页面读取，同时证明 Bug 保持人工验收边界、绝不自动关闭。只保留一个迟到/旧 revision 明确忽略且不得覆盖路径，通过后继续 Build/通知主链。
+
+已验证 slice：MuMu Android 已真实回读 `fix_delivered`；QA Hub durable Inbox 保存 revision `2` 为 `applied`，另一个 revision `1` 为 `ignored`，Receipt 未被回退且 Bug/Verification 未变化。P5.4 保持 `VERIFYING`，因为真实 Relay 多事件、继续任务和对账尚未完成。
 
 验证：
 
@@ -927,6 +929,8 @@ Gate `G5-RELAY-INTEGRATED`：真实 QA Bug 一键创建 Relay Task，交付后�
 #### P6.1 Build adapter
 
 要做：通用 Build contract、OZDQP adapter、人工 provider、状态重试和 Commit identity。
+
+MuMu MVP execution override：先只在 QA Hub 自有 API/SQLite/fake/manual provider 中把一条成功 Build 精确绑定到 P5.4 的 `deliveredCommitSha`，并由 Android 原生页面回读；保留一个 wrong-SHA 失败。不得触发 Unity Jenkins、不得使用 Unity `/apk`，也不得把 fake/manual provider 冒充真实生产构建流水线。
 
 验证：completed 只在 Job/项目/分支/完整 SHA/mode 均匹配时接受；失败后同 Job 恢复可继续推进。
 
