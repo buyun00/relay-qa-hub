@@ -9,16 +9,16 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P4
-  current_gate: G4-HUMAN-CLOSED-LOOP
+  current_phase: P3
+  current_gate: G3-ANDROID-APP-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 410507d
-  last_verified_at: 2026-08-25T16:53:19+08:00
-  next_action: P4.3 IN_PROGRESS（MVP execution override）；对 exact Build 绑定后的 human RepairAttempt 创建/开始/通过人工 Verification 并关闭 Bug；一个缺失或错误验收证据明确失败
+  last_verified_commit: a98549c
+  last_verified_at: 2026-08-25T17:23:33+08:00
+  next_action: P3.5 IN_PROGRESS（post-P4 MVP consolidation）；进程/服务重启后由原生 Android 首页从 QA Hub API/SQLite 回读最近一条 Bug/Attempt/Build/Verification 人工闭环投影；一个不存在项明确失败
   blockers:
-    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1-G7 仍未正式关闭，但按 execution override 不阻塞 P4.3 human Verification/close 主链路
+    - 当前 MuMu API35 P3.5 原生重启回读切片无外部 blocker；P4.3 已有人工通过/关闭真链证据，但 G3/G4 仍未正式关闭
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -816,6 +816,8 @@ Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
 实现创建/编辑、列表/筛选、去重候选、评论、附件、分配、主状态、人工/外部修复、Build、验收、审计时间线、通知 Inbox，以及 Relay 一键派发/回执展示位。P3 阶段使用 fake Relay；P5 再接真实 adapter。
 
+post-P4 MVP consolidation：P4.1-P4.3 已分别跑通 human Attempt、exact Build link 与 passed Verification/close 后，先增加一个有界、只读的人工作流投影。API/SQLite 在服务重启后返回最近一条 Bug/Attempt/Build/Verification/closure 事实，原生 Android 首页在新进程中回读并显示；一个不存在项目/工作流返回明确 `404`。该切片不重跑创建链、不扩导航/筛选矩阵，也不把它解释为正式 G3/G4 完成。
+
 验证：App 内完整人工闭环；Relay 关闭仍可上报到验收关闭；30 秒快速提单；修复人与验收、版本冲突、重复候选人工决定和未通过 Verification 禁止关闭均成立。
 
 #### P3.6 悬浮球、MediaProjection 与系统分享
@@ -869,6 +871,8 @@ MuMu MVP execution override：复用已有 QA-owned manual Build adapter，先�
 要做：验收领取、criteria snapshot、通过/失败/阻塞、S0/S1 分离职责、关闭和重开。
 
 MuMu MVP execution override：先对 P4.2 的 exact Attempt/Build 创建并回读一条人工 Verification，显式开始、记录 `passed` 结果并由同一人工操作关闭 Bug；保留一个缺失/错误验收证据不能关闭的失败。失败重开、blocked/cancelled、S0/S1 分离职责与 newer-build reopen 留在正式 Gate 收尾。
+
+已验证 slice：MuMu/API35 Android 经真实 4319/SQLite 对 exact human Attempt/Build 创建、回读并开始 Verification；缺少 `resultSummary` 的完整结果请求返回 `400 INVALID_REQUEST`，随后人工提交 `passed`，Verification=`passed/v3`、Bug=`closed/v7`，且 closure acceptance 指向同一 Verification。P4.3 转 `VERIFYING`；失败/阻塞/取消、reopen、S0/S1 分离职责、附件/capture 与 durable create/start receipt 仍在收尾/正式 Gate，唯一指针回到 P3.5 原生全流转首页整合。
 
 验证：
 
