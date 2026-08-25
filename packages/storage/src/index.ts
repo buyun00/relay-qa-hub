@@ -252,11 +252,17 @@ export type {
   SqliteOnlineBackupOptions,
   SqliteOnlineBackupResult,
 } from "./sqlite-backup.js";
-export { restoreSqliteToIsolatedRoot, SqliteRestoreError } from "./sqlite-restore.js";
+export {
+  restoreSqliteToIsolatedRoot,
+  SqliteRestoreError,
+  validateSqliteBackupBundle,
+} from "./sqlite-restore.js";
 export type {
+  SqliteBackupBundleValidation,
   SqliteIsolatedRestoreOptions,
   SqliteIsolatedRestoreResult,
   SqliteRestoreErrorCode,
+  ValidateSqliteBackupBundleOptions,
 } from "./sqlite-restore.js";
 export {
   restoreReferencedAttachmentsToIsolatedRoot,

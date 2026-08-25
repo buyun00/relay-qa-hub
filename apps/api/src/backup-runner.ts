@@ -1,12 +1,18 @@
 import { randomUUID } from "node:crypto";
-import { existsSync, lstatSync, mkdirSync, realpathSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
-import type { SqliteOnlineBackupResult, SqliteStorageWorker } from "@relay-qa-hub/storage";
+import {
+  validateSqliteBackupBundle,
+  type SqliteOnlineBackupResult,
+  type SqliteStorageWorker,
+} from "@relay-qa-hub/storage";
 
 const MINIMUM_BACKUP_INTERVAL_MINUTES = 15;
 const MAXIMUM_BACKUP_INTERVAL_MINUTES = 7 * 24 * 60;
+const MAXIMUM_FUTURE_CLOCK_SKEW_MS = 60_000;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+const MANIFEST_SUFFIX = ".sqlite.manifest.json";
 
 export class ApiBackupConfigurationError extends Error {
   readonly code = "API_BACKUP_CONFIG_INVALID";
@@ -172,6 +178,89 @@ function ensureSafeRpoRoot(backupRoot: string): string {
   return canonicalRpoRoot;
 }
 
+interface LatestRecoveryPoint {
+  readonly backupPath: string;
+  readonly manifestPath: string;
+  readonly createdAt: string;
+  readonly createdAtMs: number;
+}
+
+function requireOrdinaryRecoveryFile(filePath: string, rpoRoot: string, field: string): string {
+  try {
+    const stat = lstatSync(filePath);
+    if (stat.isSymbolicLink() || !stat.isFile()) {
+      throw new ApiBackupConfigurationError(`${field} must be an ordinary file`);
+    }
+    const canonicalPath = realpathSync.native(filePath);
+    if (!pathsEqual(dirname(canonicalPath), rpoRoot)) {
+      throw new ApiBackupConfigurationError(`${field} must remain a direct child of rpo root`);
+    }
+    return canonicalPath;
+  } catch (error) {
+    if (error instanceof ApiBackupConfigurationError) throw error;
+    throw new ApiBackupConfigurationError(
+      `${field} could not be verified: ${error instanceof Error ? error.message : "unknown error"}`,
+    );
+  }
+}
+
+function findLatestRecoveryPoint(rpoRoot: string, nowMs: number): LatestRecoveryPoint | undefined {
+  let entries: string[];
+  try {
+    entries = readdirSync(rpoRoot, { encoding: "utf8" });
+  } catch (error) {
+    throw new ApiBackupConfigurationError(
+      `backup rpo root could not be read: ${error instanceof Error ? error.message : "unknown error"}`,
+    );
+  }
+
+  let latest: LatestRecoveryPoint | undefined;
+  for (const name of entries) {
+    if (!name.endsWith(MANIFEST_SUFFIX)) continue;
+    const manifestPath = requireOrdinaryRecoveryFile(
+      resolve(rpoRoot, name),
+      rpoRoot,
+      "recovery point manifest",
+    );
+    const backupName = name.slice(0, -".manifest.json".length);
+    const backupPath = requireOrdinaryRecoveryFile(
+      resolve(rpoRoot, backupName),
+      rpoRoot,
+      "recovery point database",
+    );
+
+    let manifest;
+    try {
+      ({ manifest } = validateSqliteBackupBundle({ backupPath, manifestPath }));
+    } catch (error) {
+      throw new ApiBackupConfigurationError(
+        `recovery point validation failed: ${error instanceof Error ? error.message : "unknown error"}`,
+      );
+    }
+    const createdAtMs = Date.parse(manifest.createdAt);
+    if (createdAtMs > nowMs + MAXIMUM_FUTURE_CLOCK_SKEW_MS) {
+      throw new ApiBackupConfigurationError(
+        "recovery point createdAt exceeds the allowed future clock skew",
+      );
+    }
+
+    const candidate = Object.freeze({
+      backupPath,
+      manifestPath,
+      createdAt: manifest.createdAt,
+      createdAtMs,
+    });
+    if (
+      latest === undefined ||
+      candidate.createdAtMs > latest.createdAtMs ||
+      (candidate.createdAtMs === latest.createdAtMs && candidate.manifestPath > latest.manifestPath)
+    ) {
+      latest = candidate;
+    }
+  }
+  return latest;
+}
+
 export function parseApiBackupEnvironment(
   environment: Readonly<Record<string, string | undefined>>,
   options: ApiBackupEnvironmentOptions,
@@ -269,6 +358,27 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
     );
   };
 
+  const scheduleNextBackup = (delayMs: number): void => {
+    if (stopped || config.intervalMs === undefined) return;
+    timer = setTimeout(() => {
+      timer = undefined;
+      if (stopped) return;
+      void runBackup()
+        .then((result) => {
+          if (result !== undefined) recordSuccess(result);
+        })
+        .catch((error: unknown) => {
+          options.logger.error({ error }, "Relay QA Hub scheduled online backup failed");
+        })
+        .finally(() => {
+          if (!stopped && config.intervalMs !== undefined) {
+            scheduleNextBackup(config.intervalMs);
+          }
+        });
+    }, delayMs);
+    timer.unref();
+  };
+
   return Object.freeze({
     async start(): Promise<SqliteOnlineBackupResult | undefined> {
       if (started) throw new Error("API backup runner has already started");
@@ -276,23 +386,40 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
       if (stopped) return undefined;
 
       let onStartResult: SqliteOnlineBackupResult | undefined;
+      let nextBackupDelayMs = config.intervalMs;
       if (config.onStart) {
         onStartResult = await runBackup();
         if (onStartResult !== undefined) recordSuccess(onStartResult);
+      } else if (config.intervalMs !== undefined) {
+        const currentTime = now();
+        const currentTimeMs = currentTime.getTime();
+        if (!Number.isFinite(currentTimeMs)) {
+          throw new ApiBackupConfigurationError("backup runner clock returned an invalid time");
+        }
+        const latest = findLatestRecoveryPoint(ensureSafeRpoRoot(config.backupRoot), currentTimeMs);
+        const ageMs =
+          latest === undefined
+            ? config.intervalMs
+            : Math.max(0, currentTimeMs - latest.createdAtMs);
+        if (latest === undefined || ageMs >= config.intervalMs) {
+          onStartResult = await runBackup();
+          if (onStartResult !== undefined) recordSuccess(onStartResult);
+        } else {
+          nextBackupDelayMs = config.intervalMs - ageMs;
+          options.logger.info(
+            {
+              latestBackupPath: latest.backupPath,
+              latestManifestPath: latest.manifestPath,
+              latestCreatedAt: latest.createdAt,
+              nextBackupDelayMs,
+            },
+            "Relay QA Hub backup cadence resumed from latest recovery point",
+          );
+        }
       }
 
-      if (!stopped && config.intervalMs !== undefined) {
-        timer = setInterval(() => {
-          if (stopped) return;
-          void runBackup()
-            .then((result) => {
-              if (result !== undefined) recordSuccess(result);
-            })
-            .catch((error: unknown) => {
-              options.logger.error({ error }, "Relay QA Hub scheduled online backup failed");
-            });
-        }, config.intervalMs);
-        timer.unref();
+      if (!stopped && nextBackupDelayMs !== undefined) {
+        scheduleNextBackup(Math.max(1, nextBackupDelayMs));
       }
       return onStartResult;
     },

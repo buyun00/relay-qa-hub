@@ -43,6 +43,19 @@ export interface SqliteIsolatedRestoreResult {
   readonly manifest: SqliteBackupManifest;
 }
 
+export interface ValidateSqliteBackupBundleOptions {
+  /** Existing online-backup database. */
+  readonly backupPath: string;
+  /** Optional sidecar path; defaults to `${backupPath}.manifest.json`. */
+  readonly manifestPath?: string;
+}
+
+export interface SqliteBackupBundleValidation {
+  readonly backupPath: string;
+  readonly manifestPath: string;
+  readonly manifest: SqliteBackupManifest;
+}
+
 const RESTORE_MARKER = ".qa-hub-isolated-restore.json";
 
 function requireAbsolutePath(value: string, field: string): string {
@@ -284,6 +297,32 @@ function verifyBackupAgainstManifest(backupPath: string, manifest: SqliteBackupM
 }
 
 /**
+ * Validate a manifest-bound online backup without restoring or changing its database bytes.
+ *
+ * Callers may use this to select a recovery point, but must still enforce their
+ * own directory/ownership boundary before passing paths into this helper.
+ */
+export function validateSqliteBackupBundle(
+  options: ValidateSqliteBackupBundleOptions,
+): SqliteBackupBundleValidation {
+  const backupPath = requireAbsolutePath(options.backupPath, "backupPath");
+  const manifestPath = requireAbsolutePath(
+    options.manifestPath ?? `${backupPath}.manifest.json`,
+    "manifestPath",
+  );
+  if (!existsSync(backupPath) || !existsSync(manifestPath)) {
+    throw new SqliteRestoreError(
+      "SQLITE_RESTORE_BACKUP_INVALID",
+      "SQLite backup database and manifest are required",
+    );
+  }
+
+  const manifest = readManifest(manifestPath);
+  verifyBackupAgainstManifest(backupPath, manifest);
+  return Object.freeze({ backupPath, manifestPath, manifest });
+}
+
+/**
  * Restore a verified P8.3 backup into a brand-new isolated directory.
  *
  * This is intentionally not an API operation. A restore root is create-only,
@@ -305,15 +344,7 @@ export async function restoreSqliteToIsolatedRoot(
       "isolated restore root must not already exist",
     );
   }
-  if (!existsSync(backupPath) || !existsSync(manifestPath)) {
-    throw new SqliteRestoreError(
-      "SQLITE_RESTORE_BACKUP_INVALID",
-      "SQLite backup database and manifest are required",
-    );
-  }
-
-  const manifest = readManifest(manifestPath);
-  verifyBackupAgainstManifest(backupPath, manifest);
+  const { manifest } = validateSqliteBackupBundle({ backupPath, manifestPath });
 
   let rootCreated = false;
   const markerPath = join(restoreRoot, RESTORE_MARKER);
