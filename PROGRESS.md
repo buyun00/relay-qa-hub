@@ -3,23 +3,23 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P7`（桌面 Web 正式管理平台恢复为 MVP 主路径；G3-G7 尚未正式关闭）
-- Current pointer: `P7.4`（现有 React/Vite 壳接真实 QA Hub API；首段为桌面 Bug 列表）
+- Current pointer: `P7.4`（桌面 Bug 列表已接通真实 API；当前进入详情/证据/时间线/评论）
 - Current gate: `G7-WORKBENCH-READY`（不得把 P0 Web 壳或临时 API 响应误报为 G7 完成）
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G7-WORKBENCH-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
 - Active work packages: `P3.1, P3.3, P3.4, P3.5, P3.6, P3.7, P4.1, P4.2, P4.3, P5.1, P5.4, P6.1, P6.2, P7.1, P7.2, P7.4`
-- Current delivery slice: `Android field capture/submit chain verified through Comment/audit; management responsibility now moves to desktop Web over the same 4319 API/SQLite facts`
-- Minimal verification: `下一切片只证明真实 Web 页面从 4319 API 读取并渲染一条 SQLite Bug；一个不存在项目/错误响应在页面明确显示`
-- Next atomic action: `P7.4 IN_PROGRESS：把 apps/web 接到真实 GET /api/v1/bugs，渲染一条现有 Bug，并保留一个不存在项目/错误响应；通过后进入详情/时间线/评论`
+- Current delivery slice: `desktop Web -> same-origin proxy -> 4319 API -> SQLite Bug list is real; Android remains field capture/submit only`
+- Minimal verification: `下一切片只证明点击真实 Bug 后从 4319 回读详情与审计时间线，并让不存在 Bug 的 404 明确显示；随后接 Comment`
+- Next atomic action: `P7.4 IN_PROGRESS：接通真实 Bug 详情 + events 时间线 + missing Bug 404，再复用现有 POST Comment 路由提供最小评论入口`
 - Completed gates: `1 / 11`
-- Last green commit: `c2788b7`
+- Last green commit: `f1ed5dc`
 - Last deployed commit: `none`
 - Schema version: `contract 1.1.0; database v3 verified at P1.2`
 - Production URL: `not deployed`
 - Last production verification: `none`
 - Last backup verified: `none`
 - Last restore drill: `none`
-- Blockers: `当前 P7.4 Web Bug 列表切片无外部 blocker；apps/web 仍只是未接业务 API 的 P0 壳，真实 Relay/Unity/Jenkins 均不在授权范围`
-- Updated at: `2026-08-25T18:30:47+08:00`
+- Blockers: `当前 P7.4 详情/时间线/评论切片无外部 blocker；真实 Relay/Unity/Jenkins 均不在授权范围`
+- Updated at: `2026-08-25T18:50:22+08:00`
 
 ## Gate status
 
@@ -33,7 +33,7 @@
 | G4-HUMAN-CLOSED-LOOP      | PLANNED |                                                                                                                                 |                           |
 | G5-RELAY-INTEGRATED       | PLANNED |                                                                                                                                 |                           |
 | G6-BUILD-VERIFICATION     | PLANNED |                                                                                                                                 |                           |
-| G7-WORKBENCH-READY        | PLANNED |                                                                                                                                 |                           |
+| G7-WORKBENCH-READY        | IN_PROGRESS | [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md)：真实桌面 Bug list/error 首段；管理闭环仍未完成 | 2026-08-25T18:50:22+08:00 |
 | G8-OPERATIONS-READY       | PLANNED |                                                                                                                                 |                           |
 | G9-REAL-DEVICE            | PLANNED |                                                                                                                                 |                           |
 | G10-PRODUCTION-CANARY     | PLANNED |                                                                                                                                 |                           |
@@ -76,7 +76,7 @@
 | P7.1  | VERIFYING   | root + Luna/max          | G3 (MVP override)   | duplicate candidates                                 | one bounded real candidate + Android hint; one unrelated empty result                              | [`docs/evidence/P7.1-mumu-duplicate-candidates.md`](docs/evidence/P7.1-mumu-duplicate-candidates.md)：MuMu 显示 5 条；无关 LOCAL-7 为 0；未自动 duplicate/验收 | `48a2bee9f5754d7bdad3cd63bd5712c570599d3e` | 2026-08-25T15:42:46+08:00 |
 | P7.2  | VERIFYING   | root + Luna/max          | G4,P7.1             | workbench/filters                                    | one bounded Android list + state filter; one invalid-filter failure                                | [`docs/evidence/P7.2-mumu-bug-workbench.md`](docs/evidence/P7.2-mumu-bug-workbench.md)：MuMu 回读 5 个 reported Bug/snapshot 18；非法 state 400 | `b3bab0ad4946a70276f4807edf473695f0a7b2cc` | 2026-08-25T15:56:07+08:00 |
 | P7.3  | PLANNED     | unassigned               | P7.2                | metrics/export                                       | fact-table recomputation                                                                           |                                                                       |                                            | 2026-08-24                |
-| P7.4  | IN_PROGRESS | root + Luna/max          | P3.3,P7.2           | formal desktop QA management Web                     | real Web -> 4319 Bug list + one missing/error; then detail/timeline/comment                         | existing P0.4 shell only; first business API slice active             |                                            | 2026-08-25T18:30:47+08:00 |
+| P7.4  | IN_PROGRESS | root + Luna/max          | P3.3,P7.2           | formal desktop QA management Web                     | real detail/events/missing 404; then Comment UI                                                      | [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md)：list/snapshot + invalid project error | `f1ed5dc68e7e7fe51d38620cf213a3ba8a2a4284` | 2026-08-25T18:50:22+08:00 |
 | P8.1  | PLANNED     | unassigned               | G6,G7               | security hardening                                   | security suite/secret scan                                                                         |                                                                       |                                            | 2026-08-24                |
 | P8.2  | PLANNED     | unassigned               | P8.1                | performance/fault injection                          | p95/p99 + no-false-success                                                                         |                                                                       |                                            | 2026-08-24                |
 | P8.3  | PLANNED     | unassigned               | P1.1,P3.3           | online backup                                        | integrity/hash/retention tests                                                                     |                                                                       |                                            | 2026-08-24                |
@@ -93,7 +93,7 @@
 - `P3.3` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T09:57:30+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Bug/Occurrence 与单 PNG attachment/bind 已有 MuMu 真证据；full mobile API/scanner/idempotency hardening 转入收尾清单，主链先进入 P3.6`。
 - `P3.4` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:25:29+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Room v4 已保存 final reservation/claim；逐阶段 resume、response-loss 与 multi-chunk 在 capture 主链后补`。
 - `P3.5` — owner: `root + Luna/xhigh`; started: `2026-08-25T17:23:33+08:00`; updated: `2026-08-25T18:30:47+08:00`; state: `VERIFYING`; completed slices: `fresh workflow readback + append-only Comment/comment.created timeline + missing project/Bug 404`；boundary: `Android 管理能力冻结，不再扩完整管理后台，正式管理转 P7.4 Web`。
-- `P7.4` — owner: `root + Luna/max`; started: `2026-08-25T18:30:47+08:00`; state: `IN_PROGRESS`; next atomic action: `现有 React/Vite 壳从真实 4319 GET /api/v1/bugs 渲染一条 SQLite Bug；不存在项目/错误响应明确显示；随后详情/时间线/评论`。
+- `P7.4` — owner: `root + Luna/max`; started: `2026-08-25T18:30:47+08:00`; updated: `2026-08-25T18:50:22+08:00`; state: `IN_PROGRESS`; completed slice: `真实 desktop list/snapshot + invalid project 400 error`；next atomic action: `点击 Bug 回读详情/events，missing Bug 404，再接 Comment UI`。
 - `P3.6` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:57:27+08:00`; updated: `2026-08-25T11:19:01+08:00`; state: `IN_PROGRESS`; next atomic action: `MuMu 已证明显式授权、悬浮球、2560x1440 MediaProjection PNG 到 attachment/Bug 及拒绝降级；录屏、Share/Picker、旋转/真机/API37 进入收尾，不阻塞 P3.7`。
 - `P3.7` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T11:19:01+08:00`; updated: `2026-08-25T12:36:50+08:00`; state: `VERIFYING`; next atomic action: `MuMu MVP 已证明 partial Poco PNG 与 unavailable no-Poco bundle 均同 captureId bound/readable；真实 Unity、qa.snapshot、LAN-negative、真机/API37 由 P3.8/P3.9/P9.1 补证，不阻塞当前 P5.1`。
 - `P4.1` — owner: `root + Luna/max`; started: `2026-08-25T15:56:07+08:00`; updated: `2026-08-25T16:24:37+08:00`; state: `VERIFYING`; next atomic action: `MuMu 已创建/回读 mode=human 的 planned Attempt，并证明缺交付证据 400/无 delivered event；完整转交/supersede/external 后补`。
@@ -184,6 +184,7 @@
 - P4.3 human Verification/close slice 于 `2026-08-25T17:23:33+08:00` 验证并提交为 `a98549cfca1b85867a90366f1708387f90f27701`：MuMu/API35 经真实 4319/SQLite 创建/回读/开始 Verification `495dd9d6-6aa2-4705-9faf-5266cd58d963`；缺 `resultSummary` 返回 `400 INVALID_REQUEST`，人工通过后 Verification=`passed/v3`、Bug `LOCAL-11`=`closed/v7`，closure acceptance 与 result submission 均指向同一 Verification。证据见 [`docs/evidence/P4.3-mumu-human-verification-close.md`](docs/evidence/P4.3-mumu-human-verification-close.md)。P4.3 转 `VERIFYING`，唯一 pointer 回到 P3.5 原生工作流整合；未启动 Relay/Unity/Jenkins，也未宣称失败重开、职责分离、真机或正式 G4 完成。
 - P3.5 persisted human-workflow readback slice 于 `2026-08-25T18:04:43+08:00` 验证并提交为 `6de01a92dc56a650cab03b244217a59f7eb7e5e1`：fresh QA Hub API 与 fresh MuMu App 经真实 4319/SQLite 回读 `LOCAL-11/closed/v7`、human Attempt=`delivered`、exact-SHA Build=`ready`、Verification=`passed/v3`；哨兵项目返回 `404 NOT_FOUND`。证据见 [`docs/evidence/P3.5-mumu-human-workflow-readback.md`](docs/evidence/P3.5-mumu-human-workflow-readback.md)。P3.5 保持 `IN_PROGRESS` 并进入 Comment/audit 原子段；最终无令牌 APK 已恢复，4319 listener/reverse 清零，未启动 Relay/Unity/Jenkins，也未宣称 G3/G4 完成。
 - P3.5 Comment/audit slice 于 `2026-08-25T18:30:47+08:00` 验证：MuMu/API35 经真实 4319/SQLite 对 `LOCAL-11` 追加 Comment `870beb5c-a9d6-491d-bed6-d866081bbc82` 并回读 `comment.created` event `d974bff7-bce9-4ee1-9886-b7a9dd8fd399`，missing Bug=`404 NOT_FOUND`；混合 aggregate timeline 客户端修复提交为 `c2788b7fe53fa0adb143ca055d5efea11558990e`。证据见 [`docs/evidence/P3.5-mumu-comment-audit.md`](docs/evidence/P3.5-mumu-comment-audit.md)。无令牌 APK/4319/reverse 已清理；P3.5 转 `VERIFYING` 并冻结 Android 管理扩展，唯一 pointer 切到 P7.4 Web。
+- P7.4 desktop Bug list slice 于 `2026-08-25T18:50:22+08:00` 验证并提交为 `f1ed5dc68e7e7fe51d38620cf213a3ba8a2a4284`：真实浏览器经 Vite server-side bearer proxy/4319/SQLite 显示 `LOCAL-12..LOCAL-1` 与 snapshot `48`；哨兵项目在页面明确显示 `400 INVALID_REQUEST`，未伪装为空列表。PWA/Service Worker 已移除，4174/4319 与一次性凭据已清理。证据见 [`docs/evidence/P7.4-desktop-bug-list.md`](docs/evidence/P7.4-desktop-bug-list.md)。P7.4/G7 保持 `IN_PROGRESS`，唯一 pointer 进入详情/时间线/评论；未启动 Android、Relay、Unity 或 Jenkins。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 

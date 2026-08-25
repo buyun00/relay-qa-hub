@@ -14,11 +14,11 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: c2788b7
-  last_verified_at: 2026-08-25T18:30:47+08:00
-  next_action: P7.4 IN_PROGRESS；把现有 React/Vite 壳接到真实 4319 API，桌面页面渲染一条 SQLite Bug 列表记录，并明确显示一个不存在项目/错误响应
+  last_verified_commit: f1ed5dc
+  last_verified_at: 2026-08-25T18:50:22+08:00
+  next_action: P7.4 IN_PROGRESS；点击真实 Bug 回读详情与 events 时间线，明确显示 missing Bug 404，再接现有 POST Comment 路由
   blockers:
-    - 当前 P7.4 首条 Web Bug 列表垂直切片无外部 blocker；现有 apps/web 仅是写有“P0 运行骨架 · 暂未连接业务 API”的壳，不能描述为管理平台
+    - 当前 P7.4 详情/时间线/评论切片无外部 blocker；首条桌面 Bug list/error 已经真实浏览器 -> 4319 -> SQLite 验证，但不能误报为 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -995,7 +995,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。现有 P0.4 `apps/web` 只是未接业务 API 的 React/Vite 壳。按最小真实切片依次接通：真实 API Bug 列表 -> Bug 详情/证据/时间线/评论 -> 分配与状态修改 -> 一键 Relay/回执/失败重试 -> Build/人工 Verification/关闭；随后补搜索/组合筛选、去重合并与必要项目/人员/角色/模块/Relay 设置。每段只保留一条成功与一个关键失败，复杂筛选、批量操作和设置细节进入收尾清单。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。首条真实 API Bug 列表/error 已由桌面浏览器经 4174 server-side auth proxy -> 4319 -> SQLite 验证；原 PWA 插件与 Service Worker 已移除。当前按最小真实切片继续：Bug 详情/证据/时间线/评论 -> 分配与状态修改 -> 一键 Relay/回执/失败重试 -> Build/人工 Verification/关闭；随后补搜索/组合筛选、去重合并与必要项目/人员/角色/模块/Relay 设置。每段只保留一条成功与一个关键失败，复杂筛选、批量操作和设置细节进入收尾清单。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态、版本和待办。
 
