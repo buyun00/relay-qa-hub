@@ -55,6 +55,14 @@ import type {
   StartMobileRepairAttemptInput,
 } from "./mobile-relay-store.js";
 import type {
+  CreateMobileVerificationInput,
+  GetMobileVerificationInput,
+  MobileVerificationRecord,
+  MobileVerificationResultResponse,
+  RecordMobileVerificationResultInput,
+  StartMobileVerificationInput,
+} from "./mobile-verification-store.js";
+import type {
   ListMobileNotificationsInput,
   MobileNotificationList,
 } from "./mobile-inbox-store.js";
@@ -242,6 +250,34 @@ export class SqliteStorageWorker {
   }): Promise<MobileBuildRecord | null> {
     await this.initialization;
     return this.request<MobileBuildRecord | null>("getMobileBuild", input);
+  }
+
+  async createMobileVerification(
+    input: CreateMobileVerificationInput,
+  ): Promise<MobileVerificationRecord> {
+    await this.initialization;
+    return this.request<MobileVerificationRecord>("createMobileVerification", input);
+  }
+
+  async getMobileVerification(
+    input: GetMobileVerificationInput,
+  ): Promise<MobileVerificationRecord | null> {
+    await this.initialization;
+    return this.request<MobileVerificationRecord | null>("getMobileVerification", input);
+  }
+
+  async startMobileVerification(
+    input: StartMobileVerificationInput,
+  ): Promise<MobileVerificationRecord> {
+    await this.initialization;
+    return this.request<MobileVerificationRecord>("startMobileVerification", input);
+  }
+
+  async recordMobileVerificationResult(
+    input: RecordMobileVerificationResultInput,
+  ): Promise<MobileVerificationResultResponse> {
+    await this.initialization;
+    return this.request<MobileVerificationResultResponse>("recordMobileVerificationResult", input);
   }
 
   async syncAndListMobileNotifications(

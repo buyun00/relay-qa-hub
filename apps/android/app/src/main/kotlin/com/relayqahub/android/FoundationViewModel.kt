@@ -105,6 +105,8 @@ data class ManualRepairUiState(
 
 data class HumanRepairBuildUiState(
     val phase: String = "idle",
+    val bugId: String? = null,
+    val bugVersion: Int = 0,
     val attemptId: String? = null,
     val deliveredCommitSha: String? = null,
     val buildId: String? = null,
@@ -112,6 +114,13 @@ data class HumanRepairBuildUiState(
     val bugState: String? = null,
     val wrongShaRejectionCode: String? = null,
     val errorCode: String? = null,
+    val verificationPhase: String = "idle",
+    val verificationId: String? = null,
+    val verificationStatus: String? = null,
+    val closedBugState: String? = null,
+    val closedBugVersion: Int = 0,
+    val missingResultRejectionCode: String? = null,
+    val verificationErrorCode: String? = null,
 )
 
 private data class ScopeUiValues(
@@ -576,6 +585,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             }.onSuccess { result ->
                 humanRepairBuild.value = HumanRepairBuildUiState(
                     phase = "linked",
+                    bugId = result.bugId,
+                    bugVersion = result.bugVersion,
                     attemptId = result.attemptId,
                     deliveredCommitSha = result.deliveredCommitSha,
                     buildId = result.buildId,
@@ -608,6 +619,75 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             errorCode = code,
         )
         lastAction.value = "Human delivery/Build link failed: $code."
+    }
+
+    fun verifyManualRepairAndClose() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setHumanVerificationFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            val current = humanRepairBuild.value
+            val bugId = current.bugId
+            val attemptId = current.attemptId
+            val buildId = current.buildId
+            if (
+                current.phase != "linked" ||
+                bugId.isNullOrBlank() ||
+                current.bugVersion < 1 ||
+                attemptId.isNullOrBlank() ||
+                buildId.isNullOrBlank()
+            ) {
+                setHumanVerificationFailure("HUMAN_BUILD_LINK_MISSING")
+                return@launch
+            }
+            humanRepairBuild.value = current.copy(
+                verificationPhase = "loading",
+                verificationErrorCode = null,
+            )
+            lastAction.value = "Running human Verification against the exact QA Build…"
+            runCatching {
+                appContainer.repairAttemptClient.verifyManualBuildAndClose(
+                    bugId = bugId,
+                    expectedBugVersion = current.bugVersion,
+                    attemptId = attemptId,
+                    buildId = buildId,
+                    verifierId = scope.actorId,
+                    accessToken = accessToken,
+                )
+            }.onSuccess { result ->
+                humanRepairBuild.value = humanRepairBuild.value.copy(
+                    verificationPhase = "closed",
+                    verificationId = result.verificationId,
+                    verificationStatus = result.verificationStatus,
+                    closedBugState = result.bugState,
+                    closedBugVersion = result.bugVersion,
+                    missingResultRejectionCode = result.missingResultRejectionCode,
+                )
+                lastAction.value =
+                    "Human Verification ${result.verificationId}=${result.verificationStatus}; " +
+                        "Bug ${result.bugId}=${result.bugState}; missing result=" +
+                        "${result.missingResultRejectionCode}."
+            }.onFailure { failure ->
+                setHumanVerificationFailure(
+                    if (failure is RepairAttemptFailure) {
+                        failure.code
+                    } else {
+                        failure.message?.takeIf(String::isNotBlank)
+                            ?: "UNEXPECTED_HUMAN_VERIFICATION_FAILURE"
+                    },
+                )
+            }
+        }
+    }
+
+    private fun setHumanVerificationFailure(code: String) {
+        humanRepairBuild.value = humanRepairBuild.value.copy(
+            verificationPhase = "failed",
+            verificationErrorCode = code,
+        )
+        lastAction.value = "Human Verification failed: $code."
     }
 
     fun createBugAndCheckDuplicates() {

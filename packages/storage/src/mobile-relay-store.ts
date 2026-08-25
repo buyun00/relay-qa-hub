@@ -682,7 +682,7 @@ function insertUserEvent(
 
 export function ensureMobileRelayRoles(database: DatabaseSync, scope: MobileScopeBootstrap): void {
   requireTransaction(database);
-  for (const role of ["triager", "developer", "release_manager"] as const) {
+  for (const role of ["triager", "developer", "release_manager", "verifier"] as const) {
     database
       .prepare(
         `INSERT OR IGNORE INTO membership_roles(

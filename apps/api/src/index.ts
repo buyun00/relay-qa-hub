@@ -89,6 +89,24 @@ export type {
 } from "./mobile-builds.js";
 
 export {
+  MOBILE_VERIFICATION_COLLECTION_PATH,
+  MOBILE_VERIFICATION_ITEM_PATH,
+  MOBILE_VERIFICATION_RESULT_PATH,
+  MOBILE_VERIFICATION_START_PATH,
+  parseMobileCreateVerificationRequest,
+  parseMobileRecordVerificationResultRequest,
+  parseMobileStartVerificationRequest,
+  requireVerificationIdempotencyKey,
+  requireVerificationUuid,
+} from "./mobile-verification.js";
+export type {
+  MobileCreateVerificationRequest,
+  MobileRecordVerificationResultRequest,
+  MobileStartVerificationRequest,
+  MobileVerificationStore,
+} from "./mobile-verification.js";
+
+export {
   MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
   requireDuplicateBugUuid,
 } from "./mobile-duplicates.js";

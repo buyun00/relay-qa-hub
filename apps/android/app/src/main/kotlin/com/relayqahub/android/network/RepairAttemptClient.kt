@@ -279,12 +279,169 @@ class RepairAttemptClient(
         }
 
         HumanRepairBuildResult(
+            bugId = linkedBug.requireRepairString("id"),
+            bugVersion = linkedBug.optInt("version", -1).also {
+                require(it > 0) { "LINKED_BUG_VERSION_INVALID" }
+            },
             attemptId = attemptId,
             deliveredCommitSha = deliveredCommitSha,
             buildId = buildId,
             buildStatus = readBackBuild.requireRepairString("status"),
             bugState = linkedBug.requireRepairString("state"),
             wrongShaRejectionCode = wrongShaRejectionCode,
+        )
+    }
+
+    suspend fun verifyManualBuildAndClose(
+        bugId: String,
+        expectedBugVersion: Int,
+        attemptId: String,
+        buildId: String,
+        verifierId: String,
+        accessToken: String,
+    ): HumanVerificationResult = withContext(Dispatchers.IO) {
+        requireUuid(bugId, "bugId")
+        require(expectedBugVersion > 0)
+        requireUuid(attemptId, "attemptId")
+        requireUuid(buildId, "buildId")
+        requireUuid(verifierId, "verifierId")
+        require(accessToken.isNotBlank())
+
+        val requestedResponse = executeJson(
+            method = "POST",
+            relativePath = "/bugs/$bugId/verifications",
+            accessToken = accessToken,
+            idempotencyKey =
+                "workflow:createVerification:bug:$bugId:attempt:$attemptId:v$expectedBugVersion",
+            expectedStatuses = setOf(201),
+            body = JSONObject()
+                .put("expectedVersion", expectedBugVersion)
+                .put("repairAttemptId", attemptId)
+                .put("buildId", buildId)
+                .put("verifierId", verifierId)
+                .put("criteria", "Confirm the exact QA Build resolves the reported defect"),
+        ).body
+        val requested = requestedResponse.optJSONObject("verification") ?: requestedResponse
+        val verificationId = requested.requireRepairString("id")
+        validateVerification(
+            value = requested,
+            verificationId = verificationId,
+            bugId = bugId,
+            attemptId = attemptId,
+            buildId = buildId,
+            verifierId = verifierId,
+            status = "requested",
+            version = 1,
+        )
+
+        val readBackResponse = executeJson(
+            method = "GET",
+            relativePath = "/verifications/$verificationId",
+            accessToken = accessToken,
+            idempotencyKey = null,
+            expectedStatuses = setOf(200),
+            body = null,
+        ).body
+        val readBack = readBackResponse.optJSONObject("verification") ?: readBackResponse
+        validateVerification(
+            value = readBack,
+            verificationId = verificationId,
+            bugId = bugId,
+            attemptId = attemptId,
+            buildId = buildId,
+            verifierId = verifierId,
+            status = "requested",
+            version = 1,
+        )
+
+        val startedResponse = executeJson(
+            method = "POST",
+            relativePath = "/verifications/$verificationId/start",
+            accessToken = accessToken,
+            idempotencyKey = "workflow:startVerification:verification:$verificationId:v1",
+            expectedStatuses = setOf(200),
+            body = JSONObject()
+                .put("expectedVersion", 1)
+                .put("reason", "Native verifier started exact-Build acceptance"),
+        ).body
+        val started = startedResponse.optJSONObject("verification") ?: startedResponse
+        validateVerification(
+            value = started,
+            verificationId = verificationId,
+            bugId = bugId,
+            attemptId = attemptId,
+            buildId = buildId,
+            verifierId = verifierId,
+            status = "in_progress",
+            version = 2,
+        )
+
+        val resultSubmissionId = UUID.nameUUIDFromBytes(
+            "qa-hub-verification-result-v1|$verificationId".toByteArray(Charsets.UTF_8),
+        ).toString()
+        val missingResult = executeJson(
+            method = "POST",
+            relativePath = "/verifications/$verificationId/result",
+            accessToken = accessToken,
+            idempotencyKey = "smoke:verification:missing-result:$verificationId:v2",
+            expectedStatuses = setOf(400),
+            body = JSONObject()
+                .put("submissionContractVersion", QaHubApiContract.VERSION)
+                .put("clientSubmissionId", resultSubmissionId)
+                .put("expectedVersion", 2)
+                .put("status", "passed")
+                .put("attachmentIds", JSONArray()),
+        ).body
+        val missingResultRejectionCode = missingResult.optString("code")
+        require(missingResultRejectionCode == "INVALID_REQUEST") {
+            "MISSING_VERIFICATION_RESULT_NOT_REJECTED"
+        }
+
+        val result = executeJson(
+            method = "POST",
+            relativePath = "/verifications/$verificationId/result",
+            accessToken = accessToken,
+            idempotencyKey = "workflow:recordVerificationResult:verification:$verificationId:v2",
+            expectedStatuses = setOf(200),
+            body = JSONObject()
+                .put("submissionContractVersion", QaHubApiContract.VERSION)
+                .put("clientSubmissionId", resultSubmissionId)
+                .put("expectedVersion", 2)
+                .put("status", "passed")
+                .put("resultSummary", "Native human verifier confirmed the exact QA Build")
+                .put("attachmentIds", JSONArray()),
+        ).body
+        val passed = result.optJSONObject("verification")
+            ?: throw RepairAttemptFailure("VERIFICATION_RESULT_MISSING")
+        val closedBug = result.optJSONObject("bug")
+            ?: throw RepairAttemptFailure("VERIFICATION_BUG_MISSING")
+        validateVerification(
+            value = passed,
+            verificationId = verificationId,
+            bugId = bugId,
+            attemptId = attemptId,
+            buildId = buildId,
+            verifierId = verifierId,
+            status = "passed",
+            version = 3,
+        )
+        require(
+            closedBug.optString("id") == bugId &&
+                closedBug.optString("state") == "closed" &&
+                closedBug.optString("closedAt").isNotBlank()
+        ) {
+            "BUG_NOT_HUMAN_CLOSED"
+        }
+
+        HumanVerificationResult(
+            verificationId = verificationId,
+            verificationStatus = passed.requireRepairString("status"),
+            bugId = bugId,
+            bugState = closedBug.requireRepairString("state"),
+            bugVersion = closedBug.optInt("version", -1).also {
+                require(it > expectedBugVersion) { "CLOSED_BUG_VERSION_INVALID" }
+            },
+            missingResultRejectionCode = missingResultRejectionCode,
         )
     }
 
@@ -347,6 +504,27 @@ class RepairAttemptClient(
         require(value.optString("mode") == "human") { "REPAIR_ATTEMPT_MODE_MISMATCH" }
         require(value.optString("status") == status) { "REPAIR_ATTEMPT_STATUS_MISMATCH" }
         require(value.optInt("version", -1) == version) { "REPAIR_ATTEMPT_VERSION_MISMATCH" }
+    }
+
+    private fun validateVerification(
+        value: JSONObject,
+        verificationId: String,
+        bugId: String,
+        attemptId: String,
+        buildId: String,
+        verifierId: String,
+        status: String,
+        version: Int,
+    ) {
+        require(value.optString("id") == verificationId) { "VERIFICATION_ID_MISMATCH" }
+        require(value.optString("bugId") == bugId) { "VERIFICATION_BUG_MISMATCH" }
+        require(value.optString("repairAttemptId") == attemptId) {
+            "VERIFICATION_ATTEMPT_MISMATCH"
+        }
+        require(value.optString("buildId") == buildId) { "VERIFICATION_BUILD_MISMATCH" }
+        require(value.optString("verifierId") == verifierId) { "VERIFICATION_OWNER_MISMATCH" }
+        require(value.optString("status") == status) { "VERIFICATION_STATUS_MISMATCH" }
+        require(value.optInt("version", -1) == version) { "VERIFICATION_VERSION_MISMATCH" }
     }
 
     private fun executeJson(
@@ -417,12 +595,23 @@ data class ManualRepairAttemptResult(
 )
 
 data class HumanRepairBuildResult(
+    val bugId: String,
+    val bugVersion: Int,
     val attemptId: String,
     val deliveredCommitSha: String,
     val buildId: String,
     val buildStatus: String,
     val bugState: String,
     val wrongShaRejectionCode: String,
+)
+
+data class HumanVerificationResult(
+    val verificationId: String,
+    val verificationStatus: String,
+    val bugId: String,
+    val bugState: String,
+    val bugVersion: Int,
+    val missingResultRejectionCode: String,
 )
 
 class RepairAttemptFailure(val code: String) : RuntimeException()

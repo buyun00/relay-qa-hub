@@ -55,6 +55,18 @@ import {
   type MobileDuplicateStore,
 } from "./mobile-duplicates.js";
 import {
+  MOBILE_VERIFICATION_COLLECTION_PATH,
+  MOBILE_VERIFICATION_ITEM_PATH,
+  MOBILE_VERIFICATION_RESULT_PATH,
+  MOBILE_VERIFICATION_START_PATH,
+  parseMobileCreateVerificationRequest,
+  parseMobileRecordVerificationResultRequest,
+  parseMobileStartVerificationRequest,
+  requireVerificationIdempotencyKey,
+  requireVerificationUuid,
+  type MobileVerificationStore,
+} from "./mobile-verification.js";
+import {
   MOBILE_NOTIFICATION_LIST_PATH,
   parseMobileNotificationLimit,
   type MobileNotificationStore,
@@ -108,6 +120,7 @@ export interface CreateApiAppOptions {
   readonly mobileRelayStore?: MobileRelayStore;
   readonly mobileBuildStore?: MobileBuildStore;
   readonly mobileDuplicateStore?: MobileDuplicateStore;
+  readonly mobileVerificationStore?: MobileVerificationStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
@@ -199,6 +212,19 @@ const unconfiguredMobileDuplicateStore: MobileDuplicateStore = {
   },
 };
 
+const unconfiguredMobileVerificationStore: MobileVerificationStore = {
+  createVerification: () => {
+    throw new Error("MobileVerificationStore is not configured");
+  },
+  getVerification: () => null,
+  startVerification: () => {
+    throw new Error("MobileVerificationStore is not configured");
+  },
+  recordResult: () => {
+    throw new Error("MobileVerificationStore is not configured");
+  },
+};
+
 const unconfiguredMobileNotificationStore: MobileNotificationStore = {
   listNotifications: () => {
     throw new Error("MobileNotificationStore is not configured");
@@ -241,6 +267,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileBuildStore = options.mobileBuildStore ?? unconfiguredMobileBuildStore;
   const mobileDuplicateStore =
     options.mobileDuplicateStore ?? unconfiguredMobileDuplicateStore;
+  const mobileVerificationStore =
+    options.mobileVerificationStore ?? unconfiguredMobileVerificationStore;
   const mobileNotificationStore =
     options.mobileNotificationStore ?? unconfiguredMobileNotificationStore;
   const mobileRelayWebhookStore =
@@ -803,6 +831,125 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         const result = await mobileBuildStore.linkRepair({
           actorId: debugActorId,
           buildId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return buildErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.post<{ Params: { bugId: string } }>(
+    MOBILE_VERIFICATION_COLLECTION_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const bugId = requireVerificationUuid(request.params.bugId, "bugId");
+        const body = parseMobileCreateVerificationRequest(request.body);
+        const idempotencyKey = requireVerificationIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        const expectedKey =
+          `workflow:createVerification:bug:${bugId}:attempt:${body.repairAttemptId}:v${body.expectedVersion}`;
+        if (idempotencyKey !== expectedKey) {
+          throw new TypeError("Idempotency-Key does not match Verification creation");
+        }
+        const result = await mobileVerificationStore.createVerification({
+          actorId: debugActorId,
+          bugId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return buildErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.get<{ Params: { verificationId: string } }>(
+    MOBILE_VERIFICATION_ITEM_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const verificationId = requireVerificationUuid(
+          request.params.verificationId,
+          "verificationId",
+        );
+        const result = await mobileVerificationStore.getVerification({
+          actorId: debugActorId,
+          verificationId,
+        });
+        if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return buildErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.post<{ Params: { verificationId: string } }>(
+    MOBILE_VERIFICATION_START_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const verificationId = requireVerificationUuid(
+          request.params.verificationId,
+          "verificationId",
+        );
+        const body = parseMobileStartVerificationRequest(request.body);
+        const idempotencyKey = requireVerificationIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        const expectedKey =
+          `workflow:startVerification:verification:${verificationId}:v${body.expectedVersion}`;
+        if (idempotencyKey !== expectedKey) {
+          throw new TypeError("Idempotency-Key does not match Verification start");
+        }
+        const result = await mobileVerificationStore.startVerification({
+          actorId: debugActorId,
+          verificationId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return buildErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.post<{ Params: { verificationId: string } }>(
+    MOBILE_VERIFICATION_RESULT_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const verificationId = requireVerificationUuid(
+          request.params.verificationId,
+          "verificationId",
+        );
+        const body = parseMobileRecordVerificationResultRequest(request.body);
+        const idempotencyKey = requireVerificationIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        const expectedKey =
+          `workflow:recordVerificationResult:verification:${verificationId}:v${body.expectedVersion}`;
+        if (idempotencyKey !== expectedKey) {
+          throw new TypeError("Idempotency-Key does not match Verification result");
+        }
+        const result = await mobileVerificationStore.recordResult({
+          actorId: debugActorId,
+          verificationId,
           idempotencyKey,
           request: body,
         });

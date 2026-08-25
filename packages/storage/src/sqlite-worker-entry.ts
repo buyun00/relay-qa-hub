@@ -69,6 +69,16 @@ import {
   startMobileRepairAttempt,
 } from "./mobile-relay-store.js";
 import {
+  createMobileVerification,
+  getMobileVerification,
+  recordMobileVerificationResult,
+  startMobileVerification,
+  type CreateMobileVerificationInput,
+  type GetMobileVerificationInput,
+  type RecordMobileVerificationResultInput,
+  type StartMobileVerificationInput,
+} from "./mobile-verification-store.js";
+import {
   canonicalMigrationDigest,
   insertBugWithNextNumber,
   migrateSqliteDatabase,
@@ -99,6 +109,10 @@ interface WorkerRequest {
     | "getMobileCapture"
     | "registerMobileBuild"
     | "getMobileBuild"
+    | "createMobileVerification"
+    | "getMobileVerification"
+    | "startMobileVerification"
+    | "recordMobileVerificationResult"
     | "syncAndListMobileNotifications"
     | "ensureMobileRelayRoles"
     | "transitionMobileBugReady"
@@ -296,6 +310,34 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly buildId: string;
     };
     return getMobileBuild(requireDatabase(), payload);
+  }
+
+  if (request.operation === "createMobileVerification") {
+    return inWriteTransaction((current) =>
+      createMobileVerification(current, request.payload as CreateMobileVerificationInput),
+    );
+  }
+
+  if (request.operation === "getMobileVerification") {
+    return getMobileVerification(
+      requireDatabase(),
+      request.payload as GetMobileVerificationInput,
+    );
+  }
+
+  if (request.operation === "startMobileVerification") {
+    return inWriteTransaction((current) =>
+      startMobileVerification(current, request.payload as StartMobileVerificationInput),
+    );
+  }
+
+  if (request.operation === "recordMobileVerificationResult") {
+    return inWriteTransaction((current) =>
+      recordMobileVerificationResult(
+        current,
+        request.payload as RecordMobileVerificationResultInput,
+      ),
+    );
   }
 
   if (request.operation === "syncAndListMobileNotifications") {

@@ -312,6 +312,21 @@ export type {
   RegisterMobileBuildInput,
   RegisterMobileBuildResult,
 } from "./mobile-build-store.js";
+export {
+  createMobileVerification,
+  getMobileVerification,
+  recordMobileVerificationResult,
+  startMobileVerification,
+} from "./mobile-verification-store.js";
+export type {
+  CreateMobileVerificationInput,
+  GetMobileVerificationInput,
+  MobileVerificationRecord,
+  MobileVerificationResultResponse,
+  MobileVerificationStatus,
+  RecordMobileVerificationResultInput,
+  StartMobileVerificationInput,
+} from "./mobile-verification-store.js";
 export { syncAndListMobileNotifications } from "./mobile-inbox-store.js";
 export type {
   ListMobileNotificationsInput,

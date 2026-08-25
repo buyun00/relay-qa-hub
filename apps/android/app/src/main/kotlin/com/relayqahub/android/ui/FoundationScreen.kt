@@ -44,6 +44,7 @@ fun FoundationScreen(
     onRefreshBugWorkbench: () -> Unit = viewModel::refreshBugWorkbench,
     onCreateManualRepairAttempt: () -> Unit = viewModel::createManualRepairAttempt,
     onDeliverManualRepairAndLinkBuild: () -> Unit = viewModel::deliverManualRepairAndLinkBuild,
+    onVerifyManualRepairAndClose: () -> Unit = viewModel::verifyManualRepairAndClose,
     onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -60,6 +61,7 @@ fun FoundationScreen(
         onRefreshBugWorkbench = onRefreshBugWorkbench,
         onCreateManualRepairAttempt = onCreateManualRepairAttempt,
         onDeliverManualRepairAndLinkBuild = onDeliverManualRepairAndLinkBuild,
+        onVerifyManualRepairAndClose = onVerifyManualRepairAndClose,
         onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
     )
 }
@@ -78,6 +80,7 @@ internal fun FoundationScreen(
     onRefreshBugWorkbench: () -> Unit = {},
     onCreateManualRepairAttempt: () -> Unit = {},
     onDeliverManualRepairAndLinkBuild: () -> Unit = {},
+    onVerifyManualRepairAndClose: () -> Unit = {},
     onCreateBugAndCheckDuplicates: () -> Unit = {},
 ) {
     Scaffold(
@@ -307,6 +310,36 @@ internal fun FoundationScreen(
                     text = "Human delivery/Build error: " +
                         "${state.humanRepairBuild.errorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("human-repair-build-status"),
+                )
+            }
+            Button(
+                onClick = onVerifyManualRepairAndClose,
+                enabled = state.humanRepairBuild.phase == "linked" &&
+                    state.humanRepairBuild.verificationPhase != "loading" &&
+                    state.humanRepairBuild.verificationPhase != "closed",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("verify-manual-repair-close"),
+            ) {
+                Text("人工验收 QA Build 并关闭 Bug")
+            }
+            when (state.humanRepairBuild.verificationPhase) {
+                "loading" -> Text(
+                    text = "Human Verification: running…",
+                    modifier = Modifier.testTag("human-verification-status"),
+                )
+                "closed" -> Text(
+                    text = "Verification ${state.humanRepairBuild.verificationId}/" +
+                        "${state.humanRepairBuild.verificationStatus}; Bug=" +
+                        "${state.humanRepairBuild.closedBugState}/v" +
+                        "${state.humanRepairBuild.closedBugVersion}; missingResult=" +
+                        "${state.humanRepairBuild.missingResultRejectionCode}.",
+                    modifier = Modifier.testTag("human-verification-status"),
+                )
+                "failed" -> Text(
+                    text = "Human Verification error: " +
+                        "${state.humanRepairBuild.verificationErrorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("human-verification-status"),
                 )
             }
             Button(
