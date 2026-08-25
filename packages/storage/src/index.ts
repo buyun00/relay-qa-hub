@@ -332,9 +332,12 @@ export type {
   BindMobileAttachmentInput,
   FinalizeMobileUploadInput,
   GetMobileAttachmentInput,
+  GetMobileCaptureArtifactInput,
   InitMobileUploadInput,
   ListMobileBugAttachmentsInput,
   MobileAttachmentDownload,
+  MobileCaptureArtifactDownload,
+  MobileCaptureArtifactMetadata,
   MobileAttachmentMetadata,
   MobileAttachmentReservation,
   MobileAttachmentRoots,
@@ -346,6 +349,7 @@ export type {
   PutMobileUploadChunkInput,
 } from "./mobile-attachment-store.js";
 export { getMobileAttachment, listMobileBugAttachments } from "./mobile-attachment-store.js";
+export { getMobileCaptureArtifact } from "./mobile-attachment-store.js";
 export {
   MOBILE_CAPTURE_ALLOWED_METHODS,
   createMobileCapture,

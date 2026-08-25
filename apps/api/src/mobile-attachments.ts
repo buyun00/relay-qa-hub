@@ -1,11 +1,15 @@
 import { createHash } from "node:crypto";
 
+import type { MobileCaptureArtifactKind } from "@relay-qa-hub/storage";
+
 export const MOBILE_UPLOAD_INIT_PATH = "/api/v1/uploads/init" as const;
 export const MOBILE_UPLOAD_CHUNK_PATH = "/api/v1/uploads/:sessionId/chunks/:chunkNumber" as const;
 export const MOBILE_UPLOAD_FINALIZE_PATH = "/api/v1/uploads/:sessionId/finalize" as const;
 export const MOBILE_ATTACHMENT_BIND_PATH = "/api/v1/attachments/:attachmentId/bind" as const;
 export const MOBILE_ATTACHMENT_ITEM_PATH = "/api/v1/attachments/:attachmentId" as const;
 export const MOBILE_BUG_ATTACHMENTS_PATH = "/api/v1/bugs/:bugId/attachments" as const;
+export const MOBILE_CAPTURE_ARTIFACT_PATH =
+  "/api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind" as const;
 export const MAX_MOBILE_CHUNK_SIZE_BYTES = 8 * 1024 * 1024;
 
 export type MobileAttachmentIntent =
@@ -130,6 +134,27 @@ export interface MobileAttachmentDownload {
   readonly bytes: Buffer;
 }
 
+export interface MobileCaptureArtifactMetadata {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly captureId: string;
+  readonly artifactKind: MobileCaptureArtifactKind;
+  readonly attachmentId: string;
+  readonly clientAttachmentId: string;
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
+  readonly scanStatus: "clean";
+  readonly ready: true;
+  readonly version: number;
+}
+
+export interface MobileCaptureArtifactDownload {
+  readonly metadata: MobileCaptureArtifactMetadata;
+  readonly bytes: Buffer;
+}
+
 export interface InitMobileUploadCommand {
   readonly actorId: string;
   readonly idempotencyKey: string;
@@ -177,6 +202,13 @@ export interface GetMobileAttachmentQuery {
   readonly attachmentId: string;
 }
 
+export interface GetMobileCaptureArtifactQuery {
+  readonly actorId: string;
+  readonly bugId: string;
+  readonly captureId: string;
+  readonly artifactKind: MobileCaptureArtifactKind;
+}
+
 export interface MobileAttachmentStore {
   readonly initUpload: (
     command: InitMobileUploadCommand,
@@ -196,6 +228,9 @@ export interface MobileAttachmentStore {
   readonly getAttachment: (
     query: GetMobileAttachmentQuery,
   ) => MobileAttachmentDownload | null | Promise<MobileAttachmentDownload | null>;
+  readonly getCaptureArtifact: (
+    query: GetMobileCaptureArtifactQuery,
+  ) => MobileCaptureArtifactDownload | null | Promise<MobileCaptureArtifactDownload | null>;
 }
 
 const UUID_PATTERN =
@@ -237,6 +272,14 @@ const ATTACHMENT_INTENTS = new Set<MobileAttachmentIntent>([
   "occurrence_append",
   "comment_append",
   "verification_result",
+]);
+const MOBILE_CAPTURE_ARTIFACT_KINDS: readonly MobileCaptureArtifactKind[] = Object.freeze([
+  "system_screenshot",
+  "system_recording",
+  "poco_screenshot",
+  "poco_hierarchy",
+  "poco_profiling",
+  "poco_snapshot",
 ]);
 
 function requireRecord(value: unknown, label: string): Record<string, unknown> {
@@ -400,6 +443,13 @@ export function parseMobileAttachmentListLimit(
     throw new TypeError("limit must be between 1 and 100");
   }
   return limit;
+}
+
+export function requireMobileCaptureArtifactKind(value: string): MobileCaptureArtifactKind {
+  if (!MOBILE_CAPTURE_ARTIFACT_KINDS.includes(value as MobileCaptureArtifactKind)) {
+    throw new TypeError("artifactKind is unsupported");
+  }
+  return value as MobileCaptureArtifactKind;
 }
 
 export function requireMobileIdempotencyKey(value: string | undefined): string {

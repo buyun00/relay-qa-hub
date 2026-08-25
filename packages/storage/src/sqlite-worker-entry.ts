@@ -5,12 +5,14 @@ import {
   bindMobileAttachment,
   finalizeMobileUpload,
   getMobileAttachment,
+  getMobileCaptureArtifact,
   initMobileUpload,
   listMobileBugAttachments,
   putMobileUploadChunk,
   type BindMobileAttachmentInput,
   type FinalizeMobileUploadInput,
   type GetMobileAttachmentInput,
+  type GetMobileCaptureArtifactInput,
   type InitMobileUploadInput,
   type ListMobileBugAttachmentsInput,
   type MobileAttachmentRoots,
@@ -166,6 +168,7 @@ interface WorkerRequest {
     | "bindMobileAttachment"
     | "listMobileBugAttachments"
     | "getMobileAttachment"
+    | "getMobileCaptureArtifact"
     | "testCreateBug"
     | "integrity"
     | "close";
@@ -582,6 +585,14 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       requireDatabase(),
       requireAttachmentRoots(),
       request.payload as GetMobileAttachmentInput,
+    );
+  }
+
+  if (request.operation === "getMobileCaptureArtifact") {
+    return getMobileCaptureArtifact(
+      requireDatabase(),
+      requireAttachmentRoots(),
+      request.payload as GetMobileCaptureArtifactInput,
     );
   }
 

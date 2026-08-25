@@ -134,12 +134,21 @@ export type CapturePocoMethod =
   | "GetDebugProfilingData"
   | "qa.snapshot";
 
+export type CaptureArtifactKind =
+  | "system_screenshot"
+  | "system_recording"
+  | "poco_screenshot"
+  | "poco_hierarchy"
+  | "poco_profiling"
+  | "poco_snapshot";
+
 export interface CaptureBundleSummary {
   readonly captureId: string;
   readonly enrichmentStatus: CaptureEnrichmentStatus;
   readonly artifacts: readonly {
     readonly captureId: string;
-    readonly kind: string;
+    readonly attachmentId: string | null;
+    readonly kind: CaptureArtifactKind;
     readonly status: "succeeded" | "failed" | "skipped";
   }[];
   readonly poco: {
@@ -152,6 +161,13 @@ export interface CaptureBundleSummary {
     readonly succeededMethods: readonly CapturePocoMethod[];
     readonly failureReason: string | null;
   };
+}
+
+export interface CaptureArtifactBinary {
+  readonly blob: Blob;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
 }
 
 export interface DuplicateCandidate {
@@ -421,6 +437,24 @@ const CAPTURE_POCO_METHODS = new Set<CapturePocoMethod>([
   "qa.snapshot",
 ]);
 
+const CAPTURE_ARTIFACT_KINDS = new Set<CaptureArtifactKind>([
+  "system_screenshot",
+  "system_recording",
+  "poco_screenshot",
+  "poco_hierarchy",
+  "poco_profiling",
+  "poco_snapshot",
+]);
+
+const CAPTURE_ARTIFACT_MEDIA_TYPES: Readonly<Record<CaptureArtifactKind, readonly string[]>> = {
+  system_screenshot: ["image/png", "image/jpeg", "image/webp"],
+  system_recording: ["video/mp4", "video/webm"],
+  poco_screenshot: ["image/png", "image/jpeg", "image/webp"],
+  poco_hierarchy: ["application/json"],
+  poco_profiling: ["application/json"],
+  poco_snapshot: ["application/json"],
+};
+
 function isCaptureEnrichmentStatus(value: unknown): value is CaptureEnrichmentStatus {
   return (
     typeof value === "string" && CAPTURE_ENRICHMENT_STATUSES.has(value as CaptureEnrichmentStatus)
@@ -435,6 +469,10 @@ function isCapturePocoMethodList(value: unknown): value is readonly CapturePocoM
         typeof method === "string" && CAPTURE_POCO_METHODS.has(method as CapturePocoMethod),
     )
   );
+}
+
+function isCaptureArtifactKind(value: unknown): value is CaptureArtifactKind {
+  return typeof value === "string" && CAPTURE_ARTIFACT_KINDS.has(value as CaptureArtifactKind);
 }
 
 function isCaptureBundleSummary(value: unknown, captureId: string): value is CaptureBundleSummary {
@@ -456,7 +494,8 @@ function isCaptureBundleSummary(value: unknown, captureId: string): value is Cap
     const item = artifact as Record<string, unknown>;
     return (
       item.captureId === captureId &&
-      typeof item.kind === "string" &&
+      (item.attachmentId === null || typeof item.attachmentId === "string") &&
+      isCaptureArtifactKind(item.kind) &&
       (item.status === "succeeded" || item.status === "failed" || item.status === "skipped")
     );
   });
@@ -590,6 +629,38 @@ export async function getCaptureBundle(captureId: string): Promise<CaptureBundle
     throw new QaHubApiError(200, "INVALID_CAPTURE_BUNDLE");
   }
   return body;
+}
+
+export async function downloadCaptureArtifact(
+  bugId: string,
+  captureId: string,
+  artifactKind: CaptureArtifactKind,
+): Promise<CaptureArtifactBinary> {
+  const response = await fetch(
+    `/api/v1/bugs/${encodeURIComponent(bugId)}/capture-bundles/${encodeURIComponent(
+      captureId,
+    )}/artifacts/${encodeURIComponent(artifactKind)}`,
+    { headers: { Accept: "application/octet-stream" } },
+  );
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => null);
+    throw new QaHubApiError(response.status, readErrorCode(body));
+  }
+
+  const blob = await response.blob();
+  const mediaType = response.headers.get("content-type")?.split(";", 1)[0]?.trim() ?? "";
+  const sha256 = response.headers.get("x-content-sha256") ?? "";
+  const contentLength = Number(response.headers.get("content-length"));
+  if (
+    !CAPTURE_ARTIFACT_MEDIA_TYPES[artifactKind].includes(mediaType) ||
+    !Number.isSafeInteger(contentLength) ||
+    contentLength < 1 ||
+    blob.size !== contentLength ||
+    !/^[0-9a-f]{64}$/u.test(sha256)
+  ) {
+    throw new QaHubApiError(200, "INVALID_CAPTURE_ARTIFACT_BYTES");
+  }
+  return { blob, mediaType, size: contentLength, sha256 };
 }
 
 export async function getHumanWorkflow(bugId: string): Promise<HumanWorkflowSnapshot> {

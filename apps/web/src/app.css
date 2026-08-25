@@ -590,6 +590,73 @@ h1 {
   margin-top: 0.6rem;
 }
 
+.poco-artifact {
+  margin-top: 0.75rem;
+  padding: 0.7rem;
+  background: #172321;
+  border: 1px solid #2e4943;
+  border-radius: 0.55rem;
+}
+
+.poco-artifact__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: #f4f0e5;
+}
+
+.poco-artifact__heading strong {
+  font-size: 0.78rem;
+}
+
+.poco-artifact__heading span,
+.poco-artifact p {
+  color: #a9bbb5;
+  font-size: 0.68rem;
+}
+
+.poco-artifact p {
+  margin: 0.55rem 0 0;
+}
+
+.poco-artifact .poco-artifact__error {
+  color: #ffcfb3;
+  line-height: 1.45;
+}
+
+.poco-artifact img {
+  display: block;
+  width: 100%;
+  max-height: 24rem;
+  margin-top: 0.65rem;
+  object-fit: contain;
+  background: #0e1715;
+  border-radius: 0.4rem;
+}
+
+.poco-artifact dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.65rem;
+}
+
+.poco-artifact dt {
+  color: #92aaa3;
+}
+
+.poco-artifact dd {
+  color: #dbe8e2;
+}
+
+.poco-artifact a {
+  display: inline-block;
+  margin-top: 0.65rem;
+  color: #9ad8c9;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
 .evidence-card__title {
   display: flex;
   flex-wrap: wrap;

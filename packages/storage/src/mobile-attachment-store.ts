@@ -10,6 +10,7 @@ import {
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 
+import type { MobileCaptureArtifactKind } from "./mobile-capture-store.js";
 import { SqliteStorageError } from "./sqlite.js";
 
 const MOBILE_MIN_CHUNK_SIZE_BYTES = 256 * 1024;
@@ -145,6 +146,12 @@ export interface GetMobileAttachmentInput extends MobileAttachmentScope {
   readonly attachmentId: string;
 }
 
+export interface GetMobileCaptureArtifactInput extends MobileAttachmentScope {
+  readonly bugId: string;
+  readonly captureId: string;
+  readonly artifactKind: MobileCaptureArtifactKind;
+}
+
 export interface MobileAttachmentMetadata {
   readonly attachmentId: string;
   readonly projectId: string;
@@ -171,6 +178,27 @@ export interface MobileBugAttachmentList {
 
 export interface MobileAttachmentDownload {
   readonly metadata: MobileAttachmentMetadata;
+  readonly bytes: Uint8Array;
+}
+
+export interface MobileCaptureArtifactMetadata {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly captureId: string;
+  readonly artifactKind: MobileCaptureArtifactKind;
+  readonly attachmentId: string;
+  readonly clientAttachmentId: string;
+  readonly filename: string;
+  readonly mediaType: string;
+  readonly size: number;
+  readonly sha256: string;
+  readonly scanStatus: "clean";
+  readonly ready: true;
+  readonly version: number;
+}
+
+export interface MobileCaptureArtifactDownload {
+  readonly metadata: MobileCaptureArtifactMetadata;
   readonly bytes: Uint8Array;
 }
 
@@ -225,6 +253,13 @@ interface AttachmentRow {
 
 interface ClaimedAttachmentRow extends AttachmentRow {
   readonly storage_key: string;
+}
+
+interface CaptureArtifactAttachmentRow extends AttachmentRow {
+  readonly storage_key: string;
+  readonly bug_id: string;
+  readonly artifact_capture_id: string;
+  readonly artifact_type: MobileCaptureArtifactKind;
 }
 
 function requireTransaction(database: DatabaseSync): void {
@@ -1120,6 +1155,124 @@ export function getMobileAttachment(
     if (bytes.length !== attachment.size_bytes || sha256(bytes) !== attachment.sha256) return null;
     return Object.freeze({
       metadata: claimedAttachmentMetadata(attachment),
+      bytes,
+    });
+  } catch {
+    return null;
+  }
+}
+
+function captureArtifactMetadata(row: CaptureArtifactAttachmentRow): MobileCaptureArtifactMetadata {
+  return Object.freeze({
+    bugId: row.bug_id,
+    projectId: row.project_id,
+    captureId: row.artifact_capture_id,
+    artifactKind: row.artifact_type,
+    attachmentId: row.id,
+    clientAttachmentId: row.client_attachment_id,
+    filename: row.file_name,
+    mediaType: row.media_type,
+    size: row.size_bytes,
+    sha256: row.sha256,
+    scanStatus: "clean",
+    ready: true,
+    version: row.version,
+  });
+}
+
+function selectMobileCaptureArtifact(
+  database: DatabaseSync,
+  input: GetMobileCaptureArtifactInput,
+): CaptureArtifactAttachmentRow | null {
+  return (
+    (database
+      .prepare(
+        `SELECT bug.id AS bug_id,
+                bundle.capture_id AS artifact_capture_id,
+                artifact.artifact_type,
+                attachment.id, attachment.account_id, attachment.project_id,
+                attachment.actor_id, attachment.client_submission_id,
+                attachment.client_attachment_id, attachment.capture_id,
+                attachment.file_name, attachment.media_type, attachment.size_bytes,
+                attachment.sha256, attachment.status, attachment.scan_state,
+                attachment.version, blob.storage_key
+         FROM bugs AS bug
+         JOIN capture_bundles AS bundle
+           ON bundle.account_id = bug.account_id
+          AND bundle.project_id = bug.project_id
+          AND bundle.status = 'bound'
+          AND bundle.id = ?
+          AND bundle.capture_id = ?
+         JOIN attachments AS primary_attachment
+           ON primary_attachment.account_id = bundle.account_id
+          AND primary_attachment.project_id = bundle.project_id
+          AND primary_attachment.id = bundle.primary_attachment_id
+          AND primary_attachment.status = 'ready'
+          AND primary_attachment.scan_state = 'clean'
+         JOIN attachment_bindings AS primary_binding
+           ON primary_binding.account_id = bundle.account_id
+          AND primary_binding.project_id = bundle.project_id
+          AND primary_binding.attachment_id = bundle.primary_attachment_id
+          AND primary_binding.target_bug_id = bug.id
+          AND primary_binding.state = 'claimed'
+         JOIN bug_attachments AS primary_link
+           ON primary_link.account_id = bug.account_id
+          AND primary_link.project_id = bug.project_id
+          AND primary_link.bug_id = bug.id
+          AND primary_link.attachment_id = bundle.primary_attachment_id
+          AND primary_link.binding_id = primary_binding.id
+         JOIN capture_artifacts AS artifact
+           ON artifact.account_id = bundle.account_id
+          AND artifact.project_id = bundle.project_id
+          AND artifact.capture_bundle_id = bundle.id
+          AND artifact.capture_id = bundle.capture_id
+          AND artifact.artifact_type = ?
+          AND artifact.status = 'succeeded'
+         JOIN attachments AS attachment
+           ON attachment.account_id = artifact.account_id
+          AND attachment.project_id = artifact.project_id
+          AND attachment.id = artifact.attachment_id
+          AND attachment.client_attachment_id = artifact.client_attachment_id
+          AND attachment.capture_id = artifact.capture_id
+          AND attachment.status = 'ready'
+          AND attachment.scan_state = 'clean'
+         JOIN blobs AS blob
+           ON blob.account_id = attachment.account_id
+          AND blob.id = attachment.blob_id
+          AND blob.size_bytes = attachment.size_bytes
+          AND blob.sha256 = attachment.sha256
+          AND blob.state = 'ready'
+         WHERE bug.account_id = ?
+           AND bug.project_id = ?
+           AND bug.id = ?`,
+      )
+      .get(
+        input.captureId,
+        input.captureId,
+        input.artifactKind,
+        input.accountId,
+        input.projectId,
+        input.bugId,
+      ) as CaptureArtifactAttachmentRow | undefined) ?? null
+  );
+}
+
+export function getMobileCaptureArtifact(
+  database: DatabaseSync,
+  roots: MobileAttachmentRoots,
+  input: GetMobileCaptureArtifactInput,
+): MobileCaptureArtifactDownload | null {
+  requireRoots(roots);
+  if (!hasActiveAttachmentReadMembership(database, input)) return null;
+  const artifact = selectMobileCaptureArtifact(database, input);
+  if (artifact === null) return null;
+  const evidencePath = resolveEvidenceFile(roots.evidenceRoot, artifact.storage_key);
+  if (evidencePath === null) return null;
+  try {
+    const bytes = readFileSync(evidencePath);
+    if (bytes.length !== artifact.size_bytes || sha256(bytes) !== artifact.sha256) return null;
+    return Object.freeze({
+      metadata: captureArtifactMetadata(artifact),
       bytes,
     });
   } catch {

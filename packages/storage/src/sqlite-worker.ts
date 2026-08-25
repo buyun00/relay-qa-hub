@@ -4,9 +4,11 @@ import type {
   BindMobileAttachmentInput,
   FinalizeMobileUploadInput,
   GetMobileAttachmentInput,
+  GetMobileCaptureArtifactInput,
   InitMobileUploadInput,
   ListMobileBugAttachmentsInput,
   MobileAttachmentDownload,
+  MobileCaptureArtifactDownload,
   MobileAttachmentReservation,
   MobileBugAttachmentList,
   MobileFinalizedAttachment,
@@ -232,6 +234,13 @@ export class SqliteStorageWorker {
   ): Promise<MobileAttachmentDownload | null> {
     await this.initialization;
     return this.request<MobileAttachmentDownload | null>("getMobileAttachment", input);
+  }
+
+  async getMobileCaptureArtifact(
+    input: GetMobileCaptureArtifactInput,
+  ): Promise<MobileCaptureArtifactDownload | null> {
+    await this.initialization;
+    return this.request<MobileCaptureArtifactDownload | null>("getMobileCaptureArtifact", input);
   }
 
   async getMobileBug(input: {

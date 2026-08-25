@@ -146,5 +146,20 @@ export function createSqliteMobileAttachmentStore(
         bytes: Buffer.from(download.bytes),
       };
     },
+
+    async getCaptureArtifact(query) {
+      requireActor(query.actorId, options.scope);
+      const download = await options.worker.getMobileCaptureArtifact({
+        ...scope,
+        bugId: query.bugId,
+        captureId: query.captureId,
+        artifactKind: query.artifactKind,
+      });
+      if (download === null) return null;
+      return {
+        metadata: download.metadata,
+        bytes: Buffer.from(download.bytes),
+      };
+    },
   };
 }

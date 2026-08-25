@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   downloadAttachment,
+  downloadCaptureArtifact,
   getCaptureBundle,
   listBugAttachments,
   QaHubApiError,
   type AttachmentMetadata,
+  type CaptureArtifactBinary,
   type CaptureBundleSummary,
 } from "./api";
 
@@ -27,6 +29,15 @@ type ListState =
 type CaptureContextState =
   | { readonly state: "loading" }
   | { readonly state: "ready"; readonly bundle: CaptureBundleSummary }
+  | { readonly state: "unavailable"; readonly status: number; readonly code: string };
+
+type PocoScreenshotState =
+  | { readonly state: "loading" }
+  | {
+      readonly state: "ready";
+      readonly artifact: CaptureArtifactBinary;
+      readonly objectUrl: string;
+    }
   | { readonly state: "unavailable"; readonly status: number; readonly code: string };
 
 function evidenceError(cause: unknown): { readonly status: number; readonly code: string } {
@@ -58,6 +69,9 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
   const [entries, setEntries] = useState<readonly EvidenceEntry[]>([]);
   const [captureContexts, setCaptureContexts] = useState<
     Readonly<Record<string, CaptureContextState>>
+  >({});
+  const [pocoScreenshots, setPocoScreenshots] = useState<
+    Readonly<Record<string, PocoScreenshotState>>
   >({});
   const generationRef = useRef(0);
   const objectUrlsRef = useRef(new Set<string>());
@@ -99,23 +113,66 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
     }
   }
 
-  async function loadCaptureContext(captureId: string, generation: number): Promise<void> {
+  const loadPocoScreenshot = useCallback(async function loadPocoScreenshot(
+    selectedBugId: string,
+    captureId: string,
+    generation: number,
+  ): Promise<void> {
     try {
-      const bundle = await getCaptureBundle(captureId);
-      if (generationRef.current !== generation) return;
-      setCaptureContexts((current) => ({
+      const artifact = await downloadCaptureArtifact(selectedBugId, captureId, "poco_screenshot");
+      const objectUrl = URL.createObjectURL(artifact.blob);
+      if (generationRef.current !== generation) {
+        URL.revokeObjectURL(objectUrl);
+        return;
+      }
+      objectUrlsRef.current.add(objectUrl);
+      setPocoScreenshots((current) => ({
         ...current,
-        [captureId]: { state: "ready", bundle },
+        [captureId]: { state: "ready", artifact, objectUrl },
       }));
     } catch (cause: unknown) {
       if (generationRef.current !== generation) return;
       const failure = evidenceError(cause);
-      setCaptureContexts((current) => ({
+      setPocoScreenshots((current) => ({
         ...current,
         [captureId]: { state: "unavailable", ...failure },
       }));
     }
-  }
+  }, []);
+
+  const loadCaptureContext = useCallback(
+    async function loadCaptureContext(
+      selectedBugId: string,
+      captureId: string,
+      generation: number,
+    ): Promise<void> {
+      try {
+        const bundle = await getCaptureBundle(captureId);
+        if (generationRef.current !== generation) return;
+        setCaptureContexts((current) => ({
+          ...current,
+          [captureId]: { state: "ready", bundle },
+        }));
+        setPocoScreenshots((current) => ({
+          ...current,
+          [captureId]: { state: "loading" },
+        }));
+        await loadPocoScreenshot(selectedBugId, captureId, generation);
+      } catch (cause: unknown) {
+        if (generationRef.current !== generation) return;
+        const failure = evidenceError(cause);
+        setCaptureContexts((current) => ({
+          ...current,
+          [captureId]: { state: "unavailable", ...failure },
+        }));
+        setPocoScreenshots((current) => ({
+          ...current,
+          [captureId]: { state: "unavailable", ...failure },
+        }));
+      }
+    },
+    [loadPocoScreenshot],
+  );
 
   useEffect(() => {
     const generation = generationRef.current + 1;
@@ -124,6 +181,7 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
     setListState({ state: "loading" });
     setEntries([]);
     setCaptureContexts({});
+    setPocoScreenshots({});
 
     void (async () => {
       try {
@@ -143,7 +201,7 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
         );
         await Promise.all([
           ...result.items.map((metadata) => loadEvidenceBytes(metadata, generation)),
-          ...captureIds.map((captureId) => loadCaptureContext(captureId, generation)),
+          ...captureIds.map((captureId) => loadCaptureContext(bugId, captureId, generation)),
         ]);
       } catch (cause: unknown) {
         if (generationRef.current !== generation) return;
@@ -157,7 +215,7 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
       for (const objectUrl of objectUrls) URL.revokeObjectURL(objectUrl);
       objectUrls.clear();
     };
-  }, [bugId]);
+  }, [bugId, loadCaptureContext]);
 
   async function retry(entry: EvidenceEntry): Promise<void> {
     const generation = generationRef.current;
@@ -171,14 +229,22 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
     );
     const captureId = entry.metadata.captureId;
     if (captureId !== null) {
+      const currentPocoScreenshot = pocoScreenshots[captureId];
+      if (currentPocoScreenshot?.state === "ready") {
+        releaseObjectUrl(currentPocoScreenshot.objectUrl);
+      }
       setCaptureContexts((current) => ({
+        ...current,
+        [captureId]: { state: "loading" },
+      }));
+      setPocoScreenshots((current) => ({
         ...current,
         [captureId]: { state: "loading" },
       }));
     }
     await Promise.all([
       loadEvidenceBytes(entry.metadata, generation),
-      ...(captureId === null ? [] : [loadCaptureContext(captureId, generation)]),
+      ...(captureId === null ? [] : [loadCaptureContext(bugId, captureId, generation)]),
     ]);
   }
 
@@ -214,6 +280,16 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
               entry.metadata.captureId === null
                 ? ({ state: "unavailable", status: 404, code: "NO_CAPTURE_ID" } as const)
                 : (captureContexts[entry.metadata.captureId] ?? ({ state: "loading" } as const));
+            const pocoScreenshot =
+              entry.metadata.captureId === null
+                ? ({ state: "unavailable", status: 404, code: "NO_CAPTURE_ID" } as const)
+                : (pocoScreenshots[entry.metadata.captureId] ?? ({ state: "loading" } as const));
+            const pocoArtifact =
+              captureContext.state === "ready"
+                ? captureContext.bundle.artifacts.find(
+                    (artifact) => artifact.kind === "poco_screenshot",
+                  )
+                : undefined;
             return (
               <article className="evidence-card" key={entry.metadata.attachmentId}>
                 <div className="evidence-card__preview">
@@ -298,6 +374,56 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
                       </>
                     )}
                   </aside>
+                  {captureContext.state === "ready" && (
+                    <section
+                      aria-label={`${captureContext.bundle.captureId} 的 Poco 干净截图`}
+                      className="poco-artifact"
+                    >
+                      <div className="poco-artifact__heading">
+                        <strong>Poco 干净截图</strong>
+                        <span>与系统画面同一 captureId</span>
+                      </div>
+                      {pocoScreenshot.state === "loading" ? (
+                        <p>正在读取可选 Unity framebuffer…</p>
+                      ) : pocoScreenshot.state === "unavailable" ? (
+                        <p className="poco-artifact__error">
+                          HTTP {pocoScreenshot.status === 0 ? "网络不可达" : pocoScreenshot.status}{" "}
+                          · {pocoScreenshot.code}。主系统截图与 Bug 详情仍可使用。
+                        </p>
+                      ) : (
+                        <>
+                          <img
+                            alt={`${bugKey} · Poco clean screenshot`}
+                            src={pocoScreenshot.objectUrl}
+                          />
+                          <dl>
+                            <div>
+                              <dt>类型</dt>
+                              <dd>{pocoScreenshot.artifact.mediaType}</dd>
+                            </div>
+                            <div>
+                              <dt>大小</dt>
+                              <dd>{readableBytes(pocoScreenshot.artifact.size)}</dd>
+                            </div>
+                            <div>
+                              <dt>SHA-256</dt>
+                              <dd>{pocoScreenshot.artifact.sha256}</dd>
+                            </div>
+                            <div>
+                              <dt>Attachment ID</dt>
+                              <dd>{pocoArtifact?.attachmentId ?? "未提供"}</dd>
+                            </div>
+                          </dl>
+                          <a
+                            download={`poco-${captureContext.bundle.captureId}.png`}
+                            href={pocoScreenshot.objectUrl}
+                          >
+                            打开或保存 Poco 原图
+                          </a>
+                        </>
+                      )}
+                    </section>
+                  )}
                   <dl>
                     <div>
                       <dt>Capture ID</dt>
