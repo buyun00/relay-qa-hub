@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: c8d3043f1ed8c61ee07ce5aa0222d0e89a9b1306
-  last_verified_at: 2026-08-26T07:03:01+08:00
-  next_action: P8.6 IN_PROGRESS；P8.5 真实 attachment inventory/create-only copy/readback 与 missing-source rejection 已转 VERIFYING；下一步只做同一快照的 DB+附件组合恢复并从隔离 API 回读一条 Bug/附件，测一次 RTO
+  last_verified_commit: 7ef75649f5d666ffda68b5f68660303042a8cdd5
+  last_verified_at: 2026-08-26T07:14:08+08:00
+  next_action: P8.7 IN_PROGRESS；P8.6 同一快照的 DB+附件+API 组合恢复已转 VERIFYING，本机 RTO=576.181ms；下一步只接 API-owned、默认关闭的 create-only backup-on-start/cadence runner，不启动第二 SQLite writer、不做 retention 删除
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1082,7 +1082,11 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 #### P8.6 数据库、附件与 API 组合恢复演练
 
-当前状态：`IN_PROGRESS`。从同一隔离 runtime 获取 SQLite backup 与其 SQLite 引用的 attachment inventory，恢复到同一个全新 data root；通知与 Relay 默认关闭，在独立临时端口启动 QA Hub API，只通过受控内存凭据回读一条真实 Bug、附件 metadata 和附件 bytes/hash。记录从 restore 开始到 API readback 的一次实际 RTO；只保留一个缺失附件失败，不扩登录/搜索/全矩阵。RPO 策略、随机抽样、定时器、异盘副本和前一版本回切仍为 G8 尾项。
+当前状态：`VERIFYING`。在提交 `7ef75649f5d666ffda68b5f68660303042a8cdd5` 上的一次受控会话从同一隔离 runtime 创建 SQLite backup，以该恢复 DB 定义 attachment inventory，并恢复到同一个全新 data root；通知 hint 与 Relay 均关闭。独立 API 在 4320 返回 ready/schema v4/database+evidence+worker=`ok`，随后真实 `LOCAL-1`、一条 attachment metadata 和 145,986-byte PNG 均经 API 200 回读，binary/header SHA 均为 `2e39b408...115ce`；未知附件返回 `404 NOT_FOUND`。从 restore 开始到 API binary readback 的本机 RTO 为 `576.181 ms`，结束后 4320/PID 已清理，SQLite integrity=`ok`/FK=`0`。证据见 [`docs/evidence/P8.6-combined-restore-api.md`](evidence/P8.6-combined-restore-api.md)。这不等于生产 SLA；RPO 策略、随机抽样、异盘副本、retention 与前一版本回切仍为 G8 尾项。
+
+#### P8.7 API-owned RPO 备份 runner
+
+当前状态：`IN_PROGRESS`。在现有 QA Hub API 进程内复用同一个 `SqliteStorageWorker`，新增默认关闭的 create-only backup-on-start/cadence runner；配置必须使用独立绝对 backup root，拒绝与 data/source root 重叠。首次启动 smoke 只生成一份 DB/manifest 并回读 hash/integrity，API ready 保持；一个重叠 backup root 在监听端口前失败。runner 不开放普通 HTTP restore、不启动第二 SQLite writer，也不执行 retention 删除。真实 15 分钟 cadence、重启补偿、异盘复制与 retention 进入后续尾项。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
