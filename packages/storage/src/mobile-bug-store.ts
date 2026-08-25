@@ -279,15 +279,119 @@ function loadCreation(
   const bug = readBug(database, input.accountId, input.projectId, effect.bug_id);
   if (!bug)
     throw new SqliteStorageError("SQLITE_EFFECT_MISSING", "mobile Bug effect is incomplete");
+  const attachmentIds = database
+    .prepare(
+      `SELECT attachment_id
+       FROM bug_attachments
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?
+       ORDER BY attachment_id`,
+    )
+    .all(input.accountId, input.projectId, bug.id)
+    .map((row) => String(row.attachment_id));
   return Object.freeze({
     clientSubmissionId: input.clientSubmissionId,
     bug,
     occurrenceId: effect.occurrence_id,
     eventId: effect.event_id,
-    attachmentIds: Object.freeze([]),
+    attachmentIds: Object.freeze(attachmentIds),
     captureBundleId: null,
     replayed,
   });
+}
+
+function claimBugAttachments(
+  database: DatabaseSync,
+  input: CreateMobileBugInput,
+  bugId: string,
+): void {
+  if (new Set(input.attachmentIds).size !== input.attachmentIds.length) {
+    throw new SqliteStorageError(
+      "SQLITE_ATTACHMENT_RESERVATION_INVALID",
+      "Bug attachments must be unique",
+    );
+  }
+  for (const attachmentId of input.attachmentIds) {
+    const reservation = database
+      .prepare(
+        `SELECT binding.id AS binding_id, binding.version AS binding_version,
+                attachment.version AS attachment_version
+         FROM attachments AS attachment
+         JOIN attachment_bindings AS binding
+           ON binding.account_id = attachment.account_id
+          AND binding.project_id = attachment.project_id
+          AND binding.attachment_id = attachment.id
+         JOIN blobs AS blob
+           ON blob.account_id = attachment.account_id
+          AND blob.id = attachment.blob_id
+          AND blob.size_bytes = attachment.size_bytes
+          AND blob.sha256 = attachment.sha256
+          AND blob.state = 'ready'
+         JOIN upload_sessions AS upload
+           ON upload.account_id = attachment.account_id
+          AND upload.project_id = attachment.project_id
+          AND upload.id = attachment.upload_session_id
+          AND upload.status = 'finalized'
+          AND upload.finalized_attachment_id = attachment.id
+         WHERE attachment.account_id = ?
+           AND attachment.project_id = ?
+           AND attachment.id = ?
+           AND attachment.actor_id = ?
+           AND attachment.client_submission_id = ?
+           AND attachment.status = 'ready'
+           AND attachment.scan_state = 'clean'
+           AND binding.intent = 'bug_create'
+           AND binding.target_bug_id IS NULL
+           AND binding.state = 'reserved'
+           AND unixepoch(binding.expires_at) > unixepoch('now')`,
+      )
+      .get(
+        input.accountId,
+        input.projectId,
+        attachmentId,
+        input.actorId,
+        input.clientSubmissionId,
+      ) as
+      | {
+          readonly binding_id: string;
+          readonly binding_version: number;
+          readonly attachment_version: number;
+        }
+      | undefined;
+    if (!reservation) {
+      throw new SqliteStorageError(
+        "SQLITE_ATTACHMENT_RESERVATION_INVALID",
+        "Bug attachment has no matching active reservation",
+      );
+    }
+    database
+      .prepare(
+        `UPDATE attachment_bindings
+         SET target_bug_id = ?, state = 'claimed', expires_at = NULL,
+             claimed_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+      )
+      .run(
+        bugId,
+        input.createdAt,
+        input.accountId,
+        input.projectId,
+        reservation.binding_id,
+        reservation.binding_version,
+      );
+    database
+      .prepare(
+        `UPDATE attachments SET version = version + 1
+         WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+      )
+      .run(input.accountId, input.projectId, attachmentId, reservation.attachment_version);
+    database
+      .prepare(
+        `INSERT INTO bug_attachments(
+          account_id, project_id, bug_id, attachment_id, binding_id
+        ) VALUES (?, ?, ?, ?, ?)`,
+      )
+      .run(input.accountId, input.projectId, bugId, attachmentId, reservation.binding_id);
+  }
 }
 
 export function createMobileBug(
@@ -295,10 +399,10 @@ export function createMobileBug(
   input: CreateMobileBugInput,
 ): MobileBugCreation {
   requireTransaction(database);
-  if (input.attachmentIds.length !== 0 || input.captureBundleId !== null) {
+  if (input.captureBundleId !== null) {
     throw new SqliteStorageError(
       "SQLITE_MVP_ATTACHMENT_UNSUPPORTED",
-      "the first mobile slice accepts Bugs without attachments",
+      "the first mobile slice does not yet accept capture bundles",
     );
   }
   const prior = database
@@ -368,6 +472,7 @@ export function createMobileBug(
         : JSON.stringify(input.occurrence.environment),
       input.createdAt,
     );
+  claimBugAttachments(database, input, bugId);
   database
     .prepare(
       `INSERT INTO events(

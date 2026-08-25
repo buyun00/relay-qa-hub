@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.relayqahub.android.data.QaHubDatabase
 import com.relayqahub.android.data.ScopedRepository
+import com.relayqahub.android.network.AttachmentUploadClient
 import com.relayqahub.android.network.OkHttpQaHubApiClient
 import com.relayqahub.android.security.AndroidKeystoreCredentialVault
 import com.relayqahub.android.security.CredentialVault
@@ -18,6 +19,7 @@ import okhttp3.OkHttpClient
 class AppContainer private constructor(
     val database: QaHubDatabase,
     val scopedRepository: ScopedRepository,
+    val attachmentUploadClient: AttachmentUploadClient,
     val credentialVault: CredentialVault,
     val syncEngine: OfflineSyncEngine,
     val syncScheduler: SyncScheduler,
@@ -34,29 +36,38 @@ class AppContainer private constructor(
             ).addMigrations(
                 QaHubDatabase.MIGRATION_1_2,
                 QaHubDatabase.MIGRATION_2_3,
+                QaHubDatabase.MIGRATION_3_4,
             ).build()
             val credentialVault = AndroidKeystoreCredentialVault(applicationContext)
+            val httpClient = OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .retryOnConnectionFailure(false)
+                .build()
             val apiClient = OkHttpQaHubApiClient(
                 baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
-                httpClient = OkHttpClient.Builder()
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .writeTimeout(30, TimeUnit.SECONDS)
-                    .followRedirects(false)
-                    .followSslRedirects(false)
-                    .retryOnConnectionFailure(false)
-                    .build(),
+                httpClient = httpClient,
+                allowLoopbackHttp = BuildConfig.DEBUG,
+            )
+            val attachmentUploadClient = AttachmentUploadClient(
+                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                httpClient = httpClient,
                 allowLoopbackHttp = BuildConfig.DEBUG,
             )
             val scopedRepository = ScopedRepository(
                 accountProjectDao = database.accountProjectDao(),
                 cachedQaItemDao = database.cachedQaItemDao(),
                 offlineOperationDao = database.offlineOperationDao(),
+                attachmentPipelineReceiptDao = database.attachmentPipelineReceiptDao(),
             )
             val syncScheduler = SyncScheduler(WorkManager.getInstance(applicationContext))
             return AppContainer(
                 database = database,
                 scopedRepository = scopedRepository,
+                attachmentUploadClient = attachmentUploadClient,
                 credentialVault = credentialVault,
                 syncEngine = OfflineSyncEngine(
                     operationDao = database.offlineOperationDao(),

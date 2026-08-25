@@ -1,5 +1,6 @@
 package com.relayqahub.android.data
 
+import com.relayqahub.android.network.AttachmentUploadReceipt
 import com.relayqahub.android.network.QaHubRelativePath
 import java.util.Locale
 import java.util.UUID
@@ -37,6 +38,7 @@ class ScopedRepository(
     private val accountProjectDao: AccountProjectDao,
     private val cachedQaItemDao: CachedQaItemDao,
     private val offlineOperationDao: OfflineOperationDao,
+    private val attachmentPipelineReceiptDao: AttachmentPipelineReceiptDao,
     private val clock: () -> Long = System::currentTimeMillis,
 ) : AccountDataCleaner {
     fun observeAccount(accountId: String): Flow<AccountEntity?> =
@@ -127,6 +129,74 @@ class ScopedRepository(
             sessionId = scope.sessionId,
         )
     }
+
+    suspend fun recordAttachmentReservation(
+        scope: AccountProjectScope,
+        receipt: AttachmentUploadReceipt,
+    ) {
+        require(receipt.bindingStatus == "reserved")
+        attachmentPipelineReceiptDao.upsert(
+            AttachmentPipelineReceiptEntity(
+                accountId = scope.accountId,
+                projectId = scope.projectId,
+                actorId = scope.actorId,
+                installationId = scope.installationId,
+                sessionId = scope.sessionId,
+                clientSubmissionId = receipt.clientSubmissionId,
+                clientAttachmentId = receipt.clientAttachmentId,
+                attachmentId = receipt.attachmentId,
+                bindingId = receipt.bindingId,
+                bindingStatus = receipt.bindingStatus,
+                qaItemId = null,
+                qaItemKey = null,
+                responseJson = receipt.responseJson,
+                updatedAtEpochMs = clock(),
+            ),
+        )
+    }
+
+    suspend fun recordAttachmentClaimed(
+        scope: AccountProjectScope,
+        clientSubmissionId: String,
+        clientAttachmentId: String,
+        qaItemId: String,
+        qaItemKey: String,
+        responseJson: String,
+    ): AttachmentPipelineReceiptEntity {
+        require(qaItemId.isNotBlank() && qaItemKey.isNotBlank())
+        val reserved = attachmentPipelineReceiptDao.findForScope(
+            accountId = scope.accountId,
+            projectId = scope.projectId,
+            actorId = scope.actorId,
+            installationId = scope.installationId,
+            sessionId = scope.sessionId,
+            clientSubmissionId = clientSubmissionId,
+            clientAttachmentId = clientAttachmentId,
+        ) ?: error("Attachment reservation receipt is missing")
+        val claimed = reserved.copy(
+            bindingStatus = "claimed",
+            qaItemId = qaItemId,
+            qaItemKey = qaItemKey,
+            responseJson = responseJson,
+            updatedAtEpochMs = clock(),
+        )
+        attachmentPipelineReceiptDao.upsert(claimed)
+        return claimed
+    }
+
+    suspend fun findAttachmentReceipt(
+        scope: AccountProjectScope,
+        clientSubmissionId: String,
+        clientAttachmentId: String,
+    ): AttachmentPipelineReceiptEntity? = attachmentPipelineReceiptDao.findForScope(
+        accountId = scope.accountId,
+        projectId = scope.projectId,
+        actorId = scope.actorId,
+        installationId = scope.installationId,
+        sessionId = scope.sessionId,
+        clientSubmissionId = clientSubmissionId,
+        clientAttachmentId = clientAttachmentId,
+    )
 
     override suspend fun clearAccount(accountId: String) {
         accountProjectDao.deleteAccount(accountId)

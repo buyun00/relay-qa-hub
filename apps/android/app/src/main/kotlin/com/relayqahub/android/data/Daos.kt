@@ -60,6 +60,29 @@ interface CachedQaItemDao {
 }
 
 @Dao
+interface AttachmentPipelineReceiptDao {
+    @Upsert
+    suspend fun upsert(receipt: AttachmentPipelineReceiptEntity)
+
+    @Query(
+        "SELECT * FROM attachment_pipeline_receipts " +
+            "WHERE accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId AND clientSubmissionId = :clientSubmissionId " +
+            "AND clientAttachmentId = :clientAttachmentId LIMIT 1",
+    )
+    suspend fun findForScope(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        clientSubmissionId: String,
+        clientAttachmentId: String,
+    ): AttachmentPipelineReceiptEntity?
+}
+
+@Dao
 interface OfflineOperationDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(operation: OfflineOperationEntity)

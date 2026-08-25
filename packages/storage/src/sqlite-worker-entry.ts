@@ -2,6 +2,17 @@ import { parentPort, workerData } from "node:worker_threads";
 import type { DatabaseSync } from "node:sqlite";
 
 import {
+  bindMobileAttachment,
+  finalizeMobileUpload,
+  initMobileUpload,
+  putMobileUploadChunk,
+  type BindMobileAttachmentInput,
+  type FinalizeMobileUploadInput,
+  type InitMobileUploadInput,
+  type MobileAttachmentRoots,
+  type PutMobileUploadChunkInput,
+} from "./mobile-attachment-store.js";
+import {
   createMobileBug,
   ensureMobileScope,
   getMobileBug,
@@ -21,6 +32,8 @@ interface WorkerConfiguration {
   readonly databaseFile: string;
   readonly busyTimeoutMs: number;
   readonly backupRoot?: string;
+  readonly evidenceRoot?: string;
+  readonly quarantineRoot?: string;
   readonly allowUnsafeTestCommands?: boolean;
 }
 
@@ -31,6 +44,10 @@ interface WorkerRequest {
     | "ensureMobileScope"
     | "createMobileBug"
     | "getMobileBug"
+    | "initMobileUpload"
+    | "putMobileUploadChunk"
+    | "finalizeMobileUpload"
+    | "bindMobileAttachment"
     | "testCreateBug"
     | "integrity"
     | "close";
@@ -65,6 +82,31 @@ function errorResponse(id: number, error: unknown): WorkerResponse {
 function requireDatabase(): DatabaseSync {
   if (!database) throw new Error("sqlite worker is not initialized");
   return database;
+}
+
+function requireAttachmentRoots(): MobileAttachmentRoots {
+  if (!configuration.evidenceRoot || !configuration.quarantineRoot) {
+    throw Object.assign(new Error("SQLite worker attachment roots are not configured"), {
+      code: "SQLITE_CONFIGURATION_INVALID",
+    });
+  }
+  return {
+    evidenceRoot: configuration.evidenceRoot,
+    quarantineRoot: configuration.quarantineRoot,
+  };
+}
+
+function inWriteTransaction<T>(work: (current: DatabaseSync) => T): T {
+  const current = requireDatabase();
+  current.exec("BEGIN IMMEDIATE");
+  try {
+    const value = work(current);
+    current.exec("COMMIT");
+    return value;
+  } catch (error) {
+    if (current.isTransaction) current.exec("ROLLBACK");
+    throw error;
+  }
 }
 
 async function execute(request: WorkerRequest): Promise<unknown> {
@@ -128,6 +170,38 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly bugId: string;
     };
     return getMobileBug(requireDatabase(), payload, payload.bugId);
+  }
+
+  if (request.operation === "initMobileUpload") {
+    return inWriteTransaction((current) =>
+      initMobileUpload(current, request.payload as InitMobileUploadInput),
+    );
+  }
+
+  if (request.operation === "putMobileUploadChunk") {
+    return inWriteTransaction((current) =>
+      putMobileUploadChunk(
+        current,
+        requireAttachmentRoots(),
+        request.payload as PutMobileUploadChunkInput,
+      ),
+    );
+  }
+
+  if (request.operation === "finalizeMobileUpload") {
+    return inWriteTransaction((current) =>
+      finalizeMobileUpload(
+        current,
+        requireAttachmentRoots(),
+        request.payload as FinalizeMobileUploadInput,
+      ),
+    );
+  }
+
+  if (request.operation === "bindMobileAttachment") {
+    return inWriteTransaction((current) =>
+      bindMobileAttachment(current, request.payload as BindMobileAttachmentInput),
+    );
   }
 
   if (request.operation === "integrity") {

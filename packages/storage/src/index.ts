@@ -243,3 +243,15 @@ export type {
   MobileOccurrenceInput,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
+export type {
+  BindMobileAttachmentInput,
+  FinalizeMobileUploadInput,
+  InitMobileUploadInput,
+  MobileAttachmentReservation,
+  MobileAttachmentRoots,
+  MobileAttachmentScope,
+  MobileFinalizedAttachment,
+  MobileUploadChunkReceipt,
+  MobileUploadSession,
+  PutMobileUploadChunkInput,
+} from "./mobile-attachment-store.js";

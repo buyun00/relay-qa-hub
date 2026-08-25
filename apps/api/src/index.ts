@@ -2,6 +2,38 @@ export { LIVE_HEALTH_PATH, createApiApp, createLiveHealth } from "./app.js";
 export type { CreateApiAppOptions, LiveHealth } from "./app.js";
 
 export {
+  MAX_MOBILE_CHUNK_SIZE_BYTES,
+  MOBILE_ATTACHMENT_BIND_PATH,
+  MOBILE_UPLOAD_CHUNK_PATH,
+  MOBILE_UPLOAD_FINALIZE_PATH,
+  MOBILE_UPLOAD_INIT_PATH,
+  parseMobileAttachmentBindingRequest,
+  parseMobileChunkNumber,
+  parseMobileFinalizeUploadRequest,
+  parseMobileInitUploadRequest,
+  parseStrongUploadVersion,
+  requireMobileChunkSha256,
+  requireMobileContentLength,
+  requireMobileIdempotencyKey,
+  requireMobileUuid,
+} from "./mobile-attachments.js";
+export type {
+  BindMobileAttachmentCommand,
+  FinalizeMobileUploadCommand,
+  InitMobileUploadCommand,
+  MobileAttachmentBindingRequest,
+  MobileAttachmentIntent,
+  MobileAttachmentReservation,
+  MobileAttachmentStore,
+  MobileFinalizeUploadRequest,
+  MobileFinalizeUploadResponse,
+  MobileInitUploadRequest,
+  MobileInitUploadResponse,
+  PutMobileUploadChunkCommand,
+  PutMobileUploadChunkResult,
+} from "./mobile-attachments.js";
+
+export {
   DEFAULT_DEBUG_ACTOR_ID,
   DEFAULT_DEBUG_BEARER_TOKEN,
   MOBILE_API_CONTENT_TYPE,

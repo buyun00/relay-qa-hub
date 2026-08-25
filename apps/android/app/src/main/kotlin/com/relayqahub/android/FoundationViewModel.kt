@@ -1,15 +1,19 @@
 package com.relayqahub.android
 
 import android.app.Application
+import android.graphics.Bitmap
+import android.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
+import com.relayqahub.android.network.AttachmentUploadFailure
 import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.security.NativeCredentials
 import com.relayqahub.android.security.VaultResult
 import com.relayqahub.android.security.nativeSessionScope
 import com.relayqahub.android.work.SyncRunResult
+import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -101,8 +105,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
 
-            lastAction.value = "Running live smoke through the real offline queue…"
+            lastAction.value = "Uploading a real PNG, then committing it through the Room queue…"
             val result = runCatching {
+                appContainer.scopedRepository.seedFoundationScope(scope)
                 when (
                     appContainer.credentialVault.put(
                         scope = scope.nativeSessionScope(),
@@ -121,25 +126,52 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         throw LiveSmokeFailure("CREDENTIAL_VAULT_UNAVAILABLE")
                 }
 
+                val submissionId = UUID.randomUUID().toString()
+                val clientAttachmentId = UUID.randomUUID().toString()
+                val uploadReceipt = appContainer.attachmentUploadClient.uploadAndReserveBugCreate(
+                    scope = scope,
+                    clientSubmissionId = submissionId,
+                    clientAttachmentId = clientAttachmentId,
+                    filename = LIVE_SMOKE_FILENAME,
+                    pngBytes = createLiveSmokePng(),
+                    accessToken = accessToken,
+                )
+                appContainer.scopedRepository.recordAttachmentReservation(scope, uploadReceipt)
+
                 val operationId = appContainer.scopedRepository.enqueue(
                     scope = scope,
                     request = FoundationCreateBugContract.buildOperation(
                         projectId = scope.projectId,
-                        submissionId = UUID.randomUUID().toString(),
+                        submissionId = submissionId,
                         observedAt = Instant.now().toString(),
                         qaAppVersion = BuildConfig.VERSION_NAME,
+                        attachmentIds = listOf(uploadReceipt.attachmentId),
                     ),
                 )
                 val syncResult = appContainer.syncEngine.run(scope)
                 val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
                 if (receipt != null) {
-                    "Live smoke created ${receipt.qaItemKey} (${receipt.qaItemId})."
+                    val claimed = appContainer.scopedRepository.recordAttachmentClaimed(
+                        scope = scope,
+                        clientSubmissionId = submissionId,
+                        clientAttachmentId = clientAttachmentId,
+                        qaItemId = receipt.qaItemId,
+                        qaItemKey = receipt.qaItemKey,
+                        responseJson = receipt.responseJson,
+                    )
+                    "Live smoke created ${receipt.qaItemKey}; attachment " +
+                        "${claimed.attachmentId} is ${claimed.bindingStatus}."
                 } else {
-                    "Live smoke finished without a receipt: ${syncResult.liveSmokeSummary()}."
+                    "Attachment ${uploadReceipt.attachmentId} is reserved; Bug commit " +
+                        "${syncResult.liveSmokeSummary()}."
                 }
             }
             lastAction.value = result.getOrElse { failure ->
-                val code = (failure as? LiveSmokeFailure)?.code ?: "UNEXPECTED_LOCAL_FAILURE"
+                val code = when (failure) {
+                    is LiveSmokeFailure -> failure.code
+                    is AttachmentUploadFailure -> failure.code
+                    else -> "UNEXPECTED_LOCAL_FAILURE"
+                }
                 "Live smoke failed: $code."
             }
         }
@@ -168,6 +200,20 @@ private fun SyncRunResult.liveSmokeSummary(): String = when (this) {
 
 private const val LIVE_SMOKE_CREDENTIAL_TTL_MS = 5 * 60 * 1_000L
 private const val LIVE_SMOKE_UNUSED_REFRESH_TOKEN = "debug-live-smoke-does-not-refresh"
+private const val LIVE_SMOKE_FILENAME = "android-live-smoke.png"
+
+private fun createLiveSmokePng(): ByteArray {
+    val bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
+    return try {
+        bitmap.eraseColor(Color.rgb(42, 91, 215))
+        ByteArrayOutputStream().use { output ->
+            check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
+            output.toByteArray()
+        }
+    } finally {
+        bitmap.recycle()
+    }
+}
 
 internal data class FoundationFakeCreateBugRequest(
     val operationKind: String,
@@ -242,6 +288,7 @@ internal object FoundationCreateBugContract {
         submissionId: String,
         observedAt: String,
         qaAppVersion: String,
+        attachmentIds: List<String> = emptyList(),
     ): FoundationFakeCreateBugRequest {
         val occurrence = linkedMapOf<String, Any?>(
             "observedAt" to observedAt,
@@ -271,7 +318,7 @@ internal object FoundationCreateBugContract {
             "severity" to "S3",
             "priority" to "P3",
             "occurrence" to occurrence,
-            "attachmentIds" to emptyList<String>(),
+            "attachmentIds" to attachmentIds,
         )
         return FoundationFakeCreateBugRequest(
             operationKind = OPERATION_KIND,
@@ -287,8 +334,15 @@ internal object FoundationCreateBugContract {
         submissionId: String,
         observedAt: String,
         qaAppVersion: String,
+        attachmentIds: List<String> = emptyList(),
     ): NewOfflineOperation {
-        val request = buildRequest(projectId, submissionId, observedAt, qaAppVersion)
+        val request = buildRequest(
+            projectId = projectId,
+            submissionId = submissionId,
+            observedAt = observedAt,
+            qaAppVersion = qaAppVersion,
+            attachmentIds = attachmentIds,
+        )
         requireValid(request, expectedProjectId = projectId)
         return NewOfflineOperation(
             operationKind = request.operationKind,

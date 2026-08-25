@@ -51,8 +51,8 @@ function requireFirstSliceRequest(
   if (request.moduleId != null) {
     throw new TypeError("moduleId is not available in the first mobile slice");
   }
-  if ((request.attachmentIds?.length ?? 0) !== 0 || request.captureBundleId != null) {
-    throw new TypeError("attachments and capture bundles require the next mobile slice");
+  if (request.captureBundleId != null) {
+    throw new TypeError("capture bundles require the next mobile slice");
   }
 }
 

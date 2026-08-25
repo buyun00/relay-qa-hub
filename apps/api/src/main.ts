@@ -6,6 +6,7 @@ import {
 
 import { DEFAULT_API_HOST, resolvePort } from "./config.js";
 import { createApiServer, type ApiServer } from "./server.js";
+import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-store.js";
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
@@ -37,6 +38,8 @@ async function run(): Promise<void> {
   const worker = new SqliteStorageWorker({
     databaseFile: storage.databaseFile,
     busyTimeoutMs: storage.busyTimeoutMs,
+    evidenceRoot: storage.evidenceRoot,
+    quarantineRoot: storage.quarantineRoot,
   });
   let server: ApiServer | undefined;
   let shutdownStarted = false;
@@ -47,6 +50,7 @@ async function run(): Promise<void> {
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
+      mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
       debugBearerToken,
       debugActorId: MOBILE_SCOPE.actorId,
     });

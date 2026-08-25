@@ -20,6 +20,7 @@ export class SqliteStorageError extends Error {
   constructor(
     readonly code:
       | "SQLITE_APPLICATION_ID_MISMATCH"
+      | "SQLITE_ATTACHMENT_RESERVATION_INVALID"
       | "SQLITE_CONFIGURATION_INVALID"
       | "SQLITE_FTS5_UNAVAILABLE"
       | "SQLITE_INTEGRITY_FAILED"
@@ -32,6 +33,9 @@ export class SqliteStorageError extends Error {
       | "SQLITE_SCHEMA_DOWNGRADE_REJECTED"
       | "SQLITE_SCHEMA_FUTURE_VERSION"
       | "SQLITE_TRANSACTION_REQUIRED"
+      | "SQLITE_UPLOAD_INVALID"
+      | "SQLITE_UPLOAD_NOT_FOUND"
+      | "SQLITE_UPLOAD_VERSION_CONFLICT"
       | "SQLITE_PROJECT_NOT_FOUND",
     message: string,
   ) {

@@ -1,12 +1,17 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 
 import {
   API_SERVICE_NAME,
   LIVE_HEALTH_PATH,
+  MOBILE_ATTACHMENT_BIND_PATH,
   MOBILE_API_CONTENT_TYPE,
   MOBILE_API_MEDIA_TYPE,
   MOBILE_BUG_COLLECTION_PATH,
+  MOBILE_UPLOAD_CHUNK_PATH,
+  MOBILE_UPLOAD_FINALIZE_PATH,
+  MOBILE_UPLOAD_INIT_PATH,
   createApiApp,
   createApiServer,
   resolveBuildSha,
@@ -168,6 +173,219 @@ test("Android createBug persists an exact receipt, supports GET, and rejects a w
   assert.equal(loaded.statusCode, 200);
   assert.equal(loaded.headers["content-type"], MOBILE_API_CONTENT_TYPE);
   assert.deepEqual(loaded.json(), receipt.bug);
+});
+
+test("Android attachment upload follows the frozen init, chunk, finalize, bind wire", async (t) => {
+  const token = "fixed-attachment-smoke-token";
+  const actorId = "10000000-0000-4000-8000-000000000003";
+  const projectId = "10000000-0000-4000-8000-000000000004";
+  const clientSubmissionId = "20000000-0000-4000-8000-000000000001";
+  const clientAttachmentId = "30000000-0000-4000-8000-000000000001";
+  const sessionId = "40000000-0000-4000-8000-000000000001";
+  const attachmentId = "50000000-0000-4000-8000-000000000001";
+  const bindingId = "50000000-0000-4000-8000-000000000002";
+  const bytes = Buffer.from("real mobile attachment bytes", "utf8");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const initKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:upload:1:init`;
+  const chunkKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:upload:1:chunk:0`;
+  const finalizeKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:upload:1:finalize`;
+  const bindKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:bind:1`;
+  const store = {
+    async initUpload(command) {
+      assert.equal(command.actorId, actorId);
+      assert.equal(command.idempotencyKey, initKey);
+      assert.equal(command.request.sha256, sha256);
+      return {
+        sessionId,
+        projectId,
+        clientSubmissionId,
+        clientAttachmentId,
+        uploadAttempt: 1,
+        status: "open",
+        filename: "screen.png",
+        mediaType: "image/png",
+        captureId: null,
+        expectedSize: bytes.length,
+        chunkSize: 1_048_576,
+        sha256,
+        expectedChunkCount: 1,
+        receivedBytes: 0,
+        attachmentId: null,
+        expiresAt: "2026-08-25T12:00:00.000Z",
+        confirmedChunks: [],
+        version: 1,
+        replayed: false,
+      };
+    },
+    async putChunk(command) {
+      assert.equal(command.idempotencyKey, chunkKey);
+      assert.equal(command.sessionId, sessionId);
+      assert.equal(command.chunkNumber, 0);
+      assert.equal(command.expectedVersion, 1);
+      assert.equal(command.chunkSha256, sha256);
+      assert.deepEqual(command.bytes, bytes);
+      return { version: 2 };
+    },
+    async finalizeUpload(command) {
+      assert.equal(command.idempotencyKey, finalizeKey);
+      assert.equal(command.sessionId, sessionId);
+      assert.equal(command.request.expectedVersion, 2);
+      return {
+        sessionId,
+        projectId,
+        clientSubmissionId,
+        uploadAttempt: 1,
+        attachmentId,
+        clientAttachmentId,
+        filename: "screen.png",
+        mediaType: "image/png",
+        captureId: null,
+        sha256,
+        size: bytes.length,
+        scanStatus: "clean",
+        readyToBind: true,
+        bindingStatus: "unbound",
+        version: 3,
+        replayed: false,
+      };
+    },
+    async bindAttachment(command) {
+      assert.equal(command.idempotencyKey, bindKey);
+      assert.equal(command.attachmentId, attachmentId);
+      assert.equal(command.request.expectedVersion, 3);
+      assert.equal(command.request.intent, "bug_create");
+      assert.equal(command.request.targetQaItemId, undefined);
+      return {
+        bindingId,
+        attachmentId,
+        projectId,
+        clientSubmissionId,
+        clientAttachmentId,
+        leaseGeneration: 1,
+        intent: "bug_create",
+        targetQaItemId: null,
+        status: "reserved",
+        expiresAt: "2026-08-25T10:00:00.000Z",
+        version: 4,
+        replayed: false,
+      };
+    },
+  };
+  const app = createApiApp({
+    logger: false,
+    mobileAttachmentStore: store,
+    debugBearerToken: token,
+    debugActorId: actorId,
+  });
+  t.after(async () => app.close());
+  const authHeaders = { authorization: `Bearer ${token}` };
+
+  const initialized = await app.inject({
+    method: "POST",
+    url: MOBILE_UPLOAD_INIT_PATH,
+    headers: {
+      ...authHeaders,
+      "content-type": MOBILE_API_MEDIA_TYPE,
+      "idempotency-key": initKey,
+    },
+    payload: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      projectId,
+      clientSubmissionId,
+      clientAttachmentId,
+      uploadAttempt: 1,
+      filename: "screen.png",
+      mediaType: "image/png",
+      expectedSize: bytes.length,
+      sha256,
+    }),
+  });
+  assert.equal(initialized.statusCode, 201);
+  assert.equal(initialized.headers["content-type"], MOBILE_API_CONTENT_TYPE);
+  assert.equal(initialized.json().version, 1);
+
+  const chunked = await app.inject({
+    method: "PUT",
+    url: MOBILE_UPLOAD_CHUNK_PATH.replace(":sessionId", sessionId).replace(":chunkNumber", "0"),
+    headers: {
+      ...authHeaders,
+      "content-type": "application/octet-stream",
+      "content-length": String(bytes.length),
+      "idempotency-key": chunkKey,
+      "if-match": '"1"',
+      "x-chunk-sha256": sha256,
+      "x-client-submission-id": clientSubmissionId,
+      "x-client-attachment-id": clientAttachmentId,
+    },
+    payload: bytes,
+  });
+  assert.equal(chunked.statusCode, 204);
+  assert.equal(chunked.body, "");
+  assert.equal(chunked.headers.etag, '"2"');
+  assert.equal(chunked.headers["x-upload-version"], "2");
+
+  const finalized = await app.inject({
+    method: "POST",
+    url: MOBILE_UPLOAD_FINALIZE_PATH.replace(":sessionId", sessionId),
+    headers: {
+      ...authHeaders,
+      "content-type": MOBILE_API_MEDIA_TYPE,
+      "idempotency-key": finalizeKey,
+    },
+    payload: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      expectedVersion: 2,
+      clientSubmissionId,
+      clientAttachmentId,
+      uploadAttempt: 1,
+      sha256,
+      expectedSize: bytes.length,
+    }),
+  });
+  assert.equal(finalized.statusCode, 200);
+  assert.deepEqual(
+    {
+      version: finalized.json().version,
+      scanStatus: finalized.json().scanStatus,
+      readyToBind: finalized.json().readyToBind,
+      bindingStatus: finalized.json().bindingStatus,
+    },
+    { version: 3, scanStatus: "clean", readyToBind: true, bindingStatus: "unbound" },
+  );
+
+  const bound = await app.inject({
+    method: "POST",
+    url: MOBILE_ATTACHMENT_BIND_PATH.replace(":attachmentId", attachmentId),
+    headers: {
+      ...authHeaders,
+      "content-type": MOBILE_API_MEDIA_TYPE,
+      "idempotency-key": bindKey,
+    },
+    payload: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      expectedVersion: 3,
+      projectId,
+      clientSubmissionId,
+      clientAttachmentId,
+      leaseGeneration: 1,
+      intent: "bug_create",
+    }),
+  });
+  assert.equal(bound.statusCode, 200);
+  assert.deepEqual(bound.json(), {
+    bindingId,
+    attachmentId,
+    projectId,
+    clientSubmissionId,
+    clientAttachmentId,
+    leaseGeneration: 1,
+    intent: "bug_create",
+    targetQaItemId: null,
+    status: "reserved",
+    expiresAt: "2026-08-25T10:00:00.000Z",
+    version: 4,
+    replayed: false,
+  });
 });
 
 test("server defaults to loopback and supports graceful stop plus restart", async () => {

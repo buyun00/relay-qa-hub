@@ -1,6 +1,16 @@
 import { Worker } from "node:worker_threads";
 
 import type {
+  BindMobileAttachmentInput,
+  FinalizeMobileUploadInput,
+  InitMobileUploadInput,
+  MobileAttachmentReservation,
+  MobileFinalizedAttachment,
+  MobileUploadChunkReceipt,
+  MobileUploadSession,
+  PutMobileUploadChunkInput,
+} from "./mobile-attachment-store.js";
+import type {
   CreateMobileBugInput,
   MobileBugCreation,
   MobileBugRecord,
@@ -17,6 +27,8 @@ export interface SqliteStorageWorkerOptions {
   readonly databaseFile: string;
   readonly busyTimeoutMs: number;
   readonly backupRoot?: string;
+  readonly evidenceRoot?: string;
+  readonly quarantineRoot?: string;
   /** @internal Enables migration stress-test commands. Never set in an application process. */
   readonly allowUnsafeTestCommands?: boolean;
 }
@@ -115,6 +127,28 @@ export class SqliteStorageWorker {
   async createMobileBug(input: CreateMobileBugInput): Promise<MobileBugCreation> {
     await this.initialization;
     return this.request<MobileBugCreation>("createMobileBug", input);
+  }
+
+  async initMobileUpload(input: InitMobileUploadInput): Promise<MobileUploadSession> {
+    await this.initialization;
+    return this.request<MobileUploadSession>("initMobileUpload", input);
+  }
+
+  async putMobileUploadChunk(input: PutMobileUploadChunkInput): Promise<MobileUploadChunkReceipt> {
+    await this.initialization;
+    return this.request<MobileUploadChunkReceipt>("putMobileUploadChunk", input);
+  }
+
+  async finalizeMobileUpload(input: FinalizeMobileUploadInput): Promise<MobileFinalizedAttachment> {
+    await this.initialization;
+    return this.request<MobileFinalizedAttachment>("finalizeMobileUpload", input);
+  }
+
+  async bindMobileAttachment(
+    input: BindMobileAttachmentInput,
+  ): Promise<MobileAttachmentReservation> {
+    await this.initialization;
+    return this.request<MobileAttachmentReservation>("bindMobileAttachment", input);
   }
 
   async getMobileBug(input: {

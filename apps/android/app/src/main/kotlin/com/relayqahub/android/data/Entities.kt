@@ -184,6 +184,76 @@ data class OfflineOperationReceiptEntity(
     }
 }
 
+@Entity(
+    tableName = "attachment_pipeline_receipts",
+    primaryKeys = ["accountId", "projectId", "clientSubmissionId", "clientAttachmentId"],
+    foreignKeys = [
+        ForeignKey(
+            entity = ProjectEntity::class,
+            parentColumns = ["accountId", "projectId"],
+            childColumns = ["accountId", "projectId"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
+    indices = [
+        Index(
+            name = "attachment_receipts_scope_idx",
+            value = [
+                "accountId",
+                "projectId",
+                "actorId",
+                "installationId",
+                "sessionId",
+            ],
+        ),
+        Index(
+            name = "attachment_receipts_attachment_idx",
+            value = ["accountId", "projectId", "attachmentId"],
+            unique = true,
+        ),
+    ],
+)
+data class AttachmentPipelineReceiptEntity(
+    val accountId: String,
+    val projectId: String,
+    val actorId: String,
+    val installationId: String,
+    val sessionId: String,
+    val clientSubmissionId: String,
+    val clientAttachmentId: String,
+    val attachmentId: String,
+    val bindingId: String,
+    val bindingStatus: String,
+    val qaItemId: String?,
+    val qaItemKey: String?,
+    val responseJson: String,
+    val updatedAtEpochMs: Long,
+) {
+    init {
+        require(
+            listOf(
+                accountId,
+                projectId,
+                actorId,
+                installationId,
+                sessionId,
+                clientSubmissionId,
+                clientAttachmentId,
+                attachmentId,
+                bindingId,
+            ).all(String::isNotBlank),
+        )
+        require(bindingStatus in setOf("reserved", "claimed"))
+        if (bindingStatus == "reserved") {
+            require(qaItemId == null && qaItemKey == null)
+        } else {
+            require(!qaItemId.isNullOrBlank() && !qaItemKey.isNullOrBlank())
+        }
+        require(responseJson.toByteArray(Charsets.UTF_8).size <= 256 * 1024)
+        require(updatedAtEpochMs >= 0)
+    }
+}
+
 class DatabaseConverters {
     @TypeConverter
     fun queueStateToString(value: QueueState): String = value.name

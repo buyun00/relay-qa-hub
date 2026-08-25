@@ -34,10 +34,11 @@ class RoomMigrationTest {
 
         helper.runMigrationsAndValidate(
             databaseName,
-            3,
+            4,
             true,
             QaHubDatabase.MIGRATION_1_2,
             QaHubDatabase.MIGRATION_2_3,
+            QaHubDatabase.MIGRATION_3_4,
         ).use { database ->
             database.query(
                 "SELECT actorId, installationId, sessionId, state, lastErrorCode " +
@@ -71,7 +72,11 @@ class RoomMigrationTest {
             "session-restart",
         )
         val original = Room.databaseBuilder(context, QaHubDatabase::class.java, databaseName)
-            .addMigrations(QaHubDatabase.MIGRATION_1_2, QaHubDatabase.MIGRATION_2_3)
+            .addMigrations(
+                QaHubDatabase.MIGRATION_1_2,
+                QaHubDatabase.MIGRATION_2_3,
+                QaHubDatabase.MIGRATION_3_4,
+            )
             .build()
         original.accountProjectDao().upsertScope(
             AccountEntity(scope.accountId, "Account", 1),
@@ -81,7 +86,11 @@ class RoomMigrationTest {
         original.close()
 
         val reopened = Room.databaseBuilder(context, QaHubDatabase::class.java, databaseName)
-            .addMigrations(QaHubDatabase.MIGRATION_1_2, QaHubDatabase.MIGRATION_2_3)
+            .addMigrations(
+                QaHubDatabase.MIGRATION_1_2,
+                QaHubDatabase.MIGRATION_2_3,
+                QaHubDatabase.MIGRATION_3_4,
+            )
             .build()
         assertEquals(
             listOf("durable-operation"),
@@ -100,7 +109,7 @@ class RoomMigrationTest {
         val downgradePath = context.getDatabasePath(downgradeName)
         downgradePath.parentFile?.mkdirs()
         SQLiteDatabase.openOrCreateDatabase(downgradePath, null).use { database ->
-            database.version = 4
+            database.version = 5
         }
         val downgradeAttempt = Room.databaseBuilder(
             context,
@@ -109,6 +118,7 @@ class RoomMigrationTest {
         ).addMigrations(
             QaHubDatabase.MIGRATION_1_2,
             QaHubDatabase.MIGRATION_2_3,
+            QaHubDatabase.MIGRATION_3_4,
         ).build()
         try {
             val failure = runCatching {
@@ -118,7 +128,7 @@ class RoomMigrationTest {
             assertTrue(
                 generateSequence(failure) { it.cause }
                     .mapNotNull(Throwable::message)
-                    .any { message -> "4 to 3" in message },
+                    .any { message -> "5 to 4" in message },
             )
         } finally {
             downgradeAttempt.close()

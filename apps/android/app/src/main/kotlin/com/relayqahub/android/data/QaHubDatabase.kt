@@ -13,8 +13,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         CachedQaItemEntity::class,
         OfflineOperationEntity::class,
         OfflineOperationReceiptEntity::class,
+        AttachmentPipelineReceiptEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(DatabaseConverters::class)
@@ -22,6 +23,7 @@ abstract class QaHubDatabase : RoomDatabase() {
     abstract fun accountProjectDao(): AccountProjectDao
     abstract fun cachedQaItemDao(): CachedQaItemDao
     abstract fun offlineOperationDao(): OfflineOperationDao
+    abstract fun attachmentPipelineReceiptDao(): AttachmentPipelineReceiptDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -98,6 +100,34 @@ abstract class QaHubDatabase : RoomDatabase() {
                         "installationId_sessionId_clientSubmissionId " +
                         "ON offline_operation_receipts (accountId, projectId, actorId, " +
                         "installationId, sessionId, clientSubmissionId)",
+                )
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS attachment_pipeline_receipts (" +
+                        "accountId TEXT NOT NULL, projectId TEXT NOT NULL, " +
+                        "actorId TEXT NOT NULL, installationId TEXT NOT NULL, " +
+                        "sessionId TEXT NOT NULL, clientSubmissionId TEXT NOT NULL, " +
+                        "clientAttachmentId TEXT NOT NULL, attachmentId TEXT NOT NULL, " +
+                        "bindingId TEXT NOT NULL, bindingStatus TEXT NOT NULL, " +
+                        "qaItemId TEXT, qaItemKey TEXT, responseJson TEXT NOT NULL, " +
+                        "updatedAtEpochMs INTEGER NOT NULL, " +
+                        "PRIMARY KEY(accountId, projectId, clientSubmissionId, " +
+                        "clientAttachmentId), FOREIGN KEY(accountId, projectId) " +
+                        "REFERENCES projects(accountId, projectId) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS attachment_receipts_scope_idx " +
+                        "ON attachment_pipeline_receipts (accountId, projectId, actorId, " +
+                        "installationId, sessionId)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS attachment_receipts_attachment_idx " +
+                        "ON attachment_pipeline_receipts (accountId, projectId, attachmentId)",
                 )
             }
         }
