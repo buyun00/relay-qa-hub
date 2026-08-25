@@ -208,6 +208,10 @@ export default function App() {
   const [verificationResultSummary, setVerificationResultSummary] = useState("");
   const listRequestSequence = useRef(0);
   const settingsRequestSequence = useRef(0);
+  const projectViewGenerationRef = useRef(0);
+  const projectViewPendingGenerationRef = useRef<number | null>(null);
+  const activeProjectIdRef = useRef(DEFAULT_PROJECT_ID);
+  const initialProjectViewLoadedRef = useRef(false);
   const duplicateRequestSequence = useRef(0);
   const detailRequestSequence = useRef(0);
   const selectedBugIdRef = useRef<string | null>(null);
@@ -234,6 +238,8 @@ export default function App() {
   }, []);
 
   const loadProjectSettings = useCallback(async (nextProjectId: string): Promise<boolean> => {
+    if (projectViewPendingGenerationRef.current !== null) return false;
+    const viewGeneration = projectViewGenerationRef.current;
     const requestSequence = settingsRequestSequence.current + 1;
     settingsRequestSequence.current = requestSequence;
     const normalizedProjectId = nextProjectId.trim();
@@ -245,7 +251,13 @@ export default function App() {
         listProjectMembers(normalizedProjectId),
         listProjectModules(normalizedProjectId),
       ]);
-      if (settingsRequestSequence.current !== requestSequence) return false;
+      if (
+        settingsRequestSequence.current !== requestSequence ||
+        projectViewPendingGenerationRef.current !== null ||
+        projectViewGenerationRef.current !== viewGeneration
+      ) {
+        return false;
+      }
       if (!projects.items.some((project) => project.id === normalizedProjectId)) {
         throw new QaHubApiError(403, "PROJECT_NOT_VISIBLE");
       }
@@ -256,7 +268,13 @@ export default function App() {
       setSettingsState("success");
       return true;
     } catch (cause: unknown) {
-      if (settingsRequestSequence.current !== requestSequence) return false;
+      if (
+        settingsRequestSequence.current !== requestSequence ||
+        projectViewPendingGenerationRef.current !== null ||
+        projectViewGenerationRef.current !== viewGeneration
+      ) {
+        return false;
+      }
       setVisibleProjects([]);
       setProjectMembers([]);
       setProjectModules([]);
@@ -269,6 +287,8 @@ export default function App() {
 
   const loadBugList = useCallback(
     async (nextProjectId: string, filters: BugListFilters = {}): Promise<boolean> => {
+      if (projectViewPendingGenerationRef.current !== null) return false;
+      const viewGeneration = projectViewGenerationRef.current;
       const requestSequence = listRequestSequence.current + 1;
       listRequestSequence.current = requestSequence;
       const normalizedProjectId = nextProjectId.trim();
@@ -276,13 +296,25 @@ export default function App() {
       setError(null);
       try {
         const response = await listBugs(normalizedProjectId, filters);
-        if (listRequestSequence.current !== requestSequence) return false;
+        if (
+          listRequestSequence.current !== requestSequence ||
+          projectViewPendingGenerationRef.current !== null ||
+          projectViewGenerationRef.current !== viewGeneration
+        ) {
+          return false;
+        }
         setBugs(response.items);
         setSnapshotSequence(response.snapshotSequence);
         setRequestState("success");
         return true;
       } catch (cause: unknown) {
-        if (listRequestSequence.current !== requestSequence) return false;
+        if (
+          listRequestSequence.current !== requestSequence ||
+          projectViewPendingGenerationRef.current !== null ||
+          projectViewGenerationRef.current !== viewGeneration
+        ) {
+          return false;
+        }
         setBugs([]);
         setSnapshotSequence(null);
         setRequestState("error");
@@ -298,44 +330,83 @@ export default function App() {
   );
 
   const refreshVisibleBugList = useCallback(async (): Promise<void> => {
-    await loadBugList(activeProjectId, {
+    await loadBugList(activeProjectIdRef.current, {
       ...(bugQuery.trim().length === 0 ? {} : { q: bugQuery.trim() }),
       ...(bugStateFilter === "" ? {} : { state: bugStateFilter }),
       ...(bugSeverityFilter === "" ? {} : { severity: bugSeverityFilter }),
     });
-  }, [activeProjectId, bugQuery, bugSeverityFilter, bugStateFilter, loadBugList]);
+  }, [bugQuery, bugSeverityFilter, bugStateFilter, loadBugList]);
 
   const applyProjectView = useCallback(async (): Promise<void> => {
     const normalizedProjectId = projectDraftId.trim().toLowerCase();
-    const [listLoaded, settingsLoaded] = await Promise.all([
-      loadBugList(normalizedProjectId, {
-        ...(bugQuery.trim().length === 0 ? {} : { q: bugQuery.trim() }),
-        ...(bugStateFilter === "" ? {} : { state: bugStateFilter }),
-        ...(bugSeverityFilter === "" ? {} : { severity: bugSeverityFilter }),
-      }),
-      loadProjectSettings(normalizedProjectId),
-    ]);
-    if (!listLoaded || !settingsLoaded) return;
-    if (normalizedProjectId !== activeProjectId) {
-      detailRequestSequence.current += 1;
-      selectionGenerationRef.current += 1;
-      selectedBugIdRef.current = null;
-      setSelectedBugId(null);
-      setSelectedBug(null);
-      setTimeline([]);
-      setDetailState("idle");
-      setDetailError(null);
+    const generation = projectViewGenerationRef.current + 1;
+    projectViewGenerationRef.current = generation;
+    projectViewPendingGenerationRef.current = generation;
+    setRequestState("loading");
+    setError(null);
+    setSettingsState("loading");
+    setSettingsError(null);
+    try {
+      const [bugResponse, projects, members, modules] = await Promise.all([
+        listBugs(normalizedProjectId, {
+          ...(bugQuery.trim().length === 0 ? {} : { q: bugQuery.trim() }),
+          ...(bugStateFilter === "" ? {} : { state: bugStateFilter }),
+          ...(bugSeverityFilter === "" ? {} : { severity: bugSeverityFilter }),
+        }),
+        listVisibleProjects(),
+        listProjectMembers(normalizedProjectId),
+        listProjectModules(normalizedProjectId),
+      ]);
+      if (
+        projectViewGenerationRef.current !== generation ||
+        projectViewPendingGenerationRef.current !== generation
+      ) {
+        return;
+      }
+      if (!projects.items.some((project) => project.id === normalizedProjectId)) {
+        throw new QaHubApiError(403, "PROJECT_NOT_VISIBLE");
+      }
+      if (members.projectId !== normalizedProjectId || modules.projectId !== normalizedProjectId) {
+        throw new QaHubApiError(200, "PROJECT_VIEW_SCOPE_MISMATCH");
+      }
+
+      const previousProjectId = activeProjectIdRef.current;
+      projectViewPendingGenerationRef.current = null;
+      activeProjectIdRef.current = normalizedProjectId;
+      setActiveProjectId(normalizedProjectId);
+      setBugs(bugResponse.items);
+      setSnapshotSequence(bugResponse.snapshotSequence);
+      setRequestState("success");
+      setVisibleProjects(projects.items);
+      setProjectMembers(members.items);
+      setProjectModules(modules.items);
+      setSettingsSnapshotSequence(Math.max(projects.snapshotSequence, members.snapshotSequence));
+      setSettingsState("success");
+      if (normalizedProjectId !== previousProjectId) {
+        detailRequestSequence.current += 1;
+        selectionGenerationRef.current += 1;
+        selectedBugIdRef.current = null;
+        setSelectedBugId(null);
+        setSelectedBug(null);
+        setTimeline([]);
+        setDetailState("idle");
+        setDetailError(null);
+      }
+    } catch (cause: unknown) {
+      if (
+        projectViewGenerationRef.current !== generation ||
+        projectViewPendingGenerationRef.current !== generation
+      ) {
+        return;
+      }
+      projectViewPendingGenerationRef.current = null;
+      const nextError = mutationError(cause);
+      setRequestState("error");
+      setError(nextError);
+      setSettingsState("error");
+      setSettingsError(nextError);
     }
-    setActiveProjectId(normalizedProjectId);
-  }, [
-    activeProjectId,
-    bugQuery,
-    bugSeverityFilter,
-    bugStateFilter,
-    loadBugList,
-    loadProjectSettings,
-    projectDraftId,
-  ]);
+  }, [bugQuery, bugSeverityFilter, bugStateFilter, projectDraftId]);
 
   const loadBugDetails = useCallback(
     async (
@@ -1056,9 +1127,10 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    void loadBugList(DEFAULT_PROJECT_ID);
-    void loadProjectSettings(DEFAULT_PROJECT_ID);
-  }, [loadBugList, loadProjectSettings]);
+    if (initialProjectViewLoadedRef.current) return;
+    initialProjectViewLoadedRef.current = true;
+    void applyProjectView();
+  }, [applyProjectView]);
 
   useEffect(() => {
     const openDeepLink = (): void => {
@@ -1201,7 +1273,7 @@ export default function App() {
                 setBugQuery("");
                 setBugStateFilter("");
                 setBugSeverityFilter("");
-                void loadBugList(activeProjectId);
+                void loadBugList(activeProjectIdRef.current);
               }}
               type="button"
             >
@@ -1299,7 +1371,7 @@ export default function App() {
             className="secondary-button"
             disabled={settingsState === "loading"}
             id="project-settings-refresh"
-            onClick={() => void loadProjectSettings(activeProjectId)}
+            onClick={() => void loadProjectSettings(activeProjectIdRef.current)}
             type="button"
           >
             刷新当前项目配置
@@ -1320,7 +1392,7 @@ export default function App() {
           </p>
         )}
 
-        {settingsState === "success" && (
+        {visibleProjects.length > 0 && (
           <>
             <div className="settings-grid">
               <article className="settings-panel">
