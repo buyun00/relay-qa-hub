@@ -9,17 +9,17 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P7
-  current_gate: G7-WORKBENCH-READY
+  current_phase: P3
+  current_gate: G3-ANDROID-APP-READY
   status: executing
   gates_completed: 1
   gates_total: 11
   last_verified_commit: 0478ea64416d6e82ab82e98b705a7f2630acdf44
-  last_verified_at: 2026-08-26T00:37:57+08:00
-  next_action: P7.5 IN_PROGRESS；P7.4 普通 Edge 组合签收已形成 current Web MVP 稳定基线；现在统一打包一次 Windows x64 package 并回归 exact React/Vite 资产
+  last_verified_at: 2026-08-26T00:55:56+08:00
+  next_action: P3.4 IN_PROGRESS；普通 Edge Web 稳定基线与 latest-Web Windows package/runtime 已通过；当前只接一条 MuMu 离线草稿 -> 重连 -> 单一 attachment/Bug/final receipt
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
-    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类、跨刷新恢复、Edge 选择/原子 view 与最终组合签收均已由真实 Web -> 4319 -> SQLite 验证；P7.4 进入 VERIFYING 稳定基线，但 P7.5 latest-Web package/runtime 尚未回归，不能误报 G7 完成
+    - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -824,6 +824,8 @@ Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
 验证：飞行模式、Wi-Fi/蜂窝切换、进程/App 被杀、服务重启、登录过期、重复点击和响应丢失最终只产生一个 attachment/QA item；20 MiB 图片和短录屏续传成功，不产生孤儿。
 
+当前状态：`IN_PROGRESS`。Room v4 final reservation/claim receipt 已通过；当前只做一条 MuMu/API35 最小真实链：断开 4319 后带附件草稿进入 queued/retry，恢复后沿同一 `clientSubmissionId` 完成单一 attachment/Bug 并显示最终 QA item ID。只补阻断该链的 adapter；process-kill、20 MiB、auth expiry 和多网络矩阵进入正式 G3 收尾。
+
 #### P3.5 历史原生管理切片（已冻结）
 
 历史目标曾要求 Android 承担完整流转首页；最新架构已收窄为现场快速上报与轻量提交状态。已产生的 debug 管理代码保留为迁移/诊断资产，不再扩展分配、状态、RepairAttempt、Build、Verification、Relay 或完整审计 UI；这些正式能力移到 P7.4 Web。
@@ -1010,7 +1012,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.5 Windows Electron 桌面壳
 
-状态：`IN_PROGRESS`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现并真实运行；P7.4 普通浏览器现已形成稳定基线，当前唯一指针是统一打包/回归该 exact Web 资产。独立 `apps/desktop` 复用 `apps/web` production 资产；安全 BrowserWindow、单实例、托盘隐藏/恢复/显式退出、可配置登录自启，以及主进程认证 WebSocket -> Inbox 补读 -> Windows Notification -> Bug 深链均已接通。主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。证据见 [`docs/evidence/P7.5-windows-desktop-notification.md`](evidence/P7.5-windows-desktop-notification.md)；当前自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，实际 Notification show/Windows 平台投递与同一 `routeToBug()` 深链已分别真实证明。本次只为 Web 稳定点统一构建一次 package，不重复普通浏览器功能矩阵。
+状态：`VERIFYING`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现；P7.4 普通浏览器稳定基线现已统一打入 Windows x64 package。证据见 [`docs/evidence/P7.5-windows-latest-web-package.md`](evidence/P7.5-windows-latest-web-package.md)：package `app.asar/web` 与 current `apps/web/dist` 7/7 path+SHA 完全一致；真实 package 本地渲染、同一 Bug deep-link、second-instance exit、关窗驻留、wrong token `401` 和 SQLite integrity 均通过。独立 `apps/desktop` 继续复用同一 Web production 资产，主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。本轮 tray UIA=`TRAY_NOT_FOUND`，因此不宣称 latest package 的真实托盘点击；历史 shell 源码未变且已有实际托盘退出证据，toast/tray 物理交互、installer/signing 留作发布尾项。
 
 最小验证：本地构建并运行 Electron；关闭窗口后托盘与进程/连接仍存活；Web 修改一条真实 Bug 后 SQLite 只有同一 Inbox 事实，主进程收到事件并只弹一条 Windows 通知，点击恢复并打开对应详情；显式托盘退出才结束。保留一个断开 socket 后重连/前台补读同一 Inbox 且不重复的失败路径，不扩厂商 Push 或安装矩阵。
 
