@@ -14,12 +14,12 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: aa001563762810bceb5d267adb51950340a2f7c3
-  last_verified_at: 2026-08-26T00:07:13+08:00
-  next_action: P7.4 IN_PROGRESS；真实 Edge 已验证 in-flight mutation selection generation 隔离；当前唯一原子段是项目 Bug 列表/目录的全有或全无 view generation，Web 功能稳定后才统一打包回归 Windows 应用
+  last_verified_commit: 0478ea64416d6e82ab82e98b705a7f2630acdf44
+  last_verified_at: 2026-08-26T00:26:55+08:00
+  next_action: P7.4 IN_PROGRESS；真实 Edge 已验证 mutation selection 隔离及项目 Bug 列表/目录全有或全无 view generation；只再做一次有界普通浏览器组合签收，通过后统一打包回归 Windows 应用
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
-    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类、跨刷新恢复及 Edge 详情/mutation selection 已由真实 Web -> 4319 -> SQLite 验证；项目双读取原子应用与最终组合签收仍未完成，不能误报为 G7 完成
+    - P7.4 核心人工管理闭环、组合筛选、显式去重、项目目录/Bug 模块归类、跨刷新恢复、Edge 详情/mutation selection 及 project view 原子应用已由真实 Web -> 4319 -> SQLite 验证；最终有界浏览器组合签收仍未完成，不能误报为 G7 完成
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
@@ -527,19 +527,19 @@ X-Relay-Signature: sha256=<HMAC(timestamp + "." + rawBody)>
 
 Relay 事件只能更新当前 `RepairAttempt` 的 Relay receipt/投影和通知；不得自动修改 QA Bug 状态或任何 Verification 结果。允许的投影动作固定为 `repair.queued/submitted/running/needs_input/blocked/failed/fix_delivered/awaiting_build/awaiting_verification` 与 `build.pending/exact_commit_eligible`。
 
-| Relay 来源                                      | RepairAttempt/receipt 投影 | QA 自动动作                                                     |
-| ----------------------------------------------- | -------------------------- | --------------------------------------------------------------- |
-| 创建响应/`turn.queued`                          | `queued`                   | 记录派发与队列元数据；不改变 Bug/Verification                   |
-| 开始执行                                        | `running`                  | 展示正在处理；不改变 Bug/Verification                           |
-| `needs_input`                                   | `needs_input`              | 通知报告人/负责人；由人工决定补充、转人工或重试                  |
-| `blocked`                                       | `blocked`                  | 记录阻断并通知；不自动改 Bug 状态                               |
-| `failed`                                        | `failed`                   | 记录本次 Attempt 失败并通知；Bug 不自动回 `ready`                |
-| `turn.delivered` 且远端 Commit/分支证据完整     | `fix_delivered`            | 记录交付证据；按 Build 要求进入 `awaiting_build` 或待人工验收投影 |
-| Build 排队/运行                                 | `awaiting_build`           | 更新 Build 进度；不产生 Verification 结果                       |
-| Build completed 且精确包含交付 Commit           | `awaiting_verification`    | 绑定 Build 并通知人工验收；绝不自动验收或关闭                    |
-| Build failed                                    | `fix_delivered`            | 记录 Build 失败；修复交付证据保留，等待人工处置                  |
-| MR merged                                       | 元数据                     | 记录 MR/SHA；不表示 Build、验收或关闭                            |
-| `cancelled`、Relay Task closed 或未知 Relay 状态 | 仅原始审计元数据           | 忽略其对 QA Bug/Verification 的任何状态暗示                      |
+| Relay 来源                                       | RepairAttempt/receipt 投影 | QA 自动动作                                                       |
+| ------------------------------------------------ | -------------------------- | ----------------------------------------------------------------- |
+| 创建响应/`turn.queued`                           | `queued`                   | 记录派发与队列元数据；不改变 Bug/Verification                     |
+| 开始执行                                         | `running`                  | 展示正在处理；不改变 Bug/Verification                             |
+| `needs_input`                                    | `needs_input`              | 通知报告人/负责人；由人工决定补充、转人工或重试                   |
+| `blocked`                                        | `blocked`                  | 记录阻断并通知；不自动改 Bug 状态                                 |
+| `failed`                                         | `failed`                   | 记录本次 Attempt 失败并通知；Bug 不自动回 `ready`                 |
+| `turn.delivered` 且远端 Commit/分支证据完整      | `fix_delivered`            | 记录交付证据；按 Build 要求进入 `awaiting_build` 或待人工验收投影 |
+| Build 排队/运行                                  | `awaiting_build`           | 更新 Build 进度；不产生 Verification 结果                         |
+| Build completed 且精确包含交付 Commit            | `awaiting_verification`    | 绑定 Build 并通知人工验收；绝不自动验收或关闭                     |
+| Build failed                                     | `fix_delivered`            | 记录 Build 失败；修复交付证据保留，等待人工处置                   |
+| MR merged                                        | 元数据                     | 记录 MR/SHA；不表示 Build、验收或关闭                             |
+| `cancelled`、Relay Task closed 或未知 Relay 状态 | 仅原始审计元数据           | 忽略其对 QA Bug/Verification 的任何状态暗示                       |
 
 迟到事件必须检查当前 Attempt generation 和 handling mode，不能覆盖已经转人工或被取代的 Attempt。`cancelled`、`task.closed` 和未识别的原始状态只存审计元数据，不得扩展投影动作 allowlist。
 
@@ -1006,7 +1006,7 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后从服务端事实恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路；wrong-SHA Build、非法 severity、self-target duplicate、无权项目与未知 workflow Bug 分别被真实 `422/400/422/403/404` 拒绝且没有错误业务写入。最新证据见 [`docs/evidence/P7.4-desktop-mutation-selection.md`](evidence/P7.4-desktop-mutation-selection.md)：installed Edge 已证明服务器先完成旧 Bug mutation 后切换 Bug，释放旧响应不会重新选择、写 success/error 或触发旧 readback；SQLite 事实不回滚，用户刷新列表即可见。当前唯一指针是把 project list/settings 结果先聚合再一次提交 view generation，防止一侧失败/迟到或旧 refresh 产生混合项目上下文；cursor/保存视图/批量、真正 project_admin 设置写入、unlinked Build response-loss 与 additive workflow contract 进入收尾清单。只有 Web 功能稳定后才统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后从服务端事实恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路；wrong-SHA Build、非法 severity、self-target duplicate、无权项目与未知 workflow Bug 分别被真实 `422/400/422/403/404` 拒绝且没有错误业务写入。选择一致性证据见 [`docs/evidence/P7.4-desktop-mutation-selection.md`](evidence/P7.4-desktop-mutation-selection.md)；最新原子视图证据见 [`docs/evidence/P7.4-desktop-atomic-project-view.md`](evidence/P7.4-desktop-atomic-project-view.md)：真实 list 已返回三张而真实 modules 上游 `200` 被单侧改为 `503` 时，页面仍保留旧两张 Bug、旧目录与 active project，恢复后才一次提交三张与目录。当前唯一指针只剩一次有界普通 Edge 组合签收；cursor/保存视图/批量、真正 project_admin 设置写入、unlinked Build response-loss 与 additive workflow contract 进入收尾清单。组合签收通过即形成当前 Web MVP 稳定基线，再统一打包/回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 #### P7.5 Windows Electron 桌面壳
 
@@ -1049,13 +1049,13 @@ Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，�
 
 测试槽位：
 
-| 槽位                     |     现场快速上报 |             Capture/Share |                                              Poco 标准 RPC |     qa.snapshot | 离线/续传 |            通知 |
-| ------------------------ | -------------: | ------------------------: | ---------------------------------------------------------: | --------------: | --------: | --------------: |
-| 当前 MuMu / Android 15 / API 35 / Permissive | 自动化/补测 | 补测，不作安全 Gate | 回环功能补测 | capability 决定 | 必测 | 补测 |
-| Android 15 / API 35 真机 |           必测 |         FGS/BOOT 限制必测 |                                                       必测 | capability 决定 |      必测 |            必测 |
-| Android 16 / API 36 真机 |   运行兼容必测 |       API 36 兼容行为必测 |                                                       必测 | capability 决定 |      必测 |            必测 |
-| Android 17 / API 37 真机 | target 37 必测 |   FGS/通知/大屏自适应必测 | 同 profile loopback 成功且无 LAN 权限；LAN/跨 profile 失败 | capability 决定 |      必测 | API 37 限制必测 |
-| 强省电 OEM 真机          |           必测 |        权限回收/kill 必测 |                                              回环/LAN 必测 | capability 决定 |      必测 |            必测 |
+| 槽位                                         |   现场快速上报 |           Capture/Share |                                              Poco 标准 RPC |     qa.snapshot | 离线/续传 |            通知 |
+| -------------------------------------------- | -------------: | ----------------------: | ---------------------------------------------------------: | --------------: | --------: | --------------: |
+| 当前 MuMu / Android 15 / API 35 / Permissive |    自动化/补测 |     补测，不作安全 Gate |                                               回环功能补测 | capability 决定 |      必测 |            补测 |
+| Android 15 / API 35 真机                     |           必测 |       FGS/BOOT 限制必测 |                                                       必测 | capability 决定 |      必测 |            必测 |
+| Android 16 / API 36 真机                     |   运行兼容必测 |     API 36 兼容行为必测 |                                                       必测 | capability 决定 |      必测 |            必测 |
+| Android 17 / API 37 真机                     | target 37 必测 | FGS/通知/大屏自适应必测 | 同 profile loopback 成功且无 LAN 权限；LAN/跨 profile 失败 | capability 决定 |      必测 | API 37 限制必测 |
+| 强省电 OEM 真机                              |           必测 |      权限回收/kill 必测 |                                              回环/LAN 必测 | capability 决定 |      必测 |            必测 |
 
 每个槽位交叉 Wi-Fi/蜂窝/切换/飞行模式/弱网、锁屏/后台/App kill/Unity crash、权限拒绝/撤销、磁盘不足、20 MiB 图片/短录屏、单/双/长按、横竖屏/分辨率/字体 200%/深色模式、5001 占用与 5002..5005 回退、超时/超大 hierarchy、IL2CPP/弱机/恶意同机客户端/`FLAG_SECURE`。API 37 还要保存未声明 `ACCESS_LOCAL_NETWORK` 的 manifest 证据、同 profile/跨 profile loopback 结果、LAN 拒绝、`sw600dp+`/多窗口状态保存、默认 CT 与所选网络库 ECH 协商/fallback、通知/FGS 结果。MuMu 的真实 API level 在 adb 可用后用 `getprop ro.build.version.sdk` 记录；模拟器只补自动化，不替代任何必测真机。
 
@@ -1097,16 +1097,16 @@ Gate `G10-PRODUCTION-CANARY`：真实用户 URL 验证通过并记录最后部�
 
 P0 contracts 冻结后：
 
-| 车道                   | 独占目录/工作                                                                                      | 可并行阶段                     | 汇合点     |
-| ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- |
-| A Domain/API           | `packages/domain`, API handlers；主代理独占迁移/contracts                                          | P1/P2/P4                       | G4         |
-| B Android App          | `apps/android`；Compose、Room、WorkManager、capture、Poco client、快速提单/轻量状态；不扩完整管理 UI | P3.2/P3.4-P3.7；P3.0 后启动 | G3         |
-| C Evidence/Reliability | storage、upload、outbox/inbox、worker                                                              | P1/P3/P6                       | G6         |
-| D Integrations/Test    | relay-client、build-client、fake servers、contract/e2e                                             | P5/P6                          | G6         |
-| E Ops/Security         | runbooks、health、backup、service scripts、安全测试                                                | P2/P8/P10                      | G8/G10     |
-| F Poco QA Bridge       | 实际 Unity QA/Debug 测试包中的最小 loopback/provider 兼容层；先只读审计，后独占明确文件            | P3.1/P3.8                      | G3         |
-| W Desktop Web          | `apps/web`；浏览器与 Electron 复用的正式桌面管理 UI，只经 QA Hub API 使用同一事实源                  | P7.4 IN_PROGRESS               | G7/G4/G5/G6 |
-| WD Windows Desktop     | `apps/desktop`；Electron 主进程/预加载/托盘/认证 WSS/Inbox 补读/原生通知；不复制 renderer 业务 UI     | P7.5 IN_PROGRESS               | G7/G6       |
+| 车道                   | 独占目录/工作                                                                                        | 可并行阶段                  | 汇合点      |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------- | ----------- |
+| A Domain/API           | `packages/domain`, API handlers；主代理独占迁移/contracts                                            | P1/P2/P4                    | G4          |
+| B Android App          | `apps/android`；Compose、Room、WorkManager、capture、Poco client、快速提单/轻量状态；不扩完整管理 UI | P3.2/P3.4-P3.7；P3.0 后启动 | G3          |
+| C Evidence/Reliability | storage、upload、outbox/inbox、worker                                                                | P1/P3/P6                    | G6          |
+| D Integrations/Test    | relay-client、build-client、fake servers、contract/e2e                                               | P5/P6                       | G6          |
+| E Ops/Security         | runbooks、health、backup、service scripts、安全测试                                                  | P2/P8/P10                   | G8/G10      |
+| F Poco QA Bridge       | 实际 Unity QA/Debug 测试包中的最小 loopback/provider 兼容层；先只读审计，后独占明确文件              | P3.1/P3.8                   | G3          |
+| W Desktop Web          | `apps/web`；浏览器与 Electron 复用的正式桌面管理 UI，只经 QA Hub API 使用同一事实源                  | P7.4 IN_PROGRESS            | G7/G4/G5/G6 |
+| WD Windows Desktop     | `apps/desktop`；Electron 主进程/预加载/托盘/认证 WSS/Inbox 补读/原生通知；不复制 renderer 业务 UI    | P7.5 IN_PROGRESS            | G7/G6       |
 
 并行纪律：
 
@@ -1179,23 +1179,23 @@ QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 
 ## 18. 最高风险与应对
 
-| 风险                                | 应对                                                                                                                  |
-| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| 现有 Relay API 无 M2M 授权          | 新建 scoped integration routes；Android/Web 客户端都不直连 Relay，M2M 凭据只在服务端                                  |
-| SSE 超 250 条可能漏事件             | durable webhook outbox + inbox + reconcile API                                                                        |
-| 创建幂等无 payload hash             | handoff/action canonical hash + DB unique                                                                             |
-| 后续 Turn 无幂等                    | 新增 `qa_turn_requests` 动作键                                                                                        |
-| Relay 上传接口暴露本机路径          | QA 保管证据，Relay 受控拉取，响应白名单                                                                               |
-| Relay 工作树已有大量用户改动        | 独立目录开发；Relay 阶段逐文件审计，禁止破坏性 Git                                                                    |
-| SQLite 写竞争或附件膨胀             | WAL/短事务/指标/磁盘阈值；达到触发条件迁移 PostgreSQL                                                                 |
+| 风险                                    | 应对                                                                                                                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 现有 Relay API 无 M2M 授权              | 新建 scoped integration routes；Android/Web 客户端都不直连 Relay，M2M 凭据只在服务端                                               |
+| SSE 超 250 条可能漏事件                 | durable webhook outbox + inbox + reconcile API                                                                                     |
+| 创建幂等无 payload hash                 | handoff/action canonical hash + DB unique                                                                                          |
+| 后续 Turn 无幂等                        | 新增 `qa_turn_requests` 动作键                                                                                                     |
+| Relay 上传接口暴露本机路径              | QA 保管证据，Relay 受控拉取，响应白名单                                                                                            |
+| Relay 工作树已有大量用户改动            | 独立目录开发；Relay 阶段逐文件审计，禁止破坏性 Git                                                                                 |
+| SQLite 写竞争或附件膨胀                 | WAL/短事务/指标/磁盘阈值；达到触发条件迁移 PostgreSQL                                                                              |
 | Android 工具链已绿但工程/设备证据未产生 | P3.0/P3.1/P1/P2 继续；P3.2 生成并 pin AGP 9.1.1 + Gradle 9.3.1 + SDK37/Build-Tools36.0.0；adb 无设备时不宣称 instrumented/真机通过 |
-| Android 截图权限或生命周期被误解    | 每次显式 MediaProjection 同意、前台服务通知、onStop 清理、Sharesheet/Photo Picker 降级；禁止静默捕获和相册扫描        |
-| App 误采敏感内容或 Poco 暴露控制面  | 显著状态/停止入口、尊重 FLAG_SECURE、本地加密/保留；Poco 仅 loopback+只读 allowlist，LAN 暴露阻断 Gate                |
-| Poco 不存在、旧版或自定义扩展不兼容 | 先做实际版本 capability spike；标准 Screenshot/Dump fallback，qa.snapshot 薄兼容层，不实现完整 Reporter               |
-| 借用手机数据串用                    | 短会话、默认无 Push、退出清理本地命名空间                                                                             |
-| Relay 迟到事件覆盖人工处理          | Attempt generation、handling mode 和 event order 守卫                                                                 |
-| Build 完成但不含修复 Commit         | 精确 SHA/manifest identity，Release Manager 覆盖需审计                                                                |
-| 源码完成被误当上线                  | 真实 URL、真实设备、真实恢复和 canary 门禁                                                                            |
+| Android 截图权限或生命周期被误解        | 每次显式 MediaProjection 同意、前台服务通知、onStop 清理、Sharesheet/Photo Picker 降级；禁止静默捕获和相册扫描                     |
+| App 误采敏感内容或 Poco 暴露控制面      | 显著状态/停止入口、尊重 FLAG_SECURE、本地加密/保留；Poco 仅 loopback+只读 allowlist，LAN 暴露阻断 Gate                             |
+| Poco 不存在、旧版或自定义扩展不兼容     | 先做实际版本 capability spike；标准 Screenshot/Dump fallback，qa.snapshot 薄兼容层，不实现完整 Reporter                            |
+| 借用手机数据串用                        | 短会话、默认无 Push、退出清理本地命名空间                                                                                          |
+| Relay 迟到事件覆盖人工处理              | Attempt generation、handling mode 和 event order 守卫                                                                              |
+| Build 完成但不含修复 Commit             | 精确 SHA/manifest identity，Release Manager 覆盖需审计                                                                             |
+| 源码完成被误当上线                      | 真实 URL、真实设备、真实恢复和 canary 门禁                                                                                         |
 
 ## 19. 开始实施时的第一批动作
 
