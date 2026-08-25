@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 19a4b03093306d340b059fd3c48c76429c2d348d
-  last_verified_at: 2026-08-26T06:14:06+08:00
-  next_action: P8.4 IN_PROGRESS；P8.3 worker-owned online backup、manifest/hash/integrity 与 corrupt rejection 已转 VERIFYING；下一步只做 create-only 隔离恢复和 existing-target 拒绝，不覆盖任何现有 data root
+  last_verified_commit: 437201e66b52ae21d5e4ff08ffb9c962a77cc5a4
+  last_verified_at: 2026-08-26T06:30:26+08:00
+  next_action: P8.5 IN_PROGRESS；P8.4 create-only 隔离恢复、worker integrity/readback 与 existing-target 拒绝已转 VERIFYING；下一步只补 SQLite 引用附件的有界 inventory/hash 与隔离恢复，不覆盖任何现有 evidence root
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1072,9 +1072,13 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 #### P8.4 隔离恢复
 
-当前状态：`IN_PROGRESS`。下一原子切片只新增非 API 的 restore admission/helper：必须验证 P8.3 sidecar hash、QA Hub application ID/schema/integrity，目标为全新绝对目录且默认拒绝任何既存 target。随后用同一真实 backup 恢复并经 worker 回读 `LOCAL-1/LOCAL-2`；只保留一个 existing-target 拒绝，完整登录/附件/RPO/RTO 与随机备份演练后置。
+当前状态：`VERIFYING`。提交 `437201e66b52ae21d5e4ff08ffb9c962a77cc5a4` 已新增非 API 的 restore admission/helper：严格验证 P8.3 sidecar shape/hash、QA Hub application ID/schema/integrity，目标必须是全新绝对目录并默认拒绝任何既存 target。同一真实 backup 已恢复到独立 data root，真实 worker integrity 为 `ok` 并回读 `LOCAL-1/LOCAL-2`；同 target 重放返回 `SQLITE_RESTORE_ROOT_EXISTS` 且完成 marker 不变。证据见 [`docs/evidence/P8.4-isolated-sqlite-restore.md`](evidence/P8.4-isolated-sqlite-restore.md)。完整登录/搜索/时间线、随机备份和 RPO/RTO 仍后置，不据此标记 G8 完成。
 
 恢复到独立目录/端口，默认关闭通知和 Relay 集成；验证登录、搜索、Bug、时间线、附件和计数，不覆盖当前生产目录。
+
+#### P8.5 附件清单与隔离恢复
+
+当前状态：`IN_PROGRESS`。只从 QA Hub SQLite 的附件事实生成有界 inventory（storage key、size、SHA-256），对现有 evidence root 做只读校验；随后将匹配文件 create-only 复制到全新隔离 evidence root 并回读一条真实附件。一个 missing/hash-mismatch 必须明确失败且不得生成“完整” marker。retention scheduler、异盘复制、大文件流式 hash 和完整附件矩阵继续后置。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
