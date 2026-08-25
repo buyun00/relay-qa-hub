@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 41b0971abe65c4483fa157d696b1ead39b1bda0c
-  last_verified_at: 2026-08-26T02:53:21+08:00
-  next_action: P7.4 IN_PROGRESS；普通浏览器已真实显示 capture bundle/Poco partial 与 no-bundle 未连接降级；下一步在同一证据区展示具体 bundle artifacts，优先 Poco clean screenshot，任一可选 artifact 不可用都不得阻断系统截图，Web 功能稳定后才统一打 Windows 包
+  last_verified_commit: 290281e6f8d45741f484456bc7dfff5c7c1b3089
+  last_verified_at: 2026-08-26T03:19:46+08:00
+  next_action: P7.3 IN_PROGRESS；P7.4 普通浏览器管理与系统截图/Poco artifact 基线转 VERIFYING；下一步只接一条真实 facts -> API -> 浏览器统计切片，先显示新 Bug 与当前状态分布并保留一个非法时间范围 400，Web 功能稳定后才统一打 Windows 包
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1015,6 +1015,8 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 要做：新 Bug、回归、重复率、交付到验收时长、重新打开率、版本分布；导出 CSV/Excel 只读快照。
 
+当前状态：`IN_PROGRESS`。P7.4 浏览器管理与 evidence/Poco artifact 基线已经转入 `VERIFYING`；首个原子切片只从现有 QA Hub SQLite 事实计算新 Bug 与当前状态分布，经真实 API 在普通浏览器显示，并用一个非法时间范围返回明确 `400`。回归率、重复率、交付到验收、重开率、版本分布和导出按真实数据逐段补，不用 mock 或 Windows 重打包替代事实验证。
+
 验证：指标能从事实表重算；导出不能反向覆盖 QA Hub。
 
 #### P7.4 桌面正式管理 Web
@@ -1023,7 +1025,9 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 Android 证据读取的首个浏览器 slice 已在提交 `772b9267b1c9d75e8cb0b990d8e893e538190500` 通过：Web 从真实 P3.6 MuMu 提交数据读取 claimed attachment 元数据与受认证二进制路由，实际解码并显示同一 `captureId` 的 2560x1440 PNG；临时移开隔离 runtime 的 exact blob 后，证据卡显示 `404 NOT_FOUND`，但 Bug 详情、管理动作和审计时间线保持可用。证据见 [`docs/evidence/P7.4-browser-android-evidence.md`](evidence/P7.4-browser-android-evidence.md)。下一原子 slice 仅在普通浏览器接通现有 capture-bundle/Poco enrichment 摘要；缺失 bundle 或 Poco 必须显示“未连接”且不阻塞截图。按用户当前顺序，Web 功能集合稳定后才统一重打 Windows 应用，不为每个 Web slice 重复 Electron 打包。
 
-Capture/Poco 摘要 slice 已在提交 `41b0971abe65c4483fa157d696b1ead39b1bda0c` 通过：P3.7 的真实 partial bundle 在浏览器显示 `部分`、Poco `127.0.0.1:5001`、SDK 6、成功方法与 artifact 计数；P3.6 的真实 primary screenshot 在 bundle GET 返回 `404 NOT_FOUND` 时显示 `未连接`，但 2560x1440 PNG、Bug 详情与时间线仍可用。证据见 [`docs/evidence/P7.4-browser-capture-context.md`](evidence/P7.4-browser-capture-context.md)。下一原子 slice 继续复用同一 API/DB 事实，展示 bundle 中具体 artifact，优先 Poco clean screenshot；可选 artifact 缺失/失败不得改变系统截图或 Bug 事实。Windows 打包顺序不变。
+Capture/Poco 摘要 slice 已在提交 `41b0971abe65c4483fa157d696b1ead39b1bda0c` 通过：P3.7 的真实 partial bundle 在浏览器显示 `部分`、Poco `127.0.0.1:5001`、SDK 6、成功方法与 artifact 计数；P3.6 的真实 primary screenshot 在 bundle GET 返回 `404 NOT_FOUND` 时显示 `未连接`，但 2560x1440 PNG、Bug 详情与时间线仍可用。证据见 [`docs/evidence/P7.4-browser-capture-context.md`](evidence/P7.4-browser-capture-context.md)。
+
+具体 Poco artifact slice 已在提交 `290281e6f8d45741f484456bc7dfff5c7c1b3089` 通过：新增 Bug-scoped read，沿 bound capture bundle、claimed primary attachment 和 Bug link 授权后读取同 capture 的 successful artifact，并在文件发送前复核 evidence-root containment、size 与 SHA-256。普通浏览器对 P3.7 `LOCAL-1` 同时显示 2560x1440 系统截图、partial 摘要和 68-byte/1x1 的真实 persisted stub Poco PNG；`LOCAL-3` 的 Poco 路由返回 `404` 时，系统截图、Bug 详情与时间线保持可用。该 1x1 artifact 不是现实 Unity framebuffer 或 Poco 安全 Gate 证明。证据见 [`docs/evidence/P7.4-browser-poco-artifact.md`](evidence/P7.4-browser-poco-artifact.md)。P7.4 转 `VERIFYING`，唯一 pointer 进入 P7.3 浏览器统计；Windows 打包顺序不变。
 
 #### P7.5 Windows Electron 桌面壳
 
