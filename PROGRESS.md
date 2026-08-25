@@ -3,15 +3,15 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P3`
-- Current pointer: `P3.6`
+- Current pointer: `P3.7`
 - Current gate: `G3-ANDROID-APP-READY`（vertical slice in progress；G1/G2 尚未正式关闭）
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P3.1, P3.3, P3.4, P3.6`
-- Current delivery slice: `MuMu capture/overlay -> verified attachment API -> Bug`（Bug/Occurrence 与单 PNG attachment 真链路均已验证）
-- Minimal verification: `P3.6 仅证明一次用户触发的普通截图进入现有附件建单链，并保留一个权限拒绝/无画面降级；不扩展真机矩阵`
-- Next atomic action: `P3.6 IN_PROGRESS：实现最小 SAW 悬浮入口与显式 MediaProjection capture session，把普通截图送入已验证的 attachment -> Bug 路径；Poco 只做 optional enrichment fallback`
+- Active work packages: `P3.1, P3.3, P3.4, P3.6, P3.7`
+- Current delivery slice: `verified MuMu captureId bundle -> optional Poco read-only enrichment -> existing attachment/Bug path`
+- Minimal verification: `P3.7 只证明 Android 真实 SimpleRPC 通信的一条只读握手/有限 enrichment，以及 Poco 不存在时普通截图仍能建单；不扩展 Unity/真机矩阵`
+- Next atomic action: `P3.7 IN_PROGRESS：实现 bounded Kotlin SimpleRPC allowlist client 与同 captureId enrichment；先用受控 loopback stub 验证 Android socket/framing，再验证 no-Poco fallback 不阻断现有截图建单`
 - Completed gates: `1 / 11`
-- Last green commit: `3382b4046ee38763a6a931d9ff70ba8532206aff`
+- Last green commit: `15c668a7d1f6a36a09935ce39f0e6348eb78c73c`
 - Last deployed commit: `none`
 - Schema version: `contract 1.1.0; database v3 verified at P1.2`
 - Production URL: `not deployed`
@@ -19,7 +19,7 @@
 - Last backup verified: `none`
 - Last restore drill: `none`
 - Blockers: `当前 MuMu API35 MVP 主链路无外部 blocker；真机/API37/Poco 安全加固为后续 Gate，不阻塞当前可运行切片`
-- Updated at: `2026-08-25T10:57:27+08:00`
+- Updated at: `2026-08-25T11:19:01+08:00`
 
 ## Gate status
 
@@ -59,8 +59,8 @@
 | P3.3  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P1.1,P2.2,P3.0      | backend evidence/mobile APIs                         | real API process + Android/MuMu HTTP create/read/upload/bind + one input failure                    | [`docs/evidence/P3.3-mobile-api-smoke.md`](docs/evidence/P3.3-mobile-api-smoke.md) + [`docs/evidence/P3.3-attachment-smoke.md`](docs/evidence/P3.3-attachment-smoke.md)：Bug 与单 PNG attachment 真链路已验证；full API/scanner hardening pending | `3382b4046ee38763a6a931d9ff70ba8532206aff` | 2026-08-25T10:57:27+08:00 |
 | P3.4  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P3.2,P3.3           | Room/WorkManager offline attachment queue            | final receipt/claim real smoke；stage resume/process-kill/duplicate/orphan follow-up                | [`docs/evidence/P3.3-attachment-smoke.md`](docs/evidence/P3.3-attachment-smoke.md)：Room v4 final reservation/claim receipt verified；resumable stages pending | `3382b4046ee38763a6a931d9ff70ba8532206aff` | 2026-08-25T10:57:27+08:00 |
 | P3.5  | PLANNED     | unassigned               | P1.2,P2.2,P3.2,P3.3 | native full-workflow home                            | Relay-offline human loop + 30-second intake                                                        |                                                                       |                                            | 2026-08-24                |
-| P3.6  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P3.2                | overlay/MediaProjection/Share/Picker                 | one real MuMu capture -> attachment -> Bug + one permission/fallback failure                       |                                                                       |                                            | 2026-08-25T10:57:27+08:00 |
-| P3.7  | PLANNED     | unassigned               | P3.1,P3.2,P3.6      | Kotlin Poco read-only adapter/capture bundle         | framing/timeout/size/fallback/captureId tests                                                      |                                                                       |                                            | 2026-08-24                |
+| P3.6  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P3.2                | overlay/MediaProjection/Share/Picker                 | one real MuMu capture -> attachment -> Bug + one permission/fallback failure                       | [`docs/evidence/P3.6-mumu-capture-smoke.md`](docs/evidence/P3.6-mumu-capture-smoke.md)：real 2560x1440 capture + consent denial; recording/Share/Picker/device matrix pending | `15c668a7d1f6a36a09935ce39f0e6348eb78c73c` | 2026-08-25T11:19:01+08:00 |
+| P3.7  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P3.1,P3.2,P3.6      | Kotlin Poco read-only adapter/capture bundle         | one Android loopback SimpleRPC success + no-Poco screenshot/Bug fallback                           |                                                                       |                                            | 2026-08-25T11:19:01+08:00 |
 | P3.8  | PLANNED     | unassigned               | P3.1                | Unity qa.snapshot/loopback compatibility layer       | standard/old/Invoke, server allowlist, Mono/IL2CPP, LAN-negative tests                             |                                                                       |                                            | 2026-08-24                |
 | P3.9  | PLANNED     | unassigned               | P3.3-P3.8           | Android/Poco real-device/performance matrix          | API35 MuMu+real; API36/37 compatibility, API37 behaviors, OEM, P50/P95                             | current MuMu covers API35 emulator only; real-device/security gates pending |                                       | 2026-08-24T19:39:16+08:00 |
 | P4.1  | PLANNED     | unassigned               | G3                  | human/external attempts                              | Relay-offline flow                                                                                 |                                                                       |                                            | 2026-08-24                |
@@ -92,13 +92,14 @@
 - `P3.1` — owner: `poco_capability_spike (GPT-5.6 Sol/ultra)`; started: `2026-08-25T01:53:02+08:00`; updated: `2026-08-25T02:19:38+08:00`; state: `VERIFYING`; next atomic action: `保留静态审计证据；P3.8 产生 provenance-bound Loopback QA game APK 后补 127.0.0.1/LAN-negative/恶意方法/runtime proof，期间不修改 Unity/Relay`。
 - `P3.3` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T09:57:30+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Bug/Occurrence 与单 PNG attachment/bind 已有 MuMu 真证据；full mobile API/scanner/idempotency hardening 转入收尾清单，主链先进入 P3.6`。
 - `P3.4` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:25:29+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Room v4 已保存 final reservation/claim；逐阶段 resume、response-loss 与 multi-chunk 在 capture 主链后补`。
-- `P3.6` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:57:27+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `实现显式授权的最小 overlay/MediaProjection capture session，将一张普通截图送入已验证附件建单链；Poco 不可用时正常提交`。
+- `P3.6` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:57:27+08:00`; updated: `2026-08-25T11:19:01+08:00`; state: `IN_PROGRESS`; next atomic action: `MuMu 已证明显式授权、悬浮球、2560x1440 MediaProjection PNG 到 attachment/Bug 及拒绝降级；录屏、Share/Picker、旋转/真机/API37 进入收尾，不阻塞 P3.7`。
+- `P3.7` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T11:19:01+08:00`; updated: `2026-08-25T11:19:01+08:00`; state: `IN_PROGRESS`; next atomic action: `新增 allowlist-only Kotlin SimpleRPC client，以短 timeout/size/deadline 探测 127.0.0.1 configured port 与 5001..5005；先证明一个真实 Android handshake/enrichment，再证明 no-Poco fallback 仍沿现有 captureId 建单`。
 
 ## MuMu MVP execution cadence (2026-08-25 override)
 
 - 当前优先级是打通可运行主链路，不以测试数量、全量边界穷举、性能优化、文档完善或独立终审零发现作为 MuMu API35 MVP 的进入条件。
 - 每个相邻模块只验证四件事：真实启动、实际通信、成功数据通过、一个关键失败明确暴露。通过后立即进入下一段。
-- 当前垂直切片：QA Hub API 真进程创建最小 Bug/Occurrence -> Android 原生界面调用 -> MuMu API35 安装运行 -> 后续接附件/悬浮球截图、Poco optional enrichment、Relay optional handoff/receipt。
+- 当前垂直切片：QA Hub API/SQLite -> Android/MuMu HTTP -> attachment -> 显式 MediaProjection/悬浮球截图均已真实通过；现在接 Poco optional enrichment，再进入 Relay optional handoff/receipt。
 - API31（已被当前 minSdk=35 产品决策取代）、API37 runtime、真机、广域安全硬化、完整性能矩阵和冗余对抗测试均不阻塞当前 MuMu API35 MVP；仍保留为对应正式 Gate 的发布前证据。
 
 ## 收尾修复清单 / technical debt
@@ -117,6 +118,10 @@
 | 上传 exact HTTP receipt 尚未写入通用 `idempotency_records` | 响应丢失时只能依赖 typed unique/natural replay，不能返回冻结的原始 HTTP receipt | App 在 init/chunk/finalize/bind 成功后断线再重放 | additive migration 仅允许非认证 upload receipt 保存 `sessionId`，继续拒绝 token/sessionToken | 每阶段丢响应后同 key 返回同 effect/receipt |
 | 当前附件 `clean` 仅由 PNG magic 判定，Blob 使用 debug plaintext | 共享测试或生产会缺少恶意文件隔离与静态加密保证 | 超出受控 MuMu 生成 PNG smoke | 接真实 scanner、at-rest encryption、atomic rename 与 orphan cleanup | 一条 clean、一条 rejected、一次 crash cleanup |
 | Android 只持久化最终 reservation/claim，单请求只支持一块（服务端单块上限 8 MiB） | 大截图/录屏、进程杀或响应丢失后不能可靠续传 | 媒体 >8 MiB、上传中杀 App、成功响应丢失 | Room 分阶段 ack + WorkManager reconciliation + bounded multi-chunk loop | 进程杀/断网恢复后仍只有一个 attachment/QA item |
+| 单击 capture 当前直接建单，尚未进入可编辑极简草稿 | 用户不能在提交前补标题/说明或删除误采画面 | 使用悬浮球单击完成截图 | P3.5 将 capture receipt 送入原生 editable draft，再显式提交 | 单击后编辑并仅创建一个最终 Bug |
+| 长按短录屏与系统 Sharesheet/Photo Picker 尚未实现 | 录屏取证与硬件截图降级不可用 | 用户长按或 MediaProjection 不适用 | 在 P3.6 收尾实现显式录屏前台状态、ACTION_SEND receiver 与用户选择 Photo Picker | 各一条真实媒体进入同一 attachment pipeline |
+| capture 文件仍为 app-private plaintext，成功后不清理 | 借用测试机可能残留敏感画面 | 截图成功上传或草稿过期 | Keystore-backed encryption + configurable retention/cleanup | 上传成功清理，失败草稿按策略保留 |
+| rotation resize/setSurface、`FLAG_SECURE` 专用说明、API37 BAL/OEM/真机生命周期未验证 | 方向变化可能停帧；系统限制时提示不完整；不能宣称设备 Gate | 旋转、安全窗口、API37/OEM 后台限制或进程回收 | P3.6/P3.9/P9.1 用真实设备补 resize/lifecycle/permission evidence | 一条真实设备 success + 一条 system-stop/secure failure |
 
 ## Completed evidence
 
@@ -135,6 +140,7 @@
 - P3.2 于 `2026-08-25T08:27:02+08:00` 完成最终只读复审：Android source tree 无差异；独立 clean assemble/lint/JVM `38/38`/MuMu `10/10`、无缓存 39/39 tasks、adb install/cold launch 均成功；当前 APK 与 installed base SHA 均为 `80FBFAC14AFF08B7016B7C0A34D0D512067D19D57511C8BF332A79431BB7BF30`，Blocker/High/Medium=`0/0/0`。历史 `2265...` 保留为先前时间点工件身份；两者均非真机/API37/Poco/overlay/MediaProjection 证据。
 - P3.3 首个真实垂直切片于 `2026-08-25T10:25:29+08:00` 验证并提交为 `8c1d821d24b99a2fff939806f0095cf97dd7d908`：独立 API 真进程 + SQLite、原生 Android Keystore/Room/OkHttp、MuMu API35 经 `adb reverse` 实际建单得到 `LOCAL-1`，GET 回读同一 Bug/Occurrence，错误 bearer 返回 401；证据见 `docs/evidence/P3.3-mobile-api-smoke.md`。P3.3 仍为 `IN_PROGRESS`，下一段是 attachment；该证据不代表 G3、真机、API37、Poco、overlay/MediaProjection 或生产完成。
 - P3.3/P3.4 单 PNG attachment 垂直切片于 `2026-08-25T10:57:27+08:00` 验证并提交为 `3382b4046ee38763a6a931d9ff70ba8532206aff`：本仓库 APK 在 MuMu API35 实际完成 `init 201 -> chunk 204 -> finalize 200 -> bind 200 -> Bug 201`，UI 得到 `LOCAL-1`/claimed，SQLite 与内容寻址文件 SHA 回读一致；错 chunk hash 返回 400。证据见 `docs/evidence/P3.3-attachment-smoke.md`。P3.3/P3.4 仍为 `IN_PROGRESS`，唯一 root pointer 已转 P3.6 capture/overlay；未宣称 G3、真机、API37、生产 scanner/encryption 或 resumable queue 完成。
+- P3.6 MuMu capture/overlay 垂直切片于 `2026-08-25T11:19:01+08:00` 验证并提交为 `15c668a7d1f6a36a09935ce39f0e6348eb78c73c`：显式通知/SAW/MediaProjection 授权后，真实悬浮球采集 2560x1440 PNG，以同一 `captureId` 经 attachment 创建 `LOCAL-1`；第二次系统授权拒绝明确降级且未新增 Bug。证据见 `docs/evidence/P3.6-mumu-capture-smoke.md`。P3.6 仍为 `IN_PROGRESS`，唯一 root pointer 已转 P3.7 Poco optional enrichment；未宣称录屏、Share/Picker、G3、真机或 API37 完成。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 

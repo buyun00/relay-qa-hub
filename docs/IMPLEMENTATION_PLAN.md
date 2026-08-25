@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 3382b4046ee38763a6a931d9ff70ba8532206aff
-  last_verified_at: 2026-08-25T10:57:27+08:00
-  next_action: P3.3/P3.4 单 PNG attachment 到 Bug 真链路已验证；当前 P3.6 实现最小 overlay/MediaProjection capture 并复用该上传路径，Poco 保持 optional fallback
+  last_verified_commit: 15c668a7d1f6a36a09935ce39f0e6348eb78c73c
+  last_verified_at: 2026-08-25T11:19:01+08:00
+  next_action: P3.6 已证明 MuMu 显式 MediaProjection/悬浮球到 attachment/Bug 及拒绝降级；当前 P3.7 接 bounded Kotlin Poco read-only enrichment，并保持 no-Poco 普通截图建单
   blockers:
     - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1/G2 仍未正式关闭，但按执行 override 不阻塞 P3 主链路实现
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
@@ -340,7 +340,7 @@ D:\Relay-QA-Hub-Data\            可配置持久目录，生产前核对磁盘�
 - SQLite WAL 单节点首发；短事务、busy timeout、乐观锁、在线备份。
 - Vitest/node:test、Playwright、契约测试和真实设备手工矩阵。
 
-Android 基线冻结为 `minSdk=35`（Android 15）、`compileSdk=37`、`targetSdk=37`、AGP `9.1.1`、Gradle Wrapper `9.3.1`、Build-Tools `36.0.0`，纯 Kotlin/JVM/Android，不引入 NDK、CMake 或本地 C++。Android 16/API 36 仅是运行兼容测试层，不是默认编译目标。仓库生成并固定 Wrapper/version catalog；本机开发使用 Android Studio bundled JDK，不要求单独安装系统 Java。`2026-08-24T19:27:07+08:00` 修正后的 preflight 已从 `platforms/android-37.0/source.properties` 识别稳定 API `37.0`、`PreviewSdkInt=0` 和真实 `android.jar`，并确认 Studio 2026.1.3、JBR 25.0.2、Platform-Tools 37.0.1、Build-Tools 36.0.0、Command-line Tools、Emulator、license、WHPX 可用。`19:33+08:00` 已连接的 MuMu 实测是 Android 15/API 35、SELinux Permissive，可承担最低版本 API35 emulator lane。当前尚无 Android Gradle 工程或 QA Hub APK，也没有真实设备 Gate 证据，因此仍不能宣称 APK/device test 已通过；边界记录在 `docs/ANDROID_SETUP.md`。
+Android 基线冻结为 `minSdk=35`（Android 15）、`compileSdk=37`、`targetSdk=37`、AGP `9.1.1`、Gradle Wrapper `9.3.1`、Build-Tools `36.0.0`，纯 Kotlin/JVM/Android，不引入 NDK、CMake 或本地 C++。Android 16/API 36 仅是运行兼容测试层，不是默认编译目标。仓库已生成并固定 Wrapper/version catalog；本机开发使用 Android Studio bundled JDK，不要求单独安装系统 Java。`2026-08-24T19:27:07+08:00` 修正后的 preflight 已从 `platforms/android-37.0/source.properties` 识别稳定 API `37.0`、`PreviewSdkInt=0` 和真实 `android.jar`，并确认 Studio 2026.1.3、JBR 25.0.2、Platform-Tools 37.0.1、Build-Tools 36.0.0、Command-line Tools、Emulator、license、WHPX 可用。MuMu 实测是 Android 15/API 35、SELinux Permissive；仓库自有 APK 已完成 P3.2 foundation 安装以及 P3.3/P3.4/P3.6 API、附件与 capture 垂直切片。它们仍不是 Android 15+ 真机或 API37 runtime Gate 证据；边界记录在 `docs/ANDROID_SETUP.md`。
 
 模拟器只使用已启用的 Windows Hypervisor Platform/WHPX；绝不为了 AEHD/HAXM 关闭 Hyper-V，因为 Relay worker 正在依赖 Hyper-V。需要的组件为稳定 SDK Platform 37（目录名可为 `android-37.0`，必须以 metadata 判断）、Build-Tools 36.0.0、Platform-Tools、Command-line Tools、Emulator；system image 缺失不阻断当前 API35 MuMu lane。NDK 只有未来明确引入 JNI/本地库时才按 Gradle 锁定版本安装。adb serial/endpoint 只允许通过开发配置注入，不能硬编码到生产 App。MuMu 只能补测试，不能替代 Android 15+ 真机对悬浮窗、MediaProjection、系统回收和 Poco `127.0.0.1` 的 Gate 证据；必须保存 live `getprop`，不能信产品标签。
 
