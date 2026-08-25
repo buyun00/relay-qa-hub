@@ -18,6 +18,56 @@ export interface BugListFilters {
   readonly severity?: BugSeverity;
 }
 
+export type ProjectRole =
+  | "viewer"
+  | "reporter"
+  | "developer"
+  | "verifier"
+  | "triager"
+  | "release_manager"
+  | "project_admin";
+
+export interface VisibleProject {
+  readonly id: string;
+  readonly key: string;
+  readonly name: string;
+  readonly active: true;
+  readonly roles: readonly ProjectRole[];
+}
+
+export interface VisibleProjectList {
+  readonly snapshotSequence: number;
+  readonly items: readonly VisibleProject[];
+  readonly nextCursor: null;
+}
+
+export interface ProjectMember {
+  readonly userId: string;
+  readonly projectId: string;
+  readonly displayName: string;
+  readonly roles: readonly ProjectRole[];
+  readonly active: true;
+}
+
+export interface ProjectMemberList {
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly ProjectMember[];
+  readonly nextCursor: null;
+}
+
+export interface ProjectModule {
+  readonly id: string;
+  readonly projectId: string;
+  readonly name: string;
+  readonly active: boolean;
+}
+
+export interface ProjectModuleList {
+  readonly projectId: string;
+  readonly items: readonly ProjectModule[];
+}
+
 export interface BugListItem {
   readonly id: string;
   readonly key: string;
@@ -254,6 +304,18 @@ function isBugListResponse(value: unknown): value is BugListResponse {
   return Number.isSafeInteger(response.snapshotSequence) && Array.isArray(response.items);
 }
 
+function isVisibleProjectList(value: unknown): value is VisibleProjectList {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const response = value as { readonly snapshotSequence?: unknown; readonly items?: unknown };
+  return Number.isSafeInteger(response.snapshotSequence) && Array.isArray(response.items);
+}
+
+function isProjectScopedList(value: unknown, projectId: string): boolean {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const response = value as { readonly projectId?: unknown; readonly items?: unknown };
+  return response.projectId === projectId && Array.isArray(response.items);
+}
+
 async function requestJson(path: string, init?: RequestInit): Promise<unknown> {
   const response = await fetch(path, {
     ...init,
@@ -288,6 +350,30 @@ export async function listBugs(
   });
   if (!isBugListResponse(body)) throw new QaHubApiError(200, "INVALID_RESPONSE");
   return body;
+}
+
+export async function listVisibleProjects(): Promise<VisibleProjectList> {
+  const body = await requestJson("/api/v1/projects?limit=50");
+  if (!isVisibleProjectList(body)) throw new QaHubApiError(200, "INVALID_PROJECT_LIST");
+  return body;
+}
+
+export async function listProjectMembers(projectId: string): Promise<ProjectMemberList> {
+  const body = await requestJson(
+    `/api/v1/projects/${encodeURIComponent(projectId)}/members?limit=100`,
+  );
+  if (!isProjectScopedList(body, projectId)) {
+    throw new QaHubApiError(200, "INVALID_PROJECT_MEMBER_LIST");
+  }
+  return body as unknown as ProjectMemberList;
+}
+
+export async function listProjectModules(projectId: string): Promise<ProjectModuleList> {
+  const body = await requestJson(`/api/v1/projects/${encodeURIComponent(projectId)}/modules`);
+  if (!isProjectScopedList(body, projectId)) {
+    throw new QaHubApiError(200, "INVALID_PROJECT_MODULE_LIST");
+  }
+  return body as unknown as ProjectModuleList;
 }
 
 export async function getBug(bugId: string): Promise<BugDetail> {
@@ -335,6 +421,22 @@ export async function updateBugOwner(
       "Idempotency-Key": `web:updateBug:bug:${bugId}:v${expectedVersion}:owner:${ownerId ?? "null"}`,
     },
     body: JSON.stringify({ expectedVersion, ownerId }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
+export async function updateBugModule(
+  bugId: string,
+  expectedVersion: number,
+  moduleId: string | null,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `web:updateBug:bug:${bugId}:v${expectedVersion}:module:${moduleId ?? "null"}`,
+    },
+    body: JSON.stringify({ expectedVersion, moduleId }),
   });
   return requireRecord(body, "BUG") as unknown as BugDetail;
 }

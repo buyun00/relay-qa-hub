@@ -136,6 +136,24 @@ export { MOBILE_NOTIFICATION_LIST_PATH, parseMobileNotificationLimit } from "./m
 export type { MobileNotificationStore } from "./mobile-inbox.js";
 
 export {
+  MOBILE_PROJECT_COLLECTION_PATH,
+  MOBILE_PROJECT_MEMBERS_PATH,
+  MOBILE_PROJECT_MODULES_PATH,
+  parseMobileProjectDirectoryListQuery,
+  requireMobileProjectUuid,
+} from "./mobile-project-directory.js";
+export type {
+  MobileProjectDirectoryStore,
+  MobileProjectMember,
+  MobileProjectMemberList,
+  MobileProjectModule,
+  MobileProjectModuleList,
+  MobileProjectRole,
+  MobileVisibleProject,
+  MobileVisibleProjectList,
+} from "./mobile-project-directory.js";
+
+export {
   MOBILE_NOTIFICATION_HINT_PATH,
   MOBILE_NOTIFICATION_HINT_PROTOCOL,
   startMobileNotificationHintChannel,

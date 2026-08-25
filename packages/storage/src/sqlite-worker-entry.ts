@@ -20,6 +20,14 @@ import {
   type MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
 import { listMobileBugs, type ListMobileBugsInput } from "./mobile-bug-list-store.js";
+import {
+  listMobileProjectMembers,
+  listMobileProjectModules,
+  listMobileVisibleProjects,
+  type ListMobileProjectMembersInput,
+  type ListMobileProjectModulesInput,
+  type ListMobileVisibleProjectsInput,
+} from "./mobile-project-directory-store.js";
 import { getLatestMobileHumanWorkflow } from "./mobile-human-workflow-store.js";
 import {
   createMobileComment,
@@ -112,6 +120,9 @@ interface WorkerRequest {
     | "createMobileBug"
     | "getMobileBug"
     | "listMobileBugs"
+    | "listMobileVisibleProjects"
+    | "listMobileProjectMembers"
+    | "listMobileProjectModules"
     | "getLatestMobileHumanWorkflow"
     | "createMobileComment"
     | "listMobileBugEvents"
@@ -271,6 +282,27 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 
   if (request.operation === "listMobileBugs") {
     return listMobileBugs(requireDatabase(), request.payload as ListMobileBugsInput);
+  }
+
+  if (request.operation === "listMobileVisibleProjects") {
+    return listMobileVisibleProjects(
+      requireDatabase(),
+      request.payload as ListMobileVisibleProjectsInput,
+    );
+  }
+
+  if (request.operation === "listMobileProjectMembers") {
+    return listMobileProjectMembers(
+      requireDatabase(),
+      request.payload as ListMobileProjectMembersInput,
+    );
+  }
+
+  if (request.operation === "listMobileProjectModules") {
+    return listMobileProjectModules(
+      requireDatabase(),
+      request.payload as ListMobileProjectModulesInput,
+    );
   }
 
   if (request.operation === "getLatestMobileHumanWorkflow") {

@@ -16,6 +16,9 @@ import {
   listBugEvents,
   listBugs,
   listDuplicateCandidates,
+  listProjectMembers,
+  listProjectModules,
+  listVisibleProjects,
   markBugDuplicate,
   QaHubApiError,
   recordVerificationPassed,
@@ -24,6 +27,7 @@ import {
   startVerification,
   transitionBugReady,
   updateBugOwner,
+  updateBugModule,
   type BugDetail,
   type BugEvent,
   type BugListFilters,
@@ -33,7 +37,10 @@ import {
   type DuplicateCandidate,
   type HumanRepairAttempt,
   type LinkBuildRepairResponse,
+  type ProjectMember,
+  type ProjectModule,
   type RelayReceipt,
+  type VisibleProject,
   type VerificationRecord,
 } from "./api";
 import { product } from "./product";
@@ -105,6 +112,15 @@ export default function App() {
   const [bugSeverityFilter, setBugSeverityFilter] = useState<BugSeverity | "">("");
   const [bugs, setBugs] = useState<readonly BugListItem[]>([]);
   const [snapshotSequence, setSnapshotSequence] = useState<number | null>(null);
+  const [visibleProjects, setVisibleProjects] = useState<readonly VisibleProject[]>([]);
+  const [projectMembers, setProjectMembers] = useState<readonly ProjectMember[]>([]);
+  const [projectModules, setProjectModules] = useState<readonly ProjectModule[]>([]);
+  const [settingsSnapshotSequence, setSettingsSnapshotSequence] = useState<number | null>(null);
+  const [settingsState, setSettingsState] = useState<RequestState>("idle");
+  const [settingsError, setSettingsError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
   const [requestState, setRequestState] = useState<RequestState>("idle");
   const [error, setError] = useState<{
     readonly status: number;
@@ -128,8 +144,14 @@ export default function App() {
     readonly code: string | null;
   } | null>(null);
   const [ownerSelection, setOwnerSelection] = useState("");
+  const [moduleSelection, setModuleSelection] = useState("");
   const [assignmentState, setAssignmentState] = useState<MutationState>("idle");
   const [assignmentError, setAssignmentError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
+  const [moduleAssignmentState, setModuleAssignmentState] = useState<MutationState>("idle");
+  const [moduleAssignmentError, setModuleAssignmentError] = useState<{
     readonly status: number;
     readonly code: string | null;
   } | null>(null);
@@ -178,7 +200,40 @@ export default function App() {
   const [verificationCriteria, setVerificationCriteria] = useState("");
   const [verificationResultSummary, setVerificationResultSummary] = useState("");
   const listRequestSequence = useRef(0);
+  const settingsRequestSequence = useRef(0);
   const duplicateRequestSequence = useRef(0);
+
+  const loadProjectSettings = useCallback(async (nextProjectId: string): Promise<void> => {
+    const requestSequence = settingsRequestSequence.current + 1;
+    settingsRequestSequence.current = requestSequence;
+    const normalizedProjectId = nextProjectId.trim();
+    setSettingsState("loading");
+    setSettingsError(null);
+    try {
+      const [projects, members, modules] = await Promise.all([
+        listVisibleProjects(),
+        listProjectMembers(normalizedProjectId),
+        listProjectModules(normalizedProjectId),
+      ]);
+      if (settingsRequestSequence.current !== requestSequence) return;
+      if (!projects.items.some((project) => project.id === normalizedProjectId)) {
+        throw new QaHubApiError(403, "PROJECT_NOT_VISIBLE");
+      }
+      setVisibleProjects(projects.items);
+      setProjectMembers(members.items);
+      setProjectModules(modules.items);
+      setSettingsSnapshotSequence(Math.max(projects.snapshotSequence, members.snapshotSequence));
+      setSettingsState("success");
+    } catch (cause: unknown) {
+      if (settingsRequestSequence.current !== requestSequence) return;
+      setVisibleProjects([]);
+      setProjectMembers([]);
+      setProjectModules([]);
+      setSettingsSnapshotSequence(null);
+      setSettingsState("error");
+      setSettingsError(mutationError(cause));
+    }
+  }, []);
 
   const loadBugList = useCallback(
     async (nextProjectId: string, filters: BugListFilters = {}): Promise<void> => {
@@ -217,6 +272,18 @@ export default function App() {
     });
   }, [bugQuery, bugSeverityFilter, bugStateFilter, loadBugList, projectId]);
 
+  const applyProjectView = useCallback(async (): Promise<void> => {
+    const normalizedProjectId = projectId.trim().toLowerCase();
+    await Promise.all([
+      loadBugList(normalizedProjectId, {
+        ...(bugQuery.trim().length === 0 ? {} : { q: bugQuery.trim() }),
+        ...(bugStateFilter === "" ? {} : { state: bugStateFilter }),
+        ...(bugSeverityFilter === "" ? {} : { severity: bugSeverityFilter }),
+      }),
+      loadProjectSettings(normalizedProjectId),
+    ]);
+  }, [bugQuery, bugSeverityFilter, bugStateFilter, loadBugList, loadProjectSettings, projectId]);
+
   const loadBugDetails = useCallback(
     async (
       bugId: string,
@@ -238,6 +305,8 @@ export default function App() {
       setDuplicateMutationState("idle");
       setDuplicateMutationError(null);
       setDuplicateMessage(null);
+      setModuleAssignmentState("idle");
+      setModuleAssignmentError(null);
       if (!preserveComment) {
         setCommentId(null);
         setCommentState("idle");
@@ -270,6 +339,7 @@ export default function App() {
         const [bug, events] = await Promise.all([getBug(bugId), listBugEvents(bugId)]);
         setSelectedBug(bug);
         setOwnerSelection(bug.ownerId ?? "");
+        setModuleSelection(bug.moduleId ?? "");
         setTimeline(events.items);
         setDetailState("success");
         return { bug, events: events.items };
@@ -305,6 +375,27 @@ export default function App() {
       setAssignmentError(mutationError(cause));
     }
   }, [loadBugDetails, ownerSelection, selectedBug]);
+
+  const assignModule = useCallback(async (): Promise<void> => {
+    if (selectedBug === null) return;
+    const nextModuleId = moduleSelection.length === 0 ? null : moduleSelection;
+    setModuleAssignmentState("submitting");
+    setModuleAssignmentError(null);
+    try {
+      await updateBugModule(selectedBug.id, selectedBug.version, nextModuleId);
+      const refreshed = await loadBugDetails(selectedBug.id, true, true, true);
+      if (refreshed?.bug.moduleId === nextModuleId) {
+        setModuleAssignmentState("success");
+        await refreshVisibleBugList();
+      } else {
+        setModuleAssignmentState("error");
+        setModuleAssignmentError({ status: 200, code: "MODULE_READBACK_MISMATCH" });
+      }
+    } catch (cause: unknown) {
+      setModuleAssignmentState("error");
+      setModuleAssignmentError(mutationError(cause));
+    }
+  }, [loadBugDetails, moduleSelection, refreshVisibleBugList, selectedBug]);
 
   const markReady = useCallback(async (): Promise<void> => {
     if (selectedBug === null || selectedBug.state !== "reported") return;
@@ -758,7 +849,8 @@ export default function App() {
 
   useEffect(() => {
     void loadBugList(DEFAULT_PROJECT_ID);
-  }, [loadBugList]);
+    void loadProjectSettings(DEFAULT_PROJECT_ID);
+  }, [loadBugList, loadProjectSettings]);
 
   useEffect(() => {
     const openDeepLink = (): void => {
@@ -826,7 +918,7 @@ export default function App() {
           className="project-form"
           onSubmit={(event) => {
             event.preventDefault();
-            void refreshVisibleBugList();
+            void applyProjectView();
           }}
         >
           <label htmlFor="project-id">项目 ID</label>
@@ -971,9 +1063,150 @@ export default function App() {
         )}
 
         <div aria-label="后续管理台切片" className="next-slices">
-          <span>当前段：候选展示 + 显式人工去重合并</span>
-          <span>下一段：必要设置；Windows 桌面打包统一后置</span>
+          <span>已完成：核心闭环、组合筛选、显式人工去重</span>
+          <span>当前段：项目目录与模块归类；Windows 桌面打包统一后置</span>
         </div>
+      </section>
+
+      <section aria-labelledby="project-settings-title" className="workspace-card">
+        <div className="section-heading">
+          <div>
+            <p className="card-kicker">同一 QA Hub 事实源</p>
+            <h2 id="project-settings-title">项目、成员角色与模块</h2>
+          </div>
+          <span className={`status-dot status-dot--${settingsState}`}>
+            {settingsState === "loading"
+              ? "读取中"
+              : settingsState === "error"
+                ? "权限 / API 错误"
+                : "配置可读"}
+          </span>
+        </div>
+
+        <div className="settings-actions">
+          <button
+            className="secondary-button"
+            disabled={settingsState === "loading"}
+            id="project-settings-refresh"
+            onClick={() => void loadProjectSettings(projectId)}
+            type="button"
+          >
+            刷新当前项目配置
+          </button>
+          <button
+            className="link-button"
+            id="project-settings-forbidden"
+            onClick={() => void loadProjectSettings(INVALID_PROJECT_ID)}
+            type="button"
+          >
+            验证无权项目（应显示 403）
+          </button>
+        </div>
+
+        {settingsState === "error" && settingsError !== null && (
+          <p aria-live="assertive" className="api-error" id="project-settings-error">
+            项目配置读取失败：{mutationErrorMessage(settingsError)}
+          </p>
+        )}
+
+        {settingsState === "success" && (
+          <>
+            <div className="settings-grid">
+              <article className="settings-panel">
+                <h3>项目</h3>
+                {visibleProjects.map((project) => (
+                  <div className="settings-record" key={project.id}>
+                    <strong>
+                      {project.key} · {project.name}
+                    </strong>
+                    <small>{project.roles.join(" · ")}</small>
+                    <span>{project.id === projectId ? "当前项目" : "可见项目"}</span>
+                  </div>
+                ))}
+              </article>
+
+              <article className="settings-panel">
+                <h3>成员 / 角色</h3>
+                {projectMembers.map((member) => (
+                  <div className="settings-record" key={member.userId}>
+                    <strong>{member.displayName}</strong>
+                    <small>{member.roles.join(" · ")}</small>
+                    <span>{member.userId}</span>
+                  </div>
+                ))}
+              </article>
+
+              <article className="settings-panel">
+                <h3>模块</h3>
+                {projectModules.length === 0 ? (
+                  <p className="empty-state">当前项目还没有模块。</p>
+                ) : (
+                  projectModules.map((module) => (
+                    <div className="settings-record" key={module.id}>
+                      <strong>{module.name}</strong>
+                      <small>{module.active ? "active" : "inactive"}</small>
+                      <span>{module.id}</span>
+                    </div>
+                  ))
+                )}
+              </article>
+            </div>
+
+            <div className="module-assignment">
+              <div>
+                <p className="card-kicker">必要设置首段</p>
+                <h3>将当前 Bug 归入模块</h3>
+                <p>复用受角色权限、版本锁与审计保护的 Bug 更新；不会在浏览器建立第二份配置事实。</p>
+              </div>
+              {selectedBug === null ? (
+                <p className="empty-state">先从 Bug 列表选择一条记录。</p>
+              ) : (
+                <div className="module-assignment__controls">
+                  <label htmlFor="bug-module">{selectedBug.key} 的模块</label>
+                  <select
+                    id="bug-module"
+                    onChange={(event) => setModuleSelection(event.target.value)}
+                    value={moduleSelection}
+                  >
+                    <option value="">未归类</option>
+                    {projectModules
+                      .filter((module) => module.active)
+                      .map((module) => (
+                        <option key={module.id} value={module.id}>
+                          {module.name}
+                        </option>
+                      ))}
+                  </select>
+                  <button
+                    className="primary-button"
+                    disabled={moduleAssignmentState === "submitting"}
+                    id="bug-module-save"
+                    onClick={() => void assignModule()}
+                    type="button"
+                  >
+                    {moduleAssignmentState === "submitting" ? "保存中" : "保存并回读"}
+                  </button>
+                </div>
+              )}
+              {moduleAssignmentState === "success" && selectedBug !== null && (
+                <p aria-live="polite" className="success-note" id="bug-module-success">
+                  {selectedBug.key} 的 moduleId 已由 QA Hub API/SQLite 回读确认。
+                </p>
+              )}
+              {moduleAssignmentState === "error" && moduleAssignmentError !== null && (
+                <p aria-live="assertive" className="api-error" id="bug-module-error">
+                  模块归类失败：{mutationErrorMessage(moduleAssignmentError)}
+                </p>
+              )}
+            </div>
+
+            {settingsSnapshotSequence !== null && (
+              <p className="api-footnote">
+                项目目录已授权读取 · 最新 snapshot {settingsSnapshotSequence}
+              </p>
+            )}
+          </>
+        )}
       </section>
 
       <section aria-labelledby="bug-detail-title" className="workspace-card detail-card">
@@ -1029,6 +1262,14 @@ export default function App() {
                   <dd>{selectedBug.ownerId ?? "未分配"}</dd>
                 </div>
                 <div>
+                  <dt>模块</dt>
+                  <dd>
+                    {projectModules.find((module) => module.id === selectedBug.moduleId)?.name ??
+                      selectedBug.moduleId ??
+                      "未归类"}
+                  </dd>
+                </div>
+                <div>
                   <dt>版本</dt>
                   <dd>v{selectedBug.version}</dd>
                 </div>
@@ -1043,7 +1284,17 @@ export default function App() {
                       value={ownerSelection}
                     >
                       <option value="">未分配</option>
-                      <option value={MVP_OWNER_ID}>QA 值班成员（MVP）</option>
+                      {projectMembers
+                        .filter((member) =>
+                          member.roles.some((role) =>
+                            ["developer", "triager", "project_admin"].includes(role),
+                          ),
+                        )
+                        .map((member) => (
+                          <option key={member.userId} value={member.userId}>
+                            {member.displayName}
+                          </option>
+                        ))}
                     </select>
                     <button
                       className="secondary-button"

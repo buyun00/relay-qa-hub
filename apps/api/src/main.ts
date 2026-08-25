@@ -10,6 +10,7 @@ import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-st
 import { createSqliteMobileBuildStore } from "./sqlite-mobile-build-store.js";
 import { createSqliteMobileDuplicateStore } from "./sqlite-mobile-duplicate-store.js";
 import { createSqliteMobileInboxStore } from "./sqlite-mobile-inbox-store.js";
+import { createSqliteMobileProjectDirectoryStore } from "./sqlite-mobile-project-directory-store.js";
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
 import { createSqliteMobileCaptureStore } from "./sqlite-mobile-capture-store.js";
 import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
@@ -91,6 +92,10 @@ async function run(): Promise<void> {
       mobileCommentStore: createSqliteMobileCommentStore({ worker, scope: MOBILE_SCOPE }),
       mobileDuplicateStore: createSqliteMobileDuplicateStore({ worker, scope: MOBILE_SCOPE }),
       mobileNotificationStore: createSqliteMobileInboxStore({ worker, scope: MOBILE_SCOPE }),
+      mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
+        worker,
+        scope: MOBILE_SCOPE,
+      }),
       mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
       mobileRelayStore: createSqliteMobileRelayStore({ worker, scope: MOBILE_SCOPE }),
       ...(relayWebhookSecret === undefined

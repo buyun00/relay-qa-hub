@@ -260,6 +260,24 @@ export type {
   MobileBugList,
   MobileBugListState,
 } from "./mobile-bug-list-store.js";
+export {
+  listMobileProjectMembers,
+  listMobileProjectModules,
+  listMobileVisibleProjects,
+} from "./mobile-project-directory-store.js";
+export type {
+  ListMobileProjectMembersInput,
+  ListMobileProjectModulesInput,
+  ListMobileVisibleProjectsInput,
+  MobileProjectDirectoryScope,
+  MobileProjectMember,
+  MobileProjectMemberList,
+  MobileProjectModule,
+  MobileProjectModuleList,
+  MobileProjectRole,
+  MobileVisibleProject,
+  MobileVisibleProjectList,
+} from "./mobile-project-directory-store.js";
 export { listMobileDuplicateCandidates, markMobileBugDuplicate } from "./mobile-duplicate-store.js";
 export type {
   ListMobileDuplicateCandidatesInput,

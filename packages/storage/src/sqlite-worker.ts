@@ -17,6 +17,14 @@ import type {
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
 import type { ListMobileBugsInput, MobileBugList } from "./mobile-bug-list-store.js";
+import type {
+  ListMobileProjectMembersInput,
+  ListMobileProjectModulesInput,
+  ListMobileVisibleProjectsInput,
+  MobileProjectMemberList,
+  MobileProjectModuleList,
+  MobileVisibleProjectList,
+} from "./mobile-project-directory-store.js";
 import type { MobileHumanWorkflowProjection } from "./mobile-human-workflow-store.js";
 import type {
   CreateMobileCommentInput,
@@ -216,6 +224,27 @@ export class SqliteStorageWorker {
   async listMobileBugs(input: ListMobileBugsInput): Promise<MobileBugList> {
     await this.initialization;
     return this.request<MobileBugList>("listMobileBugs", input);
+  }
+
+  async listMobileVisibleProjects(
+    input: ListMobileVisibleProjectsInput,
+  ): Promise<MobileVisibleProjectList> {
+    await this.initialization;
+    return this.request<MobileVisibleProjectList>("listMobileVisibleProjects", input);
+  }
+
+  async listMobileProjectMembers(
+    input: ListMobileProjectMembersInput,
+  ): Promise<MobileProjectMemberList> {
+    await this.initialization;
+    return this.request<MobileProjectMemberList>("listMobileProjectMembers", input);
+  }
+
+  async listMobileProjectModules(
+    input: ListMobileProjectModulesInput,
+  ): Promise<MobileProjectModuleList> {
+    await this.initialization;
+    return this.request<MobileProjectModuleList>("listMobileProjectModules", input);
   }
 
   async getLatestMobileHumanWorkflow(input: {
