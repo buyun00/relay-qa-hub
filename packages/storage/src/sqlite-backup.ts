@@ -197,10 +197,19 @@ export async function createSqliteOnlineBackup(
   const targetPath = requireAbsolutePath(options.targetPath, "targetPath");
   const manifestPath = `${targetPath}.manifest.json`;
   const createdAt = options.createdAt ?? new Date().toISOString();
-  if (Number.isNaN(Date.parse(createdAt))) {
+  let canonicalCreatedAt: string;
+  try {
+    canonicalCreatedAt = new Date(createdAt).toISOString();
+  } catch {
     throw new SqliteBackupError(
       "SQLITE_BACKUP_CONFIGURATION_INVALID",
-      "createdAt must be an ISO-8601 timestamp",
+      "createdAt must be a canonical UTC ISO-8601 timestamp",
+    );
+  }
+  if (createdAt !== canonicalCreatedAt) {
+    throw new SqliteBackupError(
+      "SQLITE_BACKUP_CONFIGURATION_INVALID",
+      "createdAt must be a canonical UTC ISO-8601 timestamp",
     );
   }
   if (existsSync(targetPath) || existsSync(manifestPath)) {

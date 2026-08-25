@@ -252,6 +252,12 @@ export type {
   SqliteOnlineBackupOptions,
   SqliteOnlineBackupResult,
 } from "./sqlite-backup.js";
+export { restoreSqliteToIsolatedRoot, SqliteRestoreError } from "./sqlite-restore.js";
+export type {
+  SqliteIsolatedRestoreOptions,
+  SqliteIsolatedRestoreResult,
+  SqliteRestoreErrorCode,
+} from "./sqlite-restore.js";
 export {
   ensureBrowserAdmin,
   loginBrowserSession,
