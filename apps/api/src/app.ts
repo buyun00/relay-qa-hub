@@ -39,6 +39,14 @@ import {
   type MobileCaptureStore,
 } from "./mobile-captures.js";
 import {
+  MOBILE_BUILD_COLLECTION_PATH,
+  MOBILE_BUILD_ITEM_PATH,
+  parseMobileRegisterBuildRequest,
+  requireBuildIdempotencyKey,
+  requireBuildUuid,
+  type MobileBuildStore,
+} from "./mobile-builds.js";
+import {
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_RELAY_DISPATCH_PATH,
@@ -80,6 +88,7 @@ export interface CreateApiAppOptions {
   readonly mobileAttachmentStore?: MobileAttachmentStore;
   readonly mobileCaptureStore?: MobileCaptureStore;
   readonly mobileRelayStore?: MobileRelayStore;
+  readonly mobileBuildStore?: MobileBuildStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
   readonly debugBearerToken?: string;
@@ -141,6 +150,13 @@ const unconfiguredMobileRelayStore: MobileRelayStore = {
   getRelayReceipt: () => null,
 };
 
+const unconfiguredMobileBuildStore: MobileBuildStore = {
+  registerBuild: () => {
+    throw new Error("MobileBuildStore is not configured");
+  },
+  getBuild: () => null,
+};
+
 const unconfiguredMobileRelayWebhookStore: MobileRelayWebhookStore = {
   receiveRelayWebhook: () => {
     throw new Error("MobileRelayWebhookStore is not configured");
@@ -174,6 +190,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileAttachmentStore = options.mobileAttachmentStore ?? unconfiguredMobileAttachmentStore;
   const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
   const mobileRelayStore = options.mobileRelayStore ?? unconfiguredMobileRelayStore;
+  const mobileBuildStore = options.mobileBuildStore ?? unconfiguredMobileBuildStore;
   const mobileRelayWebhookStore =
     options.mobileRelayWebhookStore ?? unconfiguredMobileRelayWebhookStore;
   const relayWebhookSecret = options.relayWebhookSecret ?? "";
@@ -457,6 +474,85 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
     },
   );
+
+  const buildErrorReply = (error: unknown, reply: FastifyReply) => {
+    const code = (error as { code?: unknown })?.code;
+    if (code === "NOT_FOUND") {
+      return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
+    if (code === "VERSION_CONFLICT") {
+      return reply.code(412).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
+    if (
+      code === "IDEMPOTENCY_PAYLOAD_MISMATCH" ||
+      code === "INVALID_TRANSITION" ||
+      code === "ACTIVE_REPAIR_EXISTS"
+    ) {
+      return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
+    if (
+      code === "BUILD_IDENTITY_MISMATCH" ||
+      code === "RELAY_DELIVERY_EVIDENCE_INVALID" ||
+      code === "GUARD_FAILED"
+    ) {
+      return reply.code(422).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
+    if (code === "FORBIDDEN" || code === "INTEGRATION_AUTOMATION_FORBIDDEN") {
+      return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
+    if (error instanceof TypeError || code === "INVALID_REQUEST") {
+      return reply
+        .code(400)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "INVALID_REQUEST" });
+    }
+    throw error;
+  };
+
+  app.post<{ Params: { projectId: string } }>(
+    MOBILE_BUILD_COLLECTION_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const projectId = requireBuildUuid(request.params.projectId, "projectId");
+        const body = parseMobileRegisterBuildRequest(request.body);
+        const idempotencyKey = requireBuildIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (
+          idempotencyKey !==
+          `build:register:project:${projectId}:provider:${body.provider}:external:${body.externalId}`
+        ) {
+          throw new TypeError("Idempotency-Key does not match Build registration");
+        }
+        const result = await mobileBuildStore.registerBuild({
+          actorId: debugActorId,
+          projectId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return buildErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.get<{ Params: { buildId: string } }>(MOBILE_BUILD_ITEM_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const buildId = requireBuildUuid(request.params.buildId, "buildId");
+      const result = await mobileBuildStore.getBuild({ actorId: debugActorId, buildId });
+      if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      return buildErrorReply(error, reply);
+    }
+  });
 
   app.post(MOBILE_CAPTURE_COLLECTION_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {

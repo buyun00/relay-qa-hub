@@ -39,6 +39,7 @@ fun FoundationScreen(
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
     onDispatchToRelay: () -> Unit = viewModel::dispatchToRelay,
+    onAdoptFixAndBindQaBuild: () -> Unit = viewModel::adoptFixAndBindQaBuild,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     FoundationScreen(
@@ -49,6 +50,7 @@ fun FoundationScreen(
         onCaptureNow = onCaptureNow,
         onStopCaptureSession = onStopCaptureSession,
         onDispatchToRelay = onDispatchToRelay,
+        onAdoptFixAndBindQaBuild = onAdoptFixAndBindQaBuild,
     )
 }
 
@@ -61,6 +63,7 @@ internal fun FoundationScreen(
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
     onDispatchToRelay: () -> Unit = {},
+    onAdoptFixAndBindQaBuild: () -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier
@@ -151,6 +154,35 @@ internal fun FoundationScreen(
                     .testTag("dispatch-to-relay"),
             ) {
                 Text("交给 Relay（新建 Bug）")
+            }
+            val handoff = state.relayHandoff
+            val buildProjection = state.buildProjection
+            val canAdoptFix = handoff?.handoffStatus == "fix_delivered" &&
+                !handoff.deliveredCommitSha.isNullOrBlank() &&
+                buildProjection.phase != "in_flight"
+            Button(
+                onClick = onAdoptFixAndBindQaBuild,
+                enabled = canAdoptFix,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("adopt-fix-build"),
+            ) {
+                Text("注册并回读 QA Build")
+            }
+            when (buildProjection.phase) {
+                "in_flight" -> Text(
+                    text = "QA Build: linking delivered ${buildProjection.deliveredCommitSha}…",
+                    modifier = Modifier.testTag("build-projection-status"),
+                )
+                "registered" -> Text(
+                    text = "QA Build ${buildProjection.buildId} registered/read back; " +
+                        "SHA ${buildProjection.deliveredCommitSha}. 不代表验收或关闭 Bug。",
+                    modifier = Modifier.testTag("build-projection-status"),
+                )
+                "failed" -> Text(
+                    text = "QA Build adoption error: ${buildProjection.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("build-projection-status"),
+                )
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -22,7 +22,9 @@ export class MobileRelayStorageError extends Error {
       | "IDEMPOTENCY_PAYLOAD_MISMATCH"
       | "INTEGRATION_EVENT_CONFLICT"
       | "INTEGRATION_AUTOMATION_FORBIDDEN"
-      | "RELAY_DELIVERY_EVIDENCE_INVALID",
+      | "RELAY_DELIVERY_EVIDENCE_INVALID"
+      | "BUILD_IDENTITY_MISMATCH"
+      | "FORBIDDEN",
     message: string,
   ) {
     super(message);
@@ -558,7 +560,7 @@ function insertUserEvent(
 
 export function ensureMobileRelayRoles(database: DatabaseSync, scope: MobileScopeBootstrap): void {
   requireTransaction(database);
-  for (const role of ["triager", "developer"] as const) {
+  for (const role of ["triager", "developer", "release_manager"] as const) {
     database
       .prepare(
         `INSERT OR IGNORE INTO membership_roles(

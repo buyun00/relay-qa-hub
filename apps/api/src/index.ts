@@ -62,6 +62,18 @@ export type {
 } from "./mobile-relay.js";
 
 export {
+  MOBILE_BUILD_COLLECTION_PATH,
+  MOBILE_BUILD_ITEM_PATH,
+  parseMobileRegisterBuildRequest,
+  requireBuildIdempotencyKey,
+  requireBuildUuid,
+} from "./mobile-builds.js";
+export type {
+  MobileBuildStore,
+  MobileRegisterBuildRequest,
+} from "./mobile-builds.js";
+
+export {
   MAX_RELAY_WEBHOOK_BYTES,
   MOBILE_RELAY_WEBHOOK_PATH,
   MobileRelayWebhookRequestError,

@@ -22,6 +22,11 @@ import type {
   MobileCaptureCreation,
 } from "./mobile-capture-store.js";
 import type {
+  MobileBuildRecord,
+  RegisterMobileBuildInput,
+  RegisterMobileBuildResult,
+} from "./mobile-build-store.js";
+import type {
   CompleteMobileRelayOutboxInput,
   CreateMobileRelayAttemptInput,
   DispatchMobileRelayInput,
@@ -191,6 +196,21 @@ export class SqliteStorageWorker {
   }): Promise<MobileCaptureBundleRecord | null> {
     await this.initialization;
     return this.request<MobileCaptureBundleRecord | null>("getMobileCapture", input);
+  }
+
+  async registerMobileBuild(input: RegisterMobileBuildInput): Promise<RegisterMobileBuildResult> {
+    await this.initialization;
+    return this.request<RegisterMobileBuildResult>("registerMobileBuild", input);
+  }
+
+  async getMobileBuild(input: {
+    readonly accountId: string;
+    readonly projectId: string;
+    readonly actorId: string;
+    readonly buildId: string;
+  }): Promise<MobileBuildRecord | null> {
+    await this.initialization;
+    return this.request<MobileBuildRecord | null>("getMobileBuild", input);
   }
 
   async ensureMobileRelayRoles(scope: MobileScopeBootstrap): Promise<void> {

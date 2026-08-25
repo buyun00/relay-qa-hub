@@ -16,7 +16,10 @@ import com.relayqahub.android.network.CaptureBundleArtifactUpload
 import com.relayqahub.android.network.CaptureBundleDeviceInput
 import com.relayqahub.android.network.CaptureBundlePocoInput
 import com.relayqahub.android.network.QaHubApiContract
+import com.relayqahub.android.network.BuildProjectionFailure
+import com.relayqahub.android.network.BuildProjectionResult
 import com.relayqahub.android.network.RelayHandoffFailure
+import com.relayqahub.android.network.RelayHandoffResult
 import com.relayqahub.android.security.NativeCredentials
 import com.relayqahub.android.security.VaultResult
 import com.relayqahub.android.security.nativeSessionScope
@@ -41,32 +44,66 @@ data class FoundationUiState(
     val credentialBoundary: String = "Checking Android Keystore…",
     val contractVersion: String = QaHubApiContract.VERSION,
     val lastAction: String = "Ready for offline-first QA work.",
+    val relayHandoff: RelayHandoffResult? = null,
+    val buildProjection: BuildProjectionUiState = BuildProjectionUiState(),
+)
+
+data class BuildProjectionUiState(
+    val phase: String = "idle",
+    val buildId: String? = null,
+    val deliveredCommitSha: String? = null,
+    val linked: Boolean = false,
+    val errorCode: String? = null,
+)
+
+private data class ScopeUiValues(
+    val accountName: String,
+    val projectName: String,
+    val cachedItemCount: Int,
+    val queuedOperationCount: Int,
 )
 
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
     private val appContainer = (application as QaHubApplication).container
     private val scope = FOUNDATION_SCOPE
     private val lastAction = MutableStateFlow("Ready for offline-first QA work.")
+    private val latestRelayHandoff = MutableStateFlow<RelayHandoffResult?>(null)
+    private val buildProjection = MutableStateFlow(BuildProjectionUiState())
 
-    val uiState = combine(
+    private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
         appContainer.scopedRepository.observeProject(scope),
         appContainer.scopedRepository.observeCachedItems(scope),
         appContainer.scopedRepository.observeOutstandingCount(scope),
-        lastAction,
-    ) { account, project, cachedItems, queuedCount, action ->
-        val support = appContainer.credentialVault.support()
-        FoundationUiState(
+    ) { account, project, cachedItems, queuedCount ->
+        ScopeUiValues(
             accountName = account?.displayName ?: "Local account scope",
             projectName = project?.displayName ?: "Local project scope",
             cachedItemCount = cachedItems.size,
             queuedOperationCount = queuedCount,
+        )
+    }
+
+    val uiState = combine(
+        scopeState,
+        lastAction,
+        latestRelayHandoff,
+        buildProjection,
+    ) { values, action, handoff, projection ->
+        val support = appContainer.credentialVault.support()
+        FoundationUiState(
+            accountName = values.accountName,
+            projectName = values.projectName,
+            cachedItemCount = values.cachedItemCount,
+            queuedOperationCount = values.queuedOperationCount,
             credentialBoundary = if (support.available) {
                 "${support.provider} format v${support.formatVersion} available"
             } else {
                 "Unavailable: ${support.reasonCode}"
             },
             lastAction = action,
+            relayHandoff = handoff,
+            buildProjection = projection,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -173,6 +210,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 )
             }
             result.onSuccess { handoff ->
+                latestRelayHandoff.value = handoff
+                buildProjection.value = BuildProjectionUiState()
                 lastAction.value =
                     "${handoff.bugKey} queued to Relay; receipt=${handoff.handoffStatus}; " +
                         "requiresHumanVerification=${handoff.requiresHumanVerification}."
@@ -184,6 +223,77 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 lastAction.value = "Relay handoff failed: $code."
             }
         }
+    }
+
+    /** Human-only action: register the delivered commit as a Build and read it back. */
+    fun adoptFixAndBindQaBuild() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setBuildProjectionFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            val handoff = latestRelayHandoff.value
+            if (handoff == null) {
+                setBuildProjectionFailure("RELAY_HANDOFF_MISSING")
+                return@launch
+            }
+            if (handoff.handoffStatus != "fix_delivered") {
+                setBuildProjectionFailure("BUILD_ADOPTION_REQUIRES_FIX_DELIVERED")
+                return@launch
+            }
+            if (handoff.deliveredCommitSha.isNullOrBlank()) {
+                setBuildProjectionFailure("BUILD_DELIVERED_COMMIT_MISSING")
+                return@launch
+            }
+
+            buildProjection.value = BuildProjectionUiState(
+                phase = "in_flight",
+                deliveredCommitSha = handoff.deliveredCommitSha,
+            )
+            lastAction.value = "Registering the delivered commit as a QA Build…"
+            runCatching {
+                appContainer.buildProjectionClient.adoptFixAndBindQaBuild(
+                    projectId = scope.projectId,
+                    projectKey = FOUNDATION_PROJECT_KEY,
+                    handoff = handoff,
+                    accessToken = accessToken,
+                    deliveredCommitShaOverride = null,
+                )
+            }.onSuccess { result ->
+                setBuildProjectionSuccess(result)
+            }.onFailure { failure ->
+                setBuildProjectionFailure(
+                    when (failure) {
+                        is BuildProjectionFailure -> failure.code
+                        else -> "UNEXPECTED_BUILD_PROJECTION_FAILURE"
+                    },
+                    handoff.deliveredCommitSha,
+                )
+            }
+        }
+    }
+
+    private fun setBuildProjectionSuccess(result: BuildProjectionResult) {
+        buildProjection.value = BuildProjectionUiState(
+            phase = "registered",
+            buildId = result.buildId,
+            deliveredCommitSha = result.deliveredCommitSha,
+            linked = result.linked,
+        )
+        lastAction.value =
+            "QA Build ${result.buildId} (v${result.buildVersion}) registered and read back for delivered " +
+                "${result.deliveredCommitSha}; " +
+                "this does not verify or close the Bug."
+    }
+
+    private fun setBuildProjectionFailure(code: String, deliveredCommitSha: String? = null) {
+        buildProjection.value = BuildProjectionUiState(
+            phase = "failed",
+            deliveredCommitSha = deliveredCommitSha,
+            errorCode = code,
+        )
+        lastAction.value = "QA Build adoption failed: $code."
     }
 
     fun submitCapturedPng(
@@ -394,6 +504,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     companion object {
+        const val FOUNDATION_PROJECT_KEY = "LOCAL"
         val FOUNDATION_SCOPE = AccountProjectScope(
             accountId = "10000000-0000-4000-8000-000000000020",
             projectId = "10000000-0000-4000-8000-000000000004",

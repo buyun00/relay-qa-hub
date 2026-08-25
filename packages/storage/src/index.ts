@@ -280,6 +280,12 @@ export {
   createMobileCapture,
   getMobileCapture,
 } from "./mobile-capture-store.js";
+export { getMobileBuild, registerMobileBuild } from "./mobile-build-store.js";
+export type {
+  MobileBuildRecord,
+  RegisterMobileBuildInput,
+  RegisterMobileBuildResult,
+} from "./mobile-build-store.js";
 export type {
   CreateMobileCaptureInput,
   MobileCaptureArtifactInput,

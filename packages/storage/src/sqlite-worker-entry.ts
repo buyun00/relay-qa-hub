@@ -25,6 +25,11 @@ import {
   type CreateMobileCaptureInput,
 } from "./mobile-capture-store.js";
 import {
+  getMobileBuild,
+  registerMobileBuild,
+  type RegisterMobileBuildInput,
+} from "./mobile-build-store.js";
+import {
   claimMobileRelayOutbox,
   completeMobileRelayOutbox,
   createMobileRelayAttempt,
@@ -68,6 +73,8 @@ interface WorkerRequest {
     | "getMobileBug"
     | "createMobileCapture"
     | "getMobileCapture"
+    | "registerMobileBuild"
+    | "getMobileBuild"
     | "ensureMobileRelayRoles"
     | "transitionMobileBugReady"
     | "createMobileRelayAttempt"
@@ -232,6 +239,22 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly captureId: string;
     };
     return getMobileCapture(requireDatabase(), payload);
+  }
+
+  if (request.operation === "registerMobileBuild") {
+    return inWriteTransaction((current) =>
+      registerMobileBuild(current, request.payload as RegisterMobileBuildInput),
+    );
+  }
+
+  if (request.operation === "getMobileBuild") {
+    const payload = request.payload as {
+      readonly accountId: string;
+      readonly projectId: string;
+      readonly actorId: string;
+      readonly buildId: string;
+    };
+    return getMobileBuild(requireDatabase(), payload);
   }
 
   if (request.operation === "ensureMobileRelayRoles") {

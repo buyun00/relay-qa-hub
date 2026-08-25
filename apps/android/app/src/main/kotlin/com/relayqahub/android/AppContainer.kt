@@ -6,6 +6,7 @@ import androidx.work.WorkManager
 import com.relayqahub.android.data.QaHubDatabase
 import com.relayqahub.android.data.ScopedRepository
 import com.relayqahub.android.network.AttachmentUploadClient
+import com.relayqahub.android.network.BuildProjectionClient
 import com.relayqahub.android.network.OkHttpQaHubApiClient
 import com.relayqahub.android.network.RelayHandoffClient
 import com.relayqahub.android.security.AndroidKeystoreCredentialVault
@@ -22,6 +23,7 @@ class AppContainer private constructor(
     val scopedRepository: ScopedRepository,
     val attachmentUploadClient: AttachmentUploadClient,
     val relayHandoffClient: RelayHandoffClient,
+    val buildProjectionClient: BuildProjectionClient,
     val credentialVault: CredentialVault,
     val syncEngine: OfflineSyncEngine,
     val syncScheduler: SyncScheduler,
@@ -64,6 +66,11 @@ class AppContainer private constructor(
                 httpClient = httpClient,
                 allowLoopbackHttp = BuildConfig.DEBUG,
             )
+            val buildProjectionClient = BuildProjectionClient(
+                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                httpClient = httpClient,
+                allowLoopbackHttp = BuildConfig.DEBUG,
+            )
             val scopedRepository = ScopedRepository(
                 accountProjectDao = database.accountProjectDao(),
                 cachedQaItemDao = database.cachedQaItemDao(),
@@ -76,6 +83,7 @@ class AppContainer private constructor(
                 scopedRepository = scopedRepository,
                 attachmentUploadClient = attachmentUploadClient,
                 relayHandoffClient = relayHandoffClient,
+                buildProjectionClient = buildProjectionClient,
                 credentialVault = credentialVault,
                 syncEngine = OfflineSyncEngine(
                     operationDao = database.offlineOperationDao(),

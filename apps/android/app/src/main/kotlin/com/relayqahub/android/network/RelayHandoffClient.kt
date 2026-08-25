@@ -88,6 +88,8 @@ class RelayHandoffClient(
         val attemptId = attempt.requireString("id")
         require(attempt.optString("bugId") == bugId) { "REPAIR_ATTEMPT_BUG_MISMATCH" }
         require(attempt.optString("mode") == "relay") { "REPAIR_ATTEMPT_MODE_MISMATCH" }
+        val initialAttemptVersion = attempt.optionalInt("version")
+            ?: throw RelayHandoffFailure("REPAIR_ATTEMPT_VERSION_MISSING")
 
         val handoffId = java.util.UUID.randomUUID().toString()
         executeJson(
@@ -97,7 +99,7 @@ class RelayHandoffClient(
             idempotencyKey = "relay:dispatch:$handoffId",
             expectedStatus = 202,
             body = JSONObject()
-                .put("expectedVersion", 1)
+                .put("expectedVersion", initialAttemptVersion)
                 .put("handoffId", handoffId)
                 .put("selectedAttachmentIds", JSONArray()),
         )
@@ -125,6 +127,9 @@ class RelayHandoffClient(
         val requiresHumanVerification = finalReceipt.optBoolean("requiresHumanVerification", false)
         require(requiresHumanVerification) { "RELAY_RECEIPT_HUMAN_VERIFICATION_FALSE" }
         val qaItem = finalReceipt.optJSONObject("qaItem")
+        val buildLink = finalReceipt.optJSONObject("buildLink")
+            ?: finalReceipt.optJSONObject("buildProjection")
+        val build = finalReceipt.optJSONObject("build")
         val responseBugId = qaItem?.optString("id").orEmpty()
             .ifBlank { finalReceipt.optString("bugId") }
         require(responseBugId == bugId) { "RELAY_RECEIPT_BUG_MISMATCH" }
@@ -133,10 +138,28 @@ class RelayHandoffClient(
             bugId = bugId,
             bugKey = qaItem?.optString("key").orEmpty().ifBlank { bugKey },
             repairAttemptId = attemptId,
+            initialAttemptVersion = initialAttemptVersion,
             handoffId = handoffId,
             handoffStatus = finalReceipt.requireString("handoffStatus"),
             relayTaskId = finalReceipt.nullableString("relayTaskId"),
             requiresHumanVerification = requiresHumanVerification,
+            deliveredCommitSha = finalReceipt.nullableString("deliveredCommitSha"),
+            deliveredBranch = finalReceipt.nullableString("branch")
+                ?: finalReceipt.nullableString("deliveredBranch"),
+            buildRequirement = finalReceipt.nullableString("buildRequirement"),
+            buildId = finalReceipt.nullableString("buildId")
+                ?: build?.nullableString("id"),
+            externalRevision = finalReceipt.optionalInt("externalRevision"),
+            receiptVersion = finalReceipt.optionalInt("version"),
+            attemptVersion = finalReceipt.optionalInt("attemptVersion")
+                ?: finalReceipt.optionalInt("repairAttemptVersion"),
+            buildLinkExpectedVersion = finalReceipt.optionalInt("expectedVersion")
+                ?: buildLink?.optionalInt("expectedVersion"),
+            expectedBugVersion = finalReceipt.optionalInt("expectedBugVersion")
+                ?: buildLink?.optionalInt("expectedBugVersion"),
+            expectedBuildRequirementVersion =
+                finalReceipt.optionalInt("expectedBuildRequirementVersion")
+                    ?: buildLink?.optionalInt("expectedBuildRequirementVersion"),
         )
     }
 
@@ -196,10 +219,26 @@ data class RelayHandoffResult(
     val bugId: String,
     val bugKey: String,
     val repairAttemptId: String,
+    /** Version returned by createRepairAttempt; the adoption action uses this exact value. */
+    val initialAttemptVersion: Int,
     val handoffId: String,
     val handoffStatus: String,
     val relayTaskId: String?,
     val requiresHumanVerification: Boolean,
+    /** Exact commit reported by the Relay receipt; never inferred from a build or task. */
+    val deliveredCommitSha: String? = null,
+    val deliveredBranch: String? = null,
+    /** Server-owned build requirement state, when the receipt exposes it. */
+    val buildRequirement: String? = null,
+    /** Build identity returned by the receipt, if one is already linked. */
+    val buildId: String? = null,
+    val externalRevision: Int? = null,
+    val receiptVersion: Int? = null,
+    /** Optional server-owned CAS facts used by the explicit build-link action. */
+    val attemptVersion: Int? = null,
+    val buildLinkExpectedVersion: Int? = null,
+    val expectedBugVersion: Int? = null,
+    val expectedBuildRequirementVersion: Int? = null,
 )
 
 class RelayHandoffFailure(val code: String) : RuntimeException()
@@ -212,6 +251,12 @@ private fun JSONObject.nullableString(key: String): String? = if (isNull(key)) {
     null
 } else {
     optString(key).takeIf(String::isNotBlank)
+}
+
+private fun JSONObject.optionalInt(key: String): Int? = if (isNull(key) || !has(key)) {
+    null
+} else {
+    optInt(key).takeIf { it > 0 }
 }
 
 private fun requireUuid(value: String, label: String) {
