@@ -1,6 +1,14 @@
 import { strict as assert } from "node:assert";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -119,6 +127,59 @@ test("retains a failed marker when an inventoried attachment is missing", async 
       readFileSync(join(restoreRoot, ".qa-hub-attachment-inventory.json"), "utf8").includes(root),
       false,
     );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("rejects a non-canonical storage key before writing a manifest", async () => {
+  const root = mkdtempSync(join(tmpdir(), "relay-qa-hub-attachment-key-"));
+  try {
+    const fixture = createFixture(root, Buffer.from("malicious path bytes"), true);
+    const database = new DatabaseSync(fixture.databasePath);
+    try {
+      database.prepare("UPDATE blobs SET storage_key = ?").run(join(root, "source-secret"));
+    } finally {
+      database.close();
+    }
+    const restoreRoot = join(root, "isolated-evidence");
+    await assert.rejects(
+      restoreReferencedAttachmentsToIsolatedRoot({
+        databasePath: fixture.databasePath,
+        evidenceRoot: fixture.evidenceRoot,
+        restoreRoot,
+      }),
+      (error: unknown) =>
+        error instanceof AttachmentRestoreError &&
+        error.code === "ATTACHMENT_RESTORE_DATABASE_INVALID",
+    );
+    assert.equal(existsSync(restoreRoot), false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("rejects a restore parent that resolves into the source evidence root", async () => {
+  const root = mkdtempSync(join(tmpdir(), "relay-qa-hub-attachment-junction-"));
+  try {
+    const fixture = createFixture(root, Buffer.from("junction bytes"), true);
+    const linkedParent = join(root, "evidence-link");
+    symlinkSync(
+      fixture.evidenceRoot,
+      linkedParent,
+      process.platform === "win32" ? "junction" : "dir",
+    );
+    await assert.rejects(
+      restoreReferencedAttachmentsToIsolatedRoot({
+        databasePath: fixture.databasePath,
+        evidenceRoot: fixture.evidenceRoot,
+        restoreRoot: join(linkedParent, "nested-restore"),
+      }),
+      (error: unknown) =>
+        error instanceof AttachmentRestoreError &&
+        error.code === "ATTACHMENT_RESTORE_CONFIGURATION_INVALID",
+    );
+    assert.equal(existsSync(join(fixture.evidenceRoot, "nested-restore")), false);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

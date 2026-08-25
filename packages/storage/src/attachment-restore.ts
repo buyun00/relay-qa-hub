@@ -9,7 +9,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
 import { QA_HUB_SQLITE_APPLICATION_ID } from "./sqlite.js";
@@ -233,6 +233,13 @@ function readInventory(
           "attachment inventory contains invalid storage metadata",
         );
       }
+      const canonicalStorageKey = `sha256/${sha256.slice(0, 2)}/${sha256}`;
+      if (storageKey.replaceAll("\\", "/") !== canonicalStorageKey) {
+        throw new AttachmentRestoreError(
+          "ATTACHMENT_RESTORE_DATABASE_INVALID",
+          "attachment inventory contains a non-canonical content-addressed storage key",
+        );
+      }
       const sizeBytes = safeNonNegativeInteger(row["size_bytes"], "attachment size");
       if (sizeBytes < 1) {
         throw new AttachmentRestoreError(
@@ -354,36 +361,51 @@ async function copyAndVerifyEntry(
 export async function restoreReferencedAttachmentsToIsolatedRoot(
   options: RestoreReferencedAttachmentsOptions,
 ): Promise<RestoreReferencedAttachmentsResult> {
-  const databasePath = requireAbsolutePath(options.databasePath, "databasePath");
-  const evidenceRoot = requireAbsolutePath(options.evidenceRoot, "evidenceRoot");
-  const restoreRoot = requireAbsolutePath(options.restoreRoot, "restoreRoot");
+  const requestedDatabasePath = requireAbsolutePath(options.databasePath, "databasePath");
+  const requestedEvidenceRoot = requireAbsolutePath(options.evidenceRoot, "evidenceRoot");
+  const requestedRestoreRoot = requireAbsolutePath(options.restoreRoot, "restoreRoot");
   const createdAt = canonicalCreatedAt(options.createdAt);
   const maxEntries = requireMaxEntries(options.maxEntries);
-  const resolvedRestoreRoot = resolve(restoreRoot);
+  if (existsSync(requestedRestoreRoot)) {
+    throw new AttachmentRestoreError(
+      "ATTACHMENT_RESTORE_ROOT_EXISTS",
+      "isolated attachment restore root must not already exist",
+    );
+  }
+  let databasePath: string;
+  let evidenceRoot: string;
+  let restoreRoot: string;
+  try {
+    if (
+      !statSync(requestedDatabasePath).isFile() ||
+      !statSync(requestedEvidenceRoot).isDirectory()
+    ) {
+      throw new Error("source database or evidence root has the wrong type");
+    }
+    databasePath = realpathSync(requestedDatabasePath);
+    evidenceRoot = realpathSync(requestedEvidenceRoot);
+    const restoreParent = realpathSync(dirname(requestedRestoreRoot));
+    restoreRoot = join(restoreParent, basename(requestedRestoreRoot));
+  } catch (error) {
+    throw new AttachmentRestoreError(
+      "ATTACHMENT_RESTORE_CONFIGURATION_INVALID",
+      "source database, evidence root, and restore parent must exist",
+      { cause: error },
+    );
+  }
   if (
-    isSameOrContained(resolve(evidenceRoot), resolvedRestoreRoot) ||
-    isSameOrContained(resolve(dirname(databasePath)), resolvedRestoreRoot)
+    isSameOrContained(evidenceRoot, restoreRoot) ||
+    isSameOrContained(dirname(databasePath), restoreRoot)
   ) {
     throw new AttachmentRestoreError(
       "ATTACHMENT_RESTORE_CONFIGURATION_INVALID",
-      "isolated attachment restore root must be outside source data directories",
+      "isolated attachment restore root must be outside canonical source data directories",
     );
   }
   if (existsSync(restoreRoot)) {
     throw new AttachmentRestoreError(
       "ATTACHMENT_RESTORE_ROOT_EXISTS",
       "isolated attachment restore root must not already exist",
-    );
-  }
-  try {
-    if (!statSync(databasePath).isFile() || !statSync(evidenceRoot).isDirectory()) {
-      throw new Error("source database or evidence root has the wrong type");
-    }
-  } catch (error) {
-    throw new AttachmentRestoreError(
-      "ATTACHMENT_RESTORE_CONFIGURATION_INVALID",
-      "source database and evidence root must exist",
-      { cause: error },
     );
   }
 
