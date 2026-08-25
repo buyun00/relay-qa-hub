@@ -538,6 +538,58 @@ h1 {
   padding: 0.8rem;
 }
 
+.evidence-context {
+  margin-top: 0.75rem;
+  padding: 0.7rem;
+  color: #334c47;
+  background: #f3f0e7;
+  border: 1px solid #ded9ca;
+  border-radius: 0.55rem;
+}
+
+.evidence-context--complete {
+  background: #e4f0e9;
+  border-color: #b9d5c7;
+}
+
+.evidence-context--partial {
+  background: #fff3cf;
+  border-color: #e5cd83;
+}
+
+.evidence-context--unavailable {
+  background: #f5f2ea;
+}
+
+.evidence-context__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.evidence-context__heading strong {
+  color: #245f57;
+  font-size: 0.78rem;
+}
+
+.evidence-context__heading span,
+.evidence-context p {
+  color: #61706b;
+  font-size: 0.68rem;
+}
+
+.evidence-context p {
+  margin: 0.45rem 0 0;
+  line-height: 1.45;
+}
+
+.evidence-context dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.6rem;
+}
+
 .evidence-card__title {
   display: flex;
   flex-wrap: wrap;

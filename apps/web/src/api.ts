@@ -124,6 +124,36 @@ export interface BugAttachmentList {
   readonly nextCursor: null;
 }
 
+export type CaptureEnrichmentStatus = "unavailable" | "partial" | "complete";
+
+export type CapturePocoMethod =
+  | "GetSDKVersion"
+  | "Screenshot"
+  | "Dump"
+  | "GetScreenSize"
+  | "GetDebugProfilingData"
+  | "qa.snapshot";
+
+export interface CaptureBundleSummary {
+  readonly captureId: string;
+  readonly enrichmentStatus: CaptureEnrichmentStatus;
+  readonly artifacts: readonly {
+    readonly captureId: string;
+    readonly kind: string;
+    readonly status: "succeeded" | "failed" | "skipped";
+  }[];
+  readonly poco: {
+    readonly status: CaptureEnrichmentStatus;
+    readonly attempted: boolean;
+    readonly connectedPort: number | null;
+    readonly sdkVersion: string | null;
+    readonly snapshotCapability: "not_probed" | "standard_only" | "qa_snapshot_available";
+    readonly negotiatedMethods: readonly CapturePocoMethod[];
+    readonly succeededMethods: readonly CapturePocoMethod[];
+    readonly failureReason: string | null;
+  };
+}
+
 export interface DuplicateCandidate {
   readonly bugId: string;
   readonly bugKey: string;
@@ -360,6 +390,9 @@ function isAttachmentMetadata(value: unknown): value is AttachmentMetadata {
   return (
     typeof item.attachmentId === "string" &&
     typeof item.projectId === "string" &&
+    typeof item.clientSubmissionId === "string" &&
+    typeof item.clientAttachmentId === "string" &&
+    (item.captureId === null || typeof item.captureId === "string") &&
     typeof item.filename === "string" &&
     typeof item.mediaType === "string" &&
     typeof item.size === "number" &&
@@ -370,6 +403,80 @@ function isAttachmentMetadata(value: unknown): value is AttachmentMetadata {
     item.scanStatus === "clean" &&
     item.readyToBind === true &&
     item.bindingStatus === "claimed"
+  );
+}
+
+const CAPTURE_ENRICHMENT_STATUSES = new Set<CaptureEnrichmentStatus>([
+  "unavailable",
+  "partial",
+  "complete",
+]);
+
+const CAPTURE_POCO_METHODS = new Set<CapturePocoMethod>([
+  "GetSDKVersion",
+  "Screenshot",
+  "Dump",
+  "GetScreenSize",
+  "GetDebugProfilingData",
+  "qa.snapshot",
+]);
+
+function isCaptureEnrichmentStatus(value: unknown): value is CaptureEnrichmentStatus {
+  return (
+    typeof value === "string" && CAPTURE_ENRICHMENT_STATUSES.has(value as CaptureEnrichmentStatus)
+  );
+}
+
+function isCapturePocoMethodList(value: unknown): value is readonly CapturePocoMethod[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (method) =>
+        typeof method === "string" && CAPTURE_POCO_METHODS.has(method as CapturePocoMethod),
+    )
+  );
+}
+
+function isCaptureBundleSummary(value: unknown, captureId: string): value is CaptureBundleSummary {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const bundle = value as Record<string, unknown>;
+  if (
+    bundle.captureId !== captureId ||
+    !isCaptureEnrichmentStatus(bundle.enrichmentStatus) ||
+    !Array.isArray(bundle.artifacts) ||
+    typeof bundle.poco !== "object" ||
+    bundle.poco === null ||
+    Array.isArray(bundle.poco)
+  ) {
+    return false;
+  }
+
+  const artifactsAreValid = bundle.artifacts.every((artifact: unknown) => {
+    if (typeof artifact !== "object" || artifact === null || Array.isArray(artifact)) return false;
+    const item = artifact as Record<string, unknown>;
+    return (
+      item.captureId === captureId &&
+      typeof item.kind === "string" &&
+      (item.status === "succeeded" || item.status === "failed" || item.status === "skipped")
+    );
+  });
+  if (!artifactsAreValid) return false;
+
+  const poco = bundle.poco as Record<string, unknown>;
+  return (
+    poco.status === bundle.enrichmentStatus &&
+    typeof poco.attempted === "boolean" &&
+    (poco.connectedPort === null ||
+      (Number.isSafeInteger(poco.connectedPort) &&
+        (poco.connectedPort as number) > 0 &&
+        (poco.connectedPort as number) <= 65_535)) &&
+    (poco.sdkVersion === null || typeof poco.sdkVersion === "string") &&
+    (poco.snapshotCapability === "not_probed" ||
+      poco.snapshotCapability === "standard_only" ||
+      poco.snapshotCapability === "qa_snapshot_available") &&
+    isCapturePocoMethodList(poco.negotiatedMethods) &&
+    isCapturePocoMethodList(poco.succeededMethods) &&
+    (poco.failureReason === null || typeof poco.failureReason === "string")
   );
 }
 
@@ -475,6 +582,14 @@ export async function downloadAttachment(metadata: AttachmentMetadata): Promise<
     throw new QaHubApiError(200, "INVALID_ATTACHMENT_BYTES");
   }
   return blob;
+}
+
+export async function getCaptureBundle(captureId: string): Promise<CaptureBundleSummary> {
+  const body = await requestJson(`/api/v1/capture-bundles/${encodeURIComponent(captureId)}`);
+  if (!isCaptureBundleSummary(body, captureId)) {
+    throw new QaHubApiError(200, "INVALID_CAPTURE_BUNDLE");
+  }
+  return body;
 }
 
 export async function getHumanWorkflow(bugId: string): Promise<HumanWorkflowSnapshot> {
