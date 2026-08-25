@@ -1,6 +1,12 @@
 import { Worker } from "node:worker_threads";
 
 import type {
+  CreateMobileBugInput,
+  MobileBugCreation,
+  MobileBugRecord,
+  MobileScopeBootstrap,
+} from "./mobile-bug-store.js";
+import type {
   InsertedBugIdentity,
   MigrationReport,
   NewBugStorageRecord,
@@ -99,6 +105,25 @@ export class SqliteStorageWorker {
     }
     await this.initialization;
     return this.request<InsertedBugIdentity>("testCreateBug", record);
+  }
+
+  async ensureMobileScope(scope: MobileScopeBootstrap): Promise<void> {
+    await this.initialization;
+    await this.request("ensureMobileScope", scope);
+  }
+
+  async createMobileBug(input: CreateMobileBugInput): Promise<MobileBugCreation> {
+    await this.initialization;
+    return this.request<MobileBugCreation>("createMobileBug", input);
+  }
+
+  async getMobileBug(input: {
+    readonly accountId: string;
+    readonly projectId: string;
+    readonly bugId: string;
+  }): Promise<MobileBugRecord | null> {
+    await this.initialization;
+    return this.request<MobileBugRecord | null>("getMobileBug", input);
   }
 
   /** @internal Forces an unexpected worker exit for terminal-state regression tests. */

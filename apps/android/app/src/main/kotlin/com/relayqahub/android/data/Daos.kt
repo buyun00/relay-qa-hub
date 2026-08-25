@@ -126,6 +126,22 @@ interface OfflineOperationDao {
     suspend fun findReceipt(operationId: String): OfflineOperationReceiptEntity?
 
     @Query(
+        "SELECT * FROM offline_operation_receipts " +
+            "WHERE operationId = :operationId " +
+            "AND accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId LIMIT 1",
+    )
+    suspend fun findReceiptForScope(
+        operationId: String,
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+    ): OfflineOperationReceiptEntity?
+
+    @Query(
         "UPDATE offline_operations SET state = 'RUNNING', updatedAtEpochMs = :nowEpochMs " +
             "WHERE operationId IN (:operationIds) " +
             "AND accountId = :accountId AND projectId = :projectId " +

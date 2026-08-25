@@ -38,7 +38,7 @@ fun FoundationScreen(viewModel: FoundationViewModel) {
     FoundationScreen(
         state = state,
         onQueueDraft = viewModel::queueLocalDraft,
-        onScheduleSync = viewModel::scheduleConstrainedSync,
+        onRunLiveSmoke = viewModel::runLiveSmoke,
     )
 }
 
@@ -46,7 +46,7 @@ fun FoundationScreen(viewModel: FoundationViewModel) {
 internal fun FoundationScreen(
     state: FoundationUiState,
     onQueueDraft: () -> Unit,
-    onScheduleSync: () -> Unit,
+    onRunLiveSmoke: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -100,7 +100,7 @@ internal fun FoundationScreen(
             )
             FoundationCard(
                 title = "Versioned QA Hub API",
-                detail = "JSON writes prefer the additive App-first vendor media type; the fake client shares the same contract boundary.",
+                detail = "Queued and live JSON writes share the additive App-first vendor media type and contract boundary.",
                 value = "Contract ${state.contractVersion}",
             )
 
@@ -117,12 +117,12 @@ internal fun FoundationScreen(
                     Text("Queue draft")
                 }
                 Button(
-                    onClick = onScheduleSync,
+                    onClick = onRunLiveSmoke,
                     modifier = Modifier
                         .weight(1f)
-                        .testTag("schedule-sync"),
+                        .testTag("live-smoke"),
                 ) {
-                    Text("Schedule sync")
+                    Text("Run live smoke")
                 }
             }
 

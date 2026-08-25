@@ -6,6 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
 import com.relayqahub.android.network.QaHubApiContract
+import com.relayqahub.android.security.NativeCredentials
+import com.relayqahub.android.security.VaultResult
+import com.relayqahub.android.security.nativeSessionScope
+import com.relayqahub.android.work.SyncRunResult
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -88,6 +92,59 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         lastAction.value = "Sync scheduled with connected-network and battery constraints."
     }
 
+    fun runLiveSmoke() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                lastAction.value =
+                    "Live smoke unavailable: configure qaHubDebugAccessToken for a debug build."
+                return@launch
+            }
+
+            lastAction.value = "Running live smoke through the real offline queue…"
+            val result = runCatching {
+                when (
+                    appContainer.credentialVault.put(
+                        scope = scope.nativeSessionScope(),
+                        credentials = NativeCredentials(
+                            accessToken = accessToken,
+                            refreshToken = LIVE_SMOKE_UNUSED_REFRESH_TOKEN,
+                            accessTokenExpiresAtEpochMs =
+                                System.currentTimeMillis() + LIVE_SMOKE_CREDENTIAL_TTL_MS,
+                            sharedDeviceSession = false,
+                        ),
+                    )
+                ) {
+                    is VaultResult.Success -> Unit
+                    VaultResult.Missing -> throw LiveSmokeFailure("CREDENTIAL_WRITE_MISSING")
+                    is VaultResult.Unavailable ->
+                        throw LiveSmokeFailure("CREDENTIAL_VAULT_UNAVAILABLE")
+                }
+
+                val operationId = appContainer.scopedRepository.enqueue(
+                    scope = scope,
+                    request = FoundationCreateBugContract.buildOperation(
+                        projectId = scope.projectId,
+                        submissionId = UUID.randomUUID().toString(),
+                        observedAt = Instant.now().toString(),
+                        qaAppVersion = BuildConfig.VERSION_NAME,
+                    ),
+                )
+                val syncResult = appContainer.syncEngine.run(scope)
+                val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
+                if (receipt != null) {
+                    "Live smoke created ${receipt.qaItemKey} (${receipt.qaItemId})."
+                } else {
+                    "Live smoke finished without a receipt: ${syncResult.liveSmokeSummary()}."
+                }
+            }
+            lastAction.value = result.getOrElse { failure ->
+                val code = (failure as? LiveSmokeFailure)?.code ?: "UNEXPECTED_LOCAL_FAILURE"
+                "Live smoke failed: $code."
+            }
+        }
+    }
+
     companion object {
         val FOUNDATION_SCOPE = AccountProjectScope(
             accountId = "10000000-0000-4000-8000-000000000020",
@@ -99,6 +156,19 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 }
 
+private class LiveSmokeFailure(val code: String) : RuntimeException()
+
+private fun SyncRunResult.liveSmokeSummary(): String = when (this) {
+    is SyncRunResult.Completed -> "completed without a matching receipt"
+    is SyncRunResult.ContinueAt -> "queued for retry"
+    is SyncRunResult.BlockedOnAuthentication -> "authentication rejected"
+    is SyncRunResult.BlockedOnDeviceSecurity -> "device credential storage unavailable"
+    is SyncRunResult.Exhausted -> "retry limit exhausted"
+}
+
+private const val LIVE_SMOKE_CREDENTIAL_TTL_MS = 5 * 60 * 1_000L
+private const val LIVE_SMOKE_UNUSED_REFRESH_TOKEN = "debug-live-smoke-does-not-refresh"
+
 internal data class FoundationFakeCreateBugRequest(
     val operationKind: String,
     val httpMethod: String,
@@ -108,7 +178,7 @@ internal data class FoundationFakeCreateBugRequest(
 )
 
 /**
- * Pure Kotlin guard for the foundation demonstrator's fake `/bugs` submission.
+ * Pure Kotlin guard for the foundation demonstrator's `/bugs` submission.
  *
  * The DTO and nested maps are validated before the Android-only JSONObject serialization step,
  * so JVM tests can exercise the same path, payload, scope, and idempotency rules. The server is

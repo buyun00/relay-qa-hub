@@ -233,3 +233,13 @@ export function parseStorageEnvironment(environment: StorageEnvironment): Storag
     wal,
   });
 }
+
+export { SqliteStorageWorker, SqliteStorageWorkerError } from "./sqlite-worker.js";
+export type { SqliteStorageWorkerOptions, SqliteWorkerInitialization } from "./sqlite-worker.js";
+export type {
+  CreateMobileBugInput,
+  MobileBugCreation,
+  MobileBugRecord,
+  MobileOccurrenceInput,
+  MobileScopeBootstrap,
+} from "./mobile-bug-store.js";

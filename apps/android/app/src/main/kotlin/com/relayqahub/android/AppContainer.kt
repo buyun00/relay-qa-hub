@@ -46,6 +46,7 @@ class AppContainer private constructor(
                     .followSslRedirects(false)
                     .retryOnConnectionFailure(false)
                     .build(),
+                allowLoopbackHttp = BuildConfig.DEBUG,
             )
             val scopedRepository = ScopedRepository(
                 accountProjectDao = database.accountProjectDao(),

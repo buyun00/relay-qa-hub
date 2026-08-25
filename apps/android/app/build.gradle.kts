@@ -9,6 +9,8 @@ fun String.asBuildConfigString(): String =
 
 val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
     .orElse("https://qa-hub.invalid/api/v1/")
+val qaHubDebugAccessToken = providers.gradleProperty("qaHubDebugAccessToken")
+    .orElse("")
 
 android {
     namespace = "com.relayqahub.android"
@@ -30,6 +32,7 @@ android {
             "QA_HUB_API_BASE_URL",
             qaHubApiBaseUrl.get().asBuildConfigString(),
         )
+        buildConfigField("String", "QA_HUB_DEBUG_ACCESS_TOKEN", "\"\"")
         buildConfigField("String", "QA_HUB_CONTRACT_VERSION", "\"1.1.0\"")
     }
 
@@ -37,6 +40,11 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
+            buildConfigField(
+                "String",
+                "QA_HUB_DEBUG_ACCESS_TOKEN",
+                qaHubDebugAccessToken.get().asBuildConfigString(),
+            )
         }
         release {
             isMinifyEnabled = false

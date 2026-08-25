@@ -435,6 +435,22 @@ class OfflineSyncEngineTest {
         override suspend fun findReceipt(operationId: String): OfflineOperationReceiptEntity? =
             receipts.singleOrNull { it.operationId == operationId }
 
+        override suspend fun findReceiptForScope(
+            operationId: String,
+            accountId: String,
+            projectId: String,
+            actorId: String,
+            installationId: String,
+            sessionId: String,
+        ): OfflineOperationReceiptEntity? = receipts.singleOrNull {
+            it.operationId == operationId &&
+                it.accountId == accountId &&
+                it.projectId == projectId &&
+                it.actorId == actorId &&
+                it.installationId == installationId &&
+                it.sessionId == sessionId
+        }
+
         override suspend fun markRunning(
             accountId: String,
             projectId: String,

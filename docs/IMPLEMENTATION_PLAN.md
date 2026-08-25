@@ -9,18 +9,18 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P1
-  current_gate: G1-INDEPENDENT-FOUNDATION
+  current_phase: P3
+  current_gate: G3-ANDROID-APP-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 71c7afbe14262f68059a06af490167b7d3854ab4
-  last_verified_at: 2026-08-25T04:49:11+08:00
-  next_action: 以 PROGRESS.md 的唯一 P1.2 root pointer 完成纯 Domain command/transition/effect-plan 实现；P3.1/P3.2 为互斥并行车道
+  last_verified_commit: a8998983fda15c65c0e97d41eb401c887269af97
+  last_verified_at: 2026-08-25T09:54:49+08:00
+  next_action: P3.3 首个 API 到 Android/MuMu 的 Bug/Occurrence 真链路已验证；当前接最小 attachment session/chunk/finalize/bind 与 Room 队列，随后进入 capture/overlay/Poco
   blockers:
-    - apps/android 自有工程已完成 P3.2 技术终审；API35 MuMu 已连接，Android 15+ 真机证据仍缺失
-    - API37 运行环境/真机证据尚缺；不阻断 P1/P3.2 编译，但阻断 target37 行为 Gate
-    - Active vendored Poco 已定位，但当前 IPAddress.Any/无认证/无 qa.snapshot extension，且没有 provenance-bound 安全 runtime；阻断 P3.1 live proof/P3.8/G3
+    - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1/G2 仍未正式关闭，但按执行 override 不阻塞 P3 主链路实现
+    - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
+    - API37/真机/Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 MuMu smoke
 ```
 
 ## 1. 决策摘要

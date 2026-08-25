@@ -1,8 +1,8 @@
 package com.relayqahub.android.data
 
 import com.relayqahub.android.network.QaHubRelativePath
-import java.util.UUID
 import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 
 data class AccountProjectScope(
@@ -111,6 +111,21 @@ class ScopedRepository(
             ),
         )
         return operationId
+    }
+
+    suspend fun findReceipt(
+        scope: AccountProjectScope,
+        operationId: String,
+    ): OfflineOperationReceiptEntity? {
+        require(operationId.isNotBlank())
+        return offlineOperationDao.findReceiptForScope(
+            operationId = operationId,
+            accountId = scope.accountId,
+            projectId = scope.projectId,
+            actorId = scope.actorId,
+            installationId = scope.installationId,
+            sessionId = scope.sessionId,
+        )
     }
 
     override suspend fun clearAccount(accountId: String) {

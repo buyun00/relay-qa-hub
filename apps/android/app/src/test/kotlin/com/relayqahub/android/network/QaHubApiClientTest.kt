@@ -43,12 +43,30 @@ class QaHubApiClientTest {
     }
 
     @Test
-    fun `client rejects non https base url`() {
-        val result = runCatching {
-            OkHttpQaHubApiClient("http://qa-hub.example/api/v1/", OkHttpClient())
-        }
+    fun `loopback http requires explicit opt in`() {
+        val loopbackUrl = "http://127.0.0.1:4318/api/v1/"
+        assertTrue(
+            runCatching { OkHttpQaHubApiClient(loopbackUrl, OkHttpClient()) }.isFailure,
+        )
 
-        assertTrue(result.isFailure)
+        val optedIn = OkHttpQaHubApiClient(
+            baseUrl = loopbackUrl,
+            httpClient = OkHttpClient(),
+            allowLoopbackHttp = true,
+        )
+        assertEquals(
+            "http://127.0.0.1:4318/api/v1/bugs",
+            optedIn.buildRequest(operation(), "opaque-access-token").url.toString(),
+        )
+        assertTrue(
+            runCatching {
+                OkHttpQaHubApiClient(
+                    baseUrl = "http://qa-hub.example/api/v1/",
+                    httpClient = OkHttpClient(),
+                    allowLoopbackHttp = true,
+                )
+            }.isFailure,
+        )
     }
 
     @Test

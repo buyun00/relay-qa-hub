@@ -2,6 +2,13 @@ import { parentPort, workerData } from "node:worker_threads";
 import type { DatabaseSync } from "node:sqlite";
 
 import {
+  createMobileBug,
+  ensureMobileScope,
+  getMobileBug,
+  type CreateMobileBugInput,
+  type MobileScopeBootstrap,
+} from "./mobile-bug-store.js";
+import {
   canonicalMigrationDigest,
   insertBugWithNextNumber,
   migrateSqliteDatabase,
@@ -19,7 +26,14 @@ interface WorkerConfiguration {
 
 interface WorkerRequest {
   readonly id: number;
-  readonly operation: "initialize" | "testCreateBug" | "integrity" | "close";
+  readonly operation:
+    | "initialize"
+    | "ensureMobileScope"
+    | "createMobileBug"
+    | "getMobileBug"
+    | "testCreateBug"
+    | "integrity"
+    | "close";
   readonly payload?: unknown;
 }
 
@@ -79,6 +93,41 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       if (current.isTransaction) current.exec("ROLLBACK");
       throw error;
     }
+  }
+
+  if (request.operation === "ensureMobileScope") {
+    const current = requireDatabase();
+    current.exec("BEGIN IMMEDIATE");
+    try {
+      ensureMobileScope(current, request.payload as MobileScopeBootstrap);
+      current.exec("COMMIT");
+      return { ready: true };
+    } catch (error) {
+      if (current.isTransaction) current.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
+  if (request.operation === "createMobileBug") {
+    const current = requireDatabase();
+    current.exec("BEGIN IMMEDIATE");
+    try {
+      const result = createMobileBug(current, request.payload as CreateMobileBugInput);
+      current.exec("COMMIT");
+      return result;
+    } catch (error) {
+      if (current.isTransaction) current.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
+  if (request.operation === "getMobileBug") {
+    const payload = request.payload as {
+      readonly accountId: string;
+      readonly projectId: string;
+      readonly bugId: string;
+    };
+    return getMobileBug(requireDatabase(), payload, payload.bugId);
   }
 
   if (request.operation === "integrity") {

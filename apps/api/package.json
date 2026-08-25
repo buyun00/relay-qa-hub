@@ -24,6 +24,7 @@
     "start": "node dist/main.js"
   },
   "dependencies": {
+    "@relay-qa-hub/storage": "0.1.0-debug",
     "fastify": "5.12.1"
   },
   "devDependencies": {

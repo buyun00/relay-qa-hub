@@ -21,10 +21,17 @@ import okhttp3.Response
 class OkHttpQaHubApiClient(
     baseUrl: String,
     httpClient: OkHttpClient,
+    allowLoopbackHttp: Boolean = false,
 ) : QaHubApiClient {
     private val apiBaseUrl: HttpUrl = baseUrl.toHttpUrl().let { parsed ->
-        require(parsed.isHttps) { "QA Hub API base URL must use HTTPS" }
-        require(parsed.username.isEmpty() && parsed.password.isEmpty())
+        require(parsed.username.isEmpty() && parsed.password.isEmpty()) {
+            "QA Hub API base URL must not embed credentials"
+        }
+        val isAllowedLoopbackHttp =
+            allowLoopbackHttp && parsed.scheme == "http" && parsed.host in LOOPBACK_HOSTS
+        require(parsed.isHttps || isAllowedLoopbackHttp) {
+            "QA Hub API base URL must use HTTPS unless loopback HTTP is explicitly enabled"
+        }
         require(parsed.query == null && parsed.fragment == null)
         val normalized = parsed.newBuilder().apply {
             if (!parsed.encodedPath.endsWith('/')) addPathSegment("")
@@ -157,6 +164,7 @@ class OkHttpQaHubApiClient(
         const val API_BASE_PATH = "/api/v1/"
         const val CREATE_BUG_OPERATION = "CREATE_BUG"
         const val CREATE_BUG_SUCCESS_STATUS = 201
+        val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
         val VERSIONED_JSON_MEDIA_TYPE = QaHubApiContract.VERSIONED_JSON.toMediaType()
     }
 }
