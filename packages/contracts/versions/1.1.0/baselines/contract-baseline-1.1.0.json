@@ -1,7 +1,7 @@
 {
   "contractVersion": "1.1.0",
   "baseContractVersion": "1.0.0",
-  "frozenAt": "2026-08-24T17:48:23.796Z",
+  "frozenAt": "2026-08-25T01:26:38.186Z",
   "canonicalSha256": {
     "README.md": "312257f6d21bf45414af6ea50ca5a0eba1c4589a9c17025c826d5af76fd2ccca",
     "errors/error-codes.json": "f606037bd157e7e4ef52e9d7428cabe28370a488403eea5a74bfb94047be33e4",
@@ -12,9 +12,9 @@
     "scripts/check-additive.mjs": "b09d1736eba7dcfcdc8714ff75c0fbc0cfe3e16acfeb6f71edec9a81f196f9e2",
     "scripts/check-breaking.mjs": "57199ca81ae28c0f1eda175ce78ef9a6ad76215bb3b06180ae7e42f293e9113a",
     "scripts/generate-openapi.mjs": "76a3fd214b2e3ee16373518084c8c8e2959557b24926d4f97c7f705c26f2e306",
-    "scripts/validate-contracts.mjs": "220818beab1efc7658eda3fa0b0639538b3060f8094088f92cce16d3a72eba0b",
+    "scripts/validate-contracts.mjs": "400bd25beb7790d41feac7ed842786b1f7cec8ce8d4dac081d3da39d904113e0",
     "semantics/behavior-scenarios.json": "07dfd85f93cf764711889e5b6fca95698dcd1826da3c749066a2f65da45e7cfa",
     "src/api-manifest.json": "ec6d4202e32a4c79092a8615e6cb17b3ada72ef82a7d2c4099715b92b76ae766",
-    "src/evaluate-app-first-behavior.mjs": "5d3e0c5f08e26970d976edabad39f37b76309d0dd874d6dd998a076e10ccde64"
+    "src/evaluate-app-first-behavior.mjs": "78f4d6ad9f867ca4eae5bdf945bda224142113b6559c687e59071cbdd44dc385"
   }
 }

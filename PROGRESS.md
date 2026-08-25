@@ -7,7 +7,9 @@
 - Current gate: `G1-INDEPENDENT-FOUNDATION`
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
 - Active work packages: `P1.2, P3.1`
-- Next atomic action: `P1.2 在纯 Domain 包冻结 Bug/RepairAttempt/BuildRequirement/Verification 的命令与合法迁移矩阵，先补合法/非法/authority/version 决策测试，再实现返回同事务 Event+Outbox effect plan 的纯状态机`
+- Current delivery slice: `Backend/API -> Android native client -> MuMu API35`（先用一次根 `npm run verify` 收口 P1.2，然后立即实现真实 HTTP 建单垂直切片）
+- Minimal verification: `服务端真实启动 + Android/MuMu 实际 HTTP 成功建单并落库 + 一个关键鉴权/输入失败可见；每段只保留一条主证据`
+- Next atomic action: `P1.2 Domain 64/64、Storage 77/77 与根 npm run verify 已完成；立即落本地提交并把唯一 pointer 切到 P3.3/P3.5 的真实 HTTP 建单垂直切片`
 - Completed gates: `1 / 11`
 - Last green commit: `71c7afbe14262f68059a06af490167b7d3854ab4`
 - Last deployed commit: `none`
@@ -16,8 +18,8 @@
 - Last production verification: `none`
 - Last backup verified: `none`
 - Last restore drill: `none`
-- Blockers: `Android real-device/API37 runtime evidence pending; active Poco is identified but binds IPAddress.Any, has no auth/qa.snapshot extension, and has no safe runtime proof`
-- Updated at: `2026-08-25T05:09:07+08:00`
+- Blockers: `当前 MuMu API35 MVP 主链路无外部 blocker；真机/API37/Poco 安全加固为后续 Gate，不阻塞当前可运行切片`
+- Updated at: `2026-08-25T09:55:36+08:00`
 
 ## Gate status
 
@@ -45,7 +47,7 @@
 | P0.3  | DONE        | root (GPT-5.6 Sol/ultra) | P0.2                | OpenAPI/Event/Relay contracts                        | 9 schemas、12+12 场景、35 operations、19 errors、24-file breaking baseline；独立复验通过           | [`docs/evidence/P0.3-contracts.md`](docs/evidence/P0.3-contracts.md)  | `525f81b3c87749e00b4118c866fb26a68c88175c` | 2026-08-24T17:33:24+08:00 |
 | P0.4  | DONE        | root (GPT-5.6 Sol/ultra) | P0.3                | 最小运行骨架                                         | clean `npm ci`; full `verify`; actual health/SIGINT/restart; Relay fingerprint                     | [`docs/evidence/P0.4-skeleton.md`](docs/evidence/P0.4-skeleton.md)    | `a873df7e9f07d37e1116ab7ff06734eb1bde0281` | 2026-08-24T18:01:36+08:00 |
 | P1.1  | DONE        | root (GPT-5.6 Sol/ultra) | G0                  | schema/migrations                                    | migration/integrity/concurrency                                                                    | 41 focused DML、storage `56/56`、full `npm run verify` exit 0；post-fix independent 5 temp DB / `64/64`、FK/integrity green、Blocker/High/Medium=`0/0/0` | [`docs/evidence/P1.1-storage.md`](docs/evidence/P1.1-storage.md) | `71c7afbe14262f68059a06af490167b7d3854ab4` | 2026-08-25T04:49:11+08:00 |
-| P1.2  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | P1.1                | domain state machine                                 | transition/guard/version tests                                                                     | red-first pure-domain matrix starting; no implementation completion claim |                                            | 2026-08-25T04:49:11+08:00 |
+| P1.2  | VERIFYING  | root (GPT-5.6 Sol/ultra) | P1.1                | domain state machine                                 | transition/guard/version tests                                                                     | Domain `64/64`、Storage `77/77`、根 `npm run verify` exit 0；按 MVP override 不再等待穷举终审，正在落本地提交 | [`docs/evidence/P1.2-domain-state-machine.md`](docs/evidence/P1.2-domain-state-machine.md) |                                            | 2026-08-25T09:55:36+08:00 |
 | P1.3  | PLANNED     | unassigned               | P1.1                | outbox/inbox                                         | crash/retry/order/replay tests                                                                     |                                                                       |                                            | 2026-08-24                |
 | P1.4  | PLANNED     | unassigned               | P1.1                | health/log/config                                    | dependency fault tests                                                                             |                                                                       |                                            | 2026-08-24                |
 | P2.1  | PLANNED     | unassigned               | G1                  | user auth/invite QR                                  | auth/session/CSRF tests                                                                            |                                                                       |                                            | 2026-08-24                |
@@ -53,7 +55,7 @@
 | P2.3  | PLANNED     | unassigned               | P1.2,P2.2           | append-only audit                                    | atomicity/immutability tests                                                                       |                                                                       |                                            | 2026-08-24                |
 | P3.0  | DONE        | root (GPT-5.6 Sol/ultra) | P0.3                | App-first API/evidence/Poco contract delta           | schema/examples/behavior/breaking/version tests                                                    | [`docs/evidence/P3.0-app-first-contracts.md`](docs/evidence/P3.0-app-first-contracts.md) | `e27049cd614dafea1baf63c50ae67abdb992b030` | 2026-08-25T01:50:26+08:00 |
 | P3.1  | VERIFYING   | poco_capability_spike (GPT-5.6 Sol/ultra) | P3.0                | actual Poco capability/security spike                | vendored SHA/version, framing/RPC, loopback/LAN, server read-only evidence                         | [`docs/spikes/poco/P3.1-capability-audit.md`](docs/spikes/poco/P3.1-capability-audit.md); static discovery complete, live/security proof blocked by current Any bind/no safe runtime |                                            | 2026-08-25T02:19:38+08:00 |
-| P3.2  | DONE        | p3_2_medium_closure (GPT-5.6 Sol/ultra) | P3.0                | Kotlin/Compose/Room/WorkManager native foundation    | metadata-aware preflight + pinned AGP/Gradle clean build/lint/unit/instrumented                    | 独立 `--no-build-cache --rerun-tasks` clean：JVM `38/38`、MuMu API35 `10/10`、lint 0 errors/13 warnings；APK/installed base SHA=`2265B10159B4DC86A58721A3964C13E15B51E0B5CCF453AB5D3D8A9F67180A48`；终审 Blocker/High/Medium=`0/0/0` | `7a9354cdce506950e64d63372b276d4870ee987b` | 2026-08-25T05:09:07+08:00 |
+| P3.2  | DONE        | p3_2_medium_closure (GPT-5.6 Sol/ultra) | P3.0                | Kotlin/Compose/Room/WorkManager native foundation    | metadata-aware preflight + pinned AGP/Gradle clean build/lint/unit/instrumented                    | `2026-08-25T08:27+08:00` 最终复审：clean JVM `38/38`、MuMu API35 `10/10`、lint 0 errors/13 warnings、强制 39/39 tasks；当前 APK/installed base SHA=`80FBFAC14AFF08B7016B7C0A34D0D512067D19D57511C8BF332A79431BB7BF30`，cold launch 750 ms；Blocker/High/Medium=`0/0/0` | `7a9354cdce506950e64d63372b276d4870ee987b` | 2026-08-25T08:27:02+08:00 |
 | P3.3  | PLANNED     | unassigned               | P1.1,P2.2,P3.0      | backend evidence/mobile APIs                         | upload adversarial, IDOR, pagination/filter tests                                                  |                                                                       |                                            | 2026-08-24                |
 | P3.4  | PLANNED     | unassigned               | P3.2,P3.3           | Room/WorkManager offline attachment queue            | offline/retry/auth-expiry/duplicate/orphan tests                                                   |                                                                       |                                            | 2026-08-24                |
 | P3.5  | PLANNED     | unassigned               | P1.2,P2.2,P3.2,P3.3 | native full-workflow home                            | Relay-offline human loop + 30-second intake                                                        |                                                                       |                                            | 2026-08-24                |
@@ -87,8 +89,28 @@
 
 ## Active work
 
-- `P1.2` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T04:49:11+08:00`; updated: `2026-08-25T04:49:11+08:00`; next atomic action: `完整读取现有 Domain vocabulary 与 frozen transition/authority contracts；由独占测试车道先写 Bug/RepairAttempt/BuildRequirement/Verification 的合法、非法、stale-version、Relay-no-human-authority 决策矩阵；根车道实现纯 effect plan`。
+- `P1.2` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T04:49:11+08:00`; updated: `2026-08-25T09:55:36+08:00`; state: `VERIFYING`; next atomic action: `根 verify 已绿；stage 精确 P1.2 文件与 evidence、排除 docs/spikes，检查 staged diff 后本地 commit，随即推进真实 API/Android/MuMu smoke`。
 - `P3.1` — owner: `poco_capability_spike (GPT-5.6 Sol/ultra)`; started: `2026-08-25T01:53:02+08:00`; updated: `2026-08-25T02:19:38+08:00`; state: `VERIFYING`; next atomic action: `保留静态审计证据；P3.8 产生 provenance-bound Loopback QA game APK 后补 127.0.0.1/LAN-negative/恶意方法/runtime proof，期间不修改 Unity/Relay`。
+
+## MuMu MVP execution cadence (2026-08-25 override)
+
+- 当前优先级是打通可运行主链路，不以测试数量、全量边界穷举、性能优化、文档完善或独立终审零发现作为 MuMu API35 MVP 的进入条件。
+- 每个相邻模块只验证四件事：真实启动、实际通信、成功数据通过、一个关键失败明确暴露。通过后立即进入下一段。
+- 当前垂直切片：QA Hub API 真进程创建最小 Bug/Occurrence -> Android 原生界面调用 -> MuMu API35 安装运行 -> 后续接附件/悬浮球截图、Poco optional enrichment、Relay optional handoff/receipt。
+- API31（已被当前 minSdk=35 产品决策取代）、API37 runtime、真机、广域安全硬化、完整性能矩阵和冗余对抗测试均不阻塞当前 MuMu API35 MVP；仍保留为对应正式 Gate 的发布前证据。
+
+## 收尾修复清单 / technical debt
+
+| 问题 | 风险 | 触发条件 | 建议修复 | 最小回归 |
+| --- | --- | --- | --- | --- |
+| `events` 尚无 durable `idempotency_key` 列 | 命令 Event 与请求重放键不能直接持久关联 | 应用 UnitOfWork 开始持久化 Domain Event | 在后续 additive migration 增列并由 persistence assembler 绑定 | 同 key 重放只产生一个业务效果与同一 Event |
+| persisted timestamp 尚未统一 canonical UTC `Z`，个别 SQLite 比较仍是文本比较 | 带 offset 的等价/逆序时间可能误判 reopen 顺序 | 非 canonical RFC3339 经 raw DML 进入数据库 | 写边界统一 canonical `Z`，顺序比较改 `julianday`/epoch | 一个 offset inversion 负例 |
+| 裸 `occurrences` 可先于/缺少 typed append Event 存在 | 非 UnitOfWork 写入可留下不可审计孤儿；当前不能进入 lineage/reopen proof | 绕过未来应用 UnitOfWork 直接 raw DML | P2.3/P3.3 用原子 UnitOfWork 或 completion fact 封闭反向关系 | 故障注入证明 occurrence/Event 同成同败 |
+| Verification result 的业务摘要与 Event `summary/reason` 尚未做逐字段关系证明 | 审计文本可能与 durable result 文本不一致 | raw DML 同时构造合法状态与不一致 Event | 在 P2.3 append-only audit 汇合时绑定 bounded/redacted relation | 一条 mismatch 拒绝、一条 redacted 成功 |
+| Domain 与 SQLite 的 Unicode 隐私规范化尚不一致 | 零宽字符/全角混淆可能绕过 raw Event secret 扫描 | 敏感词含 NFKC 变体或 Unicode format chars | 在 P2.3 统一规范化函数或写前 redaction | 一个 NFKC/零宽 secret 在两层得到同一结论 |
+| Domain `eventSequence` 与 SQLite global `event_position` 命名/映射待收敛 | persistence assembler 可能把 per-aggregate sequence 与全局位置混用 | P2.3 实现真实 UnitOfWork | 明确拆成 aggregateSequence 与数据库生成 eventPosition | 两个 aggregate 交错写入仍各自有序 |
+| API37/真机、SELinux Enforcing、Poco Loopback/LAN-negative 完整矩阵未完成 | 不能据此宣称正式设备/安全 Gate 完成 | 进入 G9/G10 或生产发布 | 按 P3.9/P9.1 补真实设备与安全证据 | 每个 Gate 一条真实设备主证据 |
+| P1.2 evidence 曾含旧计数/Occurrence 反向关系过度陈述 | 只影响历史签收真实性，不影响 canonical happy path | 引用旧快照作发布证明 | 本次校正 64/77 与单向语义，后续以 commit 为身份 | 发布前抽查 evidence 与 commit/命令一致 |
 
 ## Completed evidence
 
@@ -103,12 +125,13 @@
 - P1.1 第一次 post-fix 独立重放委派曾被系统误分类并在执行前中止，未产生数据库结论；改写为纯本地数据库业务一致性验收后完成 5 个临时库 `64/64` 正反向 DML、FK/integrity green 和 Blocker/High/Medium=`0/0/0`，因此该临时执行阻断已解除。
 - P1.1 已于 `2026-08-25T04:49:11+08:00` 完成：数据库 v2、Worker、41 focused DML、storage `56/56`、full verify、独立 `64/64`/`0/0/0` 与证据齐全；本地提交 `71c7afbe14262f68059a06af490167b7d3854ab4`，未 push。唯一 root pointer 已按规则移到 P1.2。
 - P3.2 已于 `2026-08-25T05:09:07+08:00` 完成：本仓库自有 Gradle 的 Kotlin/Compose/Room/WorkManager foundation、38/38 JVM、10/10 MuMu API35、APK/installed-base exact SHA、独立 `0/0/0` 终审与证据齐全；本地提交 `7a9354cdce506950e64d63372b276d4870ee987b`，未 push。真机/API37/Poco/overlay/MediaProjection 仍由 P3.6-P3.9/P9.1 单独 Gate。
+- P3.2 于 `2026-08-25T08:27:02+08:00` 完成最终只读复审：Android source tree 无差异；独立 clean assemble/lint/JVM `38/38`/MuMu `10/10`、无缓存 39/39 tasks、adb install/cold launch 均成功；当前 APK 与 installed base SHA 均为 `80FBFAC14AFF08B7016B7C0A34D0D512067D19D57511C8BF332A79431BB7BF30`，Blocker/High/Medium=`0/0/0`。历史 `2265...` 保留为先前时间点工件身份；两者均非真机/API37/Poco/overlay/MediaProjection 证据。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 
 ## Blockers
 
-1. **Android real-device evidence not yet available**：产品最低版本为 Android 15/API35（`minSdk=35`）。`apps/android` 自有 Gradle 工程已 pin AGP 9.1.1/Gradle 9.3.1/compile+target 37，并完成独立强制 clean assemble/lint、38/38 JVM、10/10 MuMu connected tests；32,618,659-byte QA Hub APK 与 MuMu installed base SHA-256 均为 `2265B10159B4DC86A58721A3964C13E15B51E0B5CCF453AB5D3D8A9F67180A48`，P3.2 终审为 `0/0/0`。MuMu live 证据仍是 Android 15/API35、SELinux Permissive，只承担 emulator lane，不能替代 Android 15+ 真机 overlay/MediaProjection/Poco/security Gate。解除条件是按 P3.9/P9.1 连接相应真机；Unity Jenkins 与 Unity `/apk` 严禁作为 QA Hub App 构建来源。
+1. **Android real-device evidence not yet available**：产品最低版本为 Android 15/API35（`minSdk=35`）。`apps/android` 自有 Gradle工程已 pin AGP 9.1.1/Gradle 9.3.1/compile+target 37，并完成独立强制 clean assemble/lint、38/38 JVM、10/10 MuMu connected tests；当前 32,618,659-byte QA Hub APK 与 MuMu installed base SHA-256 均为 `80FBFAC14AFF08B7016B7C0A34D0D512067D19D57511C8BF332A79431BB7BF30`，P3.2 最终复审为 `0/0/0`。MuMu live 证据仍是 Android 15/API35、SELinux Permissive，只承担 emulator lane，不能替代 Android 15+ 真机 overlay/MediaProjection/Poco/security Gate。解除条件是按 P3.9/P9.1 连接相应真机；Unity Jenkins 与 Unity `/apk` 严禁作为 QA Hub App 构建来源。
 2. **Poco runtime/security Gate fails static boundary and lacks safe runtime**：P3.1 已定位权威 `ozdqp/baloot_client` active vendored Poco（upstream pin `e0ef118...`、当前三 worker tree digest 与 DLL SHA 一致），并证明只有五个标准只读 RPC/5001..5005 回退；但 active server 当前绑定 `IPAddress.Any`、无认证，且缺少 `PocoListenersBase`/`PocoMethod`/Invoke/`qa.snapshot`。MuMu 当前没有 provenance-bound 游戏 QA APK/监听器，因此不能做 127.0.0.1、LAN-negative、恶意同机客户端、Mono/IL2CPP 证明。影响 P3.1/P3.7/P3.8/G3；解除条件是 P3.8 先用独立最小 Unity commit 改为 Loopback+严格只读/鉴权兼容层，再按用户授权从 Unity Jenkins 获取该提交对应的游戏 APK并完成真机矩阵。P1/P2/P3.2 fake/no-Poco fallback 不受阻；当前未修改 Unity、Relay，也未触发 Jenkins。
 3. HypervisorPlatform 已启用；模拟器必须走 WHPX，禁止关闭 Hyper-V 或影响 Relay workers。当前 MuMu 是受支持的最低 API35，但 SELinux Permissive，不能替代 SELinux Enforcing 或任何真机 Gate；serial/endpoint 只通过开发配置注入，不写入生产 App。
 4. **API 37 runtime evidence unavailable**：SDK/adb 和 API35 MuMu 已可用，但没有 API37 运行环境/真机，不能证明同 profile `127.0.0.1` 在未申请 `ACCESS_LOCAL_NETWORK` 时可用、跨 profile/LAN 被阻断，也不能证明大屏自适应、CT/ECH、通知/MediaProjection FGS 行为。解除条件是连接 API37 环境与真机后按 P3.9/P9.1 保存证据；不阻断 P3.0 契约、P3.2 本地/API35 build-test 或后端工作。

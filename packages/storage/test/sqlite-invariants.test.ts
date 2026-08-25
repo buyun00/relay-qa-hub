@@ -301,13 +301,40 @@ function insertRepairAttempt(
   sequence = 1,
   status: "running" | "delivered" = "delivered",
   mode: "human" | "relay" = "human",
+  noCodeReason = "No executable change",
+  deliveryCommitSha: string | null = null,
+  auditNoCodeReasonOverride?: string,
 ): void {
+  const attemptSequence = Number(attemptId.slice(-12));
+  const createdAt = "2026-08-24T23:58:00.000Z";
+  const startedAt = "2026-08-24T23:59:00.000Z";
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(8_000_000 + attemptSequence),
+    "developer",
+  );
+  insertBugWorkflowEvent(database, tenant, {
+    aggregateId: attemptId,
+    aggregateSequence: 80_000_000 + attemptSequence * 10 + 1,
+    aggregateType: "repair_attempt",
+    bugId,
+    createdAt,
+    eventId: identifier(8_100_000 + attemptSequence * 10 + 1),
+    eventType: "repair_attempt.created",
+    fromState: "ready",
+    payload: { status: "planned", repairAttemptId: attemptId, fromVersion: 1, toVersion: 2 },
+    resourceId: attemptId,
+    resourceType: "repair_attempt",
+    resourceVersionAfter: 1,
+    toState: "in_progress",
+  });
   database
     .prepare(
       `INSERT INTO repair_attempts(
         id, account_id, project_id, bug_id, sequence, mode, status,
-        assignee_id, no_code_reason, created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        assignee_id, summary, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, ?, ?, 'planned', ?, 'Fixture repair', ?, ?, 1)`,
     )
     .run(
       attemptId,
@@ -316,9 +343,167 @@ function insertRepairAttempt(
       bugId,
       sequence,
       mode,
-      status,
       tenant.userId,
-      status === "delivered" ? "No executable change" : null,
+      createdAt,
+      createdAt,
+    );
+  insertBugWorkflowEvent(database, tenant, {
+    aggregateId: attemptId,
+    aggregateSequence: 80_000_000 + attemptSequence * 10 + 2,
+    aggregateType: "repair_attempt",
+    bugId,
+    createdAt: startedAt,
+    eventId: identifier(8_100_000 + attemptSequence * 10 + 2),
+    eventType: "repair_attempt.started",
+    fromState: null,
+    payload: { status: "running", repairAttemptId: attemptId, fromVersion: 1, toVersion: 2 },
+    resourceId: attemptId,
+    resourceType: "repair_attempt",
+    resourceVersionAfter: 2,
+    toState: null,
+  });
+  database
+    .prepare(
+      `UPDATE repair_attempts
+       SET status = 'running', updated_at = ?, version = 2
+       WHERE id = ? AND version = 1`,
+    )
+    .run(startedAt, attemptId);
+  if (status === "delivered") {
+    const auditNoCodeReason =
+      auditNoCodeReasonOverride ??
+      (noCodeReason.length <= 2_000 ? noCodeReason : `${noCodeReason.slice(0, 1_997)}…`);
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: attemptId,
+      aggregateSequence: 80_000_000 + attemptSequence * 10 + 3,
+      aggregateType: "repair_attempt",
+      bugId,
+      createdAt: CREATED_AT,
+      eventId: identifier(8_100_000 + attemptSequence * 10 + 3),
+      eventType: "repair_attempt.delivered",
+      fromState: "in_progress",
+      payload: {
+        status: "delivered",
+        repairAttemptId: attemptId,
+        ...(deliveryCommitSha === null
+          ? { reason: auditNoCodeReason }
+          : { commitSha: deliveryCommitSha }),
+        fromVersion: 2,
+        toVersion: 3,
+      },
+      resourceId: identifier(8_900_000 + attemptSequence),
+      resourceType: "build_requirement",
+      resourceVersionAfter: 1,
+      toState: deliveryCommitSha === null ? "ready_for_verification" : "awaiting_build",
+    });
+    if (deliveryCommitSha === null) {
+      database
+        .prepare(
+          `UPDATE repair_attempts
+           SET status = 'delivered', summary = 'Fixture delivery', no_code_reason = ?,
+               updated_at = ?, version = 3
+           WHERE id = ? AND version = 2`,
+        )
+        .run(noCodeReason, CREATED_AT, attemptId);
+    } else {
+      database
+        .prepare(
+          `UPDATE repair_attempts
+           SET status = 'delivered', summary = 'Fixture delivery', branch = 'main', commit_sha = ?,
+               updated_at = ?, version = 3
+           WHERE id = ? AND version = 2`,
+        )
+        .run(deliveryCommitSha, CREATED_AT, attemptId);
+    }
+  }
+}
+
+function insertForwardNoBuildDeliveryAudit(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  requirementId: string,
+  eventId: string,
+  eventType: "repair_attempt.delivered" | "repair.delivered",
+  decisionReason: string,
+  auditDecisionReason = decisionReason,
+): string {
+  const requestDigest = digest(Number(requirementId.slice(-12)));
+  const payloadJson = JSON.stringify({
+    status: "delivered",
+    repairAttemptId: attemptId,
+    reason: auditDecisionReason,
+    fromVersion: 2,
+    toVersion: 3,
+  });
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, ?, 'qa_hub', 'user', ?, 'repair_attempt', ?, 3,
+        'build_requirement', ?, 1, ?, ?, ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      eventType,
+      tenant.userId,
+      attemptId,
+      requirementId,
+      requestDigest,
+      identifier(Number(eventId.slice(-12)) + 200_000),
+      payloadJson,
+      CREATED_AT,
+    );
+  return payloadJson;
+}
+
+function insertForwardNoBuildRequirement(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  requirementId: string,
+  auditEventId: string,
+  decisionReason: string,
+): void {
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(Number(requirementId.slice(-12)) + 700_000),
+    "developer",
+  );
+  database
+    .prepare(
+      `INSERT INTO build_requirements(
+        id, account_id, project_id, bug_id, repair_attempt_id,
+        source_delivery_version, delivered_commit_sha, requirement, decision_basis,
+        decision_reason, decision_actor_id, decision_audit_event_id,
+        delivery_request_digest, policy_version, bug_version_at_delivery,
+        created_at, updated_at, version
+      ) VALUES (
+        ?, ?, ?, ?, ?, 3, NULL, 'not_required', 'no_code_delivery',
+        ?, ?, ?, ?, '1.0.0', 1, ?, ?, 1
+      )`,
+    )
+    .run(
+      requirementId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      attemptId,
+      decisionReason,
+      tenant.userId,
+      auditEventId,
+      digest(Number(requirementId.slice(-12))),
       CREATED_AT,
       CREATED_AT,
     );
@@ -331,7 +516,7 @@ function insertQaAuditEvent(
   eventId: string,
   attemptId: string,
   requirementId: string,
-  aggregateSequence = 1,
+  aggregateSequence = 3,
 ): void {
   const requestDigest = digest(Number(requirementId.slice(-12)));
   database
@@ -342,7 +527,7 @@ function insertQaAuditEvent(
         resource_type, resource_id, resource_version_after, request_digest,
         correlation_id, payload_json, created_at
       ) VALUES (
-        ?, ?, ?, ?, 'repair.delivered', 'qa_hub', 'user', ?,
+        ?, ?, ?, ?, 'repair_attempt.delivered', 'qa_hub', 'user', ?,
         'repair_attempt', ?, ?, 'build_requirement', ?, 1, ?, ?, ?, ?
       )`,
     )
@@ -358,21 +543,11 @@ function insertQaAuditEvent(
       requestDigest,
       identifier(Number(eventId.slice(-12)) + 100_000),
       JSON.stringify({
+        status: "delivered",
         repairAttemptId: attemptId,
-        buildRequirementId: requirementId,
-        sourceDeliveryVersion: 1,
-        deliveredCommitSha: null,
-        requirement: "not_required",
-        decisionBasis: "no_code_delivery",
-        decisionReason: "No executable change",
-        actorId: tenant.userId,
-        deliveryRequestDigest: requestDigest,
-        policyVersion: "1.0.0",
-        serverPolicyEvaluatedAtDelivery: true,
-        authorizedNoBuildExemptionAtDelivery: false,
-        noCodeDecisionValidatedAtDelivery: true,
-        committed: true,
-        atomicWithDelivery: true,
+        reason: "No executable change",
+        fromVersion: 2,
+        toVersion: 3,
       }),
       CREATED_AT,
     );
@@ -386,6 +561,12 @@ function insertBuildRequirement(
   auditEventId: string,
   requirementId: string,
 ): void {
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(Number(requirementId.slice(-12)) + 700_000),
+    "developer",
+  );
   database
     .prepare(
       `INSERT INTO build_requirements(
@@ -395,7 +576,7 @@ function insertBuildRequirement(
         delivery_request_digest, policy_version, bug_version_at_delivery,
         created_at, updated_at, version
       ) VALUES (
-        ?, ?, ?, ?, ?, 1, NULL, 'not_required', 'no_code_delivery',
+        ?, ?, ?, ?, ?, 3, NULL, 'not_required', 'no_code_delivery',
         'No executable change', ?, ?, ?, '1.0.0', 1, ?, ?, 1
       )`,
     )
@@ -420,13 +601,54 @@ function insertVerification(
   attemptId: string,
   verificationId: string,
   verifierId = tenant.userId,
+  buildId: string | null = null,
+  createdAt = CREATED_AT,
+  auditEventId = identifier(8_300_000 + Number(verificationId.slice(-12))),
+  criteria = "Reproduce and verify",
+  creatorId = verifierId,
 ): void {
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(8_400_000 + Number(verificationId.slice(-12))),
+    "verifier",
+    verifierId,
+  );
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(8_500_000 + Number(verificationId.slice(-12))),
+    "verifier",
+    creatorId,
+  );
+  insertBugWorkflowEvent(database, tenant, {
+    actorUserId: creatorId,
+    aggregateId: verificationId,
+    aggregateSequence: 83_000_000 + Number(verificationId.slice(-12)),
+    aggregateType: "verification",
+    bugId,
+    createdAt,
+    eventId: auditEventId,
+    eventType: "verification.created",
+    fromState: null,
+    payload: {
+      status: "requested",
+      verificationId,
+      repairAttemptId: attemptId,
+      ...(buildId === null ? {} : { buildId }),
+      toVersion: 1,
+    },
+    resourceId: verificationId,
+    resourceType: "verification",
+    resourceVersionAfter: 1,
+    toState: null,
+  });
   database
     .prepare(
       `INSERT INTO verifications(
         id, account_id, project_id, bug_id, repair_attempt_id, status,
-        verifier_id, criteria_snapshot, created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, ?, 'requested', ?, 'Reproduce and verify', ?, ?, 1)`,
+        verifier_id, build_id, criteria_snapshot, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, ?, 'requested', ?, ?, ?, ?, ?, 1)`,
     )
     .run(
       verificationId,
@@ -435,9 +657,597 @@ function insertVerification(
       bugId,
       attemptId,
       verifierId,
-      CREATED_AT,
-      CREATED_AT,
+      buildId,
+      criteria,
+      createdAt,
+      createdAt,
     );
+}
+
+function insertActiveMembershipRole(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  membershipId: string,
+  role: "viewer" | "reporter" | "developer" | "triager" | "verifier" | "release_manager",
+  userId = tenant.userId,
+): void {
+  database
+    .prepare(
+      `INSERT OR IGNORE INTO memberships(
+        id, account_id, project_id, user_id, status, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`,
+    )
+    .run(membershipId, tenant.accountId, tenant.projectId, userId, CREATED_AT, CREATED_AT);
+  const effectiveMembershipId = String(
+    database
+      .prepare(
+        `SELECT id FROM memberships
+         WHERE account_id = ? AND project_id = ? AND user_id = ?`,
+      )
+      .get(tenant.accountId, tenant.projectId, userId)?.id ?? membershipId,
+  );
+  database
+    .prepare(
+      `INSERT OR IGNORE INTO membership_roles(account_id, project_id, membership_id, role, granted_at)
+       VALUES (?, ?, ?, ?, ?)`,
+    )
+    .run(tenant.accountId, tenant.projectId, effectiveMembershipId, role, CREATED_AT);
+}
+
+function insertVerificationClosureEvent(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  verificationId: string,
+  eventId: string,
+  closedAt: string,
+  buildId: string | null,
+  aggregateSequence = 2,
+  reason: string | null = null,
+): void {
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, from_state, to_state, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'verification.result_recorded', 'qa_hub', 'user', ?,
+        'verification', ?, ?, 'verification', ?, 3, ?, ?,
+        'ready_for_verification', 'closed', ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      verificationId,
+      aggregateSequence,
+      verificationId,
+      digest(Number(eventId.slice(-12))),
+      identifier(Number(eventId.slice(-12)) + 100_000),
+      JSON.stringify({
+        status: "passed",
+        summary: "Human verification passed",
+        ...(reason === null ? {} : { reason }),
+        verificationId,
+        repairAttemptId: attemptId,
+        ...(buildId === null ? {} : { buildId }),
+        fromVersion: 2,
+        toVersion: 3,
+      }),
+      closedAt,
+    );
+}
+
+function insertVerificationStartEvent(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  verificationId: string,
+  eventId: string,
+  startedAt: string,
+  aggregateSequence = 1,
+): void {
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'verification.started', 'qa_hub', 'user', ?,
+        'verification', ?, ?, 'verification', ?, 2, ?, ?, ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      verificationId,
+      aggregateSequence,
+      verificationId,
+      digest(Number(eventId.slice(-12))),
+      identifier(Number(eventId.slice(-12)) + 100_000),
+      JSON.stringify({
+        status: "in_progress",
+        verificationId,
+        fromVersion: 1,
+        toVersion: 2,
+      }),
+      startedAt,
+    );
+}
+
+function insertOccurrenceAppendEvent(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  occurrenceId: string,
+  eventId: string,
+  createdAt: string,
+  fromBugVersion: number,
+  toBugVersion: number,
+  aggregateSequence = 1,
+): void {
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(Number(eventId.slice(-12)) + 9_000_000),
+    "reporter",
+  );
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'occurrence.appended', 'qa_hub', 'user', ?,
+        'bug', ?, ?, 'occurrence', ?, 1, ?, ?, ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      bugId,
+      aggregateSequence,
+      occurrenceId,
+      digest(Number(eventId.slice(-12))),
+      identifier(Number(eventId.slice(-12)) + 100_000),
+      JSON.stringify({ occurrenceId, fromVersion: fromBugVersion, toVersion: toBugVersion }),
+      createdAt,
+    );
+}
+
+function appendOccurrenceEvidence(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  occurrenceId: string,
+  submissionId: string,
+  eventId: string,
+  createdAt: string,
+  fromBugVersion: number,
+  toBugVersion: number,
+  buildId: string | null,
+  aggregateSequence = 1,
+): void {
+  database
+    .prepare(
+      `INSERT INTO occurrences(
+        id, account_id, project_id, bug_id, reporter_id, client_submission_id,
+        observed_at, platform, steps_json, actual_behavior, environment_json,
+        created_at, version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'android', ?, ?, ?, ?, 1)`,
+    )
+    .run(
+      occurrenceId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      submissionId,
+      createdAt,
+      JSON.stringify(["Observe the regression again"]),
+      "The verified regression occurred again",
+      buildId === null ? null : JSON.stringify({ buildId }),
+      createdAt,
+    );
+  insertOccurrenceAppendEvent(
+    database,
+    tenant,
+    bugId,
+    occurrenceId,
+    eventId,
+    createdAt,
+    fromBugVersion,
+    toBugVersion,
+    aggregateSequence,
+  );
+  const update = database
+    .prepare(
+      `UPDATE bugs
+       SET occurrence_count = occurrence_count + 1, updated_at = ?, version = ?
+       WHERE id = ? AND version = ?`,
+    )
+    .run(createdAt, toBugVersion, bugId, fromBugVersion);
+  assert.equal(update.changes, 1);
+}
+
+function insertBuildLineage(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  lineageId: string,
+  createdAt: string,
+): void {
+  database
+    .prepare(
+      `INSERT INTO build_lineages(
+        id, account_id, project_id, lineage_key, channel, created_at, version
+      ) VALUES (?, ?, ?, ?, 'qa', ?, 1)`,
+    )
+    .run(lineageId, tenant.accountId, tenant.projectId, `qa-${lineageId}`, createdAt);
+}
+
+function insertBuildLineageEntry(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  lineageId: string,
+  buildId: string,
+  predecessorBuildId: string | null,
+  ordinal: number,
+  eventId: string,
+  createdAt: string,
+  requestDigest: string | null = digest(Number(eventId.slice(-12))),
+): void {
+  const buildVersion = database
+    .prepare("SELECT version FROM builds WHERE id = ?")
+    .get(buildId)?.version;
+  if (typeof buildVersion !== "number") throw new TypeError("Build fixture must exist");
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, NULL, 'build.lineage_entry_recorded', 'qa_hub', 'user', ?,
+        'build', ?, ?, 'build', ?, ?, ?, ?, ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      tenant.userId,
+      lineageId,
+      ordinal,
+      buildId,
+      buildVersion,
+      requestDigest,
+      identifier(Number(eventId.slice(-12)) + 100_000),
+      JSON.stringify({
+        status: "ranked",
+        buildId,
+        ...(ordinal === 1 ? {} : { fromVersion: ordinal - 1 }),
+        toVersion: ordinal,
+      }),
+      createdAt,
+    );
+  database
+    .prepare(
+      `INSERT INTO build_lineage_entries(
+        account_id, project_id, lineage_id, ordinal, build_id,
+        predecessor_build_id, evidence_actor_id, evidence_event_id,
+        policy_version, created_at, version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '1.0.0', ?, 1)`,
+    )
+    .run(
+      tenant.accountId,
+      tenant.projectId,
+      lineageId,
+      ordinal,
+      buildId,
+      predecessorBuildId,
+      tenant.userId,
+      eventId,
+      createdAt,
+    );
+}
+
+function insertReopenEvent(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  occurrenceId: string,
+  eventId: string,
+  reopenedAt: string,
+  fromBugVersion: number,
+  toBugVersion: number,
+  aggregateSequence = 2,
+): void {
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, from_state, to_state, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'bug.reopen.newer_occurrence', 'qa_hub', 'user', ?,
+        'bug', ?, ?, 'bug', ?, ?, ?, ?, 'closed', 'ready', ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      bugId,
+      aggregateSequence,
+      bugId,
+      toBugVersion,
+      digest(Number(eventId.slice(-12))),
+      identifier(Number(eventId.slice(-12)) + 100_000),
+      JSON.stringify({
+        status: "ready",
+        occurrenceId,
+        fromVersion: fromBugVersion,
+        toVersion: toBugVersion,
+      }),
+      reopenedAt,
+    );
+}
+
+function insertBugWorkflowEvent(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  options: {
+    readonly actorUserId?: string;
+    readonly aggregateId: string;
+    readonly aggregateSequence: number;
+    readonly aggregateType: "bug" | "repair_attempt" | "verification";
+    readonly bugId: string;
+    readonly createdAt: string;
+    readonly eventId: string;
+    readonly eventType: string;
+    readonly fromState: string | null;
+    readonly payload: Readonly<Record<string, string | number | boolean | null>>;
+    readonly resourceId: string;
+    readonly resourceType: "bug" | "build_requirement" | "repair_attempt" | "verification";
+    readonly resourceVersionAfter: number;
+    readonly toState: string | null;
+  },
+): void {
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest,
+        correlation_id, from_state, to_state, payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, ?, 'qa_hub', 'user', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      )`,
+    )
+    .run(
+      options.eventId,
+      tenant.accountId,
+      tenant.projectId,
+      options.bugId,
+      options.eventType,
+      options.actorUserId ?? tenant.userId,
+      options.aggregateType,
+      options.aggregateId,
+      options.aggregateSequence,
+      options.resourceType,
+      options.resourceId,
+      options.resourceVersionAfter,
+      digest(Number(options.eventId.slice(-12))),
+      identifier(Number(options.eventId.slice(-12)) + 100_000),
+      options.fromState,
+      options.toState,
+      JSON.stringify(options.payload),
+      options.createdAt,
+    );
+}
+
+interface TypedWorkflowFixture {
+  readonly attemptCreatedAt: string;
+  readonly attemptStartedAt: string;
+  readonly readyAt: string;
+}
+
+function seedTypedRunningWorkflow(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  eventBase: number,
+): TypedWorkflowFixture {
+  const readyAt = "2026-08-25T00:10:00.000Z";
+  const attemptCreatedAt = "2026-08-25T00:20:00.000Z";
+  const attemptStartedAt = "2026-08-25T00:30:00.000Z";
+  insertActiveMembershipRole(database, tenant, identifier(eventBase + 1), "triager");
+  insertActiveMembershipRole(database, tenant, identifier(eventBase + 2), "developer");
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(eventBase + 7),
+    "developer",
+    tenant.secondaryUserId,
+  );
+  insertBugWorkflowEvent(database, tenant, {
+    aggregateId: bugId,
+    aggregateSequence: 1,
+    aggregateType: "bug",
+    bugId,
+    createdAt: readyAt,
+    eventId: identifier(eventBase + 3),
+    eventType: "bug.triage.ready",
+    fromState: "reported",
+    payload: { status: "ready", fromVersion: 1, toVersion: 2 },
+    resourceId: bugId,
+    resourceType: "bug",
+    resourceVersionAfter: 2,
+    toState: "ready",
+  });
+  database
+    .prepare(
+      `UPDATE bugs SET state = 'ready', updated_at = ?, version = 2
+       WHERE id = ? AND version = 1`,
+    )
+    .run(readyAt, bugId);
+  insertBugWorkflowEvent(database, tenant, {
+    aggregateId: attemptId,
+    aggregateSequence: 1,
+    aggregateType: "repair_attempt",
+    bugId,
+    createdAt: attemptCreatedAt,
+    eventId: identifier(eventBase + 4),
+    eventType: "repair_attempt.created",
+    fromState: "ready",
+    payload: { status: "planned", repairAttemptId: attemptId, fromVersion: 2, toVersion: 3 },
+    resourceId: attemptId,
+    resourceType: "repair_attempt",
+    resourceVersionAfter: 1,
+    toState: "in_progress",
+  });
+  database
+    .prepare(
+      `INSERT INTO repair_attempts(
+        id, account_id, project_id, bug_id, sequence, mode, status,
+        assignee_id, summary, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 1, 'human', 'planned', ?, 'Typed fixture', ?, ?, 1)`,
+    )
+    .run(
+      attemptId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.secondaryUserId,
+      attemptCreatedAt,
+      attemptCreatedAt,
+    );
+  database
+    .prepare(
+      `UPDATE bugs
+       SET state = 'in_progress', active_repair_attempt_id = ?, updated_at = ?, version = 3
+       WHERE id = ? AND version = 2`,
+    )
+    .run(attemptId, attemptCreatedAt, bugId);
+  insertBugWorkflowEvent(database, tenant, {
+    aggregateId: attemptId,
+    aggregateSequence: 2,
+    aggregateType: "repair_attempt",
+    bugId,
+    createdAt: attemptStartedAt,
+    eventId: identifier(eventBase + 5),
+    eventType: "repair_attempt.started",
+    fromState: null,
+    payload: { status: "running", repairAttemptId: attemptId, fromVersion: 1, toVersion: 2 },
+    resourceId: attemptId,
+    resourceType: "repair_attempt",
+    resourceVersionAfter: 2,
+    toState: null,
+  });
+  database
+    .prepare(
+      `UPDATE repair_attempts
+       SET status = 'running', updated_at = ?, version = 2
+       WHERE id = ? AND version = 1`,
+    )
+    .run(attemptStartedAt, attemptId);
+  return { attemptCreatedAt, attemptStartedAt, readyAt };
+}
+
+function seedTypedNoBuildRfvWorkflow(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  requirementId: string,
+  eventBase: number,
+): void {
+  seedTypedRunningWorkflow(database, tenant, bugId, attemptId, eventBase);
+  const deliveredAt = "2026-08-25T00:40:00.000Z";
+  const deliveryEventId = identifier(eventBase + 6);
+  const reason = "No executable change";
+  insertBugWorkflowEvent(database, tenant, {
+    aggregateId: attemptId,
+    aggregateSequence: 3,
+    aggregateType: "repair_attempt",
+    bugId,
+    createdAt: deliveredAt,
+    eventId: deliveryEventId,
+    eventType: "repair_attempt.delivered",
+    fromState: "in_progress",
+    payload: {
+      status: "delivered",
+      repairAttemptId: attemptId,
+      reason,
+      fromVersion: 2,
+      toVersion: 3,
+    },
+    resourceId: requirementId,
+    resourceType: "build_requirement",
+    resourceVersionAfter: 1,
+    toState: "ready_for_verification",
+  });
+  database
+    .prepare(
+      `UPDATE repair_attempts
+       SET status = 'delivered', summary = 'No-code delivery', no_code_reason = ?,
+           updated_at = ?, version = 3
+       WHERE id = ? AND version = 2`,
+    )
+    .run(reason, deliveredAt, attemptId);
+  database
+    .prepare(
+      `INSERT INTO build_requirements(
+        id, account_id, project_id, bug_id, repair_attempt_id,
+        source_delivery_version, delivered_commit_sha, requirement, decision_basis,
+        decision_reason, decision_actor_id, decision_audit_event_id,
+        delivery_request_digest, policy_version, bug_version_at_delivery,
+        created_at, updated_at, version
+      ) VALUES (
+        ?, ?, ?, ?, ?, 3, NULL, 'not_required', 'no_code_delivery',
+        ?, ?, ?, ?, '1.0.0', 4, ?, ?, 1
+      )`,
+    )
+    .run(
+      requirementId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      attemptId,
+      reason,
+      tenant.userId,
+      deliveryEventId,
+      digest(Number(deliveryEventId.slice(-12))),
+      deliveredAt,
+      deliveredAt,
+    );
+  database
+    .prepare(
+      `UPDATE bugs SET state = 'ready_for_verification', updated_at = ?, version = 4
+       WHERE id = ? AND version = 3`,
+    )
+    .run(deliveredAt, bugId);
 }
 
 function insertRequiredRepairAttempt(
@@ -446,24 +1256,20 @@ function insertRequiredRepairAttempt(
   bugId: string,
   attemptId: string,
   commitSha: string,
+  assigneeId = tenant.userId,
 ): void {
-  database
-    .prepare(
-      `INSERT INTO repair_attempts(
-        id, account_id, project_id, bug_id, sequence, mode, status,
-        assignee_id, branch, commit_sha, created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, 1, 'human', 'delivered', ?, 'main', ?, ?, ?, 1)`,
-    )
-    .run(
-      attemptId,
-      tenant.accountId,
-      tenant.projectId,
-      bugId,
-      tenant.userId,
-      commitSha,
-      CREATED_AT,
-      CREATED_AT,
-    );
+  assert.equal(assigneeId, tenant.userId);
+  insertRepairAttempt(
+    database,
+    tenant,
+    bugId,
+    attemptId,
+    1,
+    "delivered",
+    "human",
+    "No executable change",
+    commitSha,
+  );
 }
 
 function insertRequiredDeliveryAudit(
@@ -475,6 +1281,10 @@ function insertRequiredDeliveryAudit(
   eventId: string,
   commitSha: string,
   aggregateSequence: number,
+  eventType: "repair_attempt.delivered" | "repair.delivered" = "repair_attempt.delivered",
+  createdAt = CREATED_AT,
+  fromState: string | null = null,
+  toState: string | null = null,
 ): void {
   const requestDigest = digest(Number(requirementId.slice(-12)));
   database
@@ -483,10 +1293,10 @@ function insertRequiredDeliveryAudit(
         id, account_id, project_id, bug_id, type, source, actor_type,
         actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
         resource_type, resource_id, resource_version_after, request_digest,
-        correlation_id, payload_json, created_at
+        correlation_id, from_state, to_state, payload_json, created_at
       ) VALUES (
-        ?, ?, ?, ?, 'repair.delivered', 'qa_hub', 'user', ?,
-        'repair_attempt', ?, ?, 'build_requirement', ?, 1, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, 'qa_hub', 'user', ?,
+        'repair_attempt', ?, ?, 'build_requirement', ?, 1, ?, ?, ?, ?, ?, ?
       )`,
     )
     .run(
@@ -494,30 +1304,23 @@ function insertRequiredDeliveryAudit(
       tenant.accountId,
       tenant.projectId,
       bugId,
+      eventType,
       tenant.userId,
       attemptId,
       aggregateSequence,
       requirementId,
       requestDigest,
       identifier(Number(eventId.slice(-12)) + 100_000),
+      fromState,
+      toState,
       JSON.stringify({
+        status: "delivered",
         repairAttemptId: attemptId,
-        buildRequirementId: requirementId,
-        sourceDeliveryVersion: 1,
-        deliveredCommitSha: commitSha,
-        requirement: "required",
-        decisionBasis: "code_requires_build",
-        decisionReason: null,
-        actorId: tenant.userId,
-        deliveryRequestDigest: requestDigest,
-        policyVersion: "1.0.0",
-        serverPolicyEvaluatedAtDelivery: true,
-        authorizedNoBuildExemptionAtDelivery: false,
-        noCodeDecisionValidatedAtDelivery: false,
-        committed: true,
-        atomicWithDelivery: true,
+        commitSha,
+        fromVersion: 2,
+        toVersion: 3,
       }),
-      CREATED_AT,
+      createdAt,
     );
 }
 
@@ -529,7 +1332,15 @@ function insertRequiredBuildRequirement(
   requirementId: string,
   auditEventId: string,
   commitSha: string,
+  createdAt = CREATED_AT,
+  bugVersionAtDelivery = 1,
 ): void {
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(Number(requirementId.slice(-12)) + 700_000),
+    "developer",
+  );
   database
     .prepare(
       `INSERT INTO build_requirements(
@@ -539,8 +1350,8 @@ function insertRequiredBuildRequirement(
         delivery_request_digest, policy_version, bug_version_at_delivery,
         created_at, updated_at, version
       ) VALUES (
-        ?, ?, ?, ?, ?, 1, ?, 'required', 'code_requires_build',
-        NULL, ?, ?, ?, '1.0.0', 1, ?, ?, 1
+        ?, ?, ?, ?, ?, 3, ?, 'required', 'code_requires_build',
+        NULL, ?, ?, ?, '1.0.0', ?, ?, ?, 1
       )`,
     )
     .run(
@@ -553,8 +1364,9 @@ function insertRequiredBuildRequirement(
       tenant.userId,
       auditEventId,
       digest(Number(requirementId.slice(-12))),
-      CREATED_AT,
-      CREATED_AT,
+      bugVersionAtDelivery,
+      createdAt,
+      createdAt,
     );
 }
 
@@ -618,17 +1430,20 @@ function insertBuildLinkAudit(
   eventId: string,
   commitSha: string,
   aggregateSequence: number,
+  createdAt = UPDATED_AT,
+  fromState: string | null = null,
+  toState: string | null = null,
 ): void {
   database
     .prepare(
       `INSERT INTO events(
         id, account_id, project_id, bug_id, type, source, actor_type,
         actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
-        resource_type, resource_id, resource_version_after, correlation_id,
-        payload_json, created_at
+        resource_type, resource_id, resource_version_after, request_digest, correlation_id,
+        from_state, to_state, payload_json, created_at
       ) VALUES (
         ?, ?, ?, ?, 'build.repair_linked', 'qa_hub', 'user', ?,
-        'repair_attempt', ?, ?, 'build_repair_link', ?, 1, ?, ?, ?
+        'repair_attempt', ?, ?, 'build_repair_link', ?, 1, ?, ?, ?, ?, ?, ?
       )`,
     )
     .run(
@@ -640,22 +1455,19 @@ function insertBuildLinkAudit(
       attemptId,
       aggregateSequence,
       linkId,
+      digest(Number(linkId.slice(-12))),
       identifier(Number(eventId.slice(-12)) + 100_000),
+      fromState,
+      toState,
       JSON.stringify({
+        status: "ready_for_verification",
         repairAttemptId: attemptId,
         buildId,
-        linkId,
-        deliveredCommitSha: commitSha,
-        evidenceType: "manifest",
-        evidenceDecision: "manifest_verified",
-        overrideReason: null,
-        policyVersion: "1.0.0",
-        manifestVerifiedAtLink: true,
-        releaseManagerAuthorizedAtLink: false,
-        committed: true,
-        atomicWithLink: true,
+        commitSha,
+        fromVersion: 2,
+        toVersion: 3,
       }),
-      CREATED_AT,
+      createdAt,
     );
 }
 
@@ -670,6 +1482,12 @@ function linkRequiredBuild(
   auditEventId: string,
   commitSha: string,
 ): void {
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(Number(linkId.slice(-12)) + 800_000),
+    "release_manager",
+  );
   transaction(database, () => {
     const update = database
       .prepare(
@@ -704,6 +1522,135 @@ function linkRequiredBuild(
         auditEventId,
         UPDATED_AT,
       );
+    const buildUpdate = database
+      .prepare(
+        `UPDATE builds
+         SET updated_at = ?, version = 3
+         WHERE id = ? AND version = 2`,
+      )
+      .run(FINALIZED_AT, buildId);
+    assert.equal(buildUpdate.changes, 1);
+  });
+}
+
+function insertReleaseManagerMembership(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  membershipId: string,
+): void {
+  insertActiveMembershipRole(database, tenant, membershipId, "release_manager");
+}
+
+function insertOverrideBuildLinkAudit(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  buildId: string,
+  linkId: string,
+  eventId: string,
+  commitSha: string,
+  overrideReason: string,
+  auditOverrideReason: string,
+): string {
+  const payloadJson = JSON.stringify({
+    status: "ready_for_verification",
+    repairAttemptId: attemptId,
+    buildId,
+    commitSha,
+    reason: auditOverrideReason,
+    fromVersion: 2,
+    toVersion: 3,
+  });
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, request_digest, correlation_id,
+        payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'build.repair_linked', 'qa_hub', 'user', ?,
+        'repair_attempt', ?, 2, 'build_repair_link', ?, 1, ?, ?, ?, ?
+      )`,
+    )
+    .run(
+      eventId,
+      tenant.accountId,
+      tenant.projectId,
+      bugId,
+      tenant.userId,
+      attemptId,
+      linkId,
+      digest(Number(linkId.slice(-12))),
+      identifier(Number(eventId.slice(-12)) + 200_000),
+      payloadJson,
+      UPDATED_AT,
+    );
+  return payloadJson;
+}
+
+function linkRequiredBuildWithOverride(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  bugId: string,
+  attemptId: string,
+  requirementId: string,
+  buildId: string,
+  linkId: string,
+  auditEventId: string,
+  commitSha: string,
+  overrideReason: string,
+): void {
+  insertActiveMembershipRole(
+    database,
+    tenant,
+    identifier(Number(linkId.slice(-12)) + 800_000),
+    "release_manager",
+  );
+  transaction(database, () => {
+    const update = database
+      .prepare(
+        `UPDATE build_requirements
+         SET linked_build_id = ?, link_id = ?, updated_at = ?, version = 2
+         WHERE id = ? AND version = 1`,
+      )
+      .run(buildId, linkId, UPDATED_AT, requirementId);
+    assert.equal(update.changes, 1);
+    database
+      .prepare(
+        `INSERT INTO build_repair_links(
+          id, account_id, project_id, bug_id, repair_attempt_id, build_id,
+          build_requirement_id, build_requirement_version, delivered_commit_sha,
+          evidence_type, evidence_decision, override_reason, evidence_actor_id,
+          evidence_audit_event_id, evidence_policy_version, linked_at, version
+        ) VALUES (
+          ?, ?, ?, ?, ?, ?, ?, 2, ?, 'release_manager_override',
+          'release_manager_authorized', ?, ?, ?, '1.0.0', ?, 1
+        )`,
+      )
+      .run(
+        linkId,
+        tenant.accountId,
+        tenant.projectId,
+        bugId,
+        attemptId,
+        buildId,
+        requirementId,
+        commitSha,
+        overrideReason,
+        tenant.userId,
+        auditEventId,
+        UPDATED_AT,
+      );
+    const buildUpdate = database
+      .prepare(
+        `UPDATE builds
+         SET updated_at = ?, version = 3
+         WHERE id = ? AND version = 2`,
+      )
+      .run(FINALIZED_AT, buildId);
+    assert.equal(buildUpdate.changes, 1);
   });
 }
 
@@ -715,24 +1662,18 @@ function insertVerificationForBuild(
   verificationId: string,
   buildId: string | null,
 ): void {
-  database
-    .prepare(
-      `INSERT INTO verifications(
-        id, account_id, project_id, bug_id, repair_attempt_id, build_id, status,
-        verifier_id, criteria_snapshot, created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, ?, ?, 'requested', ?, 'Verify the exact delivered build', ?, ?, 1)`,
-    )
-    .run(
-      verificationId,
-      tenant.accountId,
-      tenant.projectId,
-      bugId,
-      attemptId,
-      buildId,
-      tenant.userId,
-      CREATED_AT,
-      CREATED_AT,
-    );
+  insertVerification(
+    database,
+    tenant,
+    bugId,
+    attemptId,
+    verificationId,
+    tenant.userId,
+    buildId,
+    CREATED_AT,
+    undefined,
+    "Verify the exact delivered build",
+  );
 }
 
 function insertServicePrincipal(
@@ -1088,24 +2029,16 @@ test("a Bug cannot point at another Bug's active RepairAttempt", async () => {
              WHERE id = ?`,
           )
           .run(attemptB, UPDATED_AT, bugA),
-      /FOREIGN KEY constraint failed/i,
+      /FOREIGN KEY constraint failed|Bug same-state workflow pointers require their exact typed human audit/i,
     );
     assert.equal(
       database.prepare("SELECT active_repair_attempt_id FROM bugs WHERE id = ?").get(bugA)
         ?.active_repair_attempt_id,
       null,
     );
-    database
-      .prepare(
-        `UPDATE bugs
-         SET active_repair_attempt_id = ?, updated_at = ?, version = 2
-         WHERE id = ?`,
-      )
-      .run(attemptB, UPDATED_AT, bugB);
     assert.equal(
-      database.prepare("SELECT active_repair_attempt_id FROM bugs WHERE id = ?").get(bugB)
-        ?.active_repair_attempt_id,
-      attemptB,
+      database.prepare("SELECT bug_id FROM repair_attempts WHERE id = ?").get(attemptB)?.bug_id,
+      bugB,
     );
     assertIntegrity(database);
   });
@@ -1129,13 +2062,13 @@ test("BuildRequirement, Verification, and RelayReceipt preserve Attempt-to-Bug i
 
     assert.throws(
       () => insertBuildRequirement(database, tenant, bugA, attemptB, auditA, invalidRequirementId),
-      /FOREIGN KEY constraint failed/i,
+      /FOREIGN KEY constraint failed|exact typed delivery audit/i,
     );
     insertBuildRequirement(database, tenant, bugB, attemptB, auditB, validRequirementId);
 
     assert.throws(
       () => insertVerification(database, tenant, bugA, attemptB, identifier(219)),
-      /FOREIGN KEY constraint failed|exact immutable BuildRequirement/i,
+      /FOREIGN KEY constraint failed|exact immutable BuildRequirement|Verification must begin as one requested version-one fact/i,
     );
     insertVerification(database, tenant, bugB, attemptB, identifier(220));
 
@@ -1269,7 +2202,7 @@ test("Relay service projection is repair-only and cannot author QA Bugs or Verif
           JSON.stringify({ status: "closed", verificationId: identifier(317) }),
           CREATED_AT,
         ),
-      /CHECK constraint failed/i,
+      /CHECK constraint failed|Bug closure requires current passed human Verification|Bug state transition requires its exact typed human audit/i,
     );
     relayEvent.run(
       identifier(318),
@@ -4307,8 +5240,6 @@ test("idempotency reservations require complete audited terminal effects and rem
           JSON.stringify({
             status: "committed",
             relatedBugId: bugId,
-            actorId: tenant.userId,
-            committed: true,
           }),
           UPDATED_AT,
         );
@@ -4643,7 +5574,7 @@ test("required BuildRequirement uses typed audits, manifest commit evidence, and
           rejectedLinkAuditEventId,
           deliveredCommitSha,
         ),
-      /manifest evidence must contain the exact delivered commit/i,
+      /manifest evidence must contain the exact delivered commit|exact typed evidence audit/i,
     );
     const rolledBackRequirement = database
       .prepare(
@@ -4845,7 +5776,7 @@ test("Bug tenant, key, and reporter identity stay fixed while allowed content ke
              WHERE id = ?`,
           )
           .run(UPDATED_AT, bugId),
-      /CHECK constraint failed/i,
+      /CHECK constraint failed|Bug closure requires current passed human Verification|Bug state transition requires its exact typed human audit/i,
     );
     assert.throws(
       () =>
@@ -4856,7 +5787,7 @@ test("Bug tenant, key, and reporter identity stay fixed while allowed content ke
              WHERE id = ?`,
           )
           .run(UPDATED_AT, bugId),
-      /CHECK constraint failed/i,
+      /CHECK constraint failed|Bug closure requires current passed human Verification/i,
     );
     const identityError = /Bug.*(?:tenant|identity|key|reporter).*immutable/i;
     assert.throws(
@@ -5069,7 +6000,7 @@ test("Occurrence environment Build references are generated, project-scoped, and
              WHERE id = ?`,
           )
           .run(JSON.stringify({ buildId: null }), exactOccurrenceId),
-      /occurrence.*Build.*immutable/i,
+      /Occurrence (?:Build lineage facts|evidence).*immutable/i,
     );
     assertIntegrity(database);
   });
@@ -5898,8 +6829,6 @@ test("committed generic idempotency replays the exact immutable typed submission
         JSON.stringify({
           status: "committed",
           relatedBugId: bugId,
-          actorId: tenant.userId,
-          committed: true,
         }),
         now,
       );
@@ -6576,6 +7505,2886 @@ test("capture artifacts transition from pending through exact attachment CAS and
         status: "succeeded",
         version: 2,
       },
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 rejects typed Build facts from disabled or archived principals", async () => {
+  const inactivePrincipalCases: readonly {
+    readonly label: string;
+    readonly mutate: (database: DatabaseSync, tenant: TenantFixture, updatedAt: string) => void;
+  }[] = [
+    {
+      label: "disabled User",
+      mutate: (database, tenant, updatedAt) => {
+        const result = database
+          .prepare(
+            `UPDATE users SET status = 'disabled', updated_at = ?, version = 2
+             WHERE id = ? AND version = 1`,
+          )
+          .run(updatedAt, tenant.userId);
+        assert.equal(result.changes, 1);
+      },
+    },
+    {
+      label: "disabled Account",
+      mutate: (database, tenant, updatedAt) => {
+        const result = database
+          .prepare(
+            `UPDATE accounts SET status = 'disabled', updated_at = ?, version = 2
+             WHERE id = ? AND version = 1`,
+          )
+          .run(updatedAt, tenant.accountId);
+        assert.equal(result.changes, 1);
+      },
+    },
+    {
+      label: "archived Project",
+      mutate: (database, tenant, updatedAt) => {
+        const result = database
+          .prepare(
+            `UPDATE projects SET status = 'archived', updated_at = ?, version = 2
+             WHERE id = ? AND version = 1`,
+          )
+          .run(updatedAt, tenant.projectId);
+        assert.equal(result.changes, 1);
+      },
+    },
+  ];
+
+  for (const [index, scenario] of inactivePrincipalCases.entries()) {
+    await withDatabase((database) => {
+      const base = 5_200 + index * 100;
+      const tenant = seedTenant(database, base, `CUR${index}`);
+      const bugId = identifier(base + 10);
+      const attemptId = identifier(base + 11);
+      const attemptSequence = Number(attemptId.slice(-12));
+      const requirementId = identifier(8_900_000 + attemptSequence);
+      const deliveryEventId = identifier(8_100_000 + attemptSequence * 10 + 3);
+      const buildId = identifier(base + 12);
+      const linkId = identifier(base + 13);
+      const linkEventId = identifier(base + 14);
+      const commitSha = String(index + 1).repeat(40);
+      const disabledAt = `2026-08-25T02:10:0${index}.000Z`;
+
+      createBug(database, tenant, bugId, `${scenario.label} typed Build facts`);
+      insertRepairAttempt(database, tenant, bugId, attemptId, 1, "running", "human");
+      insertRequiredDeliveryAudit(
+        database,
+        tenant,
+        bugId,
+        attemptId,
+        requirementId,
+        deliveryEventId,
+        commitSha,
+        3,
+        "repair_attempt.delivered",
+        CREATED_AT,
+        "in_progress",
+        "awaiting_build",
+      );
+      const deliveryUpdate = database
+        .prepare(
+          `UPDATE repair_attempts
+           SET status = 'delivered', summary = 'Fix delivered', branch = 'main',
+               commit_sha = ?, updated_at = ?, version = 3
+           WHERE id = ? AND version = 2`,
+        )
+        .run(commitSha, CREATED_AT, attemptId);
+      assert.equal(deliveryUpdate.changes, 1);
+
+      const requirementRejection = probeSqlRejection(database, () => {
+        scenario.mutate(database, tenant, disabledAt);
+        insertRequiredBuildRequirement(
+          database,
+          tenant,
+          bugId,
+          attemptId,
+          requirementId,
+          deliveryEventId,
+          commitSha,
+        );
+      });
+      assert.match(
+        String(requirementRejection),
+        /BuildRequirement requires its exact typed delivery audit/i,
+        `${scenario.label} recorded a BuildRequirement fact`,
+      );
+
+      insertRequiredBuildRequirement(
+        database,
+        tenant,
+        bugId,
+        attemptId,
+        requirementId,
+        deliveryEventId,
+        commitSha,
+      );
+      insertReadyBuild(database, tenant, buildId, commitSha, [commitSha]);
+      insertBuildLinkAudit(
+        database,
+        tenant,
+        bugId,
+        attemptId,
+        buildId,
+        linkId,
+        linkEventId,
+        commitSha,
+        4,
+      );
+
+      const linkRejection = probeSqlRejection(database, () => {
+        scenario.mutate(database, tenant, disabledAt);
+        const requirementUpdate = database
+          .prepare(
+            `UPDATE build_requirements
+             SET linked_build_id = ?, link_id = ?, updated_at = ?, version = 2
+             WHERE id = ? AND version = 1`,
+          )
+          .run(buildId, linkId, UPDATED_AT, requirementId);
+        assert.equal(requirementUpdate.changes, 1);
+        database
+          .prepare(
+            `INSERT INTO build_repair_links(
+              id, account_id, project_id, bug_id, repair_attempt_id, build_id,
+              build_requirement_id, build_requirement_version, delivered_commit_sha,
+              evidence_type, evidence_decision, override_reason, evidence_actor_id,
+              evidence_audit_event_id, evidence_policy_version, linked_at, version
+            ) VALUES (
+              ?, ?, ?, ?, ?, ?, ?, 2, ?, 'manifest', 'manifest_verified', NULL, ?, ?,
+              '1.0.0', ?, 1
+            )`,
+          )
+          .run(
+            linkId,
+            tenant.accountId,
+            tenant.projectId,
+            bugId,
+            attemptId,
+            buildId,
+            requirementId,
+            commitSha,
+            tenant.userId,
+            linkEventId,
+            UPDATED_AT,
+          );
+      });
+      assert.match(
+        String(linkRejection),
+        /build repair link requires its exact typed evidence audit/i,
+        `${scenario.label} recorded a BuildRepairLink fact`,
+      );
+
+      linkRequiredBuild(
+        database,
+        tenant,
+        bugId,
+        attemptId,
+        requirementId,
+        buildId,
+        linkId,
+        linkEventId,
+        commitSha,
+      );
+      assertIntegrity(database);
+    });
+  }
+});
+
+test("forward v3 accepts the frozen human repair_attempt.delivered BuildRequirement audit", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_100, "FDT");
+    const bugId = identifier(4_110);
+    const attemptId = identifier(4_111);
+    const requirementId = identifier(4_112);
+    const eventId = identifier(4_113);
+    const decisionReason = "No executable change";
+    createBug(database, tenant, bugId, "Forward typed delivery audit Bug");
+    insertRepairAttempt(database, tenant, bugId, attemptId);
+    insertForwardNoBuildDeliveryAudit(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      eventId,
+      "repair_attempt.delivered",
+      decisionReason,
+    );
+
+    insertForwardNoBuildRequirement(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      eventId,
+      decisionReason,
+    );
+
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT requirement, decision_reason AS decisionReason
+             FROM build_requirements WHERE id = ?`,
+          )
+          .get(requirementId),
+      },
+      { decisionReason, requirement: "not_required" },
+    );
+    assert.equal(
+      database.prepare("SELECT type FROM events WHERE id = ?").get(eventId)?.type,
+      "repair_attempt.delivered",
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 rejects the legacy repair.delivered BuildRequirement audit spelling", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_200, "FLG");
+    const bugId = identifier(4_210);
+    const attemptId = identifier(4_211);
+    const requirementId = identifier(4_212);
+    const eventId = identifier(4_213);
+    const decisionReason = "No executable change";
+    createBug(database, tenant, bugId, "Legacy delivery audit Bug");
+    insertRepairAttempt(database, tenant, bugId, attemptId);
+    insertForwardNoBuildDeliveryAudit(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      eventId,
+      "repair.delivered",
+      decisionReason,
+    );
+
+    const rejection = probeSqlRejection(database, () => {
+      insertForwardNoBuildRequirement(
+        database,
+        tenant,
+        bugId,
+        attemptId,
+        requirementId,
+        eventId,
+        decisionReason,
+      );
+    });
+    assert.match(String(rejection), /BuildRequirement requires its exact typed delivery audit/i);
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM build_requirements").get()?.count,
+      0,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 stores a 5000-character decisionReason while its typed Event keeps a bounded truncation", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_300, "FDR");
+    const bugId = identifier(4_310);
+    const attemptId = identifier(4_311);
+    const requirementId = identifier(4_312);
+    const eventId = identifier(4_313);
+    const decisionReason = "D".repeat(5_000);
+    const auditDecisionReason = `${"D".repeat(1_997)}…`;
+    createBug(database, tenant, bugId, "Long BuildRequirement decision Bug");
+    insertRepairAttempt(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      1,
+      "delivered",
+      "human",
+      decisionReason,
+    );
+    const payloadJson = insertForwardNoBuildDeliveryAudit(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      eventId,
+      "repair_attempt.delivered",
+      decisionReason,
+      auditDecisionReason,
+    );
+    assert.ok(Buffer.byteLength(payloadJson, "utf8") <= 4_096);
+    assert.equal((JSON.parse(payloadJson) as { reason: string }).reason, auditDecisionReason);
+    assert.notEqual(auditDecisionReason, decisionReason);
+
+    insertForwardNoBuildRequirement(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      eventId,
+      decisionReason,
+    );
+
+    const stored = database
+      .prepare(
+        `SELECT decision_reason AS decisionReason, length(decision_reason) AS reasonLength
+         FROM build_requirements WHERE id = ?`,
+      )
+      .get(requirementId);
+    assert.equal(stored?.decisionReason, decisionReason);
+    assert.equal(stored?.reasonLength, 5_000);
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 stores a 5000-character overrideReason while its typed Event keeps a bounded truncation", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_400, "FOR");
+    const bugId = identifier(4_410);
+    const attemptId = identifier(4_411);
+    const requirementId = identifier(4_412);
+    const deliveryEventId = identifier(4_413);
+    const buildId = identifier(4_414);
+    const linkId = identifier(4_415);
+    const linkEventId = identifier(4_416);
+    const membershipId = identifier(4_417);
+    const commitSha = "c".repeat(40);
+    const overrideReason = "O".repeat(5_000);
+    const auditOverrideReason = `${"O".repeat(1_997)}…`;
+    createBug(database, tenant, bugId, "Long Build override Bug");
+    insertRequiredRepairAttempt(database, tenant, bugId, attemptId, commitSha);
+    insertRequiredDeliveryAudit(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      deliveryEventId,
+      commitSha,
+      1,
+      "repair_attempt.delivered",
+    );
+    insertRequiredBuildRequirement(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      deliveryEventId,
+      commitSha,
+    );
+    insertReleaseManagerMembership(database, tenant, membershipId);
+    insertReadyBuild(database, tenant, buildId, commitSha, [commitSha]);
+    const payloadJson = insertOverrideBuildLinkAudit(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      buildId,
+      linkId,
+      linkEventId,
+      commitSha,
+      overrideReason,
+      auditOverrideReason,
+    );
+    assert.ok(Buffer.byteLength(payloadJson, "utf8") <= 4_096);
+    assert.equal((JSON.parse(payloadJson) as { reason: string }).reason, auditOverrideReason);
+    assert.notEqual(auditOverrideReason, overrideReason);
+
+    linkRequiredBuildWithOverride(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      requirementId,
+      buildId,
+      linkId,
+      linkEventId,
+      commitSha,
+      overrideReason,
+    );
+
+    const stored = database
+      .prepare(
+        `SELECT override_reason AS overrideReason, length(override_reason) AS reasonLength
+         FROM build_repair_links WHERE id = ?`,
+      )
+      .get(linkId);
+    assert.equal(stored?.overrideReason, overrideReason);
+    assert.equal(stored?.reasonLength, 5_000);
+    assert.equal(
+      database.prepare("SELECT version FROM builds WHERE id = ?").get(buildId)?.version,
+      3,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 preserves Windows-path decisions only through redacted typed Events", async () => {
+  await withDatabase((database) => {
+    const decisionTenant = seedTenant(database, 5_400, "WPD");
+    const decisionBugId = identifier(5_410);
+    const decisionAttemptId = identifier(5_411);
+    const decisionRequirementId = identifier(5_412);
+    const decisionEventId = identifier(5_413);
+    const decisionReason = "Evidence retained at C:\\Users\\qa\\private-decision.txt";
+    createBug(database, decisionTenant, decisionBugId, "Redacted Windows-path decision");
+    insertRepairAttempt(
+      database,
+      decisionTenant,
+      decisionBugId,
+      decisionAttemptId,
+      1,
+      "delivered",
+      "human",
+      decisionReason,
+      null,
+      "[REDACTED]",
+    );
+    insertForwardNoBuildDeliveryAudit(
+      database,
+      decisionTenant,
+      decisionBugId,
+      decisionAttemptId,
+      decisionRequirementId,
+      decisionEventId,
+      "repair_attempt.delivered",
+      decisionReason,
+      "[REDACTED]",
+    );
+    insertForwardNoBuildRequirement(
+      database,
+      decisionTenant,
+      decisionBugId,
+      decisionAttemptId,
+      decisionRequirementId,
+      decisionEventId,
+      decisionReason,
+    );
+    assert.equal(
+      database
+        .prepare("SELECT decision_reason FROM build_requirements WHERE id = ?")
+        .get(decisionRequirementId)?.decision_reason,
+      decisionReason,
+    );
+
+    const overrideTenant = seedTenant(database, 5_500, "WPO");
+    const overrideBugId = identifier(5_510);
+    const overrideAttemptId = identifier(5_511);
+    const overrideRequirementId = identifier(5_512);
+    const deliveryEventId = identifier(5_513);
+    const buildId = identifier(5_514);
+    const linkId = identifier(5_515);
+    const linkEventId = identifier(5_516);
+    const commitSha = "5".repeat(40);
+    const overrideReason = "Approval retained at C:\\Users\\release\\private-override.txt";
+    createBug(database, overrideTenant, overrideBugId, "Redacted Windows-path override");
+    insertRequiredRepairAttempt(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      commitSha,
+    );
+    insertRequiredDeliveryAudit(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      overrideRequirementId,
+      deliveryEventId,
+      commitSha,
+      1,
+      "repair_attempt.delivered",
+    );
+    insertRequiredBuildRequirement(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      overrideRequirementId,
+      deliveryEventId,
+      commitSha,
+    );
+    insertReleaseManagerMembership(database, overrideTenant, identifier(5_517));
+    insertReadyBuild(database, overrideTenant, buildId, commitSha, [commitSha]);
+    insertOverrideBuildLinkAudit(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      buildId,
+      linkId,
+      linkEventId,
+      commitSha,
+      overrideReason,
+      "[REDACTED]",
+    );
+    linkRequiredBuildWithOverride(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      overrideRequirementId,
+      buildId,
+      linkId,
+      linkEventId,
+      commitSha,
+      overrideReason,
+    );
+    assert.equal(
+      database.prepare("SELECT override_reason FROM build_repair_links WHERE id = ?").get(linkId)
+        ?.override_reason,
+      overrideReason,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 persists redacted cookie and API-key reasons without exposing Event text", async () => {
+  await withDatabase((database) => {
+    const decisionTenant = seedTenant(database, 5_800, "RDC");
+    const decisionBugId = identifier(5_810);
+    const decisionAttemptId = identifier(5_811);
+    const decisionRequirementId = identifier(5_812);
+    const decisionEventId = identifier(5_813);
+    const decisionReason = "cookie=session-secret";
+    createBug(database, decisionTenant, decisionBugId, "Redacted cookie decision");
+    insertRepairAttempt(
+      database,
+      decisionTenant,
+      decisionBugId,
+      decisionAttemptId,
+      1,
+      "delivered",
+      "human",
+      decisionReason,
+      null,
+      "[REDACTED]",
+    );
+    insertForwardNoBuildDeliveryAudit(
+      database,
+      decisionTenant,
+      decisionBugId,
+      decisionAttemptId,
+      decisionRequirementId,
+      decisionEventId,
+      "repair_attempt.delivered",
+      decisionReason,
+      "[REDACTED]",
+    );
+    insertForwardNoBuildRequirement(
+      database,
+      decisionTenant,
+      decisionBugId,
+      decisionAttemptId,
+      decisionRequirementId,
+      decisionEventId,
+      decisionReason,
+    );
+    assert.equal(
+      database
+        .prepare("SELECT decision_reason FROM build_requirements WHERE id = ?")
+        .get(decisionRequirementId)?.decision_reason,
+      decisionReason,
+    );
+
+    const overrideTenant = seedTenant(database, 5_900, "RDA");
+    const overrideBugId = identifier(5_910);
+    const overrideAttemptId = identifier(5_911);
+    const overrideRequirementId = identifier(5_912);
+    const deliveryEventId = identifier(5_913);
+    const buildId = identifier(5_914);
+    const linkId = identifier(5_915);
+    const linkEventId = identifier(5_916);
+    const commitSha = "6".repeat(40);
+    const overrideReason = "x-api-key: release-secret";
+    createBug(database, overrideTenant, overrideBugId, "Redacted API-key override");
+    insertRequiredRepairAttempt(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      commitSha,
+    );
+    insertRequiredDeliveryAudit(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      overrideRequirementId,
+      deliveryEventId,
+      commitSha,
+      1,
+      "repair_attempt.delivered",
+    );
+    insertRequiredBuildRequirement(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      overrideRequirementId,
+      deliveryEventId,
+      commitSha,
+    );
+    insertReleaseManagerMembership(database, overrideTenant, identifier(5_917));
+    insertReadyBuild(database, overrideTenant, buildId, commitSha, [commitSha]);
+    insertOverrideBuildLinkAudit(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      buildId,
+      linkId,
+      linkEventId,
+      commitSha,
+      overrideReason,
+      "[REDACTED]",
+    );
+    linkRequiredBuildWithOverride(
+      database,
+      overrideTenant,
+      overrideBugId,
+      overrideAttemptId,
+      overrideRequirementId,
+      buildId,
+      linkId,
+      linkEventId,
+      commitSha,
+      overrideReason,
+    );
+    assert.equal(
+      database.prepare("SELECT override_reason FROM build_repair_links WHERE id = ?").get(linkId)
+        ?.override_reason,
+      overrideReason,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 durably preserves raw RepairAttempt failure truth behind bounded audit text", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_700, "FAR");
+    const scenarios = [
+      {
+        auditReason: `${"F".repeat(1_997)}…`,
+        rawReason: "F".repeat(5_000),
+      },
+      {
+        auditReason: "[REDACTED]",
+        rawReason: "cookie=session-secret",
+      },
+    ];
+
+    for (const [index, scenario] of scenarios.entries()) {
+      const bugId = identifier(5_710 + index * 10);
+      const attemptId = identifier(5_711 + index * 10);
+      const eventId = identifier(5_712 + index * 10);
+      const eventBase = 5_720 + index * 20;
+      const failedAt = `2026-08-25T03:0${index}:00.000Z`;
+      createBug(database, tenant, bugId, `Durable failure truth ${index}`);
+      seedTypedRunningWorkflow(database, tenant, bugId, attemptId, eventBase);
+
+      const missingEvent = probeSqlRejection(database, () => {
+        database
+          .prepare(
+            `UPDATE repair_attempts
+             SET status = 'failed', failure_reason = ?, updated_at = ?, version = 3
+             WHERE id = ? AND version = 2`,
+          )
+          .run(scenario.rawReason, failedAt, attemptId);
+      });
+      assert.match(String(missingEvent), /RepairAttempt lifecycle requires a forward exact-CAS/i);
+
+      database.exec("BEGIN IMMEDIATE");
+      try {
+        insertBugWorkflowEvent(database, tenant, {
+          aggregateId: attemptId,
+          aggregateSequence: 3,
+          aggregateType: "repair_attempt",
+          bugId,
+          createdAt: failedAt,
+          eventId,
+          eventType: "repair_attempt.failed",
+          fromState: "in_progress",
+          payload: {
+            status: "failed",
+            repairAttemptId: attemptId,
+            reason: scenario.auditReason,
+            fromVersion: 2,
+            toVersion: 3,
+          },
+          resourceId: attemptId,
+          resourceType: "repair_attempt",
+          resourceVersionAfter: 3,
+          toState: "ready",
+        });
+
+        const mismatchedTruth = probeSqlRejection(database, () => {
+          database
+            .prepare(
+              `UPDATE repair_attempts
+               SET status = 'failed', failure_reason = 'unrelated failure',
+                   updated_at = ?, version = 3
+               WHERE id = ? AND version = 2`,
+            )
+            .run(failedAt, attemptId);
+        });
+        assert.match(
+          String(mismatchedTruth),
+          /RepairAttempt lifecycle requires a forward exact-CAS/i,
+        );
+
+        const attemptUpdate = database
+          .prepare(
+            `UPDATE repair_attempts
+             SET status = 'failed', failure_reason = ?, updated_at = ?, version = 3
+             WHERE id = ? AND version = 2`,
+          )
+          .run(scenario.rawReason, failedAt, attemptId);
+        assert.equal(attemptUpdate.changes, 1);
+        const bugUpdate = database
+          .prepare(
+            `UPDATE bugs
+             SET state = 'ready', active_repair_attempt_id = NULL,
+                 updated_at = ?, version = 4
+             WHERE id = ? AND version = 3`,
+          )
+          .run(failedAt, bugId);
+        assert.equal(bugUpdate.changes, 1);
+        database.exec("COMMIT");
+      } catch (error) {
+        if (database.isTransaction) database.exec("ROLLBACK");
+        throw error;
+      }
+
+      assert.deepEqual(
+        {
+          ...database
+            .prepare(
+              `SELECT status, failure_reason AS failureReason, version
+               FROM repair_attempts WHERE id = ?`,
+            )
+            .get(attemptId),
+        },
+        { failureReason: scenario.rawReason, status: "failed", version: 3 },
+      );
+      assert.equal(
+        database
+          .prepare(
+            "SELECT json_extract(payload_json, '$.reason') AS reason FROM events WHERE id = ?",
+          )
+          .get(eventId)?.reason,
+        scenario.auditReason,
+      );
+    }
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 preserves a distinct current Verification creator and assigned verifier", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_600, "CVF");
+    const bugId = identifier(5_610);
+    const attemptId = identifier(5_611);
+    const requirementId = identifier(5_612);
+    const verificationId = identifier(5_613);
+    const verificationEventId = identifier(5_614);
+    const createdAt = "2026-08-25T02:20:00.000Z";
+    createBug(database, tenant, bugId, "Assigned verifier differs from current creator");
+    seedTypedNoBuildRfvWorkflow(database, tenant, bugId, attemptId, requirementId, 5_620);
+
+    const disabledTarget = probeSqlRejection(database, () => {
+      const disabled = database
+        .prepare(
+          `UPDATE users SET status = 'disabled', updated_at = ?, version = 2
+           WHERE id = ? AND version = 1`,
+        )
+        .run(createdAt, tenant.secondaryUserId);
+      assert.equal(disabled.changes, 1);
+      insertVerification(
+        database,
+        tenant,
+        bugId,
+        attemptId,
+        verificationId,
+        tenant.secondaryUserId,
+        null,
+        createdAt,
+        verificationEventId,
+        "Verify another user's assigned run",
+        tenant.userId,
+      );
+    });
+    assert.match(String(disabledTarget), /current creator and assigned-verifier authority/i);
+
+    insertVerification(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      verificationId,
+      tenant.secondaryUserId,
+      null,
+      createdAt,
+      verificationEventId,
+      "Verify another user's assigned run",
+      tenant.userId,
+    );
+    const pointerUpdate = database
+      .prepare(
+        `UPDATE bugs
+         SET active_verification_id = ?, updated_at = ?, version = 5
+         WHERE id = ? AND version = 4`,
+      )
+      .run(verificationId, createdAt, bugId);
+    assert.equal(pointerUpdate.changes, 1);
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT verification.verifier_id AS verifierId, event.actor_user_id AS creatorId,
+                    bug.active_verification_id AS activeVerificationId
+             FROM verifications AS verification
+             JOIN events AS event ON event.id = ?
+             JOIN bugs AS bug ON bug.id = verification.bug_id
+             WHERE verification.id = ?`,
+          )
+          .get(verificationEventId, verificationId),
+      },
+      {
+        activeVerificationId: verificationId,
+        creatorId: tenant.userId,
+        verifierId: tenant.secondaryUserId,
+      },
+    );
+
+    const hijackStartedAt = "2026-08-25T02:21:00.000Z";
+    const verifierRewrite = probeSqlRejection(database, () => {
+      insertVerificationStartEvent(
+        database,
+        tenant,
+        bugId,
+        verificationId,
+        identifier(5_615),
+        hijackStartedAt,
+      );
+      database
+        .prepare(
+          `UPDATE verifications
+           SET verifier_id = ?, status = 'in_progress', updated_at = ?, version = 2
+           WHERE id = ? AND version = 1`,
+        )
+        .run(tenant.userId, hijackStartedAt, verificationId);
+    });
+    assert.match(
+      String(verifierRewrite),
+      /verification identity and exact Build evidence are immutable/i,
+    );
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            "SELECT verifier_id AS verifierId, status, version FROM verifications WHERE id = ?",
+          )
+          .get(verificationId),
+      },
+      { status: "requested", verifierId: tenant.secondaryUserId, version: 1 },
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 preserves delivered history and reopens only for a later ranked Build occurrence", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_500, "FRP");
+    const bugId = identifier(4_510);
+    const deliveredAttemptId = identifier(4_511);
+    const requirementId = identifier(4_512);
+    const deliveryEventId = identifier(4_513);
+    const verifiedBuildId = identifier(4_514);
+    const newerBuildId = identifier(4_515);
+    const olderBuildId = identifier(4_538);
+    const linkId = identifier(4_516);
+    const linkEventId = identifier(4_517);
+    const lineageId = identifier(4_518);
+    const firstLineageEventId = identifier(4_519);
+    const secondLineageEventId = identifier(4_520);
+    const thirdLineageEventId = identifier(4_540);
+    const verificationId = identifier(4_521);
+    const membershipId = identifier(4_522);
+    const startEventId = identifier(4_523);
+    const closeEventId = identifier(4_524);
+    const occurrenceId = identifier(4_525);
+    const occurrenceSubmissionId = identifier(4_526);
+    const occurrenceEventId = identifier(4_527);
+    const reopenEventId = identifier(4_528);
+    const equalOccurrenceId = identifier(4_541);
+    const equalOccurrenceSubmissionId = identifier(4_542);
+    const equalOccurrenceEventId = identifier(4_543);
+    const equalReopenEventId = identifier(4_544);
+    const olderOccurrenceId = identifier(4_545);
+    const olderOccurrenceSubmissionId = identifier(4_546);
+    const olderOccurrenceEventId = identifier(4_547);
+    const olderReopenEventId = identifier(4_548);
+    const duplicateOccurrenceEventId = identifier(4_549);
+    const splitCloseEventId = identifier(4_550);
+    const splitReopenEventId = identifier(4_551);
+    const plannedAttemptId = identifier(4_529);
+    const triageEventId = identifier(4_530);
+    const attemptCreatedEventId = identifier(4_531);
+    const attemptStartedEventId = identifier(4_532);
+    const verificationCreatedEventId = identifier(4_533);
+    const rejectedPlannedAttemptId = identifier(4_534);
+    const secondaryMembershipId = identifier(4_535);
+    const commitSha = "a".repeat(40);
+    const triagedAt = "2026-08-25T00:00:10.000Z";
+    const attemptCreatedAt = "2026-08-25T00:00:20.000Z";
+    const attemptStartedAt = "2026-08-25T00:00:30.000Z";
+    const deliveredAt = "2026-08-25T00:00:40.000Z";
+    const firstLineageAt = "2026-08-25T00:03:00.000Z";
+    const secondLineageAt = "2026-08-25T00:04:00.000Z";
+    const thirdLineageAt = "2026-08-25T00:04:05.000Z";
+    const verificationCreatedAt = "2026-08-25T00:04:10.000Z";
+    const verificationStartedAt = "2026-08-25T00:04:20.000Z";
+    const closedAt = "2026-08-25T00:05:00.000Z";
+    const equalOccurredAt = "2026-08-25T00:06:00.000Z";
+    const equalReopenAt = "2026-08-25T00:06:10.000Z";
+    const olderOccurredAt = "2026-08-25T00:06:20.000Z";
+    const olderReopenAt = "2026-08-25T00:06:30.000Z";
+    const occurredAt = "2026-08-25T00:06:40.000Z";
+    const reopenedAt = "2026-08-25T00:07:00.000Z";
+    const replannedAt = "2026-08-25T00:08:00.000Z";
+
+    createBug(database, tenant, bugId, "Reopen after a later ranked Build occurrence");
+    insertActiveMembershipRole(database, tenant, membershipId, "verifier");
+    insertActiveMembershipRole(database, tenant, membershipId, "triager");
+    insertActiveMembershipRole(database, tenant, membershipId, "release_manager");
+    insertActiveMembershipRole(database, tenant, membershipId, "developer");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      secondaryMembershipId,
+      "developer",
+      tenant.secondaryUserId,
+    );
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      secondaryMembershipId,
+      "verifier",
+      tenant.secondaryUserId,
+    );
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      secondaryMembershipId,
+      "triager",
+      tenant.secondaryUserId,
+    );
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: bugId,
+      aggregateSequence: 1,
+      aggregateType: "bug",
+      bugId,
+      createdAt: triagedAt,
+      eventId: triageEventId,
+      eventType: "bug.triage.ready",
+      fromState: "reported",
+      payload: { status: "ready", fromVersion: 1, toVersion: 2 },
+      resourceId: bugId,
+      resourceType: "bug",
+      resourceVersionAfter: 2,
+      toState: "ready",
+    });
+    database
+      .prepare(
+        `UPDATE bugs
+         SET state = 'ready', updated_at = ?, version = 2
+         WHERE id = ? AND version = 1`,
+      )
+      .run(triagedAt, bugId);
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: deliveredAttemptId,
+      aggregateSequence: 1,
+      aggregateType: "repair_attempt",
+      bugId,
+      createdAt: attemptCreatedAt,
+      eventId: attemptCreatedEventId,
+      eventType: "repair_attempt.created",
+      fromState: "ready",
+      payload: {
+        status: "planned",
+        repairAttemptId: deliveredAttemptId,
+        fromVersion: 2,
+        toVersion: 3,
+      },
+      resourceId: deliveredAttemptId,
+      resourceType: "repair_attempt",
+      resourceVersionAfter: 1,
+      toState: "in_progress",
+    });
+    database
+      .prepare(
+        `INSERT INTO repair_attempts(
+          id, account_id, project_id, bug_id, sequence, mode, status,
+          assignee_id, created_at, updated_at, version
+        ) VALUES (?, ?, ?, ?, 1, 'human', 'planned', ?, ?, ?, 1)`,
+      )
+      .run(
+        deliveredAttemptId,
+        tenant.accountId,
+        tenant.projectId,
+        bugId,
+        tenant.secondaryUserId,
+        attemptCreatedAt,
+        attemptCreatedAt,
+      );
+    database
+      .prepare(
+        `UPDATE bugs
+         SET state = 'in_progress', active_repair_attempt_id = ?,
+             updated_at = ?, version = 3
+         WHERE id = ? AND version = 2`,
+      )
+      .run(deliveredAttemptId, attemptCreatedAt, bugId);
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: deliveredAttemptId,
+      aggregateSequence: 2,
+      aggregateType: "repair_attempt",
+      bugId,
+      createdAt: attemptStartedAt,
+      eventId: attemptStartedEventId,
+      eventType: "repair_attempt.started",
+      fromState: null,
+      payload: {
+        status: "running",
+        repairAttemptId: deliveredAttemptId,
+        fromVersion: 1,
+        toVersion: 2,
+      },
+      resourceId: deliveredAttemptId,
+      resourceType: "repair_attempt",
+      resourceVersionAfter: 2,
+      toState: null,
+    });
+    database
+      .prepare(
+        `UPDATE repair_attempts
+         SET status = 'running', updated_at = ?, version = 2
+         WHERE id = ? AND version = 1`,
+      )
+      .run(attemptStartedAt, deliveredAttemptId);
+    insertRequiredDeliveryAudit(
+      database,
+      tenant,
+      bugId,
+      deliveredAttemptId,
+      requirementId,
+      deliveryEventId,
+      commitSha,
+      3,
+      "repair_attempt.delivered",
+      deliveredAt,
+      "in_progress",
+      "awaiting_build",
+    );
+    database
+      .prepare(
+        `UPDATE repair_attempts
+         SET status = 'delivered', summary = 'Fix delivered', branch = 'main',
+             commit_sha = ?, updated_at = ?, version = 3
+         WHERE id = ? AND version = 2`,
+      )
+      .run(commitSha, deliveredAt, deliveredAttemptId);
+    insertRequiredBuildRequirement(
+      database,
+      tenant,
+      bugId,
+      deliveredAttemptId,
+      requirementId,
+      deliveryEventId,
+      commitSha,
+      deliveredAt,
+      4,
+    );
+    database
+      .prepare(
+        `UPDATE bugs
+         SET state = 'awaiting_build', updated_at = ?, version = 4
+         WHERE id = ? AND version = 3`,
+      )
+      .run(deliveredAt, bugId);
+    insertReadyBuild(database, tenant, olderBuildId, "9".repeat(40), ["9".repeat(40)]);
+    insertReadyBuild(database, tenant, verifiedBuildId, commitSha, [commitSha]);
+    insertReadyBuild(database, tenant, newerBuildId, "b".repeat(40), ["b".repeat(40)]);
+    insertBuildLinkAudit(
+      database,
+      tenant,
+      bugId,
+      deliveredAttemptId,
+      verifiedBuildId,
+      linkId,
+      linkEventId,
+      commitSha,
+      4,
+      UPDATED_AT,
+      "awaiting_build",
+      "ready_for_verification",
+    );
+    linkRequiredBuild(
+      database,
+      tenant,
+      bugId,
+      deliveredAttemptId,
+      requirementId,
+      verifiedBuildId,
+      linkId,
+      linkEventId,
+      commitSha,
+    );
+    database
+      .prepare(
+        `UPDATE bugs
+         SET state = 'ready_for_verification', updated_at = ?, version = 5
+         WHERE id = ? AND version = 4`,
+      )
+      .run(UPDATED_AT, bugId);
+    const rejectedPlanning = probeSqlRejection(database, () => {
+      insertBugWorkflowEvent(database, tenant, {
+        aggregateId: rejectedPlannedAttemptId,
+        aggregateSequence: 1,
+        aggregateType: "repair_attempt",
+        bugId,
+        createdAt: UPDATED_AT,
+        eventId: identifier(4_537),
+        eventType: "repair_attempt.created",
+        fromState: "ready",
+        payload: {
+          status: "planned",
+          repairAttemptId: rejectedPlannedAttemptId,
+          fromVersion: 5,
+          toVersion: 6,
+        },
+        resourceId: rejectedPlannedAttemptId,
+        resourceType: "repair_attempt",
+        resourceVersionAfter: 1,
+        toState: "in_progress",
+      });
+      database
+        .prepare(
+          `INSERT INTO repair_attempts(
+              id, account_id, project_id, bug_id, sequence, mode, status,
+              assignee_id, created_at, updated_at, version
+            ) VALUES (?, ?, ?, ?, 2, 'human', 'planned', ?, ?, ?, 1)`,
+        )
+        .run(
+          rejectedPlannedAttemptId,
+          tenant.accountId,
+          tenant.projectId,
+          bugId,
+          tenant.userId,
+          UPDATED_AT,
+          UPDATED_AT,
+        );
+    });
+    assert.match(
+      String(rejectedPlanning),
+      /new planned RepairAttempt requires the Bug active delivered pointer to be cleared/i,
+    );
+    insertBuildLineage(database, tenant, lineageId, firstLineageAt);
+    insertBuildLineageEntry(
+      database,
+      tenant,
+      lineageId,
+      olderBuildId,
+      null,
+      1,
+      firstLineageEventId,
+      firstLineageAt,
+    );
+    insertBuildLineageEntry(
+      database,
+      tenant,
+      lineageId,
+      verifiedBuildId,
+      olderBuildId,
+      2,
+      secondLineageEventId,
+      secondLineageAt,
+    );
+    insertBuildLineageEntry(
+      database,
+      tenant,
+      lineageId,
+      newerBuildId,
+      verifiedBuildId,
+      3,
+      thirdLineageEventId,
+      thirdLineageAt,
+    );
+    insertVerification(
+      database,
+      tenant,
+      bugId,
+      deliveredAttemptId,
+      verificationId,
+      tenant.userId,
+      verifiedBuildId,
+      verificationCreatedAt,
+      verificationCreatedEventId,
+    );
+    database
+      .prepare(
+        `UPDATE bugs
+         SET active_verification_id = ?, updated_at = ?, version = 6
+         WHERE id = ? AND version = 5`,
+      )
+      .run(verificationId, verificationCreatedAt, bugId);
+    insertVerificationStartEvent(
+      database,
+      tenant,
+      bugId,
+      verificationId,
+      startEventId,
+      verificationStartedAt,
+      2,
+    );
+    database
+      .prepare(
+        `UPDATE verifications
+         SET status = 'in_progress', updated_at = ?, version = 2
+         WHERE id = ?`,
+      )
+      .run(verificationStartedAt, verificationId);
+
+    const nakedPass = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE verifications
+           SET status = 'passed', result_summary = 'Naked result',
+               updated_at = ?, version = 3
+           WHERE id = ?`,
+        )
+        .run(closedAt, verificationId);
+    });
+    assert.match(String(nakedPass), /exact assigned-human typed audit Event/i);
+
+    transaction(database, () => {
+      insertVerificationClosureEvent(
+        database,
+        tenant,
+        bugId,
+        deliveredAttemptId,
+        verificationId,
+        closeEventId,
+        closedAt,
+        verifiedBuildId,
+        3,
+      );
+      database
+        .prepare(
+          `UPDATE verifications
+           SET status = 'passed', result_summary = 'Human verification passed',
+               updated_at = ?, version = 3
+           WHERE id = ?`,
+        )
+        .run(closedAt, verificationId);
+      insertBugWorkflowEvent(database, tenant, {
+        actorUserId: tenant.secondaryUserId,
+        aggregateId: bugId,
+        aggregateSequence: 9_000_001,
+        aggregateType: "bug",
+        bugId,
+        createdAt: closedAt,
+        eventId: splitCloseEventId,
+        eventType: "bug.verification.passed",
+        fromState: "ready_for_verification",
+        payload: { status: "passed", fromVersion: 6, toVersion: 7 },
+        resourceId: bugId,
+        resourceType: "bug",
+        resourceVersionAfter: 7,
+        toState: "closed",
+      });
+      const disabledExactVerifier = probeSqlRejection(database, () => {
+        const disabled = database
+          .prepare(
+            `UPDATE users SET status = 'disabled', updated_at = ?, version = 2
+             WHERE id = ? AND version = 1`,
+          )
+          .run(closedAt, tenant.userId);
+        assert.equal(disabled.changes, 1);
+        database
+          .prepare(
+            `UPDATE bugs
+             SET state = 'closed', active_repair_attempt_id = NULL,
+                 active_verification_id = NULL, closed_at = ?, updated_at = ?, version = 7
+             WHERE id = ? AND version = 6`,
+          )
+          .run(closedAt, closedAt, bugId);
+      });
+      assert.match(
+        String(disabledExactVerifier),
+        /Bug closure requires current passed human Verification and typed audit proof/i,
+      );
+      const forgedClosure = probeSqlRejection(database, () => {
+        database
+          .prepare(
+            `INSERT INTO bug_closure_acceptances(
+              account_id, project_id, bug_id, closure_generation, verification_id,
+              close_event_id, close_event_position, actor_user_id, closed_bug_version,
+              closed_at, baseline_kind, baseline_build_id, baseline_lineage_id,
+              baseline_ordinal, created_at
+            ) VALUES (
+              ?, ?, ?, 0, ?, ?, (SELECT event_position FROM events WHERE id = ?), ?, 7,
+              ?, 'verified_build', ?, ?, 2, ?
+            )`,
+          )
+          .run(
+            tenant.accountId,
+            tenant.projectId,
+            bugId,
+            verificationId,
+            closeEventId,
+            closeEventId,
+            tenant.userId,
+            closedAt,
+            verifiedBuildId,
+            lineageId,
+            closedAt,
+          );
+      });
+      assert.match(
+        String(forgedClosure),
+        /Bug closure acceptance requires the exact current human closure proof/i,
+      );
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'closed', active_repair_attempt_id = NULL,
+               active_verification_id = NULL, closed_at = ?, updated_at = ?, version = 7
+           WHERE id = ?`,
+        )
+        .run(closedAt, closedAt, bugId);
+    });
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT baseline_kind AS baselineKind, baseline_build_id AS baselineBuildId,
+                    baseline_lineage_id AS baselineLineageId, baseline_ordinal AS baselineOrdinal,
+                    closure_generation AS closureGeneration, closed_bug_version AS closedBugVersion
+             FROM bug_closure_acceptances WHERE bug_id = ?`,
+          )
+          .get(bugId),
+      },
+      {
+        baselineBuildId: verifiedBuildId,
+        baselineKind: "verified_build",
+        baselineLineageId: lineageId,
+        baselineOrdinal: 2,
+        closedBugVersion: 7,
+        closureGeneration: 0,
+      },
+    );
+    const closedTimestampRewrite = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE bugs
+           SET closed_at = ?, updated_at = ?, version = 8
+           WHERE id = ? AND version = 7`,
+        )
+        .run("2026-08-25T00:05:30.000Z", "2026-08-25T00:05:30.000Z", bugId);
+    });
+    assert.match(
+      String(closedTimestampRewrite),
+      /same-state workflow pointers require their exact typed/i,
+    );
+    const nakedReopen = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'ready', closed_at = NULL, reopen_count = 1,
+               updated_at = ?, version = 8
+           WHERE id = ?`,
+        )
+        .run(occurredAt, bugId);
+    });
+    assert.match(String(nakedReopen), /later same-lineage server-ranked Build occurrence/i);
+
+    const equalBuildReopen = probeSqlRejection(database, () => {
+      appendOccurrenceEvidence(
+        database,
+        tenant,
+        bugId,
+        equalOccurrenceId,
+        equalOccurrenceSubmissionId,
+        equalOccurrenceEventId,
+        equalOccurredAt,
+        7,
+        8,
+        verifiedBuildId,
+        2,
+      );
+      insertReopenEvent(
+        database,
+        tenant,
+        bugId,
+        equalOccurrenceId,
+        equalReopenEventId,
+        equalReopenAt,
+        8,
+        9,
+        3,
+      );
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'ready', closed_at = NULL, reopen_count = 1,
+               updated_at = ?, version = 9
+           WHERE id = ? AND version = 8`,
+        )
+        .run(equalReopenAt, bugId);
+    });
+    assert.match(String(equalBuildReopen), /later same-lineage server-ranked Build occurrence/i);
+
+    const olderBuildReopen = probeSqlRejection(database, () => {
+      appendOccurrenceEvidence(
+        database,
+        tenant,
+        bugId,
+        olderOccurrenceId,
+        olderOccurrenceSubmissionId,
+        olderOccurrenceEventId,
+        olderOccurredAt,
+        7,
+        8,
+        olderBuildId,
+        2,
+      );
+      insertReopenEvent(
+        database,
+        tenant,
+        bugId,
+        olderOccurrenceId,
+        olderReopenEventId,
+        olderReopenAt,
+        8,
+        9,
+        3,
+      );
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'ready', closed_at = NULL, reopen_count = 1,
+               updated_at = ?, version = 9
+           WHERE id = ? AND version = 8`,
+        )
+        .run(olderReopenAt, bugId);
+    });
+    assert.match(String(olderBuildReopen), /later same-lineage server-ranked Build occurrence/i);
+
+    appendOccurrenceEvidence(
+      database,
+      tenant,
+      bugId,
+      occurrenceId,
+      occurrenceSubmissionId,
+      occurrenceEventId,
+      occurredAt,
+      7,
+      8,
+      newerBuildId,
+      2,
+    );
+    const duplicateOccurrenceEvent = probeSqlRejection(database, () => {
+      insertOccurrenceAppendEvent(
+        database,
+        tenant,
+        bugId,
+        occurrenceId,
+        duplicateOccurrenceEventId,
+        occurredAt,
+        7,
+        8,
+        3,
+      );
+    });
+    assert.match(
+      String(duplicateOccurrenceEvent),
+      /UNIQUE constraint failed: events\.account_id, events\.project_id, events\.resource_type, events\.resource_id/i,
+    );
+    insertReopenEvent(database, tenant, bugId, occurrenceId, reopenEventId, reopenedAt, 8, 9, 3);
+    insertBugWorkflowEvent(database, tenant, {
+      actorUserId: tenant.secondaryUserId,
+      aggregateId: bugId,
+      aggregateSequence: 9_000_002,
+      aggregateType: "bug",
+      bugId,
+      createdAt: reopenedAt,
+      eventId: splitReopenEventId,
+      eventType: "bug.reopen.newer_occurrence",
+      fromState: "closed",
+      payload: { status: "ready", fromVersion: 8, toVersion: 9 },
+      resourceId: bugId,
+      resourceType: "bug",
+      resourceVersionAfter: 9,
+      toState: "ready",
+    });
+    const disabledExactTriager = probeSqlRejection(database, () => {
+      const disabled = database
+        .prepare(
+          `UPDATE users SET status = 'disabled', updated_at = ?, version = 2
+           WHERE id = ? AND version = 1`,
+        )
+        .run(reopenedAt, tenant.userId);
+      assert.equal(disabled.changes, 1);
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'ready', closed_at = NULL, reopen_count = 1,
+               updated_at = ?, version = 9
+           WHERE id = ? AND version = 8`,
+        )
+        .run(reopenedAt, bugId);
+    });
+    assert.match(
+      String(disabledExactTriager),
+      /later same-lineage server-ranked Build occurrence/i,
+    );
+    database
+      .prepare(
+        `UPDATE bugs
+         SET state = 'ready', closed_at = NULL, reopen_count = 1,
+             updated_at = ?, version = 9
+         WHERE id = ?`,
+      )
+      .run(reopenedAt, bugId);
+
+    transaction(database, () => {
+      insertBugWorkflowEvent(database, tenant, {
+        aggregateId: plannedAttemptId,
+        aggregateSequence: 1,
+        aggregateType: "repair_attempt",
+        bugId,
+        createdAt: replannedAt,
+        eventId: identifier(4_536),
+        eventType: "repair_attempt.created",
+        fromState: "ready",
+        payload: {
+          status: "planned",
+          repairAttemptId: plannedAttemptId,
+          fromVersion: 9,
+          toVersion: 10,
+        },
+        resourceId: plannedAttemptId,
+        resourceType: "repair_attempt",
+        resourceVersionAfter: 1,
+        toState: "in_progress",
+      });
+      database
+        .prepare(
+          `INSERT INTO repair_attempts(
+            id, account_id, project_id, bug_id, sequence, mode, status,
+            assignee_id, created_at, updated_at, version
+          ) VALUES (?, ?, ?, ?, 2, 'human', 'planned', ?, ?, ?, 1)`,
+        )
+        .run(
+          plannedAttemptId,
+          tenant.accountId,
+          tenant.projectId,
+          bugId,
+          tenant.userId,
+          replannedAt,
+          replannedAt,
+        );
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'in_progress', active_repair_attempt_id = ?,
+               updated_at = ?, version = 10
+           WHERE id = ?`,
+        )
+        .run(plannedAttemptId, replannedAt, bugId);
+    });
+
+    assert.deepEqual(
+      database
+        .prepare(
+          `SELECT id, status FROM repair_attempts
+           WHERE bug_id = ? ORDER BY sequence`,
+        )
+        .all(bugId)
+        .map((row) => ({ ...row })),
+      [
+        { id: deliveredAttemptId, status: "delivered" },
+        { id: plannedAttemptId, status: "planned" },
+      ],
+    );
+    assert.equal(
+      database
+        .prepare("SELECT ordinal FROM occurrence_build_lineage_facts WHERE occurrence_id = ?")
+        .get(occurrenceId)?.ordinal,
+      3,
+    );
+    assert.equal(
+      database.prepare("SELECT active_repair_attempt_id FROM bugs WHERE id = ?").get(bugId)
+        ?.active_repair_attempt_id,
+      plannedAttemptId,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 keeps Build lineage scoped, contiguous, immutable, and occurrence Events singular", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_100, "LIN");
+    const foreignTenant = seedTenant(database, 5_200, "LIX");
+    const firstBuildId = identifier(5_110);
+    const secondBuildId = identifier(5_111);
+    const foreignBuildId = identifier(5_210);
+    const lineageId = identifier(5_112);
+    const firstEventId = identifier(5_113);
+    const gapEventId = identifier(5_114);
+    const crossScopeEventId = identifier(5_115);
+    const secondEventId = identifier(5_116);
+    const bugId = identifier(5_117);
+    const occurrenceId = identifier(5_118);
+    const submissionId = identifier(5_119);
+    const occurrenceEventId = identifier(5_120);
+    const duplicateEventId = identifier(5_121);
+    const nullDigestEventId = identifier(5_126);
+    insertReleaseManagerMembership(database, tenant, identifier(5_122));
+    insertReadyBuild(database, tenant, firstBuildId, "1".repeat(40), ["1".repeat(40)]);
+    insertReadyBuild(database, tenant, secondBuildId, "2".repeat(40), ["2".repeat(40)]);
+    insertReadyBuild(database, foreignTenant, foreignBuildId, "3".repeat(40), ["3".repeat(40)]);
+    insertBuildLineage(database, tenant, lineageId, "2026-08-25T02:00:00.000Z");
+    insertBuildLineageEntry(
+      database,
+      tenant,
+      lineageId,
+      firstBuildId,
+      null,
+      1,
+      firstEventId,
+      "2026-08-25T02:01:00.000Z",
+    );
+
+    const missingDigest = probeSqlRejection(database, () => {
+      insertBuildLineageEntry(
+        database,
+        tenant,
+        lineageId,
+        secondBuildId,
+        firstBuildId,
+        2,
+        nullDigestEventId,
+        "2026-08-25T02:01:05.000Z",
+        null,
+      );
+    });
+    assert.match(String(missingDigest), /contiguous server-ranked release fact/i);
+
+    const inactivePrincipalCases = [
+      {
+        label: "disabled User",
+        mutate: () => {
+          const result = database
+            .prepare(
+              `UPDATE users SET status = 'disabled', updated_at = ?, version = 2
+               WHERE id = ? AND version = 1`,
+            )
+            .run("2026-08-25T02:01:10.000Z", tenant.userId);
+          assert.equal(result.changes, 1);
+        },
+      },
+      {
+        label: "disabled Account",
+        mutate: () => {
+          const result = database
+            .prepare(
+              `UPDATE accounts SET status = 'disabled', updated_at = ?, version = 2
+               WHERE id = ? AND version = 1`,
+            )
+            .run("2026-08-25T02:01:20.000Z", tenant.accountId);
+          assert.equal(result.changes, 1);
+        },
+      },
+      {
+        label: "archived Project",
+        mutate: () => {
+          const result = database
+            .prepare(
+              `UPDATE projects SET status = 'archived', updated_at = ?, version = 2
+               WHERE id = ? AND version = 1`,
+            )
+            .run("2026-08-25T02:01:30.000Z", tenant.projectId);
+          assert.equal(result.changes, 1);
+        },
+      },
+    ];
+    for (const [index, scenario] of inactivePrincipalCases.entries()) {
+      const rejection = probeSqlRejection(database, () => {
+        scenario.mutate();
+        insertBuildLineageEntry(
+          database,
+          tenant,
+          lineageId,
+          secondBuildId,
+          firstBuildId,
+          2,
+          identifier(5_123 + index),
+          `2026-08-25T02:01:${40 + index}.000Z`,
+        );
+      });
+      assert.match(
+        String(rejection),
+        /contiguous server-ranked release fact/i,
+        `${scenario.label} recorded a Build lineage fact`,
+      );
+    }
+
+    const gap = probeSqlRejection(database, () => {
+      insertBuildLineageEntry(
+        database,
+        tenant,
+        lineageId,
+        secondBuildId,
+        firstBuildId,
+        3,
+        gapEventId,
+        "2026-08-25T02:02:00.000Z",
+      );
+    });
+    assert.match(String(gap), /contiguous server-ranked release fact/i);
+
+    const crossScope = probeSqlRejection(database, () => {
+      insertBuildLineageEntry(
+        database,
+        tenant,
+        lineageId,
+        foreignBuildId,
+        firstBuildId,
+        2,
+        crossScopeEventId,
+        "2026-08-25T02:03:00.000Z",
+      );
+    });
+    assert.match(String(crossScope), /contiguous server-ranked release fact/i);
+
+    insertBuildLineageEntry(
+      database,
+      tenant,
+      lineageId,
+      secondBuildId,
+      firstBuildId,
+      2,
+      secondEventId,
+      "2026-08-25T02:04:00.000Z",
+    );
+    assert.match(
+      String(
+        probeSqlRejection(database, () => {
+          database
+            .prepare(
+              `UPDATE build_lineage_entries SET created_at = ?
+               WHERE account_id = ? AND project_id = ? AND lineage_id = ? AND ordinal = 2`,
+            )
+            .run("2026-08-25T02:05:00.000Z", tenant.accountId, tenant.projectId, lineageId);
+        }),
+      ),
+      /Build lineage entries are immutable/i,
+    );
+    assert.match(
+      String(
+        probeSqlRejection(database, () => {
+          database
+            .prepare(
+              `DELETE FROM build_lineage_entries
+               WHERE account_id = ? AND project_id = ? AND lineage_id = ? AND ordinal = 2`,
+            )
+            .run(tenant.accountId, tenant.projectId, lineageId);
+        }),
+      ),
+      /Build lineage entries are append-only/i,
+    );
+
+    createBug(database, tenant, bugId, "One occurrence append Event");
+    for (const [index, scenario] of inactivePrincipalCases.entries()) {
+      const rejection = probeSqlRejection(database, () => {
+        scenario.mutate();
+        appendOccurrenceEvidence(
+          database,
+          tenant,
+          bugId,
+          identifier(5_130 + index * 3),
+          identifier(5_131 + index * 3),
+          identifier(5_132 + index * 3),
+          `2026-08-25T02:05:${10 + index}.000Z`,
+          1,
+          2,
+          secondBuildId,
+          10 + index,
+        );
+      });
+      assert.match(
+        String(rejection),
+        /occurrence\.appended Event requires one same-scope persisted Occurrence/i,
+        `${scenario.label} appended occurrence evidence`,
+      );
+    }
+    appendOccurrenceEvidence(
+      database,
+      tenant,
+      bugId,
+      occurrenceId,
+      submissionId,
+      occurrenceEventId,
+      "2026-08-25T02:06:00.000Z",
+      1,
+      2,
+      secondBuildId,
+      1,
+    );
+    const duplicateOccurrence = probeSqlRejection(database, () => {
+      insertOccurrenceAppendEvent(
+        database,
+        tenant,
+        bugId,
+        occurrenceId,
+        duplicateEventId,
+        "2026-08-25T02:06:00.000Z",
+        1,
+        2,
+        2,
+      );
+    });
+    assert.match(
+      String(duplicateOccurrence),
+      /UNIQUE constraint failed: events\.account_id, events\.project_id, events\.resource_type, events\.resource_id/i,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 never reopens a no-Build closure from a later ranked Build occurrence", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_300, "NBR");
+    const bugId = identifier(5_310);
+    const attemptId = identifier(5_311);
+    const requirementId = identifier(5_312);
+    const verificationId = identifier(5_313);
+    const startEventId = identifier(5_314);
+    const closeEventId = identifier(5_315);
+    const buildId = identifier(5_316);
+    const lineageId = identifier(5_317);
+    const lineageEventId = identifier(5_318);
+    const occurrenceId = identifier(5_319);
+    const submissionId = identifier(5_320);
+    const occurrenceEventId = identifier(5_321);
+    const reopenEventId = identifier(5_322);
+    const verificationCreatedAt = "2026-08-25T01:00:00.000Z";
+    const verificationStartedAt = "2026-08-25T01:10:00.000Z";
+    const closedAt = "2026-08-25T01:20:00.000Z";
+    const occurredAt = "2026-08-25T01:40:00.000Z";
+    const reopenedAt = "2026-08-25T01:50:00.000Z";
+    createBug(database, tenant, bugId, "No-Build closure cannot gain a Build baseline");
+    seedTypedNoBuildRfvWorkflow(database, tenant, bugId, attemptId, requirementId, 5_330);
+    insertVerification(
+      database,
+      tenant,
+      bugId,
+      attemptId,
+      verificationId,
+      tenant.userId,
+      null,
+      verificationCreatedAt,
+      identifier(5_339),
+    );
+    database
+      .prepare(
+        `UPDATE bugs SET active_verification_id = ?, updated_at = ?, version = 5
+         WHERE id = ? AND version = 4`,
+      )
+      .run(verificationId, verificationCreatedAt, bugId);
+    insertVerificationStartEvent(
+      database,
+      tenant,
+      bugId,
+      verificationId,
+      startEventId,
+      verificationStartedAt,
+      2,
+    );
+    database
+      .prepare(
+        `UPDATE verifications SET status = 'in_progress', updated_at = ?, version = 2
+         WHERE id = ? AND version = 1`,
+      )
+      .run(verificationStartedAt, verificationId);
+    transaction(database, () => {
+      insertVerificationClosureEvent(
+        database,
+        tenant,
+        bugId,
+        attemptId,
+        verificationId,
+        closeEventId,
+        closedAt,
+        null,
+        3,
+      );
+      database
+        .prepare(
+          `UPDATE verifications
+           SET status = 'passed', result_summary = 'Human verification passed',
+               updated_at = ?, version = 3
+           WHERE id = ? AND version = 2`,
+        )
+        .run(closedAt, verificationId);
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'closed', active_repair_attempt_id = NULL,
+               active_verification_id = NULL, closed_at = ?, updated_at = ?, version = 6
+           WHERE id = ? AND version = 5`,
+        )
+        .run(closedAt, closedAt, bugId);
+    });
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT baseline_kind AS baselineKind, baseline_build_id AS baselineBuildId
+             FROM bug_closure_acceptances WHERE bug_id = ?`,
+          )
+          .get(bugId),
+      },
+      { baselineBuildId: null, baselineKind: "no_build" },
+    );
+
+    insertReleaseManagerMembership(database, tenant, identifier(5_323));
+    insertReadyBuild(database, tenant, buildId, "4".repeat(40), ["4".repeat(40)]);
+    insertBuildLineage(database, tenant, lineageId, "2026-08-25T01:30:00.000Z");
+    insertBuildLineageEntry(
+      database,
+      tenant,
+      lineageId,
+      buildId,
+      null,
+      1,
+      lineageEventId,
+      "2026-08-25T01:31:00.000Z",
+    );
+    appendOccurrenceEvidence(
+      database,
+      tenant,
+      bugId,
+      occurrenceId,
+      submissionId,
+      occurrenceEventId,
+      occurredAt,
+      6,
+      7,
+      buildId,
+      2,
+    );
+    const rejection = probeSqlRejection(database, () => {
+      insertReopenEvent(database, tenant, bugId, occurrenceId, reopenEventId, reopenedAt, 7, 8, 3);
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'ready', closed_at = NULL, reopen_count = 1,
+               updated_at = ?, version = 8
+           WHERE id = ? AND version = 7`,
+        )
+        .run(reopenedAt, bugId);
+    });
+    assert.match(String(rejection), /later same-lineage server-ranked Build occurrence/i);
+    assert.deepEqual(
+      { ...database.prepare("SELECT state, version FROM bugs WHERE id = ?").get(bugId) },
+      { state: "closed", version: 7 },
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 rejects a naked Bug workflow jump without its typed audit Event", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_600, "FAP");
+    const bugId = identifier(4_610);
+    createBug(database, tenant, bugId, "Typed workflow defense Bug");
+
+    const rejection = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE bugs
+           SET state = 'deferred', updated_at = ?, version = 2
+           WHERE id = ? AND version = 1`,
+        )
+        .run(UPDATED_AT, bugId);
+    });
+    assert.match(String(rejection), /Bug state transition requires its exact typed human audit/i);
+    assert.deepEqual(
+      { ...database.prepare("SELECT state, version FROM bugs WHERE id = ?").get(bugId) },
+      { state: "reported", version: 1 },
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 rejects naked same-state pointers and lifecycle shortcut DML", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_700, "DML");
+    const runningBugId = identifier(4_710);
+    const runningAttemptId = identifier(4_711);
+    createBug(database, tenant, runningBugId, "Running DML defense Bug");
+    seedTypedRunningWorkflow(database, tenant, runningBugId, runningAttemptId, 4_720);
+
+    const pointerClear = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE bugs
+           SET active_repair_attempt_id = NULL, updated_at = ?, version = 4
+           WHERE id = ? AND version = 3`,
+        )
+        .run("2026-08-25T00:35:00.000Z", runningBugId);
+    });
+    assert.match(String(pointerClear), /same-state workflow pointers require their exact typed/i);
+
+    const skippedAttemptVersion = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE repair_attempts
+           SET updated_at = ?, version = 99
+           WHERE id = ? AND version = 2`,
+        )
+        .run("2026-08-25T00:35:00.000Z", runningAttemptId);
+    });
+    assert.match(
+      String(skippedAttemptVersion),
+      /RepairAttempt lifecycle requires a forward exact-CAS/i,
+    );
+
+    const nakedDelivery = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE repair_attempts
+           SET status = 'delivered', summary = 'Naked delivery',
+               no_code_reason = 'No executable change', updated_at = ?, version = 3
+           WHERE id = ? AND version = 2`,
+        )
+        .run("2026-08-25T00:35:00.000Z", runningAttemptId);
+    });
+    assert.match(String(nakedDelivery), /RepairAttempt lifecycle requires a forward exact-CAS/i);
+
+    const terminalBugId = identifier(4_712);
+    const terminalAttemptId = identifier(4_713);
+    createBug(database, tenant, terminalBugId, "Terminal insert defense Bug");
+    const terminalInsert = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `INSERT INTO repair_attempts(
+            id, account_id, project_id, bug_id, sequence, mode, status,
+            assignee_id, summary, no_code_reason, created_at, updated_at, version
+          ) VALUES (?, ?, ?, ?, 1, 'human', 'delivered', ?, 'Forged terminal',
+            'No executable change', ?, ?, 3)`,
+        )
+        .run(
+          terminalAttemptId,
+          tenant.accountId,
+          tenant.projectId,
+          terminalBugId,
+          tenant.userId,
+          UPDATED_AT,
+          UPDATED_AT,
+        );
+    });
+    assert.match(
+      String(terminalInsert),
+      /RepairAttempt must begin as one neutral planned version-one fact/i,
+    );
+
+    const rfvBugId = identifier(4_714);
+    const deliveredAttemptId = identifier(4_715);
+    const requirementId = identifier(4_716);
+    const verificationId = identifier(4_717);
+    createBug(database, tenant, rfvBugId, "RFV DML defense Bug");
+    seedTypedNoBuildRfvWorkflow(
+      database,
+      tenant,
+      rfvBugId,
+      deliveredAttemptId,
+      requirementId,
+      4_730,
+    );
+
+    const evidenceRewrite = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE repair_attempts
+           SET summary = 'Rewritten delivery evidence', updated_at = ?, version = 4
+           WHERE id = ? AND version = 3`,
+        )
+        .run("2026-08-25T00:45:00.000Z", deliveredAttemptId);
+    });
+    assert.match(String(evidenceRewrite), /immutable delivery evidence|RepairAttempt lifecycle/i);
+
+    const nakedVerificationPointer = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE bugs
+           SET active_verification_id = ?, updated_at = ?, version = 5
+           WHERE id = ? AND version = 4`,
+        )
+        .run(identifier(4_719), "2026-08-25T00:45:00.000Z", rfvBugId);
+    });
+    assert.match(
+      String(nakedVerificationPointer),
+      /same-state workflow pointers require their exact typed|FOREIGN KEY constraint/i,
+    );
+
+    const directPassedVerification = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `INSERT INTO verifications(
+            id, account_id, project_id, bug_id, repair_attempt_id, status,
+            verifier_id, criteria_snapshot, result_summary, created_at, updated_at, version
+          ) VALUES (?, ?, ?, ?, ?, 'passed', ?, 'Forged criteria', 'Forged pass', ?, ?, 2)`,
+        )
+        .run(
+          identifier(4_718),
+          tenant.accountId,
+          tenant.projectId,
+          rfvBugId,
+          deliveredAttemptId,
+          tenant.userId,
+          "2026-08-25T00:45:00.000Z",
+          "2026-08-25T00:45:00.000Z",
+        );
+    });
+    assert.match(
+      String(directPassedVerification),
+      /Verification must begin as one requested version-one fact/i,
+    );
+
+    insertVerification(
+      database,
+      tenant,
+      rfvBugId,
+      deliveredAttemptId,
+      verificationId,
+      tenant.userId,
+      null,
+      "2026-08-25T00:50:00.000Z",
+      identifier(4_739),
+    );
+    database
+      .prepare(
+        `UPDATE bugs
+         SET active_verification_id = ?, updated_at = ?, version = 5
+         WHERE id = ? AND version = 4`,
+      )
+      .run(verificationId, "2026-08-25T00:50:00.000Z", rfvBugId);
+    const nakedVerificationClear = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE bugs
+           SET active_verification_id = NULL, updated_at = ?, version = 6
+           WHERE id = ? AND version = 5`,
+        )
+        .run("2026-08-25T00:55:00.000Z", rfvBugId);
+    });
+    assert.match(
+      String(nakedVerificationClear),
+      /same-state workflow pointers require their exact typed/i,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 allows only exact vendor supersede and blocked Verification pointer changes", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_800, "PTR");
+    const vendorBugId = identifier(4_810);
+    const replacedAttemptId = identifier(4_811);
+    const successorAttemptId = identifier(4_812);
+    const supersedeEventId = identifier(4_829);
+    const supersededAt = "2026-08-25T00:40:00.000Z";
+    createBug(database, tenant, vendorBugId, "Vendor successor pointer Bug");
+    seedTypedRunningWorkflow(database, tenant, vendorBugId, replacedAttemptId, 4_820);
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: replacedAttemptId,
+      aggregateSequence: 3,
+      aggregateType: "repair_attempt",
+      bugId: vendorBugId,
+      createdAt: supersededAt,
+      eventId: supersedeEventId,
+      eventType: "repair_attempt.superseded",
+      fromState: null,
+      payload: {
+        status: "superseded",
+        repairAttemptId: replacedAttemptId,
+        reason: "Replace vendor execution",
+        fromVersion: 2,
+        toVersion: 3,
+      },
+      resourceId: replacedAttemptId,
+      resourceType: "repair_attempt",
+      resourceVersionAfter: 3,
+      toState: null,
+    });
+    database
+      .prepare(
+        `UPDATE repair_attempts SET status = 'superseded', updated_at = ?, version = 3
+         WHERE id = ? AND version = 2`,
+      )
+      .run(supersededAt, replacedAttemptId);
+    database
+      .prepare(
+        `INSERT INTO repair_attempts(
+          id, account_id, project_id, bug_id, sequence, mode, status,
+          assignee_id, parent_attempt_id, created_at, updated_at, version
+        ) VALUES (?, ?, ?, ?, 2, 'human', 'planned', ?, ?, ?, ?, 1)`,
+      )
+      .run(
+        successorAttemptId,
+        tenant.accountId,
+        tenant.projectId,
+        vendorBugId,
+        tenant.userId,
+        replacedAttemptId,
+        supersededAt,
+        supersededAt,
+      );
+    database
+      .prepare(
+        `UPDATE bugs SET active_repair_attempt_id = ?, updated_at = ?, version = 4
+         WHERE id = ? AND version = 3`,
+      )
+      .run(successorAttemptId, supersededAt, vendorBugId);
+    assert.equal(
+      database.prepare("SELECT active_repair_attempt_id FROM bugs WHERE id = ?").get(vendorBugId)
+        ?.active_repair_attempt_id,
+      successorAttemptId,
+    );
+
+    const blockedBugId = identifier(4_813);
+    const deliveredAttemptId = identifier(4_814);
+    const requirementId = identifier(4_815);
+    const verificationId = identifier(4_816);
+    createBug(database, tenant, blockedBugId, "Blocked Verification pointer Bug");
+    seedTypedNoBuildRfvWorkflow(
+      database,
+      tenant,
+      blockedBugId,
+      deliveredAttemptId,
+      requirementId,
+      4_840,
+    );
+    insertVerification(
+      database,
+      tenant,
+      blockedBugId,
+      deliveredAttemptId,
+      verificationId,
+      tenant.userId,
+      null,
+      "2026-08-25T00:50:00.000Z",
+      identifier(4_847),
+    );
+    database
+      .prepare(
+        `UPDATE bugs SET active_verification_id = ?, updated_at = ?, version = 5
+         WHERE id = ? AND version = 4`,
+      )
+      .run(verificationId, "2026-08-25T00:50:00.000Z", blockedBugId);
+    insertVerificationStartEvent(
+      database,
+      tenant,
+      blockedBugId,
+      verificationId,
+      identifier(4_848),
+      "2026-08-25T01:00:00.000Z",
+      2,
+    );
+    database
+      .prepare(
+        `UPDATE verifications SET status = 'in_progress', updated_at = ?, version = 2
+         WHERE id = ? AND version = 1`,
+      )
+      .run("2026-08-25T01:00:00.000Z", verificationId);
+    const blockedAt = "2026-08-25T01:10:00.000Z";
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: verificationId,
+      aggregateSequence: 3,
+      aggregateType: "verification",
+      bugId: blockedBugId,
+      createdAt: blockedAt,
+      eventId: identifier(4_849),
+      eventType: "verification.result_recorded",
+      fromState: "ready_for_verification",
+      payload: {
+        status: "blocked",
+        summary: "Environment unavailable",
+        reason: "Test device unavailable",
+        verificationId,
+        repairAttemptId: deliveredAttemptId,
+        fromVersion: 2,
+        toVersion: 3,
+      },
+      resourceId: verificationId,
+      resourceType: "verification",
+      resourceVersionAfter: 3,
+      toState: "ready_for_verification",
+    });
+    database
+      .prepare(
+        `UPDATE verifications
+         SET status = 'blocked', result_summary = 'Environment unavailable',
+             blocked_reason = 'Test device unavailable', updated_at = ?, version = 3
+         WHERE id = ? AND version = 2`,
+      )
+      .run(blockedAt, verificationId);
+    database
+      .prepare(
+        `UPDATE bugs SET active_verification_id = NULL, updated_at = ?, version = 6
+         WHERE id = ? AND version = 5`,
+      )
+      .run(blockedAt, blockedBugId);
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT state, active_repair_attempt_id AS activeRepairAttemptId,
+                    active_verification_id AS activeVerificationId, version
+             FROM bugs WHERE id = ?`,
+          )
+          .get(blockedBugId),
+      },
+      {
+        activeRepairAttemptId: deliveredAttemptId,
+        activeVerificationId: null,
+        state: "ready_for_verification",
+        version: 6,
+      },
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 rejects duplicate cycles, canonical repoints, and disabled workflow actors", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_900, "DUP");
+    const canonicalBugId = identifier(4_910);
+    const duplicateBugId = identifier(4_911);
+    const alternateBugId = identifier(4_912);
+    const actorBugId = identifier(4_913);
+    createBug(database, tenant, canonicalBugId, "Canonical Bug");
+    createBug(database, tenant, duplicateBugId, "Duplicate Bug");
+    createBug(database, tenant, alternateBugId, "Alternate canonical Bug");
+    createBug(database, tenant, actorBugId, "Disabled actor Bug");
+    insertActiveMembershipRole(database, tenant, identifier(4_920), "triager");
+
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: duplicateBugId,
+      aggregateSequence: 1,
+      aggregateType: "bug",
+      bugId: duplicateBugId,
+      createdAt: "2026-08-25T00:10:00.000Z",
+      eventId: identifier(4_921),
+      eventType: "bug.mark_duplicate",
+      fromState: "reported",
+      payload: {
+        status: "duplicate",
+        relatedBugId: canonicalBugId,
+        reason: "Same regression",
+        fromVersion: 1,
+        toVersion: 2,
+      },
+      resourceId: duplicateBugId,
+      resourceType: "bug",
+      resourceVersionAfter: 2,
+      toState: "duplicate",
+    });
+    database
+      .prepare(
+        `UPDATE bugs SET state = 'duplicate', duplicate_of_bug_id = ?, updated_at = ?, version = 2
+         WHERE id = ? AND version = 1`,
+      )
+      .run(canonicalBugId, "2026-08-25T00:10:00.000Z", duplicateBugId);
+
+    const canonicalRepoint = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `UPDATE bugs SET duplicate_of_bug_id = ?, updated_at = ?, version = 3
+           WHERE id = ? AND version = 2`,
+        )
+        .run(alternateBugId, "2026-08-25T00:20:00.000Z", duplicateBugId);
+    });
+    assert.match(
+      String(canonicalRepoint),
+      /same-state workflow pointers require their exact typed/i,
+    );
+
+    const cycle = probeSqlRejection(database, () => {
+      insertBugWorkflowEvent(database, tenant, {
+        aggregateId: canonicalBugId,
+        aggregateSequence: 1,
+        aggregateType: "bug",
+        bugId: canonicalBugId,
+        createdAt: "2026-08-25T00:30:00.000Z",
+        eventId: identifier(4_922),
+        eventType: "bug.mark_duplicate",
+        fromState: "reported",
+        payload: {
+          status: "duplicate",
+          relatedBugId: duplicateBugId,
+          reason: "Cycle attempt",
+          fromVersion: 1,
+          toVersion: 2,
+        },
+        resourceId: canonicalBugId,
+        resourceType: "bug",
+        resourceVersionAfter: 2,
+        toState: "duplicate",
+      });
+      database
+        .prepare(
+          `UPDATE bugs SET state = 'duplicate', duplicate_of_bug_id = ?, updated_at = ?, version = 2
+           WHERE id = ? AND version = 1`,
+        )
+        .run(duplicateBugId, "2026-08-25T00:30:00.000Z", canonicalBugId);
+    });
+    assert.match(String(cycle), /canonical chain must remain acyclic/i);
+
+    database
+      .prepare(
+        `UPDATE users SET status = 'disabled', updated_at = ?, version = 2
+         WHERE id = ? AND version = 1`,
+      )
+      .run("2026-08-25T00:40:00.000Z", tenant.userId);
+    const disabledActor = probeSqlRejection(database, () => {
+      insertBugWorkflowEvent(database, tenant, {
+        aggregateId: actorBugId,
+        aggregateSequence: 1,
+        aggregateType: "bug",
+        bugId: actorBugId,
+        createdAt: "2026-08-25T00:50:00.000Z",
+        eventId: identifier(4_923),
+        eventType: "bug.triage.ready",
+        fromState: "reported",
+        payload: { status: "ready", fromVersion: 1, toVersion: 2 },
+        resourceId: actorBugId,
+        resourceType: "bug",
+        resourceVersionAfter: 2,
+        toState: "ready",
+      });
+      database
+        .prepare(
+          `UPDATE bugs SET state = 'ready', updated_at = ?, version = 2
+           WHERE id = ? AND version = 1`,
+        )
+        .run("2026-08-25T00:50:00.000Z", actorBugId);
+    });
+    assert.match(
+      String(disabledActor),
+      /Bug state transition requires its exact typed human audit/i,
+    );
+    assert.deepEqual(
+      { ...database.prepare("SELECT state, version FROM bugs WHERE id = ?").get(actorBugId) },
+      { state: "reported", version: 1 },
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 rejects raw secrets in Event text while accepting explicit redaction", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 4_950, "PRV");
+    const bugId = identifier(4_960);
+    const eventId = identifier(4_961);
+    const createdAt = "2026-08-25T01:20:00.000Z";
+    createBug(database, tenant, bugId, "Event privacy policy Bug");
+
+    for (const [index, rawSensitiveText] of [
+      "Authorization: Bearer raw-test-token",
+      "passwd=abc",
+      "cookie=session",
+      "apiKey=abc",
+      "x-api-key: abc",
+      "pwd=abc",
+      "https://user:pass@example.invalid/private",
+      "eyJabcdefgh.abcdef.abcdef",
+    ].entries()) {
+      const rejection = probeSqlRejection(database, () => {
+        insertBugWorkflowEvent(database, tenant, {
+          aggregateId: bugId,
+          aggregateSequence: index + 1,
+          aggregateType: "bug",
+          bugId,
+          createdAt,
+          eventId: identifier(4_970 + index),
+          eventType: "audit.redaction.checked",
+          fromState: null,
+          payload: {
+            reason: rawSensitiveText,
+            fromVersion: 1,
+            toVersion: 1,
+          },
+          resourceId: bugId,
+          resourceType: "bug",
+          resourceVersionAfter: 1,
+          toState: null,
+        });
+      });
+      assert.match(
+        String(rejection),
+        /event payload violates bounded redacted audit policy/i,
+        `${rawSensitiveText} bypassed raw-DML Event privacy`,
+      );
+    }
+
+    const rawWindowsPath = probeSqlRejection(database, () => {
+      insertBugWorkflowEvent(database, tenant, {
+        aggregateId: bugId,
+        aggregateSequence: 2,
+        aggregateType: "bug",
+        bugId,
+        createdAt,
+        eventId: identifier(4_962),
+        eventType: "audit.redaction.checked",
+        fromState: null,
+        payload: {
+          reason: "C:\\Users\\qa\\private-capture.png",
+          fromVersion: 1,
+          toVersion: 1,
+        },
+        resourceId: bugId,
+        resourceType: "bug",
+        resourceVersionAfter: 1,
+        toState: null,
+      });
+    });
+    assert.match(String(rawWindowsPath), /event payload violates bounded redacted audit policy/i);
+
+    const rawSecretInStructuredKey = probeSqlRejection(database, () => {
+      insertBugWorkflowEvent(database, tenant, {
+        aggregateId: bugId,
+        aggregateSequence: 3,
+        aggregateType: "bug",
+        bugId,
+        createdAt,
+        eventId: identifier(4_963),
+        eventType: "audit.redaction.checked",
+        fromState: null,
+        payload: {
+          status: "Authorization: Bearer raw-status-token",
+          fromVersion: 1,
+          toVersion: 1,
+        },
+        resourceId: bugId,
+        resourceType: "bug",
+        resourceVersionAfter: 1,
+        toState: null,
+      });
+    });
+    assert.match(
+      String(rawSecretInStructuredKey),
+      /event payload violates bounded redacted audit policy/i,
+    );
+
+    insertBugWorkflowEvent(database, tenant, {
+      aggregateId: bugId,
+      aggregateSequence: 1,
+      aggregateType: "bug",
+      bugId,
+      createdAt,
+      eventId,
+      eventType: "audit.redaction.checked",
+      fromState: null,
+      payload: { reason: "[REDACTED]", fromVersion: 1, toVersion: 1 },
+      resourceId: bugId,
+      resourceType: "bug",
+      resourceVersionAfter: 1,
+      toState: null,
+    });
+    assert.equal(
+      database
+        .prepare("SELECT json_extract(payload_json, '$.reason') AS reason FROM events WHERE id = ?")
+        .get(eventId)?.reason,
+      "[REDACTED]",
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 enforces the frozen 16-key Event payload boundary for raw DML", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_000, "EVP");
+    const bugId = identifier(5_010);
+    const createdAt = "2026-08-25T01:30:00.000Z";
+    const validUuidV7 = "11111111-1111-7111-8111-111111111111";
+    createBug(database, tenant, bugId, "Frozen Event payload Bug");
+
+    const insertRawEvent = database.prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+        resource_type, resource_id, resource_version_after, correlation_id,
+        payload_json, created_at
+      ) VALUES (
+        ?, ?, ?, ?, 'audit.payload.checked', 'qa_hub', 'user', ?,
+        'bug', ?, ?, 'bug', ?, 1, ?, ?, ?
+      )`,
+    );
+    const insertPayload = (
+      eventId: string,
+      aggregateSequence: number,
+      payloadJson: string,
+    ): void => {
+      insertRawEvent.run(
+        eventId,
+        tenant.accountId,
+        tenant.projectId,
+        bugId,
+        tenant.userId,
+        bugId,
+        aggregateSequence,
+        bugId,
+        identifier(5_999),
+        payloadJson,
+        createdAt,
+      );
+    };
+
+    const validPayload = {
+      summary: "Frozen payload accepted",
+      reason: "All typed fields are valid",
+      status: "ready_for_verification",
+      relatedBugId: validUuidV7,
+      repairAttemptId: validUuidV7,
+      buildId: validUuidV7,
+      verificationId: validUuidV7,
+      attachmentId: validUuidV7,
+      captureId: validUuidV7,
+      handoffId: validUuidV7,
+      commentId: validUuidV7,
+      occurrenceId: validUuidV7,
+      commitSha: "a".repeat(40),
+      attachmentCount: 20,
+      fromVersion: 1,
+      toVersion: 2,
+    };
+    const validEventId = identifier(5_120);
+    insertPayload(validEventId, 1, JSON.stringify(validPayload));
+    assert.deepEqual(
+      JSON.parse(
+        String(
+          database.prepare("SELECT payload_json FROM events WHERE id = ?").get(validEventId)
+            ?.payload_json,
+        ),
+      ),
+      validPayload,
+    );
+
+    const invalidPayloads: readonly (readonly [string, string])[] = [
+      ["extra key", JSON.stringify({ status: "ready", actorId: validUuidV7 })],
+      ["duplicate key", '{"status":"ready","status":"closed"}'],
+      ["null value", JSON.stringify({ reason: null })],
+      ["status type", JSON.stringify({ status: 1 })],
+      ["status pattern", JSON.stringify({ status: "ready-for-verification" })],
+      ["non-UUID reference", JSON.stringify({ relatedBugId: "not-a-uuid" })],
+      [
+        "UUID v0 reference",
+        JSON.stringify({ relatedBugId: "11111111-1111-0111-8111-111111111111" }),
+      ],
+      [
+        "UUID v9 reference",
+        JSON.stringify({ relatedBugId: "11111111-1111-9111-8111-111111111111" }),
+      ],
+      [
+        "UUID bad variant",
+        JSON.stringify({ relatedBugId: "11111111-1111-7111-7111-111111111111" }),
+      ],
+      ["uppercase commit SHA", JSON.stringify({ commitSha: "A".repeat(40) })],
+      ["non-hex commit SHA", JSON.stringify({ commitSha: "g".repeat(40) })],
+      ["fractional attachment count", JSON.stringify({ attachmentCount: 1.5 })],
+      ["negative attachment count", JSON.stringify({ attachmentCount: -1 })],
+      ["oversized attachment count", JSON.stringify({ attachmentCount: 21 })],
+      ["non-positive fromVersion", JSON.stringify({ fromVersion: 0 })],
+      ["fractional fromVersion", JSON.stringify({ fromVersion: 1.5 })],
+      ["non-positive toVersion", JSON.stringify({ toVersion: 0 })],
+      ["fractional toVersion", JSON.stringify({ toVersion: 1.5 })],
+    ];
+    const payloadPolicyError = /(?:event payload violates .*audit|event payload.*frozen)/i;
+    for (const [index, [label, payloadJson]] of invalidPayloads.entries()) {
+      const rejection = probeSqlRejection(database, () => {
+        insertPayload(identifier(5_130 + index), index + 2, payloadJson);
+      });
+      assert.notEqual(rejection, undefined, `${label} bypassed the frozen Event payload boundary`);
+      assert.match(String(rejection), payloadPolicyError, label);
+    }
+
+    assert.equal(
+      database
+        .prepare(
+          `SELECT count(*) AS count FROM events
+           WHERE account_id = ? AND aggregate_type = 'bug' AND aggregate_id = ?`,
+        )
+        .get(tenant.accountId, bugId)?.count,
+      1,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 requires current reporter authority for an occurrence append Event", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_200, "ORP");
+    const bugId = identifier(5_210);
+    const occurrenceId = identifier(5_211);
+    const submissionId = identifier(5_212);
+    const eventId = identifier(5_213);
+    const createdAt = "2026-08-25T01:40:00.000Z";
+    createBug(database, tenant, bugId, "Viewer cannot append an Occurrence");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(5_214),
+      "viewer",
+      tenant.secondaryUserId,
+    );
+    database
+      .prepare(
+        `INSERT INTO occurrences(
+          id, account_id, project_id, bug_id, reporter_id, client_submission_id,
+          observed_at, platform, steps_json, actual_behavior, environment_json,
+          created_at, version
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'android', ?, ?, NULL, ?, 1)`,
+      )
+      .run(
+        occurrenceId,
+        tenant.accountId,
+        tenant.projectId,
+        bugId,
+        tenant.secondaryUserId,
+        submissionId,
+        createdAt,
+        JSON.stringify(["Observe without reporter authority"]),
+        "Viewer-only evidence must not become an append Event",
+        createdAt,
+      );
+
+    const viewerAppend = probeSqlRejection(database, () => {
+      database
+        .prepare(
+          `INSERT INTO events(
+            id, account_id, project_id, bug_id, type, source, actor_type,
+            actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+            resource_type, resource_id, resource_version_after, request_digest,
+            correlation_id, payload_json, created_at
+          ) VALUES (
+            ?, ?, ?, ?, 'occurrence.appended', 'qa_hub', 'user', ?,
+            'bug', ?, 1, 'occurrence', ?, 1, ?, ?, ?, ?
+          )`,
+        )
+        .run(
+          eventId,
+          tenant.accountId,
+          tenant.projectId,
+          bugId,
+          tenant.secondaryUserId,
+          bugId,
+          occurrenceId,
+          digest(5_213),
+          identifier(5_215),
+          JSON.stringify({ occurrenceId, fromVersion: 1, toVersion: 2 }),
+          createdAt,
+        );
+    });
+    assert.match(
+      String(viewerAppend),
+      /occurrence\.appended Event requires one same-scope persisted Occurrence/i,
+    );
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM events WHERE id = ?").get(eventId)?.count,
+      0,
+    );
+    assert.equal(
+      database
+        .prepare(
+          "SELECT count(*) AS count FROM occurrence_build_lineage_facts WHERE occurrence_id = ?",
+        )
+        .get(occurrenceId)?.count,
+      0,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("forward v3 requires developer authority for a RepairAttempt assignee", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_300, "RDA");
+    const bugId = identifier(5_310);
+    const attemptId = identifier(5_311);
+    const eventId = identifier(5_312);
+    const createdAt = "2026-08-25T01:50:00.000Z";
+    createBug(database, tenant, bugId, "Verifier-only assignee is not a developer");
+    insertActiveMembershipRole(database, tenant, identifier(5_313), "developer");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(5_314),
+      "verifier",
+      tenant.secondaryUserId,
+    );
+
+    const verifierOnlyAssignee = probeSqlRejection(database, () => {
+      insertBugWorkflowEvent(database, tenant, {
+        aggregateId: attemptId,
+        aggregateSequence: 1,
+        aggregateType: "repair_attempt",
+        bugId,
+        createdAt,
+        eventId,
+        eventType: "repair_attempt.created",
+        fromState: "ready",
+        payload: { status: "planned", repairAttemptId: attemptId, fromVersion: 1, toVersion: 2 },
+        resourceId: attemptId,
+        resourceType: "repair_attempt",
+        resourceVersionAfter: 1,
+        toState: "in_progress",
+      });
+      database
+        .prepare(
+          `INSERT INTO repair_attempts(
+            id, account_id, project_id, bug_id, sequence, mode, status,
+            assignee_id, summary, created_at, updated_at, version
+          ) VALUES (?, ?, ?, ?, 1, 'human', 'planned', ?, ?, ?, ?, 1)`,
+        )
+        .run(
+          attemptId,
+          tenant.accountId,
+          tenant.projectId,
+          bugId,
+          tenant.secondaryUserId,
+          "Verifier-only target",
+          createdAt,
+          createdAt,
+        );
+    });
+    assert.match(
+      String(verifierOnlyAssignee),
+      /RepairAttempt must begin as one neutral planned version-one fact/i,
+    );
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM repair_attempts WHERE id = ?").get(attemptId)
+        ?.count,
+      0,
     );
     assertIntegrity(database);
   });

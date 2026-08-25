@@ -196,21 +196,11 @@ function insertBuildDecisionEvent(
   const requestDigest = "b".repeat(64);
   const deliveredCommitSha = "a".repeat(40);
   const payload = JSON.stringify({
+    status: "delivered",
     repairAttemptId: attemptId,
-    buildRequirementId: requirementId,
-    sourceDeliveryVersion: 1,
-    deliveredCommitSha,
-    requirement: "required",
-    decisionBasis: "code_requires_build",
-    decisionReason: null,
-    actorId: tenant.userId,
-    deliveryRequestDigest: requestDigest,
-    policyVersion: "1.0.0",
-    serverPolicyEvaluatedAtDelivery: true,
-    authorizedNoBuildExemptionAtDelivery: false,
-    noCodeDecisionValidatedAtDelivery: false,
-    committed: true,
-    atomicWithDelivery: true,
+    commitSha: deliveredCommitSha,
+    fromVersion: 2,
+    toVersion: 3,
   });
 
   database
@@ -221,7 +211,7 @@ function insertBuildDecisionEvent(
         resource_type, resource_id, resource_version_after, request_digest,
         correlation_id, payload_json, created_at
       ) VALUES (
-        ?, ?, ?, ?, 'repair.delivered', 'qa_hub', 'user', ?,
+        ?, ?, ?, ?, 'repair_attempt.delivered', 'qa_hub', 'user', ?,
         'repair_attempt', ?, 1, 'build_requirement', ?, 1, ?, ?, ?, ?
       )`,
     )
@@ -246,23 +236,121 @@ function insertRepairAttempt(
   bugId: string,
   attemptId: string,
 ): void {
+  const attemptSequence = Number(attemptId.slice(-12));
+  const membershipId = identifier(8_000_000 + attemptSequence);
+  const createdAt = "2026-08-24T23:58:00.000Z";
+  const startedAt = "2026-08-24T23:59:00.000Z";
+  database
+    .prepare(
+      `INSERT INTO memberships(
+        id, account_id, project_id, user_id, status, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`,
+    )
+    .run(membershipId, tenant.accountId, tenant.projectId, tenant.userId, createdAt, createdAt);
+  database
+    .prepare(
+      `INSERT INTO membership_roles(
+        account_id, project_id, membership_id, role, granted_at
+      ) VALUES (?, ?, ?, 'developer', ?)`,
+    )
+    .run(tenant.accountId, tenant.projectId, membershipId, createdAt);
+  const insertLifecycleEvent = database.prepare(
+    `INSERT INTO events(
+      id, account_id, project_id, bug_id, type, source, actor_type,
+      actor_user_id, aggregate_type, aggregate_id, aggregate_sequence,
+      resource_type, resource_id, resource_version_after, request_digest,
+      correlation_id, from_state, to_state, payload_json, created_at
+    ) VALUES (
+      ?, ?, ?, ?, ?, 'qa_hub', 'user', ?, 'repair_attempt', ?, ?,
+      ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )`,
+  );
+  insertLifecycleEvent.run(
+    identifier(8_100_000 + attemptSequence * 10 + 1),
+    tenant.accountId,
+    tenant.projectId,
+    bugId,
+    "repair_attempt.created",
+    tenant.userId,
+    attemptId,
+    80_000_000 + attemptSequence * 10 + 1,
+    "repair_attempt",
+    attemptId,
+    1,
+    "c".repeat(64),
+    identifier(8_200_000 + attemptSequence * 10 + 1),
+    "ready",
+    "in_progress",
+    JSON.stringify({ status: "planned", repairAttemptId: attemptId, fromVersion: 1, toVersion: 2 }),
+    createdAt,
+  );
   database
     .prepare(
       `INSERT INTO repair_attempts(
         id, account_id, project_id, bug_id, sequence, mode, status,
-        assignee_id, commit_sha, created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, 1, 'human', 'delivered', ?, ?, ?, ?, 1)`,
+        assignee_id, summary, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 1, 'human', 'planned', ?, 'Fixture repair', ?, ?, 1)`,
     )
-    .run(
-      attemptId,
-      tenant.accountId,
-      tenant.projectId,
-      bugId,
-      tenant.userId,
-      "a".repeat(40),
-      STAMP,
-      STAMP,
-    );
+    .run(attemptId, tenant.accountId, tenant.projectId, bugId, tenant.userId, createdAt, createdAt);
+  insertLifecycleEvent.run(
+    identifier(8_100_000 + attemptSequence * 10 + 2),
+    tenant.accountId,
+    tenant.projectId,
+    bugId,
+    "repair_attempt.started",
+    tenant.userId,
+    attemptId,
+    80_000_000 + attemptSequence * 10 + 2,
+    "repair_attempt",
+    attemptId,
+    2,
+    "d".repeat(64),
+    identifier(8_200_000 + attemptSequence * 10 + 2),
+    null,
+    null,
+    JSON.stringify({ status: "running", repairAttemptId: attemptId, fromVersion: 1, toVersion: 2 }),
+    startedAt,
+  );
+  database
+    .prepare(
+      `UPDATE repair_attempts
+       SET status = 'running', updated_at = ?, version = 2
+       WHERE id = ? AND version = 1`,
+    )
+    .run(startedAt, attemptId);
+  insertLifecycleEvent.run(
+    identifier(8_100_000 + attemptSequence * 10 + 3),
+    tenant.accountId,
+    tenant.projectId,
+    bugId,
+    "repair_attempt.delivered",
+    tenant.userId,
+    attemptId,
+    80_000_000 + attemptSequence * 10 + 3,
+    "build_requirement",
+    identifier(8_900_000 + attemptSequence),
+    1,
+    "e".repeat(64),
+    identifier(8_200_000 + attemptSequence * 10 + 3),
+    "in_progress",
+    "awaiting_build",
+    JSON.stringify({
+      status: "delivered",
+      repairAttemptId: attemptId,
+      commitSha: "a".repeat(40),
+      fromVersion: 2,
+      toVersion: 3,
+    }),
+    STAMP,
+  );
+  database
+    .prepare(
+      `UPDATE repair_attempts
+       SET status = 'delivered', summary = 'Fixture delivery', branch = 'main', commit_sha = ?,
+           updated_at = ?, version = 3
+       WHERE id = ? AND version = 2`,
+    )
+    .run("a".repeat(40), STAMP, attemptId);
 }
 
 interface BuildRequirementInput {
@@ -285,6 +373,29 @@ function insertBuildRequirement(
   requirementId: string,
   input: BuildRequirementInput,
 ): void {
+  const membershipId = identifier(Number(requirementId.slice(-12)) + 700_000);
+  database
+    .prepare(
+      `INSERT OR IGNORE INTO memberships(
+        id, account_id, project_id, user_id, status, created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`,
+    )
+    .run(membershipId, tenant.accountId, tenant.projectId, tenant.userId, STAMP, STAMP);
+  const effectiveMembershipId = String(
+    database
+      .prepare(
+        `SELECT id FROM memberships
+         WHERE account_id = ? AND project_id = ? AND user_id = ?`,
+      )
+      .get(tenant.accountId, tenant.projectId, tenant.userId)?.id ?? membershipId,
+  );
+  database
+    .prepare(
+      `INSERT OR IGNORE INTO membership_roles(
+        account_id, project_id, membership_id, role, granted_at
+      ) VALUES (?, ?, ?, 'developer', ?)`,
+    )
+    .run(tenant.accountId, tenant.projectId, effectiveMembershipId, STAMP);
   database
     .prepare(
       `INSERT INTO build_requirements(
@@ -293,7 +404,7 @@ function insertBuildRequirement(
         decision_reason, decision_actor_id, decision_audit_event_id,
         delivery_request_digest, linked_build_id, link_id, policy_version,
         bug_version_at_delivery, created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, '1.0.0', 1, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, 3, ?, ?, ?, ?, ?, ?, ?, ?, ?, '1.0.0', 1, ?, ?, ?)`,
     )
     .run(
       requirementId,
@@ -322,7 +433,7 @@ test("empty migration is repeatable and enables WAL, foreign keys, and integrity
     assert.deepEqual(first, {
       fromVersion: 0,
       toVersion: SQLITE_SCHEMA_VERSION,
-      appliedVersions: [1, 2],
+      appliedVersions: [1, 2, 3],
       backupPath: null,
     });
     assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);
@@ -364,7 +475,10 @@ test("v1 to v2 migration creates a backup and backfills full-text search", async
     createBug(database, tenant, bugId, "Preexisting searchable migration record");
 
     const backupRoot = join(root, "verified-backups");
-    const upgrade = await migrateSqliteDatabase(database, databaseFile, { backupRoot });
+    const upgrade = await migrateSqliteDatabase(database, databaseFile, {
+      backupRoot,
+      targetVersion: 2,
+    });
     assert.deepEqual(upgrade.appliedVersions, [2]);
     assert.equal(upgrade.fromVersion, 1);
     assert.equal(upgrade.toVersion, 2);
@@ -398,7 +512,64 @@ test("v1 to v2 migration creates a backup and backfills full-text search", async
   });
 });
 
-test("two worker upgraders re-read locked history and apply v2 exactly once", async () => {
+test("v2 to v3 adds durable RepairAttempt failure truth without rewriting history", async () => {
+  await withDatabase(async ({ database, databaseFile, root }) => {
+    await migrateSqliteDatabase(database, databaseFile, { targetVersion: 2 });
+    const tenant = seedTenant(database, 150, "FWD");
+    const bugId = identifier(160);
+    const attemptId = identifier(161);
+    createBug(database, tenant, bugId, "Forward failure-reason migration record");
+    insertRepairAttempt(database, tenant, bugId, attemptId);
+
+    const backupRoot = join(root, "v2-backups");
+    const upgrade = await migrateSqliteDatabase(database, databaseFile, {
+      backupRoot,
+      targetVersion: 3,
+    });
+    assert.deepEqual(upgrade.appliedVersions, [3]);
+    assert.equal(upgrade.fromVersion, 2);
+    assert.equal(upgrade.toVersion, 3);
+    assert.ok(upgrade.backupPath);
+    assert.ok(existsSync(upgrade.backupPath));
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM pragma_table_info('repair_attempts') WHERE name = 'failure_reason'",
+        "count",
+      ),
+      1,
+    );
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT status, failure_reason AS failureReason, version
+             FROM repair_attempts WHERE id = ?`,
+          )
+          .get(attemptId),
+      },
+      { failureReason: null, status: "delivered", version: 3 },
+    );
+
+    const backupDatabase = new DatabaseSync(upgrade.backupPath, { readOnly: true });
+    try {
+      assert.equal(numberColumn(backupDatabase, "PRAGMA user_version", "user_version"), 2);
+      assert.equal(
+        numberColumn(
+          backupDatabase,
+          "SELECT count(*) AS count FROM pragma_table_info('repair_attempts') WHERE name = 'failure_reason'",
+          "count",
+        ),
+        0,
+      );
+    } finally {
+      backupDatabase.close();
+    }
+    assert.deepEqual(verifySqliteIntegrity(database).integrityMessages, ["ok"]);
+  });
+});
+
+test("two worker upgraders re-read locked history and apply every pending migration exactly once", async () => {
   const root = mkdtempSync(join(tmpdir(), "relay-qa-hub-upgrade-race-"));
   const databaseFile = join(root, "db", "qa-hub.sqlite");
   const seedDatabase = openSqliteDatabaseForWorker({
@@ -428,7 +599,13 @@ test("two worker upgraders re-read locked history and apply v2 exactly once", as
         .filter((version) => version === 2).length,
       1,
     );
-    assert.ok(reports.every(({ migration }) => migration.toVersion === 2));
+    assert.equal(
+      reports
+        .flatMap(({ migration }) => migration.appliedVersions)
+        .filter((version) => version === 3).length,
+      1,
+    );
+    assert.ok(reports.every(({ migration }) => migration.toVersion === SQLITE_SCHEMA_VERSION));
     assert.ok(
       reports
         .map(({ migration }) => migration.backupPath)
@@ -529,7 +706,7 @@ test("a conflict late in a migration rolls back every object and history change"
     const recovered = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "recovered-upgrade-backups"),
     });
-    assert.deepEqual(recovered.appliedVersions, [2]);
+    assert.deepEqual(recovered.appliedVersions, [2, 3]);
     assert.equal(
       numberColumn(
         database,

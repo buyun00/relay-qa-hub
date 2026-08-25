@@ -3306,6 +3306,32 @@ for (const [operationId, source] of workflowWriteReceiptCases) {
   }
 }
 
+{
+  const policyAllowedSelfVerification = makeWorkflowWriteReceipt("createVerification");
+  const verifierId = policyAllowedSelfVerification.request.verifierId;
+  policyAllowedSelfVerification.repairAttemptFact.attempt.assigneeId = verifierId;
+  policyAllowedSelfVerification.separationOfDutiesFact = {
+    repairAssigneeId: verifierId,
+    verifierId,
+    passed: true,
+  };
+  refreshWorkflowWriteReceipt(policyAllowedSelfVerification);
+  if (
+    evaluateAppFirstBehavior("workflow-write-receipt", policyAllowedSelfVerification) !==
+    "unambiguous"
+  ) {
+    failures.push("createVerification rejected a policy-approved same-assignee verifier fact");
+  }
+  const policyRejectedSelfVerification = structuredClone(policyAllowedSelfVerification);
+  policyRejectedSelfVerification.separationOfDutiesFact.passed = false;
+  if (
+    evaluateAppFirstBehavior("workflow-write-receipt", policyRejectedSelfVerification) !==
+    "ambiguous"
+  ) {
+    failures.push("createVerification accepted a policy-rejected same-assignee verifier fact");
+  }
+}
+
 function makeNotRequiredDeliveryReceipt({ deliveryKind, withExemption = false }) {
   const input = makeWorkflowWriteReceipt("deliverRepairAttempt");
   const noCode = deliveryKind === "no_code";
@@ -4270,6 +4296,36 @@ for (const status of ["passed", "failed", "blocked"]) {
   }
 }
 {
+  const policyAllowedSelfVerification = structuredClone(submissionReceiptCases[3][1]);
+  const verifierId = policyAllowedSelfVerification.authenticatedActorId;
+  policyAllowedSelfVerification.repairAttemptResource.attempt.assigneeId = verifierId;
+  policyAllowedSelfVerification.response.repairAttempt.assigneeId = verifierId;
+  policyAllowedSelfVerification.separationOfDutiesFact = {
+    repairAssigneeId: verifierId,
+    verifierId,
+    passed: true,
+  };
+  refreshVerificationResultReceipt(policyAllowedSelfVerification, "vendor");
+  if (
+    evaluateAppFirstBehavior(
+      "verification-result-write-receipt",
+      policyAllowedSelfVerification,
+    ) !== "unambiguous"
+  ) {
+    failures.push("recordVerificationResult rejected a policy-approved same-assignee verifier fact");
+  }
+  const policyRejectedSelfVerification = structuredClone(policyAllowedSelfVerification);
+  policyRejectedSelfVerification.separationOfDutiesFact.passed = false;
+  if (
+    evaluateAppFirstBehavior(
+      "verification-result-write-receipt",
+      policyRejectedSelfVerification,
+    ) !== "ambiguous"
+  ) {
+    failures.push("recordVerificationResult accepted a policy-rejected same-assignee verifier fact");
+  }
+}
+{
   const candidate = structuredClone(submissionReceiptCases[3][1]);
   candidate.response.bug.title = "Forged title hidden behind a vendor verification result";
   candidate.persistedResponse = structuredClone(candidate.response);
@@ -4339,7 +4395,7 @@ for (const status of ["passed", "failed", "blocked"]) {
   }
   for (const [label, mutate] of [
     ["non-running verification", (input) => (input.verificationResource.verification.status = "requested")],
-    ["same repairer and verifier", (input) => (input.repairAttemptResource.attempt.assigneeId = input.authenticatedActorId)],
+    ["repair assignee mismatches SOD fact", (input) => (input.repairAttemptResource.attempt.assigneeId = input.authenticatedActorId)],
     ["ineligible Build commit", (input) => (input.buildResource.build.manifest.commitShas = ["eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"])],
     ["missing atomic audit", (input) => (input.multiAggregateEffectFact.auditEventCommitted = false)],
     ["machine acceptance mutation", (input) => (input.multiAggregateEffectFact.machineAcceptanceMutationCount = 1)],
@@ -8193,6 +8249,28 @@ const receiptBugResource = {
       evaluateAppFirstBehavior("audit-payload", { payload: { summary } }) !== "invalid"
     ) {
       failures.push(`Sensitive audit summary was accepted: ${summary}`);
+    }
+  }
+  const uuidV7 = "11111111-1111-7111-8111-111111111111";
+  if (
+    evaluateAppFirstBehavior("audit-payload", {
+      payload: { relatedBugId: uuidV7 },
+    }) !== "valid"
+  ) {
+    failures.push("Audit payload rejected the plan-mandated RFC 9562 UUIDv7 identity");
+  }
+  for (const invalidUuid of [
+    "11111111-1111-0111-8111-111111111111",
+    "11111111-1111-9111-8111-111111111111",
+    "11111111-1111-7111-7111-111111111111",
+    "not-a-uuid",
+  ]) {
+    if (
+      evaluateAppFirstBehavior("audit-payload", {
+        payload: { relatedBugId: invalidUuid },
+      }) !== "invalid"
+    ) {
+      failures.push(`Audit payload accepted a non-RFC9562 UUID identity: ${invalidUuid}`);
     }
   }
 }

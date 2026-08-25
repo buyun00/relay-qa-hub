@@ -97,7 +97,7 @@ const sensitiveCustomFieldKey =
   /(?:password|passwd|secret|token|authorization|cookie|credential|email|phone|session)/i;
 const sensitiveLogAssignment =
   /(?:password|passwd|secret|access[_-]?token|refresh[_-]?token|authorization|cookie|credential)\s*[:=]/i;
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const occurrenceEnvironmentKeys = new Set([
   "qaAppVersion",
   "testSessionId",
@@ -5535,7 +5535,6 @@ function evaluateWorkflowWriteReceipt(input) {
       input.separationOfDutiesFact?.repairAssigneeId === attempt.assigneeId &&
       input.separationOfDutiesFact?.verifierId === request.verifierId &&
       input.separationOfDutiesFact?.passed === true &&
-      attempt.assigneeId !== request.verifierId &&
       response.bugId === bugId &&
       response.repairAttemptId === request.repairAttemptId &&
       sameNullable(response.buildId, request.buildId) &&
@@ -6036,7 +6035,6 @@ function evaluateVerificationResultStateInvariant(input, response, representatio
       input.separationOfDutiesFact?.repairAssigneeId === currentAttempt.assigneeId &&
       input.separationOfDutiesFact?.verifierId === input.authenticatedActorId &&
       input.separationOfDutiesFact?.passed === true &&
-      currentAttempt.assigneeId !== input.authenticatedActorId &&
       buildValid &&
       input.bugResource?.accountId === input.accountId &&
       input.bugResource?.projectId === input.authorizedProjectId &&

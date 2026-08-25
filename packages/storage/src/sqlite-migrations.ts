@@ -4155,6 +4155,2537 @@ SELECT rowid, account_id, project_id, id, title, description, expected_behavior
 FROM bugs;
 `;
 
+const DOMAIN_AUDIT_ALIGNMENT_SQL = String.raw`
+ALTER TABLE repair_attempts
+  ADD COLUMN failure_reason TEXT
+  CHECK (failure_reason IS NULL OR length(failure_reason) BETWEEN 1 AND 5000);
+
+DROP TRIGGER build_requirements_typed_decision_audit;
+CREATE TRIGGER build_requirements_typed_decision_audit
+BEFORE INSERT ON build_requirements
+WHEN NOT EXISTS (
+  SELECT 1
+  FROM events AS event
+  JOIN repair_attempts AS attempt
+    ON attempt.account_id = new.account_id
+   AND attempt.project_id = new.project_id
+   AND attempt.bug_id = new.bug_id
+   AND attempt.id = new.repair_attempt_id
+  JOIN accounts AS account
+    ON account.id = new.account_id
+   AND account.status = 'active'
+  JOIN projects AS project
+    ON project.account_id = new.account_id
+   AND project.id = new.project_id
+   AND project.status = 'active'
+  JOIN users AS actor
+    ON actor.account_id = new.account_id
+   AND actor.id = new.decision_actor_id
+   AND actor.status = 'active'
+  JOIN memberships AS membership
+    ON membership.account_id = new.account_id
+   AND membership.project_id = new.project_id
+   AND membership.user_id = new.decision_actor_id
+   AND membership.status = 'active'
+  JOIN membership_roles AS role
+    ON role.account_id = membership.account_id
+   AND role.project_id = membership.project_id
+   AND role.membership_id = membership.id
+   AND role.role = 'developer'
+  WHERE event.id = new.decision_audit_event_id
+    AND event.account_id = new.account_id
+    AND event.project_id = new.project_id
+    AND event.bug_id = new.bug_id
+    AND event.source = 'qa_hub'
+    AND event.actor_type = 'user'
+    AND event.actor_user_id = new.decision_actor_id
+    AND event.type = 'repair_attempt.delivered'
+    AND event.aggregate_type = 'repair_attempt'
+    AND event.aggregate_id = new.repair_attempt_id
+    AND event.resource_type = 'build_requirement'
+    AND event.resource_id = new.id
+    AND event.resource_version_after = 1
+    AND event.request_digest = new.delivery_request_digest
+    AND event.created_at = new.created_at
+    AND attempt.status = 'delivered'
+    AND attempt.version = new.source_delivery_version
+    AND json_extract(event.payload_json, '$.repairAttemptId') = new.repair_attempt_id
+    AND json_extract(event.payload_json, '$.status') = 'delivered'
+    AND json_extract(event.payload_json, '$.commitSha') IS new.delivered_commit_sha
+    AND (
+      (new.decision_reason IS NULL AND json_extract(event.payload_json, '$.reason') IS NULL)
+      OR (
+        new.decision_reason IS NOT NULL
+        AND json_type(event.payload_json, '$.reason') = 'text'
+        AND (
+          json_extract(event.payload_json, '$.reason') = new.decision_reason
+          OR (
+            length(CAST(json_extract(event.payload_json, '$.reason') AS BLOB)) <= 2000
+            AND length(CAST(json_extract(event.payload_json, '$.reason') AS BLOB))
+              < length(CAST(new.decision_reason AS BLOB))
+            AND substr(json_extract(event.payload_json, '$.reason'), -1, 1) = '…'
+            AND substr(
+              new.decision_reason,
+              1,
+              length(json_extract(event.payload_json, '$.reason')) - 1
+            ) = substr(
+              json_extract(event.payload_json, '$.reason'),
+              1,
+              length(json_extract(event.payload_json, '$.reason')) - 1
+            )
+          )
+          OR (
+            json_extract(event.payload_json, '$.reason') = '[REDACTED]'
+            AND (
+              lower(new.decision_reason) GLOB '*authorization*[:=]*'
+              OR lower(new.decision_reason) LIKE '%bearer %'
+              OR lower(new.decision_reason) GLOB '*password*[:=]*'
+              OR lower(new.decision_reason) GLOB '*passwd*[:=]*'
+              OR lower(new.decision_reason) GLOB '*pwd*[:=]*'
+              OR lower(new.decision_reason) GLOB '*secret*[:=]*'
+              OR lower(new.decision_reason) GLOB '*token*[:=]*'
+              OR lower(new.decision_reason) GLOB '*cookie*[:=]*'
+              OR lower(new.decision_reason) GLOB '*credential*[:=]*'
+              OR lower(new.decision_reason) GLOB '*apikey*[:=]*'
+              OR lower(new.decision_reason) GLOB '*api_key*[:=]*'
+              OR lower(new.decision_reason) GLOB '*api-key*[:=]*'
+              OR lower(new.decision_reason) GLOB '*api key*[:=]*'
+              OR lower(new.decision_reason) GLOB '*private*key*[:=]*'
+              OR lower(new.decision_reason) GLOB '*://*:*@*'
+              OR lower(new.decision_reason) GLOB '*eyj????????*.*.*'
+              OR instr(new.decision_reason, char(92)) > 0
+            )
+          )
+        )
+      )
+    )
+    AND json_extract(event.payload_json, '$.fromVersion') = new.source_delivery_version - 1
+    AND json_extract(event.payload_json, '$.toVersion') = new.source_delivery_version
+    AND new.policy_version = '1.0.0'
+    AND (
+      (
+        new.requirement = 'required'
+        AND new.decision_basis = 'code_requires_build'
+        AND new.decision_reason IS NULL
+        AND new.delivered_commit_sha IS NOT NULL
+        AND attempt.commit_sha = new.delivered_commit_sha
+        AND attempt.branch IS NOT NULL
+      )
+      OR (
+        new.requirement = 'not_required'
+        AND new.decision_basis = 'no_code_delivery'
+        AND new.decision_reason IS NOT NULL
+        AND new.delivered_commit_sha IS NULL
+        AND attempt.commit_sha IS NULL
+        AND attempt.branch IS NULL
+        AND attempt.no_code_reason = new.decision_reason
+      )
+      OR (
+        new.requirement = 'not_required'
+        AND new.decision_basis = 'authorized_no_build_exemption'
+        AND new.decision_reason IS NOT NULL
+        AND new.delivered_commit_sha IS NOT NULL
+        AND attempt.commit_sha = new.delivered_commit_sha
+        AND attempt.branch IS NOT NULL
+        AND EXISTS (
+          SELECT 1
+          FROM membership_roles AS release_role
+          WHERE release_role.account_id = membership.account_id
+            AND release_role.project_id = membership.project_id
+            AND release_role.membership_id = membership.id
+            AND release_role.role = 'release_manager'
+        )
+      )
+    )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'BuildRequirement requires its exact typed delivery audit');
+END;
+
+DROP TRIGGER build_repair_links_typed_evidence_audit;
+CREATE TRIGGER build_repair_links_typed_evidence_audit
+BEFORE INSERT ON build_repair_links
+WHEN NOT EXISTS (
+  SELECT 1
+  FROM events AS event
+  JOIN repair_attempts AS attempt
+    ON attempt.account_id = new.account_id
+   AND attempt.project_id = new.project_id
+   AND attempt.bug_id = new.bug_id
+   AND attempt.id = new.repair_attempt_id
+  JOIN build_requirements AS requirement
+    ON requirement.account_id = new.account_id
+   AND requirement.project_id = new.project_id
+   AND requirement.bug_id = new.bug_id
+   AND requirement.repair_attempt_id = new.repair_attempt_id
+   AND requirement.id = new.build_requirement_id
+  JOIN builds AS build
+    ON build.account_id = new.account_id
+   AND build.project_id = new.project_id
+   AND build.id = new.build_id
+  JOIN accounts AS account
+    ON account.id = new.account_id
+   AND account.status = 'active'
+  JOIN projects AS project
+    ON project.account_id = new.account_id
+   AND project.id = new.project_id
+   AND project.status = 'active'
+  JOIN users AS actor
+    ON actor.account_id = new.account_id
+   AND actor.id = new.evidence_actor_id
+   AND actor.status = 'active'
+  JOIN memberships AS membership
+    ON membership.account_id = new.account_id
+   AND membership.project_id = new.project_id
+   AND membership.user_id = new.evidence_actor_id
+   AND membership.status = 'active'
+  JOIN membership_roles AS role
+    ON role.account_id = membership.account_id
+   AND role.project_id = membership.project_id
+   AND role.membership_id = membership.id
+   AND role.role = 'release_manager'
+  WHERE event.id = new.evidence_audit_event_id
+    AND event.account_id = new.account_id
+    AND event.project_id = new.project_id
+    AND event.bug_id = new.bug_id
+    AND event.source = 'qa_hub'
+    AND event.actor_type = 'user'
+    AND event.actor_user_id = new.evidence_actor_id
+    AND event.type = 'build.repair_linked'
+    AND event.aggregate_type = 'repair_attempt'
+    AND event.aggregate_id = new.repair_attempt_id
+    AND event.resource_type = 'build_repair_link'
+    AND event.resource_id = new.id
+    AND event.resource_version_after = new.version
+    AND event.request_digest IS NOT NULL
+    AND event.created_at = new.linked_at
+    AND json_extract(event.payload_json, '$.repairAttemptId') = new.repair_attempt_id
+    AND json_extract(event.payload_json, '$.buildId') = new.build_id
+    AND json_extract(event.payload_json, '$.status') = 'ready_for_verification'
+    AND json_extract(event.payload_json, '$.commitSha') = new.delivered_commit_sha
+    AND (
+      (new.override_reason IS NULL AND json_extract(event.payload_json, '$.reason') IS NULL)
+      OR (
+        new.override_reason IS NOT NULL
+        AND json_type(event.payload_json, '$.reason') = 'text'
+        AND (
+          json_extract(event.payload_json, '$.reason') = new.override_reason
+          OR (
+            length(CAST(json_extract(event.payload_json, '$.reason') AS BLOB)) <= 2000
+            AND length(CAST(json_extract(event.payload_json, '$.reason') AS BLOB))
+              < length(CAST(new.override_reason AS BLOB))
+            AND substr(json_extract(event.payload_json, '$.reason'), -1, 1) = '…'
+            AND substr(
+              new.override_reason,
+              1,
+              length(json_extract(event.payload_json, '$.reason')) - 1
+            ) = substr(
+              json_extract(event.payload_json, '$.reason'),
+              1,
+              length(json_extract(event.payload_json, '$.reason')) - 1
+            )
+          )
+          OR (
+            json_extract(event.payload_json, '$.reason') = '[REDACTED]'
+            AND (
+              lower(new.override_reason) GLOB '*authorization*[:=]*'
+              OR lower(new.override_reason) LIKE '%bearer %'
+              OR lower(new.override_reason) GLOB '*password*[:=]*'
+              OR lower(new.override_reason) GLOB '*passwd*[:=]*'
+              OR lower(new.override_reason) GLOB '*pwd*[:=]*'
+              OR lower(new.override_reason) GLOB '*secret*[:=]*'
+              OR lower(new.override_reason) GLOB '*token*[:=]*'
+              OR lower(new.override_reason) GLOB '*cookie*[:=]*'
+              OR lower(new.override_reason) GLOB '*credential*[:=]*'
+              OR lower(new.override_reason) GLOB '*apikey*[:=]*'
+              OR lower(new.override_reason) GLOB '*api_key*[:=]*'
+              OR lower(new.override_reason) GLOB '*api-key*[:=]*'
+              OR lower(new.override_reason) GLOB '*api key*[:=]*'
+              OR lower(new.override_reason) GLOB '*private*key*[:=]*'
+              OR lower(new.override_reason) GLOB '*://*:*@*'
+              OR lower(new.override_reason) GLOB '*eyj????????*.*.*'
+              OR instr(new.override_reason, char(92)) > 0
+            )
+          )
+        )
+      )
+    )
+    AND json_extract(event.payload_json, '$.fromVersion') = build.version
+    AND json_extract(event.payload_json, '$.toVersion') = build.version + 1
+    AND new.evidence_policy_version = '1.0.0'
+    AND requirement.version = new.build_requirement_version
+    AND requirement.requirement = 'required'
+    AND requirement.decision_basis = 'code_requires_build'
+    AND requirement.linked_build_id = new.build_id
+    AND requirement.link_id = new.id
+    AND requirement.delivered_commit_sha = new.delivered_commit_sha
+    AND attempt.status = 'delivered'
+    AND attempt.commit_sha = new.delivered_commit_sha
+    AND build.status = 'ready'
+    AND (
+      (
+        new.evidence_type = 'manifest'
+        AND new.evidence_decision = 'manifest_verified'
+        AND new.override_reason IS NULL
+        AND EXISTS (
+          SELECT 1
+          FROM build_manifest_commits AS manifest_commit
+          WHERE manifest_commit.account_id = new.account_id
+            AND manifest_commit.project_id = new.project_id
+            AND manifest_commit.build_id = new.build_id
+            AND manifest_commit.commit_sha = new.delivered_commit_sha
+        )
+      )
+      OR (
+        new.evidence_type = 'release_manager_override'
+        AND new.evidence_decision = 'release_manager_authorized'
+        AND new.override_reason IS NOT NULL
+      )
+    )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'build repair link requires its exact typed evidence audit');
+END;
+
+DROP INDEX repair_attempts_one_active_idx;
+CREATE UNIQUE INDEX repair_attempts_one_active_idx
+  ON repair_attempts(account_id, project_id, bug_id)
+  WHERE status IN ('planned', 'queued', 'running', 'needs_input', 'blocked');
+
+CREATE TRIGGER repair_attempts_initial_typed_guard
+BEFORE INSERT ON repair_attempts
+WHEN NOT (
+  new.status = 'planned'
+  AND new.version = 1
+  AND new.created_at = new.updated_at
+  AND new.branch IS NULL
+  AND new.commit_sha IS NULL
+  AND new.merge_request_url IS NULL
+  AND new.patch_url IS NULL
+  AND new.no_code_reason IS NULL
+  AND new.target_build_id IS NULL
+  AND new.failure_reason IS NULL
+  AND new.sequence = COALESCE((
+    SELECT max(candidate.sequence) + 1
+    FROM repair_attempts AS candidate
+    WHERE candidate.account_id = new.account_id
+      AND candidate.project_id = new.project_id
+      AND candidate.bug_id = new.bug_id
+  ), 1)
+  AND EXISTS (
+    SELECT 1
+    FROM users AS assignee_user
+    JOIN accounts AS assignee_account
+      ON assignee_account.id = assignee_user.account_id
+     AND assignee_account.status = 'active'
+    JOIN projects AS assignee_project
+      ON assignee_project.account_id = assignee_user.account_id
+     AND assignee_project.id = new.project_id
+     AND assignee_project.status = 'active'
+    JOIN memberships AS assignee_membership
+      ON assignee_membership.account_id = assignee_user.account_id
+     AND assignee_membership.project_id = new.project_id
+     AND assignee_membership.user_id = assignee_user.id
+     AND assignee_membership.status = 'active'
+    JOIN membership_roles AS assignee_role
+      ON assignee_role.account_id = assignee_membership.account_id
+     AND assignee_role.project_id = assignee_membership.project_id
+     AND assignee_role.membership_id = assignee_membership.id
+     AND assignee_role.role = 'developer'
+    WHERE assignee_user.account_id = new.account_id
+      AND assignee_user.id = new.assignee_id
+      AND assignee_user.status = 'active'
+  )
+  AND EXISTS (
+    SELECT 1
+    FROM events AS event
+    JOIN users AS actor_user
+      ON actor_user.account_id = event.account_id
+     AND actor_user.id = event.actor_user_id
+     AND actor_user.status = 'active'
+    JOIN accounts AS actor_account
+      ON actor_account.id = event.account_id
+     AND actor_account.status = 'active'
+    JOIN projects AS actor_project
+      ON actor_project.account_id = event.account_id
+     AND actor_project.id = event.project_id
+     AND actor_project.status = 'active'
+    JOIN memberships AS membership
+      ON membership.account_id = event.account_id
+     AND membership.project_id = event.project_id
+     AND membership.user_id = event.actor_user_id
+     AND membership.status = 'active'
+    JOIN membership_roles AS role
+      ON role.account_id = membership.account_id
+     AND role.project_id = membership.project_id
+     AND role.membership_id = membership.id
+    WHERE event.account_id = new.account_id
+      AND event.project_id = new.project_id
+      AND event.bug_id = new.bug_id
+      AND event.source = 'qa_hub'
+      AND event.actor_type = 'user'
+      AND event.request_digest IS NOT NULL
+      AND event.created_at = new.created_at
+      AND (
+        (
+          event.type = 'repair_attempt.created'
+          AND role.role IN ('developer', 'triager')
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = new.id
+          AND event.resource_type = 'repair_attempt'
+          AND event.resource_id = new.id
+          AND event.resource_version_after = 1
+          AND event.from_state = 'ready'
+          AND event.to_state = 'in_progress'
+          AND json_extract(event.payload_json, '$.status') = 'planned'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = new.id
+        )
+        OR (
+          new.parent_attempt_id IS NOT NULL
+          AND role.role = 'developer'
+          AND event.type = 'repair_attempt.superseded'
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = new.parent_attempt_id
+          AND event.resource_type = 'repair_attempt'
+          AND event.resource_id = new.parent_attempt_id
+          AND event.from_state IS NULL
+          AND event.to_state IS NULL
+          AND json_extract(event.payload_json, '$.status') = 'superseded'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = new.parent_attempt_id
+          AND json_type(event.payload_json, '$.reason') = 'text'
+          AND length(trim(json_extract(event.payload_json, '$.reason'))) > 0
+          AND EXISTS (
+            SELECT 1 FROM repair_attempts AS parent
+            WHERE parent.account_id = new.account_id
+              AND parent.project_id = new.project_id
+              AND parent.bug_id = new.bug_id
+              AND parent.id = new.parent_attempt_id
+              AND parent.status = 'superseded'
+              AND parent.version = event.resource_version_after
+              AND parent.updated_at = new.created_at
+              AND json_extract(event.payload_json, '$.fromVersion') = parent.version - 1
+              AND json_extract(event.payload_json, '$.toVersion') = parent.version
+          )
+        )
+      )
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'RepairAttempt must begin as one neutral planned version-one fact with its exact typed audit Event');
+END;
+
+CREATE TRIGGER repair_attempts_active_after_delivered_insert
+BEFORE INSERT ON repair_attempts
+WHEN new.status IN ('planned', 'queued', 'running', 'needs_input', 'blocked')
+  AND EXISTS (
+    SELECT 1
+    FROM bugs AS bug
+    JOIN repair_attempts AS pointed
+      ON pointed.account_id = bug.account_id
+     AND pointed.project_id = bug.project_id
+     AND pointed.bug_id = bug.id
+     AND pointed.id = bug.active_repair_attempt_id
+    WHERE bug.account_id = new.account_id
+      AND bug.project_id = new.project_id
+      AND bug.id = new.bug_id
+      AND pointed.status = 'delivered'
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'new planned RepairAttempt requires the Bug active delivered pointer to be cleared');
+END;
+
+CREATE TRIGGER repair_attempts_active_after_delivered_update
+BEFORE UPDATE OF status ON repair_attempts
+WHEN new.status IN ('planned', 'queued', 'running', 'needs_input', 'blocked')
+  AND old.status NOT IN ('planned', 'queued', 'running', 'needs_input', 'blocked')
+  AND EXISTS (
+    SELECT 1
+    FROM bugs AS bug
+    JOIN repair_attempts AS pointed
+      ON pointed.account_id = bug.account_id
+     AND pointed.project_id = bug.project_id
+     AND pointed.bug_id = bug.id
+     AND pointed.id = bug.active_repair_attempt_id
+    WHERE bug.account_id = new.account_id
+      AND bug.project_id = new.project_id
+      AND bug.id = new.bug_id
+      AND pointed.status = 'delivered'
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'new planned RepairAttempt requires the Bug active delivered pointer to be cleared');
+END;
+
+CREATE TRIGGER repair_attempts_parent_insert_guard
+BEFORE INSERT ON repair_attempts
+WHEN (
+  new.parent_attempt_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM repair_attempts AS parent
+    WHERE parent.account_id = new.account_id
+      AND parent.project_id = new.project_id
+      AND parent.bug_id = new.bug_id
+      AND parent.id = new.parent_attempt_id
+      AND parent.sequence < new.sequence
+      AND parent.sequence = (
+        SELECT max(latest.sequence)
+        FROM repair_attempts AS latest
+        WHERE latest.account_id = new.account_id
+          AND latest.project_id = new.project_id
+          AND latest.bug_id = new.bug_id
+      )
+      AND parent.status IN ('delivered', 'failed', 'verification_failed', 'cancelled', 'superseded')
+      AND NOT EXISTS (
+        SELECT 1 FROM repair_attempts AS child
+        WHERE child.account_id = parent.account_id
+          AND child.project_id = parent.project_id
+          AND child.bug_id = parent.bug_id
+          AND child.parent_attempt_id = parent.id
+      )
+  )
+)
+OR (
+  new.parent_attempt_id IS NULL
+  AND EXISTS (
+    SELECT 1
+    FROM repair_attempts AS latest
+    WHERE latest.account_id = new.account_id
+      AND latest.project_id = new.project_id
+      AND latest.bug_id = new.bug_id
+      AND latest.status = 'superseded'
+      AND latest.sequence = (
+        SELECT max(candidate.sequence)
+        FROM repair_attempts AS candidate
+        WHERE candidate.account_id = new.account_id
+          AND candidate.project_id = new.project_id
+          AND candidate.bug_id = new.bug_id
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM repair_attempts AS child
+        WHERE child.account_id = latest.account_id
+          AND child.project_id = latest.project_id
+          AND child.bug_id = latest.bug_id
+          AND child.parent_attempt_id = latest.id
+      )
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'RepairAttempt parent must be the latest eligible history leaf; legacy supersede requires its exact child');
+END;
+
+CREATE TRIGGER bugs_duplicate_identity_insert_guard
+BEFORE INSERT ON bugs
+WHEN (new.state = 'duplicate') <> (new.duplicate_of_bug_id IS NOT NULL)
+BEGIN
+  SELECT RAISE(ABORT, 'duplicate Bug state and canonical Bug identity must agree');
+END;
+
+CREATE TRIGGER bugs_duplicate_identity_update_guard
+BEFORE UPDATE OF state, duplicate_of_bug_id ON bugs
+WHEN (new.state = 'duplicate') <> (new.duplicate_of_bug_id IS NOT NULL)
+BEGIN
+  SELECT RAISE(ABORT, 'duplicate Bug state and canonical Bug identity must agree');
+END;
+
+CREATE TRIGGER bugs_duplicate_no_cycle_guard
+BEFORE UPDATE OF duplicate_of_bug_id ON bugs
+WHEN new.duplicate_of_bug_id IS NOT NULL AND EXISTS (
+  WITH RECURSIVE canonical_chain(id, duplicate_of_bug_id) AS (
+    SELECT candidate.id, candidate.duplicate_of_bug_id
+    FROM bugs AS candidate
+    WHERE candidate.account_id = new.account_id
+      AND candidate.project_id = new.project_id
+      AND candidate.id = new.duplicate_of_bug_id
+    UNION ALL
+    SELECT candidate.id, candidate.duplicate_of_bug_id
+    FROM bugs AS candidate
+    JOIN canonical_chain AS prior
+      ON candidate.account_id = new.account_id
+     AND candidate.project_id = new.project_id
+     AND candidate.id = prior.duplicate_of_bug_id
+    WHERE prior.duplicate_of_bug_id IS NOT NULL
+  )
+  SELECT 1 FROM canonical_chain WHERE id = new.id
+)
+BEGIN
+  SELECT RAISE(ABORT, 'duplicate Bug canonical chain must remain acyclic');
+END;
+
+CREATE TRIGGER bugs_initial_workflow_guard
+BEFORE INSERT ON bugs
+WHEN new.state <> 'reported'
+  OR new.version <> 1
+  OR new.active_repair_attempt_id IS NOT NULL
+  OR new.active_verification_id IS NOT NULL
+  OR new.duplicate_of_bug_id IS NOT NULL
+  OR new.closed_at IS NOT NULL
+  OR new.reopen_count <> 0
+BEGIN
+  SELECT RAISE(ABORT, 'Bug workflow must begin as one reported version-one fact');
+END;
+
+CREATE TRIGGER bugs_typed_state_transition_guard
+BEFORE UPDATE OF state ON bugs
+WHEN new.state <> old.state AND NOT (
+  new.version = old.version + 1
+  AND new.updated_at > old.updated_at
+  AND new.title IS old.title
+  AND new.description IS old.description
+  AND new.expected_behavior IS old.expected_behavior
+  AND new.module_id IS old.module_id
+  AND new.severity IS old.severity
+  AND new.priority IS old.priority
+  AND new.owner_id IS old.owner_id
+  AND new.verification_owner_id IS old.verification_owner_id
+  AND new.occurrence_count = old.occurrence_count
+  AND EXISTS (
+    SELECT 1
+    FROM events AS event
+    JOIN memberships AS membership
+      ON membership.account_id = event.account_id
+     AND membership.project_id = event.project_id
+     AND membership.user_id = event.actor_user_id
+     AND membership.status = 'active'
+    JOIN users AS actor_user
+      ON actor_user.account_id = event.account_id
+     AND actor_user.id = event.actor_user_id
+     AND actor_user.status = 'active'
+    JOIN accounts AS actor_account
+      ON actor_account.id = event.account_id
+     AND actor_account.status = 'active'
+    JOIN projects AS actor_project
+      ON actor_project.account_id = event.account_id
+     AND actor_project.id = event.project_id
+     AND actor_project.status = 'active'
+    JOIN membership_roles AS role
+      ON role.account_id = membership.account_id
+     AND role.project_id = membership.project_id
+     AND role.membership_id = membership.id
+    WHERE event.account_id = old.account_id
+      AND event.project_id = old.project_id
+      AND event.bug_id = old.id
+      AND event.source = 'qa_hub'
+      AND event.actor_type = 'user'
+      AND event.request_digest IS NOT NULL
+      AND event.from_state = old.state
+      AND event.to_state = new.state
+      AND event.created_at = new.updated_at
+      AND (
+        (
+          (
+            (old.state IN ('reported', 'needs_info') AND new.state = 'ready' AND event.type = 'bug.triage.ready')
+            OR (old.state IN ('reported', 'ready') AND new.state = 'needs_info' AND event.type = 'bug.triage.needs_info')
+            OR (old.state IN ('reported', 'needs_info', 'ready') AND new.state = 'deferred' AND event.type = 'bug.defer')
+            OR (old.state IN ('reported', 'needs_info', 'ready') AND new.state = 'rejected' AND event.type = 'bug.reject')
+          )
+          AND role.role = 'triager'
+          AND event.aggregate_type = 'bug'
+          AND event.aggregate_id = old.id
+          AND event.resource_type = 'bug'
+          AND event.resource_id = old.id
+          AND event.resource_version_after = new.version
+          AND json_extract(event.payload_json, '$.status') = new.state
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND (event.type = 'bug.triage.ready' OR (
+            json_type(event.payload_json, '$.reason') = 'text'
+            AND length(json_extract(event.payload_json, '$.reason')) > 0
+          ))
+          AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+          AND new.active_verification_id IS old.active_verification_id
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+        )
+        OR (
+          old.state IN ('reported', 'ready')
+          AND new.state = 'duplicate'
+          AND role.role = 'triager'
+          AND event.type = 'bug.mark_duplicate'
+          AND event.aggregate_type = 'bug'
+          AND event.aggregate_id = old.id
+          AND event.resource_type = 'bug'
+          AND event.resource_id = old.id
+          AND event.resource_version_after = new.version
+          AND json_extract(event.payload_json, '$.status') = 'duplicate'
+          AND json_extract(event.payload_json, '$.relatedBugId') = new.duplicate_of_bug_id
+          AND json_type(event.payload_json, '$.reason') = 'text'
+          AND length(json_extract(event.payload_json, '$.reason')) > 0
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND old.duplicate_of_bug_id IS NULL
+          AND new.duplicate_of_bug_id IS NOT NULL
+          AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+          AND new.active_verification_id IS old.active_verification_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+        )
+        OR (
+          old.state = 'ready'
+          AND new.state = 'in_progress'
+          AND role.role IN ('developer', 'triager')
+          AND event.type = 'repair_attempt.created'
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = new.active_repair_attempt_id
+          AND event.resource_type = 'repair_attempt'
+          AND event.resource_id = new.active_repair_attempt_id
+          AND event.resource_version_after = 1
+          AND json_extract(event.payload_json, '$.status') = 'planned'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = new.active_repair_attempt_id
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND old.active_repair_attempt_id IS NULL
+          AND new.active_repair_attempt_id IS NOT NULL
+          AND new.active_verification_id IS old.active_verification_id
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+          AND EXISTS (
+            SELECT 1
+            FROM repair_attempts AS attempt
+            JOIN memberships AS assignee_membership
+              ON assignee_membership.account_id = attempt.account_id
+             AND assignee_membership.project_id = attempt.project_id
+             AND assignee_membership.user_id = attempt.assignee_id
+             AND assignee_membership.status = 'active'
+            JOIN users AS assignee_user
+              ON assignee_user.account_id = attempt.account_id
+             AND assignee_user.id = attempt.assignee_id
+             AND assignee_user.status = 'active'
+            WHERE attempt.account_id = old.account_id
+              AND attempt.project_id = old.project_id
+              AND attempt.bug_id = old.id
+              AND attempt.id = new.active_repair_attempt_id
+              AND attempt.status = 'planned'
+              AND attempt.version = 1
+              AND attempt.created_at = new.updated_at
+          )
+        )
+        OR (
+          old.state = 'in_progress'
+          AND new.state = 'ready'
+          AND role.role = 'developer'
+          AND event.type IN ('repair_attempt.failed', 'repair_attempt.superseded')
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = old.active_repair_attempt_id
+          AND event.resource_type = 'repair_attempt'
+          AND event.resource_id = old.active_repair_attempt_id
+          AND json_extract(event.payload_json, '$.repairAttemptId') = old.active_repair_attempt_id
+          AND json_extract(event.payload_json, '$.fromVersion') = event.resource_version_after - 1
+          AND json_extract(event.payload_json, '$.toVersion') = event.resource_version_after
+          AND json_type(event.payload_json, '$.reason') = 'text'
+          AND length(trim(json_extract(event.payload_json, '$.reason'))) > 0
+          AND old.active_repair_attempt_id IS NOT NULL
+          AND new.active_repair_attempt_id IS NULL
+          AND old.active_verification_id IS NULL
+          AND new.active_verification_id IS NULL
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+          AND EXISTS (
+            SELECT 1 FROM repair_attempts AS attempt
+            WHERE attempt.account_id = old.account_id
+              AND attempt.project_id = old.project_id
+              AND attempt.bug_id = old.id
+              AND attempt.id = old.active_repair_attempt_id
+              AND attempt.status = CASE event.type
+                WHEN 'repair_attempt.failed' THEN 'failed'
+                ELSE 'superseded'
+              END
+              AND attempt.version = event.resource_version_after
+              AND attempt.updated_at = new.updated_at
+              AND json_extract(event.payload_json, '$.status') = attempt.status
+          )
+        )
+        OR (
+          old.state = 'in_progress'
+          AND new.state IN ('awaiting_build', 'ready_for_verification')
+          AND role.role = 'developer'
+          AND event.type = 'repair_attempt.delivered'
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = old.active_repair_attempt_id
+          AND event.resource_type = 'build_requirement'
+          AND event.resource_version_after = 1
+          AND json_extract(event.payload_json, '$.status') = 'delivered'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = old.active_repair_attempt_id
+          AND old.active_repair_attempt_id IS NOT NULL
+          AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+          AND new.active_verification_id IS old.active_verification_id
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+          AND EXISTS (
+            SELECT 1
+            FROM repair_attempts AS attempt
+            JOIN build_requirements AS requirement
+              ON requirement.account_id = attempt.account_id
+             AND requirement.project_id = attempt.project_id
+             AND requirement.bug_id = attempt.bug_id
+             AND requirement.repair_attempt_id = attempt.id
+             AND requirement.id = event.resource_id
+            WHERE attempt.account_id = old.account_id
+              AND attempt.project_id = old.project_id
+              AND attempt.bug_id = old.id
+              AND attempt.id = old.active_repair_attempt_id
+              AND attempt.status = 'delivered'
+              AND attempt.version = requirement.source_delivery_version
+              AND attempt.updated_at = new.updated_at
+              AND requirement.version = 1
+              AND requirement.created_at = new.updated_at
+              AND requirement.bug_version_at_delivery = new.version
+              AND json_extract(event.payload_json, '$.commitSha') IS requirement.delivered_commit_sha
+              AND json_extract(event.payload_json, '$.fromVersion') = attempt.version - 1
+              AND json_extract(event.payload_json, '$.toVersion') = attempt.version
+              AND new.state = CASE requirement.requirement
+                WHEN 'required' THEN 'awaiting_build'
+                ELSE 'ready_for_verification'
+              END
+          )
+        )
+        OR (
+          old.state = 'awaiting_build'
+          AND new.state = 'ready_for_verification'
+          AND role.role = 'release_manager'
+          AND event.type = 'build.repair_linked'
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = old.active_repair_attempt_id
+          AND event.resource_type = 'build_repair_link'
+          AND event.resource_version_after = 1
+          AND json_extract(event.payload_json, '$.status') = 'ready_for_verification'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = old.active_repair_attempt_id
+          AND old.active_repair_attempt_id IS NOT NULL
+          AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+          AND new.active_verification_id IS old.active_verification_id
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+          AND EXISTS (
+            SELECT 1
+            FROM build_repair_links AS link
+            JOIN build_requirements AS requirement
+              ON requirement.account_id = link.account_id
+             AND requirement.project_id = link.project_id
+             AND requirement.bug_id = link.bug_id
+             AND requirement.repair_attempt_id = link.repair_attempt_id
+             AND requirement.id = link.build_requirement_id
+            JOIN builds AS build
+              ON build.account_id = link.account_id
+             AND build.project_id = link.project_id
+             AND build.id = link.build_id
+            WHERE link.account_id = old.account_id
+              AND link.project_id = old.project_id
+              AND link.bug_id = old.id
+              AND link.repair_attempt_id = old.active_repair_attempt_id
+              AND link.id = event.resource_id
+              AND link.evidence_audit_event_id = event.id
+              AND requirement.version = 2
+              AND requirement.link_id = link.id
+              AND requirement.linked_build_id = link.build_id
+              AND build.status = 'ready'
+              AND json_extract(event.payload_json, '$.buildId') = build.id
+              AND json_extract(event.payload_json, '$.commitSha') = link.delivered_commit_sha
+              AND json_extract(event.payload_json, '$.fromVersion') = build.version - 1
+              AND json_extract(event.payload_json, '$.toVersion') = build.version
+          )
+        )
+        OR (
+          old.state = 'ready_for_verification'
+          AND new.state = 'ready'
+          AND role.role = 'verifier'
+          AND event.type = 'verification.result_recorded'
+          AND event.aggregate_type = 'verification'
+          AND event.aggregate_id = old.active_verification_id
+          AND event.resource_type = 'verification'
+          AND event.resource_id = old.active_verification_id
+          AND json_extract(event.payload_json, '$.status') = 'failed'
+          AND old.active_repair_attempt_id IS NOT NULL
+          AND old.active_verification_id IS NOT NULL
+          AND new.active_repair_attempt_id IS NULL
+          AND new.active_verification_id IS NULL
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+          AND EXISTS (
+            SELECT 1
+            FROM verifications AS verification
+            JOIN repair_attempts AS attempt
+              ON attempt.account_id = verification.account_id
+             AND attempt.project_id = verification.project_id
+             AND attempt.bug_id = verification.bug_id
+             AND attempt.id = verification.repair_attempt_id
+            WHERE verification.account_id = old.account_id
+              AND verification.project_id = old.project_id
+              AND verification.bug_id = old.id
+              AND verification.id = old.active_verification_id
+              AND verification.status = 'failed'
+              AND verification.verifier_id = event.actor_user_id
+              AND verification.version = event.resource_version_after
+              AND verification.updated_at = new.updated_at
+              AND attempt.id = old.active_repair_attempt_id
+              AND attempt.status = 'verification_failed'
+              AND attempt.updated_at = new.updated_at
+          )
+        )
+        OR (
+          old.state = 'ready_for_verification'
+          AND new.state = 'closed'
+          AND role.role = 'verifier'
+          AND event.type IN ('verification.result_recorded', 'bug.verification.passed')
+          AND json_extract(event.payload_json, '$.status') = 'passed'
+          AND old.active_repair_attempt_id IS NOT NULL
+          AND old.active_verification_id IS NOT NULL
+          AND new.active_repair_attempt_id IS NULL
+          AND new.active_verification_id IS NULL
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at = new.updated_at
+          AND new.reopen_count = old.reopen_count
+        )
+        OR (
+          old.state = 'closed'
+          AND new.state = 'ready'
+          AND role.role = 'triager'
+          AND event.type = 'bug.reopen.newer_occurrence'
+          AND event.aggregate_type = 'bug'
+          AND event.aggregate_id = old.id
+          AND event.resource_type = 'bug'
+          AND event.resource_id = old.id
+          AND event.resource_version_after = new.version
+          AND json_extract(event.payload_json, '$.status') = 'ready'
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND old.active_repair_attempt_id IS new.active_repair_attempt_id
+          AND old.active_verification_id IS new.active_verification_id
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS NULL
+          AND new.reopen_count = old.reopen_count + 1
+        )
+      )
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Bug state transition requires its exact typed human audit and relation facts');
+END;
+
+CREATE TRIGGER bugs_typed_same_state_pointer_guard
+BEFORE UPDATE OF active_repair_attempt_id, active_verification_id, duplicate_of_bug_id, closed_at, reopen_count ON bugs
+WHEN new.state = old.state
+  AND (
+    new.active_repair_attempt_id IS NOT old.active_repair_attempt_id
+    OR new.active_verification_id IS NOT old.active_verification_id
+    OR new.duplicate_of_bug_id IS NOT old.duplicate_of_bug_id
+    OR new.closed_at IS NOT old.closed_at
+    OR new.reopen_count <> old.reopen_count
+  )
+  AND NOT (
+    new.version = old.version + 1
+    AND new.updated_at > old.updated_at
+    AND new.title IS old.title
+    AND new.description IS old.description
+    AND new.expected_behavior IS old.expected_behavior
+    AND new.module_id IS old.module_id
+    AND new.severity IS old.severity
+    AND new.priority IS old.priority
+    AND new.owner_id IS old.owner_id
+    AND new.verification_owner_id IS old.verification_owner_id
+    AND new.occurrence_count = old.occurrence_count
+    AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+    AND new.closed_at IS old.closed_at
+    AND new.reopen_count = old.reopen_count
+    AND EXISTS (
+      SELECT 1
+      FROM events AS event
+      JOIN memberships AS membership
+        ON membership.account_id = event.account_id
+       AND membership.project_id = event.project_id
+       AND membership.user_id = event.actor_user_id
+       AND membership.status = 'active'
+      JOIN membership_roles AS role
+        ON role.account_id = membership.account_id
+       AND role.project_id = membership.project_id
+       AND role.membership_id = membership.id
+      JOIN users AS actor_user
+        ON actor_user.account_id = event.account_id
+       AND actor_user.id = event.actor_user_id
+       AND actor_user.status = 'active'
+      JOIN accounts AS actor_account
+        ON actor_account.id = event.account_id
+       AND actor_account.status = 'active'
+      JOIN projects AS actor_project
+        ON actor_project.account_id = event.account_id
+       AND actor_project.id = event.project_id
+       AND actor_project.status = 'active'
+      WHERE event.account_id = old.account_id
+        AND event.project_id = old.project_id
+        AND event.bug_id = old.id
+        AND event.source = 'qa_hub'
+        AND event.actor_type = 'user'
+        AND event.request_digest IS NOT NULL
+        AND event.created_at = new.updated_at
+        AND (
+          (
+            old.state = 'in_progress'
+            AND new.state = 'in_progress'
+            AND old.active_repair_attempt_id IS NOT NULL
+            AND new.active_repair_attempt_id IS NOT NULL
+            AND new.active_repair_attempt_id <> old.active_repair_attempt_id
+            AND old.active_verification_id IS NULL
+            AND new.active_verification_id IS NULL
+            AND role.role = 'developer'
+            AND event.type = 'repair_attempt.superseded'
+            AND event.aggregate_type = 'repair_attempt'
+            AND event.aggregate_id = old.active_repair_attempt_id
+            AND event.resource_type = 'repair_attempt'
+            AND event.resource_id = old.active_repair_attempt_id
+            AND event.from_state IS NULL
+            AND event.to_state IS NULL
+            AND json_extract(event.payload_json, '$.status') = 'superseded'
+            AND json_extract(event.payload_json, '$.repairAttemptId') = old.active_repair_attempt_id
+            AND json_type(event.payload_json, '$.reason') = 'text'
+            AND length(trim(json_extract(event.payload_json, '$.reason'))) > 0
+            AND json_extract(event.payload_json, '$.fromVersion') = event.resource_version_after - 1
+            AND json_extract(event.payload_json, '$.toVersion') = event.resource_version_after
+            AND EXISTS (
+              SELECT 1
+              FROM repair_attempts AS replaced
+              JOIN repair_attempts AS successor
+                ON successor.account_id = replaced.account_id
+               AND successor.project_id = replaced.project_id
+               AND successor.bug_id = replaced.bug_id
+               AND successor.parent_attempt_id = replaced.id
+               AND successor.id = new.active_repair_attempt_id
+              JOIN memberships AS assignee_membership
+                ON assignee_membership.account_id = successor.account_id
+               AND assignee_membership.project_id = successor.project_id
+               AND assignee_membership.user_id = successor.assignee_id
+               AND assignee_membership.status = 'active'
+              JOIN users AS assignee_user
+                ON assignee_user.account_id = successor.account_id
+               AND assignee_user.id = successor.assignee_id
+               AND assignee_user.status = 'active'
+              WHERE replaced.account_id = old.account_id
+                AND replaced.project_id = old.project_id
+                AND replaced.bug_id = old.id
+                AND replaced.id = old.active_repair_attempt_id
+                AND replaced.status = 'superseded'
+                AND replaced.version = event.resource_version_after
+                AND replaced.updated_at = new.updated_at
+                AND successor.status = 'planned'
+                AND successor.version = 1
+                AND successor.created_at = new.updated_at
+                AND successor.updated_at = successor.created_at
+                AND successor.sequence = (
+                  SELECT max(candidate.sequence)
+                  FROM repair_attempts AS candidate
+                  WHERE candidate.account_id = successor.account_id
+                    AND candidate.project_id = successor.project_id
+                    AND candidate.bug_id = successor.bug_id
+                )
+                AND successor.branch IS NULL
+                AND successor.commit_sha IS NULL
+                AND successor.merge_request_url IS NULL
+                AND successor.patch_url IS NULL
+                AND successor.no_code_reason IS NULL
+                AND successor.target_build_id IS NULL
+            )
+          )
+          OR (
+            old.state = 'ready_for_verification'
+            AND new.state = 'ready_for_verification'
+            AND old.active_repair_attempt_id IS NOT NULL
+            AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+            AND old.active_verification_id IS NULL
+            AND new.active_verification_id IS NOT NULL
+            AND role.role = 'verifier'
+            AND event.type = 'verification.created'
+            AND event.aggregate_type = 'verification'
+            AND event.aggregate_id = new.active_verification_id
+            AND event.resource_type = 'verification'
+            AND event.resource_id = new.active_verification_id
+            AND event.resource_version_after = 1
+            AND event.from_state IS NULL
+            AND event.to_state IS NULL
+            AND json_extract(event.payload_json, '$.status') = 'requested'
+            AND json_extract(event.payload_json, '$.verificationId') = new.active_verification_id
+            AND json_extract(event.payload_json, '$.repairAttemptId') = old.active_repair_attempt_id
+            AND json_extract(event.payload_json, '$.toVersion') = 1
+            AND EXISTS (
+              SELECT 1
+              FROM verifications AS verification
+              JOIN users AS assigned_verifier_user
+                ON assigned_verifier_user.account_id = verification.account_id
+               AND assigned_verifier_user.id = verification.verifier_id
+               AND assigned_verifier_user.status = 'active'
+              JOIN memberships AS assigned_membership
+                ON assigned_membership.account_id = verification.account_id
+               AND assigned_membership.project_id = verification.project_id
+               AND assigned_membership.user_id = verification.verifier_id
+               AND assigned_membership.status = 'active'
+              JOIN membership_roles AS assigned_role
+                ON assigned_role.account_id = assigned_membership.account_id
+               AND assigned_role.project_id = assigned_membership.project_id
+               AND assigned_role.membership_id = assigned_membership.id
+               AND assigned_role.role = 'verifier'
+              JOIN repair_attempts AS attempt
+                ON attempt.account_id = verification.account_id
+               AND attempt.project_id = verification.project_id
+               AND attempt.bug_id = verification.bug_id
+               AND attempt.id = verification.repair_attempt_id
+              WHERE verification.account_id = old.account_id
+                AND verification.project_id = old.project_id
+                AND verification.bug_id = old.id
+                AND verification.id = new.active_verification_id
+                AND verification.repair_attempt_id = old.active_repair_attempt_id
+                AND verification.status = 'requested'
+                AND verification.version = 1
+                AND verification.created_at = new.updated_at
+                AND verification.updated_at = verification.created_at
+                AND verification.result_summary IS NULL
+                AND verification.failure_reason IS NULL
+                AND verification.blocked_reason IS NULL
+                AND json_extract(event.payload_json, '$.buildId') IS verification.build_id
+                AND attempt.status = 'delivered'
+                AND (old.severity NOT IN ('S0', 'S1') OR attempt.assignee_id <> verification.verifier_id)
+            )
+          )
+          OR (
+            old.state = 'ready_for_verification'
+            AND new.state = 'ready_for_verification'
+            AND old.active_repair_attempt_id IS NOT NULL
+            AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+            AND old.active_verification_id IS NOT NULL
+            AND new.active_verification_id IS NULL
+            AND role.role = 'verifier'
+            AND event.type = 'verification.result_recorded'
+            AND event.aggregate_type = 'verification'
+            AND event.aggregate_id = old.active_verification_id
+            AND event.resource_type = 'verification'
+            AND event.resource_id = old.active_verification_id
+            AND event.from_state = 'ready_for_verification'
+            AND event.to_state = 'ready_for_verification'
+            AND json_extract(event.payload_json, '$.status') = 'blocked'
+            AND json_extract(event.payload_json, '$.verificationId') = old.active_verification_id
+            AND json_extract(event.payload_json, '$.repairAttemptId') = old.active_repair_attempt_id
+            AND json_type(event.payload_json, '$.reason') = 'text'
+            AND length(trim(json_extract(event.payload_json, '$.reason'))) > 0
+            AND json_extract(event.payload_json, '$.fromVersion') = event.resource_version_after - 1
+            AND json_extract(event.payload_json, '$.toVersion') = event.resource_version_after
+            AND EXISTS (
+              SELECT 1
+              FROM verifications AS verification
+              JOIN repair_attempts AS attempt
+                ON attempt.account_id = verification.account_id
+               AND attempt.project_id = verification.project_id
+               AND attempt.bug_id = verification.bug_id
+               AND attempt.id = verification.repair_attempt_id
+              WHERE verification.account_id = old.account_id
+                AND verification.project_id = old.project_id
+                AND verification.bug_id = old.id
+                AND verification.id = old.active_verification_id
+                AND verification.repair_attempt_id = old.active_repair_attempt_id
+                AND verification.verifier_id = event.actor_user_id
+                AND verification.status = 'blocked'
+                AND verification.version = event.resource_version_after
+                AND verification.updated_at = new.updated_at
+                AND verification.blocked_reason IS NOT NULL
+                AND json_extract(event.payload_json, '$.buildId') IS verification.build_id
+                AND attempt.status = 'delivered'
+            )
+          )
+        )
+    )
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'Bug same-state workflow pointers require their exact typed human audit and relation facts');
+END;
+
+CREATE TRIGGER repair_attempts_history_identity_immutable
+BEFORE UPDATE ON repair_attempts
+WHEN new.id IS NOT old.id
+  OR new.account_id IS NOT old.account_id
+  OR new.project_id IS NOT old.project_id
+  OR new.bug_id IS NOT old.bug_id
+  OR new.sequence IS NOT old.sequence
+  OR new.mode IS NOT old.mode
+  OR new.assignee_id IS NOT old.assignee_id
+  OR new.parent_attempt_id IS NOT old.parent_attempt_id
+  OR new.created_at IS NOT old.created_at
+BEGIN
+  SELECT RAISE(ABORT, 'RepairAttempt identity, sequence, mode, assignee, and parent history are immutable');
+END;
+
+CREATE TRIGGER repair_attempts_lifecycle_typed_guard
+BEFORE UPDATE ON repair_attempts
+WHEN NOT (
+  new.version = old.version + 1
+  AND new.updated_at > old.updated_at
+  AND EXISTS (
+    SELECT 1
+    FROM events AS event
+    JOIN users AS actor_user
+      ON actor_user.account_id = event.account_id
+     AND actor_user.id = event.actor_user_id
+     AND actor_user.status = 'active'
+    JOIN accounts AS actor_account
+      ON actor_account.id = event.account_id
+     AND actor_account.status = 'active'
+    JOIN projects AS actor_project
+      ON actor_project.account_id = event.account_id
+     AND actor_project.id = event.project_id
+     AND actor_project.status = 'active'
+    JOIN memberships AS membership
+      ON membership.account_id = event.account_id
+     AND membership.project_id = event.project_id
+     AND membership.user_id = event.actor_user_id
+     AND membership.status = 'active'
+    JOIN membership_roles AS role
+      ON role.account_id = membership.account_id
+     AND role.project_id = membership.project_id
+     AND role.membership_id = membership.id
+    WHERE event.account_id = new.account_id
+      AND event.project_id = new.project_id
+      AND event.bug_id = new.bug_id
+      AND event.source = 'qa_hub'
+      AND event.actor_type = 'user'
+      AND event.request_digest IS NOT NULL
+      AND event.created_at = new.updated_at
+      AND (
+        (
+          old.status = 'planned'
+          AND new.status = 'running'
+          AND role.role = 'developer'
+          AND event.type = 'repair_attempt.started'
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = new.id
+          AND event.resource_type = 'repair_attempt'
+          AND event.resource_id = new.id
+          AND event.resource_version_after = new.version
+          AND event.from_state IS NULL
+          AND event.to_state IS NULL
+          AND json_extract(event.payload_json, '$.status') = 'running'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = new.id
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND new.summary IS old.summary
+          AND new.branch IS old.branch
+          AND new.commit_sha IS old.commit_sha
+          AND new.merge_request_url IS old.merge_request_url
+          AND new.patch_url IS old.patch_url
+          AND new.no_code_reason IS old.no_code_reason
+          AND new.target_build_id IS old.target_build_id
+          AND new.failure_reason IS old.failure_reason
+        )
+        OR (
+          old.status IN ('planned', 'queued', 'running', 'needs_input', 'blocked')
+          AND new.status IN ('failed', 'superseded')
+          AND role.role = 'developer'
+          AND event.type = CASE new.status
+            WHEN 'failed' THEN 'repair_attempt.failed'
+            ELSE 'repair_attempt.superseded'
+          END
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = new.id
+          AND event.resource_type = 'repair_attempt'
+          AND event.resource_id = new.id
+          AND event.resource_version_after = new.version
+          AND json_extract(event.payload_json, '$.status') = new.status
+          AND json_extract(event.payload_json, '$.repairAttemptId') = new.id
+          AND json_type(event.payload_json, '$.reason') = 'text'
+          AND length(trim(json_extract(event.payload_json, '$.reason'))) > 0
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND new.summary IS old.summary
+          AND new.branch IS old.branch
+          AND new.commit_sha IS old.commit_sha
+          AND new.merge_request_url IS old.merge_request_url
+          AND new.patch_url IS old.patch_url
+          AND new.no_code_reason IS old.no_code_reason
+          AND new.target_build_id IS old.target_build_id
+          AND (
+            (
+              new.status = 'failed'
+              AND old.failure_reason IS NULL
+              AND new.failure_reason IS NOT NULL
+              AND length(trim(new.failure_reason)) > 0
+              AND (
+                json_extract(event.payload_json, '$.reason') = new.failure_reason
+                OR (
+                  length(CAST(json_extract(event.payload_json, '$.reason') AS BLOB)) <= 2000
+                  AND length(CAST(json_extract(event.payload_json, '$.reason') AS BLOB))
+                    < length(CAST(new.failure_reason AS BLOB))
+                  AND substr(json_extract(event.payload_json, '$.reason'), -1, 1) = '…'
+                  AND substr(
+                    new.failure_reason,
+                    1,
+                    length(json_extract(event.payload_json, '$.reason')) - 1
+                  ) = substr(
+                    json_extract(event.payload_json, '$.reason'),
+                    1,
+                    length(json_extract(event.payload_json, '$.reason')) - 1
+                  )
+                )
+                OR (
+                  json_extract(event.payload_json, '$.reason') = '[REDACTED]'
+                  AND (
+                    lower(new.failure_reason) GLOB '*authorization*[:=]*'
+                    OR lower(new.failure_reason) LIKE '%bearer %'
+                    OR lower(new.failure_reason) GLOB '*password*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*passwd*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*pwd*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*secret*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*token*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*cookie*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*credential*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*apikey*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*api_key*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*api-key*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*api key*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*private*key*[:=]*'
+                    OR lower(new.failure_reason) GLOB '*://*:*@*'
+                    OR lower(new.failure_reason) GLOB '*eyj????????*.*.*'
+                    OR instr(new.failure_reason, char(92)) > 0
+                  )
+                )
+              )
+            )
+            OR (
+              new.status = 'superseded'
+              AND new.failure_reason IS old.failure_reason
+            )
+          )
+        )
+        OR (
+          old.status = 'running'
+          AND new.status = 'delivered'
+          AND role.role = 'developer'
+          AND event.type = 'repair_attempt.delivered'
+          AND event.aggregate_type = 'repair_attempt'
+          AND event.aggregate_id = new.id
+          AND event.resource_type = 'build_requirement'
+          AND event.resource_version_after = 1
+          AND event.from_state = 'in_progress'
+          AND event.to_state IN ('awaiting_build', 'ready_for_verification')
+          AND json_extract(event.payload_json, '$.status') = 'delivered'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = new.id
+          AND json_extract(event.payload_json, '$.commitSha') IS new.commit_sha
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND new.summary IS NOT NULL
+          AND length(trim(new.summary)) > 0
+          AND new.target_build_id IS NULL
+          AND new.failure_reason IS old.failure_reason
+          AND (
+            (
+              new.no_code_reason IS NOT NULL
+              AND length(trim(new.no_code_reason)) > 0
+              AND new.branch IS NULL
+              AND new.commit_sha IS NULL
+              AND new.merge_request_url IS NULL
+              AND new.patch_url IS NULL
+              AND event.to_state = 'ready_for_verification'
+              AND json_type(event.payload_json, '$.reason') = 'text'
+            )
+            OR (
+              new.no_code_reason IS NULL
+              AND new.branch IS NOT NULL
+              AND length(trim(new.branch)) > 0
+              AND new.commit_sha IS NOT NULL
+              AND event.to_state IN ('awaiting_build', 'ready_for_verification')
+            )
+          )
+        )
+        OR (
+          old.status = 'delivered'
+          AND new.status = 'verification_failed'
+          AND role.role = 'verifier'
+          AND event.type = 'verification.result_recorded'
+          AND event.aggregate_type = 'verification'
+          AND event.resource_type = 'verification'
+          AND event.aggregate_id = event.resource_id
+          AND event.resource_version_after >= 2
+          AND event.from_state = 'ready_for_verification'
+          AND event.to_state = 'ready'
+          AND json_extract(event.payload_json, '$.status') = 'failed'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = new.id
+          AND json_type(event.payload_json, '$.reason') = 'text'
+          AND length(trim(json_extract(event.payload_json, '$.reason'))) > 0
+          AND new.summary IS old.summary
+          AND new.branch IS old.branch
+          AND new.commit_sha IS old.commit_sha
+          AND new.merge_request_url IS old.merge_request_url
+          AND new.patch_url IS old.patch_url
+          AND new.no_code_reason IS old.no_code_reason
+          AND new.target_build_id IS old.target_build_id
+          AND new.failure_reason IS old.failure_reason
+          AND EXISTS (
+            SELECT 1 FROM verifications AS verification
+            WHERE verification.account_id = new.account_id
+              AND verification.project_id = new.project_id
+              AND verification.bug_id = new.bug_id
+              AND verification.id = event.resource_id
+              AND verification.repair_attempt_id = new.id
+              AND verification.verifier_id = event.actor_user_id
+              AND verification.status = 'failed'
+              AND verification.version = event.resource_version_after
+              AND verification.updated_at = new.updated_at
+          )
+        )
+      )
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'RepairAttempt lifecycle requires a forward exact-CAS typed audit Event and immutable delivery evidence');
+END;
+
+CREATE TRIGGER repair_attempts_no_delete
+BEFORE DELETE ON repair_attempts
+BEGIN
+  SELECT RAISE(ABORT, 'RepairAttempt history is append-only');
+END;
+
+CREATE TRIGGER occurrences_evidence_no_update
+BEFORE UPDATE ON occurrences
+BEGIN
+  SELECT RAISE(ABORT, 'Occurrence evidence is immutable');
+END;
+
+CREATE TRIGGER occurrences_evidence_no_delete
+BEFORE DELETE ON occurrences
+BEGIN
+  SELECT RAISE(ABORT, 'Occurrence evidence is append-only');
+END;
+
+CREATE TRIGGER verifications_lifecycle_guard
+BEFORE UPDATE ON verifications
+WHEN NOT (
+  new.version = old.version + 1
+  AND new.updated_at > old.updated_at
+  AND new.criteria_snapshot IS old.criteria_snapshot
+  AND (
+    (
+      old.status = 'requested'
+      AND new.status = 'in_progress'
+      AND new.result_summary IS NULL
+      AND new.failure_reason IS NULL
+      AND new.blocked_reason IS NULL
+    )
+    OR (
+      old.status = 'in_progress'
+      AND new.status = 'passed'
+      AND new.result_summary IS NOT NULL
+      AND length(trim(new.result_summary)) > 0
+      AND new.failure_reason IS NULL
+      AND new.blocked_reason IS NULL
+    )
+    OR (
+      old.status = 'in_progress'
+      AND new.status = 'failed'
+      AND new.result_summary IS NOT NULL
+      AND length(trim(new.result_summary)) > 0
+      AND new.failure_reason IS NOT NULL
+      AND new.blocked_reason IS NULL
+    )
+    OR (
+      old.status = 'in_progress'
+      AND new.status = 'blocked'
+      AND new.result_summary IS NOT NULL
+      AND length(trim(new.result_summary)) > 0
+      AND new.failure_reason IS NULL
+      AND new.blocked_reason IS NOT NULL
+    )
+    OR (
+      old.status IN ('requested', 'in_progress')
+      AND new.status = 'cancelled'
+      AND new.result_summary IS NULL
+      AND new.failure_reason IS NULL
+      AND new.blocked_reason IS NULL
+    )
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Verification lifecycle requires a forward exact version CAS');
+END;
+
+CREATE TRIGGER verifications_initial_typed_guard
+BEFORE INSERT ON verifications
+WHEN NOT (
+  new.status = 'requested'
+  AND new.version = 1
+  AND new.created_at = new.updated_at
+  AND new.result_summary IS NULL
+  AND new.failure_reason IS NULL
+  AND new.blocked_reason IS NULL
+  AND EXISTS (
+    SELECT 1
+    FROM events AS event
+    JOIN users AS verifier_user
+      ON verifier_user.account_id = event.account_id
+     AND verifier_user.id = event.actor_user_id
+     AND verifier_user.status = 'active'
+    JOIN accounts AS verifier_account
+      ON verifier_account.id = event.account_id
+     AND verifier_account.status = 'active'
+    JOIN projects AS verifier_project
+      ON verifier_project.account_id = event.account_id
+     AND verifier_project.id = event.project_id
+     AND verifier_project.status = 'active'
+    JOIN memberships AS membership
+      ON membership.account_id = event.account_id
+     AND membership.project_id = event.project_id
+     AND membership.user_id = event.actor_user_id
+     AND membership.status = 'active'
+    JOIN membership_roles AS role
+      ON role.account_id = membership.account_id
+     AND role.project_id = membership.project_id
+     AND role.membership_id = membership.id
+     AND role.role = 'verifier'
+    JOIN users AS assigned_verifier_user
+      ON assigned_verifier_user.account_id = new.account_id
+     AND assigned_verifier_user.id = new.verifier_id
+     AND assigned_verifier_user.status = 'active'
+    JOIN memberships AS assigned_membership
+      ON assigned_membership.account_id = new.account_id
+     AND assigned_membership.project_id = new.project_id
+     AND assigned_membership.user_id = new.verifier_id
+     AND assigned_membership.status = 'active'
+    JOIN membership_roles AS assigned_role
+      ON assigned_role.account_id = assigned_membership.account_id
+     AND assigned_role.project_id = assigned_membership.project_id
+     AND assigned_role.membership_id = assigned_membership.id
+     AND assigned_role.role = 'verifier'
+    JOIN repair_attempts AS attempt
+      ON attempt.account_id = new.account_id
+     AND attempt.project_id = new.project_id
+     AND attempt.bug_id = new.bug_id
+     AND attempt.id = new.repair_attempt_id
+     AND attempt.status = 'delivered'
+    JOIN bugs AS bug
+      ON bug.account_id = new.account_id
+     AND bug.project_id = new.project_id
+     AND bug.id = new.bug_id
+    WHERE event.account_id = new.account_id
+      AND event.project_id = new.project_id
+      AND event.bug_id = new.bug_id
+      AND event.source = 'qa_hub'
+      AND event.actor_type = 'user'
+      AND event.type = 'verification.created'
+      AND event.aggregate_type = 'verification'
+      AND event.aggregate_id = new.id
+      AND event.resource_type = 'verification'
+      AND event.resource_id = new.id
+      AND event.resource_version_after = 1
+      AND event.request_digest IS NOT NULL
+      AND event.from_state IS NULL
+      AND event.to_state IS NULL
+      AND event.created_at = new.created_at
+      AND json_extract(event.payload_json, '$.status') = 'requested'
+      AND json_extract(event.payload_json, '$.verificationId') = new.id
+      AND json_extract(event.payload_json, '$.repairAttemptId') = new.repair_attempt_id
+      AND json_extract(event.payload_json, '$.buildId') IS new.build_id
+      AND json_extract(event.payload_json, '$.toVersion') = 1
+      AND (bug.severity NOT IN ('S0', 'S1') OR attempt.assignee_id <> new.verifier_id)
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Verification must begin as one requested version-one fact with current creator and assigned-verifier authority');
+END;
+
+CREATE TRIGGER verifications_typed_audit_guard
+BEFORE UPDATE OF status ON verifications
+WHEN new.status <> old.status AND NOT EXISTS (
+  SELECT 1
+  FROM events AS event
+  JOIN users AS verifier_user
+    ON verifier_user.account_id = event.account_id
+   AND verifier_user.id = event.actor_user_id
+   AND verifier_user.status = 'active'
+  JOIN accounts AS verifier_account
+    ON verifier_account.id = event.account_id
+   AND verifier_account.status = 'active'
+  JOIN projects AS verifier_project
+    ON verifier_project.account_id = event.account_id
+   AND verifier_project.id = event.project_id
+   AND verifier_project.status = 'active'
+  JOIN memberships AS membership
+    ON membership.account_id = new.account_id
+   AND membership.project_id = new.project_id
+   AND membership.user_id = new.verifier_id
+   AND membership.status = 'active'
+  JOIN membership_roles AS role
+    ON role.account_id = membership.account_id
+   AND role.project_id = membership.project_id
+   AND role.membership_id = membership.id
+   AND role.role = 'verifier'
+  WHERE event.account_id = new.account_id
+    AND event.project_id = new.project_id
+    AND event.bug_id = new.bug_id
+    AND event.source = 'qa_hub'
+    AND event.actor_type = 'user'
+    AND event.actor_user_id = new.verifier_id
+    AND event.aggregate_type = 'verification'
+    AND event.aggregate_id = new.id
+    AND event.resource_type = 'verification'
+    AND event.resource_id = new.id
+    AND event.resource_version_after = new.version
+    AND event.request_digest IS NOT NULL
+    AND event.created_at = new.updated_at
+    AND json_extract(event.payload_json, '$.verificationId') = new.id
+    AND json_extract(event.payload_json, '$.fromVersion') = old.version
+    AND json_extract(event.payload_json, '$.toVersion') = new.version
+    AND (
+      (
+        old.status = 'requested'
+        AND new.status = 'in_progress'
+        AND event.type = 'verification.started'
+        AND event.from_state IS NULL
+        AND event.to_state IS NULL
+        AND json_extract(event.payload_json, '$.status') = 'in_progress'
+      )
+      OR (
+        old.status = 'in_progress'
+        AND new.status IN ('passed', 'failed', 'blocked')
+        AND event.type = 'verification.result_recorded'
+        AND event.from_state = 'ready_for_verification'
+        AND event.to_state = CASE new.status
+          WHEN 'passed' THEN 'closed'
+          WHEN 'failed' THEN 'ready'
+          ELSE 'ready_for_verification'
+        END
+        AND json_extract(event.payload_json, '$.status') = new.status
+        AND json_extract(event.payload_json, '$.repairAttemptId') = new.repair_attempt_id
+        AND json_extract(event.payload_json, '$.buildId') IS new.build_id
+      )
+    )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Verification transition requires its exact assigned-human typed audit Event');
+END;
+
+CREATE TRIGGER verifications_no_delete
+BEFORE DELETE ON verifications
+BEGIN
+  SELECT RAISE(ABORT, 'Verification history is append-only');
+END;
+
+CREATE TABLE build_lineages (
+  id TEXT PRIMARY KEY CHECK (length(id) = 36),
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  lineage_key TEXT NOT NULL CHECK (length(lineage_key) BETWEEN 1 AND 100),
+  channel TEXT NOT NULL CHECK (length(channel) BETWEEN 1 AND 100),
+  created_at TEXT NOT NULL CHECK (length(created_at) >= 20),
+  version INTEGER NOT NULL CHECK (version = 1),
+  FOREIGN KEY (account_id, project_id)
+    REFERENCES projects(account_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, project_id, id),
+  UNIQUE (account_id, project_id, lineage_key)
+) STRICT;
+
+CREATE TRIGGER build_lineages_no_update
+BEFORE UPDATE ON build_lineages
+BEGIN
+  SELECT RAISE(ABORT, 'Build lineage identity is immutable');
+END;
+
+CREATE TRIGGER build_lineages_no_delete
+BEFORE DELETE ON build_lineages
+BEGIN
+  SELECT RAISE(ABORT, 'Build lineage identity is append-only');
+END;
+
+CREATE TABLE build_lineage_entries (
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  lineage_id TEXT NOT NULL CHECK (length(lineage_id) = 36),
+  ordinal INTEGER NOT NULL CHECK (ordinal >= 1),
+  build_id TEXT NOT NULL CHECK (length(build_id) = 36),
+  predecessor_build_id TEXT,
+  evidence_actor_id TEXT NOT NULL CHECK (length(evidence_actor_id) = 36),
+  evidence_event_id TEXT NOT NULL CHECK (length(evidence_event_id) = 36),
+  policy_version TEXT NOT NULL CHECK (policy_version = '1.0.0'),
+  created_at TEXT NOT NULL CHECK (length(created_at) >= 20),
+  version INTEGER NOT NULL CHECK (version = 1),
+  PRIMARY KEY (account_id, project_id, lineage_id, ordinal),
+  FOREIGN KEY (account_id, project_id, lineage_id)
+    REFERENCES build_lineages(account_id, project_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, build_id)
+    REFERENCES builds(account_id, project_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, predecessor_build_id)
+    REFERENCES builds(account_id, project_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, evidence_actor_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, evidence_event_id)
+    REFERENCES events(account_id, project_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, project_id, build_id),
+  UNIQUE (account_id, project_id, lineage_id, build_id),
+  UNIQUE (account_id, project_id, lineage_id, ordinal, build_id)
+) STRICT;
+
+CREATE TRIGGER build_lineage_entries_typed_guard
+BEFORE INSERT ON build_lineage_entries
+WHEN NOT EXISTS (
+  SELECT 1
+  FROM builds AS build
+  WHERE build.account_id = new.account_id
+    AND build.project_id = new.project_id
+    AND build.id = new.build_id
+    AND build.status = 'ready'
+)
+OR NOT (
+  (
+    new.ordinal = 1
+    AND new.predecessor_build_id IS NULL
+    AND NOT EXISTS (
+      SELECT 1 FROM build_lineage_entries AS existing
+      WHERE existing.account_id = new.account_id
+        AND existing.project_id = new.project_id
+        AND existing.lineage_id = new.lineage_id
+    )
+  )
+  OR (
+    new.ordinal > 1
+    AND EXISTS (
+      SELECT 1 FROM build_lineage_entries AS predecessor
+      WHERE predecessor.account_id = new.account_id
+        AND predecessor.project_id = new.project_id
+        AND predecessor.lineage_id = new.lineage_id
+        AND predecessor.ordinal = new.ordinal - 1
+        AND predecessor.build_id = new.predecessor_build_id
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM build_lineage_entries AS later
+      WHERE later.account_id = new.account_id
+        AND later.project_id = new.project_id
+        AND later.lineage_id = new.lineage_id
+        AND later.ordinal >= new.ordinal
+    )
+  )
+)
+OR NOT EXISTS (
+  SELECT 1
+  FROM events AS event
+  JOIN builds AS build
+    ON build.account_id = new.account_id
+   AND build.project_id = new.project_id
+   AND build.id = new.build_id
+  JOIN accounts AS account
+    ON account.id = new.account_id
+   AND account.status = 'active'
+  JOIN projects AS project
+    ON project.account_id = new.account_id
+   AND project.id = new.project_id
+   AND project.status = 'active'
+  JOIN users AS actor
+    ON actor.account_id = new.account_id
+   AND actor.id = new.evidence_actor_id
+   AND actor.status = 'active'
+  JOIN memberships AS membership
+    ON membership.account_id = new.account_id
+   AND membership.project_id = new.project_id
+   AND membership.user_id = new.evidence_actor_id
+   AND membership.status = 'active'
+  JOIN membership_roles AS role
+    ON role.account_id = membership.account_id
+   AND role.project_id = membership.project_id
+   AND role.membership_id = membership.id
+   AND role.role = 'release_manager'
+  WHERE event.id = new.evidence_event_id
+    AND event.account_id = new.account_id
+    AND event.project_id = new.project_id
+    AND event.bug_id IS NULL
+    AND event.type = 'build.lineage_entry_recorded'
+    AND event.source = 'qa_hub'
+    AND event.actor_type = 'user'
+    AND event.actor_user_id = new.evidence_actor_id
+    AND event.aggregate_type = 'build'
+    AND event.aggregate_id = new.lineage_id
+    AND event.aggregate_sequence = new.ordinal
+    AND event.resource_type = 'build'
+    AND event.resource_id = new.build_id
+    AND event.resource_version_after = build.version
+    AND event.request_digest IS NOT NULL
+    AND event.created_at = new.created_at
+    AND json_extract(event.payload_json, '$.status') = 'ranked'
+    AND json_extract(event.payload_json, '$.buildId') = new.build_id
+    AND (
+      (
+        new.ordinal = 1
+        AND json_type(event.payload_json, '$.fromVersion') IS NULL
+      )
+      OR (
+        new.ordinal > 1
+        AND json_type(event.payload_json, '$.fromVersion') = 'integer'
+        AND json_extract(event.payload_json, '$.fromVersion') = new.ordinal - 1
+      )
+    )
+    AND json_type(event.payload_json, '$.toVersion') = 'integer'
+    AND json_extract(event.payload_json, '$.toVersion') = new.ordinal
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Build lineage entry requires a contiguous server-ranked release fact');
+END;
+
+CREATE TRIGGER build_lineage_entries_no_update
+BEFORE UPDATE ON build_lineage_entries
+BEGIN
+  SELECT RAISE(ABORT, 'Build lineage entries are immutable');
+END;
+
+CREATE TRIGGER build_lineage_entries_no_delete
+BEFORE DELETE ON build_lineage_entries
+BEGIN
+  SELECT RAISE(ABORT, 'Build lineage entries are append-only');
+END;
+
+CREATE TABLE occurrence_build_lineage_facts (
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  bug_id TEXT NOT NULL CHECK (length(bug_id) = 36),
+  occurrence_id TEXT NOT NULL CHECK (length(occurrence_id) = 36),
+  build_id TEXT NOT NULL CHECK (length(build_id) = 36),
+  lineage_id TEXT NOT NULL CHECK (length(lineage_id) = 36),
+  ordinal INTEGER NOT NULL CHECK (ordinal >= 1),
+  append_event_id TEXT NOT NULL CHECK (length(append_event_id) = 36),
+  append_event_position INTEGER NOT NULL CHECK (append_event_position >= 1),
+  created_at TEXT NOT NULL CHECK (length(created_at) >= 20),
+  PRIMARY KEY (account_id, project_id, occurrence_id),
+  FOREIGN KEY (account_id, project_id, occurrence_id, bug_id)
+    REFERENCES occurrences(account_id, project_id, id, bug_id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, lineage_id, ordinal, build_id)
+    REFERENCES build_lineage_entries(account_id, project_id, lineage_id, ordinal, build_id)
+    ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, append_event_id)
+    REFERENCES events(account_id, project_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, project_id, append_event_id)
+) STRICT;
+
+CREATE UNIQUE INDEX events_one_occurrence_append
+  ON events(account_id, project_id, resource_type, resource_id)
+  WHERE type = 'occurrence.appended' AND resource_type = 'occurrence';
+
+CREATE TRIGGER events_occurrence_append_typed_guard
+BEFORE INSERT ON events
+WHEN new.type = 'occurrence.appended' AND NOT EXISTS (
+  SELECT 1
+  FROM occurrences AS occurrence
+  JOIN accounts AS account
+    ON account.id = occurrence.account_id
+   AND account.status = 'active'
+  JOIN projects AS project
+    ON project.account_id = occurrence.account_id
+   AND project.id = occurrence.project_id
+   AND project.status = 'active'
+  JOIN users AS actor
+    ON actor.account_id = occurrence.account_id
+   AND actor.id = new.actor_user_id
+   AND actor.status = 'active'
+  JOIN memberships AS membership
+    ON membership.account_id = occurrence.account_id
+   AND membership.project_id = occurrence.project_id
+   AND membership.user_id = new.actor_user_id
+   AND membership.status = 'active'
+  JOIN membership_roles AS role
+    ON role.account_id = membership.account_id
+   AND role.project_id = membership.project_id
+   AND role.membership_id = membership.id
+   AND role.role = 'reporter'
+  WHERE occurrence.account_id = new.account_id
+    AND occurrence.project_id = new.project_id
+    AND occurrence.bug_id = new.bug_id
+    AND occurrence.id = new.resource_id
+    AND occurrence.reporter_id = new.actor_user_id
+    AND new.source = 'qa_hub'
+    AND new.actor_type = 'user'
+    AND new.aggregate_type = 'bug'
+    AND new.aggregate_id = occurrence.bug_id
+    AND new.resource_type = 'occurrence'
+    AND new.resource_version_after = occurrence.version
+    AND new.request_digest IS NOT NULL
+    AND new.from_state IS NULL
+    AND new.to_state IS NULL
+    AND new.created_at = occurrence.created_at
+    AND json_extract(new.payload_json, '$.occurrenceId') = occurrence.id
+    AND json_type(new.payload_json, '$.fromVersion') = 'integer'
+    AND json_type(new.payload_json, '$.toVersion') = 'integer'
+    AND json_extract(new.payload_json, '$.toVersion') = json_extract(new.payload_json, '$.fromVersion') + 1
+)
+BEGIN
+  SELECT RAISE(ABORT, 'occurrence.appended Event requires one same-scope persisted Occurrence');
+END;
+
+CREATE TRIGGER events_occurrence_lineage_fact
+AFTER INSERT ON events
+WHEN new.type = 'occurrence.appended'
+BEGIN
+  INSERT INTO occurrence_build_lineage_facts(
+    account_id, project_id, bug_id, occurrence_id, build_id, lineage_id,
+    ordinal, append_event_id, append_event_position, created_at
+  )
+  SELECT occurrence.account_id, occurrence.project_id, occurrence.bug_id, occurrence.id,
+         occurrence.build_id, entry.lineage_id, entry.ordinal,
+         new.id, new.event_position, new.created_at
+  FROM occurrences AS occurrence
+  JOIN build_lineage_entries AS entry
+    ON entry.account_id = occurrence.account_id
+   AND entry.project_id = occurrence.project_id
+   AND entry.build_id = occurrence.build_id
+  WHERE occurrence.account_id = new.account_id
+    AND occurrence.project_id = new.project_id
+    AND occurrence.bug_id = new.bug_id
+    AND occurrence.id = new.resource_id;
+END;
+
+CREATE TRIGGER build_lineage_entries_backfill_occurrence_facts
+AFTER INSERT ON build_lineage_entries
+BEGIN
+  INSERT INTO occurrence_build_lineage_facts(
+    account_id, project_id, bug_id, occurrence_id, build_id, lineage_id,
+    ordinal, append_event_id, append_event_position, created_at
+  )
+  SELECT occurrence.account_id, occurrence.project_id, occurrence.bug_id, occurrence.id,
+         occurrence.build_id, new.lineage_id, new.ordinal,
+         event.id, event.event_position, event.created_at
+  FROM occurrences AS occurrence
+  JOIN events AS event
+    ON event.account_id = occurrence.account_id
+   AND event.project_id = occurrence.project_id
+   AND event.bug_id = occurrence.bug_id
+   AND event.type = 'occurrence.appended'
+   AND event.source = 'qa_hub'
+   AND event.actor_type = 'user'
+   AND event.actor_user_id = occurrence.reporter_id
+   AND event.aggregate_type = 'bug'
+   AND event.aggregate_id = occurrence.bug_id
+   AND event.resource_type = 'occurrence'
+   AND event.resource_id = occurrence.id
+   AND event.resource_version_after = occurrence.version
+   AND event.request_digest IS NOT NULL
+   AND event.from_state IS NULL
+   AND event.to_state IS NULL
+   AND event.created_at = occurrence.created_at
+   AND json_extract(event.payload_json, '$.occurrenceId') = occurrence.id
+   AND json_type(event.payload_json, '$.fromVersion') = 'integer'
+   AND json_type(event.payload_json, '$.toVersion') = 'integer'
+   AND json_extract(event.payload_json, '$.toVersion') = json_extract(event.payload_json, '$.fromVersion') + 1
+  WHERE occurrence.account_id = new.account_id
+    AND occurrence.project_id = new.project_id
+    AND occurrence.build_id = new.build_id;
+END;
+
+CREATE TRIGGER occurrence_build_lineage_facts_no_update
+BEFORE UPDATE ON occurrence_build_lineage_facts
+BEGIN
+  SELECT RAISE(ABORT, 'Occurrence Build lineage facts are immutable');
+END;
+
+CREATE TRIGGER occurrence_build_lineage_facts_no_delete
+BEFORE DELETE ON occurrence_build_lineage_facts
+BEGIN
+  SELECT RAISE(ABORT, 'Occurrence Build lineage facts are append-only');
+END;
+
+CREATE VIEW valid_human_bug_closures AS
+SELECT event.account_id,
+       event.project_id,
+       event.bug_id,
+       event.id AS close_event_id,
+       event.type AS close_event_type,
+       event.event_position AS close_event_position,
+       event.created_at AS closed_at,
+       event.actor_user_id,
+       verification.id AS verification_id,
+       verification.version AS verification_version,
+       verification.build_id AS verified_build_id,
+       attempt.id AS repair_attempt_id,
+       lineage_entry.lineage_id AS baseline_lineage_id,
+       lineage_entry.ordinal AS baseline_ordinal
+FROM events AS event
+JOIN bugs AS current_bug
+  ON current_bug.account_id = event.account_id
+ AND current_bug.project_id = event.project_id
+ AND current_bug.id = event.bug_id
+JOIN verifications AS verification
+  ON verification.account_id = event.account_id
+ AND verification.project_id = event.project_id
+ AND verification.bug_id = event.bug_id
+ AND verification.id = json_extract(event.payload_json, '$.verificationId')
+JOIN repair_attempts AS attempt
+  ON attempt.account_id = verification.account_id
+ AND attempt.project_id = verification.project_id
+ AND attempt.bug_id = verification.bug_id
+ AND attempt.id = verification.repair_attempt_id
+JOIN build_requirements AS requirement
+  ON requirement.account_id = attempt.account_id
+ AND requirement.project_id = attempt.project_id
+ AND requirement.bug_id = attempt.bug_id
+ AND requirement.repair_attempt_id = attempt.id
+JOIN accounts AS current_account
+  ON current_account.id = event.account_id
+ AND current_account.status = 'active'
+JOIN projects AS current_project
+  ON current_project.account_id = event.account_id
+ AND current_project.id = event.project_id
+ AND current_project.status = 'active'
+JOIN users AS current_actor
+  ON current_actor.account_id = event.account_id
+ AND current_actor.id = event.actor_user_id
+ AND current_actor.status = 'active'
+JOIN memberships AS membership
+  ON membership.account_id = event.account_id
+ AND membership.project_id = event.project_id
+ AND membership.user_id = event.actor_user_id
+ AND membership.status = 'active'
+JOIN membership_roles AS role
+  ON role.account_id = membership.account_id
+ AND role.project_id = membership.project_id
+ AND role.membership_id = membership.id
+ AND role.role = 'verifier'
+LEFT JOIN build_repair_links AS link
+  ON link.account_id = requirement.account_id
+ AND link.project_id = requirement.project_id
+ AND link.bug_id = requirement.bug_id
+ AND link.repair_attempt_id = requirement.repair_attempt_id
+ AND link.build_requirement_id = requirement.id
+LEFT JOIN builds AS build
+  ON build.account_id = verification.account_id
+ AND build.project_id = verification.project_id
+ AND build.id = verification.build_id
+LEFT JOIN build_lineage_entries AS lineage_entry
+  ON lineage_entry.account_id = verification.account_id
+ AND lineage_entry.project_id = verification.project_id
+ AND lineage_entry.build_id = verification.build_id
+WHERE event.source = 'qa_hub'
+  AND event.actor_type = 'user'
+  AND event.request_digest IS NOT NULL
+  AND event.actor_user_id = verification.verifier_id
+  AND event.from_state = 'ready_for_verification'
+  AND event.to_state = 'closed'
+  AND verification.status = 'passed'
+  AND attempt.status = 'delivered'
+  AND (current_bug.severity NOT IN ('S0', 'S1') OR attempt.assignee_id <> verification.verifier_id)
+  AND json_extract(event.payload_json, '$.status') = 'passed'
+  AND json_extract(event.payload_json, '$.repairAttemptId') = attempt.id
+  AND (
+    (
+      event.type = 'verification.result_recorded'
+      AND event.aggregate_type = 'verification'
+      AND event.aggregate_id = verification.id
+      AND event.resource_type = 'verification'
+      AND event.resource_id = verification.id
+      AND event.resource_version_after = verification.version
+      AND json_extract(event.payload_json, '$.fromVersion') = verification.version - 1
+      AND json_extract(event.payload_json, '$.toVersion') = verification.version
+    )
+    OR (
+      event.type = 'bug.verification.passed'
+      AND event.aggregate_type = 'bug'
+      AND event.aggregate_id = event.bug_id
+      AND event.resource_type = 'bug'
+      AND event.resource_id = event.bug_id
+    )
+  )
+  AND (
+    (
+      requirement.requirement = 'not_required'
+      AND requirement.version = 1
+      AND requirement.linked_build_id IS NULL
+      AND requirement.link_id IS NULL
+      AND verification.build_id IS NULL
+      AND requirement.decision_basis IN ('no_code_delivery', 'authorized_no_build_exemption')
+    )
+    OR (
+      requirement.requirement = 'required'
+      AND requirement.decision_basis = 'code_requires_build'
+      AND requirement.version = 2
+      AND requirement.linked_build_id = verification.build_id
+      AND requirement.link_id = link.id
+      AND build.status = 'ready'
+      AND link.version = 1
+      AND link.build_id = build.id
+      AND link.delivered_commit_sha = requirement.delivered_commit_sha
+      AND requirement.delivered_commit_sha = attempt.commit_sha
+      AND (
+        (
+          link.evidence_type = 'manifest'
+          AND link.evidence_decision = 'manifest_verified'
+          AND EXISTS (
+            SELECT 1 FROM build_manifest_commits AS manifest_commit
+            WHERE manifest_commit.account_id = build.account_id
+              AND manifest_commit.project_id = build.project_id
+              AND manifest_commit.build_id = build.id
+              AND manifest_commit.commit_sha = requirement.delivered_commit_sha
+          )
+        )
+        OR (
+          link.evidence_type = 'release_manager_override'
+          AND link.evidence_decision = 'release_manager_authorized'
+          AND link.override_reason IS NOT NULL
+        )
+      )
+    )
+  );
+
+CREATE TABLE bug_closure_acceptances (
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  bug_id TEXT NOT NULL CHECK (length(bug_id) = 36),
+  closure_generation INTEGER NOT NULL CHECK (closure_generation >= 0),
+  verification_id TEXT NOT NULL CHECK (length(verification_id) = 36),
+  close_event_id TEXT NOT NULL CHECK (length(close_event_id) = 36),
+  close_event_position INTEGER NOT NULL CHECK (close_event_position >= 1),
+  actor_user_id TEXT NOT NULL CHECK (length(actor_user_id) = 36),
+  closed_bug_version INTEGER NOT NULL CHECK (closed_bug_version >= 1),
+  closed_at TEXT NOT NULL CHECK (length(closed_at) >= 20),
+  baseline_kind TEXT NOT NULL CHECK (baseline_kind IN ('verified_build', 'unranked_build', 'no_build')),
+  baseline_build_id TEXT,
+  baseline_lineage_id TEXT,
+  baseline_ordinal INTEGER,
+  created_at TEXT NOT NULL CHECK (length(created_at) >= 20),
+  CHECK (
+    (baseline_kind = 'verified_build' AND baseline_build_id IS NOT NULL AND baseline_lineage_id IS NOT NULL AND baseline_ordinal IS NOT NULL)
+    OR (baseline_kind = 'unranked_build' AND baseline_build_id IS NOT NULL AND baseline_lineage_id IS NULL AND baseline_ordinal IS NULL)
+    OR (baseline_kind = 'no_build' AND baseline_build_id IS NULL AND baseline_lineage_id IS NULL AND baseline_ordinal IS NULL)
+  ),
+  PRIMARY KEY (account_id, project_id, bug_id, closure_generation),
+  FOREIGN KEY (account_id, project_id, bug_id)
+    REFERENCES bugs(account_id, project_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, verification_id, bug_id)
+    REFERENCES verifications(account_id, project_id, id, bug_id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, close_event_id)
+    REFERENCES events(account_id, project_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, baseline_build_id)
+    REFERENCES builds(account_id, project_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, project_id, baseline_lineage_id, baseline_ordinal, baseline_build_id)
+    REFERENCES build_lineage_entries(account_id, project_id, lineage_id, ordinal, build_id)
+    ON DELETE RESTRICT,
+  UNIQUE (account_id, project_id, close_event_id)
+) STRICT;
+
+CREATE TRIGGER bug_closure_acceptances_typed_insert_guard
+BEFORE INSERT ON bug_closure_acceptances
+WHEN NOT EXISTS (
+  SELECT 1
+  FROM bugs AS bug
+  JOIN valid_human_bug_closures AS proof
+    ON proof.account_id = bug.account_id
+   AND proof.project_id = bug.project_id
+   AND proof.bug_id = bug.id
+  WHERE bug.account_id = new.account_id
+    AND bug.project_id = new.project_id
+    AND bug.id = new.bug_id
+    AND bug.state = 'closed'
+    AND bug.closed_at = new.closed_at
+    AND bug.updated_at = new.created_at
+    AND bug.version = new.closed_bug_version
+    AND bug.reopen_count = new.closure_generation
+    AND proof.verification_id = new.verification_id
+    AND proof.close_event_id = new.close_event_id
+    AND proof.close_event_position = new.close_event_position
+    AND proof.actor_user_id = new.actor_user_id
+    AND proof.closed_at = new.closed_at
+    AND new.baseline_kind = CASE
+      WHEN proof.verified_build_id IS NULL THEN 'no_build'
+      WHEN proof.baseline_lineage_id IS NULL THEN 'unranked_build'
+      ELSE 'verified_build'
+    END
+    AND new.baseline_build_id IS proof.verified_build_id
+    AND new.baseline_lineage_id IS proof.baseline_lineage_id
+    AND new.baseline_ordinal IS proof.baseline_ordinal
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Bug closure acceptance requires the exact current human closure proof');
+END;
+
+CREATE TRIGGER bugs_human_close_proof_guard
+BEFORE UPDATE ON bugs
+WHEN old.state <> 'closed' AND new.state = 'closed' AND NOT EXISTS (
+  SELECT 1
+  FROM valid_human_bug_closures AS proof
+  WHERE proof.account_id = old.account_id
+    AND proof.project_id = old.project_id
+    AND proof.bug_id = old.id
+    AND old.state = 'ready_for_verification'
+    AND old.active_repair_attempt_id = proof.repair_attempt_id
+    AND old.active_verification_id = proof.verification_id
+    AND new.active_repair_attempt_id IS NULL
+    AND new.active_verification_id IS NULL
+    AND new.closed_at = proof.closed_at
+    AND new.updated_at = proof.closed_at
+    AND new.version = old.version + 1
+    AND new.reopen_count = old.reopen_count
+    AND proof.close_event_position > coalesce((
+      SELECT max(previous.event_position)
+      FROM events AS previous
+      WHERE previous.account_id = old.account_id
+        AND previous.project_id = old.project_id
+        AND previous.bug_id = old.id
+        AND previous.type = 'bug.reopen.newer_occurrence'
+    ), 0)
+    AND (
+      proof.close_event_type <> 'bug.verification.passed'
+      OR EXISTS (
+        SELECT 1 FROM events AS generic_close
+        WHERE generic_close.id = proof.close_event_id
+          AND generic_close.resource_version_after = new.version
+          AND json_extract(generic_close.payload_json, '$.fromVersion') = old.version
+          AND json_extract(generic_close.payload_json, '$.toVersion') = new.version
+      )
+    )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Bug closure requires current passed human Verification and typed audit proof');
+END;
+
+CREATE TRIGGER bugs_capture_closure_acceptance
+AFTER UPDATE ON bugs
+WHEN old.state <> 'closed' AND new.state = 'closed'
+BEGIN
+  INSERT INTO bug_closure_acceptances(
+    account_id, project_id, bug_id, closure_generation, verification_id,
+    close_event_id, close_event_position, actor_user_id, closed_bug_version,
+    closed_at, baseline_kind, baseline_build_id, baseline_lineage_id,
+    baseline_ordinal, created_at
+  )
+  SELECT proof.account_id, proof.project_id, proof.bug_id, new.reopen_count,
+         proof.verification_id, proof.close_event_id, proof.close_event_position,
+         proof.actor_user_id, new.version, new.closed_at,
+         CASE
+           WHEN proof.verified_build_id IS NULL THEN 'no_build'
+           WHEN proof.baseline_lineage_id IS NULL THEN 'unranked_build'
+           ELSE 'verified_build'
+         END,
+         proof.verified_build_id, proof.baseline_lineage_id, proof.baseline_ordinal,
+         new.updated_at
+  FROM valid_human_bug_closures AS proof
+  WHERE proof.account_id = new.account_id
+    AND proof.project_id = new.project_id
+    AND proof.bug_id = new.id
+    AND proof.verification_id = old.active_verification_id
+    AND proof.repair_attempt_id = old.active_repair_attempt_id
+    AND proof.closed_at = new.closed_at
+  ORDER BY proof.close_event_position DESC
+  LIMIT 1;
+END;
+
+CREATE TRIGGER bug_closure_acceptances_no_update
+BEFORE UPDATE ON bug_closure_acceptances
+BEGIN
+  SELECT RAISE(ABORT, 'Bug closure acceptance facts are immutable');
+END;
+
+CREATE TRIGGER bug_closure_acceptances_no_delete
+BEFORE DELETE ON bug_closure_acceptances
+BEGIN
+  SELECT RAISE(ABORT, 'Bug closure acceptance facts are append-only');
+END;
+
+CREATE TRIGGER bugs_newer_build_reopen_guard
+BEFORE UPDATE ON bugs
+WHEN old.state = 'closed' AND new.state = 'ready' AND NOT EXISTS (
+  SELECT 1
+  FROM bug_closure_acceptances AS closure
+  JOIN occurrence_build_lineage_facts AS occurrence_fact
+    ON occurrence_fact.account_id = closure.account_id
+   AND occurrence_fact.project_id = closure.project_id
+   AND occurrence_fact.bug_id = closure.bug_id
+   AND occurrence_fact.lineage_id = closure.baseline_lineage_id
+   AND occurrence_fact.ordinal > closure.baseline_ordinal
+  JOIN occurrences AS occurrence
+    ON occurrence.account_id = occurrence_fact.account_id
+   AND occurrence.project_id = occurrence_fact.project_id
+   AND occurrence.bug_id = occurrence_fact.bug_id
+   AND occurrence.id = occurrence_fact.occurrence_id
+   AND occurrence.build_id = occurrence_fact.build_id
+  JOIN events AS append_event
+    ON append_event.account_id = occurrence_fact.account_id
+   AND append_event.project_id = occurrence_fact.project_id
+   AND append_event.id = occurrence_fact.append_event_id
+   AND append_event.event_position = occurrence_fact.append_event_position
+  JOIN events AS reopen_event
+    ON reopen_event.account_id = closure.account_id
+   AND reopen_event.project_id = closure.project_id
+   AND reopen_event.bug_id = closure.bug_id
+  JOIN accounts AS current_account
+    ON current_account.id = reopen_event.account_id
+   AND current_account.status = 'active'
+  JOIN projects AS current_project
+    ON current_project.account_id = reopen_event.account_id
+   AND current_project.id = reopen_event.project_id
+   AND current_project.status = 'active'
+  JOIN users AS current_actor
+    ON current_actor.account_id = reopen_event.account_id
+   AND current_actor.id = reopen_event.actor_user_id
+   AND current_actor.status = 'active'
+  JOIN memberships AS membership
+    ON membership.account_id = reopen_event.account_id
+   AND membership.project_id = reopen_event.project_id
+   AND membership.user_id = reopen_event.actor_user_id
+   AND membership.status = 'active'
+  JOIN membership_roles AS role
+    ON role.account_id = membership.account_id
+   AND role.project_id = membership.project_id
+   AND role.membership_id = membership.id
+   AND role.role = 'triager'
+  WHERE closure.account_id = old.account_id
+    AND closure.project_id = old.project_id
+    AND closure.bug_id = old.id
+    AND closure.closure_generation = old.reopen_count
+    AND closure.closed_at = old.closed_at
+    AND closure.closed_bug_version <= old.version
+    AND closure.baseline_kind = 'verified_build'
+    AND occurrence_fact.append_event_position > closure.close_event_position
+    AND occurrence.created_at > closure.closed_at
+    AND append_event.type = 'occurrence.appended'
+    AND append_event.resource_type = 'occurrence'
+    AND append_event.resource_id = occurrence.id
+    AND json_extract(append_event.payload_json, '$.occurrenceId') = occurrence.id
+    AND reopen_event.type = 'bug.reopen.newer_occurrence'
+    AND reopen_event.source = 'qa_hub'
+    AND reopen_event.actor_type = 'user'
+    AND reopen_event.request_digest IS NOT NULL
+    AND reopen_event.aggregate_type = 'bug'
+    AND reopen_event.aggregate_id = old.id
+    AND reopen_event.resource_type = 'bug'
+    AND reopen_event.resource_id = old.id
+    AND reopen_event.resource_version_after = new.version
+    AND reopen_event.from_state = 'closed'
+    AND reopen_event.to_state = 'ready'
+    AND reopen_event.event_position > occurrence_fact.append_event_position
+    AND reopen_event.created_at = new.updated_at
+    AND json_extract(reopen_event.payload_json, '$.status') = 'ready'
+    AND json_extract(reopen_event.payload_json, '$.occurrenceId') = occurrence.id
+    AND json_extract(reopen_event.payload_json, '$.fromVersion') = old.version
+    AND json_extract(reopen_event.payload_json, '$.toVersion') = new.version
+    AND new.version = old.version + 1
+    AND new.reopen_count = old.reopen_count + 1
+    AND new.closed_at IS NULL
+    AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+    AND new.active_verification_id IS old.active_verification_id
+    AND new.title IS old.title
+    AND new.description IS old.description
+    AND new.expected_behavior IS old.expected_behavior
+    AND new.module_id IS old.module_id
+    AND new.severity IS old.severity
+    AND new.priority IS old.priority
+    AND new.owner_id IS old.owner_id
+    AND new.verification_owner_id IS old.verification_owner_id
+    AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+    AND new.occurrence_count = old.occurrence_count
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Bug reopen requires a later same-lineage server-ranked Build occurrence');
+END;
+
+DROP TRIGGER events_payload_privacy_guard;
+CREATE TRIGGER events_payload_privacy_guard
+BEFORE INSERT ON events
+WHEN json_type(new.payload_json) <> 'object'
+  OR length(CAST(new.payload_json AS BLOB)) > 4096
+  OR (
+    SELECT count(*)
+    FROM json_each(new.payload_json)
+  ) <> (
+    SELECT count(DISTINCT key)
+    FROM json_each(new.payload_json)
+  )
+  OR EXISTS (
+    SELECT 1 FROM json_each(new.payload_json)
+    WHERE NOT (
+      (
+        key IN ('summary', 'reason')
+        AND type = 'text'
+        AND length(value) BETWEEN 1 AND 2000
+      )
+      OR (
+        key = 'status'
+        AND type = 'text'
+        AND length(value) BETWEEN 1 AND 100
+        AND value = lower(value)
+        AND substr(value, 1, 1) GLOB '[a-z]'
+        AND value NOT GLOB '*[^a-z0-9_]*'
+      )
+      OR (
+        key IN (
+          'relatedBugId', 'repairAttemptId', 'buildId', 'verificationId',
+          'attachmentId', 'captureId', 'handoffId', 'commentId', 'occurrenceId'
+        )
+        AND type = 'text'
+        AND length(value) = 36
+        AND substr(value, 9, 1) = '-'
+        AND substr(value, 14, 1) = '-'
+        AND substr(value, 19, 1) = '-'
+        AND substr(value, 24, 1) = '-'
+        AND length(replace(value, '-', '')) = 32
+        AND lower(replace(value, '-', '')) NOT GLOB '*[^0-9a-f]*'
+        AND substr(value, 15, 1) GLOB '[1-8]'
+        AND lower(substr(value, 20, 1)) GLOB '[89ab]'
+      )
+      OR (
+        key = 'commitSha'
+        AND type = 'text'
+        AND length(value) = 40
+        AND value = lower(value)
+        AND value NOT GLOB '*[^0-9a-f]*'
+      )
+      OR (
+        key = 'attachmentCount'
+        AND type IN ('integer', 'real')
+        AND value = CAST(value AS INTEGER)
+        AND value BETWEEN 0 AND 20
+      )
+      OR (
+        key IN ('fromVersion', 'toVersion')
+        AND type IN ('integer', 'real')
+        AND value = CAST(value AS INTEGER)
+        AND value >= 1
+      )
+    )
+  )
+  OR EXISTS (
+    SELECT 1 FROM json_each(new.payload_json)
+    WHERE type = 'text'
+      AND value <> '[REDACTED]'
+      AND (
+        lower(value) GLOB '*authorization*[:=]*'
+        OR lower(value) LIKE '%bearer %'
+        OR lower(value) GLOB '*password*[:=]*'
+        OR lower(value) GLOB '*passwd*[:=]*'
+        OR lower(value) GLOB '*pwd*[:=]*'
+        OR lower(value) GLOB '*secret*[:=]*'
+        OR lower(value) GLOB '*token*[:=]*'
+        OR lower(value) GLOB '*cookie*[:=]*'
+        OR lower(value) GLOB '*credential*[:=]*'
+        OR lower(value) GLOB '*apikey*[:=]*'
+        OR lower(value) GLOB '*api_key*[:=]*'
+        OR lower(value) GLOB '*api-key*[:=]*'
+        OR lower(value) GLOB '*api key*[:=]*'
+        OR lower(value) GLOB '*private*key*[:=]*'
+        OR lower(value) GLOB '*://*:*@*'
+        OR lower(value) GLOB '*eyj????????*.*.*'
+        OR instr(value, char(92)) > 0
+      )
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'event payload violates bounded redacted audit policy');
+END;
+
+DROP TRIGGER builds_lifecycle_guard;
+CREATE TRIGGER builds_lifecycle_guard
+BEFORE UPDATE ON builds
+WHEN NOT (
+  (
+    old.status NOT IN ('ready', 'failed')
+    AND new.version = old.version + 1
+    AND new.updated_at > old.updated_at
+    AND (
+      new.status = old.status
+      OR new.status = 'failed'
+      OR (
+        CASE new.status
+          WHEN 'registered' THEN 0
+          WHEN 'queued' THEN 1
+          WHEN 'building' THEN 2
+          WHEN 'validating' THEN 3
+          WHEN 'publishing' THEN 4
+          WHEN 'ready' THEN 5
+          ELSE -1
+        END
+        >
+        CASE old.status
+          WHEN 'registered' THEN 0
+          WHEN 'queued' THEN 1
+          WHEN 'building' THEN 2
+          WHEN 'validating' THEN 3
+          WHEN 'publishing' THEN 4
+          ELSE 99
+        END
+      )
+    )
+  )
+  OR (
+    old.status = 'ready'
+    AND new.status = old.status
+    AND new.artifact_sha256 IS old.artifact_sha256
+    AND new.download_url IS old.download_url
+    AND new.version = old.version + 1
+    AND new.updated_at > old.updated_at
+    AND EXISTS (
+      SELECT 1
+      FROM build_repair_links AS link
+      JOIN events AS event
+        ON event.account_id = link.account_id
+       AND event.project_id = link.project_id
+       AND event.id = link.evidence_audit_event_id
+      WHERE link.account_id = old.account_id
+        AND link.project_id = old.project_id
+        AND link.build_id = old.id
+        AND event.type = 'build.repair_linked'
+        AND event.source = 'qa_hub'
+        AND event.actor_type = 'user'
+        AND event.actor_user_id = link.evidence_actor_id
+        AND event.aggregate_type = 'repair_attempt'
+        AND event.aggregate_id = link.repair_attempt_id
+        AND event.resource_type = 'build_repair_link'
+        AND event.resource_id = link.id
+        AND json_extract(event.payload_json, '$.buildId') = old.id
+        AND json_extract(event.payload_json, '$.repairAttemptId') = link.repair_attempt_id
+        AND json_extract(event.payload_json, '$.status') = 'ready_for_verification'
+        AND json_extract(event.payload_json, '$.commitSha') = link.delivered_commit_sha
+        AND json_extract(event.payload_json, '$.fromVersion') = old.version
+        AND json_extract(event.payload_json, '$.toVersion') = new.version
+    )
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Build lifecycle requires a forward CAS transition');
+END;
+
+DROP TRIGGER builds_linked_no_update;
+CREATE TRIGGER builds_linked_no_update
+BEFORE UPDATE ON builds
+WHEN EXISTS (
+  SELECT 1 FROM build_repair_links AS link
+  WHERE link.account_id = old.account_id
+    AND link.project_id = old.project_id
+    AND link.build_id = old.id
+)
+AND NOT (
+  old.status = 'ready'
+  AND new.status = old.status
+  AND new.artifact_sha256 IS old.artifact_sha256
+  AND new.download_url IS old.download_url
+  AND new.version = old.version + 1
+  AND new.updated_at > old.updated_at
+  AND EXISTS (
+    SELECT 1
+    FROM build_repair_links AS link
+    JOIN events AS event
+      ON event.account_id = link.account_id
+     AND event.project_id = link.project_id
+     AND event.id = link.evidence_audit_event_id
+    WHERE link.account_id = old.account_id
+      AND link.project_id = old.project_id
+      AND link.build_id = old.id
+      AND event.type = 'build.repair_linked'
+      AND event.source = 'qa_hub'
+      AND event.actor_type = 'user'
+      AND event.actor_user_id = link.evidence_actor_id
+      AND event.aggregate_type = 'repair_attempt'
+      AND event.aggregate_id = link.repair_attempt_id
+      AND event.resource_type = 'build_repair_link'
+      AND event.resource_id = link.id
+      AND json_extract(event.payload_json, '$.buildId') = old.id
+      AND json_extract(event.payload_json, '$.repairAttemptId') = link.repair_attempt_id
+      AND json_extract(event.payload_json, '$.status') = 'ready_for_verification'
+      AND json_extract(event.payload_json, '$.commitSha') = link.delivered_commit_sha
+      AND json_extract(event.payload_json, '$.fromVersion') = old.version
+      AND json_extract(event.payload_json, '$.toVersion') = new.version
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'Build facts referenced by a repair link are immutable');
+END;
+`;
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -4168,6 +6699,7 @@ function migration(version: number, name: string, sql: string): SqliteMigration 
 export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(1, "app_first_core", CORE_SCHEMA_SQL),
   migration(2, "bug_full_text_search", FTS_SCHEMA_SQL),
+  migration(3, "domain_audit_alignment", DOMAIN_AUDIT_ALIGNMENT_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;
