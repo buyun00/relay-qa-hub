@@ -41,6 +41,7 @@ fun FoundationScreen(
     onDispatchToRelay: () -> Unit = viewModel::dispatchToRelay,
     onAdoptFixAndBindQaBuild: () -> Unit = viewModel::adoptFixAndBindQaBuild,
     onRefreshInbox: () -> Unit = viewModel::refreshInbox,
+    onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     FoundationScreen(
@@ -53,6 +54,7 @@ fun FoundationScreen(
         onDispatchToRelay = onDispatchToRelay,
         onAdoptFixAndBindQaBuild = onAdoptFixAndBindQaBuild,
         onRefreshInbox = onRefreshInbox,
+        onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
     )
 }
 
@@ -67,6 +69,7 @@ internal fun FoundationScreen(
     onDispatchToRelay: () -> Unit = {},
     onAdoptFixAndBindQaBuild: () -> Unit = {},
     onRefreshInbox: () -> Unit = {},
+    onCreateBugAndCheckDuplicates: () -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier
@@ -209,6 +212,33 @@ internal fun FoundationScreen(
                 "failed" -> Text(
                     text = "QA Inbox error: ${state.inbox.errorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("inbox-status"),
+                )
+            }
+            Button(
+                onClick = onCreateBugAndCheckDuplicates,
+                enabled = state.duplicateCandidates.phase != "loading",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("check-duplicates"),
+            ) {
+                Text("创建 Bug 并检查重复")
+            }
+            when (state.duplicateCandidates.phase) {
+                "loading" -> Text(
+                    text = "Duplicate candidates: loading…",
+                    modifier = Modifier.testTag("duplicate-status"),
+                )
+                "loaded" -> Text(
+                    text = "Duplicate candidates ${state.duplicateCandidates.count}; " +
+                        "first=${state.duplicateCandidates.firstBugKey ?: "none"}; " +
+                        "score=${state.duplicateCandidates.firstScore ?: 0.0}; " +
+                        "reason=${state.duplicateCandidates.firstReason ?: "none"}.",
+                    modifier = Modifier.testTag("duplicate-status"),
+                )
+                "failed" -> Text(
+                    text = "Duplicate check error: " +
+                        "${state.duplicateCandidates.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("duplicate-status"),
                 )
             }
             Row(

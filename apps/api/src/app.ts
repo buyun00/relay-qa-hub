@@ -47,6 +47,11 @@ import {
   type MobileBuildStore,
 } from "./mobile-builds.js";
 import {
+  MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
+  requireDuplicateBugUuid,
+  type MobileDuplicateStore,
+} from "./mobile-duplicates.js";
+import {
   MOBILE_NOTIFICATION_LIST_PATH,
   parseMobileNotificationLimit,
   type MobileNotificationStore,
@@ -94,6 +99,7 @@ export interface CreateApiAppOptions {
   readonly mobileCaptureStore?: MobileCaptureStore;
   readonly mobileRelayStore?: MobileRelayStore;
   readonly mobileBuildStore?: MobileBuildStore;
+  readonly mobileDuplicateStore?: MobileDuplicateStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
@@ -163,6 +169,12 @@ const unconfiguredMobileBuildStore: MobileBuildStore = {
   getBuild: () => null,
 };
 
+const unconfiguredMobileDuplicateStore: MobileDuplicateStore = {
+  listCandidates: () => {
+    throw new Error("MobileDuplicateStore is not configured");
+  },
+};
+
 const unconfiguredMobileNotificationStore: MobileNotificationStore = {
   listNotifications: () => {
     throw new Error("MobileNotificationStore is not configured");
@@ -203,6 +215,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
   const mobileRelayStore = options.mobileRelayStore ?? unconfiguredMobileRelayStore;
   const mobileBuildStore = options.mobileBuildStore ?? unconfiguredMobileBuildStore;
+  const mobileDuplicateStore =
+    options.mobileDuplicateStore ?? unconfiguredMobileDuplicateStore;
   const mobileNotificationStore =
     options.mobileNotificationStore ?? unconfiguredMobileNotificationStore;
   const mobileRelayWebhookStore =
@@ -365,6 +379,44 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(bug);
   });
+
+  app.get<{ Params: { bugId: string } }>(
+    MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const bugId = requireDuplicateBugUuid(request.params.bugId, "bugId");
+        const result = await mobileDuplicateStore.listCandidates({
+          actorId: debugActorId,
+          bugId,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        const code = (error as { code?: unknown })?.code;
+        if (code === "NOT_FOUND") {
+          return reply
+            .code(404)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code });
+        }
+        if (code === "FORBIDDEN") {
+          return reply
+            .code(403)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code });
+        }
+        if (error instanceof TypeError || code === "INVALID_REQUEST") {
+          return reply
+            .code(400)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "INVALID_REQUEST" });
+        }
+        throw error;
+      }
+    },
+  );
 
   const relayErrorReply = (
     error: unknown,

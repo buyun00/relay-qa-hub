@@ -243,6 +243,12 @@ export type {
   MobileOccurrenceInput,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
+export { listMobileDuplicateCandidates } from "./mobile-duplicate-store.js";
+export type {
+  ListMobileDuplicateCandidatesInput,
+  MobileDuplicateCandidate,
+  MobileDuplicateCandidateList,
+} from "./mobile-duplicate-store.js";
 export {
   MOBILE_FAKE_RELAY_INSTANCE_ID,
   MOBILE_FAKE_RELAY_PRINCIPAL_ID,

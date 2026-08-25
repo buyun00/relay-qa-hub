@@ -74,6 +74,16 @@ export type {
 } from "./mobile-builds.js";
 
 export {
+  MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
+  requireDuplicateBugUuid,
+} from "./mobile-duplicates.js";
+export type {
+  MobileDuplicateCandidate,
+  MobileDuplicateCandidateList,
+  MobileDuplicateStore,
+} from "./mobile-duplicates.js";
+
+export {
   MOBILE_NOTIFICATION_LIST_PATH,
   parseMobileNotificationLimit,
 } from "./mobile-inbox.js";

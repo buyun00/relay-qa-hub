@@ -18,6 +18,7 @@ import com.relayqahub.android.network.CaptureBundlePocoInput
 import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.network.BuildProjectionFailure
 import com.relayqahub.android.network.BuildProjectionResult
+import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
 import com.relayqahub.android.network.RelayHandoffFailure
 import com.relayqahub.android.network.RelayHandoffResult
@@ -48,6 +49,7 @@ data class FoundationUiState(
     val relayHandoff: RelayHandoffResult? = null,
     val buildProjection: BuildProjectionUiState = BuildProjectionUiState(),
     val inbox: InboxUiState = InboxUiState(),
+    val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
 )
 
 data class BuildProjectionUiState(
@@ -66,11 +68,26 @@ data class InboxUiState(
     val errorCode: String? = null,
 )
 
+data class DuplicateCandidateUiState(
+    val phase: String = "idle",
+    val sourceBugId: String? = null,
+    val count: Int = 0,
+    val firstBugKey: String? = null,
+    val firstScore: Double? = null,
+    val firstReason: String? = null,
+    val errorCode: String? = null,
+)
+
 private data class ScopeUiValues(
     val accountName: String,
     val projectName: String,
     val cachedItemCount: Int,
     val queuedOperationCount: Int,
+)
+
+private data class DeliveryUiValues(
+    val buildProjection: BuildProjectionUiState,
+    val inbox: InboxUiState,
 )
 
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
@@ -80,6 +97,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val latestRelayHandoff = MutableStateFlow<RelayHandoffResult?>(null)
     private val buildProjection = MutableStateFlow(BuildProjectionUiState())
     private val inbox = MutableStateFlow(InboxUiState())
+    private val duplicateCandidates = MutableStateFlow(DuplicateCandidateUiState())
 
     private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
@@ -95,13 +113,17 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
+    private val deliveryState = combine(buildProjection, inbox) { projection, inboxState ->
+        DeliveryUiValues(buildProjection = projection, inbox = inboxState)
+    }
+
     val uiState = combine(
         scopeState,
         lastAction,
         latestRelayHandoff,
-        buildProjection,
-        inbox,
-    ) { values, action, handoff, projection, inboxState ->
+        deliveryState,
+        duplicateCandidates,
+    ) { values, action, handoff, delivery, duplicateState ->
         val support = appContainer.credentialVault.support()
         FoundationUiState(
             accountName = values.accountName,
@@ -115,8 +137,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             },
             lastAction = action,
             relayHandoff = handoff,
-            buildProjection = projection,
-            inbox = inboxState,
+            buildProjection = delivery.buildProjection,
+            inbox = delivery.inbox,
+            duplicateCandidates = duplicateState,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -340,6 +363,84 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private fun setInboxFailure(code: String) {
         inbox.value = InboxUiState(phase = "failed", errorCode = code)
         lastAction.value = "QA Inbox read failed: $code."
+    }
+
+    fun createBugAndCheckDuplicates() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setDuplicateFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            duplicateCandidates.value = DuplicateCandidateUiState(phase = "loading")
+            lastAction.value = "Creating a QA Bug and checking duplicate candidates…"
+            runCatching {
+                appContainer.scopedRepository.seedFoundationScope(scope)
+                when (
+                    appContainer.credentialVault.put(
+                        scope = scope.nativeSessionScope(),
+                        credentials = NativeCredentials(
+                            accessToken = accessToken,
+                            refreshToken = LIVE_SMOKE_UNUSED_REFRESH_TOKEN,
+                            accessTokenExpiresAtEpochMs =
+                                System.currentTimeMillis() + LIVE_SMOKE_CREDENTIAL_TTL_MS,
+                            sharedDeviceSession = false,
+                        ),
+                    )
+                ) {
+                    is VaultResult.Success -> Unit
+                    VaultResult.Missing -> throw DuplicateCandidateFailure("CREDENTIAL_WRITE_MISSING")
+                    is VaultResult.Unavailable ->
+                        throw DuplicateCandidateFailure("CREDENTIAL_VAULT_UNAVAILABLE")
+                }
+                val submissionId = UUID.randomUUID().toString()
+                val operationId = appContainer.scopedRepository.enqueue(
+                    scope = scope,
+                    request = FoundationCreateBugContract.buildOperation(
+                        projectId = scope.projectId,
+                        submissionId = submissionId,
+                        observedAt = Instant.now().toString(),
+                        qaAppVersion = BuildConfig.VERSION_NAME,
+                    ),
+                )
+                appContainer.syncEngine.run(scope)
+                val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
+                    ?: throw DuplicateCandidateFailure("BUG_COMMIT_RECEIPT_MISSING")
+                appContainer.duplicateCandidateClient.listCandidates(
+                    bugId = receipt.bugId,
+                    accessToken = accessToken,
+                )
+            }.onSuccess { result ->
+                val first = result.candidates.firstOrNull()
+                duplicateCandidates.value = DuplicateCandidateUiState(
+                    phase = "loaded",
+                    sourceBugId = result.sourceBugId,
+                    count = result.candidates.size,
+                    firstBugKey = first?.bugKey,
+                    firstScore = first?.score,
+                    firstReason = first?.reasons?.firstOrNull(),
+                )
+                lastAction.value =
+                    "Duplicate check returned ${result.candidates.size} candidate(s) for " +
+                        result.sourceBugId + "."
+            }.onFailure { failure ->
+                setDuplicateFailure(
+                    if (failure is DuplicateCandidateFailure) {
+                        failure.code
+                    } else {
+                        "UNEXPECTED_DUPLICATE_FAILURE"
+                    },
+                )
+            }
+        }
+    }
+
+    private fun setDuplicateFailure(code: String) {
+        duplicateCandidates.value = DuplicateCandidateUiState(
+            phase = "failed",
+            errorCode = code,
+        )
+        lastAction.value = "Duplicate check failed: $code."
     }
 
     fun submitCapturedPng(

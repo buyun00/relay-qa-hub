@@ -30,6 +30,10 @@ import {
   type RegisterMobileBuildInput,
 } from "./mobile-build-store.js";
 import {
+  listMobileDuplicateCandidates,
+  type ListMobileDuplicateCandidatesInput,
+} from "./mobile-duplicate-store.js";
+import {
   syncAndListMobileNotifications,
   type ListMobileNotificationsInput,
 } from "./mobile-inbox-store.js";
@@ -75,6 +79,7 @@ interface WorkerRequest {
     | "ensureMobileScope"
     | "createMobileBug"
     | "getMobileBug"
+    | "listMobileDuplicateCandidates"
     | "createMobileCapture"
     | "getMobileCapture"
     | "registerMobileBuild"
@@ -215,6 +220,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly bugId: string;
     };
     return getMobileBug(requireDatabase(), payload, payload.bugId);
+  }
+
+  if (request.operation === "listMobileDuplicateCandidates") {
+    return listMobileDuplicateCandidates(
+      requireDatabase(),
+      request.payload as ListMobileDuplicateCandidatesInput,
+    );
   }
 
   if (request.operation === "createMobileCapture") {
