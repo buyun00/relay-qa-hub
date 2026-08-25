@@ -14,8 +14,8 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: a8998983fda15c65c0e97d41eb401c887269af97
-  last_verified_at: 2026-08-25T09:54:49+08:00
+  last_verified_commit: 8c1d821d24b99a2fff939806f0095cf97dd7d908
+  last_verified_at: 2026-08-25T10:25:29+08:00
   next_action: P3.3 首个 API 到 Android/MuMu 的 Bug/Occurrence 真链路已验证；当前接最小 attachment session/chunk/finalize/bind 与 Room 队列，随后进入 capture/overlay/Poco
   blockers:
     - 当前 MuMu API35 MVP 垂直切片无外部 blocker；G1/G2 仍未正式关闭，但按执行 override 不阻塞 P3 主链路实现
