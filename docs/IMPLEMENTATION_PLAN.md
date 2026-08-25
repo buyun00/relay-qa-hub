@@ -9,25 +9,25 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P3
-  current_gate: G3-ANDROID-APP-READY
+  current_phase: P7
+  current_gate: G7-WORKBENCH-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 6de01a9
-  last_verified_at: 2026-08-25T18:04:43+08:00
-  next_action: P3.5 IN_PROGRESS（post-P4 MVP consolidation）；在已验证的重启回读上接一条原生 Comment create/read 与 audit timeline 回读；一个不存在 Bug 明确 404
+  last_verified_commit: c2788b7
+  last_verified_at: 2026-08-25T18:30:47+08:00
+  next_action: P7.4 IN_PROGRESS；把现有 React/Vite 壳接到真实 4319 API，桌面页面渲染一条 SQLite Bug 列表记录，并明确显示一个不存在项目/错误响应
   blockers:
-    - 当前 MuMu API35 P3.5 Comment/audit 原子切片无外部 blocker；restart-safe human-workflow 404/200 已实证，但 G3/G4 仍未正式关闭
+    - 当前 P7.4 首条 Web Bug 列表垂直切片无外部 blocker；现有 apps/web 仅是写有“P0 运行骨架 · 暂未连接业务 API”的壳，不能描述为管理平台
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
     - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
 ```
 
 ## 1. 决策摘要
 
-QA Hub 是一个独立、手机优先的缺陷闭环系统。它必须在 Relay 完全不可用时仍能完成提单、分诊、人工分配、修复登记、构建关联、验收、失败重开和关闭。
+QA Hub 是一个独立、双客户端职责分离的缺陷闭环系统。它必须在 Relay 完全不可用时仍能完成提单、分诊、人工分配、修复登记、构建关联、验收、失败重开和关闭。
 
-G0 完成后用户将客户端架构正式改为 App-first：原生 Android App 是唯一主要人机客户端；独立 QA Hub API/数据库继续是唯一业务事实源；Relay 仍只是可选修复执行器。现有 Web 骨架保留为 post-MVP 桌面管理/只读诊断资产，不再发展为 PWA、安装入口或离线取证主客户端。
+最新产品边界以独立 QA Hub API/数据库为唯一业务事实源：Android 原生 App 负责现场悬浮球截图、Poco/Unity 上下文、快速提单、附件、离线草稿/重试与轻量提交状态；`apps/web` 是当前 MVP 的桌面正式管理平台，负责完整分诊、管理与人工闭环。Web 不是 PWA，不承担手机截图、离线取证或 WebView 包壳；Android 与 Web 都只访问 QA Hub API，绝不直连 Relay。
 
 Relay 只通过一键派发和可靠事件回写参与某些修复尝试：
 
@@ -56,12 +56,13 @@ QA Bug
 ### 2.1 第一版必须交付
 
 - 项目、模块、成员、角色和项目级权限。
-- Android 原生 App 中完成快速上报、编辑、列表/筛选、去重提示、评论、附件、分配、状态、验收、审计、通知、离线队列和断点续传。
+- Android 原生 App 完成快速上报、极简编辑、悬浮球/系统分享取证、Poco enrichment、附件、离线草稿/重试和轻量“我提交的/上传状态/必要通知”。
+- 桌面 Web 正式管理平台完成 Bug 列表/搜索/组合筛选、详情/证据、去重合并、负责人、状态、评论、RepairAttempt、Build、Verification/关闭、Relay 回执/重试、审计与必要设置。
 - Bug、Occurrence、RepairAttempt、Build、Verification、Event 完整模型。
 - 分诊、分配、人工修复、Relay 修复、外部修复、待构建、待验收、失败重开和关闭。
 - 唯一编号、传输幂等、相似 Bug 候选、追加发生记录。
-- App 首页原生提供“待我处理”“待我验收”“由我报告”和全量检索/筛选，不使用 WebView 包壳。
-- App 内一键交给 Relay、继续原 Relay 任务并展示自动回写的交付和构建进度。
+- Android 首页原生提供快速采集/提交、离线队列和轻量提交状态，不使用 WebView 包壳。
+- Web 管理台通过 QA Hub API 一键交给 Relay、重试并展示自动回写的交付和构建进度。
 - 站内 Inbox、Android 通知、超时提醒和共享测试机模式。
 - 追加式审计、健康检查、结构化日志、备份、隔离恢复和回滚。
 - Android 15/16/17 App/Poco 矩阵和独立 HTTPS canary；Android 15/API 35 是最低支持层，Android 16/API 36 是运行兼容层，Android 17/API 37 是默认编译/目标与行为 Gate，按 P9 真机要求执行。
@@ -71,14 +72,14 @@ QA Bug
 - Sprint、需求、工时、OKR 等通用项目管理。
 - 取代 GitLab、Relay、Unity Worker、构建系统或发布系统。
 - 静默后台录屏、后台摄像头/麦克风监听。
-- 将 Web/PWA、WebView 包壳或浏览器离线捕获作为 MVP 主客户端。
+- 将 Web 做成 PWA、移动截图/离线取证客户端或 WebView 包壳。
 - 未经人工确认的语义自动合并或自动关闭。
 - 多活、多区域和跨数据中心容灾。
 - 依赖轻语账号、ID、状态、Cookie、API 或同步。
 
 ### 2.3 后续候选
 
-- post-MVP 桌面批量管理/只读诊断 Web；不承担现场移动流转或离线取证。
+- Web 的高级批量操作、复杂报表和非必要设置增强；正式基础管理平台已进入当前 MVP。
 - PostgreSQL、多实例、对象存储和企业 OIDC。
 - AI 辅助归类、相似候选解释和摘要；始终保留人工决定权。
 
@@ -330,10 +331,10 @@ D:\Relay-QA-Hub-Data\            可配置持久目录，生产前核对磁盘�
 
 - Node.js `>=24.19 <25`、TypeScript strict。
 - npm workspaces 单仓库。
-- `apps/web`：保留现有 React/Vite 骨架，post-MVP 仅作桌面批量管理/只读诊断；不再投入 PWA 安装、Service Worker 或浏览器离线捕获。
+- `apps/web`：React/Vite 桌面正式管理平台；通过同一 QA Hub API 完成列表、详情、分配、状态、评论、Relay、Verification、审计和设置；不投入 PWA、Service Worker 或浏览器离线取证。
 - `apps/api`：Fastify 或同等轻量 Node API，OpenAPI + Zod schema。
 - `apps/worker`：通知、重复候选、Outbox/Inbox、Relay/Build adapter。
-- `apps/android`：原生 Kotlin + Jetpack Compose 主客户端；Room 本地队列/缓存、WorkManager 受约束上传重试、前台服务承载 MediaProjection/悬浮球、最小 Poco SimpleRPC/Kotlin 只读 adapter。
+- `apps/android`：原生 Kotlin + Jetpack Compose 现场采集/上报客户端；Room 本地草稿/上传队列、WorkManager 受约束重试、前台服务承载 MediaProjection/悬浮球、最小 Poco SimpleRPC/Kotlin 只读 adapter。
 - `packages/domain`：状态机和守卫，禁止依赖 Web/DB。
 - `packages/contracts`：OpenAPI/事件 schema 和生成类型。
 - `packages/storage`：Repository、SQLite 和附件存储接口。
@@ -541,13 +542,13 @@ Relay 事件只能更新当前 `RepairAttempt` 的 Relay receipt/投影和通知
 
 迟到事件必须检查当前 Attempt generation 和 handling mode，不能覆盖已经转人工或被取代的 Attempt。`cancelled`、`task.closed` 和未识别的原始状态只存审计元数据，不得扩展投影动作 allowlist。
 
-## 10. Android 原生主客户端、离线、取证与通知
+## 10. Android 现场采集客户端、离线、取证与通知
 
-### 10.1 App-first 业务体验
+### 10.1 现场快速上报体验
 
-- Android App 是唯一主要人机客户端，首页原生实现缺陷创建/编辑、列表/筛选、相似候选、评论、附件、分配、状态、验收、审计、通知，以及“一键交给 Relay”和 Relay 回执；禁止 WebView 包壳。
+- Android App 聚焦缺陷快速创建/极简编辑、悬浮球/分享取证、附件、Poco enrichment、离线队列，以及“我提交的/上传状态/必要通知”等轻量查询；禁止 WebView 包壳，不继续承载完整管理后台。
 - QA Hub API/数据库是唯一事实源。Room 只保存按账号/项目隔离的缓存、草稿和本地操作队列；上线后以服务端版本/事件对账，不能在本地决定最终状态或验收。
-- Relay 离线时，App 到 QA Hub 的提单、分诊、人工修复登记、Build 关联、验收、失败重开和关闭仍完整可用。
+- Relay 离线时，Android 到 QA Hub 的现场上报仍可用；完整分诊、人工修复、Build、验收、重开和关闭由 Web 通过同一 QA Hub API 完成。
 - 共享测试机采用短会话、显式用户/项目上下文、退出撤销通知并清除本账号 Room/媒体/token 命名空间。
 
 ### 10.2 Room 队列、WorkManager 与附件
@@ -585,9 +586,9 @@ Poco 协议/安全基线以官方上游源码为准：[SimpleRPC Python framing]
 - 事件覆盖待分诊、被分配、待补充、修复已交付、待构建、待验收、超时和重新打开；点击深链到原生 App 对应 item。
 - 锁屏只显示最少信息；订阅失效自动清理，支持静默期、个人偏好和共享测试机退出撤销。
 
-### 10.6 post-MVP Web
+### 10.6 桌面正式管理 Web
 
-现有 `apps/web` 代码和 P0.4 提交完整保留，但从 MVP 关键路径移除，归入 P7.4 的 post-MVP 桌面批量管理/只读诊断台。后续不继续开发 PWA 安装、Service Worker、浏览器离线草稿或浏览器截图/录屏；Web 不称 PWA，也不替代原生 App 的现场流转。
+`apps/web` 重新进入当前 MVP 关键路径并归入 P7.4。当前代码仍只是 P0.4 React/Vite 运行壳，页面明确写着“P0 运行骨架 · 暂未连接业务 API”，不得描述为已有管理平台。它将通过与 Android 共用的 QA Hub API/认证/数据库实现桌面 Bug 列表/搜索/组合筛选、详情/证据、去重、负责人/状态、评论、RepairAttempt、Build、人工验收/关闭、Relay 派发/回执/失败重试、审计，以及项目/人员/角色/模块/Relay 集成等必要设置。它不是 PWA，不开发 Service Worker、浏览器离线草稿、截图/录屏或手机安装入口。
 
 Android 平台基线以官方文档为准：[`SYSTEM_ALERT_WINDOW`](https://developer.android.com/reference/android/Manifest.permission#SYSTEM_ALERT_WINDOW)、[MediaProjection](https://developer.android.com/media/grow/media-projection)、[mediaProjection 前台服务类型](https://developer.android.com/develop/background-work/services/fgs/service-types)、[用户停止前台服务](https://developer.android.com/develop/background-work/services/fgs/handle-user-stopping)、[接收 Sharesheet 内容](https://developer.android.com/develop/ui/compose/sharing/receive)、[Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker)、[Android 14 截图检测](https://developer.android.com/about/versions/14/features/screenshot-detection)、[`FLAG_SECURE`](https://developer.android.com/reference/android/view/Display#FLAG_SECURE)、[Android Keystore](https://developer.android.com/privacy-and-security/keystore) 和 [app-specific storage](https://developer.android.com/training/data-storage/app-specific)。
 
@@ -601,7 +602,7 @@ Android 平台基线以官方文档为准：[`SYSTEM_ALERT_WINDOW`](https://deve
 - CSP、HSTS、Referrer-Policy、`nosniff`、下载 disposition 和文件名净化。
 - 速率限制：登录、报告、搜索、上传 init/chunk/finalize、Webhook。
 - 日志禁止包含 Cookie、Authorization、密码、Token、正文、原始附件和未脱敏账号。
-- 共享手机退出时撤销本设备 Android 通知订阅，清理当前用户的 Room、app-private 媒体、token 和内存预览；post-MVP Web 若未来启用，另行清理其浏览器命名空间。
+- 共享手机退出时撤销本设备 Android 通知订阅，清理当前用户的 Room、app-private 媒体、token 和内存预览；桌面 Web 退出时撤销服务端会话并清理当前账号/项目的浏览器缓存命名空间。
 - 关键状态写入审计失败时，业务事务应 fail closed。
 
 ## 12. 进度与并行协议
@@ -626,7 +627,7 @@ PLANNED | IN_PROGRESS | BLOCKED | VERIFYING | DONE | DEFERRED
 
 ## 13. 分阶段实施计划
 
-App-first 核心关键路径为 `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`，即 Backend/API -> Android App -> Relay adapter -> E2E/发布。P0/G0 历史保持不变；P3 未开始的 Web/PWA 计划由原生 Android 计划取代。
+当前核心关键路径为 `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G7-WORKBENCH-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`，即 Backend/API -> Android 现场采集 -> Web 桌面管理 -> Relay adapter -> E2E/发布。P0/G0 与已验证 Android/后端历史保持不变；P7.4 从 deferred 恢复为当前 MVP 主路径。
 
 ### P0 - G0：计划、ADR 与独立骨架
 
@@ -780,7 +781,7 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 
 Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
-### P3 - G3：Android 原生主客户端与 Poco QA Bridge
+### P3 - G3：Android 现场采集客户端与 Poco QA Bridge
 
 #### P3.0 App-first contract delta
 
@@ -812,13 +813,13 @@ Gate `G2-SECURITY-READY`：鉴权/RBAC/CSRF/IDOR/审计测试全绿。
 
 验证：飞行模式、Wi-Fi/蜂窝切换、进程/App 被杀、服务重启、登录过期、重复点击和响应丢失最终只产生一个 attachment/QA item；20 MiB 图片和短录屏续传成功，不产生孤儿。
 
-#### P3.5 原生全流转首页
+#### P3.5 历史原生管理切片（已冻结）
 
-实现创建/编辑、列表/筛选、去重候选、评论、附件、分配、主状态、人工/外部修复、Build、验收、审计时间线、通知 Inbox，以及 Relay 一键派发/回执展示位。P3 阶段使用 fake Relay；P5 再接真实 adapter。
+历史目标曾要求 Android 承担完整流转首页；最新架构已收窄为现场快速上报与轻量提交状态。已产生的 debug 管理代码保留为迁移/诊断资产，不再扩展分配、状态、RepairAttempt、Build、Verification、Relay 或完整审计 UI；这些正式能力移到 P7.4 Web。
 
 post-P4 MVP consolidation：P4.1-P4.3 已分别跑通 human Attempt、exact Build link 与 passed Verification/close 后，先增加一个有界、只读的人工作流投影。API/SQLite 在服务重启后返回最近一条 Bug/Attempt/Build/Verification/closure 事实，原生 Android 首页在新进程中回读并显示；一个不存在项目/工作流返回明确 `404`。该切片不重跑创建链、不扩导航/筛选矩阵，也不把它解释为正式 G3/G4 完成。
 
-已验证 slice：新 API 进程和 fresh MuMu App 通过真实 4319/SQLite 回读 `LOCAL-11/closed/v7`、human Attempt=`delivered`、exact-SHA Build=`ready`、Verification=`passed/v3`；哨兵项目返回 `404 NOT_FOUND`。P3.5 保持 `IN_PROGRESS`，下一原子段只接一条原生 Comment create/read 与 audit timeline 回读；不据此宣称原生全流转首页或 G3/G4 完成。
+已验证历史 slices：fresh MuMu App 回读 `LOCAL-11` durable human workflow，并真实追加 Comment/回读完整 `comment.created` timeline；missing project/Bug 均为 `404 NOT_FOUND`。P3.5 转 `VERIFYING` 并冻结管理扩展；现场采集/草稿/上传的剩余工作仍归 P3.4/P3.6/P3.7，管理主线转 P7.4。
 
 验证：App 内完整人工闭环；Relay 关闭仍可上报到验收关闭；30 秒快速提单；修复人与验收、版本冲突、重复候选人工决定和未通过 Verification 禁止关闭均成立。
 
@@ -844,7 +845,7 @@ post-P4 MVP consolidation：P4.1-P4.3 已分别跑通 human Attempt、exact Buil
 
 至少覆盖 Android 15/API 35（当前 MuMu + 一台真机）、Android 16/API 36、Android 17/API 37、Pixel/AOSP 与一个强省电 OEM；当前 MuMu 已实测为 Android 15/API 35/SELinux Permissive，只承担 API35 emulator lane。交叉权限回收、方向/分辨率、锁屏、来电/弹窗、断网、重复、20 MiB 图片/短录屏、App/Unity crash、5001 占用、Poco 不存在/旧版、超时/超大 Dump、IL2CPP、弱机、恶意同机客户端和 `FLAG_SECURE`。API 37 额外覆盖 `ACCESS_LOCAL_NETWORK` 不声明/不请求的同 profile loopback 正例与 LAN/跨 profile 反例、`sw600dp+` 强制自适应和方向限制失效、CT/ECH、通知自定义视图与 MediaProjection 前台服务行为。测量 Unity ReadPixels/Screenshot/Dump 的 P50/P95 延迟、主线程和帧影响。MuMu API level 必须以 adb `getprop ro.build.version.sdk` 为证据，且不能替代任何真机的 overlay/MediaProjection/系统回收/Poco/SELinux 验证。
 
-Gate `G3-ANDROID-APP-READY`：P3.0-P3.9 全绿；Android App 是可安装的原生主要客户端并跑通 Relay 离线人工闭环；普通截图在 Poco 任意失败下可提交；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。此 Gate 是 App-first 核心关键路径。
+Gate `G3-ANDROID-APP-READY`：P3.0-P3.9 的现场采集范围全绿；Android App 可安装并完成极简提单、普通截图/Poco 可选 enrichment、附件和离线重试；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。完整管理闭环由 G7 Web 证明，不能再用 Android 管理按钮代替。
 
 ### P4 - G4：人工修复和验收闭环
 
@@ -874,7 +875,7 @@ MuMu MVP execution override：复用已有 QA-owned manual Build adapter，先�
 
 MuMu MVP execution override：先对 P4.2 的 exact Attempt/Build 创建并回读一条人工 Verification，显式开始、记录 `passed` 结果并由同一人工操作关闭 Bug；保留一个缺失/错误验收证据不能关闭的失败。失败重开、blocked/cancelled、S0/S1 分离职责与 newer-build reopen 留在正式 Gate 收尾。
 
-已验证 slice：MuMu/API35 Android 经真实 4319/SQLite 对 exact human Attempt/Build 创建、回读并开始 Verification；缺少 `resultSummary` 的完整结果请求返回 `400 INVALID_REQUEST`，随后人工提交 `passed`，Verification=`passed/v3`、Bug=`closed/v7`，且 closure acceptance 指向同一 Verification。P4.3 转 `VERIFYING`；失败/阻塞/取消、reopen、S0/S1 分离职责、附件/capture 与 durable create/start receipt 仍在收尾/正式 Gate，唯一指针回到 P3.5 原生全流转首页整合。
+已验证 slice：MuMu/API35 Android 经真实 4319/SQLite 对 exact human Attempt/Build 创建、回读并开始 Verification；缺少 `resultSummary` 的完整结果请求返回 `400 INVALID_REQUEST`，随后人工提交 `passed`，Verification=`passed/v3`、Bug=`closed/v7`，且 closure acceptance 指向同一 Verification。P4.3 转 `VERIFYING`；失败/阻塞/取消、reopen、S0/S1 分离职责、附件/capture 与 durable create/start receipt 仍在收尾/正式 Gate。该历史 Android 管理 pointer 已由最新架构决策替换为 P7.4 Web。
 
 验证：
 
@@ -992,9 +993,9 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 验证：指标能从事实表重算；导出不能反向覆盖 QA Hub。
 
-#### P7.4 post-MVP 桌面管理/诊断 Web
+#### P7.4 桌面正式管理 Web
 
-状态：`DEFERRED`，不属于 `0.1.0-debug` App-first 关键路径。完整保留 P0.4 `apps/web` 资产；未来若恢复投入，只实现大屏批量管理或只读诊断，并先移除“PWA/手机主客户端/离线取证”产品表述。不得用它替代 Android 真机 Gate。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前关键路径。现有 P0.4 `apps/web` 只是未接业务 API 的 React/Vite 壳。按最小真实切片依次接通：真实 API Bug 列表 -> Bug 详情/证据/时间线/评论 -> 分配与状态修改 -> 一键 Relay/回执/失败重试 -> Build/人工 Verification/关闭；随后补搜索/组合筛选、去重合并与必要项目/人员/角色/模块/Relay 设置。每段只保留一条成功与一个关键失败，复杂筛选、批量操作和设置细节进入收尾清单。Web 不称 PWA，不承担现场截图或浏览器离线取证。
 
 Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态、版本和待办。
 
@@ -1031,7 +1032,7 @@ Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，�
 
 测试槽位：
 
-| 槽位                     |     原生全流转 |             Capture/Share |                                              Poco 标准 RPC |     qa.snapshot | 离线/续传 |            通知 |
+| 槽位                     |     现场快速上报 |             Capture/Share |                                              Poco 标准 RPC |     qa.snapshot | 离线/续传 |            通知 |
 | ------------------------ | -------------: | ------------------------: | ---------------------------------------------------------: | --------------: | --------: | --------------: |
 | 当前 MuMu / Android 15 / API 35 / Permissive | 自动化/补测 | 补测，不作安全 Gate | 回环功能补测 | capability 决定 | 必测 | 补测 |
 | Android 15 / API 35 真机 |           必测 |         FGS/BOOT 限制必测 |                                                       必测 | capability 决定 |      必测 |            必测 |
@@ -1082,12 +1083,12 @@ P0 contracts 冻结后：
 | 车道                   | 独占目录/工作                                                                                      | 可并行阶段                     | 汇合点     |
 | ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- |
 | A Domain/API           | `packages/domain`, API handlers；主代理独占迁移/contracts                                          | P1/P2/P4                       | G4         |
-| B Android App          | `apps/android`；Compose、Room、WorkManager、capture、Poco client、原生流转 UI；使用 fake contracts | P3.2/P3.4-P3.7/P4；P3.0 后启动 | G3/G4      |
+| B Android App          | `apps/android`；Compose、Room、WorkManager、capture、Poco client、快速提单/轻量状态；不扩完整管理 UI | P3.2/P3.4-P3.7；P3.0 后启动 | G3         |
 | C Evidence/Reliability | storage、upload、outbox/inbox、worker                                                              | P1/P3/P6                       | G6         |
 | D Integrations/Test    | relay-client、build-client、fake servers、contract/e2e                                             | P5/P6                          | G6         |
 | E Ops/Security         | runbooks、health、backup、service scripts、安全测试                                                | P2/P8/P10                      | G8/G10     |
 | F Poco QA Bridge       | 实际 Unity QA/Debug 测试包中的最小 loopback/provider 兼容层；先只读审计，后独占明确文件            | P3.1/P3.8                      | G3         |
-| W post-MVP Web         | `apps/web`；仅未来桌面批量管理/只读诊断                                                            | P7.4 DEFERRED                  | 不阻塞 0.1 |
+| W Desktop Web          | `apps/web`；正式桌面管理 UI，只经 QA Hub API 使用同一事实源                                         | P7.4 IN_PROGRESS               | G7/G4/G5/G6 |
 
 并行纪律：
 
@@ -1110,7 +1111,7 @@ P0 contracts 冻结后：
 - Relay fake/真实 contract、Webhook 签名/乱序/重试/对账测试。
 - Android Compose/Room/WorkManager、权限/手势/lifecycle、fake API、幂等队列、加密保留和 URI/MIME 对抗测试。
 - Poco protocol fixtures、allowlist、timeout/cancel/size、captureId/nonce/deadline/schema 与 loopback/LAN 安全测试。
-- post-MVP Web 不新增 PWA/Service Worker/offline 测试投入；现有 P0.4 build 仅作为保留资产回归。
+- 桌面 Web 当前进入真实业务 API/页面 smoke；仍不新增 PWA、Service Worker、浏览器离线取证测试投入。
 - 备份校验和隔离恢复脚本测试。
 
 ### 必须手工或真实环境验证
@@ -1140,7 +1141,7 @@ P0 contracts 冻结后：
 
 独立 QA Hub 部署不需要等待 Relay Active Turns 为零；只有同批次修改/重载 Relay adapter 时，才执行 Relay 专属空闲门禁。
 
-Android App 是主工件且 `G3-ANDROID-APP-READY` 位于关键路径；没有真实 APK/AAB、真机/Poco/离线证据时，服务端临时端口或保留的 Web 壳都不能代替 App-first 完成。
+Android 现场采集 App 与桌面 Web 都是 0.1 主工件：G3 证明真实 APK/设备采集、Poco/离线边界，G7 证明正式桌面管理。服务端临时端口、MuMu-only 证据或尚未接 API 的 Web 壳都不能代替对应 Gate。
 
 ## 17. 完成定义
 
@@ -1151,7 +1152,8 @@ QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 - 一键交给 Relay 幂等，自动回写可靠，Relay 不可自动关闭 Bug。
 - 人工、Relay、外部三种修复模式均有真实 E2E。
 - 修复人与验收、交付与构建、构建与精确 Commit 的边界可证明。
-- Android App 原生首页覆盖全部现场流转；30 秒上报、Room 离线草稿、WorkManager 断点续传和通知在真实设备通过。
+- Android App 在真实设备完成 30 秒现场上报、悬浮球/Poco、Room 离线草稿、WorkManager 断点续传和轻量提交状态。
+- 桌面 Web 通过同一 QA Hub API 完成列表/详情/分配/状态/评论/Relay/Build/人工验收关闭/审计及必要设置，不建立第二事实源。
 - 悬浮球系统画面是主证据，Poco enrichment 可用/部分/未连接均真实显示且不阻断普通缺陷；Poco 仅回环只读。
 - 重复提交不重复建单，相似候选不自动合并。
 - 权限、审计、附件安全、备份、恢复、监控和回滚门禁通过。
