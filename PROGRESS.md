@@ -3,23 +3,23 @@
 - Goal status: `ACTIVE`
 - Release target: `0.1.0-debug`
 - Current phase: `P4`（MVP vertical slice；G3-G7 尚未正式关闭）
-- Current pointer: `P4.1`（MVP execution override；先做 Relay-offline manual RepairAttempt）
+- Current pointer: `P4.2`（MVP execution override；把 Relay-offline human RepairAttempt 的 exact delivery commit 绑定 QA-owned Build）
 - Current gate: `G4-HUMAN-CLOSED-LOOP`（execution override；不得解读为 G3-G7 已完成）
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
-- Active work packages: `P3.1, P3.3, P3.4, P3.6, P3.7, P4.1, P5.1, P5.4, P6.1, P6.2, P7.1, P7.2`
-- Current delivery slice: `verified Android -> 4319 -> SQLite Bug/capture/Poco -> fake Relay fix_delivered -> QA-owned manual Build -> durable Inbox -> duplicate hint -> Bug workbench`
-- Minimal verification: `下一切片只证明 Relay 离线时 Android 创建并 GET 回读一个 manual RepairAttempt；缺交付证据的 delivered 请求明确失败`
-- Next atomic action: `P4.1 IN_PROGRESS（MVP execution override）：接通 QA Hub SQLite/API manual RepairAttempt create/read -> Android 原生回执；只保留一个 missing-evidence delivered 失败`
+- Active work packages: `P3.1, P3.3, P3.4, P3.6, P3.7, P4.1, P4.2, P5.1, P5.4, P6.1, P6.2, P7.1, P7.2`
+- Current delivery slice: `verified Android -> 4319 -> SQLite Bug/capture/Poco -> fake Relay fix_delivered -> QA-owned manual Build -> durable Inbox -> duplicate hint -> Bug workbench -> Relay-offline human RepairAttempt`
+- Minimal verification: `下一切片只证明 human RepairAttempt 以 exact commit 成功交付并绑定/回读一个 QA-owned Build；一个 wrong-SHA 绑定明确失败`
+- Next atomic action: `P4.2 IN_PROGRESS（MVP execution override）：接通 planned human RepairAttempt -> evidence-backed delivery -> exact-SHA manual Build link/read；复用现有 P6.1 adapter，不扩 provider/矩阵`
 - Completed gates: `1 / 11`
-- Last green commit: `b3bab0a`
+- Last green commit: `83b198b`
 - Last deployed commit: `none`
 - Schema version: `contract 1.1.0; database v3 verified at P1.2`
 - Production URL: `not deployed`
 - Last production verification: `none`
 - Last backup verified: `none`
 - Last restore drill: `none`
-- Blockers: `当前 P4.1 Relay-offline manual RepairAttempt MVP 无外部 blocker；真实 Relay/Unity/Jenkins 均不在授权范围，真机/API37/Poco 安全加固也不在当前原子步骤`
-- Updated at: `2026-08-25T15:56:07+08:00`
+- Blockers: `当前 P4.2 exact delivery/Build link MVP 无外部 blocker；真实 Relay/Unity/Jenkins 均不在授权范围，真机/API37/Poco 安全加固也不在当前原子步骤`
+- Updated at: `2026-08-25T16:24:37+08:00`
 
 ## Gate status
 
@@ -63,8 +63,8 @@
 | P3.7  | VERIFYING   | root (GPT-5.6 Sol/ultra) | P3.1,P3.2,P3.6      | Kotlin Poco read-only adapter/capture bundle         | one Android loopback SimpleRPC success + same-capture artifact readback + no-Poco screenshot/Bug    | [`docs/evidence/P3.7-mumu-poco-probe.md`](docs/evidence/P3.7-mumu-poco-probe.md) + [`docs/evidence/P3.7-mumu-poco-artifact.md`](docs/evidence/P3.7-mumu-poco-artifact.md)：MuMu stub partial/bound 与 no-Poco unavailable/bound 均真实通过；真实 Unity/security proof pending | `f55b7d664dd8c370eb7e080ec1672714edb7ea4c` | 2026-08-25T12:36:50+08:00 |
 | P3.8  | PLANNED     | unassigned               | P3.1                | Unity qa.snapshot/loopback compatibility layer       | standard/old/Invoke, server allowlist, Mono/IL2CPP, LAN-negative tests                             |                                                                       |                                            | 2026-08-24                |
 | P3.9  | PLANNED     | unassigned               | P3.3-P3.8           | Android/Poco real-device/performance matrix          | API35 MuMu+real; API36/37 compatibility, API37 behaviors, OEM, P50/P95                             | current MuMu covers API35 emulator only; real-device/security gates pending |                                       | 2026-08-24T19:39:16+08:00 |
-| P4.1  | IN_PROGRESS | root + Luna/max          | G3 (MVP override)   | human/external attempts                              | one Relay-offline manual attempt create/read + one missing-evidence delivery failure               |                                                                       |                                            | 2026-08-25T15:56:07+08:00 |
-| P4.2  | PLANNED     | unassigned               | P4.1                | builds/commit identity                               | wrong-SHA guard tests                                                                              |                                                                       |                                            | 2026-08-24                |
+| P4.1  | VERIFYING   | root + Luna/max          | G3 (MVP override)   | human/external attempts                              | one Relay-offline manual attempt create/read + one missing-evidence delivery failure               | [`docs/evidence/P4.1-mumu-human-repair-attempt.md`](docs/evidence/P4.1-mumu-human-repair-attempt.md)：MuMu create/read 同一 human/planned Attempt；缺证据 400 且 delivered event=0 | `83b198b716b9d716c1c4a99a40a44c32a128594c` | 2026-08-25T16:24:37+08:00 |
+| P4.2  | IN_PROGRESS | root + Luna/max          | P4.1                | builds/commit identity                               | one exact-SHA human delivery/Build link + one wrong-SHA failure                                    |                                                                       |                                            | 2026-08-25T16:24:37+08:00 |
 | P4.3  | PLANNED     | unassigned               | P4.1,P4.2           | verification/reopen                                  | human closed-loop E2E                                                                              |                                                                       |                                            | 2026-08-24                |
 | P5.1  | VERIFYING   | root + Luna/xhigh | G4 (MVP override)   | QA Relay client/fake                                 | one real Bug handoff + durable receipt/readback + one unavailable/replay failure                    | [`docs/evidence/P5.1-android-fake-relay-smoke.md`](docs/evidence/P5.1-android-fake-relay-smoke.md) + [`docs/evidence/P5.1-fake-relay-submitted-smoke.md`](docs/evidence/P5.1-fake-relay-submitted-smoke.md)：MuMu queued -> independent fake HTTP -> submitted/sent；fake unavailable -> queued/retry | `f6ca6a0ca06913a33954155870385b23cbadf236` | 2026-08-25T13:39:53+08:00 |
 | P5.2  | PLANNED     | unassigned               | P5.1                | Relay M2M handoff API                                | auth/idempotency/attachment tests                                                                  |                                                                       |                                            | 2026-08-24                |
@@ -94,7 +94,8 @@
 - `P3.4` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:25:29+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Room v4 已保存 final reservation/claim；逐阶段 resume、response-loss 与 multi-chunk 在 capture 主链后补`。
 - `P3.6` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:57:27+08:00`; updated: `2026-08-25T11:19:01+08:00`; state: `IN_PROGRESS`; next atomic action: `MuMu 已证明显式授权、悬浮球、2560x1440 MediaProjection PNG 到 attachment/Bug 及拒绝降级；录屏、Share/Picker、旋转/真机/API37 进入收尾，不阻塞 P3.7`。
 - `P3.7` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T11:19:01+08:00`; updated: `2026-08-25T12:36:50+08:00`; state: `VERIFYING`; next atomic action: `MuMu MVP 已证明 partial Poco PNG 与 unavailable no-Poco bundle 均同 captureId bound/readable；真实 Unity、qa.snapshot、LAN-negative、真机/API37 由 P3.8/P3.9/P9.1 补证，不阻塞当前 P5.1`。
-- `P4.1` — owner: `root + Luna/max`; started: `2026-08-25T15:56:07+08:00`; state: `IN_PROGRESS`; next atomic action: `Relay 完全离线时创建并回读一个 manual RepairAttempt；缺交付证据的 delivered 请求明确失败，完整转交/supersede/external 后补`。
+- `P4.1` — owner: `root + Luna/max`; started: `2026-08-25T15:56:07+08:00`; updated: `2026-08-25T16:24:37+08:00`; state: `VERIFYING`; next atomic action: `MuMu 已创建/回读 mode=human 的 planned Attempt，并证明缺交付证据 400/无 delivered event；完整转交/supersede/external 后补`。
+- `P4.2` — owner: `root + Luna/max`; started: `2026-08-25T16:24:37+08:00`; state: `IN_PROGRESS`; next atomic action: `复用现有 manual Build adapter，把 human Attempt 的 exact delivered commit 绑定/回读，保留一个 wrong-SHA 失败`。
 - `P5.1` — owner: `root + Android Luna/xhigh`; started: `2026-08-25T12:36:50+08:00`; updated: `2026-08-25T13:39:53+08:00`; state: `VERIFYING`; completed slice: `MuMu Android -> QA outbox -> independent fake Relay -> submitted receipt/readback 已通过；fake unavailable 保留 queued/retry`；remaining: `附件选择、正式 M2M、真实 Relay 对账`。
 - `P5.4` — owner: `root + Luna/xhigh`; started: `2026-08-25T13:39:53+08:00`; updated: `2026-08-25T14:05:41+08:00`; state: `VERIFYING`; completed slice: `MuMu Android -> signed fake callback -> durable Inbox -> fix_delivered readback 已通过；旧 revision 明确 ignored，Bug/Verification 未变`；remaining: `真实 Relay 事件类型、继续任务与对账`。
 - `P6.1` — owner: `root + Luna/max`; started: `2026-08-25T14:05:41+08:00`; updated: `2026-08-25T15:09:48+08:00`; state: `VERIFYING`; completed slice: `MuMu Android -> QA Hub manual Build POST 201 -> SQLite exact deliveredCommitSha -> Android GET 200；wrong SHA 返回 422 且未落库，Bug/Verification 未变`；remaining: `真实 provider/artifact provenance、失败恢复与正式 G6`。
@@ -106,7 +107,7 @@
 
 - 当前优先级是打通可运行主链路，不以测试数量、全量边界穷举、性能优化、文档完善或独立终审零发现作为 MuMu API35 MVP 的进入条件。
 - 每个相邻模块只验证四件事：真实启动、实际通信、成功数据通过、一个关键失败明确暴露。通过后立即进入下一段。
-- 当前垂直切片：QA Hub API/SQLite -> Android/MuMu HTTP -> attachment -> 显式 MediaProjection/悬浮球截图 -> Poco optional artifact/no-Poco bundle -> independent fake Relay submitted -> signed fix_delivered receipt -> QA-owned manual Build -> durable Android Build Inbox -> bounded duplicate hint -> Bug workbench 均已真实通过；唯一 pointer 已回到 P4.1 Relay-offline 人工闭环，不修改真实 Relay/Unity，也不触发 Jenkins。
+- 当前垂直切片：QA Hub API/SQLite -> Android/MuMu HTTP -> attachment -> 显式 MediaProjection/悬浮球截图 -> Poco optional artifact/no-Poco bundle -> independent fake Relay submitted -> signed fix_delivered receipt -> QA-owned manual Build -> durable Android Build Inbox -> bounded duplicate hint -> Bug workbench -> Relay-offline human RepairAttempt create/read 均已真实通过；唯一 pointer 已进入 P4.2 exact delivery/Build link，不修改真实 Relay/Unity，也不触发 Jenkins。
 - API31（已被当前 minSdk=35 产品决策取代）、API37 runtime、真机、广域安全硬化、完整性能矩阵和冗余对抗测试均不阻塞当前 MuMu API35 MVP；仍保留为对应正式 Gate 的发布前证据。
 
 ## 收尾修复清单 / technical debt
@@ -141,6 +142,7 @@
 | P6.2 当前固定第一页并始终返回 `nextCursor=null`，尚无 mark-read/quiet-hours/定向收件人规则 | 超过 50 条会被截断且 unread 无法在 App 内清零；全项目成员可能收到过宽通知 | 通知量超过 limit、用户读消息或引入 assignee/verification owner | 实现稳定 cursor、mark-read CAS、收件人规则和静默期；Push 只消费同一事实 | 51 条分页无漏重；read 后 unread--；非收件人无消息 |
 | P7.1 当前只做 trim/lower/空白折叠后的 title+description 精确匹配，并在 Bug 创建后才查询 | 近似重复会漏报，用户不能在提交前避免新增重复 Bug；全项目行扫描不适合大数据量 | 文案轻微变化、图片重复或项目 Bug 量增长 | 增加 additive draft-candidate query、FTS/错误签名/pHash 索引和固定评测集；保持只提示不自动合并 | 一条近似文本/图片候选、一个无关负例、提交前无副作用查询 |
 | P7.2 当前固定 `nextCursor=null`，只实现 project/state/limit 且 Android 固定 reported | 超过首 100 条会截断，复杂工作台维度和保存视图不可用 | Bug 数量增长或用户按负责人/版本/模块组合筛选 | 增加 snapshot-bound cursor、冻结其余 filters 与 saved-view persistence；Android 提供可配置 filter UI | 101 条双页无漏重；组合 filter 与 Android/API 结果一致 |
+| P4.1 当前只实现 `mode=human` 的 planned create/read 与缺证据拒绝；合法 delivery 暂返回 `GUARD_FAILED`，MR/patch-only evidence、external、transfer、supersede 尚未接通 | 不能据此宣称人工修复交付或 G4 闭环完成 | 用户提交合法交付证据、选择 external 或转交/替换负责人 | P4.2/P4.3 先接 exact commit delivery/Build/Verification，再补冻结 MR/patch/no-code 与 external/transfer/supersede | exact commit 成功且错误 SHA 失败；MR/patch/no-code 各一条；历史 Attempt 不被覆盖 |
 
 ## Completed evidence
 
@@ -169,6 +171,7 @@
 - P6.2 durable Build Inbox slice 于 `2026-08-25T15:25:34+08:00` 验证并提交为 `9127a21e6b8f316fd4fc02267a7f40215cc26961`：现有 `build.registered` outbox 经真实 4319 投影为一条 durable notification，MuMu/API35 两次原生 GET 均显示 `1 item/1 unread/Build registered`；SQLite notifications/去重 Inbox 各 `1`、duplicate group=`0`、outbox=`sent`，Bug 仍 `in_progress`、Verification=`0`。证据见 [`docs/evidence/P6.2-mumu-build-inbox-smoke.md`](docs/evidence/P6.2-mumu-build-inbox-smoke.md)。P6.2 转 `VERIFYING`，唯一 pointer 进入 P7.1；未宣称 Push/真机/G6 完成。
 - P7.1 duplicate candidate slice 于 `2026-08-25T15:42:46+08:00` 验证并提交为 `48a2bee9f5754d7bdad3cd63bd5712c570599d3e`：MuMu/API35 原生按钮经真实 4319/SQLite 创建 Bug 并显示最多五条相同规范化内容候选；无关 `LOCAL-7` GET 返回 0；SQLite duplicate 标记/链接与 Verification 均为 0。证据见 [`docs/evidence/P7.1-mumu-duplicate-candidates.md`](docs/evidence/P7.1-mumu-duplicate-candidates.md)。P7.1 转 `VERIFYING`，唯一 pointer 进入 P7.2；未宣称 FTS/pHash/评测集/真机/G7 完成。
 - P7.2 Bug workbench slice 于 `2026-08-25T15:56:07+08:00` 验证并提交为 `b3bab0ad4946a70276f4807edf473695f0a7b2cc`：MuMu/API35 原生工作台经真实 4319 回读五个 reported Bug、snapshot `18`；非法 state 返回 `400 INVALID_REQUEST`。证据见 [`docs/evidence/P7.2-mumu-bug-workbench.md`](docs/evidence/P7.2-mumu-bug-workbench.md)。P7.2 转 `VERIFYING`，唯一 pointer 回到核心 P4.1 Relay-offline 人工闭环；未宣称 cursor/组合筛选/保存视图/真机/G7 完成。
+- P4.1 Relay-offline human RepairAttempt slice 于 `2026-08-25T16:24:37+08:00` 验证并提交为 `83b198b716b9d716c1c4a99a40a44c32a128594c`：MuMu/API35 经真实 4319/SQLite 创建并两次回读同一 `mode=human/status=planned` Attempt；缺少代码交付证据返回 `400 INVALID_REQUEST`，SQLite `delivered_events=0`。证据见 [`docs/evidence/P4.1-mumu-human-repair-attempt.md`](docs/evidence/P4.1-mumu-human-repair-attempt.md)。P4.1 转 `VERIFYING`，唯一 pointer 进入 P4.2 exact delivery/Build link；未启动 Relay/Unity/Jenkins，也未宣称完整 delivery/external/transfer/supersede/真机/G4 完成。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 
