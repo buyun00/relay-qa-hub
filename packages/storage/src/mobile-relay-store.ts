@@ -713,6 +713,22 @@ function insertUserEvent(
     );
 }
 
+function nextBugAggregateSequence(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  bugId: string,
+): number {
+  const row = database
+    .prepare(
+      `SELECT COALESCE(MAX(aggregate_sequence), 0) + 1 AS next_sequence
+       FROM events
+       WHERE account_id = ? AND project_id = ?
+         AND aggregate_type = 'bug' AND aggregate_id = ?`,
+    )
+    .get(input.accountId, input.projectId, bugId) as { readonly next_sequence: number };
+  return row.next_sequence;
+}
+
 function insertBugNotificationOutbox(
   database: DatabaseSync,
   input: MobileRelayScope & {
@@ -984,7 +1000,7 @@ export function updateMobileBug(
     type: "bug.updated",
     aggregateType: "bug",
     aggregateId: bug.id,
-    aggregateSequence: bug.version + 1,
+    aggregateSequence: nextBugAggregateSequence(database, input, bug.id),
     resourceType: "bug",
     resourceId: bug.id,
     resourceVersionAfter: bug.version + 1,
