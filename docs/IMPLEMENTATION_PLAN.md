@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 7ef75649f5d666ffda68b5f68660303042a8cdd5
-  last_verified_at: 2026-08-26T07:14:08+08:00
-  next_action: P8.7 IN_PROGRESS；P8.6 同一快照的 DB+附件+API 组合恢复已转 VERIFYING，本机 RTO=576.181ms；下一步只接 API-owned、默认关闭的 create-only backup-on-start/cadence runner，不启动第二 SQLite writer、不做 retention 删除
+  last_verified_commit: 1cf1ea76cedaee5b2b19cdb18bb05a61f7436077
+  last_verified_at: 2026-08-26T07:37:08+08:00
+  next_action: P8.8 IN_PROGRESS；P8.7 API-owned on-start backup、真实 Bug readback 与 overlap fail-before-listen 已转 VERIFYING；下一步只补 manifest-bound latest recovery point 与 cadence restart compensation，不做 retention 删除/第二 writer/HTTP restore
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1086,7 +1086,11 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 #### P8.7 API-owned RPO 备份 runner
 
-当前状态：`IN_PROGRESS`。在现有 QA Hub API 进程内复用同一个 `SqliteStorageWorker`，新增默认关闭的 create-only backup-on-start/cadence runner；配置必须使用独立绝对 backup root，拒绝与 data/source root 重叠。首次启动 smoke 只生成一份 DB/manifest 并回读 hash/integrity，API ready 保持；一个重叠 backup root 在监听端口前失败。runner 不开放普通 HTTP restore、不启动第二 SQLite writer，也不执行 retention 删除。真实 15 分钟 cadence、重启补偿、异盘复制与 retention 进入后续尾项。
+当前状态：`VERIFYING`。提交 `1cf1ea76cedaee5b2b19cdb18bb05a61f7436077` 在现有 QA Hub API 进程内复用同一个 `SqliteStorageWorker`，新增默认关闭的 create-only backup-on-start/cadence runner；配置使用独立绝对 backup root，对 data/database/evidence/quarantine/source overlap、junction/symlink、operationId 和最终 target containment fail closed。最终真实 4320 smoke 在 listen 前生成一份 1,490,944-byte schema v4 backup 与 manifest，SHA 一致、integrity/FK=`true/0`，API ready 后回读 `LOCAL-1 reported/v1`；backup root 指向 data/evidence 时进程 code 1、端口未监听且 DB SHA 不变。独立复审修复初始 1 Blocker/2 High 后为 Blocker/High=`0/0`。证据见 [`docs/evidence/P8.7-api-owned-backup-runner.md`](evidence/P8.7-api-owned-backup-runner.md)。runner 不开放普通 HTTP restore、不启动第二 SQLite writer，也不执行 retention 删除；elapsed cadence、重启补偿、异盘复制与 retention 仍为尾项。
+
+#### P8.8 latest recovery point 与 cadence 重启补偿
+
+当前状态：`IN_PROGRESS`。在 P8.7 同一 runner 内只识别 manifest 绑定的主 `.sqlite` recovery point，忽略 SQLite 校验留下的 `.sqlite-shm/.sqlite-wal` sidecar；cadence 启用且 on-start 关闭时，若没有有效 recovery point 或最新点已超过 interval，则在 listen 前补一份，若仍新鲜则从剩余时长开始 timer 而不重复备份。只保留一条 stale/none 补偿成功和一条 fresh 不重复；无效 manifest fail closed，不删除 retention、不复制异盘、不开放 HTTP restore。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
