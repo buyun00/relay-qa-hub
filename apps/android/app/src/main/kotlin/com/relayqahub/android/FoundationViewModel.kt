@@ -23,6 +23,7 @@ import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
 import com.relayqahub.android.network.RelayHandoffFailure
 import com.relayqahub.android.network.RelayHandoffResult
+import com.relayqahub.android.network.RepairAttemptFailure
 import com.relayqahub.android.security.NativeCredentials
 import com.relayqahub.android.security.VaultResult
 import com.relayqahub.android.security.nativeSessionScope
@@ -51,6 +52,7 @@ data class FoundationUiState(
     val buildProjection: BuildProjectionUiState = BuildProjectionUiState(),
     val inbox: InboxUiState = InboxUiState(),
     val bugWorkbench: BugWorkbenchUiState = BugWorkbenchUiState(),
+    val manualRepair: ManualRepairUiState = ManualRepairUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
 )
 
@@ -90,6 +92,16 @@ data class BugWorkbenchUiState(
     val errorCode: String? = null,
 )
 
+data class ManualRepairUiState(
+    val phase: String = "idle",
+    val bugKey: String? = null,
+    val attemptId: String? = null,
+    val mode: String? = null,
+    val status: String? = null,
+    val missingEvidenceRejectionCode: String? = null,
+    val errorCode: String? = null,
+)
+
 private data class ScopeUiValues(
     val accountName: String,
     val projectName: String,
@@ -101,6 +113,7 @@ private data class DeliveryUiValues(
     val buildProjection: BuildProjectionUiState,
     val inbox: InboxUiState,
     val bugWorkbench: BugWorkbenchUiState,
+    val manualRepair: ManualRepairUiState,
 )
 
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
@@ -111,6 +124,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val buildProjection = MutableStateFlow(BuildProjectionUiState())
     private val inbox = MutableStateFlow(InboxUiState())
     private val bugWorkbench = MutableStateFlow(BugWorkbenchUiState())
+    private val manualRepair = MutableStateFlow(ManualRepairUiState())
     private val duplicateCandidates = MutableStateFlow(DuplicateCandidateUiState())
 
     private val scopeState = combine(
@@ -131,11 +145,13 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         buildProjection,
         inbox,
         bugWorkbench,
-    ) { projection, inboxState, workbenchState ->
+        manualRepair,
+    ) { projection, inboxState, workbenchState, manualRepairState ->
         DeliveryUiValues(
             buildProjection = projection,
             inbox = inboxState,
             bugWorkbench = workbenchState,
+            manualRepair = manualRepairState,
         )
     }
 
@@ -162,6 +178,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             buildProjection = delivery.buildProjection,
             inbox = delivery.inbox,
             bugWorkbench = delivery.bugWorkbench,
+            manualRepair = delivery.manualRepair,
             duplicateCandidates = duplicateState,
         )
     }.stateIn(
@@ -433,6 +450,85 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             errorCode = code,
         )
         lastAction.value = "QA workbench read failed: $code."
+    }
+
+    fun createManualRepairAttempt() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setManualRepairFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            manualRepair.value = ManualRepairUiState(phase = "loading")
+            lastAction.value = "Creating a Relay-independent human RepairAttempt…"
+            runCatching {
+                appContainer.scopedRepository.seedFoundationScope(scope)
+                when (
+                    appContainer.credentialVault.put(
+                        scope = scope.nativeSessionScope(),
+                        credentials = NativeCredentials(
+                            accessToken = accessToken,
+                            refreshToken = LIVE_SMOKE_UNUSED_REFRESH_TOKEN,
+                            accessTokenExpiresAtEpochMs =
+                                System.currentTimeMillis() + LIVE_SMOKE_CREDENTIAL_TTL_MS,
+                            sharedDeviceSession = false,
+                        ),
+                    )
+                ) {
+                    is VaultResult.Success -> Unit
+                    VaultResult.Missing ->
+                        throw RepairAttemptFailure("CREDENTIAL_WRITE_MISSING")
+                    is VaultResult.Unavailable ->
+                        throw RepairAttemptFailure("CREDENTIAL_VAULT_UNAVAILABLE")
+                }
+                val submissionId = UUID.randomUUID().toString()
+                val operationId = appContainer.scopedRepository.enqueue(
+                    scope = scope,
+                    request = FoundationCreateBugContract.buildOperation(
+                        projectId = scope.projectId,
+                        submissionId = submissionId,
+                        observedAt = Instant.now().toString(),
+                        qaAppVersion = BuildConfig.VERSION_NAME,
+                    ),
+                )
+                appContainer.syncEngine.run(scope)
+                val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
+                    ?: throw RepairAttemptFailure("BUG_COMMIT_RECEIPT_MISSING")
+                val result = appContainer.repairAttemptClient
+                    .createReadAndRejectMissingDeliveryEvidence(
+                        bugId = receipt.bugId,
+                        assigneeId = scope.actorId,
+                        accessToken = accessToken,
+                    )
+                receipt.qaItemKey to result
+            }.onSuccess { (bugKey, result) ->
+                manualRepair.value = ManualRepairUiState(
+                    phase = "loaded",
+                    bugKey = bugKey,
+                    attemptId = result.attemptId,
+                    mode = result.mode,
+                    status = result.status,
+                    missingEvidenceRejectionCode = result.missingEvidenceRejectionCode,
+                )
+                lastAction.value =
+                    "$bugKey human RepairAttempt ${result.attemptId} was created/read back; " +
+                        "missing evidence rejected as ${result.missingEvidenceRejectionCode}."
+            }.onFailure { failure ->
+                setManualRepairFailure(
+                    if (failure is RepairAttemptFailure) {
+                        failure.code
+                    } else {
+                        failure.message?.takeIf(String::isNotBlank)
+                            ?: "UNEXPECTED_REPAIR_ATTEMPT_FAILURE"
+                    },
+                )
+            }
+        }
+    }
+
+    private fun setManualRepairFailure(code: String) {
+        manualRepair.value = ManualRepairUiState(phase = "failed", errorCode = code)
+        lastAction.value = "Human RepairAttempt failed: $code."
     }
 
     fun createBugAndCheckDuplicates() {

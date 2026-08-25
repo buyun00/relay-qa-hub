@@ -44,19 +44,23 @@ import {
 import {
   claimMobileRelayOutbox,
   completeMobileRelayOutbox,
+  createMobileManualRepairAttempt,
   createMobileRelayAttempt,
   dispatchMobileRelay,
   ensureMobileRelayRoles,
   getMobileRelayReceipt,
+  getMobileManualRepairAttempt,
   receiveMobileRelayWebhook,
   retryMobileRelayOutbox,
   transitionMobileBugReady,
   type CompleteMobileRelayOutboxInput,
+  type CreateMobileManualRepairAttemptInput,
   type CreateMobileRelayAttemptInput,
   type DispatchMobileRelayInput,
   type RetryMobileRelayOutboxInput,
   type ReceiveMobileRelayWebhookInput,
   type TransitionMobileBugInput,
+  type GetMobileManualRepairAttemptInput,
 } from "./mobile-relay-store.js";
 import {
   canonicalMigrationDigest,
@@ -93,6 +97,8 @@ interface WorkerRequest {
     | "ensureMobileRelayRoles"
     | "transitionMobileBugReady"
     | "createMobileRelayAttempt"
+    | "createMobileManualRepairAttempt"
+    | "getMobileManualRepairAttempt"
     | "dispatchMobileRelay"
     | "getMobileRelayReceipt"
     | "receiveMobileRelayWebhook"
@@ -305,6 +311,22 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   if (request.operation === "createMobileRelayAttempt") {
     return inWriteTransaction((current) =>
       createMobileRelayAttempt(current, request.payload as CreateMobileRelayAttemptInput),
+    );
+  }
+
+  if (request.operation === "createMobileManualRepairAttempt") {
+    return inWriteTransaction((current) =>
+      createMobileManualRepairAttempt(
+        current,
+        request.payload as CreateMobileManualRepairAttemptInput,
+      ),
+    );
+  }
+
+  if (request.operation === "getMobileManualRepairAttempt") {
+    return getMobileManualRepairAttempt(
+      requireDatabase(),
+      request.payload as GetMobileManualRepairAttemptInput,
     );
   }
 

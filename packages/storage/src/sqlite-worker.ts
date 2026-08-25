@@ -36,16 +36,19 @@ import type {
 } from "./mobile-duplicate-store.js";
 import type {
   CompleteMobileRelayOutboxInput,
+  CreateMobileManualRepairAttemptInput,
   CreateMobileRelayAttemptInput,
   DispatchMobileRelayInput,
   MobileRelayOutboxClaim,
   MobileRelayDispatchAccepted,
   MobileRelayReceipt,
   MobileRelayWebhookProjectionResult,
+  MobileManualRepairAttemptRecord,
   MobileRepairAttemptRecord,
   ReceiveMobileRelayWebhookInput,
   RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
+  GetMobileManualRepairAttemptInput,
 } from "./mobile-relay-store.js";
 import type {
   ListMobileNotificationsInput,
@@ -259,6 +262,26 @@ export class SqliteStorageWorker {
   ): Promise<MobileRepairAttemptRecord> {
     await this.initialization;
     return this.request<MobileRepairAttemptRecord>("createMobileRelayAttempt", input);
+  }
+
+  async createMobileManualRepairAttempt(
+    input: CreateMobileManualRepairAttemptInput,
+  ): Promise<MobileManualRepairAttemptRecord> {
+    await this.initialization;
+    return this.request<MobileManualRepairAttemptRecord>(
+      "createMobileManualRepairAttempt",
+      input,
+    );
+  }
+
+  async getMobileManualRepairAttempt(
+    input: GetMobileManualRepairAttemptInput,
+  ): Promise<MobileManualRepairAttemptRecord | null> {
+    await this.initialization;
+    return this.request<MobileManualRepairAttemptRecord | null>(
+      "getMobileManualRepairAttempt",
+      input,
+    );
   }
 
   async dispatchMobileRelay(input: DispatchMobileRelayInput): Promise<MobileRelayDispatchAccepted> {

@@ -42,6 +42,7 @@ fun FoundationScreen(
     onAdoptFixAndBindQaBuild: () -> Unit = viewModel::adoptFixAndBindQaBuild,
     onRefreshInbox: () -> Unit = viewModel::refreshInbox,
     onRefreshBugWorkbench: () -> Unit = viewModel::refreshBugWorkbench,
+    onCreateManualRepairAttempt: () -> Unit = viewModel::createManualRepairAttempt,
     onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -56,6 +57,7 @@ fun FoundationScreen(
         onAdoptFixAndBindQaBuild = onAdoptFixAndBindQaBuild,
         onRefreshInbox = onRefreshInbox,
         onRefreshBugWorkbench = onRefreshBugWorkbench,
+        onCreateManualRepairAttempt = onCreateManualRepairAttempt,
         onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
     )
 }
@@ -72,6 +74,7 @@ internal fun FoundationScreen(
     onAdoptFixAndBindQaBuild: () -> Unit = {},
     onRefreshInbox: () -> Unit = {},
     onRefreshBugWorkbench: () -> Unit = {},
+    onCreateManualRepairAttempt: () -> Unit = {},
     onCreateBugAndCheckDuplicates: () -> Unit = {},
 ) {
     Scaffold(
@@ -243,6 +246,33 @@ internal fun FoundationScreen(
                     text = "Bug workbench error: " +
                         "${state.bugWorkbench.errorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("bug-workbench-status"),
+                )
+            }
+            Button(
+                onClick = onCreateManualRepairAttempt,
+                enabled = state.manualRepair.phase != "loading",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("create-manual-repair"),
+            ) {
+                Text("创建并回读人工 RepairAttempt")
+            }
+            when (state.manualRepair.phase) {
+                "loading" -> Text(
+                    text = "Human RepairAttempt: creating…",
+                    modifier = Modifier.testTag("manual-repair-status"),
+                )
+                "loaded" -> Text(
+                    text = "${state.manualRepair.bugKey ?: "Bug"} RepairAttempt " +
+                        "${state.manualRepair.attemptId}; mode=${state.manualRepair.mode}; " +
+                        "status=${state.manualRepair.status}; missingEvidence=" +
+                        "${state.manualRepair.missingEvidenceRejectionCode}.",
+                    modifier = Modifier.testTag("manual-repair-status"),
+                )
+                "failed" -> Text(
+                    text = "Human RepairAttempt error: " +
+                        "${state.manualRepair.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("manual-repair-status"),
                 )
             }
             Button(

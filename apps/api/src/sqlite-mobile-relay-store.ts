@@ -52,6 +52,23 @@ export function createSqliteMobileRelayStore(
         createdAt: now().toISOString(),
       });
     },
+    async createManualAttempt(command) {
+      requireActor(command.actorId, options.scope);
+      return options.worker.createMobileManualRepairAttempt({
+        ...scope,
+        bugId: command.bugId,
+        expectedVersion: command.request.expectedVersion,
+        assigneeId: command.request.assigneeId,
+        summary: command.request.summary ?? null,
+        idempotencyKey: command.idempotencyKey,
+        requestDigest: digest(command.request),
+        createdAt: now().toISOString(),
+      });
+    },
+    async getManualAttempt(query) {
+      if (query.actorId !== options.scope.actorId) return null;
+      return options.worker.getMobileManualRepairAttempt({ ...scope, attemptId: query.attemptId });
+    },
     async dispatchRelay(command) {
       requireActor(command.actorId, options.scope);
       return options.worker.dispatchMobileRelay({

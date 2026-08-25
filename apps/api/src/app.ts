@@ -60,10 +60,13 @@ import {
 import {
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
   MOBILE_BUG_TRANSITION_PATH,
+  MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
+  MOBILE_REPAIR_ATTEMPT_ITEM_PATH,
   MOBILE_RELAY_DISPATCH_PATH,
   MOBILE_RELAY_RECEIPT_PATH,
   parseMobileBugReadyRequest,
-  parseMobileRelayAttemptRequest,
+  parseMobileRepairAttemptDeliveryRequest,
+  parseMobileRepairAttemptRequest,
   parseMobileRelayDispatchRequest,
   requireRelayIdempotencyKey,
   requireRelayUuid,
@@ -160,6 +163,10 @@ const unconfiguredMobileRelayStore: MobileRelayStore = {
   createRelayAttempt: () => {
     throw new Error("MobileRelayStore is not configured");
   },
+  createManualAttempt: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  getManualAttempt: () => null,
   dispatchRelay: () => {
     throw new Error("MobileRelayStore is not configured");
   },
@@ -468,6 +475,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     if (code === "VERSION_CONFLICT" || code === "IDEMPOTENCY_PAYLOAD_MISMATCH") {
       return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
+    if (code === "GUARD_FAILED" || code === "RELAY_DELIVERY_EVIDENCE_INVALID") {
+      return reply.code(422).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
     if (error instanceof TypeError || code === "INVALID_REQUEST") {
       return reply.code(400).header("content-type", MOBILE_API_CONTENT_TYPE).send({
         code: code === "INVALID_REQUEST" ? code : "INVALID_REQUEST",
@@ -509,7 +519,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       try {
         const bugId = requireRelayUuid(request.params.bugId, "bugId");
-        const body = parseMobileRelayAttemptRequest(request.body);
+        const body = parseMobileRepairAttemptRequest(request.body);
         const idempotencyKey = requireRelayIdempotencyKey(
           readHeader(request.headers["idempotency-key"]),
         );
@@ -519,13 +529,77 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         ) {
           throw new TypeError("Idempotency-Key does not match RepairAttempt creation");
         }
-        const result = await mobileRelayStore.createRelayAttempt({
-          actorId: debugActorId,
-          bugId,
-          idempotencyKey,
-          request: body,
-        });
+        const result =
+          body.mode === "human"
+            ? await mobileRelayStore.createManualAttempt({
+                actorId: debugActorId,
+                bugId,
+                idempotencyKey,
+                request: body,
+              })
+            : await mobileRelayStore.createRelayAttempt({
+                actorId: debugActorId,
+                bugId,
+                idempotencyKey,
+                request: body,
+              });
         return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.get<{ Params: { attemptId: string } }>(
+    MOBILE_REPAIR_ATTEMPT_ITEM_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+        const result = await mobileRelayStore.getManualAttempt({
+          actorId: debugActorId,
+          attemptId,
+        });
+        if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.post<{ Params: { attemptId: string } }>(
+    MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+        const body = parseMobileRepairAttemptDeliveryRequest(request.body);
+        const idempotencyKey = requireRelayIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (
+          idempotencyKey !==
+          `workflow:deliverRepairAttempt:attempt:${attemptId}:v${body.expectedVersion}`
+        ) {
+          throw new TypeError("Idempotency-Key does not match RepairAttempt delivery");
+        }
+        const attempt = await mobileRelayStore.getManualAttempt({
+          actorId: debugActorId,
+          attemptId,
+        });
+        if (attempt === null) return reply.code(404).send({ code: "NOT_FOUND" });
+        // The offline slice intentionally stops before lifecycle mutation.  A
+        // request that reaches here is structurally valid, but must not make a
+        // planned human attempt look delivered without the later evidence path.
+        return reply
+          .code(422)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "GUARD_FAILED" });
       } catch (error: unknown) {
         return relayErrorReply(error, reply);
       }

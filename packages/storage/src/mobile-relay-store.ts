@@ -56,6 +56,17 @@ export interface CreateMobileRelayAttemptInput extends MobileRelayScope {
   readonly createdAt: string;
 }
 
+/** The QA Hub manual/offline lane uses the frozen human repair mode. */
+export interface CreateMobileManualRepairAttemptInput extends MobileRelayScope {
+  readonly bugId: string;
+  readonly expectedVersion: number;
+  readonly assigneeId: string;
+  readonly summary: string | null;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
 export interface MobileRepairAttemptRecord {
   readonly id: string;
   readonly bugId: string;
@@ -70,6 +81,26 @@ export interface MobileRepairAttemptRecord {
   readonly mergeRequestUrl: null;
   readonly targetBuildId: null;
   readonly version: 1;
+}
+
+export interface MobileManualRepairAttemptRecord {
+  readonly id: string;
+  readonly bugId: string;
+  readonly sequence: number;
+  readonly mode: "human";
+  readonly status: "planned";
+  readonly assigneeId: string;
+  readonly parentAttemptId: null;
+  readonly summary: string | null;
+  readonly branch: null;
+  readonly commitSha: null;
+  readonly mergeRequestUrl: null;
+  readonly targetBuildId: null;
+  readonly version: 1;
+}
+
+export interface GetMobileManualRepairAttemptInput extends MobileRelayScope {
+  readonly attemptId: string;
 }
 
 export interface DispatchMobileRelayInput extends MobileRelayScope {
@@ -652,6 +683,30 @@ function toAttempt(row: AttemptRow): MobileRepairAttemptRecord {
   });
 }
 
+function toManualAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
+  if (row.mode !== "human" || row.status !== "planned" || row.version !== 1) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt is not a planned human attempt",
+    );
+  }
+  return Object.freeze({
+    id: row.id,
+    bugId: row.bug_id,
+    sequence: row.sequence,
+    mode: "human",
+    status: "planned",
+    assigneeId: row.assignee_id,
+    parentAttemptId: null,
+    summary: row.summary,
+    branch: null,
+    commitSha: null,
+    mergeRequestUrl: null,
+    targetBuildId: null,
+    version: 1,
+  });
+}
+
 export function createMobileRelayAttempt(
   database: DatabaseSync,
   input: CreateMobileRelayAttemptInput,
@@ -730,6 +785,110 @@ export function createMobileRelayAttempt(
     .get(input.accountId, input.projectId, attemptId) as AttemptRow | undefined;
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not created");
   return toAttempt(row);
+}
+
+export function createMobileManualRepairAttempt(
+  database: DatabaseSync,
+  input: CreateMobileManualRepairAttemptInput,
+): MobileManualRepairAttemptRecord {
+  requireTransaction(database);
+  const bug = readBugRow(database, input, input.bugId);
+  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+  if (bug.version !== input.expectedVersion || bug.state !== "ready") {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug is not ready at the expected version",
+    );
+  }
+  if (input.assigneeId !== input.actorId) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "manual assignee must be the actor");
+  }
+  const sequenceRow = database
+    .prepare(
+      `SELECT COALESCE(MAX(sequence), 0) + 1 AS next_sequence
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?`,
+    )
+    .get(input.accountId, input.projectId, bug.id) as { readonly next_sequence: number };
+  const sequence = sequenceRow.next_sequence;
+  const at = nextTimestamp(input.createdAt, bug.updated_at);
+  const attemptId = randomUUID();
+  const eventId = randomUUID();
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: bug.id,
+    type: "repair_attempt.created",
+    aggregateType: "repair_attempt",
+    aggregateId: attemptId,
+    aggregateSequence: 1,
+    resourceType: "repair_attempt",
+    resourceId: attemptId,
+    resourceVersionAfter: 1,
+    correlationId: randomUUID(),
+    fromState: "ready",
+    toState: "in_progress",
+    payload: {
+      status: "planned",
+      repairAttemptId: attemptId,
+      fromVersion: bug.version,
+      toVersion: bug.version + 1,
+    },
+    createdAt: at,
+  });
+  database
+    .prepare(
+      `INSERT INTO repair_attempts(
+        id, account_id, project_id, bug_id, sequence, mode, status, assignee_id,
+        parent_attempt_id, summary, branch, commit_sha, merge_request_url, patch_url,
+        no_code_reason, target_build_id, created_at, updated_at, version, failure_reason
+      ) VALUES (?, ?, ?, ?, ?, 'human', 'planned', ?, NULL, ?, NULL, NULL, NULL,
+                NULL, NULL, NULL, ?, ?, 1, NULL)`,
+    )
+    .run(
+      attemptId,
+      input.accountId,
+      input.projectId,
+      bug.id,
+      sequence,
+      input.assigneeId,
+      input.summary,
+      at,
+      at,
+    );
+  database
+    .prepare(
+      `UPDATE bugs
+       SET state = 'in_progress', active_repair_attempt_id = ?, version = version + 1,
+           updated_at = ?
+       WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+    )
+    .run(attemptId, at, input.accountId, input.projectId, bug.id, bug.version);
+  const row = database
+    .prepare(
+      `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
+              summary, branch, commit_sha, merge_request_url, target_build_id, version
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, attemptId) as AttemptRow | undefined;
+  if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not created");
+  return toManualAttempt(row);
+}
+
+export function getMobileManualRepairAttempt(
+  database: DatabaseSync,
+  input: GetMobileManualRepairAttemptInput,
+): MobileManualRepairAttemptRecord | null {
+  const row = database
+    .prepare(
+      `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
+              summary, branch, commit_sha, merge_request_url, target_build_id, version
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND id = ? AND mode = 'human'`,
+    )
+    .get(input.accountId, input.projectId, input.attemptId) as AttemptRow | undefined;
+  return row ? toManualAttempt(row) : null;
 }
 
 function scopeDigest(input: MobileRelayScope): string {
