@@ -1,9 +1,15 @@
 import http from "node:http";
+import { createHmac, randomUUID } from "node:crypto";
 
 const HOST = process.env.QA_FAKE_RELAY_HOST || "127.0.0.1";
 const PORT = parsePort(process.env.QA_FAKE_RELAY_PORT, 4321);
 const MAX_BODY_BYTES = 256 * 1024;
 const HANDOFF_PATH = "/api/fake-relay/v1/handoffs";
+const CALLBACK_PATH = "/api/v1/integrations/relay/webhooks";
+const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
+const callbackConfig = readCallbackConfig();
+const callbackStats = { delivered: 0, failed: 0 };
+let nextTaskId = 1;
 
 /** @type {Map<string, { digest: string, response: object }>} */
 const handoffs = new Map();
@@ -15,6 +21,11 @@ const server = http.createServer(async (request, response) => {
         status: "ok",
         service: "qa-hub-fake-relay",
         handoffs: handoffs.size,
+        callback: {
+          configured: callbackConfig !== null,
+          delivered: callbackStats.delivered,
+          failed: callbackStats.failed,
+        },
       });
       return;
     }
@@ -53,6 +64,13 @@ const server = http.createServer(async (request, response) => {
         digest: handoff.payloadDigest,
         response: receipt,
       });
+      if (callbackConfig !== null) {
+        const taskId = nextTaskId++;
+        const timer = setTimeout(() => {
+          void deliverTurnDelivered(handoff, taskId);
+        }, 400);
+        timer.unref?.();
+      }
       sendJson(response, 202, receipt);
       return;
     }
@@ -76,6 +94,98 @@ function parsePort(value, fallback) {
     throw new Error("QA_FAKE_RELAY_PORT must be a valid TCP port");
   }
   return port;
+}
+
+function readCallbackConfig() {
+  const callbackUrl = process.env.QA_FAKE_RELAY_CALLBACK_URL;
+  const webhookSecret = process.env.QA_FAKE_RELAY_WEBHOOK_SECRET;
+  if (callbackUrl === undefined && webhookSecret === undefined) return null;
+  if (!callbackUrl || !webhookSecret) {
+    throw new Error(
+      "QA_FAKE_RELAY_CALLBACK_URL and QA_FAKE_RELAY_WEBHOOK_SECRET must be provided together",
+    );
+  }
+  const parsed = new URL(callbackUrl);
+  if (
+    parsed.protocol !== "http:" ||
+    !LOOPBACK_HOSTS.has(parsed.hostname) ||
+    parsed.username ||
+    parsed.password ||
+    parsed.pathname !== CALLBACK_PATH ||
+    parsed.search ||
+    parsed.hash
+  ) {
+    throw new Error(
+      "QA_FAKE_RELAY_CALLBACK_URL must be credential-free loopback HTTP with the frozen webhook path",
+    );
+  }
+  return { url: parsed, secret: webhookSecret };
+}
+
+async function deliverTurnDelivered(handoff, taskId) {
+  const eventId = randomUUID();
+  const deliveryId = `fake-relay-local:event:${eventId}`;
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const body = JSON.stringify({
+    schemaVersion: "1.0",
+    relayInstanceId: "fake-relay-local",
+    eventId,
+    deliveryId,
+    eventType: "turn.delivered",
+    handoffId: handoff.handoffId,
+    attemptId: handoff.attemptId,
+    externalRevision: 2,
+    occurredAt: new Date().toISOString(),
+    payload: {
+      taskId,
+      turnId: 1,
+      deliveryEvidence: {
+        pushed: true,
+        verified: true,
+        commitSha: "f".repeat(40),
+        remoteSha: "f".repeat(40),
+        branch: "qa-hub/fake-delivery",
+        mergeRequestUrl: null,
+      },
+    },
+  });
+  const signature = `sha256=${createHmac("sha256", callbackConfig.secret)
+    .update(`${timestamp}.${body}`)
+    .digest("hex")}`;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1_500);
+    try {
+      const result = await fetch(callbackConfig.url, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "Idempotency-Key": deliveryId,
+          "X-Relay-Delivery-Id": deliveryId,
+          "X-Relay-Event-Id": eventId,
+          "X-Relay-Timestamp": timestamp,
+          "X-Relay-Signature": signature,
+        },
+        body,
+        signal: controller.signal,
+      });
+      if (result.status >= 200 && result.status < 300) {
+        callbackStats.delivered += 1;
+        return;
+      }
+    } catch {
+      // The callback is best-effort; only aggregate status is retained.
+    } finally {
+      clearTimeout(timeout);
+    }
+    if (attempt < 2) await delay(100 * (attempt + 1));
+  }
+  callbackStats.failed += 1;
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 function validateHandoff(value) {

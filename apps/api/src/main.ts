@@ -10,6 +10,7 @@ import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-st
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
 import { createSqliteMobileCaptureStore } from "./sqlite-mobile-capture-store.js";
 import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
+import { createSqliteMobileRelayWebhookStore } from "./sqlite-mobile-relay-webhook-store.js";
 import {
   parseFakeRelayEndpoint,
   startMobileRelayOutboxPump,
@@ -29,6 +30,17 @@ function requireMobileAccessToken(): string {
   const token = process.env["QA_HUB_MVP_ACCESS_TOKEN"]?.trim();
   if (!token) throw new Error("QA_HUB_MVP_ACCESS_TOKEN is required");
   return token;
+}
+
+function readRelayWebhookSecret(fakeRelayEndpoint: URL | undefined): string | undefined {
+  const configured = process.env["QA_HUB_RELAY_WEBHOOK_SECRET"]?.trim();
+  if (configured !== undefined && configured.length < 32) {
+    throw new Error("QA_HUB_RELAY_WEBHOOK_SECRET must contain at least 32 characters");
+  }
+  if (fakeRelayEndpoint !== undefined && configured === undefined) {
+    throw new Error("QA_HUB_RELAY_WEBHOOK_SECRET is required with QA_HUB_FAKE_RELAY_URL");
+  }
+  return configured;
 }
 
 async function closeRuntime(
@@ -58,12 +70,23 @@ async function run(): Promise<void> {
     await worker.ensureMobileScope(MOBILE_SCOPE);
     await worker.ensureMobileRelayRoles(MOBILE_SCOPE);
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
+    const fakeRelayEndpoint = parseFakeRelayEndpoint(process.env["QA_HUB_FAKE_RELAY_URL"]);
+    const relayWebhookSecret = readRelayWebhookSecret(fakeRelayEndpoint);
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
       mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
       mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
       mobileRelayStore: createSqliteMobileRelayStore({ worker, scope: MOBILE_SCOPE }),
+      ...(relayWebhookSecret === undefined
+        ? {}
+        : {
+            mobileRelayWebhookStore: createSqliteMobileRelayWebhookStore({
+              worker,
+              scope: MOBILE_SCOPE,
+            }),
+            relayWebhookSecret,
+          }),
       debugBearerToken,
       debugActorId: MOBILE_SCOPE.actorId,
     });
@@ -92,7 +115,6 @@ async function run(): Promise<void> {
       { address, databaseFile: storage.databaseFile },
       "Relay QA Hub API started",
     );
-    const fakeRelayEndpoint = parseFakeRelayEndpoint(process.env["QA_HUB_FAKE_RELAY_URL"]);
     if (fakeRelayEndpoint) {
       relayPump = startMobileRelayOutboxPump({
         worker,

@@ -31,12 +31,14 @@ import {
   dispatchMobileRelay,
   ensureMobileRelayRoles,
   getMobileRelayReceipt,
+  receiveMobileRelayWebhook,
   retryMobileRelayOutbox,
   transitionMobileBugReady,
   type CompleteMobileRelayOutboxInput,
   type CreateMobileRelayAttemptInput,
   type DispatchMobileRelayInput,
   type RetryMobileRelayOutboxInput,
+  type ReceiveMobileRelayWebhookInput,
   type TransitionMobileBugInput,
 } from "./mobile-relay-store.js";
 import {
@@ -71,6 +73,7 @@ interface WorkerRequest {
     | "createMobileRelayAttempt"
     | "dispatchMobileRelay"
     | "getMobileRelayReceipt"
+    | "receiveMobileRelayWebhook"
     | "claimMobileRelayOutbox"
     | "completeMobileRelayOutbox"
     | "retryMobileRelayOutbox"
@@ -264,6 +267,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly attemptId: string;
     };
     return getMobileRelayReceipt(requireDatabase(), payload);
+  }
+
+  if (request.operation === "receiveMobileRelayWebhook") {
+    return inWriteTransaction((current) =>
+      receiveMobileRelayWebhook(current, request.payload as ReceiveMobileRelayWebhookInput),
+    );
   }
 
   if (request.operation === "claimMobileRelayOutbox") {

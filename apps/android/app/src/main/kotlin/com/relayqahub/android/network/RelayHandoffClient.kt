@@ -113,7 +113,7 @@ class RelayHandoffClient(
                 body = null,
             )
             receipt = current
-            if (current.optString("handoffStatus") != "queued") break
+            if (current.optString("handoffStatus") !in NON_TERMINAL_RECEIPT_STATUSES) break
             if (poll + 1 < RECEIPT_POLL_ATTEMPTS) delay(RECEIPT_POLL_DELAY_MS)
         }
         val finalReceipt = requireNotNull(receipt)
@@ -187,6 +187,7 @@ class RelayHandoffClient(
         const val API_BASE_PATH = "/api/v1/"
         const val RECEIPT_POLL_ATTEMPTS = 12
         const val RECEIPT_POLL_DELAY_MS = 250L
+        val NON_TERMINAL_RECEIPT_STATUSES = setOf("queued", "submitted", "running")
         val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
     }
 }

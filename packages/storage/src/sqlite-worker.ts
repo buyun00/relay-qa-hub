@@ -28,7 +28,9 @@ import type {
   MobileRelayOutboxClaim,
   MobileRelayDispatchAccepted,
   MobileRelayReceipt,
+  MobileRelayWebhookProjectionResult,
   MobileRepairAttemptRecord,
+  ReceiveMobileRelayWebhookInput,
   RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
 } from "./mobile-relay-store.js";
@@ -221,6 +223,13 @@ export class SqliteStorageWorker {
   }): Promise<MobileRelayReceipt | null> {
     await this.initialization;
     return this.request<MobileRelayReceipt | null>("getMobileRelayReceipt", input);
+  }
+
+  async receiveMobileRelayWebhook(
+    input: ReceiveMobileRelayWebhookInput,
+  ): Promise<MobileRelayWebhookProjectionResult> {
+    await this.initialization;
+    return this.request<MobileRelayWebhookProjectionResult>("receiveMobileRelayWebhook", input);
   }
 
   async claimMobileRelayOutbox(input: {

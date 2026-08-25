@@ -247,6 +247,7 @@ export {
   MOBILE_FAKE_RELAY_INSTANCE_ID,
   MOBILE_FAKE_RELAY_PRINCIPAL_ID,
   MobileRelayStorageError,
+  receiveMobileRelayWebhook,
 } from "./mobile-relay-store.js";
 export type {
   CompleteMobileRelayOutboxInput,
@@ -256,7 +257,9 @@ export type {
   MobileRelayOutboxClaim,
   MobileRelayReceipt,
   MobileRelayScope,
+  MobileRelayWebhookProjectionResult,
   MobileRepairAttemptRecord,
+  ReceiveMobileRelayWebhookInput,
   RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
 } from "./mobile-relay-store.js";

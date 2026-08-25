@@ -6,10 +6,23 @@ import type { MobileBugRecord, MobileScopeBootstrap } from "./mobile-bug-store.j
 export const MOBILE_FAKE_RELAY_INSTANCE_ID = "fake-relay-local" as const;
 export const MOBILE_FAKE_RELAY_PRINCIPAL_ID = "10000000-0000-4000-8000-000000000007" as const;
 
+const RELAY_WEBHOOK_MAX_BODY_BYTES = 256 * 1024;
+const UUID_PATTERN =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
+const RELAY_INSTANCE_PATTERN = /^[a-z0-9][a-z0-9_-]{2,63}$/u;
+const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
+const COMMIT_PATTERN = /^[0-9a-f]{40}$/u;
+
 export class MobileRelayStorageError extends Error {
   constructor(
     readonly code:
-      "INVALID_REQUEST" | "NOT_FOUND" | "VERSION_CONFLICT" | "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      | "INVALID_REQUEST"
+      | "NOT_FOUND"
+      | "VERSION_CONFLICT"
+      | "IDEMPOTENCY_PAYLOAD_MISMATCH"
+      | "INTEGRATION_EVENT_CONFLICT"
+      | "INTEGRATION_AUTOMATION_FORBIDDEN"
+      | "RELAY_DELIVERY_EVIDENCE_INVALID",
     message: string,
   ) {
     super(message);
@@ -137,6 +150,41 @@ export interface RetryMobileRelayOutboxInput {
   readonly nextAttemptAt: string;
 }
 
+/**
+ * The webhook parser owns authentication and wire-shape validation.  Storage
+ * still receives the raw envelope and rechecks its identity before it can
+ * touch an integration projection.  Keeping the raw JSON here is intentional:
+ * it is the durable replay/conflict evidence in inbox.payload_json.
+ */
+export interface ReceiveMobileRelayWebhookInput {
+  readonly accountId: string;
+  readonly projectId: string;
+  readonly relayInstanceId: string;
+  readonly eventId: string;
+  readonly deliveryId: string;
+  readonly eventType: "turn.delivered";
+  readonly handoffId: string;
+  readonly attemptId: string;
+  readonly externalRevision: number;
+  readonly occurredAt: string;
+  readonly taskId: number;
+  readonly turnId: number;
+  readonly statusReason?: string | null;
+  readonly commitSha: string;
+  readonly remoteSha: string;
+  readonly branch: string;
+  readonly mergeRequestUrl?: string | null;
+  readonly payloadDigest: string;
+  readonly rawPayloadJson: string;
+  readonly receivedAt: string;
+}
+
+export interface MobileRelayWebhookProjectionResult {
+  readonly inboxMessageId: string;
+  readonly replayed: boolean;
+  readonly projectionStatus: "applied" | "ignored" | "replayed";
+}
+
 interface BugRow {
   readonly id: string;
   readonly project_id: string;
@@ -197,6 +245,21 @@ interface ReceiptRow {
   readonly version: number;
 }
 
+interface RelayWebhookReceiptRow extends ReceiptRow {
+  readonly receipt_id: string;
+  readonly integration_link_id: string;
+  readonly payload_digest: string;
+  readonly bug_id: string;
+}
+
+interface InboxRow {
+  readonly id: string;
+  readonly external_event_id: string;
+  readonly delivery_id: string;
+  readonly payload_digest: string;
+  readonly status: string;
+}
+
 function requireTransaction(database: DatabaseSync): void {
   if (!database.isTransaction) {
     throw new MobileRelayStorageError(
@@ -213,6 +276,190 @@ function nextTimestamp(candidate: string, floor: string): string {
     throw new MobileRelayStorageError("INVALID_REQUEST", "workflow timestamp is invalid");
   }
   return new Date(Math.max(candidateMs, floorMs + 1)).toISOString();
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function requireRelayString(value: unknown, field: string, min: number, max: number): string {
+  if (typeof value !== "string" || value.length < min || value.length > max) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", `Relay webhook ${field} is invalid`);
+  }
+  return value;
+}
+
+function requireRelayUuid(value: unknown, field: string): string {
+  const parsed = requireRelayString(value, field, 36, 36);
+  if (!UUID_PATTERN.test(parsed)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", `Relay webhook ${field} is invalid`);
+  }
+  return parsed;
+}
+
+function requireRelayTimestamp(value: unknown, field: string): string {
+  const parsed = requireRelayString(value, field, 20, 100);
+  if (!Number.isFinite(Date.parse(parsed))) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", `Relay webhook ${field} is invalid`);
+  }
+  return parsed;
+}
+
+function requireRelayPositiveInteger(value: unknown, field: string): number {
+  if (!Number.isSafeInteger(value) || (value as number) < 1) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", `Relay webhook ${field} is invalid`);
+  }
+  return value as number;
+}
+
+function requireRelayKeys(
+  value: Record<string, unknown>,
+  allowed: ReadonlySet<string>,
+  field: string,
+): void {
+  for (const key of Object.keys(value)) {
+    if (!allowed.has(key)) {
+      throw new MobileRelayStorageError("INVALID_REQUEST", `Relay webhook ${field} has unknown data`);
+    }
+  }
+}
+
+function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
+  if (input.eventType !== "turn.delivered") {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook event type is unsupported");
+  }
+  const relayInstanceId = requireRelayString(input.relayInstanceId, "relayInstanceId", 3, 64);
+  if (!RELAY_INSTANCE_PATTERN.test(relayInstanceId)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook relayInstanceId is invalid");
+  }
+  const eventId = requireRelayUuid(input.eventId, "eventId");
+  const handoffId = requireRelayUuid(input.handoffId, "handoffId");
+  const attemptId = requireRelayUuid(input.attemptId, "attemptId");
+  const deliveryId = requireRelayString(input.deliveryId, "deliveryId", 1, 300);
+  const externalRevision = requireRelayPositiveInteger(input.externalRevision, "externalRevision");
+  const occurredAt = requireRelayTimestamp(input.occurredAt, "occurredAt");
+  const receivedAt = requireRelayTimestamp(input.receivedAt, "receivedAt");
+  const taskId = requireRelayPositiveInteger(input.taskId, "taskId");
+  const turnId = requireRelayPositiveInteger(input.turnId, "turnId");
+  const branch = requireRelayString(input.branch, "branch", 1, 300);
+  const commitSha = requireRelayString(input.commitSha, "commitSha", 40, 40);
+  const remoteSha = requireRelayString(input.remoteSha, "remoteSha", 40, 40);
+  if (!COMMIT_PATTERN.test(commitSha) || !COMMIT_PATTERN.test(remoteSha) || commitSha !== remoteSha) {
+    throw new MobileRelayStorageError(
+      "RELAY_DELIVERY_EVIDENCE_INVALID",
+      "Relay delivery evidence must contain matching verified commit SHAs",
+    );
+  }
+  if (
+    input.statusReason !== undefined &&
+    input.statusReason !== null &&
+    (typeof input.statusReason !== "string" || input.statusReason.length > 5_000)
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook statusReason is invalid");
+  }
+  if (
+    input.mergeRequestUrl !== undefined &&
+    input.mergeRequestUrl !== null &&
+    (typeof input.mergeRequestUrl !== "string" || input.mergeRequestUrl.length > 2_048)
+  ) {
+    throw new MobileRelayStorageError("RELAY_DELIVERY_EVIDENCE_INVALID", "Relay merge request URL is invalid");
+  }
+  const payloadDigest = requireRelayString(input.payloadDigest, "payloadDigest", 64, 64);
+  if (!SHA256_PATTERN.test(payloadDigest)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook payloadDigest is invalid");
+  }
+  if (
+    typeof input.rawPayloadJson !== "string" ||
+    input.rawPayloadJson.length === 0 ||
+    Buffer.byteLength(input.rawPayloadJson, "utf8") > RELAY_WEBHOOK_MAX_BODY_BYTES
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook raw payload is invalid");
+  }
+  const computedDigest = createHash("sha256").update(input.rawPayloadJson, "utf8").digest("hex");
+  if (computedDigest !== payloadDigest) {
+    throw new MobileRelayStorageError(
+      "INTEGRATION_EVENT_CONFLICT",
+      "Relay webhook payload digest does not match its raw JSON",
+    );
+  }
+
+  let decoded: unknown;
+  try {
+    decoded = JSON.parse(input.rawPayloadJson) as unknown;
+  } catch {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook raw payload is not JSON");
+  }
+  if (!isRecord(decoded)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook envelope is invalid");
+  }
+  requireRelayKeys(
+    decoded,
+    new Set([
+      "schemaVersion",
+      "relayInstanceId",
+      "eventId",
+      "deliveryId",
+      "eventType",
+      "handoffId",
+      "attemptId",
+      "externalRevision",
+      "occurredAt",
+      "payload",
+    ]),
+    "envelope",
+  );
+  if (
+    decoded.schemaVersion !== "1.0" ||
+    decoded.relayInstanceId !== relayInstanceId ||
+    decoded.eventId !== eventId ||
+    decoded.deliveryId !== deliveryId ||
+    decoded.eventType !== "turn.delivered" ||
+    decoded.handoffId !== handoffId ||
+    decoded.attemptId !== attemptId ||
+    decoded.externalRevision !== externalRevision ||
+    decoded.occurredAt !== occurredAt
+  ) {
+    throw new MobileRelayStorageError(
+      "INTEGRATION_EVENT_CONFLICT",
+      "Relay webhook envelope identity does not match its authenticated request",
+    );
+  }
+  if (!isRecord(decoded.payload)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook delivery payload is invalid");
+  }
+  requireRelayKeys(decoded.payload, new Set(["taskId", "turnId", "statusReason", "deliveryEvidence"]), "payload");
+  if (
+    decoded.payload.taskId !== taskId ||
+    decoded.payload.turnId !== turnId
+  ) {
+    throw new MobileRelayStorageError(
+      "INTEGRATION_EVENT_CONFLICT",
+      "Relay webhook delivery payload does not match its authenticated request",
+    );
+  }
+  if (!isRecord(decoded.payload.deliveryEvidence)) {
+    throw new MobileRelayStorageError(
+      "RELAY_DELIVERY_EVIDENCE_INVALID",
+      "Relay delivery evidence is invalid",
+    );
+  }
+  requireRelayKeys(
+    decoded.payload.deliveryEvidence,
+    new Set(["pushed", "verified", "commitSha", "remoteSha", "branch", "mergeRequestUrl"]),
+    "deliveryEvidence",
+  );
+  if (
+    decoded.payload.deliveryEvidence.pushed !== true ||
+    decoded.payload.deliveryEvidence.verified !== true ||
+    decoded.payload.deliveryEvidence.commitSha !== commitSha ||
+    decoded.payload.deliveryEvidence.remoteSha !== remoteSha ||
+    decoded.payload.deliveryEvidence.branch !== branch
+  ) {
+    throw new MobileRelayStorageError(
+      "RELAY_DELIVERY_EVIDENCE_INVALID",
+      "Relay delivery evidence does not match its authenticated request",
+    );
+  }
 }
 
 function readBugRow(
@@ -754,6 +1001,314 @@ export function getMobileRelayReceipt(
     lastEventAt: row.last_event_at,
     failureSummary: row.failure_summary,
     version: row.version,
+  });
+}
+
+function requireRelayWebhookPrincipal(database: DatabaseSync, accountId: string): void {
+  const principal = database
+    .prepare(
+      `SELECT principal.id
+       FROM service_principals AS principal
+       JOIN accounts AS account ON account.id = principal.account_id
+       WHERE principal.account_id = ? AND principal.id = ?
+         AND principal.principal_type = 'relay'
+         AND principal.status = 'active' AND account.status = 'active'`,
+    )
+    .get(accountId, MOBILE_FAKE_RELAY_PRINCIPAL_ID) as { readonly id: string } | undefined;
+  if (!principal) {
+    throw new MobileRelayStorageError(
+      "INTEGRATION_AUTOMATION_FORBIDDEN",
+      "Relay webhook service principal is not active for this account",
+    );
+  }
+}
+
+function readRelayWebhookReceipt(
+  database: DatabaseSync,
+  input: ReceiveMobileRelayWebhookInput,
+): RelayWebhookReceiptRow | undefined {
+  return database
+    .prepare(
+      `SELECT receipt.id AS receipt_id, receipt.bug_id, bug.key AS bug_key,
+              receipt.repair_attempt_id, receipt.handoff_id, receipt.relay_instance_id,
+              receipt.relay_task_id, receipt.handoff_status, receipt.build_requirement,
+              receipt.build_evidence_status, receipt.delivered_commit_sha, receipt.build_id,
+              receipt.external_revision, receipt.last_event_at, receipt.failure_summary,
+              receipt.payload_digest, receipt.version, integration.id AS integration_link_id
+       FROM relay_receipts AS receipt
+       JOIN integration_links AS integration
+         ON integration.account_id = receipt.account_id
+        AND integration.project_id = receipt.project_id
+        AND integration.id = receipt.integration_link_id
+       JOIN repair_attempts AS attempt
+         ON attempt.account_id = receipt.account_id
+        AND attempt.project_id = receipt.project_id
+        AND attempt.id = receipt.repair_attempt_id
+        AND attempt.bug_id = receipt.bug_id
+       JOIN bugs AS bug
+         ON bug.account_id = receipt.account_id
+        AND bug.project_id = receipt.project_id
+        AND bug.id = receipt.bug_id
+       WHERE receipt.account_id = ? AND receipt.project_id = ?
+         AND receipt.repair_attempt_id = ? AND receipt.handoff_id = ?
+         AND receipt.relay_instance_id = ?
+         AND attempt.mode = 'relay'
+         AND integration.integration_type = 'relay'
+         AND integration.local_resource_type = 'repair_attempt'
+         AND integration.local_resource_id = receipt.repair_attempt_id
+         AND integration.external_resource_type = 'relay_handoff'
+         AND integration.external_resource_id = receipt.handoff_id
+         AND integration.state = 'active'
+         AND json_extract(integration.metadata_json, '$.relayInstanceId') = receipt.relay_instance_id`,
+    )
+    .get(
+      input.accountId,
+      input.projectId,
+      input.attemptId,
+      input.handoffId,
+      input.relayInstanceId,
+    ) as RelayWebhookReceiptRow | undefined;
+}
+
+function readRelayWebhookInbox(
+  database: DatabaseSync,
+  input: ReceiveMobileRelayWebhookInput,
+): InboxRow[] {
+  return database
+    .prepare(
+      `SELECT id, external_event_id, delivery_id, payload_digest, status
+       FROM inbox
+       WHERE account_id = ? AND project_id = ? AND source = 'relay'
+         AND source_instance_id = ?
+         AND (external_event_id = ? OR delivery_id = ?)`,
+    )
+    .all(
+      input.accountId,
+      input.projectId,
+      input.relayInstanceId,
+      input.eventId,
+      input.deliveryId,
+    ) as unknown as InboxRow[];
+}
+
+function insertRelayWebhookInbox(
+  database: DatabaseSync,
+  input: ReceiveMobileRelayWebhookInput,
+  status: "applied" | "ignored",
+  appliedAt: string | null,
+): string {
+  const id = randomUUID();
+  database
+    .prepare(
+      `INSERT INTO inbox(
+        id, account_id, project_id, source, source_instance_id,
+        external_event_id, delivery_id, event_type, aggregate_id,
+        aggregate_sequence, payload_digest, payload_json, status,
+        received_at, applied_at, version
+      ) VALUES (?, ?, ?, 'relay', ?, ?, ?, 'turn.delivered', ?, ?, ?, ?, ?, ?, ?, 1)`,
+    )
+    .run(
+      id,
+      input.accountId,
+      input.projectId,
+      input.relayInstanceId,
+      input.eventId,
+      input.deliveryId,
+      input.attemptId,
+      input.externalRevision,
+      input.payloadDigest,
+      input.rawPayloadJson,
+      status,
+      input.receivedAt,
+      appliedAt,
+    );
+  return id;
+}
+
+function nextRelayAggregateSequence(
+  database: DatabaseSync,
+  accountId: string,
+  projectId: string,
+  attemptId: string,
+): number {
+  const row = database
+    .prepare(
+      `SELECT COALESCE(MAX(aggregate_sequence), 0) + 1 AS next_sequence
+       FROM events
+       WHERE account_id = ? AND project_id = ?
+         AND aggregate_type = 'repair_attempt' AND aggregate_id = ?`,
+    )
+    .get(accountId, projectId, attemptId) as { readonly next_sequence: number };
+  return row.next_sequence;
+}
+
+export function receiveMobileRelayWebhook(
+  database: DatabaseSync,
+  input: ReceiveMobileRelayWebhookInput,
+): MobileRelayWebhookProjectionResult {
+  requireTransaction(database);
+  validateRawRelayWebhook(input);
+
+  // Authorization and exact aggregate/resource binding happen before inbox
+  // dedupe.  A foreign event must not be able to learn whether a delivery key
+  // exists in another account, project, handoff, or attempt.
+  requireRelayWebhookPrincipal(database, input.accountId);
+  const receipt = readRelayWebhookReceipt(database, input);
+  if (!receipt) {
+    throw new MobileRelayStorageError(
+      "NOT_FOUND",
+      "Relay webhook does not match an active exact handoff tuple",
+    );
+  }
+
+  const inboxRows = readRelayWebhookInbox(database, input);
+  const eventRow = inboxRows.find((row) => row.external_event_id === input.eventId);
+  const deliveryRow = inboxRows.find((row) => row.delivery_id === input.deliveryId);
+  if (eventRow) {
+    if (eventRow.payload_digest !== input.payloadDigest) {
+      throw new MobileRelayStorageError(
+        "INTEGRATION_EVENT_CONFLICT",
+        "Relay event was already received with a different payload",
+      );
+    }
+    if (deliveryRow && deliveryRow.external_event_id !== input.eventId) {
+      throw new MobileRelayStorageError(
+        "INTEGRATION_EVENT_CONFLICT",
+        "Relay delivery id is already bound to another event",
+      );
+    }
+    return Object.freeze({
+      inboxMessageId: eventRow.id,
+      replayed: true,
+      projectionStatus: "replayed" as const,
+    });
+  }
+  if (deliveryRow) {
+    throw new MobileRelayStorageError(
+      "INTEGRATION_EVENT_CONFLICT",
+      "Relay delivery id is already bound to another event",
+    );
+  }
+
+  if (input.externalRevision < receipt.external_revision) {
+    const inboxMessageId = insertRelayWebhookInbox(database, input, "ignored", null);
+    return Object.freeze({
+      inboxMessageId,
+      replayed: false,
+      projectionStatus: "ignored" as const,
+    });
+  }
+  if (input.externalRevision === receipt.external_revision) {
+    if (input.payloadDigest !== receipt.payload_digest) {
+      throw new MobileRelayStorageError(
+        "INTEGRATION_EVENT_CONFLICT",
+        "Relay event revision was already projected with a different payload",
+      );
+    }
+    const inboxMessageId = insertRelayWebhookInbox(database, input, "applied", input.receivedAt);
+    return Object.freeze({
+      inboxMessageId,
+      replayed: true,
+      projectionStatus: "replayed" as const,
+    });
+  }
+
+  const relayTaskId = String(input.taskId);
+  // The handoff acknowledgement may carry a Relay task label while the
+  // delivery webhook carries the authoritative numeric task id.  Permit that
+  // one pre-delivery reconciliation, then keep the task identity immutable
+  // for later revisions.
+  if (
+    receipt.relay_task_id !== null &&
+    receipt.relay_task_id !== relayTaskId &&
+    receipt.handoff_status !== "queued" &&
+    receipt.handoff_status !== "submitted"
+  ) {
+    throw new MobileRelayStorageError(
+      "INTEGRATION_EVENT_CONFLICT",
+      "Relay task identity changed within one handoff",
+    );
+  }
+  const eventAt = nextTimestamp(input.occurredAt, receipt.last_event_at);
+  const receiptVersionAfter = receipt.version + 1;
+  const receiptUpdate = database
+    .prepare(
+      `UPDATE relay_receipts
+       SET relay_task_id = ?, handoff_status = 'fix_delivered', external_revision = ?,
+           delivered_commit_sha = ?, last_event_at = ?, failure_summary = NULL,
+           payload_digest = ?, received_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND repair_attempt_id = ?
+         AND handoff_id = ? AND relay_instance_id = ?
+         AND version = ? AND external_revision < ?`,
+    )
+    .run(
+      relayTaskId,
+      input.externalRevision,
+      input.commitSha,
+      eventAt,
+      input.payloadDigest,
+      input.receivedAt,
+      input.accountId,
+      input.projectId,
+      input.attemptId,
+      input.handoffId,
+      input.relayInstanceId,
+      receipt.version,
+      input.externalRevision,
+    );
+  if (receiptUpdate.changes !== 1) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Relay receipt revision changed while projecting the webhook",
+    );
+  }
+
+  const eventId = randomUUID();
+  const aggregateSequence = nextRelayAggregateSequence(
+    database,
+    input.accountId,
+    input.projectId,
+    input.attemptId,
+  );
+  database
+    .prepare(
+      `INSERT INTO events(
+        id, account_id, project_id, bug_id, type, source, actor_type,
+        actor_service_principal_id, aggregate_type, aggregate_id,
+        aggregate_sequence, resource_type, resource_id, resource_version_after,
+        request_digest, correlation_id, causation_id, from_state, to_state,
+        payload_json, created_at
+      ) VALUES (?, ?, ?, ?, 'repair.fix_delivered', 'relay', 'service', ?,
+                'repair_attempt', ?, ?, 'repair_attempt', ?, ?, ?, ?, ?, NULL,
+                NULL, ?, ?)`,
+    )
+    .run(
+      eventId,
+      input.accountId,
+      input.projectId,
+      receipt.bug_id,
+      MOBILE_FAKE_RELAY_PRINCIPAL_ID,
+      input.attemptId,
+      aggregateSequence,
+      input.attemptId,
+      receiptVersionAfter,
+      input.payloadDigest,
+      randomUUID(),
+      input.eventId,
+      JSON.stringify({
+        status: "fix_delivered",
+        repairAttemptId: input.attemptId,
+        handoffId: input.handoffId,
+        commitSha: input.commitSha,
+      }),
+      eventAt,
+    );
+
+  const inboxMessageId = insertRelayWebhookInbox(database, input, "applied", eventAt);
+  return Object.freeze({
+    inboxMessageId,
+    replayed: false,
+    projectionStatus: "applied" as const,
   });
 }
 

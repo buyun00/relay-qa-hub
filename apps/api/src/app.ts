@@ -1,3 +1,6 @@
+import { randomUUID } from "node:crypto";
+import { Readable } from "node:stream";
+
 import Fastify, { type FastifyInstance, type FastifyReply } from "fastify";
 
 import { API_SERVICE_NAME, API_VERSION, DEVELOPMENT_BUILD_SHA, resolveBuildSha } from "./config.js";
@@ -47,6 +50,16 @@ import {
   requireRelayUuid,
   type MobileRelayStore,
 } from "./mobile-relay.js";
+import {
+  MAX_RELAY_WEBHOOK_BYTES,
+  MOBILE_RELAY_WEBHOOK_PATH,
+  MobileRelayWebhookRequestError,
+  authenticateMobileRelayWebhook,
+  parseMobileRelayDeliveredWebhook,
+  relayWebhookPayloadDigest,
+  validateMobileRelayWebhookHeaders,
+  type MobileRelayWebhookStore,
+} from "./mobile-relay-webhook.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
 
@@ -67,6 +80,8 @@ export interface CreateApiAppOptions {
   readonly mobileAttachmentStore?: MobileAttachmentStore;
   readonly mobileCaptureStore?: MobileCaptureStore;
   readonly mobileRelayStore?: MobileRelayStore;
+  readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
+  readonly relayWebhookSecret?: string;
   readonly debugBearerToken?: string;
   readonly debugActorId?: string;
 }
@@ -126,6 +141,12 @@ const unconfiguredMobileRelayStore: MobileRelayStore = {
   getRelayReceipt: () => null,
 };
 
+const unconfiguredMobileRelayWebhookStore: MobileRelayWebhookStore = {
+  receiveRelayWebhook: () => {
+    throw new Error("MobileRelayWebhookStore is not configured");
+  },
+};
+
 function readHeader(value: string | readonly string[] | undefined): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
@@ -153,6 +174,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileAttachmentStore = options.mobileAttachmentStore ?? unconfiguredMobileAttachmentStore;
   const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
   const mobileRelayStore = options.mobileRelayStore ?? unconfiguredMobileRelayStore;
+  const mobileRelayWebhookStore =
+    options.mobileRelayWebhookStore ?? unconfiguredMobileRelayWebhookStore;
+  const relayWebhookSecret = options.relayWebhookSecret ?? "";
   const debugBearerToken = options.debugBearerToken ?? DEFAULT_DEBUG_BEARER_TOKEN;
   const debugActorId = options.debugActorId ?? DEFAULT_DEBUG_ACTOR_ID;
 
@@ -181,6 +205,93 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       },
     },
     async (): Promise<LiveHealth> => createLiveHealth(options),
+  );
+
+  app.post(
+    MOBILE_RELAY_WEBHOOK_PATH,
+    {
+      bodyLimit: MAX_RELAY_WEBHOOK_BYTES,
+      preParsing: async (request, _reply, payload) => {
+        const chunks: Buffer[] = [];
+        let totalBytes = 0;
+        for await (const chunk of payload) {
+          const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+          totalBytes += bytes.length;
+          if (totalBytes > MAX_RELAY_WEBHOOK_BYTES) {
+            throw new MobileRelayWebhookRequestError("INVALID_REQUEST");
+          }
+          chunks.push(bytes);
+        }
+        const rawBody = Buffer.concat(chunks, totalBytes);
+        (request as typeof request & { relayWebhookRawBody?: Buffer }).relayWebhookRawBody =
+          rawBody;
+        return Readable.from([rawBody]);
+      },
+    },
+    async (request, reply) => {
+      const rawBody = (request as typeof request & { relayWebhookRawBody?: Buffer })
+        .relayWebhookRawBody;
+      try {
+        if (rawBody === undefined) {
+          throw new MobileRelayWebhookRequestError("INVALID_REQUEST");
+        }
+        authenticateMobileRelayWebhook({
+          rawBody,
+          secret: relayWebhookSecret,
+          signature: readHeader(request.headers["x-relay-signature"]),
+          timestamp: readHeader(request.headers["x-relay-timestamp"]),
+          now: (options.now ?? (() => new Date()))(),
+        });
+        const webhook = parseMobileRelayDeliveredWebhook(request.body);
+        validateMobileRelayWebhookHeaders({
+          webhook,
+          idempotencyKey: readHeader(request.headers["idempotency-key"]),
+          deliveryId: readHeader(request.headers["x-relay-delivery-id"]),
+          eventId: readHeader(request.headers["x-relay-event-id"]),
+        });
+        const result = await mobileRelayWebhookStore.receiveRelayWebhook({
+          relayInstanceId: webhook.relayInstanceId,
+          eventId: webhook.eventId,
+          deliveryId: webhook.deliveryId,
+          eventType: webhook.eventType,
+          handoffId: webhook.handoffId,
+          attemptId: webhook.attemptId,
+          externalRevision: webhook.externalRevision,
+          occurredAt: webhook.occurredAt,
+          taskId: webhook.payload.taskId,
+          turnId: webhook.payload.turnId,
+          commitSha: webhook.payload.deliveryEvidence.commitSha,
+          remoteSha: webhook.payload.deliveryEvidence.remoteSha,
+          branch: webhook.payload.deliveryEvidence.branch,
+          mergeRequestUrl: webhook.payload.deliveryEvidence.mergeRequestUrl,
+          payloadDigest: relayWebhookPayloadDigest(rawBody),
+          rawPayloadJson: rawBody.toString("utf8"),
+          receivedAt: (options.now ?? (() => new Date()))().toISOString(),
+        });
+        return reply.code(202).send({
+          requestId: randomUUID(),
+          outboxMessageId: result.inboxMessageId,
+          status: "accepted",
+          replayed: result.replayed,
+        });
+      } catch (error: unknown) {
+        if (error instanceof MobileRelayWebhookRequestError) {
+          const statusCode =
+            error.code === "INTEGRATION_SIGNATURE_INVALID"
+              ? 401
+              : error.code === "RELAY_DELIVERY_EVIDENCE_INVALID"
+                ? 422
+                : 400;
+          return reply.code(statusCode).send({ code: error.code });
+        }
+        const code = (error as { code?: unknown })?.code;
+        if (code === "NOT_FOUND") return reply.code(404).send({ code });
+        if (code === "INTEGRATION_EVENT_CONFLICT") {
+          return reply.code(409).send({ code });
+        }
+        throw error;
+      }
+    },
   );
 
   app.post(MOBILE_BUG_COLLECTION_PATH, async (request, reply) => {
