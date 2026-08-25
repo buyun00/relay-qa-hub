@@ -1,0 +1,31 @@
+{
+  "name": "@relay-qa-hub/desktop",
+  "version": "0.1.0-debug",
+  "private": true,
+  "description": "Secure Windows Electron shell for the Relay QA Hub management Web.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24.18 <25"
+  },
+  "files": [
+    "dist",
+    "assets"
+  ],
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "start": "electron .",
+    "start:dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1",
+    "package:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-windows.ps1"
+  },
+  "devDependencies": {
+    "@electron/packager": "18.3.1",
+    "@types/node": "24.10.4",
+    "electron": "43.4.1",
+    "tsx": "4.23.12",
+    "typescript": "6.0.3"
+  }
+}

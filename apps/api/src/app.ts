@@ -84,6 +84,7 @@ import {
   parseMobileNotificationLimit,
   type MobileNotificationStore,
 } from "./mobile-inbox.js";
+import { startMobileNotificationHintChannel } from "./mobile-notification-hints.js";
 import {
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
   MOBILE_BUG_TRANSITION_PATH,
@@ -311,6 +312,20 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const debugActorId = options.debugActorId ?? DEFAULT_DEBUG_ACTOR_ID;
 
   if (debugBearerToken.length === 0) throw new Error("debugBearerToken must not be empty");
+
+  if (options.mobileNotificationStore !== undefined) {
+    const notificationHintChannel = startMobileNotificationHintChannel({
+      server: app.server,
+      store: mobileNotificationStore,
+      actorId: debugActorId,
+      bearerToken: debugBearerToken,
+      ...(options.now === undefined ? {} : { now: options.now }),
+      logger: app.log,
+    });
+    // Upgrade sockets are not ordinary Fastify requests; close them before the
+    // underlying HTTP server waits for its connections during app.close().
+    app.addHook("preClose", async () => notificationHintChannel.close());
+  }
 
   app.addContentTypeParser(MOBILE_API_MEDIA_TYPE, { parseAs: "string" }, (_request, body, done) => {
     try {
@@ -1122,7 +1137,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
             userId: item.userId,
             type: item.type,
             title: item.title,
-            bugId: null,
+            bugId: item.bugId,
             createdAt: item.createdAt,
             readAt: item.readAt,
             version: item.version,

@@ -133,6 +133,16 @@ export { MOBILE_NOTIFICATION_LIST_PATH, parseMobileNotificationLimit } from "./m
 export type { MobileNotificationStore } from "./mobile-inbox.js";
 
 export {
+  MOBILE_NOTIFICATION_HINT_PATH,
+  MOBILE_NOTIFICATION_HINT_PROTOCOL,
+  startMobileNotificationHintChannel,
+} from "./mobile-notification-hints.js";
+export type {
+  MobileNotificationHintChannel,
+  MobileNotificationHintChannelOptions,
+} from "./mobile-notification-hints.js";
+
+export {
   MAX_RELAY_WEBHOOK_BYTES,
   MOBILE_RELAY_WEBHOOK_PATH,
   MobileRelayWebhookRequestError,

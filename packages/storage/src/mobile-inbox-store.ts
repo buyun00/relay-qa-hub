@@ -16,6 +16,7 @@ export interface MobileNotificationRecord {
   readonly userId: string;
   readonly type: string;
   readonly title: string;
+  readonly bugId: string | null;
   readonly buildId: string | null;
   readonly sourceEventId: string;
   readonly payload: Readonly<Record<string, unknown>>;
@@ -49,6 +50,7 @@ interface NotificationOutboxRow {
 interface EventRow {
   readonly id: string;
   readonly type: string;
+  readonly bug_id: string | null;
   readonly aggregate_id: string;
   readonly aggregate_sequence: number;
   readonly payload_json: string;
@@ -70,6 +72,7 @@ interface NotificationRow {
   readonly user_id: string;
   readonly type: string;
   readonly title: string;
+  readonly bug_id: string | null;
   readonly source_event_id: string;
   readonly payload_json: string;
   readonly created_at: string;
@@ -133,8 +136,12 @@ function consumeNotificationOutbox(
          AND status IN ('pending', 'retry') AND next_attempt_at <= ?
        ORDER BY next_attempt_at, id`,
     )
-    .all(input.accountId, input.projectId, NOTIFICATION_DESTINATION, input.now) as unknown as
-    NotificationOutboxRow[];
+    .all(
+      input.accountId,
+      input.projectId,
+      NOTIFICATION_DESTINATION,
+      input.now,
+    ) as unknown as NotificationOutboxRow[];
 
   let consumed = 0;
   let duplicate = 0;
@@ -150,7 +157,7 @@ function consumeNotificationOutbox(
     `INSERT OR IGNORE INTO notifications(
        id, account_id, project_id, user_id, type, title, bug_id,
        source_event_id, payload_json, created_at, read_at, version
-     ) VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, NULL, 1)`,
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 1)`,
   );
   const markSent = database.prepare(
     `UPDATE outbox
@@ -162,7 +169,7 @@ function consumeNotificationOutbox(
   for (const outbox of rows) {
     const event = database
       .prepare(
-        `SELECT id, type, aggregate_id, aggregate_sequence, payload_json, created_at
+        `SELECT id, type, bug_id, aggregate_id, aggregate_sequence, payload_json, created_at
          FROM events
          WHERE account_id = ? AND project_id = ? AND id = ?`,
       )
@@ -177,12 +184,8 @@ function consumeNotificationOutbox(
          WHERE account_id = ? AND source = ? AND source_instance_id = ?
            AND external_event_id = ?`,
       )
-      .get(
-        input.accountId,
-        NOTIFICATION_SOURCE,
-        NOTIFICATION_SOURCE_INSTANCE,
-        event.id,
-      ) as InboxRow | undefined;
+      .get(input.accountId, NOTIFICATION_SOURCE, NOTIFICATION_SOURCE_INSTANCE, event.id) as
+      InboxRow | undefined;
 
     if (existing) {
       duplicate += 1;
@@ -208,8 +211,6 @@ function consumeNotificationOutbox(
       receivedAt,
     );
 
-    const payload = parsePayload(event.payload_json);
-    const buildId = typeof payload.buildId === "string" ? payload.buildId : null;
     const title = event.type === "build.registered" ? "Build registered" : event.type;
     const users = database
       .prepare(
@@ -226,6 +227,7 @@ function consumeNotificationOutbox(
         user.user_id,
         event.type,
         title,
+        event.bug_id,
         event.id,
         event.payload_json,
         event.created_at,
@@ -248,6 +250,7 @@ function toNotification(row: NotificationRow): MobileNotificationRecord {
     userId: row.user_id,
     type: row.type,
     title: row.title,
+    bugId: row.bug_id,
     buildId,
     sourceEventId: row.source_event_id,
     payload,
@@ -270,14 +273,19 @@ export function syncAndListMobileNotifications(
   const sync = consumeNotificationOutbox(database, input);
   const rows = database
     .prepare(
-      `SELECT id, account_id, project_id, user_id, type, title,
+      `SELECT id, account_id, project_id, user_id, type, title, bug_id,
               source_event_id, payload_json, created_at, read_at, version
        FROM notifications
        WHERE account_id = ? AND project_id = ? AND user_id = ?
        ORDER BY created_at DESC, id DESC
        LIMIT ?`,
     )
-    .all(input.accountId, input.projectId, input.actorId, input.limit) as unknown as NotificationRow[];
+    .all(
+      input.accountId,
+      input.projectId,
+      input.actorId,
+      input.limit,
+    ) as unknown as NotificationRow[];
   const unread = database
     .prepare(
       `SELECT COUNT(*) AS count

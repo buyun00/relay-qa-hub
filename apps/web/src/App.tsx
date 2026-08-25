@@ -19,6 +19,18 @@ const DEFAULT_PROJECT_ID =
 const INVALID_PROJECT_ID = "10000000-0000-4000-8000-000000000099";
 const MISSING_BUG_ID = "20000000-0000-4000-8000-000000000099";
 const MVP_OWNER_ID = "10000000-0000-4000-8000-000000000003";
+const BUG_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+
+interface DesktopBridgeWindow extends Window {
+  readonly qaHubDesktop?: {
+    readonly onOpenBug: (listener: (bugId: string) => void) => () => void;
+  };
+}
+
+function bugIdFromHash(hash: string): string | null {
+  const value = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash).get("bug");
+  return value !== null && BUG_ID_PATTERN.test(value) ? value.toLowerCase() : null;
+}
 
 function BrandMark() {
   return (
@@ -228,6 +240,27 @@ export default function App() {
   useEffect(() => {
     void loadBugList(DEFAULT_PROJECT_ID);
   }, [loadBugList]);
+
+  useEffect(() => {
+    const openDeepLink = (): void => {
+      const bugId = bugIdFromHash(window.location.hash);
+      if (bugId !== null) void loadBugDetails(bugId);
+    };
+    const unsubscribeDesktop = (window as DesktopBridgeWindow).qaHubDesktop?.onOpenBug((bugId) => {
+      const nextHash = `#bug=${encodeURIComponent(bugId)}`;
+      if (window.location.hash === nextHash) {
+        void loadBugDetails(bugId);
+      } else {
+        window.location.hash = nextHash;
+      }
+    });
+    openDeepLink();
+    window.addEventListener("hashchange", openDeepLink);
+    return () => {
+      window.removeEventListener("hashchange", openDeepLink);
+      unsubscribeDesktop?.();
+    };
+  }, [loadBugDetails]);
 
   return (
     <main className="app-shell">

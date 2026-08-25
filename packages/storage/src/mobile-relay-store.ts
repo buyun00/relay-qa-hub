@@ -8,6 +8,7 @@ export const MOBILE_FAKE_RELAY_INSTANCE_ID = "fake-relay-local" as const;
 export const MOBILE_FAKE_RELAY_PRINCIPAL_ID = "10000000-0000-4000-8000-000000000007" as const;
 
 const RELAY_WEBHOOK_MAX_BODY_BYTES = 256 * 1024;
+const NOTIFICATION_DESTINATION = "qa-hub.notifications";
 const UUID_PATTERN =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
 const RELAY_INSTANCE_PATTERN = /^[a-z0-9][a-z0-9_-]{2,63}$/u;
@@ -482,7 +483,7 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
   const deliveryId = requireRelayString(input.deliveryId, "deliveryId", 1, 300);
   const externalRevision = requireRelayPositiveInteger(input.externalRevision, "externalRevision");
   const occurredAt = requireRelayTimestamp(input.occurredAt, "occurredAt");
-  const receivedAt = requireRelayTimestamp(input.receivedAt, "receivedAt");
+  requireRelayTimestamp(input.receivedAt, "receivedAt");
   const taskId = requireRelayPositiveInteger(input.taskId, "taskId");
   const turnId = requireRelayPositiveInteger(input.turnId, "turnId");
   const branch = requireRelayString(input.branch, "branch", 1, 300);
@@ -707,6 +708,44 @@ function insertUserEvent(
       input.fromState,
       input.toState,
       JSON.stringify(input.payload),
+      input.createdAt,
+    );
+}
+
+function insertBugNotificationOutbox(
+  database: DatabaseSync,
+  input: MobileRelayScope & {
+    readonly bugId: string;
+    readonly eventId: string;
+    readonly eventType: string;
+    readonly bugVersion: number;
+    readonly createdAt: string;
+  },
+): void {
+  database
+    .prepare(
+      `INSERT INTO outbox(
+        id, account_id, project_id, aggregate_type, aggregate_id, aggregate_version,
+        destination, dedupe_key, event_id, payload_json, status, attempt_count,
+        next_attempt_at, lease_owner, lease_expires_at, last_error_code, created_at, sent_at
+      ) VALUES (?, ?, ?, 'bug', ?, ?, ?, ?, ?, ?, 'pending', 0, ?,
+                NULL, NULL, NULL, ?, NULL)`,
+    )
+    .run(
+      randomUUID(),
+      input.accountId,
+      input.projectId,
+      input.bugId,
+      input.bugVersion,
+      NOTIFICATION_DESTINATION,
+      `notification:${input.eventId}`,
+      input.eventId,
+      JSON.stringify({
+        eventId: input.eventId,
+        eventType: input.eventType,
+        bugId: input.bugId,
+      }),
+      input.createdAt,
       input.createdAt,
     );
 }
@@ -958,6 +997,13 @@ export function updateMobileBug(
     },
     createdAt: at,
   });
+  insertBugNotificationOutbox(database, {
+    ...input,
+    eventId,
+    eventType: "bug.updated",
+    bugVersion: bug.version + 1,
+    createdAt: at,
+  });
   const result = database
     .prepare(
       `UPDATE bugs
@@ -1044,6 +1090,13 @@ export function transitionMobileBugReady(
     fromState: bug.state,
     toState: "ready",
     payload: { status: "ready", fromVersion: bug.version, toVersion: bug.version + 1 },
+    createdAt: at,
+  });
+  insertBugNotificationOutbox(database, {
+    ...input,
+    eventId,
+    eventType: "bug.triage.ready",
+    bugVersion: bug.version + 1,
     createdAt: at,
   });
   database
