@@ -347,6 +347,65 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+.bug-actions {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e1ddd2;
+}
+
+.bug-action {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.bug-action label,
+.bug-action__label {
+  color: #718079;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.bug-action__controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.bug-action select {
+  background: #fffdf8;
+  border: 1px solid #c9d0c7;
+  border-radius: 0.55rem;
+  color: #334c47;
+  min-height: 2.35rem;
+  padding: 0 0.65rem;
+}
+
+.secondary-button {
+  background: #fffdf8;
+  border: 1px solid #357d72;
+  border-radius: 0.55rem;
+  color: #246158;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 2.35rem;
+  padding: 0 0.85rem;
+}
+
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.bug-action small,
+.bug-action__hint {
+  color: #718079;
+  font-size: 0.8rem;
+}
+
 .timeline-block,
 .comment-form {
   margin-top: 1.1rem;

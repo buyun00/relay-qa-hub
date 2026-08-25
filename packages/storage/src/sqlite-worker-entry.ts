@@ -19,10 +19,7 @@ import {
   type CreateMobileBugInput,
   type MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
-import {
-  listMobileBugs,
-  type ListMobileBugsInput,
-} from "./mobile-bug-list-store.js";
+import { listMobileBugs, type ListMobileBugsInput } from "./mobile-bug-list-store.js";
 import { getLatestMobileHumanWorkflow } from "./mobile-human-workflow-store.js";
 import {
   createMobileComment,
@@ -62,6 +59,7 @@ import {
   receiveMobileRelayWebhook,
   retryMobileRelayOutbox,
   transitionMobileBugReady,
+  updateMobileBug,
   type CompleteMobileRelayOutboxInput,
   type CreateMobileManualRepairAttemptInput,
   type CreateMobileRelayAttemptInput,
@@ -71,6 +69,7 @@ import {
   type RetryMobileRelayOutboxInput,
   type ReceiveMobileRelayWebhookInput,
   type TransitionMobileBugInput,
+  type UpdateMobileBugInput,
   type GetMobileManualRepairAttemptInput,
   type StartMobileRepairAttemptInput,
   startMobileRepairAttempt,
@@ -126,6 +125,7 @@ interface WorkerRequest {
     | "syncAndListMobileNotifications"
     | "ensureMobileRelayRoles"
     | "transitionMobileBugReady"
+    | "updateMobileBug"
     | "createMobileRelayAttempt"
     | "createMobileManualRepairAttempt"
     | "getMobileManualRepairAttempt"
@@ -350,10 +350,7 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   }
 
   if (request.operation === "getMobileVerification") {
-    return getMobileVerification(
-      requireDatabase(),
-      request.payload as GetMobileVerificationInput,
-    );
+    return getMobileVerification(requireDatabase(), request.payload as GetMobileVerificationInput);
   }
 
   if (request.operation === "startMobileVerification") {
@@ -387,6 +384,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   if (request.operation === "transitionMobileBugReady") {
     return inWriteTransaction((current) =>
       transitionMobileBugReady(current, request.payload as TransitionMobileBugInput),
+    );
+  }
+
+  if (request.operation === "updateMobileBug") {
+    return inWriteTransaction((current) =>
+      updateMobileBug(current, request.payload as UpdateMobileBugInput),
     );
   }
 

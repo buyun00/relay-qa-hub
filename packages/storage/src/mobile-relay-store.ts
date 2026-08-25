@@ -47,6 +47,22 @@ export interface TransitionMobileBugInput extends MobileRelayScope {
   readonly createdAt: string;
 }
 
+export interface UpdateMobileBugInput extends MobileRelayScope {
+  readonly bugId: string;
+  readonly expectedVersion: number;
+  readonly title?: string;
+  readonly description?: string;
+  readonly expectedBehavior?: string;
+  readonly moduleId?: string | null;
+  readonly severity?: MobileBugRecord["severity"];
+  readonly priority?: MobileBugRecord["priority"];
+  readonly ownerId?: string | null;
+  readonly verificationOwnerId?: string | null;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
 export interface CreateMobileRelayAttemptInput extends MobileRelayScope {
   readonly bugId: string;
   readonly expectedVersion: number;
@@ -130,9 +146,7 @@ export interface MobileBuildRequirementRecord {
   readonly deliveredCommitSha: string | null;
   readonly requirement: "required" | "not_required";
   readonly decisionBasis:
-    | "code_requires_build"
-    | "no_code_delivery"
-    | "authorized_no_build_exemption";
+    "code_requires_build" | "no_code_delivery" | "authorized_no_build_exemption";
   readonly decisionReason: string | null;
   readonly decisionActorId: string;
   readonly decisionAuditEventId: string;
@@ -443,7 +457,10 @@ function requireRelayKeys(
 ): void {
   for (const key of Object.keys(value)) {
     if (!allowed.has(key)) {
-      throw new MobileRelayStorageError("INVALID_REQUEST", `Relay webhook ${field} has unknown data`);
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        `Relay webhook ${field} has unknown data`,
+      );
     }
   }
 }
@@ -454,7 +471,10 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
   }
   const relayInstanceId = requireRelayString(input.relayInstanceId, "relayInstanceId", 3, 64);
   if (!RELAY_INSTANCE_PATTERN.test(relayInstanceId)) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook relayInstanceId is invalid");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "Relay webhook relayInstanceId is invalid",
+    );
   }
   const eventId = requireRelayUuid(input.eventId, "eventId");
   const handoffId = requireRelayUuid(input.handoffId, "handoffId");
@@ -468,7 +488,11 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
   const branch = requireRelayString(input.branch, "branch", 1, 300);
   const commitSha = requireRelayString(input.commitSha, "commitSha", 40, 40);
   const remoteSha = requireRelayString(input.remoteSha, "remoteSha", 40, 40);
-  if (!COMMIT_PATTERN.test(commitSha) || !COMMIT_PATTERN.test(remoteSha) || commitSha !== remoteSha) {
+  if (
+    !COMMIT_PATTERN.test(commitSha) ||
+    !COMMIT_PATTERN.test(remoteSha) ||
+    commitSha !== remoteSha
+  ) {
     throw new MobileRelayStorageError(
       "RELAY_DELIVERY_EVIDENCE_INVALID",
       "Relay delivery evidence must contain matching verified commit SHAs",
@@ -486,7 +510,10 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
     input.mergeRequestUrl !== null &&
     (typeof input.mergeRequestUrl !== "string" || input.mergeRequestUrl.length > 2_048)
   ) {
-    throw new MobileRelayStorageError("RELAY_DELIVERY_EVIDENCE_INVALID", "Relay merge request URL is invalid");
+    throw new MobileRelayStorageError(
+      "RELAY_DELIVERY_EVIDENCE_INVALID",
+      "Relay merge request URL is invalid",
+    );
   }
   const payloadDigest = requireRelayString(input.payloadDigest, "payloadDigest", 64, 64);
   if (!SHA256_PATTERN.test(payloadDigest)) {
@@ -549,13 +576,17 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
     );
   }
   if (!isRecord(decoded.payload)) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook delivery payload is invalid");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "Relay webhook delivery payload is invalid",
+    );
   }
-  requireRelayKeys(decoded.payload, new Set(["taskId", "turnId", "statusReason", "deliveryEvidence"]), "payload");
-  if (
-    decoded.payload.taskId !== taskId ||
-    decoded.payload.turnId !== turnId
-  ) {
+  requireRelayKeys(
+    decoded.payload,
+    new Set(["taskId", "turnId", "statusReason", "deliveryEvidence"]),
+    "payload",
+  );
+  if (decoded.payload.taskId !== taskId || decoded.payload.turnId !== turnId) {
     throw new MobileRelayStorageError(
       "INTEGRATION_EVENT_CONFLICT",
       "Relay webhook delivery payload does not match its authenticated request",
@@ -680,6 +711,283 @@ function insertUserEvent(
     );
 }
 
+function updateBugScopeDigest(input: UpdateMobileBugInput): string {
+  return createHash("sha256")
+    .update(
+      JSON.stringify({
+        accountId: input.accountId,
+        actorId: input.actorId,
+        projectId: input.projectId,
+        operationId: "updateBug",
+      }),
+    )
+    .digest("hex");
+}
+
+function assertBugUpdateActor(database: DatabaseSync, input: UpdateMobileBugInput): void {
+  const authorized = database
+    .prepare(
+      `SELECT 1 AS present
+       FROM accounts AS account_row
+       JOIN projects AS project
+         ON project.account_id = account_row.id
+        AND project.id = ?
+        AND project.status = 'active'
+       JOIN users AS actor
+         ON actor.account_id = account_row.id
+        AND actor.id = ?
+        AND actor.status = 'active'
+       JOIN memberships AS membership
+         ON membership.account_id = account_row.id
+        AND membership.project_id = project.id
+        AND membership.user_id = actor.id
+        AND membership.status = 'active'
+       JOIN membership_roles AS role
+         ON role.account_id = membership.account_id
+        AND role.project_id = membership.project_id
+        AND role.membership_id = membership.id
+        AND role.role IN ('triager', 'project_admin')
+       WHERE account_row.id = ?`,
+    )
+    .get(input.projectId, input.actorId, input.accountId);
+  if (!authorized) {
+    throw new MobileRelayStorageError(
+      "FORBIDDEN",
+      "Bug updates require an active triager or project admin membership",
+    );
+  }
+}
+
+function assertAssignableMember(
+  database: DatabaseSync,
+  input: UpdateMobileBugInput,
+  userId: string,
+  rolePredicate: string,
+  label: string,
+): void {
+  const assignable = database
+    .prepare(
+      `SELECT 1 AS present
+       FROM accounts AS account_row
+       JOIN projects AS project
+         ON project.account_id = account_row.id
+        AND project.id = ?
+        AND project.status = 'active'
+       JOIN users AS assigned_user
+         ON assigned_user.account_id = account_row.id
+        AND assigned_user.id = ?
+        AND assigned_user.status = 'active'
+       JOIN memberships AS membership
+         ON membership.account_id = account_row.id
+        AND membership.project_id = project.id
+        AND membership.user_id = assigned_user.id
+        AND membership.status = 'active'
+       JOIN membership_roles AS role
+         ON role.account_id = membership.account_id
+        AND role.project_id = membership.project_id
+        AND role.membership_id = membership.id
+        AND ${rolePredicate}
+       WHERE account_row.id = ?`,
+    )
+    .get(input.projectId, userId, input.accountId);
+  if (!assignable) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      `${label} is not an assignable project member`,
+    );
+  }
+}
+
+function assertUpdateReferences(database: DatabaseSync, input: UpdateMobileBugInput): void {
+  if (input.moduleId !== undefined && input.moduleId !== null) {
+    const moduleRow = database
+      .prepare(
+        `SELECT 1 AS present
+         FROM modules
+         WHERE account_id = ? AND project_id = ? AND id = ? AND active = 1`,
+      )
+      .get(input.accountId, input.projectId, input.moduleId);
+    if (!moduleRow) {
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        "moduleId is not an active project module",
+      );
+    }
+  }
+  if (input.ownerId !== undefined && input.ownerId !== null) {
+    assertAssignableMember(
+      database,
+      input,
+      input.ownerId,
+      "role.role IN ('developer', 'triager', 'project_admin')",
+      "ownerId",
+    );
+  }
+  if (input.verificationOwnerId !== undefined && input.verificationOwnerId !== null) {
+    assertAssignableMember(
+      database,
+      input,
+      input.verificationOwnerId,
+      "role.role IN ('verifier', 'project_admin')",
+      "verificationOwnerId",
+    );
+  }
+}
+
+function readMobileBugUpdateReplay(
+  database: DatabaseSync,
+  input: UpdateMobileBugInput,
+): MobileBugRecord | null {
+  const row = database
+    .prepare(
+      `SELECT request_digest, status, response_json
+       FROM idempotency_records
+       WHERE account_id = ? AND actor_id = ? AND operation_id = 'updateBug'
+         AND scope_digest = ? AND idempotency_key = ?`,
+    )
+    .get(input.accountId, input.actorId, updateBugScopeDigest(input), input.idempotencyKey) as
+    | {
+        readonly request_digest: string;
+        readonly status: string;
+        readonly response_json: string | null;
+      }
+    | undefined;
+  if (!row) return null;
+  if (row.request_digest !== input.requestDigest) {
+    throw new MobileRelayStorageError(
+      "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      "Idempotency-Key was already used with a different Bug update payload",
+    );
+  }
+  if (row.status !== "committed" || row.response_json === null) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "idempotent Bug update is not committed");
+  }
+  return Object.freeze(JSON.parse(row.response_json) as MobileBugRecord);
+}
+
+export function updateMobileBug(
+  database: DatabaseSync,
+  input: UpdateMobileBugInput,
+): MobileBugRecord {
+  requireTransaction(database);
+  const bug = readBugRow(database, input, input.bugId);
+  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+  assertBugUpdateActor(database, input);
+  assertUpdateReferences(database, input);
+  const replay = readMobileBugUpdateReplay(database, input);
+  if (replay) return replay;
+  if (bug.version !== input.expectedVersion) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug is stale at the expected version");
+  }
+
+  const scopeDigest = updateBugScopeDigest(input);
+  const at = nextTimestamp(input.createdAt, bug.updated_at);
+  const idempotencyId = randomUUID();
+  const expiresAt = new Date(Date.parse(at) + 7 * 24 * 60 * 60 * 1_000).toISOString();
+  database
+    .prepare(
+      `INSERT INTO idempotency_records(
+        id, account_id, project_id, actor_id, operation_id, idempotency_key,
+        scope_digest, scope_json, request_digest, status, created_at, expires_at, version
+      ) VALUES (?, ?, ?, ?, 'updateBug', ?, ?, ?, ?, 'reserved', ?, ?, 1)`,
+    )
+    .run(
+      idempotencyId,
+      input.accountId,
+      input.projectId,
+      input.actorId,
+      input.idempotencyKey,
+      scopeDigest,
+      JSON.stringify({
+        operationId: "updateBug",
+        accountId: input.accountId,
+        actorId: input.actorId,
+        projectId: input.projectId,
+        bugId: input.bugId,
+      }),
+      input.requestDigest,
+      at,
+      expiresAt,
+    );
+
+  const assignments: string[] = [];
+  const values: Array<string | number | null> = [];
+  const mutableColumns: ReadonlyArray<readonly [keyof UpdateMobileBugInput, string]> = [
+    ["title", "title"],
+    ["description", "description"],
+    ["expectedBehavior", "expected_behavior"],
+    ["moduleId", "module_id"],
+    ["severity", "severity"],
+    ["priority", "priority"],
+    ["ownerId", "owner_id"],
+    ["verificationOwnerId", "verification_owner_id"],
+  ];
+  for (const [inputKey, column] of mutableColumns) {
+    if (input[inputKey] !== undefined) {
+      assignments.push(`${column} = ?`);
+      values.push(input[inputKey] as string | null);
+    }
+  }
+  assignments.push("version = version + 1", "updated_at = ?");
+  values.push(at, input.accountId, input.projectId, input.bugId, bug.version);
+
+  const eventId = randomUUID();
+  const changedFields = mutableColumns
+    .filter(([inputKey]) => input[inputKey] !== undefined)
+    .map(([, column]) => column)
+    .join(",");
+  const resultingOwnerId = input.ownerId !== undefined ? input.ownerId : bug.owner_id;
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: bug.id,
+    type: "bug.updated",
+    aggregateType: "bug",
+    aggregateId: bug.id,
+    aggregateSequence: bug.version + 1,
+    resourceType: "bug",
+    resourceId: bug.id,
+    resourceVersionAfter: bug.version + 1,
+    correlationId: randomUUID(),
+    fromState: null,
+    toState: null,
+    payload: {
+      summary: `Bug fields updated; changedFields=${changedFields}; ownerId=${resultingOwnerId ?? "null"}`,
+      fromVersion: bug.version,
+      toVersion: bug.version + 1,
+    },
+    createdAt: at,
+  });
+  const result = database
+    .prepare(
+      `UPDATE bugs
+       SET ${assignments.join(", ")}
+       WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+    )
+    .run(...values);
+  if (result.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug update did not apply exactly once");
+  }
+  const updated = readBugRow(database, input, bug.id);
+  if (!updated) throw new MobileRelayStorageError("NOT_FOUND", "Bug disappeared after update");
+  const response = toBug(updated);
+  const committed = database
+    .prepare(
+      `UPDATE idempotency_records
+       SET status = 'committed', http_status = 200, response_json = ?,
+           audit_event_id = ?, version = 2
+       WHERE id = ? AND status = 'reserved' AND version = 1`,
+    )
+    .run(JSON.stringify(response), eventId, idempotencyId);
+  if (committed.changes !== 1) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "idempotent Bug update did not commit exactly once",
+    );
+  }
+  return response;
+}
+
 export function ensureMobileRelayRoles(database: DatabaseSync, scope: MobileScopeBootstrap): void {
   requireTransaction(database);
   for (const role of ["triager", "developer", "release_manager", "verifier"] as const) {
@@ -728,7 +1036,7 @@ export function transitionMobileBugReady(
     type: "bug.triage.ready",
     aggregateType: "bug",
     aggregateId: bug.id,
-    aggregateSequence: 2,
+    aggregateSequence: bug.version + 1,
     resourceType: "bug",
     resourceId: bug.id,
     resourceVersionAfter: bug.version + 1,
@@ -989,7 +1297,13 @@ function readManualWorkflowAttempt(
   database: DatabaseSync,
   input: MobileRelayScope,
   attemptId: string,
-): (AttemptRow & { readonly updated_at: string; readonly bug_version: number; readonly bug_state: string }) | null {
+):
+  | (AttemptRow & {
+      readonly updated_at: string;
+      readonly bug_version: number;
+      readonly bug_state: string;
+    })
+  | null {
   const row = database
     .prepare(
       `SELECT attempt.id, attempt.bug_id, attempt.sequence, attempt.mode, attempt.status,
@@ -1094,7 +1408,10 @@ export function startMobileRepairAttempt(
     )
     .run(at, input.accountId, input.projectId, attempt.id, input.expectedVersion);
   if (updated.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt did not start exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt did not start exactly once",
+    );
   }
   const row = database
     .prepare(
@@ -1116,7 +1433,8 @@ export function deliverMobileRepairAttempt(
   requireWorkflowText(input.summary, "summary", 10_000);
   requireWorkflowText(input.branch, "branch", 300);
   requireWorkflowCommit(input.commitSha);
-  if (input.mergeRequestUrl !== null) requireWorkflowText(input.mergeRequestUrl, "mergeRequestUrl", 4_000);
+  if (input.mergeRequestUrl !== null)
+    requireWorkflowText(input.mergeRequestUrl, "mergeRequestUrl", 4_000);
   const attempt = readManualWorkflowAttempt(database, input, input.attemptId);
   if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
   if (attempt.version !== input.expectedVersion || attempt.status !== "running") {
@@ -1175,7 +1493,10 @@ export function deliverMobileRepairAttempt(
       input.expectedVersion,
     );
   if (updatedAttempt.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt did not deliver exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt did not deliver exactly once",
+    );
   }
   database
     .prepare(
@@ -1212,7 +1533,10 @@ export function deliverMobileRepairAttempt(
     )
     .run(at, input.accountId, input.projectId, attempt.bug_id, attempt.bug_version, attempt.id);
   if (updatedBug.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug did not enter awaiting_build exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug did not enter awaiting_build exactly once",
+    );
   }
   const row = database
     .prepare(
@@ -1222,7 +1546,8 @@ export function deliverMobileRepairAttempt(
        WHERE account_id = ? AND project_id = ? AND id = ?`,
     )
     .get(input.accountId, input.projectId, attempt.id) as AttemptRow | undefined;
-  if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt disappeared after delivery");
+  if (!row)
+    throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt disappeared after delivery");
   return toManualAttempt(row);
 }
 
@@ -1237,7 +1562,8 @@ interface LinkBuildRow {
   readonly branch: string;
   readonly source_commit_sha: string;
   readonly mode: "full" | "hot_update" | "cdn" | "debug" | "other";
-  readonly status: "registered" | "queued" | "building" | "validating" | "publishing" | "ready" | "failed";
+  readonly status:
+    "registered" | "queued" | "building" | "validating" | "publishing" | "ready" | "failed";
   readonly manifest_json: string;
   readonly artifact_sha256: string | null;
   readonly download_url: string | null;
@@ -1300,7 +1626,9 @@ function readBuildRequirement(
   database: DatabaseSync,
   input: MobileRelayScope,
   attemptId: string,
-): (MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string }) | null {
+):
+  | (MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string })
+  | null {
   const row = database
     .prepare(
       `SELECT id, project_id AS projectId, bug_id AS bugId,
@@ -1323,7 +1651,9 @@ function readBuildRequirement(
   return row ?? null;
 }
 
-function toBuildRequirement(row: MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string }): MobileBuildRequirementRecord {
+function toBuildRequirement(
+  row: MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string },
+): MobileBuildRequirementRecord {
   return Object.freeze({
     id: row.id,
     projectId: row.projectId,
@@ -1353,7 +1683,10 @@ export function linkMobileBuildRepair(
   requireTransaction(database);
   requireWorkflowCommit(input.deliveredCommitSha);
   if (input.evidenceType !== "manifest") {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "the mobile link slice requires manifest evidence");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "the mobile link slice requires manifest evidence",
+    );
   }
   const build = database
     .prepare(
@@ -1366,7 +1699,10 @@ export function linkMobileBuildRepair(
     .get(input.accountId, input.projectId, input.buildId) as LinkBuildRow | undefined;
   if (!build) throw new MobileRelayStorageError("NOT_FOUND", "Build was not found");
   if (build.status !== "ready" || build.version !== input.expectedVersion) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Build is not ready at the expected version");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Build is not ready at the expected version",
+    );
   }
   if (build.source_commit_sha !== input.deliveredCommitSha) {
     throw new MobileRelayStorageError(
@@ -1377,7 +1713,10 @@ export function linkMobileBuildRepair(
   const attempt = readManualWorkflowAttempt(database, input, input.repairAttemptId);
   if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
   if (attempt.status !== "delivered" || attempt.version !== 3) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt is not delivered at version three");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt is not delivered at version three",
+    );
   }
   if (attempt.commit_sha !== input.deliveredCommitSha) {
     throw new MobileRelayStorageError(
@@ -1389,14 +1728,18 @@ export function linkMobileBuildRepair(
     throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug version is stale");
   }
   const requirement = readBuildRequirement(database, input, attempt.id);
-  if (!requirement) throw new MobileRelayStorageError("NOT_FOUND", "BuildRequirement was not found");
+  if (!requirement)
+    throw new MobileRelayStorageError("NOT_FOUND", "BuildRequirement was not found");
   if (
     requirement.version !== 1 ||
     requirement.requirement !== "required" ||
     requirement.decisionBasis !== "code_requires_build" ||
     requirement.deliveredCommitSha !== input.deliveredCommitSha
   ) {
-    throw new MobileRelayStorageError("BUILD_IDENTITY_MISMATCH", "BuildRequirement commit is not exact");
+    throw new MobileRelayStorageError(
+      "BUILD_IDENTITY_MISMATCH",
+      "BuildRequirement commit is not exact",
+    );
   }
   if (
     input.expectedBuildRequirementVersion !== undefined &&
@@ -1414,8 +1757,7 @@ export function linkMobileBuildRepair(
        WHERE account_id = ? AND project_id = ? AND build_id = ? AND commit_sha = ?`,
     )
     .get(input.accountId, input.projectId, build.id, input.deliveredCommitSha) as
-    | { readonly present: number }
-    | undefined;
+    { readonly present: number } | undefined;
   if (!manifestCommit) {
     throw new MobileRelayStorageError(
       "BUILD_IDENTITY_MISMATCH",
@@ -1503,7 +1845,10 @@ export function linkMobileBuildRepair(
     )
     .run(at, input.accountId, input.projectId, attempt.bug_id, attempt.bug_version, attempt.id);
   if (updatedBug.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug did not enter ready_for_verification exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug did not enter ready_for_verification exactly once",
+    );
   }
   const linkedBuild = database
     .prepare(

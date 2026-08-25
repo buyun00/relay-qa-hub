@@ -105,6 +105,25 @@ export interface GetMobileBugQuery {
   readonly bugId: string;
 }
 
+export interface MobileUpdateBugRequest {
+  readonly expectedVersion: number;
+  readonly title?: string;
+  readonly description?: string;
+  readonly expectedBehavior?: string;
+  readonly moduleId?: string | null;
+  readonly severity?: MobileBugSeverity;
+  readonly priority?: MobileBugPriority;
+  readonly ownerId?: string | null;
+  readonly verificationOwnerId?: string | null;
+}
+
+export interface UpdateMobileBugCommand {
+  readonly actorId: string;
+  readonly bugId: string;
+  readonly idempotencyKey: string;
+  readonly request: MobileUpdateBugRequest;
+}
+
 export interface MobileBugListQuery {
   readonly actorId: string;
   readonly projectId?: string;
@@ -126,6 +145,7 @@ export interface MobileBugStore {
     query: MobileBugListQuery,
   ) => MobileBugListResponse | Promise<MobileBugListResponse>;
   readonly getBug: (query: GetMobileBugQuery) => MobileBug | null | Promise<MobileBug | null>;
+  readonly updateBug: (command: UpdateMobileBugCommand) => MobileBug | Promise<MobileBug>;
 }
 
 const UUID_PATTERN =
@@ -242,6 +262,89 @@ export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery
     ...(projectId === undefined ? {} : { projectId }),
     ...(stateValue === undefined ? {} : { state: stateValue as MobileBugState }),
     limit,
+  };
+}
+
+const UPDATE_KEYS = new Set([
+  "expectedVersion",
+  "title",
+  "description",
+  "expectedBehavior",
+  "moduleId",
+  "severity",
+  "priority",
+  "ownerId",
+  "verificationOwnerId",
+]);
+
+function positiveInteger(value: unknown, key: string): number {
+  if (!Number.isSafeInteger(value) || (value as number) < 1) {
+    throw new TypeError(`${key} must be a positive integer`);
+  }
+  return value as number;
+}
+
+function updateString(
+  value: Record<string, unknown>,
+  key: string,
+  minimum: number,
+  maximum: number,
+): string | undefined {
+  const candidate = value[key];
+  if (candidate === undefined) return undefined;
+  if (typeof candidate !== "string" || candidate.length < minimum || candidate.length > maximum) {
+    throw new TypeError(`${key} must be a bounded string`);
+  }
+  return candidate;
+}
+
+function updateOptionalUuid(
+  value: Record<string, unknown>,
+  key: string,
+): string | null | undefined {
+  const candidate = value[key];
+  if (candidate === undefined || candidate === null) return candidate;
+  if (typeof candidate !== "string") throw new TypeError(`${key} must be null or a UUID`);
+  return requireUuid(candidate, key);
+}
+
+export function parseMobileUpdateBugRequest(value: unknown): MobileUpdateBugRequest {
+  const request = requireRecord(value, "updateBug request");
+  requireOnlyKeys(request, UPDATE_KEYS);
+  const expectedVersion = positiveInteger(request["expectedVersion"], "expectedVersion");
+  if (!Object.keys(request).some((key) => key !== "expectedVersion")) {
+    throw new TypeError("updateBug request must contain at least one mutable field");
+  }
+  const title = updateString(request, "title", 1, 300);
+  const description = updateString(request, "description", 1, 20_000);
+  const expectedBehavior = updateString(request, "expectedBehavior", 1, 10_000);
+  const moduleId = updateOptionalUuid(request, "moduleId");
+  const ownerId = updateOptionalUuid(request, "ownerId");
+  const verificationOwnerId = updateOptionalUuid(request, "verificationOwnerId");
+  const severityValue = request["severity"];
+  if (
+    severityValue !== undefined &&
+    (typeof severityValue !== "string" || !SEVERITIES.has(severityValue as MobileBugSeverity))
+  ) {
+    throw new TypeError("severity is unsupported");
+  }
+  const priorityValue = request["priority"];
+  if (
+    priorityValue !== undefined &&
+    (typeof priorityValue !== "string" || !PRIORITIES.has(priorityValue as MobileBugPriority))
+  ) {
+    throw new TypeError("priority is unsupported");
+  }
+  return {
+    expectedVersion,
+    ...(title === undefined ? {} : { title }),
+    ...(description === undefined ? {} : { description }),
+    ...(expectedBehavior === undefined ? {} : { expectedBehavior }),
+    ...(moduleId === undefined ? {} : { moduleId }),
+    ...(severityValue === undefined ? {} : { severity: severityValue as MobileBugSeverity }),
+    ...(priorityValue === undefined ? {} : { priority: priorityValue as MobileBugPriority }),
+    ...(ownerId === undefined ? {} : { ownerId }),
+    ...(verificationOwnerId === undefined ? {} : { verificationOwnerId }),
   };
 }
 

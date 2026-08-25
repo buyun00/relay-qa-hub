@@ -42,6 +42,7 @@ export {
   MOBILE_BUG_ITEM_PATH,
   parseMobileBugListQuery,
   parseMobileCreateBugRequest,
+  parseMobileUpdateBugRequest,
 } from "./mobile-bugs.js";
 
 export {
@@ -128,10 +129,7 @@ export type {
   MobileDuplicateStore,
 } from "./mobile-duplicates.js";
 
-export {
-  MOBILE_NOTIFICATION_LIST_PATH,
-  parseMobileNotificationLimit,
-} from "./mobile-inbox.js";
+export { MOBILE_NOTIFICATION_LIST_PATH, parseMobileNotificationLimit } from "./mobile-inbox.js";
 export type { MobileNotificationStore } from "./mobile-inbox.js";
 
 export {
@@ -168,6 +166,7 @@ export type {
 export type {
   CreateMobileBugCommand,
   GetMobileBugQuery,
+  MobileUpdateBugRequest,
   MobileBugListQuery,
   MobileBugListResponse,
   MobileBug,
@@ -180,6 +179,7 @@ export type {
   MobileOccurrenceDraft,
   MobileOccurrenceEnvironmentValue,
   MobileOccurrencePlatform,
+  UpdateMobileBugCommand,
 } from "./mobile-bugs.js";
 
 export {

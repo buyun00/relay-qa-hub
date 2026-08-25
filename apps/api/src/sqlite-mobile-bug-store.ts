@@ -5,6 +5,7 @@ import type {
   MobileOccurrenceInput,
   MobileScopeBootstrap,
   SqliteStorageWorker,
+  UpdateMobileBugInput,
 } from "@relay-qa-hub/storage";
 
 import type {
@@ -121,6 +122,39 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         projectId: options.scope.projectId,
         bugId: query.bugId,
       });
+    },
+
+    async updateBug(command) {
+      if (command.actorId !== options.scope.actorId) {
+        throw new TypeError("actor does not match the authenticated mobile scope");
+      }
+      const input: UpdateMobileBugInput = {
+        accountId: options.scope.accountId,
+        projectId: options.scope.projectId,
+        actorId: options.scope.actorId,
+        bugId: command.bugId,
+        expectedVersion: command.request.expectedVersion,
+        ...(command.request.title === undefined ? {} : { title: command.request.title }),
+        ...(command.request.description === undefined
+          ? {}
+          : { description: command.request.description }),
+        ...(command.request.expectedBehavior === undefined
+          ? {}
+          : { expectedBehavior: command.request.expectedBehavior }),
+        ...(command.request.moduleId === undefined ? {} : { moduleId: command.request.moduleId }),
+        ...(command.request.severity === undefined ? {} : { severity: command.request.severity }),
+        ...(command.request.priority === undefined ? {} : { priority: command.request.priority }),
+        ...(command.request.ownerId === undefined ? {} : { ownerId: command.request.ownerId }),
+        ...(command.request.verificationOwnerId === undefined
+          ? {}
+          : { verificationOwnerId: command.request.verificationOwnerId }),
+        idempotencyKey: command.idempotencyKey,
+        requestDigest: createHash("sha256")
+          .update(JSON.stringify({ bugId: command.bugId, request: command.request }))
+          .digest("hex"),
+        createdAt: now().toISOString(),
+      };
+      return options.worker.updateMobileBug(input);
     },
   };
 }

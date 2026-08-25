@@ -127,6 +127,37 @@ export async function getBug(bugId: string): Promise<BugDetail> {
   return body as unknown as BugDetail;
 }
 
+export async function updateBugOwner(
+  bugId: string,
+  expectedVersion: number,
+  ownerId: string | null,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `web:updateBug:bug:${bugId}:v${expectedVersion}:owner:${ownerId ?? "null"}`,
+    },
+    body: JSON.stringify({ expectedVersion, ownerId }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
+export async function transitionBugReady(
+  bugId: string,
+  expectedVersion: number,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/transitions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:transitionBug:bug:${bugId}:v${expectedVersion}:ready`,
+    },
+    body: JSON.stringify({ expectedVersion, toState: "ready" }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
 export async function listBugEvents(bugId: string): Promise<BugEventsResponse> {
   const body = requireRecord(
     await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/events?limit=20`),

@@ -6,6 +6,8 @@ import {
   listBugEvents,
   listBugs,
   QaHubApiError,
+  transitionBugReady,
+  updateBugOwner,
   type BugDetail,
   type BugEvent,
   type BugListItem,
@@ -16,6 +18,7 @@ const DEFAULT_PROJECT_ID =
   import.meta.env.VITE_QA_HUB_PROJECT_ID ?? "10000000-0000-4000-8000-000000000004";
 const INVALID_PROJECT_ID = "10000000-0000-4000-8000-000000000099";
 const MISSING_BUG_ID = "20000000-0000-4000-8000-000000000099";
+const MVP_OWNER_ID = "10000000-0000-4000-8000-000000000003";
 
 function BrandMark() {
   return (
@@ -41,6 +44,21 @@ function BrandMark() {
 }
 
 type RequestState = "idle" | "loading" | "success" | "error";
+type MutationState = "idle" | "submitting" | "success" | "error";
+
+function mutationError(cause: unknown): { readonly status: number; readonly code: string | null } {
+  if (cause instanceof QaHubApiError) return { status: cause.status, code: cause.code };
+  return { status: 0, code: "NETWORK_ERROR" };
+}
+
+function mutationErrorMessage(error: { readonly status: number; readonly code: string | null }) {
+  if (error.code === "VERSION_CONFLICT" || error.status === 412) {
+    return "版本冲突：Bug 已被其他操作更新，请重新读取后再提交。";
+  }
+  return `请求失败：HTTP ${error.status === 0 ? "网络不可达" : error.status}${
+    error.code === null ? "" : ` · ${error.code}`
+  }。`;
+}
 
 export default function App() {
   const [projectId, setProjectId] = useState(DEFAULT_PROJECT_ID);
@@ -68,6 +86,17 @@ export default function App() {
     readonly status: number;
     readonly code: string | null;
   } | null>(null);
+  const [ownerSelection, setOwnerSelection] = useState("");
+  const [assignmentState, setAssignmentState] = useState<MutationState>("idle");
+  const [assignmentError, setAssignmentError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
+  const [transitionState, setTransitionState] = useState<MutationState>("idle");
+  const [transitionError, setTransitionError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
 
   const loadBugList = useCallback(async (nextProjectId: string): Promise<void> => {
     const normalizedProjectId = nextProjectId.trim();
@@ -92,7 +121,10 @@ export default function App() {
   }, []);
 
   const loadBugDetails = useCallback(
-    async (bugId: string, preserveComment = false): Promise<readonly BugEvent[]> => {
+    async (
+      bugId: string,
+      preserveComment = false,
+    ): Promise<{ readonly bug: BugDetail; readonly events: readonly BugEvent[] } | null> => {
       setSelectedBugId(bugId);
       setSelectedBug(null);
       setTimeline([]);
@@ -106,9 +138,10 @@ export default function App() {
       try {
         const [bug, events] = await Promise.all([getBug(bugId), listBugEvents(bugId)]);
         setSelectedBug(bug);
+        setOwnerSelection(bug.ownerId ?? "");
         setTimeline(events.items);
         setDetailState("success");
-        return events.items;
+        return { bug, events: events.items };
       } catch (cause: unknown) {
         setDetailState("error");
         if (cause instanceof QaHubApiError) {
@@ -116,11 +149,50 @@ export default function App() {
         } else {
           setDetailError({ status: 0, code: "NETWORK_ERROR" });
         }
-        return [];
+        return null;
       }
     },
     [],
   );
+
+  const assignOwner = useCallback(async (): Promise<void> => {
+    if (selectedBug === null) return;
+    const nextOwnerId = ownerSelection.length === 0 ? null : ownerSelection;
+    setAssignmentState("submitting");
+    setAssignmentError(null);
+    try {
+      await updateBugOwner(selectedBug.id, selectedBug.version, nextOwnerId);
+      const refreshed = await loadBugDetails(selectedBug.id, true);
+      if (refreshed?.bug.ownerId === nextOwnerId) {
+        setAssignmentState("success");
+      } else {
+        setAssignmentState("error");
+        setAssignmentError({ status: 200, code: "OWNER_READBACK_MISMATCH" });
+      }
+    } catch (cause: unknown) {
+      setAssignmentState("error");
+      setAssignmentError(mutationError(cause));
+    }
+  }, [loadBugDetails, ownerSelection, selectedBug]);
+
+  const markReady = useCallback(async (): Promise<void> => {
+    if (selectedBug === null || selectedBug.state !== "reported") return;
+    setTransitionState("submitting");
+    setTransitionError(null);
+    try {
+      await transitionBugReady(selectedBug.id, selectedBug.version);
+      const refreshed = await loadBugDetails(selectedBug.id, true);
+      if (refreshed?.bug.state === "ready") {
+        setTransitionState("success");
+      } else {
+        setTransitionState("error");
+        setTransitionError({ status: 200, code: "STATE_READBACK_MISMATCH" });
+      }
+    } catch (cause: unknown) {
+      setTransitionState("error");
+      setTransitionError(mutationError(cause));
+    }
+  }, [loadBugDetails, selectedBug]);
 
   const submitComment = useCallback(async (): Promise<void> => {
     if (selectedBugId === null || commentBody.trim().length === 0) return;
@@ -131,11 +203,12 @@ export default function App() {
       const result = await addBugComment(selectedBugId, commentBody.trim(), clientSubmissionId);
       setCommentBody("");
       setCommentId(result.comment.id);
-      const events = await loadBugDetails(selectedBugId, true);
-      const eventConfirmed = events.some(
-        (event) =>
-          event.type === "comment.created" && event.payload.commentId === result.comment.id,
-      );
+      const refreshed = await loadBugDetails(selectedBugId, true);
+      const eventConfirmed =
+        refreshed?.events.some(
+          (event) =>
+            event.type === "comment.created" && event.payload.commentId === result.comment.id,
+        ) === true;
       if (eventConfirmed) {
         setCommentState("success");
       } else {
@@ -329,6 +402,70 @@ export default function App() {
                   <dd>v{selectedBug.version}</dd>
                 </div>
               </dl>
+              <div aria-label="Bug 管理操作" className="bug-actions">
+                <div className="bug-action">
+                  <label htmlFor="bug-owner">负责人</label>
+                  <div className="bug-action__controls">
+                    <select
+                      id="bug-owner"
+                      onChange={(event) => setOwnerSelection(event.target.value)}
+                      value={ownerSelection}
+                    >
+                      <option value="">未分配</option>
+                      <option value={MVP_OWNER_ID}>QA 值班成员（MVP）</option>
+                    </select>
+                    <button
+                      className="secondary-button"
+                      disabled={assignmentState === "submitting"}
+                      onClick={() => void assignOwner()}
+                      type="button"
+                    >
+                      {assignmentState === "submitting" ? "保存中" : "保存负责人"}
+                    </button>
+                  </div>
+                  <small>使用当前版本 v{selectedBug.version} 乐观锁提交</small>
+                </div>
+                <div className="bug-action">
+                  <span className="bug-action__label">状态</span>
+                  <div className="bug-action__controls">
+                    <button
+                      className="secondary-button"
+                      disabled={
+                        transitionState === "submitting" || selectedBug.state !== "reported"
+                      }
+                      onClick={() => void markReady()}
+                      type="button"
+                    >
+                      {transitionState === "submitting" ? "更新中" : "标记为 ready"}
+                    </button>
+                    <span className="bug-action__hint">
+                      {selectedBug.state === "reported"
+                        ? "reported → ready"
+                        : `当前为 ${selectedBug.state}`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {assignmentState === "success" && (
+                <p aria-live="polite" className="success-note">
+                  负责人已保存，并已 GET 回读版本/负责人。
+                </p>
+              )}
+              {assignmentState === "error" && assignmentError !== null && (
+                <p aria-live="assertive" className="api-error">
+                  负责人更新失败：{mutationErrorMessage(assignmentError)}
+                </p>
+              )}
+              {transitionState === "success" && (
+                <p aria-live="polite" className="success-note">
+                  状态已更新为 ready，并已 GET 回读版本/状态。
+                </p>
+              )}
+              {transitionState === "error" && transitionError !== null && (
+                <p aria-live="assertive" className="api-error">
+                  状态更新失败：{mutationErrorMessage(transitionError)}
+                </p>
+              )}
             </article>
 
             <div className="timeline-block">

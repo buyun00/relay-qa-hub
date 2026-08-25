@@ -31,6 +31,7 @@ import {
   type MobileBugStore,
   parseMobileCreateBugRequest,
   parseMobileBugListQuery,
+  parseMobileUpdateBugRequest,
 } from "./mobile-bugs.js";
 import {
   MOBILE_CAPTURE_COLLECTION_PATH,
@@ -163,6 +164,9 @@ const unconfiguredMobileBugStore: MobileBugStore = {
     throw new Error("MobileBugStore is not configured");
   },
   getBug: () => null,
+  updateBug: () => {
+    throw new Error("MobileBugStore is not configured");
+  },
 };
 
 const unconfiguredMobileAttachmentStore: MobileAttachmentStore = {
@@ -292,8 +296,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileCaptureStore = options.mobileCaptureStore ?? unconfiguredMobileCaptureStore;
   const mobileRelayStore = options.mobileRelayStore ?? unconfiguredMobileRelayStore;
   const mobileBuildStore = options.mobileBuildStore ?? unconfiguredMobileBuildStore;
-  const mobileDuplicateStore =
-    options.mobileDuplicateStore ?? unconfiguredMobileDuplicateStore;
+  const mobileDuplicateStore = options.mobileDuplicateStore ?? unconfiguredMobileDuplicateStore;
   const mobileVerificationStore =
     options.mobileVerificationStore ?? unconfiguredMobileVerificationStore;
   const mobileHumanWorkflowStore =
@@ -467,10 +470,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     } catch (error: unknown) {
       const code = (error as { code?: unknown })?.code;
       if (code === "FORBIDDEN") {
-        return reply
-          .code(403)
-          .header("content-type", MOBILE_API_CONTENT_TYPE)
-          .send({ code });
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
       }
       if (error instanceof TypeError || code === "INVALID_REQUEST") {
         return reply
@@ -497,6 +497,47 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(bug);
   });
 
+  app.patch<{ Params: { bugId: string } }>(MOBILE_BUG_ITEM_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const body = parseMobileUpdateBugRequest(request.body);
+      const idempotencyKey = requireRelayIdempotencyKey(
+        readHeader(request.headers["idempotency-key"]),
+      );
+      const result = await mobileBugStore.updateBug({
+        actorId: debugActorId,
+        bugId,
+        idempotencyKey,
+        request: body,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "NOT_FOUND") {
+        return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "FORBIDDEN") {
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "VERSION_CONFLICT") {
+        return reply.code(412).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "IDEMPOTENCY_PAYLOAD_MISMATCH") {
+        return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
+
   app.get<{ Params: { bugId: string } }>(
     MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
     async (request, reply) => {
@@ -513,16 +554,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       } catch (error: unknown) {
         const code = (error as { code?: unknown })?.code;
         if (code === "NOT_FOUND") {
-          return reply
-            .code(404)
-            .header("content-type", MOBILE_API_CONTENT_TYPE)
-            .send({ code });
+          return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
         }
         if (code === "FORBIDDEN") {
-          return reply
-            .code(403)
-            .header("content-type", MOBILE_API_CONTENT_TYPE)
-            .send({ code });
+          return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
         }
         if (error instanceof TypeError || code === "INVALID_REQUEST") {
           return reply
@@ -535,10 +570,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
-  const relayErrorReply = (
-    error: unknown,
-    reply: FastifyReply,
-  ) => {
+  const relayErrorReply = (error: unknown, reply: FastifyReply) => {
     const code = (error as { code?: unknown })?.code;
     if (code === "NOT_FOUND") {
       return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
@@ -550,9 +582,12 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       return reply.code(422).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
     if (error instanceof TypeError || code === "INVALID_REQUEST") {
-      return reply.code(400).header("content-type", MOBILE_API_CONTENT_TYPE).send({
-        code: code === "INVALID_REQUEST" ? code : "INVALID_REQUEST",
-      });
+      return reply
+        .code(400)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({
+          code: code === "INVALID_REQUEST" ? code : "INVALID_REQUEST",
+        });
     }
     throw error;
   };
@@ -595,8 +630,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           readHeader(request.headers["idempotency-key"]),
         );
         if (
-          idempotencyKey !==
-          `workflow:createRepairAttempt:bug:${bugId}:v${body.expectedVersion}`
+          idempotencyKey !== `workflow:createRepairAttempt:bug:${bugId}:v${body.expectedVersion}`
         ) {
           throw new TypeError("Idempotency-Key does not match RepairAttempt creation");
         }
@@ -741,25 +775,22 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
-  app.get<{ Params: { attemptId: string } }>(
-    MOBILE_RELAY_RECEIPT_PATH,
-    async (request, reply) => {
-      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
-        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
-      }
-      try {
-        const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
-        const result = await mobileRelayStore.getRelayReceipt({
-          actorId: debugActorId,
-          attemptId,
-        });
-        if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
-        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
-      } catch (error: unknown) {
-        return relayErrorReply(error, reply);
-      }
-    },
-  );
+  app.get<{ Params: { attemptId: string } }>(MOBILE_RELAY_RECEIPT_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+      const result = await mobileRelayStore.getRelayReceipt({
+        actorId: debugActorId,
+        attemptId,
+      });
+      if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      return relayErrorReply(error, reply);
+    }
+  });
 
   const buildErrorReply = (error: unknown, reply: FastifyReply) => {
     const code = (error as { code?: unknown })?.code;
@@ -820,27 +851,28 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
-  app.post<{ Params: { bugId: string } }>(
-    MOBILE_BUG_COMMENTS_PATH,
-    async (request, reply) => {
-      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
-        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
-      }
-      try {
-        const bugId = requireRelayUuid(request.params.bugId, "bugId");
-        const body = parseMobileAddBugCommentRequest(request.body);
-        const idempotencyKey = requireMobileCommentIdempotencyKey(
-          readHeader(request.headers["idempotency-key"]),
-          bugId,
-          body.clientSubmissionId,
-        );
-        const result = await mobileCommentStore.addComment({
-          actorId: debugActorId,
-          bugId,
-          idempotencyKey,
-          request: body,
-        });
-        return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send({
+  app.post<{ Params: { bugId: string } }>(MOBILE_BUG_COMMENTS_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const body = parseMobileAddBugCommentRequest(request.body);
+      const idempotencyKey = requireMobileCommentIdempotencyKey(
+        readHeader(request.headers["idempotency-key"]),
+        bugId,
+        body.clientSubmissionId,
+      );
+      const result = await mobileCommentStore.addComment({
+        actorId: debugActorId,
+        bugId,
+        idempotencyKey,
+        request: body,
+      });
+      return reply
+        .code(201)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({
           comment: {
             id: result.comment.id,
             bugId: result.comment.bugId,
@@ -851,11 +883,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
             version: result.comment.version,
           },
         });
-      } catch (error: unknown) {
-        return relayErrorReply(error, reply);
-      }
-    },
-  );
+    } catch (error: unknown) {
+      return relayErrorReply(error, reply);
+    }
+  });
 
   app.get<{
     Params: { bugId: string };
@@ -965,8 +996,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         const idempotencyKey = requireVerificationIdempotencyKey(
           readHeader(request.headers["idempotency-key"]),
         );
-        const expectedKey =
-          `workflow:createVerification:bug:${bugId}:attempt:${body.repairAttemptId}:v${body.expectedVersion}`;
+        const expectedKey = `workflow:createVerification:bug:${bugId}:attempt:${body.repairAttemptId}:v${body.expectedVersion}`;
         if (idempotencyKey !== expectedKey) {
           throw new TypeError("Idempotency-Key does not match Verification creation");
         }
@@ -1021,8 +1051,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         const idempotencyKey = requireVerificationIdempotencyKey(
           readHeader(request.headers["idempotency-key"]),
         );
-        const expectedKey =
-          `workflow:startVerification:verification:${verificationId}:v${body.expectedVersion}`;
+        const expectedKey = `workflow:startVerification:verification:${verificationId}:v${body.expectedVersion}`;
         if (idempotencyKey !== expectedKey) {
           throw new TypeError("Idempotency-Key does not match Verification start");
         }
@@ -1054,8 +1083,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         const idempotencyKey = requireVerificationIdempotencyKey(
           readHeader(request.headers["idempotency-key"]),
         );
-        const expectedKey =
-          `workflow:recordVerificationResult:verification:${verificationId}:v${body.expectedVersion}`;
+        const expectedKey = `workflow:recordVerificationResult:verification:${verificationId}:v${body.expectedVersion}`;
         if (idempotencyKey !== expectedKey) {
           throw new TypeError("Idempotency-Key does not match Verification result");
         }
@@ -1126,7 +1154,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     try {
       const body = parseMobileCreateCaptureRequest(request.body);
       const idempotencyKey = readHeader(request.headers["idempotency-key"]);
-      if (idempotencyKey !== `submission:${body.clientSubmissionId}:capture:${body.capture.captureId}`) {
+      if (
+        idempotencyKey !== `submission:${body.clientSubmissionId}:capture:${body.capture.captureId}`
+      ) {
         throw new MobileCaptureRequestError(
           "Idempotency-Key does not match the capture identity",
           "INVALID_REQUEST",
@@ -1137,10 +1167,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         idempotencyKey,
         request: body,
       });
-      return reply
-        .code(201)
-        .header("content-type", MOBILE_API_CONTENT_TYPE)
-        .send(response);
+      return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(response);
     } catch (error: unknown) {
       if (error instanceof MobileCaptureRequestError) {
         return reply

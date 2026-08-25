@@ -276,6 +276,7 @@ export {
   linkMobileBuildRepair,
   receiveMobileRelayWebhook,
   startMobileRepairAttempt,
+  updateMobileBug,
 } from "./mobile-relay-store.js";
 export type {
   CompleteMobileRelayOutboxInput,
@@ -298,6 +299,7 @@ export type {
   ReceiveMobileRelayWebhookInput,
   RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
+  UpdateMobileBugInput,
   StartMobileRepairAttemptInput,
 } from "./mobile-relay-store.js";
 export type {

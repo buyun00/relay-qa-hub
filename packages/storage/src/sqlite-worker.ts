@@ -16,10 +16,7 @@ import type {
   MobileBugRecord,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
-import type {
-  ListMobileBugsInput,
-  MobileBugList,
-} from "./mobile-bug-list-store.js";
+import type { ListMobileBugsInput, MobileBugList } from "./mobile-bug-list-store.js";
 import type { MobileHumanWorkflowProjection } from "./mobile-human-workflow-store.js";
 import type {
   CreateMobileCommentInput,
@@ -58,6 +55,7 @@ import type {
   ReceiveMobileRelayWebhookInput,
   RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
+  UpdateMobileBugInput,
   GetMobileManualRepairAttemptInput,
   StartMobileRepairAttemptInput,
 } from "./mobile-relay-store.js";
@@ -69,10 +67,7 @@ import type {
   RecordMobileVerificationResultInput,
   StartMobileVerificationInput,
 } from "./mobile-verification-store.js";
-import type {
-  ListMobileNotificationsInput,
-  MobileNotificationList,
-} from "./mobile-inbox-store.js";
+import type { ListMobileNotificationsInput, MobileNotificationList } from "./mobile-inbox-store.js";
 import type {
   InsertedBugIdentity,
   MigrationReport,
@@ -326,6 +321,11 @@ export class SqliteStorageWorker {
     return this.request<MobileBugRecord>("transitionMobileBugReady", input);
   }
 
+  async updateMobileBug(input: UpdateMobileBugInput): Promise<MobileBugRecord> {
+    await this.initialization;
+    return this.request<MobileBugRecord>("updateMobileBug", input);
+  }
+
   async createMobileRelayAttempt(
     input: CreateMobileRelayAttemptInput,
   ): Promise<MobileRepairAttemptRecord> {
@@ -337,10 +337,7 @@ export class SqliteStorageWorker {
     input: CreateMobileManualRepairAttemptInput,
   ): Promise<MobileManualRepairAttemptRecord> {
     await this.initialization;
-    return this.request<MobileManualRepairAttemptRecord>(
-      "createMobileManualRepairAttempt",
-      input,
-    );
+    return this.request<MobileManualRepairAttemptRecord>("createMobileManualRepairAttempt", input);
   }
 
   async getMobileManualRepairAttempt(
