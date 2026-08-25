@@ -7,11 +7,11 @@
 - Current gate: `G5-RELAY-INTEGRATED`（execution override；不得解读为 G3/G4/G5 已完成）
 - Critical path: `G0 -> G1 -> G2 -> G3-ANDROID-APP-READY -> G4 -> G5 -> G6 -> G8 -> G9 -> G10`
 - Active work packages: `P3.1, P3.3, P3.4, P3.6, P3.7, P5.1`
-- Current delivery slice: `verified Android/4319/SQLite Poco artifact bundle -> QA-side fake Relay handoff/receipt`
-- Minimal verification: `下一切片只证明一个真实 QA Bug 经独立 QA Hub 服务端提交给 fake Relay、持久化 handoff 并回读 receipt；保留一个不可用/重放失败，不修改真实 Relay`
-- Next atomic action: `P5.1 IN_PROGRESS：在 QA Hub 内实现最小 fake Relay endpoint/client 与 durable handoff receipt，让 Android 已创建的 Bug 一次真实派发/回读；通过后立即继续状态回写主链`
+- Current delivery slice: `verified Android -> 4319 -> SQLite queued handoff/receipt -> independent fake Relay outbox consumer/submitted writeback`
+- Minimal verification: `下一切片只证明 pending outbox 被独立 fake Relay 实际消费一次、submitted receipt 持久回写且 Android GET 可见；保留一个 fake Relay unavailable，不修改真实 Relay`
+- Next atomic action: `P5.1 IN_PROGRESS：实现独立 fake Relay HTTP consumer 与 bounded outbox delivery，把当前 queued handoff 推进为 submitted receipt 并由 Android 实际回读；不得自动验收/关闭 Bug`
 - Completed gates: `1 / 11`
-- Last green commit: `f55b7d664dd8c370eb7e080ec1672714edb7ea4c`
+- Last green commit: `f09fa0b`
 - Last deployed commit: `none`
 - Schema version: `contract 1.1.0; database v3 verified at P1.2`
 - Production URL: `not deployed`
@@ -19,7 +19,7 @@
 - Last backup verified: `none`
 - Last restore drill: `none`
 - Blockers: `当前 P5.1 QA-side fake Relay MVP 主链路无外部 blocker；真实 Relay 修改/重载、真机/API37/Poco 安全加固均不在当前原子步骤`
-- Updated at: `2026-08-25T12:36:50+08:00`
+- Updated at: `2026-08-25T13:13:59+08:00`
 
 ## Gate status
 
@@ -66,7 +66,7 @@
 | P4.1  | PLANNED     | unassigned               | G3                  | human/external attempts                              | Relay-offline flow                                                                                 |                                                                       |                                            | 2026-08-24                |
 | P4.2  | PLANNED     | unassigned               | P4.1                | builds/commit identity                               | wrong-SHA guard tests                                                                              |                                                                       |                                            | 2026-08-24                |
 | P4.3  | PLANNED     | unassigned               | P4.1,P4.2           | verification/reopen                                  | human closed-loop E2E                                                                              |                                                                       |                                            | 2026-08-24                |
-| P5.1  | IN_PROGRESS | root (GPT-5.6 Sol/ultra) | G4 (MVP override)   | QA Relay client/fake                                 | one real Bug handoff + durable receipt/readback + one unavailable/replay failure                    | current slice starts QA-side only; real Relay remains untouched       |                                            | 2026-08-25T12:36:50+08:00 |
+| P5.1  | IN_PROGRESS | root + Luna/xhigh | G4 (MVP override)   | QA Relay client/fake                                 | one real Bug handoff + durable receipt/readback + one unavailable/replay failure                    | [`docs/evidence/P5.1-android-fake-relay-smoke.md`](docs/evidence/P5.1-android-fake-relay-smoke.md)：Android queued/readback + SQLite receipt/outbox + mismatch 409；fake consumer/submitted pending | `f09fa0b` | 2026-08-25T13:13:59+08:00 |
 | P5.2  | PLANNED     | unassigned               | P5.1                | Relay M2M handoff API                                | auth/idempotency/attachment tests                                                                  |                                                                       |                                            | 2026-08-24                |
 | P5.3  | PLANNED     | unassigned               | P5.2                | Relay webhook outbox                                 | signature/retry/order/reconcile tests                                                              |                                                                       |                                            | 2026-08-24                |
 | P5.4  | PLANNED     | unassigned               | P5.2,P5.3           | state projection/continue task                       | real delivery/reopen tests                                                                         |                                                                       |                                            | 2026-08-24                |
@@ -94,7 +94,7 @@
 - `P3.4` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:25:29+08:00`; updated: `2026-08-25T10:57:27+08:00`; state: `IN_PROGRESS`; next atomic action: `Room v4 已保存 final reservation/claim；逐阶段 resume、response-loss 与 multi-chunk 在 capture 主链后补`。
 - `P3.6` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T10:57:27+08:00`; updated: `2026-08-25T11:19:01+08:00`; state: `IN_PROGRESS`; next atomic action: `MuMu 已证明显式授权、悬浮球、2560x1440 MediaProjection PNG 到 attachment/Bug 及拒绝降级；录屏、Share/Picker、旋转/真机/API37 进入收尾，不阻塞 P3.7`。
 - `P3.7` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T11:19:01+08:00`; updated: `2026-08-25T12:36:50+08:00`; state: `VERIFYING`; next atomic action: `MuMu MVP 已证明 partial Poco PNG 与 unavailable no-Poco bundle 均同 captureId bound/readable；真实 Unity、qa.snapshot、LAN-negative、真机/API37 由 P3.8/P3.9/P9.1 补证，不阻塞当前 P5.1`。
-- `P5.1` — owner: `root (GPT-5.6 Sol/ultra)`; started: `2026-08-25T12:36:50+08:00`; updated: `2026-08-25T12:36:50+08:00`; state: `IN_PROGRESS`; next atomic action: `只在独立 QA Hub 内实现 fake Relay handoff/receipt 的真实 HTTP+SQLite 垂直切片；先不修改 Relay，不触发 reload`。
+- `P5.1` — owner: `root + Android Luna/xhigh`; started: `2026-08-25T12:36:50+08:00`; updated: `2026-08-25T13:13:59+08:00`; state: `IN_PROGRESS`; next atomic action: `queued handoff/receipt 已由 MuMu 真实通过；现在让独立 fake Relay 消费 pending outbox 并回写 submitted，再由 Android GET 回读；不修改真实 Relay`。
 
 ## MuMu MVP execution cadence (2026-08-25 override)
 
@@ -124,6 +124,8 @@
 | capture 文件仍为 app-private plaintext，成功后不清理 | 借用测试机可能残留敏感画面 | 截图成功上传或草稿过期 | Keystore-backed encryption + configurable retention/cleanup | 上传成功清理，失败草稿按策略保留 |
 | rotation resize/setSurface、`FLAG_SECURE` 专用说明、API37 BAL/OEM/真机生命周期未验证 | 方向变化可能停帧；系统限制时提示不完整；不能宣称设备 Gate | 旋转、安全窗口、API37/OEM 后台限制或进程回收 | P3.6/P3.9/P9.1 用真实设备补 resize/lifecycle/permission evidence | 一条真实设备 success + 一条 system-stop/secure failure |
 | P3.7 当前只以 loopback framed stub 证明 Poco PNG artifact；未以 provenance-bound Unity 游戏证明 Dump/profiling/qa.snapshot | 不能据此宣称真实 Unity enrichment 或 Poco 安全 Gate 完成 | 进入 P3.8/P3.9/P9.1 或准备 debug-ready 游戏包 | 在 Loopback-only/只读 Unity 兼容层具备提交身份后，用真实游戏 APK 拉取 bounded artifact 并补 LAN-negative/IL2CPP/真机证据 | 同 captureId 回读 Screenshot+Dump；无 Poco 仍建单；LAN 地址不可连 |
+| P5.1 当前 `reported -> ready` 与 RepairAttempt 创建只在 typed transaction/CAS 下成功，尚未保存可重放 HTTP receipt | 这两个前置请求若提交后丢响应，App 重试会得到版本冲突而不是原 receipt | transition/create 成功后连接中断 | 复用 generic idempotency reservation/commit，持久化各自无 secret 的响应 | 各一次 response-loss 后精确重放，不新增 event/Attempt |
+| P5.1 当前仅接受空 `selectedAttachmentIds`，queued outbox 尚未被 fake Relay 消费 | 有附件的真实修复上下文尚不可派发；queued 不能冒充 submitted/真实 Relay | 用户选择附件或要求外部执行器真正接单 | 下一 slice 校验 clean claimed attachment 后由独立 fake Relay 拉取；随后投影 submitted receipt | 一次附件 handoff + 一次 fake unavailable，receipt/outbox 不重复 |
 | Poco collection 取消依靠 250ms read timeout/1.5s 总 deadline，尚未在 Job cancellation 时立即关闭 active socket | 停止会话后连接可能短暂滞留，但不会无限等待 | RPC 正阻塞且用户立即停止 capture session | 给 active socket 注册 cancellation close hook，保留当前 deadline | 挂起 stub 后取消，socket/协程在目标时限内退出且不发 Ready |
 
 ## Completed evidence
@@ -146,6 +148,7 @@
 - P3.6 MuMu capture/overlay 垂直切片于 `2026-08-25T11:19:01+08:00` 验证并提交为 `15c668a7d1f6a36a09935ce39f0e6348eb78c73c`：显式通知/SAW/MediaProjection 授权后，真实悬浮球采集 2560x1440 PNG，以同一 `captureId` 经 attachment 创建 `LOCAL-1`；第二次系统授权拒绝明确降级且未新增 Bug。证据见 `docs/evidence/P3.6-mumu-capture-smoke.md`。P3.6 仍为 `IN_PROGRESS`，唯一 root pointer 已转 P3.7 Poco optional enrichment；未宣称录屏、Share/Picker、G3、真机或 API37 完成。
 - P3.7 bounded Poco probe 于 `2026-08-25T11:59:32+08:00` 验证并提交为 `d2950262ca6181d658651a2a53b7834eaa52d657`：最终本仓库 APK/installed-base SHA=`845EED1305F65545F3FE3A755025424A7C2F9F24A8855C76C866048C16D1ABBA`；MuMu 真实 loopback framed handshake 显示 partial 并创建/回读 `LOCAL-1`，移除 Poco 后仍创建/回读 `LOCAL-2`。证据见 `docs/evidence/P3.7-mumu-poco-probe.md`。P3.7 保持 `IN_PROGRESS`，因为实际 Poco artifacts 尚未按同 captureId 服务端持久化；未使用 Unity/Relay/Jenkins，也未宣称 G3、真机或真实 Poco 安全 Gate 完成。
 - P3.7 Poco artifact MVP slice 于 `2026-08-25T12:36:50+08:00` 验证并提交为 `f55b7d664dd8c370eb7e080ec1672714edb7ea4c`：本仓库 APK/installed-base SHA=`9B0F9D2951E38DFF44EA9BB583B88E0AFD721E059C60416675F893FB2F9E979E`；MuMu/API35 经真实 4319 把 system/Poco PNG 以同 captureId `e4a19eab-b124-441f-b4bd-5b3e3f7f8e96` 持久化并 GET 回读，bundle/Occurrence=`partial/bound`；移除 Poco 后 capture `5628305b-95b6-4d43-8e40-c9ccbea04c0d` 仍以 system-only `unavailable/bound` 创建 `LOCAL-3`。证据见 `docs/evidence/P3.7-mumu-poco-artifact.md`。P3.7 转 `VERIFYING`，唯一 pointer 进入 P5.1；未修改 Unity/Relay、未触发 Jenkins，也未宣称 G3/真实 Poco/真机/API37 完成。
+- P5.1 queued handoff slice 于 `2026-08-25T13:13:59+08:00` 验证并提交为 `f09fa0b`：本仓库 APK/installed-base SHA=`32C323A00F62B186EE5A36421EE7536248463C1A4E7C9A3EFCA13A38BACD91D5`；MuMu/API35 原生按钮经真实 4319 创建 `LOCAL-1`，完成 typed ready/relay-attempt/dispatch，SQLite 精确保存一条 queued receipt、一条 pending fake-Relay outbox 与三条 typed event，Android GET 显示 `requiresHumanVerification=true`；相同 key 改 payload 返回 `409 IDEMPOTENCY_PAYLOAD_MISMATCH` 且计数不变。证据见 [`docs/evidence/P5.1-android-fake-relay-smoke.md`](docs/evidence/P5.1-android-fake-relay-smoke.md)。P5.1 保持 `IN_PROGRESS` 并进入 fake consumer/submitted 回写；未修改真实 Relay/Unity/Jenkins，也未宣称 G5 完成。
 - App-first 重排于 `2026-08-24T18:31:47+08:00` 完成安全点验证：计划/进度 `44/44` ID 一一对应、7 份 ADR 与完整 `npm run verify` 全绿，独立只读签核为 Blocker/High/Medium=`0/0/0`。Android toolchain preflight 按预期非零并明确列出缺失 Studio/SDK/JDK/tools；HypervisorPlatform=`1`，未宣称 APK 构建或测试通过。
 - 上一条工具链缺失记录已被后续 live 审计取代：Studio 2026.1.3/JBR 25.0.2、SDK Platform 37.0、Build-Tools 36.0.0、Platform-Tools 37.0.1、cmdline-tools/Emulator/license/WHPX 均可用，API35 MuMu 已连接；当前真实缺口是本仓库 Android Gradle 工程验证、API37 runtime 与真实设备证据。
 
