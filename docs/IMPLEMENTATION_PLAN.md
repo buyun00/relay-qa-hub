@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: e7ace6c2af183290614f183881e775d5ef3bdd19
-  last_verified_at: 2026-08-26T02:12:21+08:00
-  next_action: P7.4 IN_PROGRESS；P3.6 已用真实 MuMu 证明 SAVE_PENDING -> 重启回读 -> 离线显式提交 -> 单一 attachment/Bug receipt；当前先在普通浏览器接通 Android 提交证据的 Web 详情展示，稳定后才统一打 Windows 包
+  last_verified_commit: 772b9267b1c9d75e8cb0b990d8e893e538190500
+  last_verified_at: 2026-08-26T02:35:09+08:00
+  next_action: P7.4 IN_PROGRESS；普通浏览器已真实显示 Android screenshot/capture attachment，单项 404 不破坏 Bug 详情；下一步在同一证据区接通 capture bundle/Poco enrichment 摘要，缺少 bundle/Poco 时降级为未连接且不阻塞截图，Web 功能稳定后才统一打 Windows 包
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1019,7 +1019,9 @@ MuMu MVP execution override：先提供一个稳定、有界的同项目 Bug 列
 
 #### P7.4 桌面正式管理 Web
 
-状态：`VERIFYING`，属于 `0.1.0-debug` 当前 Web MVP 稳定基线。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路。最终组合证据见 [`docs/evidence/P7.4-desktop-combined-edge-signoff.md`](evidence/P7.4-desktop-combined-edge-signoff.md)：普通 Edge 在同一 fresh API/SQLite 上完成目录、列表、详情/时间线、owner、`reported -> ready`、Comment 和选择切换，Relay/人工 workflow 控件只渲染未误触发，invalid project `400` 不改变 active project、selected detail 或 durable facts。cursor/保存视图/批量、真正 project_admin 设置写入、standalone invalid-project 保留旧 rows、unlinked Build response-loss 与 additive workflow contract 进入收尾清单，不阻塞 exact Web baseline 的 Windows package/runtime 回归。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+状态：`IN_PROGRESS`，属于 `0.1.0-debug` 当前 Web MVP 稳定基线。真实 API Bug 列表/error、详情/events/Comment、负责人分配、`reported -> ready`、一键 QA Hub Relay handoff/receipt、人工 RepairAttempt、exact-SHA Build 关联、人工 Verification/关闭、keyword/state/severity 服务端组合筛选、显式人工去重、项目/成员角色/模块目录读取、Bug 模块归类，以及刷新/深链后恢复同一 Attempt/精确 Build/Verification，均已通过 4174 Web server-side auth proxy -> 4319 -> SQLite 的最小真实链路。最终组合证据见 [`docs/evidence/P7.4-desktop-combined-edge-signoff.md`](evidence/P7.4-desktop-combined-edge-signoff.md)：普通 Edge 在同一 fresh API/SQLite 上完成目录、列表、详情/时间线、owner、`reported -> ready`、Comment 和选择切换，Relay/人工 workflow 控件只渲染未误触发，invalid project `400` 不改变 active project、selected detail 或 durable facts。cursor/保存视图/批量、真正 project_admin 设置写入、standalone invalid-project 保留旧 rows、unlinked Build response-loss 与 additive workflow contract 进入收尾清单，不阻塞 exact Web baseline。Web 不称 PWA，不承担现场截图或浏览器离线取证。
+
+Android 证据读取的首个浏览器 slice 已在提交 `772b9267b1c9d75e8cb0b990d8e893e538190500` 通过：Web 从真实 P3.6 MuMu 提交数据读取 claimed attachment 元数据与受认证二进制路由，实际解码并显示同一 `captureId` 的 2560x1440 PNG；临时移开隔离 runtime 的 exact blob 后，证据卡显示 `404 NOT_FOUND`，但 Bug 详情、管理动作和审计时间线保持可用。证据见 [`docs/evidence/P7.4-browser-android-evidence.md`](evidence/P7.4-browser-android-evidence.md)。下一原子 slice 仅在普通浏览器接通现有 capture-bundle/Poco enrichment 摘要；缺失 bundle 或 Poco 必须显示“未连接”且不阻塞截图。按用户当前顺序，Web 功能集合稳定后才统一重打 Windows 应用，不为每个 Web slice 重复 Electron 打包。
 
 #### P7.5 Windows Electron 桌面壳
 
