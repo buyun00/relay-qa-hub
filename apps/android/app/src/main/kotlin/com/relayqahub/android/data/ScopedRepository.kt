@@ -156,6 +156,21 @@ class ScopedRepository(
         )
     }
 
+    suspend fun findOperationByIdempotencyKey(
+        scope: AccountProjectScope,
+        idempotencyKey: String,
+    ): OfflineOperationEntity? {
+        require(idempotencyKey.isNotBlank())
+        return offlineOperationDao.findForScopeByIdempotencyKey(
+            accountId = scope.accountId,
+            projectId = scope.projectId,
+            actorId = scope.actorId,
+            installationId = scope.installationId,
+            sessionId = scope.sessionId,
+            idempotencyKey = idempotencyKey,
+        )
+    }
+
     suspend fun recordAttachmentReservation(
         scope: AccountProjectScope,
         receipt: AttachmentUploadReceipt,

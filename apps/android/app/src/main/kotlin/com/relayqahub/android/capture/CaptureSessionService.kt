@@ -321,9 +321,7 @@ class CaptureSessionService : Service() {
                     }
                     val screenSize = poco.artifacts[PocoReadOnlyMethod.GET_SCREEN_SIZE]
                         as? PocoArtifact.ScreenSize
-                    CaptureResultBridge.send(
-                        this@CaptureSessionService,
-                        CaptureResult.Ready(
+                    val ready = CaptureResult.Ready(
                             captureId = pending.captureId,
                             privatePath = file.absolutePath,
                             width = width,
@@ -345,8 +343,19 @@ class CaptureSessionService : Service() {
                                 },
                             ),
                             pocoArtifacts = pocoArtifacts,
-                        ),
-                    )
+                        )
+                    if (pending.mode == CapturedDraftMode.SAVE_PENDING) {
+                        try {
+                            PendingCaptureDraftStore(this@CaptureSessionService).persist(ready)
+                        } catch (_: Throwable) {
+                            CaptureResultBridge.send(
+                                this@CaptureSessionService,
+                                CaptureResult.Unavailable("pending_capture_persistence_failed"),
+                            )
+                            return@launch
+                        }
+                    }
+                    CaptureResultBridge.send(this@CaptureSessionService, ready)
                     if (pending.openApp) openAppFromUserCapture()
                 } finally {
                     if (currentCoroutineContext().isActive) {

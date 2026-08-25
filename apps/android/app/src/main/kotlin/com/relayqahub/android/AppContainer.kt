@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.relayqahub.android.data.QaHubDatabase
 import com.relayqahub.android.data.ScopedRepository
+import com.relayqahub.android.capture.PendingCaptureDraftStore
 import com.relayqahub.android.network.AttachmentUploadClient
 import com.relayqahub.android.network.BuildProjectionClient
 import com.relayqahub.android.network.BugWorkbenchClient
@@ -39,6 +40,7 @@ class AppContainer private constructor(
     val inboxClient: InboxClient,
     val humanWorkflowClient: HumanWorkflowClient,
     val offlineAttachmentDraftStore: OfflineAttachmentDraftStore,
+    val pendingCaptureDraftStore: PendingCaptureDraftStore,
     val credentialVault: CredentialVault,
     val syncEngine: OfflineSyncEngine,
     val syncScheduler: SyncScheduler,
@@ -124,6 +126,7 @@ class AppContainer private constructor(
                 submissionReceiptDao = database.submissionReceiptDao(),
             )
             val offlineAttachmentDraftStore = OfflineAttachmentDraftStore(applicationContext)
+            val pendingCaptureDraftStore = PendingCaptureDraftStore(applicationContext)
             val syncScheduler = SyncScheduler(WorkManager.getInstance(applicationContext))
             return AppContainer(
                 database = database,
@@ -138,6 +141,7 @@ class AppContainer private constructor(
                 inboxClient = inboxClient,
                 humanWorkflowClient = humanWorkflowClient,
                 offlineAttachmentDraftStore = offlineAttachmentDraftStore,
+                pendingCaptureDraftStore = pendingCaptureDraftStore,
                 credentialVault = credentialVault,
                 syncEngine = OfflineSyncEngine(
                     operationDao = database.offlineOperationDao(),

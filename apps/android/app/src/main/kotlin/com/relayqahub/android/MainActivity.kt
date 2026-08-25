@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        foundationViewModel.refreshPendingCapture()
         // Unlocking the device resumes the foreground activity. Re-enqueue fail-closed
         // keystore operations here so BLOCKED_DEVICE never relies on an implicit retry.
         lifecycleScope.launch {

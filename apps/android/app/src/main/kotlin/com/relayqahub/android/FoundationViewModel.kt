@@ -7,8 +7,10 @@ import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.relayqahub.android.capture.CapturedPocoArtifact
+import com.relayqahub.android.capture.PendingCaptureDraft
 import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
+import com.relayqahub.android.data.QueueState
 import com.relayqahub.android.capture.CapturePocoSummary
 import com.relayqahub.android.network.AttachmentUploadFailure
 import com.relayqahub.android.network.CaptureAttachmentReceipt
@@ -65,6 +67,16 @@ data class FoundationUiState(
     val humanWorkflow: HumanWorkflowUiState = HumanWorkflowUiState(),
     val commentAudit: CommentAuditUiState = CommentAuditUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
+    val pendingCapture: PendingCaptureUiState = PendingCaptureUiState(),
+)
+
+data class PendingCaptureUiState(
+    val available: Boolean = false,
+    val captureId: String? = null,
+    val width: Int = 0,
+    val height: Int = 0,
+    val enrichmentStatus: String? = null,
+    val deliveryState: String = "NONE",
 )
 
 data class BuildProjectionUiState(
@@ -185,6 +197,7 @@ private data class DiscoveryUiValues(
     val duplicateCandidates: DuplicateCandidateUiState,
     val humanWorkflow: HumanWorkflowUiState,
     val commentAudit: CommentAuditUiState,
+    val pendingCapture: PendingCaptureUiState,
 )
 
 private data class CommentAuditResult(
@@ -210,6 +223,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val duplicateCandidates = MutableStateFlow(DuplicateCandidateUiState())
     private val humanWorkflow = MutableStateFlow(HumanWorkflowUiState())
     private val commentAudit = MutableStateFlow(CommentAuditUiState())
+    private val pendingCapture = MutableStateFlow(PendingCaptureUiState())
 
     private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
@@ -250,11 +264,13 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         duplicateCandidates,
         humanWorkflow,
         commentAudit,
-    ) { duplicateState, workflowState, commentAuditState ->
+        pendingCapture,
+    ) { duplicateState, workflowState, commentAuditState, pendingCaptureState ->
         DiscoveryUiValues(
             duplicateCandidates = duplicateState,
             humanWorkflow = workflowState,
             commentAudit = commentAuditState,
+            pendingCapture = pendingCaptureState,
         )
     }
 
@@ -290,6 +306,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             humanWorkflow = discovery.humanWorkflow,
             commentAudit = discovery.commentAudit,
             duplicateCandidates = discovery.duplicateCandidates,
+            pendingCapture = discovery.pendingCapture,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -300,6 +317,11 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     init {
         viewModelScope.launch {
             appContainer.scopedRepository.seedFoundationScope(scope)
+        }
+        viewModelScope.launch {
+            appContainer.scopedRepository.observeLatestSubmission(scope).collect {
+                refreshPendingCaptureState()
+            }
         }
     }
 
@@ -340,17 +362,22 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         pngBytes: ByteArray,
         filename: String,
         actionLabel: String,
+        submissionId: String = UUID.randomUUID().toString(),
+        clientAttachmentId: String = UUID.randomUUID().toString(),
+        captureId: String? = null,
+        observedAt: String = Instant.now().toString(),
+        qaAppVersion: String = BuildConfig.VERSION_NAME,
+        onCompleted: () -> Unit = {},
     ) {
         viewModelScope.launch {
             val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
             if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
                 lastAction.value =
                     "$actionLabel unavailable: configure qaHubDebugAccessToken for a debug build."
+                onCompleted()
                 return@launch
             }
 
-            val submissionId = UUID.randomUUID().toString()
-            val clientAttachmentId = UUID.randomUUID().toString()
             var filePersisted = false
             lastAction.value = "Saving $actionLabel PNG before any network call…"
             val result = runCatching {
@@ -378,22 +405,34 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     pngBytes = pngBytes,
                 )
                 filePersisted = true
-                val operationId = appContainer.scopedRepository.enqueue(
-                    scope = scope,
-                    request = OfflineAttachmentDraftContract.buildOperation(
-                        projectId = scope.projectId,
-                        staged = StagedOfflineAttachment(
-                            submissionId = submissionId,
-                            clientAttachmentId = clientAttachmentId,
-                            filename = filename,
-                            observedAt = Instant.now().toString(),
-                            qaAppVersion = BuildConfig.VERSION_NAME,
-                            expectedSize = metadata.expectedSize,
-                            sha256 = metadata.sha256,
-                        ),
+                val request = OfflineAttachmentDraftContract.buildOperation(
+                    projectId = scope.projectId,
+                    staged = StagedOfflineAttachment(
+                        submissionId = submissionId,
+                        clientAttachmentId = clientAttachmentId,
+                        filename = filename,
+                        observedAt = observedAt,
+                        qaAppVersion = qaAppVersion,
+                        expectedSize = metadata.expectedSize,
+                        sha256 = metadata.sha256,
+                        captureId = captureId,
                     ),
                 )
-                appContainer.syncScheduler.enqueue(scope)
+                val existing = appContainer.scopedRepository.findOperationByIdempotencyKey(
+                    scope = scope,
+                    idempotencyKey = request.idempotencyKey,
+                )
+                val operationId = existing?.operationId
+                    ?: appContainer.scopedRepository.enqueue(scope, request)
+                if (existing?.state == QueueState.SUCCEEDED) {
+                    appContainer.offlineAttachmentDraftStore.delete(
+                        submissionId,
+                        clientAttachmentId,
+                    )
+                    filePersisted = false
+                } else {
+                    appContainer.syncScheduler.enqueue(scope)
+                }
                 operationId
             }
             result.onSuccess { operationId ->
@@ -413,6 +452,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     ?: "OFFLINE_DRAFT_PERSIST_FAILED"
                 lastAction.value = "$actionLabel failed: $code."
             }
+            onCompleted()
         }
     }
 
@@ -1108,8 +1148,69 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun reportPendingCaptureSaved(captureId: String, width: Int, height: Int) {
-        lastAction.value =
-            "Pending capture $captureId saved locally (${width}x$height); add details before submit."
+        viewModelScope.launch {
+            refreshPendingCaptureState()
+            lastAction.value =
+                "Pending capture $captureId saved locally (${width}x$height); add details before submit."
+        }
+    }
+
+    fun refreshPendingCapture() {
+        viewModelScope.launch { refreshPendingCaptureState() }
+    }
+
+    fun submitLatestPendingCapture() {
+        val current = pendingCapture.value
+        if (!current.available || current.deliveryState != "SAVED") return
+        pendingCapture.value = current.copy(deliveryState = "QUEUEING")
+        viewModelScope.launch {
+            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }
+                .getOrNull()
+            if (draft == null) {
+                pendingCapture.value = PendingCaptureUiState()
+                lastAction.value = "No durable pending capture is available to submit."
+                return@launch
+            }
+            val png = runCatching { appContainer.pendingCaptureDraftStore.readPrimary(draft) }
+                .getOrElse {
+                    pendingCapture.value = current
+                    lastAction.value = "Pending capture failed: PENDING_CAPTURE_READ_FAILED."
+                    return@launch
+                }
+            queueOfflinePngDraft(
+                pngBytes = png,
+                filename = "capture-${draft.captureId}.png",
+                actionLabel = "Pending capture",
+                submissionId = draft.clientSubmissionId,
+                clientAttachmentId = draft.clientAttachmentId,
+                captureId = draft.captureId,
+                observedAt = draft.observedAt,
+                qaAppVersion = draft.qaAppVersion,
+                onCompleted = ::refreshPendingCapture,
+            )
+        }
+    }
+
+    private suspend fun refreshPendingCaptureState() {
+        val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }.getOrNull()
+        if (draft == null) {
+            pendingCapture.value = PendingCaptureUiState()
+            return
+        }
+        val idempotencyKey = "submission:${draft.clientSubmissionId}:commit"
+        val operation = appContainer.scopedRepository.findOperationByIdempotencyKey(
+            scope = scope,
+            idempotencyKey = idempotencyKey,
+        )
+        if (
+            operation?.state == QueueState.SUCCEEDED &&
+            appContainer.scopedRepository.findReceipt(scope, operation.operationId) != null
+        ) {
+            runCatching { appContainer.pendingCaptureDraftStore.delete(draft) }
+            pendingCapture.value = PendingCaptureUiState()
+            return
+        }
+        pendingCapture.value = draft.toUiState(operation?.state?.name ?: "SAVED")
     }
 
     private fun submitPngAttachment(
@@ -1305,6 +1406,16 @@ private fun CapturePocoSummary?.pocoDisplaySuffix(): String = when (this?.status
         " Unity context: partial / 部分" + pocoEndpointSuffix() + "."
     PocoEnrichmentStatus.UNAVAILABLE -> " Unity context: unavailable / 未连接."
 }
+
+private fun PendingCaptureDraft.toUiState(deliveryState: String): PendingCaptureUiState =
+    PendingCaptureUiState(
+        available = true,
+        captureId = captureId,
+        width = width,
+        height = height,
+        enrichmentStatus = poco.status.name,
+        deliveryState = deliveryState,
+    )
 
 private fun CapturePocoSummary.pocoEndpointSuffix(): String = buildString {
     sdkVersion?.let { append(" (SDK ").append(it) }

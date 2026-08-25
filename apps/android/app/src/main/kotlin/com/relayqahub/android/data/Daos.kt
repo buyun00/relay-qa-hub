@@ -239,6 +239,21 @@ interface OfflineOperationDao {
     ): List<OfflineOperationEntity>
 
     @Query(
+        "SELECT * FROM offline_operations " +
+            "WHERE accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId " +
+            "AND sessionId = :sessionId AND idempotencyKey = :idempotencyKey LIMIT 1",
+    )
+    suspend fun findForScopeByIdempotencyKey(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        idempotencyKey: String,
+    ): OfflineOperationEntity?
+
+    @Query(
         "SELECT DISTINCT accountId, projectId, actorId, installationId, sessionId " +
             "FROM offline_operations WHERE state = 'BLOCKED_DEVICE' " +
             "ORDER BY accountId, projectId, actorId, installationId, sessionId",

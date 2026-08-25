@@ -38,6 +38,7 @@ fun FoundationScreen(
     onStartCaptureSession: () -> Unit,
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
+    onSubmitPendingCapture: () -> Unit = viewModel::submitLatestPendingCapture,
     onDispatchToRelay: () -> Unit = viewModel::dispatchToRelay,
     onAdoptFixAndBindQaBuild: () -> Unit = viewModel::adoptFixAndBindQaBuild,
     onRefreshInbox: () -> Unit = viewModel::refreshInbox,
@@ -57,6 +58,7 @@ fun FoundationScreen(
         onStartCaptureSession = onStartCaptureSession,
         onCaptureNow = onCaptureNow,
         onStopCaptureSession = onStopCaptureSession,
+        onSubmitPendingCapture = onSubmitPendingCapture,
         onDispatchToRelay = onDispatchToRelay,
         onAdoptFixAndBindQaBuild = onAdoptFixAndBindQaBuild,
         onRefreshInbox = onRefreshInbox,
@@ -78,6 +80,7 @@ internal fun FoundationScreen(
     onStartCaptureSession: () -> Unit,
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
+    onSubmitPendingCapture: () -> Unit = {},
     onDispatchToRelay: () -> Unit = {},
     onAdoptFixAndBindQaBuild: () -> Unit = {},
     onRefreshInbox: () -> Unit = {},
@@ -476,6 +479,25 @@ internal fun FoundationScreen(
                         .testTag("stop-capture-session"),
                 ) {
                     Text("Stop")
+                }
+            }
+
+            if (state.pendingCapture.available) {
+                Text(
+                    text = "Pending capture ${state.pendingCapture.captureId} • " +
+                        "${state.pendingCapture.width}x${state.pendingCapture.height} • " +
+                        "Unity ${state.pendingCapture.enrichmentStatus ?: "UNAVAILABLE"} • " +
+                        state.pendingCapture.deliveryState,
+                    modifier = Modifier.testTag("pending-capture-status"),
+                )
+                Button(
+                    onClick = onSubmitPendingCapture,
+                    enabled = state.pendingCapture.deliveryState == "SAVED",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("submit-pending-capture"),
+                ) {
+                    Text("Submit pending capture")
                 }
             }
 

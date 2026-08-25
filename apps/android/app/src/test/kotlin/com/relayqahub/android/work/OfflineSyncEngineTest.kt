@@ -419,6 +419,18 @@ class OfflineSyncEngineTest {
             it.matches(accountId, projectId, actorId, installationId, sessionId)
         }
 
+        override suspend fun findForScopeByIdempotencyKey(
+            accountId: String,
+            projectId: String,
+            actorId: String,
+            installationId: String,
+            sessionId: String,
+            idempotencyKey: String,
+        ): OfflineOperationEntity? = operations.singleOrNull {
+            it.matches(accountId, projectId, actorId, installationId, sessionId) &&
+                it.idempotencyKey == idempotencyKey
+        }
+
         override suspend fun listBlockedDeviceScopes(): List<AccountProjectScope> = operations
             .filter { it.state == QueueState.BLOCKED_DEVICE }
             .map {

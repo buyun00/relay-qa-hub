@@ -29,6 +29,7 @@ internal data class StagedOfflineAttachment(
     val qaAppVersion: String,
     val expectedSize: Int,
     val sha256: String,
+    val captureId: String? = null,
 )
 
 internal object OfflineAttachmentDraftContract {
@@ -55,6 +56,7 @@ internal object OfflineAttachmentDraftContract {
                 .put("qaAppVersion", staged.qaAppVersion)
                 .put("expectedSize", staged.expectedSize)
                 .put("sha256", staged.sha256)
+                .apply { staged.captureId?.let { put("captureId", it) } }
                 .toString(),
             idempotencyKey = "submission:${staged.submissionId}:commit",
         )
@@ -65,8 +67,8 @@ internal object OfflineAttachmentDraftContract {
         require(operation.httpMethod == HTTP_METHOD)
         require(operation.relativePath == RELATIVE_PATH)
         val payload = JSONObject(operation.payloadJson)
-        require(payload.length() == REQUIRED_KEYS.size)
-        require(REQUIRED_KEYS.all(payload::has))
+        val keys = payload.keys().asSequence().toSet()
+        require(keys.containsAll(REQUIRED_KEYS) && keys.all(ALLOWED_KEYS::contains))
         require(payload.getString("projectId") == operation.projectId)
         val staged = StagedOfflineAttachment(
             submissionId = payload.getString("clientSubmissionId"),
@@ -76,6 +78,7 @@ internal object OfflineAttachmentDraftContract {
             qaAppVersion = payload.getString("qaAppVersion"),
             expectedSize = payload.getInt("expectedSize"),
             sha256 = payload.getString("sha256"),
+            captureId = payload.optString("captureId").takeIf(String::isNotBlank),
         )
         requireValid(staged)
         require(operation.idempotencyKey == "submission:${staged.submissionId}:commit")
@@ -91,6 +94,7 @@ internal object OfflineAttachmentDraftContract {
         require(staged.qaAppVersion.isNotBlank() && staged.qaAppVersion.length <= 128)
         require(staged.expectedSize in 1..MAX_ATTACHMENT_BYTES)
         require(SHA256_PATTERN.matches(staged.sha256))
+        staged.captureId?.let { requireUuid(it, "captureId") }
     }
 
     private fun requireUuid(value: String, label: String) {
@@ -107,6 +111,7 @@ internal object OfflineAttachmentDraftContract {
         "expectedSize",
         "sha256",
     )
+    private val ALLOWED_KEYS = REQUIRED_KEYS + "captureId"
     private val SHA256_PATTERN = Regex("^[0-9a-f]{64}$")
     const val MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024
 }
@@ -226,6 +231,7 @@ class OfflineAttachmentDraftProcessor(
                 filename = staged.filename,
                 pngBytes = bytes,
                 accessToken = accessToken,
+                captureId = staged.captureId,
             )
             scopedRepository.recordAttachmentReservation(scope, uploadReceipt)
             val createBug = FoundationCreateBugContract.buildOperation(
