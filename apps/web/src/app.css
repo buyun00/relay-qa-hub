@@ -42,7 +42,7 @@ button {
 }
 
 .app-shell {
-  width: min(100%, 44rem);
+  width: min(100%, 78rem);
   min-width: 0;
   min-height: 100dvh;
   margin: 0 auto;
@@ -139,7 +139,6 @@ h1 {
   line-height: 1.35;
 }
 
-.pwa-notice,
 .boundary-card,
 .workspace-card {
   min-width: 0;
@@ -147,38 +146,147 @@ h1 {
   border-radius: 1.25rem;
 }
 
-.pwa-notice {
+.project-form {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.1rem;
+}
+
+.project-form label {
+  color: #53645e;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.project-form__controls {
+  display: flex;
+  min-width: 0;
+  gap: 0.55rem;
+}
+
+.project-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 0.7rem 0.75rem;
+  color: #173332;
+  background: #fffef9;
+  border: 1px solid #c9d2c9;
+  border-radius: 0.65rem;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.primary-button,
+.link-button {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.primary-button {
+  flex: 0 0 auto;
+  padding: 0.65rem 0.85rem;
+  color: #fffdf6;
+  background: #164f4c;
+  border: 1px solid #164f4c;
+  border-radius: 0.65rem;
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.link-button {
+  justify-self: start;
+  padding: 0.2rem 0;
+  color: #23645e;
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.15rem;
+}
+
+.api-error,
+.empty-state,
+.api-footnote {
+  margin: 0.95rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.api-error {
+  padding: 0.75rem 0.8rem;
+  color: #7a341e;
+  background: #fff0dc;
+  border: 1px solid #e6b984;
+  border-radius: 0.7rem;
+}
+
+.empty-state,
+.api-footnote {
+  color: #61706b;
+}
+
+.bug-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.bug-row {
+  min-width: 0;
+  padding: 0.9rem;
+  background: #f2efe6;
+  border: 1px solid #ded8ca;
+  border-radius: 0.85rem;
+}
+
+.bug-row__heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.8rem 0.9rem;
-  color: #123b3a;
-  background: #dfece5;
-  border: 1px solid #c2d8cd;
-  font-size: 0.8rem;
+  color: #23645e;
+  font-size: 0.78rem;
 }
 
-.pwa-notice--warning {
-  color: #6c3b18;
-  background: #fff0dc;
-  border-color: #ecc89c;
-}
-
-.pwa-notice p {
-  margin-bottom: 0;
-}
-
-.text-button {
-  flex: 0 0 auto;
-  padding: 0.45rem 0.62rem;
-  color: inherit;
-  background: transparent;
-  border: 1px solid currentColor;
-  border-radius: 0.6rem;
-  cursor: pointer;
-  font-size: 0.75rem;
+.bug-state {
+  padding: 0.25rem 0.45rem;
+  color: #6e5a26;
+  background: #f8e8bc;
+  border-radius: 999px;
+  font-size: 0.68rem;
   font-weight: 800;
+}
+
+.bug-row h3 {
+  margin: 0.55rem 0 0.3rem;
+  color: #173332;
+  font-size: 0.95rem;
+}
+
+.bug-row p {
+  margin: 0;
+  color: #61706b;
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.api-footnote {
+  font-size: 0.7rem;
+}
+
+.next-slices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  color: #718079;
+  border-top: 1px solid #e1ddd2;
+  font-size: 0.7rem;
 }
 
 .boundary-card {

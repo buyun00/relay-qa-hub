@@ -1,5 +1,4 @@
 import react from "@vitejs/plugin-react";
-import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vitest/config";
 
 import packageJson from "./package.json" with { type: "json" };
@@ -7,65 +6,7 @@ import packageJson from "./package.json" with { type: "json" };
 const contractVersion = "1.0.0";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    VitePWA({
-      registerType: "prompt",
-      injectRegister: null,
-      includeAssets: [
-        "icons/qa-hub-192.svg",
-        "icons/qa-hub-512.svg",
-        "icons/qa-hub-maskable-512.svg",
-      ],
-      manifest: {
-        id: "/qa-hub",
-        name: "Relay QA Hub",
-        short_name: "QA Hub",
-        description: "Independent QA source of truth. Relay is an optional repair executor.",
-        lang: "zh-CN",
-        start_url: "/",
-        scope: "/",
-        display: "standalone",
-        background_color: "#f4f1e8",
-        theme_color: "#123b3a",
-        icons: [
-          {
-            src: "/icons/qa-hub-192.svg",
-            sizes: "192x192",
-            type: "image/svg+xml",
-            purpose: "any",
-          },
-          {
-            src: "/icons/qa-hub-512.svg",
-            sizes: "512x512",
-            type: "image/svg+xml",
-            purpose: "any",
-          },
-          {
-            src: "/icons/qa-hub-maskable-512.svg",
-            sizes: "512x512",
-            type: "image/svg+xml",
-            purpose: "maskable",
-          },
-        ],
-      },
-      workbox: {
-        cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: false,
-        globPatterns: ["**/*.{js,css,html,webmanifest}"],
-        navigateFallback: "/index.html",
-        navigateFallbackDenylist: [
-          /^\/api(?:\/|$)/,
-          /^\/attachments(?:\/|$)/,
-          /^\/auth(?:\/|$)/,
-          /^\/integrations(?:\/|$)/,
-          /^\/uploads(?:\/|$)/,
-        ],
-        runtimeCaching: [],
-      },
-    }),
-  ],
+  plugins: [react()],
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __CONTRACT_VERSION__: JSON.stringify(contractVersion),
@@ -78,6 +19,18 @@ export default defineConfig({
     host: "127.0.0.1",
     port: 4174,
     strictPort: true,
+    proxy: {
+      "/api": {
+        target: process.env.QA_HUB_API_BASE_URL ?? "http://127.0.0.1:4319",
+        changeOrigin: true,
+        configure(proxy) {
+          proxy.on("proxyReq", (proxyRequest) => {
+            const token = process.env.QA_HUB_MVP_ACCESS_TOKEN?.trim();
+            if (token) proxyRequest.setHeader("authorization", `Bearer ${token}`);
+          });
+        },
+      },
+    },
   },
   preview: {
     host: "127.0.0.1",
