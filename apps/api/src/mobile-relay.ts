@@ -14,6 +14,8 @@ export const MOBILE_RELAY_RECEIPT_PATH =
   "/api/v1/repair-attempts/:attemptId/relay-receipt" as const;
 export const MOBILE_REPAIR_ATTEMPT_ITEM_PATH =
   "/api/v1/repair-attempts/:attemptId" as const;
+export const MOBILE_REPAIR_ATTEMPT_START_PATH =
+  "/api/v1/repair-attempts/:attemptId/start" as const;
 export const MOBILE_REPAIR_ATTEMPT_DELIVER_PATH =
   "/api/v1/repair-attempts/:attemptId/deliver" as const;
 
@@ -51,6 +53,11 @@ export interface MobileRepairAttemptDeliveryRequest {
   readonly noCodeReason?: string;
 }
 
+export interface MobileRepairAttemptStartRequest {
+  readonly expectedVersion: number;
+  readonly reason?: string;
+}
+
 export interface MobileRelayDispatchRequest {
   readonly expectedVersion: number;
   readonly handoffId: string;
@@ -80,6 +87,22 @@ export interface MobileRelayStore {
     readonly actorId: string;
     readonly attemptId: string;
   }) => MobileManualRepairAttemptRecord | null | Promise<MobileManualRepairAttemptRecord | null>;
+  readonly startManualAttempt: (command: {
+    readonly actorId: string;
+    readonly attemptId: string;
+    readonly idempotencyKey: string;
+    readonly request: MobileRepairAttemptStartRequest;
+  }) => MobileManualRepairAttemptRecord | Promise<MobileManualRepairAttemptRecord>;
+  readonly deliverManualAttempt: (command: {
+    readonly actorId: string;
+    readonly attemptId: string;
+    readonly idempotencyKey: string;
+    readonly request: MobileRepairAttemptDeliveryRequest & {
+      readonly deliveryKind: "code";
+      readonly branch: string;
+      readonly commitSha: string;
+    };
+  }) => MobileManualRepairAttemptRecord | Promise<MobileManualRepairAttemptRecord>;
   readonly dispatchRelay: (command: {
     readonly actorId: string;
     readonly attemptId: string;
@@ -168,6 +191,21 @@ export function parseMobileManualRepairAttemptRequest(
     mode: "human",
     assigneeId: requireRelayUuid(body["assigneeId"], "assigneeId"),
     ...(summary === undefined ? {} : { summary }),
+  };
+}
+
+export function parseMobileRepairAttemptStartRequest(
+  value: unknown,
+): MobileRepairAttemptStartRequest {
+  const body = record(value);
+  onlyKeys(body, new Set(["expectedVersion", "reason"]));
+  const reason = body["reason"];
+  if (reason !== undefined && (typeof reason !== "string" || reason.length > 5_000)) {
+    throw new TypeError("reason is invalid");
+  }
+  return {
+    expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
+    ...(reason === undefined ? {} : { reason }),
   };
 }
 

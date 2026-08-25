@@ -38,7 +38,10 @@ import type {
   CompleteMobileRelayOutboxInput,
   CreateMobileManualRepairAttemptInput,
   CreateMobileRelayAttemptInput,
+  DeliverMobileRepairAttemptInput,
   DispatchMobileRelayInput,
+  LinkMobileBuildRepairInput,
+  LinkMobileBuildRepairResult,
   MobileRelayOutboxClaim,
   MobileRelayDispatchAccepted,
   MobileRelayReceipt,
@@ -49,6 +52,7 @@ import type {
   RetryMobileRelayOutboxInput,
   TransitionMobileBugInput,
   GetMobileManualRepairAttemptInput,
+  StartMobileRepairAttemptInput,
 } from "./mobile-relay-store.js";
 import type {
   ListMobileNotificationsInput,
@@ -282,6 +286,27 @@ export class SqliteStorageWorker {
       "getMobileManualRepairAttempt",
       input,
     );
+  }
+
+  async startMobileRepairAttempt(
+    input: StartMobileRepairAttemptInput,
+  ): Promise<MobileManualRepairAttemptRecord> {
+    await this.initialization;
+    return this.request<MobileManualRepairAttemptRecord>("startMobileRepairAttempt", input);
+  }
+
+  async deliverMobileRepairAttempt(
+    input: DeliverMobileRepairAttemptInput,
+  ): Promise<MobileManualRepairAttemptRecord> {
+    await this.initialization;
+    return this.request<MobileManualRepairAttemptRecord>("deliverMobileRepairAttempt", input);
+  }
+
+  async linkMobileBuildRepair(
+    input: LinkMobileBuildRepairInput,
+  ): Promise<LinkMobileBuildRepairResult> {
+    await this.initialization;
+    return this.request<LinkMobileBuildRepairResult>("linkMobileBuildRepair", input);
   }
 
   async dispatchMobileRelay(input: DispatchMobileRelayInput): Promise<MobileRelayDispatchAccepted> {

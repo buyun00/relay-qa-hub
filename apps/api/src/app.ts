@@ -42,6 +42,8 @@ import {
 import {
   MOBILE_BUILD_COLLECTION_PATH,
   MOBILE_BUILD_ITEM_PATH,
+  MOBILE_BUILD_LINK_REPAIR_PATH,
+  parseMobileLinkBuildRepairRequest,
   parseMobileRegisterBuildRequest,
   requireBuildIdempotencyKey,
   requireBuildUuid,
@@ -62,11 +64,13 @@ import {
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
   MOBILE_REPAIR_ATTEMPT_ITEM_PATH,
+  MOBILE_REPAIR_ATTEMPT_START_PATH,
   MOBILE_RELAY_DISPATCH_PATH,
   MOBILE_RELAY_RECEIPT_PATH,
   parseMobileBugReadyRequest,
   parseMobileRepairAttemptDeliveryRequest,
   parseMobileRepairAttemptRequest,
+  parseMobileRepairAttemptStartRequest,
   parseMobileRelayDispatchRequest,
   requireRelayIdempotencyKey,
   requireRelayUuid,
@@ -167,6 +171,12 @@ const unconfiguredMobileRelayStore: MobileRelayStore = {
     throw new Error("MobileRelayStore is not configured");
   },
   getManualAttempt: () => null,
+  startManualAttempt: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  deliverManualAttempt: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
   dispatchRelay: () => {
     throw new Error("MobileRelayStore is not configured");
   },
@@ -178,6 +188,9 @@ const unconfiguredMobileBuildStore: MobileBuildStore = {
     throw new Error("MobileBuildStore is not configured");
   },
   getBuild: () => null,
+  linkRepair: () => {
+    throw new Error("MobileBuildStore is not configured");
+  },
 };
 
 const unconfiguredMobileDuplicateStore: MobileDuplicateStore = {
@@ -550,6 +563,37 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
+  app.post<{ Params: { attemptId: string } }>(
+    MOBILE_REPAIR_ATTEMPT_START_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+        const body = parseMobileRepairAttemptStartRequest(request.body);
+        const idempotencyKey = requireRelayIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (
+          idempotencyKey !==
+          `workflow:startRepairAttempt:attempt:${attemptId}:v${body.expectedVersion}`
+        ) {
+          throw new TypeError("Idempotency-Key does not match RepairAttempt start");
+        }
+        const result = await mobileRelayStore.startManualAttempt({
+          actorId: debugActorId,
+          attemptId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
   app.get<{ Params: { attemptId: string } }>(
     MOBILE_REPAIR_ATTEMPT_ITEM_PATH,
     async (request, reply) => {
@@ -588,18 +632,23 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         ) {
           throw new TypeError("Idempotency-Key does not match RepairAttempt delivery");
         }
-        const attempt = await mobileRelayStore.getManualAttempt({
+        if (body.deliveryKind !== "code") {
+          return reply
+            .code(422)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "RELAY_DELIVERY_EVIDENCE_INVALID" });
+        }
+        const result = await mobileRelayStore.deliverManualAttempt({
           actorId: debugActorId,
           attemptId,
+          idempotencyKey,
+          request: body as typeof body & {
+            readonly deliveryKind: "code";
+            readonly branch: string;
+            readonly commitSha: string;
+          },
         });
-        if (attempt === null) return reply.code(404).send({ code: "NOT_FOUND" });
-        // The offline slice intentionally stops before lifecycle mutation.  A
-        // request that reaches here is structurally valid, but must not make a
-        // planned human attempt look delivered without the later evidence path.
-        return reply
-          .code(422)
-          .header("content-type", MOBILE_API_CONTENT_TYPE)
-          .send({ code: "GUARD_FAILED" });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
       } catch (error: unknown) {
         return relayErrorReply(error, reply);
       }
@@ -732,6 +781,37 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       return buildErrorReply(error, reply);
     }
   });
+
+  app.post<{ Params: { buildId: string } }>(
+    MOBILE_BUILD_LINK_REPAIR_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const buildId = requireBuildUuid(request.params.buildId, "buildId");
+        const body = parseMobileLinkBuildRepairRequest(request.body);
+        const idempotencyKey = requireBuildIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (
+          idempotencyKey !==
+          `build:link:${buildId}:attempt:${body.repairAttemptId}:v${body.expectedVersion}`
+        ) {
+          throw new TypeError("Idempotency-Key does not match Build repair link");
+        }
+        const result = await mobileBuildStore.linkRepair({
+          actorId: debugActorId,
+          buildId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return buildErrorReply(error, reply);
+      }
+    },
+  );
 
   app.get<{ Querystring: { limit?: string | string[] } }>(
     MOBILE_NOTIFICATION_LIST_PATH,

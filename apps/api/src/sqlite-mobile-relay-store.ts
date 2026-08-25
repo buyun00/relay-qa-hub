@@ -69,6 +69,33 @@ export function createSqliteMobileRelayStore(
       if (query.actorId !== options.scope.actorId) return null;
       return options.worker.getMobileManualRepairAttempt({ ...scope, attemptId: query.attemptId });
     },
+    async startManualAttempt(command) {
+      requireActor(command.actorId, options.scope);
+      return options.worker.startMobileRepairAttempt({
+        ...scope,
+        attemptId: command.attemptId,
+        expectedVersion: command.request.expectedVersion,
+        reason: command.request.reason ?? null,
+        idempotencyKey: command.idempotencyKey,
+        requestDigest: digest(command.request),
+        createdAt: now().toISOString(),
+      });
+    },
+    async deliverManualAttempt(command) {
+      requireActor(command.actorId, options.scope);
+      return options.worker.deliverMobileRepairAttempt({
+        ...scope,
+        attemptId: command.attemptId,
+        expectedVersion: command.request.expectedVersion,
+        summary: command.request.summary,
+        branch: command.request.branch,
+        commitSha: command.request.commitSha,
+        mergeRequestUrl: command.request.mergeRequestUrl ?? null,
+        idempotencyKey: command.idempotencyKey,
+        requestDigest: digest(command.request),
+        createdAt: now().toISOString(),
+      });
+    },
     async dispatchRelay(command) {
       requireActor(command.actorId, options.scope);
       return options.worker.dispatchMobileRelay({

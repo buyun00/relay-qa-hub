@@ -1,5 +1,6 @@
 export const MOBILE_BUILD_COLLECTION_PATH = "/api/v1/projects/:projectId/builds" as const;
 export const MOBILE_BUILD_ITEM_PATH = "/api/v1/builds/:buildId" as const;
+export const MOBILE_BUILD_LINK_REPAIR_PATH = "/api/v1/builds/:buildId/link-repair" as const;
 
 export interface MobileRegisterBuildRequest {
   readonly provider: "manual";
@@ -18,6 +19,16 @@ export interface MobileRegisterBuildRequest {
     readonly artifactSha256: string;
     readonly providerPayloadDigest?: string;
   };
+  readonly repairAttemptId?: string;
+}
+
+export interface MobileLinkBuildRepairRequest {
+  readonly expectedVersion: number;
+  readonly expectedBugVersion?: number;
+  readonly expectedBuildRequirementVersion?: number;
+  readonly repairAttemptId: string;
+  readonly deliveredCommitSha: string;
+  readonly evidenceType: "manifest";
 }
 
 export interface MobileBuildStore {
@@ -31,6 +42,12 @@ export interface MobileBuildStore {
     readonly actorId: string;
     readonly buildId: string;
   }) => unknown | null | Promise<unknown | null>;
+  readonly linkRepair: (command: {
+    readonly actorId: string;
+    readonly buildId: string;
+    readonly idempotencyKey: string;
+    readonly request: MobileLinkBuildRepairRequest;
+  }) => unknown | Promise<unknown>;
 }
 
 const UUID_PATTERN =
@@ -125,6 +142,7 @@ export function parseMobileRegisterBuildRequest(value: unknown): MobileRegisterB
       "resourceVersion",
       "downloadUrl",
       "manifest",
+      "repairAttemptId",
     ]),
   );
   if (body["provider"] !== "manual") throw new TypeError("provider must be manual");
@@ -165,5 +183,58 @@ export function parseMobileRegisterBuildRequest(value: unknown): MobileRegisterB
         ? {}
         : { providerPayloadDigest: sha256(providerPayloadDigest, "manifest.providerPayloadDigest") }),
     },
+    ...(body["repairAttemptId"] === undefined
+      ? {}
+      : { repairAttemptId: requireBuildUuid(body["repairAttemptId"], "repairAttemptId") }),
+  };
+}
+
+export function parseMobileLinkBuildRepairRequest(value: unknown): MobileLinkBuildRepairRequest {
+  const body = record(value);
+  onlyKeys(
+    body,
+    new Set([
+      "expectedVersion",
+      "expectedBugVersion",
+      "expectedBuildRequirementVersion",
+      "repairAttemptId",
+      "deliveredCommitSha",
+      "evidenceType",
+    ]),
+  );
+  if (body["evidenceType"] !== "manifest") {
+    throw new TypeError("evidenceType must be manifest");
+  }
+  const version = body["expectedVersion"];
+  if (!Number.isSafeInteger(version) || (version as number) < 1) {
+    throw new TypeError("expectedVersion must be a positive integer");
+  }
+  const optionalVersion = (candidate: unknown, label: string): number | undefined => {
+    if (candidate === undefined) return undefined;
+    if (!Number.isSafeInteger(candidate) || (candidate as number) < 1) {
+      throw new TypeError(`${label} must be a positive integer`);
+    }
+    return candidate as number;
+  };
+  const deliveredCommitSha = commitSha(body["deliveredCommitSha"], "deliveredCommitSha");
+  return {
+    expectedVersion: version as number,
+    ...(optionalVersion(body["expectedBugVersion"], "expectedBugVersion") === undefined
+      ? {}
+      : {
+          expectedBugVersion: optionalVersion(body["expectedBugVersion"], "expectedBugVersion")!,
+        }),
+    ...(optionalVersion(body["expectedBuildRequirementVersion"], "expectedBuildRequirementVersion") ===
+    undefined
+      ? {}
+      : {
+          expectedBuildRequirementVersion: optionalVersion(
+            body["expectedBuildRequirementVersion"],
+            "expectedBuildRequirementVersion",
+          )!,
+        }),
+    repairAttemptId: requireBuildUuid(body["repairAttemptId"], "repairAttemptId"),
+    deliveredCommitSha,
+    evidenceType: "manifest",
   };
 }

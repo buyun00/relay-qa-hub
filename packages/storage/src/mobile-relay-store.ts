@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
 import type { MobileBugRecord, MobileScopeBootstrap } from "./mobile-bug-store.js";
+import type { MobileBuildRecord } from "./mobile-build-store.js";
 
 export const MOBILE_FAKE_RELAY_INSTANCE_ID = "fake-relay-local" as const;
 export const MOBILE_FAKE_RELAY_PRINCIPAL_ID = "10000000-0000-4000-8000-000000000007" as const;
@@ -67,6 +68,27 @@ export interface CreateMobileManualRepairAttemptInput extends MobileRelayScope {
   readonly createdAt: string;
 }
 
+export interface StartMobileRepairAttemptInput extends MobileRelayScope {
+  readonly attemptId: string;
+  readonly expectedVersion: number;
+  readonly reason: string | null;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
+export interface DeliverMobileRepairAttemptInput extends MobileRelayScope {
+  readonly attemptId: string;
+  readonly expectedVersion: number;
+  readonly summary: string;
+  readonly branch: string;
+  readonly commitSha: string;
+  readonly mergeRequestUrl: string | null;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
 export interface MobileRepairAttemptRecord {
   readonly id: string;
   readonly bugId: string;
@@ -88,15 +110,80 @@ export interface MobileManualRepairAttemptRecord {
   readonly bugId: string;
   readonly sequence: number;
   readonly mode: "human";
-  readonly status: "planned";
+  readonly status: "planned" | "running" | "delivered";
   readonly assigneeId: string;
   readonly parentAttemptId: null;
   readonly summary: string | null;
-  readonly branch: null;
-  readonly commitSha: null;
-  readonly mergeRequestUrl: null;
+  readonly branch: string | null;
+  readonly commitSha: string | null;
+  readonly mergeRequestUrl: string | null;
   readonly targetBuildId: null;
+  readonly version: number;
+}
+
+export interface MobileBuildRequirementRecord {
+  readonly id: string;
+  readonly projectId: string;
+  readonly bugId: string;
+  readonly repairAttemptId: string;
+  readonly sourceDeliveryVersion: number;
+  readonly deliveredCommitSha: string | null;
+  readonly requirement: "required" | "not_required";
+  readonly decisionBasis:
+    | "code_requires_build"
+    | "no_code_delivery"
+    | "authorized_no_build_exemption";
+  readonly decisionReason: string | null;
+  readonly decisionActorId: string;
+  readonly decisionAuditEventId: string;
+  readonly linkedBuildId: string | null;
+  readonly linkId: string | null;
+  readonly policyVersion: "1.0.0";
+  readonly bugVersionAtDelivery: number;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+  readonly version: 1 | 2;
+}
+
+export interface MobileBuildRepairLinkRecord {
+  readonly id: string;
+  readonly buildId: string;
+  readonly repairAttemptId: string;
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly buildRequirementId: string;
+  readonly buildRequirementVersion: 2;
+  readonly deliveredCommitSha: string;
+  readonly evidenceType: "manifest" | "release_manager_override";
+  readonly evidenceDecision: "manifest_verified" | "release_manager_authorized";
+  readonly overrideReason: string | null;
+  readonly evidenceActorId: string;
+  readonly evidenceAuditEventId: string;
+  readonly evidencePolicyVersion: "1.0.0";
+  readonly linkedAt: string;
   readonly version: 1;
+}
+
+export interface LinkMobileBuildRepairInput extends MobileRelayScope {
+  readonly buildId: string;
+  readonly expectedVersion: number;
+  readonly expectedBugVersion?: number;
+  readonly expectedBuildRequirementVersion?: number;
+  readonly repairAttemptId: string;
+  readonly deliveredCommitSha: string;
+  readonly evidenceType: "manifest";
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
+export interface LinkMobileBuildRepairResult {
+  readonly build: MobileBuildRecord;
+  readonly bug: MobileBugRecord;
+  readonly buildRequirement: MobileBuildRequirementRecord;
+  readonly repairLink: MobileBuildRepairLinkRecord;
+  readonly eventId: string;
+  readonly replayed: boolean;
 }
 
 export interface GetMobileManualRepairAttemptInput extends MobileRelayScope {
@@ -255,6 +342,10 @@ interface AttemptRow {
   readonly commit_sha: string | null;
   readonly merge_request_url: string | null;
   readonly target_build_id: string | null;
+  readonly patch_url?: string | null;
+  readonly no_code_reason?: string | null;
+  readonly failure_reason?: string | null;
+  readonly updated_at?: string;
   readonly version: number;
   readonly bug_key?: string;
   readonly bug_version?: number;
@@ -684,10 +775,13 @@ function toAttempt(row: AttemptRow): MobileRepairAttemptRecord {
 }
 
 function toManualAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
-  if (row.mode !== "human" || row.status !== "planned" || row.version !== 1) {
+  if (
+    row.mode !== "human" ||
+    (row.status !== "planned" && row.status !== "running" && row.status !== "delivered")
+  ) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
-      "RepairAttempt is not a planned human attempt",
+      "RepairAttempt is not a supported human attempt",
     );
   }
   return Object.freeze({
@@ -695,15 +789,15 @@ function toManualAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     bugId: row.bug_id,
     sequence: row.sequence,
     mode: "human",
-    status: "planned",
+    status: row.status,
     assigneeId: row.assignee_id,
     parentAttemptId: null,
     summary: row.summary,
-    branch: null,
-    commitSha: null,
-    mergeRequestUrl: null,
+    branch: row.branch,
+    commitSha: row.commit_sha,
+    mergeRequestUrl: row.merge_request_url,
     targetBuildId: null,
-    version: 1,
+    version: row.version,
   });
 }
 
@@ -889,6 +983,581 @@ export function getMobileManualRepairAttempt(
     )
     .get(input.accountId, input.projectId, input.attemptId) as AttemptRow | undefined;
   return row ? toManualAttempt(row) : null;
+}
+
+function readManualWorkflowAttempt(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  attemptId: string,
+): (AttemptRow & { readonly updated_at: string; readonly bug_version: number; readonly bug_state: string }) | null {
+  const row = database
+    .prepare(
+      `SELECT attempt.id, attempt.bug_id, attempt.sequence, attempt.mode, attempt.status,
+              attempt.assignee_id, attempt.parent_attempt_id, attempt.summary, attempt.branch,
+              attempt.commit_sha, attempt.merge_request_url, attempt.patch_url,
+              attempt.no_code_reason, attempt.target_build_id, attempt.failure_reason,
+              attempt.updated_at, attempt.version, bug.version AS bug_version,
+              bug.state AS bug_state
+       FROM repair_attempts AS attempt
+       JOIN bugs AS bug
+         ON bug.account_id = attempt.account_id
+        AND bug.project_id = attempt.project_id
+        AND bug.id = attempt.bug_id
+        AND bug.active_repair_attempt_id = attempt.id
+       WHERE attempt.account_id = ? AND attempt.project_id = ?
+         AND attempt.id = ? AND attempt.mode = 'human'`,
+    )
+    .get(input.accountId, input.projectId, attemptId) as
+    | (AttemptRow & {
+        readonly updated_at: string;
+        readonly bug_version: number;
+        readonly bug_state: string;
+      })
+    | undefined;
+  return row ?? null;
+}
+
+function nextAttemptAggregateSequence(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  attemptId: string,
+): number {
+  const row = database
+    .prepare(
+      `SELECT COALESCE(MAX(aggregate_sequence), 0) + 1 AS next_sequence
+       FROM events
+       WHERE account_id = ? AND project_id = ?
+         AND aggregate_type = 'repair_attempt' AND aggregate_id = ?`,
+    )
+    .get(input.accountId, input.projectId, attemptId) as { readonly next_sequence: number };
+  return row.next_sequence;
+}
+
+function requireWorkflowText(value: string, field: string, max: number): void {
+  if (value.trim().length === 0 || value.length > max) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", `${field} is invalid`);
+  }
+}
+
+function requireWorkflowCommit(value: string): void {
+  if (!COMMIT_PATTERN.test(value)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "commitSha is invalid");
+  }
+}
+
+export function startMobileRepairAttempt(
+  database: DatabaseSync,
+  input: StartMobileRepairAttemptInput,
+): MobileManualRepairAttemptRecord {
+  requireTransaction(database);
+  const attempt = readManualWorkflowAttempt(database, input, input.attemptId);
+  if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
+  if (attempt.version !== input.expectedVersion || attempt.status !== "planned") {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt is not planned at the expected version",
+    );
+  }
+  if (input.reason !== null) requireWorkflowText(input.reason, "reason", 5_000);
+  const at = nextTimestamp(input.createdAt, attempt.updated_at);
+  const eventId = randomUUID();
+  const payload: Record<string, unknown> = {
+    status: "running",
+    repairAttemptId: attempt.id,
+    fromVersion: attempt.version,
+    toVersion: attempt.version + 1,
+  };
+  if (input.reason !== null) payload.reason = input.reason;
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: attempt.bug_id,
+    type: "repair_attempt.started",
+    aggregateType: "repair_attempt",
+    aggregateId: attempt.id,
+    aggregateSequence: nextAttemptAggregateSequence(database, input, attempt.id),
+    resourceType: "repair_attempt",
+    resourceId: attempt.id,
+    resourceVersionAfter: attempt.version + 1,
+    correlationId: randomUUID(),
+    fromState: null,
+    toState: null,
+    payload,
+    createdAt: at,
+  });
+  const updated = database
+    .prepare(
+      `UPDATE repair_attempts
+       SET status = 'running', updated_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND status = 'planned' AND version = ?`,
+    )
+    .run(at, input.accountId, input.projectId, attempt.id, input.expectedVersion);
+  if (updated.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt did not start exactly once");
+  }
+  const row = database
+    .prepare(
+      `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
+              summary, branch, commit_sha, merge_request_url, target_build_id, version
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, attempt.id) as AttemptRow | undefined;
+  if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt disappeared after start");
+  return toManualAttempt(row);
+}
+
+export function deliverMobileRepairAttempt(
+  database: DatabaseSync,
+  input: DeliverMobileRepairAttemptInput,
+): MobileManualRepairAttemptRecord {
+  requireTransaction(database);
+  requireWorkflowText(input.summary, "summary", 10_000);
+  requireWorkflowText(input.branch, "branch", 300);
+  requireWorkflowCommit(input.commitSha);
+  if (input.mergeRequestUrl !== null) requireWorkflowText(input.mergeRequestUrl, "mergeRequestUrl", 4_000);
+  const attempt = readManualWorkflowAttempt(database, input, input.attemptId);
+  if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
+  if (attempt.version !== input.expectedVersion || attempt.status !== "running") {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt is not running at the expected version",
+    );
+  }
+  if (attempt.bug_state !== "in_progress") {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug is not in progress for delivery");
+  }
+  const at = nextTimestamp(input.createdAt, attempt.updated_at);
+  const requirementId = randomUUID();
+  const eventId = randomUUID();
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: attempt.bug_id,
+    type: "repair_attempt.delivered",
+    aggregateType: "repair_attempt",
+    aggregateId: attempt.id,
+    aggregateSequence: nextAttemptAggregateSequence(database, input, attempt.id),
+    resourceType: "build_requirement",
+    resourceId: requirementId,
+    resourceVersionAfter: 1,
+    correlationId: randomUUID(),
+    fromState: "in_progress",
+    toState: "awaiting_build",
+    payload: {
+      status: "delivered",
+      repairAttemptId: attempt.id,
+      commitSha: input.commitSha,
+      fromVersion: attempt.version,
+      toVersion: attempt.version + 1,
+    },
+    createdAt: at,
+  });
+  const updatedAttempt = database
+    .prepare(
+      `UPDATE repair_attempts
+       SET status = 'delivered', summary = ?, branch = ?, commit_sha = ?,
+           merge_request_url = ?, patch_url = NULL, no_code_reason = NULL,
+           target_build_id = NULL, updated_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND status = 'running' AND version = ?`,
+    )
+    .run(
+      input.summary,
+      input.branch,
+      input.commitSha,
+      input.mergeRequestUrl,
+      at,
+      input.accountId,
+      input.projectId,
+      attempt.id,
+      input.expectedVersion,
+    );
+  if (updatedAttempt.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt did not deliver exactly once");
+  }
+  database
+    .prepare(
+      `INSERT INTO build_requirements(
+        id, account_id, project_id, bug_id, repair_attempt_id,
+        source_delivery_version, delivered_commit_sha, requirement, decision_basis,
+        decision_reason, decision_actor_id, decision_audit_event_id,
+        delivery_request_digest, policy_version, bug_version_at_delivery,
+        created_at, updated_at, version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'required', 'code_requires_build',
+                NULL, ?, ?, ?, '1.0.0', ?, ?, ?, 1)`,
+    )
+    .run(
+      requirementId,
+      input.accountId,
+      input.projectId,
+      attempt.bug_id,
+      attempt.id,
+      attempt.version + 1,
+      input.commitSha,
+      input.actorId,
+      eventId,
+      input.requestDigest,
+      attempt.bug_version + 1,
+      at,
+      at,
+    );
+  const updatedBug = database
+    .prepare(
+      `UPDATE bugs
+       SET state = 'awaiting_build', updated_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ? AND state = 'in_progress'
+         AND version = ? AND active_repair_attempt_id = ?`,
+    )
+    .run(at, input.accountId, input.projectId, attempt.bug_id, attempt.bug_version, attempt.id);
+  if (updatedBug.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug did not enter awaiting_build exactly once");
+  }
+  const row = database
+    .prepare(
+      `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
+              summary, branch, commit_sha, merge_request_url, target_build_id, version
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, attempt.id) as AttemptRow | undefined;
+  if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt disappeared after delivery");
+  return toManualAttempt(row);
+}
+
+interface LinkBuildRow {
+  readonly id: string;
+  readonly project_id: string;
+  readonly provider: "manual" | "ozdqp" | "custom";
+  readonly external_id: string;
+  readonly version_name: string;
+  readonly channel: string;
+  readonly project_key: string;
+  readonly branch: string;
+  readonly source_commit_sha: string;
+  readonly mode: "full" | "hot_update" | "cdn" | "debug" | "other";
+  readonly status: "registered" | "queued" | "building" | "validating" | "publishing" | "ready" | "failed";
+  readonly manifest_json: string;
+  readonly artifact_sha256: string | null;
+  readonly download_url: string | null;
+  readonly version: number;
+  readonly updated_at: string;
+}
+
+function toLinkedBuild(row: LinkBuildRow): MobileBuildRecord {
+  let manifest: { readonly commitShas: readonly string[]; readonly artifactSha256: string | null };
+  try {
+    const decoded = JSON.parse(row.manifest_json) as {
+      readonly commitShas?: unknown;
+      readonly artifactSha256?: unknown;
+    };
+    if (
+      !Array.isArray(decoded.commitShas) ||
+      decoded.commitShas.some((value) => typeof value !== "string") ||
+      (decoded.artifactSha256 !== undefined && typeof decoded.artifactSha256 !== "string")
+    ) {
+      throw new Error("invalid manifest");
+    }
+    manifest = {
+      commitShas: decoded.commitShas as readonly string[],
+      artifactSha256: (decoded.artifactSha256 as string | undefined) ?? null,
+    };
+  } catch {
+    throw new MobileRelayStorageError("BUILD_IDENTITY_MISMATCH", "Build manifest JSON is invalid");
+  }
+  return Object.freeze({
+    id: row.id,
+    projectId: row.project_id,
+    provider: row.provider,
+    externalId: row.external_id,
+    versionName: row.version_name,
+    channel: row.channel,
+    projectKey: row.project_key,
+    branch: row.branch,
+    sourceCommitSha: row.source_commit_sha,
+    mode: row.mode,
+    status: row.status,
+    manifest: Object.freeze({
+      commitShas: Object.freeze([...manifest.commitShas]),
+      artifactSha256: manifest.artifactSha256,
+    }),
+    artifactSha256: row.artifact_sha256,
+    downloadUrl: row.download_url,
+    version: row.version,
+  });
+}
+
+function latestWorkflowFloor(values: readonly string[]): string {
+  const timestamps = values.map((value) => Date.parse(value));
+  if (timestamps.some((value) => !Number.isFinite(value))) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "workflow timestamp is invalid");
+  }
+  return new Date(Math.max(...timestamps)).toISOString();
+}
+
+function readBuildRequirement(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  attemptId: string,
+): (MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string }) | null {
+  const row = database
+    .prepare(
+      `SELECT id, project_id AS projectId, bug_id AS bugId,
+              repair_attempt_id AS repairAttemptId,
+              source_delivery_version AS sourceDeliveryVersion,
+              delivered_commit_sha AS deliveredCommitSha, requirement,
+              decision_basis AS decisionBasis, decision_reason AS decisionReason,
+              decision_actor_id AS decisionActorId,
+              decision_audit_event_id AS decisionAuditEventId,
+              linked_build_id AS linkedBuildId, link_id AS linkId,
+              policy_version AS policyVersion,
+              bug_version_at_delivery AS bugVersionAtDelivery,
+              created_at, updated_at, version
+       FROM build_requirements
+       WHERE account_id = ? AND project_id = ? AND repair_attempt_id = ?`,
+    )
+    .get(input.accountId, input.projectId, attemptId) as
+    | (MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string })
+    | undefined;
+  return row ?? null;
+}
+
+function toBuildRequirement(row: MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string }): MobileBuildRequirementRecord {
+  return Object.freeze({
+    id: row.id,
+    projectId: row.projectId,
+    bugId: row.bugId,
+    repairAttemptId: row.repairAttemptId,
+    sourceDeliveryVersion: row.sourceDeliveryVersion,
+    deliveredCommitSha: row.deliveredCommitSha,
+    requirement: row.requirement,
+    decisionBasis: row.decisionBasis,
+    decisionReason: row.decisionReason,
+    decisionActorId: row.decisionActorId,
+    decisionAuditEventId: row.decisionAuditEventId,
+    linkedBuildId: row.linkedBuildId,
+    linkId: row.linkId,
+    policyVersion: "1.0.0",
+    bugVersionAtDelivery: row.bugVersionAtDelivery,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    version: row.version,
+  });
+}
+
+export function linkMobileBuildRepair(
+  database: DatabaseSync,
+  input: LinkMobileBuildRepairInput,
+): LinkMobileBuildRepairResult {
+  requireTransaction(database);
+  requireWorkflowCommit(input.deliveredCommitSha);
+  if (input.evidenceType !== "manifest") {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "the mobile link slice requires manifest evidence");
+  }
+  const build = database
+    .prepare(
+      `SELECT id, project_id, provider, external_id, version_name, channel,
+              project_key, branch, source_commit_sha, mode, status, manifest_json,
+              artifact_sha256, download_url, version, updated_at
+       FROM builds
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.buildId) as LinkBuildRow | undefined;
+  if (!build) throw new MobileRelayStorageError("NOT_FOUND", "Build was not found");
+  if (build.status !== "ready" || build.version !== input.expectedVersion) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Build is not ready at the expected version");
+  }
+  if (build.source_commit_sha !== input.deliveredCommitSha) {
+    throw new MobileRelayStorageError(
+      "BUILD_IDENTITY_MISMATCH",
+      "Build source commit does not match the delivered RepairAttempt commit",
+    );
+  }
+  const attempt = readManualWorkflowAttempt(database, input, input.repairAttemptId);
+  if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
+  if (attempt.status !== "delivered" || attempt.version !== 3) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt is not delivered at version three");
+  }
+  if (attempt.commit_sha !== input.deliveredCommitSha) {
+    throw new MobileRelayStorageError(
+      "BUILD_IDENTITY_MISMATCH",
+      "Build link commit does not match the delivered RepairAttempt commit",
+    );
+  }
+  if (input.expectedBugVersion !== undefined && input.expectedBugVersion !== attempt.bug_version) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug version is stale");
+  }
+  const requirement = readBuildRequirement(database, input, attempt.id);
+  if (!requirement) throw new MobileRelayStorageError("NOT_FOUND", "BuildRequirement was not found");
+  if (
+    requirement.version !== 1 ||
+    requirement.requirement !== "required" ||
+    requirement.decisionBasis !== "code_requires_build" ||
+    requirement.deliveredCommitSha !== input.deliveredCommitSha
+  ) {
+    throw new MobileRelayStorageError("BUILD_IDENTITY_MISMATCH", "BuildRequirement commit is not exact");
+  }
+  if (
+    input.expectedBuildRequirementVersion !== undefined &&
+    input.expectedBuildRequirementVersion !== requirement.version
+  ) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "BuildRequirement version is stale");
+  }
+  if (attempt.bug_state !== "awaiting_build") {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug is not awaiting a Build");
+  }
+  const manifestCommit = database
+    .prepare(
+      `SELECT 1 AS present
+       FROM build_manifest_commits
+       WHERE account_id = ? AND project_id = ? AND build_id = ? AND commit_sha = ?`,
+    )
+    .get(input.accountId, input.projectId, build.id, input.deliveredCommitSha) as
+    | { readonly present: number }
+    | undefined;
+  if (!manifestCommit) {
+    throw new MobileRelayStorageError(
+      "BUILD_IDENTITY_MISMATCH",
+      "Build manifest does not contain the delivered commit",
+    );
+  }
+  const at = nextTimestamp(
+    input.createdAt,
+    latestWorkflowFloor([attempt.updated_at, requirement.updated_at, build.updated_at]),
+  );
+  const buildAt = nextTimestamp(at, build.updated_at);
+  const linkId = randomUUID();
+  const eventId = randomUUID();
+  database
+    .prepare(
+      `UPDATE build_requirements
+       SET linked_build_id = ?, link_id = ?, updated_at = ?, version = 2
+       WHERE account_id = ? AND project_id = ? AND id = ? AND version = 1`,
+    )
+    .run(build.id, linkId, at, input.accountId, input.projectId, requirement.id);
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    bugId: attempt.bug_id,
+    type: "build.repair_linked",
+    aggregateType: "repair_attempt",
+    aggregateId: attempt.id,
+    aggregateSequence: nextAttemptAggregateSequence(database, input, attempt.id),
+    resourceType: "build_repair_link",
+    resourceId: linkId,
+    resourceVersionAfter: 1,
+    correlationId: randomUUID(),
+    fromState: "awaiting_build",
+    toState: "ready_for_verification",
+    payload: {
+      status: "ready_for_verification",
+      repairAttemptId: attempt.id,
+      buildId: build.id,
+      commitSha: input.deliveredCommitSha,
+      fromVersion: build.version,
+      toVersion: build.version + 1,
+    },
+    createdAt: at,
+  });
+  database
+    .prepare(
+      `INSERT INTO build_repair_links(
+        id, account_id, project_id, bug_id, repair_attempt_id, build_id,
+        build_requirement_id, build_requirement_version, delivered_commit_sha,
+        evidence_type, evidence_decision, override_reason, evidence_actor_id,
+        evidence_audit_event_id, evidence_policy_version, linked_at, version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 2, ?, 'manifest', 'manifest_verified', NULL,
+                ?, ?, '1.0.0', ?, 1)`,
+    )
+    .run(
+      linkId,
+      input.accountId,
+      input.projectId,
+      attempt.bug_id,
+      attempt.id,
+      build.id,
+      requirement.id,
+      input.deliveredCommitSha,
+      input.actorId,
+      eventId,
+      at,
+    );
+  const updatedBuild = database
+    .prepare(
+      `UPDATE builds
+       SET updated_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND status = 'ready' AND version = ?`,
+    )
+    .run(buildAt, input.accountId, input.projectId, build.id, input.expectedVersion);
+  if (updatedBuild.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Build did not link exactly once");
+  }
+  const updatedBug = database
+    .prepare(
+      `UPDATE bugs
+       SET state = 'ready_for_verification', updated_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ? AND state = 'awaiting_build'
+         AND version = ? AND active_repair_attempt_id = ?`,
+    )
+    .run(at, input.accountId, input.projectId, attempt.bug_id, attempt.bug_version, attempt.id);
+  if (updatedBug.changes !== 1) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug did not enter ready_for_verification exactly once");
+  }
+  const linkedBuild = database
+    .prepare(
+      `SELECT id, project_id, provider, external_id, version_name, channel,
+              project_key, branch, source_commit_sha, mode, status, manifest_json,
+              artifact_sha256, download_url, version, updated_at
+       FROM builds WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, build.id) as LinkBuildRow | undefined;
+  const linkedRequirement = database
+    .prepare(
+      `SELECT id, project_id AS projectId, bug_id AS bugId,
+              repair_attempt_id AS repairAttemptId,
+              source_delivery_version AS sourceDeliveryVersion,
+              delivered_commit_sha AS deliveredCommitSha, requirement,
+              decision_basis AS decisionBasis, decision_reason AS decisionReason,
+              decision_actor_id AS decisionActorId,
+              decision_audit_event_id AS decisionAuditEventId,
+              linked_build_id AS linkedBuildId, link_id AS linkId,
+              policy_version AS policyVersion,
+              bug_version_at_delivery AS bugVersionAtDelivery,
+              created_at, updated_at, version
+       FROM build_requirements WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, requirement.id) as
+    | (MobileBuildRequirementRecord & { readonly created_at: string; readonly updated_at: string })
+    | undefined;
+  const linkedLink = database
+    .prepare(
+      `SELECT id, build_id AS buildId, repair_attempt_id AS repairAttemptId,
+              bug_id AS bugId, project_id AS projectId,
+              build_requirement_id AS buildRequirementId,
+              build_requirement_version AS buildRequirementVersion,
+              delivered_commit_sha AS deliveredCommitSha,
+              evidence_type AS evidenceType, evidence_decision AS evidenceDecision,
+              override_reason AS overrideReason, evidence_actor_id AS evidenceActorId,
+              evidence_audit_event_id AS evidenceAuditEventId,
+              evidence_policy_version AS evidencePolicyVersion,
+              linked_at AS linkedAt, version
+       FROM build_repair_links WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, linkId) as MobileBuildRepairLinkRecord | undefined;
+  const linkedBug = readBugRow(database, input, attempt.bug_id);
+  if (!linkedBuild || !linkedRequirement || !linkedLink || !linkedBug) {
+    throw new MobileRelayStorageError("NOT_FOUND", "Build link projection is incomplete");
+  }
+  return Object.freeze({
+    build: toLinkedBuild(linkedBuild),
+    bug: toBug(linkedBug),
+    buildRequirement: toBuildRequirement(linkedRequirement),
+    repairLink: Object.freeze({ ...linkedLink }),
+    eventId,
+    replayed: false,
+  });
 }
 
 function scopeDigest(input: MobileRelayScope): string {

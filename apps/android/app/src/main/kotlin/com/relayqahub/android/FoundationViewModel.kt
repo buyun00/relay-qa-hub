@@ -53,6 +53,7 @@ data class FoundationUiState(
     val inbox: InboxUiState = InboxUiState(),
     val bugWorkbench: BugWorkbenchUiState = BugWorkbenchUiState(),
     val manualRepair: ManualRepairUiState = ManualRepairUiState(),
+    val humanRepairBuild: HumanRepairBuildUiState = HumanRepairBuildUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
 )
 
@@ -102,6 +103,17 @@ data class ManualRepairUiState(
     val errorCode: String? = null,
 )
 
+data class HumanRepairBuildUiState(
+    val phase: String = "idle",
+    val attemptId: String? = null,
+    val deliveredCommitSha: String? = null,
+    val buildId: String? = null,
+    val buildStatus: String? = null,
+    val bugState: String? = null,
+    val wrongShaRejectionCode: String? = null,
+    val errorCode: String? = null,
+)
+
 private data class ScopeUiValues(
     val accountName: String,
     val projectName: String,
@@ -114,6 +126,7 @@ private data class DeliveryUiValues(
     val inbox: InboxUiState,
     val bugWorkbench: BugWorkbenchUiState,
     val manualRepair: ManualRepairUiState,
+    val humanRepairBuild: HumanRepairBuildUiState,
 )
 
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
@@ -125,6 +138,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val inbox = MutableStateFlow(InboxUiState())
     private val bugWorkbench = MutableStateFlow(BugWorkbenchUiState())
     private val manualRepair = MutableStateFlow(ManualRepairUiState())
+    private val humanRepairBuild = MutableStateFlow(HumanRepairBuildUiState())
     private val duplicateCandidates = MutableStateFlow(DuplicateCandidateUiState())
 
     private val scopeState = combine(
@@ -146,12 +160,14 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         inbox,
         bugWorkbench,
         manualRepair,
-    ) { projection, inboxState, workbenchState, manualRepairState ->
+        humanRepairBuild,
+    ) { projection, inboxState, workbenchState, manualRepairState, humanRepairBuildState ->
         DeliveryUiValues(
             buildProjection = projection,
             inbox = inboxState,
             bugWorkbench = workbenchState,
             manualRepair = manualRepairState,
+            humanRepairBuild = humanRepairBuildState,
         )
     }
 
@@ -179,6 +195,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             inbox = delivery.inbox,
             bugWorkbench = delivery.bugWorkbench,
             manualRepair = delivery.manualRepair,
+            humanRepairBuild = delivery.humanRepairBuild,
             duplicateCandidates = duplicateState,
         )
     }.stateIn(
@@ -460,6 +477,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
             manualRepair.value = ManualRepairUiState(phase = "loading")
+            humanRepairBuild.value = HumanRepairBuildUiState()
             lastAction.value = "Creating a Relay-independent human RepairAttempt…"
             runCatching {
                 appContainer.scopedRepository.seedFoundationScope(scope)
@@ -529,6 +547,67 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private fun setManualRepairFailure(code: String) {
         manualRepair.value = ManualRepairUiState(phase = "failed", errorCode = code)
         lastAction.value = "Human RepairAttempt failed: $code."
+    }
+
+    fun deliverManualRepairAndLinkBuild() {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                setHumanRepairBuildFailure("DEBUG_ACCESS_TOKEN_MISSING")
+                return@launch
+            }
+            val attemptId = manualRepair.value.attemptId
+            if (manualRepair.value.phase != "loaded" || attemptId.isNullOrBlank()) {
+                setHumanRepairBuildFailure("MANUAL_REPAIR_ATTEMPT_MISSING")
+                return@launch
+            }
+            humanRepairBuild.value = HumanRepairBuildUiState(
+                phase = "loading",
+                attemptId = attemptId,
+            )
+            lastAction.value = "Delivering the human repair and linking an exact QA Build…"
+            runCatching {
+                appContainer.repairAttemptClient.deliverAndLinkManualBuild(
+                    projectId = scope.projectId,
+                    projectKey = FOUNDATION_PROJECT_KEY,
+                    attemptId = attemptId,
+                    accessToken = accessToken,
+                )
+            }.onSuccess { result ->
+                humanRepairBuild.value = HumanRepairBuildUiState(
+                    phase = "linked",
+                    attemptId = result.attemptId,
+                    deliveredCommitSha = result.deliveredCommitSha,
+                    buildId = result.buildId,
+                    buildStatus = result.buildStatus,
+                    bugState = result.bugState,
+                    wrongShaRejectionCode = result.wrongShaRejectionCode,
+                )
+                lastAction.value =
+                    "Human RepairAttempt ${result.attemptId} delivered ${result.deliveredCommitSha}; " +
+                        "Build ${result.buildId} linked; Bug=${result.bugState}; " +
+                        "wrong SHA=${result.wrongShaRejectionCode}."
+            }.onFailure { failure ->
+                setHumanRepairBuildFailure(
+                    if (failure is RepairAttemptFailure) {
+                        failure.code
+                    } else {
+                        failure.message?.takeIf(String::isNotBlank)
+                            ?: "UNEXPECTED_HUMAN_BUILD_FAILURE"
+                    },
+                    attemptId,
+                )
+            }
+        }
+    }
+
+    private fun setHumanRepairBuildFailure(code: String, attemptId: String? = null) {
+        humanRepairBuild.value = HumanRepairBuildUiState(
+            phase = "failed",
+            attemptId = attemptId,
+            errorCode = code,
+        )
+        lastAction.value = "Human delivery/Build link failed: $code."
     }
 
     fun createBugAndCheckDuplicates() {

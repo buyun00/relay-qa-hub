@@ -43,6 +43,7 @@ fun FoundationScreen(
     onRefreshInbox: () -> Unit = viewModel::refreshInbox,
     onRefreshBugWorkbench: () -> Unit = viewModel::refreshBugWorkbench,
     onCreateManualRepairAttempt: () -> Unit = viewModel::createManualRepairAttempt,
+    onDeliverManualRepairAndLinkBuild: () -> Unit = viewModel::deliverManualRepairAndLinkBuild,
     onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -58,6 +59,7 @@ fun FoundationScreen(
         onRefreshInbox = onRefreshInbox,
         onRefreshBugWorkbench = onRefreshBugWorkbench,
         onCreateManualRepairAttempt = onCreateManualRepairAttempt,
+        onDeliverManualRepairAndLinkBuild = onDeliverManualRepairAndLinkBuild,
         onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
     )
 }
@@ -75,6 +77,7 @@ internal fun FoundationScreen(
     onRefreshInbox: () -> Unit = {},
     onRefreshBugWorkbench: () -> Unit = {},
     onCreateManualRepairAttempt: () -> Unit = {},
+    onDeliverManualRepairAndLinkBuild: () -> Unit = {},
     onCreateBugAndCheckDuplicates: () -> Unit = {},
 ) {
     Scaffold(
@@ -273,6 +276,37 @@ internal fun FoundationScreen(
                     text = "Human RepairAttempt error: " +
                         "${state.manualRepair.errorCode ?: "UNKNOWN"}.",
                     modifier = Modifier.testTag("manual-repair-status"),
+                )
+            }
+            Button(
+                onClick = onDeliverManualRepairAndLinkBuild,
+                enabled = state.manualRepair.phase == "loaded" &&
+                    state.humanRepairBuild.phase != "loading" &&
+                    state.humanRepairBuild.phase != "linked",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("deliver-manual-repair-build"),
+            ) {
+                Text("交付人工修复并绑定 QA Build")
+            }
+            when (state.humanRepairBuild.phase) {
+                "loading" -> Text(
+                    text = "Human delivery/Build: linking…",
+                    modifier = Modifier.testTag("human-repair-build-status"),
+                )
+                "linked" -> Text(
+                    text = "Attempt ${state.humanRepairBuild.attemptId}; " +
+                        "commit=${state.humanRepairBuild.deliveredCommitSha}; " +
+                        "Build=${state.humanRepairBuild.buildId}/" +
+                        "${state.humanRepairBuild.buildStatus}; " +
+                        "Bug=${state.humanRepairBuild.bugState}; wrongSha=" +
+                        "${state.humanRepairBuild.wrongShaRejectionCode}.",
+                    modifier = Modifier.testTag("human-repair-build-status"),
+                )
+                "failed" -> Text(
+                    text = "Human delivery/Build error: " +
+                        "${state.humanRepairBuild.errorCode ?: "UNKNOWN"}.",
+                    modifier = Modifier.testTag("human-repair-build-status"),
                 )
             }
             Button(

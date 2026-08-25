@@ -46,21 +46,27 @@ import {
   completeMobileRelayOutbox,
   createMobileManualRepairAttempt,
   createMobileRelayAttempt,
+  deliverMobileRepairAttempt,
   dispatchMobileRelay,
   ensureMobileRelayRoles,
   getMobileRelayReceipt,
   getMobileManualRepairAttempt,
+  linkMobileBuildRepair,
   receiveMobileRelayWebhook,
   retryMobileRelayOutbox,
   transitionMobileBugReady,
   type CompleteMobileRelayOutboxInput,
   type CreateMobileManualRepairAttemptInput,
   type CreateMobileRelayAttemptInput,
+  type DeliverMobileRepairAttemptInput,
   type DispatchMobileRelayInput,
+  type LinkMobileBuildRepairInput,
   type RetryMobileRelayOutboxInput,
   type ReceiveMobileRelayWebhookInput,
   type TransitionMobileBugInput,
   type GetMobileManualRepairAttemptInput,
+  type StartMobileRepairAttemptInput,
+  startMobileRepairAttempt,
 } from "./mobile-relay-store.js";
 import {
   canonicalMigrationDigest,
@@ -99,6 +105,9 @@ interface WorkerRequest {
     | "createMobileRelayAttempt"
     | "createMobileManualRepairAttempt"
     | "getMobileManualRepairAttempt"
+    | "startMobileRepairAttempt"
+    | "deliverMobileRepairAttempt"
+    | "linkMobileBuildRepair"
     | "dispatchMobileRelay"
     | "getMobileRelayReceipt"
     | "receiveMobileRelayWebhook"
@@ -327,6 +336,24 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return getMobileManualRepairAttempt(
       requireDatabase(),
       request.payload as GetMobileManualRepairAttemptInput,
+    );
+  }
+
+  if (request.operation === "startMobileRepairAttempt") {
+    return inWriteTransaction((current) =>
+      startMobileRepairAttempt(current, request.payload as StartMobileRepairAttemptInput),
+    );
+  }
+
+  if (request.operation === "deliverMobileRepairAttempt") {
+    return inWriteTransaction((current) =>
+      deliverMobileRepairAttempt(current, request.payload as DeliverMobileRepairAttemptInput),
+    );
+  }
+
+  if (request.operation === "linkMobileBuildRepair") {
+    return inWriteTransaction((current) =>
+      linkMobileBuildRepair(current, request.payload as LinkMobileBuildRepairInput),
     );
   }
 

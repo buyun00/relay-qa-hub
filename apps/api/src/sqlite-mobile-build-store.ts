@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import type {
   MobileScopeBootstrap,
+  LinkMobileBuildRepairInput,
   RegisterMobileBuildInput,
   SqliteStorageWorker,
 } from "@relay-qa-hub/storage";
@@ -56,6 +57,9 @@ export function createSqliteMobileBuildStore(
           : { resourceVersion: command.request.resourceVersion }),
         downloadUrl: command.request.downloadUrl,
         manifest: command.request.manifest,
+        ...(command.request.repairAttemptId === undefined
+          ? {}
+          : { repairAttemptId: command.request.repairAttemptId }),
         idempotencyKey: command.idempotencyKey,
         requestDigest: digest(command.request),
         createdAt: now().toISOString(),
@@ -66,6 +70,28 @@ export function createSqliteMobileBuildStore(
     async getBuild(query) {
       requireActor(query.actorId, options.scope);
       return options.worker.getMobileBuild({ ...scope, buildId: query.buildId });
+    },
+
+    async linkRepair(command) {
+      requireActor(command.actorId, options.scope);
+      const input: LinkMobileBuildRepairInput = {
+        ...scope,
+        buildId: command.buildId,
+        expectedVersion: command.request.expectedVersion,
+        ...(command.request.expectedBugVersion === undefined
+          ? {}
+          : { expectedBugVersion: command.request.expectedBugVersion }),
+        ...(command.request.expectedBuildRequirementVersion === undefined
+          ? {}
+          : { expectedBuildRequirementVersion: command.request.expectedBuildRequirementVersion }),
+        repairAttemptId: command.request.repairAttemptId,
+        deliveredCommitSha: command.request.deliveredCommitSha,
+        evidenceType: command.request.evidenceType,
+        idempotencyKey: command.idempotencyKey,
+        requestDigest: digest(command.request),
+        createdAt: now().toISOString(),
+      };
+      return options.worker.linkMobileBuildRepair(input);
     },
   };
 }

@@ -62,6 +62,8 @@ export interface RegisterMobileBuildInput extends MobileRelayScope {
     readonly artifactSha256?: string;
     readonly providerPayloadDigest?: string;
   };
+  /** Optional exact human RepairAttempt provenance for the offline lane. */
+  readonly repairAttemptId?: string;
   readonly buildId?: string;
   readonly idempotencyKey: string;
   readonly requestDigest: string;
@@ -490,6 +492,7 @@ function validateBuildRegistration(input: RegisterMobileBuildInput): void {
     throw new MobileRelayStorageError("INVALID_REQUEST", "projectKey is invalid");
   }
   requireCommit(input.sourceCommitSha, "sourceCommitSha");
+  if (input.repairAttemptId !== undefined) requireUuid(input.repairAttemptId, "repairAttemptId");
   requireDigest(input.requestDigest);
   requireIdempotencyKey(
     input.idempotencyKey,
@@ -543,22 +546,35 @@ export function registerMobileBuild(
   const { context, replay } = beginIdempotency(database, input, scopeDigest);
   if (replay) return replay;
 
-  const deliveredReceipt = database
-    .prepare(
-      `SELECT 1 AS present
-       FROM relay_receipts
-       WHERE account_id = ? AND project_id = ?
-         AND handoff_status = 'fix_delivered'
-         AND delivered_commit_sha = ?
-       LIMIT 1`,
-    )
-    .get(input.accountId, input.projectId, input.sourceCommitSha) as
-    | { readonly present: number }
-    | undefined;
-  if (!deliveredReceipt) {
+  const deliveredProvenance = input.repairAttemptId
+    ? database
+        .prepare(
+          `SELECT 1 AS present
+           FROM repair_attempts
+           WHERE account_id = ? AND project_id = ? AND id = ?
+             AND mode = 'human' AND status = 'delivered'
+             AND commit_sha = ?`,
+        )
+        .get(
+          input.accountId,
+          input.projectId,
+          input.repairAttemptId,
+          input.sourceCommitSha,
+        )
+    : database
+        .prepare(
+          `SELECT 1 AS present
+           FROM relay_receipts
+           WHERE account_id = ? AND project_id = ?
+             AND handoff_status = 'fix_delivered'
+             AND delivered_commit_sha = ?
+           LIMIT 1`,
+        )
+        .get(input.accountId, input.projectId, input.sourceCommitSha);
+  if (!deliveredProvenance) {
     throw new MobileRelayStorageError(
       "BUILD_IDENTITY_MISMATCH",
-      "Build sourceCommitSha is not backed by a fix_delivered Relay receipt",
+      "Build sourceCommitSha is not backed by an exact delivered RepairAttempt provenance",
     );
   }
 

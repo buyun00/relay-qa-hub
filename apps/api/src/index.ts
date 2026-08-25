@@ -49,12 +49,14 @@ export {
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
   MOBILE_REPAIR_ATTEMPT_ITEM_PATH,
+  MOBILE_REPAIR_ATTEMPT_START_PATH,
   MOBILE_RELAY_DISPATCH_PATH,
   MOBILE_RELAY_RECEIPT_PATH,
   parseMobileBugReadyRequest,
   parseMobileManualRepairAttemptRequest,
   parseMobileRepairAttemptDeliveryRequest,
   parseMobileRepairAttemptRequest,
+  parseMobileRepairAttemptStartRequest,
   parseMobileRelayAttemptRequest,
   parseMobileRelayDispatchRequest,
   requireRelayIdempotencyKey,
@@ -65,6 +67,7 @@ export type {
   MobileManualRepairAttemptRequest,
   MobileRepairAttemptDeliveryRequest,
   MobileRepairAttemptRequest,
+  MobileRepairAttemptStartRequest,
   MobileRelayAttemptRequest,
   MobileRelayDispatchRequest,
   MobileRelayStore,
@@ -73,12 +76,15 @@ export type {
 export {
   MOBILE_BUILD_COLLECTION_PATH,
   MOBILE_BUILD_ITEM_PATH,
+  MOBILE_BUILD_LINK_REPAIR_PATH,
+  parseMobileLinkBuildRepairRequest,
   parseMobileRegisterBuildRequest,
   requireBuildIdempotencyKey,
   requireBuildUuid,
 } from "./mobile-builds.js";
 export type {
   MobileBuildStore,
+  MobileLinkBuildRepairRequest,
   MobileRegisterBuildRequest,
 } from "./mobile-builds.js";
 
