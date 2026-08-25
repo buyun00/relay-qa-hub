@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P2
-  current_gate: G2-AUTH-RBAC-READY
+  current_phase: P1
+  current_gate: G1-INDEPENDENT-FOUNDATION
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 682ddb208eb9f495c4989f59fffbf3705ddb7a6f
-  last_verified_at: 2026-08-26T04:41:17+08:00
-  next_action: P2.3 IN_PROGRESS；P2.2 第二 browser principal 对成员项目真实读取、对既存非成员项目 403 已转 VERIFYING；下一步只接一条认证浏览器写入 -> 同事务 append-only audit 的真实链及一个审计失败回滚，Windows 打包继续等 Web 功能稳定
+  last_verified_commit: a5f5e1e7f89c34029463b9276a858e48f714bbc5
+  last_verified_at: 2026-08-26T05:01:02+08:00
+  next_action: P1.3 IN_PROGRESS；P2.3 已用普通浏览器实证 session actor/request correlation 与 Comment/Event/Submission 同事务，审计 append 失败时三类事实均未提交；下一步仅接 Web 管理动作 -> pending notification outbox -> durable Inbox 一条恢复/去重链，Windows 打包继续等 Web 功能稳定
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -735,6 +735,8 @@ Gate `G0-CONTRACT-READY`：P0.1-P0.4 全绿，进度文件证据齐全。
 - claim、指数退避、`Retry-After`、dead letter、重启恢复、同聚合保序。
 - Inbox 去重、乱序/迟到保护和可重放投影。
 
+当前状态：`IN_PROGRESS`。既有 Build/Relay/duplicate slices 已产生真实 Outbox/Inbox facts，但尚未作为 P1.3 独立签收。下一原子切片只用普通浏览器执行一个真实管理动作，确认业务事务提交且通知 outbox 在消费者未读取期间保持 pending；随后由同一 QA Hub API 投影到 durable Inbox/notification，浏览器重读只返回同一条。通过即转 `VERIFYING`；指数退避、dead letter、多聚合保序和广域 crash matrix 进入收尾。
+
 验证：
 
 - 事务后崩溃、发送中重启、重复/乱序/迟到事件无丢失或重复应用。
@@ -789,7 +791,7 @@ Gate `G1-INDEPENDENT-FOUNDATION`：关闭 Relay 后 QA Hub 仍可启动、创建
 - actor、request、IP、user-agent、correlation、状态前后、理由和证据引用。
 - 不记录请求正文、Secret 和原始附件。
 
-当前状态：`IN_PROGRESS`。下一原子切片只用一个已认证浏览器管理员执行一条真实 Comment/管理写入，将 session actor、request/correlation 与既有 append-only Event 在同一事务落库并回读；再让一次审计 append 明确失败，证明业务写入不悄悄提交。通过即转 `VERIFYING`，更广的字段矩阵、IP 代理信任与 Unicode 隐私规范化进入收尾。
+当前状态：`VERIFYING`。提交 `a5f5e1e7f89c34029463b9276a858e48f714bbc5` 已让 Web 的稳定 `clientSubmissionId` 同时成为请求与 audit correlation，Comment/Event 路由使用认证 browser session actor，storage replay 回读既有 Event correlation。普通浏览器对 `LOCAL-2` 创建 Comment 后回读匹配的 `comment.created`；隔离 SQLite 临时拒绝 audit append 时 API 明确 500，Comment/Event/Submission 总数均不变且失败正文 Comment 为 0。证据见 [`docs/evidence/P2.3-browser-comment-audit.md`](evidence/P2.3-browser-comment-audit.md)。IP/user-agent hash、proxy trust、旧随机 correlation 兼容和结构化 audit failure code 进入收尾，不宣称 G2 完成。
 
 验证：
 
