@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P1
-  current_gate: G1-INDEPENDENT-FOUNDATION
+  current_phase: P7
+  current_gate: G7-WORKBENCH-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 4108ce9aafe3d6de28937b4bf359a06766cc451f
-  last_verified_at: 2026-08-26T05:21:14+08:00
-  next_action: P1.4 IN_PROGRESS；P1.3 已用普通浏览器实证 Bug 管理事务、pending outbox、API 停机保存、默认 projector 恢复和同一 Inbox ID 重读；下一步只核对 live/ready/deps 的真实成功与一个 dependency failure，Windows 打包继续等 Web 功能稳定
+  last_verified_commit: 3e24a6fab3941fd3b5634751af59754c9342f859
+  last_verified_at: 2026-08-26T05:46:07+08:00
+  next_action: P7.5 VERIFYING；P1.4 已完成 healthy/degraded 真实 health slice，P7.4 普通浏览器功能基线已稳定；按用户顺序只统一刷新一次 current Web 的 Windows x64 package，不重复桌面视觉矩阵
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -748,7 +748,7 @@ Gate `G0-CONTRACT-READY`：P0.1-P0.4 全绿，进度文件证据齐全。
 
 - `/health/live|ready|deps`、request ID、JSON 日志、配置 schema、Secret 脱敏。
 
-当前状态：`IN_PROGRESS`。下一原子切片只核对独立 4319 runtime 的 live/ready/deps 成功事实，并让一个真实 dependency failure 明确降级且不覆盖既有 SQLite Bug facts；通过即转 `VERIFYING`，完整磁盘阈值、日志扫描与全部 Worker 故障组合进入收尾。
+当前状态：`VERIFYING`。提交 `3e24a6fab3941fd3b5634751af59754c9342f859` 已接入独立 4319 runtime 的 live/ready/deps：健康实例的 ready 与认证 deps 均显示 database/evidence/worker=`ok`，未认证 deps 返回 `401`；把隔离副本的 evidence root 替换为普通文件后，live 仍为 `ok`、ready 精确为 `not_ready` 且仅 evidence=`down`，同一 SQLite 的 `LOCAL-1/LOCAL-2` 与 integrity 保持。证据见 [`docs/evidence/P1.4-runtime-health.md`](evidence/P1.4-runtime-health.md)。完整磁盘阈值、probe timeout、日志扫描与全部 Worker 故障组合进入收尾，不宣称 G1 完成。
 
 验证：
 
@@ -1041,7 +1041,7 @@ Capture/Poco 摘要 slice 已在提交 `41b0971abe65c4483fa157d696b1ead39b1bda0c
 
 #### P7.5 Windows Electron 桌面壳
 
-状态：`VERIFYING`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现；P7.4 普通浏览器稳定基线现已统一打入 Windows x64 package。证据见 [`docs/evidence/P7.5-windows-latest-web-package.md`](evidence/P7.5-windows-latest-web-package.md)：package `app.asar/web` 与 current `apps/web/dist` 7/7 path+SHA 完全一致；真实 package 本地渲染、同一 Bug deep-link、second-instance exit、关窗驻留、wrong token `401` 和 SQLite integrity 均通过。独立 `apps/desktop` 继续复用同一 Web production 资产，主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。本轮 tray UIA=`TRAY_NOT_FOUND`，因此不宣称 latest package 的真实托盘点击；历史 shell 源码未变且已有实际托盘退出证据，toast/tray 物理交互、installer/signing 留作发布尾项。
+状态：`VERIFYING`，功能最小链已在提交 `793366264c70cd8b05eb5443fa1724504510c44e` 中实现；先前 package 曾与当时 P7.4 普通浏览器基线逐文件一致。P1.3 随后新增 durable Inbox Web 入口，因此当前原子动作按用户顺序只统一刷新一次 current Web 的 Windows x64 package：重新构建 Web、核对 `app.asar/web` 逐文件 hash 并启动到一张真实 Bug 深链。独立 `apps/desktop` 继续复用同一 Web production 资产，主进程只通过 QA Hub HTTPS/WSS 通信，不直连 Relay，不引入第二套业务状态。toast/tray 视觉点击、installer/signing 继续留作发布尾项，不重复自动化会话的 UIA 探索。
 
 最小验证：本地构建并运行 Electron；关闭窗口后托盘与进程/连接仍存活；Web 修改一条真实 Bug 后 SQLite 只有同一 Inbox 事实，主进程收到事件并只弹一条 Windows 通知，点击恢复并打开对应详情；显式托盘退出才结束。保留一个断开 socket 后重连/前台补读同一 Inbox 且不重复的失败路径，不扩厂商 Push 或安装矩阵。
 
