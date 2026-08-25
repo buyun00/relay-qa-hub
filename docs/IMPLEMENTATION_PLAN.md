@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 1cf1ea76cedaee5b2b19cdb18bb05a61f7436077
-  last_verified_at: 2026-08-26T07:37:08+08:00
-  next_action: P8.8 IN_PROGRESS；P8.7 API-owned on-start backup、真实 Bug readback 与 overlap fail-before-listen 已转 VERIFYING；下一步只补 manifest-bound latest recovery point 与 cadence restart compensation，不做 retention 删除/第二 writer/HTTP restore
+  last_verified_commit: 92f07a364b2b1d885b34ef92113a7798c4837109
+  last_verified_at: 2026-08-26T07:50:43+08:00
+  next_action: P8.9 IN_PROGRESS；P8.8 none/stale listen 前补份、fresh restart 不重复与 remaining delay 已转 VERIFYING；下一步只接默认关闭的 manifest-bound off-disk archive copy，实证 D: disk1 -> E: disk0，不删 retention、不触碰 E:\Relay-Unity-Workers
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1090,7 +1090,11 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 #### P8.8 latest recovery point 与 cadence 重启补偿
 
-当前状态：`IN_PROGRESS`。在 P8.7 同一 runner 内只识别 manifest 绑定的主 `.sqlite` recovery point，忽略 SQLite 校验留下的 `.sqlite-shm/.sqlite-wal` sidecar；cadence 启用且 on-start 关闭时，若没有有效 recovery point 或最新点已超过 interval，则在 listen 前补一份，若仍新鲜则从剩余时长开始 timer 而不重复备份。只保留一条 stale/none 补偿成功和一条 fresh 不重复；无效 manifest fail closed，不删除 retention、不复制异盘、不开放 HTTP restore。
+当前状态：`VERIFYING`。提交 `92f07a364b2b1d885b34ef92113a7798c4837109` 提取并复用 restore 的严格 bundle 校验，只扫描 canonical `rpo` 直接子项并忽略 `.sqlite-shm/.sqlite-wal`；任何坏 manifest/缺 DB/junction 均 fail closed。真实 4320 cadence smoke 在空 root 时 listen 前生成唯一 1,490,944-byte recovery point并回读 `LOCAL-1`；立即重启后主 DB/manifest 仍各一份，latest=`2026-08-25T23:47:20.661Z`，按剩余 `899462 ms` 调度。证据见 [`docs/evidence/P8.8-cadence-restart-compensation.md`](evidence/P8.8-cadence-restart-compensation.md)。独立终审 Blocker/High=`0/0`；未等待真实 15 分钟，也未做 retention/异盘。
+
+#### P8.9 manifest-bound 异盘归档副本
+
+当前状态：`IN_PROGRESS`。新增默认关闭的 archive root，只复制经严格校验的 manifest-bound 主 `.sqlite` 与 manifest，忽略 WAL/SHM；source/target 必须为普通文件/目录且 archive root 与 data/source/backup root 不重叠。复制使用 create-only 目标，主 DB hash 验证后最后发布 manifest；失败不删除 partial，也不覆盖。最小真实 smoke 使用当前主机 D:（disk 1）到 E:（disk 0）的新 `E:\Relay-QA-Hub-Archives` 子目录，验证 archive SHA/bundle 与 API facts；不得触碰既有 `E:\Relay-Unity-Workers`，不实现 retention 删除。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
