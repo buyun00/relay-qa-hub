@@ -82,6 +82,24 @@ export interface ProjectModuleList {
   readonly items: readonly ProjectModule[];
 }
 
+export interface NotificationItem {
+  readonly id: string;
+  readonly projectId: string;
+  readonly userId: string;
+  readonly type: string;
+  readonly title: string;
+  readonly bugId: string | null;
+  readonly createdAt: string;
+  readonly readAt: string | null;
+  readonly version: number;
+}
+
+export interface NotificationList {
+  readonly items: readonly NotificationItem[];
+  readonly nextCursor: string | null;
+  readonly unreadCount: number;
+}
+
 export interface BugListItem {
   readonly id: string;
   readonly key: string;
@@ -486,6 +504,35 @@ function isProjectScopedList(value: unknown, projectId: string): boolean {
   return response.projectId === projectId && Array.isArray(response.items);
 }
 
+function isNotificationList(value: unknown): value is NotificationList {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const response = value as Record<string, unknown>;
+  if (
+    !Array.isArray(response["items"]) ||
+    !(response["nextCursor"] === null || typeof response["nextCursor"] === "string") ||
+    !Number.isSafeInteger(response["unreadCount"]) ||
+    (response["unreadCount"] as number) < 0
+  ) {
+    return false;
+  }
+  return response["items"].every((value: unknown) => {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+    const item = value as Record<string, unknown>;
+    return (
+      typeof item["id"] === "string" &&
+      typeof item["projectId"] === "string" &&
+      typeof item["userId"] === "string" &&
+      typeof item["type"] === "string" &&
+      typeof item["title"] === "string" &&
+      (item["bugId"] === null || typeof item["bugId"] === "string") &&
+      typeof item["createdAt"] === "string" &&
+      (item["readAt"] === null || typeof item["readAt"] === "string") &&
+      Number.isSafeInteger(item["version"]) &&
+      (item["version"] as number) > 0
+    );
+  });
+}
+
 function isAttachmentMetadata(value: unknown): value is AttachmentMetadata {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const item = value as Partial<AttachmentMetadata>;
@@ -729,6 +776,17 @@ export async function listProjectModules(projectId: string): Promise<ProjectModu
     throw new QaHubApiError(200, "INVALID_PROJECT_MODULE_LIST");
   }
   return body as unknown as ProjectModuleList;
+}
+
+export async function listNotifications(limit = 20): Promise<NotificationList> {
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+    throw new TypeError("notification limit must be an integer between 1 and 100");
+  }
+  const body = await requestJson(`/api/v1/notifications?limit=${limit}`);
+  if (!isNotificationList(body)) {
+    throw new QaHubApiError(200, "INVALID_NOTIFICATION_LIST");
+  }
+  return body;
 }
 
 export async function getBug(bugId: string): Promise<BugDetail> {

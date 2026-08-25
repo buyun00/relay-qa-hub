@@ -190,6 +190,7 @@ export interface CreateApiAppOptions {
   readonly mobileHumanWorkflowStore?: MobileHumanWorkflowStore;
   readonly mobileCommentStore?: MobileCommentStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
+  readonly notificationHintChannelEnabled?: boolean;
   readonly mobileProjectDirectoryStore?: MobileProjectDirectoryStore;
   readonly mobileMetricsStore?: MobileMetricsStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
@@ -440,7 +441,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     registerBrowserAuthRoutes(app, browserAuth);
   }
 
-  if (options.mobileNotificationStore !== undefined) {
+  if (
+    options.mobileNotificationStore !== undefined &&
+    options.notificationHintChannelEnabled !== false
+  ) {
     const notificationHintChannel = startMobileNotificationHintChannel({
       server: app.server,
       store: mobileNotificationStore,

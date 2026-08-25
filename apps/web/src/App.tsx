@@ -17,6 +17,7 @@ import {
   listBugEvents,
   listBugs,
   listDuplicateCandidates,
+  listNotifications,
   listProjectMembers,
   listProjectModules,
   listVisibleProjects,
@@ -38,6 +39,7 @@ import {
   type DuplicateCandidate,
   type BuildRecord,
   type HumanRepairAttempt,
+  type NotificationList,
   type ProjectMember,
   type ProjectModule,
   type RelayReceipt,
@@ -127,6 +129,12 @@ export default function App() {
   const [settingsSnapshotSequence, setSettingsSnapshotSequence] = useState<number | null>(null);
   const [settingsState, setSettingsState] = useState<RequestState>("idle");
   const [settingsError, setSettingsError] = useState<{
+    readonly status: number;
+    readonly code: string | null;
+  } | null>(null);
+  const [notificationInbox, setNotificationInbox] = useState<NotificationList | null>(null);
+  const [notificationState, setNotificationState] = useState<RequestState>("idle");
+  const [notificationError, setNotificationError] = useState<{
     readonly status: number;
     readonly code: string | null;
   } | null>(null);
@@ -1157,6 +1165,18 @@ export default function App() {
     };
   }, [loadBugDetails]);
 
+  const refreshNotificationInbox = useCallback(async (): Promise<void> => {
+    setNotificationState("loading");
+    setNotificationError(null);
+    try {
+      setNotificationInbox(await listNotifications(20));
+      setNotificationState("success");
+    } catch (cause: unknown) {
+      setNotificationState("error");
+      setNotificationError(mutationError(cause));
+    }
+  }, []);
+
   return (
     <main className="app-shell">
       <header className="hero">
@@ -1184,6 +1204,62 @@ export default function App() {
       </section>
 
       <MetricsPanel projectId={activeProjectId} />
+
+      <section aria-labelledby="notification-inbox-title" className="workspace-card">
+        <div className="section-heading">
+          <div>
+            <p className="card-kicker">Durable notification fact</p>
+            <h2 id="notification-inbox-title">通知 Inbox</h2>
+          </div>
+          <span className={`status-dot status-dot--${notificationState}`}>
+            {notificationState === "loading"
+              ? "读取中"
+              : notificationState === "error"
+                ? "API 错误"
+                : notificationState === "success"
+                  ? `${notificationInbox?.unreadCount ?? 0} 条未读`
+                  : "尚未读取"}
+          </span>
+        </div>
+        <div className="settings-actions">
+          <button
+            className="secondary-button"
+            disabled={notificationState === "loading"}
+            id="notification-inbox-refresh"
+            onClick={() => void refreshNotificationInbox()}
+            type="button"
+          >
+            刷新通知 Inbox
+          </button>
+        </div>
+        {notificationState === "error" && notificationError !== null && (
+          <p aria-live="assertive" className="api-error">
+            Inbox 请求失败：HTTP
+            {notificationError.status === 0 ? "网络不可达" : notificationError.status}
+            {notificationError.code === null ? "" : ` · ${notificationError.code}`}。
+          </p>
+        )}
+        {notificationState === "success" && notificationInbox?.items.length === 0 && (
+          <p className="empty-state">当前没有通知。</p>
+        )}
+        {notificationInbox !== null && notificationInbox.items.length > 0 && (
+          <ol aria-label="durable notification Inbox" className="timeline-list">
+            {notificationInbox.items.map((item) => (
+              <li key={item.id}>
+                <div className="timeline-list__heading">
+                  <strong>{item.title}</strong>
+                  <span>{item.type}</span>
+                </div>
+                <p>
+                  {item.bugId === null ? "无关联 Bug" : `Bug ${item.bugId}`} ·
+                  {new Date(item.createdAt).toLocaleString()}
+                </p>
+                <code>{item.id}</code>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
 
       <section aria-labelledby="bug-list-title" className="workspace-card">
         <div className="section-heading">

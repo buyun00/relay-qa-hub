@@ -69,6 +69,13 @@ function readSecureCookie(): boolean | undefined {
   throw new Error("QA_HUB_WEB_SECURE_COOKIE must be true or false");
 }
 
+function readNotificationHintChannelEnabled(): boolean {
+  const value = process.env["QA_HUB_NOTIFICATION_HINT_CHANNEL_ENABLED"]?.trim().toLowerCase();
+  if (value === undefined || value === "true") return true;
+  if (value === "false") return false;
+  throw new Error("QA_HUB_NOTIFICATION_HINT_CHANNEL_ENABLED must be true or false");
+}
+
 async function closeRuntime(
   server: ApiServer | undefined,
   worker: SqliteStorageWorker,
@@ -133,6 +140,7 @@ async function run(): Promise<void> {
       mobileCommentStore: createSqliteMobileCommentStore({ worker, scope: MOBILE_SCOPE }),
       mobileDuplicateStore: createSqliteMobileDuplicateStore({ worker, scope: MOBILE_SCOPE }),
       mobileNotificationStore: createSqliteMobileInboxStore({ worker, scope: MOBILE_SCOPE }),
+      notificationHintChannelEnabled: readNotificationHintChannelEnabled(),
       mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
         worker,
         scope: MOBILE_SCOPE,
