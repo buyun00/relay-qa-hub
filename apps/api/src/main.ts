@@ -1,9 +1,16 @@
+import { join } from "node:path";
+
 import {
   parseStorageEnvironment,
   SqliteStorageWorker,
   type MobileScopeBootstrap,
 } from "@relay-qa-hub/storage";
 
+import {
+  createApiBackupRunner,
+  parseApiBackupEnvironment,
+  type ApiBackupRunner,
+} from "./backup-runner.js";
 import { DEFAULT_API_HOST, resolvePort } from "./config.js";
 import { createApiServer, type ApiServer } from "./server.js";
 import { createSqliteApiHealthProbe } from "./health.js";
@@ -81,7 +88,9 @@ async function closeRuntime(
   server: ApiServer | undefined,
   worker: SqliteStorageWorker,
   relayPump: MobileRelayOutboxPump | undefined,
+  backupRunner: ApiBackupRunner | undefined,
 ): Promise<void> {
+  await backupRunner?.stop();
   await relayPump?.stop();
   await server?.stop();
   await worker.close();
@@ -90,14 +99,25 @@ async function closeRuntime(
 async function run(): Promise<void> {
   const storage = parseStorageEnvironment(process.env);
   const debugBearerToken = requireMobileAccessToken();
+  const backupConfig = parseApiBackupEnvironment(process.env, {
+    dataRoot: storage.dataRoot,
+    databaseFile: storage.databaseFile,
+    evidenceRoot: storage.evidenceRoot,
+    quarantineRoot: storage.quarantineRoot,
+    ...(process.env["QA_HUB_SOURCE_ROOT"] === undefined
+      ? {}
+      : { sourceRoot: process.env["QA_HUB_SOURCE_ROOT"] }),
+  });
   const worker = new SqliteStorageWorker({
     databaseFile: storage.databaseFile,
     busyTimeoutMs: storage.busyTimeoutMs,
+    ...(backupConfig.enabled ? { backupRoot: join(backupConfig.backupRoot, "migration") } : {}),
     evidenceRoot: storage.evidenceRoot,
     quarantineRoot: storage.quarantineRoot,
   });
   let server: ApiServer | undefined;
   let relayPump: MobileRelayOutboxPump | undefined;
+  let backupRunner: ApiBackupRunner | undefined;
   let shutdownStarted = false;
 
   try {
@@ -186,7 +206,7 @@ async function run(): Promise<void> {
       shutdownStarted = true;
       server?.app.log.info({ signal }, "stopping Relay QA Hub API");
       try {
-        await closeRuntime(server, worker, relayPump);
+        await closeRuntime(server, worker, relayPump, backupRunner);
         process.exitCode = 0;
       } catch (error: unknown) {
         server?.app.log.error({ error, signal }, "failed to stop Relay QA Hub API");
@@ -196,6 +216,14 @@ async function run(): Promise<void> {
 
     process.once("SIGINT", () => void shutdown("SIGINT"));
     process.once("SIGTERM", () => void shutdown("SIGTERM"));
+
+    backupRunner = createApiBackupRunner({
+      config: backupConfig,
+      worker,
+      logger: server.app.log,
+    });
+    await backupRunner.start();
+    if (shutdownStarted) return;
 
     const address = await server.start({
       host: process.env["QA_HUB_API_HOST"] ?? DEFAULT_API_HOST,
@@ -228,7 +256,7 @@ async function run(): Promise<void> {
       console.error("Relay QA Hub API failed to initialize", error);
     }
     process.exitCode = 1;
-    await closeRuntime(server, worker, relayPump).catch(() => undefined);
+    await closeRuntime(server, worker, relayPump, backupRunner).catch(() => undefined);
   }
 }
 

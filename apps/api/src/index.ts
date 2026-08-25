@@ -14,6 +14,19 @@ export type {
 } from "./health.js";
 
 export {
+  ApiBackupConfigurationError,
+  createApiBackupRunner,
+  parseApiBackupEnvironment,
+} from "./backup-runner.js";
+export type {
+  ApiBackupEnvironmentOptions,
+  ApiBackupRunner,
+  ApiBackupRunnerConfig,
+  ApiBackupRunnerLogger,
+  CreateApiBackupRunnerOptions,
+} from "./backup-runner.js";
+
+export {
   MAX_MOBILE_CHUNK_SIZE_BYTES,
   MOBILE_ATTACHMENT_BIND_PATH,
   MOBILE_ATTACHMENT_ITEM_PATH,
