@@ -121,17 +121,21 @@ class CommentTimelineClient(
                     val payload = item.optJSONObject("payload") ?: JSONObject()
                     val itemBugId = item.requireCommentUuid("bugId")
                     val aggregateId = aggregate.requireCommentUuid("id")
-                    if (
-                        itemBugId != bugId ||
-                        aggregate.requireCommentString("type") != "bug" ||
-                        aggregateId != bugId
-                    ) {
+                    val aggregateType = aggregate.requireCommentString("type")
+                    val eventType = item.requireCommentString("type")
+                    if (itemBugId != bugId) {
                         throw CommentTimelineFailure("TIMELINE_SCOPE_MISMATCH")
+                    }
+                    if (
+                        eventType == "comment.created" &&
+                        (aggregateType != "bug" || aggregateId != bugId)
+                    ) {
+                        throw CommentTimelineFailure("COMMENT_EVENT_SCOPE_MISMATCH")
                     }
                     add(
                         BugAuditEvent(
                             id = item.requireCommentUuid("id"),
-                            type = item.requireCommentString("type"),
+                            type = eventType,
                             source = item.requireCommentString("source"),
                             bugId = itemBugId,
                             aggregateVersion = aggregate.optInt("version", -1),
