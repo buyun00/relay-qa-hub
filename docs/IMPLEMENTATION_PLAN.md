@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: e1dac9a3d64ff6e06abd263628d1d4de3a676e90
-  last_verified_at: 2026-08-26T08:13:27+08:00
-  next_action: P8.1 IN_PROGRESS；P8.9 D: disk1 -> E: disk0 manifest-bound archive 已转 VERIFYING；下一步只收敛一个真正阻断发布的认证/运行配置边界并做一成一败真 smoke，不扩成广域安全扫描
+  last_verified_commit: 8e2e5a544617427a3cfc3600d722b7e490436ed8
+  last_verified_at: 2026-08-26T08:28:49+08:00
+  next_action: P8.2 IN_PROGRESS；P8.1 Web session/debug auth mode 已 fail closed 并转 VERIFYING；下一步只注入一次 SQLite write lock，证明写 API 明确失败且无假成功，释放后同一操作可完成，不扩 p95/p99 或广域故障矩阵
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1053,11 +1053,13 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 验证：鉴权、RBAC、CSRF、XSS、IDOR、上传、速率限制、安全 Header、Secret 扫描全部通过。
 
-当前状态：`IN_PROGRESS`。MVP 执行范围只选择一个真实阻断发布的认证/运行配置边界，完成一条真实成功与一个关键拒绝后立即推进；完整 RBAC/CSRF/XSS/IDOR/上传/速率限制/Header/secret matrix 保持正式 G8 收尾，不以重复 mock 或广域扫描制造当前假绿。
+当前状态：`VERIFYING`。提交 `8e2e5a544617427a3cfc3600d722b7e490436ed8` 让 Web auth mode 只接受默认 `session` 或显式 `debug`：session 缺运行时 session secret 在 storage/listen 前失败；debug 不注册 BrowserAuth 且拒绝遗留 session/bootstrap secret；Vite 与 API 模式一致，示例只列空的运行时 secret 注入点。真实 4320 session smoke 完成 bootstrap/login、HttpOnly cookie、`/auth/me` 与 `LOCAL-1` 回读；移除 session secret 后 code 1、端口关闭、SQLite SHA 不变。证据见 [`docs/evidence/P8.1-web-auth-mode.md`](evidence/P8.1-web-auth-mode.md)。最终 Luna/xhigh 复审 Blocker/High=`0/0`；完整 RBAC/CSRF/XSS/IDOR/上传/速率限制/Header/secret matrix 保持正式 G8 收尾，不宣称 G8 完成。
 
 #### P8.2 性能和故障注入
 
 验证：约定并发/数据量下 p95/p99 达标；DB busy、磁盘不足、Push/Relay/Build 下线无数据丢失或假成功。
+
+当前状态：`IN_PROGRESS`。本轮只注入一个隔离 SQLite write lock：真实写 API 必须返回明确非成功，Bug/Event/Submission facts 不变；释放锁后复用同一业务操作可成功。完整 p95/p99、容量、磁盘不足和依赖下线矩阵继续后置。
 
 #### P8.3 备份
 
