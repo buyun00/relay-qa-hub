@@ -17,6 +17,7 @@ import { test } from "node:test";
 import {
   AttachmentRestoreError,
   restoreReferencedAttachmentsToIsolatedRoot,
+  validateReferencedAttachmentRoot,
 } from "../src/attachment-restore.js";
 
 const APPLICATION_ID = 0x51414842;
@@ -98,6 +99,27 @@ test("inventories and restores one real referenced attachment", async () => {
     assert.deepEqual(readFileSync(join(restoreRoot, fixture.storageKey)), bytes);
     assert.equal(JSON.parse(readFileSync(result.completeMarkerPath, "utf8")).state, "complete");
     assert.equal(readFileSync(result.manifestPath, "utf8").includes(root), false);
+
+    const validation = await validateReferencedAttachmentRoot({
+      databasePath: fixture.databasePath,
+      evidenceRoot: restoreRoot,
+      createdAt: "2026-08-26T00:00:00.000Z",
+    });
+    assert.equal(validation.manifestSha256, result.manifestSha256);
+    assert.equal(validation.manifest.entries.length, 1);
+    assert.equal(validation.completeMarkerSha256.length, 64);
+
+    writeFileSync(join(restoreRoot, fixture.storageKey), Buffer.from("tampered"));
+    await assert.rejects(
+      validateReferencedAttachmentRoot({
+        databasePath: fixture.databasePath,
+        evidenceRoot: restoreRoot,
+        createdAt: "2026-08-26T00:00:00.000Z",
+      }),
+      (error: unknown) =>
+        error instanceof AttachmentRestoreError &&
+        error.code === "ATTACHMENT_RESTORE_SOURCE_INVALID",
+    );
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

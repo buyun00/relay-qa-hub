@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: ff87001
-  last_verified_at: 2026-08-26T09:15:09+08:00
-  next_action: P8.11 VERIFYING；Comment 前 A、Comment 后 B 与 A 的 create-only rollback/API 时间点差异已通过，终审 Blocker/High=0/0；先提交证据，再选择下一本机 G8 原子段，P9.1 继续 WAITING_EXTERNAL
+  last_verified_commit: c35bf20
+  last_verified_at: 2026-08-26T09:17:05+08:00
+  next_action: P8.12 IN_PROGRESS；将同一 SQLite recovery point 的 ready/clean attachment inventory/blob 绑定为 marker-last create-only 异盘 companion，接入现有 API-owned archive runner，再从精确 E: 组合点隔离恢复并经 API 回读真实 PNG；缺 blob 必须在 listen 前 fail closed
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1107,6 +1107,10 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 #### P8.11 前一 recovery point 回切与 API 回读
 
 当前状态：`VERIFYING`。全新 D: disposable fixture 的 backup-on-start runner 在 Comment 前生成 A、Comment 后生成 B：A 的匹配 Comment/Event=`0/0`，B 与当前 fixture=`1/1`。A 已 create-only 恢复到另一个全新 rollback root；独立 4320 API ready/schema v4、回读 `LOCAL-1 reported/v1` 且匹配 Event 为 `0`，退出后 rollback/current integrity/FK 都为 `ok/0`，当前 fixture 仍为 `1/1`。A restore 到 API readback/stop 的本机值为 `497.937 ms`，三个精确 PID 均经 SIGINT 退出且外部核对不存在。证据见 [`docs/evidence/P8.11-previous-recovery-point-rollback.md`](evidence/P8.11-previous-recovery-point-rollback.md)，最终 Luna/xhigh 复审 Blocker/High=`0/0`。该 slice 不覆盖现有数据、不写 E: archive，也不等同应用二进制回滚、attachment rollback、生产切流或 G8 DONE。
+
+#### P8.12 SQLite recovery point 与附件异盘 companion
+
+当前状态：`IN_PROGRESS`。为精确 SQLite backup/manifest 增加同名 create-only attachment companion：inventory 必须从该 backup DB 而非 live DB 派生，包含有界、排序且 canonical 的 `ready/clean` content-addressed blobs；独立 binding marker 记录 DB createdAt/application/schema/size/DB SHA/DB-manifest SHA 与 inventory/complete-marker SHA，并在所有 blob size/hash 验证后最后发布。现有 API-owned archive runner 在 archive enabled 时必须调用组合 helper，任何缺 blob/partial/mismatch 都在 listen/成功前 fail closed，不静默降级成 DB-only 成功；不新增 HTTP restore、第二 worker 或第二 scheduler。最小真实链从隔离的 P8.6 MuMu PNG fixture 生成全新 D: point 并归档到全新 E: root，随后从精确组合点恢复到新 D: root，由独立 API 回读 `LOCAL-1`、attachment metadata 与 145,986-byte PNG/SHA；唯一失败用同 DB + 空 evidence 证明无 complete companion、API 不监听且 Bug facts 不变。自动 retention/删除、并发大文件吞吐和生产 SLA 继续后置。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 

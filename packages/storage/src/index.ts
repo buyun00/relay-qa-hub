@@ -264,22 +264,33 @@ export type {
   SqliteRestoreErrorCode,
   ValidateSqliteBackupBundleOptions,
 } from "./sqlite-restore.js";
-export { archiveSqliteBackupBundle, SqliteArchiveError } from "./sqlite-archive.js";
+export {
+  archiveSqliteBackupBundle,
+  archiveSqliteRecoveryPointWithAttachments,
+  SqliteArchiveError,
+  validateArchivedSqliteRecoveryPointWithAttachments,
+} from "./sqlite-archive.js";
 export type {
+  ArchiveSqliteRecoveryPointWithAttachmentsOptions,
   ArchiveSqliteBackupBundleOptions,
+  ValidateArchivedSqliteRecoveryPointWithAttachmentsOptions,
   SqliteArchiveErrorCode,
   SqliteBackupArchiveResult,
+  SqliteRecoveryPointWithAttachmentsResult,
 } from "./sqlite-archive.js";
 export {
   restoreReferencedAttachmentsToIsolatedRoot,
   AttachmentRestoreError,
+  validateReferencedAttachmentRoot,
 } from "./attachment-restore.js";
 export type {
   AttachmentInventoryEntry,
   AttachmentInventoryManifest,
   AttachmentRestoreErrorCode,
+  ReferencedAttachmentRootValidation,
   RestoreReferencedAttachmentsOptions,
   RestoreReferencedAttachmentsResult,
+  ValidateReferencedAttachmentRootOptions,
 } from "./attachment-restore.js";
 export {
   ensureBrowserAdmin,

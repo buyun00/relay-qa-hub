@@ -4,7 +4,9 @@ import {
   copyFileSync,
   createReadStream,
   existsSync,
+  lstatSync,
   mkdirSync,
+  readFileSync,
   realpathSync,
   statSync,
   writeFileSync,
@@ -64,6 +66,25 @@ export interface RestoreReferencedAttachmentsResult {
   readonly manifestPath: string;
   readonly completeMarkerPath: string;
   readonly manifestSha256: string;
+  readonly manifest: AttachmentInventoryManifest;
+}
+
+export interface ValidateReferencedAttachmentRootOptions {
+  /** Read-only QA Hub SQLite backup whose ready attachment facts define the inventory. */
+  readonly databasePath: string;
+  /** Existing evidence root produced by an isolated attachment restore. */
+  readonly evidenceRoot: string;
+  /** Timestamp that must match the inventory manifest exactly. */
+  readonly createdAt: string;
+  readonly maxEntries?: number;
+}
+
+export interface ReferencedAttachmentRootValidation {
+  readonly evidenceRoot: string;
+  readonly manifestPath: string;
+  readonly completeMarkerPath: string;
+  readonly manifestSha256: string;
+  readonly completeMarkerSha256: string;
   readonly manifest: AttachmentInventoryManifest;
 }
 
@@ -273,6 +294,10 @@ async function fileSha256(filePath: string): Promise<string> {
   return hash.digest("hex");
 }
 
+function bytesSha256(bytes: Uint8Array): string {
+  return createHash("sha256").update(bytes).digest("hex");
+}
+
 function jsonFile(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
@@ -300,30 +325,13 @@ async function copyAndVerifyEntry(
   restoreRoot: string,
   entry: AttachmentInventoryEntry,
 ): Promise<void> {
-  const sourcePath = resolveStorageKey(sourceRoot, entry.storageKey);
+  const realSourcePath = await verifyBlobAtRoot(
+    sourceRoot,
+    entry,
+    "ATTACHMENT_RESTORE_SOURCE_INVALID",
+    "attachment source is missing or does not match inventory",
+  );
   const targetPath = resolveStorageKey(restoreRoot, entry.storageKey);
-  let realSourcePath: string;
-  try {
-    const realSourceRoot = realpathSync(sourceRoot);
-    realSourcePath = realpathSync(sourcePath);
-    if (!isContained(realSourceRoot, realSourcePath)) {
-      throw new Error("source resolves outside evidence root");
-    }
-    const sourceStat = statSync(realSourcePath);
-    if (
-      !sourceStat.isFile() ||
-      sourceStat.size !== entry.sizeBytes ||
-      (await fileSha256(realSourcePath)) !== entry.sha256
-    ) {
-      throw new Error("source size or hash mismatch");
-    }
-  } catch (error) {
-    throw new AttachmentRestoreError(
-      "ATTACHMENT_RESTORE_SOURCE_INVALID",
-      `attachment source is missing or does not match inventory: ${entry.storageKey}`,
-      { cause: error },
-    );
-  }
   try {
     mkdirSync(dirname(targetPath), { recursive: true });
     copyFileSync(realSourcePath, targetPath, constants.COPYFILE_EXCL);
@@ -335,21 +343,97 @@ async function copyAndVerifyEntry(
     );
   }
   try {
-    const targetStat = statSync(targetPath);
-    if (
-      !targetStat.isFile() ||
-      targetStat.size !== entry.sizeBytes ||
-      (await fileSha256(targetPath)) !== entry.sha256
-    ) {
-      throw new Error("restored size or hash mismatch");
-    }
+    await verifyBlobAtRoot(
+      restoreRoot,
+      entry,
+      "ATTACHMENT_RESTORE_FAILED",
+      "restored attachment failed verification",
+    );
   } catch (error) {
+    if (error instanceof AttachmentRestoreError && error.code === "ATTACHMENT_RESTORE_FAILED") {
+      throw error;
+    }
     throw new AttachmentRestoreError(
       "ATTACHMENT_RESTORE_FAILED",
       `restored attachment failed verification: ${entry.storageKey}`,
       { cause: error },
     );
   }
+}
+
+async function verifyBlobAtRoot(
+  root: string,
+  entry: AttachmentInventoryEntry,
+  errorCode: "ATTACHMENT_RESTORE_SOURCE_INVALID" | "ATTACHMENT_RESTORE_FAILED",
+  message: string,
+): Promise<string> {
+  try {
+    const candidatePath = resolveStorageKey(root, entry.storageKey);
+    const resolvedRoot = resolve(root);
+    const resolvedCandidate = resolve(candidatePath);
+    if (!isContained(resolvedRoot, resolvedCandidate)) {
+      throw new Error("blob path escapes evidence root");
+    }
+    const candidateLstat = lstatSync(resolvedCandidate);
+    if (candidateLstat.isSymbolicLink() || !candidateLstat.isFile()) {
+      throw new Error("blob is not an ordinary file");
+    }
+    const realRoot = realpathSync(root);
+    const realCandidate = realpathSync(resolvedCandidate);
+    if (!isContained(realRoot, realCandidate)) {
+      throw new Error("blob resolves outside evidence root");
+    }
+    const realCandidateLstat = lstatSync(realCandidate);
+    if (realCandidateLstat.isSymbolicLink() || !realCandidateLstat.isFile()) {
+      throw new Error("blob is not an ordinary file");
+    }
+    if (
+      realCandidateLstat.size !== entry.sizeBytes ||
+      (await fileSha256(realCandidate)) !== entry.sha256
+    ) {
+      throw new Error("blob size or hash mismatch");
+    }
+    return realCandidate;
+  } catch (error) {
+    throw new AttachmentRestoreError(errorCode, `${message}: ${entry.storageKey}`, {
+      cause: error,
+    });
+  }
+}
+
+function readValidatedTargetFile(evidenceRoot: string, filePath: string, label: string): Buffer {
+  try {
+    const realFilePath = verifyOrdinaryContainedFile(evidenceRoot, filePath);
+    return readFileSync(realFilePath);
+  } catch (error) {
+    throw new AttachmentRestoreError(
+      "ATTACHMENT_RESTORE_SOURCE_INVALID",
+      `${label} is missing or is not an ordinary file`,
+      { cause: error },
+    );
+  }
+}
+
+function verifyOrdinaryContainedFile(root: string, filePath: string): string {
+  const resolvedRoot = resolve(root);
+  const resolvedFile = resolve(filePath);
+  if (!isContained(resolvedRoot, resolvedFile)) {
+    throw new Error("file escapes evidence root");
+  }
+  const fileLstat = lstatSync(resolvedFile);
+  if (fileLstat.isSymbolicLink() || !fileLstat.isFile()) {
+    throw new Error("file is not an ordinary file");
+  }
+  const realRoot = realpathSync(root);
+  const realFile = realpathSync(resolvedFile);
+  if (!isContained(realRoot, realFile)) {
+    throw new Error("file resolves outside evidence root");
+  }
+  const realFileLstat = lstatSync(realFile);
+  if (realFileLstat.isSymbolicLink() || !realFileLstat.isFile()) {
+    throw new Error("file is not an ordinary file");
+  }
+  return realFile;
 }
 
 /**
@@ -449,4 +533,106 @@ export async function restoreReferencedAttachmentsToIsolatedRoot(
       { cause: error },
     );
   }
+}
+
+/**
+ * Validate a completed isolated attachment restore without changing any source or target bytes.
+ *
+ * The inventory is always recomputed from the supplied SQLite backup. A root is accepted only
+ * when its manifest bytes and complete marker are the exact create-only outputs expected for that
+ * inventory, and every referenced blob is still an ordinary, contained file with the recorded
+ * size and SHA-256.
+ */
+export async function validateReferencedAttachmentRoot(
+  options: ValidateReferencedAttachmentRootOptions,
+): Promise<ReferencedAttachmentRootValidation> {
+  const requestedDatabasePath = requireAbsolutePath(options.databasePath, "databasePath");
+  const requestedEvidenceRoot = requireAbsolutePath(options.evidenceRoot, "evidenceRoot");
+  const createdAt = canonicalCreatedAt(options.createdAt);
+  const maxEntries = requireMaxEntries(options.maxEntries);
+
+  let databasePath: string;
+  try {
+    if (!statSync(requestedDatabasePath).isFile()) {
+      throw new Error("source database is not a file");
+    }
+    databasePath = realpathSync(requestedDatabasePath);
+  } catch (error) {
+    throw new AttachmentRestoreError(
+      "ATTACHMENT_RESTORE_DATABASE_INVALID",
+      "attachment inventory database could not be resolved",
+      { cause: error },
+    );
+  }
+
+  let evidenceRoot: string;
+  try {
+    if (!statSync(requestedEvidenceRoot).isDirectory()) {
+      throw new Error("evidence root is not a directory");
+    }
+    evidenceRoot = realpathSync(requestedEvidenceRoot);
+  } catch (error) {
+    throw new AttachmentRestoreError(
+      "ATTACHMENT_RESTORE_SOURCE_INVALID",
+      "attachment evidence root could not be resolved",
+      { cause: error },
+    );
+  }
+
+  // Keep all database identity and inventory failures in readInventory's DATABASE_INVALID class.
+  const manifest = readInventory(databasePath, createdAt, maxEntries);
+  const expectedManifestBytes = Buffer.from(jsonFile(manifest), "utf8");
+  const manifestPath = join(evidenceRoot, MANIFEST_FILE);
+  const completeMarkerPath = join(evidenceRoot, COMPLETE_MARKER_FILE);
+  const manifestBytes = readValidatedTargetFile(
+    evidenceRoot,
+    manifestPath,
+    "attachment inventory manifest",
+  );
+  if (!manifestBytes.equals(expectedManifestBytes)) {
+    throw new AttachmentRestoreError(
+      "ATTACHMENT_RESTORE_SOURCE_INVALID",
+      "attachment inventory manifest bytes do not match the backup database inventory",
+    );
+  }
+  const manifestSha256 = bytesSha256(manifestBytes);
+
+  const expectedCompleteMarker = {
+    markerVersion: 1,
+    operation: "isolated-attachment-restore",
+    state: "complete",
+    manifestSha256,
+    entryCount: manifest.entries.length,
+  };
+  const expectedCompleteMarkerBytes = Buffer.from(jsonFile(expectedCompleteMarker), "utf8");
+  const completeMarkerBytes = readValidatedTargetFile(
+    evidenceRoot,
+    completeMarkerPath,
+    "attachment restore complete marker",
+  );
+  if (!completeMarkerBytes.equals(expectedCompleteMarkerBytes)) {
+    throw new AttachmentRestoreError(
+      "ATTACHMENT_RESTORE_SOURCE_INVALID",
+      "attachment restore complete marker is missing, malformed, or does not match its manifest",
+    );
+  }
+  const completeMarkerSha256 = bytesSha256(completeMarkerBytes);
+
+  for (const entry of manifest.entries) {
+    await verifyBlobAtRoot(
+      evidenceRoot,
+      entry,
+      "ATTACHMENT_RESTORE_SOURCE_INVALID",
+      "attachment evidence blob is missing or does not match inventory",
+    );
+  }
+
+  return Object.freeze({
+    evidenceRoot,
+    manifestPath,
+    completeMarkerPath,
+    manifestSha256,
+    completeMarkerSha256,
+    manifest,
+  });
 }

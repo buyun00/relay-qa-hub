@@ -3,7 +3,7 @@ import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync } from "nod
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import {
-  archiveSqliteBackupBundle,
+  archiveSqliteRecoveryPointWithAttachments,
   validateSqliteBackupBundle,
   type SqliteOnlineBackupResult,
   type SqliteStorageWorker,
@@ -29,6 +29,7 @@ export type ApiBackupRunnerConfig =
   | Readonly<{
       enabled: true;
       backupRoot: string;
+      evidenceRoot: string;
       archiveRoot?: string;
       onStart: boolean;
       intervalMs?: number;
@@ -345,6 +346,7 @@ export function parseApiBackupEnvironment(
   return Object.freeze({
     enabled: true,
     backupRoot,
+    evidenceRoot: options.evidenceRoot,
     ...(archiveRoot === undefined ? {} : { archiveRoot }),
     onStart,
     ...(intervalMs === undefined ? {} : { intervalMs }),
@@ -381,14 +383,15 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
   let started = false;
   let stopped = false;
 
-  const archiveRecoveryPoint = (recoveryPoint: {
+  const archiveRecoveryPoint = async (recoveryPoint: {
     readonly backupPath: string;
     readonly manifestPath: string;
-  }): void => {
+  }): Promise<void> => {
     if (config.archiveRoot === undefined) return;
-    const archived = archiveSqliteBackupBundle({
+    const archived = await archiveSqliteRecoveryPointWithAttachments({
       backupPath: recoveryPoint.backupPath,
       manifestPath: recoveryPoint.manifestPath,
+      evidenceRoot: config.evidenceRoot,
       archiveRoot: config.archiveRoot,
     });
     options.logger.info(
@@ -398,8 +401,13 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
         archiveManifestPath: archived.manifestPath,
         sizeBytes: archived.manifest.backup.sizeBytes,
         sha256: archived.backupSha256,
+        archiveAttachmentRoot: archived.attachmentRoot,
+        attachmentManifestSha256: archived.attachmentManifestSha256,
+        attachmentCompleteMarkerSha256: archived.attachmentCompleteMarkerSha256,
+        attachmentBindingMarkerSha256: archived.attachmentBindingMarkerSha256,
+        attachmentEntryCount: archived.entryCount,
       },
-      "Relay QA Hub recovery point archived",
+      "Relay QA Hub recovery point and attachments archived",
     );
   };
 
@@ -410,10 +418,12 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
     const rpoRoot = ensureSafeRpoRoot(config.backupRoot);
     if (stopped) return undefined;
     const targetPath = backupTargetPath(rpoRoot, createdAt, operationId());
-    const current = options.worker.createOnlineBackup({ targetPath, createdAt }).then((result) => {
-      archiveRecoveryPoint(result);
-      return result;
-    });
+    const current = options.worker
+      .createOnlineBackup({ targetPath, createdAt })
+      .then(async (result) => {
+        await archiveRecoveryPoint(result);
+        return result;
+      });
     activeBackup = current;
     try {
       return await current;
@@ -481,7 +491,7 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
           onStartResult = await runBackup();
           if (onStartResult !== undefined) recordSuccess(onStartResult);
         } else {
-          archiveRecoveryPoint(latest);
+          await archiveRecoveryPoint(latest);
           nextBackupDelayMs = config.intervalMs - ageMs;
           options.logger.info(
             {
