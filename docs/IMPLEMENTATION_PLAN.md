@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P1
-  current_gate: G1-INDEPENDENT-FOUNDATION
+  current_phase: P3
+  current_gate: G3-ANDROID-APP-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: e619627
+  last_verified_commit: 3b408a9
   last_verified_at: 2026-08-26T16:45:33+08:00
-  next_action: P1.3 VERIFYING；有界失败调度和同 aggregate 保序已通过 TypeScript 检查，最终代码未新增 Relay Turn 做运行验证；下一步只读审计 P1.4
+  next_action: P3.10 DONE；本轮直接交付，active work=none；P1.3 与 P5.2-P5.4 保持 VERIFYING/暂停，不启动 P1/G1/G2、P4/Web/Electron/P8/P9 或新验证
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -24,6 +24,7 @@ qa_hub_progress:
     - API37/真机与完整 Poco Loopback-LAN 安全矩阵仍属于后续 G3/G9 发布 Gate，不阻塞当前 MuMu/API35 MVP 三页闭环
     - 当前游戏包 `com.chuyao.baloots` 的 Poco 已以 `127.0.0.1:5001`、`GetSDKVersion=6` 和 `qa.snapshot status=partial` 真实通过，按用户决策视为 App 联调准备完成；partial 仅保留业务 Provider 缺失警告，不再触发 Unity/Jenkins 构建
     - Relay `e0e461d` 已部署且 create/read/continue 幂等 canary 通过；QA Hub 真实 provider/outbox/webhook/storage 接线已提交为 `e619627` 并完成 TypeScript 编译，P5.2-P5.4 保持 VERIFYING，不再发送新 canary
+    - P1.4 health/config 的未提交源码改动按用户要求原样保留，未运行 typecheck/runtime，不计入当前交付或 Gate 状态
 ```
 
 ## 1. 决策摘要
