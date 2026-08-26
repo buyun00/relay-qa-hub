@@ -9,26 +9,28 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P8
-  current_gate: G8-OPERATIONS-READY
+  current_phase: P3
+  current_gate: G3-ANDROID-APP-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: af75a7b
-  last_verified_at: 2026-08-26T09:58:27+08:00
-  next_action: P8.12 VERIFYING；API-owned E: DB+attachment companion 已隔离恢复并回读真实 PNG，空 evidence 已在 listen 前 fail closed；先提交唯一证据，再选择下一本机原子段，P9.1 保持 WAITING_EXTERNAL
+  last_verified_commit: e619627
+  last_verified_at: 2026-08-26T16:33:16+08:00
+  next_action: P3.10 DONE；本轮 Android+P5 直接交付，active work=none；P5.2-P5.4 保持 VERIFYING/暂停，不启动 P4/Web/Electron/P8/P9 或新验证
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
     - P3.2 仅表示本仓库 Android foundation/APK/MuMu 基础验证完成，不表示 G3 完成
-    - API37/真机/真实 Poco Loopback-LAN 安全证据仍属于后续 G3/G9 发布 Gate，不阻塞当前 fake Relay MVP slice
+    - API37/真机与完整 Poco Loopback-LAN 安全矩阵仍属于后续 G3/G9 发布 Gate，不阻塞当前 MuMu/API35 MVP 三页闭环
+    - 当前游戏包 `com.chuyao.baloots` 的 Poco 已以 `127.0.0.1:5001`、`GetSDKVersion=6` 和 `qa.snapshot status=partial` 真实通过，按用户决策视为 App 联调准备完成；partial 仅保留业务 Provider 缺失警告，不再触发 Unity/Jenkins 构建
+    - Relay `e0e461d` 已部署且 create/read/continue 幂等 canary 通过；QA Hub 真实 provider/outbox/webhook/storage 接线已提交为 `e619627` 并完成 TypeScript 编译，P5.2-P5.4 保持 VERIFYING，不再发送新 canary
 ```
 
 ## 1. 决策摘要
 
 QA Hub 是一个独立、双客户端职责分离的缺陷闭环系统。它必须在 Relay 完全不可用时仍能完成提单、分诊、人工分配、修复登记、构建关联、验收、失败重开和关闭。
 
-最新产品边界以独立 QA Hub API/数据库为唯一业务事实源：Android 原生 App 负责现场悬浮球截图、Poco/Unity 上下文、快速提单、附件、离线草稿/重试与轻量提交状态；`apps/web` 是当前 MVP 的桌面正式管理页面，负责完整分诊、管理与人工闭环；`apps/desktop` 以 Electron 复用同一份 React/Vite 构建资产，作为 Windows 日常入口并承载托盘、连接与原生通知。普通浏览器入口继续保留。当前开发和验收顺序冻结为先在普通浏览器稳定 Web 功能，再统一打包和回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不是 PWA，不承担手机截图、离线取证或 WebView 包壳；Android、浏览器和 Electron 都只访问 QA Hub API，绝不直连 Relay。
+最新产品边界以独立 QA Hub API/数据库为唯一业务事实源：Android 原生 App 只保留“我提交的 Bug”“项目全部 Bug”“新建 Bug”三个页面，负责现场悬浮球截图、静默 Poco/Unity 上下文、触控标注、快速提单、附件、离线草稿/重试与轻量进度查看；`apps/web` 是当前 MVP 的桌面正式管理页面，负责完整分诊、管理与人工闭环；`apps/desktop` 以 Electron 复用同一份 React/Vite 构建资产，作为 Windows 日常入口并承载托盘、连接与原生通知。普通浏览器入口继续保留。当前开发和验收顺序冻结为先在普通浏览器稳定 Web 功能，再统一打包和回归 Windows 应用，不为每个 Web 原子切片重复 Electron 打包。Web 不是 PWA，不承担手机截图、离线取证或 WebView 包壳；Android、浏览器和 Electron 都只访问 QA Hub API，绝不直连 Relay。
 
 Relay 只通过一键派发和可靠事件回写参与某些修复尝试：
 
@@ -547,7 +549,10 @@ Relay 事件只能更新当前 `RepairAttempt` 的 Relay receipt/投影和通知
 
 ### 10.1 现场快速上报体验
 
-- Android App 聚焦缺陷快速创建/极简编辑、悬浮球/分享取证、附件、Poco enrichment、离线队列，以及“我提交的/上传状态/必要通知”等轻量查询；禁止 WebView 包壳，不继续承载完整管理后台。
+- Android App 的用户信息架构冻结为且仅为三个页面：`我提交的 Bug` 只列当前用户创建的 Bug；`项目全部 Bug` 只列当前项目的全部 Bug；`新建 Bug` 承担截图预览/标注、最少内容、修复人/验收人选择与一次提交。两个列表只显示进度/状态、必要详情和刷新，不提供分配变更、状态流转、评论、Relay、Build、Verification、审计或设置入口。
+- `新建 Bug` 顶部始终先处理截图，至少提供适合触控的画圈/手绘、撤销、清除；悬浮球单击完成截图后自动打开此页并带入刚截媒体。页面只有内容、人员选择和明确的“一键提交”主动作；截图原图、标记图、内容、修复人和验收人进入同一稳定 `clientSubmissionId` 提交。
+- Android 不显示调试、同步、Poco、Relay、桌面管理、复杂设置或实验入口。Poco snapshot 与截图使用同一 captureId 静默采集并随证据上传；失败只把 enrichment 记为 partial/unavailable，不阻止普通截图提单，也不向用户暴露技术按钮或原始 RPC 细节。
+- 人员不得写死在 Kotlin/Compose 中，也不新增人员管理页。唯一配置源固定为仓库种子 `apps/android/config/qa-people.json`；安装后 App 首次复制到设备可编辑路径 `/storage/emulated/0/Android/media/<applicationId>/qa-hub/config/qa-people.json` 并优先读取该文件。JSON 固定为 `schemaVersion`、`projectKey`、`people[]`，每个人包含 `id`、`displayName`、`roles`、`active`；`roles` 只允许 `fixer` 和 `verifier`。debug applicationId 为 `com.relayqahub.android.debug`，release 为 `com.relayqahub.android`。配置无可用角色时明确提示，禁止退回硬编码人员。
 - QA Hub API/数据库是唯一事实源。Room 只保存按账号/项目隔离的缓存、草稿和本地操作队列；上线后以服务端版本/事件对账，不能在本地决定最终状态或验收。
 - Relay 离线时，Android 到 QA Hub 的现场上报仍可用；完整分诊、人工修复、Build、验收、重开和关闭由 Web 通过同一 QA Hub API 完成。
 - 共享测试机采用短会话、显式用户/项目上下文、退出撤销通知并清除本账号 Room/媒体/token 命名空间。
@@ -572,7 +577,7 @@ Relay 事件只能更新当前 `RepairAttempt` 的 Relay receipt/投影和通知
 ### 10.4 Poco QA Bridge
 
 - Android App 内实现最小 Poco SimpleRPC/Kotlin 客户端。协议是 4 字节 little-endian Int32 长度头加 UTF-8 JSON-RPC 2.0；分配缓冲前拒绝负数/零/超限/截断帧。优先连接配置的 `127.0.0.1` 端口，并兼容探测 Poco 默认 `5001..5005`；以 `GetSDKVersion` 验证标准 Poco，但不能据此推断 Invoke capability。每步都有短超时、总 deadline、取消即关 socket、响应/解压大小上限和无 Poco fallback。
-- 点击悬浮球后先隐藏球，再以同一 `captureId`/timestamp 启动系统画面与 Poco enrichment：MediaProjection 用户所见系统画面（主证据）、Poco `Screenshot` 干净 Unity framebuffer（若可得）、`Dump(true)` 可见 UI hierarchy（压缩/裁剪/上限）、`GetScreenSize`/`GetSDKVersion`/`GetDebugProfilingData`（若可得）和自定义 `qa.snapshot`（若 capability 存在）。Poco 重操作在 Unity 主线程可能串行，标准 RPC 也不保证同一帧，因此每个 artifact 记录 start/end/skew，不能宣称原子同帧。任何 Poco 失败都不阻断普通截图草稿；UI 显示“已获取 Unity 上下文 / 部分 / 未连接”，并持久化 `enrichmentStatus=complete|partial|unavailable`。
+- 点击悬浮球后先隐藏球，再以同一 `captureId`/timestamp 启动系统画面与 Poco enrichment：MediaProjection 用户所见系统画面（主证据）、Poco `Screenshot` 干净 Unity framebuffer（若可得）、`Dump(true)` 可见 UI hierarchy（压缩/裁剪/上限）、`GetScreenSize`/`GetSDKVersion`/`GetDebugProfilingData`（若可得）和自定义 `qa.snapshot`（若 capability 存在）。Poco 重操作在 Unity 主线程可能串行，标准 RPC 也不保证同一帧，因此每个 artifact 记录 start/end/skew，不能宣称原子同帧。任何 Poco 失败都不阻断普通截图草稿；只在证据元数据持久化 `enrichmentStatus=complete|partial|unavailable`，三页 UI 不提供 Poco/技术触发按钮或原始诊断面板。
 - capability spike 必须先从实际内置 Poco 源码/assembly/version 证明是否支持 `PocoListenersBase`、`PocoMethod` 和 Invoke 扩展。上游在 Invoke 引入前后都可能返回 `GetSDKVersion=6`，所以必须静态检查相关类型/字段/RPCParser 分支并真实探测 `qa.snapshot`。支持时，测试包可提供 `QaPocoSnapshotProvider : PocoListenersBase`，用 `[PocoMethod("qa.snapshot")]` 暴露只读方法并绑定到 `PocoManager.pocoListenersBase`；旧版仅使用标准 Screenshot/Dump，把 `qa.snapshot` 作为小型、可审计兼容补丁，不能假装原生支持。
 - `qa.snapshot` 请求携带 `captureId`、`nonce`、`deadlineMs`、`schemaVersion`，响应回显同一 captureId，并返回带 schemaVersion 的 JSON：build/version/gitSha、scene、game time、脱敏测试用户 ID、关卡/模式、关键网络环境、有限最近错误和项目自定义字段。字段逐步可选；业务状态不硬编码进 App。
 - 安全前提：QA/Debug 构建必须把 Poco 从源码默认的 `AsyncTcpServer(IPAddress.Any, port)` 限制为 `IPAddress.Loopback/127.0.0.1`，禁止 LAN 暴露。只做 App allowlist 不足以防恶意同机客户端；Unity server 也必须只注册 `GetSDKVersion`、`Screenshot`、`Dump`、`GetScreenSize`、`GetDebugProfilingData` 和 listener 限定为 `qa.snapshot` 的 Invoke，拒绝 SetText/touch/SendMessage/RotateObject 等操作方法。若实际版本无法安全限制回环和服务端只读面，只能在受控测试机临时使用，并阻断 `G3-ANDROID-APP-READY`。
@@ -869,17 +874,25 @@ P3.6 转 `VERIFYING`；离线 Poco bundle、录屏、Sharesheet/Photo Picker、�
 
 验证：负数/零/超长/截断 frame、错 JSON-RPC id、非法 JSON、Poco 不存在/旧版/非 Poco 占端口/超时/取消/超大 hierarchy/Unity 崩溃均快速降级且不阻断草稿；captureId/nonce/deadline/schema 不匹配被拒；录屏仅打点或停止时 Dump，一次 capture 的结果按时间稳定关联但不冒充同帧原子快照。
 
-#### P3.8 Unity qa.snapshot 最小兼容层
+#### P3.8 现有 Unity 游戏 Poco 适配（联调准备完成）
 
-在实际 Poco capability 证据基础上，仅对内部 QA/Debug 测试包新增薄层：支持扩展的版本实现 `QaPocoSnapshotProvider : PocoListenersBase`、`[PocoMethod("qa.snapshot")]` 并绑定 `PocoManager.pocoListenersBase`；旧版采用最小兼容 patch 或只保留标准 Screenshot/Dump。监听必须改为 Loopback，server 注册表必须移除操作 RPC，返回版本化、大小受限、默认脱敏且回显 captureId 的 JSON；IL2CPP stripping 使用 `[Preserve]`/最小 link.xml 保护 provider，不实现完整 Reporter 或业务控制。
+当前被测包直接作为 Android App 的联调目标，不再等待或触发新的 Unity/Jenkins 构建。已确认设备 `127.0.0.1:16384` 为 Android 15/API35，包名 `com.chuyao.baloots`，Unity `2022.3.62f3`；Poco 实际监听 `127.0.0.1:5001`，`GetSDKVersion` 真实返回 `6`，`qa.snapshot` 按 JSON-RPC `params[0]` 真实返回相同 captureId、`status=partial`、`scene=GameScene`、`appVersion=2.1.65`、`unityVersion=2022.3.62f3`。`partial` 只表示业务 Provider 尚未注册，并明确给出 `business_provider_unavailable` / `business_fields_unavailable`；用户已接受该降级，监听与协议视为 App 联调准备完成。
 
-验证：Mono/IL2CPP、横竖屏、弱机下可用；恶意同机客户端、过期 nonce/deadline、超大/敏感字段被拒；同 profile 的 127.0.0.1 可连且 Wi-Fi/LAN 地址不可连。API 37 下不得为同机 Poco 请求 `ACCESS_LOCAL_NETWORK`，work profile/跨 profile 回环必须失败。若无法限制 Loopback，阻断 G3 debug-ready。
+当前状态：`DONE（APP_E2E_READY）`。P3.10 直接复用现有游戏包做截图 + 静默 snapshot 联调；不得修改 Unity、触发 Jenkins 或用 Unity APK 替代 QA Hub APK。业务 Provider 丰富字段、Mono/IL2CPP/弱机性能、恶意同机客户端、LAN-negative、API37/work-profile 等发布级矩阵保留在 P3.9/G9，不反向阻塞当前三页 MVP。
 
 #### P3.9 App/Poco 真机、性能与安全矩阵
 
-至少覆盖 Android 15/API 35（当前 MuMu + 一台真机）、Android 16/API 36、Android 17/API 37、Pixel/AOSP 与一个强省电 OEM；当前 MuMu 已实测为 Android 15/API 35/SELinux Permissive，只承担 API35 emulator lane。交叉权限回收、方向/分辨率、锁屏、来电/弹窗、断网、重复、20 MiB 图片/短录屏、App/Unity crash、5001 占用、Poco 不存在/旧版、超时/超大 Dump、IL2CPP、弱机、恶意同机客户端和 `FLAG_SECURE`。API 37 额外覆盖 `ACCESS_LOCAL_NETWORK` 不声明/不请求的同 profile loopback 正例与 LAN/跨 profile 反例、`sw600dp+` 强制自适应和方向限制失效、CT/ECH、通知自定义视图与 MediaProjection 前台服务行为。测量 Unity ReadPixels/Screenshot/Dump 的 P50/P95 延迟、主线程和帧影响。MuMu API level 必须以 adb `getprop ro.build.version.sdk` 为证据，且不能替代任何真机的 overlay/MediaProjection/系统回收/Poco/SELinux 验证。
+至少覆盖 Android 15/API 35（当前 MuMu + 一台真机）、Android 16/API 36、Android 17/API 37、Pixel/AOSP 与一个强省电 OEM；当前 MuMu 已实测为 Android 15/API 35/SELinux Permissive，只承担 API35 emulator lane。交叉权限回收、方向/分辨率、锁屏、来电/弹窗、断网、重复、20 MiB 图片/短录屏、App/Unity crash、5001 占用、Poco 不存在/旧版、超时/超大 Dump、IL2CPP、弱机、恶意同机客户端和 `FLAG_SECURE`。API 37 额外覆盖 `ACCESS_LOCAL_NETWORK` 不声明/不请求的同 profile loopback 正例与 LAN/跨 profile 反例、`sw600dp+` 强制自适应和方向限制失效、CT/ECH、通知自定义视图与 MediaProjection 前台服务行为。测量 Unity ReadPixels/Screenshot/Dump 的 P50/P95 延迟、主线程和帧影响。MuMu API level 必须以 adb `getprop ro.build.version.sdk` 为证据，且不能替代任何真机的 overlay/MediaProjection/系统回收/Poco/SELinux 验证。该发布矩阵不阻塞 P3.10 的当前 MuMu/API35 MVP。
 
-Gate `G3-ANDROID-APP-READY`：P3.0-P3.9 的现场采集范围全绿；Android App 可安装并完成极简提单、普通截图/Poco 可选 enrichment、附件和离线重试；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。完整管理闭环由 G7 Web 证明，不能再用 Android 管理按钮代替。
+#### P3.10 Android 三页现场客户端收敛
+
+将已有 Compose/debug 管理骨架收敛为唯一三页导航：`我提交的 Bug`、`项目全部 Bug`、`新建 Bug`。两个列表分别以当前 actor 与当前 project scope 调用同一 QA Hub API，只显示服务端状态/进度和必要详情；新建页接收悬浮球刚生成的 app-private screenshot/captureId，提供触控画圈/手绘、撤销、清除，读取 10.1 冻结的单一人员 JSON，选择 `fixer` 与 `verifier`，用一个按钮把原图、标记图、内容和两个人员身份沿现有附件/幂等队列创建一个 Bug。Poco/qa.snapshot 与 capture 同步静默采集，partial/unavailable 均不阻断普通截图。
+
+最小验证只做一条真实 MuMu/API35 主链和一个关键降级：安装本仓库 `apps/android` Gradle 产出的 APK，确认三页且无调试/同步/Poco/Relay/管理入口；从当前 `com.chuyao.baloots` 悬浮球截图自动打开新建页，完成标注、人员选择和一键提交，经真实 QA Hub API/SQLite 回读同一 Bug、原图/标记图、fixer/verifier 与 `qa.snapshot partial`；Poco 临时不可达时同一普通截图仍可提交。不得运行扩展模块测试矩阵，不触发 Unity/Jenkins。
+
+当前状态：`DONE`。提交 `df68325` 已在 MuMu/API35 生成 `LOCAL-4`，系统原图、标注图、配置化 fixer/verifier、Poco Screenshot/Dump/`qa.snapshot partial` 均绑定同一 captureId；既有真实 no-Poco 降级证据复用，未重复测试。G3 因真机/API37、LAN-negative/SELinux Enforcing 与发布性能尾项保持 `VERIFYING`。
+
+Gate `G3-ANDROID-APP-READY`：P3.0-P3.10 的现场采集范围全绿；Android App 可安装并完成三页进度查看、截图标注、配置化人员、极简提单、普通截图/Poco 可选 enrichment、附件和离线重试；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。完整管理闭环由 G7 Web 证明，不能再用 Android 管理按钮代替。
 
 ### P4 - G4：人工修复和验收闭环
 
@@ -957,9 +970,9 @@ MuMu MVP slice：Android -> QA Hub 的 typed handoff、durable outbox、独立 f
 
 要做：delivery evidence 校验、Build 投影、needs_input/blocked/failed、验收失败 action 幂等追加 Turn，并在 Android App 原生页面展示 handoff/receipt/对账状态。
 
-MuMu MVP execution override：P5.2/P5.3 的真实 Relay 改动仍不在当前授权范围；先由独立 fake Relay 向 QA Hub 发送一条 `fix_delivered` 回写，持久更新 receipt 并由 Android 原生页面读取，同时证明 Bug 保持人工验收边界、绝不自动关闭。只保留一个迟到/旧 revision 明确忽略且不得覆盖路径，通过后继续 Build/通知主链。
+真实 Relay execution slice（2026-08-26）：Relay `e0e461d` 已通过 Guardian 空闲门禁重载，生产 route 从 `404` 变为未认证 `401`；真实 Task `task-cf2e0806-bdbd-41df-ab30-32367bc09a0b` 的 create 与 continue 均绑定 thread `01a03c70-f468-7940-ab04-aac4316b24b7` / branch `codex/task-0078-relay-m2m-read-only-canary`，重放不生成替代 Task。signed durable `fix_delivered` revision `53265` 已由 QA Inbox applied，receipt 绑定 exact commit 且 Bug 未自动关闭。QA Hub fake-only outbound 与旧 `turn.delivered` 投影已由提交 `e619627` 替换为真实 loopback scoped Bearer provider、受限附件 bytes 和 `submitted|running|needs_input|blocked|failed|fix_delivered` durable signed webhook。
 
-已验证 slice：MuMu Android 已真实回读 `fix_delivered`；QA Hub durable Inbox 保存 revision `2` 为 `applied`，另一个 revision `1` 为 `ignored`，Receipt 未被回退且 Bug/Verification 未变化。P5.4 保持 `VERIFYING`，因为真实 Relay 多事件、继续任务和对账尚未完成。
+历史 fake slice 仅保留为投影边界回归。`e619627` 已完成 storage/API TypeScript 编译，但最终提交未重新运行 canary；按验证纪律 P5.2-P5.4 与 G5 保持 `VERIFYING`，不把旧运行证据冒充最终提交的生产验证，也不发送新 Turn。
 
 验证：
 
