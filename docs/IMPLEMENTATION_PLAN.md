@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: f5275f2
-  last_verified_at: 2026-08-26T08:54:05+08:00
-  next_action: P8.10 VERIFYING；异盘 archive -> 隔离恢复 -> 独立 API 回读及损坏副本拒绝已通过，终审 Blocker/High=0/0；先提交证据，再选择下一项本机 G8 原子段，P9.1 继续 WAITING_EXTERNAL
+  last_verified_commit: ff87001
+  last_verified_at: 2026-08-26T09:15:09+08:00
+  next_action: P8.11 VERIFYING；Comment 前 A、Comment 后 B 与 A 的 create-only rollback/API 时间点差异已通过，终审 Blocker/High=0/0；先提交证据，再选择下一本机 G8 原子段，P9.1 继续 WAITING_EXTERNAL
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1103,6 +1103,10 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 #### P8.10 异盘归档隔离恢复与 API 回读
 
 当前状态：`VERIFYING`。P8.9 的精确 E: 主 `.sqlite`/manifest pair 已由现有 `restoreSqliteToIsolatedRoot()` create-only 恢复到全新 D: data root；独立 4320 API 返回 ready/schema v4 并回读 `LOCAL-1 reported/v1`，退出后 integrity/FK=`ok/0`、PID/端口均消失，本机恢复至 API Bug 回读为 `531.370 ms`。只在全新 D: fixture 中篡改的副本返回 `SQLITE_RESTORE_BACKUP_INVALID` 且未创建 restore root，E: DB/manifest 前后 SHA 不变。证据见 [`docs/evidence/P8.10-offdisk-archive-restore.md`](evidence/P8.10-offdisk-archive-restore.md)，最终 Luna/max 复审 Blocker/High=`0/0`。该 slice 未扫描整个 archive、复制 WAL/SHM、覆盖现有 data root，也不等同 attachment restore、物理盘丢失演练、生产 SLA 或 G8 DONE。
+
+#### P8.11 前一 recovery point 回切与 API 回读
+
+当前状态：`VERIFYING`。全新 D: disposable fixture 的 backup-on-start runner 在 Comment 前生成 A、Comment 后生成 B：A 的匹配 Comment/Event=`0/0`，B 与当前 fixture=`1/1`。A 已 create-only 恢复到另一个全新 rollback root；独立 4320 API ready/schema v4、回读 `LOCAL-1 reported/v1` 且匹配 Event 为 `0`，退出后 rollback/current integrity/FK 都为 `ok/0`，当前 fixture 仍为 `1/1`。A restore 到 API readback/stop 的本机值为 `497.937 ms`，三个精确 PID 均经 SIGINT 退出且外部核对不存在。证据见 [`docs/evidence/P8.11-previous-recovery-point-rollback.md`](evidence/P8.11-previous-recovery-point-rollback.md)，最终 Luna/xhigh 复审 Blocker/High=`0/0`。该 slice 不覆盖现有数据、不写 E: archive，也不等同应用二进制回滚、attachment rollback、生产切流或 G8 DONE。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
