@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P8
-  current_gate: G8-OPERATIONS-READY
+  current_phase: P9
+  current_gate: G9-REAL-DEVICE
   status: executing
   gates_completed: 1
   gates_total: 11
   last_verified_commit: 8e2e5a544617427a3cfc3600d722b7e490436ed8
-  last_verified_at: 2026-08-26T08:28:49+08:00
-  next_action: P8.2 IN_PROGRESS；P8.1 Web session/debug auth mode 已 fail closed 并转 VERIFYING；下一步只注入一次 SQLite write lock，证明写 API 明确失败且无假成功，释放后同一操作可完成，不扩 p95/p99 或广域故障矩阵
+  last_verified_at: 2026-08-26T08:35:15+08:00
+  next_action: P9.1 WAITING_EXTERNAL；P8.2 SQLite busy no-false-success 已转 VERIFYING，G8 转 VERIFYING；下一真实 Gate 需要 Android 15 真机 + 可联调的 QA/Debug Unity Poco build，当前 MuMu/API35 只保留模拟器证据，不能替代真机或真实 Poco
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1059,7 +1059,7 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 验证：约定并发/数据量下 p95/p99 达标；DB busy、磁盘不足、Push/Relay/Build 下线无数据丢失或假成功。
 
-当前状态：`IN_PROGRESS`。本轮只注入一个隔离 SQLite write lock：真实写 API 必须返回明确非成功，Bug/Event/Submission facts 不变；释放锁后复用同一业务操作可成功。完整 p95/p99、容量、磁盘不足和依赖下线矩阵继续后置。
+当前状态：`VERIFYING`。隔离 API 使用运行时 `250 ms` busy timeout，外部 `BEGIN IMMEDIATE` 持锁时真实 Comment POST 在 `264.154 ms` 返回 `500`、API live 仍 `200`，同 UUID 的 Comment/Event/Submission 为 `0/0/0`；释放锁后完全相同请求 `201`，三 facts 精确 `1/1/1`。证据见 [`docs/evidence/P8.2-sqlite-busy-no-false-success.md`](evidence/P8.2-sqlite-busy-no-false-success.md)。Luna/xhigh 复审 Blocker/High=`0/0`；完整 p95/p99、容量、磁盘不足和依赖下线矩阵继续后置，不宣称生产性能或 G8 DONE。
 
 #### P8.3 备份
 
@@ -1105,6 +1105,8 @@ Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，�
 ### P9 - G9：Android/Poco 真实设备和 E2E
 
 #### P9.1 真实设备矩阵
+
+当前状态：`IN_PROGRESS / WAITING_EXTERNAL`。当前已连接的 MuMu 是 Android 15/API35、SELinux Permissive 模拟器，只能保留功能补测；正式 slice 需要至少一台 Android 15/API35 真机和一个已安全限制到 loopback、可联调的内部 QA/Debug Unity Poco build。设备/测试包出现前不重复 MuMu matrix，不修改 Unity、不触发 Jenkins，也不把 stand-in/fake Poco 冒充真实 Gate。
 
 测试槽位：
 
