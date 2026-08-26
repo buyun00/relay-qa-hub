@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import net from "node:net";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -13,6 +15,7 @@ const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const apiEntryPoint = path.join(repositoryRoot, "apps", "api", "dist", "main.js");
 const livePath = "/api/v1/health/live";
 const buildSha = "0123456789abcdef0123456789abcdef01234567";
+const debugBearerToken = randomBytes(32).toString("base64url");
 
 async function loadJson(relativePath) {
   return JSON.parse(await readFile(path.join(repositoryRoot, relativePath), "utf8"));
@@ -49,7 +52,7 @@ async function reservePort() {
   return port;
 }
 
-function startApi(port) {
+function startApi(port, dataRoot) {
   const output = [];
   const child = spawn(process.execPath, [apiEntryPoint], {
     cwd: repositoryRoot,
@@ -58,6 +61,9 @@ function startApi(port) {
       QA_HUB_API_HOST: "127.0.0.1",
       QA_HUB_API_PORT: String(port),
       QA_HUB_BUILD_SHA: buildSha,
+      QA_HUB_DATA_ROOT: dataRoot,
+      QA_HUB_MVP_ACCESS_TOKEN: debugBearerToken,
+      QA_HUB_WEB_AUTH_MODE: "debug",
     },
     stdio: ["ignore", "pipe", "pipe"],
     windowsHide: true,
@@ -114,7 +120,9 @@ async function stopChild(child) {
 
 test("built API process starts healthy and can be restarted on the same port", async (t) => {
   const port = await reservePort();
-  const first = startApi(port);
+  const dataRoot = await mkdtemp(path.join(os.tmpdir(), "relay-qa-hub-e2e-"));
+  t.after(async () => rm(dataRoot, { recursive: true, force: true }));
+  const first = startApi(port, dataRoot);
   t.after(async () => stopChild(first.child));
 
   const firstResponse = await waitForHealth(port, first.child, first.output);
@@ -127,7 +135,7 @@ test("built API process starts healthy and can be restarted on the same port", a
   assert.equal(firstHealth.buildSha, buildSha);
   await stopChild(first.child);
 
-  const second = startApi(port);
+  const second = startApi(port, dataRoot);
   t.after(async () => stopChild(second.child));
   const secondResponse = await waitForHealth(port, second.child, second.output);
   assert.equal(secondResponse.status, 200);

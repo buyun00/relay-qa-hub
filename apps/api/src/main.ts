@@ -60,9 +60,28 @@ function readRelayWebhookSecret(fakeRelayEndpoint: URL | undefined): string | un
   return configured;
 }
 
-function readWebSessionSecret(): string | undefined {
+type WebAuthMode = "session" | "debug";
+
+function readWebAuthMode(): WebAuthMode {
+  const configured = process.env["QA_HUB_WEB_AUTH_MODE"]?.trim().toLowerCase();
+  if (configured === undefined || configured.length === 0 || configured === "session") {
+    return "session";
+  }
+  if (configured === "debug") return "debug";
+  throw new Error("QA_HUB_WEB_AUTH_MODE must be session or debug");
+}
+
+function readWebSessionSecret(mode: WebAuthMode): string | undefined {
   const configured = process.env["QA_HUB_WEB_SESSION_SECRET"]?.trim();
-  if (configured === undefined || configured.length === 0) return undefined;
+  if (configured === undefined || configured.length === 0) {
+    if (mode === "session") {
+      throw new Error("QA_HUB_WEB_SESSION_SECRET is required in session auth mode");
+    }
+    return undefined;
+  }
+  if (mode === "debug") {
+    throw new Error("QA_HUB_WEB_SESSION_SECRET must not be set in debug auth mode");
+  }
   if (configured.length < 32) {
     throw new Error("QA_HUB_WEB_SESSION_SECRET must contain at least 32 characters");
   }
@@ -97,6 +116,13 @@ async function closeRuntime(
 }
 
 async function run(): Promise<void> {
+  const webAuthMode = readWebAuthMode();
+  const webSessionSecret = readWebSessionSecret(webAuthMode);
+  const secureCookie = webAuthMode === "session" ? readSecureCookie() : undefined;
+  const webBootstrapPassword = process.env["QA_HUB_BOOTSTRAP_ADMIN_PASSWORD"];
+  if (webAuthMode === "debug" && webBootstrapPassword !== undefined) {
+    throw new Error("QA_HUB_BOOTSTRAP_ADMIN_PASSWORD requires session auth mode");
+  }
   const storage = parseStorageEnvironment(process.env);
   const debugBearerToken = requireMobileAccessToken();
   const backupConfig = parseApiBackupEnvironment(process.env, {
@@ -123,14 +149,8 @@ async function run(): Promise<void> {
   try {
     await worker.ensureMobileScope(MOBILE_SCOPE);
     await worker.ensureMobileRelayRoles(MOBILE_SCOPE);
-    const webSessionSecret = readWebSessionSecret();
-    const secureCookie = readSecureCookie();
-    const webBootstrapPassword = process.env["QA_HUB_BOOTSTRAP_ADMIN_PASSWORD"];
-    if (webBootstrapPassword !== undefined && webSessionSecret === undefined) {
-      throw new Error("QA_HUB_WEB_SESSION_SECRET is required with QA_HUB_BOOTSTRAP_ADMIN_PASSWORD");
-    }
     const browserAuthStore =
-      webSessionSecret === undefined
+      webAuthMode === "debug" || webSessionSecret === undefined
         ? undefined
         : createSqliteBrowserAuthStore({
             worker,
