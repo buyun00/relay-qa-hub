@@ -3,6 +3,7 @@ import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync } from "nod
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import {
+  archiveSqliteBackupBundle,
   validateSqliteBackupBundle,
   type SqliteOnlineBackupResult,
   type SqliteStorageWorker,
@@ -28,6 +29,7 @@ export type ApiBackupRunnerConfig =
   | Readonly<{
       enabled: true;
       backupRoot: string;
+      archiveRoot?: string;
       onStart: boolean;
       intervalMs?: number;
     }>;
@@ -267,7 +269,18 @@ export function parseApiBackupEnvironment(
 ): ApiBackupRunnerConfig {
   const onStart = parseBoolean(environment["QA_HUB_BACKUP_ON_START"], "QA_HUB_BACKUP_ON_START");
   const intervalMs = parseIntervalMs(environment["QA_HUB_BACKUP_INTERVAL_MINUTES"]);
-  if (!onStart && intervalMs === undefined) return Object.freeze({ enabled: false });
+  const archiveEnabled = parseBoolean(
+    environment["QA_HUB_BACKUP_ARCHIVE_ENABLED"],
+    "QA_HUB_BACKUP_ARCHIVE_ENABLED",
+  );
+  if (!onStart && intervalMs === undefined) {
+    if (archiveEnabled) {
+      throw new ApiBackupConfigurationError(
+        "QA_HUB_BACKUP_ARCHIVE_ENABLED requires backup-on-start or cadence",
+      );
+    }
+    return Object.freeze({ enabled: false });
+  }
 
   const configuredRoot = environment["QA_HUB_BACKUP_ROOT"];
   if (configuredRoot === undefined || configuredRoot.trim().length === 0) {
@@ -292,9 +305,47 @@ export function parseApiBackupEnvironment(
     }
   }
 
+  let archiveRoot: string | undefined;
+  if (archiveEnabled) {
+    const configuredArchiveRoot = environment["QA_HUB_BACKUP_ARCHIVE_ROOT"];
+    if (configuredArchiveRoot === undefined || configuredArchiveRoot.trim().length === 0) {
+      throw new ApiBackupConfigurationError(
+        "QA_HUB_BACKUP_ARCHIVE_ROOT is required when backup archive is enabled",
+      );
+    }
+    const requestedArchiveRoot = requireAbsolutePath(
+      configuredArchiveRoot,
+      "QA_HUB_BACKUP_ARCHIVE_ROOT",
+    );
+    const resolvedArchiveRoot = canonicalizePotentialPath(
+      requestedArchiveRoot,
+      "QA_HUB_BACKUP_ARCHIVE_ROOT",
+    );
+    if (!pathsEqual(resolvedArchiveRoot, requestedArchiveRoot)) {
+      throw new ApiBackupConfigurationError(
+        "QA_HUB_BACKUP_ARCHIVE_ROOT must not resolve through a junction or symbolic link",
+      );
+    }
+    if (pathsOverlap(resolvedArchiveRoot, backupRoot)) {
+      throw new ApiBackupConfigurationError(
+        "QA_HUB_BACKUP_ARCHIVE_ROOT must not overlap QA_HUB_BACKUP_ROOT",
+      );
+    }
+    for (const [name, protectedPath] of protectedRoots) {
+      const canonicalProtectedPath = canonicalizePotentialPath(protectedPath, name);
+      if (pathsOverlap(resolvedArchiveRoot, canonicalProtectedPath)) {
+        throw new ApiBackupConfigurationError(
+          `QA_HUB_BACKUP_ARCHIVE_ROOT must not overlap ${name}`,
+        );
+      }
+    }
+    archiveRoot = requestedArchiveRoot;
+  }
+
   return Object.freeze({
     enabled: true,
     backupRoot,
+    ...(archiveRoot === undefined ? {} : { archiveRoot }),
     onStart,
     ...(intervalMs === undefined ? {} : { intervalMs }),
   });
@@ -330,6 +381,28 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
   let started = false;
   let stopped = false;
 
+  const archiveRecoveryPoint = (recoveryPoint: {
+    readonly backupPath: string;
+    readonly manifestPath: string;
+  }): void => {
+    if (config.archiveRoot === undefined) return;
+    const archived = archiveSqliteBackupBundle({
+      backupPath: recoveryPoint.backupPath,
+      manifestPath: recoveryPoint.manifestPath,
+      archiveRoot: config.archiveRoot,
+    });
+    options.logger.info(
+      {
+        disposition: archived.disposition,
+        archiveBackupPath: archived.backupPath,
+        archiveManifestPath: archived.manifestPath,
+        sizeBytes: archived.manifest.backup.sizeBytes,
+        sha256: archived.backupSha256,
+      },
+      "Relay QA Hub recovery point archived",
+    );
+  };
+
   const runBackup = async (): Promise<SqliteOnlineBackupResult | undefined> => {
     if (stopped) return undefined;
     if (activeBackup !== undefined) return activeBackup;
@@ -337,7 +410,10 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
     const rpoRoot = ensureSafeRpoRoot(config.backupRoot);
     if (stopped) return undefined;
     const targetPath = backupTargetPath(rpoRoot, createdAt, operationId());
-    const current = options.worker.createOnlineBackup({ targetPath, createdAt });
+    const current = options.worker.createOnlineBackup({ targetPath, createdAt }).then((result) => {
+      archiveRecoveryPoint(result);
+      return result;
+    });
     activeBackup = current;
     try {
       return await current;
@@ -405,6 +481,7 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
           onStartResult = await runBackup();
           if (onStartResult !== undefined) recordSuccess(onStartResult);
         } else {
+          archiveRecoveryPoint(latest);
           nextBackupDelayMs = config.intervalMs - ageMs;
           options.logger.info(
             {

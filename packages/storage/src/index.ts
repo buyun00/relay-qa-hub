@@ -264,6 +264,12 @@ export type {
   SqliteRestoreErrorCode,
   ValidateSqliteBackupBundleOptions,
 } from "./sqlite-restore.js";
+export { archiveSqliteBackupBundle, SqliteArchiveError } from "./sqlite-archive.js";
+export type {
+  ArchiveSqliteBackupBundleOptions,
+  SqliteArchiveErrorCode,
+  SqliteBackupArchiveResult,
+} from "./sqlite-archive.js";
 export {
   restoreReferencedAttachmentsToIsolatedRoot,
   AttachmentRestoreError,
