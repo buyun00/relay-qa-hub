@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P9
-  current_gate: G9-REAL-DEVICE
+  current_phase: P8
+  current_gate: G8-OPERATIONS-READY
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 8e2e5a544617427a3cfc3600d722b7e490436ed8
-  last_verified_at: 2026-08-26T08:35:15+08:00
-  next_action: P9.1 WAITING_EXTERNAL；P8.2 SQLite busy no-false-success 已转 VERIFYING，G8 转 VERIFYING；下一真实 Gate 需要 Android 15 真机 + 可联调的 QA/Debug Unity Poco build，当前 MuMu/API35 只保留模拟器证据，不能替代真机或真实 Poco
+  last_verified_commit: f5275f2
+  last_verified_at: 2026-08-26T08:54:05+08:00
+  next_action: P8.10 VERIFYING；异盘 archive -> 隔离恢复 -> 独立 API 回读及损坏副本拒绝已通过，终审 Blocker/High=0/0；先提交证据，再选择下一项本机 G8 原子段，P9.1 继续 WAITING_EXTERNAL
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1099,6 +1099,10 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 #### P8.9 manifest-bound 异盘归档副本
 
 当前状态：`VERIFYING`。提交 `e1dac9a3d64ff6e06abd263628d1d4de3a676e90` 新增默认关闭的 archive root，只复制严格校验的 manifest-bound 主 `.sqlite` 与 manifest；source/target 普通文件/目录、root overlap 与 junction/symlink 均 fail closed，主 DB create-only copy 经 size/SHA 验证后最后发布 create-only manifest，既有精确 pair 幂等且从不删除/覆盖。真实 4320 API 在 listen 前把 D: disk 1 recovery point 复制到新 E: disk 0 子目录，local/archive 主 DB 与 manifest SHA 各自一致，archive 只读回读 `LOCAL-1 reported/v1`；重复返回 `existing`，损坏 source 返回 `SQLITE_ARCHIVE_SOURCE_INVALID` 且不创建目标。证据见 [`docs/evidence/P8.9-off-disk-archive.md`](evidence/P8.9-off-disk-archive.md)。最终 Luna/xhigh 复审 Blocker/High=`0/0`；SQLite 只读验证产生的 WAL/SHM、附件 cadence archive、retention、disk-loss restore 与生产 SLA 仍是收尾，不宣称 G8 完成，也未触碰 `E:\Relay-Unity-Workers`。
+
+#### P8.10 异盘归档隔离恢复与 API 回读
+
+当前状态：`VERIFYING`。P8.9 的精确 E: 主 `.sqlite`/manifest pair 已由现有 `restoreSqliteToIsolatedRoot()` create-only 恢复到全新 D: data root；独立 4320 API 返回 ready/schema v4 并回读 `LOCAL-1 reported/v1`，退出后 integrity/FK=`ok/0`、PID/端口均消失，本机恢复至 API Bug 回读为 `531.370 ms`。只在全新 D: fixture 中篡改的副本返回 `SQLITE_RESTORE_BACKUP_INVALID` 且未创建 restore root，E: DB/manifest 前后 SHA 不变。证据见 [`docs/evidence/P8.10-offdisk-archive-restore.md`](evidence/P8.10-offdisk-archive-restore.md)，最终 Luna/max 复审 Blocker/High=`0/0`。该 slice 未扫描整个 archive、复制 WAL/SHM、覆盖现有 data root，也不等同 attachment restore、物理盘丢失演练、生产 SLA 或 G8 DONE。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
