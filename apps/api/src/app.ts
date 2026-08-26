@@ -128,12 +128,14 @@ import {
   MOBILE_REPAIR_ATTEMPT_ITEM_PATH,
   MOBILE_REPAIR_ATTEMPT_START_PATH,
   MOBILE_RELAY_DISPATCH_PATH,
+  MOBILE_RELAY_CONTINUE_PATH,
   MOBILE_RELAY_RECEIPT_PATH,
   parseMobileBugReadyRequest,
   parseMobileRepairAttemptDeliveryRequest,
   parseMobileRepairAttemptRequest,
   parseMobileRepairAttemptStartRequest,
   parseMobileRelayDispatchRequest,
+  parseMobileRelayContinueRequest,
   requireRelayIdempotencyKey,
   requireRelayUuid,
   type MobileRelayStore,
@@ -143,7 +145,7 @@ import {
   MOBILE_RELAY_WEBHOOK_PATH,
   MobileRelayWebhookRequestError,
   authenticateMobileRelayWebhook,
-  parseMobileRelayDeliveredWebhook,
+  parseMobileRelayWebhook,
   relayWebhookPayloadDigest,
   validateMobileRelayWebhookHeaders,
   type MobileRelayWebhookStore,
@@ -229,6 +231,12 @@ export interface CreateApiAppOptions {
   readonly mobileMetricsStore?: MobileMetricsStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
+  /**
+   * Opt-in compatibility for the pre-P5.4 fake callback.  Production uses
+   * the normalized submitted/running/.../fix_delivered contract and leaves
+   * this disabled.
+   */
+  readonly allowLegacyRelayTurnDeliveredWebhook?: boolean;
   readonly debugBearerToken?: string;
   readonly debugActorId?: string;
   readonly browserAuth?: BrowserAuthOptions;
@@ -343,6 +351,9 @@ const unconfiguredMobileRelayStore: MobileRelayStore = {
     throw new Error("MobileRelayStore is not configured");
   },
   dispatchRelay: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  continueRelay: () => {
     throw new Error("MobileRelayStore is not configured");
   },
   getRelayReceipt: () => null,
@@ -791,7 +802,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           timestamp: readHeader(request.headers["x-relay-timestamp"]),
           now: (options.now ?? (() => new Date()))(),
         });
-        const webhook = parseMobileRelayDeliveredWebhook(request.body);
+        const webhook = parseMobileRelayWebhook(request.body, {
+          allowLegacyTurnDelivered: options.allowLegacyRelayTurnDeliveredWebhook === true,
+        });
         validateMobileRelayWebhookHeaders({
           webhook,
           idempotencyKey: readHeader(request.headers["idempotency-key"]),
@@ -807,12 +820,29 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           attemptId: webhook.attemptId,
           externalRevision: webhook.externalRevision,
           occurredAt: webhook.occurredAt,
-          taskId: webhook.payload.taskId,
-          turnId: webhook.payload.turnId,
-          commitSha: webhook.payload.deliveryEvidence.commitSha,
-          remoteSha: webhook.payload.deliveryEvidence.remoteSha,
-          branch: webhook.payload.deliveryEvidence.branch,
-          mergeRequestUrl: webhook.payload.deliveryEvidence.mergeRequestUrl,
+          ...(webhook.payload.taskId === undefined ? {} : { taskId: webhook.payload.taskId }),
+          ...(webhook.payload.turnId === undefined ? {} : { turnId: webhook.payload.turnId }),
+          ...(webhook.payload.threadId === undefined
+            ? {}
+            : { threadId: webhook.payload.threadId }),
+          ...(webhook.payload.workspace === undefined
+            ? {}
+            : { workspace: webhook.payload.workspace }),
+          ...(webhook.payload.requestHash === undefined
+            ? {}
+            : { requestHash: webhook.payload.requestHash }),
+          statusReason: webhook.payload.statusReason,
+          ...(webhook.payload.deliveryEvidence === undefined
+            ? {}
+            : {
+                commitSha: webhook.payload.deliveryEvidence.commitSha,
+                remoteSha: webhook.payload.deliveryEvidence.remoteSha,
+                branch: webhook.payload.deliveryEvidence.branch,
+                mergeRequestUrl: webhook.payload.deliveryEvidence.mergeRequestUrl,
+              }),
+          ...(webhook.payload.buildRequirement === undefined
+            ? {}
+            : { buildRequirement: webhook.payload.buildRequirement }),
           payloadDigest: relayWebhookPayloadDigest(rawBody),
           rawPayloadJson: rawBody.toString("utf8"),
           receivedAt: (options.now ?? (() => new Date()))().toISOString(),
@@ -822,6 +852,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           outboxMessageId: result.inboxMessageId,
           status: "accepted",
           replayed: result.replayed,
+          eventType: webhook.eventType,
+          projectionStatus: result.projectionStatus,
         });
       } catch (error: unknown) {
         if (error instanceof MobileRelayWebhookRequestError) {
@@ -834,7 +866,14 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           return reply.code(statusCode).send({ code: error.code });
         }
         const code = (error as { code?: unknown })?.code;
+        if (code === "INVALID_REQUEST") return reply.code(400).send({ code });
+        if (code === "INTEGRATION_AUTOMATION_FORBIDDEN") {
+          return reply.code(403).send({ code });
+        }
         if (code === "NOT_FOUND") return reply.code(404).send({ code });
+        if (code === "RELAY_DELIVERY_EVIDENCE_INVALID") {
+          return reply.code(422).send({ code });
+        }
         if (code === "INTEGRATION_EVENT_CONFLICT") {
           return reply.code(409).send({ code });
         }
@@ -1153,6 +1192,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   const relayErrorReply = (error: unknown, reply: FastifyReply) => {
     const code = (error as { code?: unknown })?.code;
+    if (code === "RELAY_INTEGRATION_NOT_CONFIGURED") {
+      return reply.code(503).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
     if (code === "NOT_FOUND") {
       return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
@@ -1344,6 +1386,34 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match handoffId");
         }
         const result = await mobileRelayStore.dispatchRelay({
+          actorId: debugActorId,
+          attemptId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.code(202).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
+
+  app.post<{ Params: { attemptId: string } }>(
+    MOBILE_RELAY_CONTINUE_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+        const body = parseMobileRelayContinueRequest(request.body);
+        const idempotencyKey = requireRelayIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (idempotencyKey !== `relay:continue:${body.actionId}`) {
+          throw new TypeError("Idempotency-Key does not match actionId");
+        }
+        const result = await mobileRelayStore.continueRelay({
           actorId: debugActorId,
           attemptId,
           idempotencyKey,

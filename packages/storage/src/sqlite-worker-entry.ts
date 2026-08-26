@@ -81,6 +81,7 @@ import {
 import {
   claimMobileRelayOutbox,
   completeMobileRelayOutbox,
+  continueMobileRelay,
   createMobileManualRepairAttempt,
   createMobileRelayAttempt,
   deliverMobileRepairAttempt,
@@ -94,6 +95,7 @@ import {
   transitionMobileBugReady,
   updateMobileBug,
   type CompleteMobileRelayOutboxInput,
+  type ContinueMobileRelayInput,
   type CreateMobileManualRepairAttemptInput,
   type CreateMobileRelayAttemptInput,
   type DeliverMobileRepairAttemptInput,
@@ -133,6 +135,9 @@ interface WorkerConfiguration {
   readonly backupRoot?: string;
   readonly evidenceRoot?: string;
   readonly quarantineRoot?: string;
+  readonly relayInstanceId?: string;
+  readonly qaInstanceId?: string;
+  readonly relayPrincipalId?: string;
   readonly allowUnsafeTestCommands?: boolean;
 }
 
@@ -177,6 +182,7 @@ interface WorkerRequest {
     | "deliverMobileRepairAttempt"
     | "linkMobileBuildRepair"
     | "dispatchMobileRelay"
+    | "continueMobileRelay"
     | "getMobileRelayReceipt"
     | "receiveMobileRelayWebhook"
     | "claimMobileRelayOutbox"
@@ -487,7 +493,21 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 
   if (request.operation === "ensureMobileRelayRoles") {
     return inWriteTransaction((current) => {
-      ensureMobileRelayRoles(current, request.payload as MobileScopeBootstrap);
+      ensureMobileRelayRoles(
+        current,
+        request.payload as MobileScopeBootstrap,
+        configuration.relayInstanceId === undefined
+          ? undefined
+          : {
+              relayInstanceId: configuration.relayInstanceId,
+              ...(configuration.qaInstanceId === undefined
+                ? {}
+                : { qaInstanceId: configuration.qaInstanceId }),
+              ...(configuration.relayPrincipalId === undefined
+                ? {}
+                : { relayPrincipalId: configuration.relayPrincipalId }),
+            },
+      );
       return { ready: true };
     });
   }
@@ -550,6 +570,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     );
   }
 
+  if (request.operation === "continueMobileRelay") {
+    return inWriteTransaction((current) =>
+      continueMobileRelay(current, request.payload as ContinueMobileRelayInput),
+    );
+  }
+
   if (request.operation === "getMobileRelayReceipt") {
     const payload = request.payload as {
       readonly accountId: string;
@@ -574,6 +600,7 @@ async function execute(request: WorkerRequest): Promise<unknown> {
           readonly leaseOwner: string;
           readonly now: string;
           readonly leaseExpiresAt: string;
+          readonly relayInstanceId?: string;
         },
       ),
     );

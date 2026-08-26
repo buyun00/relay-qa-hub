@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import {
@@ -29,7 +30,7 @@ import { createSqliteMobileCommentStore } from "./sqlite-mobile-comment-store.js
 import { createSqliteMobileMetricsStore } from "./sqlite-mobile-metrics-store.js";
 import { createSqliteBrowserAuthStore } from "./browser-auth.js";
 import {
-  parseFakeRelayEndpoint,
+  parseRelayEndpoint,
   startMobileRelayOutboxPump,
   type MobileRelayOutboxPump,
 } from "./mobile-relay-outbox.js";
@@ -49,15 +50,104 @@ function requireMobileAccessToken(): string {
   return token;
 }
 
-function readRelayWebhookSecret(fakeRelayEndpoint: URL | undefined): string | undefined {
-  const configured = process.env["QA_HUB_RELAY_WEBHOOK_SECRET"]?.trim();
-  if (configured !== undefined && configured.length < 32) {
-    throw new Error("QA_HUB_RELAY_WEBHOOK_SECRET must contain at least 32 characters");
+const RELAY_INSTANCE_PATTERN = /^[a-z0-9][a-z0-9_-]{2,63}$/u;
+const UUID_PATTERN =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
+
+interface RelayRuntimeConfiguration {
+  readonly endpoint?: URL;
+  readonly bearerToken?: string;
+  readonly webhookSecret?: string;
+  readonly relayInstanceId?: string;
+  readonly qaInstanceId?: string;
+  readonly relayPrincipalId?: string;
+}
+
+function readRuntimeSecret(
+  inlineName: string,
+  fileName: string,
+  label: string,
+): string | undefined {
+  const inline = process.env[inlineName]?.trim();
+  const secretFile = process.env[fileName]?.trim();
+  if (inline !== undefined && secretFile !== undefined) {
+    throw new Error(`${label} must use either an environment value or a secret file, not both`);
   }
-  if (fakeRelayEndpoint !== undefined && configured === undefined) {
-    throw new Error("QA_HUB_RELAY_WEBHOOK_SECRET is required with QA_HUB_FAKE_RELAY_URL");
+  let configured = inline;
+  if (secretFile !== undefined) {
+    try {
+      configured = readFileSync(secretFile, "utf8").trim();
+    } catch {
+      throw new Error(`${label} secret file is not readable`);
+    }
+  }
+  if (configured === undefined) return undefined;
+  if (configured.length < 32 || /\s/u.test(configured)) {
+    throw new Error(`${label} must contain at least 32 non-whitespace characters`);
   }
   return configured;
+}
+
+function readRelayIdentifier(
+  name: string,
+  label: string,
+  pattern: RegExp,
+): string | undefined {
+  const configured = process.env[name]?.trim();
+  if (configured === undefined) return undefined;
+  if (!pattern.test(configured)) throw new Error(`${label} is invalid`);
+  return configured;
+}
+
+function readRelayRuntimeConfiguration(): RelayRuntimeConfiguration {
+  const endpoint = parseRelayEndpoint(process.env["QA_HUB_RELAY_M2M_URL"]);
+  const bearerToken = readRuntimeSecret(
+    "QA_HUB_RELAY_M2M_TOKEN",
+    "QA_HUB_RELAY_M2M_TOKEN_FILE",
+    "QA Hub Relay M2M token",
+  );
+  const webhookSecret = readRuntimeSecret(
+    "QA_HUB_RELAY_WEBHOOK_SECRET",
+    "QA_HUB_RELAY_WEBHOOK_SECRET_FILE",
+    "QA Hub Relay webhook secret",
+  );
+  const relayInstanceId = readRelayIdentifier(
+    "QA_HUB_RELAY_INSTANCE_ID",
+    "QA_HUB_RELAY_INSTANCE_ID",
+    RELAY_INSTANCE_PATTERN,
+  );
+  const qaInstanceId = readRelayIdentifier(
+    "QA_HUB_RELAY_QA_INSTANCE_ID",
+    "QA_HUB_RELAY_QA_INSTANCE_ID",
+    RELAY_INSTANCE_PATTERN,
+  );
+  const relayPrincipalId = readRelayIdentifier(
+    "QA_HUB_RELAY_PRINCIPAL_ID",
+    "QA_HUB_RELAY_PRINCIPAL_ID",
+    UUID_PATTERN,
+  );
+  const configuredValues = [
+    endpoint,
+    bearerToken,
+    webhookSecret,
+    relayInstanceId,
+    qaInstanceId,
+    relayPrincipalId,
+  ];
+  const configuredCount = configuredValues.filter((value) => value !== undefined).length;
+  if (configuredCount !== 0 && configuredCount !== configuredValues.length) {
+    throw new Error(
+      "Relay integration requires endpoint, token, webhook secret, instance IDs, and principal ID together",
+    );
+  }
+  return {
+    ...(endpoint === undefined ? {} : { endpoint }),
+    ...(bearerToken === undefined ? {} : { bearerToken }),
+    ...(webhookSecret === undefined ? {} : { webhookSecret }),
+    ...(relayInstanceId === undefined ? {} : { relayInstanceId }),
+    ...(qaInstanceId === undefined ? {} : { qaInstanceId }),
+    ...(relayPrincipalId === undefined ? {} : { relayPrincipalId }),
+  };
 }
 
 type WebAuthMode = "session" | "debug";
@@ -116,6 +206,7 @@ async function closeRuntime(
 }
 
 async function run(): Promise<void> {
+  const relayRuntime = readRelayRuntimeConfiguration();
   const webAuthMode = readWebAuthMode();
   const webSessionSecret = readWebSessionSecret(webAuthMode);
   const secureCookie = webAuthMode === "session" ? readSecureCookie() : undefined;
@@ -140,6 +231,13 @@ async function run(): Promise<void> {
     ...(backupConfig.enabled ? { backupRoot: join(backupConfig.backupRoot, "migration") } : {}),
     evidenceRoot: storage.evidenceRoot,
     quarantineRoot: storage.quarantineRoot,
+    ...(relayRuntime.relayInstanceId === undefined
+      ? {}
+      : { relayInstanceId: relayRuntime.relayInstanceId }),
+    ...(relayRuntime.qaInstanceId === undefined ? {} : { qaInstanceId: relayRuntime.qaInstanceId }),
+    ...(relayRuntime.relayPrincipalId === undefined
+      ? {}
+      : { relayPrincipalId: relayRuntime.relayPrincipalId }),
   });
   let server: ApiServer | undefined;
   let relayPump: MobileRelayOutboxPump | undefined;
@@ -166,8 +264,6 @@ async function run(): Promise<void> {
       });
     }
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
-    const fakeRelayEndpoint = parseFakeRelayEndpoint(process.env["QA_HUB_FAKE_RELAY_URL"]);
-    const relayWebhookSecret = readRelayWebhookSecret(fakeRelayEndpoint);
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       healthProbe: createSqliteApiHealthProbe({
@@ -193,15 +289,19 @@ async function run(): Promise<void> {
       }),
       mobileMetricsStore: createSqliteMobileMetricsStore({ worker, scope: MOBILE_SCOPE }),
       mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
-      mobileRelayStore: createSqliteMobileRelayStore({ worker, scope: MOBILE_SCOPE }),
-      ...(relayWebhookSecret === undefined
+      mobileRelayStore: createSqliteMobileRelayStore({
+        worker,
+        scope: MOBILE_SCOPE,
+        relayDispatchEnabled: relayRuntime.endpoint !== undefined,
+      }),
+      ...(relayRuntime.webhookSecret === undefined
         ? {}
         : {
             mobileRelayWebhookStore: createSqliteMobileRelayWebhookStore({
               worker,
               scope: MOBILE_SCOPE,
             }),
-            relayWebhookSecret,
+            relayWebhookSecret: relayRuntime.webhookSecret,
           }),
       debugBearerToken,
       debugActorId: MOBILE_SCOPE.actorId,
@@ -253,19 +353,29 @@ async function run(): Promise<void> {
       { address, databaseFile: storage.databaseFile },
       "Relay QA Hub API started",
     );
-    if (fakeRelayEndpoint) {
+    if (relayRuntime.endpoint !== undefined && relayRuntime.bearerToken !== undefined) {
       relayPump = startMobileRelayOutboxPump({
         worker,
-        endpoint: fakeRelayEndpoint,
-        onDelivery: (claim) =>
+        endpoint: relayRuntime.endpoint,
+        bearerToken: relayRuntime.bearerToken,
+        ...(relayRuntime.qaInstanceId === undefined
+          ? {}
+          : { qaInstanceId: relayRuntime.qaInstanceId }),
+        evidenceRoot: storage.evidenceRoot,
+        onDelivery: (claim, _status, receipt) =>
           server?.app.log.info(
-            { outboxMessageId: claim.outboxMessageId, handoffId: claim.handoffId },
-            "fake Relay handoff submitted",
+            {
+              outboxMessageId: claim.outboxMessageId,
+              handoffId: claim.handoffId,
+              relayTaskId: receipt.taskId,
+              relayTurnId: receipt.turnId,
+            },
+            "Relay handoff submitted",
           ),
         onRetry: (claim, errorCode) =>
           server?.app.log.warn(
             { outboxMessageId: claim.outboxMessageId, errorCode },
-            "fake Relay handoff scheduled for retry",
+            "Relay handoff scheduled for retry",
           ),
       });
     }

@@ -8,6 +8,8 @@ export interface SqliteMobileRelayStoreOptions {
   readonly worker: SqliteStorageWorker;
   readonly scope: MobileScopeBootstrap;
   readonly now?: () => Date;
+  /** Production sets this only when the complete real Relay runtime is configured. */
+  readonly relayDispatchEnabled?: boolean;
 }
 
 function digest(value: unknown): string {
@@ -16,6 +18,21 @@ function digest(value: unknown): string {
 
 function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
   if (actorId !== scope.actorId) throw new TypeError("actor does not match the authenticated mobile scope");
+}
+
+class RelayIntegrationNotConfiguredError extends Error {
+  readonly code = "RELAY_INTEGRATION_NOT_CONFIGURED" as const;
+
+  constructor() {
+    super("Relay integration is not configured");
+    this.name = "RelayIntegrationNotConfiguredError";
+  }
+}
+
+function requireRelayDispatch(options: SqliteMobileRelayStoreOptions): void {
+  if (options.relayDispatchEnabled === false) {
+    throw new RelayIntegrationNotConfiguredError();
+  }
 }
 
 export function createSqliteMobileRelayStore(
@@ -41,6 +58,7 @@ export function createSqliteMobileRelayStore(
     },
     async createRelayAttempt(command) {
       requireActor(command.actorId, options.scope);
+      requireRelayDispatch(options);
       return options.worker.createMobileRelayAttempt({
         ...scope,
         bugId: command.bugId,
@@ -98,11 +116,27 @@ export function createSqliteMobileRelayStore(
     },
     async dispatchRelay(command) {
       requireActor(command.actorId, options.scope);
+      requireRelayDispatch(options);
       return options.worker.dispatchMobileRelay({
         ...scope,
         attemptId: command.attemptId,
         expectedVersion: command.request.expectedVersion,
         handoffId: command.request.handoffId,
+        selectedAttachmentIds: command.request.selectedAttachmentIds,
+        idempotencyKey: command.idempotencyKey,
+        requestDigest: digest(command.request),
+        createdAt: now().toISOString(),
+      });
+    },
+    async continueRelay(command) {
+      requireActor(command.actorId, options.scope);
+      requireRelayDispatch(options);
+      return options.worker.continueMobileRelay({
+        ...scope,
+        attemptId: command.attemptId,
+        handoffId: command.request.handoffId,
+        actionId: command.request.actionId,
+        prompt: command.request.prompt,
         selectedAttachmentIds: command.request.selectedAttachmentIds,
         idempotencyKey: command.idempotencyKey,
         requestDigest: digest(command.request),

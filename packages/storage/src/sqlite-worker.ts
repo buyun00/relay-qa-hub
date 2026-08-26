@@ -63,6 +63,7 @@ import type {
 } from "./mobile-duplicate-store.js";
 import type {
   CompleteMobileRelayOutboxInput,
+  ContinueMobileRelayInput,
   CreateMobileManualRepairAttemptInput,
   CreateMobileRelayAttemptInput,
   DeliverMobileRepairAttemptInput,
@@ -71,6 +72,8 @@ import type {
   LinkMobileBuildRepairResult,
   MobileRelayOutboxClaim,
   MobileRelayDispatchAccepted,
+  MobileRelayContinueAccepted,
+  MobileRelayRuntimeConfig,
   MobileRelayReceipt,
   MobileRelayWebhookProjectionResult,
   MobileManualRepairAttemptRecord,
@@ -113,6 +116,10 @@ export interface SqliteStorageWorkerOptions {
   readonly backupRoot?: string;
   readonly evidenceRoot?: string;
   readonly quarantineRoot?: string;
+  /** Real Relay identity is injected by the API process; no provider is chosen by storage. */
+  readonly relayInstanceId?: string;
+  readonly qaInstanceId?: string;
+  readonly relayPrincipalId?: string;
   /** @internal Enables migration stress-test commands. Never set in an application process. */
   readonly allowUnsafeTestCommands?: boolean;
 }
@@ -155,6 +162,7 @@ export class SqliteStorageWorker {
 
   private readonly worker: Worker;
   private readonly allowUnsafeTestCommands: boolean;
+  private readonly relayRuntime: MobileRelayRuntimeConfig | undefined;
   private readonly pending = new Map<number, PendingRequest>();
   private nextRequestId = 1;
   private closed = false;
@@ -162,6 +170,15 @@ export class SqliteStorageWorker {
 
   constructor(options: SqliteStorageWorkerOptions) {
     this.allowUnsafeTestCommands = options.allowUnsafeTestCommands === true;
+    this.relayRuntime = options.relayInstanceId === undefined
+      ? undefined
+      : Object.freeze({
+          relayInstanceId: options.relayInstanceId,
+          ...(options.qaInstanceId === undefined ? {} : { qaInstanceId: options.qaInstanceId }),
+          ...(options.relayPrincipalId === undefined
+            ? {}
+            : { relayPrincipalId: options.relayPrincipalId }),
+        });
     this.worker = new Worker(workerEntryUrl(), { workerData: options });
     this.worker.on("message", (message: WorkerResponse) => this.onMessage(message));
     this.worker.on("error", (error) => this.terminateWithError(error));
@@ -486,7 +503,34 @@ export class SqliteStorageWorker {
 
   async dispatchMobileRelay(input: DispatchMobileRelayInput): Promise<MobileRelayDispatchAccepted> {
     await this.initialization;
-    return this.request<MobileRelayDispatchAccepted>("dispatchMobileRelay", input);
+    return this.request<MobileRelayDispatchAccepted>("dispatchMobileRelay", {
+      ...input,
+      ...(input.relayInstanceId === undefined && this.relayRuntime?.relayInstanceId !== undefined
+        ? { relayInstanceId: this.relayRuntime.relayInstanceId }
+        : {}),
+      ...(input.qaInstanceId === undefined && this.relayRuntime?.qaInstanceId !== undefined
+        ? { qaInstanceId: this.relayRuntime.qaInstanceId }
+        : {}),
+      ...(input.relayPrincipalId === undefined && this.relayRuntime?.relayPrincipalId !== undefined
+        ? { relayPrincipalId: this.relayRuntime.relayPrincipalId }
+        : {}),
+    });
+  }
+
+  async continueMobileRelay(input: ContinueMobileRelayInput): Promise<MobileRelayContinueAccepted> {
+    await this.initialization;
+    return this.request<MobileRelayContinueAccepted>("continueMobileRelay", {
+      ...input,
+      ...(input.relayInstanceId === undefined && this.relayRuntime?.relayInstanceId !== undefined
+        ? { relayInstanceId: this.relayRuntime.relayInstanceId }
+        : {}),
+      ...(input.qaInstanceId === undefined && this.relayRuntime?.qaInstanceId !== undefined
+        ? { qaInstanceId: this.relayRuntime.qaInstanceId }
+        : {}),
+      ...(input.relayPrincipalId === undefined && this.relayRuntime?.relayPrincipalId !== undefined
+        ? { relayPrincipalId: this.relayRuntime.relayPrincipalId }
+        : {}),
+    });
   }
 
   async getMobileRelayReceipt(input: {
@@ -510,21 +554,37 @@ export class SqliteStorageWorker {
     readonly leaseOwner: string;
     readonly now: string;
     readonly leaseExpiresAt: string;
+    readonly relayInstanceId?: string;
   }): Promise<MobileRelayOutboxClaim | null> {
     await this.initialization;
-    return this.request<MobileRelayOutboxClaim | null>("claimMobileRelayOutbox", input);
+    return this.request<MobileRelayOutboxClaim | null>("claimMobileRelayOutbox", {
+      ...input,
+      ...(input.relayInstanceId === undefined && this.relayRuntime?.relayInstanceId !== undefined
+        ? { relayInstanceId: this.relayRuntime.relayInstanceId }
+        : {}),
+    });
   }
 
   async completeMobileRelayOutbox(
     input: CompleteMobileRelayOutboxInput,
   ): Promise<MobileRelayReceipt> {
     await this.initialization;
-    return this.request<MobileRelayReceipt>("completeMobileRelayOutbox", input);
+    return this.request<MobileRelayReceipt>("completeMobileRelayOutbox", {
+      ...input,
+      ...(input.relayInstanceId === undefined && this.relayRuntime?.relayInstanceId !== undefined
+        ? { relayInstanceId: this.relayRuntime.relayInstanceId }
+        : {}),
+    });
   }
 
   async retryMobileRelayOutbox(input: RetryMobileRelayOutboxInput): Promise<boolean> {
     await this.initialization;
-    return this.request<boolean>("retryMobileRelayOutbox", input);
+    return this.request<boolean>("retryMobileRelayOutbox", {
+      ...input,
+      ...(input.relayInstanceId === undefined && this.relayRuntime?.relayInstanceId !== undefined
+        ? { relayInstanceId: this.relayRuntime.relayInstanceId }
+        : {}),
+    });
   }
 
   /** @internal Forces an unexpected worker exit for terminal-state regression tests. */

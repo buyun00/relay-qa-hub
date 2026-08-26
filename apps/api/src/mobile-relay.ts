@@ -1,5 +1,6 @@
 import type {
   MobileBugRecord,
+  MobileRelayContinueAccepted,
   MobileRelayDispatchAccepted,
   MobileRelayReceipt,
   MobileManualRepairAttemptRecord,
@@ -12,6 +13,8 @@ export const MOBILE_RELAY_DISPATCH_PATH =
   "/api/v1/repair-attempts/:attemptId/dispatch/relay" as const;
 export const MOBILE_RELAY_RECEIPT_PATH =
   "/api/v1/repair-attempts/:attemptId/relay-receipt" as const;
+export const MOBILE_RELAY_CONTINUE_PATH =
+  "/api/v1/repair-attempts/:attemptId/dispatch/relay/continue" as const;
 export const MOBILE_REPAIR_ATTEMPT_ITEM_PATH =
   "/api/v1/repair-attempts/:attemptId" as const;
 export const MOBILE_REPAIR_ATTEMPT_START_PATH =
@@ -64,6 +67,13 @@ export interface MobileRelayDispatchRequest {
   readonly selectedAttachmentIds: readonly string[];
 }
 
+export interface MobileRelayContinueRequest {
+  readonly handoffId: string;
+  readonly actionId: string;
+  readonly prompt: string;
+  readonly selectedAttachmentIds: readonly string[];
+}
+
 export interface MobileRelayStore {
   readonly transitionBugReady: (command: {
     readonly actorId: string;
@@ -109,6 +119,12 @@ export interface MobileRelayStore {
     readonly idempotencyKey: string;
     readonly request: MobileRelayDispatchRequest;
   }) => MobileRelayDispatchAccepted | Promise<MobileRelayDispatchAccepted>;
+  readonly continueRelay: (command: {
+    readonly actorId: string;
+    readonly attemptId: string;
+    readonly idempotencyKey: string;
+    readonly request: MobileRelayContinueRequest;
+  }) => MobileRelayContinueAccepted | Promise<MobileRelayContinueAccepted>;
   readonly getRelayReceipt: (query: {
     readonly actorId: string;
     readonly attemptId: string;
@@ -314,6 +330,26 @@ export function parseMobileRelayDispatchRequest(value: unknown): MobileRelayDisp
   return {
     expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
     handoffId: requireRelayUuid(body["handoffId"], "handoffId"),
+    selectedAttachmentIds,
+  };
+}
+
+export function parseMobileRelayContinueRequest(value: unknown): MobileRelayContinueRequest {
+  const body = record(value);
+  onlyKeys(body, new Set(["handoffId", "actionId", "prompt", "selectedAttachmentIds"]));
+  if (!Array.isArray(body["selectedAttachmentIds"]) || body["selectedAttachmentIds"].length > 8) {
+    throw new TypeError("selectedAttachmentIds must be an array of at most eight UUIDs");
+  }
+  const selectedAttachmentIds = body["selectedAttachmentIds"].map((entry) =>
+    requireRelayUuid(entry, "selectedAttachmentId"),
+  );
+  if (new Set(selectedAttachmentIds).size !== selectedAttachmentIds.length) {
+    throw new TypeError("selectedAttachmentIds must be unique");
+  }
+  return {
+    handoffId: requireRelayUuid(body["handoffId"], "handoffId"),
+    actionId: requireRelayUuid(body["actionId"], "actionId"),
+    prompt: boundedDeliveryString(body["prompt"], "prompt", 1, 20_000),
     selectedAttachmentIds,
   };
 }
