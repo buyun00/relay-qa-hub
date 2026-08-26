@@ -21,6 +21,7 @@ import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.network.BuildProjectionFailure
 import com.relayqahub.android.network.BuildProjectionResult
 import com.relayqahub.android.network.BugWorkbenchFailure
+import com.relayqahub.android.network.BugAssignmentFailure
 import com.relayqahub.android.network.CommentTimelineFailure
 import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
@@ -47,6 +48,9 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 data class FoundationUiState(
+    val page: QaHubPage = QaHubPage.MY_BUGS,
+    val people: QaPeopleConfig = QaPeopleConfig(1, "LOCAL", emptyList()),
+    val captureDraft: CaptureDraftUiState = CaptureDraftUiState(),
     val accountName: String = "Preparing local scope…",
     val projectName: String = "Preparing native foundation…",
     val cachedItemCount: Int = 0,
@@ -68,6 +72,22 @@ data class FoundationUiState(
     val commentAudit: CommentAuditUiState = CommentAuditUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
     val pendingCapture: PendingCaptureUiState = PendingCaptureUiState(),
+)
+
+enum class QaHubPage {
+    MY_BUGS,
+    PROJECT_BUGS,
+    NEW_BUG,
+}
+
+data class CaptureDraftUiState(
+    val available: Boolean = false,
+    val captureId: String? = null,
+    val privatePath: String? = null,
+    val width: Int = 0,
+    val height: Int = 0,
+    val requestedAtEpochMs: Long = 0L,
+    val pocoStatus: String? = null,
 )
 
 data class PendingCaptureUiState(
@@ -113,6 +133,7 @@ data class BugWorkbenchUiState(
     val firstBugKey: String? = null,
     val firstTitle: String? = null,
     val errorCode: String? = null,
+    val items: List<com.relayqahub.android.network.WorkbenchBug> = emptyList(),
 )
 
 data class ManualRepairUiState(
@@ -224,6 +245,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val humanWorkflow = MutableStateFlow(HumanWorkflowUiState())
     private val commentAudit = MutableStateFlow(CommentAuditUiState())
     private val pendingCapture = MutableStateFlow(PendingCaptureUiState())
+    private val page = MutableStateFlow(QaHubPage.MY_BUGS)
+    private val people = MutableStateFlow(QaPeopleConfig(1, "LOCAL", emptyList()))
+    private val captureDraft = MutableStateFlow(CaptureDraftUiState())
 
     private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
@@ -274,7 +298,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
-    val uiState = combine(
+    private val baseUiState = combine(
         scopeState,
         lastAction,
         latestRelayHandoff,
@@ -308,13 +332,23 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             duplicateCandidates = discovery.duplicateCandidates,
             pendingCapture = discovery.pendingCapture,
         )
-    }.stateIn(
+    }
+
+    val uiState = baseUiState
+        .combine(page) { state, currentPage -> state.copy(page = currentPage) }
+        .combine(people) { state, config -> state.copy(people = config) }
+        .combine(captureDraft) { state, draft -> state.copy(captureDraft = draft) }
+        .stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = FoundationUiState(),
     )
 
     init {
+        runCatching {
+            QaPeopleConfigLoader.ensureExternalSeed(getApplication())
+            people.value = QaPeopleConfigLoader.load(getApplication())
+        }
         viewModelScope.launch {
             appContainer.scopedRepository.seedFoundationScope(scope)
         }
@@ -322,6 +356,59 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             appContainer.scopedRepository.observeLatestSubmission(scope).collect {
                 refreshPendingCaptureState()
             }
+        }
+    }
+
+    fun navigateTo(page: QaHubPage) {
+        this.page.value = page
+        if (page != QaHubPage.NEW_BUG) refreshBugWorkbench()
+    }
+
+    fun onCaptureReady(
+        captureId: String,
+        privatePath: String,
+        width: Int,
+        height: Int,
+        requestedAtEpochMs: Long,
+        pocoStatus: String,
+    ) {
+        captureDraft.value = CaptureDraftUiState(
+            available = true,
+            captureId = captureId,
+            privatePath = privatePath,
+            width = width,
+            height = height,
+            requestedAtEpochMs = requestedAtEpochMs,
+            pocoStatus = pocoStatus,
+        )
+        page.value = QaHubPage.NEW_BUG
+        lastAction.value = "截图已载入新建 Bug。"
+    }
+
+    fun restoreLatestCaptureDraft() {
+        viewModelScope.launch {
+            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }.getOrNull()
+                ?: return@launch
+            if (draft.captureId != captureDraft.value.captureId) {
+                onCaptureReady(
+                    captureId = draft.captureId,
+                    privatePath = draft.primaryPath,
+                    width = draft.width,
+                    height = draft.height,
+                    requestedAtEpochMs = draft.requestedAtEpochMs,
+                    pocoStatus = draft.poco.status.name,
+                )
+            }
+        }
+    }
+
+    fun clearCaptureDraft() {
+        val captureId = captureDraft.value.captureId
+        captureDraft.value = CaptureDraftUiState()
+        viewModelScope.launch {
+            appContainer.pendingCaptureDraftStore.latest()
+                ?.takeIf { it.captureId == captureId }
+                ?.let { runCatching { appContainer.pendingCaptureDraftStore.delete(it) } }
         }
     }
 
@@ -639,11 +726,11 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
             bugWorkbench.value = BugWorkbenchUiState(phase = "loading")
-            lastAction.value = "Reading reported Bugs from the QA Hub workbench…"
+            lastAction.value = "Reading project Bugs from the QA Hub…"
             runCatching {
                 appContainer.bugWorkbenchClient.listBugs(
                     projectId = scope.projectId,
-                    state = "reported",
+                    state = null,
                     limit = WORKBENCH_MVP_LIMIT,
                     accessToken = accessToken,
                 )
@@ -653,11 +740,13 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     phase = "loaded",
                     snapshotSequence = result.snapshotSequence,
                     itemCount = result.items.size,
+                    stateFilter = "all",
                     firstBugKey = first?.key,
                     firstTitle = first?.title,
+                    items = result.items,
                 )
                 lastAction.value =
-                    "QA workbench read back ${result.items.size} reported Bug(s)."
+                    "QA Hub read back ${result.items.size} project Bug(s)."
             }.onFailure { failure ->
                 setBugWorkbenchFailure(
                     if (failure is BugWorkbenchFailure) {
@@ -675,7 +764,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             phase = "failed",
             errorCode = code,
         )
-        lastAction.value = "QA workbench read failed: $code."
+        lastAction.value = "QA Hub Bug list failed: $code."
     }
 
     fun createManualRepairAttempt() {
@@ -1131,6 +1220,136 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
+    /** One field-client submit action: media (when present), text, then assignments. */
+    fun submitNewBug(
+        annotatedPng: ByteArray?,
+        title: String,
+        description: String,
+        fixerId: String,
+        verifierId: String,
+    ) {
+        val cleanTitle = title.trim()
+        val cleanDescription = description.trim()
+        if (cleanTitle.isBlank() || cleanDescription.isBlank()) {
+            lastAction.value = "请填写 Bug 标题和问题描述。"
+            return
+        }
+        if (fixerId.isBlank() || verifierId.isBlank()) {
+            lastAction.value = "请选择修复人和验收人。"
+            return
+        }
+        viewModelScope.launch {
+            val draftState = captureDraft.value
+            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }
+                .getOrNull()
+                ?.takeIf { it.captureId == draftState.captureId }
+            val originalPng = draft?.let {
+                runCatching { appContainer.pendingCaptureDraftStore.readPrimary(it) }.getOrNull()
+            }
+            if (originalPng != null && draft != null) {
+                val artifactStore = com.relayqahub.android.capture.CaptureArtifactStore(
+                    getApplication(),
+                )
+                val artifacts = draft.pocoArtifacts.mapNotNull {
+                    runCatching { artifactStore.read(it) }.getOrNull()
+                }
+                submitPngAttachment(
+                    pngBytes = originalPng,
+                    annotatedPngBytes = annotatedPng,
+                    filename = "capture-${draft.captureId}.png",
+                    captureId = draft.captureId,
+                    capturedAtEpochMs = draft.requestedAtEpochMs,
+                    actionLabel = "Bug",
+                    pocoSummary = draft.poco,
+                    pocoArtifacts = artifacts,
+                    submissionIdOverride = draft.clientSubmissionId,
+                    clientAttachmentIdOverride = draft.clientAttachmentId,
+                    title = cleanTitle,
+                    description = cleanDescription,
+                    expectedBehavior = "按测试步骤可稳定复现并符合项目预期行为。",
+                    fixerId = fixerId,
+                    verifierId = verifierId,
+                )
+            } else {
+                submitBugWithoutAttachment(
+                    title = cleanTitle,
+                    description = cleanDescription,
+                    fixerId = fixerId,
+                    verifierId = verifierId,
+                )
+            }
+        }
+    }
+
+    private fun submitBugWithoutAttachment(
+        title: String,
+        description: String,
+        fixerId: String,
+        verifierId: String,
+    ) {
+        viewModelScope.launch {
+            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
+            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
+                lastAction.value = "Bug unavailable: configure the debug API session."
+                return@launch
+            }
+            val result = runCatching {
+                appContainer.scopedRepository.seedFoundationScope(scope)
+                when (
+                    appContainer.credentialVault.put(
+                        scope = scope.nativeSessionScope(),
+                        credentials = NativeCredentials(
+                            accessToken = accessToken,
+                            refreshToken = LIVE_SMOKE_UNUSED_REFRESH_TOKEN,
+                            accessTokenExpiresAtEpochMs =
+                                System.currentTimeMillis() + LIVE_SMOKE_CREDENTIAL_TTL_MS,
+                            sharedDeviceSession = false,
+                        ),
+                    )
+                ) {
+                    is VaultResult.Success -> Unit
+                    VaultResult.Missing -> throw LiveSmokeFailure("CREDENTIAL_WRITE_MISSING")
+                    is VaultResult.Unavailable -> throw LiveSmokeFailure("CREDENTIAL_VAULT_UNAVAILABLE")
+                }
+                val submissionId = UUID.randomUUID().toString()
+                val operationId = appContainer.scopedRepository.enqueue(
+                    scope = scope,
+                    request = FoundationCreateBugContract.buildOperation(
+                        projectId = scope.projectId,
+                        submissionId = submissionId,
+                        observedAt = Instant.now().toString(),
+                        qaAppVersion = BuildConfig.VERSION_NAME,
+                        title = title,
+                        description = description,
+                        expectedBehavior = "按测试步骤可稳定复现并符合项目预期行为。",
+                    ),
+                )
+                val sync = appContainer.syncEngine.run(scope)
+                val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
+                    ?: throw LiveSmokeFailure(sync.liveSmokeSummary())
+                val bug = appContainer.bugWorkbenchClient.getBug(receipt.bugId, accessToken)
+                appContainer.bugAssignmentClient.assign(
+                    bugId = receipt.bugId,
+                    expectedVersion = bug.version,
+                    fixerId = fixerId,
+                    verifierId = verifierId,
+                    accessToken = accessToken,
+                )
+                receipt.qaItemKey
+            }
+            result.onSuccess {
+                lastAction.value = "Bug $it 已提交，修复人和验收人已设置。"
+                page.value = QaHubPage.MY_BUGS
+                refreshBugWorkbench()
+            }.onFailure { failure ->
+                val code = (failure as? BugAssignmentFailure)?.code
+                    ?: (failure as? LiveSmokeFailure)?.code
+                    ?: "BUG_SUBMIT_FAILED"
+                lastAction.value = "Bug 提交失败：$code。"
+            }
+        }
+    }
+
     fun reportCaptureUnavailable(reason: String) {
         lastAction.value = "Capture unavailable: $reason. Ordinary defect entry remains available."
     }
@@ -1215,12 +1434,22 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun submitPngAttachment(
         pngBytes: ByteArray,
+        annotatedPngBytes: ByteArray? = null,
         filename: String,
         captureId: String?,
         capturedAtEpochMs: Long?,
         actionLabel: String,
         pocoSummary: CapturePocoSummary?,
         pocoArtifacts: List<CapturedPocoArtifact>,
+        submissionIdOverride: String? = null,
+        clientAttachmentIdOverride: String? = null,
+        title: String = "Native QA Hub contract-validation draft",
+        description: String =
+            "The Android foundation queued a representative Bug command for offline sync.",
+        expectedBehavior: String =
+            "A valid App-first Bug command remains isolated to its authenticated project.",
+        fixerId: String? = null,
+        verifierId: String? = null,
     ) {
         viewModelScope.launch {
             val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
@@ -1252,8 +1481,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         throw LiveSmokeFailure("CREDENTIAL_VAULT_UNAVAILABLE")
                 }
 
-                val submissionId = UUID.randomUUID().toString()
-                val clientAttachmentId = UUID.randomUUID().toString()
+                val submissionId = submissionIdOverride ?: UUID.randomUUID().toString()
+                val clientAttachmentId = clientAttachmentIdOverride ?: UUID.randomUUID().toString()
                 val uploadReceipt = appContainer.attachmentUploadClient.uploadAndReserveBugCreate(
                     scope = scope,
                     clientSubmissionId = submissionId,
@@ -1264,6 +1493,22 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     captureId = captureId,
                 )
                 appContainer.scopedRepository.recordAttachmentReservation(scope, uploadReceipt)
+                val annotatedReceipt = annotatedPngBytes?.let { markedBytes ->
+                    val markedAttachmentId = UUID.nameUUIDFromBytes(
+                        "$submissionId:annotated".toByteArray(Charsets.UTF_8),
+                    ).toString()
+                    appContainer.attachmentUploadClient.uploadAndReserveBugCreate(
+                        scope = scope,
+                        clientSubmissionId = submissionId,
+                        clientAttachmentId = markedAttachmentId,
+                        filename = filename.substringBeforeLast('.', filename) + "-annotated.png",
+                        pngBytes = markedBytes,
+                        accessToken = accessToken,
+                        captureId = captureId,
+                    ).also { receipt ->
+                        appContainer.scopedRepository.recordAttachmentReservation(scope, receipt)
+                    }
+                }
 
                 var captureBundleId: String? = null
                 var captureEvidenceSummary = ""
@@ -1345,24 +1590,49 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         submissionId = submissionId,
                         observedAt = Instant.now().toString(),
                         qaAppVersion = BuildConfig.VERSION_NAME,
-                        attachmentIds = listOf(uploadReceipt.attachmentId),
+                        attachmentIds = listOfNotNull(
+                            uploadReceipt.attachmentId,
+                            annotatedReceipt?.attachmentId,
+                        ),
                         captureBundleId = captureBundleId,
+                        title = title,
+                        description = description,
+                        expectedBehavior = expectedBehavior,
                     ),
                 )
                 val syncResult = appContainer.syncEngine.run(scope)
                 val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
                 if (receipt != null) {
-                    val claimed = appContainer.scopedRepository.recordAttachmentClaimed(
-                        scope = scope,
-                        clientSubmissionId = submissionId,
-                        clientAttachmentId = clientAttachmentId,
-                        qaItemId = receipt.qaItemId,
-                        qaItemKey = receipt.qaItemKey,
-                        responseJson = receipt.responseJson,
-                    )
-                    "$actionLabel created ${receipt.qaItemKey}; attachment " +
-                        "${claimed.attachmentId} is ${claimed.bindingStatus}" +
-                        captureEvidenceSummary + "."
+                    val claimed = listOfNotNull(uploadReceipt, annotatedReceipt).map { uploaded ->
+                        appContainer.scopedRepository.recordAttachmentClaimed(
+                            scope = scope,
+                            clientSubmissionId = submissionId,
+                            clientAttachmentId = uploaded.clientAttachmentId,
+                            qaItemId = receipt.qaItemId,
+                            qaItemKey = receipt.qaItemKey,
+                            responseJson = receipt.responseJson,
+                        )
+                    }
+                    val assignmentSummary = if (!fixerId.isNullOrBlank() && !verifierId.isNullOrBlank()) {
+                        val bug = appContainer.bugWorkbenchClient.getBug(
+                            bugId = receipt.bugId,
+                            accessToken = accessToken,
+                        )
+                        val assignment = appContainer.bugAssignmentClient.assign(
+                            bugId = receipt.bugId,
+                            expectedVersion = bug.version,
+                            fixerId = fixerId,
+                            verifierId = verifierId,
+                            accessToken = accessToken,
+                        )
+                        "; 修复人/验收人已设置 (${assignment.version})"
+                    } else {
+                        ""
+                    }
+                    if (captureId == captureDraft.value.captureId) clearCaptureDraft()
+                    "$actionLabel created ${receipt.qaItemKey}; ${claimed.size} attachment(s) " +
+                        "are ${claimed.joinToString { it.bindingStatus }}" +
+                        assignmentSummary + captureEvidenceSummary + "."
                 } else {
                     "Attachment ${uploadReceipt.attachmentId} is reserved; Bug commit " +
                         "${syncResult.liveSmokeSummary()}."
@@ -1645,6 +1915,11 @@ internal object FoundationCreateBugContract {
         qaAppVersion: String,
         attachmentIds: List<String> = emptyList(),
         captureBundleId: String? = null,
+        title: String = "Native QA Hub contract-validation draft",
+        description: String =
+            "The Android foundation queued a representative Bug command for offline sync.",
+        expectedBehavior: String =
+            "A valid App-first Bug command remains isolated to its authenticated project.",
     ): FoundationFakeCreateBugRequest {
         val occurrence = linkedMapOf<String, Any?>(
             "observedAt" to observedAt,
@@ -1666,11 +1941,9 @@ internal object FoundationCreateBugContract {
             "submissionContractVersion" to QaHubApiContract.VERSION,
             "projectId" to projectId,
             "clientSubmissionId" to submissionId,
-            "title" to "Native QA Hub contract-validation draft",
-            "description" to
-                "The Android foundation queued a representative Bug command for offline sync.",
-            "expectedBehavior" to
-                "A valid App-first Bug command remains isolated to its authenticated project.",
+            "title" to title,
+            "description" to description,
+            "expectedBehavior" to expectedBehavior,
             "severity" to "S3",
             "priority" to "P3",
             "occurrence" to occurrence,
@@ -1693,6 +1966,11 @@ internal object FoundationCreateBugContract {
         qaAppVersion: String,
         attachmentIds: List<String> = emptyList(),
         captureBundleId: String? = null,
+        title: String = "Native QA Hub contract-validation draft",
+        description: String =
+            "The Android foundation queued a representative Bug command for offline sync.",
+        expectedBehavior: String =
+            "A valid App-first Bug command remains isolated to its authenticated project.",
     ): NewOfflineOperation {
         val request = buildRequest(
             projectId = projectId,
@@ -1701,6 +1979,9 @@ internal object FoundationCreateBugContract {
             qaAppVersion = qaAppVersion,
             attachmentIds = attachmentIds,
             captureBundleId = captureBundleId,
+            title = title,
+            description = description,
+            expectedBehavior = expectedBehavior,
         )
         requireValid(request, expectedProjectId = projectId)
         return NewOfflineOperation(

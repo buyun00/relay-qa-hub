@@ -1,36 +1,71 @@
 package com.relayqahub.android.ui
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Color as AndroidColor
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.relayqahub.android.CaptureDraftUiState
 import com.relayqahub.android.FoundationUiState
 import com.relayqahub.android.FoundationViewModel
+import com.relayqahub.android.QaHubPage
+import com.relayqahub.android.QaPerson
+import com.relayqahub.android.QaPersonRole
+import com.relayqahub.android.network.WorkbenchBug
+import java.io.ByteArrayOutputStream
 
 @Composable
 fun FoundationScreen(
@@ -38,537 +73,349 @@ fun FoundationScreen(
     onStartCaptureSession: () -> Unit,
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
-    onSubmitPendingCapture: () -> Unit = viewModel::submitLatestPendingCapture,
-    onDispatchToRelay: () -> Unit = viewModel::dispatchToRelay,
-    onAdoptFixAndBindQaBuild: () -> Unit = viewModel::adoptFixAndBindQaBuild,
-    onRefreshInbox: () -> Unit = viewModel::refreshInbox,
-    onRefreshBugWorkbench: () -> Unit = viewModel::refreshBugWorkbench,
-    onCreateManualRepairAttempt: () -> Unit = viewModel::createManualRepairAttempt,
-    onDeliverManualRepairAndLinkBuild: () -> Unit = viewModel::deliverManualRepairAndLinkBuild,
-    onVerifyManualRepairAndClose: () -> Unit = viewModel::verifyManualRepairAndClose,
-    onRefreshLatestHumanWorkflow: () -> Unit = viewModel::refreshLatestHumanWorkflow,
-    onCreateCommentAndReadAudit: () -> Unit = viewModel::createCommentAndReadAudit,
-    onCreateBugAndCheckDuplicates: () -> Unit = viewModel::createBugAndCheckDuplicates,
 ) {
-    val state = viewModel.uiState.collectAsStateWithLifecycle().value
-    FoundationScreen(
-        state = state,
-        onQueueDraft = viewModel::queueLocalDraft,
-        onRunLiveSmoke = viewModel::runLiveSmoke,
-        onStartCaptureSession = onStartCaptureSession,
-        onCaptureNow = onCaptureNow,
-        onStopCaptureSession = onStopCaptureSession,
-        onSubmitPendingCapture = onSubmitPendingCapture,
-        onDispatchToRelay = onDispatchToRelay,
-        onAdoptFixAndBindQaBuild = onAdoptFixAndBindQaBuild,
-        onRefreshInbox = onRefreshInbox,
-        onRefreshBugWorkbench = onRefreshBugWorkbench,
-        onCreateManualRepairAttempt = onCreateManualRepairAttempt,
-        onDeliverManualRepairAndLinkBuild = onDeliverManualRepairAndLinkBuild,
-        onVerifyManualRepairAndClose = onVerifyManualRepairAndClose,
-        onRefreshLatestHumanWorkflow = onRefreshLatestHumanWorkflow,
-        onCreateCommentAndReadAudit = onCreateCommentAndReadAudit,
-        onCreateBugAndCheckDuplicates = onCreateBugAndCheckDuplicates,
-    )
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(state.page) {
+        if (state.page != QaHubPage.NEW_BUG) viewModel.refreshBugWorkbench()
+    }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Text(
+                text = "Relay QA Hub",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+            )
+        },
+        bottomBar = {
+            NavigationBar(Modifier.navigationBarsPadding()) {
+                NavigationBarItem(
+                    selected = state.page == QaHubPage.MY_BUGS,
+                    onClick = { viewModel.navigateTo(QaHubPage.MY_BUGS) },
+                    icon = { Text("我") },
+                    label = { Text("我提交的 Bug") },
+                )
+                NavigationBarItem(
+                    selected = state.page == QaHubPage.PROJECT_BUGS,
+                    onClick = { viewModel.navigateTo(QaHubPage.PROJECT_BUGS) },
+                    icon = { Text("全") },
+                    label = { Text("项目全部 Bug") },
+                )
+                NavigationBarItem(
+                    selected = state.page == QaHubPage.NEW_BUG,
+                    onClick = { viewModel.navigateTo(QaHubPage.NEW_BUG) },
+                    icon = { Text("+") },
+                    label = { Text("新建 Bug") },
+                )
+            }
+        },
+    ) { innerPadding ->
+        when (state.page) {
+            QaHubPage.MY_BUGS -> BugListPage(
+                state = state,
+                mineOnly = true,
+                modifier = Modifier.padding(innerPadding),
+            )
+            QaHubPage.PROJECT_BUGS -> BugListPage(
+                state = state,
+                mineOnly = false,
+                modifier = Modifier.padding(innerPadding),
+            )
+            QaHubPage.NEW_BUG -> NewBugPage(
+                state = state,
+                onStartCaptureSession = onStartCaptureSession,
+                onCaptureNow = onCaptureNow,
+                onStopCaptureSession = onStopCaptureSession,
+                onSubmit = viewModel::submitNewBug,
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
+    }
 }
 
 @Composable
-internal fun FoundationScreen(
+private fun BugListPage(
     state: FoundationUiState,
-    onQueueDraft: () -> Unit,
-    onRunLiveSmoke: () -> Unit,
+    mineOnly: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val items = if (mineOnly) {
+        state.bugWorkbench.items.filter { it.reporterId == FoundationViewModel.FOUNDATION_SCOPE.actorId }
+    } else {
+        state.bugWorkbench.items
+    }
+    var selected by remember { mutableStateOf<WorkbenchBug?>(null) }
+    Column(
+        modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                if (mineOnly) "我提交的 Bug" else "项目全部 Bug",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+            Text("${items.size}", color = MaterialTheme.colorScheme.primary)
+        }
+        when {
+            state.bugWorkbench.phase == "loading" -> Text("正在刷新…", Modifier.padding(vertical = 16.dp))
+            state.bugWorkbench.phase == "failed" -> Text(
+                "暂时无法读取 Bug：${state.bugWorkbench.errorCode ?: "未知错误"}",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(vertical = 16.dp),
+            )
+            items.isEmpty() -> Text("暂无 Bug", Modifier.padding(vertical = 16.dp))
+            else -> LazyColumn(
+                modifier = Modifier.fillMaxSize().testTag(if (mineOnly) "my-bugs" else "project-bugs"),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 20.dp),
+            ) {
+                items(items, key = { it.id }) { bug -> BugRow(bug) { selected = bug } }
+            }
+        }
+        selected?.let { bug -> BugDetailCard(bug) { selected = null } }
+    }
+}
+
+@Composable
+private fun BugRow(bug: WorkbenchBug, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("${bug.key}  ${bug.title}", fontWeight = FontWeight.SemiBold)
+            Text("状态：${bug.state}", color = MaterialTheme.colorScheme.primary)
+            Text("更新：${bug.updatedAt}", style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+private fun BugDetailCard(bug: WorkbenchBug, onDismiss: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+    ) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("${bug.key} 详情", fontWeight = FontWeight.Bold)
+            Text(bug.title)
+            if (bug.description.isNotBlank()) Text(bug.description)
+            Text("当前状态：${bug.state}")
+            Text("出现次数：${bug.occurrenceCount}")
+            OutlinedButton(onClick = onDismiss) { Text("收起") }
+        }
+    }
+}
+
+@Composable
+private fun NewBugPage(
+    state: FoundationUiState,
     onStartCaptureSession: () -> Unit,
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
-    onSubmitPendingCapture: () -> Unit = {},
-    onDispatchToRelay: () -> Unit = {},
-    onAdoptFixAndBindQaBuild: () -> Unit = {},
-    onRefreshInbox: () -> Unit = {},
-    onRefreshBugWorkbench: () -> Unit = {},
-    onCreateManualRepairAttempt: () -> Unit = {},
-    onDeliverManualRepairAndLinkBuild: () -> Unit = {},
-    onVerifyManualRepairAndClose: () -> Unit = {},
-    onRefreshLatestHumanWorkflow: () -> Unit = {},
-    onCreateCommentAndReadAudit: () -> Unit = {},
-    onCreateBugAndCheckDuplicates: () -> Unit = {},
+    onSubmit: (ByteArray?, String, String, String, String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Scaffold(
+    var title by rememberSaveable { mutableStateOf("") }
+    var description by rememberSaveable { mutableStateOf("") }
+    var fixerId by rememberSaveable { mutableStateOf("") }
+    var verifierId by rememberSaveable { mutableStateOf("") }
+    var strokes by remember { mutableStateOf<List<List<Offset>>>(emptyList()) }
+    var currentStroke by remember { mutableStateOf<List<Offset>>(emptyList()) }
+    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
+    val draft = state.captureDraft
+    val image = remember(draft.privatePath) {
+        draft.privatePath?.let { BitmapFactory.decodeFile(it)?.asImageBitmap() }
+    }
+    val fixers = state.people.activeFixers
+    val verifiers = state.people.activeVerifiers
+
+    Column(
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text("新建 Bug", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = onStartCaptureSession) { Text("开启悬浮球") }
+            OutlinedButton(onClick = onCaptureNow) { Text("立即截图") }
+            OutlinedButton(onClick = onStopCaptureSession) { Text("停止") }
+        }
+        if (image != null) {
+            Text("截图已载入，可在图上画圈或手绘标记。", style = MaterialTheme.typography.bodySmall)
+            AnnotationCanvas(
+                image = image,
+                strokes = strokes,
+                currentStroke = currentStroke,
+                onStartStroke = { currentStroke = listOf(it) },
+                onContinueStroke = { point -> currentStroke = currentStroke + point },
+                onFinishStroke = {
+                    if (currentStroke.size > 1) strokes = strokes + listOf(currentStroke)
+                    currentStroke = emptyList()
+                },
+                onSizeChanged = { canvasSize = it },
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = { if (strokes.isNotEmpty()) strokes = strokes.dropLast(1) },
+                    enabled = strokes.isNotEmpty(),
+                ) { Text("撤销") }
+                OutlinedButton(
+                    onClick = { strokes = emptyList(); currentStroke = emptyList() },
+                    enabled = strokes.isNotEmpty() || currentStroke.isNotEmpty(),
+                ) { Text("清除标记") }
+            }
+        } else {
+            Text("尚未选择截图；仍可提交文字 Bug。", style = MaterialTheme.typography.bodySmall)
+        }
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text("标题") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            label = { Text("问题描述") },
+            minLines = 4,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        PersonPicker("修复人", fixers, QaPersonRole.FIXER, fixerId) { fixerId = it }
+        PersonPicker("验收人", verifiers, QaPersonRole.VERIFIER, verifierId) { verifierId = it }
+        Button(
+            onClick = {
+                val completedStrokes = strokes +
+                    listOfNotNull(currentStroke.takeIf { it.size > 1 })
+                val bytes = image?.takeIf { completedStrokes.isNotEmpty() }?.let {
+                    renderAnnotatedPng(
+                        draft = draft,
+                        strokes = completedStrokes,
+                        canvasSize = canvasSize,
+                    )
+                }
+                onSubmit(bytes, title, description, fixerId, verifierId)
+            },
+            enabled = title.isNotBlank() && description.isNotBlank() &&
+                fixerId.isNotBlank() && verifierId.isNotBlank(),
+            modifier = Modifier.fillMaxWidth().testTag("submit-bug"),
+        ) { Text("一键提交") }
+        if (state.lastAction.isNotBlank()) Text(state.lastAction, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+private fun AnnotationCanvas(
+    image: ImageBitmap,
+    strokes: List<List<Offset>>,
+    currentStroke: List<Offset>,
+    onStartStroke: (Offset) -> Unit,
+    onContinueStroke: (Offset) -> Unit,
+    onFinishStroke: () -> Unit,
+    onSizeChanged: (IntSize) -> Unit,
+) {
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.safeDrawing),
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState())
-                .navigationBarsPadding()
-                .testTag("foundation-screen"),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Spacer(Modifier.size(6.dp))
-            Text(
-                text = "Relay QA Hub",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.testTag("app-title"),
-            )
-            Text(
-                text = "Native Android foundation",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = "Jetpack Compose UI — no WebView, PWA, or service worker.",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-
-            ScopeCard(state)
-
-            FoundationCard(
-                title = "Local isolation",
-                detail = "Room cache and queue keys include both account and project.",
-                value = "${state.cachedItemCount} cached • ${state.queuedOperationCount} queued",
-            )
-            FoundationCard(
-                title = "Latest submission",
-                detail = "The final Room receipt survives process restart and identifies the QA item.",
-                value = state.latestQaItemKey?.let { key ->
-                    "$key • ${state.latestQaItemId}"
-                } ?: "No completed submission yet",
-            )
-            FoundationCard(
-                title = "Offline delivery",
-                detail = "Queued media stays app-private while WorkManager waits or retries.",
-                value = state.latestDeliveryState?.let { deliveryState ->
-                    state.latestDeliveryError?.let { "$deliveryState • $it" } ?: deliveryState
-                } ?: "No queued operation yet",
-            )
-            FoundationCard(
-                title = "Constrained delivery",
-                detail = "WorkManager uses connected-network, battery, unique-work, and exponential backoff gates.",
-                value = "4-run retry ceiling",
-            )
-            FoundationCard(
-                title = "Credential boundary",
-                detail = "Opaque native session credentials stay outside Room and are encrypted with Android Keystore.",
-                value = state.credentialBoundary,
-            )
-            FoundationCard(
-                title = "Versioned QA Hub API",
-                detail = "Queued and live JSON writes share the additive App-first vendor media type and contract boundary.",
-                value = "Contract ${state.contractVersion}",
-            )
-            FoundationCard(
-                title = "Explicit evidence session",
-                detail = "MediaProjection starts only after system consent; the persistent notification and Stop action remain visible.",
-                value = "Overlay capture stays optional; ordinary defects remain available",
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                OutlinedButton(
-                    onClick = onQueueDraft,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("queue-draft"),
-                ) {
-                    Text("Queue draft")
-                }
-                Button(
-                    onClick = onRunLiveSmoke,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("live-smoke"),
-                ) {
-                    Text("Run live smoke")
-                }
-            }
-            Button(
-                onClick = onDispatchToRelay,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("dispatch-to-relay"),
-            ) {
-                Text("交给 Relay（新建 Bug）")
-            }
-            val handoff = state.relayHandoff
-            val buildProjection = state.buildProjection
-            val canAdoptFix = handoff?.handoffStatus == "fix_delivered" &&
-                !handoff.deliveredCommitSha.isNullOrBlank() &&
-                buildProjection.phase != "in_flight"
-            Button(
-                onClick = onAdoptFixAndBindQaBuild,
-                enabled = canAdoptFix,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("adopt-fix-build"),
-            ) {
-                Text("注册并回读 QA Build")
-            }
-            when (buildProjection.phase) {
-                "in_flight" -> Text(
-                    text = "QA Build: linking delivered ${buildProjection.deliveredCommitSha}…",
-                    modifier = Modifier.testTag("build-projection-status"),
+            .fillMaxWidth()
+            .aspectRatio(image.width.toFloat() / image.height.toFloat())
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.Black)
+            .onSizeChanged(onSizeChanged)
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = onStartStroke,
+                    onDrag = { change, _ -> onContinueStroke(change.position) },
+                    onDragEnd = onFinishStroke,
+                    onDragCancel = onFinishStroke,
                 )
-                "registered" -> Text(
-                    text = "QA Build ${buildProjection.buildId} registered/read back; " +
-                        "SHA ${buildProjection.deliveredCommitSha}. 不代表验收或关闭 Bug。",
-                    modifier = Modifier.testTag("build-projection-status"),
-                )
-                "failed" -> Text(
-                    text = "QA Build adoption error: ${buildProjection.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("build-projection-status"),
-                )
-            }
-            Button(
-                onClick = onRefreshInbox,
-                enabled = state.inbox.phase != "loading",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("refresh-inbox"),
-            ) {
-                Text("回读 QA Inbox")
-            }
-            when (state.inbox.phase) {
-                "loading" -> Text(
-                    text = "QA Inbox: loading…",
-                    modifier = Modifier.testTag("inbox-status"),
-                )
-                "loaded" -> Text(
-                    text = "QA Inbox ${state.inbox.itemCount} item(s), " +
-                        "${state.inbox.unreadCount} unread; first=${state.inbox.firstTitle ?: "none"}.",
-                    modifier = Modifier.testTag("inbox-status"),
-                )
-                "failed" -> Text(
-                    text = "QA Inbox error: ${state.inbox.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("inbox-status"),
-                )
-            }
-            Button(
-                onClick = onRefreshBugWorkbench,
-                enabled = state.bugWorkbench.phase != "loading",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("refresh-bug-workbench"),
-            ) {
-                Text("回读 Bug 工作台（reported）")
-            }
-            when (state.bugWorkbench.phase) {
-                "loading" -> Text(
-                    text = "Bug workbench: loading…",
-                    modifier = Modifier.testTag("bug-workbench-status"),
-                )
-                "loaded" -> Text(
-                    text = "Bug workbench ${state.bugWorkbench.itemCount} " +
-                        "${state.bugWorkbench.stateFilter}; " +
-                        "first=${state.bugWorkbench.firstBugKey ?: "none"}; " +
-                        "title=${state.bugWorkbench.firstTitle ?: "none"}; " +
-                        "snapshot=${state.bugWorkbench.snapshotSequence}.",
-                    modifier = Modifier.testTag("bug-workbench-status"),
-                )
-                "failed" -> Text(
-                    text = "Bug workbench error: " +
-                        "${state.bugWorkbench.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("bug-workbench-status"),
-                )
-            }
-            Button(
-                onClick = onCreateManualRepairAttempt,
-                enabled = state.manualRepair.phase != "loading",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("create-manual-repair"),
-            ) {
-                Text("创建并回读人工 RepairAttempt")
-            }
-            when (state.manualRepair.phase) {
-                "loading" -> Text(
-                    text = "Human RepairAttempt: creating…",
-                    modifier = Modifier.testTag("manual-repair-status"),
-                )
-                "loaded" -> Text(
-                    text = "${state.manualRepair.bugKey ?: "Bug"} RepairAttempt " +
-                        "${state.manualRepair.attemptId}; mode=${state.manualRepair.mode}; " +
-                        "status=${state.manualRepair.status}; missingEvidence=" +
-                        "${state.manualRepair.missingEvidenceRejectionCode}.",
-                    modifier = Modifier.testTag("manual-repair-status"),
-                )
-                "failed" -> Text(
-                    text = "Human RepairAttempt error: " +
-                        "${state.manualRepair.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("manual-repair-status"),
-                )
-            }
-            Button(
-                onClick = onDeliverManualRepairAndLinkBuild,
-                enabled = state.manualRepair.phase == "loaded" &&
-                    state.humanRepairBuild.phase != "loading" &&
-                    state.humanRepairBuild.phase != "linked",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("deliver-manual-repair-build"),
-            ) {
-                Text("交付人工修复并绑定 QA Build")
-            }
-            when (state.humanRepairBuild.phase) {
-                "loading" -> Text(
-                    text = "Human delivery/Build: linking…",
-                    modifier = Modifier.testTag("human-repair-build-status"),
-                )
-                "linked" -> Text(
-                    text = "Attempt ${state.humanRepairBuild.attemptId}; " +
-                        "commit=${state.humanRepairBuild.deliveredCommitSha}; " +
-                        "Build=${state.humanRepairBuild.buildId}/" +
-                        "${state.humanRepairBuild.buildStatus}; " +
-                        "Bug=${state.humanRepairBuild.bugState}; wrongSha=" +
-                        "${state.humanRepairBuild.wrongShaRejectionCode}.",
-                    modifier = Modifier.testTag("human-repair-build-status"),
-                )
-                "failed" -> Text(
-                    text = "Human delivery/Build error: " +
-                        "${state.humanRepairBuild.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("human-repair-build-status"),
-                )
-            }
-            Button(
-                onClick = onVerifyManualRepairAndClose,
-                enabled = state.humanRepairBuild.phase == "linked" &&
-                    state.humanRepairBuild.verificationPhase != "loading" &&
-                    state.humanRepairBuild.verificationPhase != "closed",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("verify-manual-repair-close"),
-            ) {
-                Text("人工验收 QA Build 并关闭 Bug")
-            }
-            when (state.humanRepairBuild.verificationPhase) {
-                "loading" -> Text(
-                    text = "Human Verification: running…",
-                    modifier = Modifier.testTag("human-verification-status"),
-                )
-                "closed" -> Text(
-                    text = "Verification ${state.humanRepairBuild.verificationId}/" +
-                        "${state.humanRepairBuild.verificationStatus}; Bug=" +
-                        "${state.humanRepairBuild.closedBugState}/v" +
-                        "${state.humanRepairBuild.closedBugVersion}; missingResult=" +
-                        "${state.humanRepairBuild.missingResultRejectionCode}.",
-                    modifier = Modifier.testTag("human-verification-status"),
-                )
-                "failed" -> Text(
-                    text = "Human Verification error: " +
-                        "${state.humanRepairBuild.verificationErrorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("human-verification-status"),
-                )
-            }
-            Button(
-                onClick = onRefreshLatestHumanWorkflow,
-                enabled = state.humanWorkflow.phase != "loading",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("refresh-human-workflow"),
-            ) {
-                Text("重启后回读最近人工闭环")
-            }
-            when (state.humanWorkflow.phase) {
-                "loading" -> Text(
-                    text = "Human workflow: reading persisted facts…",
-                    modifier = Modifier.testTag("human-workflow-status"),
-                )
-                "loaded" -> Text(
-                    text = "${state.humanWorkflow.bugKey}/" +
-                        "${state.humanWorkflow.bugState}/v${state.humanWorkflow.bugVersion}; " +
-                        "Attempt=${state.humanWorkflow.repairAttemptStatus}; " +
-                        "Build=${state.humanWorkflow.buildStatus}; " +
-                        "Verification=${state.humanWorkflow.verificationStatus}/v" +
-                        "${state.humanWorkflow.verificationVersion}; missing=" +
-                        "${state.humanWorkflow.missingWorkflowRejectionCode}; " +
-                        "result=${state.humanWorkflow.resultSummary}.",
-                    modifier = Modifier.testTag("human-workflow-status"),
-                )
-                "failed" -> Text(
-                    text = "Human workflow readback error: " +
-                        "${state.humanWorkflow.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("human-workflow-status"),
-                )
-            }
-            Button(
-                onClick = onCreateCommentAndReadAudit,
-                enabled = state.commentAudit.phase != "loading",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("create-comment-audit"),
-            ) {
-                Text("评论并回读审计时间线")
-            }
-            when (state.commentAudit.phase) {
-                "loading" -> Text(
-                    text = "Comment/audit: writing and reading persisted facts…",
-                    modifier = Modifier.testTag("comment-audit-status"),
-                )
-                "loaded" -> Text(
-                    text = "${state.commentAudit.bugKey} Comment=" +
-                        "${state.commentAudit.commentId}; event=" +
-                        "${state.commentAudit.eventType}/${state.commentAudit.eventId}; " +
-                        "timeline=${state.commentAudit.eventCount}; missing=" +
-                        "${state.commentAudit.missingBugRejectionCode}; body=" +
-                        "${state.commentAudit.commentBody}.",
-                    modifier = Modifier.testTag("comment-audit-status"),
-                )
-                "failed" -> Text(
-                    text = "Comment/audit error: " +
-                        "${state.commentAudit.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("comment-audit-status"),
-                )
-            }
-            Button(
-                onClick = onCreateBugAndCheckDuplicates,
-                enabled = state.duplicateCandidates.phase != "loading",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("check-duplicates"),
-            ) {
-                Text("创建 Bug 并检查重复")
-            }
-            when (state.duplicateCandidates.phase) {
-                "loading" -> Text(
-                    text = "Duplicate candidates: loading…",
-                    modifier = Modifier.testTag("duplicate-status"),
-                )
-                "loaded" -> Text(
-                    text = "Duplicate candidates ${state.duplicateCandidates.count}; " +
-                        "first=${state.duplicateCandidates.firstBugKey ?: "none"}; " +
-                        "score=${state.duplicateCandidates.firstScore ?: 0.0}; " +
-                        "reason=${state.duplicateCandidates.firstReason ?: "none"}.",
-                    modifier = Modifier.testTag("duplicate-status"),
-                )
-                "failed" -> Text(
-                    text = "Duplicate check error: " +
-                        "${state.duplicateCandidates.errorCode ?: "UNKNOWN"}.",
-                    modifier = Modifier.testTag("duplicate-status"),
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Button(
-                    onClick = onStartCaptureSession,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("start-capture-session"),
-                ) {
-                    Text("Start capture session")
-                }
-                OutlinedButton(
-                    onClick = onCaptureNow,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("capture-now"),
-                ) {
-                    Text("Capture now")
-                }
-                OutlinedButton(
-                    onClick = onStopCaptureSession,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("stop-capture-session"),
-                ) {
-                    Text("Stop")
-                }
-            }
-
-            if (state.pendingCapture.available) {
-                Text(
-                    text = "Pending capture ${state.pendingCapture.captureId} • " +
-                        "${state.pendingCapture.width}x${state.pendingCapture.height} • " +
-                        "Unity ${state.pendingCapture.enrichmentStatus ?: "UNAVAILABLE"} • " +
-                        state.pendingCapture.deliveryState,
-                    modifier = Modifier.testTag("pending-capture-status"),
-                )
-                Button(
-                    onClick = onSubmitPendingCapture,
-                    enabled = state.pendingCapture.deliveryState == "SAVED",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("submit-pending-capture"),
-                ) {
-                    Text("Submit pending capture")
-                }
-            }
-
-            Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = state.lastAction,
-                    modifier = Modifier
-                        .padding(14.dp)
-                        .testTag("last-action"),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-            Spacer(Modifier.size(16.dp))
-        }
-    }
-}
-@Composable
-private fun ScopeCard(state: FoundationUiState) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
+            },
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = "Current local scope",
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                text = state.accountName,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(text = state.projectName, style = MaterialTheme.typography.bodyMedium)
+        Image(
+            bitmap = image,
+            contentDescription = "待提交的截图",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize(),
+        )
+        Canvas(Modifier.fillMaxSize()) {
+            fun drawStroke(points: List<Offset>) {
+                points.zipWithNext().forEach { (start, end) ->
+                    drawLine(Color.Red, start, end, strokeWidth = 6f)
+                }
+            }
+            strokes.forEach(::drawStroke)
+            drawStroke(currentStroke)
         }
     }
 }
 
 @Composable
-private fun FoundationCard(
-    title: String,
-    detail: String,
-    value: String,
+private fun PersonPicker(
+    label: String,
+    people: List<QaPerson>,
+    role: QaPersonRole,
+    selectedId: String,
+    onSelected: (String) -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(text = detail, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                text = value,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.secondary,
-            )
+    var expanded by remember { mutableStateOf(false) }
+    val selected = people.firstOrNull { it.id == selectedId }
+    Box(Modifier.fillMaxWidth()) {
+        OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
+            Text(selected?.displayName ?: "选择$label")
         }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            people.filter { role in it.roles }.forEach { person ->
+                DropdownMenuItem(
+                    text = { Text(person.displayName) },
+                    onClick = { onSelected(person.id); expanded = false },
+                )
+            }
+            if (people.isEmpty()) {
+                DropdownMenuItem(
+                    text = { Text("请先配置 qa-people.json") },
+                    onClick = { expanded = false },
+                )
+            }
+        }
+    }
+}
+
+private fun renderAnnotatedPng(
+    draft: CaptureDraftUiState,
+    strokes: List<List<Offset>>,
+    canvasSize: IntSize,
+): ByteArray? {
+    val path = draft.privatePath ?: return null
+    val source = BitmapFactory.decodeFile(path) ?: return null
+    val bitmap = source.copy(Bitmap.Config.ARGB_8888, true)
+    source.recycle()
+    if (canvasSize.width > 0 && canvasSize.height > 0) {
+        val canvas = Canvas(bitmap)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = AndroidColor.RED
+            style = Paint.Style.STROKE
+            strokeWidth = (6f * bitmap.width / canvasSize.width).coerceAtLeast(2f)
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+        }
+        val sx = bitmap.width.toFloat() / canvasSize.width
+        val sy = bitmap.height.toFloat() / canvasSize.height
+        strokes.forEach { points ->
+            if (points.size < 2) return@forEach
+            val pathObject = Path()
+            pathObject.moveTo(points.first().x * sx, points.first().y * sy)
+            points.drop(1).forEach { point -> pathObject.lineTo(point.x * sx, point.y * sy) }
+            canvas.drawPath(pathObject, paint)
+        }
+    }
+    return ByteArrayOutputStream().use { output ->
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
+        bitmap.recycle()
+        output.toByteArray()
     }
 }

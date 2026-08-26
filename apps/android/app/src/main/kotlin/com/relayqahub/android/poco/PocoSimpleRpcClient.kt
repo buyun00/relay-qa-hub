@@ -49,6 +49,7 @@ enum class PocoReadOnlyMethod(
     GET_SDK_VERSION("GetSDKVersion", 64 * 1024),
     SCREENSHOT("Screenshot", 29_360_128),
     DUMP_VISIBLE("Dump", 1 * 1024 * 1024),
+    QA_SNAPSHOT("qa.snapshot", 320 * 1024),
     GET_SCREEN_SIZE("GetScreenSize", 64 * 1024),
     GET_DEBUG_PROFILING_DATA("GetDebugProfilingData", 1 * 1024 * 1024),
 }
@@ -60,6 +61,8 @@ sealed interface PocoArtifact {
     ) : PocoArtifact
 
     data class Hierarchy(val json: String) : PocoArtifact
+
+    data class Snapshot(val json: String) : PocoArtifact
 
     data class ScreenSize(
         val width: Int,
@@ -118,7 +121,7 @@ data class PocoConnectionConfig(
     val fallbackPorts: List<Int> = (5001..5005).toList(),
     val connectTimeoutMillis: Int = 150,
     val readTimeoutMillis: Int = 250,
-    val totalDeadlineMillis: Long = 1_500,
+    val totalDeadlineMillis: Long = 3_000,
 ) {
     init {
         require(configuredPort in 1..65_535)
@@ -136,7 +139,7 @@ data class PocoConnectionConfig(
 }
 
 /**
- * Bounded, loopback-only adapter for the five read-only RPCs proven by the vendored Poco spike.
+ * Bounded, loopback-only adapter for the read-only RPCs proven by the vendored Poco spike.
  * There is deliberately no public raw-method or generic Invoke entry point.
  */
 class PocoSimpleRpcClient(
@@ -226,6 +229,19 @@ class PocoSimpleRpcClient(
                     ::parseScreenshot,
                 )
                 if (streamHealthy) {
+                    val snapshotNonce = UUID.randomUUID().toString().replace("-", "")
+                    streamHealthy = collectOptional(
+                        socket,
+                        input,
+                        output,
+                        PocoReadOnlyMethod.QA_SNAPSHOT,
+                        buildSnapshotParams(request, snapshotNonce, deadlineNanos),
+                        deadlineNanos,
+                        outcomes,
+                        artifacts,
+                    ) { result -> parseSnapshot(result, request.captureId, snapshotNonce) }
+                }
+                if (streamHealthy) {
                     streamHealthy = collectOptional(
                         socket,
                         input,
@@ -279,7 +295,11 @@ class PocoSimpleRpcClient(
                     sdkVersion = sdkVersion,
                     outcomes = outcomes.toList(),
                     artifacts = artifacts.toMap(),
-                    failureCode = if (complete) null else "POCO_PARTIAL",
+                    failureCode = if (complete) {
+                        null
+                    } else {
+                        outcomes.lastOrNull { !it.succeeded }?.failureCode ?: "POCO_PARTIAL"
+                    },
                 )
             } catch (failure: Throwable) {
                 if (failure is CancellationException) throw failure
@@ -414,6 +434,63 @@ class PocoSimpleRpcClient(
         return PocoArtifact.Hierarchy(payload)
     }
 
+    private fun buildSnapshotParams(
+        request: PocoCollectionRequest,
+        nonce: String,
+        deadlineNanos: Long,
+    ): JsonArray = buildJsonArray {
+        add(
+            buildJsonObject {
+                put("schemaVersion", SNAPSHOT_SCHEMA_VERSION)
+                put("captureId", request.captureId)
+                put("nonce", nonce)
+                put(
+                    "deadlineUnixMs",
+                    System.currentTimeMillis() +
+                        remainingMillis(deadlineNanos).coerceIn(1L, SNAPSHOT_DEADLINE_MILLIS),
+                )
+            },
+        )
+    }
+
+    private fun parseSnapshot(
+        result: JsonElement,
+        expectedCaptureId: String,
+        expectedNonce: String,
+    ): PocoArtifact.Snapshot {
+        val snapshot = try {
+            when (result) {
+                is JsonObject -> result
+                is JsonPrimitive -> json.parseToJsonElement(
+                    result.contentOrNull ?: throw PocoProtocolException("SNAPSHOT_SHAPE_INVALID"),
+                ).jsonObject
+                else -> throw PocoProtocolException("SNAPSHOT_SHAPE_INVALID")
+            }
+        } catch (failure: PocoProtocolException) {
+            throw failure
+        } catch (_: Throwable) {
+            throw PocoProtocolException("SNAPSHOT_SHAPE_INVALID")
+        }
+        if (snapshot["captureId"]?.jsonPrimitive?.contentOrNull != expectedCaptureId) {
+            throw PocoProtocolException("SNAPSHOT_CAPTURE_ID_MISMATCH")
+        }
+        val schemaVersion = snapshot["schemaVersion"]?.jsonPrimitive?.contentOrNull
+        if (schemaVersion != SNAPSHOT_SCHEMA_VERSION.toString() && schemaVersion != "1.0.0") {
+            throw PocoProtocolException("SNAPSHOT_SCHEMA_VERSION_MISMATCH")
+        }
+        snapshot["nonce"]?.jsonPrimitive?.contentOrNull?.let { responseNonce ->
+            if (responseNonce != expectedNonce) {
+                throw PocoProtocolException("SNAPSHOT_NONCE_MISMATCH")
+            }
+        }
+        val payload = snapshot.toString()
+        val payloadBytes = payload.toByteArray(StandardCharsets.UTF_8).size
+        if (payloadBytes !in 2..MAX_SNAPSHOT_BYTES) {
+            throw PocoProtocolException("SNAPSHOT_TOO_LARGE")
+        }
+        return PocoArtifact.Snapshot(payload)
+    }
+
     private fun parseScreenSize(result: JsonElement): PocoArtifact.ScreenSize {
         val values = try {
             result.jsonArray
@@ -522,6 +599,9 @@ class PocoSimpleRpcClient(
         private const val MAX_DECODED_ARTIFACT_BYTES = 20 * 1024 * 1024
         private const val MAX_HIERARCHY_BYTES = 1 * 1024 * 1024
         private const val MAX_PROFILING_BYTES = 1 * 1024 * 1024
+        private const val MAX_SNAPSHOT_BYTES = 256 * 1024
+        private const val SNAPSHOT_SCHEMA_VERSION = 1
+        private const val SNAPSHOT_DEADLINE_MILLIS = 2_000L
         private val EMPTY_PARAMS = JsonArray(emptyList())
         private val CORE_METHODS = setOf(
             PocoReadOnlyMethod.GET_SDK_VERSION,

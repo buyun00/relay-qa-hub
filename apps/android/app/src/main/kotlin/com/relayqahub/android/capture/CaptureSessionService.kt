@@ -344,18 +344,21 @@ class CaptureSessionService : Service() {
                             ),
                             pocoArtifacts = pocoArtifacts,
                         )
-                    if (pending.mode == CapturedDraftMode.SAVE_PENDING) {
-                        try {
-                            PendingCaptureDraftStore(this@CaptureSessionService).persist(ready)
-                        } catch (_: Throwable) {
-                            CaptureResultBridge.send(
-                                this@CaptureSessionService,
-                                CaptureResult.Unavailable("pending_capture_persistence_failed"),
-                            )
-                            return@launch
-                        }
+                    // Both tap modes persist the same app-private sidecar.  A single-tap
+                    // result may launch MainActivity after its broadcast, so the sidecar is
+                    // the durable handoff that lets the new-Bug page recover the screenshot.
+                    try {
+                        PendingCaptureDraftStore(this@CaptureSessionService).persist(ready)
+                    } catch (_: Throwable) {
+                        CaptureResultBridge.send(
+                            this@CaptureSessionService,
+                            CaptureResult.Unavailable("pending_capture_persistence_failed"),
+                        )
+                        return@launch
                     }
                     CaptureResultBridge.send(this@CaptureSessionService, ready)
+                    // Keep the captured game visible until its bounded Poco work finishes;
+                    // foregrounding the draft earlier pauses Unity's main-thread RPC loop.
                     if (pending.openApp) openAppFromUserCapture()
                 } finally {
                     if (currentCoroutineContext().isActive) {
@@ -443,6 +446,7 @@ class CaptureSessionService : Service() {
     private fun PocoReadOnlyMethod.expectedArtifactKind(): CapturePocoArtifactKind? = when (this) {
         PocoReadOnlyMethod.SCREENSHOT -> CapturePocoArtifactKind.SCREENSHOT
         PocoReadOnlyMethod.DUMP_VISIBLE -> CapturePocoArtifactKind.HIERARCHY
+        PocoReadOnlyMethod.QA_SNAPSHOT -> CapturePocoArtifactKind.SNAPSHOT
         PocoReadOnlyMethod.GET_DEBUG_PROFILING_DATA -> CapturePocoArtifactKind.PROFILING
         PocoReadOnlyMethod.GET_SDK_VERSION,
         PocoReadOnlyMethod.GET_SCREEN_SIZE,

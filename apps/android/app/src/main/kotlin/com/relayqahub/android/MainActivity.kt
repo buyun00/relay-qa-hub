@@ -17,15 +17,11 @@ import com.relayqahub.android.capture.CaptureResult
 import com.relayqahub.android.capture.CaptureResultBridge
 import com.relayqahub.android.capture.CaptureSessionController
 import com.relayqahub.android.capture.CapturedDraftMode
-import com.relayqahub.android.capture.CaptureArtifactStore
 import com.relayqahub.android.overlay.OverlayPermissionController
 import com.relayqahub.android.ui.FoundationScreen
 import com.relayqahub.android.ui.QaHubTheme
 import java.io.Closeable
-import java.io.File
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private val foundationViewModel: FoundationViewModel by viewModels()
@@ -86,6 +82,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         foundationViewModel.refreshPendingCapture()
+        foundationViewModel.restoreLatestCaptureDraft()
         // Unlocking the device resumes the foreground activity. Re-enqueue fail-closed
         // keystore operations here so BLOCKED_DEVICE never relies on an implicit retry.
         lifecycleScope.launch {
@@ -126,36 +123,20 @@ class MainActivity : ComponentActivity() {
             is CaptureResult.SessionState -> foundationViewModel.reportCaptureSessionState(result.active)
             is CaptureResult.Unavailable -> foundationViewModel.reportCaptureUnavailable(result.reason)
             is CaptureResult.Ready -> when (result.mode) {
-                CapturedDraftMode.OPEN_DRAFT -> submitPrivateCapture(result)
+                CapturedDraftMode.OPEN_DRAFT -> foundationViewModel.onCaptureReady(
+                    captureId = result.captureId,
+                    privatePath = result.privatePath,
+                    width = result.width,
+                    height = result.height,
+                    requestedAtEpochMs = result.requestedAtEpochMs,
+                    pocoStatus = result.poco.status.name,
+                )
                 CapturedDraftMode.SAVE_PENDING -> foundationViewModel.reportPendingCaptureSaved(
                     captureId = result.captureId,
                     width = result.width,
                     height = result.height,
                 )
             }
-        }
-    }
-
-    private fun submitPrivateCapture(result: CaptureResult.Ready) {
-        lifecycleScope.launch {
-            val (bytes, pocoArtifacts) = withContext(Dispatchers.IO) {
-                val draftRoot = File(filesDir, "capture-drafts").canonicalFile
-                val captureFile = File(result.privatePath).canonicalFile
-                val relative = captureFile.relativeToOrNull(draftRoot)
-                    ?: error("capture path left the app-private draft root")
-                require(!relative.path.startsWith("..")) { "capture path left the private root" }
-                Pair(
-                    captureFile.readBytes(),
-                    result.pocoArtifacts.map(CaptureArtifactStore(this@MainActivity)::read),
-                )
-            }
-            foundationViewModel.submitCapturedPng(
-                captureId = result.captureId,
-                capturedAtEpochMs = result.requestedAtEpochMs,
-                pngBytes = bytes,
-                pocoSummary = result.poco,
-                pocoArtifacts = pocoArtifacts,
-            )
         }
     }
 }

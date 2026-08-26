@@ -33,21 +33,21 @@ class BugWorkbenchClient(
 
     suspend fun listBugs(
         projectId: String,
-        state: String,
+        state: String? = null,
         limit: Int,
         accessToken: String,
     ): BugWorkbenchResult = withContext(Dispatchers.IO) {
         require(runCatching { UUID.fromString(projectId) }.isSuccess)
-        require(state in BUG_STATES)
+        state?.let { require(it in BUG_STATES) }
         require(limit in 1..MAX_ITEMS)
         require(accessToken.isNotBlank())
         val base = apiBaseUrl.resolve("bugs")
             ?: throw BugWorkbenchFailure("INVALID_WORKBENCH_PATH")
-        val url = base.newBuilder()
-            .addQueryParameter("projectId", projectId)
-            .addQueryParameter("state", state)
-            .addQueryParameter("limit", limit.toString())
-            .build()
+        val url = base.newBuilder().apply {
+            addQueryParameter("projectId", projectId)
+            state?.let { addQueryParameter("state", it) }
+            addQueryParameter("limit", limit.toString())
+        }.build()
         val request = Request.Builder()
             .url(url)
             .header("Accept", QaHubApiContract.JSON_ACCEPT)
@@ -89,6 +89,11 @@ class BugWorkbenchClient(
                     val key = item.optString("key")
                     val title = item.optString("title")
                     val itemState = item.optString("state")
+                    val reporterId = item.optString("reporterId")
+                    val ownerId = item.optString("ownerId").takeIf(String::isNotBlank)
+                    val verificationOwnerId = item.optString("verificationOwnerId")
+                        .takeIf(String::isNotBlank)
+                    val description = item.optString("description")
                     val occurrenceCount = item.optInt("occurrenceCount", -1)
                     val updatedAt = item.optString("updatedAt")
                     if (
@@ -97,7 +102,8 @@ class BugWorkbenchClient(
                         key.isBlank() ||
                         title.isBlank() ||
                         itemState !in BUG_STATES ||
-                        itemState != state ||
+                        (state != null && itemState != state) ||
+                        reporterId.isBlank() ||
                         occurrenceCount < 0 ||
                         updatedAt.isBlank()
                     ) {
@@ -111,6 +117,11 @@ class BugWorkbenchClient(
                             state = itemState,
                             occurrenceCount = occurrenceCount,
                             updatedAt = updatedAt,
+                            reporterId = reporterId,
+                            ownerId = ownerId,
+                            verificationOwnerId = verificationOwnerId,
+                            description = description,
+                            version = item.optInt("version", 1).coerceAtLeast(1),
                         ),
                     )
                 }
@@ -121,6 +132,66 @@ class BugWorkbenchClient(
                 nextCursor = if (root.isNull("nextCursor")) null else root.optString("nextCursor"),
             )
         }
+    }
+
+    suspend fun getBug(
+        bugId: String,
+        accessToken: String,
+    ): WorkbenchBug = withContext(Dispatchers.IO) {
+        require(runCatching { UUID.fromString(bugId) }.isSuccess)
+        require(accessToken.isNotBlank())
+        val url = apiBaseUrl.resolve("bugs/$bugId")
+            ?: throw BugWorkbenchFailure("INVALID_WORKBENCH_PATH")
+        val request = Request.Builder()
+            .url(url)
+            .header("Accept", QaHubApiContract.JSON_ACCEPT)
+            .header("Authorization", "Bearer $accessToken")
+            .get()
+            .build()
+        val response = runCatching { httpClient.newCall(request).execute() }
+            .getOrElse { throw BugWorkbenchFailure("NETWORK_IO") }
+        response.use { result ->
+            val body = result.body?.byteStream()?.use { it.readWorkbenchUtf8(MAX_RESPONSE_BYTES) }
+                .orEmpty()
+            if (result.code != 200) {
+                val code = runCatching { JSONObject(body).optString("code") }.getOrNull().orEmpty()
+                throw BugWorkbenchFailure(code.ifBlank { "HTTP_${result.code}" })
+            }
+            val item = runCatching { JSONObject(body) }
+                .getOrElse { throw BugWorkbenchFailure("INVALID_WORKBENCH_RESPONSE") }
+            parseBug(item, expectedProjectId = null)
+        }
+    }
+
+    private fun parseBug(item: JSONObject, expectedProjectId: String?): WorkbenchBug {
+        val bugId = item.optString("id")
+        val itemProjectId = item.optString("projectId")
+        val key = item.optString("key")
+        val title = item.optString("title")
+        val itemState = item.optString("state")
+        val reporterId = item.optString("reporterId")
+        val occurrenceCount = item.optInt("occurrenceCount", -1)
+        val updatedAt = item.optString("updatedAt")
+        if (
+            runCatching { UUID.fromString(bugId) }.isFailure ||
+            (expectedProjectId != null && itemProjectId != expectedProjectId) ||
+            key.isBlank() || title.isBlank() || itemState !in BUG_STATES ||
+            reporterId.isBlank() || occurrenceCount < 0 || updatedAt.isBlank()
+        ) throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+        return WorkbenchBug(
+            id = bugId,
+            key = key,
+            title = title,
+            state = itemState,
+            occurrenceCount = occurrenceCount,
+            updatedAt = updatedAt,
+            reporterId = reporterId,
+            ownerId = item.optString("ownerId").takeIf(String::isNotBlank),
+            verificationOwnerId = item.optString("verificationOwnerId")
+                .takeIf(String::isNotBlank),
+            description = item.optString("description"),
+            version = item.optInt("version", 1).coerceAtLeast(1),
+        )
     }
 
     private companion object {
@@ -150,6 +221,11 @@ data class WorkbenchBug(
     val state: String,
     val occurrenceCount: Int,
     val updatedAt: String,
+    val reporterId: String = "",
+    val ownerId: String? = null,
+    val verificationOwnerId: String? = null,
+    val description: String = "",
+    val version: Int = 1,
 )
 
 data class BugWorkbenchResult(

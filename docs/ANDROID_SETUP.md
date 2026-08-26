@@ -147,6 +147,42 @@ at least one strongly managed OEM device. The current API 35 MuMu never replaces
 real-device evidence for overlay, MediaProjection, system reclaim, SELinux, OEM
 power behavior, or Poco `127.0.0.1` security.
 
+## Field people configuration
+
+The Android field client has no people-management screen and does not hardcode
+assignees. Its checked-in seed is `apps/android/config/qa-people.json`. On first
+launch the App copies that seed to the user-editable file below and prefers the
+external file on subsequent process starts:
+
+```text
+/storage/emulated/0/Android/media/<applicationId>/qa-hub/config/qa-people.json
+```
+
+Use `com.relayqahub.android.debug` for a debug APK and
+`com.relayqahub.android` for release. The JSON object has exactly
+`schemaVersion`, `projectKey`, and `people`; each person has exactly `id`,
+`displayName`, `roles`, and `active`. `roles` accepts only `fixer` and
+`verifier`:
+
+```json
+{
+  "schemaVersion": 1,
+  "projectKey": "LOCAL",
+  "people": [
+    {
+      "id": "<QA Hub user UUID>",
+      "displayName": "QA member",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    }
+  ]
+}
+```
+
+IDs must resolve to active users/memberships in the same QA Hub project. An
+empty or invalid role list is shown as a configuration problem; the App never
+falls back to embedded people.
+
 ## APK provenance boundary
 
 The QA Hub App is built only from this repository's own `apps/android` Gradle

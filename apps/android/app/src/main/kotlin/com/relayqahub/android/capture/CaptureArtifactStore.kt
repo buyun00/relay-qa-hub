@@ -14,6 +14,7 @@ enum class CapturePocoArtifactKind(
 ) {
     SCREENSHOT("poco_screenshot", PocoReadOnlyMethod.SCREENSHOT),
     HIERARCHY("poco_hierarchy", PocoReadOnlyMethod.DUMP_VISIBLE),
+    SNAPSHOT("poco_snapshot", PocoReadOnlyMethod.QA_SNAPSHOT),
     PROFILING("poco_profiling", PocoReadOnlyMethod.GET_DEBUG_PROFILING_DATA),
 }
 
@@ -134,6 +135,12 @@ class CaptureArtifactStore(context: Context) {
             }
 
             is PocoArtifact.Hierarchy -> StoredArtifact(
+                "${kind.wireName}.json",
+                "application/json",
+                json.toByteArray(StandardCharsets.UTF_8),
+            )
+
+            is PocoArtifact.Snapshot -> StoredArtifact(
                 "${kind.wireName}.json",
                 "application/json",
                 json.toByteArray(StandardCharsets.UTF_8),

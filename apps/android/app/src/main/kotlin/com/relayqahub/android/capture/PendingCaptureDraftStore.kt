@@ -32,13 +32,16 @@ data class PendingCaptureDraft(
     val pocoArtifacts: List<CapturePocoArtifactRef>,
 )
 
-/** Durable completion marker for double-click SAVE_PENDING captures. */
+/** Durable completion marker shared by single-tap drafts and double-tap pending captures. */
 class PendingCaptureDraftStore(context: Context) {
     private val root = File(context.filesDir, CAPTURE_DRAFT_DIRECTORY).canonicalFile
 
     suspend fun persist(result: CaptureResult.Ready): PendingCaptureDraft =
         withContext(Dispatchers.IO) {
-            require(result.mode == CapturedDraftMode.SAVE_PENDING)
+            require(
+                result.mode == CapturedDraftMode.OPEN_DRAFT ||
+                    result.mode == CapturedDraftMode.SAVE_PENDING,
+            )
             requireCaptureId(result.captureId)
             require(result.requestedAtEpochMs > 0L)
             require(result.width in 1..MAX_DIMENSION && result.height in 1..MAX_DIMENSION)

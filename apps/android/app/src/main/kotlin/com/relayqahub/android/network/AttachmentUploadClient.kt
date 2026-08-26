@@ -478,7 +478,11 @@ class AttachmentUploadClient(
             .put("sdkVersion", poco.sdkVersion ?: JSONObject.NULL)
             .put(
                 "snapshotCapability",
-                if (poco.connectedPort == null) "not_probed" else "standard_only",
+                when {
+                    poco.connectedPort == null -> "not_probed"
+                    "qa.snapshot" in poco.negotiatedMethods -> "qa_snapshot_available"
+                    else -> "standard_only"
+                },
             )
             .put("screenSize", screenSize)
             .put("allowedReadOnlyMethods", JSONArray(ALLOWED_POCO_METHODS))
@@ -654,7 +658,7 @@ class AttachmentUploadClient(
         val CAPTURE_ARTIFACT_MEDIA_TYPES =
             setOf("image/png", "image/jpeg", "image/webp", "application/json")
         val POCO_ARTIFACT_KINDS =
-            setOf("poco_screenshot", "poco_hierarchy", "poco_profiling")
+            setOf("poco_screenshot", "poco_hierarchy", "poco_profiling", "poco_snapshot")
         val ALLOWED_POCO_METHODS = listOf(
             "GetSDKVersion",
             "Screenshot",
