@@ -18,6 +18,10 @@ const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024;
 const MAX_TOTAL_ATTACHMENT_BYTES = 100 * 1024 * 1024;
 const MAX_FILENAME_LENGTH = 255;
 const MAX_MEDIA_TYPE_LENGTH = 100;
+const RELAY_RETRY_BASE_MS = 5_000;
+const RELAY_RETRY_MAX_MS = 5 * 60_000;
+const RELAY_RETRY_AFTER_MAX_MS = 24 * 60 * 60_000;
+const RELAY_MAX_DELIVERY_ATTEMPTS = 8;
 
 const QA_INSTANCE_ID_PATTERN = /^[a-z0-9][a-z0-9_-]{2,63}$/u;
 const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/u;
@@ -141,7 +145,11 @@ export interface MobileRelayOutboxPumpOptions {
     status: "submitted",
     receipt: RealRelayHandoffReceipt,
   ) => void;
-  readonly onRetry?: (claim: MobileRelayOutboxClaim, errorCode: string) => void;
+  readonly onRetry?: (
+    claim: MobileRelayOutboxClaim,
+    errorCode: string,
+    schedule: { readonly deadLetter: boolean; readonly nextAttemptAt: string },
+  ) => void;
 }
 
 class RealRelayClientError extends Error {
@@ -151,6 +159,18 @@ class RealRelayClientError extends Error {
     super(code);
     this.name = "RealRelayClientError";
     this.code = code;
+  }
+}
+
+class RealRelayHttpError extends RealRelayClientError {
+  readonly status: number;
+  readonly retryAfterMs: number | null;
+
+  constructor(status: number, retryAfterMs: number | null) {
+    super(`REAL_RELAY_HTTP_${status}`);
+    this.name = "RealRelayHttpError";
+    this.status = status;
+    this.retryAfterMs = retryAfterMs;
   }
 }
 
@@ -615,6 +635,54 @@ function deliveryErrorCode(error: unknown): string {
   return "REAL_RELAY_UNAVAILABLE";
 }
 
+function parseRetryAfterMs(value: string | null, nowMs: number): number | null {
+  if (value === null) return null;
+  const normalized = value.trim();
+  if (normalized === "") return null;
+  if (/^\d+$/u.test(normalized)) {
+    const seconds = Number(normalized);
+    if (!Number.isSafeInteger(seconds)) return null;
+    return Math.min(seconds * 1_000, RELAY_RETRY_AFTER_MAX_MS);
+  }
+  const retryAtMs = Date.parse(normalized);
+  if (!Number.isFinite(retryAtMs)) return null;
+  return Math.min(Math.max(0, retryAtMs - nowMs), RELAY_RETRY_AFTER_MAX_MS);
+}
+
+function isRetryableHttpStatus(status: number): boolean {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
+function exponentialRetryDelayMs(attemptCount: number): number {
+  const exponent = Math.max(0, Math.min(attemptCount - 1, 20));
+  return Math.min(RELAY_RETRY_BASE_MS * 2 ** exponent, RELAY_RETRY_MAX_MS);
+}
+
+function deliveryFailurePlan(
+  error: unknown,
+  attemptCount: number,
+  failedAt: Date,
+): {
+  readonly errorCode: string;
+  readonly deadLetter: boolean;
+  readonly nextAttemptAt: string;
+} {
+  const retryable =
+    error instanceof RealRelayHttpError
+      ? isRetryableHttpStatus(error.status)
+      : !(error instanceof RealRelayClientError);
+  const deadLetter = !retryable || attemptCount >= RELAY_MAX_DELIVERY_ATTEMPTS;
+  const retryAfterMs = error instanceof RealRelayHttpError ? error.retryAfterMs : null;
+  const delayMs = deadLetter
+    ? 0
+    : Math.max(exponentialRetryDelayMs(attemptCount), retryAfterMs ?? 0);
+  return Object.freeze({
+    errorCode: deliveryErrorCode(error),
+    deadLetter,
+    nextAttemptAt: new Date(failedAt.getTime() + delayMs).toISOString(),
+  });
+}
+
 function completionPayload(
   claim: MobileRelayOutboxClaim,
   leaseOwner: string,
@@ -672,19 +740,32 @@ async function deliverOne(
       body: JSON.stringify(built.body),
       signal: AbortSignal.timeout(1_500),
     });
-    if (response.status !== 202) throw new RealRelayClientError(`REAL_RELAY_HTTP_${response.status}`);
+    if (response.status !== 202) {
+      const failedAtMs = Date.now();
+      const retryAfterMs = parseRetryAfterMs(response.headers.get("retry-after"), failedAtMs);
+      try {
+        await response.body?.cancel();
+      } catch {
+        // The HTTP status remains the delivery fact even if body cancellation fails.
+      }
+      throw new RealRelayHttpError(response.status, retryAfterMs);
+    }
     const receipt = parseRealRelayReceipt(await response.text(), claim, built.requestHash);
     await options.worker.completeMobileRelayOutbox(completionPayload(claim, leaseOwner, receipt));
     options.onDelivery?.(claim, "submitted", receipt);
   } catch (error: unknown) {
-    const errorCode = deliveryErrorCode(error);
+    const failure = deliveryFailurePlan(error, claim.attemptCount, new Date());
     await options.worker.retryMobileRelayOutbox({
       outboxMessageId: claim.outboxMessageId,
       leaseOwner,
-      errorCode,
-      nextAttemptAt: new Date(Date.now() + 30_000).toISOString(),
+      errorCode: failure.errorCode,
+      nextAttemptAt: failure.nextAttemptAt,
+      deadLetter: failure.deadLetter,
     });
-    options.onRetry?.(claim, errorCode);
+    options.onRetry?.(claim, failure.errorCode, {
+      deadLetter: failure.deadLetter,
+      nextAttemptAt: failure.nextAttemptAt,
+    });
   }
   return true;
 }

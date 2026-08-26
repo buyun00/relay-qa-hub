@@ -372,10 +372,17 @@ async function run(): Promise<void> {
             },
             "Relay handoff submitted",
           ),
-        onRetry: (claim, errorCode) =>
+        onRetry: (claim, errorCode, schedule) =>
           server?.app.log.warn(
-            { outboxMessageId: claim.outboxMessageId, errorCode },
-            "Relay handoff scheduled for retry",
+            {
+              outboxMessageId: claim.outboxMessageId,
+              errorCode,
+              deadLetter: schedule.deadLetter,
+              nextAttemptAt: schedule.nextAttemptAt,
+            },
+            schedule.deadLetter
+              ? "Relay handoff moved to dead letter"
+              : "Relay handoff scheduled for retry",
           ),
       });
     }

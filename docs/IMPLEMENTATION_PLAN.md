@@ -9,14 +9,14 @@
 
 ```yaml
 qa_hub_progress:
-  current_phase: P3
-  current_gate: G3-ANDROID-APP-READY
+  current_phase: P1
+  current_gate: G1-INDEPENDENT-FOUNDATION
   status: executing
   gates_completed: 1
   gates_total: 11
   last_verified_commit: e619627
-  last_verified_at: 2026-08-26T16:33:16+08:00
-  next_action: P3.10 DONE；本轮 Android+P5 直接交付，active work=none；P5.2-P5.4 保持 VERIFYING/暂停，不启动 P4/Web/Electron/P8/P9 或新验证
+  last_verified_at: 2026-08-26T16:45:33+08:00
+  next_action: P1.3 VERIFYING；有界失败调度和同 aggregate 保序已通过 TypeScript 检查，最终代码未新增 Relay Turn 做运行验证；下一步只读审计 P1.4
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -740,7 +740,9 @@ Gate `G0-CONTRACT-READY`：P0.1-P0.4 全绿，进度文件证据齐全。
 - claim、指数退避、`Retry-After`、dead letter、重启恢复、同聚合保序。
 - Inbox 去重、乱序/迟到保护和可重放投影。
 
-当前状态：`VERIFYING`。提交 `16f19e374ca1725a8a664bb2c6c950858370f96a` 提供默认开启、隔离环境可关闭的 notification hint projector 与普通浏览器 durable Inbox 入口；提交 `728aa55fbcce35ef2b13b35f6b763b3c89063e75`、`4108ce9aafe3d6de28937b4bf359a06766cc451f` 将 Bug Event aggregate sequence 与 Bug resource version 正确分离。普通浏览器对已有 `comment.created #2` 的 `LOCAL-2` 保存负责人，得到 `bug.updated #3` 与同事务 pending outbox；精确停止 API 后该 pending fact 保留，默认 projector 重启后只生成目标 Inbox/notification 各一条，网页两次刷新回读同一 notification ID。证据见 [`docs/evidence/P1.3-browser-outbox-inbox-recovery.md`](evidence/P1.3-browser-outbox-inbox-recovery.md)。指数退避、dead letter、多聚合保序、非 bootstrap Inbox actor 和广域 crash matrix 进入收尾，不宣称 G1 完成。
+当前状态：`VERIFYING`。提交 `16f19e374ca1725a8a664bb2c6c950858370f96a` 提供默认开启、隔离环境可关闭的 notification hint projector 与普通浏览器 durable Inbox 入口；提交 `728aa55fbcce35ef2b13b35f6b763b3c89063e75`、`4108ce9aafe3d6de28937b4bf359a06766cc451f` 将 Bug Event aggregate sequence 与 Bug resource version 正确分离。普通浏览器对已有 `comment.created #2` 的 `LOCAL-2` 保存负责人，得到 `bug.updated #3` 与同事务 pending outbox；精确停止 API 后该 pending fact 保留，默认 projector 重启后只生成目标 Inbox/notification 各一条，网页两次刷新回读同一 notification ID。证据见 [`docs/evidence/P1.3-browser-outbox-inbox-recovery.md`](evidence/P1.3-browser-outbox-inbox-recovery.md)。非 bootstrap Inbox actor、广域 crash matrix 与最终代码的有界运行 smoke 仍在收尾，不宣称 G1 完成。
+
+2026-08-26 原子收口：真实 Relay outbox 已解析 delta/date 两种受限 `Retry-After`，只对 `408/425/429/5xx` 与网络/超时执行 5 秒起、5 分钟封顶的指数退避，最多 8 次后进入既有 durable `dead`；其他 HTTP 4xx、凭据/协议/附件事实错误直接 dead。claim 查询阻止同 destination/aggregate 的较晚版本越过任何未 `sent` 的较早版本，expired lease 仍可回收；retry 与 dead 日志明确区分。storage/API TypeScript 检查通过，但按当前纪律未新建 Relay Turn 做最终运行 smoke，因此本步骤保持 `VERIFYING`。
 
 验证：
 

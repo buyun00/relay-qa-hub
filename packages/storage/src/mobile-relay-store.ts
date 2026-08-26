@@ -3334,6 +3334,17 @@ export function claimMobileRelayOutbox(
          AND (outbox.status IN ('pending', 'retry')
               OR (outbox.status = 'claimed' AND outbox.lease_expires_at <= ?))
          AND outbox.next_attempt_at <= ?
+         AND NOT EXISTS (
+           SELECT 1
+           FROM outbox AS earlier
+           WHERE earlier.account_id = outbox.account_id
+             AND earlier.project_id = outbox.project_id
+             AND earlier.destination = outbox.destination
+             AND earlier.aggregate_type = outbox.aggregate_type
+             AND earlier.aggregate_id = outbox.aggregate_id
+             AND earlier.aggregate_version < outbox.aggregate_version
+             AND earlier.status <> 'sent'
+         )
          AND (
            json_extract(outbox.payload_json, '$.operation') = 'continue'
            OR receipt.handoff_status = 'queued'
