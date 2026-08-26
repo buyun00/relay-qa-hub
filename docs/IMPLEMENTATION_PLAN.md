@@ -14,9 +14,9 @@ qa_hub_progress:
   status: executing
   gates_completed: 1
   gates_total: 11
-  last_verified_commit: 92f07a364b2b1d885b34ef92113a7798c4837109
-  last_verified_at: 2026-08-26T07:50:43+08:00
-  next_action: P8.9 IN_PROGRESS；P8.8 none/stale listen 前补份、fresh restart 不重复与 remaining delay 已转 VERIFYING；下一步只接默认关闭的 manifest-bound off-disk archive copy，实证 D: disk1 -> E: disk0，不删 retention、不触碰 E:\Relay-Unity-Workers
+  last_verified_commit: e1dac9a3d64ff6e06abd263628d1d4de3a676e90
+  last_verified_at: 2026-08-26T08:13:27+08:00
+  next_action: P8.1 IN_PROGRESS；P8.9 D: disk1 -> E: disk0 manifest-bound archive 已转 VERIFYING；下一步只收敛一个真正阻断发布的认证/运行配置边界并做一成一败真 smoke，不扩成广域安全扫描
   blockers:
     - P7.5 功能 slice 已真实完成打包运行、托盘、durable Inbox、Windows Notification show 与同一路径 Bug 深链；自动化会话无法取得 toast 视觉截图或触发原生物理 click callback，保持 VERIFYING 尾项但不阻塞 P7.4
     - P7.4 普通 Edge 组合签收及 P7.5 latest-Web package 7/7 asset/runtime 已通过；latest package 的 tray UIA 本轮返回 TRAY_NOT_FOUND，toast/tray 物理交互、installer/signing 保持发布尾项，G7 仍为 VERIFYING
@@ -1053,6 +1053,8 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 验证：鉴权、RBAC、CSRF、XSS、IDOR、上传、速率限制、安全 Header、Secret 扫描全部通过。
 
+当前状态：`IN_PROGRESS`。MVP 执行范围只选择一个真实阻断发布的认证/运行配置边界，完成一条真实成功与一个关键拒绝后立即推进；完整 RBAC/CSRF/XSS/IDOR/上传/速率限制/Header/secret matrix 保持正式 G8 收尾，不以重复 mock 或广域扫描制造当前假绿。
+
 #### P8.2 性能和故障注入
 
 验证：约定并发/数据量下 p95/p99 达标；DB busy、磁盘不足、Push/Relay/Build 下线无数据丢失或假成功。
@@ -1094,7 +1096,7 @@ Gate `G7-WORKBENCH-READY`：真实 Debug 数据能快速定位负责人、状态
 
 #### P8.9 manifest-bound 异盘归档副本
 
-当前状态：`IN_PROGRESS`。新增默认关闭的 archive root，只复制经严格校验的 manifest-bound 主 `.sqlite` 与 manifest，忽略 WAL/SHM；source/target 必须为普通文件/目录且 archive root 与 data/source/backup root 不重叠。复制使用 create-only 目标，主 DB hash 验证后最后发布 manifest；失败不删除 partial，也不覆盖。最小真实 smoke 使用当前主机 D:（disk 1）到 E:（disk 0）的新 `E:\Relay-QA-Hub-Archives` 子目录，验证 archive SHA/bundle 与 API facts；不得触碰既有 `E:\Relay-Unity-Workers`，不实现 retention 删除。
+当前状态：`VERIFYING`。提交 `e1dac9a3d64ff6e06abd263628d1d4de3a676e90` 新增默认关闭的 archive root，只复制严格校验的 manifest-bound 主 `.sqlite` 与 manifest；source/target 普通文件/目录、root overlap 与 junction/symlink 均 fail closed，主 DB create-only copy 经 size/SHA 验证后最后发布 create-only manifest，既有精确 pair 幂等且从不删除/覆盖。真实 4320 API 在 listen 前把 D: disk 1 recovery point 复制到新 E: disk 0 子目录，local/archive 主 DB 与 manifest SHA 各自一致，archive 只读回读 `LOCAL-1 reported/v1`；重复返回 `existing`，损坏 source 返回 `SQLITE_ARCHIVE_SOURCE_INVALID` 且不创建目标。证据见 [`docs/evidence/P8.9-off-disk-archive.md`](evidence/P8.9-off-disk-archive.md)。最终 Luna/xhigh 复审 Blocker/High=`0/0`；SQLite 只读验证产生的 WAL/SHM、附件 cadence archive、retention、disk-loss restore 与生产 SLA 仍是收尾，不宣称 G8 完成，也未触碰 `E:\Relay-Unity-Workers`。
 
 Gate `G8-OPERATIONS-READY`：随机备份真实恢复，记录实际 RPO/RTO，前一版本可回切。
 
