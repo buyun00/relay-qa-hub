@@ -17,7 +17,7 @@ VIAddVersionKey /LANG=1033 "ProductVersion" "${PRODUCT_VERSION}"
 
 !define MUI_ABORTWARNING
 !define MUI_FINISHPAGE_RUN "$INSTDIR\RelayQaHub.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "启动 Relay QA Hub"
+!define MUI_FINISHPAGE_RUN_TEXT "Launch Relay QA Hub"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -37,7 +37,7 @@ Section "Relay QA Hub" MainSection
   CreateShortCut "$DESKTOP\Relay QA Hub.lnk" "$INSTDIR\RelayQaHub.exe" "" "$INSTDIR\RelayQaHub.exe" 0
   CreateDirectory "$SMPROGRAMS\Relay QA Hub"
   CreateShortCut "$SMPROGRAMS\Relay QA Hub\Relay QA Hub.lnk" "$INSTDIR\RelayQaHub.exe" "" "$INSTDIR\RelayQaHub.exe" 0
-  CreateShortCut "$SMPROGRAMS\Relay QA Hub\卸载 Relay QA Hub.lnk" "$INSTDIR\Uninstall.exe"
+  CreateShortCut "$SMPROGRAMS\Relay QA Hub\Uninstall Relay QA Hub.lnk" "$INSTDIR\Uninstall.exe"
 
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "Relay QA Hub" '$\"$INSTDIR\RelayQaHub.exe$\" --hidden'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub" "DisplayName" "Relay QA Hub"
