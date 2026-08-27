@@ -392,14 +392,25 @@ export class PortableUpdater {
     }
     const helperFile = path.join(this.options.updatesDirectory, "install-update.ps1");
     const readyFile = path.join(this.options.updatesDirectory, "install-update-ready.json");
+    const launchLogFile = path.join(this.options.updatesDirectory, "install-update-launch.log");
     const logFile = path.join(this.options.updatesDirectory, "install-update.log");
     const resultFile = path.join(this.options.updatesDirectory, "last-update-result.json");
     await fs.rm(readyFile, { force: true });
     await fs.rm(resultFile, { force: true });
     await fs.writeFile(helperFile, INSTALL_HELPER, { encoding: "utf8", mode: 0o600 });
     this.emit({ status: "installing", releaseId: manifest.releaseId, version: manifest.version });
+    const systemRoot = process.env["SystemRoot"]?.trim();
+    const powershellExecutable =
+      systemRoot === undefined || systemRoot.length === 0
+        ? "powershell.exe"
+        : path.join(systemRoot, "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
+    const launchLogHandle = await fs.open(launchLogFile, "a", 0o600);
+    await launchLogHandle.appendFile(
+      `${new Date().toISOString()} launching update helper with ${powershellExecutable}\n`,
+      "utf8",
+    );
     const child = spawn(
-      "powershell.exe",
+      powershellExecutable,
       [
         "-NoProfile",
         "-NonInteractive",
@@ -428,18 +439,19 @@ export class PortableUpdater {
       ],
       {
         detached: true,
-        stdio: "ignore",
+        stdio: ["ignore", launchLogHandle.fd, launchLogHandle.fd],
         windowsHide: true,
         cwd: this.options.updatesDirectory,
       },
     );
+    await launchLogHandle.close();
     let launchError: unknown = null;
     child.once("error", (cause) => {
       launchError = cause;
     });
     child.unref();
     try {
-      const deadline = Date.now() + 10_000;
+      const deadline = Date.now() + 30_000;
       let helperReady = false;
       while (Date.now() < deadline) {
         if (launchError !== null) throw launchError;
@@ -484,6 +496,9 @@ export const INSTALL_HELPER = String.raw`param(
 )
 
 $ErrorActionPreference = "Stop"
+$logPathFull = [IO.Path]::GetFullPath($LogPath)
+[IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($logPathFull)) | Out-Null
+Add-Content -LiteralPath $logPathFull -Value ((Get-Date).ToString("o") + " update helper process started")
 $package = [IO.Path]::GetFullPath($PackageDirectory).TrimEnd([IO.Path]::DirectorySeparatorChar)
 $archive = [IO.Path]::GetFullPath($ArchivePath)
 $parent = [IO.Directory]::GetParent($package).FullName
@@ -557,7 +572,7 @@ function Move-PackageWithRetry([string]$Source, [string]$Destination) {
   throw $lastError
 }
 
-Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " update helper started")
+Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " update helper preflight passed")
 $readyMarker = [ordered]@{
   schemaVersion = 1
   status = "ready"

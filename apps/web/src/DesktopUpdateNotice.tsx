@@ -38,7 +38,7 @@ export default function DesktopUpdateNotice() {
   if (state.status === "error") {
     return (
       <aside className="desktop-update-notice is-error" role="alert">
-        <span>更新未能安装，QA Hub 已保留当前版本。请重新检查更新。</span>
+        <span>更新未能安装，QA Hub 已保留当前版本。错误：{state.message}。请重新检查更新。</span>
         <button onClick={() => void bridge.checkForUpdate()} type="button">
           重新检查
         </button>
