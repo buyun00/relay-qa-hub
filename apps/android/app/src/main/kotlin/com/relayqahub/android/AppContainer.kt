@@ -105,6 +105,14 @@ class AppContainer private constructor(
                     }
                 }
                 .build()
+            val distributionHttpClient = OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(2, TimeUnit.MINUTES)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .retryOnConnectionFailure(false)
+                .build()
             val apiClient = OkHttpQaHubApiClient(
                 baseUrl = apiBaseUrl,
                 httpClient = httpClient,
@@ -112,12 +120,12 @@ class AppContainer private constructor(
             )
             val androidUpdateClient = AndroidUpdateClient(
                 apiBaseUrl = apiBaseUrl,
-                httpClient = httpClient,
+                httpClient = distributionHttpClient,
                 allowPrivateHttp = true,
             )
             val gameApkCatalogClient = GameApkCatalogClient(
                 directoryUrl = BuildConfig.QA_HUB_GAME_APK_DIRECTORY_URL,
-                httpClient = httpClient,
+                httpClient = distributionHttpClient,
                 allowPrivateHttp = true,
             )
             val attachmentUploadClient = AttachmentUploadClient(
@@ -181,7 +189,7 @@ class AppContainer private constructor(
                 database = database,
                 androidUpdateClient = androidUpdateClient,
                 gameApkCatalogClient = gameApkCatalogClient,
-                apkDownloadClient = ApkDownloadClient(applicationContext, httpClient),
+                apkDownloadClient = ApkDownloadClient(applicationContext, distributionHttpClient),
                 scopedRepository = scopedRepository,
                 attachmentUploadClient = attachmentUploadClient,
                 relayHandoffClient = relayHandoffClient,
