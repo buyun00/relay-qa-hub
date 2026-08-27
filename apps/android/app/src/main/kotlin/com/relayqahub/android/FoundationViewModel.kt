@@ -13,6 +13,7 @@ import com.relayqahub.android.data.NewOfflineOperation
 import com.relayqahub.android.data.QueueState
 import com.relayqahub.android.capture.CapturePocoSummary
 import com.relayqahub.android.network.AttachmentUploadFailure
+import com.relayqahub.android.network.AccountSessionFailure
 import com.relayqahub.android.network.CaptureAttachmentReceipt
 import com.relayqahub.android.network.CaptureBundleArtifactUpload
 import com.relayqahub.android.network.CaptureBundleDeviceInput
@@ -49,7 +50,8 @@ import org.json.JSONObject
 
 data class FoundationUiState(
     val page: QaHubPage = QaHubPage.MY_BUGS,
-    val people: QaPeopleConfig = QaPeopleConfig(1, "LOCAL", emptyList()),
+    val people: QaPeopleConfig = QaPeopleConfig("LOCAL", emptyList()),
+    val accountSession: AccountSessionUiState = AccountSessionUiState(),
     val captureDraft: CaptureDraftUiState = CaptureDraftUiState(),
     val accountName: String = "Preparing local scope…",
     val projectName: String = "Preparing native foundation…",
@@ -72,6 +74,13 @@ data class FoundationUiState(
     val commentAudit: CommentAuditUiState = CommentAuditUiState(),
     val duplicateCandidates: DuplicateCandidateUiState = DuplicateCandidateUiState(),
     val pendingCapture: PendingCaptureUiState = PendingCaptureUiState(),
+)
+
+data class AccountSessionUiState(
+    val phase: String = "signed_out",
+    val userId: String? = null,
+    val displayName: String? = null,
+    val errorCode: String? = null,
 )
 
 enum class QaHubPage {
@@ -246,7 +255,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val commentAudit = MutableStateFlow(CommentAuditUiState())
     private val pendingCapture = MutableStateFlow(PendingCaptureUiState())
     private val page = MutableStateFlow(QaHubPage.MY_BUGS)
-    private val people = MutableStateFlow(QaPeopleConfig(1, "LOCAL", emptyList()))
+    private val people = MutableStateFlow(QaPeopleConfig(FOUNDATION_PROJECT_KEY, emptyList()))
+    private val accountSession = MutableStateFlow(AccountSessionUiState())
+    private val accountAccessToken = MutableStateFlow<String?>(null)
     private val captureDraft = MutableStateFlow(CaptureDraftUiState())
 
     private val scopeState = combine(
@@ -337,6 +348,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     val uiState = baseUiState
         .combine(page) { state, currentPage -> state.copy(page = currentPage) }
         .combine(people) { state, config -> state.copy(people = config) }
+        .combine(accountSession) { state, session -> state.copy(accountSession = session) }
         .combine(captureDraft) { state, draft -> state.copy(captureDraft = draft) }
         .stateIn(
         scope = viewModelScope,
@@ -345,10 +357,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     )
 
     init {
-        runCatching {
-            QaPeopleConfigLoader.ensureExternalSeed(getApplication())
-            people.value = QaPeopleConfigLoader.load(getApplication())
-        }
         viewModelScope.launch {
             appContainer.scopedRepository.seedFoundationScope(scope)
         }
@@ -358,6 +366,48 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             }
         }
     }
+
+    fun login(name: String) {
+        if (accountSession.value.phase == "loading") return
+        accountAccessToken.value = null
+        accountSession.value = AccountSessionUiState(phase = "loading")
+        viewModelScope.launch {
+            runCatching {
+                val session = appContainer.accountSessionClient.login(name)
+                val serverPeople = appContainer.accountSessionClient.listPeople(
+                    projectId = scope.projectId,
+                    projectKey = FOUNDATION_PROJECT_KEY,
+                    accessToken = session.accessToken,
+                )
+                session to serverPeople
+            }.onSuccess { (session, serverPeople) ->
+                people.value = serverPeople
+                accountAccessToken.value = session.accessToken
+                accountSession.value = AccountSessionUiState(
+                    phase = "signed_in",
+                    userId = session.userId,
+                    displayName = session.displayName,
+                )
+                lastAction.value = "已登录：${session.displayName}。人员列表来自 QA Hub 后端。"
+                refreshBugWorkbench()
+            }.onFailure { failure ->
+                accountAccessToken.value = null
+                accountSession.value = AccountSessionUiState(
+                    phase = "signed_out",
+                    errorCode = (failure as? AccountSessionFailure)?.code ?: "LOGIN_FAILED",
+                )
+            }
+        }
+    }
+
+    fun logout() {
+        accountAccessToken.value = null
+        accountSession.value = AccountSessionUiState()
+        people.value = QaPeopleConfig(FOUNDATION_PROJECT_KEY, emptyList())
+        bugWorkbench.value = BugWorkbenchUiState()
+    }
+
+    private fun currentAccessToken(): String? = accountAccessToken.value?.takeIf(String::isNotBlank)
 
     fun navigateTo(page: QaHubPage) {
         this.page.value = page
@@ -457,10 +507,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         onCompleted: () -> Unit = {},
     ) {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                lastAction.value =
-                    "$actionLabel unavailable: configure qaHubDebugAccessToken for a debug build."
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                lastAction.value = "$actionLabel unavailable: account login is required."
                 onCompleted()
                 return@launch
             }
@@ -550,10 +599,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
      */
     fun dispatchToRelay() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                lastAction.value =
-                    "Relay handoff unavailable: configure qaHubDebugAccessToken for a debug build."
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                lastAction.value = "Relay handoff unavailable: account login is required."
                 return@launch
             }
 
@@ -617,9 +665,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     /** Human-only action: register the delivered commit as a Build and read it back. */
     fun adoptFixAndBindQaBuild() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setBuildProjectionFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setBuildProjectionFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             val handoff = latestRelayHandoff.value
@@ -687,9 +735,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun refreshInbox() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setInboxFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setInboxFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             inbox.value = InboxUiState(phase = "loading")
@@ -720,9 +768,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun refreshBugWorkbench() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setBugWorkbenchFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setBugWorkbenchFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             bugWorkbench.value = BugWorkbenchUiState(phase = "loading")
@@ -769,9 +817,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun createManualRepairAttempt() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setManualRepairFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setManualRepairFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             manualRepair.value = ManualRepairUiState(phase = "loading")
@@ -849,9 +897,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun deliverManualRepairAndLinkBuild() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setHumanRepairBuildFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setHumanRepairBuildFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             val attemptId = manualRepair.value.attemptId
@@ -912,9 +960,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun verifyManualRepairAndClose() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setHumanVerificationFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setHumanVerificationFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             val current = humanRepairBuild.value
@@ -981,9 +1029,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun refreshLatestHumanWorkflow() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setHumanWorkflowFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setHumanWorkflowFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             humanWorkflow.value = HumanWorkflowUiState(phase = "loading")
@@ -1043,9 +1091,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun createCommentAndReadAudit() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setCommentAuditFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setCommentAuditFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             commentAudit.value = CommentAuditUiState(phase = "loading")
@@ -1125,9 +1173,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun createBugAndCheckDuplicates() {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                setDuplicateFailure("DEBUG_ACCESS_TOKEN_MISSING")
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                setDuplicateFailure("ACCOUNT_LOGIN_REQUIRED")
                 return@launch
             }
             duplicateCandidates.value = DuplicateCandidateUiState(phase = "loading")
@@ -1288,9 +1336,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         verifierId: String,
     ) {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                lastAction.value = "Bug unavailable: configure the debug API session."
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                lastAction.value = "Bug unavailable: account login is required."
                 return@launch
             }
             val result = runCatching {
@@ -1452,10 +1500,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         verifierId: String? = null,
     ) {
         viewModelScope.launch {
-            val accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN.trim()
-            if (!BuildConfig.DEBUG || accessToken.isEmpty()) {
-                lastAction.value =
-                    "$actionLabel unavailable: configure qaHubDebugAccessToken for a debug build."
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                lastAction.value = "$actionLabel unavailable: account login is required."
                 return@launch
             }
 

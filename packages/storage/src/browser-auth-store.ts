@@ -43,6 +43,16 @@ export interface LoginBrowserSessionInput {
   readonly lastSeenAt?: string;
 }
 
+export interface CreateBrowserSessionInput {
+  readonly accountId: string;
+  readonly userId: string;
+  readonly sessionId: string;
+  readonly tokenDigest: string;
+  readonly issuedAt: string;
+  readonly expiresAt: string;
+  readonly lastSeenAt?: string;
+}
+
 export interface ResolveBrowserSessionInput {
   readonly tokenDigest: string;
   readonly now: string;
@@ -225,6 +235,57 @@ export function loginBrowserSession(
 
   if (!verifyPassword(input.password, row?.password_hash ?? null)) authenticationFailed();
 
+  if (!row) authenticationFailed();
+  database
+    .prepare(
+      `INSERT INTO browser_sessions(
+        id, account_id, user_id, token_digest, issued_at, expires_at,
+        last_seen_at, revoked_at, revoked_reason, version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, 1)`,
+    )
+    .run(
+      input.sessionId,
+      input.accountId,
+      row.user_id,
+      input.tokenDigest,
+      input.issuedAt,
+      input.expiresAt,
+      input.lastSeenAt ?? input.issuedAt,
+    );
+  return Object.freeze({
+    accountId: input.accountId,
+    userId: row.user_id,
+    actorId: row.user_id,
+    email: row.email,
+    displayName: row.display_name,
+  });
+}
+
+export function createBrowserSession(
+  database: DatabaseSync,
+  input: CreateBrowserSessionInput,
+): BrowserPrincipal {
+  requireTransaction(database);
+  requireTokenDigest(input.tokenDigest);
+  const row = database
+    .prepare(
+      `SELECT user.id AS user_id, user.email AS email,
+              user.display_name AS display_name
+       FROM accounts AS account
+       JOIN users AS user
+         ON user.account_id = account.id
+       WHERE account.id = ?
+         AND account.status = 'active'
+         AND user.id = ?
+         AND user.status = 'active'`,
+    )
+    .get(input.accountId, input.userId) as
+    | {
+        readonly user_id: string;
+        readonly email: string;
+        readonly display_name: string;
+      }
+    | undefined;
   if (!row) authenticationFailed();
   database
     .prepare(

@@ -1,24 +1,44 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 import {
   API_SERVICE_NAME,
+  BROWSER_LOGIN_PATH,
+  DESKTOP_UPDATE_PATH,
   LIVE_HEALTH_PATH,
   MOBILE_ATTACHMENT_BIND_PATH,
   MOBILE_API_CONTENT_TYPE,
   MOBILE_API_MEDIA_TYPE,
   MOBILE_BUG_COLLECTION_PATH,
+  MOBILE_PROJECT_COLLECTION_PATH,
   MOBILE_UPLOAD_CHUNK_PATH,
   MOBILE_UPLOAD_FINALIZE_PATH,
   MOBILE_UPLOAD_INIT_PATH,
   createApiApp,
   createApiServer,
+  normalizeQaLoginName,
+  qaLoginEmail,
+  qaUserId,
   resolveBuildSha,
 } from "../dist/index.js";
 
 const fixedTime = new Date("2026-08-24T08:00:00.000Z");
 const buildSha = "a".repeat(40);
+
+test("backend account-name normalization is stable and preserves the display spelling", () => {
+  const accountId = "10000000-0000-4000-8000-000000000020";
+  assert.deepEqual(normalizeQaLoginName("  NewUser  "), {
+    displayName: "NewUser",
+    key: "newuser",
+  });
+  assert.equal(qaUserId(accountId, "NewUser"), qaUserId(accountId, " newuser "));
+  assert.equal(qaLoginEmail(accountId, "NewUser"), qaLoginEmail(accountId, " newuser "));
+  assert.throws(() => normalizeQaLoginName("   "), /name is invalid/u);
+});
 
 test("GET /api/v1/health/live returns the frozen liveness shape", async (t) => {
   const app = createApiApp({
@@ -39,6 +59,129 @@ test("GET /api/v1/health/live returns the frozen liveness shape", async (t) => {
     buildSha,
     time: fixedTime.toISOString(),
   });
+});
+
+test("desktop update feed serves uncached metadata and bounded installer ranges", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "qa-hub-desktop-updates-"));
+  const installerName = "Relay-QA-Hub-Setup-1.0.0-x64.exe";
+  await writeFile(
+    join(root, "latest.yml"),
+    `version: 1.0.0\nfiles:\n  - url: ${installerName}\n    sha512: test\n    size: 10\n`,
+  );
+  await writeFile(join(root, installerName), Buffer.from("0123456789", "utf8"));
+  const app = createApiApp({ logger: false, desktopUpdateRoot: root });
+  t.after(async () => {
+    await app.close();
+    await rm(root, { recursive: true, force: true });
+  });
+
+  const metadata = await app.inject({
+    method: "GET",
+    url: DESKTOP_UPDATE_PATH.replace(":fileName", "latest.yml"),
+  });
+  assert.equal(metadata.statusCode, 200);
+  assert.equal(metadata.headers["cache-control"], "no-store");
+  assert.match(metadata.body, /^version: 1\.0\.0$/mu);
+
+  const range = await app.inject({
+    method: "GET",
+    url: DESKTOP_UPDATE_PATH.replace(":fileName", installerName),
+    headers: { range: "bytes=2-5" },
+  });
+  assert.equal(range.statusCode, 206);
+  assert.equal(range.headers["content-range"], "bytes 2-5/10");
+  assert.equal(range.body, "2345");
+
+  const rejected = await app.inject({
+    method: "GET",
+    url: DESKTOP_UPDATE_PATH.replace(":fileName", "untrusted.exe"),
+  });
+  assert.equal(rejected.statusCode, 404);
+});
+
+test("unknown names are created by the backend login boundary and native sessions keep that actor", async (t) => {
+  const accountId = "10000000-0000-4000-8000-000000000020";
+  const userId = "30000000-0000-4000-8000-000000000021";
+  const debugActorId = "10000000-0000-4000-8000-000000000003";
+  const debugBearerToken = "fixed-debug-token";
+  const resolvedSessions = new Map();
+  const rawNames = [];
+  const store = {
+    async ensureBrowserAdmin() {},
+    async loginBrowserSession() {
+      return null;
+    },
+    async createBrowserSession(input) {
+      const principal = {
+        accountId,
+        userId: input.userId,
+        actorId: input.userId,
+        email: "qa-created@local.invalid",
+        displayName: "新账号",
+      };
+      resolvedSessions.set(input.tokenDigest, principal);
+      return principal;
+    },
+    async resolveBrowserSession(input) {
+      return resolvedSessions.get(input.tokenDigest) ?? null;
+    },
+    async revokeBrowserSession() {
+      return true;
+    },
+  };
+  const app = createApiApp({
+    logger: false,
+    debugActorId,
+    debugBearerToken,
+    browserAuth: {
+      store,
+      accountId,
+      userId: debugActorId,
+      actorId: debugActorId,
+      adminEmail: "admin@local.invalid",
+      passwordlessLogin: async (name) => {
+        rawNames.push(name);
+        return { userId };
+      },
+      sessionSecret: "a".repeat(64),
+      webOrigin: "http://127.0.0.1:4174",
+      secureCookie: false,
+    },
+    mobileProjectDirectoryStore: {
+      async listProjects(query) {
+        assert.equal(query.actorId, userId);
+        return { snapshotSequence: 0, items: [], nextCursor: null };
+      },
+      async listMembers() {
+        throw new Error("not used");
+      },
+      async listModules() {
+        throw new Error("not used");
+      },
+    },
+  });
+  t.after(async () => app.close());
+
+  const login = await app.inject({
+    method: "POST",
+    url: BROWSER_LOGIN_PATH,
+    headers: { "content-type": "application/json" },
+    payload: JSON.stringify({ name: "  新账号  ", client: "android" }),
+  });
+  assert.equal(login.statusCode, 200);
+  assert.deepEqual(rawNames, ["  新账号  "]);
+  assert.equal(login.json().userId, userId);
+  assert.equal(login.json().displayName, "新账号");
+  assert.match(login.json().accessToken, /^[A-Za-z0-9_-]{43}$/u);
+  assert.equal(login.headers["set-cookie"], undefined);
+
+  const projects = await app.inject({
+    method: "GET",
+    url: MOBILE_PROJECT_COLLECTION_PATH,
+    headers: { authorization: `Bearer ${login.json().accessToken}` },
+  });
+  assert.equal(projects.statusCode, 200);
+  assert.deepEqual(projects.json(), { snapshotSequence: 0, items: [], nextCursor: null });
 });
 
 test("Android createBug persists an exact receipt, supports GET, and rejects a wrong token", async (t) => {

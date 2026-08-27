@@ -694,15 +694,12 @@ export async function getBrowserSession(): Promise<BrowserSessionPrincipal> {
   return body;
 }
 
-export async function loginBrowserSession(
-  email: string,
-  password: string,
-): Promise<BrowserSessionPrincipal> {
+export async function loginBrowserSession(name: string): Promise<BrowserSessionPrincipal> {
   setBrowserCsrfToken(null);
   const body = await requestJson("/api/v1/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ name, client: "web" }),
   });
   if (!isBrowserSessionPrincipal(body)) {
     throw new QaHubApiError(200, "INVALID_AUTH_RESPONSE");

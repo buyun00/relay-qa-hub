@@ -553,7 +553,7 @@ Relay 事件只能更新当前 `RepairAttempt` 的 Relay receipt/投影和通知
 - Android App 的用户信息架构冻结为且仅为三个页面：`我提交的 Bug` 只列当前用户创建的 Bug；`项目全部 Bug` 只列当前项目的全部 Bug；`新建 Bug` 承担截图预览/标注、最少内容、修复人/验收人选择与一次提交。两个列表只显示进度/状态、必要详情和刷新，不提供分配变更、状态流转、评论、Relay、Build、Verification、审计或设置入口。
 - `新建 Bug` 顶部始终先处理截图，至少提供适合触控的画圈/手绘、撤销、清除；悬浮球单击完成截图后自动打开此页并带入刚截媒体。页面只有内容、人员选择和明确的“一键提交”主动作；截图原图、标记图、内容、修复人和验收人进入同一稳定 `clientSubmissionId` 提交。
 - Android 不显示调试、同步、Poco、Relay、桌面管理、复杂设置或实验入口。Poco snapshot 与截图使用同一 captureId 静默采集并随证据上传；失败只把 enrichment 记为 partial/unavailable，不阻止普通截图提单，也不向用户暴露技术按钮或原始 RPC 细节。
-- 人员不得写死在 Kotlin/Compose 中，也不新增人员管理页。唯一配置源固定为仓库种子 `apps/android/config/qa-people.json`；安装后 App 首次复制到设备可编辑路径 `/storage/emulated/0/Android/media/<applicationId>/qa-hub/config/qa-people.json` 并优先读取该文件。JSON 固定为 `schemaVersion`、`projectKey`、`people[]`，每个人包含 `id`、`displayName`、`roles`、`active`；`roles` 只允许 `fixer` 和 `verifier`。debug applicationId 为 `com.relayqahub.android.debug`，release 为 `com.relayqahub.android`。配置无可用角色时明确提示，禁止退回硬编码人员。
+- 账户和人员的唯一运行时事实源是 QA Hub 后端。EXE/APK 登录都把原始姓名交给同一后端接口；已有姓名复用账号，未记录姓名由后端创建用户、项目成员关系、角色和会话后直接登录，客户端不得维护 allowlist 或自行拒绝。两端登录后均从项目成员 API 读取人员；`apps/android/config/qa-people.json` 只保留为 API 启动种子，不再打入 APK、复制到设备或由 Android 本地读取。配置无可用角色时明确显示后端无可用人员，禁止退回硬编码人员。
 - QA Hub API/数据库是唯一事实源。Room 只保存按账号/项目隔离的缓存、草稿和本地操作队列；上线后以服务端版本/事件对账，不能在本地决定最终状态或验收。
 - Relay 离线时，Android 到 QA Hub 的现场上报仍可用；完整分诊、人工修复、Build、验收、重开和关闭由 Web 通过同一 QA Hub API 完成。
 - 共享测试机采用短会话、显式用户/项目上下文、退出撤销通知并清除本账号 Room/媒体/token 命名空间。

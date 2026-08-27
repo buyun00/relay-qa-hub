@@ -7,6 +7,7 @@ import com.relayqahub.android.data.QaHubDatabase
 import com.relayqahub.android.data.ScopedRepository
 import com.relayqahub.android.capture.PendingCaptureDraftStore
 import com.relayqahub.android.network.AttachmentUploadClient
+import com.relayqahub.android.network.AccountSessionClient
 import com.relayqahub.android.network.BuildProjectionClient
 import com.relayqahub.android.network.BugWorkbenchClient
 import com.relayqahub.android.network.BugAssignmentClient
@@ -30,6 +31,7 @@ import okhttp3.OkHttpClient
 
 class AppContainer private constructor(
     val database: QaHubDatabase,
+    val accountSessionClient: AccountSessionClient,
     val scopedRepository: ScopedRepository,
     val attachmentUploadClient: AttachmentUploadClient,
     val relayHandoffClient: RelayHandoffClient,
@@ -71,6 +73,11 @@ class AppContainer private constructor(
                 .retryOnConnectionFailure(false)
                 .build()
             val apiClient = OkHttpQaHubApiClient(
+                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                httpClient = httpClient,
+                allowLoopbackHttp = BuildConfig.DEBUG,
+            )
+            val accountSessionClient = AccountSessionClient(
                 baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
                 httpClient = httpClient,
                 allowLoopbackHttp = BuildConfig.DEBUG,
@@ -137,6 +144,7 @@ class AppContainer private constructor(
             val syncScheduler = SyncScheduler(WorkManager.getInstance(applicationContext))
             return AppContainer(
                 database = database,
+                accountSessionClient = accountSessionClient,
                 scopedRepository = scopedRepository,
                 attachmentUploadClient = attachmentUploadClient,
                 relayHandoffClient = relayHandoffClient,

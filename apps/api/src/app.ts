@@ -114,6 +114,8 @@ import {
 } from "./health.js";
 import {
   authenticateBrowserRequest,
+  authenticateBrowserBearerRequest,
+  browserAuthSession,
   BROWSER_LOGIN_PATH,
   BROWSER_LOGOUT_PATH,
   BROWSER_ME_PATH,
@@ -150,37 +152,11 @@ import {
   validateMobileRelayWebhookHeaders,
   type MobileRelayWebhookStore,
 } from "./mobile-relay-webhook.js";
+import { registerDesktopUpdateRoutes } from "./desktop-updates.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
 export const READY_HEALTH_PATH = "/api/v1/health/ready" as const;
 export const DEPENDENCY_HEALTH_PATH = "/api/v1/health/deps" as const;
-
-const P2_2_BROWSER_MEMBERSHIP_READ_PATHS = new Set<string>([
-  MOBILE_PROJECT_COLLECTION_PATH,
-  MOBILE_PROJECT_MEMBERS_PATH,
-  MOBILE_PROJECT_MODULES_PATH,
-  MOBILE_METRICS_OVERVIEW_PATH,
-  MOBILE_BUG_COLLECTION_PATH,
-]);
-const BROWSER_ACCOUNT_HEALTH_READ_PATHS = new Set<string>([DEPENDENCY_HEALTH_PATH]);
-
-function isP2_2BrowserMembershipRead(request: FastifyRequest): boolean {
-  const routeUrl = request.routeOptions.url;
-  return (
-    request.method === "GET" &&
-    routeUrl !== undefined &&
-    P2_2_BROWSER_MEMBERSHIP_READ_PATHS.has(routeUrl)
-  );
-}
-
-function isBrowserAccountHealthRead(request: FastifyRequest): boolean {
-  const routeUrl = request.routeOptions.url;
-  return (
-    request.method === "GET" &&
-    routeUrl !== undefined &&
-    BROWSER_ACCOUNT_HEALTH_READ_PATHS.has(routeUrl)
-  );
-}
 
 function authenticatedActorId(request: FastifyRequest, debugActorId: string): string {
   return getBrowserPrincipal(request)?.actorId ?? debugActorId;
@@ -240,6 +216,7 @@ export interface CreateApiAppOptions {
   readonly debugBearerToken?: string;
   readonly debugActorId?: string;
   readonly browserAuth?: BrowserAuthOptions;
+  readonly desktopUpdateRoot?: string;
 }
 
 const liveHealthResponseSchema = {
@@ -524,7 +501,16 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       ) {
         return;
       }
-      if (readHeader(request.headers.authorization) !== undefined) return;
+      if (
+        readHeader(request.headers.authorization) !== undefined &&
+        browserAuthSession(request, browserAuth) === undefined
+      ) {
+        const principal = await authenticateBrowserBearerRequest(request, browserAuth);
+        if (principal !== undefined && principal.accountId === browserAuth.accountId) {
+          request.headers.authorization = `Bearer ${debugBearerToken}`;
+        }
+        return;
+      }
 
       const principal = await authenticateBrowserRequest(request, reply, browserAuth);
       if (principal === undefined) {
@@ -538,16 +524,6 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           .code(401)
           .header("content-type", MOBILE_API_CONTENT_TYPE)
           .send({ code: "UNAUTHENTICATED" });
-      }
-      if (
-        principal.actorId !== debugActorId &&
-        !isP2_2BrowserMembershipRead(request) &&
-        !isBrowserAccountHealthRead(request)
-      ) {
-        return reply
-          .code(403)
-          .header("content-type", MOBILE_API_CONTENT_TYPE)
-          .send({ code: "FORBIDDEN" });
       }
       request.headers.authorization = `Bearer ${debugBearerToken}`;
     });
@@ -583,6 +559,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     { parseAs: "buffer", bodyLimit: MAX_MOBILE_CHUNK_SIZE_BYTES },
     (_request, body, done) => done(null, body),
   );
+
+  registerDesktopUpdateRoutes(app, options.desktopUpdateRoot);
 
   app.get(
     LIVE_HEALTH_PATH,
@@ -822,9 +800,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           occurredAt: webhook.occurredAt,
           ...(webhook.payload.taskId === undefined ? {} : { taskId: webhook.payload.taskId }),
           ...(webhook.payload.turnId === undefined ? {} : { turnId: webhook.payload.turnId }),
-          ...(webhook.payload.threadId === undefined
-            ? {}
-            : { threadId: webhook.payload.threadId }),
+          ...(webhook.payload.threadId === undefined ? {} : { threadId: webhook.payload.threadId }),
           ...(webhook.payload.workspace === undefined
             ? {}
             : { workspace: webhook.payload.workspace }),
@@ -894,7 +870,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         throw new TypeError("Idempotency-Key does not match clientSubmissionId");
       }
       const response = await mobileBugStore.createBug({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         idempotencyKey,
         request: body,
       });
@@ -948,7 +924,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
 
     const bug = await mobileBugStore.getBug({
-      actorId: debugActorId,
+      actorId: authenticatedActorId(request, debugActorId),
       bugId: request.params.bugId,
     });
     if (bug === null) {
@@ -969,7 +945,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     try {
       const result = await mobileAttachmentStore.listBugAttachments({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         bugId: requireMobileUuid(request.params.bugId, "bugId"),
         limit: parseMobileAttachmentListLimit(request.query.limit),
       });
@@ -1000,7 +976,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       try {
         const download = await mobileAttachmentStore.getAttachment({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           attachmentId: requireMobileUuid(request.params.attachmentId, "attachmentId"),
         });
         if (download === null) {
@@ -1037,7 +1013,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     try {
       const download = await mobileAttachmentStore.getCaptureArtifact({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         bugId: requireMobileUuid(request.params.bugId, "bugId"),
         captureId: requireMobileUuid(request.params.captureId, "captureId"),
         artifactKind: requireMobileCaptureArtifactKind(request.params.artifactKind),
@@ -1075,7 +1051,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         readHeader(request.headers["idempotency-key"]),
       );
       const result = await mobileBugStore.updateBug({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         bugId,
         idempotencyKey,
         request: body,
@@ -1114,7 +1090,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       try {
         const bugId = requireDuplicateBugUuid(request.params.bugId, "bugId");
         const result = await mobileDuplicateStore.listCandidates({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           bugId,
         });
         return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
@@ -1156,7 +1132,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match mark duplicate action");
         }
         const result = await mobileDuplicateStore.markDuplicate({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           bugId,
           idempotencyKey,
           request: body,
@@ -1229,7 +1205,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         throw new TypeError("Idempotency-Key does not match the ready transition");
       }
       const result = await mobileRelayStore.transitionBugReady({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         bugId,
         idempotencyKey,
         request: body,
@@ -1260,13 +1236,13 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         const result =
           body.mode === "human"
             ? await mobileRelayStore.createManualAttempt({
-                actorId: debugActorId,
+                actorId: authenticatedActorId(request, debugActorId),
                 bugId,
                 idempotencyKey,
                 request: body,
               })
             : await mobileRelayStore.createRelayAttempt({
-                actorId: debugActorId,
+                actorId: authenticatedActorId(request, debugActorId),
                 bugId,
                 idempotencyKey,
                 request: body,
@@ -1297,7 +1273,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match RepairAttempt start");
         }
         const result = await mobileRelayStore.startManualAttempt({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           attemptId,
           idempotencyKey,
           request: body,
@@ -1318,7 +1294,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       try {
         const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
         const result = await mobileRelayStore.getManualAttempt({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           attemptId,
         });
         if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
@@ -1354,7 +1330,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
             .send({ code: "RELAY_DELIVERY_EVIDENCE_INVALID" });
         }
         const result = await mobileRelayStore.deliverManualAttempt({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           attemptId,
           idempotencyKey,
           request: body as typeof body & {
@@ -1386,7 +1362,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match handoffId");
         }
         const result = await mobileRelayStore.dispatchRelay({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           attemptId,
           idempotencyKey,
           request: body,
@@ -1414,7 +1390,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match actionId");
         }
         const result = await mobileRelayStore.continueRelay({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           attemptId,
           idempotencyKey,
           request: body,
@@ -1433,7 +1409,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     try {
       const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
       const result = await mobileRelayStore.getRelayReceipt({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         attemptId,
       });
       if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
@@ -1486,7 +1462,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       try {
         const projectId = requireBuildUuid(request.params.projectId, "projectId");
         const workflow = await mobileHumanWorkflowStore.getLatest({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           projectId,
         });
         if (workflow === null) {
@@ -1509,7 +1485,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     try {
       const bugId = requireRelayUuid(request.params.bugId, "bugId");
       const workflow = await mobileHumanWorkflowStore.getForBug({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         bugId,
       });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(workflow);
@@ -1600,7 +1576,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match Build registration");
         }
         const result = await mobileBuildStore.registerBuild({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           projectId,
           idempotencyKey,
           request: body,
@@ -1618,7 +1594,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     try {
       const buildId = requireBuildUuid(request.params.buildId, "buildId");
-      const result = await mobileBuildStore.getBuild({ actorId: debugActorId, buildId });
+      const result = await mobileBuildStore.getBuild({
+        actorId: authenticatedActorId(request, debugActorId),
+        buildId,
+      });
       if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
     } catch (error: unknown) {
@@ -1645,7 +1624,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match Build repair link");
         }
         const result = await mobileBuildStore.linkRepair({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           buildId,
           idempotencyKey,
           request: body,
@@ -1674,7 +1653,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match Verification creation");
         }
         const result = await mobileVerificationStore.createVerification({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           bugId,
           idempotencyKey,
           request: body,
@@ -1698,7 +1677,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           "verificationId",
         );
         const result = await mobileVerificationStore.getVerification({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           verificationId,
         });
         if (result === null) return reply.code(404).send({ code: "NOT_FOUND" });
@@ -1729,7 +1708,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match Verification start");
         }
         const result = await mobileVerificationStore.startVerification({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           verificationId,
           idempotencyKey,
           request: body,
@@ -1761,7 +1740,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match Verification result");
         }
         const result = await mobileVerificationStore.recordResult({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           verificationId,
           idempotencyKey,
           request: body,
@@ -1784,7 +1763,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       try {
         const result = await mobileNotificationStore.listNotifications({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           limit: parseMobileNotificationLimit(request.query.limit),
           now: (options.now ?? (() => new Date()))().toISOString(),
         });
@@ -1836,7 +1815,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         );
       }
       const response = await mobileCaptureStore.createCapture({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         idempotencyKey,
         request: body,
       });
@@ -1866,7 +1845,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         .send({ code: "UNAUTHENTICATED" });
     }
     const capture = await mobileCaptureStore.getCapture({
-      actorId: debugActorId,
+      actorId: authenticatedActorId(request, debugActorId),
       captureId: request.params.captureId,
     });
     if (capture === null) return reply.code(404).send({ code: "NOT_FOUND" });
@@ -1893,7 +1872,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         throw new TypeError("Idempotency-Key does not match the upload identity");
       }
       const response = await mobileAttachmentStore.initUpload({
-        actorId: debugActorId,
+        actorId: authenticatedActorId(request, debugActorId),
         idempotencyKey,
         request: body,
       });
@@ -1928,7 +1907,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           bytes,
         );
         const result = await mobileAttachmentStore.putChunk({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           idempotencyKey: requireMobileIdempotencyKey(
             readHeader(request.headers["idempotency-key"]),
           ),
@@ -1983,7 +1962,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match the upload identity");
         }
         const response = await mobileAttachmentStore.finalizeUpload({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           idempotencyKey,
           sessionId: requireMobileUuid(request.params.sessionId, "sessionId"),
           request: body,
@@ -2021,7 +2000,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match the attachment identity");
         }
         const response = await mobileAttachmentStore.bindAttachment({
-          actorId: debugActorId,
+          actorId: authenticatedActorId(request, debugActorId),
           idempotencyKey,
           attachmentId: requireMobileUuid(request.params.attachmentId, "attachmentId"),
           request: body,

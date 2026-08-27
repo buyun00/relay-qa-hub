@@ -75,18 +75,38 @@ fun FoundationScreen(
     onStopCaptureSession: () -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    if (state.accountSession.phase != "signed_in") {
+        AccountLoginScreen(
+            loading = state.accountSession.phase == "loading",
+            errorCode = state.accountSession.errorCode,
+            onLogin = viewModel::login,
+        )
+        return
+    }
     LaunchedEffect(state.page) {
         if (state.page != QaHubPage.NEW_BUG) viewModel.refreshBugWorkbench()
     }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            Text(
-                text = "Relay QA Hub",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(
+                        text = "Relay QA Hub",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        state.accountSession.displayName.orEmpty(),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                OutlinedButton(onClick = viewModel::logout) { Text("退出") }
+            }
         },
         bottomBar = {
             NavigationBar(Modifier.navigationBarsPadding()) {
@@ -135,13 +155,54 @@ fun FoundationScreen(
 }
 
 @Composable
+private fun AccountLoginScreen(
+    loading: Boolean,
+    errorCode: String?,
+    onLogin: (String) -> Unit,
+) {
+    var name by rememberSaveable { mutableStateOf("") }
+    Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+        Card(Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Text("进入 Relay QA Hub", style = MaterialTheme.typography.headlineSmall)
+                Text("输入姓名即可登录；后端没有记录时会自动创建新账号。")
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("姓名") },
+                    singleLine = true,
+                    enabled = !loading,
+                    modifier = Modifier.fillMaxWidth().testTag("account-name"),
+                )
+                if (errorCode != null) {
+                    Text(
+                        if (errorCode == "INVALID_REQUEST") "请输入有效的姓名。" else "登录失败：$errorCode",
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                Button(
+                    onClick = { onLogin(name) },
+                    enabled = !loading,
+                    modifier = Modifier.fillMaxWidth().testTag("account-login"),
+                ) {
+                    Text(if (loading) "正在登录…" else "登录")
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun BugListPage(
     state: FoundationUiState,
     mineOnly: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val items = if (mineOnly) {
-        state.bugWorkbench.items.filter { it.reporterId == FoundationViewModel.FOUNDATION_SCOPE.actorId }
+        state.bugWorkbench.items.filter { it.reporterId == state.accountSession.userId }
     } else {
         state.bugWorkbench.items
     }
@@ -377,7 +438,7 @@ private fun PersonPicker(
             }
             if (people.isEmpty()) {
                 DropdownMenuItem(
-                    text = { Text("请先配置 qa-people.json") },
+                    text = { Text("后端没有可用人员") },
                     onClick = { expanded = false },
                 )
             }

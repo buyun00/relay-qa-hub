@@ -8,6 +8,14 @@ import {
   parseDesktopConfig,
 } from "../src/config.js";
 
+test("desktop double-click defaults to the local QA Hub debug service", () => {
+  const config = parseDesktopConfig({}, { webAssetsDirectory: "./web-dist" });
+  assert.equal(config.apiBaseUrl.toString(), "http://127.0.0.1:4319/");
+  assert.equal(config.wssUrl.toString(), "ws://127.0.0.1:4319/api/v1/notifications/stream");
+  assert.equal(config.csrfOrigin, "http://127.0.0.1:4174");
+  assert.equal(config.allowLoopbackHttp, true);
+});
+
 test("desktop config derives the authenticated notification WSS path", () => {
   const config = parseDesktopConfig(
     {

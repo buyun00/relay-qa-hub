@@ -10,6 +10,8 @@ export interface MobileScopeBootstrap {
   readonly membershipId: string;
   readonly projectKey: string;
   readonly createdAt: string;
+  readonly actorDisplayName?: string;
+  readonly actorEmail?: string;
 }
 
 export interface MobileOccurrenceInput {
@@ -166,6 +168,9 @@ function readBug(
 export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBootstrap): void {
   requireTransaction(database);
   const suffix = scope.accountId.replaceAll("-", "").slice(-12).toLowerCase();
+  const actorDisplayName = scope.actorDisplayName ?? "MuMu MVP reporter";
+  const actorEmail =
+    scope.actorEmail ?? `mvp-${scope.actorId.replaceAll("-", "")}@local.invalid`;
   database
     .prepare(
       `INSERT OR IGNORE INTO accounts(
@@ -177,14 +182,31 @@ export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBoot
     .prepare(
       `INSERT OR IGNORE INTO users(
         id, account_id, email, display_name, status, created_at, updated_at, version
-      ) VALUES (?, ?, ?, 'MuMu MVP reporter', 'active', ?, ?, 1)`,
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`,
     )
     .run(
       scope.actorId,
       scope.accountId,
-      `mvp-${scope.actorId.replaceAll("-", "")}@local.invalid`,
+      actorEmail,
+      actorDisplayName,
       scope.createdAt,
       scope.createdAt,
+    );
+  database
+    .prepare(
+      `UPDATE users
+       SET email = ?, display_name = ?, updated_at = ?, version = version + 1
+       WHERE account_id = ? AND id = ? AND status = 'active'
+         AND (email <> ? OR display_name <> ?)`,
+    )
+    .run(
+      actorEmail,
+      actorDisplayName,
+      scope.createdAt,
+      scope.accountId,
+      scope.actorId,
+      actorEmail,
+      actorDisplayName,
     );
   database
     .prepare(

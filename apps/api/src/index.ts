@@ -6,6 +6,7 @@ export {
   createLiveHealth,
 } from "./app.js";
 export type { CreateApiAppOptions, DependencyHealth, LiveHealth, ReadyHealth } from "./app.js";
+export { DESKTOP_UPDATE_PATH, registerDesktopUpdateRoutes } from "./desktop-updates.js";
 export { createSqliteApiHealthProbe } from "./health.js";
 export type {
   ApiDependencyHealthProbe,
@@ -285,6 +286,7 @@ export {
   BROWSER_ME_PATH,
   BROWSER_SESSION_COOKIE,
   BROWSER_SESSION_TTL_MS,
+  authenticateBrowserBearerRequest,
   browserAuthSession,
   browserCsrfToken,
   createSqliteBrowserAuthStore,
@@ -295,8 +297,11 @@ export type {
   BrowserAuthOptions,
   BrowserAuthPrincipal,
   BrowserAuthStore,
+  CreateBrowserSessionInput,
   EnsureBrowserAdminInput,
   LoginBrowserSessionInput,
   ResolveBrowserSessionInput,
   RevokeBrowserSessionInput,
 } from "./browser-auth.js";
+
+export { normalizeQaLoginName, qaLoginEmail, qaMembershipId, qaUserId } from "./people-config.js";

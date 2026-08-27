@@ -41,6 +41,15 @@ export interface LoginBrowserSessionInput {
   readonly expiresAt: string;
 }
 
+export interface CreateBrowserSessionInput {
+  readonly accountId: string;
+  readonly userId: string;
+  readonly sessionId: string;
+  readonly tokenDigest: string;
+  readonly issuedAt: string;
+  readonly expiresAt: string;
+}
+
 export interface ResolveBrowserSessionInput {
   readonly tokenDigest: string;
   readonly now: string;
@@ -57,6 +66,9 @@ export interface BrowserAuthStore {
   readonly loginBrowserSession: (
     input: LoginBrowserSessionInput,
   ) => Promise<BrowserAuthPrincipal | null>;
+  readonly createBrowserSession: (
+    input: CreateBrowserSessionInput,
+  ) => Promise<BrowserAuthPrincipal | null>;
   readonly resolveBrowserSession: (
     input: ResolveBrowserSessionInput,
   ) => Promise<BrowserAuthPrincipal | null>;
@@ -69,6 +81,10 @@ export interface BrowserAuthOptions {
   readonly userId: string;
   readonly actorId: string;
   readonly adminEmail: string;
+  readonly passwordlessLogin?: (
+    name: string,
+    now: string,
+  ) => Promise<{ readonly userId: string }>;
   readonly sessionSecret: string;
   readonly webOrigin: string;
   readonly now?: () => Date;
@@ -84,6 +100,23 @@ interface BrowserAuthRequest extends FastifyRequest {
 interface LoginBody {
   readonly email?: unknown;
   readonly password?: unknown;
+  readonly name?: unknown;
+  readonly client?: unknown;
+}
+
+function parsePasswordlessLoginBody(body: unknown): {
+  readonly name: string;
+  readonly client: "web" | "android";
+} {
+  if (body === null || typeof body !== "object" || Array.isArray(body)) {
+    throw new TypeError("login body is invalid");
+  }
+  const value = body as LoginBody;
+  const name = requireText(value.name, "name", 100);
+  if (value.client !== "web" && value.client !== "android") {
+    throw new TypeError("client is invalid");
+  }
+  return { name, client: value.client };
 }
 
 function requireText(value: unknown, field: string, maxLength: number): string {
@@ -243,7 +276,28 @@ export async function authenticateBrowserRequest(
   return principal;
 }
 
+export async function authenticateBrowserBearerRequest(
+  request: FastifyRequest,
+  options: BrowserAuthOptions,
+): Promise<BrowserAuthPrincipal | undefined> {
+  const authorization = request.headers.authorization;
+  if (typeof authorization !== "string" || !authorization.startsWith("Bearer ")) {
+    return undefined;
+  }
+  const token = authorization.slice("Bearer ".length);
+  if (!/^[A-Za-z0-9_-]{43}$/u.test(token)) return undefined;
+  const principal = await options.store.resolveBrowserSession({
+    tokenDigest: digestBrowserSessionToken(token),
+    now: requestNow(options).toISOString(),
+  });
+  if (principal === null) return undefined;
+  (request as BrowserAuthRequest).browserPrincipal = principal;
+  (request as BrowserAuthRequest).browserSessionToken = token;
+  return principal;
+}
+
 export function createSqliteBrowserAuthStore(options: {
+  readonly sharedActorId?: string;
   readonly worker: {
     readonly ensureBrowserAdmin: (input: {
       readonly accountId: string;
@@ -265,6 +319,12 @@ export function createSqliteBrowserAuthStore(options: {
       readonly email: string;
       readonly displayName: string;
     }>;
+    readonly createBrowserSession: (input: CreateBrowserSessionInput) => Promise<{
+      readonly accountId: string;
+      readonly userId: string;
+      readonly email: string;
+      readonly displayName: string;
+    }>;
     readonly resolveBrowserSession: (input: ResolveBrowserSessionInput) => Promise<{
       readonly accountId: string;
       readonly userId: string;
@@ -274,6 +334,18 @@ export function createSqliteBrowserAuthStore(options: {
     readonly revokeBrowserSession: (input: RevokeBrowserSessionInput) => Promise<boolean>;
   };
 }): BrowserAuthStore {
+  const withActor = (principal: {
+    readonly accountId: string;
+    readonly userId: string;
+    readonly email: string;
+    readonly displayName: string;
+  }): BrowserAuthPrincipal => ({
+    accountId: principal.accountId,
+    userId: principal.userId,
+    actorId: options.sharedActorId ?? principal.userId,
+    email: principal.email,
+    displayName: principal.displayName,
+  });
   return {
     ensureBrowserAdmin: async (input) => {
       await options.worker.ensureBrowserAdmin({
@@ -285,14 +357,17 @@ export function createSqliteBrowserAuthStore(options: {
     },
     loginBrowserSession: async (input) => {
       try {
-        const principal = await options.worker.loginBrowserSession(input);
-        return {
-          accountId: principal.accountId,
-          userId: principal.userId,
-          actorId: principal.userId,
-          email: principal.email,
-          displayName: principal.displayName,
-        };
+        return withActor(await options.worker.loginBrowserSession(input));
+      } catch (error: unknown) {
+        if ((error as { readonly code?: unknown })?.code === "AUTHENTICATION_FAILED") {
+          return null;
+        }
+        throw error;
+      }
+    },
+    createBrowserSession: async (input) => {
+      try {
+        return withActor(await options.worker.createBrowserSession(input));
       } catch (error: unknown) {
         if ((error as { readonly code?: unknown })?.code === "AUTHENTICATION_FAILED") {
           return null;
@@ -304,13 +379,7 @@ export function createSqliteBrowserAuthStore(options: {
       const principal = await options.worker.resolveBrowserSession(input);
       return principal === null
         ? null
-        : {
-            accountId: principal.accountId,
-            userId: principal.userId,
-            actorId: principal.userId,
-            email: principal.email,
-            displayName: principal.displayName,
-          };
+        : withActor(principal);
     },
     revokeBrowserSession: (input) => options.worker.revokeBrowserSession(input),
   };
@@ -323,23 +392,41 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
 
   app.post(BROWSER_LOGIN_PATH, async (request, reply) => {
     try {
-      if (!originMatches(request, options.webOrigin)) {
+      const passwordless = options.passwordlessLogin;
+      const passwordlessBody =
+        passwordless === undefined ? undefined : parsePasswordlessLoginBody(request.body);
+      if (
+        (passwordlessBody === undefined || passwordlessBody.client === "web") &&
+        !originMatches(request, options.webOrigin)
+      ) {
         return writeJson(reply, 403, { code: "CSRF_ORIGIN_INVALID" });
       }
-      const body = parseLoginBody(request.body);
       const issuedAt = requestNow(options);
       const expiresAt = new Date(issuedAt.getTime() + ttl);
       const token = randomBytes(32).toString("base64url");
-      const principal = await options.store.loginBrowserSession({
+      const session = {
         accountId: options.accountId,
-        email: body.email,
-        password: body.password,
         sessionId: randomUUID(),
         tokenDigest: digestBrowserSessionToken(token),
         issuedAt: issuedAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
-      });
+      };
+      const principal =
+        passwordless === undefined || passwordlessBody === undefined
+          ? await options.store.loginBrowserSession({
+              ...session,
+              ...parseLoginBody(request.body),
+            })
+          : await passwordless(passwordlessBody.name, issuedAt.toISOString()).then((identity) =>
+              options.store.createBrowserSession({ ...session, userId: identity.userId }),
+            );
       if (principal === null) return writeJson(reply, 401, AUTHENTICATION_FAILED);
+      if (passwordlessBody?.client === "android") {
+        return writeJson(reply, 200, {
+          ...principalResponse(principal, browserCsrfToken(token, options.sessionSecret)),
+          accessToken: token,
+        });
+      }
       return reply
         .header("set-cookie", cookieHeader(token, secureCookie, ttlSeconds))
         .code(200)

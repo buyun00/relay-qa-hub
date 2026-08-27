@@ -128,6 +128,42 @@ button {
   overflow-wrap: anywhere;
 }
 
+.desktop-update {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(18, 59, 58, 0.16);
+  border-radius: 18px;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 16px 18px;
+}
+
+.desktop-update p {
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+.desktop-update--available,
+.desktop-update--downloading,
+.desktop-update--downloaded {
+  background: rgba(233, 154, 78, 0.12);
+  border-color: rgba(169, 91, 30, 0.32);
+}
+
+.desktop-update--error {
+  background: rgba(166, 53, 53, 0.08);
+  border-color: rgba(166, 53, 53, 0.24);
+}
+
+@media (max-width: 720px) {
+  .desktop-update {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
 .hero {
   position: relative;
   overflow: hidden;

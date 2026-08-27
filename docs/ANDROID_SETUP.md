@@ -147,30 +147,29 @@ at least one strongly managed OEM device. The current API 35 MuMu never replaces
 real-device evidence for overlay, MediaProjection, system reclaim, SELinux, OEM
 power behavior, or Poco `127.0.0.1` security.
 
-## Field people configuration
+## Backend-owned accounts and people
 
-The Android field client has no people-management screen and does not hardcode
-assignees. Its checked-in seed is `apps/android/config/qa-people.json`. On first
-launch the App copies that seed to the user-editable file below and prefers the
-external file on subsequent process starts:
+The Android field client and Windows desktop use the same passwordless backend
+login endpoint. Clients send the entered name unchanged. The API normalizes it,
+reuses an existing active user when present, or creates the user, project
+membership, roles, and session when it is new. Client code must not keep
+an account allowlist or reject an unrecorded name.
 
-```text
-/storage/emulated/0/Android/media/<applicationId>/qa-hub/config/qa-people.json
-```
-
-Use `com.relayqahub.android.debug` for a debug APK and
-`com.relayqahub.android` for release. The JSON object has exactly
-`schemaVersion`, `projectKey`, and `people`; each person has exactly `id`,
-`displayName`, `roles`, and `active`. `roles` accepts only `fixer` and
-`verifier`:
+After login, both clients read the active project members from the QA Hub API.
+The APK no longer embeds, copies, or reads `qa-people.json` from device storage.
+`apps/android/config/qa-people.json` is retained only as the API's optional
+startup seed. Its JSON object has exactly `schemaVersion`, `projectKey`, and
+`people`; each seeded person has exactly `id`, `pinyin`, `displayName`, `roles`,
+and `active`:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "projectKey": "LOCAL",
   "people": [
     {
       "id": "<QA Hub user UUID>",
+      "pinyin": "luodongle",
       "displayName": "QA member",
       "roles": ["fixer", "verifier"],
       "active": true
@@ -179,9 +178,10 @@ Use `com.relayqahub.android.debug` for a debug APK and
 }
 ```
 
-IDs must resolve to active users/memberships in the same QA Hub project. An
-empty or invalid role list is shown as a configuration problem; the App never
-falls back to embedded people.
+At API startup the seed creates or updates active project users and memberships.
+Operators can override it with `QA_HUB_PEOPLE_CONFIG_FILE`. New names entered
+later are persisted directly in the backend database and immediately appear in
+the server-returned project member list.
 
 ## APK provenance boundary
 

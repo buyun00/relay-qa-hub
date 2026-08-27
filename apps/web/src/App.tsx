@@ -47,6 +47,7 @@ import {
   type VerificationRecord,
 } from "./api";
 import { EvidencePanel } from "./EvidencePanel";
+import { DesktopUpdateBanner } from "./DesktopUpdateBanner";
 import { MetricsPanel } from "./MetricsPanel";
 import { product } from "./product";
 
@@ -1194,6 +1195,8 @@ export default function App() {
         </p>
         <span className="skeleton-badge">Web 管理台 · 真实 API</span>
       </header>
+
+      <DesktopUpdateBanner />
 
       <section aria-labelledby="boundary-title" className="boundary-card">
         <div>

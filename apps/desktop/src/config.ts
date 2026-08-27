@@ -12,6 +12,7 @@ export const EVENTS_PATH = "/api/v1/notifications/stream";
 export interface DesktopConfig {
   readonly apiBaseUrl: URL;
   readonly wssUrl: URL;
+  readonly csrfOrigin: string;
   readonly allowedOrigins: ReadonlySet<string>;
   readonly webAssetsDirectory: string;
   readonly developmentUrl: URL | null;
@@ -81,6 +82,19 @@ function normalizeDirectory(value: string | null, fallback: string): string {
   return path.resolve(value ?? fallback);
 }
 
+function parseCsrfOrigin(value: string, allowLoopbackHttp: boolean): string {
+  const url = validateNetworkUrl(
+    parseUrl(value, "QA_HUB_DESKTOP_CSRF_ORIGIN"),
+    "QA_HUB_DESKTOP_CSRF_ORIGIN",
+    "https:",
+    allowLoopbackHttp,
+  );
+  if (url.pathname !== "/" || url.search.length > 0 || url.hash.length > 0) {
+    throw new DesktopConfigError("QA_HUB_DESKTOP_CSRF_ORIGIN must be an origin without a path");
+  }
+  return url.origin;
+}
+
 export function isAllowedNetworkUrl(url: URL, config: DesktopConfig): boolean {
   return config.allowedOrigins.has(url.origin);
 }
@@ -98,8 +112,14 @@ export function parseDesktopConfig(
   env: NodeJS.ProcessEnv = process.env,
   defaults: { readonly webAssetsDirectory?: string } = {},
 ): DesktopConfig {
-  const allowLoopbackHttp = parseBoolean(env, "QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP", false);
-  const apiRaw = envValue(env, "QA_HUB_DESKTOP_API_BASE_URL") ?? "https://qa-hub.local";
+  const configuredApiBaseUrl = envValue(env, "QA_HUB_DESKTOP_API_BASE_URL");
+  const usingLocalDebugDefault = configuredApiBaseUrl === null;
+  const allowLoopbackHttp = parseBoolean(
+    env,
+    "QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP",
+    usingLocalDebugDefault,
+  );
+  const apiRaw = configuredApiBaseUrl ?? "http://127.0.0.1:4319";
   const apiBaseUrl = validateNetworkUrl(
     parseUrl(apiRaw, "QA_HUB_DESKTOP_API_BASE_URL"),
     "QA_HUB_DESKTOP_API_BASE_URL",
@@ -132,6 +152,11 @@ export function parseDesktopConfig(
   return {
     apiBaseUrl,
     wssUrl,
+    csrfOrigin: parseCsrfOrigin(
+      envValue(env, "QA_HUB_DESKTOP_CSRF_ORIGIN") ??
+        (usingLocalDebugDefault ? "http://127.0.0.1:4174" : apiBaseUrl.origin),
+      allowLoopbackHttp,
+    ),
     allowedOrigins: new Set([
       apiBaseUrl.origin,
       wssUrl.origin,

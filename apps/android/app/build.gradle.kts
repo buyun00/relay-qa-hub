@@ -84,10 +84,6 @@ android {
     }
 
     sourceSets {
-        // The seed is kept at apps/android/config so QA can edit one documented
-        // file; the app copies it to Android/media/<package>/qa-hub/config/qa-people.json on
-        // first run and prefers that external file thereafter.
-        getByName("main").assets.srcDir(file("../config"))
         getByName("androidTest").assets.srcDir(file("schemas"))
     }
 

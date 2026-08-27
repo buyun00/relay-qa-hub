@@ -96,6 +96,7 @@ import type {
 import type { ListMobileNotificationsInput, MobileNotificationList } from "./mobile-inbox-store.js";
 import type {
   BrowserPrincipal,
+  CreateBrowserSessionInput,
   EnsureBrowserAdminInput,
   EnsureBrowserAdminResult,
   LoginBrowserSessionInput,
@@ -233,6 +234,11 @@ export class SqliteStorageWorker {
   async loginBrowserSession(input: LoginBrowserSessionInput): Promise<BrowserPrincipal> {
     await this.initialization;
     return this.request<BrowserPrincipal>("loginBrowserSession", input);
+  }
+
+  async createBrowserSession(input: CreateBrowserSessionInput): Promise<BrowserPrincipal> {
+    await this.initialization;
+    return this.request<BrowserPrincipal>("createBrowserSession", input);
   }
 
   async resolveBrowserSession(input: ResolveBrowserSessionInput): Promise<BrowserPrincipal | null> {

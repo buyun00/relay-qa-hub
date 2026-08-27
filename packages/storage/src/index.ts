@@ -293,6 +293,7 @@ export type {
   ValidateReferencedAttachmentRootOptions,
 } from "./attachment-restore.js";
 export {
+  createBrowserSession,
   ensureBrowserAdmin,
   loginBrowserSession,
   resolveBrowserSession,
@@ -300,6 +301,7 @@ export {
 } from "./browser-auth-store.js";
 export type {
   BrowserPrincipal,
+  CreateBrowserSessionInput,
   EnsureBrowserAdminInput,
   EnsureBrowserAdminResult,
   LoginBrowserSessionInput,

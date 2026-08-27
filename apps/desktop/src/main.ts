@@ -12,9 +12,12 @@ import {
   protocol,
   Tray,
 } from "electron";
+import log from "electron-log/main";
+import electronUpdater from "electron-updater";
 
 import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
 import type { DesktopConnectionStatus } from "./bridge-types.js";
+import type { DesktopUpdateStatus } from "./bridge-types.js";
 import {
   NotificationTransport,
   type DesktopNotification,
@@ -22,6 +25,7 @@ import {
 } from "./notification-transport.js";
 import { fetchDurableInbox, proxyRendererApiRequest } from "./network.js";
 import { createAuthenticatedWssClient } from "./wss-client.js";
+import { DesktopUpdateController } from "./update-controller.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const APP_PROTOCOL = `${APP_SCHEME}:`;
@@ -29,6 +33,10 @@ const MAX_ASSET_BYTES = 50 * 1024 * 1024;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 const FALLBACK_TRAY_ICON =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+const AUTO_UPDATE_INITIAL_DELAY_MS = 15_000;
+const AUTO_UPDATE_INTERVAL_MS = 4 * 60 * 60 * 1_000;
+const MAX_RENDERER_RECOVERY_ATTEMPTS = 3;
+const AUTO_START_REGISTRY_NAME = "Relay QA Hub";
 
 const config = parseDesktopConfig(process.env, {
   webAssetsDirectory: path.resolve(currentDirectory, "../../../apps/web/dist"),
@@ -40,6 +48,10 @@ let transport: NotificationTransport;
 let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
+let updateController: DesktopUpdateController | null = null;
+let updateCheckTimer: NodeJS.Timeout | null = null;
+let updateCheckInterval: NodeJS.Timeout | null = null;
+let rendererRecoveryAttempts = 0;
 
 function responseJson(value: Record<string, string>, status: number): Response {
   return new Response(JSON.stringify(value), {
@@ -181,6 +193,84 @@ function sendConnectionStatus(status: TransportStatus): void {
   rebuildTrayMenu();
 }
 
+function disabledUpdateStatus(): DesktopUpdateStatus {
+  return {
+    phase: "disabled",
+    currentVersion: app.getVersion(),
+    availableVersion: null,
+    progressPercent: null,
+    checkedAt: null,
+    errorCode: null,
+  };
+}
+
+function currentUpdateStatus(): DesktopUpdateStatus {
+  return updateController?.status ?? disabledUpdateStatus();
+}
+
+function sendUpdateStatus(status: DesktopUpdateStatus): void {
+  if (mainWindow !== null && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("desktop:update-status", status);
+  }
+  rebuildTrayMenu();
+  if (status.phase === "downloaded") {
+    const version = status.availableVersion ?? "新版本";
+    const notification = new Notification({
+      title: `Relay QA Hub ${version} 已下载`,
+      body: "更新已准备好，请在应用内点击“重启并安装”。",
+      silent: false,
+    });
+    notification.once("click", openMainWindow);
+    notification.show();
+  }
+}
+
+function createDesktopUpdater(): DesktopUpdateController {
+  const enabled = process.platform === "win32" && app.isPackaged;
+  if (!enabled) {
+    return new DesktopUpdateController({
+      updater: null,
+      currentVersion: app.getVersion(),
+      enabled: false,
+    });
+  }
+  log.initialize();
+  log.transports.file.level = "info";
+  const { autoUpdater } = electronUpdater;
+  autoUpdater.logger = log;
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.allowDowngrade = false;
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.disableWebInstaller = true;
+  const controller = new DesktopUpdateController({
+    updater: autoUpdater,
+    currentVersion: app.getVersion(),
+    enabled: true,
+  });
+  controller.subscribe(sendUpdateStatus);
+  return controller;
+}
+
+function scheduleAutomaticUpdateChecks(): void {
+  if (updateController === null || updateController.status.phase === "disabled") return;
+  updateCheckTimer = setTimeout(() => {
+    void updateController?.checkForUpdates();
+    updateCheckInterval = setInterval(() => {
+      void updateController?.checkForUpdates();
+    }, AUTO_UPDATE_INTERVAL_MS);
+    updateCheckInterval.unref();
+  }, AUTO_UPDATE_INITIAL_DELAY_MS);
+  updateCheckTimer.unref();
+}
+
+function stopAutomaticUpdateChecks(): void {
+  if (updateCheckTimer !== null) clearTimeout(updateCheckTimer);
+  if (updateCheckInterval !== null) clearInterval(updateCheckInterval);
+  updateCheckTimer = null;
+  updateCheckInterval = null;
+}
+
 function openMainWindow(): void {
   if (mainWindow === null || mainWindow.isDestroyed()) return;
   if (mainWindow.isMinimized()) mainWindow.restore();
@@ -217,7 +307,7 @@ function parseBugDeepLink(value: string): string | null {
   }
 }
 
-function handleSecondInstanceArguments(args: readonly unknown[]): void {
+function handleInstanceArguments(args: readonly unknown[], openWhenNoDeepLink = true): void {
   for (const value of args) {
     if (typeof value !== "string") continue;
     const bugId = parseBugDeepLink(value);
@@ -229,6 +319,7 @@ function handleSecondInstanceArguments(args: readonly unknown[]): void {
       return;
     }
   }
+  if (!openWhenNoDeepLink) return;
   process.stdout.write(
     `${JSON.stringify({ event: "desktop.second-instance.open", argumentCount: args.length })}\n`,
   );
@@ -265,7 +356,11 @@ function statusLabel(status: TransportStatus): string {
 
 function setAutoStartAtLogin(enabled: boolean): void {
   try {
-    app.setLoginItemSettings({ openAtLogin: enabled });
+    app.setLoginItemSettings({
+      openAtLogin: enabled,
+      args: ["--autostart"],
+      name: AUTO_START_REGISTRY_NAME,
+    });
   } catch {
     // Unsupported platforms keep the menu action harmless and reversible.
   }
@@ -278,10 +373,30 @@ function rebuildTrayMenu(): void {
   const paused = status.state === "paused";
   let autoStart = config.autoStartAtLogin;
   try {
-    autoStart = app.getLoginItemSettings().openAtLogin;
+    autoStart = app.getLoginItemSettings({ args: ["--autostart"] }).openAtLogin;
   } catch {
     // Keep the configured default when the platform does not expose login settings.
   }
+  const update = currentUpdateStatus();
+  const updateBusy =
+    update.phase === "checking" ||
+    update.phase === "available" ||
+    update.phase === "downloading" ||
+    update.phase === "installing";
+  const updateLabel =
+    update.phase === "downloaded"
+      ? `重启并安装 ${update.availableVersion ?? "新版本"}`
+      : update.phase === "downloading"
+        ? `正在下载更新 ${update.progressPercent ?? 0}%`
+        : update.phase === "checking"
+          ? "正在检查更新"
+          : update.phase === "up-to-date"
+            ? `已是最新版本 ${update.currentVersion}`
+            : update.phase === "error"
+              ? "更新检查失败，点击重试"
+              : update.phase === "disabled"
+                ? `应用版本 ${update.currentVersion}`
+                : `检查更新 · ${update.currentVersion}`;
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: "打开 QA Hub", click: openMainWindow },
@@ -300,6 +415,14 @@ function rebuildTrayMenu(): void {
         type: "checkbox",
         checked: autoStart,
         click: () => setAutoStartAtLogin(!autoStart),
+      },
+      {
+        label: updateLabel,
+        enabled: update.phase !== "disabled" && !updateBusy,
+        click: () => {
+          if (update.phase === "downloaded") updateController?.installUpdate();
+          else void updateController?.checkForUpdates();
+        },
       },
       { type: "separator" },
       { label: "退出 QA Hub", click: quitApplication },
@@ -379,11 +502,37 @@ function createWindow(): BrowserWindow {
     window.hide();
   });
   window.webContents.once("did-finish-load", () => {
+    rendererRecoveryAttempts = 0;
     if (pendingBugId !== null) {
       const bugId = pendingBugId;
       pendingBugId = null;
       window.webContents.send("desktop:open-bug", { bugId });
     }
+  });
+  window.webContents.on("render-process-gone", (_event, details) => {
+    if (quitting) return;
+    rendererRecoveryAttempts += 1;
+    process.stderr.write(
+      `${JSON.stringify({
+        event: "desktop.renderer.gone",
+        reason: details.reason,
+        attempt: rendererRecoveryAttempts,
+      })}\n`,
+    );
+    if (rendererRecoveryAttempts > MAX_RENDERER_RECOVERY_ATTEMPTS) {
+      const notification = new Notification({
+        title: "Relay QA Hub 需要重新打开",
+        body: "界面连续恢复失败，请从托盘退出后重新启动应用。",
+      });
+      notification.show();
+      return;
+    }
+    const recoveryTimer = setTimeout(() => {
+      if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
+        window.webContents.reload();
+      }
+    }, 1_000);
+    recoveryTimer.unref();
   });
   return window;
 }
@@ -391,6 +540,9 @@ function createWindow(): BrowserWindow {
 function installIpcHandlers(): void {
   ipcMain.removeHandler("desktop:get-connection-status");
   ipcMain.removeHandler("desktop:get-notifications-paused");
+  ipcMain.removeHandler("desktop:get-update-status");
+  ipcMain.removeHandler("desktop:check-for-updates");
+  ipcMain.removeHandler("desktop:install-update");
   ipcMain.handle("desktop:get-connection-status", (event) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) {
       return { state: "stopped", reconnectAttempt: 0, lastError: "UNTRUSTED_SENDER" };
@@ -400,6 +552,18 @@ function installIpcHandlers(): void {
   ipcMain.handle("desktop:get-notifications-paused", (event) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return false;
     return transport.status.state === "paused";
+  });
+  ipcMain.handle("desktop:get-update-status", (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return disabledUpdateStatus();
+    return currentUpdateStatus();
+  });
+  ipcMain.handle("desktop:check-for-updates", async (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return disabledUpdateStatus();
+    return (await updateController?.checkForUpdates()) ?? disabledUpdateStatus();
+  });
+  ipcMain.handle("desktop:install-update", (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return false;
+    return updateController?.installUpdate() ?? false;
   });
 }
 
@@ -436,6 +600,7 @@ function createTransport(): NotificationTransport {
 async function startApplication(): Promise<void> {
   if (process.platform === "win32") app.setAppUserModelId("com.relayqahub.desktop");
   await registerAppProtocol();
+  updateController = createDesktopUpdater();
   transport = createTransport();
   installIpcHandlers();
   tray = new Tray(trayIcon());
@@ -448,7 +613,11 @@ async function startApplication(): Promise<void> {
     process.env["QA_HUB_DESKTOP_AUTO_START_LOGIN"] !== undefined
   ) {
     try {
-      app.setLoginItemSettings({ openAtLogin: config.autoStartAtLogin });
+      app.setLoginItemSettings({
+        openAtLogin: config.autoStartAtLogin,
+        args: ["--autostart"],
+        name: AUTO_START_REGISTRY_NAME,
+      });
     } catch {
       // Login startup is best effort and remains explicitly visible in the tray menu.
     }
@@ -463,8 +632,11 @@ async function startApplication(): Promise<void> {
       ? config.developmentUrl.toString()
       : appUrl();
   await mainWindow.loadURL(target);
-  if (!config.startupHidden) openMainWindow();
+  const launchedForAutostart = process.argv.includes("--autostart");
+  if (!config.startupHidden && !launchedForAutostart) openMainWindow();
+  handleInstanceArguments(process.argv, false);
   transport.start();
+  scheduleAutomaticUpdateChecks();
 }
 
 const hasLock = app.requestSingleInstanceLock();
@@ -485,12 +657,13 @@ if (!hasLock) {
   ]);
   app.on("second-instance", (...args: readonly unknown[]) => {
     const commandLine = Array.isArray(args[1]) ? args[1] : [];
-    handleSecondInstanceArguments(commandLine);
+    handleInstanceArguments(commandLine);
   });
   app.on("before-quit", () => {
     if (!quitting) {
       quitting = true;
       transport?.stop();
+      stopAutomaticUpdateChecks();
     }
   });
   app.on("window-all-closed", () => {

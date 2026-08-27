@@ -16,12 +16,14 @@ const ALLOWED_RENDERER_HEADERS = new Set([
   "x-client-submission-id",
   "x-client-attachment-id",
   "x-upload-version",
+  "x-csrf-token",
 ]);
 const FORWARDED_RESPONSE_HEADERS = [
   "content-type",
   "etag",
   "cache-control",
   "retry-after",
+  "set-cookie",
 ] as const;
 
 async function readBoundedBody(response: Response, maxBytes: number): Promise<Uint8Array> {
@@ -113,6 +115,11 @@ export async function proxyRendererApiRequest(
     });
   }
   const headers = copyRendererHeaders(request);
+  const browserSessionCookie = request.headers.get("cookie");
+  if (browserSessionCookie !== null) headers.set("cookie", browserSessionCookie);
+  if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    headers.set("origin", config.csrfOrigin);
+  }
   if (config.accessToken !== null) headers.set("Authorization", `Bearer ${config.accessToken}`);
   let body: Uint8Array | undefined;
   if (request.method !== "GET" && request.method !== "HEAD") {

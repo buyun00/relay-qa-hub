@@ -13,6 +13,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -22,7 +23,7 @@ import org.junit.Test
 
 class PocoSimpleRpcClientTest {
     @Test
-    fun `rejects a wrong-id endpoint then collects the five read-only methods`() {
+    fun `rejects a wrong-id endpoint then collects all read-only methods`() {
         runBlocking {
             val wrongIdServer = loopbackServer()
             val validServer = loopbackServer()
@@ -35,7 +36,7 @@ class PocoSimpleRpcClientTest {
             }
             val validFuture = executor.submit {
                 validServer.accept().use { socket ->
-                    repeat(5) {
+                    repeat(6) {
                         val request = readRequest(socket)
                         val method = request["method"]!!.jsonPrimitive.content
                         val id = request["id"]!!
@@ -44,6 +45,16 @@ class PocoSimpleRpcClientTest {
                             "Screenshot" -> buildJsonArray {
                                 add(JsonPrimitive("AQID"))
                                 add(JsonPrimitive("jpg"))
+                            }
+                            "qa.snapshot" -> {
+                                val snapshotRequest = request["params"]!!
+                                    .jsonArray[0]
+                                    .jsonObject
+                                buildJsonObject {
+                                    put("schemaVersion", 1)
+                                    put("captureId", snapshotRequest["captureId"]!!)
+                                    put("nonce", snapshotRequest["nonce"]!!)
+                                }
                             }
                             "Dump" -> buildJsonObject { put("name", "root") }
                             "GetScreenSize" -> buildJsonArray {
