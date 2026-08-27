@@ -1,7 +1,6 @@
 Unicode true
-SetCompressor /SOLID lzma
+SetCompressor zlib
 RequestExecutionLevel user
-SetShellVarContext current
 
 !include "MUI2.nsh"
 
@@ -27,6 +26,7 @@ VIAddVersionKey /LANG=1033 "ProductVersion" "${PRODUCT_VERSION}"
 !insertmacro MUI_LANGUAGE "SimpChinese"
 
 Section "Relay QA Hub" MainSection
+  SetShellVarContext current
   nsExec::ExecToLog '"$SYSDIR\taskkill.exe" /F /T /IM RelayQaHub.exe'
   Sleep 500
   RMDir /r "$INSTDIR"
@@ -51,6 +51,7 @@ Section "Relay QA Hub" MainSection
 SectionEnd
 
 Section "Uninstall"
+  SetShellVarContext current
   nsExec::ExecToLog '"$SYSDIR\taskkill.exe" /F /T /IM RelayQaHub.exe'
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "Relay QA Hub"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub"
