@@ -23,6 +23,7 @@
 6. 不允许任意方法调用、反射调用、脚本执行或游戏状态修改。
 7. TCP 帧统一使用 UTF-8 字节长度，中文和 emoji 不错帧。
 8. Mono/Editor 与 IL2CPP/Android 均能返回快照。
+9. 快照明确返回当前业务 UI form/prefab 与最近 120 秒的有界、脱敏 Error/Exception/Assert；标准 `Dump(true)` 继续返回实际节点层级。
 
 ## 2. 修改范围
 
@@ -352,6 +353,10 @@ public sealed class QaGameSnapshotData
     public string LevelId;
     public string UserHash;
     public Dictionary<string, string> Custom;
+    public QaUiSnapshot Ui;
+    public List<QaRecentError> RecentErrors;
+    public int RecentErrorWindowMs;
+    public int DroppedErrorCount;
 }
 
 public sealed class QaSnapshotRpcException : Exception
@@ -416,6 +421,82 @@ Screen.height
 - 可用于任意类型反序列化的类型名或对象图。
 
 `userHash` 只能是不可逆哈希或已有匿名测试标识。
+
+### 6.5 截图时页面与近期错误（必接调试字段）
+
+基础场景名、版本号不足以辅助定位 UI Bug。`schemaVersion=1` 保持不变，在 `data` 中增加以下可选字段；旧 App 和旧数据必须继续兼容：
+
+```json
+{
+  "data": {
+    "ui": {
+      "loadedCount": 8,
+      "shownCount": 1,
+      "truncated": false,
+      "omittedCount": 0,
+      "groups": [
+        {
+          "name": "MenuLayer",
+          "depth": 40,
+          "forms": [
+            {
+              "assetKey": "Assets/UI/Hall/Hall-3_optimized.prefab",
+              "prefabName": "Hall-3_optimized",
+              "instanceName": "Hall-3_optimized(Clone)",
+              "rootInstanceId": -4452,
+              "shown": true,
+              "logicVisible": true,
+              "activeSelf": true,
+              "activeInHierarchy": true,
+              "siblingIndex": 7,
+              "isCurrent": true
+            }
+          ]
+        }
+      ]
+    },
+    "recentErrors": [
+      {
+        "type": "Exception",
+        "message": "NullReferenceException in HallLobbyMainView",
+        "stackTrace": "HallLobbyMainView.Refresh()\nHallView.OnOpen()",
+        "firstAtUnixMs": 1787795179000,
+        "lastAtUnixMs": 1787795179000,
+        "occurrences": 1,
+        "fingerprint": "sha256:..."
+      }
+    ],
+    "recentErrorWindowMs": 120000,
+    "droppedErrorCount": 0
+  }
+}
+```
+
+职责必须拆开：
+
+- 标准 `Dump(true)` 继续提供截图时的 GameObject/Transform 子树；不要把第二份完整树塞入 `qa.snapshot`。
+- `data.ui` 只提供 Poco 不知道的业务语义：UI group、form/prefab 资源键、逻辑可见性、层级顺序和当前页。
+- `rootInstanceId` 必须等于标准 Dump 节点的 `payload._instanceId`，供 QA Hub 把业务页面与实际子树对上。
+- `recentErrors` 由游戏进程内部缓存；Android App 不得尝试跨应用读取 logcat。
+
+当前项目可直接使用的 UI 只读入口是 `FsbmEntry.UI`、`UIManager` 的 UI groups、`IUIGroup.CurrentUIForm/UIForms`、`IUIForm.AssetName/Handle/Group` 与 `UIFormLogic.Visible`。页面顺序使用 group `Depth`、root Transform 的 `GetSiblingIndex()` 和 `CurrentUIForm`，不要依赖当前未刷新的 `DepthInUIGroup`。
+
+页面数据上限：group 最多 16 个，form 最多 64 个；只返回 `shown && activeInHierarchy` 的 form。达到上限时必须设置 `truncated=true`、`omittedCount` 并追加稳定 warning `ui_context_truncated`。
+
+### 6.6 近期错误环形缓冲
+
+在游戏进程启动早期订阅 `Application.logMessageReceivedThreaded`，只接收 `LogType.Error`、`LogType.Exception`、`LogType.Assert`。线程回调中只能处理字符串、时间戳和有界内存队列，不得访问 GameObject、Scene、UI，也不得再次调用 `Debug.Log`。
+
+固定边界：
+
+- 内存 ring 最多 64 条不同错误，保留最近 120 秒；相同 fingerprint 合并 `occurrences/firstAt/lastAt`。
+- 每次 snapshot 最多返回最新 10 条。
+- message 最多 256 个 Unicode scalar 且最多 1 KiB UTF-8。
+- `stackTrace` 可选，只保留脱敏后的前 8 帧且最多 2 KiB UTF-8；不得返回本地绝对路径或完整原始调用栈。
+- token、cookie、Authorization、手机号、URL query、账号标识和本地路径必须在进入 ring 前 fail-closed 脱敏；脱敏异常时丢弃该条或写 `[redacted]`，绝不保留原文。
+- Provider 在 Unity 主线程同步复制 ring 快照，不读磁盘、不调 Android logcat、不等待异步任务。
+
+QA Hub Web 已按上述字段兼容读取：有字段且数组为空表示“窗口内无错误”；字段缺失表示“当前游戏构建尚未接入”，不能把二者混为一谈。
 
 ## 7. 新增业务 Provider
 
@@ -589,7 +670,10 @@ $snapshot | ConvertTo-Json -Depth 10
 - `qa.snapshot.result.captureId` 与请求一致。
 - Provider 已注册时 `status` 为 `complete`；未注册时允许 `partial`。
 - `scene`、`appVersion`、屏幕尺寸和运行时间存在。
-- 响应没有异常堆栈、绝对路径或敏感信息。
+- `data.ui.groups[].forms[]` 能指出当前 shown/current form、prefab assetKey、siblingIndex 和 rootInstanceId。
+- `rootInstanceId` 能在同一 captureId 的 `Dump(true)` 中找到相同 `_instanceId` 节点及其子树。
+- 触发一条测试 Error/Exception 后，`recentErrors` 在 120 秒窗口内出现；空窗口明确返回 `[]`。
+- 响应没有完整原始异常堆栈、绝对路径或敏感信息。
 
 ### 9.3 中文和 emoji
 
@@ -701,7 +785,9 @@ adb shell ss -ltn
 - [ ] 原有五个只读 RPC 正常。
 - [ ] 只新增 `qa.snapshot`，没有任意 Invoke/反射入口。
 - [ ] Provider 快速、同步、只读、无额外网络和大文件读取。
-- [ ] 响应没有敏感数据、绝对路径和异常堆栈。
+- [ ] 页面 form/prefab 与 Dump `_instanceId` 能对应，达到上限时明确标记 truncated。
+- [ ] 最近错误 ring 仅收 Error/Exception/Assert，120 秒/64 条/返回 10 条边界生效。
+- [ ] 响应没有敏感数据、绝对路径或完整原始异常堆栈。
 - [ ] 重放、过期和非法帧会被拒绝。
 - [ ] 非法连接后下一条合法请求仍成功。
 - [ ] Debug/测试包可用，Release 正式包不监听。

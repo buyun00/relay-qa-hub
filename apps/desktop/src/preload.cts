@@ -1,9 +1,10 @@
 import electron = require("electron");
 
 import type {
+  DesktopBugChange,
   DesktopConnectionStatus,
-  DesktopUpdatePhase,
-  DesktopUpdateStatus,
+  DesktopRuntimeInfo,
+  DesktopUpdateState,
   QaHubDesktopBridge,
 } from "./bridge-types.js";
 
@@ -18,17 +19,6 @@ const STATES = new Set([
   "connected",
   "reconnecting",
   "paused",
-]);
-const UPDATE_PHASES = new Set<DesktopUpdatePhase>([
-  "disabled",
-  "idle",
-  "checking",
-  "available",
-  "downloading",
-  "downloaded",
-  "up-to-date",
-  "installing",
-  "error",
 ]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -53,46 +43,26 @@ function parseStatus(value: unknown): DesktopConnectionStatus {
   };
 }
 
-function parseUpdateStatus(value: unknown): DesktopUpdateStatus {
-  if (!isRecord(value)) {
-    return {
-      phase: "disabled",
-      currentVersion: "unknown",
-      availableVersion: null,
-      progressPercent: null,
-      checkedAt: null,
-      errorCode: null,
-    };
+function parseRuntimeInfo(value: unknown): DesktopRuntimeInfo {
+  if (!isRecord(value)) return { apiBaseUrl: "", notificationsEnabled: false };
+  const apiBaseUrl = value["apiBaseUrl"];
+  let safeApiBaseUrl = "";
+  if (typeof apiBaseUrl === "string" && apiBaseUrl.length <= 2_048) {
+    try {
+      const parsed = new URL(apiBaseUrl);
+      if (
+        (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+        parsed.origin === apiBaseUrl
+      ) {
+        safeApiBaseUrl = parsed.origin;
+      }
+    } catch {
+      // Invalid main-process data is reduced to the empty safe fallback.
+    }
   }
-  const phase = value["phase"];
-  const currentVersion = value["currentVersion"];
-  const availableVersion = value["availableVersion"];
-  const progressPercent = value["progressPercent"];
-  const checkedAt = value["checkedAt"];
-  const errorCode = value["errorCode"];
   return {
-    phase:
-      typeof phase === "string" && UPDATE_PHASES.has(phase as DesktopUpdatePhase)
-        ? (phase as DesktopUpdatePhase)
-        : "disabled",
-    currentVersion:
-      typeof currentVersion === "string" && currentVersion.length <= 64
-        ? currentVersion
-        : "unknown",
-    availableVersion:
-      typeof availableVersion === "string" && availableVersion.length <= 64
-        ? availableVersion
-        : null,
-    progressPercent:
-      typeof progressPercent === "number" &&
-      Number.isFinite(progressPercent) &&
-      progressPercent >= 0 &&
-      progressPercent <= 100
-        ? progressPercent
-        : null,
-    checkedAt:
-      typeof checkedAt === "string" && !Number.isNaN(Date.parse(checkedAt)) ? checkedAt : null,
-    errorCode: typeof errorCode === "string" && errorCode.length <= 64 ? errorCode : null,
+    apiBaseUrl: safeApiBaseUrl,
+    notificationsEnabled: value["notificationsEnabled"] === true,
   };
 }
 
@@ -102,43 +72,146 @@ function safeBugId(value: unknown): string | null {
   return typeof bugId === "string" && UUID_PATTERN.test(bugId) ? bugId.toLowerCase() : null;
 }
 
+function parseBugChange(value: unknown): DesktopBugChange | null {
+  if (!isRecord(value)) return null;
+  const notificationId = value["notificationId"];
+  const eventId = value["eventId"];
+  const bugId = value["bugId"];
+  if (
+    typeof notificationId !== "string" ||
+    !UUID_PATTERN.test(notificationId) ||
+    (eventId !== null && (typeof eventId !== "string" || !UUID_PATTERN.test(eventId))) ||
+    (bugId !== null && (typeof bugId !== "string" || !UUID_PATTERN.test(bugId)))
+  ) {
+    return null;
+  }
+  return {
+    notificationId: notificationId.toLowerCase(),
+    eventId: eventId === null ? null : eventId.toLowerCase(),
+    bugId: bugId === null ? null : bugId.toLowerCase(),
+  };
+}
+
+function shortText(value: unknown, fallback = "UPDATE_STATE_INVALID"): string {
+  return typeof value === "string" && value.length > 0 && value.length <= 100 ? value : fallback;
+}
+
+function parseUpdateState(value: unknown): DesktopUpdateState {
+  if (!isRecord(value) || typeof value["status"] !== "string") {
+    return { status: "error", message: "UPDATE_STATE_INVALID" };
+  }
+  const status = value["status"];
+  if (status === "disabled" || status === "error") {
+    return { status, message: shortText(value["message"]) };
+  }
+  const version = shortText(value["version"], "unknown");
+  if (status === "idle" || status === "checking" || status === "up-to-date") {
+    return {
+      status,
+      currentReleaseId: shortText(value["currentReleaseId"], "unknown"),
+      version,
+    };
+  }
+  if (status === "downloading") {
+    const progress = value["progressPercent"];
+    return {
+      status,
+      releaseId: shortText(value["releaseId"], "unknown"),
+      version,
+      progressPercent:
+        Number.isSafeInteger(progress) && (progress as number) >= 0 && (progress as number) <= 100
+          ? (progress as number)
+          : 0,
+    };
+  }
+  if (status === "ready") {
+    return {
+      status,
+      releaseId: shortText(value["releaseId"], "unknown"),
+      version,
+      publishedAt: shortText(value["publishedAt"], "unknown"),
+    };
+  }
+  if (status === "installing") {
+    return {
+      status,
+      releaseId: shortText(value["releaseId"], "unknown"),
+      version,
+    };
+  }
+  return { status: "error", message: "UPDATE_STATE_INVALID" };
+}
+
+const connectionStatusListeners = new Set<(status: DesktopConnectionStatus) => void>();
+const bugChangeListeners = new Set<(change: DesktopBugChange) => void>();
+const openBugListeners = new Set<(bugId: string) => void>();
+const updateStateListeners = new Set<(state: DesktopUpdateState) => void>();
+let pendingBugChange: DesktopBugChange | null = null;
+let pendingOpenBugId: string | null = null;
+
+ipcRenderer.on("desktop:connection-status", (_event: IpcRendererEvent, value: unknown) => {
+  const status = parseStatus(value);
+  for (const listener of connectionStatusListeners) listener(status);
+});
+ipcRenderer.on("desktop:bug-changed", (_event: IpcRendererEvent, value: unknown) => {
+  const change = parseBugChange(value);
+  if (change === null) return;
+  if (bugChangeListeners.size === 0) pendingBugChange = change;
+  for (const listener of bugChangeListeners) listener(change);
+});
+ipcRenderer.on("desktop:open-bug", (_event: IpcRendererEvent, value: unknown) => {
+  const bugId = safeBugId(value);
+  if (bugId === null) return;
+  if (openBugListeners.size === 0) pendingOpenBugId = bugId;
+  for (const listener of openBugListeners) listener(bugId);
+});
+ipcRenderer.on("desktop:update-state", (_event: IpcRendererEvent, value: unknown) => {
+  const state = parseUpdateState(value);
+  for (const listener of updateStateListeners) listener(state);
+});
+
 const bridge: QaHubDesktopBridge = {
   getConnectionStatus: async () =>
     parseStatus(await ipcRenderer.invoke("desktop:get-connection-status")),
+  getRuntimeInfo: async () =>
+    parseRuntimeInfo(await ipcRenderer.invoke("desktop:get-runtime-info")),
   getNotificationsPaused: async () => {
     const value = await ipcRenderer.invoke("desktop:get-notifications-paused");
     return value === true;
   },
-  getUpdateStatus: async () =>
-    parseUpdateStatus(await ipcRenderer.invoke("desktop:get-update-status")),
-  checkForUpdates: async () =>
-    parseUpdateStatus(await ipcRenderer.invoke("desktop:check-for-updates")),
-  installUpdate: async () => {
-    const value = await ipcRenderer.invoke("desktop:install-update");
-    return value === true;
-  },
+  getUpdateState: async () =>
+    parseUpdateState(await ipcRenderer.invoke("desktop:get-update-state")),
+  checkForUpdate: async () => (await ipcRenderer.invoke("desktop:check-update")) === true,
+  installUpdate: async () => (await ipcRenderer.invoke("desktop:install-update")) === true,
   onConnectionStatus: (listener) => {
-    const handler = (_event: IpcRendererEvent, value: unknown): void => {
-      listener(parseStatus(value));
-    };
-    ipcRenderer.on("desktop:connection-status", handler);
-    return () => ipcRenderer.removeListener("desktop:connection-status", handler);
+    connectionStatusListeners.add(listener);
+    return () => connectionStatusListeners.delete(listener);
   },
-  onUpdateStatus: (listener) => {
-    const handler = (_event: IpcRendererEvent, value: unknown): void => {
-      listener(parseUpdateStatus(value));
-    };
-    ipcRenderer.on("desktop:update-status", handler);
-    return () => ipcRenderer.removeListener("desktop:update-status", handler);
+  onBugChanged: (listener) => {
+    bugChangeListeners.add(listener);
+    if (pendingBugChange !== null) {
+      const change = pendingBugChange;
+      pendingBugChange = null;
+      queueMicrotask(() => {
+        if (bugChangeListeners.has(listener)) listener(change);
+      });
+    }
+    return () => bugChangeListeners.delete(listener);
   },
   onOpenBug: (listener) => {
-    const handler = (_event: IpcRendererEvent, value: unknown): void => {
-      const bugId = safeBugId(value);
-      if (bugId === null) return;
-      listener(bugId);
-    };
-    ipcRenderer.on("desktop:open-bug", handler);
-    return () => ipcRenderer.removeListener("desktop:open-bug", handler);
+    openBugListeners.add(listener);
+    if (pendingOpenBugId !== null) {
+      const bugId = pendingOpenBugId;
+      pendingOpenBugId = null;
+      queueMicrotask(() => {
+        if (openBugListeners.has(listener)) listener(bugId);
+      });
+    }
+    return () => openBugListeners.delete(listener);
+  },
+  onUpdateState: (listener) => {
+    updateStateListeners.add(listener);
+    return () => updateStateListeners.delete(listener);
   },
 };
 

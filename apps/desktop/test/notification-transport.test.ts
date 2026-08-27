@@ -168,3 +168,50 @@ test("transport fetches durable Inbox once, dedupes reconnect replay, and deep-l
   transport.stop();
   assert.equal(notifications.length, 1);
 });
+
+test("persisted delivered IDs suppress unread Inbox replay after desktop restart", async () => {
+  const socket = new FakeSocket();
+  const notifications: unknown[] = [];
+  const transport = new NotificationTransport({
+    socketUrl: new URL("wss://qa.example.test/api/v1/notifications/stream"),
+    accessToken: "main-process-only",
+    openSocket: () => socket,
+    fetchInbox: async () =>
+      parseDurableInbox({ items: [inboxItem()], nextCursor: null, unreadCount: 1 }),
+    showNotification: (notification) => notifications.push(notification),
+    seenNotificationIds: [NOTIFICATION_ID],
+  });
+  transport.start();
+  socket.open();
+  await flush();
+  transport.stop();
+  assert.deepEqual(notifications, []);
+});
+
+test("a browser login enables a transport that started without a shared credential", async () => {
+  const socket = new FakeSocket();
+  const openedWith: string[] = [];
+  const transport = new NotificationTransport({
+    socketUrl: new URL("wss://qa.example.test/api/v1/notifications/stream"),
+    accessToken: null,
+    openSocket: (_url, credential) => {
+      openedWith.push(credential);
+      return socket;
+    },
+    fetchInbox: async () => [],
+    showNotification: () => undefined,
+  });
+
+  transport.start();
+  assert.equal(transport.status.state, "disabled");
+  transport.updateAccessToken(`qa_hub_browser_session=${"A".repeat(43)}`);
+  assert.deepEqual(openedWith, [`qa_hub_browser_session=${"A".repeat(43)}`]);
+  socket.open();
+  await flush();
+  assert.equal(transport.status.state, "connected");
+
+  transport.updateAccessToken(null);
+  assert.equal(socket.closed, true);
+  assert.equal(transport.status.state, "disabled");
+  transport.stop();
+});

@@ -16,10 +16,6 @@ function digest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
-  if (actorId !== scope.actorId) throw new TypeError("actor does not match the authenticated mobile scope");
-}
-
 class RelayIntegrationNotConfiguredError extends Error {
   readonly code = "RELAY_INTEGRATION_NOT_CONFIGURED" as const;
 
@@ -39,16 +35,16 @@ export function createSqliteMobileRelayStore(
   options: SqliteMobileRelayStoreOptions,
 ): MobileRelayStore {
   const now = options.now ?? (() => new Date());
-  const scope = {
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
+  const actorScope = (actorId: string) =>
+    ({
+      accountId: options.scope.accountId,
+      projectId: options.scope.projectId,
+      actorId,
+    }) as const;
   return {
     async transitionBugReady(command) {
-      requireActor(command.actorId, options.scope);
       return options.worker.transitionMobileBugReady({
-        ...scope,
+        ...actorScope(command.actorId),
         bugId: command.bugId,
         expectedVersion: command.request.expectedVersion,
         idempotencyKey: command.idempotencyKey,
@@ -57,10 +53,9 @@ export function createSqliteMobileRelayStore(
       });
     },
     async createRelayAttempt(command) {
-      requireActor(command.actorId, options.scope);
       requireRelayDispatch(options);
       return options.worker.createMobileRelayAttempt({
-        ...scope,
+        ...actorScope(command.actorId),
         bugId: command.bugId,
         expectedVersion: command.request.expectedVersion,
         assigneeId: command.request.assigneeId,
@@ -71,9 +66,8 @@ export function createSqliteMobileRelayStore(
       });
     },
     async createManualAttempt(command) {
-      requireActor(command.actorId, options.scope);
       return options.worker.createMobileManualRepairAttempt({
-        ...scope,
+        ...actorScope(command.actorId),
         bugId: command.bugId,
         expectedVersion: command.request.expectedVersion,
         assigneeId: command.request.assigneeId,
@@ -84,13 +78,14 @@ export function createSqliteMobileRelayStore(
       });
     },
     async getManualAttempt(query) {
-      if (query.actorId !== options.scope.actorId) return null;
-      return options.worker.getMobileManualRepairAttempt({ ...scope, attemptId: query.attemptId });
+      return options.worker.getMobileManualRepairAttempt({
+        ...actorScope(query.actorId),
+        attemptId: query.attemptId,
+      });
     },
     async startManualAttempt(command) {
-      requireActor(command.actorId, options.scope);
       return options.worker.startMobileRepairAttempt({
-        ...scope,
+        ...actorScope(command.actorId),
         attemptId: command.attemptId,
         expectedVersion: command.request.expectedVersion,
         reason: command.request.reason ?? null,
@@ -100,25 +95,39 @@ export function createSqliteMobileRelayStore(
       });
     },
     async deliverManualAttempt(command) {
-      requireActor(command.actorId, options.scope);
-      return options.worker.deliverMobileRepairAttempt({
-        ...scope,
+      const common = {
+        ...actorScope(command.actorId),
         attemptId: command.attemptId,
         expectedVersion: command.request.expectedVersion,
         summary: command.request.summary,
-        branch: command.request.branch,
-        commitSha: command.request.commitSha,
-        mergeRequestUrl: command.request.mergeRequestUrl ?? null,
         idempotencyKey: command.idempotencyKey,
         requestDigest: digest(command.request),
         createdAt: now().toISOString(),
-      });
+      } as const;
+      return command.request.deliveryKind === "code"
+        ? options.worker.deliverMobileRepairAttempt({
+            ...common,
+            deliveryKind: "code",
+            branch: command.request.branch,
+            commitSha: command.request.commitSha,
+            mergeRequestUrl: command.request.mergeRequestUrl ?? null,
+            patchUrl: command.request.patchUrl ?? null,
+            noCodeReason: null,
+          })
+        : options.worker.deliverMobileRepairAttempt({
+            ...common,
+            deliveryKind: "no_code",
+            branch: null,
+            commitSha: null,
+            mergeRequestUrl: null,
+            patchUrl: null,
+            noCodeReason: command.request.noCodeReason,
+          });
     },
     async dispatchRelay(command) {
-      requireActor(command.actorId, options.scope);
       requireRelayDispatch(options);
       return options.worker.dispatchMobileRelay({
-        ...scope,
+        ...actorScope(command.actorId),
         attemptId: command.attemptId,
         expectedVersion: command.request.expectedVersion,
         handoffId: command.request.handoffId,
@@ -129,10 +138,9 @@ export function createSqliteMobileRelayStore(
       });
     },
     async continueRelay(command) {
-      requireActor(command.actorId, options.scope);
       requireRelayDispatch(options);
       return options.worker.continueMobileRelay({
-        ...scope,
+        ...actorScope(command.actorId),
         attemptId: command.attemptId,
         handoffId: command.request.handoffId,
         actionId: command.request.actionId,
@@ -144,8 +152,10 @@ export function createSqliteMobileRelayStore(
       });
     },
     async getRelayReceipt(query) {
-      if (query.actorId !== options.scope.actorId) return null;
-      return options.worker.getMobileRelayReceipt({ ...scope, attemptId: query.attemptId });
+      return options.worker.getMobileRelayReceipt({
+        ...actorScope(query.actorId),
+        attemptId: query.attemptId,
+      });
     },
   };
 }

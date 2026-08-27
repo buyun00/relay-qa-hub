@@ -1,8 +1,7 @@
 import { createHash } from "node:crypto";
 import {
-  constants,
-  copyFileSync,
   createReadStream,
+  createWriteStream,
   existsSync,
   lstatSync,
   mkdirSync,
@@ -13,6 +12,8 @@ import {
 } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { pipeline } from "node:stream/promises";
+import { pathToFileURL } from "node:url";
 
 import { QA_HUB_SQLITE_APPLICATION_ID } from "./sqlite.js";
 
@@ -211,7 +212,9 @@ function readInventory(
 ): AttachmentInventoryManifest {
   let database: DatabaseSync;
   try {
-    database = new DatabaseSync(databasePath, { readOnly: true });
+    const immutableLocation = pathToFileURL(databasePath);
+    immutableLocation.searchParams.set("immutable", "1");
+    database = new DatabaseSync(immutableLocation, { readOnly: true });
   } catch (error) {
     throw new AttachmentRestoreError(
       "ATTACHMENT_RESTORE_DATABASE_INVALID",
@@ -334,7 +337,15 @@ async function copyAndVerifyEntry(
   const targetPath = resolveStorageKey(restoreRoot, entry.storageKey);
   try {
     mkdirSync(dirname(targetPath), { recursive: true });
-    copyFileSync(realSourcePath, targetPath, constants.COPYFILE_EXCL);
+    // Stream the payload with create-only destination semantics. Windows can
+    // route CopyFile through an offload/block-clone path on ReFS; on the live
+    // archive disk that path can stall for minutes even for small attachments.
+    // A bounded userspace stream retains the same fail-closed verification
+    // below without depending on the volume's copy-offload implementation.
+    await pipeline(
+      createReadStream(realSourcePath),
+      createWriteStream(targetPath, { flags: "wx" }),
+    );
   } catch (error) {
     throw new AttachmentRestoreError(
       "ATTACHMENT_RESTORE_FAILED",

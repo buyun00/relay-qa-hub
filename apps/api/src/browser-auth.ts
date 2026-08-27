@@ -81,12 +81,12 @@ export interface BrowserAuthOptions {
   readonly userId: string;
   readonly actorId: string;
   readonly adminEmail: string;
-  readonly passwordlessLogin?: (
+  readonly passwordlessLogin: (
     name: string,
     now: string,
   ) => Promise<{ readonly userId: string }>;
   readonly sessionSecret: string;
-  readonly webOrigin: string;
+  readonly webOrigins: readonly string[];
   readonly now?: () => Date;
   readonly sessionTtlMs?: number;
   readonly secureCookie?: boolean;
@@ -98,8 +98,6 @@ interface BrowserAuthRequest extends FastifyRequest {
 }
 
 interface LoginBody {
-  readonly email?: unknown;
-  readonly password?: unknown;
   readonly name?: unknown;
   readonly client?: unknown;
 }
@@ -126,18 +124,9 @@ function requireText(value: unknown, field: string, maxLength: number): string {
   return value;
 }
 
-function parseLoginBody(body: unknown): { readonly email: string; readonly password: string } {
-  if (body === null || typeof body !== "object" || Array.isArray(body)) {
-    throw new TypeError("login body is invalid");
-  }
-  const value = body as LoginBody;
-  return {
-    email: requireText(value.email, "email", 320).trim().toLowerCase(),
-    password: requireText(value.password, "password", 512),
-  };
-}
-
-function parseCookieHeader(value: string | readonly string[] | undefined): string | undefined {
+export function browserSessionTokenFromCookieHeader(
+  value: string | readonly string[] | undefined,
+): string | undefined {
   const raw = typeof value === "string" ? value : undefined;
   if (raw === undefined) return undefined;
   for (const item of raw.split(";")) {
@@ -166,9 +155,9 @@ function equalSecret(left: string, right: string): boolean {
   return leftBytes.length === rightBytes.length && timingSafeEqual(leftBytes, rightBytes);
 }
 
-function originMatches(request: FastifyRequest, expectedOrigin: string): boolean {
+function originMatches(request: FastifyRequest, expectedOrigins: readonly string[]): boolean {
   const origin = request.headers.origin;
-  return typeof origin === "string" && origin === expectedOrigin;
+  return typeof origin === "string" && expectedOrigins.includes(origin);
 }
 
 function requestNeedsCsrf(request: FastifyRequest): boolean {
@@ -233,11 +222,8 @@ function sessionTtl(options: BrowserAuthOptions): number {
   return ttl;
 }
 
-export function browserAuthSession(
-  request: FastifyRequest,
-  options: BrowserAuthOptions,
-): string | undefined {
-  const token = parseCookieHeader(request.headers.cookie);
+export function browserAuthSession(request: FastifyRequest): string | undefined {
+  const token = browserSessionTokenFromCookieHeader(request.headers.cookie);
   if (token === undefined) return undefined;
   return token;
 }
@@ -247,7 +233,7 @@ export async function authenticateBrowserRequest(
   reply: FastifyReply,
   options: BrowserAuthOptions,
 ): Promise<BrowserAuthPrincipal | undefined> {
-  const token = browserAuthSession(request, options);
+  const token = browserAuthSession(request);
   if (token === undefined) return undefined;
   const now = requestNow(options);
   const principal = await options.store.resolveBrowserSession({
@@ -258,7 +244,7 @@ export async function authenticateBrowserRequest(
     await writeJson(reply, 401, UNAUTHENTICATED);
     return undefined;
   }
-  if (requestNeedsCsrf(request) && !originMatches(request, options.webOrigin)) {
+  if (requestNeedsCsrf(request) && !originMatches(request, options.webOrigins)) {
     await writeJson(reply, 403, { code: "CSRF_ORIGIN_INVALID" });
     return undefined;
   }
@@ -291,13 +277,13 @@ export async function authenticateBrowserBearerRequest(
     now: requestNow(options).toISOString(),
   });
   if (principal === null) return undefined;
-  (request as BrowserAuthRequest).browserPrincipal = principal;
-  (request as BrowserAuthRequest).browserSessionToken = token;
+  const browserRequest = request as BrowserAuthRequest;
+  browserRequest.browserPrincipal = principal;
+  browserRequest.browserSessionToken = token;
   return principal;
 }
 
 export function createSqliteBrowserAuthStore(options: {
-  readonly sharedActorId?: string;
   readonly worker: {
     readonly ensureBrowserAdmin: (input: {
       readonly accountId: string;
@@ -342,7 +328,7 @@ export function createSqliteBrowserAuthStore(options: {
   }): BrowserAuthPrincipal => ({
     accountId: principal.accountId,
     userId: principal.userId,
-    actorId: options.sharedActorId ?? principal.userId,
+    actorId: principal.userId,
     email: principal.email,
     displayName: principal.displayName,
   });
@@ -377,27 +363,25 @@ export function createSqliteBrowserAuthStore(options: {
     },
     resolveBrowserSession: async (input) => {
       const principal = await options.worker.resolveBrowserSession(input);
-      return principal === null
-        ? null
-        : withActor(principal);
+      return principal === null ? null : withActor(principal);
     },
     revokeBrowserSession: (input) => options.worker.revokeBrowserSession(input),
   };
 }
 
 export function registerBrowserAuthRoutes(app: FastifyInstance, options: BrowserAuthOptions): void {
-  const secureCookie = options.secureCookie ?? options.webOrigin.startsWith("https://");
+  const secureCookie =
+    options.secureCookie ?? options.webOrigins.every((origin) => origin.startsWith("https://"));
   const ttl = sessionTtl(options);
   const ttlSeconds = Math.floor(ttl / 1_000);
 
   app.post(BROWSER_LOGIN_PATH, async (request, reply) => {
     try {
       const passwordless = options.passwordlessLogin;
-      const passwordlessBody =
-        passwordless === undefined ? undefined : parsePasswordlessLoginBody(request.body);
+      const passwordlessBody = parsePasswordlessLoginBody(request.body);
       if (
-        (passwordlessBody === undefined || passwordlessBody.client === "web") &&
-        !originMatches(request, options.webOrigin)
+        passwordlessBody.client === "web" &&
+        !originMatches(request, options.webOrigins)
       ) {
         return writeJson(reply, 403, { code: "CSRF_ORIGIN_INVALID" });
       }
@@ -411,15 +395,12 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
         issuedAt: issuedAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
       };
-      const principal =
-        passwordless === undefined || passwordlessBody === undefined
-          ? await options.store.loginBrowserSession({
-              ...session,
-              ...parseLoginBody(request.body),
-            })
-          : await passwordless(passwordlessBody.name, issuedAt.toISOString()).then((identity) =>
-              options.store.createBrowserSession({ ...session, userId: identity.userId }),
-            );
+      const principal = await passwordless(
+        passwordlessBody.name,
+        issuedAt.toISOString(),
+      ).then((identity) =>
+        options.store.createBrowserSession({ ...session, userId: identity.userId }),
+      );
       if (principal === null) return writeJson(reply, 401, AUTHENTICATION_FAILED);
       if (passwordlessBody?.client === "android") {
         return writeJson(reply, 200, {

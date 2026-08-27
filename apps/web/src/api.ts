@@ -28,6 +28,8 @@ export type BugSeverity = "S0" | "S1" | "S2" | "S3" | "S4";
 
 export interface BugListFilters {
   readonly q?: string;
+  readonly ownerId?: string;
+  readonly ownerState?: "assigned" | "unassigned";
   readonly state?: BugListState;
   readonly severity?: BugSeverity;
 }
@@ -108,6 +110,14 @@ export interface BugListItem {
   readonly severity: BugSeverity;
   readonly priority: string;
   readonly updatedAt: string;
+  readonly reporterId: string;
+  readonly ownerId: string | null;
+  readonly verificationOwnerId: string | null;
+  readonly description: string;
+  readonly expectedBehavior: string;
+  readonly version: number;
+  readonly createdAt: string;
+  readonly closedAt: string | null;
 }
 
 export interface BugListResponse {
@@ -321,7 +331,7 @@ export interface HumanRepairAttempt {
   readonly bugId: string;
   readonly sequence: number;
   readonly mode: "human";
-  readonly status: "planned" | "running" | "delivered";
+  readonly status: "planned" | "running" | "delivered" | "verification_failed";
   readonly assigneeId: string;
   readonly summary: string | null;
   readonly branch: string | null;
@@ -407,6 +417,31 @@ export interface VerificationResultResponse {
   readonly bug: BugDetail;
   readonly attachmentIds: readonly string[];
   readonly captureBundleId: string | null;
+  readonly eventId: string;
+  readonly replayed: boolean;
+}
+
+export interface CreateBugInput {
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly title: string;
+  readonly description: string;
+  readonly expectedBehavior: string;
+  readonly severity: BugSeverity;
+  readonly priority: "P0" | "P1" | "P2" | "P3" | "P4";
+  readonly ownerId: string | null;
+  readonly verificationOwnerId: string;
+  readonly attachmentIds: readonly string[];
+}
+
+export interface CreateBugResponse {
+  readonly clientSubmissionId: string;
+  readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
+  readonly disposition: "created";
+  readonly bug: BugDetail;
+  readonly occurrenceId: string;
+  readonly attachmentIds: readonly string[];
+  readonly captureBundleId: null;
   readonly eventId: string;
   readonly replayed: boolean;
 }
@@ -724,9 +759,15 @@ export async function listBugs(
   projectId: string,
   filters: BugListFilters = {},
   signal?: AbortSignal,
+  limit = 100,
 ): Promise<BugListResponse> {
-  const query = new URLSearchParams({ projectId, limit: "20" });
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 500) {
+    throw new TypeError("Bug list limit must be an integer between 1 and 500");
+  }
+  const query = new URLSearchParams({ projectId, limit: String(limit) });
   if (filters.q !== undefined) query.set("q", filters.q);
+  if (filters.ownerId !== undefined) query.set("ownerId", filters.ownerId);
+  if (filters.ownerState !== undefined) query.set("ownerState", filters.ownerState);
   if (filters.state !== undefined) query.set("state", filters.state);
   if (filters.severity !== undefined) query.set("severity", filters.severity);
   const body = await requestJson(`/api/v1/bugs?${query.toString()}`, {
@@ -926,6 +967,179 @@ export async function updateBugOwner(
   return requireRecord(body, "BUG") as unknown as BugDetail;
 }
 
+export async function updateBugAssignments(
+  bugId: string,
+  expectedVersion: number,
+  ownerId: string,
+  verificationOwnerId: string,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `web:updateBug:bug:${bugId}:v${expectedVersion}:assign:${ownerId}:${verificationOwnerId}`,
+    },
+    body: JSON.stringify({ expectedVersion, ownerId, verificationOwnerId }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
+export async function createBug(input: CreateBugInput): Promise<CreateBugResponse> {
+  const body = await requestJson("/api/v1/bugs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+      "Idempotency-Key": `submission:${input.clientSubmissionId}:commit`,
+    },
+    body: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      projectId: input.projectId,
+      clientSubmissionId: input.clientSubmissionId,
+      title: input.title,
+      description: input.description,
+      expectedBehavior: input.expectedBehavior,
+      severity: input.severity,
+      priority: input.priority,
+      ownerId: input.ownerId,
+      verificationOwnerId: input.verificationOwnerId,
+      occurrence: {
+        observedAt: new Date().toISOString(),
+        platform: "web",
+        deviceModel: navigator.userAgent.slice(0, 200),
+        osVersion: navigator.platform.slice(0, 100),
+        steps: ["从 Relay QA Hub Web 管理台提交"],
+        actualBehavior: input.description,
+      },
+      attachmentIds: input.attachmentIds,
+      captureBundleId: null,
+    }),
+  });
+  return requireRecord(body, "BUG_CREATION") as unknown as CreateBugResponse;
+}
+
+interface UploadInitResponse {
+  readonly sessionId: string;
+  readonly chunkSize: number;
+  readonly version: number;
+}
+
+interface UploadFinalizeResponse {
+  readonly attachmentId: string;
+  readonly readyToBind: boolean;
+  readonly version: number;
+}
+
+function csrfHeadersForMutation(): Record<string, string> {
+  return browserCsrfToken === null ? {} : { "X-CSRF-Token": browserCsrfToken };
+}
+
+async function sha256Hex(blob: Blob): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", await blob.arrayBuffer());
+  return [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, "0")).join("");
+}
+
+export async function uploadBugCreateAttachment(input: {
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly file: File;
+}): Promise<string> {
+  const clientAttachmentId = crypto.randomUUID();
+  const uploadAttempt = 1;
+  const sha256 = await sha256Hex(input.file);
+  const initBody = (await requestJson("/api/v1/uploads/init", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+      "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:init`,
+    },
+    body: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      projectId: input.projectId,
+      clientSubmissionId: input.clientSubmissionId,
+      clientAttachmentId,
+      uploadAttempt,
+      filename: input.file.name,
+      mediaType: input.file.type || "application/octet-stream",
+      expectedSize: input.file.size,
+      sha256,
+    }),
+  })) as UploadInitResponse;
+
+  let version = initBody.version;
+  let chunkNumber = 0;
+  for (let offset = 0; offset < input.file.size; offset += initBody.chunkSize) {
+    const chunk = input.file.slice(offset, Math.min(input.file.size, offset + initBody.chunkSize));
+    const chunkSha256 = await sha256Hex(chunk);
+    const response = await fetch(
+      `/api/v1/uploads/${encodeURIComponent(initBody.sessionId)}/chunks/${chunkNumber}`,
+      {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: {
+          Accept: "application/vnd.relay-qa-hub.v1.1+json",
+          "Content-Type": "application/octet-stream",
+          "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:chunk:${chunkNumber}`,
+          "If-Match": `"${version}"`,
+          "X-Chunk-SHA256": chunkSha256,
+          "X-Client-Submission-Id": input.clientSubmissionId,
+          "X-Client-Attachment-Id": clientAttachmentId,
+          ...csrfHeadersForMutation(),
+        },
+        body: chunk,
+      },
+    );
+    if (!response.ok) {
+      const errorBody: unknown = await response.json().catch(() => null);
+      throw new QaHubApiError(response.status, readErrorCode(errorBody));
+    }
+    const nextVersion = Number(response.headers.get("x-upload-version"));
+    if (!Number.isSafeInteger(nextVersion) || nextVersion <= version) {
+      throw new QaHubApiError(200, "INVALID_UPLOAD_VERSION");
+    }
+    version = nextVersion;
+    chunkNumber += 1;
+  }
+
+  const finalized = (await requestJson(
+    `/api/v1/uploads/${encodeURIComponent(initBody.sessionId)}/finalize`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+        "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:finalize`,
+      },
+      body: JSON.stringify({
+        submissionContractVersion: "1.1.0",
+        expectedVersion: version,
+        clientSubmissionId: input.clientSubmissionId,
+        clientAttachmentId,
+        uploadAttempt,
+        sha256,
+        expectedSize: input.file.size,
+      }),
+    },
+  )) as UploadFinalizeResponse;
+  if (!finalized.readyToBind) throw new QaHubApiError(409, "ATTACHMENT_NOT_READY");
+
+  await requestJson(`/api/v1/attachments/${encodeURIComponent(finalized.attachmentId)}/bind`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+      "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:bind:1`,
+    },
+    body: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      expectedVersion: finalized.version,
+      projectId: input.projectId,
+      clientSubmissionId: input.clientSubmissionId,
+      clientAttachmentId,
+      leaseGeneration: 1,
+      intent: "bug_create",
+    }),
+  });
+  return finalized.attachmentId;
+}
+
 export async function updateBugModule(
   bugId: string,
   expectedVersion: number,
@@ -1095,6 +1309,26 @@ export async function deliverHumanRepairAttempt(
   return requireRecord(body, "HUMAN_ATTEMPT") as unknown as HumanRepairAttempt;
 }
 
+export async function deliverHumanRepairAttemptNoCode(
+  attemptId: string,
+  expectedVersion: number,
+  summary: string,
+  noCodeReason: string,
+): Promise<HumanRepairAttempt> {
+  const body = await requestJson(
+    `/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/deliver`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": `workflow:deliverRepairAttempt:attempt:${attemptId}:v${expectedVersion}`,
+      },
+      body: JSON.stringify({ expectedVersion, summary, deliveryKind: "no_code", noCodeReason }),
+    },
+  );
+  return requireRecord(body, "HUMAN_ATTEMPT") as unknown as HumanRepairAttempt;
+}
+
 export async function registerManualBuild(input: {
   readonly projectId: string;
   readonly externalId: string;
@@ -1169,7 +1403,7 @@ export async function createVerification(input: {
   readonly bugId: string;
   readonly expectedBugVersion: number;
   readonly repairAttemptId: string;
-  readonly buildId: string;
+  readonly buildId: string | null;
   readonly verifierId: string;
   readonly criteria: string;
 }): Promise<VerificationRecord> {
@@ -1236,6 +1470,35 @@ export async function recordVerificationPassed(
         expectedVersion,
         status: "passed",
         resultSummary,
+        attachmentIds: [],
+      }),
+    },
+  );
+  return requireRecord(body, "VERIFICATION_RESULT") as unknown as VerificationResultResponse;
+}
+
+export async function recordVerificationFailed(
+  verificationId: string,
+  expectedVersion: number,
+  resultSummary: string,
+  failureReason: string,
+  clientSubmissionId: string,
+): Promise<VerificationResultResponse> {
+  const body = await requestJson(
+    `/api/v1/verifications/${encodeURIComponent(verificationId)}/result`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+        "Idempotency-Key": `workflow:recordVerificationResult:verification:${verificationId}:v${expectedVersion}`,
+      },
+      body: JSON.stringify({
+        submissionContractVersion: "1.1.0",
+        clientSubmissionId,
+        expectedVersion,
+        status: "failed",
+        resultSummary,
+        failureReason,
         attachmentIds: [],
       }),
     },

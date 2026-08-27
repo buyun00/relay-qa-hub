@@ -56,22 +56,20 @@ function parseSingleRange(value: string | undefined, size: number): ByteRange | 
 
 async function ordinaryContainedPath(root: string, fileName: string): Promise<string | null> {
   if (!UPDATE_FILE_PATTERN.test(fileName) || basename(fileName) !== fileName) return null;
-  let canonicalRoot: string;
-  let canonicalFile: string;
   try {
-    canonicalRoot = await realpath(root);
-    canonicalFile = await realpath(resolve(canonicalRoot, fileName));
+    const canonicalRoot = await realpath(root);
+    const canonicalFile = await realpath(resolve(canonicalRoot, fileName));
+    if (!canonicalFile.startsWith(`${canonicalRoot}${sep}`)) return null;
+    const result = await stat(canonicalFile);
+    if (!result.isFile() || result.size <= 0 || result.size > maximumBytes(fileName)) return null;
+    return canonicalFile;
   } catch {
     return null;
   }
-  if (!canonicalFile.startsWith(`${canonicalRoot}${sep}`)) return null;
-  const result = await stat(canonicalFile);
-  if (!result.isFile() || result.size <= 0 || result.size > maximumBytes(fileName)) return null;
-  return canonicalFile;
 }
 
 function weakEtag(size: number, modifiedMs: number): string {
-  return `W/\"${size.toString(16)}-${Math.trunc(modifiedMs).toString(16)}\"`;
+  return `W/"${size.toString(16)}-${Math.trunc(modifiedMs).toString(16)}"`;
 }
 
 export function registerDesktopUpdateRoutes(app: FastifyInstance, root: string | undefined): void {
@@ -91,7 +89,7 @@ export function registerDesktopUpdateRoutes(app: FastifyInstance, root: string |
       .header("accept-ranges", "bytes")
       .header("cache-control", cacheControl)
       .header("content-type", contentType(fileName))
-      .header("content-disposition", `inline; filename=\"${fileName}\"`)
+      .header("content-disposition", `inline; filename="${fileName}"`)
       .header("etag", etag)
       .header("x-content-type-options", "nosniff");
     if (request.headers["if-none-match"] === etag) return reply.code(304).send();

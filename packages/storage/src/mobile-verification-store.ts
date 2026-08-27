@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
+import { toBoundedAuditText } from "./audit-text.js";
 import type { MobileBugRecord } from "./mobile-bug-store.js";
 import {
   MobileRelayStorageError,
@@ -13,12 +14,7 @@ const UUID_PATTERN =
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 
 export type MobileVerificationStatus =
-  | "requested"
-  | "in_progress"
-  | "passed"
-  | "failed"
-  | "blocked"
-  | "cancelled";
+  "requested" | "in_progress" | "passed" | "failed" | "blocked" | "cancelled";
 
 export interface MobileVerificationRecord {
   readonly id: string;
@@ -29,6 +25,8 @@ export interface MobileVerificationRecord {
   readonly verifierId: string;
   readonly criteriaSnapshot: string;
   readonly resultSummary: string | null;
+  readonly failureReason: string | null;
+  readonly blockedReason: string | null;
   readonly version: number;
 }
 
@@ -36,7 +34,7 @@ export interface CreateMobileVerificationInput extends MobileRelayScope {
   readonly bugId: string;
   readonly expectedVersion: number;
   readonly repairAttemptId: string;
-  readonly buildId: string;
+  readonly buildId: string | null;
   readonly verifierId: string;
   readonly criteria: string;
   readonly idempotencyKey: string;
@@ -57,10 +55,9 @@ export interface StartMobileVerificationInput extends MobileRelayScope {
   readonly createdAt: string;
 }
 
-export interface RecordMobileVerificationResultInput extends MobileRelayScope {
+interface RecordMobileVerificationResultBase extends MobileRelayScope {
   readonly verificationId: string;
   readonly expectedVersion: number;
-  readonly status: "passed";
   readonly resultSummary: string;
   readonly clientSubmissionId: string;
   readonly attachmentIds: readonly string[];
@@ -69,6 +66,12 @@ export interface RecordMobileVerificationResultInput extends MobileRelayScope {
   readonly requestDigest: string;
   readonly createdAt: string;
 }
+
+export type RecordMobileVerificationResultInput = RecordMobileVerificationResultBase &
+  (
+    | { readonly status: "passed"; readonly failureReason: null }
+    | { readonly status: "failed"; readonly failureReason: string }
+  );
 
 export interface MobileVerificationResultResponse {
   readonly clientSubmissionId: string;
@@ -91,6 +94,8 @@ interface VerificationRow {
   readonly verifier_id: string;
   readonly criteria_snapshot: string;
   readonly result_summary: string | null;
+  readonly failure_reason: string | null;
+  readonly blocked_reason: string | null;
   readonly version: number;
   readonly created_at: string;
   readonly updated_at: string;
@@ -133,6 +138,9 @@ interface AttemptRow {
   readonly branch: string | null;
   readonly commit_sha: string | null;
   readonly merge_request_url: string | null;
+  readonly patch_url: string | null;
+  readonly no_code_reason: string | null;
+  readonly failure_reason: string | null;
   readonly target_build_id: string | null;
   readonly version: number;
 }
@@ -151,13 +159,18 @@ interface EligibleWorkflowRow extends BugRow {
   readonly attempt_target_build_id: string | null;
   readonly attempt_version: number;
   readonly attempt_updated_at: string;
-  readonly build_id: string;
-  readonly build_status: string;
-  readonly build_version: number;
-  readonly build_source_commit_sha: string;
-  readonly requirement_commit_sha: string;
+  readonly build_id: string | null;
+  readonly build_status: string | null;
+  readonly build_version: number | null;
+  readonly build_source_commit_sha: string | null;
+  readonly requirement_requirement: "required" | "not_required";
+  readonly requirement_decision_basis:
+    "code_requires_build" | "no_code_delivery" | "authorized_no_build_exemption";
+  readonly requirement_commit_sha: string | null;
   readonly requirement_version: number;
-  readonly link_id: string;
+  readonly requirement_linked_build_id: string | null;
+  readonly requirement_link_id: string | null;
+  readonly link_id: string | null;
 }
 
 function requireTransaction(database: DatabaseSync): void {
@@ -199,20 +212,20 @@ function nextTimestamp(candidate: string, floor: string): string {
   return new Date(Math.max(Date.parse(candidate), Date.parse(floor) + 1)).toISOString();
 }
 
-function requireActorVerifier(input: MobileRelayScope, verifierId: string): void {
+function requireVerificationIdentity(input: MobileRelayScope, verifierId: string): void {
   requireUuid(input.accountId, "accountId");
   requireUuid(input.projectId, "projectId");
   requireUuid(input.actorId, "actorId");
   requireUuid(verifierId, "verifierId");
-  if (input.actorId !== verifierId) {
-    throw new MobileRelayStorageError(
-      "FORBIDDEN",
-      "the mobile verification slice requires the authenticated actor as verifier",
-    );
-  }
 }
 
-function hasVerifierRole(database: DatabaseSync, input: MobileRelayScope): boolean {
+function hasProjectRole(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  userId: string,
+  roles: readonly ("reporter" | "triager" | "verifier")[],
+): boolean {
+  const placeholders = roles.map(() => "?").join(", ");
   const row = database
     .prepare(
       `SELECT 1 AS present
@@ -232,16 +245,30 @@ function hasVerifierRole(database: DatabaseSync, input: MobileRelayScope): boole
          ON role.account_id = membership.account_id
         AND role.project_id = membership.project_id
         AND role.membership_id = membership.id
-        AND role.role = 'verifier'
-       WHERE account.id = ? AND account.status = 'active'` ,
+        AND role.role IN (${placeholders})
+       WHERE account.id = ? AND account.status = 'active'`,
     )
-    .get(input.projectId, input.actorId, input.accountId) as { readonly present: number } | undefined;
+    .get(input.projectId, userId, ...roles, input.accountId) as
+    { readonly present: number } | undefined;
   return row !== undefined;
 }
 
-function requireVerifierRole(database: DatabaseSync, input: MobileRelayScope): void {
-  if (!hasVerifierRole(database, input)) {
-    throw new MobileRelayStorageError("FORBIDDEN", "actor lacks verifier authority");
+function requireVerificationCreatorRole(database: DatabaseSync, input: MobileRelayScope): void {
+  if (!hasProjectRole(database, input, input.actorId, ["verifier", "triager"])) {
+    throw new MobileRelayStorageError(
+      "FORBIDDEN",
+      "Verification creation requires verifier or triager authority",
+    );
+  }
+}
+
+function requireVerifierRole(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  verifierId = input.actorId,
+): void {
+  if (!hasProjectRole(database, input, verifierId, ["verifier"])) {
+    throw new MobileRelayStorageError("FORBIDDEN", "assigned user lacks verifier authority");
   }
 }
 
@@ -281,26 +308,37 @@ function toVerification(row: VerificationRow): MobileVerificationRecord {
     verifierId: row.verifier_id,
     criteriaSnapshot: row.criteria_snapshot,
     resultSummary: row.result_summary,
+    failureReason: row.failure_reason,
+    blockedReason: row.blocked_reason,
     version: row.version,
   });
 }
 
 function toAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
-  if (row.mode !== "human" || row.status !== "delivered") {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "RepairAttempt is not a delivered human attempt");
+  if (
+    row.mode !== "human" ||
+    (row.status !== "delivered" && row.status !== "verification_failed")
+  ) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "RepairAttempt is not a delivered or verification-failed human attempt",
+    );
   }
   return Object.freeze({
     id: row.id,
     bugId: row.bug_id,
     sequence: row.sequence,
     mode: "human",
-    status: "delivered",
+    status: row.status,
     assigneeId: row.assignee_id,
     parentAttemptId: null,
     summary: row.summary,
     branch: row.branch,
     commitSha: row.commit_sha,
     mergeRequestUrl: row.merge_request_url,
+    patchUrl: row.patch_url,
+    noCodeReason: row.no_code_reason,
+    failureReason: row.failure_reason,
     targetBuildId: null,
     version: row.version,
   });
@@ -314,7 +352,8 @@ function readVerification(
   const row = database
     .prepare(
       `SELECT id, bug_id, repair_attempt_id, build_id, status, verifier_id,
-              criteria_snapshot, result_summary, version, created_at, updated_at
+              criteria_snapshot, result_summary, failure_reason, blocked_reason,
+              version, created_at, updated_at
        FROM verifications
        WHERE account_id = ? AND project_id = ? AND id = ?`,
     )
@@ -337,11 +376,16 @@ function readBug(database: DatabaseSync, input: MobileRelayScope, bugId: string)
   return row ?? null;
 }
 
-function readAttempt(database: DatabaseSync, input: MobileRelayScope, attemptId: string): AttemptRow | null {
+function readAttempt(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  attemptId: string,
+): AttemptRow | null {
   const row = database
     .prepare(
       `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
-              summary, branch, commit_sha, merge_request_url, target_build_id, version
+              summary, branch, commit_sha, merge_request_url, patch_url,
+              no_code_reason, failure_reason, target_build_id, version
        FROM repair_attempts
        WHERE account_id = ? AND project_id = ? AND id = ?`,
     )
@@ -371,8 +415,13 @@ function readEligibleWorkflow(
               attempt.version AS attempt_version, attempt.updated_at AS attempt_updated_at,
               build.id AS build_id, build.status AS build_status, build.version AS build_version,
               build.source_commit_sha AS build_source_commit_sha,
+              requirement.requirement AS requirement_requirement,
+              requirement.decision_basis AS requirement_decision_basis,
               requirement.delivered_commit_sha AS requirement_commit_sha,
-              requirement.version AS requirement_version, link.id AS link_id
+              requirement.version AS requirement_version,
+              requirement.linked_build_id AS requirement_linked_build_id,
+              requirement.link_id AS requirement_link_id,
+              link.id AS link_id
        FROM bugs AS bug
        JOIN repair_attempts AS attempt
          ON attempt.account_id = bug.account_id
@@ -384,30 +433,21 @@ function readEligibleWorkflow(
         AND requirement.project_id = attempt.project_id
         AND requirement.bug_id = attempt.bug_id
         AND requirement.repair_attempt_id = attempt.id
-        AND requirement.linked_build_id = ?
-       JOIN build_repair_links AS link
+       LEFT JOIN build_repair_links AS link
          ON link.account_id = requirement.account_id
         AND link.project_id = requirement.project_id
         AND link.bug_id = requirement.bug_id
         AND link.repair_attempt_id = requirement.repair_attempt_id
         AND link.id = requirement.link_id
-       JOIN builds AS build
+       LEFT JOIN builds AS build
          ON build.account_id = link.account_id
         AND build.project_id = link.project_id
         AND build.id = link.build_id
        WHERE bug.account_id = ? AND bug.project_id = ? AND bug.id = ?
-         AND attempt.id = ? AND requirement.requirement = 'required'
-         AND requirement.decision_basis = 'code_requires_build'
-         AND requirement.version = 2 AND link.version = 1
-         AND build.status = 'ready'`,
+         AND attempt.id = ?`,
     )
-    .get(
-      input.buildId,
-      input.accountId,
-      input.projectId,
-      input.bugId,
-      input.repairAttemptId,
-    ) as EligibleWorkflowRow | undefined;
+    .get(input.accountId, input.projectId, input.bugId, input.repairAttemptId) as
+    EligibleWorkflowRow | undefined;
   return row ?? null;
 }
 
@@ -491,15 +531,18 @@ function readResultEventId(
        LIMIT 1`,
     )
     .get(input.accountId, input.projectId, bugId, verificationId) as
-    | { readonly id: string }
-    | undefined;
+    { readonly id: string } | undefined;
   return row?.id ?? null;
 }
 
 function readVerificationSubmission(
   database: DatabaseSync,
   input: RecordMobileVerificationResultInput,
-): { readonly payload_digest: string; readonly intent: string; readonly capture_bundle_id: string | null } | null {
+): {
+  readonly payload_digest: string;
+  readonly intent: string;
+  readonly capture_bundle_id: string | null;
+} | null {
   const row = database
     .prepare(
       `SELECT payload_digest, intent, capture_bundle_id
@@ -508,7 +551,11 @@ function readVerificationSubmission(
          AND client_submission_id = ?`,
     )
     .get(input.accountId, input.projectId, input.actorId, input.clientSubmissionId) as
-    | { readonly payload_digest: string; readonly intent: string; readonly capture_bundle_id: string | null }
+    | {
+        readonly payload_digest: string;
+        readonly intent: string;
+        readonly capture_bundle_id: string | null;
+      }
     | undefined;
   return row ?? null;
 }
@@ -537,8 +584,7 @@ function loadResultResponse(
          AND client_submission_id = ? AND intent = 'verification_result'`,
     )
     .get(input.accountId, input.projectId, input.actorId, input.clientSubmissionId) as
-    | { readonly capture_bundle_id: string | null }
-    | undefined;
+    { readonly capture_bundle_id: string | null } | undefined;
   return Object.freeze({
     clientSubmissionId: input.clientSubmissionId,
     qaItem: Object.freeze({ type: "bug" as const, id: bug.id, key: bug.key }),
@@ -569,27 +615,51 @@ export function createMobileVerification(
   requireTransaction(database);
   requireUuid(input.bugId, "bugId");
   requireUuid(input.repairAttemptId, "repairAttemptId");
-  requireUuid(input.buildId, "buildId");
-  requireActorVerifier(input, input.verifierId);
+  if (input.buildId !== null) requireUuid(input.buildId, "buildId");
+  requireVerificationIdentity(input, input.verifierId);
   requireText(input.criteria, "criteria", 10_000);
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
-  requireVerifierRole(database, input);
+  requireVerificationCreatorRole(database, input);
+  requireVerifierRole(database, input, input.verifierId);
   const workflow = readEligibleWorkflow(database, input);
-  if (!workflow) throw new MobileRelayStorageError("NOT_FOUND", "eligible delivered workflow was not found");
+  if (!workflow)
+    throw new MobileRelayStorageError("NOT_FOUND", "eligible delivered workflow was not found");
+  const noBuildEligible =
+    input.buildId === null &&
+    workflow.requirement_requirement === "not_required" &&
+    workflow.requirement_decision_basis === "no_code_delivery" &&
+    workflow.requirement_version === 1 &&
+    workflow.requirement_commit_sha === null &&
+    workflow.requirement_linked_build_id === null &&
+    workflow.requirement_link_id === null &&
+    workflow.link_id === null &&
+    workflow.build_id === null &&
+    workflow.attempt_commit_sha === null;
+  const requiredBuildEligible =
+    input.buildId !== null &&
+    workflow.requirement_requirement === "required" &&
+    workflow.requirement_decision_basis === "code_requires_build" &&
+    workflow.requirement_version === 2 &&
+    workflow.requirement_linked_build_id === input.buildId &&
+    workflow.requirement_link_id === workflow.link_id &&
+    workflow.link_id !== null &&
+    workflow.build_status === "ready" &&
+    workflow.build_id === input.buildId &&
+    workflow.requirement_commit_sha === workflow.attempt_commit_sha &&
+    workflow.build_source_commit_sha === workflow.attempt_commit_sha;
   if (
     workflow.version !== input.expectedVersion ||
     workflow.state !== "ready_for_verification" ||
     workflow.attempt_mode !== "human" ||
     workflow.attempt_status !== "delivered" ||
     workflow.attempt_version !== 3 ||
-    workflow.build_status !== "ready" ||
-    workflow.requirement_version !== 2 ||
-    workflow.build_id !== input.buildId ||
-    workflow.requirement_commit_sha !== workflow.attempt_commit_sha ||
-    workflow.build_source_commit_sha !== workflow.attempt_commit_sha
+    (!noBuildEligible && !requiredBuildEligible)
   ) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "workflow is not an exact eligible Verification target");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "workflow is not an exact eligible Verification target",
+    );
   }
   if (workflow.active_verification_id !== null) {
     throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug already has an active Verification");
@@ -611,7 +681,7 @@ export function createMobileVerification(
       status: "requested",
       verificationId,
       repairAttemptId: input.repairAttemptId,
-      buildId: input.buildId,
+      ...(input.buildId === null ? {} : { buildId: input.buildId }),
       toVersion: 1,
     },
     createdAt: at,
@@ -653,7 +723,10 @@ export function createMobileVerification(
       input.repairAttemptId,
     );
   if (updatedBug.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug did not bind Verification exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug did not bind Verification exactly once",
+    );
   }
   const row = readVerification(database, input, verificationId);
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not created");
@@ -675,7 +748,7 @@ export function startMobileVerification(
 ): MobileVerificationRecord {
   requireTransaction(database);
   requireUuid(input.verificationId, "verificationId");
-  requireActorVerifier(input, input.actorId);
+  requireVerificationIdentity(input, input.actorId);
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
   requireVerifierRole(database, input);
@@ -685,7 +758,10 @@ export function startMobileVerification(
     throw new MobileRelayStorageError("FORBIDDEN", "actor is not the assigned verifier");
   }
   if (current.status !== "requested" || current.version !== input.expectedVersion) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Verification is not requested at the expected version");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Verification is not requested at the expected version",
+    );
   }
   const at = nextTimestamp(input.createdAt, current.updated_at);
   const eventId = randomUUID();
@@ -721,7 +797,10 @@ export function startMobileVerification(
     )
     .run(at, input.accountId, input.projectId, current.id, input.actorId, input.expectedVersion);
   if (updated.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Verification did not start exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Verification did not start exactly once",
+    );
   }
   const row = readVerification(database, input, current.id);
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "Verification disappeared after start");
@@ -735,8 +814,11 @@ export function recordMobileVerificationResult(
   requireTransaction(database);
   requireUuid(input.verificationId, "verificationId");
   requireUuid(input.clientSubmissionId, "clientSubmissionId");
-  requireActorVerifier(input, input.actorId);
-  requireText(input.resultSummary, "resultSummary", 2_000);
+  requireVerificationIdentity(input, input.actorId);
+  requireText(input.resultSummary, "resultSummary", 10_000);
+  if (input.status === "failed") {
+    requireText(input.failureReason, "failureReason", 5_000);
+  }
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
   if (input.attachmentIds.length !== 0 || input.captureBundleId !== null) {
@@ -755,28 +837,45 @@ export function recordMobileVerificationResult(
     }
     return loadResultResponse(database, input, true);
   }
-  requireVerifierRole(database, input);
   const current = readVerification(database, input, input.verificationId);
   if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
-  if (current.verifier_id !== input.actorId) {
-    throw new MobileRelayStorageError("FORBIDDEN", "actor is not the assigned verifier");
-  }
   const bug = readBug(database, input, current.bug_id);
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Verification Bug was not found");
+  const assignedVerifierAuthorized =
+    current.verifier_id === input.actorId &&
+    hasProjectRole(database, input, input.actorId, ["verifier"]);
+  const reporterAuthorized =
+    bug.reporter_id === input.actorId &&
+    hasProjectRole(database, input, input.actorId, ["reporter"]);
+  if (!assignedVerifierAuthorized && !reporterAuthorized) {
+    throw new MobileRelayStorageError(
+      "FORBIDDEN",
+      "only the assigned verifier or Bug reporter can record a Verification result",
+    );
+  }
   if (
     current.status !== "in_progress" ||
     current.version !== input.expectedVersion ||
     bug.state !== "ready_for_verification" ||
     bug.active_verification_id !== current.id
   ) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Verification is not active at the expected version");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Verification is not active at the expected version",
+    );
   }
   const attempt = readAttempt(database, input, current.repair_attempt_id);
   if (!attempt || attempt.status !== "delivered" || attempt.version !== 3) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Verification attempt is not an exact delivered Attempt");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Verification attempt is not an exact delivered Attempt",
+    );
   }
-  const at = nextTimestamp(input.createdAt, bug.updated_at);
+  // Starting a Verification advances the Verification clock without mutating the Bug.
+  // The result writes both facts, so its timestamp must advance from the newer Verification.
+  const at = nextTimestamp(input.createdAt, current.updated_at);
   const eventId = randomUUID();
+  const nextBugState = input.status === "passed" ? "closed" : "ready";
   insertVerificationEvent(database, input, {
     id: eventId,
     bugId: bug.id,
@@ -786,10 +885,13 @@ export function recordMobileVerificationResult(
     resourceVersionAfter: current.version + 1,
     requestDigest: input.requestDigest,
     fromState: "ready_for_verification",
-    toState: "closed",
+    toState: nextBugState,
     payload: {
-      status: "passed",
-      summary: input.resultSummary,
+      status: input.status,
+      summary: toBoundedAuditText(input.resultSummary, input.status === "failed" ? 1_500 : 2_000),
+      ...(input.status === "failed"
+        ? { reason: toBoundedAuditText(input.failureReason, 1_500) }
+        : {}),
       verificationId: current.id,
       repairAttemptId: current.repair_attempt_id,
       ...(current.build_id === null ? {} : { buildId: current.build_id }),
@@ -801,43 +903,80 @@ export function recordMobileVerificationResult(
   const updatedVerification = database
     .prepare(
       `UPDATE verifications
-       SET status = 'passed', result_summary = ?, updated_at = ?, version = version + 1
+       SET status = ?, result_summary = ?, failure_reason = ?, blocked_reason = NULL,
+           updated_at = ?, version = version + 1
        WHERE account_id = ? AND project_id = ? AND id = ?
-         AND verifier_id = ? AND status = 'in_progress' AND version = ?`,
+         AND status = 'in_progress' AND version = ?`,
     )
     .run(
+      input.status,
       input.resultSummary,
+      input.failureReason,
       at,
       input.accountId,
       input.projectId,
       current.id,
-      input.actorId,
       input.expectedVersion,
     );
   if (updatedVerification.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Verification result was not recorded exactly once");
-  }
-  const updatedBug = database
-    .prepare(
-      `UPDATE bugs
-       SET state = 'closed', active_repair_attempt_id = NULL,
-           active_verification_id = NULL, closed_at = ?, updated_at = ?, version = version + 1
-       WHERE account_id = ? AND project_id = ? AND id = ?
-         AND state = 'ready_for_verification' AND version = ?
-         AND active_repair_attempt_id = ? AND active_verification_id = ?`,
-    )
-    .run(
-      at,
-      at,
-      input.accountId,
-      input.projectId,
-      bug.id,
-      bug.version,
-      attempt.id,
-      current.id,
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Verification result was not recorded exactly once",
     );
+  }
+  if (input.status === "failed") {
+    const updatedAttempt = database
+      .prepare(
+        `UPDATE repair_attempts
+         SET status = 'verification_failed', updated_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ? AND id = ?
+           AND status = 'delivered' AND version = ?`,
+      )
+      .run(at, input.accountId, input.projectId, attempt.id, attempt.version);
+    if (updatedAttempt.changes !== 1) {
+      throw new MobileRelayStorageError(
+        "VERSION_CONFLICT",
+        "RepairAttempt did not enter verification_failed exactly once",
+      );
+    }
+  }
+  const updatedBug =
+    input.status === "passed"
+      ? database
+          .prepare(
+            `UPDATE bugs
+             SET state = 'closed', active_repair_attempt_id = NULL,
+                 active_verification_id = NULL, closed_at = ?, updated_at = ?,
+                 version = version + 1
+             WHERE account_id = ? AND project_id = ? AND id = ?
+               AND state = 'ready_for_verification' AND version = ?
+               AND active_repair_attempt_id = ? AND active_verification_id = ?`,
+          )
+          .run(
+            at,
+            at,
+            input.accountId,
+            input.projectId,
+            bug.id,
+            bug.version,
+            attempt.id,
+            current.id,
+          )
+      : database
+          .prepare(
+            `UPDATE bugs
+             SET state = 'ready', active_repair_attempt_id = NULL,
+                 active_verification_id = NULL, updated_at = ?, version = version + 1
+             WHERE account_id = ? AND project_id = ? AND id = ?
+               AND state = 'ready_for_verification' AND version = ?
+               AND active_repair_attempt_id = ? AND active_verification_id = ?`,
+          )
+          .run(at, input.accountId, input.projectId, bug.id, bug.version, attempt.id, current.id);
   if (updatedBug.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug did not close exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      `Bug did not enter ${nextBugState} exactly once`,
+    );
   }
   database
     .prepare(

@@ -7,18 +7,11 @@ export interface SqliteMobileHumanWorkflowStoreOptions {
   readonly scope: MobileScopeBootstrap;
 }
 
-function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
-  if (actorId !== scope.actorId) {
-    throw new TypeError("actor does not match the authenticated mobile scope");
-  }
-}
-
 export function createSqliteMobileHumanWorkflowStore(
   options: SqliteMobileHumanWorkflowStoreOptions,
 ): MobileHumanWorkflowStore {
   return {
     async getLatest(query) {
-      requireActor(query.actorId, options.scope);
       return options.worker.getLatestMobileHumanWorkflow({
         accountId: options.scope.accountId,
         projectId: query.projectId,
@@ -27,7 +20,6 @@ export function createSqliteMobileHumanWorkflowStore(
     },
 
     async getForBug(query) {
-      requireActor(query.actorId, options.scope);
       return options.worker.getMobileHumanWorkflowForBug({
         accountId: options.scope.accountId,
         projectId: options.scope.projectId,

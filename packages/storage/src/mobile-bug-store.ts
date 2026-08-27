@@ -3,6 +3,8 @@ import type { DatabaseSync } from "node:sqlite";
 
 import { insertBugWithNextNumber, SqliteStorageError } from "./sqlite.js";
 
+const NOTIFICATION_DESTINATION = "qa-hub.notifications";
+
 export interface MobileScopeBootstrap {
   readonly accountId: string;
   readonly projectId: string;
@@ -40,6 +42,8 @@ export interface CreateMobileBugInput {
   readonly expectedBehavior: string;
   readonly severity: "S0" | "S1" | "S2" | "S3" | "S4";
   readonly priority: "P0" | "P1" | "P2" | "P3" | "P4";
+  readonly ownerId: string | null;
+  readonly verificationOwnerId: string | null;
   readonly occurrence: MobileOccurrenceInput;
   readonly attachmentIds: readonly string[];
   readonly captureBundleId: string | null;
@@ -163,6 +167,40 @@ function readBug(
     updatedAt: row.updated_at,
     closedAt: row.closed_at,
   });
+}
+
+function assertInitialAssignment(
+  database: DatabaseSync,
+  input: CreateMobileBugInput,
+  userId: string | null,
+  roles: readonly string[],
+  label: string,
+): void {
+  if (userId === null) return;
+  const placeholders = roles.map(() => "?").join(", ");
+  const row = database
+    .prepare(
+      `SELECT 1 AS assignable
+       FROM users AS user
+       JOIN memberships AS membership
+         ON membership.account_id = user.account_id
+        AND membership.user_id = user.id
+        AND membership.project_id = ?
+        AND membership.status = 'active'
+       JOIN membership_roles AS role
+         ON role.account_id = membership.account_id
+        AND role.project_id = membership.project_id
+        AND role.membership_id = membership.id
+        AND role.role IN (${placeholders})
+       WHERE user.account_id = ? AND user.id = ? AND user.status = 'active'
+       LIMIT 1`,
+    )
+    .get(input.projectId, ...roles, input.accountId, userId);
+  if (!row) {
+    throw Object.assign(new Error(`${label} is not an assignable project member`), {
+      code: "INVALID_REQUEST",
+    });
+  }
 }
 
 export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBootstrap): void {
@@ -422,6 +460,40 @@ function claimBugAttachments(
   }
 }
 
+function insertBugCreatedNotificationOutbox(
+  database: DatabaseSync,
+  input: Pick<CreateMobileBugInput, "accountId" | "projectId" | "createdAt"> & {
+    readonly bugId: string;
+    readonly eventId: string;
+  },
+): void {
+  database
+    .prepare(
+      `INSERT INTO outbox(
+        id, account_id, project_id, aggregate_type, aggregate_id, aggregate_version,
+        destination, dedupe_key, event_id, payload_json, status, attempt_count,
+        next_attempt_at, lease_owner, lease_expires_at, last_error_code, created_at, sent_at
+      ) VALUES (?, ?, ?, 'bug', ?, 1, ?, ?, ?, ?, 'pending', 0, ?,
+                NULL, NULL, NULL, ?, NULL)`,
+    )
+    .run(
+      randomUUID(),
+      input.accountId,
+      input.projectId,
+      input.bugId,
+      NOTIFICATION_DESTINATION,
+      `notification:${input.eventId}`,
+      input.eventId,
+      JSON.stringify({
+        eventId: input.eventId,
+        eventType: "occurrence.appended",
+        bugId: input.bugId,
+      }),
+      input.createdAt,
+      input.createdAt,
+    );
+}
+
 export function createMobileBug(
   database: DatabaseSync,
   input: CreateMobileBugInput,
@@ -476,6 +548,21 @@ export function createMobileBug(
     return replay;
   }
 
+  assertInitialAssignment(
+    database,
+    input,
+    input.ownerId,
+    ["developer", "triager", "project_admin"],
+    "ownerId",
+  );
+  assertInitialAssignment(
+    database,
+    input,
+    input.verificationOwnerId,
+    ["verifier", "project_admin"],
+    "verificationOwnerId",
+  );
+
   const bugId = randomUUID();
   const occurrenceId = randomUUID();
   const eventId = randomUUID();
@@ -489,6 +576,8 @@ export function createMobileBug(
     severity: input.severity,
     priority: input.priority,
     reporterId: input.actorId,
+    ownerId: input.ownerId,
+    verificationOwnerId: input.verificationOwnerId,
     createdAt: input.createdAt,
   });
   database
@@ -550,6 +639,13 @@ export function createMobileBug(
       JSON.stringify({ occurrenceId, fromVersion: 1, toVersion: 2 }),
       input.createdAt,
     );
+  insertBugCreatedNotificationOutbox(database, {
+    accountId: input.accountId,
+    projectId: input.projectId,
+    bugId,
+    eventId,
+    createdAt: input.createdAt,
+  });
   if (capture && capture.status === "uploaded") {
     const createdAtMs = Date.parse(input.createdAt);
     const updatedAt = new Date(Math.max(createdAtMs, createdAtMs + 1)).toISOString();

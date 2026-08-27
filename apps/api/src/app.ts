@@ -4,6 +4,8 @@ import { Readable } from "node:stream";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 
 import { API_SERVICE_NAME, API_VERSION, DEVELOPMENT_BUILD_SHA, resolveBuildSha } from "./config.js";
+import { registerAndroidUpdateRoutes } from "./android-updates.js";
+import { registerDesktopUpdateRoutes } from "./desktop-updates.js";
 import {
   MAX_MOBILE_CHUNK_SIZE_BYTES,
   MOBILE_ATTACHMENT_BIND_PATH,
@@ -113,13 +115,15 @@ import {
   type ApiDependencyHealthSnapshot,
 } from "./health.js";
 import {
-  authenticateBrowserRequest,
   authenticateBrowserBearerRequest,
+  authenticateBrowserRequest,
   browserAuthSession,
+  browserSessionTokenFromCookieHeader,
   BROWSER_LOGIN_PATH,
   BROWSER_LOGOUT_PATH,
   BROWSER_ME_PATH,
   type BrowserAuthOptions,
+  digestBrowserSessionToken,
   getBrowserPrincipal,
   registerBrowserAuthRoutes,
 } from "./browser-auth.js";
@@ -152,14 +156,19 @@ import {
   validateMobileRelayWebhookHeaders,
   type MobileRelayWebhookStore,
 } from "./mobile-relay-webhook.js";
-import { registerDesktopUpdateRoutes } from "./desktop-updates.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
 export const READY_HEALTH_PATH = "/api/v1/health/ready" as const;
 export const DEPENDENCY_HEALTH_PATH = "/api/v1/health/deps" as const;
+export const NATIVE_ACTOR_ID_HEADER = "x-qa-actor-id" as const;
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 
 function authenticatedActorId(request: FastifyRequest, debugActorId: string): string {
-  return getBrowserPrincipal(request)?.actorId ?? debugActorId;
+  const browserActorId = getBrowserPrincipal(request)?.actorId;
+  if (browserActorId !== undefined) return browserActorId;
+  const nativeActorId = readHeader(request.headers[NATIVE_ACTOR_ID_HEADER]);
+  return nativeActorId?.toLowerCase() ?? debugActorId;
 }
 
 export interface LiveHealth {
@@ -217,6 +226,7 @@ export interface CreateApiAppOptions {
   readonly debugActorId?: string;
   readonly browserAuth?: BrowserAuthOptions;
   readonly desktopUpdateRoot?: string;
+  readonly androidUpdateRoot?: string;
 }
 
 const liveHealthResponseSchema = {
@@ -491,6 +501,23 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   if (debugBearerToken.length === 0) throw new Error("debugBearerToken must not be empty");
 
+  app.addHook("preHandler", async (request, reply) => {
+    const nativeActorId = readHeader(request.headers[NATIVE_ACTOR_ID_HEADER]);
+    if (nativeActorId === undefined) return;
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply
+        .code(401)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    if (!UUID_PATTERN.test(nativeActorId)) {
+      return reply
+        .code(400)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "INVALID_REQUEST" });
+    }
+  });
+
   const browserAuth = options.browserAuth;
   if (browserAuth !== undefined) {
     app.addHook("preHandler", async (request, reply) => {
@@ -503,10 +530,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       if (
         readHeader(request.headers.authorization) !== undefined &&
-        browserAuthSession(request, browserAuth) === undefined
+        browserAuthSession(request) === undefined
       ) {
         const principal = await authenticateBrowserBearerRequest(request, browserAuth);
-        if (principal !== undefined && principal.accountId === browserAuth.accountId) {
+        if (principal?.accountId === browserAuth.accountId) {
           request.headers.authorization = `Bearer ${debugBearerToken}`;
         }
         return;
@@ -539,6 +566,19 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       store: mobileNotificationStore,
       actorId: debugActorId,
       bearerToken: debugBearerToken,
+      ...(browserAuth === undefined
+        ? {}
+        : {
+            resolveBrowserSession: async (cookieHeader: string): Promise<string | null> => {
+              const token = browserSessionTokenFromCookieHeader(cookieHeader);
+              if (token === undefined) return null;
+              const principal = await browserAuth.store.resolveBrowserSession({
+                tokenDigest: digestBrowserSessionToken(token),
+                now: (options.now ?? (() => new Date()))().toISOString(),
+              });
+              return principal?.accountId === browserAuth.accountId ? principal.actorId : null;
+            },
+          }),
       ...(options.now === undefined ? {} : { now: options.now }),
       logger: app.log,
     });
@@ -559,8 +599,6 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     { parseAs: "buffer", bodyLimit: MAX_MOBILE_CHUNK_SIZE_BYTES },
     (_request, body, done) => done(null, body),
   );
-
-  registerDesktopUpdateRoutes(app, options.desktopUpdateRoot);
 
   app.get(
     LIVE_HEALTH_PATH,
@@ -876,7 +914,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       });
       return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(response);
     } catch (error: unknown) {
-      if (!(error instanceof TypeError)) throw error;
+      const code = (error as { readonly code?: unknown })?.code;
+      if (!(error instanceof TypeError) && code !== "INVALID_REQUEST") throw error;
       return reply
         .code(400)
         .header("content-type", MOBILE_API_CONTENT_TYPE)
@@ -887,6 +926,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   app.get<{
     Querystring: {
       readonly projectId?: string | readonly string[];
+      readonly ownerId?: string | readonly string[];
+      readonly ownerState?: string | readonly string[];
       readonly q?: string | readonly string[];
       readonly state?: string | readonly string[];
       readonly severity?: string | readonly string[];
@@ -1323,21 +1364,11 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         ) {
           throw new TypeError("Idempotency-Key does not match RepairAttempt delivery");
         }
-        if (body.deliveryKind !== "code") {
-          return reply
-            .code(422)
-            .header("content-type", MOBILE_API_CONTENT_TYPE)
-            .send({ code: "RELAY_DELIVERY_EVIDENCE_INVALID" });
-        }
         const result = await mobileRelayStore.deliverManualAttempt({
           actorId: authenticatedActorId(request, debugActorId),
           attemptId,
           idempotencyKey,
-          request: body as typeof body & {
-            readonly deliveryKind: "code";
-            readonly branch: string;
-            readonly commitSha: string;
-          },
+          request: body,
         });
         return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
       } catch (error: unknown) {
@@ -2016,5 +2047,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
+  registerDesktopUpdateRoutes(app, options.desktopUpdateRoot);
+  registerAndroidUpdateRoutes(app, options.androidUpdateRoot);
   return app;
 }

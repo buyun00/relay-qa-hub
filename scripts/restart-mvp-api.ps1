@@ -1,23 +1,17 @@
-param(
-  [string]$ApiSourceRoot = "",
-  [string]$BuildSha = "dev"
-)
+param([string]$LanAddress)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version 2
 
-$defaultRepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$repoRoot = if ([string]::IsNullOrWhiteSpace($ApiSourceRoot)) {
-  $defaultRepoRoot
-} else {
-  (Resolve-Path -LiteralPath $ApiSourceRoot -ErrorAction Stop).Path
-}
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $statePath = "D:\Relay-QA-Hub-Data\mvp-e2e-current.json"
 $nodeExe = "C:\Users\lin0\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
 $apiEntry = Join-Path $repoRoot "apps\api\dist\main.js"
-$desktopUpdateRoot = "D:\Relay-QA-Hub-Data\desktop-updates\stable"
-$runtimeBuildSha = $BuildSha
 $state = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+. (Join-Path $PSScriptRoot "qa-hub-lan.ps1")
+. (Join-Path $PSScriptRoot "qa-hub-persistent-runtime.ps1")
+$lan = Resolve-QAHubLanBinding -LanAddress $LanAddress
+$backupPolicy = Initialize-QAHubPersistentRuntime -State $state -RepositoryRoot $repoRoot
 
 $listeners = @(Get-NetTCPConnection -State Listen -LocalPort 4319 -ErrorAction SilentlyContinue)
 foreach ($listener in $listeners) {
@@ -37,18 +31,43 @@ if (Get-NetTCPConnection -State Listen -LocalPort 4319 -ErrorAction SilentlyCont
   throw "Port 4319 did not close"
 }
 
-$env:QA_HUB_API_HOST = "127.0.0.1"
+$env:QA_HUB_API_HOST = "0.0.0.0"
 $env:QA_HUB_API_PORT = "4319"
-$env:QA_HUB_BUILD_SHA = $runtimeBuildSha
+$env:QA_HUB_BUILD_SHA = [string]$state.buildSha
 $env:QA_HUB_DATA_ROOT = [string]$state.dataRoot
-$env:QA_HUB_DESKTOP_UPDATE_ROOT = $desktopUpdateRoot
 $env:QA_HUB_MVP_ACCESS_TOKEN = [string]$state.accessToken
 $env:QA_HUB_WEB_AUTH_MODE = "session"
 $env:QA_HUB_WEB_SESSION_SECRET = [string]$state.webSessionSecret
 $env:QA_HUB_WEB_SECURE_COOKIE = "false"
-$env:QA_HUB_WEB_ORIGIN = "http://127.0.0.1:4174"
+Remove-Item Env:QA_HUB_WEB_ORIGIN -ErrorAction SilentlyContinue
+$env:QA_HUB_WEB_ORIGINS = "http://127.0.0.1:4174,http://localhost:4174,http://$($lan.Address):4174"
 $env:QA_HUB_BOOTSTRAP_ADMIN_PASSWORD = [string]$state.bootstrapPassword
 $env:QA_HUB_NOTIFICATION_HINT_CHANNEL_ENABLED = "true"
+
+$relayTokenFile = "C:\ProgramData\Relay\secrets\qa-hub-m2m.token"
+$relayWebhookSecretFile = "C:\ProgramData\Relay\secrets\qa-hub-webhook.secret"
+if (
+  (Test-Path -LiteralPath $relayTokenFile -PathType Leaf) -and
+  (Test-Path -LiteralPath $relayWebhookSecretFile -PathType Leaf)
+) {
+  $env:QA_HUB_RELAY_M2M_URL = "http://127.0.0.1:4317/api/integrations/qa/v1/handoffs"
+  $env:QA_HUB_RELAY_M2M_TOKEN_FILE = $relayTokenFile
+  $env:QA_HUB_RELAY_WEBHOOK_SECRET_FILE = $relayWebhookSecretFile
+  $env:QA_HUB_RELAY_INSTANCE_ID = "relay-main"
+  $env:QA_HUB_RELAY_QA_INSTANCE_ID = "qa-local"
+  $env:QA_HUB_RELAY_PRINCIPAL_ID = "10000000-0000-4000-8000-000000000008"
+} else {
+  foreach ($name in @(
+    "QA_HUB_RELAY_M2M_URL",
+    "QA_HUB_RELAY_M2M_TOKEN_FILE",
+    "QA_HUB_RELAY_WEBHOOK_SECRET_FILE",
+    "QA_HUB_RELAY_INSTANCE_ID",
+    "QA_HUB_RELAY_QA_INSTANCE_ID",
+    "QA_HUB_RELAY_PRINCIPAL_ID"
+  )) {
+    Remove-Item "Env:$name" -ErrorAction SilentlyContinue
+  }
+}
 
 $stamp = [DateTime]::UtcNow.ToString("yyyyMMddHHmmssfff")
 $stdout = Join-Path ([string]$state.logsRoot) "$stamp-api.stdout.log"
@@ -85,14 +104,21 @@ if (-not $ready) {
 }
 
 $state.apiPid = $api.Id
-$state.buildSha = $runtimeBuildSha
 $state.generation = $stamp
 $state.startedAt = [DateTime]::UtcNow.ToString("o")
+$state | Add-Member -NotePropertyName lanAddress -NotePropertyValue $lan.Address -Force
+$state | Add-Member -NotePropertyName lanSubnet -NotePropertyValue $lan.Cidr -Force
+$state | Add-Member -NotePropertyName apiUrl -NotePropertyValue "http://$($lan.Address):4319" -Force
 $state | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $statePath -Encoding UTF8
 
 [pscustomobject]@{
   apiPid = $api.Id
   ready = $ready
   dataRoot = $state.dataRoot
-  desktopUpdateRoot = $desktopUpdateRoot
+  backupRoot = $backupPolicy.backupRoot
+  backupArchiveRoot = $backupPolicy.archiveRoot
+  backupIntervalMinutes = $backupPolicy.intervalMinutes
+  lanAddress = $lan.Address
+  lanSubnet = $lan.Cidr
+  url = "http://$($lan.Address):4319"
 }

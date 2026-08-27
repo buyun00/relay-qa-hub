@@ -34,6 +34,7 @@ class QaHubApiClientTest {
         assertEquals("https://qa-hub.example/api/v1/bugs", request.url.toString())
         assertEquals(QaHubApiContract.JSON_ACCEPT, request.header("Accept"))
         assertEquals("Bearer opaque-access-token", request.header("Authorization"))
+        assertEquals(ACTOR_ID, request.header(QA_HUB_ACTOR_ID_HEADER))
         assertEquals("submission:$SUBMISSION_ID:commit", request.header("Idempotency-Key"))
         val contentType = request.body?.contentType()
         assertEquals(
@@ -43,7 +44,7 @@ class QaHubApiClientTest {
     }
 
     @Test
-    fun `loopback http requires explicit opt in`() {
+    fun `private http requires explicit opt in and public cleartext stays rejected`() {
         val loopbackUrl = "http://127.0.0.1:4318/api/v1/"
         assertTrue(
             runCatching { OkHttpQaHubApiClient(loopbackUrl, OkHttpClient()) }.isFailure,
@@ -52,7 +53,7 @@ class QaHubApiClientTest {
         val optedIn = OkHttpQaHubApiClient(
             baseUrl = loopbackUrl,
             httpClient = OkHttpClient(),
-            allowLoopbackHttp = true,
+            allowPrivateHttp = true,
         )
         assertEquals(
             "http://127.0.0.1:4318/api/v1/bugs",
@@ -63,7 +64,25 @@ class QaHubApiClientTest {
                 OkHttpQaHubApiClient(
                     baseUrl = "http://qa-hub.example/api/v1/",
                     httpClient = OkHttpClient(),
-                    allowLoopbackHttp = true,
+                    allowPrivateHttp = true,
+                )
+            }.isFailure,
+        )
+        val lanClient = OkHttpQaHubApiClient(
+            baseUrl = "http://10.100.5.157:4319/api/v1/",
+            httpClient = OkHttpClient(),
+            allowPrivateHttp = true,
+        )
+        assertEquals(
+            "http://10.100.5.157:4319/api/v1/bugs",
+            lanClient.buildRequest(operation(), "opaque-access-token").url.toString(),
+        )
+        assertTrue(
+            runCatching {
+                OkHttpQaHubApiClient(
+                    baseUrl = "http://8.8.8.8:4319/api/v1/",
+                    httpClient = OkHttpClient(),
+                    allowPrivateHttp = true,
                 )
             }.isFailure,
         )
@@ -205,6 +224,20 @@ class QaHubApiClientTest {
     }
 
     @Test
+    fun `real okhttp createBug proves atomic owner and verifier assignment`() = runBlocking {
+        val assigned = operation().copy(
+            payloadJson = requestJson(ownerId = OWNER_ID, verificationOwnerId = VERIFIER_ID),
+        )
+        val outcome = responseClient(
+            status = 201,
+            contentType = QaHubApiContract.VERSIONED_JSON,
+            body = successJson(ownerId = OWNER_ID, verificationOwnerId = VERIFIER_ID),
+        ).execute(assigned, "opaque-access-token")
+
+        assertTrue(outcome is ApiOutcome.Success)
+    }
+
+    @Test
     fun `createBug never persists protocol-invalid success responses`() = runBlocking {
         val cases = listOf(
             Triple(204, QaHubApiContract.VERSIONED_JSON, successJson()),
@@ -309,10 +342,23 @@ class QaHubApiClientTest {
         updatedAtEpochMs = 0,
     )
 
-    private fun requestJson(): String =
-        """{"projectId":"$PROJECT_ID","clientSubmissionId":"$SUBMISSION_ID","attachmentIds":[],"captureBundleId":null}"""
+    private fun requestJson(
+        ownerId: String? = null,
+        verificationOwnerId: String? = null,
+    ): String = buildString {
+        append("""{"projectId":"$PROJECT_ID","clientSubmissionId":"$SUBMISSION_ID","attachmentIds":[],"captureBundleId":null""")
+        ownerId?.let { append(",\"ownerId\":\"").append(it).append('"') }
+        verificationOwnerId?.let {
+            append(",\"verificationOwnerId\":\"").append(it).append('"')
+        }
+        append('}')
+    }
 
-    private fun successJson(replayed: Boolean = false): String = """
+    private fun successJson(
+        replayed: Boolean = false,
+        ownerId: String? = null,
+        verificationOwnerId: String? = null,
+    ): String = """
         {
           "clientSubmissionId":"$SUBMISSION_ID",
           "qaItem":{"type":"bug","id":"$QA_ITEM_ID","key":"QA-42"},
@@ -330,8 +376,8 @@ class QaHubApiClientTest {
             "severity":"S2",
             "priority":"P2",
             "reporterId":"$ACTOR_ID",
-            "ownerId":null,
-            "verificationOwnerId":null,
+            "ownerId":${ownerId?.let { "\"$it\"" } ?: "null"},
+            "verificationOwnerId":${verificationOwnerId?.let { "\"$it\"" } ?: "null"},
             "duplicateOfBugId":null,
             "occurrenceCount":1,
             "reopenCount":0,
@@ -362,5 +408,7 @@ class QaHubApiClientTest {
         const val OTHER_SUBMISSION_ID = "00000000-0000-4000-8000-000000000011"
         const val OTHER_PROJECT_ID = "00000000-0000-4000-8000-000000000012"
         const val OTHER_QA_ITEM_ID = "00000000-0000-4000-8000-000000000013"
+        const val OWNER_ID = "00000000-0000-4000-8000-000000000014"
+        const val VERIFIER_ID = "00000000-0000-4000-8000-000000000015"
     }
 }

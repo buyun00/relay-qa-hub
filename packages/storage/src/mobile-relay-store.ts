@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
+import { toBoundedAuditText } from "./audit-text.js";
 import type { MobileBugRecord, MobileScopeBootstrap } from "./mobile-bug-store.js";
 import type { MobileBuildRecord } from "./mobile-build-store.js";
 
@@ -31,12 +32,7 @@ export interface MobileRelayAttachmentClaim {
 export type MobileRelayOutboxOperation = "create" | "continue";
 
 export type MobileRelayWebhookStatus =
-  | "submitted"
-  | "running"
-  | "needs_input"
-  | "blocked"
-  | "failed"
-  | "fix_delivered";
+  "submitted" | "running" | "needs_input" | "blocked" | "failed" | "fix_delivered";
 
 export interface MobileRelayRuntimeConfig {
   readonly relayInstanceId: string;
@@ -132,17 +128,34 @@ export interface StartMobileRepairAttemptInput extends MobileRelayScope {
   readonly createdAt: string;
 }
 
-export interface DeliverMobileRepairAttemptInput extends MobileRelayScope {
+interface DeliverMobileRepairAttemptBase extends MobileRelayScope {
   readonly attemptId: string;
   readonly expectedVersion: number;
   readonly summary: string;
-  readonly branch: string;
-  readonly commitSha: string;
-  readonly mergeRequestUrl: string | null;
   readonly idempotencyKey: string;
   readonly requestDigest: string;
   readonly createdAt: string;
 }
+
+export type DeliverMobileRepairAttemptInput = DeliverMobileRepairAttemptBase &
+  (
+    | {
+        readonly deliveryKind: "code";
+        readonly branch: string;
+        readonly commitSha: string;
+        readonly mergeRequestUrl: string | null;
+        readonly patchUrl: string | null;
+        readonly noCodeReason: null;
+      }
+    | {
+        readonly deliveryKind: "no_code";
+        readonly branch: null;
+        readonly commitSha: null;
+        readonly mergeRequestUrl: null;
+        readonly patchUrl: null;
+        readonly noCodeReason: string;
+      }
+  );
 
 export interface MobileRepairAttemptRecord {
   readonly id: string;
@@ -165,13 +178,16 @@ export interface MobileManualRepairAttemptRecord {
   readonly bugId: string;
   readonly sequence: number;
   readonly mode: "human";
-  readonly status: "planned" | "running" | "delivered";
+  readonly status: "planned" | "running" | "delivered" | "verification_failed";
   readonly assigneeId: string;
   readonly parentAttemptId: null;
   readonly summary: string | null;
   readonly branch: string | null;
   readonly commitSha: string | null;
   readonly mergeRequestUrl: string | null;
+  readonly patchUrl: string | null;
+  readonly noCodeReason: string | null;
+  readonly failureReason: string | null;
   readonly targetBuildId: null;
   readonly version: number;
 }
@@ -569,7 +585,12 @@ function requireRelayIdentity(
     }
     return String(value);
   }
-  if (typeof value !== "string" || value.length < 1 || value.length > 300 || value.trim() !== value) {
+  if (
+    typeof value !== "string" ||
+    value.length < 1 ||
+    value.length > 300 ||
+    value.trim() !== value
+  ) {
     throw new MobileRelayStorageError("INVALID_REQUEST", `Relay webhook ${field} is invalid`);
   }
   return value;
@@ -590,7 +611,9 @@ function requireRelayPositiveInteger(value: unknown, field: string): number {
   return value as number;
 }
 
-function relayWebhookStatus(eventType: ReceiveMobileRelayWebhookInput["eventType"]): MobileRelayWebhookStatus {
+function relayWebhookStatus(
+  eventType: ReceiveMobileRelayWebhookInput["eventType"],
+): MobileRelayWebhookStatus {
   switch (eventType) {
     case "submitted":
     case "turn.queued":
@@ -614,7 +637,10 @@ function relayWebhookStatus(eventType: ReceiveMobileRelayWebhookInput["eventType
     case "turn.delivered":
       return "fix_delivered";
     default:
-      throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook event type is unsupported");
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        "Relay webhook event type is unsupported",
+      );
   }
 }
 
@@ -625,12 +651,14 @@ function validateRelayWorkspace(value: unknown, field: string): MobileRelayWorks
   }
   requireRelayKeys(value, new Set(["projectId", "branchName", "threadId"]), field);
   const projectId = requireRelayString(value.projectId, `${field}.projectId`, 1, 200);
-  const branchName = value.branchName === null || value.branchName === undefined
-    ? null
-    : requireRelayString(value.branchName, `${field}.branchName`, 1, 300);
-  const threadId = value.threadId === null || value.threadId === undefined
-    ? null
-    : requireRelayString(value.threadId, `${field}.threadId`, 1, 300);
+  const branchName =
+    value.branchName === null || value.branchName === undefined
+      ? null
+      : requireRelayString(value.branchName, `${field}.branchName`, 1, 300);
+  const threadId =
+    value.threadId === null || value.threadId === undefined
+      ? null
+      : requireRelayString(value.threadId, `${field}.threadId`, 1, 300);
   return Object.freeze({ projectId, branchName, threadId });
 }
 
@@ -640,7 +668,10 @@ function normalizeBuildRequirement(
   if (value === undefined || value === null) return null;
   if (value === "required" || value === "not_required") return value;
   if (!isRecord(value) || typeof value.required !== "boolean") {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook buildRequirement is invalid");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "Relay webhook buildRequirement is invalid",
+    );
   }
   return value.required ? "required" : "not_required";
 }
@@ -678,19 +709,23 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
   requireRelayTimestamp(input.receivedAt, "receivedAt");
   const taskId = requireRelayIdentity(input.taskId, "taskId");
   const turnId = requireRelayIdentity(input.turnId, "turnId");
-  const threadId = input.threadId === undefined || input.threadId === null
-    ? null
-    : requireRelayString(input.threadId, "threadId", 1, 300);
+  const threadId =
+    input.threadId === undefined || input.threadId === null
+      ? null
+      : requireRelayString(input.threadId, "threadId", 1, 300);
   validateRelayWorkspace(input.workspace, "workspace");
-  const branch = input.branch === undefined || input.branch === null
-    ? null
-    : requireRelayString(input.branch, "branch", 1, 300);
-  const commitSha = input.commitSha === undefined || input.commitSha === null
-    ? null
-    : requireRelayString(input.commitSha, "commitSha", 40, 40);
-  const remoteSha = input.remoteSha === undefined || input.remoteSha === null
-    ? null
-    : requireRelayString(input.remoteSha, "remoteSha", 40, 40);
+  const branch =
+    input.branch === undefined || input.branch === null
+      ? null
+      : requireRelayString(input.branch, "branch", 1, 300);
+  const commitSha =
+    input.commitSha === undefined || input.commitSha === null
+      ? null
+      : requireRelayString(input.commitSha, "commitSha", 40, 40);
+  const remoteSha =
+    input.remoteSha === undefined || input.remoteSha === null
+      ? null
+      : requireRelayString(input.remoteSha, "remoteSha", 40, 40);
   if (status === "fix_delivered") {
     if (
       taskId === null ||
@@ -731,7 +766,7 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
     );
   }
   const requestHash = input.requestHash;
-  if (requestHash !== undefined && requestHash !== null && (!SHA256_PATTERN.test(requestHash))) {
+  if (requestHash !== undefined && requestHash !== null && !SHA256_PATTERN.test(requestHash)) {
     throw new MobileRelayStorageError("INVALID_REQUEST", "Relay webhook requestHash is invalid");
   }
   normalizeBuildRequirement(input.buildRequirement);
@@ -784,7 +819,8 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
     decoded.relayInstanceId !== relayInstanceId ||
     decoded.eventId !== eventId ||
     decoded.deliveryId !== deliveryId ||
-    relayWebhookStatus(decoded.eventType as ReceiveMobileRelayWebhookInput["eventType"]) !== status ||
+    relayWebhookStatus(decoded.eventType as ReceiveMobileRelayWebhookInput["eventType"]) !==
+      status ||
     decoded.handoffId !== handoffId ||
     decoded.attemptId !== attemptId ||
     decoded.externalRevision !== externalRevision ||
@@ -817,7 +853,10 @@ function validateRawRelayWebhook(input: ReceiveMobileRelayWebhookInput): void {
   );
   const decodedTaskId = requireRelayIdentity(decoded.payload.taskId, "payload.taskId");
   const decodedTurnId = requireRelayIdentity(decoded.payload.turnId, "payload.turnId");
-  if ((taskId !== null && decodedTaskId !== taskId) || (turnId !== null && decodedTurnId !== turnId)) {
+  if (
+    (taskId !== null && decodedTaskId !== taskId) ||
+    (turnId !== null && decodedTurnId !== turnId)
+  ) {
     throw new MobileRelayStorageError(
       "INTEGRATION_EVENT_CONFLICT",
       "Relay webhook payload identity does not match its authenticated request",
@@ -1330,9 +1369,7 @@ export function ensureMobileRelayRoles(
       .run(
         principalId,
         scope.accountId,
-        createHash("sha256")
-          .update(`relay-qa-hub-configured:${principalId}`)
-          .digest("hex"),
+        createHash("sha256").update(`relay-qa-hub-configured:${principalId}`).digest("hex"),
         scope.createdAt,
       );
   }
@@ -1416,7 +1453,10 @@ function toAttempt(row: AttemptRow): MobileRepairAttemptRecord {
 function toManualAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
   if (
     row.mode !== "human" ||
-    (row.status !== "planned" && row.status !== "running" && row.status !== "delivered")
+    (row.status !== "planned" &&
+      row.status !== "running" &&
+      row.status !== "delivered" &&
+      row.status !== "verification_failed")
   ) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
@@ -1435,9 +1475,52 @@ function toManualAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     branch: row.branch,
     commitSha: row.commit_sha,
     mergeRequestUrl: row.merge_request_url,
+    patchUrl: row.patch_url ?? null,
+    noCodeReason: row.no_code_reason ?? null,
+    failureReason: row.failure_reason ?? null,
     targetBuildId: null,
     version: row.version,
   });
+}
+
+function assertRepairAttemptAssignee(
+  database: DatabaseSync,
+  input: MobileRelayScope & { readonly assigneeId: string },
+): void {
+  if (!UUID_PATTERN.test(input.assigneeId)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "assigneeId is invalid");
+  }
+  const assignable = database
+    .prepare(
+      `SELECT 1 AS present
+       FROM accounts AS account
+       JOIN projects AS project
+         ON project.account_id = account.id
+        AND project.id = ?
+        AND project.status = 'active'
+       JOIN users AS assignee
+         ON assignee.account_id = account.id
+        AND assignee.id = ?
+        AND assignee.status = 'active'
+       JOIN memberships AS membership
+         ON membership.account_id = account.id
+        AND membership.project_id = project.id
+        AND membership.user_id = assignee.id
+        AND membership.status = 'active'
+       JOIN membership_roles AS role
+         ON role.account_id = membership.account_id
+        AND role.project_id = membership.project_id
+        AND role.membership_id = membership.id
+        AND role.role = 'developer'
+       WHERE account.id = ? AND account.status = 'active'`,
+    )
+    .get(input.projectId, input.assigneeId, input.accountId);
+  if (!assignable) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "assigneeId must be an active developer in the requested project",
+    );
+  }
 }
 
 export function createMobileRelayAttempt(
@@ -1453,9 +1536,7 @@ export function createMobileRelayAttempt(
       "Bug is not ready at the expected version",
     );
   }
-  if (input.assigneeId !== input.actorId) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "debug Relay assignee must be the actor");
-  }
+  assertRepairAttemptAssignee(database, input);
   const at = nextTimestamp(input.createdAt, bug.updated_at);
   const attemptId = randomUUID();
   const eventId = randomUUID();
@@ -1533,9 +1614,7 @@ export function createMobileManualRepairAttempt(
       "Bug is not ready at the expected version",
     );
   }
-  if (input.assigneeId !== input.actorId) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "manual assignee must be the actor");
-  }
+  assertRepairAttemptAssignee(database, input);
   const sequenceRow = database
     .prepare(
       `SELECT COALESCE(MAX(sequence), 0) + 1 AS next_sequence
@@ -1616,7 +1695,8 @@ export function getMobileManualRepairAttempt(
   const row = database
     .prepare(
       `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
-              summary, branch, commit_sha, merge_request_url, target_build_id, version
+              summary, branch, commit_sha, merge_request_url, patch_url,
+              no_code_reason, target_build_id, failure_reason, version
        FROM repair_attempts
        WHERE account_id = ? AND project_id = ? AND id = ? AND mode = 'human'`,
     )
@@ -1762,10 +1842,16 @@ export function deliverMobileRepairAttempt(
 ): MobileManualRepairAttemptRecord {
   requireTransaction(database);
   requireWorkflowText(input.summary, "summary", 10_000);
-  requireWorkflowText(input.branch, "branch", 300);
-  requireWorkflowCommit(input.commitSha);
-  if (input.mergeRequestUrl !== null)
-    requireWorkflowText(input.mergeRequestUrl, "mergeRequestUrl", 4_000);
+  if (input.deliveryKind === "code") {
+    requireWorkflowText(input.branch, "branch", 300);
+    requireWorkflowCommit(input.commitSha);
+    if (input.mergeRequestUrl !== null) {
+      requireWorkflowText(input.mergeRequestUrl, "mergeRequestUrl", 4_000);
+    }
+    if (input.patchUrl !== null) requireWorkflowText(input.patchUrl, "patchUrl", 4_000);
+  } else {
+    requireWorkflowText(input.noCodeReason, "noCodeReason", 5_000);
+  }
   const attempt = readManualWorkflowAttempt(database, input, input.attemptId);
   if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
   if (attempt.version !== input.expectedVersion || attempt.status !== "running") {
@@ -1793,11 +1879,14 @@ export function deliverMobileRepairAttempt(
     resourceVersionAfter: 1,
     correlationId: randomUUID(),
     fromState: "in_progress",
-    toState: "awaiting_build",
+    toState: input.deliveryKind === "code" ? "awaiting_build" : "ready_for_verification",
     payload: {
       status: "delivered",
       repairAttemptId: attempt.id,
-      commitSha: input.commitSha,
+      ...(input.deliveryKind === "code" ? { commitSha: input.commitSha } : {}),
+      ...(input.deliveryKind === "no_code"
+        ? { reason: toBoundedAuditText(input.noCodeReason) }
+        : {}),
       fromVersion: attempt.version,
       toVersion: attempt.version + 1,
     },
@@ -1807,7 +1896,7 @@ export function deliverMobileRepairAttempt(
     .prepare(
       `UPDATE repair_attempts
        SET status = 'delivered', summary = ?, branch = ?, commit_sha = ?,
-           merge_request_url = ?, patch_url = NULL, no_code_reason = NULL,
+           merge_request_url = ?, patch_url = ?, no_code_reason = ?,
            target_build_id = NULL, updated_at = ?, version = version + 1
        WHERE account_id = ? AND project_id = ? AND id = ?
          AND status = 'running' AND version = ?`,
@@ -1817,6 +1906,8 @@ export function deliverMobileRepairAttempt(
       input.branch,
       input.commitSha,
       input.mergeRequestUrl,
+      input.patchUrl,
+      input.noCodeReason,
       at,
       input.accountId,
       input.projectId,
@@ -1837,8 +1928,8 @@ export function deliverMobileRepairAttempt(
         decision_reason, decision_actor_id, decision_audit_event_id,
         delivery_request_digest, policy_version, bug_version_at_delivery,
         created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'required', 'code_requires_build',
-                NULL, ?, ?, ?, '1.0.0', ?, ?, ?, 1)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, '1.0.0', ?, ?, ?, 1)`,
     )
     .run(
       requirementId,
@@ -1848,6 +1939,9 @@ export function deliverMobileRepairAttempt(
       attempt.id,
       attempt.version + 1,
       input.commitSha,
+      input.deliveryKind === "code" ? "required" : "not_required",
+      input.deliveryKind === "code" ? "code_requires_build" : "no_code_delivery",
+      input.deliveryKind === "code" ? null : input.noCodeReason,
       input.actorId,
       eventId,
       input.requestDigest,
@@ -1858,21 +1952,30 @@ export function deliverMobileRepairAttempt(
   const updatedBug = database
     .prepare(
       `UPDATE bugs
-       SET state = 'awaiting_build', updated_at = ?, version = version + 1
+       SET state = ?, updated_at = ?, version = version + 1
        WHERE account_id = ? AND project_id = ? AND id = ? AND state = 'in_progress'
          AND version = ? AND active_repair_attempt_id = ?`,
     )
-    .run(at, input.accountId, input.projectId, attempt.bug_id, attempt.bug_version, attempt.id);
+    .run(
+      input.deliveryKind === "code" ? "awaiting_build" : "ready_for_verification",
+      at,
+      input.accountId,
+      input.projectId,
+      attempt.bug_id,
+      attempt.bug_version,
+      attempt.id,
+    );
   if (updatedBug.changes !== 1) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
-      "Bug did not enter awaiting_build exactly once",
+      "Bug did not enter its delivery state exactly once",
     );
   }
   const row = database
     .prepare(
       `SELECT id, bug_id, sequence, mode, status, assignee_id, parent_attempt_id,
-              summary, branch, commit_sha, merge_request_url, target_build_id, version
+              summary, branch, commit_sha, merge_request_url, patch_url,
+              no_code_reason, target_build_id, failure_reason, version
        FROM repair_attempts
        WHERE account_id = ? AND project_id = ? AND id = ?`,
     )
@@ -2630,7 +2733,11 @@ export function continueMobileRelay(
   if (qaInstanceId === null) {
     throw new MobileRelayStorageError("INVALID_REQUEST", "qaInstanceId is required for continue");
   }
-  if (input.actionId.length < 1 || input.actionId.length > 200 || input.actionId.trim() !== input.actionId) {
+  if (
+    input.actionId.length < 1 ||
+    input.actionId.length > 200 ||
+    input.actionId.trim() !== input.actionId
+  ) {
     throw new MobileRelayStorageError("INVALID_REQUEST", "actionId is invalid");
   }
   if (input.prompt.length < 1 || input.prompt.length > 50_000) {
@@ -2644,7 +2751,11 @@ export function continueMobileRelay(
          AND scope_digest = ? AND idempotency_key = ?`,
     )
     .get(input.accountId, input.actorId, continueScopeDigest(input), input.idempotencyKey) as
-    | { readonly request_digest: string; readonly status: string; readonly response_json: string | null }
+    | {
+        readonly request_digest: string;
+        readonly status: string;
+        readonly response_json: string | null;
+      }
     | undefined;
   if (replayRow) {
     if (replayRow.request_digest !== input.requestDigest) {
@@ -2674,7 +2785,7 @@ export function continueMobileRelay(
        WHERE receipt.account_id = ? AND receipt.project_id = ?
          AND receipt.repair_attempt_id = ? AND receipt.handoff_id = ?
          AND receipt.relay_instance_id = ?
-         AND attempt.mode = 'relay'` ,
+         AND attempt.mode = 'relay'`,
     )
     .get(input.accountId, input.projectId, input.attemptId, input.handoffId, relayInstanceId) as
     | {
@@ -2832,8 +2943,7 @@ export function getMobileRelayReceipt(
          AND receipt.repair_attempt_id = ?`,
     )
     .get(input.accountId, input.projectId, input.attemptId) as
-    | (ReceiptRow & { readonly metadata_json: string })
-    | undefined;
+    (ReceiptRow & { readonly metadata_json: string }) | undefined;
   if (!row) return null;
   const metadata = parseRelayMetadata(row.metadata_json);
   const evidence = readLatestRelayReceiptEvidence(
@@ -2886,7 +2996,8 @@ function parseRelayMetadata(value: string): {
     if (!isRecord(parsed)) return { qaInstanceId: null, relayPrincipalId: null, projectKey: null };
     return {
       qaInstanceId: typeof parsed.qaInstanceId === "string" ? parsed.qaInstanceId : null,
-      relayPrincipalId: typeof parsed.relayPrincipalId === "string" ? parsed.relayPrincipalId : null,
+      relayPrincipalId:
+        typeof parsed.relayPrincipalId === "string" ? parsed.relayPrincipalId : null,
       projectKey: typeof parsed.projectKey === "string" ? parsed.projectKey : null,
     };
   } catch {
@@ -2912,8 +3023,7 @@ function readLatestRelayReceiptEvidence(
        LIMIT 1`,
     )
     .get(input.accountId, input.projectId, attemptId, relayInstanceId) as
-    | { readonly payload_json?: string }
-    | undefined;
+    { readonly payload_json?: string } | undefined;
   if (!row?.payload_json) {
     return { turnId: null, branch: null, threadId: null, workspace: null, requestHash: null };
   }
@@ -3200,13 +3310,18 @@ export function receiveMobileRelayWebhook(
         ? "pending"
         : "not_required"
       : receipt.build_evidence_status;
-  const deliveredCommitSha = status === "fix_delivered" ? (input.commitSha ?? null) : receipt.delivered_commit_sha;
-  if (projectedStatus !== "fix_delivered" && projectedStatus !== "awaiting_build" && projectedStatus !== "awaiting_verification" && deliveredCommitSha !== null) {
+  const deliveredCommitSha =
+    status === "fix_delivered" ? (input.commitSha ?? null) : receipt.delivered_commit_sha;
+  if (
+    projectedStatus !== "fix_delivered" &&
+    projectedStatus !== "awaiting_build" &&
+    projectedStatus !== "awaiting_verification" &&
+    deliveredCommitSha !== null
+  ) {
     throw new MobileRelayStorageError("VERSION_CONFLICT", "Relay delivery evidence cannot regress");
   }
-  const failureSummary = projectedStatus === "failed"
-    ? (input.statusReason ?? "Relay reported failure")
-    : null;
+  const failureSummary =
+    projectedStatus === "failed" ? (input.statusReason ?? "Relay reported failure") : null;
   const receiptUpdateParameters: Array<string | number | null> = [
     relayTaskId,
     projectedStatus,
@@ -3281,9 +3396,7 @@ export function receiveMobileRelayWebhook(
         status,
         repairAttemptId: input.attemptId,
         handoffId: input.handoffId,
-        ...(status === "fix_delivered"
-          ? { commitSha: input.commitSha }
-          : {}),
+        ...(status === "fix_delivered" ? { commitSha: input.commitSha } : {}),
       }),
       eventAt,
     );
@@ -3522,23 +3635,23 @@ export function completeMobileRelayOutbox(
       }
     | undefined;
   if (!row) {
-    throw new MobileRelayStorageError(
-      "VERSION_CONFLICT",
-      "Relay outbox lease is no longer active",
-    );
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Relay outbox lease is no longer active");
   }
   const relayTaskId = requireRelayIdentity(input.relayTaskId, "relayTaskId", { required: true });
   const relayTurnId = requireRelayIdentity(input.relayTurnId ?? input.turnId, "relayTurnId");
-  const branch = input.branch === undefined || input.branch === null
-    ? null
-    : requireRelayString(input.branch, "branch", 1, 300);
-  const threadId = input.threadId === undefined || input.threadId === null
-    ? null
-    : requireRelayString(input.threadId, "threadId", 1, 300);
+  const branch =
+    input.branch === undefined || input.branch === null
+      ? null
+      : requireRelayString(input.branch, "branch", 1, 300);
+  const threadId =
+    input.threadId === undefined || input.threadId === null
+      ? null
+      : requireRelayString(input.threadId, "threadId", 1, 300);
   const workspace = validateRelayWorkspace(input.workspace, "workspace");
-  const requestHash = input.requestHash === undefined || input.requestHash === null
-    ? null
-    : requireRelayString(input.requestHash, "requestHash", 64, 64);
+  const requestHash =
+    input.requestHash === undefined || input.requestHash === null
+      ? null
+      : requireRelayString(input.requestHash, "requestHash", 64, 64);
   if (
     row.relay_task_id !== null &&
     row.relay_task_id !== relayTaskId &&
@@ -3547,10 +3660,7 @@ export function completeMobileRelayOutbox(
     throw new MobileRelayStorageError("INTEGRATION_EVENT_CONFLICT", "Relay task identity changed");
   }
   const acknowledgementAdvancesReceipt = input.externalRevision > row.external_revision;
-  if (
-    !acknowledgementAdvancesReceipt &&
-    row.relay_task_id !== relayTaskId
-  ) {
+  if (!acknowledgementAdvancesReceipt && row.relay_task_id !== relayTaskId) {
     throw new MobileRelayStorageError(
       "INTEGRATION_EVENT_CONFLICT",
       "Relay acknowledgement task identity conflicts with the newer webhook projection",
@@ -3576,7 +3686,7 @@ export function completeMobileRelayOutbox(
     const eventId = randomUUID();
     database
       .prepare(
-      `INSERT INTO events(
+        `INSERT INTO events(
         id, account_id, project_id, bug_id, type, source, actor_type,
         actor_service_principal_id, aggregate_type, aggregate_id,
         aggregate_sequence, resource_type, resource_id, resource_version_after,
@@ -3585,49 +3695,49 @@ export function completeMobileRelayOutbox(
       ) VALUES (?, ?, ?, ?, 'repair.submitted', 'relay', 'service', ?,
                 'repair_attempt', ?, ?, 'repair_attempt', ?, ?, ?, ?, ?, NULL,
                 NULL, ?, ?)`,
-    )
+      )
       .run(
-      eventId,
-      row.account_id,
-      row.project_id,
-      row.bug_id,
-      metadata.relayPrincipalId ?? MOBILE_FAKE_RELAY_PRINCIPAL_ID,
-      row.aggregate_id,
-      nextRelayAggregateSequence(database, row.account_id, row.project_id, row.aggregate_id),
-      row.aggregate_id,
-      row.version + 1,
-      input.payloadDigest,
-      randomUUID(),
-      row.event_id,
-      JSON.stringify({
-        status: "submitted",
-        repairAttemptId: row.aggregate_id,
-        handoffId: row.handoff_id,
-      }),
-      eventAt,
-    );
+        eventId,
+        row.account_id,
+        row.project_id,
+        row.bug_id,
+        metadata.relayPrincipalId ?? MOBILE_FAKE_RELAY_PRINCIPAL_ID,
+        row.aggregate_id,
+        nextRelayAggregateSequence(database, row.account_id, row.project_id, row.aggregate_id),
+        row.aggregate_id,
+        row.version + 1,
+        input.payloadDigest,
+        randomUUID(),
+        row.event_id,
+        JSON.stringify({
+          status: "submitted",
+          repairAttemptId: row.aggregate_id,
+          handoffId: row.handoff_id,
+        }),
+        eventAt,
+      );
     receiptUpdateChanges = database
       .prepare(
-      `UPDATE relay_receipts
+        `UPDATE relay_receipts
        SET relay_task_id = ?, handoff_status = ?, external_revision = ?,
            last_event_at = ?, payload_digest = ?, received_at = ?, version = version + 1
        WHERE account_id = ? AND project_id = ? AND repair_attempt_id = ?
          AND handoff_id = ? AND version = ? AND external_revision < ?`,
-    )
-    .run(
-      relayTaskId,
-      projectedStatus,
-      input.externalRevision,
-      eventAt,
-      input.payloadDigest,
-      at,
-      row.account_id,
-      row.project_id,
-      row.aggregate_id,
-      row.handoff_id,
-      row.version,
-      input.externalRevision,
-    ).changes;
+      )
+      .run(
+        relayTaskId,
+        projectedStatus,
+        input.externalRevision,
+        eventAt,
+        input.payloadDigest,
+        at,
+        row.account_id,
+        row.project_id,
+        row.aggregate_id,
+        row.handoff_id,
+        row.version,
+        input.externalRevision,
+      ).changes;
   }
   let completedOutboxPayload: Record<string, unknown> = {};
   try {

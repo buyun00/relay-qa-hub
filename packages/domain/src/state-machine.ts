@@ -77,6 +77,7 @@ export class DomainDecisionError extends Error {
 export interface BugAggregate {
   id: string;
   projectId: string;
+  reporterId?: string;
   severity: Severity;
   state: BugState;
   version: number;
@@ -2222,8 +2223,8 @@ function decideCreateVerification(
   command: CreateVerificationCommand,
   context: DomainDecisionContext,
 ): DomainDecision {
-  requireRole(context, "verifier");
-  requireProjectActorCapability(snapshot, context, context.actor.id, "canVerify");
+  requireAnyRole(context, ["verifier", "triager"]);
+  requireCurrentProjectActor(snapshot, context, context.actor.id);
   requireExactVersion(snapshot.bug.version, command.expectedVersion);
   requireNonEmpty(command.criteria, "criteria");
   if (
@@ -2324,9 +2325,9 @@ function decideVerificationResult(
   command: RecordVerificationResultCommand,
   context: DomainDecisionContext,
 ): DomainDecision {
-  requireRole(context, "verifier");
+  requireAnyRole(context, ["verifier", "reporter"]);
   requireRuntimeLiteral(command.status, ["passed", "failed", "blocked"], "status");
-  requireProjectActorCapability(snapshot, context, context.actor.id, "canVerify");
+  requireCurrentProjectActor(snapshot, context, context.actor.id);
   requireNonEmpty(command.resultSummary, "resultSummary");
   const verification = findVerification(snapshot, command.verificationId);
   requireExactVersion(verification.version, command.expectedVersion);
@@ -2337,8 +2338,14 @@ function decideVerificationResult(
   ) {
     reject("INVALID_TRANSITION", "only the active in-progress Verification accepts a result");
   }
-  if (context.actor.id !== verification.verifierId) {
-    reject("FORBIDDEN", "only the assigned verifier can record a result");
+  if (
+    context.actor.id !== verification.verifierId &&
+    context.actor.id !== snapshot.bug.reporterId
+  ) {
+    reject("FORBIDDEN", "only the assigned verifier or Bug reporter can record a result");
+  }
+  if (context.actor.id === verification.verifierId) {
+    requireProjectActorCapability(snapshot, context, context.actor.id, "canVerify");
   }
   const attempt = findAttempt(snapshot, verification.repairAttemptId);
   if (

@@ -7,6 +7,7 @@ import type { NotificationSocket } from "./notification-transport.js";
 const MAX_HANDSHAKE_BYTES = 16 * 1024;
 const MAX_FRAME_BYTES = 256 * 1024;
 const WEBSOCKET_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+const BROWSER_SESSION_COOKIE_PATTERN = /^qa_hub_browser_session=[A-Za-z0-9_-]{43}$/u;
 
 type VoidListener = () => void;
 type ErrorListener = (code: string) => void;
@@ -38,11 +39,21 @@ export class AuthenticatedWssClient implements NotificationSocket {
   private closeNotified = false;
   private failureNotified = false;
 
-  constructor(url: URL, accessToken: string) {
+  constructor(
+    url: URL,
+    credential: string,
+    authenticationKind: "bearer" | "browser-session" = "bearer",
+  ) {
     if (url.protocol !== "wss:" && url.protocol !== "ws:") {
       throw new Error("WSS_URL_PROTOCOL_INVALID");
     }
-    if (accessToken.trim().length === 0) throw new Error("ACCESS_TOKEN_MISSING");
+    if (credential.trim().length === 0) throw new Error("ACCESS_TOKEN_MISSING");
+    if (
+      authenticationKind === "browser-session" &&
+      !BROWSER_SESSION_COOKIE_PATTERN.test(credential)
+    ) {
+      throw new Error("BROWSER_SESSION_COOKIE_INVALID");
+    }
     const port = url.port.length === 0 ? (url.protocol === "wss:" ? 443 : 80) : Number(url.port);
     if (!Number.isSafeInteger(port) || port < 1 || port > 65_535)
       throw new Error("WSS_URL_PORT_INVALID");
@@ -57,7 +68,9 @@ export class AuthenticatedWssClient implements NotificationSocket {
       "Connection: Upgrade",
       `Sec-WebSocket-Key: ${key}`,
       "Sec-WebSocket-Version: 13",
-      `Authorization: Bearer ${accessToken}`,
+      authenticationKind === "bearer"
+        ? `Authorization: Bearer ${credential}`
+        : `Cookie: ${credential}`,
       "User-Agent: Relay-QA-Hub-Desktop",
       "",
       "",
@@ -265,4 +278,11 @@ export class AuthenticatedWssClient implements NotificationSocket {
 
 export function createAuthenticatedWssClient(url: URL, accessToken: string): NotificationSocket {
   return new AuthenticatedWssClient(url, accessToken);
+}
+
+export function createBrowserSessionWssClient(
+  url: URL,
+  browserSessionCookie: string,
+): NotificationSocket {
+  return new AuthenticatedWssClient(url, browserSessionCookie, "browser-session");
 }

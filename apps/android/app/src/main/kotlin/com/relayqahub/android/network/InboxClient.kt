@@ -7,7 +7,6 @@ import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -15,21 +14,9 @@ import org.json.JSONObject
 class InboxClient(
     baseUrl: String,
     private val httpClient: OkHttpClient,
-    allowLoopbackHttp: Boolean = false,
+    allowPrivateHttp: Boolean = false,
 ) {
-    private val apiBaseUrl: HttpUrl = baseUrl.toHttpUrl().let { parsed ->
-        require(parsed.username.isEmpty() && parsed.password.isEmpty())
-        val loopbackHttp = allowLoopbackHttp &&
-            parsed.scheme == "http" &&
-            parsed.host in LOOPBACK_HOSTS
-        require(parsed.isHttps || loopbackHttp)
-        require(parsed.query == null && parsed.fragment == null)
-        val normalized = parsed.newBuilder().apply {
-            if (!parsed.encodedPath.endsWith('/')) addPathSegment("")
-        }.build()
-        require(normalized.encodedPath == API_BASE_PATH)
-        normalized
-    }
+    private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
 
     suspend fun listNotifications(accessToken: String): InboxResult = withContext(Dispatchers.IO) {
         require(accessToken.isNotBlank())
@@ -86,9 +73,7 @@ class InboxClient(
     }
 
     private companion object {
-        const val API_BASE_PATH = "/api/v1/"
         const val MAX_RESPONSE_BYTES = 256 * 1024
-        val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
     }
 }
 

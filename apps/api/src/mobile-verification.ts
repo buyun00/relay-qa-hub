@@ -9,8 +9,7 @@ import type {
   StartMobileVerificationInput,
 } from "@relay-qa-hub/storage";
 
-export const MOBILE_VERIFICATION_COLLECTION_PATH =
-  "/api/v1/bugs/:bugId/verifications" as const;
+export const MOBILE_VERIFICATION_COLLECTION_PATH = "/api/v1/bugs/:bugId/verifications" as const;
 export const MOBILE_VERIFICATION_ITEM_PATH = "/api/v1/verifications/:verificationId" as const;
 export const MOBILE_VERIFICATION_START_PATH =
   "/api/v1/verifications/:verificationId/start" as const;
@@ -20,7 +19,7 @@ export const MOBILE_VERIFICATION_RESULT_PATH =
 export interface MobileCreateVerificationRequest {
   readonly expectedVersion: number;
   readonly repairAttemptId: string;
-  readonly buildId: string;
+  readonly buildId: string | null;
   readonly verifierId: string;
   readonly criteria: string;
 }
@@ -30,15 +29,17 @@ export interface MobileStartVerificationRequest {
   readonly reason?: string;
 }
 
-export interface MobileRecordVerificationResultRequest {
+interface MobileRecordVerificationResultBase {
   readonly submissionContractVersion: "1.1.0";
   readonly clientSubmissionId: string;
   readonly expectedVersion: number;
-  readonly status: "passed";
   readonly resultSummary: string;
   readonly attachmentIds: readonly string[];
   readonly captureBundleId?: string | null;
 }
+
+export type MobileRecordVerificationResultRequest = MobileRecordVerificationResultBase &
+  ({ readonly status: "passed" } | { readonly status: "failed"; readonly failureReason: string });
 
 export interface MobileVerificationStore {
   readonly createVerification: (command: {
@@ -113,11 +114,14 @@ export function parseMobileCreateVerificationRequest(
   value: unknown,
 ): MobileCreateVerificationRequest {
   const body = record(value);
-  onlyKeys(body, new Set(["expectedVersion", "repairAttemptId", "buildId", "verifierId", "criteria"]));
+  onlyKeys(
+    body,
+    new Set(["expectedVersion", "repairAttemptId", "buildId", "verifierId", "criteria"]),
+  );
   return {
     expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
     repairAttemptId: requireVerificationUuid(body["repairAttemptId"], "repairAttemptId"),
-    buildId: requireVerificationUuid(body["buildId"], "buildId"),
+    buildId: body["buildId"] === null ? null : requireVerificationUuid(body["buildId"], "buildId"),
     verifierId: requireVerificationUuid(body["verifierId"], "verifierId"),
     criteria: boundedString(body["criteria"], "criteria", 1, 10_000),
   };
@@ -150,6 +154,7 @@ export function parseMobileRecordVerificationResultRequest(
       "expectedVersion",
       "status",
       "resultSummary",
+      "failureReason",
       "attachmentIds",
       "captureBundleId",
     ]),
@@ -157,8 +162,15 @@ export function parseMobileRecordVerificationResultRequest(
   if (body["submissionContractVersion"] !== "1.1.0") {
     throw new TypeError("submissionContractVersion must be 1.1.0");
   }
-  if (body["status"] !== "passed") {
-    throw new TypeError("only passed Verification results are supported");
+  if (body["status"] !== "passed" && body["status"] !== "failed") {
+    throw new TypeError("status must be passed or failed");
+  }
+  const status = body["status"];
+  const failureReason = body["failureReason"];
+  if (status === "failed") {
+    boundedString(failureReason, "failureReason", 1, 5_000);
+  } else if (failureReason !== undefined) {
+    throw new TypeError("passed result cannot include failureReason");
   }
   if (!Array.isArray(body["attachmentIds"]) || body["attachmentIds"].length > 20) {
     throw new TypeError("attachmentIds must contain at most twenty UUIDs");
@@ -173,15 +185,21 @@ export function parseMobileRecordVerificationResultRequest(
   if (captureBundleId !== undefined && captureBundleId !== null) {
     requireVerificationUuid(captureBundleId, "captureBundleId");
   }
-  return {
+  const common = {
     submissionContractVersion: "1.1.0",
     clientSubmissionId: requireVerificationUuid(body["clientSubmissionId"], "clientSubmissionId"),
     expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
-    status: "passed",
-    resultSummary: boundedString(body["resultSummary"], "resultSummary", 1, 2_000),
+    resultSummary: boundedString(body["resultSummary"], "resultSummary", 1, 10_000),
     attachmentIds,
     ...(captureBundleId === undefined ? {} : { captureBundleId: captureBundleId as string | null }),
-  };
+  } as const;
+  return status === "failed"
+    ? {
+        ...common,
+        status: "failed",
+        failureReason: failureReason as string,
+      }
+    : { ...common, status: "passed" };
 }
 
 export type {

@@ -15,10 +15,6 @@ export interface SqliteMobileCaptureStoreOptions {
   readonly now?: () => Date;
 }
 
-function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
-  if (actorId !== scope.actorId) throw new TypeError("actor does not match the authenticated mobile scope");
-}
-
 function requireProject(projectId: string, scope: MobileScopeBootstrap): void {
   if (projectId !== scope.projectId) throw new TypeError("projectId does not match the authenticated mobile scope");
 }
@@ -27,19 +23,18 @@ export function createSqliteMobileCaptureStore(
   options: SqliteMobileCaptureStoreOptions,
 ): MobileCaptureStore {
   const now = options.now ?? (() => new Date());
-  const scope = {
+  const actorScope = (actorId: string) => ({
     accountId: options.scope.accountId,
     projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
+    actorId,
+  } as const);
 
   return {
     async createCapture(command) {
-      requireActor(command.actorId, options.scope);
       requireProject(command.request.projectId, options.scope);
       const capture = command.request.capture;
       const input: CreateMobileCaptureInput = {
-        ...scope,
+        ...actorScope(command.actorId),
         clientSubmissionId: command.request.clientSubmissionId,
         captureId: capture.captureId,
         capturedAt: capture.capturedAt,
@@ -59,9 +54,8 @@ export function createSqliteMobileCaptureStore(
     },
 
     async getCapture(query): Promise<MobileCaptureBundleRecord | null> {
-      if (query.actorId !== options.scope.actorId) return null;
       return options.worker.getMobileCapture({
-        ...scope,
+        ...actorScope(query.actorId),
         captureId: query.captureId,
       });
     },

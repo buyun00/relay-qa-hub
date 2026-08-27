@@ -7,33 +7,46 @@ export interface DesktopConnectionStatus {
   readonly lastError: string | null;
 }
 
-export type DesktopUpdatePhase =
-  | "disabled"
-  | "idle"
-  | "checking"
-  | "available"
-  | "downloading"
-  | "downloaded"
-  | "up-to-date"
-  | "installing"
-  | "error";
-
-export interface DesktopUpdateStatus {
-  readonly phase: DesktopUpdatePhase;
-  readonly currentVersion: string;
-  readonly availableVersion: string | null;
-  readonly progressPercent: number | null;
-  readonly checkedAt: string | null;
-  readonly errorCode: string | null;
+export interface DesktopBugChange {
+  readonly notificationId: string;
+  readonly eventId: string | null;
+  readonly bugId: string | null;
 }
+
+export interface DesktopRuntimeInfo {
+  readonly apiBaseUrl: string;
+  readonly notificationsEnabled: boolean;
+}
+
+export type DesktopUpdateState =
+  | { readonly status: "disabled"; readonly message: string }
+  | { readonly status: "idle"; readonly currentReleaseId: string; readonly version: string }
+  | { readonly status: "checking"; readonly currentReleaseId: string; readonly version: string }
+  | { readonly status: "up-to-date"; readonly currentReleaseId: string; readonly version: string }
+  | {
+      readonly status: "downloading";
+      readonly releaseId: string;
+      readonly version: string;
+      readonly progressPercent: number;
+    }
+  | {
+      readonly status: "ready";
+      readonly releaseId: string;
+      readonly version: string;
+      readonly publishedAt: string;
+    }
+  | { readonly status: "installing"; readonly releaseId: string; readonly version: string }
+  | { readonly status: "error"; readonly message: string };
 
 export interface QaHubDesktopBridge {
   readonly getConnectionStatus: () => Promise<DesktopConnectionStatus>;
+  readonly getRuntimeInfo: () => Promise<DesktopRuntimeInfo>;
   readonly getNotificationsPaused: () => Promise<boolean>;
-  readonly getUpdateStatus: () => Promise<DesktopUpdateStatus>;
-  readonly checkForUpdates: () => Promise<DesktopUpdateStatus>;
+  readonly getUpdateState: () => Promise<DesktopUpdateState>;
+  readonly checkForUpdate: () => Promise<boolean>;
   readonly installUpdate: () => Promise<boolean>;
   readonly onConnectionStatus: (listener: (status: DesktopConnectionStatus) => void) => () => void;
-  readonly onUpdateStatus: (listener: (status: DesktopUpdateStatus) => void) => () => void;
+  readonly onBugChanged: (listener: (change: DesktopBugChange) => void) => () => void;
   readonly onOpenBug: (listener: (bugId: string) => void) => () => void;
+  readonly onUpdateState: (listener: (state: DesktopUpdateState) => void) => () => void;
 }

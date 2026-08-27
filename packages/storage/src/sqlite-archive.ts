@@ -1,14 +1,16 @@
 import { createHash, randomUUID } from "node:crypto";
 import {
-  constants,
-  copyFileSync,
+  closeSync,
   existsSync,
   lstatSync,
   mkdirSync,
+  openSync,
+  readSync,
   renameSync,
   readFileSync,
   realpathSync,
   statSync,
+  writeSync,
   writeFileSync,
 } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
@@ -19,6 +21,30 @@ import {
 } from "./attachment-restore.js";
 import { backupFileSha256, type SqliteBackupManifest } from "./sqlite-backup.js";
 import { validateSqliteBackupBundle } from "./sqlite-restore.js";
+
+const ARCHIVE_COPY_BUFFER_BYTES = 1024 * 1024;
+
+function copyFileCreateOnlyBuffered(sourcePath: string, targetPath: string): void {
+  const source = openSync(sourcePath, "r");
+  let target: number | undefined;
+  try {
+    target = openSync(targetPath, "wx");
+    const buffer = Buffer.allocUnsafe(ARCHIVE_COPY_BUFFER_BYTES);
+    for (;;) {
+      const bytesRead = readSync(source, buffer, 0, buffer.length, null);
+      if (bytesRead === 0) break;
+      let offset = 0;
+      while (offset < bytesRead) {
+        const bytesWritten = writeSync(target, buffer, offset, bytesRead - offset, null);
+        if (bytesWritten < 1) throw new Error("archive copy made no forward progress");
+        offset += bytesWritten;
+      }
+    }
+  } finally {
+    if (target !== undefined) closeSync(target);
+    closeSync(source);
+  }
+}
 
 export type SqliteArchiveErrorCode =
   | "SQLITE_ARCHIVE_CONFIGURATION_INVALID"
@@ -313,7 +339,7 @@ export function archiveSqliteBackupBundle(
   }
 
   try {
-    copyFileSync(sourceBackupPath, targetBackupPath, constants.COPYFILE_EXCL);
+    copyFileCreateOnlyBuffered(sourceBackupPath, targetBackupPath);
     const targetStat = statSync(targetBackupPath);
     if (
       !targetStat.isFile() ||
@@ -325,7 +351,7 @@ export function archiveSqliteBackupBundle(
         "copied archive database failed size or hash validation",
       );
     }
-    copyFileSync(sourceManifestPath, targetManifestPath, constants.COPYFILE_EXCL);
+    copyFileCreateOnlyBuffered(sourceManifestPath, targetManifestPath);
     const hashes = validateArchivedPair(
       targetBackupPath,
       targetManifestPath,
@@ -832,7 +858,6 @@ export async function validateArchivedSqliteRecoveryPointWithAttachments(
     );
   }
 
-  let backupValidation: SqliteBackupArchiveResult;
   let validated;
   try {
     validated = validateSqliteBackupBundle({
@@ -846,7 +871,7 @@ export async function validateArchivedSqliteRecoveryPointWithAttachments(
       { cause: error },
     );
   }
-  backupValidation = Object.freeze({
+  const backupValidation: SqliteBackupArchiveResult = Object.freeze({
     disposition: "existing",
     archiveRoot,
     backupPath: canonicalBackupPath,

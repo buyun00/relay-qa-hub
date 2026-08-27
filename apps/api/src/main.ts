@@ -17,6 +17,7 @@ import {
   resolveEvidenceMinFreeBytes,
   resolveHealthProbeTimeoutMs,
   resolvePort,
+  resolveWebOrigins,
 } from "./config.js";
 import { createApiServer, type ApiServer } from "./server.js";
 import { createSqliteApiHealthProbe } from "./health.js";
@@ -211,6 +212,16 @@ function readDesktopUpdateRoot(dataRoot: string): string {
   return resolve(updateRoot);
 }
 
+function readAndroidUpdateRoot(dataRoot: string): string {
+  const configured = process.env["QA_HUB_ANDROID_UPDATE_ROOT"]?.trim();
+  const updateRoot =
+    configured === undefined ? join(dataRoot, "android-updates", "stable") : configured;
+  if (!isAbsolute(updateRoot)) {
+    throw new Error("QA_HUB_ANDROID_UPDATE_ROOT must be an absolute path");
+  }
+  return resolve(updateRoot);
+}
+
 async function closeRuntime(
   server: ApiServer | undefined,
   worker: SqliteStorageWorker,
@@ -282,7 +293,7 @@ async function run(): Promise<void> {
         actorId: person.id,
         membershipId: qaMembershipId(person.id),
         actorDisplayName: person.displayName,
-        actorEmail: qaLoginEmail(MOBILE_SCOPE.accountId, person.pinyin),
+        actorEmail: `${person.pinyin}@qa.local`,
       };
       await worker.ensureMobileScope(personScope);
       await worker.ensureMobileRelayRoles(personScope);
@@ -307,6 +318,7 @@ async function run(): Promise<void> {
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       desktopUpdateRoot: readDesktopUpdateRoot(storage.dataRoot),
+      androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
       healthProbe: createSqliteApiHealthProbe({
         worker,
         evidenceRoot: storage.evidenceRoot,
@@ -369,14 +381,20 @@ async function run(): Promise<void> {
                   actorId: userId,
                   membershipId: qaMembershipId(userId),
                   actorDisplayName: configured?.displayName ?? normalized.displayName,
-                  actorEmail: qaLoginEmail(MOBILE_SCOPE.accountId, normalized.key),
+                  actorEmail:
+                    configured === undefined
+                      ? qaLoginEmail(MOBILE_SCOPE.accountId, normalized.key)
+                      : `${configured.pinyin}@qa.local`,
                 };
                 await worker.ensureMobileScope(personScope);
                 await worker.ensureMobileRelayRoles(personScope);
                 return { userId };
               },
               sessionSecret: webSessionSecret,
-              webOrigin: process.env["QA_HUB_WEB_ORIGIN"]?.trim() || "http://127.0.0.1:4174",
+              webOrigins: resolveWebOrigins(
+                process.env["QA_HUB_WEB_ORIGINS"],
+                process.env["QA_HUB_WEB_ORIGIN"],
+              ),
               ...(secureCookie === undefined ? {} : { secureCookie }),
             },
           }),

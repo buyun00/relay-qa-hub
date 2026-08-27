@@ -9,7 +9,6 @@ import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -82,26 +81,9 @@ class AttachmentUploadFailure(val code: String) : IOException(code)
 class AttachmentUploadClient(
     baseUrl: String,
     httpClient: OkHttpClient,
-    allowLoopbackHttp: Boolean = false,
+    allowPrivateHttp: Boolean = false,
 ) {
-    private val apiBaseUrl: HttpUrl = baseUrl.toHttpUrl().let { parsed ->
-        require(parsed.username.isEmpty() && parsed.password.isEmpty()) {
-            "QA Hub API base URL must not embed credentials"
-        }
-        val isAllowedLoopbackHttp =
-            allowLoopbackHttp && parsed.scheme == "http" && parsed.host in LOOPBACK_HOSTS
-        require(parsed.isHttps || isAllowedLoopbackHttp) {
-            "QA Hub API base URL must use HTTPS unless loopback HTTP is explicitly enabled"
-        }
-        require(parsed.query == null && parsed.fragment == null)
-        val normalized = parsed.newBuilder().apply {
-            if (!parsed.encodedPath.endsWith('/')) addPathSegment("")
-        }.build()
-        require(normalized.encodedPath == API_BASE_PATH) {
-            "QA Hub API base URL must use the frozen $API_BASE_PATH path"
-        }
-        normalized
-    }
+    private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
     private val httpClient = httpClient.newBuilder()
         .followRedirects(false)
         .followSslRedirects(false)
@@ -118,6 +100,7 @@ class AttachmentUploadClient(
         captureId: String? = null,
     ): AttachmentUploadReceipt = withContext(Dispatchers.IO) {
         requireUuid(scope.projectId, "projectId")
+        requireUuid(scope.actorId, "actorId")
         requireUuid(clientSubmissionId, "clientSubmissionId")
         requireUuid(clientAttachmentId, "clientAttachmentId")
         captureId?.let { requireUuid(it, "captureId") }
@@ -147,6 +130,7 @@ class AttachmentUploadClient(
                 method = "POST",
                 body = initBody,
                 accessToken = accessToken,
+                actorId = scope.actorId,
                 idempotencyKey = initKey,
             ),
             expectedStatus = 201,
@@ -179,6 +163,7 @@ class AttachmentUploadClient(
             .url(resolve("/uploads/$sessionId/chunks/0"))
             .header("Accept", QaHubApiContract.JSON_ACCEPT)
             .header("Authorization", "Bearer $accessToken")
+            .header(QA_HUB_ACTOR_ID_HEADER, scope.actorId)
             .header("Idempotency-Key", chunkKey)
             .header("If-Match", quotedVersion(INIT_VERSION))
             .header("Content-Length", pngBytes.size.toString())
@@ -215,6 +200,7 @@ class AttachmentUploadClient(
                 method = "POST",
                 body = finalizeBody,
                 accessToken = accessToken,
+                actorId = scope.actorId,
                 idempotencyKey = finalizeKey,
             ),
             expectedStatus = 200,
@@ -257,6 +243,7 @@ class AttachmentUploadClient(
                 method = "POST",
                 body = bindBody,
                 accessToken = accessToken,
+                actorId = scope.actorId,
                 idempotencyKey = bindKey,
             ),
             expectedStatus = 200,
@@ -299,6 +286,7 @@ class AttachmentUploadClient(
         captureId: String,
     ): CaptureAttachmentReceipt = withContext(Dispatchers.IO) {
         requireUuid(scope.projectId, "projectId")
+        requireUuid(scope.actorId, "actorId")
         requireUuid(clientSubmissionId, "clientSubmissionId")
         requireUuid(clientAttachmentId, "clientAttachmentId")
         requireUuid(captureId, "captureId")
@@ -328,6 +316,7 @@ class AttachmentUploadClient(
                     .put("captureId", captureId)
                     .toString(),
                 accessToken = accessToken,
+                actorId = scope.actorId,
                 idempotencyKey = initKey,
             ),
             expectedStatus = 201,
@@ -352,6 +341,7 @@ class AttachmentUploadClient(
             .url(resolve("/uploads/$sessionId/chunks/0"))
             .header("Accept", QaHubApiContract.JSON_ACCEPT)
             .header("Authorization", "Bearer $accessToken")
+            .header(QA_HUB_ACTOR_ID_HEADER, scope.actorId)
             .header("Idempotency-Key", chunkKey)
             .header("If-Match", quotedVersion(INIT_VERSION))
             .header("Content-Length", contentBytes.size.toString())
@@ -384,6 +374,7 @@ class AttachmentUploadClient(
                     .put("expectedSize", contentBytes.size)
                     .toString(),
                 accessToken = accessToken,
+                actorId = scope.actorId,
                 idempotencyKey = finalizeKey,
             ),
             expectedStatus = 200,
@@ -423,6 +414,7 @@ class AttachmentUploadClient(
         accessToken: String,
     ): CaptureBundleReceipt = withContext(Dispatchers.IO) {
         requireUuid(scope.projectId, "projectId")
+        requireUuid(scope.actorId, "actorId")
         requireUuid(clientSubmissionId, "clientSubmissionId")
         requireUuid(captureId, "captureId")
         require(primaryAttachment.clientSubmissionId == clientSubmissionId)
@@ -524,6 +516,7 @@ class AttachmentUploadClient(
                 method = "POST",
                 body = requestBody,
                 accessToken = accessToken,
+                actorId = scope.actorId,
                 idempotencyKey = idempotencyKey,
             ),
             expectedStatus = 201,
@@ -543,6 +536,7 @@ class AttachmentUploadClient(
             .url(resolve("/capture-bundles/$captureId"))
             .header("Accept", QaHubApiContract.JSON_ACCEPT)
             .header("Authorization", "Bearer $accessToken")
+            .header(QA_HUB_ACTOR_ID_HEADER, scope.actorId)
             .get()
             .build()
         val readBack = executeJson(readRequest, expectedStatus = 200, stage = "CAPTURE_READ")
@@ -603,11 +597,13 @@ class AttachmentUploadClient(
         method: String,
         body: String,
         accessToken: String,
+        actorId: String,
         idempotencyKey: String,
     ): Request = Request.Builder()
         .url(resolve(relativePath))
         .header("Accept", QaHubApiContract.JSON_ACCEPT)
         .header("Authorization", "Bearer $accessToken")
+        .header(QA_HUB_ACTOR_ID_HEADER, actorId)
         .header("Idempotency-Key", idempotencyKey)
         .method(method, body.toRequestBody(VERSIONED_JSON_MEDIA_TYPE))
         .build()
@@ -643,7 +639,6 @@ class AttachmentUploadClient(
         AttachmentUploadFailure("${stage}_HTTP_${code}")
 
     private companion object {
-        const val API_BASE_PATH = "/api/v1/"
         const val PNG_MEDIA_TYPE_VALUE = "image/png"
         const val UPLOAD_ATTEMPT = 1
         const val LEASE_GENERATION = 1
@@ -667,7 +662,6 @@ class AttachmentUploadClient(
             "GetDebugProfilingData",
             "qa.snapshot",
         )
-        val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
         val VERSIONED_JSON_MEDIA_TYPE = QaHubApiContract.VERSIONED_JSON.toMediaType()
         val OCTET_STREAM_MEDIA_TYPE = "application/octet-stream".toMediaType()
     }

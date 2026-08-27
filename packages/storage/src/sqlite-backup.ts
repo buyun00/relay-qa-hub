@@ -11,6 +11,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { basename, dirname, isAbsolute } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { verifySqliteIntegrity, type SqliteIntegrityReport } from "./sqlite.js";
 
@@ -169,7 +170,9 @@ export function validateSqliteBackup(backupPath: string): SqliteBackupValidation
 
   let database: DatabaseSync | undefined;
   try {
-    database = new DatabaseSync(absolutePath, { readOnly: true });
+    const immutableLocation = pathToFileURL(absolutePath);
+    immutableLocation.searchParams.set("immutable", "1");
+    database = new DatabaseSync(immutableLocation, { readOnly: true });
     const databaseIdentity = readDatabaseIdentity(database);
     const integrity = readIntegrity(database);
     assertIntegrity(integrity, "SQLITE_BACKUP_INVALID");

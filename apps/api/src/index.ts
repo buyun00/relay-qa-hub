@@ -6,6 +6,7 @@ export {
   createLiveHealth,
 } from "./app.js";
 export type { CreateApiAppOptions, DependencyHealth, LiveHealth, ReadyHealth } from "./app.js";
+export { ANDROID_UPDATE_PATH, registerAndroidUpdateRoutes } from "./android-updates.js";
 export { DESKTOP_UPDATE_PATH, registerDesktopUpdateRoutes } from "./desktop-updates.js";
 export { createSqliteApiHealthProbe } from "./health.js";
 export type {
@@ -271,9 +272,11 @@ export {
   API_VERSION,
   DEFAULT_API_HOST,
   DEFAULT_API_PORT,
+  DEFAULT_WEB_ORIGIN,
   DEVELOPMENT_BUILD_SHA,
   resolveBuildSha,
   resolvePort,
+  resolveWebOrigins,
 } from "./config.js";
 
 export { createApiServer } from "./server.js";
@@ -293,6 +296,8 @@ export {
   digestBrowserSessionToken,
   registerBrowserAuthRoutes,
 } from "./browser-auth.js";
+
+export { normalizeQaLoginName, qaLoginEmail, qaMembershipId, qaUserId } from "./people-config.js";
 export type {
   BrowserAuthOptions,
   BrowserAuthPrincipal,
@@ -303,5 +308,3 @@ export type {
   ResolveBrowserSessionInput,
   RevokeBrowserSessionInput,
 } from "./browser-auth.js";
-
-export { normalizeQaLoginName, qaLoginEmail, qaMembershipId, qaUserId } from "./people-config.js";

@@ -26,28 +26,22 @@ function digest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
-  if (actorId !== scope.actorId) {
-    throw new TypeError("actor does not match the authenticated mobile scope");
-  }
-}
-
 export function createSqliteMobileVerificationStore(
   options: SqliteMobileVerificationStoreOptions,
 ): MobileVerificationStore {
   const now = options.now ?? (() => new Date());
-  const scope = {
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
+  const actorScope = (actorId: string) =>
+    ({
+      accountId: options.scope.accountId,
+      projectId: options.scope.projectId,
+      actorId,
+    }) as const;
 
   return {
     async createVerification(command) {
-      requireActor(command.actorId, options.scope);
       const request: MobileCreateVerificationRequest = command.request;
       const input: CreateMobileVerificationInput = {
-        ...scope,
+        ...actorScope(command.actorId),
         bugId: command.bugId,
         expectedVersion: request.expectedVersion,
         repairAttemptId: request.repairAttemptId,
@@ -62,19 +56,17 @@ export function createSqliteMobileVerificationStore(
     },
 
     async getVerification(query) {
-      requireActor(query.actorId, options.scope);
       const input: GetMobileVerificationInput = {
-        ...scope,
+        ...actorScope(query.actorId),
         verificationId: query.verificationId,
       };
       return options.worker.getMobileVerification(input);
     },
 
     async startVerification(command) {
-      requireActor(command.actorId, options.scope);
       const request: MobileStartVerificationRequest = command.request;
       const input: StartMobileVerificationInput = {
-        ...scope,
+        ...actorScope(command.actorId),
         verificationId: command.verificationId,
         expectedVersion: request.expectedVersion,
         reason: request.reason ?? null,
@@ -86,13 +78,11 @@ export function createSqliteMobileVerificationStore(
     },
 
     async recordResult(command) {
-      requireActor(command.actorId, options.scope);
       const request: MobileRecordVerificationResultRequest = command.request;
-      const input: RecordMobileVerificationResultInput = {
-        ...scope,
+      const common = {
+        ...actorScope(command.actorId),
         verificationId: command.verificationId,
         expectedVersion: request.expectedVersion,
-        status: request.status,
         resultSummary: request.resultSummary,
         clientSubmissionId: request.clientSubmissionId,
         attachmentIds: request.attachmentIds,
@@ -100,7 +90,15 @@ export function createSqliteMobileVerificationStore(
         idempotencyKey: command.idempotencyKey,
         requestDigest: digest(request),
         createdAt: now().toISOString(),
-      };
+      } as const;
+      const input: RecordMobileVerificationResultInput =
+        request.status === "failed"
+          ? {
+              ...common,
+              status: "failed",
+              failureReason: request.failureReason,
+            }
+          : { ...common, status: "passed", failureReason: null };
       return options.worker.recordMobileVerificationResult(input);
     },
   };

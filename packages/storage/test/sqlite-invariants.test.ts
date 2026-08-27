@@ -11,6 +11,20 @@ import {
   openSqliteDatabaseForWorker,
   verifySqliteIntegrity,
 } from "../src/sqlite.ts";
+import { createMobileBug } from "../src/mobile-bug-store.ts";
+import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.ts";
+import {
+  createMobileManualRepairAttempt,
+  createMobileRelayAttempt,
+  deliverMobileRepairAttempt,
+  startMobileRepairAttempt,
+  transitionMobileBugReady,
+} from "../src/mobile-relay-store.ts";
+import {
+  createMobileVerification,
+  recordMobileVerificationResult,
+  startMobileVerification,
+} from "../src/mobile-verification-store.ts";
 
 const CREATED_AT = "2026-08-25T00:00:00.000Z";
 const UPDATED_AT = "2026-08-25T00:01:00.000Z";
@@ -693,6 +707,101 @@ function insertActiveMembershipRole(
     )
     .run(tenant.accountId, tenant.projectId, effectiveMembershipId, role, CREATED_AT);
 }
+
+test("new Bug creation emits one durable team notification and idempotent replay emits none", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 930, "NOTIFY");
+    insertActiveMembershipRole(database, tenant, identifier(934), "reporter");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(935),
+      "viewer",
+      tenant.secondaryUserId,
+    );
+    const input = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.userId,
+      clientSubmissionId: identifier(936),
+      payloadDigest: digest(937),
+      title: "New notification Bug",
+      description: "New notification Bug content",
+      expectedBehavior: "The issue no longer reproduces",
+      severity: "S2" as const,
+      priority: "P2" as const,
+      ownerId: null,
+      verificationOwnerId: null,
+      occurrence: {
+        observedAt: CREATED_AT,
+        platform: "web" as const,
+        steps: ["Open the affected screen"] as const,
+        actualBehavior: "The issue is visible",
+      },
+      attachmentIds: [] as const,
+      captureBundleId: null,
+      createdAt: CREATED_AT,
+    };
+
+    const created = transaction(database, () => createMobileBug(database, input));
+    assert.equal(created.replayed, false);
+    const primaryInbox = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.userId,
+        limit: 100,
+        now: UPDATED_AT,
+      }),
+    );
+    assert.equal(primaryInbox.consumed, 1);
+    assert.equal(primaryInbox.items.length, 1);
+    assert.equal(primaryInbox.items[0]?.title, "新 Bug 已提交");
+    assert.equal(primaryInbox.items[0]?.bugId, created.bug.id);
+    assert.equal(primaryInbox.items[0]?.sourceEventId, created.eventId);
+
+    const secondaryInbox = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.secondaryUserId,
+        limit: 100,
+        now: UPDATED_AT,
+      }),
+    );
+    assert.equal(secondaryInbox.items.length, 1);
+    assert.equal(secondaryInbox.items[0]?.sourceEventId, created.eventId);
+
+    const replayed = transaction(database, () => createMobileBug(database, input));
+    assert.equal(replayed.replayed, true);
+    assert.equal(replayed.eventId, created.eventId);
+    const afterReplay = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.userId,
+        limit: 100,
+        now: FINALIZED_AT,
+      }),
+    );
+    assert.equal(afterReplay.consumed, 0);
+    assert.equal(afterReplay.items.length, 1);
+    const outbox = database
+      .prepare(
+        `SELECT COUNT(*) AS count, MIN(status) AS status
+         FROM outbox
+         WHERE account_id = ? AND project_id = ? AND destination = 'qa-hub.notifications'
+           AND event_id = ?`,
+      )
+      .get(tenant.accountId, tenant.projectId, created.eventId) as {
+      readonly count: number;
+      readonly status: string;
+    };
+    assert.equal(outbox.count, 1);
+    assert.equal(outbox.status, "sent");
+    assertIntegrity(database);
+  });
+});
 
 function insertVerificationClosureEvent(
   database: DatabaseSync,
@@ -5787,7 +5896,7 @@ test("Bug tenant, key, and reporter identity stay fixed while allowed content ke
              WHERE id = ?`,
           )
           .run(UPDATED_AT, bugId),
-      /CHECK constraint failed|Bug closure requires current passed human Verification/i,
+      /CHECK constraint failed|Bug closure requires current passed human Verification|Bug state transition requires its exact typed human audit/i,
     );
     const identityError = /Bug.*(?:tenant|identity|key|reporter).*immutable/i;
     assert.throws(
@@ -8913,7 +9022,10 @@ test("forward v3 preserves delivered history and reopens only for a later ranked
         )
         .run(occurredAt, bugId);
     });
-    assert.match(String(nakedReopen), /later same-lineage server-ranked Build occurrence/i);
+    assert.match(
+      String(nakedReopen),
+      /later same-lineage server-ranked Build occurrence|Bug state transition requires its exact typed human audit/i,
+    );
 
     const equalBuildReopen = probeSqlRejection(database, () => {
       appendOccurrenceEvidence(
@@ -10385,6 +10497,308 @@ test("forward v3 requires developer authority for a RepairAttempt assignee", asy
       database.prepare("SELECT count(*) AS count FROM repair_attempts WHERE id = ?").get(attemptId)
         ?.count,
       0,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("multi-actor no-code human workflow can be rejected and then closed by the reporter", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_400, "MHW");
+    const bugId = identifier(5_410);
+    const workflowAt = "2026-08-26T02:00:00.000Z";
+    const primaryScope = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.userId,
+    } as const;
+    const developerScope = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.secondaryUserId,
+    } as const;
+
+    insertActiveMembershipRole(database, tenant, identifier(5_411), "triager");
+    insertActiveMembershipRole(database, tenant, identifier(5_412), "reporter");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(5_413),
+      "developer",
+      tenant.secondaryUserId,
+    );
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(5_414),
+      "verifier",
+      tenant.secondaryUserId,
+    );
+    createBug(database, tenant, bugId, "No-code reporter verification workflow");
+
+    const readyBug = transaction(database, () =>
+      transitionMobileBugReady(database, {
+        ...primaryScope,
+        bugId,
+        expectedVersion: 1,
+        idempotencyKey: "workflow-ready",
+        requestDigest: digest(5_420),
+        createdAt: workflowAt,
+      }),
+    );
+    assert.equal(readyBug.state, "ready");
+
+    for (const createAttempt of [createMobileRelayAttempt, createMobileManualRepairAttempt]) {
+      assert.throws(
+        () =>
+          transaction(database, () =>
+            createAttempt(database, {
+              ...primaryScope,
+              bugId,
+              expectedVersion: readyBug.version,
+              assigneeId: tenant.userId,
+              summary: "A non-developer must not be assignable",
+              idempotencyKey: "invalid-assignee",
+              requestDigest: digest(5_421),
+              createdAt: workflowAt,
+            }),
+          ),
+        /assigneeId must be an active developer/i,
+      );
+    }
+
+    const deliverNoCode = (expectedBugVersion: number, attemptDigestBase: number) => {
+      const noCodeReason = "No source change was required; configuration only. ".repeat(70);
+      const attempt = transaction(database, () =>
+        createMobileManualRepairAttempt(database, {
+          ...primaryScope,
+          bugId,
+          expectedVersion: expectedBugVersion,
+          assigneeId: tenant.secondaryUserId,
+          summary: "Configuration-only repair",
+          idempotencyKey: `create-attempt-${attemptDigestBase}`,
+          requestDigest: digest(attemptDigestBase),
+          createdAt: workflowAt,
+        }),
+      );
+      assert.equal(attempt.assigneeId, tenant.secondaryUserId);
+      const running = transaction(database, () =>
+        startMobileRepairAttempt(database, {
+          ...developerScope,
+          attemptId: attempt.id,
+          expectedVersion: attempt.version,
+          reason: "Begin the assigned configuration repair",
+          idempotencyKey: `start-attempt-${attemptDigestBase}`,
+          requestDigest: digest(attemptDigestBase + 1),
+          createdAt: workflowAt,
+        }),
+      );
+      const delivered = transaction(database, () =>
+        deliverMobileRepairAttempt(database, {
+          ...developerScope,
+          attemptId: attempt.id,
+          expectedVersion: running.version,
+          deliveryKind: "no_code",
+          branch: null,
+          commitSha: null,
+          mergeRequestUrl: null,
+          patchUrl: null,
+          noCodeReason,
+          summary: "Feature flag corrected without a code change",
+          idempotencyKey: `deliver-attempt-${attemptDigestBase}`,
+          requestDigest: digest(attemptDigestBase + 2),
+          createdAt: workflowAt,
+        }),
+      );
+      assert.equal(delivered.status, "delivered");
+      assert.equal(delivered.commitSha, null);
+      assert.equal(delivered.noCodeReason, noCodeReason);
+      const deliveryAuditReason = String(
+        database
+          .prepare(
+            `SELECT json_extract(payload_json, '$.reason') AS reason
+             FROM events
+             WHERE aggregate_type = 'repair_attempt' AND aggregate_id = ?
+               AND type = 'repair_attempt.delivered'`,
+          )
+          .get(attempt.id)?.reason,
+      );
+      assert.ok(Buffer.byteLength(deliveryAuditReason, "utf8") <= 2_000);
+      assert.match(deliveryAuditReason, /…$/u);
+      assert.deepEqual(
+        {
+          ...database
+            .prepare(
+              `SELECT requirement, decision_basis AS decisionBasis,
+                      delivered_commit_sha AS deliveredCommitSha, linked_build_id AS linkedBuildId
+               FROM build_requirements WHERE repair_attempt_id = ?`,
+            )
+            .get(attempt.id),
+        },
+        {
+          requirement: "not_required",
+          decisionBasis: "no_code_delivery",
+          deliveredCommitSha: null,
+          linkedBuildId: null,
+        },
+      );
+      const bug = database
+        .prepare(
+          `SELECT state, version, active_repair_attempt_id AS activeRepairAttemptId,
+                  active_verification_id AS activeVerificationId
+           FROM bugs WHERE id = ?`,
+        )
+        .get(bugId) as {
+        readonly state: string;
+        readonly version: number;
+        readonly activeRepairAttemptId: string | null;
+        readonly activeVerificationId: string | null;
+      };
+      assert.equal(bug.state, "ready_for_verification");
+      assert.equal(bug.activeRepairAttemptId, attempt.id);
+      assert.equal(bug.activeVerificationId, null);
+      return { attempt: delivered, bug };
+    };
+
+    const rejectedTarget = deliverNoCode(readyBug.version, 5_430);
+    const rejectedVerification = transaction(database, () =>
+      createMobileVerification(database, {
+        ...primaryScope,
+        bugId,
+        expectedVersion: rejectedTarget.bug.version,
+        repairAttemptId: rejectedTarget.attempt.id,
+        buildId: null,
+        verifierId: tenant.secondaryUserId,
+        criteria: "Reporter confirms the configuration behavior",
+        idempotencyKey: "create-rejected-verification",
+        requestDigest: digest(5_440),
+        createdAt: workflowAt,
+      }),
+    );
+    assert.equal(rejectedVerification.verifierId, tenant.secondaryUserId);
+    assert.equal(rejectedVerification.buildId, null);
+    const startedRejectedVerification = transaction(database, () =>
+      startMobileVerification(database, {
+        ...developerScope,
+        verificationId: rejectedVerification.id,
+        expectedVersion: rejectedVerification.version,
+        reason: "Run the reporter's acceptance scenario",
+        idempotencyKey: "start-rejected-verification",
+        requestDigest: digest(5_441),
+        createdAt: workflowAt,
+      }),
+    );
+    const failedSubmissionId = identifier(5_442);
+    const failureReason = "Feature flag propagation did not reach the target environment. ".repeat(
+      55,
+    );
+    const failedRequest = {
+      ...primaryScope,
+      verificationId: rejectedVerification.id,
+      expectedVersion: startedRejectedVerification.version,
+      status: "failed" as const,
+      resultSummary: "The original behavior is still reproducible",
+      failureReason,
+      clientSubmissionId: failedSubmissionId,
+      attachmentIds: [] as const,
+      captureBundleId: null,
+      idempotencyKey: "reporter-rejects-verification",
+      requestDigest: digest(5_443),
+      createdAt: workflowAt,
+    };
+    const failedResult = transaction(database, () =>
+      recordMobileVerificationResult(database, failedRequest),
+    );
+    assert.equal(failedResult.verification.status, "failed");
+    assert.equal(failedResult.verification.failureReason, failureReason);
+    const failureAuditReason = String(
+      database
+        .prepare(
+          `SELECT json_extract(payload_json, '$.reason') AS reason
+           FROM events
+           WHERE aggregate_type = 'verification' AND aggregate_id = ?
+             AND type = 'verification.result_recorded'`,
+        )
+        .get(rejectedVerification.id)?.reason,
+    );
+    assert.ok(Buffer.byteLength(failureAuditReason, "utf8") <= 1_500);
+    assert.match(failureAuditReason, /…$/u);
+    assert.equal(failedResult.repairAttempt.status, "verification_failed");
+    assert.equal(failedResult.bug.state, "ready");
+    assert.equal(failedResult.replayed, false);
+    const failedReplay = transaction(database, () =>
+      recordMobileVerificationResult(database, failedRequest),
+    );
+    assert.equal(failedReplay.replayed, true);
+    assert.equal(failedReplay.eventId, failedResult.eventId);
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT active_repair_attempt_id AS activeRepairAttemptId,
+                    active_verification_id AS activeVerificationId
+             FROM bugs WHERE id = ?`,
+          )
+          .get(bugId),
+      },
+      { activeRepairAttemptId: null, activeVerificationId: null },
+    );
+
+    const passedTarget = deliverNoCode(failedResult.bug.version, 5_450);
+    const passedVerification = transaction(database, () =>
+      createMobileVerification(database, {
+        ...primaryScope,
+        bugId,
+        expectedVersion: passedTarget.bug.version,
+        repairAttemptId: passedTarget.attempt.id,
+        buildId: null,
+        verifierId: tenant.secondaryUserId,
+        criteria: "Reporter confirms the corrected configuration behavior",
+        idempotencyKey: "create-passed-verification",
+        requestDigest: digest(5_460),
+        createdAt: workflowAt,
+      }),
+    );
+    const startedPassedVerification = transaction(database, () =>
+      startMobileVerification(database, {
+        ...developerScope,
+        verificationId: passedVerification.id,
+        expectedVersion: passedVerification.version,
+        reason: null,
+        idempotencyKey: "start-passed-verification",
+        requestDigest: digest(5_461),
+        createdAt: workflowAt,
+      }),
+    );
+    const passedResult = transaction(database, () =>
+      recordMobileVerificationResult(database, {
+        ...primaryScope,
+        verificationId: passedVerification.id,
+        expectedVersion: startedPassedVerification.version,
+        status: "passed",
+        resultSummary: "Reporter confirms the Bug is fixed",
+        failureReason: null,
+        clientSubmissionId: identifier(5_462),
+        attachmentIds: [],
+        captureBundleId: null,
+        idempotencyKey: "reporter-passes-verification",
+        requestDigest: digest(5_463),
+        createdAt: workflowAt,
+      }),
+    );
+    assert.equal(passedResult.verification.status, "passed");
+    assert.equal(passedResult.repairAttempt.status, "delivered");
+    assert.equal(passedResult.bug.state, "closed");
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT baseline_kind AS baselineKind, baseline_build_id AS baselineBuildId
+             FROM bug_closure_acceptances WHERE bug_id = ?`,
+          )
+          .get(bugId),
+      },
+      { baselineBuildId: null, baselineKind: "no_build" },
     );
     assertIntegrity(database);
   });

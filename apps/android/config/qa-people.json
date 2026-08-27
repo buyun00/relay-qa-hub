@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "projectKey": "LOCAL",
   "people": [
     {
@@ -104,6 +104,13 @@
       "id": "20000000-0000-4000-8000-000000000014",
       "pinyin": "linbuyun",
       "displayName": "林步云",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "20000000-0000-4000-8000-000000000015",
+      "pinyin": "raoxiaochun",
+      "displayName": "饶小春",
       "roles": ["fixer", "verifier"],
       "active": true
     }

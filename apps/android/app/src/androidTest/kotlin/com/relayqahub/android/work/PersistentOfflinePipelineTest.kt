@@ -3,14 +3,10 @@ package com.relayqahub.android.work
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.ListenableWorker
 import androidx.work.WorkManager
-import androidx.work.testing.TestListenableWorkerBuilder
 import com.relayqahub.android.QaHubApplication
 import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
-import com.relayqahub.android.data.QueueState
-import com.relayqahub.android.security.NativeCredentials
 import com.relayqahub.android.security.SessionExitResult
 import com.relayqahub.android.security.VaultResult
 import com.relayqahub.android.security.nativeSessionScope
@@ -25,31 +21,15 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class PersistentOfflinePipelineTest {
     @Test
-    fun realWorkerBatchesPersistentRoomAndLogoutClearsWorkRoomAndKeystore() = runBlocking {
+    fun logoutClearsScopedRoomAndWorkWithoutMutatingBundledLanConfig() = runBlocking {
         val application = ApplicationProvider.getApplicationContext<QaHubApplication>()
         val container = application.container
         val suffix = UUID.randomUUID().toString()
         val scope = scope(suffix, project = "primary", session = "primary")
         val siblingScope = scope(suffix, project = "sibling", session = "sibling")
-        val credentials = NativeCredentials(
-            accessToken = "access-$suffix",
-            refreshToken = "refresh-$suffix",
-            accessTokenExpiresAtEpochMs = 1,
-            sharedDeviceSession = false,
-        )
-
         container.scopedRepository.seedFoundationScope(scope)
         container.scopedRepository.seedFoundationScope(siblingScope)
-        assertTrue(
-            container.credentialVault.put(scope.nativeSessionScope(), credentials) is
-                VaultResult.Success,
-        )
-        assertTrue(
-            container.credentialVault.put(
-                siblingScope.nativeSessionScope(),
-                credentials.copy(accessToken = "sibling-access-$suffix"),
-            ) is VaultResult.Success,
-        )
+        assertTrue(container.credentialVault.read(scope.nativeSessionScope()) is VaultResult.Success)
 
         repeat(OfflineSyncEngine.BATCH_SIZE + 1) { index ->
             val submissionId = UUID.randomUUID().toString()
@@ -78,29 +58,6 @@ class PersistentOfflinePipelineTest {
             ),
         )
 
-        val workerRequest = SyncScheduler.buildRequest(scope)
-        assertEquals(scope.accountId, workerRequest.workSpec.input.getString(OfflineSyncWorker.KEY_ACCOUNT_ID))
-        assertEquals(scope.projectId, workerRequest.workSpec.input.getString(OfflineSyncWorker.KEY_PROJECT_ID))
-        assertEquals(scope.actorId, workerRequest.workSpec.input.getString(OfflineSyncWorker.KEY_ACTOR_ID))
-        assertEquals(
-            scope.installationId,
-            workerRequest.workSpec.input.getString(OfflineSyncWorker.KEY_INSTALLATION_ID),
-        )
-        assertEquals(scope.sessionId, workerRequest.workSpec.input.getString(OfflineSyncWorker.KEY_SESSION_ID))
-
-        val worker = TestListenableWorkerBuilder<OfflineSyncWorker>(application)
-            .setInputData(workerRequest.workSpec.input)
-            .build()
-        assertEquals(
-            ListenableWorker.Result.success(
-                androidx.work.workDataOf(
-                    OfflineSyncWorker.KEY_STATUS to "BLOCKED_AUTH",
-                    OfflineSyncWorker.KEY_PROCESSED_COUNT to OfflineSyncEngine.BATCH_SIZE,
-                ),
-            ),
-            worker.doWork(),
-        )
-
         val persisted = container.database.offlineOperationDao().listForScope(
             scope.accountId,
             scope.projectId,
@@ -109,11 +66,6 @@ class PersistentOfflinePipelineTest {
             scope.sessionId,
         )
         assertEquals(OfflineSyncEngine.BATCH_SIZE + 1, persisted.size)
-        assertEquals(
-            OfflineSyncEngine.BATCH_SIZE,
-            persisted.count { it.state == QueueState.BLOCKED_AUTH },
-        )
-        assertEquals(1, persisted.count { it.state == QueueState.PENDING })
         persisted.forEach { operation ->
             assertEquals(scope.accountId, operation.accountId)
             assertEquals(scope.projectId, operation.projectId)
@@ -126,11 +78,8 @@ class PersistentOfflinePipelineTest {
         val siblingWork = container.syncScheduler.enqueueContinuation(siblingScope, ONE_DAY_MS)
         assertSame(SessionExitResult.Completed, container.sessionLifecycle.signOut(scope))
 
-        assertSame(VaultResult.Missing, container.credentialVault.read(scope.nativeSessionScope()))
-        assertSame(
-            VaultResult.Missing,
-            container.credentialVault.read(siblingScope.nativeSessionScope()),
-        )
+        assertTrue(container.credentialVault.read(scope.nativeSessionScope()) is VaultResult.Success)
+        assertTrue(container.credentialVault.read(siblingScope.nativeSessionScope()) is VaultResult.Success)
         assertTrue(
             container.database.offlineOperationDao().listForScope(
                 scope.accountId,

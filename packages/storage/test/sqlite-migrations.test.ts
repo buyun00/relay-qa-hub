@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import test from "node:test";
 
-import { SQLITE_SCHEMA_VERSION } from "../src/sqlite-migrations.ts";
+import { SQLITE_MIGRATIONS, SQLITE_SCHEMA_VERSION } from "../src/sqlite-migrations.ts";
 import {
   QA_HUB_SQLITE_APPLICATION_ID,
   SqliteStorageError,
@@ -433,7 +433,7 @@ test("empty migration is repeatable and enables WAL, foreign keys, and integrity
     assert.deepEqual(first, {
       fromVersion: 0,
       toVersion: SQLITE_SCHEMA_VERSION,
-      appliedVersions: [1, 2, 3],
+      appliedVersions: SQLITE_MIGRATIONS.map(({ version }) => version),
       backupPath: null,
     });
     assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);
@@ -706,7 +706,10 @@ test("a conflict late in a migration rolls back every object and history change"
     const recovered = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "recovered-upgrade-backups"),
     });
-    assert.deepEqual(recovered.appliedVersions, [2, 3]);
+    assert.deepEqual(
+      recovered.appliedVersions,
+      SQLITE_MIGRATIONS.filter(({ version }) => version > 1).map(({ version }) => version),
+    );
     assert.equal(
       numberColumn(
         database,

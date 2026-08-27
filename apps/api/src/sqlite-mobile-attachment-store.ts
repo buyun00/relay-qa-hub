@@ -8,12 +8,6 @@ export interface SqliteMobileAttachmentStoreOptions {
   readonly now?: () => Date;
 }
 
-function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
-  if (actorId !== scope.actorId) {
-    throw new TypeError("actor does not match the authenticated mobile scope");
-  }
-}
-
 function requireProject(projectId: string, scope: MobileScopeBootstrap): void {
   if (projectId !== scope.projectId) {
     throw new TypeError("projectId does not match the authenticated mobile scope");
@@ -24,18 +18,17 @@ export function createSqliteMobileAttachmentStore(
   options: SqliteMobileAttachmentStoreOptions,
 ): MobileAttachmentStore {
   const now = options.now ?? (() => new Date());
-  const scope = {
+  const actorScope = (actorId: string) => ({
     accountId: options.scope.accountId,
     projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
+    actorId,
+  } as const);
 
   return {
     async initUpload(command) {
-      requireActor(command.actorId, options.scope);
       requireProject(command.request.projectId, options.scope);
       const session = await options.worker.initMobileUpload({
-        ...scope,
+        ...actorScope(command.actorId),
         clientSubmissionId: command.request.clientSubmissionId,
         clientAttachmentId: command.request.clientAttachmentId,
         uploadAttempt: command.request.uploadAttempt,
@@ -77,9 +70,8 @@ export function createSqliteMobileAttachmentStore(
     },
 
     async putChunk(command) {
-      requireActor(command.actorId, options.scope);
       return options.worker.putMobileUploadChunk({
-        ...scope,
+        ...actorScope(command.actorId),
         idempotencyKey: command.idempotencyKey,
         sessionId: command.sessionId,
         chunkNumber: command.chunkNumber,
@@ -93,9 +85,8 @@ export function createSqliteMobileAttachmentStore(
     },
 
     async finalizeUpload(command) {
-      requireActor(command.actorId, options.scope);
       return options.worker.finalizeMobileUpload({
-        ...scope,
+        ...actorScope(command.actorId),
         sessionId: command.sessionId,
         expectedVersion: command.request.expectedVersion,
         clientSubmissionId: command.request.clientSubmissionId,
@@ -108,13 +99,12 @@ export function createSqliteMobileAttachmentStore(
     },
 
     async bindAttachment(command) {
-      requireActor(command.actorId, options.scope);
       requireProject(command.request.projectId, options.scope);
       if (command.request.intent !== "bug_create" || command.request.targetQaItemId !== undefined) {
         throw new TypeError("the current mobile slice only supports bug_create reservations");
       }
       return options.worker.bindMobileAttachment({
-        ...scope,
+        ...actorScope(command.actorId),
         attachmentId: command.attachmentId,
         expectedVersion: command.request.expectedVersion,
         clientSubmissionId: command.request.clientSubmissionId,
@@ -126,18 +116,16 @@ export function createSqliteMobileAttachmentStore(
     },
 
     async listBugAttachments(query) {
-      requireActor(query.actorId, options.scope);
       return options.worker.listMobileBugAttachments({
-        ...scope,
+        ...actorScope(query.actorId),
         bugId: query.bugId,
         limit: query.limit,
       });
     },
 
     async getAttachment(query) {
-      requireActor(query.actorId, options.scope);
       const download = await options.worker.getMobileAttachment({
-        ...scope,
+        ...actorScope(query.actorId),
         attachmentId: query.attachmentId,
       });
       if (download === null) return null;
@@ -148,9 +136,8 @@ export function createSqliteMobileAttachmentStore(
     },
 
     async getCaptureArtifact(query) {
-      requireActor(query.actorId, options.scope);
       const download = await options.worker.getMobileCaptureArtifact({
-        ...scope,
+        ...actorScope(query.actorId),
         bugId: query.bugId,
         captureId: query.captureId,
         artifactKind: query.artifactKind,

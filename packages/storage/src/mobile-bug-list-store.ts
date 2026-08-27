@@ -21,6 +21,8 @@ const BUG_STATES = [
 export type MobileBugListState = (typeof BUG_STATES)[number];
 
 export interface ListMobileBugsInput extends MobileRelayScope {
+  readonly ownerId?: string;
+  readonly ownerState?: "assigned" | "unassigned";
   readonly q?: string;
   readonly state?: MobileBugListState;
   readonly severity?: MobileBugRecord["severity"];
@@ -64,10 +66,10 @@ function requireUuid(value: string, field: string): void {
 }
 
 function requireLimit(value: number): void {
-  if (!Number.isSafeInteger(value) || value < 1 || value > 100) {
+  if (!Number.isSafeInteger(value) || value < 1 || value > 500) {
     throw new MobileRelayStorageError(
       "INVALID_REQUEST",
-      "limit must be an integer from 1 through 100",
+      "limit must be an integer from 1 through 500",
     );
   }
 }
@@ -147,6 +149,13 @@ export function listMobileBugs(database: DatabaseSync, input: ListMobileBugsInpu
   requireUuid(input.accountId, "accountId");
   requireUuid(input.projectId, "projectId");
   requireUuid(input.actorId, "actorId");
+  if (input.ownerId !== undefined) requireUuid(input.ownerId, "ownerId");
+  if (input.ownerId !== undefined && input.ownerState !== undefined) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "ownerId and ownerState cannot be combined",
+    );
+  }
   requireLimit(input.limit);
   requireQuery(input.q);
   requireState(input.state);
@@ -163,6 +172,12 @@ export function listMobileBugs(database: DatabaseSync, input: ListMobileBugsInpu
 
   const conditions = ["account_id = ?", "project_id = ?"];
   const parameters: SQLInputValue[] = [input.accountId, input.projectId];
+  if (input.ownerId !== undefined) {
+    conditions.push("owner_id = ?");
+    parameters.push(input.ownerId);
+  }
+  if (input.ownerState === "assigned") conditions.push("owner_id IS NOT NULL");
+  if (input.ownerState === "unassigned") conditions.push("owner_id IS NULL");
   if (input.q !== undefined) {
     conditions.push(
       "(instr(lower(key), lower(?)) > 0 OR instr(lower(title), lower(?)) > 0 OR instr(lower(description), lower(?)) > 0 OR instr(lower(expected_behavior), lower(?)) > 0)",

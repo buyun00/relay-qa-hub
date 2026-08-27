@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Internal QA installations may use HTTP. The application accepts such a URL
+    only when QaHubApiEndpoint proves that its host is loopback/private/link-local.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

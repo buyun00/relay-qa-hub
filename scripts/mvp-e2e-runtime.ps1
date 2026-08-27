@@ -1,6 +1,7 @@
 param(
   [ValidateSet("PrepareStart", "Restart", "Stop")]
-  [string]$Action = "PrepareStart"
+  [string]$Action = "PrepareStart",
+  [switch]$FreshData
 )
 
 $ErrorActionPreference = "Stop"
@@ -20,6 +21,9 @@ $workerEntry = Join-Path $repoRoot "apps\worker\dist\main.js"
 $viteEntry = Join-Path $repoRoot "node_modules\vite\bin\vite.js"
 $apkPath = Join-Path $repoRoot "apps\android\app\build\outputs\apk\debug\app-debug.apk"
 $deviceSerial = "127.0.0.1:16384"
+. (Join-Path $PSScriptRoot "qa-hub-lan.ps1")
+. (Join-Path $PSScriptRoot "qa-hub-persistent-runtime.ps1")
+$lan = Resolve-QAHubLanBinding
 
 function New-HexSecret {
   param([int]$Bytes = 32)
@@ -103,9 +107,10 @@ function Start-Runtime {
   $generation = [DateTime]::UtcNow.ToString("yyyyMMddHHmmssfff")
   $logsRoot = [string]$State.logsRoot
   New-Item -ItemType Directory -Path $logsRoot -Force | Out-Null
+  $backupPolicy = Initialize-QAHubPersistentRuntime -State $State -RepositoryRoot $repoRoot
   $started = @()
   try {
-    $env:QA_HUB_API_HOST = "127.0.0.1"
+    $env:QA_HUB_API_HOST = "0.0.0.0"
     $env:QA_HUB_API_PORT = "4319"
     $env:QA_HUB_BUILD_SHA = [string]$State.buildSha
     $env:QA_HUB_DATA_ROOT = [string]$State.dataRoot
@@ -113,7 +118,8 @@ function Start-Runtime {
     $env:QA_HUB_WEB_AUTH_MODE = "session"
     $env:QA_HUB_WEB_SESSION_SECRET = [string]$State.webSessionSecret
     $env:QA_HUB_WEB_SECURE_COOKIE = "false"
-    $env:QA_HUB_WEB_ORIGIN = "http://127.0.0.1:4174"
+    Remove-Item Env:QA_HUB_WEB_ORIGIN -ErrorAction SilentlyContinue
+    $env:QA_HUB_WEB_ORIGINS = "http://127.0.0.1:4174,http://localhost:4174,http://$($lan.Address):4174"
     $env:QA_HUB_BOOTSTRAP_ADMIN_PASSWORD = [string]$State.bootstrapPassword
     $env:QA_HUB_NOTIFICATION_HINT_CHANNEL_ENABLED = "true"
     $api = Start-LoggedProcess -FilePath $nodeExe -ArgumentList @($apiEntry) -WorkingDirectory $repoRoot -LogPrefix (Join-Path $logsRoot "$generation-api")
@@ -127,7 +133,8 @@ function Start-Runtime {
     $started += $worker
 
     $env:QA_HUB_API_BASE_URL = "http://127.0.0.1:4319"
-    $web = Start-LoggedProcess -FilePath $nodeExe -ArgumentList @($viteEntry, "--host", "127.0.0.1", "--port", "4174", "--strictPort") -WorkingDirectory (Join-Path $repoRoot "apps\web") -LogPrefix (Join-Path $logsRoot "$generation-web")
+    $env:QA_HUB_WEB_HOST = "0.0.0.0"
+    $web = Start-LoggedProcess -FilePath $nodeExe -ArgumentList @($viteEntry, "--host", "0.0.0.0", "--port", "4174", "--strictPort") -WorkingDirectory (Join-Path $repoRoot "apps\web") -LogPrefix (Join-Path $logsRoot "$generation-web")
     $started += $web
     Wait-HttpOk -Url "http://127.0.0.1:4174" -TimeoutSeconds 30
 
@@ -149,6 +156,10 @@ function Start-Runtime {
     $State.electronPid = $electron.Id
     $State.generation = $generation
     $State.startedAt = [DateTime]::UtcNow.ToString("o")
+    $State | Add-Member -NotePropertyName lanAddress -NotePropertyValue $lan.Address -Force
+    $State | Add-Member -NotePropertyName lanSubnet -NotePropertyValue $lan.Cidr -Force
+    $State | Add-Member -NotePropertyName apiUrl -NotePropertyValue "http://$($lan.Address):4319" -Force
+    $State | Add-Member -NotePropertyName webUrl -NotePropertyValue "http://$($lan.Address):4174" -Force
     Write-State $State
   } catch {
     foreach ($process in $started) {
@@ -159,6 +170,7 @@ function Start-Runtime {
 }
 
 if ($Action -eq "PrepareStart") {
+  $existing = $null
   if (Test-Path -LiteralPath $pointerPath -PathType Leaf) {
     $existing = Read-State
     foreach ($pidValue in @($existing.apiPid, $existing.workerPid, $existing.webPid, $existing.electronPid)) {
@@ -184,38 +196,55 @@ if ($Action -eq "PrepareStart") {
   & $npmCmd run build --workspace "@relay-qa-hub/desktop"
   if ($LASTEXITCODE -ne 0) { throw "desktop build failed" }
 
-  $stamp = [DateTime]::UtcNow.ToString("yyyyMMddHHmmssfff")
-  $runtimeRoot = Join-Path $runtimeParent "mvp-e2e-$stamp"
-  $dataRoot = Join-Path $runtimeRoot "data"
-  $logsRoot = Join-Path $runtimeRoot "logs"
-  New-Item -ItemType Directory -Path $runtimeRoot | Out-Null
-  New-Item -ItemType Directory -Path $logsRoot | Out-Null
-  $state = [pscustomobject][ordered]@{
-    runtimeRoot = $runtimeRoot
-    dataRoot = $dataRoot
-    logsRoot = $logsRoot
-    buildSha = (& git -C $repoRoot rev-parse HEAD).Trim()
-    accessToken = New-HexSecret 32
-    webSessionSecret = New-HexSecret 32
-    bootstrapPassword = "Mvp-" + (New-HexSecret 16)
-    androidSerial = $deviceSerial
-    apiPort = 4319
-    webPort = 4174
-    apiPid = $null
-    workerPid = $null
-    webPid = $null
-    electronPid = $null
-    generation = $null
-    startedAt = $null
-    apkPath = $apkPath
-    apkSha256 = $null
+  if ($null -ne $existing -and -not $FreshData) {
+    $state = $existing
+    if (-not (Test-Path -LiteralPath ([string]$state.dataRoot) -PathType Container)) {
+      throw "Existing persistent data root is missing; restore it from E: instead of silently creating a new empty database: $($state.dataRoot)"
+    }
+    $state.buildSha = (& git -C $repoRoot rev-parse HEAD).Trim()
+    $state.apkPath = $apkPath
+    $state.apkSha256 = $null
+    $state.apiPid = $null
+    $state.workerPid = $null
+    $state.webPid = $null
+    $state.electronPid = $null
+    $state.generation = $null
+    $state.startedAt = $null
+  } else {
+    $stamp = [DateTime]::UtcNow.ToString("yyyyMMddHHmmssfff")
+    $runtimeRoot = Join-Path $runtimeParent "mvp-e2e-$stamp"
+    $dataRoot = if ($FreshData) { Join-Path $runtimeRoot "data" } else { $script:QAHubPersistentDataRoot }
+    $logsRoot = Join-Path $runtimeRoot "logs"
+    New-Item -ItemType Directory -Path $runtimeRoot | Out-Null
+    New-Item -ItemType Directory -Path $dataRoot | Out-Null
+    New-Item -ItemType Directory -Path $logsRoot | Out-Null
+    $state = [pscustomobject][ordered]@{
+      runtimeRoot = $runtimeRoot
+      dataRoot = $dataRoot
+      logsRoot = $logsRoot
+      buildSha = (& git -C $repoRoot rev-parse HEAD).Trim()
+      accessToken = New-HexSecret 32
+      webSessionSecret = New-HexSecret 32
+      bootstrapPassword = "Mvp-" + (New-HexSecret 16)
+      androidSerial = $deviceSerial
+      apiPort = 4319
+      webPort = 4174
+      apiPid = $null
+      workerPid = $null
+      webPid = $null
+      electronPid = $null
+      generation = $null
+      startedAt = $null
+      apkPath = $apkPath
+      apkSha256 = $null
+    }
   }
   Write-State $state
 
   $env:ANDROID_HOME = $androidSdk
   $env:ANDROID_SDK_ROOT = $androidSdk
   $env:JAVA_HOME = $javaHome
-  $env:ORG_GRADLE_PROJECT_qaHubApiBaseUrl = "http://127.0.0.1:4319/api/v1/"
+  $env:ORG_GRADLE_PROJECT_qaHubApiBaseUrl = "http://$($lan.Address):4319/api/v1/"
   $env:ORG_GRADLE_PROJECT_qaHubDebugAccessToken = [string]$state.accessToken
   Push-Location (Join-Path $repoRoot "apps\android")
   try {
@@ -230,13 +259,12 @@ if ($Action -eq "PrepareStart") {
 
   & $adbExe -s $deviceSerial install -r $apkPath
   if ($LASTEXITCODE -ne 0) { throw "APK install failed" }
-  & $adbExe -s $deviceSerial reverse tcp:4319 tcp:4319
-  if ($LASTEXITCODE -ne 0) { throw "adb reverse failed" }
+  & $adbExe -s $deviceSerial reverse --remove tcp:4319 2>$null | Out-Null
   Start-Runtime $state
 } elseif ($Action -eq "Restart") {
   $state = Read-State
   Stop-StateProcesses $state
-  & $adbExe -s $deviceSerial reverse tcp:4319 tcp:4319 | Out-Null
+  & $adbExe -s $deviceSerial reverse --remove tcp:4319 2>$null | Out-Null
   Start-Runtime $state
 } else {
   $state = Read-State
@@ -257,8 +285,10 @@ $result = [ordered]@{
   apkPath = $state.apkPath
   apkSha256 = $state.apkSha256
   androidSerial = $state.androidSerial
-  apiUrl = "http://127.0.0.1:4319"
-  webUrl = "http://127.0.0.1:4174"
+  apiUrl = "http://$($lan.Address):4319"
+  webUrl = "http://$($lan.Address):4174"
+  loopbackApiUrl = "http://127.0.0.1:4319"
+  loopbackWebUrl = "http://127.0.0.1:4174"
   apiPid = $state.apiPid
   workerPid = $state.workerPid
   webPid = $state.webPid

@@ -19,9 +19,9 @@ import android.media.projection.MediaProjectionManager
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.IBinder
-import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.IntentCompat
 import com.relayqahub.android.BuildConfig
 import com.relayqahub.android.MainActivity
 import com.relayqahub.android.R
@@ -58,6 +58,7 @@ class CaptureSessionService : Service() {
         val requestedAtEpochMs: Long,
         val mode: CapturedDraftMode,
         val openApp: Boolean,
+        val expectedGeometry: CaptureDisplayGeometry,
         val pocoAnchorEpochMs: Long,
         val pocoAnchorElapsedNanos: Long,
         val pocoEnrichment: Deferred<PocoEnrichmentResult>,
@@ -78,6 +79,7 @@ class CaptureSessionService : Service() {
     private var mediaProjection: MediaProjection? = null
     private var imageReader: ImageReader? = null
     private var virtualDisplay: VirtualDisplay? = null
+    private var captureGeometry: CaptureDisplayGeometry? = null
     private var endingSession = false
 
     override fun onCreate() {
@@ -145,17 +147,19 @@ class CaptureSessionService : Service() {
             mediaProjection = projection
             projection.registerCallback(projectionCallback, frameHandler)
 
-            val bounds = getSystemService(WindowManager::class.java).maximumWindowMetrics.bounds
-            val width = bounds.width().coerceAtLeast(1)
-            val height = bounds.height().coerceAtLeast(1)
-            val densityDpi = resources.displayMetrics.densityDpi
-            val reader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
+            val geometry = currentCaptureDisplayGeometry()
+            val reader = ImageReader.newInstance(
+                geometry.width,
+                geometry.height,
+                PixelFormat.RGBA_8888,
+                2,
+            )
             reader.setOnImageAvailableListener(::onImageAvailable, frameHandler)
             val display = projection.createVirtualDisplay(
                 "Relay QA Hub evidence session",
-                width,
-                height,
-                densityDpi,
+                geometry.width,
+                geometry.height,
+                geometry.densityDpi,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 reader.surface,
                 null,
@@ -164,6 +168,7 @@ class CaptureSessionService : Service() {
 
             imageReader = reader
             virtualDisplay = display
+            captureGeometry = geometry
             when (OverlayPermissionController.startAfterUserConsent(this)) {
                 is com.relayqahub.android.overlay.OverlayStartResult.Started -> Unit
                 is com.relayqahub.android.overlay.OverlayStartResult.PermissionRequired -> {
@@ -231,6 +236,18 @@ class CaptureSessionService : Service() {
             OverlayPermissionController.restoreAfterCapture(this)
             return
         }
+        if (pendingCapture.get() != null) {
+            CaptureResultBridge.send(this, CaptureResult.Unavailable("capture_already_pending"))
+            OverlayPermissionController.restoreAfterCapture(this)
+            return
+        }
+        if (!refreshCaptureSurfaceForCurrentDisplay()) {
+            CaptureResultBridge.send(this, CaptureResult.Unavailable("capture_orientation_reconfigure_failed"))
+            OverlayPermissionController.restoreAfterCapture(this)
+            endSession("capture_orientation_reconfigure_failed", notifyUnavailable = false)
+            stopSelf()
+            return
+        }
         val pocoAnchorEpochMs = System.currentTimeMillis()
         val pocoAnchorElapsedNanos = System.nanoTime()
         val pocoEnrichment = serviceScope.async(start = CoroutineStart.LAZY) {
@@ -250,6 +267,7 @@ class CaptureSessionService : Service() {
             requestedAtEpochMs = requestedAtEpochMs,
             mode = mode,
             openApp = openApp,
+            expectedGeometry = checkNotNull(captureGeometry),
             pocoAnchorEpochMs = pocoAnchorEpochMs,
             pocoAnchorElapsedNanos = pocoAnchorElapsedNanos,
             pocoEnrichment = pocoEnrichment,
@@ -263,10 +281,53 @@ class CaptureSessionService : Service() {
         pocoEnrichment.start()
     }
 
+    private fun refreshCaptureSurfaceForCurrentDisplay(): Boolean {
+        val display = virtualDisplay ?: return false
+        val previousReader = imageReader ?: return false
+        val nextGeometry = currentCaptureDisplayGeometry()
+        if (!nextGeometry.requiresReconfigure(captureGeometry)) return true
+
+        var nextReader: ImageReader? = null
+        return runCatching {
+            nextReader = ImageReader.newInstance(
+                nextGeometry.width,
+                nextGeometry.height,
+                PixelFormat.RGBA_8888,
+                2,
+            )
+            val reader = checkNotNull(nextReader)
+            reader.setOnImageAvailableListener(::onImageAvailable, frameHandler)
+            previousReader.setOnImageAvailableListener(null, null)
+            display.resize(
+                nextGeometry.width,
+                nextGeometry.height,
+                nextGeometry.densityDpi,
+            )
+            display.setSurface(reader.surface)
+            imageReader = reader
+            captureGeometry = nextGeometry
+            previousReader.close()
+        }.onFailure {
+            nextReader?.setOnImageAvailableListener(null, null)
+            nextReader?.close()
+        }.isSuccess
+    }
+
     private fun onImageAvailable(reader: ImageReader) {
         val image = reader.acquireLatestImage() ?: return
-        val pending = pendingCapture.getAndSet(null)
+        val pending = pendingCapture.get()
         if (pending == null) {
+            image.close()
+            return
+        }
+        // A callback from the retired portrait reader can already be queued when
+        // the game rotates. Keep the request pending until a frame from the newly
+        // sized surface arrives instead of accepting the stale letterboxed frame.
+        if (!pending.expectedGeometry.matchesFrame(image.width, image.height)) {
+            image.close()
+            return
+        }
+        if (!pendingCapture.compareAndSet(pending, null)) {
             image.close()
             return
         }
@@ -432,6 +493,7 @@ class CaptureSessionService : Service() {
         virtualDisplay = null
         imageReader?.close()
         imageReader = null
+        captureGeometry = null
         val projection = mediaProjection
         mediaProjection = null
         projection?.unregisterCallback(projectionCallback)
@@ -489,7 +551,7 @@ class CaptureSessionService : Service() {
     }
 
     private fun Intent.readProjectionResultData(): Intent? =
-        getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java)
+        IntentCompat.getParcelableExtra(this, EXTRA_RESULT_DATA, Intent::class.java)
 
     companion object {
         private const val ACTION_START_SESSION =

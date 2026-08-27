@@ -9,7 +9,6 @@ import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -25,27 +24,9 @@ import org.json.JSONObject
 class BuildProjectionClient(
     baseUrl: String,
     private val httpClient: OkHttpClient,
-    allowLoopbackHttp: Boolean = false,
+    allowPrivateHttp: Boolean = false,
 ) {
-    private val apiBaseUrl: HttpUrl = baseUrl.toHttpUrl().let { parsed ->
-        require(parsed.username.isEmpty() && parsed.password.isEmpty()) {
-            "QA Hub API base URL must not embed credentials"
-        }
-        val loopbackHttp = allowLoopbackHttp &&
-            parsed.scheme == "http" &&
-            parsed.host in LOOPBACK_HOSTS
-        require(parsed.isHttps || loopbackHttp) {
-            "QA Hub API base URL must use HTTPS unless loopback HTTP is explicitly enabled"
-        }
-        require(parsed.query == null && parsed.fragment == null)
-        val normalized = parsed.newBuilder().apply {
-            if (!parsed.encodedPath.endsWith('/')) addPathSegment("")
-        }.build()
-        require(normalized.encodedPath == API_BASE_PATH) {
-            "QA Hub API base URL must use the frozen $API_BASE_PATH path"
-        }
-        normalized
-    }
+    private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
 
     /**
      * Registers a manual ready Build for the exact delivered Relay commit, then reads it back
@@ -188,10 +169,8 @@ class BuildProjectionClient(
     }
 
     private companion object {
-        const val API_BASE_PATH = "/api/v1/"
         const val MAX_RESPONSE_BYTES = 256 * 1024
         const val DEFAULT_DELIVERY_BRANCH = "qa-hub/fake-delivery"
-        val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
         val COMMIT_SHA_PATTERN = Regex("^[0-9a-f]{40}$")
         val PROJECT_KEY_PATTERN = Regex("^[A-Z][A-Z0-9]{1,15}$")
     }

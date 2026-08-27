@@ -5,7 +5,6 @@ import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -16,20 +15,9 @@ import org.json.JSONObject
 class BugAssignmentClient(
     baseUrl: String,
     private val httpClient: OkHttpClient,
-    allowLoopbackHttp: Boolean = false,
+    allowPrivateHttp: Boolean = false,
 ) {
-    private val apiBaseUrl: HttpUrl = baseUrl.toHttpUrl().let { parsed ->
-        val loopback = allowLoopbackHttp && parsed.scheme == "http" &&
-            parsed.host in setOf("localhost", "127.0.0.1", "::1")
-        require(parsed.isHttps || loopback)
-        require(parsed.username.isEmpty() && parsed.password.isEmpty())
-        require(parsed.query == null && parsed.fragment == null)
-        val normalized = parsed.newBuilder().apply {
-            if (!parsed.encodedPath.endsWith('/')) addPathSegment("")
-        }.build()
-        require(normalized.encodedPath == "/api/v1/")
-        normalized
-    }
+    private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
 
     suspend fun assign(
         bugId: String,

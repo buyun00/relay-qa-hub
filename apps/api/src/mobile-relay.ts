@@ -15,10 +15,8 @@ export const MOBILE_RELAY_RECEIPT_PATH =
   "/api/v1/repair-attempts/:attemptId/relay-receipt" as const;
 export const MOBILE_RELAY_CONTINUE_PATH =
   "/api/v1/repair-attempts/:attemptId/dispatch/relay/continue" as const;
-export const MOBILE_REPAIR_ATTEMPT_ITEM_PATH =
-  "/api/v1/repair-attempts/:attemptId" as const;
-export const MOBILE_REPAIR_ATTEMPT_START_PATH =
-  "/api/v1/repair-attempts/:attemptId/start" as const;
+export const MOBILE_REPAIR_ATTEMPT_ITEM_PATH = "/api/v1/repair-attempts/:attemptId" as const;
+export const MOBILE_REPAIR_ATTEMPT_START_PATH = "/api/v1/repair-attempts/:attemptId/start" as const;
 export const MOBILE_REPAIR_ATTEMPT_DELIVER_PATH =
   "/api/v1/repair-attempts/:attemptId/deliver" as const;
 
@@ -42,19 +40,27 @@ export interface MobileManualRepairAttemptRequest {
 }
 
 export type MobileRepairAttemptRequest =
-  | MobileRelayAttemptRequest
-  | MobileManualRepairAttemptRequest;
+  MobileRelayAttemptRequest | MobileManualRepairAttemptRequest;
 
-export interface MobileRepairAttemptDeliveryRequest {
+interface MobileRepairAttemptDeliveryBase {
   readonly expectedVersion: number;
   readonly summary: string;
-  readonly deliveryKind: "code" | "no_code";
-  readonly branch?: string;
-  readonly commitSha?: string;
-  readonly mergeRequestUrl?: string;
-  readonly patchUrl?: string;
-  readonly noCodeReason?: string;
 }
+
+export type MobileRepairAttemptDeliveryRequest = MobileRepairAttemptDeliveryBase &
+  (
+    | {
+        readonly deliveryKind: "code";
+        readonly branch: string;
+        readonly commitSha: string;
+        readonly mergeRequestUrl?: string;
+        readonly patchUrl?: string;
+      }
+    | {
+        readonly deliveryKind: "no_code";
+        readonly noCodeReason: string;
+      }
+  );
 
 export interface MobileRepairAttemptStartRequest {
   readonly expectedVersion: number;
@@ -107,11 +113,7 @@ export interface MobileRelayStore {
     readonly actorId: string;
     readonly attemptId: string;
     readonly idempotencyKey: string;
-    readonly request: MobileRepairAttemptDeliveryRequest & {
-      readonly deliveryKind: "code";
-      readonly branch: string;
-      readonly commitSha: string;
-    };
+    readonly request: MobileRepairAttemptDeliveryRequest;
   }) => MobileManualRepairAttemptRecord | Promise<MobileManualRepairAttemptRecord>;
   readonly dispatchRelay: (command: {
     readonly actorId: string;
@@ -173,7 +175,10 @@ export function parseMobileBugReadyRequest(value: unknown): MobileBugReadyReques
   const body = record(value);
   onlyKeys(body, new Set(["expectedVersion", "toState"]));
   if (body["toState"] !== "ready") throw new TypeError("only ready is supported");
-  return { expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"), toState: "ready" };
+  return {
+    expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
+    toState: "ready",
+  };
 }
 
 export function parseMobileRelayAttemptRequest(value: unknown): MobileRelayAttemptRequest {
@@ -232,7 +237,12 @@ export function parseMobileRepairAttemptRequest(value: unknown): MobileRepairAtt
     : parseMobileRelayAttemptRequest(body);
 }
 
-function boundedDeliveryString(value: unknown, label: string, minimum: number, maximum: number): string {
+function boundedDeliveryString(
+  value: unknown,
+  label: string,
+  minimum: number,
+  maximum: number,
+): string {
   if (typeof value !== "string" || value.length < minimum || value.length > maximum) {
     throw new TypeError(`${label} is invalid`);
   }
@@ -287,14 +297,17 @@ export function parseMobileRepairAttemptDeliveryRequest(
     }
     const parsedCommitSha = boundedDeliveryString(commitSha, "commitSha", 40, 40);
     if (!COMMIT_PATTERN.test(parsedCommitSha)) throw new TypeError("commitSha is invalid");
-    if (noCodeReason !== undefined) throw new TypeError("code delivery cannot include noCodeReason");
+    if (noCodeReason !== undefined)
+      throw new TypeError("code delivery cannot include noCodeReason");
     return {
       expectedVersion,
       summary,
       deliveryKind,
       branch: boundedDeliveryString(branch, "branch", 1, 300),
       commitSha: parsedCommitSha,
-      ...(mergeRequestUrl === undefined ? {} : { mergeRequestUrl: deliveryUrl(mergeRequestUrl, "mergeRequestUrl") }),
+      ...(mergeRequestUrl === undefined
+        ? {}
+        : { mergeRequestUrl: deliveryUrl(mergeRequestUrl, "mergeRequestUrl") }),
       ...(patchUrl === undefined ? {} : { patchUrl: deliveryUrl(patchUrl, "patchUrl") }),
     };
   }

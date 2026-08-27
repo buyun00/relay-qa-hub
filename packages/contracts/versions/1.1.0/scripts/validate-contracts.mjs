@@ -722,7 +722,7 @@ if (openapi) {
   }
   try {
     assert.deepStrictEqual(manifest.androidPlatform, {
-      minSdk: 35,
+      minSdk: 31,
       compileSdk: 37,
       targetSdk: 37,
       pocoEndpoint: "127.0.0.1 in the same Android profile",
@@ -736,7 +736,7 @@ if (openapi) {
       throw new Error("Android SDK ordering must satisfy minSdk <= targetSdk <= compileSdk");
     }
   } catch (error) {
-    failures.push(`Android 35/37/37 platform baseline drifted: ${error.message}`);
+    failures.push(`Android 31/37/37 platform baseline drifted: ${error.message}`);
   }
   for (const [schemaName, actualMinimum] of [
     ["nativeDeviceMetadata", appSchema.$defs.nativeDeviceMetadata.properties.androidApi.minimum],

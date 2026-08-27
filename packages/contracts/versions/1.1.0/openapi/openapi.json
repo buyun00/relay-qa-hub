@@ -752,7 +752,7 @@
         "x-idempotency-key-source": "submission:<body.clientSubmissionId>:commit",
         "x-idempotency-scope": "authenticated account + authenticated actor + project + operationId + Idempotency-Key",
         "x-idempotency-replay-authorization": "authenticate the actor and authorize the current resource account/project scope before any idempotency lookup or replay; a cross-account, cross-actor, or cross-project lookup returns NOT_FOUND without revealing whether a key exists",
-        "x-authorization-policy": "resolve the authenticated account, actor, reporter role, and writable project before idempotency; moduleId must resolve inside that project and every capture/attachment claim must belong to the same scoped submission"
+        "x-authorization-policy": "resolve the authenticated account, actor, reporter role, and writable project before idempotency; moduleId and optional ownerId/verificationOwnerId must resolve to active assignable members inside that project, and every capture/attachment claim must belong to the same scoped submission"
       },
       "get": {
         "operationId": "listBugs",
@@ -799,6 +799,18 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "ownerState",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "assigned",
+                "unassigned"
+              ]
             }
           },
           {
@@ -880,7 +892,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
+              "maximum": 500,
               "default": 50
             }
           },
@@ -21760,7 +21772,7 @@
   "x-base-contract-version": "1.0.0",
   "x-versioned-media-type": "application/vnd.relay-qa-hub.v1.1+json",
   "x-android-platform": {
-    "minSdk": 35,
+    "minSdk": 31,
     "compileSdk": 37,
     "targetSdk": 37,
     "pocoEndpoint": "127.0.0.1 in the same Android profile",

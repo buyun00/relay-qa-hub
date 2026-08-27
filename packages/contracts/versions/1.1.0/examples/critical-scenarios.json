@@ -18,38 +18,38 @@
       "expectedValid": false
     },
     {
-      "id": "android-api-34-is-not-supported",
+      "id": "android-api-30-is-not-supported",
       "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeLoginRequest",
       "source": { "operationId": "createNativeSession", "direction": "request" },
       "mutations": [
-        { "op": "replace", "path": "/device/androidApi", "value": 34 }
+        { "op": "replace", "path": "/device/androidApi", "value": 30 }
       ],
       "expectedValid": false
     },
     {
-      "id": "android-api-35-is-the-supported-floor",
+      "id": "android-api-31-is-the-supported-floor",
       "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeLoginRequest",
       "source": { "operationId": "createNativeSession", "direction": "request" },
       "mutations": [
-        { "op": "replace", "path": "/device/androidApi", "value": 35 }
+        { "op": "replace", "path": "/device/androidApi", "value": 31 }
       ],
       "expectedValid": true
     },
     {
-      "id": "capture-device-api-35-is-supported",
+      "id": "capture-device-api-31-is-supported",
       "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createCaptureBundleRequest",
       "source": { "operationId": "createCaptureBundle", "direction": "request" },
       "mutations": [
-        { "op": "replace", "path": "/capture/deviceMetadata/androidApi", "value": 35 }
+        { "op": "replace", "path": "/capture/deviceMetadata/androidApi", "value": 31 }
       ],
       "expectedValid": true
     },
     {
-      "id": "capture-device-api-34-is-not-supported",
+      "id": "capture-device-api-30-is-not-supported",
       "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createCaptureBundleRequest",
       "source": { "operationId": "createCaptureBundle", "direction": "request" },
       "mutations": [
-        { "op": "replace", "path": "/capture/deviceMetadata/androidApi", "value": 34 }
+        { "op": "replace", "path": "/capture/deviceMetadata/androidApi", "value": 30 }
       ],
       "expectedValid": false
     },

@@ -1,5 +1,7 @@
 # Unity Poco QA Snapshot 对接说明
 
+> 历史说明（实施前审计稿）：文中“当前不存在 `qa.snapshot`”等判断已被后续实现取代。当前权威实现与扩展契约请以 `docs/UNITY_POCO_SNAPSHOT_IMPLEMENTATION_GUIDE.md` 为准；本文件仅保留早期边界和回滚背景，不再作为现状证明。
+
 状态：设计与用户执行手册（2026-08-26）。本轮只写文档，未修改 Unity 工作区、Relay、Jenkins，也未构建或安装任何 Unity APK。QA Hub Android APK 与 Unity 游戏 APK 是两条完全独立的构建链。
 
 ## 1. 适用范围与已审计事实

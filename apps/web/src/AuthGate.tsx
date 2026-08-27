@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useState } from "react";
 
 import App from "./App";
+import DesktopUpdateNotice from "./DesktopUpdateNotice";
 import {
   getBrowserSession,
   loginBrowserSession,
@@ -18,6 +19,7 @@ export default function AuthGate() {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [desktopApiBaseUrl, setDesktopApiBaseUrl] = useState<string | null>(null);
 
   const checkSession = async () => {
     setAuthState("checking");
@@ -39,6 +41,13 @@ export default function AuthGate() {
 
   useEffect(() => {
     void checkSession();
+    const bridge = window.qaHubDesktop;
+    if (bridge !== undefined) {
+      void bridge
+        .getRuntimeInfo()
+        .then((runtime) => setDesktopApiBaseUrl(runtime.apiBaseUrl || null))
+        .catch(() => setDesktopApiBaseUrl(null));
+    }
   }, []);
 
   const submitLogin = async (event: FormEvent<HTMLFormElement>) => {
@@ -65,6 +74,7 @@ export default function AuthGate() {
     setMessage(null);
     try {
       await logoutBrowserSession();
+      setName("");
       setPrincipal(null);
       setAuthState("signed-out");
     } catch {
@@ -82,7 +92,12 @@ export default function AuthGate() {
     return (
       <main className="auth-status">
         <h1>QA Hub 暂时无法连接</h1>
-        <p>服务没有返回可验证的登录状态。</p>
+        <p>服务没有返回可验证的登录状态，请确认这台电脑能访问 QA Hub 内网主机。</p>
+        {desktopApiBaseUrl === null ? null : (
+          <p className="auth-endpoint">
+            当前 EXE 服务地址：<code>{desktopApiBaseUrl}</code>
+          </p>
+        )}
         <button onClick={() => void checkSession()} type="button">
           重试
         </button>
@@ -120,16 +135,8 @@ export default function AuthGate() {
 
   return (
     <>
-      <div className="session-bar">
-        <span>
-          {principal.displayName}
-        </span>
-        <button disabled={submitting} onClick={() => void signOut()} type="button">
-          注销
-        </button>
-        {message === null ? null : <span className="session-bar__error">{message}</span>}
-      </div>
-      <App />
+      <DesktopUpdateNotice />
+      <App onSignOut={() => void signOut()} principal={principal} signingOut={submitting} />
     </>
   );
 }

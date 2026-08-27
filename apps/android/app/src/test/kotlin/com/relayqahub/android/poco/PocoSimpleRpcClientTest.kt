@@ -51,7 +51,7 @@ class PocoSimpleRpcClientTest {
                                     .jsonArray[0]
                                     .jsonObject
                                 buildJsonObject {
-                                    put("schemaVersion", 1)
+                                    put("schemaVersion", snapshotRequest["schemaVersion"]!!)
                                     put("captureId", snapshotRequest["captureId"]!!)
                                     put("nonce", snapshotRequest["nonce"]!!)
                                 }

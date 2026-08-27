@@ -211,7 +211,12 @@ function consumeNotificationOutbox(
       receivedAt,
     );
 
-    const title = event.type === "build.registered" ? "Build registered" : event.type;
+    const title =
+      event.type === "build.registered"
+        ? "Build registered"
+        : event.type === "occurrence.appended"
+          ? "新 Bug 已提交"
+          : event.type;
     const users = database
       .prepare(
         `SELECT user_id

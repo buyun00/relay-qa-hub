@@ -1,29 +1,37 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
 import {
+  ANDROID_UPDATE_PATH,
   API_SERVICE_NAME,
   BROWSER_LOGIN_PATH,
-  DESKTOP_UPDATE_PATH,
   LIVE_HEALTH_PATH,
   MOBILE_ATTACHMENT_BIND_PATH,
   MOBILE_API_CONTENT_TYPE,
   MOBILE_API_MEDIA_TYPE,
   MOBILE_BUG_COLLECTION_PATH,
   MOBILE_PROJECT_COLLECTION_PATH,
+  MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
   MOBILE_UPLOAD_CHUNK_PATH,
   MOBILE_UPLOAD_FINALIZE_PATH,
   MOBILE_UPLOAD_INIT_PATH,
+  MOBILE_VERIFICATION_COLLECTION_PATH,
+  MOBILE_VERIFICATION_RESULT_PATH,
+  MobileCaptureRequestError,
   createApiApp,
   createApiServer,
   normalizeQaLoginName,
+  parseMobileBugListQuery,
+  parseMobileCreateCaptureRequest,
   qaLoginEmail,
   qaUserId,
   resolveBuildSha,
+  resolveWebOrigins,
 } from "../dist/index.js";
 
 const fixedTime = new Date("2026-08-24T08:00:00.000Z");
@@ -40,66 +48,7 @@ test("backend account-name normalization is stable and preserves the display spe
   assert.throws(() => normalizeQaLoginName("   "), /name is invalid/u);
 });
 
-test("GET /api/v1/health/live returns the frozen liveness shape", async (t) => {
-  const app = createApiApp({
-    logger: false,
-    version: "0.1.0-test",
-    buildSha,
-    now: () => fixedTime,
-  });
-  t.after(async () => app.close());
-
-  const response = await app.inject({ method: "GET", url: LIVE_HEALTH_PATH });
-
-  assert.equal(response.statusCode, 200);
-  assert.deepEqual(response.json(), {
-    status: "ok",
-    service: API_SERVICE_NAME,
-    version: "0.1.0-test",
-    buildSha,
-    time: fixedTime.toISOString(),
-  });
-});
-
-test("desktop update feed serves uncached metadata and bounded installer ranges", async (t) => {
-  const root = await mkdtemp(join(tmpdir(), "qa-hub-desktop-updates-"));
-  const installerName = "Relay-QA-Hub-Setup-1.0.0-x64.exe";
-  await writeFile(
-    join(root, "latest.yml"),
-    `version: 1.0.0\nfiles:\n  - url: ${installerName}\n    sha512: test\n    size: 10\n`,
-  );
-  await writeFile(join(root, installerName), Buffer.from("0123456789", "utf8"));
-  const app = createApiApp({ logger: false, desktopUpdateRoot: root });
-  t.after(async () => {
-    await app.close();
-    await rm(root, { recursive: true, force: true });
-  });
-
-  const metadata = await app.inject({
-    method: "GET",
-    url: DESKTOP_UPDATE_PATH.replace(":fileName", "latest.yml"),
-  });
-  assert.equal(metadata.statusCode, 200);
-  assert.equal(metadata.headers["cache-control"], "no-store");
-  assert.match(metadata.body, /^version: 1\.0\.0$/mu);
-
-  const range = await app.inject({
-    method: "GET",
-    url: DESKTOP_UPDATE_PATH.replace(":fileName", installerName),
-    headers: { range: "bytes=2-5" },
-  });
-  assert.equal(range.statusCode, 206);
-  assert.equal(range.headers["content-range"], "bytes 2-5/10");
-  assert.equal(range.body, "2345");
-
-  const rejected = await app.inject({
-    method: "GET",
-    url: DESKTOP_UPDATE_PATH.replace(":fileName", "untrusted.exe"),
-  });
-  assert.equal(rejected.statusCode, 404);
-});
-
-test("unknown names are created by the backend login boundary and native sessions keep that actor", async (t) => {
+test("new Web and Android name login creates backend accounts and rejects the old pinyin contract", async (t) => {
   const accountId = "10000000-0000-4000-8000-000000000020";
   const userId = "30000000-0000-4000-8000-000000000021";
   const debugActorId = "10000000-0000-4000-8000-000000000003";
@@ -109,7 +58,7 @@ test("unknown names are created by the backend login boundary and native session
   const store = {
     async ensureBrowserAdmin() {},
     async loginBrowserSession() {
-      return null;
+      throw new Error("legacy password login must not be used");
     },
     async createBrowserSession(input) {
       const principal = {
@@ -144,7 +93,7 @@ test("unknown names are created by the backend login boundary and native session
         return { userId };
       },
       sessionSecret: "a".repeat(64),
-      webOrigin: "http://127.0.0.1:4174",
+      webOrigins: ["http://127.0.0.1:4174"],
       secureCookie: false,
     },
     mobileProjectDirectoryStore: {
@@ -162,26 +111,294 @@ test("unknown names are created by the backend login boundary and native session
   });
   t.after(async () => app.close());
 
-  const login = await app.inject({
+  const legacy = await app.inject({
+    method: "POST",
+    url: BROWSER_LOGIN_PATH,
+    headers: { origin: "http://127.0.0.1:4174", "content-type": "application/json" },
+    payload: JSON.stringify({ pinyin: "oldclient" }),
+  });
+  assert.equal(legacy.statusCode, 400);
+
+  const webLogin = await app.inject({
+    method: "POST",
+    url: BROWSER_LOGIN_PATH,
+    headers: { origin: "http://127.0.0.1:4174", "content-type": "application/json" },
+    payload: JSON.stringify({ name: "  新账号  ", client: "web" }),
+  });
+  assert.equal(webLogin.statusCode, 200);
+  assert.match(webLogin.headers["set-cookie"], /^qa_hub_browser_session=/u);
+
+  const androidLogin = await app.inject({
     method: "POST",
     url: BROWSER_LOGIN_PATH,
     headers: { "content-type": "application/json" },
     payload: JSON.stringify({ name: "  新账号  ", client: "android" }),
   });
-  assert.equal(login.statusCode, 200);
-  assert.deepEqual(rawNames, ["  新账号  "]);
-  assert.equal(login.json().userId, userId);
-  assert.equal(login.json().displayName, "新账号");
-  assert.match(login.json().accessToken, /^[A-Za-z0-9_-]{43}$/u);
-  assert.equal(login.headers["set-cookie"], undefined);
+  assert.equal(androidLogin.statusCode, 200);
+  assert.deepEqual(rawNames, ["  新账号  ", "  新账号  "]);
+  assert.match(androidLogin.json().accessToken, /^[A-Za-z0-9_-]{43}$/u);
+  assert.equal(androidLogin.headers["set-cookie"], undefined);
 
   const projects = await app.inject({
     method: "GET",
     url: MOBILE_PROJECT_COLLECTION_PATH,
-    headers: { authorization: `Bearer ${login.json().accessToken}` },
+    headers: { authorization: `Bearer ${androidLogin.json().accessToken}` },
   });
   assert.equal(projects.statusCode, 200);
   assert.deepEqual(projects.json(), { snapshotSequence: 0, items: [], nextCursor: null });
+});
+
+test("Bug overview query supports unassigned ownership and a 500-row window", () => {
+  const projectId = "10000000-0000-4000-8000-000000000004";
+
+  assert.deepEqual(
+    parseMobileBugListQuery({
+      projectId,
+      ownerState: "unassigned",
+      limit: "500",
+    }),
+    {
+      projectId,
+      ownerState: "unassigned",
+      limit: 500,
+    },
+  );
+  assert.throws(
+    () =>
+      parseMobileBugListQuery({
+        projectId,
+        ownerId: "20000000-0000-4000-8000-000000000003",
+        ownerState: "assigned",
+      }),
+    /ownerId and ownerState cannot be combined/,
+  );
+  assert.throws(() => parseMobileBugListQuery({ projectId, limit: "501" }), /1 through 500/);
+});
+
+test("Android 12 capture metadata is accepted while API 30 remains rejected", () => {
+  const examples = JSON.parse(
+    readFileSync(
+      new URL(
+        "../../../packages/contracts/versions/1.1.0/examples/openapi-examples.json",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
+  const request = structuredClone(examples.operations.createCaptureBundle.request);
+  request.capture.deviceMetadata.androidApi = 31;
+  request.capture.deviceMetadata.androidRelease = "12";
+  request.capture.deviceMetadata.qaAppVersion = "0.1.1-debug";
+
+  assert.equal(parseMobileCreateCaptureRequest(request).capture.deviceMetadata.androidApi, 31);
+
+  request.capture.deviceMetadata.androidApi = 30;
+  assert.throws(
+    () => parseMobileCreateCaptureRequest(request),
+    (error) =>
+      error instanceof MobileCaptureRequestError && error.code === "CAPTURE_BUNDLE_INVALID",
+  );
+});
+
+test("GET /api/v1/health/live returns the frozen liveness shape", async (t) => {
+  const app = createApiApp({
+    logger: false,
+    version: "0.1.0-test",
+    buildSha,
+    now: () => fixedTime,
+  });
+  t.after(async () => app.close());
+
+  const response = await app.inject({ method: "GET", url: LIVE_HEALTH_PATH });
+
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(response.json(), {
+    status: "ok",
+    service: API_SERVICE_NAME,
+    version: "0.1.0-test",
+    buildSha,
+    time: fixedTime.toISOString(),
+  });
+});
+
+test("android update feed serves uncached metadata and immutable APK ranges", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "qa-hub-android-updates-"));
+  const apkName = "Relay-QA-Hub-Android-7-0.1.6-debug.apk";
+  const apkBytes = Buffer.from("0123456789", "utf8");
+  await writeFile(
+    join(root, "latest.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      versionCode: 7,
+      versionName: "0.1.6-debug",
+      packageName: "com.relayqahub.android.debug",
+      fileName: apkName,
+      size: apkBytes.length,
+      sha256: createHash("sha256").update(apkBytes).digest("hex"),
+    }),
+  );
+  await writeFile(join(root, apkName), apkBytes);
+  const app = createApiApp({ logger: false, androidUpdateRoot: root });
+  t.after(async () => {
+    await app.close();
+    await rm(root, { recursive: true, force: true });
+  });
+
+  const metadata = await app.inject({
+    method: "GET",
+    url: ANDROID_UPDATE_PATH.replace(":fileName", "latest.json"),
+  });
+  assert.equal(metadata.statusCode, 200);
+  assert.equal(metadata.headers["cache-control"], "no-store");
+  assert.equal(metadata.json().versionCode, 7);
+
+  const range = await app.inject({
+    method: "GET",
+    url: ANDROID_UPDATE_PATH.replace(":fileName", apkName),
+    headers: { range: "bytes=4-7" },
+  });
+  assert.equal(range.statusCode, 206);
+  assert.equal(range.headers["cache-control"], "public, max-age=31536000, immutable");
+  assert.equal(range.headers["content-range"], "bytes 4-7/10");
+  assert.equal(range.body, "4567");
+
+  const rejected = await app.inject({
+    method: "GET",
+    url: ANDROID_UPDATE_PATH.replace(":fileName", "other.apk"),
+  });
+  assert.equal(rejected.statusCode, 404);
+});
+
+test("human workflow routes preserve no-code and failed Verification contracts", async (t) => {
+  const token = "human-workflow-route-token";
+  const actorId = "10000000-0000-4000-8000-000000000031";
+  const fallbackActorId = "10000000-0000-4000-8000-000000000030";
+  const bugId = "10000000-0000-4000-8000-000000000032";
+  const attemptId = "10000000-0000-4000-8000-000000000033";
+  const verificationId = "10000000-0000-4000-8000-000000000034";
+  const verifierId = "10000000-0000-4000-8000-000000000035";
+  const clientSubmissionId = "10000000-0000-4000-8000-000000000036";
+  const calls = [];
+  const app = createApiApp({
+    logger: false,
+    debugBearerToken: token,
+    debugActorId: fallbackActorId,
+    mobileRelayStore: {
+      async deliverManualAttempt(command) {
+        calls.push(["deliver", command]);
+        return { id: attemptId, deliveryKind: command.request.deliveryKind };
+      },
+    },
+    mobileVerificationStore: {
+      async createVerification(command) {
+        calls.push(["create-verification", command]);
+        return { id: verificationId, buildId: command.request.buildId };
+      },
+      async recordResult(command) {
+        calls.push(["result", command]);
+        return { verificationId, status: command.request.status };
+      },
+    },
+  });
+  t.after(async () => app.close());
+  const commonHeaders = {
+    authorization: `Bearer ${token}`,
+    "content-type": MOBILE_API_MEDIA_TYPE,
+    "x-qa-actor-id": actorId,
+  };
+
+  const missingBearer = await app.inject({
+    method: "GET",
+    url: LIVE_HEALTH_PATH,
+    headers: { "x-qa-actor-id": actorId },
+  });
+  assert.equal(missingBearer.statusCode, 401);
+  const invalidActor = await app.inject({
+    method: "GET",
+    url: LIVE_HEALTH_PATH,
+    headers: { authorization: `Bearer ${token}`, "x-qa-actor-id": "not-a-uuid" },
+  });
+  assert.equal(invalidActor.statusCode, 400);
+
+  const delivered = await app.inject({
+    method: "POST",
+    url: MOBILE_REPAIR_ATTEMPT_DELIVER_PATH.replace(":attemptId", attemptId),
+    headers: {
+      ...commonHeaders,
+      "idempotency-key": `workflow:deliverRepairAttempt:attempt:${attemptId}:v2`,
+    },
+    payload: JSON.stringify({
+      expectedVersion: 2,
+      summary: "Configuration corrected",
+      deliveryKind: "no_code",
+      noCodeReason: "No source change was required",
+    }),
+  });
+  assert.equal(delivered.statusCode, 200);
+  assert.deepEqual(calls[0], [
+    "deliver",
+    {
+      actorId,
+      attemptId,
+      idempotencyKey: `workflow:deliverRepairAttempt:attempt:${attemptId}:v2`,
+      request: {
+        expectedVersion: 2,
+        summary: "Configuration corrected",
+        deliveryKind: "no_code",
+        noCodeReason: "No source change was required",
+      },
+    },
+  ]);
+
+  const created = await app.inject({
+    method: "POST",
+    url: MOBILE_VERIFICATION_COLLECTION_PATH.replace(":bugId", bugId),
+    headers: {
+      ...commonHeaders,
+      "idempotency-key": `workflow:createVerification:bug:${bugId}:attempt:${attemptId}:v4`,
+    },
+    payload: JSON.stringify({
+      expectedVersion: 4,
+      repairAttemptId: attemptId,
+      buildId: null,
+      verifierId,
+      criteria: "Reporter acceptance check",
+    }),
+  });
+  assert.equal(created.statusCode, 201);
+  assert.equal(calls[1][1].request.buildId, null);
+  assert.equal(calls[1][1].request.verifierId, verifierId);
+
+  const failed = await app.inject({
+    method: "POST",
+    url: MOBILE_VERIFICATION_RESULT_PATH.replace(":verificationId", verificationId),
+    headers: {
+      ...commonHeaders,
+      "idempotency-key": `workflow:recordVerificationResult:verification:${verificationId}:v2`,
+    },
+    payload: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      clientSubmissionId,
+      expectedVersion: 2,
+      status: "failed",
+      resultSummary: "Issue remains reproducible",
+      failureReason: "Acceptance behavior still differs",
+      attachmentIds: [],
+      captureBundleId: null,
+    }),
+  });
+  assert.equal(failed.statusCode, 200);
+  assert.equal(calls[2][1].actorId, actorId);
+  assert.deepEqual(calls[2][1].request, {
+    submissionContractVersion: "1.1.0",
+    clientSubmissionId,
+    expectedVersion: 2,
+    status: "failed",
+    resultSummary: "Issue remains reproducible",
+    failureReason: "Acceptance behavior still differs",
+    attachmentIds: [],
+    captureBundleId: null,
+  });
 });
 
 test("Android createBug persists an exact receipt, supports GET, and rejects a wrong token", async (t) => {
@@ -551,4 +768,23 @@ test("server defaults to loopback and supports graceful stop plus restart", asyn
 test("rejects ambiguous build provenance", () => {
   assert.equal(resolveBuildSha(undefined), "dev");
   assert.throws(() => resolveBuildSha("ABC123"), /40-character lowercase Git SHA/u);
+});
+
+test("normalizes an explicit set of exact browser origins", () => {
+  assert.deepEqual(resolveWebOrigins(undefined, undefined), ["http://127.0.0.1:4174"]);
+  assert.deepEqual(
+    resolveWebOrigins(
+      "http://127.0.0.1:4174, http://10.100.5.157:4174/,http://10.100.5.157:4174",
+      undefined,
+    ),
+    ["http://127.0.0.1:4174", "http://10.100.5.157:4174"],
+  );
+  assert.throws(
+    () => resolveWebOrigins("http://10.100.5.157:4174/path", undefined),
+    /without paths/u,
+  );
+  assert.throws(
+    () => resolveWebOrigins("http://10.100.5.157:4174", "http://127.0.0.1:4174"),
+    /not both/u,
+  );
 });

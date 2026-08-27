@@ -6769,6 +6769,209 @@ BEGIN
 END;
 `;
 
+function extractSchemaBlock(source: string, start: string, next: string): string {
+  const startIndex = source.indexOf(start);
+  const nextIndex = source.indexOf(next, startIndex + start.length);
+  if (startIndex < 0 || nextIndex < 0) {
+    throw new Error(`SQLite migration source block is missing: ${start}`);
+  }
+  return source.slice(startIndex, nextIndex).trim();
+}
+
+function replaceSchemaFragment(
+  source: string,
+  search: string,
+  replacement: string,
+  label: string,
+): string {
+  const first = source.indexOf(search);
+  if (first < 0 || source.indexOf(search, first + search.length) >= 0) {
+    throw new Error(`SQLite migration fragment must occur exactly once: ${label}`);
+  }
+  return source.replace(search, replacement);
+}
+
+function multiActorHumanWorkflowSql(): string {
+  let submissionReceipt = extractSchemaBlock(
+    CORE_SCHEMA_SQL,
+    "CREATE TRIGGER submissions_exact_effect_insert",
+    "CREATE TRIGGER submissions_no_update",
+  );
+  submissionReceipt = replaceSchemaFragment(
+    submissionReceipt,
+    "AND verification.verifier_id = new.actor_id",
+    `AND (
+          verification.verifier_id = new.actor_id
+          OR EXISTS (
+            SELECT 1 FROM bugs AS reporter_bug
+            WHERE reporter_bug.account_id = verification.account_id
+              AND reporter_bug.project_id = verification.project_id
+              AND reporter_bug.id = verification.bug_id
+              AND reporter_bug.reporter_id = new.actor_id
+          )
+        )`,
+    "Verification result submission actor",
+  );
+
+  let bugState = extractSchemaBlock(
+    DOMAIN_AUDIT_ALIGNMENT_SQL,
+    "CREATE TRIGGER bugs_typed_state_transition_guard",
+    "CREATE TRIGGER bugs_typed_same_state_pointer_guard",
+  );
+  bugState = replaceSchemaFragment(
+    bugState,
+    "old.state = 'ready_for_verification'\n          AND new.state = 'ready'\n          AND role.role = 'verifier'",
+    "old.state = 'ready_for_verification'\n          AND new.state = 'ready'\n          AND role.role IN ('verifier', 'reporter')",
+    "failed Verification Bug transition actor",
+  );
+  bugState = replaceSchemaFragment(
+    bugState,
+    "old.state = 'ready_for_verification'\n          AND new.state = 'closed'\n          AND role.role = 'verifier'",
+    "old.state = 'ready_for_verification'\n          AND new.state = 'closed'\n          AND role.role IN ('verifier', 'reporter')",
+    "passed Verification Bug transition actor",
+  );
+  bugState = replaceSchemaFragment(
+    bugState,
+    "AND verification.verifier_id = event.actor_user_id",
+    "AND event.actor_user_id IN (verification.verifier_id, old.reporter_id)",
+    "failed Verification Bug actor identity",
+  );
+
+  let bugPointers = extractSchemaBlock(
+    DOMAIN_AUDIT_ALIGNMENT_SQL,
+    "CREATE TRIGGER bugs_typed_same_state_pointer_guard",
+    "CREATE TRIGGER repair_attempts_history_identity_immutable",
+  );
+  bugPointers = replaceSchemaFragment(
+    bugPointers,
+    "AND role.role = 'verifier'\n            AND event.type = 'verification.created'",
+    "AND role.role IN ('verifier', 'triager')\n            AND event.type = 'verification.created'",
+    "Verification creator pointer authority",
+  );
+
+  let attemptLifecycle = extractSchemaBlock(
+    DOMAIN_AUDIT_ALIGNMENT_SQL,
+    "CREATE TRIGGER repair_attempts_lifecycle_typed_guard",
+    "CREATE TRIGGER repair_attempts_no_delete",
+  );
+  attemptLifecycle = replaceSchemaFragment(
+    attemptLifecycle,
+    "old.status = 'delivered'\n          AND new.status = 'verification_failed'\n          AND role.role = 'verifier'",
+    "old.status = 'delivered'\n          AND new.status = 'verification_failed'\n          AND role.role IN ('verifier', 'reporter')",
+    "verification-failed RepairAttempt actor",
+  );
+  attemptLifecycle = replaceSchemaFragment(
+    attemptLifecycle,
+    "AND verification.verifier_id = event.actor_user_id",
+    `AND event.actor_user_id IN (
+                verification.verifier_id,
+                (SELECT reporter_id FROM bugs
+                 WHERE account_id = new.account_id
+                   AND project_id = new.project_id
+                   AND id = new.bug_id)
+              )`,
+    "verification-failed RepairAttempt actor identity",
+  );
+
+  let verificationInitial = extractSchemaBlock(
+    DOMAIN_AUDIT_ALIGNMENT_SQL,
+    "CREATE TRIGGER verifications_initial_typed_guard",
+    "CREATE TRIGGER verifications_typed_audit_guard",
+  );
+  verificationInitial = replaceSchemaFragment(
+    verificationInitial,
+    "AND role.role = 'verifier'",
+    "AND role.role IN ('verifier', 'triager')",
+    "Verification creator role",
+  );
+
+  let verificationAudit = extractSchemaBlock(
+    DOMAIN_AUDIT_ALIGNMENT_SQL,
+    "CREATE TRIGGER verifications_typed_audit_guard",
+    "CREATE TRIGGER verifications_no_delete",
+  );
+  verificationAudit = replaceSchemaFragment(
+    verificationAudit,
+    "AND membership.user_id = new.verifier_id",
+    "AND membership.user_id = event.actor_user_id",
+    "Verification transition actor membership",
+  );
+  verificationAudit = replaceSchemaFragment(
+    verificationAudit,
+    "AND role.role = 'verifier'",
+    "AND role.role IN ('verifier', 'reporter')",
+    "Verification transition actor role",
+  );
+  verificationAudit = replaceSchemaFragment(
+    verificationAudit,
+    "    AND event.actor_user_id = new.verifier_id\n",
+    "",
+    "Verification transition assigned actor global guard",
+  );
+  verificationAudit = replaceSchemaFragment(
+    verificationAudit,
+    "AND event.type = 'verification.started'",
+    "AND event.type = 'verification.started'\n        AND event.actor_user_id = new.verifier_id\n        AND role.role = 'verifier'",
+    "Verification start assigned actor guard",
+  );
+  verificationAudit = replaceSchemaFragment(
+    verificationAudit,
+    "AND new.status IN ('passed', 'failed', 'blocked')\n        AND event.type = 'verification.result_recorded'",
+    `AND new.status IN ('passed', 'failed', 'blocked')
+        AND (
+          (event.actor_user_id = new.verifier_id AND role.role = 'verifier')
+          OR (
+            role.role = 'reporter'
+            AND event.actor_user_id = (
+              SELECT reporter_id FROM bugs
+              WHERE account_id = new.account_id
+                AND project_id = new.project_id
+                AND id = new.bug_id
+            )
+          )
+        )
+        AND event.type = 'verification.result_recorded'`,
+    "Verification result actor guard",
+  );
+
+  let closureView = extractSchemaBlock(
+    DOMAIN_AUDIT_ALIGNMENT_SQL,
+    "CREATE VIEW valid_human_bug_closures AS",
+    "CREATE TABLE bug_closure_acceptances",
+  );
+  closureView = replaceSchemaFragment(
+    closureView,
+    "AND role.role = 'verifier'",
+    "AND role.role IN ('verifier', 'reporter')",
+    "human closure actor role",
+  );
+  closureView = replaceSchemaFragment(
+    closureView,
+    "AND event.actor_user_id = verification.verifier_id",
+    "AND event.actor_user_id IN (verification.verifier_id, current_bug.reporter_id)",
+    "human closure actor identity",
+  );
+
+  return [
+    "DROP TRIGGER submissions_exact_effect_insert;",
+    "DROP TRIGGER bugs_typed_state_transition_guard;",
+    "DROP TRIGGER bugs_typed_same_state_pointer_guard;",
+    "DROP TRIGGER repair_attempts_lifecycle_typed_guard;",
+    "DROP TRIGGER verifications_initial_typed_guard;",
+    "DROP TRIGGER verifications_typed_audit_guard;",
+    "DROP VIEW valid_human_bug_closures;",
+    submissionReceipt,
+    bugState,
+    bugPointers,
+    attemptLifecycle,
+    verificationInitial,
+    verificationAudit,
+    closureView,
+  ].join("\n\n");
+}
+
+const MULTI_ACTOR_HUMAN_WORKFLOW_SQL = multiActorHumanWorkflowSql();
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -6784,6 +6987,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(2, "bug_full_text_search", FTS_SCHEMA_SQL),
   migration(3, "domain_audit_alignment", DOMAIN_AUDIT_ALIGNMENT_SQL),
   migration(4, "browser_sessions", BROWSER_SESSION_SCHEMA_SQL),
+  migration(5, "multi_actor_human_workflow", MULTI_ACTOR_HUMAN_WORKFLOW_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;
