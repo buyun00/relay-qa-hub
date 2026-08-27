@@ -53,7 +53,7 @@ New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
   "/DSOURCE_DIR=$packageDirectory" `
   "/DICON_FILE=$iconFile" `
   "/DOUTPUT_FILE=$installerFile" `
-  $installerScript
+  $installerScript | Out-Host
 if ($LASTEXITCODE -ne 0) {
   throw "NSIS installer build failed with exit code $LASTEXITCODE."
 }
