@@ -148,32 +148,27 @@ OEM device. The current API 35 MuMu never replaces real-device evidence for
 installation, overlay, MediaProjection, system reclaim, SELinux, OEM power
 behavior, or Poco `127.0.0.1` security.
 
-## Field people configuration
+## Backend-owned accounts and people
 
-The Android field client has no people-management screen and does not hardcode
-assignees. Its checked-in seed is `apps/android/config/qa-people.json`. On first
-launch the App copies that seed to the user-editable file below and prefers the
-external file on subsequent process starts:
-
-```text
-/storage/emulated/0/Android/media/<applicationId>/qa-hub/config/qa-people.json
-```
+The Android field client has no local account or people configuration. It sends
+the entered display name to the backend; an unknown name is created as a new
+account and logged in immediately. The backend returns the active project
+members used by the create and filter screens. The APK never copies or reads a
+device-editable `qa-people.json` and contains no shared bearer token.
 
 Use `com.relayqahub.android.debug` for a debug APK and
-`com.relayqahub.android` for release. The JSON object has exactly
+`com.relayqahub.android` for release. The server-side JSON object has exactly
 `schemaVersion`, `projectKey`, and `people`; each person has exactly `id`,
-`pinyin`, `displayName`, `roles`, and `active`. `pinyin` is the unique lowercase
-name spelling used by the passwordless Web and Android login. `roles` accepts only `fixer` and
+`displayName`, `roles`, and `active`. `roles` accepts only `fixer` and
 `verifier`:
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 4,
   "projectKey": "LOCAL",
   "people": [
     {
       "id": "<QA Hub user UUID>",
-      "pinyin": "luodongle",
       "displayName": "QA member",
       "roles": ["fixer", "verifier"],
       "active": true
@@ -182,14 +177,10 @@ name spelling used by the passwordless Web and Android login. `roles` accepts on
 }
 ```
 
-At API startup the same file creates or updates the active project users and
-memberships. The default API path is the checked-in seed; operators can override
-it with `QA_HUB_PEOPLE_CONFIG_FILE`. An empty or invalid role list is shown as a
-configuration problem; the App never falls back to embedded people.
-
-On an existing debug installation, the App preserves a schema-v1 external file
-as `qa-people.schema-v1.backup.json` and atomically seeds schema v2. An unknown
-future schema is never overwritten automatically.
+At API startup this file creates or updates the active project users and
+memberships. The default API path is the checked-in server seed; operators can
+override it with `QA_HUB_PEOPLE_CONFIG_FILE`. The API rejects old schemas and
+extra account-alias fields instead of preserving an old client contract.
 
 ## Current Android interaction model
 
@@ -248,7 +239,7 @@ The two Android network endpoints are deliberately independent:
 - QA Hub API is on the Windows host and defaults to
   `http://10.100.5.157:4319/api/v1/` for the current LAN.
 
-The repository seed is `apps/android/config/qa-runtime.json`. On first launch,
+The repository seed is `apps/android/app/src/main/assets/qa-runtime.json`. On first launch,
 the App copies it to the path below and then prefers that external file on every
 process start:
 

@@ -1,6 +1,6 @@
 param(
   [string]$PackageDirectory,
-  [string]$LoginPinyin = "linbuyun",
+  [string]$LoginName = "Windows安装包验收账号",
   [string]$NodeExe = $env:QA_HUB_DESKTOP_NODE_EXE
 )
 
@@ -28,8 +28,8 @@ if ([string]::IsNullOrWhiteSpace($NodeExe) -or -not (Test-Path -LiteralPath $Nod
   }
   $NodeExe = $nodeCommand.Source
 }
-if ($LoginPinyin -notmatch '^[a-z]+$') {
-  throw "LoginPinyin must contain lowercase ASCII letters only"
+if ([string]::IsNullOrWhiteSpace($LoginName) -or $LoginName.Length -gt 100 -or $LoginName -match '[\x00-\x1f\x7f]') {
+  throw "LoginName must contain 1 to 100 visible characters"
 }
 if (Get-NetTCPConnection -State Listen -LocalPort 9333 -ErrorAction SilentlyContinue) {
   throw "CDP smoke port 9333 is already in use"
@@ -61,7 +61,7 @@ $environmentNames = @(
   "QA_HUB_DESKTOP_CSRF_ORIGIN",
   "QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP",
   "QA_HUB_DESKTOP_ALLOW_PRIVATE_LAN_HTTP",
-  "QA_HUB_DESKTOP_LOGIN_PINYIN"
+  "QA_HUB_DESKTOP_LOGIN_NAME"
 )
 $savedEnvironment = @{}
 foreach ($name in $environmentNames) {
@@ -107,15 +107,15 @@ try {
   if ($LASTEXITCODE -ne 0) { throw "Packaged signed-out snapshot failed" }
   $snapshot = ($snapshotOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
   if (-not $snapshot.loginVisible -or $snapshot.authUnavailable) {
-    throw "Portable package did not reach the pinyin login page"
+    throw "Portable package did not reach the name login page"
   }
   if ($snapshot.desktopConnection.state -ne "disabled") {
     throw "Fresh portable package unexpectedly loaded a background notification credential"
   }
 
-  $env:QA_HUB_DESKTOP_LOGIN_PINYIN = $LoginPinyin
+  $env:QA_HUB_DESKTOP_LOGIN_NAME = $LoginName
   $loginOutput = & $NodeExe $smokeScript login
-  if ($LASTEXITCODE -ne 0) { throw "Packaged pinyin login failed" }
+  if ($LASTEXITCODE -ne 0) { throw "Packaged name login failed" }
   $login = ($loginOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
   if (-not $login.appReady) {
     throw "Portable package login did not load the QA Hub workbench"
@@ -127,9 +127,6 @@ try {
   if ((@($login.summaryLabels) -join "|") -ne ($expectedSummaryLabels -join "|")) {
     throw "Packaged workbench shortcuts do not match the four lifecycle categories"
   }
-  if ([string]$login.rememberedPinyin -ne $LoginPinyin) {
-    throw "Packaged login did not remember the successful pinyin identity"
-  }
   $notificationState = [string]$login.desktopConnection.state
   $notificationDeadline = [DateTime]::UtcNow.AddSeconds(15)
   while ($notificationState -ne "connected" -and [DateTime]::UtcNow -lt $notificationDeadline) {
@@ -140,7 +137,7 @@ try {
     $notificationState = [string]$notificationSnapshot.desktopConnection.state
   }
   if ($notificationState -ne "connected") {
-    throw "Pinyin login did not establish the browser-session notification stream: $notificationState"
+    throw "Name login did not establish the browser-session notification stream: $notificationState"
   }
 
   $detailOutput = & $NodeExe $smokeScript open-first-bug
@@ -179,8 +176,7 @@ try {
     apiUnavailableBeforeLogin = [bool]$snapshot.authUnavailable
     notificationsCredentialState = [string]$snapshot.desktopConnection.state
     notificationsAfterLogin = $notificationState
-    pinyinLoginSucceeded = [bool]$login.appReady
-    rememberedPinyin = [string]$login.rememberedPinyin
+    nameLoginSucceeded = [bool]$login.appReady
     summaryLabels = @($login.summaryLabels) -join ", "
     bugRowCount = [int]$login.bugRowCount
     workbenchEmpty = [bool]$login.workbenchEmpty

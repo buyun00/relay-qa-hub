@@ -9,18 +9,16 @@ fun String.asBuildConfigString(): String =
 
 val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
     .orElse("http://10.100.5.157:4319/api/v1/")
-val qaHubDebugAccessToken = providers.gradleProperty("qaHubDebugAccessToken")
-    .orElse("")
 val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
     .orElse("http://10.100.5.129:8000/apk/")
 val qaHubVersionCode = providers.gradleProperty("qaHubVersionCode")
-    .orElse("8")
+    .orElse("9")
     .map { value ->
         value.toIntOrNull()?.takeIf { it > 0 }
             ?: error("qaHubVersionCode must be a positive integer")
     }
 val qaHubVersionName = providers.gradleProperty("qaHubVersionName")
-    .orElse("0.1.7-debug")
+    .orElse("0.1.8-debug")
 val qaHubPocoPort = providers.gradleProperty("qaHubPocoPort")
     .orElse("5001")
     .map { value ->
@@ -48,7 +46,6 @@ android {
             "QA_HUB_API_BASE_URL",
             qaHubApiBaseUrl.get().asBuildConfigString(),
         )
-        buildConfigField("String", "QA_HUB_DEBUG_ACCESS_TOKEN", "\"\"")
         buildConfigField("String", "QA_HUB_CONTRACT_VERSION", "\"1.1.0\"")
         buildConfigField(
             "String",
@@ -62,11 +59,6 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
-            buildConfigField(
-                "String",
-                "QA_HUB_DEBUG_ACCESS_TOKEN",
-                qaHubDebugAccessToken.get().asBuildConfigString(),
-            )
         }
         release {
             isMinifyEnabled = false
@@ -99,10 +91,6 @@ android {
     }
 
     sourceSets {
-        // The seeds are kept at apps/android/config so QA can edit one documented
-        // directory. The app copies them to Android/media/<package>/qa-hub/config/
-        // on first run and prefers those external files thereafter.
-        getByName("main").assets.srcDir(file("../config"))
         getByName("androidTest").assets.srcDir(file("schemas"))
     }
 

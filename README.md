@@ -60,10 +60,12 @@ The signed LAN product mainline is running at:
 - API readiness: `http://10.100.5.157:4319/api/v1/health/ready`
 - Same-PC fallback: `http://127.0.0.1:4174/`
 
-The browser login accepts only a team member's lowercase pinyin, for example
-`luodongle`; there is no password form. The sole people source is
-[`apps/android/config/qa-people.json`](apps/android/config/qa-people.json), or
-the server-side `QA_HUB_PEOPLE_CONFIG_FILE` override with the same schema.
+Web, EXE, and Android all submit a display name to the same backend login
+boundary. An existing name resumes that backend account; a previously unseen
+name is created as a new backend account and logged in immediately. Clients do
+not load or validate a local people file. The server-owned initial membership
+seed is [`apps/android/config/qa-people.json`](apps/android/config/qa-people.json),
+or the server-side `QA_HUB_PEOPLE_CONFIG_FILE` override with the same schema.
 
 After building `packages/storage`, `apps/api`, and `apps/web`, the current local
 runtime can be safely restarted from an ordinary PowerShell prompt with:
@@ -105,30 +107,27 @@ contract are in
 
 ## Windows desktop App
 
-The current management Web is also packaged as a close-to-tray Windows App:
+The current management Web is also packaged as an installable close-to-tray
+Windows App:
 
 ```text
-apps/desktop/release/RelayQaHub-win32-x64/RelayQaHub.exe
-apps/desktop/release/RelayQaHub-win32-x64.zip
+apps/desktop/release/installer/Relay-QA-Hub-Setup-1.1.0-x64.exe
 ```
 
-The EXE is a portable Electron application, so keep the complete extracted
-`RelayQaHub-win32-x64` directory together; the EXE is not a standalone file.
-The current ZIP carries a token-free portable profile for
-`http://10.100.5.157:4319`, so another computer on the allowed LAN can extract
-the directory and log in directly with pinyin. Download it from:
+The installer places the complete application under the current user's local
+application directory, creates Desktop and Start Menu shortcuts, registers an
+uninstaller, and enables per-user login startup. It carries a token-free LAN
+profile for `http://10.100.5.157:4319`; another computer on the allowed LAN can
+install it and log in by name. Download it from:
 
 ```text
-http://10.100.5.157:4174/downloads/Relay-QA-Hub-Windows-x64.zip
+http://10.100.5.157:4174/downloads/Relay-QA-Hub-Setup-x64.exe
 ```
 
-Current verified ZIP: `155,044,980` bytes, release
-`20260827T062551963Z`, SHA-256
-`3746D0872B94091885DC5B3B851FDB6043D4204524FDD1712D0F609BC48BB0CE`.
-It includes the cross-Windows browser-session continuity fix and signed
-self-update. Existing clients check the same 4174 endpoint automatically,
-download a newer release in the background, verify its Ed25519 manifest and
-ZIP SHA-256, then show `安装并重启` in the page and tray.
+The installed App checks the same 4174 endpoint automatically, downloads a
+newer portable payload in the background, verifies its Ed25519 manifest and ZIP
+SHA-256, and then shows `安装并重启` in the page and tray. The updater preserves
+the installed runtime profile and uninstaller.
 
 If the server address changes or an older per-user config overrides the
 portable default, run the script shipped beside the EXE:
@@ -144,12 +143,12 @@ the separate local notification credential:
 .\scripts\Configure-QAHubDesktopRuntime.ps1
 ```
 
-This writes `%LOCALAPPDATA%\Relay QA Hub\desktop-runtime.json` and a separate,
-ACL-protected `desktop-access.token`. The Web login still only asks for pinyin.
-Fresh remote clients do not receive this bearer. Management and native
-background toast now use the remembered browser session, so a successful
-pinyin login enables both list refresh and the Windows notification stream.
-The successful pinyin is remembered locally and restored on later launches.
+This writes `%LOCALAPPDATA%\Relay QA Hub\desktop-runtime.json` and, when
+explicitly provisioned on the server computer, a separate ACL-protected local
+notification credential. Fresh remote clients do not receive this credential.
+Management and native background toast use the backend browser session, so a
+successful name login enables both list refresh and the Windows notification
+stream.
 Closing the window hides it to the tray and keeps the authenticated WSS/Inbox
 notification transport running. Use the tray's `退出 QA Hub` command to stop it.
 The first normal launch enables `登录时启动`; users can turn it off again from
@@ -189,8 +188,7 @@ current controlled-device artifact is:
 
 ```text
 apps/android/app/build/outputs/apk/debug/app-debug.apk
-version 0.1.4-debug (code 5), Android 12/API31+
-SHA-256 81C5EB63CE9D8798C695757FA8634966590E35F8500D88668A500D97E4C55647
+version 0.1.8-debug (code 9), Android 12/API31+
 ```
 
 Phones on the controlled QA LAN can download the same verified bytes from
@@ -213,12 +211,14 @@ It connects directly to the PC's configurable LAN API address. No `adb reverse`
 is required. Poco remains a separate phone-local connection to
 `127.0.0.1:5001`, so a physical phone talks to the game on that phone and to QA
 Hub on the PC at the same time. The checked-in API seed is
-[`apps/android/config/qa-runtime.json`](apps/android/config/qa-runtime.json);
+[`apps/android/app/src/main/assets/qa-runtime.json`](apps/android/app/src/main/assets/qa-runtime.json);
 the installed App prefers `Android/media/<applicationId>/qa-hub/config/qa-runtime.json`.
-This debug APK contains the controlled-LAN backend connection configuration and
-does not use a device key vault, PIN/biometric gate, password, or per-user token
-setup. It must not be distributed outside the controlled QA environment. Build, configuration, and
-install details are in [`docs/ANDROID_SETUP.md`](docs/ANDROID_SETUP.md).
+This debug APK contains only the controlled-LAN backend endpoint. It embeds no
+shared bearer or account list. A name login obtains a backend-issued account
+session token and stores it only in app-private preferences; switching identity
+deletes that account session. It must not be distributed outside the controlled
+QA environment. Build, configuration, and install details are in
+[`docs/ANDROID_SETUP.md`](docs/ANDROID_SETUP.md).
 
 The real Web + Android + API + Relay-boundary sign-off, including `LOCAL-6` and
 `LOCAL-7`, is recorded in

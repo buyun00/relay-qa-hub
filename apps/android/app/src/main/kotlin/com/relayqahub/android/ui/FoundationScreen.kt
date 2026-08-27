@@ -1945,7 +1945,7 @@ private fun PersonPicker(
                 }
                 if (people.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text("请先配置 qa-people.json") },
+                        text = { Text("后端尚未返回可分配成员") },
                         onClick = { expanded = false },
                     )
                 }

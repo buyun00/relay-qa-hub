@@ -7,20 +7,18 @@ export type QaPersonRole = "fixer" | "verifier";
 
 export interface QaPersonConfig {
   readonly id: string;
-  readonly pinyin: string;
   readonly displayName: string;
   readonly roles: readonly QaPersonRole[];
   readonly active: boolean;
 }
 
 export interface QaPeopleConfig {
-  readonly schemaVersion: 3;
+  readonly schemaVersion: 4;
   readonly projectKey: string;
   readonly people: readonly QaPersonConfig[];
 }
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u;
-const PINYIN_PATTERN = /^[a-z][a-z0-9]{1,63}$/u;
 const PROJECT_KEY_PATTERN = /^[A-Z][A-Z0-9_-]{1,31}$/u;
 const ROLES = new Set<QaPersonRole>(["fixer", "verifier"]);
 const DEFAULT_CONFIG_FILE = fileURLToPath(
@@ -88,12 +86,10 @@ function requireExactFields(
 function parsePerson(value: unknown, index: number): QaPersonConfig {
   const label = `qa people config people[${index}]`;
   const item = requireRecord(value, label);
-  requireExactFields(item, ["id", "pinyin", "displayName", "roles", "active"], label);
+  requireExactFields(item, ["id", "displayName", "roles", "active"], label);
   const id = typeof item["id"] === "string" ? item["id"].trim().toLowerCase() : "";
-  const pinyin = typeof item["pinyin"] === "string" ? item["pinyin"].trim().toLowerCase() : "";
   const displayName = typeof item["displayName"] === "string" ? item["displayName"].trim() : "";
   if (!UUID_PATTERN.test(id)) throw new Error(`${label}.id is invalid`);
-  if (!PINYIN_PATTERN.test(pinyin)) throw new Error(`${label}.pinyin is invalid`);
   if (displayName.length < 1 || displayName.length > 100) {
     throw new Error(`${label}.displayName is invalid`);
   }
@@ -110,7 +106,6 @@ function parsePerson(value: unknown, index: number): QaPersonConfig {
   if (typeof item["active"] !== "boolean") throw new Error(`${label}.active is invalid`);
   return Object.freeze({
     id,
-    pinyin,
     displayName,
     roles: Object.freeze(roles),
     active: item["active"],
@@ -130,7 +125,7 @@ export function loadQaPeopleConfig(configuredFile?: string): QaPeopleConfig {
   }
   const root = requireRecord(JSON.parse(raw) as unknown, "qa people config");
   requireExactFields(root, ["schemaVersion", "projectKey", "people"], "qa people config");
-  if (root["schemaVersion"] !== 3) throw new Error("qa people config schemaVersion is unsupported");
+  if (root["schemaVersion"] !== 4) throw new Error("qa people config schemaVersion is unsupported");
   const projectKey = typeof root["projectKey"] === "string" ? root["projectKey"].trim() : "";
   if (!PROJECT_KEY_PATTERN.test(projectKey))
     throw new Error("qa people config projectKey is invalid");
@@ -139,16 +134,13 @@ export function loadQaPeopleConfig(configuredFile?: string): QaPeopleConfig {
   }
   const people = root["people"].map(parsePerson);
   const ids = new Set<string>();
-  const pinyins = new Set<string>();
   for (const person of people) {
     if (!ids.add(person.id)) throw new Error("qa people config person id is duplicated");
-    if (!pinyins.add(person.pinyin))
-      throw new Error("qa people config person pinyin is duplicated");
   }
   if (!people.some((person) => person.active)) {
     throw new Error("qa people config requires at least one active person");
   }
-  return Object.freeze({ schemaVersion: 3, projectKey, people: Object.freeze(people) });
+  return Object.freeze({ schemaVersion: 4, projectKey, people: Object.freeze(people) });
 }
 
 export function qaMembershipId(userId: string): string {

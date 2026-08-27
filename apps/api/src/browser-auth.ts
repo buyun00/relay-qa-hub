@@ -81,10 +81,7 @@ export interface BrowserAuthOptions {
   readonly userId: string;
   readonly actorId: string;
   readonly adminEmail: string;
-  readonly passwordlessLogin: (
-    name: string,
-    now: string,
-  ) => Promise<{ readonly userId: string }>;
+  readonly passwordlessLogin: (name: string, now: string) => Promise<{ readonly userId: string }>;
   readonly sessionSecret: string;
   readonly webOrigins: readonly string[];
   readonly now?: () => Date;
@@ -379,10 +376,7 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
     try {
       const passwordless = options.passwordlessLogin;
       const passwordlessBody = parsePasswordlessLoginBody(request.body);
-      if (
-        passwordlessBody.client === "web" &&
-        !originMatches(request, options.webOrigins)
-      ) {
+      if (passwordlessBody.client === "web" && !originMatches(request, options.webOrigins)) {
         return writeJson(reply, 403, { code: "CSRF_ORIGIN_INVALID" });
       }
       const issuedAt = requestNow(options);
@@ -395,17 +389,15 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
         issuedAt: issuedAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
       };
-      const principal = await passwordless(
-        passwordlessBody.name,
-        issuedAt.toISOString(),
-      ).then((identity) =>
-        options.store.createBrowserSession({ ...session, userId: identity.userId }),
+      const principal = await passwordless(passwordlessBody.name, issuedAt.toISOString()).then(
+        (identity) => options.store.createBrowserSession({ ...session, userId: identity.userId }),
       );
       if (principal === null) return writeJson(reply, 401, AUTHENTICATION_FAILED);
       if (passwordlessBody?.client === "android") {
         return writeJson(reply, 200, {
           ...principalResponse(principal, browserCsrfToken(token, options.sessionSecret)),
           accessToken: token,
+          expiresAt: expiresAt.toISOString(),
         });
       }
       return reply

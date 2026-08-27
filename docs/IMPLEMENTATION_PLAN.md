@@ -22,7 +22,7 @@ qa_hub_progress:
     - Android 12/API31 包解析已修复并通过 lint/签名/下载哈希/API35 回归；当前没有连接 API31/32 设备，实际 OEM 安装与权限 smoke 待用户手机回读
     - API37、SELinux Enforcing、OEM 电源策略与正式发布签名仍属于后续发布 Gate
     - Android debug APK 内含受控内网后台配置、不得外发；App 不再使用 Keystore/PIN/生物识别/用户密钥，离线队列当前最多四次持久尝试
-    - 当前 APK 已取消 adb reverse 依赖；PC LAN 地址变化时必须同步 qa-runtime.json 并重跑受限防火墙/重启脚本
+    - 当前 APK 已取消 adb reverse 依赖；PC LAN 地址变化时必须同步 `apps/android/app/src/main/assets/qa-runtime.json` 并重跑受限防火墙/重启脚本
     - Poco `partial` 只因业务 Provider 未注册，普通截图与 Bug 已证明不受阻断；Web 已展示标准 Dump，prefab assetKey/recentErrors 等待下一 Unity QA 包
 ```
 
@@ -553,7 +553,7 @@ Relay 事件只能更新当前 `RepairAttempt` 的 Relay receipt/投影和通知
 - 新建 Bug 的验收人默认当前身份；修复人优先使用该身份上一次成功入队的选择，无本地偏好时回看该身份最近提单。标题仅作为从内容生成的内部旧契约兼容摘要，不作为用户输入或可见主字段。
 - `新建 Bug` 顶部始终先处理截图，至少提供适合触控的画圈/手绘、撤销、清除；悬浮球单击完成截图后自动打开此页并带入刚截媒体。页面只有内容、人员选择和明确的“一键提交”主动作；截图原图、标记图、内容、修复人和验收人进入同一稳定 `clientSubmissionId` 提交。
 - Android 不显示调试、同步、Poco、Relay、桌面管理、复杂设置或实验入口。Poco snapshot 与截图使用同一 captureId 静默采集并随证据上传；失败只把 enrichment 记为 partial/unavailable，不阻止普通截图提单，也不向用户暴露技术按钮或原始 RPC 细节。
-- 人员不得写死在 Kotlin/Compose 中，也不新增人员管理页。唯一配置源固定为仓库种子 `apps/android/config/qa-people.json`；安装后 App 首次复制到设备可编辑路径 `/storage/emulated/0/Android/media/<applicationId>/qa-hub/config/qa-people.json` 并优先读取该文件。JSON 固定为 `schemaVersion`、`projectKey`、`people[]`，每个人包含 `id`、`pinyin`、`displayName`、`roles`、`active`；`pinyin` 是唯一的小写姓名全拼，同时用于桌面端免密码登录，`roles` 只允许 `fixer` 和 `verifier`。debug applicationId 为 `com.relayqahub.android.debug`，release 为 `com.relayqahub.android`。配置无可用角色时明确提示，禁止退回硬编码人员。
+- 账号与人员统一由 QA Hub 后端管理。Web、EXE、Android 都只提交姓名；已有姓名登录原账号，未登记姓名由后端立即创建账号并登录。Android 不读取设备人员文件，也不在 APK 中嵌入人员表或共享 Bearer；登录后通过账号会话读取当前项目成员。服务端人员种子固定为 `schemaVersion=4`，每个人只包含 `id`、`displayName`、`roles`、`active`，旧 schema 和额外别名字段直接拒绝。debug applicationId 为 `com.relayqahub.android.debug`，release 为 `com.relayqahub.android`。
 - QA Hub API/数据库是唯一事实源。Room 只保存按账号/项目隔离的缓存、草稿和本地操作队列；上线后以服务端版本/事件对账，不能在本地决定最终状态或验收。
 - Relay 离线时，Android 到 QA Hub 的现场上报仍可用；完整分诊、人工修复、Build、验收、重开和关闭由 Web 通过同一 QA Hub API 完成。
 - 共享测试机采用短会话、显式用户/项目上下文、退出撤销通知并清除本账号 Room/媒体/token 命名空间。
@@ -891,7 +891,7 @@ P3.6 转 `VERIFYING`；离线 Poco bundle、录屏、Sharesheet/Photo Picker、�
 
 #### P3.10 Android 现场客户端收敛
 
-Android 已按 2026-08-27 使用反馈固定为三个底部顶层入口：独立 `悬浮球` 设置页、中央突出 `+ 新建`、默认 `Bug 列表`。列表按提交人、责任人和状态对当前已加载最多 100 条执行 AND 筛选并可打开必要详情；`新建 Bug` 接收悬浮球生成的 app-private screenshot/captureId，只显示一个内容，点击预览后才进入触控画圈/手绘、撤销、清除编辑器，读取 10.1 冻结的单一人员 JSON，默认 verifier 为自己、fixer 为上次成功选择，再用一个按钮把原图、标记图、内容和两个人员身份沿现有附件/幂等队列创建一个 Bug。Poco/qa.snapshot 与 capture 同步静默采集，partial/unavailable 均不阻断普通截图。
+Android 已按 2026-08-27 使用反馈固定为三个底部顶层入口：独立 `悬浮球` 设置页、中央突出 `+ 新建`、默认 `Bug 列表`。列表按提交人、责任人和状态对当前已加载最多 100 条执行 AND 筛选并可打开必要详情；`新建 Bug` 接收悬浮球生成的 app-private screenshot/captureId，只显示一个内容，点击预览后才进入触控画圈/手绘、撤销、清除编辑器，通过当前后端账号会话读取项目成员，默认 verifier 为自己、fixer 为上次成功选择，再用一个按钮把原图、标记图、内容和两个人员身份沿现有附件/幂等队列创建一个 Bug。Poco/qa.snapshot 与 capture 同步静默采集，partial/unavailable 均不阻断普通截图。
 
 最小验证只做一条真实 MuMu/API35 主链和一个关键降级：安装本仓库 `apps/android` Gradle 产出的 APK，确认悬浮球/突出新建/Bug 列表三个入口且无调试/Poco/Relay/桌面管理入口；从当前 `com.chuyao.baloots` 悬浮球截图自动打开新建页，点击图片完成标注、人员选择和一键提交，列表完成三类筛选/全部重置并打开真实图片详情，经真实 QA Hub API/SQLite 回读同一 Bug、原图/标记图、fixer/verifier 与 `qa.snapshot partial`；Poco 临时不可达时同一普通截图仍可提交。不得运行扩展模块测试矩阵，不触发 Unity/Jenkins。
 
@@ -907,11 +907,11 @@ Android 已按 2026-08-27 使用反馈固定为三个底部顶层入口：独立
 
 #### P3.13 Android 12 安装兼容与内网 APK 交付
 
-状态：`VERIFYING`。用户 Android 12 安装器返回泛化错误 `-2`；根因由模块事实确认：旧 APK 的 `minSdk=35` 高于 Android 12/12L 的 API31/32。当前 `0.1.3-debug` 保持 `minSdk=31`、版本码提升至 4，并把 app-private 动态广播注册与 MediaProjection parcelable 读取改成 AndroidX compat API，避免 APK 能安装但启动时调用 API33 重载崩溃。下载包曾因构建时未注入受控内网后台配置而显示 `DEBUG_ACCESS_TOKEN_MISSING`；专用构建脚本会在最终 DEX 上验证配置非空，否则失败。
+状态：`VERIFYING`。用户 Android 12 安装器返回泛化错误 `-2`；根因由模块事实确认：旧 APK 的 `minSdk=35` 高于 Android 12/12L 的 API31/32。当前发布基线保持 `minSdk=31`，并把 app-private 动态广播注册与 MediaProjection parcelable 读取改成 AndroidX compat API，避免 APK 能安装但启动时调用 API33 重载崩溃。APK 只注入可公开的后端地址，构建脚本会检查最终 DEX 不含共享访问凭据。
 
-定向 Gradle JVM、lint 与 assemble 全绿；`aapt2` 回读 `minSdk=31/targetSdk=37`，`apksigner` v2 校验通过。Android 12 真机报告 `credential vault unavailable` 后，App 已按内网工具边界删除 Android Keystore/加密 SharedPreferences/设备解锁依赖与每次提交前的 credential write；前台请求和 WorkManager 直接读同一 APK 内网配置。最终包在 MuMu/API35 上 `adb install -r` 成功、无 `adb reverse` 创建并回读 `LOCAL-17`。4174 完整下载的 33,947,528 bytes 与构建及已安装 APK 的 SHA-256 `F1B706...0850` 完全一致。权威证据见 `docs/evidence/ANDROID-LAN-NO-KEYSTORE-2026-08-27.md`；既有权限/横屏证据仍见 `docs/evidence/ANDROID-REMOTE-PHONE-CAPTURE-FIX-2026-08-27.md`。当前唯一未证明项是报告问题的 Android 12 真机实际重装回读；该设备不在当前 adb 列表中，不能以 API35 模拟器冒充。
+当前实现保留 Android 12 不依赖 Keystore/PIN/生物识别的约束，但已废除 APK 内共享调试凭据。姓名登录由后端签发账号会话 token，仅保存到 app-private preferences；切换身份会删除该会话。最终发布包必须以 Gradle、`aapt2`、`apksigner`、DEX 无嵌入凭据检查和真实后端姓名登录共同验收；既有权限/横屏证据仍见 `docs/evidence/ANDROID-REMOTE-PHONE-CAPTURE-FIX-2026-08-27.md`。
 
-Gate `G3-ANDROID-APP-READY`：P3.0-P3.10 的现场采集范围全绿；Android App 可安装并完成统一范围列表/详情、点击后截图标注、配置化人员、极简提单、普通截图/Poco 可选 enrichment、附件和离线重试；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。完整管理闭环由 G7 Web 证明，不能再用 Android 管理按钮代替。
+Gate `G3-ANDROID-APP-READY`：P3.0-P3.10 的现场采集范围全绿；Android App 可安装并完成统一范围列表/详情、点击后截图标注、后端人员选择、极简提单、普通截图/Poco 可选 enrichment、附件和离线重试；Poco 只允许回环只读；重复/重试只有一个 QA item；保存 APK/AAB SHA、设备/Unity/Poco 版本、request ID/item ID、性能与录屏证据。完整管理闭环由 G7 Web 证明，不能再用 Android 管理按钮代替。
 
 ### P4 - G4：人工修复和验收闭环
 

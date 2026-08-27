@@ -245,14 +245,12 @@ if ($Action -eq "PrepareStart") {
   $env:ANDROID_SDK_ROOT = $androidSdk
   $env:JAVA_HOME = $javaHome
   $env:ORG_GRADLE_PROJECT_qaHubApiBaseUrl = "http://$($lan.Address):4319/api/v1/"
-  $env:ORG_GRADLE_PROJECT_qaHubDebugAccessToken = [string]$state.accessToken
   Push-Location (Join-Path $repoRoot "apps\android")
   try {
     & ".\gradlew.bat" --no-daemon assembleDebug
     if ($LASTEXITCODE -ne 0) { throw "Android assembleDebug failed" }
   } finally {
     Pop-Location
-    Remove-Item Env:ORG_GRADLE_PROJECT_qaHubDebugAccessToken -ErrorAction SilentlyContinue
   }
   $state.apkSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $apkPath).Hash
   Write-State $state

@@ -2,29 +2,32 @@ package com.relayqahub.android
 
 import android.content.Context
 
-/** App-private selected QA identity. The canonical identity still comes from qa-people.json. */
+/** App-private remembered identity created by the backend name-login contract. */
 class QaIdentityStore(context: Context) {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
-    fun current(config: QaPeopleConfig): QaPerson? {
+    fun current(): QaPerson? {
         val actorId = actorIdOrNull() ?: return null
-        return config.people.singleOrNull { it.active && it.id == actorId }
+        val displayName = preferences.getString(KEY_DISPLAY_NAME, null)
+            ?.trim()
+            ?.takeIf(String::isNotEmpty)
             ?: run {
                 clear()
-                null
+                return null
             }
+        return QaPerson(actorId, displayName, emptySet(), active = true)
     }
 
-    fun selectByPinyin(config: QaPeopleConfig, input: String): QaPerson? {
-        val normalized = input.trim().lowercase()
-        val person = config.people.singleOrNull { it.active && it.pinyin == normalized }
-            ?: return null
+    fun select(userId: String, displayName: String): QaPerson {
+        val normalizedName = displayName.trim()
+        require(userId.isNotBlank() && normalizedName.isNotEmpty())
         check(
             preferences.edit()
-                .putString(KEY_ACTOR_ID, person.id)
+                .putString(KEY_ACTOR_ID, userId)
+                .putString(KEY_DISPLAY_NAME, normalizedName)
                 .commit(),
         ) { "QA_IDENTITY_PERSIST_FAILED" }
-        return person
+        return QaPerson(userId, normalizedName, emptySet(), active = true)
     }
 
     fun actorIdOrNull(): String? = preferences.getString(KEY_ACTOR_ID, null)
@@ -32,7 +35,7 @@ class QaIdentityStore(context: Context) {
         ?.takeIf(String::isNotEmpty)
 
     fun clear() {
-        check(preferences.edit().remove(KEY_ACTOR_ID).commit()) {
+        check(preferences.edit().clear().commit()) {
             "QA_IDENTITY_CLEAR_FAILED"
         }
     }
@@ -40,5 +43,6 @@ class QaIdentityStore(context: Context) {
     private companion object {
         const val PREFERENCES_NAME = "qa-hub-private-identity"
         const val KEY_ACTOR_ID = "actor_id"
+        const val KEY_DISPLAY_NAME = "display_name"
     }
 }

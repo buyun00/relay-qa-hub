@@ -26,10 +26,6 @@ if (-not (Test-Path -LiteralPath (Join-Path $JavaHome 'bin\java.exe') -PathType 
 }
 
 $state = Get-Content -LiteralPath $RuntimeStatePath -Raw | ConvertFrom-Json
-$accessToken = [string]$state.accessToken
-if ([string]::IsNullOrWhiteSpace($accessToken) -or $accessToken.Length -lt 32) {
-    throw 'Runtime state does not contain a usable controlled-QA access token.'
-}
 $apiUrl = [string]$state.apiUrl
 if ([string]::IsNullOrWhiteSpace($apiUrl)) {
     $lanAddress = [string]$state.lanAddress
@@ -44,14 +40,12 @@ $previousAndroidHome = $env:ANDROID_HOME
 $previousAndroidSdkRoot = $env:ANDROID_SDK_ROOT
 $previousJavaHome = $env:JAVA_HOME
 $previousApiBaseUrl = $env:ORG_GRADLE_PROJECT_qaHubApiBaseUrl
-$previousAccessToken = $env:ORG_GRADLE_PROJECT_qaHubDebugAccessToken
 
 try {
     $env:ANDROID_HOME = $AndroidSdkRoot
     $env:ANDROID_SDK_ROOT = $AndroidSdkRoot
     $env:JAVA_HOME = $JavaHome
     $env:ORG_GRADLE_PROJECT_qaHubApiBaseUrl = $apiBaseUrl
-    $env:ORG_GRADLE_PROJECT_qaHubDebugAccessToken = $accessToken
 
     $tasks = @()
     if (-not $SkipUnitTests) { $tasks += ':app:testDebugUnitTest' }
@@ -70,9 +64,6 @@ finally {
     $env:ANDROID_SDK_ROOT = $previousAndroidSdkRoot
     $env:JAVA_HOME = $previousJavaHome
     $env:ORG_GRADLE_PROJECT_qaHubApiBaseUrl = $previousApiBaseUrl
-    $env:ORG_GRADLE_PROJECT_qaHubDebugAccessToken = $previousAccessToken
-    $accessTokenForVerification = $accessToken
-    $accessToken = $null
 }
 
 if (-not (Test-Path -LiteralPath $apkPath -PathType Leaf)) {
@@ -88,37 +79,41 @@ if ($element.Count -ne 1 -or [string]$element[0].outputFile -ne 'app-debug.apk')
 }
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-$archive = [System.IO.Compression.ZipFile]::OpenRead($apkPath)
+$archive = [IO.Compression.ZipFile]::OpenRead($apkPath)
 try {
-    $latin1 = [System.Text.Encoding]::GetEncoding(28591)
-    $credentialEmbedded = $false
-    foreach ($entry in $archive.Entries) {
-        if ($entry.FullName -notmatch '^classes\d*\.dex$') { continue }
-        $stream = $entry.Open()
+    $entryNames = @($archive.Entries | ForEach-Object FullName)
+    if ($entryNames -contains 'assets/qa-people.json') {
+        throw 'Android APK unexpectedly contains the backend-only people seed.'
+    }
+    $forbiddenDexMarkers = @(
+        'QA_HUB_DEBUG_ACCESS_TOKEN',
+        'DEBUG_ACCESS_TOKEN_MISSING',
+        'BundledLanCredentialProvider'
+    )
+    foreach ($dexEntry in @($archive.Entries | Where-Object { $_.FullName -match '^classes\d*\.dex$' })) {
+        $stream = $dexEntry.Open()
         try {
-            $reader = [System.IO.StreamReader]::new($stream, $latin1, $false, 65536, $true)
+            $memory = [IO.MemoryStream]::new()
             try {
-                if ($reader.ReadToEnd().Contains($accessTokenForVerification)) {
-                    $credentialEmbedded = $true
-                    break
-                }
+                $stream.CopyTo($memory)
+                $dexText = [Text.Encoding]::UTF8.GetString($memory.ToArray())
             }
             finally {
-                $reader.Dispose()
+                $memory.Dispose()
             }
         }
         finally {
             $stream.Dispose()
         }
+        foreach ($marker in $forbiddenDexMarkers) {
+            if ($dexText.Contains($marker, [StringComparison]::Ordinal)) {
+                throw "Android APK still contains obsolete embedded-credential marker: $marker"
+            }
+        }
     }
 }
 finally {
     $archive.Dispose()
-    $accessTokenForVerification = $null
-}
-
-if (-not $credentialEmbedded) {
-    throw 'Built APK verification failed: controlled-QA credential was not embedded.'
 }
 
 $artifact = Get-Item -LiteralPath $apkPath
@@ -131,6 +126,6 @@ $artifact = Get-Item -LiteralPath $apkPath
     versionCode = [int]$element[0].versionCode
     minSdk = [int]$metadata.minSdkVersionForDexing
     apiBaseUrl = $apiBaseUrl
-    credentialVerified = $credentialEmbedded
+    containsEmbeddedAccessToken = $false
     controlledQaLanOnly = $true
 } | ConvertTo-Json -Depth 3

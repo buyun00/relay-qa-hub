@@ -235,10 +235,7 @@ async function run(): Promise<void> {
   }
   const activePeople = peopleConfig.people.filter((person) => person.active);
   const configuredPeople = new Map(
-    activePeople.flatMap((person) => [
-      [normalizeQaLoginName(person.pinyin).key, person] as const,
-      [normalizeQaLoginName(person.displayName).key, person] as const,
-    ]),
+    activePeople.map((person) => [normalizeQaLoginName(person.displayName).key, person] as const),
   );
   const webBootstrapPassword = process.env["QA_HUB_BOOTSTRAP_ADMIN_PASSWORD"];
   if (webAuthMode === "debug" && webBootstrapPassword !== undefined) {
@@ -283,7 +280,7 @@ async function run(): Promise<void> {
         actorId: person.id,
         membershipId: qaMembershipId(person.id),
         actorDisplayName: person.displayName,
-        actorEmail: `${person.pinyin}@qa.local`,
+        actorEmail: qaLoginEmail(MOBILE_SCOPE.accountId, person.displayName),
       };
       await worker.ensureMobileScope(personScope);
       await worker.ensureMobileRelayRoles(personScope);
@@ -370,10 +367,10 @@ async function run(): Promise<void> {
                   actorId: userId,
                   membershipId: qaMembershipId(userId),
                   actorDisplayName: configured?.displayName ?? normalized.displayName,
-                  actorEmail:
-                    configured === undefined
-                      ? qaLoginEmail(MOBILE_SCOPE.accountId, normalized.key)
-                      : `${configured.pinyin}@qa.local`,
+                  actorEmail: qaLoginEmail(
+                    MOBILE_SCOPE.accountId,
+                    configured?.displayName ?? normalized.key,
+                  ),
                 };
                 await worker.ensureMobileScope(personScope);
                 await worker.ensureMobileRelayRoles(personScope);

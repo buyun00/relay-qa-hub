@@ -499,23 +499,6 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   if (debugBearerToken.length === 0) throw new Error("debugBearerToken must not be empty");
 
-  app.addHook("preHandler", async (request, reply) => {
-    const nativeActorId = readHeader(request.headers[NATIVE_ACTOR_ID_HEADER]);
-    if (nativeActorId === undefined) return;
-    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
-      return reply
-        .code(401)
-        .header("content-type", MOBILE_API_CONTENT_TYPE)
-        .send({ code: "NATIVE_SESSION_INVALID" });
-    }
-    if (!UUID_PATTERN.test(nativeActorId)) {
-      return reply
-        .code(400)
-        .header("content-type", MOBILE_API_CONTENT_TYPE)
-        .send({ code: "INVALID_REQUEST" });
-    }
-  });
-
   const browserAuth = options.browserAuth;
   if (browserAuth !== undefined) {
     app.addHook("preHandler", async (request, reply) => {
@@ -554,6 +537,30 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     });
     registerBrowserAuthRoutes(app, browserAuth);
   }
+
+  app.addHook("preHandler", async (request, reply) => {
+    const nativeActorId = readHeader(request.headers[NATIVE_ACTOR_ID_HEADER]);
+    if (nativeActorId === undefined) return;
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply
+        .code(401)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    if (!UUID_PATTERN.test(nativeActorId)) {
+      return reply
+        .code(400)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "INVALID_REQUEST" });
+    }
+    const principal = getBrowserPrincipal(request);
+    if (principal !== undefined && principal.actorId !== nativeActorId.toLowerCase()) {
+      return reply
+        .code(403)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "NATIVE_ACTOR_MISMATCH" });
+    }
+  });
 
   if (
     options.mobileNotificationStore !== undefined &&

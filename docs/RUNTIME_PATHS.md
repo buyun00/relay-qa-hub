@@ -31,7 +31,7 @@ Current production persistence and recovery paths (verified 2026-08-27):
 - Data root: `D:\Relay-QA-Hub-Data\production`
 - SQLite fact source: `D:\Relay-QA-Hub-Data\production\db\qa-hub.sqlite`
 - Content-addressed evidence: `D:\Relay-QA-Hub-Data\production\evidence\sha256`
-- External people configuration: `D:\Relay-QA-Hub-Config\qa-people.json`
+- Backend-only account/membership seed: `D:\Relay-QA-Hub-Config\qa-people.json`
 - Local online SQLite recovery points: `D:\Relay-QA-Hub-Backups\production\rpo`
 - Separate-disk DB + attachment archive: `E:\Relay-QA-Hub-Archives\production\rpo`
 - Content-hash people configuration copies: `E:\Relay-QA-Hub-Archives\production\configuration`

@@ -296,7 +296,13 @@ export {
   registerBrowserAuthRoutes,
 } from "./browser-auth.js";
 
-export { normalizeQaLoginName, qaLoginEmail, qaMembershipId, qaUserId } from "./people-config.js";
+export {
+  loadQaPeopleConfig,
+  normalizeQaLoginName,
+  qaLoginEmail,
+  qaMembershipId,
+  qaUserId,
+} from "./people-config.js";
 export type {
   BrowserAuthOptions,
   BrowserAuthPrincipal,

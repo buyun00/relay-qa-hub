@@ -6,11 +6,11 @@ import com.relayqahub.android.QaPersonRole
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -22,6 +22,7 @@ data class QaHubAccountSession(
     val userId: String,
     val displayName: String,
     val accessToken: String,
+    val accessTokenExpiresAtEpochMs: Long,
 )
 
 class AccountSessionFailure(val code: String) : RuntimeException(code)
@@ -29,21 +30,9 @@ class AccountSessionFailure(val code: String) : RuntimeException(code)
 class AccountSessionClient(
     baseUrl: String,
     private val httpClient: OkHttpClient,
-    allowLoopbackHttp: Boolean = false,
+    allowPrivateHttp: Boolean = false,
 ) {
-    private val apiBaseUrl: HttpUrl = baseUrl.toHttpUrl().let { parsed ->
-        require(parsed.username.isEmpty() && parsed.password.isEmpty())
-        val loopbackHttp = allowLoopbackHttp &&
-            parsed.scheme == "http" &&
-            parsed.host in LOOPBACK_HOSTS
-        require(parsed.isHttps || loopbackHttp)
-        require(parsed.query == null && parsed.fragment == null)
-        val normalized = parsed.newBuilder().apply {
-            if (!parsed.encodedPath.endsWith('/')) addPathSegment("")
-        }.build()
-        require(normalized.encodedPath == API_BASE_PATH)
-        normalized
-    }
+    private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
 
     internal fun buildLoginRequest(name: String): Request {
         val url = apiBaseUrl.resolve("auth/login")
@@ -75,15 +64,20 @@ class AccountSessionClient(
             val userId = root.optString("userId")
             val displayName = root.optString("displayName")
             val accessToken = root.optString("accessToken")
+            val expiresAtEpochMs = runCatching {
+                Instant.parse(root.optString("expiresAt")).toEpochMilli()
+            }.getOrNull()
             if (
                 runCatching { UUID.fromString(accountId) }.isFailure ||
                 runCatching { UUID.fromString(userId) }.isFailure ||
                 displayName.isBlank() ||
-                accessToken.length != 43
+                accessToken.length != 43 ||
+                expiresAtEpochMs == null ||
+                expiresAtEpochMs <= System.currentTimeMillis()
             ) {
                 throw AccountSessionFailure("INVALID_LOGIN_RESPONSE")
             }
-            QaHubAccountSession(accountId, userId, displayName, accessToken)
+            QaHubAccountSession(accountId, userId, displayName, accessToken, expiresAtEpochMs)
         }
     }
 
@@ -146,7 +140,7 @@ class AccountSessionClient(
                     add(QaPerson(userId, displayName, roles, active = true))
                 }
             }
-            QaPeopleConfig(projectKey, people)
+            QaPeopleConfig(schemaVersion = 4, projectKey = projectKey, people = people)
         }
     }
 
@@ -157,10 +151,8 @@ class AccountSessionClient(
     }
 
     private companion object {
-        const val API_BASE_PATH = "/api/v1/"
         const val MAX_RESPONSE_BYTES = 256 * 1024
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
-        val LOOPBACK_HOSTS = setOf("127.0.0.1", "localhost", "::1")
     }
 }
 

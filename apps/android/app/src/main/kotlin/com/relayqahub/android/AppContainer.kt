@@ -8,6 +8,7 @@ import com.relayqahub.android.data.ScopedRepository
 import com.relayqahub.android.capture.PendingCaptureDraftStore
 import com.relayqahub.android.capture.CaptureArtifactStore
 import com.relayqahub.android.network.AttachmentUploadClient
+import com.relayqahub.android.network.AccountSessionClient
 import com.relayqahub.android.network.AndroidUpdateClient
 import com.relayqahub.android.network.ApkDownloadClient
 import com.relayqahub.android.network.BuildProjectionClient
@@ -21,7 +22,7 @@ import com.relayqahub.android.network.OkHttpQaHubApiClient
 import com.relayqahub.android.network.QA_HUB_ACTOR_ID_HEADER
 import com.relayqahub.android.network.RelayHandoffClient
 import com.relayqahub.android.network.RepairAttemptClient
-import com.relayqahub.android.security.BundledLanCredentialProvider
+import com.relayqahub.android.security.AppPrivateCredentialVault
 import com.relayqahub.android.security.CredentialVault
 import com.relayqahub.android.security.SessionLifecycleCoordinator
 import com.relayqahub.android.work.OfflineSyncEngine
@@ -34,6 +35,7 @@ import okhttp3.OkHttpClient
 
 class AppContainer private constructor(
     val identityStore: QaIdentityStore,
+    val accountSessionClient: AccountSessionClient,
     val bugDraftPreferences: BugDraftPreferences,
     val database: QaHubDatabase,
     val androidUpdateClient: AndroidUpdateClient,
@@ -78,12 +80,7 @@ class AppContainer private constructor(
                 QaHubDatabase.MIGRATION_2_3,
                 QaHubDatabase.MIGRATION_3_4,
             ).build()
-            // QA Hub is a controlled-LAN tool. The debug APK already carries the runtime
-            // connection credential, so do not couple submission or offline retry to Android
-            // Keystore, device PIN, biometrics, or an additional user authentication flow.
-            val credentialVault = BundledLanCredentialProvider(
-                accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN,
-            )
+            val credentialVault = AppPrivateCredentialVault(applicationContext)
             val httpClient = OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -113,6 +110,11 @@ class AppContainer private constructor(
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(false)
                 .build()
+            val accountSessionClient = AccountSessionClient(
+                baseUrl = apiBaseUrl,
+                httpClient = distributionHttpClient,
+                allowPrivateHttp = true,
+            )
             val apiClient = OkHttpQaHubApiClient(
                 baseUrl = apiBaseUrl,
                 httpClient = httpClient,
@@ -185,6 +187,7 @@ class AppContainer private constructor(
             val syncScheduler = SyncScheduler(WorkManager.getInstance(applicationContext))
             return AppContainer(
                 identityStore = identityStore,
+                accountSessionClient = accountSessionClient,
                 bugDraftPreferences = BugDraftPreferences(applicationContext),
                 database = database,
                 androidUpdateClient = androidUpdateClient,

@@ -23,9 +23,9 @@ const hasControlCharacter = (value) =>
 if (marker.length > 300 || hasControlCharacter(marker)) {
   throw new Error("QA_HUB_DESKTOP_SMOKE_MARKER is invalid");
 }
-const loginPinyin = process.env.QA_HUB_DESKTOP_LOGIN_PINYIN?.trim().toLowerCase() ?? "";
-if (loginPinyin.length > 100 || (loginPinyin.length > 0 && !/^[a-z]+$/u.test(loginPinyin))) {
-  throw new Error("QA_HUB_DESKTOP_LOGIN_PINYIN is invalid");
+const loginName = process.env.QA_HUB_DESKTOP_LOGIN_NAME?.trim() ?? "";
+if (loginName.length > 100 || (loginName.length > 0 && hasControlCharacter(loginName))) {
+  throw new Error("QA_HUB_DESKTOP_LOGIN_NAME is invalid");
 }
 
 async function target() {
@@ -109,7 +109,6 @@ const snapshotExpression = `
         node.textContent?.trim() ?? ""),
       overviewUnassignedFilterAvailable: [...document.querySelectorAll(".overview-toolbar option")].some(
         (option) => option.value === "unassigned" && (option.textContent ?? "").includes("未分配")),
-      rememberedPinyin: localStorage.getItem("relay-qa-hub:remembered-pinyin"),
       markerVisible: ${JSON.stringify(marker)}.length > 0 && bodyText.includes(${JSON.stringify(marker)}),
       desktopConnection: status,
       desktopUpdate: updateState,
@@ -132,14 +131,14 @@ const page = await target();
 const client = await connect(page.webSocketDebuggerUrl);
 try {
   if (action === "login") {
-    if (loginPinyin.length === 0) throw new Error("QA_HUB_DESKTOP_LOGIN_PINYIN is required");
+    if (loginName.length === 0) throw new Error("QA_HUB_DESKTOP_LOGIN_NAME is required");
     const result = await client.send("Runtime.evaluate", {
       expression: `(() => {
-        const input = document.querySelector("#login-pinyin");
+        const input = document.querySelector("#login-name");
         const form = document.querySelector(".auth-form");
         if (!(input instanceof HTMLInputElement) || !(form instanceof HTMLFormElement)) return false;
         const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
-        setter?.call(input, ${JSON.stringify(loginPinyin)});
+        setter?.call(input, ${JSON.stringify(loginName)});
         input.dispatchEvent(new Event("input", { bubbles: true }));
         form.requestSubmit();
         return true;

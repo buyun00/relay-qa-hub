@@ -25,6 +25,7 @@ import {
   MobileCaptureRequestError,
   createApiApp,
   createApiServer,
+  loadQaPeopleConfig,
   normalizeQaLoginName,
   parseMobileBugListQuery,
   parseMobileCreateCaptureRequest,
@@ -46,6 +47,46 @@ test("backend account-name normalization is stable and preserves the display spe
   assert.equal(qaUserId(accountId, "NewUser"), qaUserId(accountId, " newuser "));
   assert.equal(qaLoginEmail(accountId, "NewUser"), qaLoginEmail(accountId, " newuser "));
   assert.throws(() => normalizeQaLoginName("   "), /name is invalid/u);
+});
+
+test("backend people seed accepts only schema 4 without client-side aliases", async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), "qa-hub-people-v4-"));
+  t.after(async () => rm(directory, { recursive: true, force: true }));
+  const configFile = join(directory, "qa-people.json");
+  await writeFile(
+    configFile,
+    JSON.stringify({
+      schemaVersion: 4,
+      projectKey: "LOCAL",
+      people: [
+        {
+          id: "10000000-0000-4000-8000-000000000003",
+          displayName: "罗东乐",
+          roles: ["fixer", "verifier"],
+          active: true,
+        },
+      ],
+    }),
+  );
+  assert.equal(loadQaPeopleConfig(configFile).people[0].displayName, "罗东乐");
+
+  await writeFile(
+    configFile,
+    JSON.stringify({
+      schemaVersion: 3,
+      projectKey: "LOCAL",
+      people: [
+        {
+          id: "10000000-0000-4000-8000-000000000003",
+          pinyin: "luodongle",
+          displayName: "罗东乐",
+          roles: ["fixer", "verifier"],
+          active: true,
+        },
+      ],
+    }),
+  );
+  assert.throws(() => loadQaPeopleConfig(configFile), /schemaVersion is unsupported/u);
 });
 
 test("new Web and Android name login creates backend accounts and rejects the old pinyin contract", async (t) => {
@@ -137,15 +178,30 @@ test("new Web and Android name login creates backend accounts and rejects the ol
   assert.equal(androidLogin.statusCode, 200);
   assert.deepEqual(rawNames, ["  新账号  ", "  新账号  "]);
   assert.match(androidLogin.json().accessToken, /^[A-Za-z0-9_-]{43}$/u);
+  assert.match(androidLogin.json().expiresAt, /^\d{4}-\d{2}-\d{2}T/u);
   assert.equal(androidLogin.headers["set-cookie"], undefined);
 
   const projects = await app.inject({
     method: "GET",
     url: MOBILE_PROJECT_COLLECTION_PATH,
-    headers: { authorization: `Bearer ${androidLogin.json().accessToken}` },
+    headers: {
+      authorization: `Bearer ${androidLogin.json().accessToken}`,
+      "x-qa-actor-id": userId,
+    },
   });
   assert.equal(projects.statusCode, 200);
   assert.deepEqual(projects.json(), { snapshotSequence: 0, items: [], nextCursor: null });
+
+  const actorMismatch = await app.inject({
+    method: "GET",
+    url: MOBILE_PROJECT_COLLECTION_PATH,
+    headers: {
+      authorization: `Bearer ${androidLogin.json().accessToken}`,
+      "x-qa-actor-id": debugActorId,
+    },
+  });
+  assert.equal(actorMismatch.statusCode, 403);
+  assert.deepEqual(actorMismatch.json(), { code: "NATIVE_ACTOR_MISMATCH" });
 });
 
 test("Bug overview query supports unassigned ownership and a 500-row window", () => {

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -32,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,8 +50,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.relayqahub.android.FoundationViewModel
 import com.relayqahub.android.QaHubApplication
-import com.relayqahub.android.QaPeopleConfigLoader
 import com.relayqahub.android.QaPerson
+import com.relayqahub.android.network.AccountSessionFailure
+import com.relayqahub.android.security.NativeCredentials
+import com.relayqahub.android.security.VaultResult
+import com.relayqahub.android.security.nativeSessionScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun QaHubRoot(
@@ -61,21 +65,45 @@ fun QaHubRoot(
     onStopCaptureSession: () -> Unit,
 ) {
     val application = LocalContext.current.applicationContext as QaHubApplication
-    val identityStore = application.container.identityStore
-    val configResult = remember {
-        runCatching {
-            QaPeopleConfigLoader.ensureExternalSeed(application)
-            QaPeopleConfigLoader.load(application)
+    val container = application.container
+    val identityStore = container.identityStore
+    val coroutineScope = rememberCoroutineScope()
+    val rememberedPerson = remember { identityStore.current() }
+    var signedInPerson by remember { mutableStateOf<QaPerson?>(null) }
+    var loginPending by rememberSaveable { mutableStateOf(rememberedPerson != null) }
+    var loginError by rememberSaveable { mutableStateOf<String?>(null) }
+    val establishSession: suspend (String) -> QaPerson = { name ->
+        val session = container.accountSessionClient.login(name)
+        val scope = FoundationViewModel.foundationScope(session.userId)
+        when (
+            container.credentialVault.put(
+                scope.nativeSessionScope(),
+                NativeCredentials(
+                    accessToken = session.accessToken,
+                    refreshToken = "backend-name-login-no-refresh",
+                    accessTokenExpiresAtEpochMs = session.accessTokenExpiresAtEpochMs,
+                    sharedDeviceSession = false,
+                ),
+            )
+        ) {
+            is VaultResult.Success -> identityStore.select(session.userId, session.displayName)
+            is VaultResult.Missing -> throw AccountSessionFailure("SESSION_PERSIST_MISSING")
+            is VaultResult.Unavailable -> throw AccountSessionFailure("SESSION_PERSIST_FAILED")
         }
     }
-    val config = configResult.getOrNull()
-    if (config == null) {
-        IdentityConfigurationFailure(configResult.exceptionOrNull())
-        return
-    }
-
-    var signedInPerson by remember(config) {
-        mutableStateOf(identityStore.current(config))
+    LaunchedEffect(rememberedPerson?.id) {
+        val remembered = rememberedPerson ?: return@LaunchedEffect
+        try {
+            signedInPerson = establishSession(remembered.displayName)
+        } catch (failure: AccountSessionFailure) {
+            identityStore.clear()
+            loginError = when (failure.code) {
+                "NETWORK_IO" -> "无法连接 QA Hub，请检查内网后重新登录。"
+                else -> "原登录已失效，请重新输入姓名。"
+            }
+        } finally {
+            loginPending = false
+        }
     }
     val person = signedInPerson
     if (person == null) {
@@ -84,8 +112,28 @@ fun QaHubRoot(
             onDispose { }
         }
         IdentityGate(
-            onLogin = { pinyin ->
-                identityStore.selectByPinyin(config, pinyin)?.also { signedInPerson = it }
+            pending = loginPending,
+            error = loginError,
+            onLogin = { name ->
+                if (!loginPending) {
+                    loginPending = true
+                    loginError = null
+                    coroutineScope.launch {
+                        try {
+                            signedInPerson = establishSession(name)
+                        } catch (failure: AccountSessionFailure) {
+                            loginError = when (failure.code) {
+                                "NETWORK_IO" -> "无法连接 QA Hub，请检查内网。"
+                                "INVALID_ACCOUNT_NAME", "INVALID_REQUEST" -> "请输入有效姓名。"
+                                "SESSION_PERSIST_MISSING", "SESSION_PERSIST_FAILED" ->
+                                    "登录会话保存失败，请重试。"
+                                else -> "登录失败：${failure.code}"
+                            }
+                        } finally {
+                            loginPending = false
+                        }
+                    }
+                }
             },
         )
         return
@@ -105,8 +153,13 @@ fun QaHubRoot(
         viewModel = foundationViewModel,
         signedInPerson = person,
         onSwitchIdentity = {
-            identityStore.clear()
-            signedInPerson = null
+            coroutineScope.launch {
+                container.credentialVault.deleteSession(
+                    FoundationViewModel.foundationScope(person.id).nativeSessionScope(),
+                )
+                identityStore.clear()
+                signedInPerson = null
+            }
         },
         onStartCaptureSession = onStartCaptureSession,
         onCaptureNow = onCaptureNow,
@@ -115,13 +168,14 @@ fun QaHubRoot(
 }
 
 @Composable
-private fun IdentityGate(onLogin: (String) -> QaPerson?) {
-    var pinyin by rememberSaveable { mutableStateOf("") }
-    var error by rememberSaveable { mutableStateOf<String?>(null) }
+private fun IdentityGate(
+    pending: Boolean,
+    error: String?,
+    onLogin: (String) -> Unit,
+) {
+    var name by rememberSaveable { mutableStateOf("") }
     val submit: () -> Unit = {
-        if (pinyin.isNotBlank() && onLogin(pinyin) == null) {
-            error = "未找到该成员，请检查完整拼音。"
-        }
+        if (name.isNotBlank() && !pending) onLogin(name)
     }
 
     Box(
@@ -173,26 +227,25 @@ private fun IdentityGate(onLogin: (String) -> QaPerson?) {
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = "输入姓名拼音识别身份",
+                        text = "输入姓名；未登记的姓名会由后端自动创建账号",
                         modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
                     OutlinedTextField(
-                        value = pinyin,
+                        value = name,
                         onValueChange = {
-                            pinyin = it
-                            error = null
+                            name = it
                         },
                         singleLine = true,
-                        label = { Text("姓名拼音") },
-                        placeholder = { Text("例如：luodongle") },
+                        label = { Text("姓名") },
+                        placeholder = { Text("例如：罗东乐") },
                         supportingText = error?.let { message -> ({ Text(message) }) },
                         isError = error != null,
                         shape = RoundedCornerShape(16.dp),
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Ascii,
+                            keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Done,
                         ),
                         keyboardActions = KeyboardActions(onDone = { submit() }),
@@ -206,11 +259,11 @@ private fun IdentityGate(onLogin: (String) -> QaPerson?) {
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .testTag("identity-pinyin"),
+                            .testTag("identity-name"),
                     )
                     Button(
                         onClick = submit,
-                        enabled = pinyin.isNotBlank(),
+                        enabled = name.isNotBlank() && !pending,
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = QaForest,
@@ -224,65 +277,16 @@ private fun IdentityGate(onLogin: (String) -> QaPerson?) {
                             .height(56.dp)
                             .testTag("identity-login"),
                     ) {
-                        Text("进入工作台", fontWeight = FontWeight.Bold)
+                        Text(if (pending) "正在登录…" else "进入工作台", fontWeight = FontWeight.Bold)
                     }
                     Text(
-                        text = "仅用于内网身份识别，无需密码",
+                        text = "账号和团队成员均由 QA Hub 后端统一管理",
                         modifier = Modifier.padding(top = 16.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun IdentityConfigurationFailure(failure: Throwable?) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .padding(24.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth().widthIn(max = 520.dp),
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.22f)),
-            shadowElevation = 6.dp,
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Surface(
-                    modifier = Modifier.size(48.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.errorContainer,
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "!",
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                }
-                Text(
-                    "人员配置不可用",
-                    modifier = Modifier.padding(top = 18.dp),
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Text(
-                    "请检查 qa-people.json。${failure?.message?.let { " ($it)" }.orEmpty()}",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
             }
         }
     }
