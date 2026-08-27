@@ -4,6 +4,7 @@ import type { DatabaseSync } from "node:sqlite";
 import { toBoundedAuditText } from "./audit-text.js";
 import type { MobileBugRecord } from "./mobile-bug-store.js";
 import {
+  insertBugNotificationOutbox,
   MobileRelayStorageError,
   type MobileManualRepairAttemptRecord,
   type MobileRelayScope,
@@ -898,6 +899,14 @@ export function recordMobileVerificationResult(
       fromVersion: current.version,
       toVersion: current.version + 1,
     },
+    createdAt: at,
+  });
+  insertBugNotificationOutbox(database, {
+    ...input,
+    bugId: bug.id,
+    eventId,
+    eventType: "verification.result_recorded",
+    bugVersion: bug.version + 1,
     createdAt: at,
   });
   const updatedVerification = database

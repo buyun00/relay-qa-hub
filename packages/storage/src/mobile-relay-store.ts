@@ -1004,7 +1004,7 @@ function nextBugAggregateSequence(
   return row.next_sequence;
 }
 
-function insertBugNotificationOutbox(
+export function insertBugNotificationOutbox(
   database: DatabaseSync,
   input: MobileRelayScope & {
     readonly bugId: string;
@@ -1562,6 +1562,13 @@ export function createMobileRelayAttempt(
     },
     createdAt: at,
   });
+  insertBugNotificationOutbox(database, {
+    ...input,
+    eventId,
+    eventType: "repair_attempt.created",
+    bugVersion: bug.version + 1,
+    createdAt: at,
+  });
   database
     .prepare(
       `INSERT INTO repair_attempts(
@@ -1646,6 +1653,13 @@ export function createMobileManualRepairAttempt(
       fromVersion: bug.version,
       toVersion: bug.version + 1,
     },
+    createdAt: at,
+  });
+  insertBugNotificationOutbox(database, {
+    ...input,
+    eventId,
+    eventType: "repair_attempt.created",
+    bugVersion: bug.version + 1,
     createdAt: at,
   });
   database
@@ -1890,6 +1904,14 @@ export function deliverMobileRepairAttempt(
       fromVersion: attempt.version,
       toVersion: attempt.version + 1,
     },
+    createdAt: at,
+  });
+  insertBugNotificationOutbox(database, {
+    ...input,
+    bugId: attempt.bug_id,
+    eventId,
+    eventType: "repair_attempt.delivered",
+    bugVersion: attempt.bug_version + 1,
     createdAt: at,
   });
   const updatedAttempt = database
@@ -2234,6 +2256,14 @@ export function linkMobileBuildRepair(
       fromVersion: build.version,
       toVersion: build.version + 1,
     },
+    createdAt: at,
+  });
+  insertBugNotificationOutbox(database, {
+    ...input,
+    bugId: attempt.bug_id,
+    eventId,
+    eventType: "build.repair_linked",
+    bugVersion: attempt.bug_version + 1,
     createdAt: at,
   });
   database

@@ -290,6 +290,10 @@ function createBug(
   tenant: TenantFixture,
   bugId: string,
   title: string,
+  assignments: {
+    readonly ownerId?: string | null;
+    readonly verificationOwnerId?: string | null;
+  } = {},
 ): void {
   transaction(database, () => {
     insertBugWithNextNumber(database, {
@@ -302,6 +306,8 @@ function createBug(
       severity: "S2",
       priority: "P2",
       reporterId: tenant.userId,
+      ownerId: assignments.ownerId,
+      verificationOwnerId: assignments.verificationOwnerId,
       createdAt: CREATED_AT,
     });
   });
@@ -708,7 +714,7 @@ function insertActiveMembershipRole(
     .run(tenant.accountId, tenant.projectId, effectiveMembershipId, role, CREATED_AT);
 }
 
-test("new Bug creation emits one durable team notification and idempotent replay emits none", async () => {
+test("new Bug notifications include content and route unassigned versus assigned work", async () => {
   await withDatabase((database) => {
     const tenant = seedTenant(database, 930, "NOTIFY");
     insertActiveMembershipRole(database, tenant, identifier(934), "reporter");
@@ -716,7 +722,7 @@ test("new Bug creation emits one durable team notification and idempotent replay
       database,
       tenant,
       identifier(935),
-      "viewer",
+      "developer",
       tenant.secondaryUserId,
     );
     const input = {
@@ -756,7 +762,8 @@ test("new Bug creation emits one durable team notification and idempotent replay
     );
     assert.equal(primaryInbox.consumed, 1);
     assert.equal(primaryInbox.items.length, 1);
-    assert.equal(primaryInbox.items[0]?.title, "新 Bug 已提交");
+    assert.equal(primaryInbox.items[0]?.title, "有一个新单子");
+    assert.equal(primaryInbox.items[0]?.body, "NOTIFY-1 · New notification Bug content");
     assert.equal(primaryInbox.items[0]?.bugId, created.bug.id);
     assert.equal(primaryInbox.items[0]?.sourceEventId, created.eventId);
 
@@ -771,6 +778,44 @@ test("new Bug creation emits one durable team notification and idempotent replay
     );
     assert.equal(secondaryInbox.items.length, 1);
     assert.equal(secondaryInbox.items[0]?.sourceEventId, created.eventId);
+
+    const assignedInput = {
+      ...input,
+      clientSubmissionId: identifier(938),
+      payloadDigest: digest(939),
+      title: "Assigned notification Bug",
+      description: "Assigned notification Bug content",
+      ownerId: tenant.secondaryUserId,
+    };
+    const assigned = transaction(database, () => createMobileBug(database, assignedInput));
+    const primaryAfterAssigned = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.userId,
+        limit: 100,
+        now: FINALIZED_AT,
+      }),
+    );
+    assert.equal(primaryAfterAssigned.consumed, 1);
+    assert.equal(
+      primaryAfterAssigned.items.some((item) => item.sourceEventId === assigned.eventId),
+      false,
+    );
+    const secondaryAfterAssigned = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.secondaryUserId,
+        limit: 100,
+        now: FINALIZED_AT,
+      }),
+    );
+    const assignedNotification = secondaryAfterAssigned.items.find(
+      (item) => item.sourceEventId === assigned.eventId,
+    );
+    assert.equal(assignedNotification?.title, "有一个新单子");
+    assert.equal(assignedNotification?.body, "NOTIFY-2 · Assigned notification Bug content");
 
     const replayed = transaction(database, () => createMobileBug(database, input));
     assert.equal(replayed.replayed, true);
@@ -10534,7 +10579,10 @@ test("multi-actor no-code human workflow can be rejected and then closed by the 
       "verifier",
       tenant.secondaryUserId,
     );
-    createBug(database, tenant, bugId, "No-code reporter verification workflow");
+    createBug(database, tenant, bugId, "No-code reporter verification workflow", {
+      ownerId: tenant.userId,
+      verificationOwnerId: tenant.secondaryUserId,
+    });
 
     const readyBug = transaction(database, () =>
       transitionMobileBugReady(database, {
@@ -10799,6 +10847,42 @@ test("multi-actor no-code human workflow can be rejected and then closed by the 
           .get(bugId),
       },
       { baselineBuildId: null, baselineKind: "no_build" },
+    );
+    const notificationAt = "2026-08-26T02:01:00.000Z";
+    const ownerInbox = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        ...primaryScope,
+        limit: 100,
+        now: notificationAt,
+      }),
+    );
+    const verifierInbox = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        ...developerScope,
+        limit: 100,
+        now: notificationAt,
+      }),
+    );
+    const ownerCompleted = ownerInbox.items.find(
+      (item) => item.type === "verification.result_recorded" && item.title === "单子已完成",
+    );
+    const verifierCompleted = verifierInbox.items.find(
+      (item) => item.type === "verification.result_recorded" && item.title === "单子已完成",
+    );
+    assert.equal(ownerCompleted?.body, "MHW-1 · Invariant regression record");
+    assert.equal(verifierCompleted?.body, "MHW-1 · Invariant regression record");
+    assert.equal(
+      verifierInbox.items.some(
+        (item) => item.type === "repair_attempt.delivered" && item.title === "有一个单子待你验收",
+      ),
+      true,
+    );
+    assert.equal(
+      ownerInbox.items.some(
+        (item) =>
+          item.type === "verification.result_recorded" && item.title === "验收未通过，已退回",
+      ),
+      true,
     );
     assertIntegrity(database);
   });

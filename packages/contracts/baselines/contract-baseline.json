@@ -12,7 +12,7 @@
     "schemas/build.schema.json": "309e99895943ea266dbd6d30bee08b33c588b5c318d3bd5927a33f976c95754e",
     "schemas/common.schema.json": "bd0b291a6215365ba3efe0fd16c6d81b231fc497c504a0960fe5eaa62bb9a390",
     "schemas/event-envelope.schema.json": "06aa747be53955ec62ad558d467db7e2f56643fddc0da5d5ebd4d59e41976097",
-    "schemas/notification.schema.json": "86c4f9432d44b3ef7e2291f6c10cac5ba76a71d14ebd6b0a953aa9f0f75e6dc5",
+    "schemas/notification.schema.json": "2fe23a67dae651f215ac0ca53b4b596161668fe307ca9430b1c84b31769c074f",
     "schemas/relay.schema.json": "ac5f79a304a33a234093f9d6a2ed437b61ab9ac2f762b68dfe715a91cd8a9cbf",
     "schemas/upload.schema.json": "b92b22a6a8e57fa198d91426e9710c0b6de37a7c3257fb6a84803dc9583a6201",
     "schemas/workflow.schema.json": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",

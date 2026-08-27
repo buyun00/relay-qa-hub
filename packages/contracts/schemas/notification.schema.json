@@ -13,6 +13,7 @@
         "userId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
         "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
         "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "body": { "type": "string", "minLength": 1, "maxLength": 500 },
         "bugId": {
           "oneOf": [
             { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },

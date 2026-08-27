@@ -1810,6 +1810,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
             userId: item.userId,
             type: item.type,
             title: item.title,
+            body: item.body,
             bugId: item.bugId,
             createdAt: item.createdAt,
             readAt: item.readAt,

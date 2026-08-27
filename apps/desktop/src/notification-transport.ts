@@ -21,6 +21,7 @@ export interface DurableNotification {
   readonly id: string;
   readonly type: string;
   readonly title: string;
+  readonly body: string;
   readonly bugId: string | null;
   readonly createdAt: string;
   readonly readAt: string | null;
@@ -147,6 +148,7 @@ export function parseDurableInbox(value: unknown): readonly DurableNotification[
       "userId",
       "type",
       "title",
+      "body",
       "bugId",
       "createdAt",
       "readAt",
@@ -156,6 +158,7 @@ export function parseDurableInbox(value: unknown): readonly DurableNotification[
     const id = requiredUuid(itemValue["id"]);
     const type = boundedText(itemValue["type"], 120);
     const title = boundedText(itemValue["title"], MAX_SUMMARY_LENGTH);
+    const body = itemValue["body"] === undefined ? type : boundedText(itemValue["body"], 500);
     const bugId = nullableUuid(itemValue["bugId"]);
     const createdAt = boundedText(itemValue["createdAt"], 100);
     const readAt = itemValue["readAt"] === null ? null : boundedText(itemValue["readAt"], 100);
@@ -164,6 +167,7 @@ export function parseDurableInbox(value: unknown): readonly DurableNotification[
       id === null ||
       type === null ||
       title === null ||
+      body === null ||
       bugId === undefined ||
       createdAt === null ||
       (itemValue["readAt"] !== null && readAt === null) ||
@@ -178,6 +182,7 @@ export function parseDurableInbox(value: unknown): readonly DurableNotification[
       id,
       type,
       title,
+      body,
       bugId,
       createdAt,
       readAt,
@@ -415,7 +420,7 @@ export class NotificationTransport {
         notificationId: item.id,
         eventId: event?.eventId ?? null,
         title: item.title,
-        body: event?.summary ?? item.type,
+        body: item.body,
         bugId: item.bugId ?? event?.bugId ?? null,
       });
     } catch {

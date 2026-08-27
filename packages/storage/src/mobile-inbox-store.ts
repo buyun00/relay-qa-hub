@@ -16,6 +16,7 @@ export interface MobileNotificationRecord {
   readonly userId: string;
   readonly type: string;
   readonly title: string;
+  readonly body: string;
   readonly bugId: string | null;
   readonly buildId: string | null;
   readonly sourceEventId: string;
@@ -51,8 +52,11 @@ interface EventRow {
   readonly id: string;
   readonly type: string;
   readonly bug_id: string | null;
+  readonly aggregate_type: string;
   readonly aggregate_id: string;
   readonly aggregate_sequence: number;
+  readonly from_state: string | null;
+  readonly to_state: string | null;
   readonly payload_json: string;
   readonly created_at: string;
 }
@@ -63,6 +67,17 @@ interface InboxRow {
 
 interface UserRow {
   readonly user_id: string;
+}
+
+interface BugNotificationRow {
+  readonly id: string;
+  readonly key: string;
+  readonly title: string;
+  readonly description: string;
+  readonly state: string;
+  readonly reporter_id: string;
+  readonly owner_id: string | null;
+  readonly verification_owner_id: string | null;
 }
 
 interface NotificationRow {
@@ -124,6 +139,159 @@ function parsePayload(payloadJson: string): Readonly<Record<string, unknown>> {
   return value as Readonly<Record<string, unknown>>;
 }
 
+function boundedNotificationText(value: string, maxLength: number): string {
+  const normalized = value
+    .replace(/[\u0000-\u001f\u007f]/gu, " ")
+    .replace(/\s+/gu, " ")
+    .trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, Math.max(1, maxLength - 1)).trimEnd()}…`;
+}
+
+function readNotificationBug(
+  database: DatabaseSync,
+  input: ListMobileNotificationsInput,
+  bugId: string | null,
+): BugNotificationRow | null {
+  if (bugId === null) return null;
+  return (
+    (database
+      .prepare(
+        `SELECT id, key, title, description, state, reporter_id, owner_id,
+                verification_owner_id
+         FROM bugs
+         WHERE account_id = ? AND project_id = ? AND id = ?`,
+      )
+      .get(input.accountId, input.projectId, bugId) as BugNotificationRow | undefined) ?? null
+  );
+}
+
+function activeProjectUsers(
+  database: DatabaseSync,
+  input: ListMobileNotificationsInput,
+): readonly string[] {
+  return (
+    database
+      .prepare(
+        `SELECT DISTINCT membership.user_id
+         FROM memberships AS membership
+         JOIN users AS user
+           ON user.account_id = membership.account_id
+          AND user.id = membership.user_id
+          AND user.status = 'active'
+         WHERE membership.account_id = ? AND membership.project_id = ?
+           AND membership.status = 'active'
+         ORDER BY membership.user_id`,
+      )
+      .all(input.accountId, input.projectId) as unknown as UserRow[]
+  ).map((row) => row.user_id);
+}
+
+function relatedRepairAssignee(
+  database: DatabaseSync,
+  input: ListMobileNotificationsInput,
+  event: EventRow,
+): string | null {
+  if (event.aggregate_type !== "repair_attempt") return null;
+  const row = database
+    .prepare(
+      `SELECT assignee_id
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, event.aggregate_id) as
+    { readonly assignee_id: string } | undefined;
+  return row?.assignee_id ?? null;
+}
+
+function relatedVerifier(
+  database: DatabaseSync,
+  input: ListMobileNotificationsInput,
+  event: EventRow,
+): string | null {
+  if (event.aggregate_type !== "verification") return null;
+  const row = database
+    .prepare(
+      `SELECT verifier_id
+       FROM verifications
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, event.aggregate_id) as
+    { readonly verifier_id: string } | undefined;
+  return row?.verifier_id ?? null;
+}
+
+function notificationRecipients(
+  database: DatabaseSync,
+  input: ListMobileNotificationsInput,
+  event: EventRow,
+  bug: BugNotificationRow | null,
+  allUsers: readonly string[],
+): readonly string[] {
+  if (bug === null) return allUsers;
+  const repairAssignee = relatedRepairAssignee(database, input, event);
+  const owner = bug.owner_id ?? repairAssignee;
+  const verifier = relatedVerifier(database, input, event) ?? bug.verification_owner_id;
+  let requested: readonly (string | null)[];
+
+  if (event.type === "occurrence.appended") {
+    requested = bug.owner_id === null ? allUsers : [bug.owner_id];
+  } else if (event.type === "bug.updated") {
+    const payload = parsePayload(event.payload_json);
+    const changedFields = typeof payload.summary === "string" ? payload.summary : "";
+    requested =
+      bug.state === "ready_for_verification" && changedFields.includes("verification_owner_id")
+        ? [verifier ?? bug.reporter_id]
+        : owner === null
+          ? allUsers
+          : [owner];
+  } else if (event.to_state === "ready_for_verification" || event.type === "verification.created") {
+    requested = [verifier ?? bug.reporter_id];
+  } else if (event.type === "verification.result_recorded") {
+    const payload = parsePayload(event.payload_json);
+    requested = payload.status === "passed" ? [owner, verifier] : [owner];
+  } else {
+    requested = owner === null ? allUsers : [owner];
+  }
+
+  const activeUsers = new Set(allUsers);
+  return [...new Set(requested.filter((userId): userId is string => userId !== null))].filter(
+    (userId) => activeUsers.has(userId),
+  );
+}
+
+function notificationPresentation(
+  event: EventRow,
+  bug: BugNotificationRow | null,
+): { readonly title: string; readonly body: string } {
+  const payload = parsePayload(event.payload_json);
+  const body =
+    bug === null
+      ? boundedNotificationText(
+          typeof payload.summary === "string" ? payload.summary : event.type,
+          500,
+        )
+      : boundedNotificationText(`${bug.key} · ${bug.description.trim() || bug.title}`, 500);
+
+  if (event.type === "occurrence.appended") return { title: "有一个新单子", body };
+  if (event.type === "bug.updated") return { title: "单子信息已更新", body };
+  if (event.type === "bug.triage.ready") return { title: "状态更新 · 待处理", body };
+  if (event.type === "repair_attempt.created") return { title: "状态更新 · 修复中", body };
+  if (event.to_state === "awaiting_build") return { title: "状态更新 · 待构建", body };
+  if (event.to_state === "ready_for_verification" || event.type === "verification.created") {
+    return { title: "有一个单子待你验收", body };
+  }
+  if (event.type === "verification.started") return { title: "验收已开始", body };
+  if (event.type === "verification.result_recorded") {
+    return payload.status === "passed"
+      ? { title: "单子已完成", body }
+      : { title: "验收未通过，已退回", body };
+  }
+  if (event.type === "bug.mark_duplicate") return { title: "状态更新 · 已标记重复", body };
+  if (event.type === "build.registered") return { title: "Build 已登记", body };
+  return { title: "单子状态已更新", body };
+}
+
 function consumeNotificationOutbox(
   database: DatabaseSync,
   input: ListMobileNotificationsInput,
@@ -169,7 +337,8 @@ function consumeNotificationOutbox(
   for (const outbox of rows) {
     const event = database
       .prepare(
-        `SELECT id, type, bug_id, aggregate_id, aggregate_sequence, payload_json, created_at
+        `SELECT id, type, bug_id, aggregate_type, aggregate_id, aggregate_sequence,
+                from_state, to_state, payload_json, created_at
          FROM events
          WHERE account_id = ? AND project_id = ? AND id = ?`,
       )
@@ -211,30 +380,25 @@ function consumeNotificationOutbox(
       receivedAt,
     );
 
-    const title =
-      event.type === "build.registered"
-        ? "Build registered"
-        : event.type === "occurrence.appended"
-          ? "新 Bug 已提交"
-          : event.type;
-    const users = database
-      .prepare(
-        `SELECT user_id
-         FROM memberships
-         WHERE account_id = ? AND project_id = ? AND status = 'active'`,
-      )
-      .all(input.accountId, input.projectId) as unknown as UserRow[];
-    for (const user of users) {
+    const bug = readNotificationBug(database, input, event.bug_id);
+    const allUsers = activeProjectUsers(database, input);
+    const recipients = notificationRecipients(database, input, event, bug, allUsers);
+    const presentation = notificationPresentation(event, bug);
+    const payload = {
+      ...parsePayload(event.payload_json),
+      notificationBody: presentation.body,
+    };
+    for (const userId of recipients) {
       insertNotification.run(
         randomUUID(),
         input.accountId,
         input.projectId,
-        user.user_id,
+        userId,
         event.type,
-        title,
+        presentation.title,
         event.bug_id,
         event.id,
-        event.payload_json,
+        JSON.stringify(payload),
         event.created_at,
       );
     }
@@ -248,6 +412,10 @@ function consumeNotificationOutbox(
 function toNotification(row: NotificationRow): MobileNotificationRecord {
   const payload = parsePayload(row.payload_json);
   const buildId = typeof payload.buildId === "string" ? payload.buildId : null;
+  const body =
+    typeof payload.notificationBody === "string"
+      ? boundedNotificationText(payload.notificationBody, 500)
+      : row.title;
   return Object.freeze({
     id: row.id,
     accountId: row.account_id,
@@ -255,6 +423,7 @@ function toNotification(row: NotificationRow): MobileNotificationRecord {
     userId: row.user_id,
     type: row.type,
     title: row.title,
+    body,
     bugId: row.bug_id,
     buildId,
     sourceEventId: row.source_event_id,

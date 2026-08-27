@@ -1,5 +1,90 @@
 {
   "schemaVersion": 4,
   "projectKey": "LOCAL",
-  "people": []
+  "people": [
+    {
+      "id": "85a49b10-c467-4800-8dd8-e33818544904",
+      "displayName": "饶小春",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "eac8012e-2108-4b1c-801e-7bce354f6af7",
+      "displayName": "王永永",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "90f58d33-e690-4ae7-8674-93aea1e2cf92",
+      "displayName": "吴鹏生",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "fb0e471b-d111-4d4c-88d3-9a011c6741b6",
+      "displayName": "王月",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "f6e9fd6a-50f0-4e02-8583-046ca8e08c86",
+      "displayName": "汤万鹏",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "dc623a28-26bc-413c-8d52-6196bc1f3718",
+      "displayName": "谭一林",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "811dc02f-c582-4e87-8de7-a26e4139d515",
+      "displayName": "何坤",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "92fa07cd-21b0-4d6e-87ae-3c6cd4fb87dc",
+      "displayName": "郑志航",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "de4be22c-a154-4f1f-8352-6d4a61d811c3",
+      "displayName": "谭雪平",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "be7bcfd4-8f08-4701-868a-e07b95c93911",
+      "displayName": "黄燕吟",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "a74b4e82-8390-4b79-8cff-57aa83aef78c",
+      "displayName": "王江",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "736d1cf4-85dc-4a20-8f4b-e54e830dc577",
+      "displayName": "彭江雨",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "67113e99-62d2-49a0-8127-dda31348fce6",
+      "displayName": "肖飞侠",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    },
+    {
+      "id": "3807ffeb-910b-428a-8890-810be9102b7c",
+      "displayName": "王蕊",
+      "roles": ["fixer", "verifier"],
+      "active": true
+    }
+  ]
 }

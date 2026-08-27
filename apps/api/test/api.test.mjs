@@ -99,6 +99,39 @@ test("backend people seed accepts only schema 4 without client-side aliases", as
   assert.throws(() => loadQaPeopleConfig(configFile), /schemaVersion is unsupported/u);
 });
 
+test("checked-in backend people seed contains the default QA team", () => {
+  const people = loadQaPeopleConfig().people;
+  const expectedPeople = [
+    ["饶小春", "85a49b10-c467-4800-8dd8-e33818544904"],
+    ["王永永", "eac8012e-2108-4b1c-801e-7bce354f6af7"],
+    ["吴鹏生", "90f58d33-e690-4ae7-8674-93aea1e2cf92"],
+    ["王月", "fb0e471b-d111-4d4c-88d3-9a011c6741b6"],
+    ["汤万鹏", "f6e9fd6a-50f0-4e02-8583-046ca8e08c86"],
+    ["谭一林", "dc623a28-26bc-413c-8d52-6196bc1f3718"],
+    ["何坤", "811dc02f-c582-4e87-8de7-a26e4139d515"],
+    ["郑志航", "92fa07cd-21b0-4d6e-87ae-3c6cd4fb87dc"],
+    ["谭雪平", "de4be22c-a154-4f1f-8352-6d4a61d811c3"],
+    ["黄燕吟", "be7bcfd4-8f08-4701-868a-e07b95c93911"],
+    ["王江", "a74b4e82-8390-4b79-8cff-57aa83aef78c"],
+    ["彭江雨", "736d1cf4-85dc-4a20-8f4b-e54e830dc577"],
+    ["肖飞侠", "67113e99-62d2-49a0-8127-dda31348fce6"],
+    ["王蕊", "3807ffeb-910b-428a-8890-810be9102b7c"],
+  ];
+
+  assert.deepEqual(
+    people.map((person) => [person.displayName, person.id]),
+    expectedPeople,
+  );
+  assert.ok(people.every((person) => person.active));
+  assert.ok(people.every((person) => person.roles.join(",") === "fixer,verifier"));
+  assert.ok(
+    people.every(
+      (person) =>
+        person.id === qaUserId("10000000-0000-4000-8000-000000000020", person.displayName),
+    ),
+  );
+});
+
 test("new Web and Android name login creates backend accounts and rejects the old pinyin contract", async (t) => {
   const accountId = "10000000-0000-4000-8000-000000000020";
   const userId = "30000000-0000-4000-8000-000000000021";

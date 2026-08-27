@@ -83,6 +83,7 @@ function inboxItem(readAt: string | null = null) {
     userId: "50000000-0000-4000-8000-000000000001",
     type: "bug.updated",
     title: "Bug changed",
+    body: "QA-12 · Login button does not respond",
     bugId: BUG_ID,
     createdAt: "2026-08-25T12:00:00.000Z",
     readAt,
@@ -131,6 +132,7 @@ test("Inbox parser preserves only bounded notification fields", () => {
   const parsed = parseDurableInbox({ items: [inboxItem()], nextCursor: null, unreadCount: 1 });
   assert.equal(parsed.length, 1);
   assert.equal(parsed[0]?.bugId, BUG_ID);
+  assert.equal(parsed[0]?.body, "QA-12 · Login button does not respond");
   assert.throws(() => parseDurableInbox({ items: [{ ...inboxItem(), extra: "secret" }] }));
 });
 
@@ -164,6 +166,10 @@ test("transport fetches durable Inbox once, dedupes reconnect replay, and deep-l
   assert.equal(inboxReads, 2);
   assert.equal(notifications.length, 1);
   assert.equal((notifications[0] as { readonly bugId: string }).bugId, BUG_ID);
+  assert.equal(
+    (notifications[0] as { readonly body: string }).body,
+    "QA-12 · Login button does not respond",
+  );
   socket.closeFromPeer();
   transport.stop();
   assert.equal(notifications.length, 1);

@@ -168,20 +168,16 @@ function parseFrames(connection: HintConnection, onPong: () => void): void {
 }
 
 function safeHint(record: MobileNotificationRecord): string {
-  const title = record.title
+  const body = record.body
     .replace(/[\u0000-\u001f\u007f]/gu, " ")
     .trim()
     .slice(0, 300);
-  const type = record.type
-    .replace(/[\u0000-\u001f\u007f]/gu, " ")
-    .trim()
-    .slice(0, 120);
   return JSON.stringify({
     type: "notification.hint",
     notificationId: record.id,
     eventId: record.sourceEventId,
     bugId: record.bugId,
-    summary: `${title} [${type}]`.slice(0, 300),
+    summary: body,
   });
 }
 
