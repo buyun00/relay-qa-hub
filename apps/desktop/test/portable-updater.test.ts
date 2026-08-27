@@ -3,14 +3,9 @@ import { generateKeyPairSync, sign } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 import test from "node:test";
 
-import {
-  INSTALL_HELPER,
-  PortableUpdater,
-  parseAndVerifyUpdateManifest,
-} from "../src/portable-updater.js";
+import { PortableUpdater, parseAndVerifyUpdateManifest } from "../src/portable-updater.js";
 
 function signedManifest() {
   const { privateKey, publicKey } = generateKeyPairSync("ed25519");
@@ -20,7 +15,7 @@ function signedManifest() {
     version: "0.1.0-debug",
     publishedAt: "2026-08-27T13:01:02.345Z",
     archive: {
-      url: "/downloads/Relay-QA-Hub-Windows-x64.zip",
+      url: "/downloads/Relay-QA-Hub-Setup-x64.exe",
       size: 123_456,
       sha256: "a".repeat(64),
     },
@@ -94,112 +89,3 @@ test("portable updater surfaces a failed newer install after the old release res
     await fs.rm(root, { recursive: true, force: true });
   }
 });
-
-test(
-  "install helper accepts a renamed portable directory and preserves its runtime config",
-  { skip: process.platform !== "win32" },
-  async () => {
-    const root = await fs.mkdtemp(path.join(tmpdir(), "qa-hub-update-helper-"));
-    const installDirectory = path.join(root, "QA Hub Custom Folder");
-    const payloadDirectory = path.join(root, "payload", "RelayQaHub-win32-x64");
-    const archive = path.join(root, "update.zip");
-    const helper = path.join(root, "install-update.ps1");
-    const log = path.join(root, "install-update.log");
-    const result = path.join(root, "last-update-result.json");
-    try {
-      await fs.mkdir(installDirectory, { recursive: true });
-      await fs.mkdir(payloadDirectory, { recursive: true });
-      await fs.copyFile(
-        "C:\\Windows\\System32\\where.exe",
-        path.join(installDirectory, "RelayQaHub.exe"),
-      );
-      await fs.copyFile(
-        "C:\\Windows\\System32\\where.exe",
-        path.join(payloadDirectory, "RelayQaHub.exe"),
-      );
-      await fs.writeFile(path.join(installDirectory, "old-marker.txt"), "old\n");
-      await fs.writeFile(path.join(installDirectory, "desktop-runtime.json"), '{"server":"old"}\n');
-      await fs.writeFile(path.join(installDirectory, "Uninstall.exe"), "uninstaller\n");
-      await fs.writeFile(path.join(payloadDirectory, "new-marker.txt"), "new\n");
-      await fs.writeFile(path.join(payloadDirectory, "desktop-runtime.json"), '{"server":"new"}\n');
-      await fs.writeFile(helper, INSTALL_HELPER);
-      const compression = spawnSync(
-        "powershell.exe",
-        [
-          "-NoProfile",
-          "-NonInteractive",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-Command",
-          "& { param($source, $destination) Compress-Archive -LiteralPath $source -DestinationPath $destination -Force }",
-          payloadDirectory,
-          archive,
-        ],
-        { encoding: "utf8" },
-      );
-      assert.equal(compression.status, 0, compression.stderr);
-      const installed = spawnSync(
-        "powershell.exe",
-        [
-          "-NoProfile",
-          "-NonInteractive",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-File",
-          helper,
-          "-CurrentPid",
-          "2147483647",
-          "-PackageDirectory",
-          installDirectory,
-          "-ArchivePath",
-          archive,
-          "-ExecutableName",
-          "RelayQaHub.exe",
-          "-LogPath",
-          log,
-          "-ResultPath",
-          result,
-          "-ReleaseId",
-          "20260827T130102345Z",
-          "-Version",
-          "0.1.1-debug",
-        ],
-        { encoding: "utf8", timeout: 30_000 },
-      );
-      assert.equal(installed.status, 0, `${installed.stdout}\n${installed.stderr}`);
-      await fs.access(path.join(installDirectory, "new-marker.txt"));
-      assert.equal(
-        await fs.readFile(path.join(installDirectory, "desktop-runtime.json"), "utf8"),
-        '{"server":"old"}\n',
-      );
-      assert.equal(
-        await fs.readFile(path.join(installDirectory, "Uninstall.exe"), "utf8"),
-        "uninstaller\n",
-      );
-      const updateResult = JSON.parse(await fs.readFile(result, "utf8")) as {
-        status: string;
-        releaseId: string;
-      };
-      assert.equal(updateResult.status, "installed");
-      assert.equal(updateResult.releaseId, "20260827T130102345Z");
-      const backups = (await fs.readdir(root)).filter((entry) =>
-        entry.startsWith("QA Hub Custom Folder.backup-"),
-      );
-      assert.equal(backups.length, 1);
-      await fs.access(path.join(root, backups[0]!, "old-marker.txt"));
-    } finally {
-      let cleanupError: unknown;
-      for (let attempt = 0; attempt < 20; attempt += 1) {
-        try {
-          await fs.rm(root, { recursive: true, force: true });
-          cleanupError = undefined;
-          break;
-        } catch (cause) {
-          cleanupError = cause;
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-      }
-      if (cleanupError !== undefined) throw cleanupError;
-    }
-  },
-);

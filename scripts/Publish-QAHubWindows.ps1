@@ -17,8 +17,9 @@ $tsc = Join-Path $repoRoot "node_modules\.bin\tsc.cmd"
 $vite = Join-Path $repoRoot "node_modules\.bin\vite.cmd"
 $packageScript = Join-Path $repoRoot "apps\desktop\scripts\package-windows.ps1"
 $installerScript = Join-Path $repoRoot "apps\desktop\scripts\build-installer.ps1"
+$signUpdateScript = Join-Path $repoRoot "apps\desktop\scripts\sign-update.mjs"
 $assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
-foreach ($required in @($tsc, $vite, $packageScript, $installerScript, $assertReleaseSource)) {
+foreach ($required in @($tsc, $vite, $packageScript, $installerScript, $signUpdateScript, $assertReleaseSource)) {
   if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
     throw "Required Windows publish dependency is missing: $required"
   }
@@ -42,6 +43,15 @@ try {
   if ($LASTEXITCODE -ne 0) { throw "Desktop build failed." }
   $installer = & $installerScript -LanAddress $LanAddress -ReleaseId $releaseId
   if ($LASTEXITCODE -ne 0) { throw "Desktop installer build failed." }
+  $updateManifest = Join-Path $repoRoot "apps\desktop\release\RelayQaHub-win32-x64-latest.json"
+  & $nodeExecutable `
+    $signUpdateScript `
+    --archive ([string]$installer.stableAlias) `
+    --manifest $updateManifest `
+    --release-id $releaseId `
+    --version ([string]$installer.version) `
+    --url "/downloads/Relay-QA-Hub-Setup-x64.exe"
+  if ($LASTEXITCODE -ne 0) { throw "Desktop installer update manifest signing failed." }
 } finally {
   Pop-Location
 }

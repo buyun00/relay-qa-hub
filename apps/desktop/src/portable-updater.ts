@@ -78,6 +78,17 @@ interface UpdateInstallResult {
   readonly recordedAt: string;
 }
 
+function decodeResultFile(contents: Buffer): string {
+  if (
+    (contents.length >= 2 && contents[0] === 0xff && contents[1] === 0xfe) ||
+    (contents.length >= 2 && contents[1] === 0)
+  ) {
+    const offset = contents[0] === 0xff && contents[1] === 0xfe ? 2 : 0;
+    return contents.subarray(offset).toString("utf16le");
+  }
+  return contents.toString("utf8");
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -232,10 +243,10 @@ export class PortableUpdater {
       if (release === null) throw new Error("CURRENT_RELEASE_INVALID");
       this.currentRelease = release;
       try {
-        const resultRaw = await fs.readFile(
+        const resultBytes = await fs.readFile(
           path.join(this.options.updatesDirectory, "last-update-result.json"),
-          "utf8",
         );
+        const resultRaw = decodeResultFile(resultBytes);
         const result = parseInstallResult(JSON.parse(resultRaw.replace(/^\uFEFF/u, "")) as unknown);
         if (result !== null && result.status === "failed" && result.releaseId > release.releaseId) {
           this.emit({ status: "error", message: "UPDATE_INSTALL_FAILED" });
@@ -313,7 +324,11 @@ export class PortableUpdater {
 
   private async download(manifest: SignedUpdateManifest, archiveUrl: URL): Promise<void> {
     await fs.mkdir(this.options.updatesDirectory, { recursive: true });
-    const archiveFile = path.join(this.options.updatesDirectory, `${manifest.releaseId}.zip`);
+    const archiveExtension = archiveUrl.pathname.toLowerCase().endsWith(".exe") ? ".exe" : ".zip";
+    const archiveFile = path.join(
+      this.options.updatesDirectory,
+      `${manifest.releaseId}${archiveExtension}`,
+    );
     const temporaryFile = `${archiveFile}.partial`;
     await fs.rm(temporaryFile, { force: true });
     await fs.rm(archiveFile, { force: true });
@@ -386,271 +401,101 @@ export class PortableUpdater {
 
   async install(): Promise<boolean> {
     const manifest = this.readyManifest;
-    const archiveFile = this.readyArchive;
-    if (manifest === null || archiveFile === null || this.stateValue.status !== "ready") {
+    const packageFile = this.readyArchive;
+    if (manifest === null || packageFile === null || this.stateValue.status !== "ready") {
       return false;
     }
-    const helperFile = path.join(this.options.updatesDirectory, "install-update.ps1");
-    const readyFile = path.join(this.options.updatesDirectory, "install-update-ready.json");
-    const launchLogFile = path.join(this.options.updatesDirectory, "install-update-launch.log");
-    const logFile = path.join(this.options.updatesDirectory, "install-update.log");
-    const resultFile = path.join(this.options.updatesDirectory, "last-update-result.json");
-    await fs.rm(readyFile, { force: true });
-    await fs.rm(resultFile, { force: true });
-    await fs.writeFile(helperFile, INSTALL_HELPER, { encoding: "utf8", mode: 0o600 });
-    this.emit({ status: "installing", releaseId: manifest.releaseId, version: manifest.version });
-    const systemRoot = process.env["SystemRoot"]?.trim();
-    const powershellExecutable =
-      systemRoot === undefined || systemRoot.length === 0
-        ? "powershell.exe"
-        : path.join(systemRoot, "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
-    const launchLogHandle = await fs.open(launchLogFile, "a", 0o600);
-    await launchLogHandle.appendFile(
-      `${new Date().toISOString()} launching update helper with ${powershellExecutable}\n`,
-      "utf8",
-    );
-    const child = spawn(
-      powershellExecutable,
-      [
-        "-NoProfile",
-        "-NonInteractive",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        helperFile,
-        "-CurrentPid",
-        String(this.options.currentPid ?? process.pid),
-        "-PackageDirectory",
-        this.options.installDirectory,
-        "-ArchivePath",
-        archiveFile,
-        "-ExecutableName",
-        this.options.executableName,
-        "-LogPath",
-        logFile,
-        "-ResultPath",
-        resultFile,
-        "-ReadyPath",
-        readyFile,
-        "-ReleaseId",
-        manifest.releaseId,
-        "-Version",
-        manifest.version,
-      ],
-      {
-        detached: true,
-        stdio: ["ignore", launchLogHandle.fd, launchLogHandle.fd],
-        windowsHide: true,
-        cwd: this.options.updatesDirectory,
-      },
-    );
-    await launchLogHandle.close();
-    let launchError: unknown = null;
-    child.once("error", (cause) => {
-      launchError = cause;
-    });
-    child.unref();
+    if (path.extname(packageFile).toLowerCase() !== ".exe") {
+      this.emit({ status: "error", message: "UPDATE_PACKAGE_UNSUPPORTED" });
+      return false;
+    }
+
+    const updaterSource = path.join(this.options.installDirectory, "RelayQaHubUpdater.exe");
     try {
-      const deadline = Date.now() + 30_000;
-      let helperReady = false;
+      await fs.access(updaterSource);
+    } catch {
+      this.emit({ status: "error", message: "UPDATE_UPDATER_MISSING" });
+      return false;
+    }
+
+    const stagingDirectory = path.join(
+      this.options.updatesDirectory,
+      `updater-${manifest.releaseId}-${this.options.currentPid ?? process.pid}`,
+    );
+    const updaterFile = path.join(stagingDirectory, "RelayQaHubUpdater.exe");
+    const configFile = path.join(stagingDirectory, "update.ini");
+    const readyFile = path.join(stagingDirectory, "ready.flag");
+    const resultFile = path.join(this.options.updatesDirectory, "last-update-result.json");
+
+    let updaterProcess: ReturnType<typeof spawn> | null = null;
+    try {
+      const configValues = {
+        PackagePath: packageFile,
+        AppPath: path.join(this.options.installDirectory, this.options.executableName),
+        ParentPid: String(this.options.currentPid ?? process.pid),
+        ResultPath: resultFile,
+        ReleaseId: manifest.releaseId,
+        Version: manifest.version,
+      };
+      for (const value of Object.values(configValues)) {
+        if (/[\r\n]/u.test(value)) throw new Error("UPDATE_CONFIG_INVALID");
+      }
+      const configText = [
+        "[Update]",
+        ...Object.entries(configValues).map(([key, value]) => `${key}=${value}`),
+        "",
+      ].join("\r\n");
+
+      await fs.rm(stagingDirectory, { recursive: true, force: true });
+      await fs.mkdir(stagingDirectory, { recursive: true });
+      await fs.copyFile(updaterSource, updaterFile);
+      await fs.writeFile(
+        configFile,
+        Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(configText, "utf16le")]),
+        { mode: 0o600 },
+      );
+      await fs.rm(resultFile, { force: true });
+
+      this.emit({ status: "installing", releaseId: manifest.releaseId, version: manifest.version });
+      const updater = spawn(updaterFile, [], {
+        detached: true,
+        stdio: "ignore",
+        windowsHide: true,
+        cwd: stagingDirectory,
+      });
+      updaterProcess = updater;
+      let launchError: unknown = null;
+      updater.once("error", (cause) => {
+        launchError = cause;
+      });
+      await new Promise<void>((resolve, reject) => {
+        updater.once("spawn", resolve);
+        updater.once("error", reject);
+      });
+
+      const deadline = Date.now() + 10_000;
+      let updaterReady = false;
       while (Date.now() < deadline) {
         if (launchError !== null) throw launchError;
         try {
-          const marker = JSON.parse(await fs.readFile(readyFile, "utf8")) as Record<
-            string,
-            unknown
-          >;
-          helperReady =
-            marker["schemaVersion"] === 1 &&
-            marker["status"] === "ready" &&
-            marker["releaseId"] === manifest.releaseId;
-          if (helperReady) break;
+          updaterReady = (await fs.readFile(readyFile, "utf16le")).includes(manifest.releaseId);
+          if (updaterReady) break;
         } catch {
-          // The helper writes the marker atomically after validating every install path.
+          // The native updater writes this only after validating the handoff file.
         }
-        if (child.exitCode !== null) throw new Error("UPDATE_HELPER_LAUNCH_FAILED");
+        if (updater.exitCode !== null) throw new Error("UPDATE_UPDATER_LAUNCH_FAILED");
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
       }
-      if (!helperReady) throw new Error("UPDATE_HELPER_READY_TIMEOUT");
+      if (!updaterReady) throw new Error("UPDATE_UPDATER_READY_TIMEOUT");
+      updater.unref();
     } catch (cause) {
-      child.kill();
+      updaterProcess?.kill();
       this.emit({ status: "error", message: safeError(cause) });
       return false;
     }
+
     const quitTimer = setTimeout(() => this.options.requestQuit(), 100);
     quitTimer.unref();
     return true;
   }
 }
-
-export const INSTALL_HELPER = String.raw`param(
-  [Parameter(Mandatory = $true)][int]$CurrentPid,
-  [Parameter(Mandatory = $true)][string]$PackageDirectory,
-  [Parameter(Mandatory = $true)][string]$ArchivePath,
-  [Parameter(Mandatory = $true)][string]$ExecutableName,
-  [Parameter(Mandatory = $true)][string]$LogPath,
-  [Parameter(Mandatory = $true)][string]$ResultPath,
-  [Parameter(Mandatory = $true)][string]$ReadyPath,
-  [Parameter(Mandatory = $true)][string]$ReleaseId,
-  [Parameter(Mandatory = $true)][string]$Version
-)
-
-$ErrorActionPreference = "Stop"
-$logPathFull = [IO.Path]::GetFullPath($LogPath)
-[IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($logPathFull)) | Out-Null
-Add-Content -LiteralPath $logPathFull -Value ((Get-Date).ToString("o") + " update helper process started")
-$package = [IO.Path]::GetFullPath($PackageDirectory).TrimEnd([IO.Path]::DirectorySeparatorChar)
-$archive = [IO.Path]::GetFullPath($ArchivePath)
-$parent = [IO.Directory]::GetParent($package).FullName
-$leaf = [IO.Path]::GetFileName($package)
-$resultPathFull = [IO.Path]::GetFullPath($ResultPath)
-$readyPathFull = [IO.Path]::GetFullPath($ReadyPath)
-if ([string]::IsNullOrWhiteSpace($leaf) -or
-    [IO.Path]::GetFileName($ExecutableName) -ne $ExecutableName -or
-    $ReleaseId -notmatch '^\d{8}T\d{9}Z$' -or
-    $Version -notmatch '^[0-9A-Za-z][0-9A-Za-z._+-]{0,63}$' -or
-    -not (Test-Path -LiteralPath $package -PathType Container) -or
-    -not (Test-Path -LiteralPath $archive -PathType Leaf) -or
-    [IO.Path]::GetDirectoryName($readyPathFull) -ne [IO.Path]::GetDirectoryName($resultPathFull)) {
-  throw "Unsafe update paths."
-}
-$suffix = [Guid]::NewGuid().ToString("N")
-$extractRoot = Join-Path $parent ($leaf + ".extract-" + $suffix)
-$backup = Join-Path $parent ($leaf + ".backup-" + (Get-Date -Format "yyyyMMddHHmmss") + "-" + $suffix)
-foreach ($candidate in @($extractRoot, $backup)) {
-  if ([IO.Directory]::GetParent([IO.Path]::GetFullPath($candidate)).FullName -ne $parent) {
-    throw "Unsafe update target."
-  }
-}
-
-function Write-UpdateResult([string]$Status, [string]$Message) {
-  $resultDirectory = [IO.Path]::GetDirectoryName($resultPathFull)
-  [IO.Directory]::CreateDirectory($resultDirectory) | Out-Null
-  $safeMessage = ([string]$Message -replace '[\r\n]+', ' ').Trim()
-  if ($safeMessage.Length -gt 500) { $safeMessage = $safeMessage.Substring(0, 500) }
-  $result = [ordered]@{
-    schemaVersion = 1
-    status = $Status
-    releaseId = $ReleaseId
-    version = $Version
-    recordedAt = [DateTime]::UtcNow.ToString("o")
-    message = $safeMessage
-  }
-  $temporaryResult = $resultPathFull + "." + $suffix + ".tmp"
-  $utf8 = [Text.UTF8Encoding]::new($false)
-  [IO.File]::WriteAllText(
-    $temporaryResult,
-    (($result | ConvertTo-Json -Depth 3) + [Environment]::NewLine),
-    $utf8
-  )
-  Move-Item -LiteralPath $temporaryResult -Destination $resultPathFull -Force
-}
-
-function Get-PackageProcesses {
-  $prefix = $package + [IO.Path]::DirectorySeparatorChar
-  return @(
-    Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
-      Where-Object {
-        -not [string]::IsNullOrWhiteSpace($_.ExecutablePath) -and
-        $_.ExecutablePath.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)
-      }
-  )
-}
-
-function Move-PackageWithRetry([string]$Source, [string]$Destination) {
-  $deadline = [DateTime]::UtcNow.AddSeconds(20)
-  $lastError = $null
-  do {
-    try {
-      Move-Item -LiteralPath $Source -Destination $Destination
-      return
-    } catch {
-      $lastError = $_
-      Start-Sleep -Milliseconds 250
-    }
-  } while ([DateTime]::UtcNow -lt $deadline)
-  throw $lastError
-}
-
-Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " update helper preflight passed")
-$readyMarker = [ordered]@{
-  schemaVersion = 1
-  status = "ready"
-  releaseId = $ReleaseId
-  processId = $PID
-  recordedAt = [DateTime]::UtcNow.ToString("o")
-}
-$readyTemporary = $readyPathFull + "." + $suffix + ".tmp"
-$readyEncoding = [Text.UTF8Encoding]::new($false)
-[IO.File]::WriteAllText(
-  $readyTemporary,
-  (($readyMarker | ConvertTo-Json -Depth 3) + [Environment]::NewLine),
-  $readyEncoding
-)
-Move-Item -LiteralPath $readyTemporary -Destination $readyPathFull -Force
-
-try {
-  $exitDeadline = [DateTime]::UtcNow.AddSeconds(45)
-  do {
-    $mainStillRunning = $null -ne (Get-Process -Id $CurrentPid -ErrorAction SilentlyContinue)
-    $packageProcesses = @(Get-PackageProcesses)
-    if (-not $mainStillRunning -and $packageProcesses.Count -eq 0) { break }
-    Start-Sleep -Milliseconds 200
-  } while ([DateTime]::UtcNow -lt $exitDeadline)
-  if ($null -ne (Get-Process -Id $CurrentPid -ErrorAction SilentlyContinue) -or
-      @(Get-PackageProcesses).Count -gt 0) {
-    throw "QA Hub processes did not exit before the update timeout."
-  }
-  Expand-Archive -LiteralPath $archive -DestinationPath $extractRoot -Force
-  $incomingCandidates = @()
-  if (Test-Path -LiteralPath (Join-Path $extractRoot $ExecutableName) -PathType Leaf) {
-    $incomingCandidates += $extractRoot
-  }
-  $incomingCandidates += @(
-    Get-ChildItem -LiteralPath $extractRoot -Directory -Force |
-      Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName $ExecutableName) -PathType Leaf } |
-      ForEach-Object { $_.FullName }
-  )
-  if ($incomingCandidates.Count -ne 1) {
-    throw "The downloaded package layout is invalid."
-  }
-  $incoming = [IO.Path]::GetFullPath([string]$incomingCandidates[0])
-  $incomingExe = Join-Path $incoming $ExecutableName
-  $runtime = Join-Path $package "desktop-runtime.json"
-  if (Test-Path -LiteralPath $runtime -PathType Leaf) {
-    Copy-Item -LiteralPath $runtime -Destination (Join-Path $incoming "desktop-runtime.json") -Force
-  }
-  $uninstaller = Join-Path $package "Uninstall.exe"
-  if (Test-Path -LiteralPath $uninstaller -PathType Leaf) {
-    Copy-Item -LiteralPath $uninstaller -Destination (Join-Path $incoming "Uninstall.exe") -Force
-  }
-  Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " update payload extracted")
-  Move-PackageWithRetry -Source $package -Destination $backup
-  try {
-    Move-PackageWithRetry -Source $incoming -Destination $package
-    Start-Process -FilePath (Join-Path $package $ExecutableName) -ArgumentList "--updated"
-  } catch {
-    if (Test-Path -LiteralPath $package) {
-      Move-Item -LiteralPath $package -Destination ($package + ".failed-" + $suffix)
-    }
-    Move-PackageWithRetry -Source $backup -Destination $package
-    throw
-  }
-  Write-UpdateResult -Status "installed" -Message "Update installed."
-  Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " update installed")
-} catch {
-  $failureMessage = $_.Exception.Message
-  Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " " + $failureMessage)
-  try { Write-UpdateResult -Status "failed" -Message $failureMessage } catch {}
-  $restoredExe = Join-Path $package $ExecutableName
-  if (Test-Path -LiteralPath $restoredExe -PathType Leaf) {
-    try { Start-Process -FilePath $restoredExe -ArgumentList "--update-failed" } catch {}
-  }
-  exit 1
-} finally {
-  if (Test-Path -LiteralPath $extractRoot) {
-    Remove-Item -LiteralPath $extractRoot -Recurse -Force
-  }
-}
-exit 0
-`;

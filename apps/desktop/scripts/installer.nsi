@@ -3,6 +3,9 @@ SetCompressor zlib
 RequestExecutionLevel user
 
 !include "MUI2.nsh"
+!include "FileFunc.nsh"
+
+Var QaHubUpdateMode
 
 Name "Relay QA Hub"
 OutFile "${OUTPUT_FILE}"
@@ -27,7 +30,11 @@ VIAddVersionKey /LANG=1033 "ProductVersion" "${PRODUCT_VERSION}"
 
 Section "Relay QA Hub" MainSection
   SetShellVarContext current
+  ${GetOptions} $CMDLINE "/QA_HUB_UPDATE=" $QaHubUpdateMode
+  StrCmp $QaHubUpdateMode "1" update_processes_closed
   nsExec::ExecToLog '"$SYSDIR\taskkill.exe" /F /T /IM RelayQaHub.exe'
+  Sleep 500
+update_processes_closed:
   Sleep 500
   RMDir /r "$INSTDIR"
   SetOutPath "$INSTDIR"
@@ -48,6 +55,7 @@ Section "Relay QA Hub" MainSection
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub" "NoRepair" 1
+
 SectionEnd
 
 Section "Uninstall"

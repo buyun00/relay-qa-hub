@@ -14,6 +14,7 @@ $outputRoot = Join-Path $desktopRoot "release"
 $portableClientScript = Join-Path $PSScriptRoot "Configure-QAHubPortableClient.ps1"
 $signUpdateScript = Join-Path $PSScriptRoot "sign-update.mjs"
 $generateIconScript = Join-Path $PSScriptRoot "generate-windows-icon.mjs"
+$buildUpdaterScript = Join-Path $PSScriptRoot "build-updater.ps1"
 $assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
 $manifestFile = Join-Path $outputRoot "RelayQaHub-win32-x64-latest.json"
@@ -56,6 +57,9 @@ if (-not (Test-Path -LiteralPath $signUpdateScript -PathType Leaf)) {
 if (-not (Test-Path -LiteralPath $generateIconScript -PathType Leaf)) {
   throw "Windows icon generator is missing."
 }
+if (-not (Test-Path -LiteralPath $buildUpdaterScript -PathType Leaf)) {
+  throw "Native updater builder is missing."
+}
 if (-not (Test-Path -LiteralPath $assertReleaseSource -PathType Leaf)) {
   throw "Release source guard is missing."
 }
@@ -71,6 +75,12 @@ $iconFile = Join-Path $outputRoot ".generated\RelayQaHub.ico"
 & $nodeCommand.Source $generateIconScript $iconFile
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $iconFile -PathType Leaf)) {
   throw "Windows icon generation failed."
+}
+$nativeUpdater = & $buildUpdaterScript `
+  -IconFile $iconFile `
+  -ProductVersion ([string]$desktopPackage.version)
+if (-not (Test-Path -LiteralPath ([string]$nativeUpdater.updater) -PathType Leaf)) {
+  throw "Native updater build did not produce RelayQaHubUpdater.exe."
 }
 
 try {
@@ -97,6 +107,10 @@ try {
   if (-not (Test-Path -LiteralPath $packageDirectory -PathType Container)) {
     throw "Packaged desktop directory is missing."
   }
+  Copy-Item `
+    -LiteralPath ([string]$nativeUpdater.updater) `
+    -Destination (Join-Path $packageDirectory "RelayQaHubUpdater.exe") `
+    -Force
   $runtimeConfig = [ordered]@{
     schemaVersion = 1
     apiBaseUrl = "http://$($lan.Address):4319"
@@ -164,4 +178,5 @@ try {
   defaultApiBaseUrl = $runtimeConfig.apiBaseUrl
   containsAccessToken = $false
   sourceCommit = $sourceCommit
+  nativeUpdater = [string]$nativeUpdater.updater
 }
