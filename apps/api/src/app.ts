@@ -5,7 +5,6 @@ import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest }
 
 import { API_SERVICE_NAME, API_VERSION, DEVELOPMENT_BUILD_SHA, resolveBuildSha } from "./config.js";
 import { registerAndroidUpdateRoutes } from "./android-updates.js";
-import { registerDesktopUpdateRoutes } from "./desktop-updates.js";
 import {
   MAX_MOBILE_CHUNK_SIZE_BYTES,
   MOBILE_ATTACHMENT_BIND_PATH,
@@ -225,7 +224,6 @@ export interface CreateApiAppOptions {
   readonly debugBearerToken?: string;
   readonly debugActorId?: string;
   readonly browserAuth?: BrowserAuthOptions;
-  readonly desktopUpdateRoot?: string;
   readonly androidUpdateRoot?: string;
 }
 
@@ -2047,7 +2045,6 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
-  registerDesktopUpdateRoutes(app, options.desktopUpdateRoot);
   registerAndroidUpdateRoutes(app, options.androidUpdateRoot);
   return app;
 }

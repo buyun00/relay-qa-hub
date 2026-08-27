@@ -7,7 +7,6 @@ export {
 } from "./app.js";
 export type { CreateApiAppOptions, DependencyHealth, LiveHealth, ReadyHealth } from "./app.js";
 export { ANDROID_UPDATE_PATH, registerAndroidUpdateRoutes } from "./android-updates.js";
-export { DESKTOP_UPDATE_PATH, registerDesktopUpdateRoutes } from "./desktop-updates.js";
 export { createSqliteApiHealthProbe } from "./health.js";
 export type {
   ApiDependencyHealthProbe,

@@ -202,16 +202,6 @@ function readNotificationHintChannelEnabled(): boolean {
   throw new Error("QA_HUB_NOTIFICATION_HINT_CHANNEL_ENABLED must be true or false");
 }
 
-function readDesktopUpdateRoot(dataRoot: string): string {
-  const configured = process.env["QA_HUB_DESKTOP_UPDATE_ROOT"]?.trim();
-  const updateRoot =
-    configured === undefined ? join(dataRoot, "desktop-updates", "stable") : configured;
-  if (!isAbsolute(updateRoot)) {
-    throw new Error("QA_HUB_DESKTOP_UPDATE_ROOT must be an absolute path");
-  }
-  return resolve(updateRoot);
-}
-
 function readAndroidUpdateRoot(dataRoot: string): string {
   const configured = process.env["QA_HUB_ANDROID_UPDATE_ROOT"]?.trim();
   const updateRoot =
@@ -317,7 +307,6 @@ async function run(): Promise<void> {
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
-      desktopUpdateRoot: readDesktopUpdateRoot(storage.dataRoot),
       androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
       healthProbe: createSqliteApiHealthProbe({
         worker,
