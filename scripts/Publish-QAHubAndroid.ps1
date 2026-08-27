@@ -92,7 +92,14 @@ $temporaryLatest = Join-Path $updateDirectory ".latest.$([Guid]::NewGuid().ToStr
 $json = $manifest | ConvertTo-Json -Depth 3
 [IO.File]::WriteAllText($temporaryLatest, $json, [Text.UTF8Encoding]::new($false))
 if ([IO.File]::Exists($latestPath)) {
-    [IO.File]::Replace($temporaryLatest, $latestPath, $null)
+    $backupLatest = Join-Path $updateDirectory ".latest-backup.$([Guid]::NewGuid().ToString('N')).json"
+    try {
+        [IO.File]::Replace($temporaryLatest, $latestPath, $backupLatest, $true)
+    } finally {
+        if ([IO.File]::Exists($backupLatest)) {
+            [IO.File]::Delete($backupLatest)
+        }
+    }
 } else {
     [IO.File]::Move($temporaryLatest, $latestPath)
 }
