@@ -1,12 +1,10 @@
 {
   "name": "@relay-qa-hub/desktop",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Secure Windows Electron shell for the Relay QA Hub management Web.",
   "license": "UNLICENSED",
-  "author": "Relay QA Hub Team",
   "type": "module",
-  "packageManager": "pnpm@11.19.0",
   "engines": {
     "node": ">=24.18 <25"
   },
@@ -21,81 +19,14 @@
     "test": "node --import tsx --test test/*.test.ts",
     "start": "electron .",
     "start:dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1",
+    "package:portable": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-windows.ps1",
     "package:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-installer.ps1"
   },
   "devDependencies": {
     "@electron/packager": "18.3.1",
     "@types/node": "24.10.4",
-    "@types/semver": "7.7.1",
     "electron": "43.4.1",
-    "electron-builder": "26.15.3",
     "tsx": "4.23.12",
     "typescript": "6.0.3"
-  },
-  "dependencies": {
-    "electron-log": "5.4.4",
-    "electron-updater": "6.8.9"
-  },
-  "build": {
-    "appId": "com.relayqahub.desktop",
-    "productName": "Relay QA Hub",
-    "electronVersion": "43.4.1",
-    "artifactName": "Relay-QA-Hub-Setup-${version}-${arch}.${ext}",
-    "asar": true,
-    "compression": "maximum",
-    "directories": {
-      "buildResources": "assets",
-      "output": "release/installer"
-    },
-    "files": [
-      "dist/**/*",
-      "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "../web/dist",
-        "to": "web"
-      }
-    ],
-    "protocols": [
-      {
-        "name": "Relay QA Hub Bug",
-        "schemes": [
-          "qa-hub"
-        ]
-      }
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "assets/icon.svg",
-      "executableName": "RelayQaHub"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": false,
-      "allowElevation": false,
-      "allowToChangeInstallationDirectory": false,
-      "createDesktopShortcut": "always",
-      "createStartMenuShortcut": true,
-      "shortcutName": "Relay QA Hub",
-      "runAfterFinish": true,
-      "deleteAppDataOnUninstall": false,
-      "include": "assets/installer.nsh"
-    },
-    "publish": [
-      {
-        "provider": "generic",
-        "channel": "latest",
-        "useMultipleRangeRequest": false,
-        "url": "${env.QA_HUB_DESKTOP_UPDATE_URL}"
-      }
-    ]
   }
 }

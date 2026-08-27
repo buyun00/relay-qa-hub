@@ -613,6 +613,10 @@ try {
   if (Test-Path -LiteralPath $runtime -PathType Leaf) {
     Copy-Item -LiteralPath $runtime -Destination (Join-Path $incoming "desktop-runtime.json") -Force
   }
+  $uninstaller = Join-Path $package "Uninstall.exe"
+  if (Test-Path -LiteralPath $uninstaller -PathType Leaf) {
+    Copy-Item -LiteralPath $uninstaller -Destination (Join-Path $incoming "Uninstall.exe") -Force
+  }
   Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " update payload extracted")
   Move-PackageWithRetry -Source $package -Destination $backup
   try {

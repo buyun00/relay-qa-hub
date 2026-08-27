@@ -119,6 +119,7 @@ test(
       );
       await fs.writeFile(path.join(installDirectory, "old-marker.txt"), "old\n");
       await fs.writeFile(path.join(installDirectory, "desktop-runtime.json"), '{"server":"old"}\n');
+      await fs.writeFile(path.join(installDirectory, "Uninstall.exe"), "uninstaller\n");
       await fs.writeFile(path.join(payloadDirectory, "new-marker.txt"), "new\n");
       await fs.writeFile(path.join(payloadDirectory, "desktop-runtime.json"), '{"server":"new"}\n');
       await fs.writeFile(helper, INSTALL_HELPER);
@@ -170,6 +171,10 @@ test(
       assert.equal(
         await fs.readFile(path.join(installDirectory, "desktop-runtime.json"), "utf8"),
         '{"server":"old"}\n',
+      );
+      assert.equal(
+        await fs.readFile(path.join(installDirectory, "Uninstall.exe"), "utf8"),
+        "uninstaller\n",
       );
       const updateResult = JSON.parse(await fs.readFile(result, "utf8")) as {
         status: string;

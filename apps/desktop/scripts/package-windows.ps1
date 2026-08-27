@@ -13,6 +13,8 @@ $packager = Join-Path $repoRoot "node_modules\.bin\electron-packager.cmd"
 $outputRoot = Join-Path $desktopRoot "release"
 $portableClientScript = Join-Path $PSScriptRoot "Configure-QAHubPortableClient.ps1"
 $signUpdateScript = Join-Path $PSScriptRoot "sign-update.mjs"
+$generateIconScript = Join-Path $PSScriptRoot "generate-windows-icon.mjs"
+$assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
 $manifestFile = Join-Path $outputRoot "RelayQaHub-win32-x64-latest.json"
 $stageRoot = Join-Path $desktopRoot (".packaging-stage-" + [Guid]::NewGuid().ToString("N"))
@@ -51,12 +53,25 @@ if (-not (Test-Path -LiteralPath $portableClientScript -PathType Leaf)) {
 if (-not (Test-Path -LiteralPath $signUpdateScript -PathType Leaf)) {
   throw "Desktop update signing script is missing."
 }
+if (-not (Test-Path -LiteralPath $generateIconScript -PathType Leaf)) {
+  throw "Windows icon generator is missing."
+}
+if (-not (Test-Path -LiteralPath $assertReleaseSource -PathType Leaf)) {
+  throw "Release source guard is missing."
+}
 if ($ReleaseId -notmatch '^\d{8}T\d{9}Z$') {
   throw "ReleaseId must use yyyyMMddTHHmmssfffZ."
 }
 . $lanScript
 $lan = Resolve-QAHubLanBinding -LanAddress $LanAddress
+& $assertReleaseSource -RepoRoot $repoRoot | Out-Null
+$sourceCommit = (git -C $repoRoot rev-parse HEAD).Trim()
 $env:PATH = "$(Split-Path -Parent $nodeCommand.Source);$env:PATH"
+$iconFile = Join-Path $outputRoot ".generated\RelayQaHub.ico"
+& $nodeCommand.Source $generateIconScript $iconFile
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $iconFile -PathType Leaf)) {
+  throw "Windows icon generation failed."
+}
 
 try {
   New-Item -ItemType Directory -Path $stageRoot -Force | Out-Null
@@ -68,13 +83,14 @@ try {
     schemaVersion = 1
     releaseId = $ReleaseId
     version = [string]$desktopPackage.version
+    sourceCommit = $sourceCommit
   }
   [IO.File]::WriteAllText(
     (Join-Path $stageRoot "release.json"),
     (($releaseDescriptor | ConvertTo-Json -Depth 3) + "`n"),
     $encoding
   )
-  & $packager $stageRoot "RelayQaHub" --platform=win32 --arch=x64 --out=$outputRoot --overwrite --prune=true --asar
+  & $packager $stageRoot "RelayQaHub" --platform=win32 --arch=x64 --out=$outputRoot --overwrite --prune=true --asar --icon=$iconFile
   if ($LASTEXITCODE -ne 0) { throw "electron-packager failed with exit code $LASTEXITCODE." }
 
   $packageDirectory = Join-Path $outputRoot "RelayQaHub-win32-x64"
@@ -147,4 +163,5 @@ try {
   releaseId = $ReleaseId
   defaultApiBaseUrl = $runtimeConfig.apiBaseUrl
   containsAccessToken = $false
+  sourceCommit = $sourceCommit
 }

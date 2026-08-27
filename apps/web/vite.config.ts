@@ -5,6 +5,7 @@ import type { Connect, Plugin, ProxyOptions } from "vite";
 import { defineConfig } from "vitest/config";
 
 import packageJson from "./package.json" with { type: "json" };
+import desktopPackageJson from "../desktop/package.json" with { type: "json" };
 
 const contractVersion = "1.0.0";
 const webAuthMode = process.env.QA_HUB_WEB_AUTH_MODE?.trim().toLowerCase() || "session";
@@ -24,6 +25,10 @@ const windowsZipFile = fileURLToPath(
 const windowsUpdateManifestPath = "/downloads/Relay-QA-Hub-Windows-x64-latest.json";
 const windowsUpdateManifestFile = fileURLToPath(
   new URL("../desktop/release/RelayQaHub-win32-x64-latest.json", import.meta.url),
+);
+const windowsInstallerDownloadPath = "/downloads/Relay-QA-Hub-Setup-x64.exe";
+const windowsInstallerFile = fileURLToPath(
+  new URL("../desktop/release/installer/Relay-QA-Hub-Setup-x64.exe", import.meta.url),
 );
 if (webAuthMode === "debug" && !debugProxyToken) {
   throw new Error("QA_HUB_MVP_ACCESS_TOKEN is required in debug Web auth mode");
@@ -79,6 +84,15 @@ const downloadableArtifacts: ReadonlyMap<string, DownloadableArtifact> = new Map
       fileName: "Relay-QA-Hub-Windows-x64-latest.json",
       missingMessage: "Windows update manifest has not been published yet.",
       attachment: false,
+    },
+  ],
+  [
+    windowsInstallerDownloadPath,
+    {
+      file: windowsInstallerFile,
+      contentType: "application/vnd.microsoft.portable-executable",
+      fileName: `Relay-QA-Hub-Setup-${desktopPackageJson.version}-x64.exe`,
+      missingMessage: "Windows installer has not been published yet.",
     },
   ],
 ]);

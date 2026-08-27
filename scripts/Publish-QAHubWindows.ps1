@@ -16,11 +16,16 @@ $env:PATH = "$(Split-Path -Parent $nodeExecutable);$env:PATH"
 $tsc = Join-Path $repoRoot "node_modules\.bin\tsc.cmd"
 $vite = Join-Path $repoRoot "node_modules\.bin\vite.cmd"
 $packageScript = Join-Path $repoRoot "apps\desktop\scripts\package-windows.ps1"
-foreach ($required in @($tsc, $vite, $packageScript)) {
+$installerScript = Join-Path $repoRoot "apps\desktop\scripts\build-installer.ps1"
+$assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
+foreach ($required in @($tsc, $vite, $packageScript, $installerScript, $assertReleaseSource)) {
   if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
     throw "Required Windows publish dependency is missing: $required"
   }
 }
+
+& $assertReleaseSource -RepoRoot $repoRoot | Out-Null
+$releaseId = [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssfffZ")
 
 Push-Location $repoRoot
 try {
@@ -35,8 +40,13 @@ try {
   }
   & $tsc -p apps/desktop/tsconfig.json
   if ($LASTEXITCODE -ne 0) { throw "Desktop build failed." }
-  & $packageScript -LanAddress $LanAddress
-  if ($LASTEXITCODE -ne 0) { throw "Desktop packaging failed." }
+  $installer = & $installerScript -LanAddress $LanAddress -ReleaseId $releaseId
+  if ($LASTEXITCODE -ne 0) { throw "Desktop installer build failed." }
 } finally {
   Pop-Location
+}
+
+[pscustomobject][ordered]@{
+  releaseId = $releaseId
+  installer = $installer
 }
