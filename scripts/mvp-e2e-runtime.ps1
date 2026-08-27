@@ -120,7 +120,7 @@ function Start-Runtime {
     $env:QA_HUB_WEB_SECURE_COOKIE = "false"
     Remove-Item Env:QA_HUB_WEB_ORIGIN -ErrorAction SilentlyContinue
     $env:QA_HUB_WEB_ORIGINS = "http://127.0.0.1:4174,http://localhost:4174,http://$($lan.Address):4174"
-    $env:QA_HUB_BOOTSTRAP_ADMIN_PASSWORD = [string]$State.bootstrapPassword
+    Remove-Item Env:QA_HUB_BOOTSTRAP_ADMIN_PASSWORD -ErrorAction SilentlyContinue
     $env:QA_HUB_NOTIFICATION_HINT_CHANNEL_ENABLED = "true"
     $api = Start-LoggedProcess -FilePath $nodeExe -ArgumentList @($apiEntry) -WorkingDirectory $repoRoot -LogPrefix (Join-Path $logsRoot "$generation-api")
     $started += $api

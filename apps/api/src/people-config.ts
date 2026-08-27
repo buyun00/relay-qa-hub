@@ -137,9 +137,6 @@ export function loadQaPeopleConfig(configuredFile?: string): QaPeopleConfig {
   for (const person of people) {
     if (!ids.add(person.id)) throw new Error("qa people config person id is duplicated");
   }
-  if (!people.some((person) => person.active)) {
-    throw new Error("qa people config requires at least one active person");
-  }
   return Object.freeze({ schemaVersion: 4, projectKey, people: Object.freeze(people) });
 }
 

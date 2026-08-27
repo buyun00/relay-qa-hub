@@ -65,7 +65,9 @@ boundary. An existing name resumes that backend account; a previously unseen
 name is created as a new backend account and logged in immediately. Clients do
 not load or validate a local people file. The server-owned initial membership
 seed is [`apps/android/config/qa-people.json`](apps/android/config/qa-people.json),
-or the server-side `QA_HUB_PEOPLE_CONFIG_FILE` override with the same schema.
+or the server-side `QA_HUB_PEOPLE_CONFIG_FILE` override with the same schema. An
+empty `people` array is valid and keeps a fresh backend at zero users until the
+first successful name login.
 
 After building `packages/storage`, `apps/api`, and `apps/web`, the current local
 runtime can be safely restarted from an ordinary PowerShell prompt with:

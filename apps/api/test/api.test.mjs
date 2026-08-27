@@ -73,6 +73,16 @@ test("backend people seed accepts only schema 4 without client-side aliases", as
   await writeFile(
     configFile,
     JSON.stringify({
+      schemaVersion: 4,
+      projectKey: "LOCAL",
+      people: [],
+    }),
+  );
+  assert.deepEqual(loadQaPeopleConfig(configFile).people, []);
+
+  await writeFile(
+    configFile,
+    JSON.stringify({
       schemaVersion: 3,
       projectKey: "LOCAL",
       people: [

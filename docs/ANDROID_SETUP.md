@@ -180,7 +180,9 @@ Use `com.relayqahub.android.debug` for a debug APK and
 At API startup this file creates or updates the active project users and
 memberships. The default API path is the checked-in server seed; operators can
 override it with `QA_HUB_PEOPLE_CONFIG_FILE`. The API rejects old schemas and
-extra account-alias fields instead of preserving an old client contract.
+extra account-alias fields instead of preserving an old client contract. An
+empty `people` array is valid; it creates no startup users, and the first entered
+name becomes the first backend account.
 
 ## Current Android interaction model
 
