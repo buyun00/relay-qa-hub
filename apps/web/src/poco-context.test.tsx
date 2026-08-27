@@ -164,6 +164,36 @@ describe("Poco debug context", () => {
     });
   });
 
+  it("reads the recentLogs field emitted by existing Unity QA builds", () => {
+    const summary = summarizeUnitySnapshot({
+      schemaVersion: 1,
+      status: "partial",
+      data: {
+        scene: "Hall",
+        recentLogs: [
+          {
+            timeUnixMs: 1_787_795_179_000,
+            level: "Error",
+            message: "[QA_ANDROID_LOG_TEST] error",
+            stackTrace: "BattleView.Refresh()",
+          },
+        ],
+      },
+      warnings: ["business_provider_unavailable"],
+    });
+
+    expect(summary?.recentErrorsAvailable).toBe(true);
+    expect(summary?.recentErrors).toEqual([
+      {
+        occurredAtUnixMs: 1_787_795_179_000,
+        level: "error",
+        message: "[QA_ANDROID_LOG_TEST] error",
+        stackTrace: "BattleView.Refresh()",
+        repeatCount: 1,
+      },
+    ]);
+  });
+
   it("distinguishes a missing game log provider from an empty error window", () => {
     const summary = summarizeUnitySnapshot({
       schemaVersion: 1,

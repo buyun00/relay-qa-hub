@@ -1,4 +1,4 @@
-# Unity Poco 截图附带最近日志：修改与验证
+# Unity Poco 近期错误：修改与验证
 
 ## 1. 修改文件
 
@@ -169,24 +169,27 @@ public static class QaRecentLogBuffer
 
 ## 3. 接入 `qa.snapshot`
 
-在 `QaSnapshotBridge.Handle(...)` 中找到构造 `result.data` 的位置，在最终序列化之前加入 `recentLogs`。
+在 `QaSnapshotBridge.Handle(...)` 中找到构造 `result.data` 的位置，在最终序列化之前加入 `recentErrors` 和 `recentErrorWindowMs`。
 
 如果 `data` 是 `Dictionary<string, object>`：
 
 ```csharp
-data["recentLogs"] = QaRecentLogBuffer.GetSnapshot(10, 120 * 1000L);
+data["recentErrors"] = QaRecentLogBuffer.GetSnapshot(10, 120 * 1000L);
+data["recentErrorWindowMs"] = 120 * 1000L;
 ```
 
 如果 `data` 是 DTO，给 DTO 增加字段：
 
 ```csharp
-public List<QaRecentLogEntry> recentLogs;
+public List<QaRecentLogEntry> recentErrors;
+public long recentErrorWindowMs;
 ```
 
 构造 DTO 时赋值：
 
 ```csharp
-recentLogs = QaRecentLogBuffer.GetSnapshot(10, 120 * 1000L),
+recentErrors = QaRecentLogBuffer.GetSnapshot(10, 120 * 1000L),
+recentErrorWindowMs = 120 * 1000L,
 ```
 
 保持现有内容不变：
@@ -201,7 +204,10 @@ recentLogs = QaRecentLogBuffer.GetSnapshot(10, 120 * 1000L),
 没有日志时正常返回空数组：
 
 ```json
-"recentLogs": []
+{
+  "recentErrors": [],
+  "recentErrorWindowMs": 120000
+}
 ```
 
 有日志时返回格式：
@@ -212,14 +218,15 @@ recentLogs = QaRecentLogBuffer.GetSnapshot(10, 120 * 1000L),
   "captureId": "原请求的 captureId",
   "status": "complete",
   "data": {
-    "recentLogs": [
+    "recentErrors": [
       {
         "timeUnixMs": 1787790000456,
         "level": "Exception",
         "message": "NullReferenceException: Object reference not set",
         "stackTrace": "BattleView.Refresh() ..."
       }
-    ]
+    ],
+    "recentErrorWindowMs": 120000
   }
 }
 ```
@@ -256,7 +263,7 @@ qa.snapshot
 
 确认响应满足：
 
-1. `data.recentLogs` 存在。
+1. `data.recentErrors` 存在，且不存在 `data.recentLogs`。
 2. 能看到 `error`、`assert`、`exception` 三条测试日志。
 3. 看不到 `normal` 和 `warning`。
 4. `level` 分别为 `Error`、`Assert`、`Exception`。
@@ -277,7 +284,7 @@ for (int i = 0; i < 120; i++)
 
 再次调用 `qa.snapshot`，确认：
 
-1. `recentLogs` 只有 10 条，并且只包含最近 120 秒的日志。
+1. `recentErrors` 只有 10 条，并且只包含最近 120 秒的日志。
 2. 返回的是 `110`～`119` 的最新日志。
 3. `qa.snapshot` 响应没有超过现有 256 KiB 上限。
 
@@ -301,15 +308,15 @@ for (int i = 0; i < 120; i++)
 7. 确认：
 
    - `captureId` 与本次截图一致。
-   - `data.recentLogs` 中存在 `[QA_ANDROID_LOG_TEST] error`。
+   - `data.recentErrors` 中存在 `[QA_ANDROID_LOG_TEST] error`。
    - `level` 为 `Error`。
    - 原有 Poco Screenshot、Dump 和其他 `qa.snapshot` 字段没有丢失。
 
-8. 不产生任何新日志，再截图一次，确认即使 `recentLogs` 为空或只有之前的少量日志，截图和提单仍正常完成。
+8. 不产生任何新日志，再截图一次，确认即使 `recentErrors` 为空或只有之前的少量日志，截图和提单仍正常完成。
 
 ## 6. IL2CPP 字段缺失时处理
 
-如果 Editor 返回正常，但 Android IL2CPP 的 `recentLogs` 字段或成员丢失，在现有 `link.xml` 中精确保留新增类型。把 namespace 替换为实际值：
+如果 Editor 返回正常，但 Android IL2CPP 的 `recentErrors` 字段或成员丢失，在现有 `link.xml` 中精确保留新增类型。把 namespace 替换为实际值：
 
 ```xml
 <linker>
@@ -324,7 +331,7 @@ for (int i = 0; i < 120; i++)
 
 ## 7. 常见问题检查
 
-### `recentLogs` 不存在
+### `recentErrors` 不存在
 
 检查：
 
@@ -332,7 +339,7 @@ for (int i = 0; i < 120; i++)
 2. 新字段是否放在最终返回的 `result.data` 中。
 3. 是否在加入字段之后又被另一段 DTO 转换覆盖。
 
-### `recentLogs` 一直为空
+### `recentErrors` 一直为空
 
 检查：
 
@@ -364,8 +371,8 @@ MaxMessageCharacters 512     → 256
 
 ## 8. 完成标准
 
-- [ ] Editor 中 `qa.snapshot.data.recentLogs` 只返回 `Error`、`Assert`、`Exception`。
-- [ ] 普通 `Log` 和 `Warning` 不进入 `recentLogs`。
+- [ ] Editor 中 `qa.snapshot.data.recentErrors` 只返回 `Error`、`Assert`、`Exception`。
+- [ ] 普通 `Log` 和 `Warning` 不进入 `recentErrors`。
 - [ ] 最多只返回最近 120 秒内的最新 10 条。
 - [ ] 重新启动游戏后旧日志被清空。
 - [ ] Android IL2CPP 测试包能返回真实游戏日志。

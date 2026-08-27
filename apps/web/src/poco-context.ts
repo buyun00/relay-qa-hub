@@ -396,6 +396,7 @@ export function summarizeUnitySnapshot(value: unknown): UnitySnapshotSummary | n
   const diagnostics = asRecord(data.diagnostics);
   const recentErrorsSource = firstArray([
     data.recentErrors,
+    data.recentLogs,
     diagnostics?.recentErrors,
     root.recentErrors,
   ]);
