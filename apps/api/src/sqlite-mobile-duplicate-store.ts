@@ -19,29 +19,23 @@ export function createSqliteMobileDuplicateStore(
   options: SqliteMobileDuplicateStoreOptions,
 ): MobileDuplicateStore {
   const now = options.now ?? (() => new Date());
-  const scope = {
+  const actorScope = (actorId: string) => ({
     accountId: options.scope.accountId,
     projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
+    actorId,
+  } as const);
 
   return {
     async listCandidates(query): Promise<MobileDuplicateCandidateList> {
-      if (query.actorId !== options.scope.actorId) {
-        throw new TypeError("actor does not match the authenticated mobile scope");
-      }
       const input: ListMobileDuplicateCandidatesInput = {
-        ...scope,
+        ...actorScope(query.actorId),
         bugId: query.bugId,
       };
       return options.worker.listMobileDuplicateCandidates(input);
     },
     async markDuplicate(command) {
-      if (command.actorId !== options.scope.actorId) {
-        throw new TypeError("actor does not match the authenticated mobile scope");
-      }
       const input: MarkMobileBugDuplicateInput = {
-        ...scope,
+        ...actorScope(command.actorId),
         bugId: command.bugId,
         expectedVersion: command.request.expectedVersion,
         canonicalBugId: command.request.canonicalBugId,

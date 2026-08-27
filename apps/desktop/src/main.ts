@@ -14,14 +14,21 @@ import {
 } from "electron";
 
 import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
-import type { DesktopConnectionStatus } from "./bridge-types.js";
+import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
+import { NotificationHistory } from "./notification-history.js";
 import {
   NotificationTransport,
   type DesktopNotification,
   type TransportStatus,
 } from "./notification-transport.js";
-import { fetchDurableInbox, proxyRendererApiRequest } from "./network.js";
-import { createAuthenticatedWssClient } from "./wss-client.js";
+import {
+  DesktopBrowserSessionCookieStore,
+  fetchDurableInbox,
+  proxyRendererApiRequest,
+} from "./network.js";
+import { loadDesktopRuntimeEnvironment, resolveDesktopRuntimePaths } from "./runtime-config.js";
+import { createAuthenticatedWssClient, createBrowserSessionWssClient } from "./wss-client.js";
+import { PortableUpdater, type DesktopUpdateState } from "./portable-updater.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const APP_PROTOCOL = `${APP_SCHEME}:`;
@@ -29,14 +36,20 @@ const MAX_ASSET_BYTES = 50 * 1024 * 1024;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 const FALLBACK_TRAY_ICON =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+const AUTO_START_DEFAULT_MARKER = "auto-start-default-v1";
 
-const config = parseDesktopConfig(process.env, {
+const runtimeEnvironment = loadDesktopRuntimeEnvironment(process.env);
+const runtimePaths = resolveDesktopRuntimePaths(runtimeEnvironment);
+const notificationHistory = new NotificationHistory(runtimePaths.notificationHistoryFile);
+const browserSession = new DesktopBrowserSessionCookieStore();
+const config = parseDesktopConfig(runtimeEnvironment, {
   webAssetsDirectory: path.resolve(currentDirectory, "../../../apps/web/dist"),
 });
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let transport: NotificationTransport;
+let updater: PortableUpdater | null = null;
 let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
@@ -181,6 +194,21 @@ function sendConnectionStatus(status: TransportStatus): void {
   rebuildTrayMenu();
 }
 
+function notificationCredential(): string | null {
+  return config.accessToken ?? browserSession.cookieHeader(null);
+}
+
+function syncNotificationCredential(): void {
+  transport?.updateAccessToken(notificationCredential());
+}
+
+function sendUpdateState(state: DesktopUpdateState): void {
+  if (mainWindow !== null && !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()) {
+    mainWindow.webContents.send("desktop:update-state", state);
+  }
+  rebuildTrayMenu();
+}
+
 function openMainWindow(): void {
   if (mainWindow === null || mainWindow.isDestroyed()) return;
   if (mainWindow.isMinimized()) mainWindow.restore();
@@ -265,11 +293,29 @@ function statusLabel(status: TransportStatus): string {
 
 function setAutoStartAtLogin(enabled: boolean): void {
   try {
-    app.setLoginItemSettings({ openAtLogin: enabled });
+    app.setLoginItemSettings({ openAtLogin: enabled, args: enabled ? ["--hidden"] : [] });
   } catch {
     // Unsupported platforms keep the menu action harmless and reversible.
   }
   rebuildTrayMenu();
+}
+
+async function ensureDefaultAutoStart(): Promise<void> {
+  const marker = path.join(app.getPath("userData"), AUTO_START_DEFAULT_MARKER);
+  try {
+    await fs.access(marker);
+    return;
+  } catch {
+    // The first run of this release enables the requested default once. Later
+    // tray changes remain authoritative and are not overwritten on restart.
+  }
+  try {
+    app.setLoginItemSettings({ openAtLogin: true, args: ["--hidden"] });
+    await fs.mkdir(path.dirname(marker), { recursive: true });
+    await fs.writeFile(marker, "enabled\n", { encoding: "utf8", mode: 0o600, flag: "wx" });
+  } catch {
+    // Startup remains usable when Windows or the install location disallows it.
+  }
 }
 
 function rebuildTrayMenu(): void {
@@ -286,6 +332,28 @@ function rebuildTrayMenu(): void {
     Menu.buildFromTemplate([
       { label: "打开 QA Hub", click: openMainWindow },
       { label: statusLabel(status), enabled: false },
+      ...(updater === null
+        ? []
+        : updater.state.status === "ready"
+          ? [
+              {
+                label: `安装更新 ${updater.state.version}`,
+                click: () => void updater?.install(),
+              },
+            ]
+          : [
+              {
+                label:
+                  updater.state.status === "downloading"
+                    ? `正在下载更新 ${updater.state.progressPercent}%`
+                    : updater.state.status === "checking"
+                      ? "正在检查更新"
+                      : "检查更新",
+                enabled:
+                  updater.state.status !== "downloading" && updater.state.status !== "checking",
+                click: () => void updater?.check(),
+              },
+            ]),
       { type: "separator" },
       {
         label: paused ? "恢复通知" : "暂停通知",
@@ -308,6 +376,14 @@ function rebuildTrayMenu(): void {
 }
 
 function showNativeNotification(notification: DesktopNotification): void {
+  const change: DesktopBugChange = {
+    notificationId: notification.notificationId,
+    eventId: notification.eventId,
+    bugId: notification.bugId,
+  };
+  if (mainWindow !== null && !mainWindow.isDestroyed() && !mainWindow.webContents.isDestroyed()) {
+    mainWindow.webContents.send("desktop:bug-changed", change);
+  }
   const nativeNotification = new Notification({
     title: `QA Hub · ${notification.title}`,
     body: notification.body,
@@ -336,6 +412,7 @@ function showNativeNotification(notification: DesktopNotification): void {
     else openMainWindow();
   });
   nativeNotification.show();
+  notificationHistory.record(notification.notificationId);
 }
 
 function quitApplication(): void {
@@ -345,6 +422,18 @@ function quitApplication(): void {
   tray?.destroy();
   tray = null;
   app.quit();
+}
+
+function showUpdateReadyNotification(
+  state: Extract<DesktopUpdateState, { status: "ready" }>,
+): void {
+  const notification = new Notification({
+    title: "QA Hub 更新已就绪",
+    body: `版本 ${state.version} 已下载，点击即可安装并重启。`,
+    silent: false,
+  });
+  notification.once("click", () => void updater?.install());
+  notification.show();
 }
 
 function installNavigationGuards(window: BrowserWindow): void {
@@ -390,17 +479,66 @@ function createWindow(): BrowserWindow {
 
 function installIpcHandlers(): void {
   ipcMain.removeHandler("desktop:get-connection-status");
+  ipcMain.removeHandler("desktop:get-runtime-info");
   ipcMain.removeHandler("desktop:get-notifications-paused");
+  ipcMain.removeHandler("desktop:get-update-state");
+  ipcMain.removeHandler("desktop:check-update");
+  ipcMain.removeHandler("desktop:install-update");
   ipcMain.handle("desktop:get-connection-status", (event) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) {
       return { state: "stopped", reconnectAttempt: 0, lastError: "UNTRUSTED_SENDER" };
     }
     return transport.status;
   });
+  ipcMain.handle("desktop:get-runtime-info", (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) {
+      return { apiBaseUrl: "", notificationsEnabled: false };
+    }
+    return {
+      apiBaseUrl: config.apiBaseUrl.origin,
+      notificationsEnabled: notificationCredential() !== null,
+    };
+  });
   ipcMain.handle("desktop:get-notifications-paused", (event) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return false;
     return transport.status.state === "paused";
   });
+  ipcMain.handle("desktop:get-update-state", (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) {
+      return { status: "disabled", message: "UNTRUSTED_SENDER" };
+    }
+    return updater?.state ?? { status: "disabled", message: "UPDATE_NOT_INITIALIZED" };
+  });
+  ipcMain.handle("desktop:check-update", async (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return false;
+    await updater?.check();
+    return updater !== null;
+  });
+  ipcMain.handle("desktop:install-update", async (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return false;
+    return (await updater?.install()) ?? false;
+  });
+}
+
+async function createUpdater(): Promise<PortableUpdater> {
+  const updateManifestUrl = new URL(
+    "/downloads/Relay-QA-Hub-Windows-x64-latest.json",
+    config.csrfOrigin,
+  );
+  const instance = new PortableUpdater({
+    currentReleaseFile: path.join(app.getAppPath(), "release.json"),
+    updatesDirectory: path.join(app.getPath("userData"), "updates"),
+    installDirectory: path.dirname(process.execPath),
+    executableName: path.basename(process.execPath),
+    manifestUrl: updateManifestUrl,
+    requestQuit: quitApplication,
+    onState: (state) => {
+      sendUpdateState(state);
+      if (state.status === "ready") showUpdateReadyNotification(state);
+    },
+  });
+  await instance.initialize();
+  return instance;
 }
 
 async function registerAppProtocol(): Promise<void> {
@@ -416,7 +554,9 @@ async function registerAppProtocol(): Promise<void> {
       return responseJson({ code: "APP_ORIGIN_NOT_ALLOWED" }, 403);
     }
     if (url.pathname.startsWith("/api/")) {
-      return proxyRendererApiRequest(request, config);
+      const response = await proxyRendererApiRequest(request, config, browserSession);
+      syncNotificationCredential();
+      return response;
     }
     return serveAsset(request);
   });
@@ -425,10 +565,14 @@ async function registerAppProtocol(): Promise<void> {
 function createTransport(): NotificationTransport {
   return new NotificationTransport({
     socketUrl: config.wssUrl,
-    accessToken: config.accessToken,
-    openSocket: createAuthenticatedWssClient,
-    fetchInbox: () => fetchDurableInbox(config),
+    accessToken: notificationCredential(),
+    openSocket: (url, credential) =>
+      config.accessToken === null
+        ? createBrowserSessionWssClient(url, credential)
+        : createAuthenticatedWssClient(url, credential),
+    fetchInbox: () => fetchDurableInbox(config, browserSession.cookieHeader(null)),
     showNotification: showNativeNotification,
+    seenNotificationIds: notificationHistory.notificationIds,
     onStatus: sendConnectionStatus,
   });
 }
@@ -437,22 +581,14 @@ async function startApplication(): Promise<void> {
   if (process.platform === "win32") app.setAppUserModelId("com.relayqahub.desktop");
   await registerAppProtocol();
   transport = createTransport();
+  updater = await createUpdater();
   installIpcHandlers();
+  await ensureDefaultAutoStart();
   tray = new Tray(trayIcon());
   tray.setToolTip("Relay QA Hub");
   tray.on("click", openMainWindow);
   tray.on("double-click", openMainWindow);
   rebuildTrayMenu();
-  if (
-    process.env["QA_HUB_DESKTOP_AUTO_START"] !== undefined ||
-    process.env["QA_HUB_DESKTOP_AUTO_START_LOGIN"] !== undefined
-  ) {
-    try {
-      app.setLoginItemSettings({ openAtLogin: config.autoStartAtLogin });
-    } catch {
-      // Login startup is best effort and remains explicitly visible in the tray menu.
-    }
-  }
   mainWindow = createWindow();
   const useDevelopmentUrl =
     !app.isPackaged &&
@@ -463,8 +599,12 @@ async function startApplication(): Promise<void> {
       ? config.developmentUrl.toString()
       : appUrl();
   await mainWindow.loadURL(target);
-  if (!config.startupHidden) openMainWindow();
+  if (!(config.startupHidden || process.argv.includes("--hidden"))) openMainWindow();
   transport.start();
+  const initialUpdateTimer = setTimeout(() => void updater?.check(), 5_000);
+  initialUpdateTimer.unref();
+  const recurringUpdateTimer = setInterval(() => void updater?.check(), 30 * 60 * 1_000);
+  recurringUpdateTimer.unref();
 }
 
 const hasLock = app.requestSingleInstanceLock();
@@ -499,7 +639,13 @@ if (!hasLock) {
   void app
     .whenReady()
     .then(startApplication)
-    .catch(() => {
+    .catch((error: unknown) => {
+      process.stderr.write(
+        `${JSON.stringify({
+          event: "desktop.startup.failed",
+          error: error instanceof Error ? error.name : "UNKNOWN_ERROR",
+        })}\n`,
+      );
       quitting = true;
       transport?.stop();
       app.quit();

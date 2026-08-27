@@ -18,6 +18,8 @@ internal data class CreateBugRequestScope(
     val actorId: String,
     val attachmentIds: List<String>,
     val captureBundleId: String?,
+    val ownerId: String?,
+    val verificationOwnerId: String?,
 )
 
 internal class SuccessResponseViolation(
@@ -123,12 +125,16 @@ internal object CreateBugSuccessResponseValidator {
                 "captureBundleId",
             )
         }
+        val ownerId = queuedOptionalUuid(request, "ownerId")
+        val verificationOwnerId = queuedOptionalUuid(request, "verificationOwnerId")
         return CreateBugRequestScope(
             clientSubmissionId = submissionId,
             projectId = requestProjectId,
             actorId = operation.actorId,
             attachmentIds = attachmentIds,
             captureBundleId = captureBundleId,
+            ownerId = ownerId,
+            verificationOwnerId = verificationOwnerId,
         )
     }
 
@@ -174,8 +180,10 @@ internal object CreateBugSuccessResponseValidator {
         requireSchema(responseString(bug, "priority", 2, 2) in priorities)
         val reporterId = responseUuid(bug, "reporterId")
         requireScope(reporterId == expected.actorId)
-        responseNullableUuid(bug, "ownerId")
-        responseNullableUuid(bug, "verificationOwnerId")
+        requireScope(responseNullableUuid(bug, "ownerId") == expected.ownerId)
+        requireScope(
+            responseNullableUuid(bug, "verificationOwnerId") == expected.verificationOwnerId,
+        )
         responseNullableUuid(bug, "duplicateOfBugId")
         responsePositiveLong(bug, "occurrenceCount", minimum = 1)
         responsePositiveLong(bug, "reopenCount", minimum = 0)
@@ -327,6 +335,16 @@ internal object CreateBugSuccessResponseValidator {
             ?: throw SuccessResponseViolation("INVALID_SUCCESS_SCHEMA", retryable = true)
         return requireUuid(string, key, queuedRequest = false)
     }
+
+    private fun queuedOptionalUuid(value: JsonObject, key: String): String? =
+        when (val element = value[key]) {
+            null, JsonNull -> null
+            else -> requireUuid(
+                requireString(element, key, 1, 100, queuedRequest = true),
+                key,
+                queuedRequest = true,
+            )
+        }
 
     private fun responsePositiveLong(value: JsonObject, key: String, minimum: Long): Long {
         val primitive = value[key] as? JsonPrimitive

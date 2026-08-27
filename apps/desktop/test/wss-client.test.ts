@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { createServer, type Socket } from "node:net";
 import test from "node:test";
 
-import { createAuthenticatedWssClient } from "../src/wss-client.js";
+import { createAuthenticatedWssClient, createBrowserSessionWssClient } from "../src/wss-client.js";
 
 const EVENT = JSON.stringify({
   type: "notification.hint",
@@ -11,6 +11,59 @@ const EVENT = JSON.stringify({
   eventId: "20000000-0000-4000-8000-000000000001",
   bugId: "30000000-0000-4000-8000-000000000001",
   summary: "bounded",
+});
+
+test("browser-session WebSocket client authenticates without a shared Bearer", async () => {
+  const server = createServer();
+  let acceptedSocket: Socket | null = null;
+  const browserSessionCookie = `qa_hub_browser_session=${"A".repeat(43)}`;
+  const serverReady = new Promise<number>((resolve) => {
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      if (address === null || typeof address === "string") {
+        throw new Error("server address missing");
+      }
+      resolve(address.port);
+    });
+  });
+  server.on("connection", (socket) => {
+    acceptedSocket = socket;
+    let request = Buffer.alloc(0);
+    socket.on("data", (chunk) => {
+      request = Buffer.concat([request, chunk]);
+      const end = request.indexOf("\r\n\r\n");
+      if (end < 0) return;
+      const header = request.subarray(0, end).toString("ascii");
+      const keyLine = header
+        .split("\r\n")
+        .find((line) => line.toLowerCase().startsWith("sec-websocket-key:"));
+      const key = keyLine?.slice(keyLine.indexOf(":") + 1).trim();
+      assert.equal(header.includes(`Cookie: ${browserSessionCookie}`), true);
+      assert.equal(header.includes("Authorization: Bearer"), false);
+      assert.ok(key);
+      const accept = createHash("sha1")
+        .update(`${key}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`)
+        .digest("base64");
+      socket.write(
+        `HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${accept}\r\n\r\n`,
+      );
+      socket.write(textFrame(EVENT));
+    });
+  });
+  try {
+    const port = await serverReady;
+    const socket = createBrowserSessionWssClient(
+      new URL(`ws://127.0.0.1:${port}/api/v1/notifications/stream`),
+      browserSessionCookie,
+    );
+    const message = new Promise<string>((resolve) => socket.onMessage(resolve));
+    await new Promise<void>((resolve) => socket.onOpen(resolve));
+    assert.equal(await message, EVENT);
+    socket.close();
+  } finally {
+    acceptedSocket?.destroy();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
 });
 
 function textFrame(payload: string): Buffer {

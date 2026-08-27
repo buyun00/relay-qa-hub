@@ -13,27 +13,20 @@ export interface SqliteMobileInboxStoreOptions {
   readonly now?: () => Date;
 }
 
-function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
-  if (actorId !== scope.actorId) {
-    throw new TypeError("actor does not match the authenticated mobile scope");
-  }
-}
-
 export function createSqliteMobileInboxStore(
   options: SqliteMobileInboxStoreOptions,
 ): MobileNotificationStore {
   const now = options.now ?? (() => new Date());
-  const scope = {
+  const actorScope = (actorId: string) => ({
     accountId: options.scope.accountId,
     projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
+    actorId,
+  } as const);
 
   return {
     async listNotifications(query): Promise<MobileNotificationList> {
-      requireActor(query.actorId, options.scope);
       const input: ListMobileNotificationsInput = {
-        ...scope,
+        ...actorScope(query.actorId),
         limit: query.limit,
         now: now().toISOString(),
       };

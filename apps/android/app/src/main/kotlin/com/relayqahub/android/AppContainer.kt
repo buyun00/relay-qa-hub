@@ -6,18 +6,22 @@ import androidx.work.WorkManager
 import com.relayqahub.android.data.QaHubDatabase
 import com.relayqahub.android.data.ScopedRepository
 import com.relayqahub.android.capture.PendingCaptureDraftStore
+import com.relayqahub.android.capture.CaptureArtifactStore
 import com.relayqahub.android.network.AttachmentUploadClient
+import com.relayqahub.android.network.AndroidUpdateClient
+import com.relayqahub.android.network.ApkDownloadClient
 import com.relayqahub.android.network.BuildProjectionClient
 import com.relayqahub.android.network.BugWorkbenchClient
-import com.relayqahub.android.network.BugAssignmentClient
 import com.relayqahub.android.network.CommentTimelineClient
 import com.relayqahub.android.network.DuplicateCandidateClient
 import com.relayqahub.android.network.InboxClient
 import com.relayqahub.android.network.HumanWorkflowClient
+import com.relayqahub.android.network.GameApkCatalogClient
 import com.relayqahub.android.network.OkHttpQaHubApiClient
+import com.relayqahub.android.network.QA_HUB_ACTOR_ID_HEADER
 import com.relayqahub.android.network.RelayHandoffClient
 import com.relayqahub.android.network.RepairAttemptClient
-import com.relayqahub.android.security.AndroidKeystoreCredentialVault
+import com.relayqahub.android.security.BundledLanCredentialProvider
 import com.relayqahub.android.security.CredentialVault
 import com.relayqahub.android.security.SessionLifecycleCoordinator
 import com.relayqahub.android.work.OfflineSyncEngine
@@ -29,14 +33,18 @@ import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 
 class AppContainer private constructor(
+    val identityStore: QaIdentityStore,
+    val bugDraftPreferences: BugDraftPreferences,
     val database: QaHubDatabase,
+    val androidUpdateClient: AndroidUpdateClient,
+    val gameApkCatalogClient: GameApkCatalogClient,
+    val apkDownloadClient: ApkDownloadClient,
     val scopedRepository: ScopedRepository,
     val attachmentUploadClient: AttachmentUploadClient,
     val relayHandoffClient: RelayHandoffClient,
     val repairAttemptClient: RepairAttemptClient,
     val buildProjectionClient: BuildProjectionClient,
     val bugWorkbenchClient: BugWorkbenchClient,
-    val bugAssignmentClient: BugAssignmentClient,
     val commentTimelineClient: CommentTimelineClient,
     val duplicateCandidateClient: DuplicateCandidateClient,
     val inboxClient: InboxClient,
@@ -52,6 +60,15 @@ class AppContainer private constructor(
     companion object {
         fun create(context: Context): AppContainer {
             val applicationContext = context.applicationContext
+            QaRuntimeConfigLoader.ensureExternalSeed(
+                applicationContext,
+                BuildConfig.QA_HUB_API_BASE_URL,
+            )
+            val apiBaseUrl = QaRuntimeConfigLoader.load(
+                applicationContext,
+                BuildConfig.QA_HUB_API_BASE_URL,
+            ).apiBaseUrl
+            val identityStore = QaIdentityStore(applicationContext)
             val database = Room.databaseBuilder(
                 applicationContext,
                 QaHubDatabase::class.java,
@@ -61,7 +78,12 @@ class AppContainer private constructor(
                 QaHubDatabase.MIGRATION_2_3,
                 QaHubDatabase.MIGRATION_3_4,
             ).build()
-            val credentialVault = AndroidKeystoreCredentialVault(applicationContext)
+            // QA Hub is a controlled-LAN tool. The debug APK already carries the runtime
+            // connection credential, so do not couple submission or offline retry to Android
+            // Keystore, device PIN, biometrics, or an additional user authentication flow.
+            val credentialVault = BundledLanCredentialProvider(
+                accessToken = BuildConfig.QA_HUB_DEBUG_ACCESS_TOKEN,
+            )
             val httpClient = OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -69,61 +91,79 @@ class AppContainer private constructor(
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(false)
+                .addInterceptor { chain ->
+                    val request = chain.request()
+                    if (request.header(QA_HUB_ACTOR_ID_HEADER) != null) {
+                        chain.proceed(request)
+                    } else {
+                        val actorId = identityStore.actorIdOrNull()
+                        chain.proceed(
+                            if (actorId == null) request else request.newBuilder()
+                                .header(QA_HUB_ACTOR_ID_HEADER, actorId)
+                                .build(),
+                        )
+                    }
+                }
                 .build()
             val apiClient = OkHttpQaHubApiClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
+            )
+            val androidUpdateClient = AndroidUpdateClient(
+                apiBaseUrl = apiBaseUrl,
+                httpClient = httpClient,
+                allowPrivateHttp = true,
+            )
+            val gameApkCatalogClient = GameApkCatalogClient(
+                directoryUrl = BuildConfig.QA_HUB_GAME_APK_DIRECTORY_URL,
+                httpClient = httpClient,
+                allowPrivateHttp = true,
             )
             val attachmentUploadClient = AttachmentUploadClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val relayHandoffClient = RelayHandoffClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val repairAttemptClient = RepairAttemptClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val buildProjectionClient = BuildProjectionClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val bugWorkbenchClient = BugWorkbenchClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
-            )
-            val bugAssignmentClient = BugAssignmentClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
-                httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val commentTimelineClient = CommentTimelineClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val duplicateCandidateClient = DuplicateCandidateClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val inboxClient = InboxClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val humanWorkflowClient = HumanWorkflowClient(
-                baseUrl = BuildConfig.QA_HUB_API_BASE_URL,
+                baseUrl = apiBaseUrl,
                 httpClient = httpClient,
-                allowLoopbackHttp = BuildConfig.DEBUG,
+                allowPrivateHttp = true,
             )
             val scopedRepository = ScopedRepository(
                 accountProjectDao = database.accountProjectDao(),
@@ -136,14 +176,18 @@ class AppContainer private constructor(
             val pendingCaptureDraftStore = PendingCaptureDraftStore(applicationContext)
             val syncScheduler = SyncScheduler(WorkManager.getInstance(applicationContext))
             return AppContainer(
+                identityStore = identityStore,
+                bugDraftPreferences = BugDraftPreferences(applicationContext),
                 database = database,
+                androidUpdateClient = androidUpdateClient,
+                gameApkCatalogClient = gameApkCatalogClient,
+                apkDownloadClient = ApkDownloadClient(applicationContext, httpClient),
                 scopedRepository = scopedRepository,
                 attachmentUploadClient = attachmentUploadClient,
                 relayHandoffClient = relayHandoffClient,
                 repairAttemptClient = repairAttemptClient,
                 buildProjectionClient = buildProjectionClient,
                 bugWorkbenchClient = bugWorkbenchClient,
-                bugAssignmentClient = bugAssignmentClient,
                 commentTimelineClient = commentTimelineClient,
                 duplicateCandidateClient = duplicateCandidateClient,
                 inboxClient = inboxClient,
@@ -160,6 +204,8 @@ class AppContainer private constructor(
                         scopedRepository = scopedRepository,
                         uploadClient = attachmentUploadClient,
                         draftStore = offlineAttachmentDraftStore,
+                        pendingCaptureDraftStore = pendingCaptureDraftStore,
+                        captureArtifactStore = CaptureArtifactStore(applicationContext),
                     ),
                     attachmentReceiptDao = database.attachmentPipelineReceiptDao(),
                     attachmentDraftStore = offlineAttachmentDraftStore,

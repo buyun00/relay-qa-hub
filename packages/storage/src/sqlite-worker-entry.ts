@@ -69,10 +69,12 @@ import {
   type ListMobileNotificationsInput,
 } from "./mobile-inbox-store.js";
 import {
+  createBrowserSession,
   ensureBrowserAdmin,
   loginBrowserSession,
   resolveBrowserSession,
   revokeBrowserSession,
+  type CreateBrowserSessionInput,
   type EnsureBrowserAdminInput,
   type LoginBrowserSessionInput,
   type ResolveBrowserSessionInput,
@@ -148,6 +150,7 @@ interface WorkerRequest {
     | "ensureMobileScope"
     | "ensureBrowserAdmin"
     | "loginBrowserSession"
+    | "createBrowserSession"
     | "resolveBrowserSession"
     | "revokeBrowserSession"
     | "createMobileBug"
@@ -307,6 +310,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   if (request.operation === "loginBrowserSession") {
     return inWriteTransaction((current) =>
       loginBrowserSession(current, request.payload as LoginBrowserSessionInput),
+    );
+  }
+
+  if (request.operation === "createBrowserSession") {
+    return inWriteTransaction((current) =>
+      createBrowserSession(current, request.payload as CreateBrowserSessionInput),
     );
   }
 

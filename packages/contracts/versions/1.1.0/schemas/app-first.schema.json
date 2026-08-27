@@ -98,7 +98,7 @@
       "properties": {
         "manufacturer": { "type": "string", "minLength": 1, "maxLength": 100 },
         "model": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "androidApi": { "type": "integer", "minimum": 35, "maximum": 100 },
+        "androidApi": { "type": "integer", "minimum": 31, "maximum": 100 },
         "androidRelease": { "type": "string", "minLength": 1, "maxLength": 100 },
         "qaAppVersion": { "type": "string", "minLength": 1, "maxLength": 100 }
       }
@@ -953,6 +953,8 @@
         "description": { "type": "string", "minLength": 1, "maxLength": 20000 },
         "expectedBehavior": { "type": "string", "minLength": 1, "maxLength": 10000 },
         "moduleId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "ownerId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
+        "verificationOwnerId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
         "severity": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/severity" },
         "priority": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/priority" },
         "occurrence": { "$ref": "#/$defs/nativeOccurrenceDraft" },
@@ -2468,7 +2470,7 @@
       "properties": {
         "manufacturer": { "type": "string", "minLength": 1, "maxLength": 100 },
         "model": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "androidApi": { "type": "integer", "minimum": 35, "maximum": 100 },
+        "androidApi": { "type": "integer", "minimum": 31, "maximum": 100 },
         "androidRelease": { "type": "string", "minLength": 1, "maxLength": 100 },
         "qaAppVersion": { "type": "string", "minLength": 1, "maxLength": 100 },
         "buildId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },

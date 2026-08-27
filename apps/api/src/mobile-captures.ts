@@ -80,7 +80,10 @@ export interface MobileCaptureStore {
 export class MobileCaptureRequestError extends TypeError {
   readonly code: "CAPTURE_BUNDLE_INVALID" | "INVALID_REQUEST";
 
-  constructor(message: string, code: "CAPTURE_BUNDLE_INVALID" | "INVALID_REQUEST" = "INVALID_REQUEST") {
+  constructor(
+    message: string,
+    code: "CAPTURE_BUNDLE_INVALID" | "INVALID_REQUEST" = "INVALID_REQUEST",
+  ) {
     super(message);
     this.name = "MobileCaptureRequestError";
     this.code = code;
@@ -156,11 +159,7 @@ const ARTIFACT_KINDS = new Set<MobileCaptureArtifactKind>([
   "poco_profiling",
   "poco_snapshot",
 ]);
-const ARTIFACT_STATUSES = new Set<MobileCaptureArtifactStatus>([
-  "succeeded",
-  "failed",
-  "skipped",
-]);
+const ARTIFACT_STATUSES = new Set<MobileCaptureArtifactStatus>(["succeeded", "failed", "skipped"]);
 const FAILURE_REASONS = new Set([
   "not_running",
   "connection_refused",
@@ -174,16 +173,25 @@ const FAILURE_REASONS = new Set([
 ]);
 const NETWORK_TYPES = new Set(["offline", "wifi", "cellular", "ethernet", "vpn", "other"]);
 
-function requireRecord(value: unknown, label: string, code = "INVALID_REQUEST"): Record<string, unknown> {
+function requireRecord(
+  value: unknown,
+  label: string,
+  code = "INVALID_REQUEST",
+): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new MobileCaptureRequestError(`${label} must be an object`, code as "INVALID_REQUEST");
   }
   return value as Record<string, unknown>;
 }
 
-function requireOnlyKeys(value: Record<string, unknown>, allowed: ReadonlySet<string>, code = "INVALID_REQUEST"): void {
+function requireOnlyKeys(
+  value: Record<string, unknown>,
+  allowed: ReadonlySet<string>,
+  code = "INVALID_REQUEST",
+): void {
   for (const key of Object.keys(value)) {
-    if (!allowed.has(key)) throw new MobileCaptureRequestError(`unexpected property: ${key}`, code as "INVALID_REQUEST");
+    if (!allowed.has(key))
+      throw new MobileCaptureRequestError(`unexpected property: ${key}`, code as "INVALID_REQUEST");
   }
 }
 
@@ -191,7 +199,12 @@ function invalidCapture(message: string): never {
   throw new MobileCaptureRequestError(message, "CAPTURE_BUNDLE_INVALID");
 }
 
-function requireString(value: Record<string, unknown>, key: string, minimum: number, maximum: number): string {
+function requireString(
+  value: Record<string, unknown>,
+  key: string,
+  minimum: number,
+  maximum: number,
+): string {
   const candidate = value[key];
   if (typeof candidate !== "string" || candidate.length < minimum || candidate.length > maximum) {
     throw new MobileCaptureRequestError(`${key} must be a bounded string`);
@@ -242,7 +255,10 @@ function parsePocoMethodArray(value: unknown, key: string): readonly MobileCaptu
     invalidCapture(`${key} must contain at most six methods`);
   }
   const methods = value.map((candidate) => {
-    if (typeof candidate !== "string" || !MOBILE_CAPTURE_ALLOWED_METHODS.includes(candidate as MobileCapturePocoMethod)) {
+    if (
+      typeof candidate !== "string" ||
+      !MOBILE_CAPTURE_ALLOWED_METHODS.includes(candidate as MobileCapturePocoMethod)
+    ) {
       invalidCapture(`${key} contains an unsupported method`);
     }
     return candidate as MobileCapturePocoMethod;
@@ -262,16 +278,25 @@ function parsePoco(value: unknown): MobileCapturePocoInput {
   const connectedPort = poco["connectedPort"];
   if (
     connectedPort !== null &&
-    (!Number.isInteger(connectedPort) || (connectedPort as number) < 1 || (connectedPort as number) > 65535)
+    (!Number.isInteger(connectedPort) ||
+      (connectedPort as number) < 1 ||
+      (connectedPort as number) > 65535)
   ) {
     invalidCapture("poco.connectedPort is invalid");
   }
   const sdkVersion = poco["sdkVersion"];
-  if (sdkVersion !== null && (typeof sdkVersion !== "string" || sdkVersion.length < 1 || sdkVersion.length > 100)) {
+  if (
+    sdkVersion !== null &&
+    (typeof sdkVersion !== "string" || sdkVersion.length < 1 || sdkVersion.length > 100)
+  ) {
     invalidCapture("poco.sdkVersion is invalid");
   }
   const snapshotCapability = poco["snapshotCapability"];
-  if (!new Set(["not_probed", "standard_only", "qa_snapshot_available"]).has(snapshotCapability as string)) {
+  if (
+    !new Set(["not_probed", "standard_only", "qa_snapshot_available"]).has(
+      snapshotCapability as string,
+    )
+  ) {
     invalidCapture("poco.snapshotCapability is invalid");
   }
   const allowed = poco["allowedReadOnlyMethods"];
@@ -282,15 +307,22 @@ function parsePoco(value: unknown): MobileCapturePocoInput {
   ) {
     invalidCapture("poco.allowedReadOnlyMethods must use the frozen allowlist");
   }
-  const negotiatedMethods = parsePocoMethodArray(poco["negotiatedMethods"], "poco.negotiatedMethods");
+  const negotiatedMethods = parsePocoMethodArray(
+    poco["negotiatedMethods"],
+    "poco.negotiatedMethods",
+  );
   const succeededMethods = parsePocoMethodArray(poco["succeededMethods"], "poco.succeededMethods");
   const failureReason = poco["failureReason"];
-  if (failureReason !== null && (typeof failureReason !== "string" || !FAILURE_REASONS.has(failureReason))) {
+  if (
+    failureReason !== null &&
+    (typeof failureReason !== "string" || !FAILURE_REASONS.has(failureReason))
+  ) {
     invalidCapture("poco.failureReason is invalid");
   }
   const screenSize = parseScreenSize(poco["screenSize"]);
   for (const method of succeededMethods) {
-    if (!negotiatedMethods.includes(method)) invalidCapture("succeeded Poco methods must be negotiated");
+    if (!negotiatedMethods.includes(method))
+      invalidCapture("succeeded Poco methods must be negotiated");
   }
   if (!poco["attempted"]) {
     if (
@@ -301,9 +333,13 @@ function parsePoco(value: unknown): MobileCapturePocoInput {
       snapshotCapability !== "not_probed" ||
       screenSize !== null ||
       failureReason !== null
-    ) invalidCapture("an unattempted Poco enrichment must be effect-free");
+    )
+      invalidCapture("an unattempted Poco enrichment must be effect-free");
   } else {
-    if (negotiatedMethods.some((method) => method !== "GetSDKVersion") && !succeededMethods.includes("GetSDKVersion")) {
+    if (
+      negotiatedMethods.some((method) => method !== "GetSDKVersion") &&
+      !succeededMethods.includes("GetSDKVersion")
+    ) {
       invalidCapture("negotiated Poco methods require GetSDKVersion");
     }
     if (succeededMethods.length > 0 && !succeededMethods.includes("GetSDKVersion")) {
@@ -318,10 +354,16 @@ function parsePoco(value: unknown): MobileCapturePocoInput {
     if ((screenSize !== null) !== succeededMethods.includes("GetScreenSize")) {
       invalidCapture("screenSize does not match GetScreenSize");
     }
-    if ((snapshotCapability === "qa_snapshot_available") !== negotiatedMethods.includes("qa.snapshot")) {
+    if (
+      (snapshotCapability === "qa_snapshot_available") !==
+      negotiatedMethods.includes("qa.snapshot")
+    ) {
       invalidCapture("snapshotCapability does not match qa.snapshot negotiation");
     }
-    if (snapshotCapability === "standard_only" && (!succeededMethods.includes("GetSDKVersion") || negotiatedMethods.includes("qa.snapshot"))) {
+    if (
+      snapshotCapability === "standard_only" &&
+      (!succeededMethods.includes("GetSDKVersion") || negotiatedMethods.includes("qa.snapshot"))
+    ) {
       invalidCapture("standard_only requires SDK success without qa.snapshot");
     }
     if (snapshotCapability === "not_probed" && succeededMethods.includes("GetSDKVersion")) {
@@ -352,7 +394,11 @@ function parseDeviceMetadata(value: unknown): MobileCaptureDeviceMetadata {
   const device = requireRecord(value, "capture.deviceMetadata", "CAPTURE_BUNDLE_INVALID");
   requireOnlyKeys(device, DEVICE_KEYS, "CAPTURE_BUNDLE_INVALID");
   const androidApi = device["androidApi"];
-  if (!Number.isInteger(androidApi) || (androidApi as number) < 35 || (androidApi as number) > 100) {
+  if (
+    !Number.isInteger(androidApi) ||
+    (androidApi as number) < 31 ||
+    (androidApi as number) > 100
+  ) {
     invalidCapture("deviceMetadata.androidApi is invalid");
   }
   const networkType = device["networkType"];
@@ -361,7 +407,11 @@ function parseDeviceMetadata(value: unknown): MobileCaptureDeviceMetadata {
   }
   const buildId = optionalUuid(device, "buildId");
   const testSessionId = device["testSessionId"];
-  if (testSessionId !== undefined && testSessionId !== null && (typeof testSessionId !== "string" || testSessionId.length > 200)) {
+  if (
+    testSessionId !== undefined &&
+    testSessionId !== null &&
+    (typeof testSessionId !== "string" || testSessionId.length > 200)
+  ) {
     invalidCapture("deviceMetadata.testSessionId is invalid");
   }
   return {
@@ -379,31 +429,46 @@ function parseDeviceMetadata(value: unknown): MobileCaptureDeviceMetadata {
 function parseArtifact(value: unknown, captureId: string): MobileCaptureArtifactRequest {
   const artifact = requireRecord(value, "capture.artifact", "CAPTURE_BUNDLE_INVALID");
   requireOnlyKeys(artifact, ARTIFACT_KEYS, "CAPTURE_BUNDLE_INVALID");
-  const artifactCaptureId = requireUuid(artifact["captureId"], "artifact.captureId", "CAPTURE_BUNDLE_INVALID");
-  if (artifactCaptureId !== captureId) invalidCapture("artifact.captureId must equal capture.captureId");
+  const artifactCaptureId = requireUuid(
+    artifact["captureId"],
+    "artifact.captureId",
+    "CAPTURE_BUNDLE_INVALID",
+  );
+  if (artifactCaptureId !== captureId)
+    invalidCapture("artifact.captureId must equal capture.captureId");
   const kind = artifact["kind"];
-  if (typeof kind !== "string" || !ARTIFACT_KINDS.has(kind as MobileCaptureArtifactKind)) invalidCapture("artifact.kind is invalid");
+  if (typeof kind !== "string" || !ARTIFACT_KINDS.has(kind as MobileCaptureArtifactKind))
+    invalidCapture("artifact.kind is invalid");
   const status = artifact["status"];
-  if (typeof status !== "string" || !ARTIFACT_STATUSES.has(status as MobileCaptureArtifactStatus)) invalidCapture("artifact.status is invalid");
+  if (typeof status !== "string" || !ARTIFACT_STATUSES.has(status as MobileCaptureArtifactStatus))
+    invalidCapture("artifact.status is invalid");
   const clientAttachmentId = optionalUuid(artifact, "clientAttachmentId");
   const attachmentId = optionalUuid(artifact, "attachmentId");
   if (status === "succeeded") {
     if (!clientAttachmentId || !attachmentId) invalidCapture("succeeded artifact IDs are required");
-    if (artifact["failureReason"] !== null) invalidCapture("succeeded artifact failureReason must be null");
+    if (artifact["failureReason"] !== null)
+      invalidCapture("succeeded artifact failureReason must be null");
   } else if (clientAttachmentId !== null || attachmentId !== null) {
     invalidCapture("failed or skipped artifacts must not claim attachment IDs");
   }
   const failureReason = artifact["failureReason"];
-  if (failureReason !== null && (typeof failureReason !== "string" || failureReason.length < 1 || failureReason.length > 300)) {
+  if (
+    failureReason !== null &&
+    (typeof failureReason !== "string" || failureReason.length < 1 || failureReason.length > 300)
+  ) {
     invalidCapture("artifact.failureReason is invalid");
   }
-  if (status === "failed" && typeof failureReason !== "string") invalidCapture("failed artifact requires failureReason");
+  if (status === "failed" && typeof failureReason !== "string")
+    invalidCapture("failed artifact requires failureReason");
   const startedAt = requireDateTime(artifact, "startedAt");
   const endedAt = requireDateTime(artifact, "endedAt");
-  if (Date.parse(endedAt) < Date.parse(startedAt)) invalidCapture("artifact.endedAt precedes startedAt");
+  if (Date.parse(endedAt) < Date.parse(startedAt))
+    invalidCapture("artifact.endedAt precedes startedAt");
   const skewMs = artifact["skewMs"];
-  if (!Number.isInteger(skewMs) || (skewMs as number) < 0 || (skewMs as number) > 5000) invalidCapture("artifact.skewMs is invalid");
-  if (typeof artifact["truncated"] !== "boolean") invalidCapture("artifact.truncated must be boolean");
+  if (!Number.isInteger(skewMs) || (skewMs as number) < 0 || (skewMs as number) > 5000)
+    invalidCapture("artifact.skewMs is invalid");
+  if (typeof artifact["truncated"] !== "boolean")
+    invalidCapture("artifact.truncated must be boolean");
   return {
     captureId,
     clientAttachmentId: clientAttachmentId ?? null,
@@ -428,26 +493,60 @@ export function parseMobileCreateCaptureRequest(value: unknown): MobileCaptureRe
   const clientSubmissionId = requireUuid(request["clientSubmissionId"], "clientSubmissionId");
   const capture = requireRecord(request["capture"], "capture", "CAPTURE_BUNDLE_INVALID");
   requireOnlyKeys(capture, CAPTURE_KEYS, "CAPTURE_BUNDLE_INVALID");
-  const captureId = requireUuid(capture["captureId"], "capture.captureId", "CAPTURE_BUNDLE_INVALID");
-  const nestedSubmissionId = requireUuid(capture["clientSubmissionId"], "capture.clientSubmissionId", "CAPTURE_BUNDLE_INVALID");
-  const nestedProjectId = requireUuid(capture["projectId"], "capture.projectId", "CAPTURE_BUNDLE_INVALID");
-  if (nestedSubmissionId !== clientSubmissionId) invalidCapture("capture.clientSubmissionId must equal the request clientSubmissionId");
-  if (nestedProjectId !== projectId) invalidCapture("capture.projectId must equal the request projectId");
+  const captureId = requireUuid(
+    capture["captureId"],
+    "capture.captureId",
+    "CAPTURE_BUNDLE_INVALID",
+  );
+  const nestedSubmissionId = requireUuid(
+    capture["clientSubmissionId"],
+    "capture.clientSubmissionId",
+    "CAPTURE_BUNDLE_INVALID",
+  );
+  const nestedProjectId = requireUuid(
+    capture["projectId"],
+    "capture.projectId",
+    "CAPTURE_BUNDLE_INVALID",
+  );
+  if (nestedSubmissionId !== clientSubmissionId)
+    invalidCapture("capture.clientSubmissionId must equal the request clientSubmissionId");
+  if (nestedProjectId !== projectId)
+    invalidCapture("capture.projectId must equal the request projectId");
   const artifactsValue = capture["artifacts"];
-  if (!Array.isArray(artifactsValue) || artifactsValue.length < 1 || artifactsValue.length > 12) invalidCapture("capture.artifacts must contain from 1 through 12 entries");
+  if (!Array.isArray(artifactsValue) || artifactsValue.length < 1 || artifactsValue.length > 12)
+    invalidCapture("capture.artifacts must contain from 1 through 12 entries");
   const artifacts = artifactsValue.map((artifact) => parseArtifact(artifact, captureId));
   const kinds = new Set(artifacts.map((artifact) => artifact.kind));
   if (kinds.size !== artifacts.length) invalidCapture("capture artifact kinds must be unique");
-  const primaryClientAttachmentId = requireUuid(capture["primaryEvidenceClientAttachmentId"], "capture.primaryEvidenceClientAttachmentId", "CAPTURE_BUNDLE_INVALID");
-  const primaryAttachmentId = requireUuid(capture["primaryEvidenceAttachmentId"], "capture.primaryEvidenceAttachmentId", "CAPTURE_BUNDLE_INVALID");
-  const primary = artifacts.find((artifact) => artifact.clientAttachmentId === primaryClientAttachmentId && artifact.attachmentId === primaryAttachmentId);
-  if (!primary || primary.status !== "succeeded" || !["system_screenshot", "system_recording"].includes(primary.kind)) invalidCapture("primary evidence must be a succeeded system artifact");
+  const primaryClientAttachmentId = requireUuid(
+    capture["primaryEvidenceClientAttachmentId"],
+    "capture.primaryEvidenceClientAttachmentId",
+    "CAPTURE_BUNDLE_INVALID",
+  );
+  const primaryAttachmentId = requireUuid(
+    capture["primaryEvidenceAttachmentId"],
+    "capture.primaryEvidenceAttachmentId",
+    "CAPTURE_BUNDLE_INVALID",
+  );
+  const primary = artifacts.find(
+    (artifact) =>
+      artifact.clientAttachmentId === primaryClientAttachmentId &&
+      artifact.attachmentId === primaryAttachmentId,
+  );
+  if (
+    !primary ||
+    primary.status !== "succeeded" ||
+    !["system_screenshot", "system_recording"].includes(primary.kind)
+  )
+    invalidCapture("primary evidence must be a succeeded system artifact");
   const capturedAt = requireDateTime(capture, "capturedAt");
   for (const artifact of artifacts) {
     const actualSkew = Math.abs(Date.parse(artifact.startedAt) - Date.parse(capturedAt));
-    if (actualSkew > 5000 || Math.abs(artifact.skewMs - actualSkew) > 1) invalidCapture("artifact skewMs does not match capturedAt");
+    if (actualSkew > 5000 || Math.abs(artifact.skewMs - actualSkew) > 1)
+      invalidCapture("artifact skewMs does not match capturedAt");
     const maxDuration = artifact.kind === "system_recording" ? 120_000 : 5_000;
-    if (Date.parse(artifact.endedAt) - Date.parse(artifact.startedAt) > maxDuration) invalidCapture("artifact duration is too long");
+    if (Date.parse(artifact.endedAt) - Date.parse(artifact.startedAt) > maxDuration)
+      invalidCapture("artifact duration is too long");
   }
   const poco = parsePoco(capture["poco"]);
   const deviceMetadata = parseDeviceMetadata(capture["deviceMetadata"]);
@@ -462,7 +561,8 @@ export function parseMobileCreateCaptureRequest(value: unknown): MobileCaptureRe
       capturedAt,
       source: (() => {
         const source = capture["source"];
-        if (typeof source !== "string" || !SOURCES.has(source as MobileCaptureSource)) invalidCapture("capture.source is invalid");
+        if (typeof source !== "string" || !SOURCES.has(source as MobileCaptureSource))
+          invalidCapture("capture.source is invalid");
         return source as MobileCaptureSource;
       })(),
       primaryEvidenceClientAttachmentId: primaryClientAttachmentId,

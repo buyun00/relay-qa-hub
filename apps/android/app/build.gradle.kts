@@ -8,9 +8,19 @@ fun String.asBuildConfigString(): String =
     "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
 val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
-    .orElse("https://qa-hub.invalid/api/v1/")
+    .orElse("http://10.100.5.157:4319/api/v1/")
 val qaHubDebugAccessToken = providers.gradleProperty("qaHubDebugAccessToken")
     .orElse("")
+val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
+    .orElse("http://10.100.5.129:8000/apk/")
+val qaHubVersionCode = providers.gradleProperty("qaHubVersionCode")
+    .orElse("7")
+    .map { value ->
+        value.toIntOrNull()?.takeIf { it > 0 }
+            ?: error("qaHubVersionCode must be a positive integer")
+    }
+val qaHubVersionName = providers.gradleProperty("qaHubVersionName")
+    .orElse("0.1.6-debug")
 val qaHubPocoPort = providers.gradleProperty("qaHubPocoPort")
     .orElse("5001")
     .map { value ->
@@ -25,10 +35,10 @@ android {
 
     defaultConfig {
         applicationId = "com.relayqahub.android"
-        minSdk = 35
+        minSdk = 31
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0-debug"
+        versionCode = qaHubVersionCode.get()
+        versionName = qaHubVersionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
@@ -40,6 +50,11 @@ android {
         )
         buildConfigField("String", "QA_HUB_DEBUG_ACCESS_TOKEN", "\"\"")
         buildConfigField("String", "QA_HUB_CONTRACT_VERSION", "\"1.1.0\"")
+        buildConfigField(
+            "String",
+            "QA_HUB_GAME_APK_DIRECTORY_URL",
+            qaHubGameApkDirectoryUrl.get().asBuildConfigString(),
+        )
         buildConfigField("int", "QA_HUB_POCO_PORT", qaHubPocoPort.get().toString())
     }
 
@@ -84,9 +99,9 @@ android {
     }
 
     sourceSets {
-        // The seed is kept at apps/android/config so QA can edit one documented
-        // file; the app copies it to Android/media/<package>/qa-hub/config/qa-people.json on
-        // first run and prefers that external file thereafter.
+        // The seeds are kept at apps/android/config so QA can edit one documented
+        // directory. The app copies them to Android/media/<package>/qa-hub/config/
+        // on first run and prefers those external files thereafter.
         getByName("main").assets.srcDir(file("../config"))
         getByName("androidTest").assets.srcDir(file("schemas"))
     }

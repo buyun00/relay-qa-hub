@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -23,27 +22,9 @@ import org.json.JSONObject
 class RelayHandoffClient(
     baseUrl: String,
     private val httpClient: OkHttpClient,
-    allowLoopbackHttp: Boolean = false,
+    allowPrivateHttp: Boolean = false,
 ) {
-    private val apiBaseUrl: HttpUrl = baseUrl.toHttpUrl().let { parsed ->
-        require(parsed.username.isEmpty() && parsed.password.isEmpty()) {
-            "QA Hub API base URL must not embed credentials"
-        }
-        val loopbackHttp = allowLoopbackHttp &&
-            parsed.scheme == "http" &&
-            parsed.host in LOOPBACK_HOSTS
-        require(parsed.isHttps || loopbackHttp) {
-            "QA Hub API base URL must use HTTPS unless loopback HTTP is explicitly enabled"
-        }
-        require(parsed.query == null && parsed.fragment == null)
-        val normalized = parsed.newBuilder().apply {
-            if (!parsed.encodedPath.endsWith('/')) addPathSegment("")
-        }.build()
-        require(normalized.encodedPath == API_BASE_PATH) {
-            "QA Hub API base URL must use the frozen $API_BASE_PATH path"
-        }
-        normalized
-    }
+    private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
 
     suspend fun dispatchBugToRelay(
         bugId: String,
@@ -207,11 +188,9 @@ class RelayHandoffClient(
     }
 
     private companion object {
-        const val API_BASE_PATH = "/api/v1/"
         const val RECEIPT_POLL_ATTEMPTS = 12
         const val RECEIPT_POLL_DELAY_MS = 250L
         val NON_TERMINAL_RECEIPT_STATUSES = setOf("queued", "submitted", "running")
-        val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")
     }
 }
 

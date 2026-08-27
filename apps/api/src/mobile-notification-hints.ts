@@ -19,6 +19,7 @@ const MAX_SENT_NOTIFICATION_IDS = 256;
 
 interface HintConnection {
   socket: Socket;
+  actorId: string;
   sentNotificationIds: Set<string>;
   onData: (chunk: Buffer) => void;
   onError: () => void;
@@ -33,6 +34,7 @@ export interface MobileNotificationHintChannelOptions {
   readonly store: MobileNotificationStore;
   readonly actorId: string;
   readonly bearerToken: string;
+  readonly resolveBrowserSession?: (cookieHeader: string) => Promise<string | null>;
   readonly now?: () => Date;
   readonly logger?: {
     readonly warn?: (object: unknown, message?: string) => void;
@@ -211,7 +213,11 @@ export function startMobileNotificationHintChannel(
     closeConnection(connection);
   };
 
-  const onUpgrade = (request: IncomingMessage, socket: Socket, head: Buffer): void => {
+  const acceptUpgrade = async (
+    request: IncomingMessage,
+    socket: Socket,
+    head: Buffer,
+  ): Promise<void> => {
     let pathname: string;
     try {
       pathname = new URL(request.url ?? "", "http://qa-hub.local").pathname;
@@ -230,10 +236,19 @@ export function startMobileNotificationHintChannel(
 
     const protocols = headerTokens(request.headers["sec-websocket-protocol"]);
     const expectedProtocolToken = `bearer.${options.bearerToken}`;
-    const authenticated =
+    const bearerAuthenticated =
       headerValue(request.headers.authorization) === `Bearer ${options.bearerToken}` ||
       protocols.includes(expectedProtocolToken);
-    if (!authenticated) {
+    const cookieHeader = headerValue(request.headers.cookie);
+    let actorId: string | null = bearerAuthenticated ? options.actorId : null;
+    if (
+      actorId === null &&
+      cookieHeader !== undefined &&
+      options.resolveBrowserSession !== undefined
+    ) {
+      actorId = await options.resolveBrowserSession(cookieHeader);
+    }
+    if (actorId === null) {
       sendHttpError(socket, 401, "Unauthorized");
       return;
     }
@@ -272,6 +287,7 @@ export function startMobileNotificationHintChannel(
     };
     const connection: HintConnection = {
       socket,
+      actorId,
       sentNotificationIds: new Set(),
       onData,
       onError,
@@ -288,18 +304,47 @@ export function startMobileNotificationHintChannel(
     void poll();
   };
 
+  const onUpgrade = (request: IncomingMessage, socket: Socket, head: Buffer): void => {
+    void acceptUpgrade(request, socket, head).catch((error: unknown) => {
+      options.logger?.warn?.({ error }, "notification hint authentication failed");
+      sendHttpError(socket, 401, "Unauthorized");
+    });
+  };
+
   const poll = async (): Promise<void> => {
     if (stopped || pollRunning) return;
     pollRunning = true;
     try {
       // listNotifications is the durable materialization/read path. Hints are
       // emitted only from its committed result; this channel stores no facts.
-      const result = await options.store.listNotifications({
-        actorId: options.actorId,
-        limit: 100,
-        now: now().toISOString(),
-      });
+      const actorResults = new Map<
+        string,
+        Awaited<ReturnType<MobileNotificationStore["listNotifications"]>>
+      >();
+      await Promise.all(
+        [...new Set([...connections].map((connection) => connection.actorId))].map(
+          async (actorId) => {
+            try {
+              actorResults.set(
+                actorId,
+                await options.store.listNotifications({
+                  actorId,
+                  limit: 100,
+                  now: now().toISOString(),
+                }),
+              );
+            } catch (error: unknown) {
+              options.logger?.warn?.(
+                { error, actorId },
+                "notification hint materialization failed",
+              );
+            }
+          },
+        ),
+      );
       for (const connection of connections) {
+        const result = actorResults.get(connection.actorId);
+        if (result === undefined) continue;
         for (const notification of result.items) {
           sendNotificationHint(connection, notification);
         }

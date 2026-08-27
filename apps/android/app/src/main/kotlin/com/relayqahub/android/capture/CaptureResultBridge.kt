@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import com.relayqahub.android.poco.PocoEnrichmentStatus
 import java.io.Closeable
 import java.util.concurrent.atomic.AtomicBoolean
@@ -87,10 +88,11 @@ object CaptureResultBridge {
                 intent.toCaptureResult()?.let(onResult)
             }
         }
-        appContext.registerReceiver(
+        ContextCompat.registerReceiver(
+            appContext,
             receiver,
             IntentFilter(ACTION_CAPTURE_RESULT),
-            Context.RECEIVER_NOT_EXPORTED,
+            ContextCompat.RECEIVER_NOT_EXPORTED,
         )
         return ReceiverRegistration(appContext, receiver)
     }

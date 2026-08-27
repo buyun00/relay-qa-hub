@@ -47,6 +47,8 @@ export interface MobileCreateBugRequest {
   readonly description: string;
   readonly expectedBehavior: string;
   readonly moduleId?: string | null;
+  readonly ownerId?: string | null;
+  readonly verificationOwnerId?: string | null;
   readonly severity: MobileBugSeverity;
   readonly priority: MobileBugPriority;
   readonly occurrence: MobileOccurrenceDraft;
@@ -127,6 +129,8 @@ export interface UpdateMobileBugCommand {
 export interface MobileBugListQuery {
   readonly actorId: string;
   readonly projectId?: string;
+  readonly ownerId?: string;
+  readonly ownerState?: "assigned" | "unassigned";
   readonly q?: string;
   readonly state?: MobileBugState;
   readonly severity?: MobileBugSeverity;
@@ -161,6 +165,8 @@ const CREATE_KEYS = new Set([
   "description",
   "expectedBehavior",
   "moduleId",
+  "ownerId",
+  "verificationOwnerId",
   "severity",
   "priority",
   "occurrence",
@@ -241,9 +247,25 @@ function queryString(value: Record<string, unknown>, key: string): string | unde
 
 export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery, "actorId"> {
   const query = requireRecord(value, "Bug list query");
-  requireOnlyKeys(query, new Set(["projectId", "q", "state", "severity", "limit"]));
+  requireOnlyKeys(
+    query,
+    new Set(["projectId", "ownerId", "ownerState", "q", "state", "severity", "limit"]),
+  );
   const projectId = queryString(query, "projectId");
   if (projectId !== undefined) requireUuid(projectId, "projectId");
+  const ownerId = queryString(query, "ownerId");
+  if (ownerId !== undefined) requireUuid(ownerId, "ownerId");
+  const ownerStateValue = queryString(query, "ownerState");
+  if (
+    ownerStateValue !== undefined &&
+    ownerStateValue !== "assigned" &&
+    ownerStateValue !== "unassigned"
+  ) {
+    throw new TypeError("ownerState must be assigned or unassigned");
+  }
+  if (ownerId !== undefined && ownerStateValue !== undefined) {
+    throw new TypeError("ownerId and ownerState cannot be combined");
+  }
 
   const queryValue = queryString(query, "q");
   const normalizedQuery = queryValue?.trim();
@@ -270,12 +292,16 @@ export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery
     (limitValue !== undefined && !/^\d+$/u.test(limitValue)) ||
     !Number.isSafeInteger(limit) ||
     limit < 1 ||
-    limit > 100
+    limit > 500
   ) {
-    throw new TypeError("limit must be an integer from 1 through 100");
+    throw new TypeError("limit must be an integer from 1 through 500");
   }
   return {
     ...(projectId === undefined ? {} : { projectId }),
+    ...(ownerId === undefined ? {} : { ownerId }),
+    ...(ownerStateValue === undefined
+      ? {}
+      : { ownerState: ownerStateValue as "assigned" | "unassigned" }),
     ...(normalizedQuery === undefined ? {} : { q: normalizedQuery }),
     ...(stateValue === undefined ? {} : { state: stateValue as MobileBugState }),
     ...(severityValue === undefined ? {} : { severity: severityValue as MobileBugSeverity }),
@@ -493,6 +519,8 @@ export function parseMobileCreateBugRequest(value: unknown): MobileCreateBugRequ
     }
   }
   const moduleId = optionalUuid(request, "moduleId");
+  const ownerId = optionalUuid(request, "ownerId");
+  const verificationOwnerId = optionalUuid(request, "verificationOwnerId");
   const captureBundleId = optionalUuid(request, "captureBundleId");
   return {
     submissionContractVersion: "1.1.0",
@@ -505,6 +533,8 @@ export function parseMobileCreateBugRequest(value: unknown): MobileCreateBugRequ
     description: requireString(request, "description", 1, 20_000),
     expectedBehavior: requireString(request, "expectedBehavior", 1, 10_000),
     ...(moduleId === undefined ? {} : { moduleId }),
+    ...(ownerId === undefined ? {} : { ownerId }),
+    ...(verificationOwnerId === undefined ? {} : { verificationOwnerId }),
     severity,
     priority,
     occurrence: parseOccurrence(request["occurrence"]),

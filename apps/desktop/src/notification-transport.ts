@@ -66,6 +66,7 @@ export interface NotificationTransportOptions {
   readonly openSocket: NotificationSocketFactory;
   readonly fetchInbox: InboxFetcher;
   readonly showNotification: NotificationSink;
+  readonly seenNotificationIds?: readonly string[];
   readonly onStatus?: TransportStatusListener;
   readonly setTimeout?: typeof globalThis.setTimeout;
   readonly clearTimeout?: typeof globalThis.clearTimeout;
@@ -212,10 +213,11 @@ export class NotificationTransport {
   private readonly setIntervalFn: typeof globalThis.setInterval;
   private readonly clearIntervalFn: typeof globalThis.clearInterval;
   private readonly now: () => number;
-  private readonly seenNotifications = new BoundedSet(MAX_SEEN_NOTIFICATIONS);
+  private readonly seenNotifications: BoundedSet;
   private readonly seenEvents = new BoundedSet(MAX_SEEN_NOTIFICATIONS);
   private readonly statusListeners = new Set<TransportStatusListener>();
   private readonly options: NotificationTransportOptions;
+  private accessToken: string | null;
   private socket: NotificationSocket | null = null;
   private socketUnsubscribers: readonly (() => void)[] = [];
   private reconnectTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
@@ -229,13 +231,19 @@ export class NotificationTransport {
 
   constructor(options: NotificationTransportOptions) {
     this.options = options;
+    this.accessToken = options.accessToken;
+    this.seenNotifications = new BoundedSet(MAX_SEEN_NOTIFICATIONS);
+    for (const notificationId of options.seenNotificationIds ?? []) {
+      if (UUID_PATTERN.test(notificationId))
+        this.seenNotifications.add(notificationId.toLowerCase());
+    }
     this.setTimeoutFn = options.setTimeout ?? globalThis.setTimeout;
     this.clearTimeoutFn = options.clearTimeout ?? globalThis.clearTimeout;
     this.setIntervalFn = options.setInterval ?? globalThis.setInterval;
     this.clearIntervalFn = options.clearInterval ?? globalThis.clearInterval;
     this.now = options.now ?? Date.now;
     this.currentStatus = {
-      state: options.accessToken === null ? "disabled" : "stopped",
+      state: this.accessToken === null ? "disabled" : "stopped",
       reconnectAttempt: 0,
       lastError: null,
     };
@@ -253,9 +261,40 @@ export class NotificationTransport {
   }
 
   start(): void {
-    if (this.running || this.options.accessToken === null) return;
+    if (this.running) return;
     this.running = true;
     this.paused = false;
+    if (this.accessToken === null) {
+      this.publish({ state: "disabled", reconnectAttempt: 0, lastError: null });
+      return;
+    }
+    this.publish({ state: "connecting", reconnectAttempt: 0, lastError: null });
+    this.connect();
+  }
+
+  updateAccessToken(accessToken: string | null): void {
+    if (this.accessToken === accessToken) return;
+    this.accessToken = accessToken;
+    this.reconnectAttempt = 0;
+    this.clearReconnectTimer();
+    this.clearHeartbeatTimer();
+    this.detachSocket(true);
+    if (!this.running) {
+      this.publish({
+        state: accessToken === null ? "disabled" : "stopped",
+        reconnectAttempt: 0,
+        lastError: null,
+      });
+      return;
+    }
+    if (this.paused) {
+      this.publish({ state: "paused", reconnectAttempt: 0, lastError: null });
+      return;
+    }
+    if (accessToken === null) {
+      this.publish({ state: "disabled", reconnectAttempt: 0, lastError: null });
+      return;
+    }
     this.publish({ state: "connecting", reconnectAttempt: 0, lastError: null });
     this.connect();
   }
@@ -296,11 +335,10 @@ export class NotificationTransport {
   }
 
   private connect(): void {
-    if (!this.running || this.paused || this.socket !== null || this.options.accessToken === null)
-      return;
+    if (!this.running || this.paused || this.socket !== null || this.accessToken === null) return;
     let socket: NotificationSocket;
     try {
-      socket = this.options.openSocket(this.options.socketUrl, this.options.accessToken);
+      socket = this.options.openSocket(this.options.socketUrl, this.accessToken);
     } catch {
       this.handleSocketFailure("SOCKET_CREATE_FAILED");
       return;

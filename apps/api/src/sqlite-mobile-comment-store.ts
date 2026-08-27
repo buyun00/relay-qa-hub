@@ -18,27 +18,20 @@ function digest(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-function requireActor(actorId: string, scope: MobileScopeBootstrap): void {
-  if (actorId !== scope.actorId) {
-    throw new TypeError("actor does not match the authenticated mobile scope");
-  }
-}
-
 export function createSqliteMobileCommentStore(
   options: SqliteMobileCommentStoreOptions,
 ): MobileCommentStore {
   const now = options.now ?? (() => new Date());
-  const scope = {
+  const actorScope = (actorId: string) => ({
     accountId: options.scope.accountId,
     projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
+    actorId,
+  } as const);
 
   return {
     async addComment(command) {
-      requireActor(command.actorId, options.scope);
       const input: CreateMobileCommentInput = {
-        ...scope,
+        ...actorScope(command.actorId),
         bugId: command.bugId,
         clientSubmissionId: command.request.clientSubmissionId,
         body: command.request.body,
@@ -51,9 +44,8 @@ export function createSqliteMobileCommentStore(
     },
 
     async listEvents(query) {
-      requireActor(query.actorId, options.scope);
       return options.worker.listMobileBugEvents({
-        ...scope,
+        ...actorScope(query.actorId),
         bugId: query.bugId,
         limit: query.limit,
       });

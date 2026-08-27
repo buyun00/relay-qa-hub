@@ -1,6 +1,7 @@
 import { backup, DatabaseSync } from "node:sqlite";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import {
   backupFileSha256,
@@ -355,7 +356,9 @@ export async function restoreSqliteToIsolatedRoot(
     writeMarker(markerPath, "in_progress");
     mkdirSync(join(restoreRoot, "db"));
 
-    const source = new DatabaseSync(backupPath, { readOnly: true });
+    const immutableLocation = pathToFileURL(backupPath);
+    immutableLocation.searchParams.set("immutable", "1");
+    const source = new DatabaseSync(immutableLocation, { readOnly: true });
     try {
       await backup(source, databasePath);
     } finally {

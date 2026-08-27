@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useState } from "react";
 
 import App from "./App";
+import DesktopUpdateNotice from "./DesktopUpdateNotice";
 import {
   getBrowserSession,
   loginBrowserSession,
@@ -15,10 +16,10 @@ type AuthState = "checking" | "signed-out" | "signed-in" | "unavailable";
 export default function AuthGate() {
   const [authState, setAuthState] = useState<AuthState>("checking");
   const [principal, setPrincipal] = useState<BrowserSessionPrincipal | null>(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [desktopApiBaseUrl, setDesktopApiBaseUrl] = useState<string | null>(null);
 
   const checkSession = async () => {
     setAuthState("checking");
@@ -40,6 +41,13 @@ export default function AuthGate() {
 
   useEffect(() => {
     void checkSession();
+    const bridge = window.qaHubDesktop;
+    if (bridge !== undefined) {
+      void bridge
+        .getRuntimeInfo()
+        .then((runtime) => setDesktopApiBaseUrl(runtime.apiBaseUrl || null))
+        .catch(() => setDesktopApiBaseUrl(null));
+    }
   }, []);
 
   const submitLogin = async (event: FormEvent<HTMLFormElement>) => {
@@ -47,14 +55,13 @@ export default function AuthGate() {
     setSubmitting(true);
     setMessage(null);
     try {
-      const current = await loginBrowserSession(email.trim(), password);
+      const current = await loginBrowserSession(name);
       setPrincipal(current);
-      setPassword("");
       setAuthState("signed-in");
     } catch (cause) {
       setMessage(
-        cause instanceof QaHubApiError && cause.status === 401
-          ? "邮箱或密码不正确。"
+        cause instanceof QaHubApiError && cause.status === 400
+          ? "请输入有效的姓名。"
           : "登录服务暂时不可用。",
       );
     } finally {
@@ -67,6 +74,7 @@ export default function AuthGate() {
     setMessage(null);
     try {
       await logoutBrowserSession();
+      setName("");
       setPrincipal(null);
       setAuthState("signed-out");
     } catch {
@@ -84,7 +92,12 @@ export default function AuthGate() {
     return (
       <main className="auth-status">
         <h1>QA Hub 暂时无法连接</h1>
-        <p>服务没有返回可验证的登录状态。</p>
+        <p>服务没有返回可验证的登录状态，请确认这台电脑能访问 QA Hub 内网主机。</p>
+        {desktopApiBaseUrl === null ? null : (
+          <p className="auth-endpoint">
+            当前 EXE 服务地址：<code>{desktopApiBaseUrl}</code>
+          </p>
+        )}
         <button onClick={() => void checkSession()} type="button">
           重试
         </button>
@@ -97,26 +110,18 @@ export default function AuthGate() {
       <main className="auth-shell">
         <section className="auth-card" aria-labelledby="login-title">
           <p className="eyebrow">独立事实源</p>
-          <h1 id="login-title">登录 Relay QA Hub</h1>
-          <p>使用 QA Hub 自有账号进入桌面管理台。</p>
+          <h1 id="login-title">进入 Relay QA Hub</h1>
+          <p>输入姓名进入内部管理台；新姓名会由后端自动创建为账号。</p>
           <form className="auth-form" onSubmit={(event) => void submitLogin(event)}>
-            <label htmlFor="login-email">邮箱</label>
+            <label htmlFor="login-name">姓名</label>
             <input
-              autoComplete="username"
-              id="login-email"
-              onChange={(event) => setEmail(event.target.value)}
-              required
-              type="email"
-              value={email}
-            />
-            <label htmlFor="login-password">密码</label>
-            <input
-              autoComplete="current-password"
-              id="login-password"
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              type="password"
-              value={password}
+              autoComplete="off"
+              id="login-name"
+              onChange={(event) => setName(event.target.value)}
+              placeholder="输入姓名"
+              spellCheck={false}
+              type="text"
+              value={name}
             />
             {message === null ? null : <p className="auth-error">{message}</p>}
             <button disabled={submitting} type="submit">
@@ -130,16 +135,8 @@ export default function AuthGate() {
 
   return (
     <>
-      <div className="session-bar">
-        <span>
-          {principal.displayName} · {principal.email}
-        </span>
-        <button disabled={submitting} onClick={() => void signOut()} type="button">
-          注销
-        </button>
-        {message === null ? null : <span className="session-bar__error">{message}</span>}
-      </div>
-      <App />
+      <DesktopUpdateNotice />
+      <App onSignOut={() => void signOut()} principal={principal} signingOut={submitting} />
     </>
   );
 }

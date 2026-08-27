@@ -85,6 +85,11 @@ class PendingCaptureDraftStore(context: Context) {
             .firstOrNull()
     }
 
+    suspend fun find(captureId: String): PendingCaptureDraft? = withContext(Dispatchers.IO) {
+        requireCaptureId(captureId)
+        sidecar(captureId).takeIf(File::isFile)?.let(::readSidecar)
+    }
+
     suspend fun readPrimary(draft: PendingCaptureDraft): ByteArray = withContext(Dispatchers.IO) {
         val primary = resolvePrimary(draft.captureId, draft.primaryPath)
         check(primary.length().toBoundedInt(MAX_PRIMARY_BYTES) == draft.primarySize) {

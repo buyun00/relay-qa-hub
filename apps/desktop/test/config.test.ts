@@ -8,6 +8,15 @@ import {
   parseDesktopConfig,
 } from "../src/config.js";
 
+test("desktop double-click defaults to the local QA Hub debug service", () => {
+  const config = parseDesktopConfig({}, { webAssetsDirectory: "./web-dist" });
+  assert.equal(config.apiBaseUrl.toString(), "http://127.0.0.1:4319/");
+  assert.equal(config.wssUrl.toString(), "ws://127.0.0.1:4319/api/v1/notifications/stream");
+  assert.equal(config.csrfOrigin, "http://127.0.0.1:4174");
+  assert.equal(config.allowLoopbackHttp, true);
+  assert.equal(config.allowPrivateLanHttp, false);
+});
+
 test("desktop config derives the authenticated notification WSS path", () => {
   const config = parseDesktopConfig(
     {
@@ -38,6 +47,43 @@ test("HTTP and WS are rejected unless explicitly limited to loopback", () => {
   });
   assert.equal(config.apiBaseUrl.protocol, "http:");
   assert.equal(config.wssUrl.protocol, "ws:");
+});
+
+test("RFC1918 LAN HTTP is accepted only with the dedicated explicit opt-in", () => {
+  assert.throws(
+    () =>
+      parseDesktopConfig({
+        QA_HUB_DESKTOP_API_BASE_URL: "http://10.100.5.157:4319",
+        QA_HUB_DESKTOP_CSRF_ORIGIN: "http://10.100.5.157:4174",
+      }),
+    DesktopConfigError,
+  );
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://10.100.5.157:4319",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://10.100.5.157:4174",
+    QA_HUB_DESKTOP_ALLOW_PRIVATE_LAN_HTTP: "1",
+  });
+  assert.equal(config.apiBaseUrl.toString(), "http://10.100.5.157:4319/");
+  assert.equal(config.wssUrl.toString(), "ws://10.100.5.157:4319/api/v1/notifications/stream");
+  assert.equal(config.csrfOrigin, "http://10.100.5.157:4174");
+  assert.equal(config.allowPrivateLanHttp, true);
+});
+
+test("private-LAN opt-in never permits public HTTP, hostnames, or link-local addresses", () => {
+  for (const url of [
+    "http://8.8.8.8:4319",
+    "http://qa-hub.example.test:4319",
+    "http://169.254.10.20:4319",
+  ]) {
+    assert.throws(
+      () =>
+        parseDesktopConfig({
+          QA_HUB_DESKTOP_API_BASE_URL: url,
+          QA_HUB_DESKTOP_ALLOW_PRIVATE_LAN_HTTP: "1",
+        }),
+      DesktopConfigError,
+    );
+  }
 });
 
 test("URLs with embedded credentials or query state are rejected", () => {

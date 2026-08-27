@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import java.io.Closeable
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -47,10 +48,11 @@ object OverlayCaptureBridge {
                 intent.toCaptureRequest()?.let(onRequest)
             }
         }
-        appContext.registerReceiver(
+        ContextCompat.registerReceiver(
+            appContext,
             receiver,
             IntentFilter(ACTION_CAPTURE_COMMAND),
-            Context.RECEIVER_NOT_EXPORTED,
+            ContextCompat.RECEIVER_NOT_EXPORTED,
         )
         return ReceiverRegistration(appContext, receiver)
     }

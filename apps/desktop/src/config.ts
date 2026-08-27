@@ -12,12 +12,14 @@ export const EVENTS_PATH = "/api/v1/notifications/stream";
 export interface DesktopConfig {
   readonly apiBaseUrl: URL;
   readonly wssUrl: URL;
+  readonly csrfOrigin: string;
   readonly allowedOrigins: ReadonlySet<string>;
   readonly webAssetsDirectory: string;
   readonly developmentUrl: URL | null;
   readonly accessToken: string | null;
   readonly autoStartAtLogin: boolean;
   readonly allowLoopbackHttp: boolean;
+  readonly allowPrivateLanHttp: boolean;
   readonly startupHidden: boolean;
 }
 
@@ -47,11 +49,26 @@ function parseUrl(value: string, name: string): URL {
   }
 }
 
+export function isPrivateLanIpv4(hostname: string): boolean {
+  const octets = hostname.split(".");
+  if (octets.length !== 4 || octets.some((octet) => !/^\d{1,3}$/u.test(octet))) {
+    return false;
+  }
+  const values = octets.map(Number);
+  if (values.some((octet) => octet < 0 || octet > 255)) return false;
+  return (
+    values[0] === 10 ||
+    (values[0] === 172 && values[1] !== undefined && values[1] >= 16 && values[1] <= 31) ||
+    (values[0] === 192 && values[1] === 168)
+  );
+}
+
 function validateNetworkUrl(
   value: URL,
   name: string,
   secureProtocol: "https:" | "wss:",
   allowLoopbackHttp: boolean,
+  allowPrivateLanHttp: boolean,
 ): URL {
   if (value.username.length > 0 || value.password.length > 0) {
     throw new DesktopConfigError(`${name} must not contain URL credentials`);
@@ -60,13 +77,14 @@ function validateNetworkUrl(
     throw new DesktopConfigError(`${name} must not contain a query or fragment`);
   }
   if (value.protocol !== secureProtocol) {
-    const loopbackProtocol = secureProtocol === "https:" ? "http:" : "ws:";
-    if (!(
-      allowLoopbackHttp &&
-      value.protocol === loopbackProtocol &&
-      LOOPBACK_HOSTS.has(value.hostname)
-    )) {
-      throw new DesktopConfigError(`${name} must use ${secureProtocol}`);
+    const insecureProtocol = secureProtocol === "https:" ? "http:" : "ws:";
+    const explicitlyAllowedHost =
+      (allowLoopbackHttp && LOOPBACK_HOSTS.has(value.hostname)) ||
+      (allowPrivateLanHttp && isPrivateLanIpv4(value.hostname));
+    if (!(value.protocol === insecureProtocol && explicitlyAllowedHost)) {
+      throw new DesktopConfigError(
+        `${name} must use ${secureProtocol} unless insecure transport is explicitly limited to loopback or RFC1918 IPv4`,
+      );
     }
   }
   return value;
@@ -79,6 +97,24 @@ function deriveWssUrl(apiBaseUrl: URL): URL {
 
 function normalizeDirectory(value: string | null, fallback: string): string {
   return path.resolve(value ?? fallback);
+}
+
+function parseCsrfOrigin(
+  value: string,
+  allowLoopbackHttp: boolean,
+  allowPrivateLanHttp: boolean,
+): string {
+  const url = validateNetworkUrl(
+    parseUrl(value, "QA_HUB_DESKTOP_CSRF_ORIGIN"),
+    "QA_HUB_DESKTOP_CSRF_ORIGIN",
+    "https:",
+    allowLoopbackHttp,
+    allowPrivateLanHttp,
+  );
+  if (url.pathname !== "/" || url.search.length > 0 || url.hash.length > 0) {
+    throw new DesktopConfigError("QA_HUB_DESKTOP_CSRF_ORIGIN must be an origin without a path");
+  }
+  return url.origin;
 }
 
 export function isAllowedNetworkUrl(url: URL, config: DesktopConfig): boolean {
@@ -98,13 +134,21 @@ export function parseDesktopConfig(
   env: NodeJS.ProcessEnv = process.env,
   defaults: { readonly webAssetsDirectory?: string } = {},
 ): DesktopConfig {
-  const allowLoopbackHttp = parseBoolean(env, "QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP", false);
-  const apiRaw = envValue(env, "QA_HUB_DESKTOP_API_BASE_URL") ?? "https://qa-hub.local";
+  const configuredApiBaseUrl = envValue(env, "QA_HUB_DESKTOP_API_BASE_URL");
+  const usingLocalDebugDefault = configuredApiBaseUrl === null;
+  const allowLoopbackHttp = parseBoolean(
+    env,
+    "QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP",
+    usingLocalDebugDefault,
+  );
+  const allowPrivateLanHttp = parseBoolean(env, "QA_HUB_DESKTOP_ALLOW_PRIVATE_LAN_HTTP", false);
+  const apiRaw = configuredApiBaseUrl ?? "http://127.0.0.1:4319";
   const apiBaseUrl = validateNetworkUrl(
     parseUrl(apiRaw, "QA_HUB_DESKTOP_API_BASE_URL"),
     "QA_HUB_DESKTOP_API_BASE_URL",
     "https:",
     allowLoopbackHttp,
+    allowPrivateLanHttp,
   );
   const wssRaw = envValue(env, "QA_HUB_DESKTOP_WSS_URL");
   const wssUrl = validateNetworkUrl(
@@ -112,6 +156,7 @@ export function parseDesktopConfig(
     "QA_HUB_DESKTOP_WSS_URL",
     "wss:",
     allowLoopbackHttp,
+    allowPrivateLanHttp,
   );
   const developmentRaw = envValue(env, "QA_HUB_DESKTOP_DEV_URL");
   const developmentUrl =
@@ -119,12 +164,12 @@ export function parseDesktopConfig(
   if (developmentUrl !== null) {
     const allowedDevProtocol =
       developmentUrl.protocol === "https:" ||
-      (allowLoopbackHttp &&
-        developmentUrl.protocol === "http:" &&
-        LOOPBACK_HOSTS.has(developmentUrl.hostname));
+      (developmentUrl.protocol === "http:" &&
+        ((allowLoopbackHttp && LOOPBACK_HOSTS.has(developmentUrl.hostname)) ||
+          (allowPrivateLanHttp && isPrivateLanIpv4(developmentUrl.hostname))));
     if (!allowedDevProtocol || developmentUrl.username || developmentUrl.password) {
       throw new DesktopConfigError(
-        "QA_HUB_DESKTOP_DEV_URL must be HTTPS or explicitly allowed loopback HTTP",
+        "QA_HUB_DESKTOP_DEV_URL must be HTTPS or explicitly allowed loopback/private LAN HTTP",
       );
     }
   }
@@ -132,6 +177,12 @@ export function parseDesktopConfig(
   return {
     apiBaseUrl,
     wssUrl,
+    csrfOrigin: parseCsrfOrigin(
+      envValue(env, "QA_HUB_DESKTOP_CSRF_ORIGIN") ??
+        (usingLocalDebugDefault ? "http://127.0.0.1:4174" : apiBaseUrl.origin),
+      allowLoopbackHttp,
+      allowPrivateLanHttp,
+    ),
     allowedOrigins: new Set([
       apiBaseUrl.origin,
       wssUrl.origin,
@@ -147,6 +198,7 @@ export function parseDesktopConfig(
       parseBoolean(env, "QA_HUB_DESKTOP_AUTO_START", false) ||
       parseBoolean(env, "QA_HUB_DESKTOP_AUTO_START_LOGIN", false),
     allowLoopbackHttp,
+    allowPrivateLanHttp,
     startupHidden: parseBoolean(env, "QA_HUB_DESKTOP_START_HIDDEN", false),
   };
 }

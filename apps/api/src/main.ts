@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 
 import {
   parseStorageEnvironment,
@@ -12,7 +12,13 @@ import {
   parseApiBackupEnvironment,
   type ApiBackupRunner,
 } from "./backup-runner.js";
-import { DEFAULT_API_HOST, resolvePort } from "./config.js";
+import {
+  DEFAULT_API_HOST,
+  resolveEvidenceMinFreeBytes,
+  resolveHealthProbeTimeoutMs,
+  resolvePort,
+  resolveWebOrigins,
+} from "./config.js";
 import { createApiServer, type ApiServer } from "./server.js";
 import { createSqliteApiHealthProbe } from "./health.js";
 import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-store.js";
@@ -29,6 +35,13 @@ import { createSqliteMobileHumanWorkflowStore } from "./sqlite-mobile-human-work
 import { createSqliteMobileCommentStore } from "./sqlite-mobile-comment-store.js";
 import { createSqliteMobileMetricsStore } from "./sqlite-mobile-metrics-store.js";
 import { createSqliteBrowserAuthStore } from "./browser-auth.js";
+import {
+  loadQaPeopleConfig,
+  normalizeQaLoginName,
+  qaLoginEmail,
+  qaMembershipId,
+  qaUserId,
+} from "./people-config.js";
 import {
   parseRelayEndpoint,
   startMobileRelayOutboxPump,
@@ -88,11 +101,7 @@ function readRuntimeSecret(
   return configured;
 }
 
-function readRelayIdentifier(
-  name: string,
-  label: string,
-  pattern: RegExp,
-): string | undefined {
+function readRelayIdentifier(name: string, label: string, pattern: RegExp): string | undefined {
   const configured = process.env[name]?.trim();
   if (configured === undefined) return undefined;
   if (!pattern.test(configured)) throw new Error(`${label} is invalid`);
@@ -193,6 +202,26 @@ function readNotificationHintChannelEnabled(): boolean {
   throw new Error("QA_HUB_NOTIFICATION_HINT_CHANNEL_ENABLED must be true or false");
 }
 
+function readDesktopUpdateRoot(dataRoot: string): string {
+  const configured = process.env["QA_HUB_DESKTOP_UPDATE_ROOT"]?.trim();
+  const updateRoot =
+    configured === undefined ? join(dataRoot, "desktop-updates", "stable") : configured;
+  if (!isAbsolute(updateRoot)) {
+    throw new Error("QA_HUB_DESKTOP_UPDATE_ROOT must be an absolute path");
+  }
+  return resolve(updateRoot);
+}
+
+function readAndroidUpdateRoot(dataRoot: string): string {
+  const configured = process.env["QA_HUB_ANDROID_UPDATE_ROOT"]?.trim();
+  const updateRoot =
+    configured === undefined ? join(dataRoot, "android-updates", "stable") : configured;
+  if (!isAbsolute(updateRoot)) {
+    throw new Error("QA_HUB_ANDROID_UPDATE_ROOT must be an absolute path");
+  }
+  return resolve(updateRoot);
+}
+
 async function closeRuntime(
   server: ApiServer | undefined,
   worker: SqliteStorageWorker,
@@ -210,6 +239,17 @@ async function run(): Promise<void> {
   const webAuthMode = readWebAuthMode();
   const webSessionSecret = readWebSessionSecret(webAuthMode);
   const secureCookie = webAuthMode === "session" ? readSecureCookie() : undefined;
+  const peopleConfig = loadQaPeopleConfig(process.env["QA_HUB_PEOPLE_CONFIG_FILE"]);
+  if (peopleConfig.projectKey !== MOBILE_SCOPE.projectKey) {
+    throw new Error("QA Hub people config projectKey does not match the configured project scope");
+  }
+  const activePeople = peopleConfig.people.filter((person) => person.active);
+  const configuredPeople = new Map(
+    activePeople.flatMap((person) => [
+      [normalizeQaLoginName(person.pinyin).key, person] as const,
+      [normalizeQaLoginName(person.displayName).key, person] as const,
+    ]),
+  );
   const webBootstrapPassword = process.env["QA_HUB_BOOTSTRAP_ADMIN_PASSWORD"];
   if (webAuthMode === "debug" && webBootstrapPassword !== undefined) {
     throw new Error("QA_HUB_BOOTSTRAP_ADMIN_PASSWORD requires session auth mode");
@@ -245,8 +285,19 @@ async function run(): Promise<void> {
   let shutdownStarted = false;
 
   try {
-    await worker.ensureMobileScope(MOBILE_SCOPE);
-    await worker.ensureMobileRelayRoles(MOBILE_SCOPE);
+    const peopleSeededAt = new Date().toISOString();
+    for (const person of activePeople) {
+      const personScope: MobileScopeBootstrap = {
+        ...MOBILE_SCOPE,
+        createdAt: peopleSeededAt,
+        actorId: person.id,
+        membershipId: qaMembershipId(person.id),
+        actorDisplayName: person.displayName,
+        actorEmail: `${person.pinyin}@qa.local`,
+      };
+      await worker.ensureMobileScope(personScope);
+      await worker.ensureMobileRelayRoles(personScope);
+    }
     const browserAuthStore =
       webAuthMode === "debug" || webSessionSecret === undefined
         ? undefined
@@ -266,10 +317,16 @@ async function run(): Promise<void> {
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
+      desktopUpdateRoot: readDesktopUpdateRoot(storage.dataRoot),
+      androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
       healthProbe: createSqliteApiHealthProbe({
         worker,
         evidenceRoot: storage.evidenceRoot,
         quarantineRoot: storage.quarantineRoot,
+        timeoutMs: resolveHealthProbeTimeoutMs(process.env["QA_HUB_HEALTH_PROBE_TIMEOUT_MS"]),
+        minimumFreeBytes: BigInt(
+          resolveEvidenceMinFreeBytes(process.env["QA_HUB_EVIDENCE_MIN_FREE_BYTES"]),
+        ),
       }),
       mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
       mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
@@ -314,8 +371,30 @@ async function run(): Promise<void> {
               userId: MOBILE_SCOPE.actorId,
               actorId: MOBILE_SCOPE.actorId,
               adminEmail: `mvp-${MOBILE_SCOPE.actorId.replaceAll("-", "")}@local.invalid`,
+              passwordlessLogin: async (name, now) => {
+                const normalized = normalizeQaLoginName(name);
+                const configured = configuredPeople.get(normalized.key);
+                const userId = configured?.id ?? qaUserId(MOBILE_SCOPE.accountId, normalized.key);
+                const personScope: MobileScopeBootstrap = {
+                  ...MOBILE_SCOPE,
+                  createdAt: now,
+                  actorId: userId,
+                  membershipId: qaMembershipId(userId),
+                  actorDisplayName: configured?.displayName ?? normalized.displayName,
+                  actorEmail:
+                    configured === undefined
+                      ? qaLoginEmail(MOBILE_SCOPE.accountId, normalized.key)
+                      : `${configured.pinyin}@qa.local`,
+                };
+                await worker.ensureMobileScope(personScope);
+                await worker.ensureMobileRelayRoles(personScope);
+                return { userId };
+              },
               sessionSecret: webSessionSecret,
-              webOrigin: process.env["QA_HUB_WEB_ORIGIN"]?.trim() || "http://127.0.0.1:4174",
+              webOrigins: resolveWebOrigins(
+                process.env["QA_HUB_WEB_ORIGINS"],
+                process.env["QA_HUB_WEB_ORIGIN"],
+              ),
               ...(secureCookie === undefined ? {} : { secureCookie }),
             },
           }),

@@ -8,6 +8,15 @@ import org.junit.Test
 
 class FoundationViewModelContractTest {
     @Test
+    fun `single field content derives only the hidden bounded contract summary`() {
+        val content = "  登录后   点击开始按钮\n游戏卡住  "
+
+        assertEquals("登录后 点击开始按钮 游戏卡住", internalBugSummary(content))
+        assertEquals(80, internalBugSummary("问".repeat(120)).length)
+        assertTrue(runCatching { internalBugSummary("  \n  ") }.isFailure)
+    }
+
+    @Test
     fun `foundation fake creates the frozen App-first Bug command`() {
         val request = request()
 
@@ -22,6 +31,8 @@ class FoundationViewModelContractTest {
         assertEquals(QaHubApiContract.VERSION, payload["submissionContractVersion"])
         assertEquals(PROJECT_ID, payload["projectId"])
         assertEquals(SUBMISSION_ID, payload["clientSubmissionId"])
+        assertEquals(OWNER_ID, payload["ownerId"])
+        assertEquals(VERIFIER_ID, payload["verificationOwnerId"])
         assertTrue((payload["description"] as String).isNotBlank())
         assertTrue((payload["expectedBehavior"] as String).isNotBlank())
         assertEquals("S3", payload["severity"])
@@ -30,6 +41,22 @@ class FoundationViewModelContractTest {
         assertEquals("android", occurrence["platform"])
         assertTrue((occurrence["steps"] as List<*>).isNotEmpty())
         assertTrue((occurrence["actualBehavior"] as String).isNotBlank())
+    }
+
+    @Test
+    fun `new bug may leave fixer unassigned while keeping a verifier`() {
+        val request = FoundationCreateBugContract.buildRequest(
+            projectId = PROJECT_ID,
+            submissionId = SUBMISSION_ID,
+            observedAt = "2026-08-25T01:02:03Z",
+            qaAppVersion = "0.1.4-debug",
+            ownerId = null,
+            verificationOwnerId = VERIFIER_ID,
+        )
+
+        FoundationCreateBugContract.requireValid(request, PROJECT_ID)
+        assertTrue("ownerId" !in request.payload)
+        assertEquals(VERIFIER_ID, request.payload["verificationOwnerId"])
     }
 
     @Test
@@ -109,7 +136,7 @@ class FoundationViewModelContractTest {
 
     @Test
     fun `foundation identity fixture uses UUID contract identities`() {
-        val scope = FoundationViewModel.FOUNDATION_SCOPE
+        val scope = FoundationViewModel.foundationScope(ACTOR_ID)
 
         listOf(
             scope.accountId,
@@ -125,6 +152,8 @@ class FoundationViewModelContractTest {
         submissionId = SUBMISSION_ID,
         observedAt = "2026-08-25T01:02:03Z",
         qaAppVersion = "0.1.0-debug",
+        ownerId = OWNER_ID,
+        verificationOwnerId = VERIFIER_ID,
     )
 
     private fun assertRejected(request: FoundationFakeCreateBugRequest) {
@@ -137,5 +166,8 @@ class FoundationViewModelContractTest {
     companion object {
         private const val PROJECT_ID = "10000000-0000-4000-8000-000000000004"
         private const val SUBMISSION_ID = "20000000-0000-4000-8000-000000000001"
+        private const val ACTOR_ID = "20000000-0000-4000-8000-000000000002"
+        private const val OWNER_ID = "20000000-0000-4000-8000-000000000003"
+        private const val VERIFIER_ID = "20000000-0000-4000-8000-000000000004"
     }
 }

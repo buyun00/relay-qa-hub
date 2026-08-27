@@ -3,6 +3,11 @@ package com.relayqahub.android
 import android.content.Context
 import android.os.Environment
 import java.io.File
+import java.io.FileOutputStream
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.UUID
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -13,6 +18,7 @@ import org.json.JSONObject
  */
 data class QaPerson(
     val id: String,
+    val pinyin: String,
     val displayName: String,
     val roles: Set<QaPersonRole>,
     val active: Boolean,
@@ -38,7 +44,7 @@ data class QaPeopleConfig(
 object QaPeopleConfigLoader {
     const val FILE_NAME = "qa-people.json"
     const val CONFIG_PROJECT_KEY = "LOCAL"
-    private const val SCHEMA_VERSION = 1
+    private const val SCHEMA_VERSION = 3
     private const val MAX_CONFIG_BYTES = 128 * 1024
     private const val MAX_PEOPLE = 200
 
@@ -75,18 +81,22 @@ object QaPeopleConfigLoader {
         val peopleJson = root.optJSONArray("people") ?: error("qa people config people missing")
         require(peopleJson.length() <= MAX_PEOPLE) { "qa people config has too many people" }
         val ids = mutableSetOf<String>()
+        val pinyins = mutableSetOf<String>()
         val people = buildList {
             for (index in 0 until peopleJson.length()) {
                 val item = peopleJson.optJSONObject(index)
                     ?: error("qa people config people[$index] must be an object")
-                require(item.length() == 4) { "qa people config people[$index] has unsupported fields" }
+                require(item.length() == 5) { "qa people config people[$index] has unsupported fields" }
                 val id = item.optString("id").trim()
+                val pinyin = item.optString("pinyin").trim().lowercase()
                 val displayName = item.optString("displayName").trim()
                 require(id.isNotEmpty() && id.length <= 100) { "person id is invalid" }
+                require(PINYIN_PATTERN.matches(pinyin)) { "person pinyin is invalid" }
                 require(displayName.isNotEmpty() && displayName.length <= 100) {
                     "person displayName is invalid"
                 }
                 require(ids.add(id)) { "person id is duplicated" }
+                require(pinyins.add(pinyin)) { "person pinyin is duplicated" }
                 val rolesJson = item.optJSONArray("roles")
                     ?: error("person roles is missing")
                 require(rolesJson.length() in 1..2) { "person roles is invalid" }
@@ -104,6 +114,7 @@ object QaPeopleConfigLoader {
                 add(
                     QaPerson(
                         id = id,
+                        pinyin = pinyin,
                         displayName = displayName,
                         roles = roles,
                         active = item.optBoolean("active", false),
@@ -114,11 +125,46 @@ object QaPeopleConfigLoader {
         return QaPeopleConfig(SCHEMA_VERSION, projectKey, people)
     }
 
+    private val PINYIN_PATTERN = Regex("^[a-z][a-z0-9]{1,63}$")
+
     fun ensureExternalSeed(context: Context): File? {
         val target = externalFile(context) ?: return null
-        if (!target.exists()) {
-            target.parentFile?.mkdirs()
-            context.assets.open(FILE_NAME).use { input -> target.outputStream().use(input::copyTo) }
+        val existingSchema = target.takeIf(File::isFile)?.let { file ->
+            runCatching { JSONObject(file.readText(Charsets.UTF_8)).optInt("schemaVersion", -1) }
+                .getOrNull()
+        }
+        if (existingSchema == SCHEMA_VERSION) return target
+        if (existingSchema != null && existingSchema !in 1..2) return target
+
+        target.parentFile?.mkdirs()
+        if (existingSchema == 1 || existingSchema == 2) {
+            val backup = File(target.parentFile, "qa-people.schema-v$existingSchema.backup.json")
+            if (!backup.exists()) target.copyTo(backup)
+        }
+        val seed = context.assets.open(FILE_NAME).use { input -> input.readBytes() }
+        require(seed.size <= MAX_CONFIG_BYTES)
+        val temporary = File(target.parentFile, "${target.name}.tmp-${UUID.randomUUID()}")
+        try {
+            FileOutputStream(temporary).use { output ->
+                output.write(seed)
+                output.fd.sync()
+            }
+            try {
+                Files.move(
+                    temporary.toPath(),
+                    target.toPath(),
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING,
+                )
+            } catch (_: AtomicMoveNotSupportedException) {
+                Files.move(
+                    temporary.toPath(),
+                    target.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING,
+                )
+            }
+        } finally {
+            temporary.delete()
         }
         return target
     }

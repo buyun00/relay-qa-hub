@@ -61,14 +61,11 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
 
   return {
     async createBug(command): Promise<MobileCreateBugResponse> {
-      if (command.actorId !== options.scope.actorId) {
-        throw new TypeError("actor does not match the authenticated mobile scope");
-      }
       requireFirstSliceRequest(command.request, options.scope);
       const input: CreateMobileBugInput = {
         accountId: options.scope.accountId,
         projectId: options.scope.projectId,
-        actorId: options.scope.actorId,
+        actorId: command.actorId,
         clientSubmissionId: command.request.clientSubmissionId,
         payloadDigest: payloadDigest(command.request),
         title: command.request.title,
@@ -76,6 +73,8 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         expectedBehavior: command.request.expectedBehavior,
         severity: command.request.severity,
         priority: command.request.priority,
+        ownerId: command.request.ownerId ?? null,
+        verificationOwnerId: command.request.verificationOwnerId ?? null,
         occurrence: occurrenceInput(command.request.occurrence),
         attachmentIds: command.request.attachmentIds ?? [],
         captureBundleId: command.request.captureBundleId ?? null,
@@ -104,6 +103,8 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         accountId: options.scope.accountId,
         projectId: query.projectId ?? options.scope.projectId,
         actorId: query.actorId,
+        ...(query.ownerId === undefined ? {} : { ownerId: query.ownerId }),
+        ...(query.ownerState === undefined ? {} : { ownerState: query.ownerState }),
         ...(query.q === undefined ? {} : { q: query.q }),
         ...(query.state === undefined ? {} : { state: query.state }),
         ...(query.severity === undefined ? {} : { severity: query.severity }),
@@ -112,7 +113,6 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
     },
 
     async getBug(query) {
-      if (query.actorId !== options.scope.actorId) return null;
       return options.worker.getMobileBug({
         accountId: options.scope.accountId,
         projectId: options.scope.projectId,
@@ -121,13 +121,10 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
     },
 
     async updateBug(command) {
-      if (command.actorId !== options.scope.actorId) {
-        throw new TypeError("actor does not match the authenticated mobile scope");
-      }
       const input: UpdateMobileBugInput = {
         accountId: options.scope.accountId,
         projectId: options.scope.projectId,
-        actorId: options.scope.actorId,
+        actorId: command.actorId,
         bugId: command.bugId,
         expectedVersion: command.request.expectedVersion,
         ...(command.request.title === undefined ? {} : { title: command.request.title }),

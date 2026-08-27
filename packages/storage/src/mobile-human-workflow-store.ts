@@ -223,6 +223,9 @@ interface HumanWorkflowAttemptRow {
   readonly branch: string | null;
   readonly commit_sha: string | null;
   readonly merge_request_url: string | null;
+  readonly patch_url: string | null;
+  readonly no_code_reason: string | null;
+  readonly failure_reason: string | null;
   readonly version: number;
 }
 
@@ -274,6 +277,8 @@ interface HumanWorkflowVerificationRow {
   readonly verifier_id: string;
   readonly criteria_snapshot: string;
   readonly result_summary: string | null;
+  readonly failure_reason: string | null;
+  readonly blocked_reason: string | null;
   readonly version: number;
 }
 
@@ -335,7 +340,8 @@ function readHumanRepairAttempt(
   const row = database
     .prepare(
       `SELECT id, bug_id, sequence, mode, status, assignee_id,
-              summary, branch, commit_sha, merge_request_url, version
+              summary, branch, commit_sha, merge_request_url, patch_url,
+              no_code_reason, failure_reason, version
        FROM repair_attempts
        WHERE account_id = ? AND project_id = ? AND bug_id = ?
          AND id = ? AND mode = 'human'`,
@@ -358,6 +364,9 @@ function readHumanRepairAttempt(
     branch: row.branch,
     commitSha: row.commit_sha,
     mergeRequestUrl: row.merge_request_url,
+    patchUrl: row.patch_url,
+    noCodeReason: row.no_code_reason,
+    failureReason: row.failure_reason,
     targetBuildId: null,
     version: row.version,
   });
@@ -495,7 +504,8 @@ function readActiveVerification(
   const row = database
     .prepare(
       `SELECT id, bug_id, repair_attempt_id, build_id, status, verifier_id,
-              criteria_snapshot, result_summary, version
+              criteria_snapshot, result_summary, failure_reason, blocked_reason,
+              version
        FROM verifications
        WHERE account_id = ? AND project_id = ? AND bug_id = ? AND id = ?`,
     )
@@ -511,6 +521,8 @@ function readActiveVerification(
     verifierId: row.verifier_id,
     criteriaSnapshot: row.criteria_snapshot,
     resultSummary: row.result_summary,
+    failureReason: row.failure_reason,
+    blockedReason: row.blocked_reason,
     version: row.version,
   });
 }
