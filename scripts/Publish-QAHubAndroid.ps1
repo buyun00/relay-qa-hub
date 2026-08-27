@@ -11,6 +11,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$sourceEvidence = & (Join-Path $PSScriptRoot 'Assert-QAHubReleaseSource.ps1') -RepoRoot $repoRoot
 $defaultApkPath = Join-Path $repoRoot 'apps\android\app\build\outputs\apk\debug\app-debug.apk'
 $metadataPath = Join-Path $repoRoot 'apps\android\app\build\outputs\apk\debug\output-metadata.json'
 
@@ -86,6 +87,7 @@ $manifest = [ordered]@{
     fileName = $fileName
     size = [long]$sourceItem.Length
     sha256 = $sourceHash
+    sourceCommit = [string]$sourceEvidence.commit
 }
 $latestPath = Join-Path $updateDirectory 'latest.json'
 $temporaryLatest = Join-Path $updateDirectory ".latest.$([Guid]::NewGuid().ToString('N')).json"
@@ -113,4 +115,5 @@ if ([IO.File]::Exists($latestPath)) {
     versionCode = $versionCode
     bytes = [long]$sourceItem.Length
     sha256 = $sourceHash
+    sourceCommit = [string]$sourceEvidence.commit
 } | ConvertTo-Json -Depth 3
