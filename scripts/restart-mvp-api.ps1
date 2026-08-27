@@ -8,6 +8,8 @@ $statePath = "D:\Relay-QA-Hub-Data\mvp-e2e-current.json"
 $nodeExe = "C:\Users\lin0\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
 $apiEntry = Join-Path $repoRoot "apps\api\dist\main.js"
 $state = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+$sourceEvidence = & (Join-Path $PSScriptRoot "Assert-QAHubReleaseSource.ps1") -RepoRoot $repoRoot
+$state.buildSha = [string]$sourceEvidence.commit
 . (Join-Path $PSScriptRoot "qa-hub-lan.ps1")
 . (Join-Path $PSScriptRoot "qa-hub-persistent-runtime.ps1")
 $lan = Resolve-QAHubLanBinding -LanAddress $LanAddress
