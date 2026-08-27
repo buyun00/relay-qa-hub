@@ -391,11 +391,12 @@ export class PortableUpdater {
       return false;
     }
     const helperFile = path.join(this.options.updatesDirectory, "install-update.ps1");
-    const launcherFile = path.join(this.options.updatesDirectory, "launch-update.ps1");
+    const readyFile = path.join(this.options.updatesDirectory, "install-update-ready.json");
     const logFile = path.join(this.options.updatesDirectory, "install-update.log");
     const resultFile = path.join(this.options.updatesDirectory, "last-update-result.json");
+    await fs.rm(readyFile, { force: true });
+    await fs.rm(resultFile, { force: true });
     await fs.writeFile(helperFile, INSTALL_HELPER, { encoding: "utf8", mode: 0o600 });
-    await fs.writeFile(launcherFile, UPDATE_LAUNCHER, { encoding: "utf8", mode: 0o600 });
     this.emit({ status: "installing", releaseId: manifest.releaseId, version: manifest.version });
     const child = spawn(
       "powershell.exe",
@@ -405,8 +406,6 @@ export class PortableUpdater {
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        launcherFile,
-        "-HelperPath",
         helperFile,
         "-CurrentPid",
         String(this.options.currentPid ?? process.pid),
@@ -420,22 +419,49 @@ export class PortableUpdater {
         logFile,
         "-ResultPath",
         resultFile,
+        "-ReadyPath",
+        readyFile,
         "-ReleaseId",
         manifest.releaseId,
         "-Version",
         manifest.version,
       ],
-      { stdio: "ignore", windowsHide: true, cwd: this.options.updatesDirectory },
+      {
+        detached: true,
+        stdio: "ignore",
+        windowsHide: true,
+        cwd: this.options.updatesDirectory,
+      },
     );
+    let launchError: unknown = null;
+    child.once("error", (cause) => {
+      launchError = cause;
+    });
+    child.unref();
     try {
-      await new Promise<void>((resolve, reject) => {
-        child.once("error", reject);
-        child.once("exit", (code) => {
-          if (code === 0) resolve();
-          else reject(new Error("UPDATE_HELPER_LAUNCH_FAILED"));
-        });
-      });
+      const deadline = Date.now() + 10_000;
+      let helperReady = false;
+      while (Date.now() < deadline) {
+        if (launchError !== null) throw launchError;
+        try {
+          const marker = JSON.parse(await fs.readFile(readyFile, "utf8")) as Record<
+            string,
+            unknown
+          >;
+          helperReady =
+            marker["schemaVersion"] === 1 &&
+            marker["status"] === "ready" &&
+            marker["releaseId"] === manifest.releaseId;
+          if (helperReady) break;
+        } catch {
+          // The helper writes the marker atomically after validating every install path.
+        }
+        if (child.exitCode !== null) throw new Error("UPDATE_HELPER_LAUNCH_FAILED");
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+      }
+      if (!helperReady) throw new Error("UPDATE_HELPER_READY_TIMEOUT");
     } catch (cause) {
+      child.kill();
       this.emit({ status: "error", message: safeError(cause) });
       return false;
     }
@@ -445,58 +471,6 @@ export class PortableUpdater {
   }
 }
 
-const UPDATE_LAUNCHER = String.raw`param(
-  [Parameter(Mandatory = $true)][string]$HelperPath,
-  [Parameter(Mandatory = $true)][int]$CurrentPid,
-  [Parameter(Mandatory = $true)][string]$PackageDirectory,
-  [Parameter(Mandatory = $true)][string]$ArchivePath,
-  [Parameter(Mandatory = $true)][string]$ExecutableName,
-  [Parameter(Mandatory = $true)][string]$LogPath,
-  [Parameter(Mandatory = $true)][string]$ResultPath,
-  [Parameter(Mandatory = $true)][string]$ReleaseId,
-  [Parameter(Mandatory = $true)][string]$Version
-)
-
-$ErrorActionPreference = "Stop"
-function Quote-UpdateArgument([string]$Value) {
-  if ($Value -match '[\r\n"]') { throw "Unsafe update argument." }
-  return '"' + $Value + '"'
-}
-$parts = @(
-  "powershell.exe",
-  "-NoProfile",
-  "-NonInteractive",
-  "-ExecutionPolicy",
-  "Bypass",
-  "-File",
-  (Quote-UpdateArgument $HelperPath),
-  "-CurrentPid",
-  (Quote-UpdateArgument ([string]$CurrentPid)),
-  "-PackageDirectory",
-  (Quote-UpdateArgument $PackageDirectory),
-  "-ArchivePath",
-  (Quote-UpdateArgument $ArchivePath),
-  "-ExecutableName",
-  (Quote-UpdateArgument $ExecutableName),
-  "-LogPath",
-  (Quote-UpdateArgument $LogPath),
-  "-ResultPath",
-  (Quote-UpdateArgument $ResultPath),
-  "-ReleaseId",
-  (Quote-UpdateArgument $ReleaseId),
-  "-Version",
-  (Quote-UpdateArgument $Version)
-)
-$commandLine = $parts -join " "
-$result = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
-  CommandLine = $commandLine
-  CurrentDirectory = [IO.Path]::GetDirectoryName($HelperPath)
-}
-if ($result.ReturnValue -ne 0 -or $result.ProcessId -le 0) {
-  throw "Win32_Process.Create failed: $($result.ReturnValue)"
-}
-`;
-
 export const INSTALL_HELPER = String.raw`param(
   [Parameter(Mandatory = $true)][int]$CurrentPid,
   [Parameter(Mandatory = $true)][string]$PackageDirectory,
@@ -504,6 +478,7 @@ export const INSTALL_HELPER = String.raw`param(
   [Parameter(Mandatory = $true)][string]$ExecutableName,
   [Parameter(Mandatory = $true)][string]$LogPath,
   [Parameter(Mandatory = $true)][string]$ResultPath,
+  [Parameter(Mandatory = $true)][string]$ReadyPath,
   [Parameter(Mandatory = $true)][string]$ReleaseId,
   [Parameter(Mandatory = $true)][string]$Version
 )
@@ -514,12 +489,14 @@ $archive = [IO.Path]::GetFullPath($ArchivePath)
 $parent = [IO.Directory]::GetParent($package).FullName
 $leaf = [IO.Path]::GetFileName($package)
 $resultPathFull = [IO.Path]::GetFullPath($ResultPath)
+$readyPathFull = [IO.Path]::GetFullPath($ReadyPath)
 if ([string]::IsNullOrWhiteSpace($leaf) -or
     [IO.Path]::GetFileName($ExecutableName) -ne $ExecutableName -or
     $ReleaseId -notmatch '^\d{8}T\d{9}Z$' -or
     $Version -notmatch '^[0-9A-Za-z][0-9A-Za-z._+-]{0,63}$' -or
     -not (Test-Path -LiteralPath $package -PathType Container) -or
-    -not (Test-Path -LiteralPath $archive -PathType Leaf)) {
+    -not (Test-Path -LiteralPath $archive -PathType Leaf) -or
+    [IO.Path]::GetDirectoryName($readyPathFull) -ne [IO.Path]::GetDirectoryName($resultPathFull)) {
   throw "Unsafe update paths."
 }
 $suffix = [Guid]::NewGuid().ToString("N")
@@ -581,6 +558,21 @@ function Move-PackageWithRetry([string]$Source, [string]$Destination) {
 }
 
 Add-Content -LiteralPath $LogPath -Value ((Get-Date).ToString("o") + " update helper started")
+$readyMarker = [ordered]@{
+  schemaVersion = 1
+  status = "ready"
+  releaseId = $ReleaseId
+  processId = $PID
+  recordedAt = [DateTime]::UtcNow.ToString("o")
+}
+$readyTemporary = $readyPathFull + "." + $suffix + ".tmp"
+$readyEncoding = [Text.UTF8Encoding]::new($false)
+[IO.File]::WriteAllText(
+  $readyTemporary,
+  (($readyMarker | ConvertTo-Json -Depth 3) + [Environment]::NewLine),
+  $readyEncoding
+)
+Move-Item -LiteralPath $readyTemporary -Destination $readyPathFull -Force
 
 try {
   $exitDeadline = [DateTime]::UtcNow.AddSeconds(45)
