@@ -6,6 +6,8 @@ RequestExecutionLevel user
 !include "FileFunc.nsh"
 
 Var QaHubUpdateMode
+Var QaHubBackupPath
+Var QaHubRuntimeBackup
 
 Name "Relay QA Hub"
 OutFile "${OUTPUT_FILE}"
@@ -36,10 +38,38 @@ Section "Relay QA Hub" MainSection
   Sleep 500
 update_processes_closed:
   Sleep 500
+  StrCmp $QaHubUpdateMode "1" prepare_update fresh_install
+
+prepare_update:
+  InitPluginsDir
+  StrCpy $QaHubRuntimeBackup "$PLUGINSDIR\desktop-runtime.json"
+  IfFileExists "$INSTDIR\desktop-runtime.json" 0 runtime_preserved
+  ClearErrors
+  CopyFiles /SILENT "$INSTDIR\desktop-runtime.json" "$QaHubRuntimeBackup"
+  IfErrors update_backup_failed
+runtime_preserved:
+  StrCpy $QaHubBackupPath "$INSTDIR.backup-${RELEASE_ID}"
+  IfFileExists "$QaHubBackupPath\*.*" update_backup_failed
+  ClearErrors
+  Rename "$INSTDIR" "$QaHubBackupPath"
+  IfErrors update_backup_failed
+  Goto install_payload
+
+fresh_install:
   RMDir /r "$INSTDIR"
+
+install_payload:
+  ClearErrors
   SetOutPath "$INSTDIR"
   File /r "${SOURCE_DIR}\*.*"
+  IfErrors install_failed
+  IfFileExists "$QaHubRuntimeBackup" 0 runtime_restored
+  CopyFiles /SILENT "$QaHubRuntimeBackup" "$INSTDIR\desktop-runtime.json"
+  IfErrors install_failed
+runtime_restored:
   WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+  StrCmp $QaHubUpdateMode "1" install_complete
 
   CreateShortCut "$DESKTOP\Relay QA Hub.lnk" "$INSTDIR\RelayQaHub.exe" "" "$INSTDIR\RelayQaHub.exe" 0
   CreateDirectory "$SMPROGRAMS\Relay QA Hub"
@@ -55,6 +85,24 @@ update_processes_closed:
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHub" "NoRepair" 1
+
+install_complete:
+  Goto install_done
+
+install_failed:
+  StrCmp $QaHubUpdateMode "1" restore_update install_abort
+restore_update:
+  RMDir /r "$INSTDIR"
+  Rename "$QaHubBackupPath" "$INSTDIR"
+install_abort:
+  SetErrorLevel 3
+  Quit
+
+update_backup_failed:
+  SetErrorLevel 2
+  Quit
+
+install_done:
 
 SectionEnd
 

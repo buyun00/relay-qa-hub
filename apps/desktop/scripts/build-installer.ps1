@@ -50,6 +50,7 @@ New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
 
 & $makensis `
   "/DPRODUCT_VERSION=$($desktopPackage.version)" `
+  "/DRELEASE_ID=$ReleaseId" `
   "/DSOURCE_DIR=$packageDirectory" `
   "/DICON_FILE=$iconFile" `
   "/DOUTPUT_FILE=$installerFile" `

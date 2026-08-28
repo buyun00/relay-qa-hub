@@ -24,6 +24,7 @@ Var Version
 Var LogPath
 Var InstallerExitCode
 Var FailureCode
+Var InstallRoot
 
 Function AppendLog
   Exch $9
@@ -74,6 +75,8 @@ package_exists:
   IfFileExists "$AppPath" app_exists
   Goto invalid_config
 app_exists:
+  ${GetParent} "$AppPath" $InstallRoot
+  StrCmp $InstallRoot "" invalid_config
 
   ClearErrors
   FileOpen $0 "$EXEDIR\ready.flag" w
@@ -95,7 +98,7 @@ parent_exited:
   Sleep 1000
   Push "main process exited; starting installer"
   Call AppendLog
-  ExecWait '$\"$PackagePath$\" /S /QA_HUB_UPDATE=1' $InstallerExitCode
+  ExecWait '$\"$PackagePath$\" /S /QA_HUB_UPDATE=1 /D=$InstallRoot' $InstallerExitCode
   IntCmp $InstallerExitCode 0 install_succeeded install_failed install_failed
 
 install_succeeded:
