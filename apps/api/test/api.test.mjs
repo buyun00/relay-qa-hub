@@ -248,6 +248,11 @@ test("new Web and Android name login creates backend accounts and rejects the le
       adminEmail: "admin@local.invalid",
       passwordlessLogin: async (name) => {
         rawNames.push(name);
+        if (name === "已停用账号") {
+          throw Object.assign(new Error("mobile scope conflicts with existing tenant identity"), {
+            code: "SQLITE_MOBILE_SCOPE_CONFLICT",
+          });
+        }
         return { userId };
       },
       sessionSecret: "a".repeat(64),
@@ -277,6 +282,16 @@ test("new Web and Android name login creates backend accounts and rejects the le
   });
   assert.equal(legacy.statusCode, 400);
 
+  const disabled = await app.inject({
+    method: "POST",
+    url: BROWSER_LOGIN_PATH,
+    headers: { origin: "http://127.0.0.1:4174", "content-type": "application/json" },
+    payload: JSON.stringify({ name: "已停用账号", client: "web" }),
+  });
+  assert.equal(disabled.statusCode, 401);
+  assert.deepEqual(disabled.json(), { code: "AUTHENTICATION_FAILED" });
+  assert.equal(disabled.headers["set-cookie"], undefined);
+
   const webLogin = await app.inject({
     method: "POST",
     url: BROWSER_LOGIN_PATH,
@@ -293,7 +308,7 @@ test("new Web and Android name login creates backend accounts and rejects the le
     payload: JSON.stringify({ name: "  新账号  ", client: "android" }),
   });
   assert.equal(androidLogin.statusCode, 200);
-  assert.deepEqual(rawNames, ["  新账号  ", "  新账号  "]);
+  assert.deepEqual(rawNames, ["已停用账号", "  新账号  ", "  新账号  "]);
   assert.match(androidLogin.json().accessToken, /^[A-Za-z0-9_-]{43}$/u);
   assert.match(androidLogin.json().expiresAt, /^\d{4}-\d{2}-\d{2}T/u);
   assert.equal(androidLogin.headers["set-cookie"], undefined);

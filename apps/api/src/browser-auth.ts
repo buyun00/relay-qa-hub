@@ -410,6 +410,9 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
         .header("content-type", MOBILE_API_CONTENT_TYPE)
         .send(principalResponse(principal, browserCsrfToken(token, options.sessionSecret)));
     } catch (error: unknown) {
+      if ((error as { readonly code?: unknown })?.code === "SQLITE_MOBILE_SCOPE_CONFLICT") {
+        return writeJson(reply, 401, AUTHENTICATION_FAILED);
+      }
       if (error instanceof TypeError) return writeJson(reply, 400, { code: "INVALID_REQUEST" });
       throw error;
     }
