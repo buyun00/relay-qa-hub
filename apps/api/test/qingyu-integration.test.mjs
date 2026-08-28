@@ -42,9 +42,7 @@ test("QingyuClient uses Relay-proven QR, own-defect, detail, and resolve protoco
       if (url.pathname === "/api/auth/qr/exchange") {
         return json({ code: 0, data: { token: "token-1", user: { id: 7, nickname: "测试用户" } } });
       }
-      if (url.pathname === "/api/users/me") {
-        return json({ code: 0, data: { id: 7, nickname: "测试用户" } });
-      }
+      if (url.pathname === "/api/users/me") throw new Error("QR identity must be reused");
       if (url.pathname === "/api/tasks" && url.searchParams.has("page")) {
         return json({
           code: 0,
@@ -102,6 +100,10 @@ test("QingyuClient uses Relay-proven QR, own-defect, detail, and resolve protoco
   assert.equal(taskCall.search.get("type"), "bug");
   assert.equal(taskCall.search.get("assignee_id"), "7");
   assert.equal(taskCall.search.get("project_id"), "project-3");
+  assert.equal(
+    calls.some((call) => call.pathname === "/api/users/me"),
+    false,
+  );
 
   const resolved = await client.resolveDefect(login.credentials, {
     defectId: "91",
@@ -295,7 +297,7 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
   assert.equal(isActionableQingyuDefect({ status: "已解决", statusKey: "RESOLVED" }), false);
 });
 
-test("human close resolves Qingyu before recording the local passed result and fails closed", async () => {
+test("assigned closer resolves Qingyu and closes without reporter confirmation", async () => {
   const actorId = "10000000-0000-4000-8000-000000000003";
   const bugId = "20000000-0000-4000-8000-000000000001";
   const verificationId = "30000000-0000-4000-8000-000000000001";
@@ -326,7 +328,7 @@ test("human close resolves Qingyu before recording the local passed result and f
     state: "ready_for_verification",
     severity: "S1",
     priority: "P1",
-    reporterId: actorId,
+    reporterId: "10000000-0000-4000-8000-000000000009",
     ownerId: actorId,
     verificationOwnerId: actorId,
     duplicateOfBugId: null,

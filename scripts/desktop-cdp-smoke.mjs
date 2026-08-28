@@ -112,6 +112,9 @@ const snapshotExpression = `
       ).length,
       qingyuModalVisible: document.querySelector('.qingyu-modal[aria-label="从轻语导入 Bug"]') !== null,
       qingyuQrVisible: document.querySelector(".qingyu-login-panel svg") !== null,
+      qingyuWorkspaceVisible:
+        document.querySelector(".qingyu-connected") !== null &&
+        document.querySelector(".qingyu-defect-list") !== null,
       qingyuErrorText: document.querySelector(".qingyu-modal .error-banner")?.textContent?.trim() ?? null,
       evidenceImageCount: evidenceImages.length,
       evidenceLoadedCount: evidenceImages.filter((image) => image.complete && image.naturalWidth > 0).length,
@@ -274,6 +277,7 @@ try {
       if (
         current?.appReady !== true ||
         current?.qingyuQrVisible === true ||
+        current?.qingyuWorkspaceVisible === true ||
         current?.qingyuErrorText !== null
       ) {
         break;

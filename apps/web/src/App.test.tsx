@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import App, {
   canSaveBugDetailDraft,
+  canDirectCloseBug,
   canSubmitNewBug,
   collectClipboardImages,
   mergeCreateBugImages,
@@ -31,8 +32,9 @@ describe("Relay QA Hub browser workbench", () => {
     expect(markup).toContain("总览");
     expect(markup).toContain("待处理");
     expect(markup).toContain("处理中");
-    expect(markup).toContain("待验收");
+    expect(markup).toContain("待关闭");
     expect(markup).toContain("已完成");
+    expect(markup).not.toContain("提报人确认");
     expect(markup).not.toContain("全部 Bug · 表格视图");
     expect(markup).toContain("人员范围");
     expect(markup).toContain("新建 Bug");
@@ -88,6 +90,14 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canSubmitNewBug(null, "verifier-id")).toBe(true);
     expect(canSubmitNewBug("正在提交", "verifier-id")).toBe(false);
     expect(canSubmitNewBug(null, "")).toBe(false);
+  });
+
+  it("lets the assigned closer directly close a ready Bug without reporter confirmation", () => {
+    expect(canDirectCloseBug("ready_for_verification", true, true, null)).toBe(true);
+    expect(canDirectCloseBug("ready_for_verification", true, true, "requested")).toBe(true);
+    expect(canDirectCloseBug("ready_for_verification", true, true, "in_progress")).toBe(true);
+    expect(canDirectCloseBug("ready_for_verification", false, true, "requested")).toBe(false);
+    expect(canDirectCloseBug("in_progress", true, true, null)).toBe(false);
   });
 
   it("only enables detail saving for a valid changed versioned draft", () => {

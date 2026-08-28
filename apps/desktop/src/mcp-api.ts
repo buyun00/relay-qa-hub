@@ -264,7 +264,7 @@ export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
     name: "qa_get_bug_context",
     title: "读取 Bug 完整上下文",
     description:
-      "读取一个 Bug 的详情、当前修复/构建/验收工作流、事件、附件、采集快照、项目成员与模块。修代码前必须调用。",
+      "读取一个 Bug 的详情、当前修复/构建/关闭工作流、事件、附件、采集快照、项目成员与模块。修代码前必须调用。",
     inputSchema: {
       type: "object",
       properties: { bugId: { type: "string", format: "uuid" } },
@@ -324,7 +324,7 @@ export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
     name: "qa_submit_fix",
     title: "提交已验证的代码修复",
     description:
-      "提交当前 RepairAttempt 的分支、40 位提交 SHA、修复摘要和实际验证命令。代码交付进入等待精确构建/待验收，绝不会自动验收或关闭 Bug。",
+      "提交当前 RepairAttempt 的分支、40 位提交 SHA、修复摘要和实际验证命令。代码交付进入等待精确构建/待关闭；指定关闭人可在详情直接关闭，无需提报人确认。",
     inputSchema: {
       type: "object",
       properties: {
@@ -920,7 +920,7 @@ export class QaHubMcpTools {
         bug: await this.getBug(bugId),
         workflow: await this.workflow(bugId),
         replayed: true,
-        humanAcceptanceRequired: true,
+        reporterConfirmationRequired: false,
       };
     }
     if (attempt["status"] !== "running") {
@@ -969,9 +969,9 @@ export class QaHubMcpTools {
       bug: await this.getBug(bugId),
       workflow: await this.workflow(bugId),
       replayed: false,
-      humanAcceptanceRequired: true,
+      reporterConfirmationRequired: false,
       nextAction:
-        "The code delivery now waits for an exact-commit Build and human verification. MCP cannot accept or close the Bug.",
+        "The code delivery now waits for an exact-commit Build. After it reaches ready_for_verification, the assigned closer can close it directly without reporter confirmation.",
     };
   }
 

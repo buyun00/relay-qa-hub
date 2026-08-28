@@ -59,6 +59,7 @@ import {
   type QingyuDefect,
   type QingyuProject,
   type QingyuSession,
+  type VerificationRecord,
   type VisibleProject,
 } from "./api";
 import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
@@ -202,11 +203,11 @@ const categoryCopy: Readonly<
     icon: "…",
   },
   verification: {
-    label: "待验收",
-    hint: "所选人员已点完成，等待提报人确认",
+    label: "待关闭",
+    hint: "修复完成后由关闭人直接关闭",
     icon: "↗",
   },
-  completed: { label: "已完成", hint: "提报人已确认并关闭", icon: "◎" },
+  completed: { label: "已完成", hint: "Bug 已关闭", icon: "◎" },
 };
 
 const DEFAULT_RETURN_REASON = "问题仍可复现，请继续处理";
@@ -217,7 +218,7 @@ const stateCopy: Readonly<Record<BugListState, string>> = {
   ready: "待修复",
   in_progress: "处理中",
   awaiting_build: "等待构建",
-  ready_for_verification: "待提报人确认",
+  ready_for_verification: "待关闭",
   closed: "已完成",
   deferred: "已延期",
   rejected: "不处理",
@@ -233,6 +234,22 @@ function categoryMatches(category: Category, state: BugListState): boolean {
   if (category === "inProgress") return inProgressStates.has(state);
   if (category === "verification") return state === "ready_for_verification";
   return state === "closed";
+}
+
+export function canDirectCloseBug(
+  state: BugListState,
+  isAssignedCloser: boolean,
+  hasRepairAttempt: boolean,
+  verificationStatus: VerificationRecord["status"] | null,
+): boolean {
+  return (
+    state === "ready_for_verification" &&
+    isAssignedCloser &&
+    hasRepairAttempt &&
+    (verificationStatus === null ||
+      verificationStatus === "requested" ||
+      verificationStatus === "in_progress")
+  );
 }
 
 function initials(name: string): string {
@@ -260,7 +277,7 @@ function messageFor(cause: unknown): string {
       QINGYU_RESOLVE_TRANSITION_UNAVAILABLE:
         "轻语当前状态没有可用的“已解决”流转，或当前账号没有关单权限。",
       QINGYU_RESOLVE_VERSION_REQUIRED: "轻语要求填写解决版本，但项目没有可用版本。",
-      QINGYU_TRANSITION_FIELD_REQUIRED: "轻语关单还缺少必填字段，QA Hub 已保留为待确认状态。",
+      QINGYU_TRANSITION_FIELD_REQUIRED: "轻语关单还缺少必填字段，QA Hub 已保留为待关闭状态。",
       QINGYU_RESOLUTION_NOT_VERIFIED: "轻语未确认 Bug 已解决，QA Hub 未执行本地关单。",
       QINGYU_TIMEOUT: "轻语响应超时，请稍后重试。",
       QINGYU_UNAVAILABLE: "当前无法连接轻语，请检查网络后重试。",
@@ -288,10 +305,10 @@ function eventCopy(event: BugEvent): string {
     "repair_attempt.created": "建立了处理任务",
     "repair_attempt.started": "开始处理",
     "repair_attempt.delivered": "标记修复完成",
-    "verification.requested": "发起验收",
-    "verification.started": "开始验收",
-    "verification.failed": "验收打回",
-    "verification.passed": "确认关闭",
+    "verification.requested": "进入待关闭",
+    "verification.started": "开始关闭处理",
+    "verification.failed": "关闭前打回",
+    "verification.passed": "关闭 Bug",
     "relay.handoff_queued": "已交给 Relay",
   };
   return labels[event.type] ?? event.type;
@@ -962,11 +979,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     )
       return;
     const attempt = workflow.repairAttempt;
-    await runMutation("修复已完成，等待提报人确认", async () => {
+    await runMutation("修复已完成，等待关闭人处理", async () => {
       await deliverHumanRepairAttemptNoCode(
         attempt.id,
         attempt.version,
-        "已由人工完成修复并提交验收",
+        "已由人工完成修复并提交关闭",
         "本次处理无需独立代码或构建产物",
       );
       const nextBug = await getBug(detail.id);
@@ -975,30 +992,41 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         expectedBugVersion: nextBug.version,
         repairAttemptId: attempt.id,
         buildId: null,
-        verifierId: nextBug.verificationOwnerId ?? nextBug.reporterId,
-        criteria: nextBug.expectedBehavior || "提报人确认问题已解决且未引入回归",
+        verifierId: nextBug.verificationOwnerId ?? principal.userId,
+        criteria: nextBug.expectedBehavior || "关闭人确认问题已解决且未引入回归",
       });
     });
   };
 
   const ensureVerificationStarted = async () => {
-    if (workflow?.verification === null || workflow?.verification === undefined) return null;
-    if (workflow.verification.status === "requested") {
-      return startVerification(workflow.verification.id, workflow.verification.version);
+    if (detail === null || repairAttempt === null) return null;
+    let current = workflow?.verification ?? null;
+    if (current === null) {
+      current = await createVerification({
+        bugId: detail.id,
+        expectedBugVersion: detail.version,
+        repairAttemptId: repairAttempt.id,
+        buildId: workflow?.build?.id ?? null,
+        verifierId: detail.verificationOwnerId ?? principal.userId,
+        criteria: detail.expectedBehavior || "关闭人确认问题已解决且未引入回归",
+      });
     }
-    return workflow.verification;
+    if (current.status === "requested") {
+      return startVerification(current.id, current.version);
+    }
+    return current;
   };
 
   const acceptBug = async () => {
     await runMutation(
-      "已由提报人确认关闭",
+      "Bug 已关闭并计入已完成",
       async () => {
         const verification = await ensureVerificationStarted();
         if (verification === null) return;
         await recordVerificationPassed(
           verification.id,
           verification.version,
-          "提报人确认修复有效，关闭 Bug",
+          "关闭人确认修复有效，直接关闭 Bug",
           crypto.randomUUID(),
         );
       },
@@ -1102,7 +1130,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const canManageDetail = detail !== null && mutation === null;
   const isOwner = detail?.ownerId === principal.userId;
-  const isReporter = detail?.reporterId === principal.userId;
   const isAssignedVerifier = detail?.verificationOwnerId === principal.userId;
   const repairAttempt = workflow?.repairAttempt ?? null;
   const verification = workflow?.verification ?? null;
@@ -1284,7 +1311,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 ) : null}
                 {visibleBugs.map((bug) => {
                   const actionPersonId =
-                    bug.state === "ready_for_verification" ? bug.reporterId : bug.ownerId;
+                    bug.state === "ready_for_verification" ? bug.verificationOwnerId : bug.ownerId;
                   return (
                     <button
                       className="table-row bug-row"
@@ -1302,7 +1329,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           <span className="bug-meta">
                             <b className="bug-key">{bug.key}</b>
                             <span>·</span>
-                            <span>{memberName(bug.verificationOwnerId)} 验收</span>
+                            <span>{memberName(bug.verificationOwnerId)} 关闭</span>
                           </span>
                         </span>
                       </span>
@@ -1311,7 +1338,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <span>
                           <strong>{memberName(actionPersonId)}</strong>
                           <small>
-                            {bug.state === "ready_for_verification" ? "提报人确认" : "修复人"}
+                            {bug.state === "ready_for_verification" ? "关闭人" : "修复人"}
                           </small>
                         </span>
                       </span>
@@ -1415,8 +1442,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           {qingyuLink.syncStatus === "succeeded"
                             ? `已同步为${qingyuLink.externalStatus ?? "已解决"}`
                             : qingyuLink.syncStatus === "failed"
-                              ? "上次同步关单失败，本地仍保留待确认"
-                              : "确认修复并关闭时，将同步解决轻语单"}
+                              ? "上次同步关单失败，本地仍保留待关闭"
+                              : "直接关闭时，将同步解决轻语单"}
                         </span>
                       </div>
                       <a href={qingyuLink.defectUrl} rel="noreferrer" target="_blank">
@@ -1624,7 +1651,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <span>{stateCopy[detail.state]}</span>
                       </div>
                       <div className="flow">
-                        {["已提交", "处理中", "待提报人确认", "已关闭"].map((label, index) => {
+                        {["已提交", "处理中", "待关闭", "已完成"].map((label, index) => {
                           const activeIndex =
                             detail.state === "closed"
                               ? 3
@@ -1662,7 +1689,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         </select>
                       </label>
                       <label>
-                        <span>验收人</span>
+                        <span>关闭人</span>
                         <select
                           disabled={!canManageDetail}
                           onChange={(event) => setVerifierId(event.target.value)}
@@ -1792,29 +1819,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           标记修复完成
                         </button>
                       ) : null}
-                      {detail.state === "ready_for_verification" &&
-                      verification?.status === "requested" &&
-                      isAssignedVerifier &&
-                      !isReporter ? (
-                        <button
-                          className="primary-button wide"
-                          disabled={mutation !== null}
-                          onClick={() =>
-                            void runMutation("已开始验收，等待提报人最终确认", async () => {
-                              await startVerification(verification.id, verification.version);
-                            })
-                          }
-                          type="button"
-                        >
-                          开始验收
-                        </button>
-                      ) : null}
-                      {detail.state === "ready_for_verification" &&
-                      verification !== null &&
-                      isReporter &&
-                      (verification.status === "requested"
-                        ? isAssignedVerifier
-                        : verification.status === "in_progress") ? (
+                      {canDirectCloseBug(
+                        detail.state,
+                        isAssignedVerifier,
+                        repairAttempt !== null,
+                        verification?.status ?? null,
+                      ) ? (
                         <>
                           <label className="return-reason">
                             <span>打回原因</span>
@@ -1838,25 +1848,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                             onClick={() => void acceptBug()}
                             type="button"
                           >
-                            {qingyuLink === null ? "确认修复并关闭" : "确认修复并同步关单"}
+                            {qingyuLink === null ? "直接关闭" : "关闭并同步轻语"}
                           </button>
                         </>
                       ) : null}
-                      {detail.state === "ready_for_verification" &&
-                      verification?.status === "requested" &&
-                      isReporter &&
-                      !isAssignedVerifier ? (
+                      {detail.state === "ready_for_verification" && !isAssignedVerifier ? (
                         <p className="action-note">
-                          等待验收人 {memberName(verification.verifierId)}{" "}
-                          开始验收后，由你最终确认或打回。
-                        </p>
-                      ) : null}
-                      {detail.state === "ready_for_verification" &&
-                      verification?.status === "in_progress" &&
-                      isAssignedVerifier &&
-                      !isReporter ? (
-                        <p className="action-note">
-                          验收已开始，最终关闭或打回由提报人 {memberName(detail.reporterId)} 确认。
+                          等待关闭人 {memberName(detail.verificationOwnerId)} 直接关闭或打回。
                         </p>
                       ) : null}
                       {detail.state !== "closed" &&
@@ -1873,7 +1871,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       ) : null}
                       {detail.state === "closed" ? (
                         <p className="action-note action-note-left">
-                          这条 Bug 已由提报人确认完成。
+                          这条 Bug 已关闭，并计入“已完成”。
                         </p>
                       ) : null}
                       {detail.state !== "closed" &&
@@ -2122,7 +2120,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 </select>
               </label>
               <label>
-                验收人
+                关闭人
                 <select
                   onChange={(event) => setNewVerifierId(event.target.value)}
                   value={newVerifierId}

@@ -250,7 +250,7 @@ try {
   if ($login.workbenchLoading -or -not [string]::IsNullOrWhiteSpace([string]$login.workbenchErrorText)) {
     throw "Portable package login reached the shell but the real workbench API did not load"
   }
-  $expectedSummaryLabels = @("待处理", "处理中", "待验收", "已完成")
+  $expectedSummaryLabels = @("待处理", "处理中", "待关闭", "已完成")
   if ((@($login.summaryLabels) -join "|") -ne ($expectedSummaryLabels -join "|")) {
     throw "Packaged workbench shortcuts do not match the four lifecycle categories"
   }
@@ -273,8 +273,10 @@ try {
   if ($qingyuExitCode -ne 0) {
     throw "Packaged Qingyu import smoke failed: $($qingyu | ConvertTo-Json -Depth 20 -Compress)"
   }
-  if (-not $qingyu.snapshot.qingyuModalVisible -or -not $qingyu.snapshot.qingyuQrVisible) {
-    throw "Packaged Qingyu import did not render its QR login dialog"
+  if (-not $qingyu.snapshot.qingyuModalVisible -or
+      (-not $qingyu.snapshot.qingyuQrVisible -and -not $qingyu.snapshot.qingyuWorkspaceVisible) -or
+      -not [string]::IsNullOrWhiteSpace([string]$qingyu.snapshot.qingyuErrorText)) {
+    throw "Packaged Qingyu import did not render its login or connected workspace without an error"
   }
 
   $detailOutput = & $NodeExe $smokeScript open-first-bug
@@ -304,7 +306,7 @@ try {
       -not [string]::IsNullOrWhiteSpace([string]$overview.overviewErrorText)) {
     throw "Portable package did not load the shared Bug overview"
   }
-  $expectedOverviewHeaders = @("编号", "反馈问题", "负责人", "验收人", "处理状态", "提出时间", "最后更新")
+  $expectedOverviewHeaders = @("编号", "反馈问题", "负责人", "关闭人", "处理状态", "提出时间", "最后更新")
   if ((@($overview.overviewHeaders) -join "|") -ne ($expectedOverviewHeaders -join "|")) {
     throw "Packaged overview does not expose the dense shared-table columns"
   }
@@ -362,6 +364,7 @@ try {
     bugDetailEditorFieldCount = [int]$detailEditor.detailEditorFieldCount
     qingyuImportDialogLoaded = [bool]$qingyu.snapshot.qingyuModalVisible
     qingyuQrLoaded = [bool]$qingyu.snapshot.qingyuQrVisible
+    qingyuWorkspaceLoaded = [bool]$qingyu.snapshot.qingyuWorkspaceVisible
     pocoRegionVisible = [bool]$detail.pocoRegionVisible
     bugDetailErrorText = [string]$detail.detailErrorText
     evidenceImageCount = [int]$detail.evidenceImageCount

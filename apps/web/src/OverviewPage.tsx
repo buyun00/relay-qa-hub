@@ -33,7 +33,7 @@ const overviewColumns = [
   { key: "key", label: "编号", defaultWidth: 86, minWidth: 72 },
   { key: "title", label: "反馈问题", defaultWidth: 560, minWidth: 300 },
   { key: "owner", label: "负责人", defaultWidth: 190, minWidth: 150 },
-  { key: "verifier", label: "验收人", defaultWidth: 190, minWidth: 150 },
+  { key: "verifier", label: "关闭人", defaultWidth: 190, minWidth: 150 },
   { key: "state", label: "处理状态", defaultWidth: 112, minWidth: 96 },
   { key: "created", label: "提出时间", defaultWidth: 118, minWidth: 104 },
   { key: "updated", label: "最后更新", defaultWidth: 118, minWidth: 104 },
@@ -115,7 +115,7 @@ const stateCopy: Readonly<Record<BugListState, string>> = {
   ready: "待修复",
   in_progress: "处理中",
   awaiting_build: "等待构建",
-  ready_for_verification: "待验收",
+  ready_for_verification: "待关闭",
   closed: "已完成",
   deferred: "已延期",
   rejected: "不处理",
@@ -126,7 +126,7 @@ const stateGroupCopy: Readonly<Record<StateGroup, string>> = {
   all: "全部状态",
   pending: "待处理",
   inProgress: "处理中",
-  verification: "待验收",
+  verification: "待关闭",
   completed: "已完成",
 };
 
@@ -289,7 +289,7 @@ export default function OverviewPage({
     try {
       const updated = await updateBugVerificationOwner(bug.id, bug.version, nextVerifierId);
       setItems((current) => current.map((item) => (item.id === updated.id ? updated : item)));
-      setNotice(`${bug.key} 的验收人已设为 ${memberName(nextVerifierId)}`);
+      setNotice(`${bug.key} 的关闭人已设为 ${memberName(nextVerifierId)}`);
       onMutated();
     } catch (cause) {
       setError(errorMessage(cause));
@@ -412,7 +412,7 @@ export default function OverviewPage({
         <div>
           <p className="eyebrow">共享总表</p>
           <h1>Bug 总览</h1>
-          <p>集中查看当前项目的全部单子，筛出未分配事项并直接设置优先级、负责人或验收人。</p>
+          <p>集中查看当前项目的全部单子，筛出未分配事项并直接设置优先级、负责人或关闭人。</p>
         </div>
         <button className="primary-button" onClick={onCreateBug} type="button">
           <span>＋</span> 新建 Bug
@@ -605,7 +605,7 @@ export default function OverviewPage({
                   </button>
                 )}
                 <select
-                  aria-label={`设置 ${bug.key} 验收人`}
+                  aria-label={`设置 ${bug.key} 关闭人`}
                   disabled={mutatingId === bug.id}
                   onChange={(event) => void assignVerificationOwner(bug, event.target.value)}
                   value={effectiveVerifierId}

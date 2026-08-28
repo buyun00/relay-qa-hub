@@ -637,9 +637,10 @@ export class QingyuClient {
   }
 
   async currentUser(credentials: QingyuCredentials): Promise<QingyuUser> {
-    const user = normalizeUser(dataFromPayload(await this.authenticated(credentials, "/users/me")));
-    if (user === null) throw new QingyuError(502, "QINGYU_USER_INVALID", "无法识别轻语当前用户");
-    return user;
+    // The QR exchange already returns and validates the authenticated user.
+    // Reusing that identity matches Qingyu's browser flow and avoids depending
+    // on the deployment-specific response envelope of /users/me.
+    return credentials.user;
   }
 
   async getDefect(credentials: QingyuCredentials, defectId: string): Promise<QingyuDefect> {

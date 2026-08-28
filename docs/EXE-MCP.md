@@ -14,13 +14,13 @@ http://127.0.0.1:4320/mcp
 
 - `qa_list_projects`：读取当前登录人和可见项目。
 - `qa_list_bugs`：读取当前单子；默认隐藏关闭、延期、驳回和重复项。
-- `qa_get_bug_context`：读取 Bug、RepairAttempt、构建/验收状态、事件、成员、模块、附件和采集快照。
+- `qa_get_bug_context`：读取 Bug、RepairAttempt、构建/关闭状态、事件、成员、模块、附件和采集快照。
 - `qa_materialize_attachment`：下载附件到 `%APPDATA%\RelayQaHub\mcp-attachments` 下的 EXE 用户数据目录，校验大小与 SHA-256，再返回绝对路径。
 - `qa_begin_fix`：当前登录人领取未分配单子并沿现有状态机创建、启动 RepairAttempt；已属于他人的单子会拒绝抢占。
 - `qa_add_comment`：回写真实调查进度、阻塞或验证记录。
 - `qa_submit_fix`：提交分支、40 位 Git SHA、修复摘要和实际验证命令。
 
-没有“验收通过”或“关闭 Bug”工具。代码交付后仍需精确提交构建证据，并由提报人或指定验收人验收；本地 AI 的测试结果只作为交付记录，不能冒充 QA 验收。
+MCP 负责回写修复和真实验证证据；代码交付仍需精确构建证据。进入待关闭后由指定关闭人在 EXE 详情中直接关闭，不需要提报人二次确认；关闭后统一计入“已完成”。
 
 ## 建议工作流
 
@@ -29,7 +29,7 @@ http://127.0.0.1:4320/mcp
 3. 确认仓库与单子匹配后调用 `qa_begin_fix`。
 4. 在 AI 编辑器里审计代码、做窄改动、运行相关测试，并创建 Git commit。
 5. 用 `qa_submit_fix` 回写真实验证命令、分支和完整 commit SHA。
-6. 等待精确构建和人工验收；若被打回，重新读取上下文后继续原 RepairAttempt 链。
+6. 等待精确构建；进入待关闭后由关闭人在详情中直接关闭。若被打回，重新读取上下文后继续原 RepairAttempt 链。
 
 ## 运行配置
 

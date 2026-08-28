@@ -139,7 +139,7 @@ test("qa_begin_fix claims an unassigned Bug and follows the existing ready/attem
   assert.deepEqual(assign?.request.body, { expectedVersion: 1, ownerId: USER_ID });
 });
 
-test("qa_submit_fix records real validation evidence and leaves human acceptance required", async () => {
+test("qa_submit_fix records real validation evidence without requiring reporter confirmation", async () => {
   const api = new ScriptedApi();
   api.queue("GET", "/api/v1/auth/me", principal());
   api.queue("GET", `/api/v1/repair-attempts/${ATTEMPT_ID}`, {
@@ -169,9 +169,9 @@ test("qa_submit_fix records real validation evidence and leaves human acceptance
     validation: ["npm test -- --runInBand：通过"],
     branch: "codex/fix-local-1",
     commitSha: "a".repeat(40),
-  })) as { bug: Record<string, unknown>; humanAcceptanceRequired: boolean };
+  })) as { bug: Record<string, unknown>; reporterConfirmationRequired: boolean };
   assert.equal(result.bug["state"], "awaiting_build");
-  assert.equal(result.humanAcceptanceRequired, true);
+  assert.equal(result.reporterConfirmationRequired, false);
   const delivery = api.calls.find((call) => call.pathname.endsWith("/deliver"));
   const deliveryBody = delivery?.request.body as { summary: string; deliveryKind: string };
   assert.equal(deliveryBody.deliveryKind, "code");
