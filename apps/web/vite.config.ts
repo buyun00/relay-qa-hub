@@ -147,6 +147,12 @@ function artifactDownloadPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [artifactDownloadPlugin(), react()],
+  resolve: {
+    // qrcode.react is a peer-dependency consumer. Force it and the app to use
+    // the same React module even when Windows workspace links point at two
+    // physically distinct copies of the same package.
+    dedupe: ["react", "react-dom"],
+  },
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __CONTRACT_VERSION__: JSON.stringify(contractVersion),

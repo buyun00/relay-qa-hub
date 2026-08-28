@@ -267,6 +267,16 @@ try {
     throw "Name login did not establish the browser-session notification stream: $notificationState"
   }
 
+  $qingyuOutput = & $NodeExe $smokeScript open-qingyu
+  $qingyuExitCode = $LASTEXITCODE
+  $qingyu = ($qingyuOutput | Select-Object -Last 1 | ConvertFrom-Json)
+  if ($qingyuExitCode -ne 0) {
+    throw "Packaged Qingyu import smoke failed: $($qingyu | ConvertTo-Json -Depth 20 -Compress)"
+  }
+  if (-not $qingyu.snapshot.qingyuModalVisible -or -not $qingyu.snapshot.qingyuQrVisible) {
+    throw "Packaged Qingyu import did not render its QR login dialog"
+  }
+
   $detailOutput = & $NodeExe $smokeScript open-first-bug
   if ($LASTEXITCODE -ne 0) { throw "Packaged Bug detail smoke failed" }
   $detail = ($detailOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
@@ -350,6 +360,8 @@ try {
     bugDetailLoaded = [bool]($detail.detailOpen -and -not $detail.detailLoadingVisible)
     bugDetailEditAvailable = [bool]$detail.detailEditTriggerVisible
     bugDetailEditorFieldCount = [int]$detailEditor.detailEditorFieldCount
+    qingyuImportDialogLoaded = [bool]$qingyu.snapshot.qingyuModalVisible
+    qingyuQrLoaded = [bool]$qingyu.snapshot.qingyuQrVisible
     pocoRegionVisible = [bool]$detail.pocoRegionVisible
     bugDetailErrorText = [string]$detail.detailErrorText
     evidenceImageCount = [int]$detail.evidenceImageCount

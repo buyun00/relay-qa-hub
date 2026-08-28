@@ -3,6 +3,7 @@ const ACTIONS = new Set([
   "login",
   "open-first-bug",
   "open-bug-editor",
+  "open-qingyu",
   "open-overview",
   "wait-marker",
   "wait-update-ready",
@@ -11,7 +12,7 @@ const ACTIONS = new Set([
 const action = process.argv[2] ?? "snapshot";
 if (!ACTIONS.has(action)) {
   throw new Error(
-    "action must be snapshot, login, open-first-bug, open-bug-editor, open-overview, wait-marker, wait-update-ready, or install-update",
+    "action must be snapshot, login, open-first-bug, open-bug-editor, open-qingyu, open-overview, wait-marker, wait-update-ready, or install-update",
   );
 }
 
@@ -48,9 +49,15 @@ async function connect(url) {
   });
   let sequence = 0;
   const pending = new Map();
+  const events = [];
   socket.addEventListener("message", (event) => {
     const value = JSON.parse(String(event.data));
-    if (typeof value.id !== "number") return;
+    if (typeof value.id !== "number") {
+      if (value.method === "Runtime.exceptionThrown" || value.method === "Log.entryAdded") {
+        events.push(value);
+      }
+      return;
+    }
     const waiter = pending.get(value.id);
     if (waiter === undefined) return;
     pending.delete(value.id);
@@ -64,6 +71,9 @@ async function connect(url) {
       const response = new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
       socket.send(JSON.stringify({ id, method, params }));
       return response;
+    },
+    events() {
+      return events.slice();
     },
     close() {
       socket.close();
@@ -100,6 +110,9 @@ const snapshotExpression = `
       detailEditorFieldCount: document.querySelectorAll(
         ".detail-edit-form input, .detail-edit-form textarea, .detail-edit-form select",
       ).length,
+      qingyuModalVisible: document.querySelector('.qingyu-modal[aria-label="从轻语导入 Bug"]') !== null,
+      qingyuQrVisible: document.querySelector(".qingyu-login-panel svg") !== null,
+      qingyuErrorText: document.querySelector(".qingyu-modal .error-banner")?.textContent?.trim() ?? null,
       evidenceImageCount: evidenceImages.length,
       evidenceLoadedCount: evidenceImages.filter((image) => image.complete && image.naturalWidth > 0).length,
       summaryLabels: [...document.querySelectorAll(".summary-label")].map((node) => node.textContent?.trim() ?? ""),
@@ -147,6 +160,8 @@ async function snapshot(client) {
 const page = await target();
 const client = await connect(page.webSocketDebuggerUrl);
 try {
+  await client.send("Runtime.enable");
+  await client.send("Log.enable");
   if (action === "login") {
     if (loginName.length === 0) throw new Error("QA_HUB_DESKTOP_LOGIN_NAME is required");
     const result = await client.send("Runtime.evaluate", {
@@ -237,6 +252,51 @@ try {
     process.stdout.write(`${JSON.stringify({ action, snapshot: current })}\n`);
     if (current?.detailEditorVisible !== true || current?.detailEditorFieldCount !== 6) {
       process.exitCode = 1;
+    }
+  } else if (action === "open-qingyu") {
+    const result = await client.send("Runtime.evaluate", {
+      expression: `(() => {
+        const button = [...document.querySelectorAll("button")].find(
+          (candidate) => (candidate.textContent ?? "").trim() === "从轻语导入",
+        );
+        if (!(button instanceof HTMLButtonElement)) return false;
+        button.click();
+        return true;
+      })()`,
+      returnByValue: true,
+    });
+    if (result.result?.value !== true)
+      throw new Error("desktop Qingyu import action is unavailable");
+    const deadline = Date.now() + 10_000;
+    let current;
+    do {
+      current = await snapshot(client);
+      if (
+        current?.appReady !== true ||
+        current?.qingyuQrVisible === true ||
+        current?.qingyuErrorText !== null
+      ) {
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    } while (Date.now() < deadline);
+    const diagnostics = client
+      .events()
+      .slice(-10)
+      .map((event) => ({ method: event.method, params: event.params }));
+    process.stdout.write(`${JSON.stringify({ action, snapshot: current, diagnostics })}\n`);
+    if (current?.appReady !== true || current?.qingyuModalVisible !== true) {
+      process.exitCode = 1;
+    } else {
+      await client.send("Runtime.evaluate", {
+        expression: `(() => {
+          const button = document.querySelector(".qingyu-modal .modal-head button");
+          if (!(button instanceof HTMLButtonElement)) return false;
+          button.click();
+          return true;
+        })()`,
+        returnByValue: true,
+      });
     }
   } else if (action === "open-overview") {
     const result = await client.send("Runtime.evaluate", {
