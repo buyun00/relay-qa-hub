@@ -1,11 +1,11 @@
 # Relay QA Hub 独立产品实施总计划
 
-> 文档版本：1.3
+> 文档版本：1.4
 > 制定日期：2026-08-24  
 > 目标版本：`0.1.3-debug`
 > 权威进度指针：[`../PROGRESS.md`](../PROGRESS.md)  
 > 产品事实源：QA Hub；Relay 只是可选修复执行器  
-> 轻语：不在产品、数据、认证、状态或运行链路中
+> 轻语：仅为可选服务端导入/关单适配器，不是身份或 Bug 生命周期事实源
 
 ```yaml
 qa_hub_progress:
@@ -68,6 +68,7 @@ QA Bug
 - Web 管理台通过 QA Hub API 一键交给 Relay、重试并展示自动回写的交付和构建进度。
 - 站内 Inbox/notification outbox、Electron Windows 原生通知、超时提醒和共享测试机模式；Android 系统 Push 不作为当前 MVP 门禁。
 - 追加式审计、健康检查、结构化日志、备份、隔离恢复和回滚。
+- Web/EXE 可由当前用户扫码连接轻语，幂等导入分配给自己的可处理 Bug；关联单仅在人工验收通过时先同步轻语再本地关单，任何同步失败均保留待验收。
 - Android 12/12L/15/16/17 App/Poco 矩阵和独立 HTTPS canary；Android 12/API 31 是最低支持层，Android 12L/API 32 与 Android 15/API 35 是兼容/回归层，Android 17/API 37 是默认编译/目标与行为 Gate，按 P9 真机要求执行。
 
 ### 2.2 第一版明确不做
@@ -78,7 +79,7 @@ QA Bug
 - 将 Web 做成 PWA、移动截图/离线取证客户端或 WebView 包壳。
 - 未经人工确认的语义自动合并或自动关闭。
 - 多活、多区域和跨数据中心容灾。
-- 依赖轻语账号、ID、状态、Cookie、API 或同步。
+- 让 QA Hub 的登录、人工闭环或本地 Bug 数据可用性依赖轻语；轻语不可用只能降级可选导入与关联关单同步。
 
 ### 2.3 后续候选
 
@@ -448,7 +449,7 @@ GET    /health/deps
 
 - Android App 和任何 QA Hub 浏览器绝不直接调用 Relay 4317；客户端只调用 QA Hub API，M2M 仅存在于服务端 integration worker。
 - 生产自动回写不依赖现有 UI SSE。
-- 不复用 `project_management_*` 字段或轻语完成链路。
+- 不复用 Relay 的 `project_management_*` 字段、会话或任务关联；QA Hub 的可选轻语适配器独立持有加密会话和本地关联。
 - 不向 Relay 同步大视频；Relay 只拉取被选中的图片和小型日志。
 - 新增最小、版本化、M2M 认证的 QA Integration API 和 durable Webhook Outbox。
 
@@ -1278,7 +1279,7 @@ Android 现场采集 App 与桌面 Web 都是 0.1 主工件：G3 证明真实 AP
 
 QA Hub `0.1.0-debug` 只有满足以下全部条件才算完成：
 
-- 无轻语运行时、数据、认证或状态依赖。
+- 轻语不可用时，除关联单的上游同步外，QA Hub 登录、提单、管理、修复、人工验收和本地数据均可用；轻语令牌不进入客户端或 QA 身份模型。
 - Relay 完全离线时人工闭环可用。
 - 一键交给 Relay 幂等，自动回写可靠，Relay 不可自动关闭 Bug。
 - 人工、Relay、外部三种修复模式均有真实 E2E。

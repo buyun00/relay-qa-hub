@@ -111,6 +111,13 @@ import type {
   SqliteIntegrityReport,
 } from "./sqlite.js";
 import type { CreateSqliteOnlineBackupInput, SqliteOnlineBackupResult } from "./sqlite-backup.js";
+import type {
+  GetQingyuLinkByExternalInput,
+  GetQingyuLinkInput,
+  PutQingyuLinkInput,
+  QingyuLinkRecord,
+  UpdateQingyuLinkSyncInput,
+} from "./qingyu-link-store.js";
 
 export interface SqliteStorageWorkerOptions {
   readonly databaseFile: string;
@@ -313,6 +320,28 @@ export class SqliteStorageWorker {
   }): Promise<MobileBugRecord | null> {
     await this.initialization;
     return this.request<MobileBugRecord | null>("getMobileBug", input);
+  }
+
+  async getQingyuLink(input: GetQingyuLinkInput): Promise<QingyuLinkRecord | null> {
+    await this.initialization;
+    return this.request<QingyuLinkRecord | null>("getQingyuLink", input);
+  }
+
+  async getQingyuLinkByExternal(
+    input: GetQingyuLinkByExternalInput,
+  ): Promise<QingyuLinkRecord | null> {
+    await this.initialization;
+    return this.request<QingyuLinkRecord | null>("getQingyuLinkByExternal", input);
+  }
+
+  async putQingyuLink(input: PutQingyuLinkInput): Promise<QingyuLinkRecord> {
+    await this.initialization;
+    return this.request<QingyuLinkRecord>("putQingyuLink", input);
+  }
+
+  async updateQingyuLinkSync(input: UpdateQingyuLinkSyncInput): Promise<QingyuLinkRecord> {
+    await this.initialization;
+    return this.request<QingyuLinkRecord>("updateQingyuLinkSync", input);
   }
 
   async listMobileBugs(input: ListMobileBugsInput): Promise<MobileBugList> {

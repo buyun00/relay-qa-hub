@@ -15,6 +15,8 @@ test("desktop double-click defaults to the local QA Hub debug service", () => {
   assert.equal(config.csrfOrigin, "http://127.0.0.1:4174");
   assert.equal(config.allowLoopbackHttp, true);
   assert.equal(config.allowPrivateLanHttp, false);
+  assert.equal(config.mcpEnabled, true);
+  assert.equal(config.mcpPort, 4_320);
 });
 
 test("desktop config derives the authenticated notification WSS path", () => {
@@ -93,6 +95,20 @@ test("URLs with embedded credentials or query state are rejected", () => {
   );
   assert.throws(
     () => parseDesktopConfig({ QA_HUB_DESKTOP_API_BASE_URL: "https://example.test/?token=secret" }),
+    DesktopConfigError,
+  );
+});
+
+test("MCP host is enabled on the fixed loopback port and validates overrides", () => {
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_MCP_ENABLED: "0",
+    QA_HUB_DESKTOP_MCP_PORT: "54321",
+  });
+  assert.equal(config.mcpEnabled, false);
+  assert.equal(config.mcpPort, 54_321);
+  assert.throws(() => parseDesktopConfig({ QA_HUB_DESKTOP_MCP_PORT: "0" }), DesktopConfigError);
+  assert.throws(
+    () => parseDesktopConfig({ QA_HUB_DESKTOP_MCP_PORT: "4320.5" }),
     DesktopConfigError,
   );
 });

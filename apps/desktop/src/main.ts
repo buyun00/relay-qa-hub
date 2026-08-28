@@ -27,6 +27,8 @@ import {
   fetchDurableInbox,
   proxyRendererApiRequest,
 } from "./network.js";
+import { DesktopQaHubApiClient, QaHubMcpTools } from "./mcp-api.js";
+import { QaHubMcpHttpServer, type QaHubMcpServerStatus } from "./mcp-server.js";
 import { loadDesktopRuntimeEnvironment, resolveDesktopRuntimePaths } from "./runtime-config.js";
 import { createAuthenticatedWssClient, createBrowserSessionWssClient } from "./wss-client.js";
 import { PortableUpdater, type DesktopUpdateState } from "./portable-updater.js";
@@ -52,6 +54,7 @@ let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let transport: NotificationTransport;
 let updater: PortableUpdater | null = null;
+let mcpServer: QaHubMcpHttpServer | null = null;
 let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
@@ -309,6 +312,14 @@ function statusLabel(status: TransportStatus): string {
   }
 }
 
+function mcpStatusLabel(status: QaHubMcpServerStatus | null): string {
+  if (!config.mcpEnabled) return "MCP：已禁用";
+  if (status === null || status.state === "stopped") return "MCP：未启动";
+  if (status.state === "starting") return "MCP：启动中";
+  if (status.state === "failed") return `MCP：不可用（${status.lastError ?? "启动失败"}）`;
+  return `MCP：127.0.0.1:${status.port}`;
+}
+
 function setAutoStartAtLogin(enabled: boolean): void {
   try {
     app.setLoginItemSettings({ openAtLogin: enabled, args: enabled ? ["--hidden"] : [] });
@@ -350,6 +361,7 @@ function rebuildTrayMenu(): void {
     Menu.buildFromTemplate([
       { label: "打开 QA Hub", click: openMainWindow },
       { label: statusLabel(status), enabled: false },
+      { label: mcpStatusLabel(mcpServer?.status ?? null), enabled: false },
       ...(updater === null
         ? []
         : updater.state.status === "ready"
@@ -437,6 +449,7 @@ function quitApplication(): void {
   if (quitting) return;
   quitting = true;
   transport.stop();
+  void mcpServer?.stop();
   tray?.destroy();
   tray = null;
   app.quit();
@@ -515,6 +528,7 @@ function installIpcHandlers(): void {
     return {
       apiBaseUrl: config.apiBaseUrl.origin,
       notificationsEnabled: notificationCredential() !== null,
+      mcpUrl: mcpServer?.status.state === "listening" ? mcpServer.status.url : null,
     };
   });
   ipcMain.handle("desktop:get-notifications-paused", (event) => {
@@ -600,6 +614,32 @@ async function startApplication(): Promise<void> {
   await registerAppProtocol();
   transport = createTransport();
   updater = await createUpdater();
+  if (config.mcpEnabled) {
+    const mcpTools = new QaHubMcpTools(
+      new DesktopQaHubApiClient(config, browserSession),
+      path.join(app.getPath("userData"), "mcp-attachments"),
+    );
+    mcpServer = new QaHubMcpHttpServer({
+      port: config.mcpPort,
+      tools: mcpTools,
+      serverVersion: app.getVersion(),
+      onStatus: (status) => {
+        process.stdout.write(`${JSON.stringify({ event: "desktop.mcp.status", ...status })}\n`);
+        rebuildTrayMenu();
+      },
+    });
+    try {
+      await mcpServer.start();
+    } catch (error) {
+      process.stderr.write(
+        `${JSON.stringify({
+          event: "desktop.mcp.start.failed",
+          code: error instanceof Error ? error.name : "UNKNOWN_ERROR",
+          status: mcpServer.status,
+        })}\n`,
+      );
+    }
+  }
   installIpcHandlers();
   await ensureDefaultAutoStart();
   tray = new Tray(await trayIcon());
@@ -649,6 +689,7 @@ if (!hasLock) {
     if (!quitting) {
       quitting = true;
       transport?.stop();
+      void mcpServer?.stop();
     }
   });
   app.on("window-all-closed", () => {
@@ -666,6 +707,7 @@ if (!hasLock) {
       );
       quitting = true;
       transport?.stop();
+      void mcpServer?.stop();
       app.quit();
     });
 }

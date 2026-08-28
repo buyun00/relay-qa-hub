@@ -13,6 +13,8 @@ const ALLOWED_CONFIG_KEYS = new Set([
   "allowPrivateLanHttp",
   "autoStartAtLogin",
   "startupHidden",
+  "mcpEnabled",
+  "mcpPort",
 ]);
 
 interface DesktopRuntimeFile {
@@ -25,6 +27,8 @@ interface DesktopRuntimeFile {
   readonly allowPrivateLanHttp?: boolean;
   readonly autoStartAtLogin?: boolean;
   readonly startupHidden?: boolean;
+  readonly mcpEnabled?: boolean;
+  readonly mcpPort?: number;
 }
 
 export interface DesktopRuntimePaths {
@@ -64,6 +68,14 @@ function booleanValue(value: unknown, field: string): boolean | undefined {
     throw new DesktopRuntimeConfigError(`${field} must be a boolean`);
   }
   return value;
+}
+
+function portValue(value: unknown, field: string): number | undefined {
+  if (value === undefined) return undefined;
+  if (!Number.isSafeInteger(value) || (value as number) < 1 || (value as number) > 65_535) {
+    throw new DesktopRuntimeConfigError(`${field} must be an integer from 1 through 65535`);
+  }
+  return value as number;
 }
 
 function parseRuntimeFile(filePath: string): DesktopRuntimeFile {
@@ -122,6 +134,12 @@ function parseRuntimeFile(filePath: string): DesktopRuntimeFile {
     ...(booleanValue(record["startupHidden"], "startupHidden") === undefined
       ? {}
       : { startupHidden: booleanValue(record["startupHidden"], "startupHidden") }),
+    ...(booleanValue(record["mcpEnabled"], "mcpEnabled") === undefined
+      ? {}
+      : { mcpEnabled: booleanValue(record["mcpEnabled"], "mcpEnabled") }),
+    ...(portValue(record["mcpPort"], "mcpPort") === undefined
+      ? {}
+      : { mcpPort: portValue(record["mcpPort"], "mcpPort") }),
   } as DesktopRuntimeFile;
 }
 
@@ -237,6 +255,16 @@ export function loadDesktopRuntimeEnvironment(
       env,
       "QA_HUB_DESKTOP_START_HIDDEN",
       runtime.startupHidden === undefined ? undefined : runtime.startupHidden ? "1" : "0",
+    );
+    setDefault(
+      env,
+      "QA_HUB_DESKTOP_MCP_ENABLED",
+      runtime.mcpEnabled === undefined ? undefined : runtime.mcpEnabled ? "1" : "0",
+    );
+    setDefault(
+      env,
+      "QA_HUB_DESKTOP_MCP_PORT",
+      runtime.mcpPort === undefined ? undefined : String(runtime.mcpPort),
     );
   }
   if (envText(env, "QA_HUB_DESKTOP_ACCESS_TOKEN") === null) {

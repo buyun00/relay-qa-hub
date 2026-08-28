@@ -155,6 +155,18 @@ import {
   validateMobileRelayWebhookHeaders,
   type MobileRelayWebhookStore,
 } from "./mobile-relay-webhook.js";
+import {
+  QINGYU_BUG_LINK_PATH,
+  QINGYU_DEFECTS_PATH,
+  QINGYU_IMPORT_PATH,
+  QINGYU_LOGIN_START_PATH,
+  QINGYU_LOGIN_STATUS_PATH,
+  QINGYU_LOGOUT_PATH,
+  QINGYU_PROJECTS_PATH,
+  QINGYU_SESSION_PATH,
+  type QingyuIntegration,
+} from "./qingyu-integration.js";
+import { QingyuError } from "./qingyu-client.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
 export const READY_HEALTH_PATH = "/api/v1/health/ready" as const;
@@ -215,6 +227,7 @@ export interface CreateApiAppOptions {
   readonly mobileMetricsStore?: MobileMetricsStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
+  readonly qingyuIntegration?: QingyuIntegration;
   /**
    * Opt-in compatibility for the pre-P5.4 fake callback.  Production uses
    * the normalized submitted/running/.../fix_delivered contract and leaves
@@ -494,6 +507,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileRelayWebhookStore =
     options.mobileRelayWebhookStore ?? unconfiguredMobileRelayWebhookStore;
   const relayWebhookSecret = options.relayWebhookSecret ?? "";
+  const qingyuIntegration = options.qingyuIntegration;
   const debugBearerToken = options.debugBearerToken ?? DEFAULT_DEBUG_BEARER_TOKEN;
   const debugActorId = options.debugActorId ?? DEFAULT_DEBUG_ACTOR_ID;
 
@@ -604,6 +618,104 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     { parseAs: "buffer", bodyLimit: MAX_MOBILE_CHUNK_SIZE_BYTES },
     (_request, body, done) => done(null, body),
   );
+
+  if (qingyuIntegration !== undefined) {
+    const qingyuActor = (request: FastifyRequest): string => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        throw new QingyuError(401, "UNAUTHENTICATED", "请先登录 QA Hub");
+      }
+      return authenticatedActorId(request, debugActorId);
+    };
+    const qingyuReply = async <T>(reply: FastifyReply, operation: () => Promise<T> | T) => {
+      try {
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(await operation());
+      } catch (error: unknown) {
+        if (error instanceof QingyuError) {
+          return reply
+            .code(error.status)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: error.code, message: error.message, details: error.details });
+        }
+        if (error instanceof TypeError) {
+          return reply
+            .code(400)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: "INVALID_REQUEST" });
+        }
+        throw error;
+      }
+    };
+    const boundedQingyuId = (value: unknown, label: string): string => {
+      if (typeof value !== "string" || value.trim().length < 1 || value.trim().length > 200) {
+        throw new TypeError(`${label} is invalid`);
+      }
+      return value.trim();
+    };
+    const qingyuBody = (value: unknown): Record<string, unknown> => {
+      if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        throw new TypeError("request body must be an object");
+      }
+      return value as Record<string, unknown>;
+    };
+
+    app.get(QINGYU_SESSION_PATH, async (request, reply) =>
+      qingyuReply(reply, () => qingyuIntegration.session(qingyuActor(request))),
+    );
+    app.post(QINGYU_LOGIN_START_PATH, async (request, reply) =>
+      qingyuReply(reply, () => qingyuIntegration.startLogin(qingyuActor(request))),
+    );
+    app.get(QINGYU_LOGIN_STATUS_PATH, async (request, reply) =>
+      qingyuReply(reply, () => qingyuIntegration.pollLogin(qingyuActor(request))),
+    );
+    app.post(QINGYU_LOGOUT_PATH, async (request, reply) =>
+      qingyuReply(reply, () => qingyuIntegration.logout(qingyuActor(request))),
+    );
+    app.get(QINGYU_PROJECTS_PATH, async (request, reply) =>
+      qingyuReply(reply, () => qingyuIntegration.listProjects(qingyuActor(request))),
+    );
+    app.get<{ Querystring: { readonly projectId?: string | readonly string[] } }>(
+      QINGYU_DEFECTS_PATH,
+      async (request, reply) =>
+        qingyuReply(reply, () => {
+          const value = request.query.projectId;
+          if (Array.isArray(value)) throw new TypeError("projectId must occur once");
+          return qingyuIntegration.listOwnDefects(
+            qingyuActor(request),
+            boundedQingyuId(value, "projectId"),
+          );
+        }),
+    );
+    app.post(QINGYU_IMPORT_PATH, async (request, reply) =>
+      qingyuReply(reply, () => {
+        const body = qingyuBody(request.body);
+        for (const key of Object.keys(body)) {
+          if (key !== "projectId" && key !== "defectIds") {
+            throw new TypeError(`unexpected property: ${key}`);
+          }
+        }
+        const projectId = boundedQingyuId(body["projectId"], "projectId");
+        const defectIdsValue = body["defectIds"];
+        let defectIds: readonly string[] | undefined;
+        if (defectIdsValue !== undefined) {
+          if (!Array.isArray(defectIdsValue) || defectIdsValue.length > 200) {
+            throw new TypeError("defectIds is invalid");
+          }
+          defectIds = defectIdsValue.map((value) => boundedQingyuId(value, "defectId"));
+          if (new Set(defectIds).size !== defectIds.length) {
+            throw new TypeError("defectIds must be unique");
+          }
+        }
+        return qingyuIntegration.importOwnDefects(qingyuActor(request), projectId, defectIds);
+      }),
+    );
+    app.get<{ Params: { readonly bugId: string } }>(QINGYU_BUG_LINK_PATH, async (request, reply) =>
+      qingyuReply(reply, async () => {
+        qingyuActor(request);
+        const bugId = requireVerificationUuid(request.params.bugId, "bugId");
+        return { link: await qingyuIntegration.getBugLink(bugId) };
+      }),
+    );
+  }
 
   app.get(
     LIVE_HEALTH_PATH,
@@ -1775,14 +1887,39 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         if (idempotencyKey !== expectedKey) {
           throw new TypeError("Idempotency-Key does not match Verification result");
         }
+        const actorId = authenticatedActorId(request, debugActorId);
+        if (body.status === "passed" && qingyuIntegration !== undefined) {
+          const verification = await mobileVerificationStore.getVerification({
+            actorId,
+            verificationId,
+          });
+          if (verification !== null && verification.status !== "passed") {
+            const bug = await mobileBugStore.getBug({ actorId, bugId: verification.bugId });
+            const authorized =
+              bug !== null && (verification.verifierId === actorId || bug.reporterId === actorId);
+            const active =
+              verification.status === "in_progress" &&
+              verification.version === body.expectedVersion &&
+              bug?.state === "ready_for_verification";
+            if (authorized && active) {
+              await qingyuIntegration.beforeHumanClose(actorId, verification.bugId);
+            }
+          }
+        }
         const result = await mobileVerificationStore.recordResult({
-          actorId: authenticatedActorId(request, debugActorId),
+          actorId,
           verificationId,
           idempotencyKey,
           request: body,
         });
         return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
       } catch (error: unknown) {
+        if (error instanceof QingyuError) {
+          return reply
+            .code(error.status)
+            .header("content-type", MOBILE_API_CONTENT_TYPE)
+            .send({ code: error.code, message: error.message, details: error.details });
+        }
         return buildErrorReply(error, reply);
       }
     },

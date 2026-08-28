@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 import {
   addBugComment,
@@ -21,26 +22,43 @@ import {
   getBug,
   getCaptureBundle,
   getHumanWorkflow,
+  getQingyuBugLink,
+  getQingyuSession,
+  importOwnQingyuDefects,
   listBugAttachments,
   listBugEvents,
   listBugs,
   listProjectMembers,
+  listProjectModules,
+  listOwnQingyuDefects,
+  listQingyuProjects,
   listVisibleProjects,
+  logoutQingyu,
+  pollQingyuLogin,
   QaHubApiError,
   recordVerificationFailed,
   recordVerificationPassed,
   startHumanRepairAttempt,
+  startQingyuLogin,
   startVerification,
   transitionBugReady,
   updateBugAssignments,
+  updateBugDetails,
   uploadBugCreateAttachment,
   type BrowserSessionPrincipal,
   type BugDetail,
   type BugEvent,
   type BugListItem,
+  type BugPriority,
+  type BugSeverity,
   type BugListState,
   type HumanWorkflowSnapshot,
   type ProjectMember,
+  type ProjectModule,
+  type QingyuBugLink,
+  type QingyuDefect,
+  type QingyuProject,
+  type QingyuSession,
   type VisibleProject,
 } from "./api";
 import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
@@ -62,6 +80,16 @@ interface EvidenceImage {
   readonly attachmentId: string;
   readonly filename: string;
   readonly url: string;
+}
+
+interface BugDetailDraft {
+  readonly expectedVersion: number;
+  readonly title: string;
+  readonly description: string;
+  readonly expectedBehavior: string;
+  readonly moduleId: string | null;
+  readonly severity: BugSeverity;
+  readonly priority: BugPriority;
 }
 
 interface ClipboardImageItem {
@@ -117,6 +145,39 @@ export function collectClipboardImages(
     );
   }
   return images;
+}
+
+function draftFromBug(bug: BugDetail): BugDetailDraft {
+  return {
+    expectedVersion: bug.version,
+    title: bug.title,
+    description: bug.description,
+    expectedBehavior: bug.expectedBehavior,
+    moduleId: bug.moduleId,
+    severity: bug.severity,
+    priority: bug.priority,
+  };
+}
+
+export function canSaveBugDetailDraft(
+  draft: BugDetailDraft | null,
+  bug: BugDetail | null,
+  mutation: string | null,
+  versionConflict: boolean,
+): boolean {
+  if (draft === null || bug === null || mutation !== null || versionConflict) return false;
+  const title = draft.title.trim();
+  const description = draft.description.trim();
+  const expectedBehavior = draft.expectedBehavior.trim();
+  if (title.length === 0 || description.length === 0 || expectedBehavior.length === 0) return false;
+  return (
+    title !== bug.title ||
+    description !== bug.description ||
+    expectedBehavior !== bug.expectedBehavior ||
+    draft.moduleId !== bug.moduleId ||
+    draft.severity !== bug.severity ||
+    draft.priority !== bug.priority
+  );
 }
 
 function bugContent(bug: Pick<BugListItem, "description" | "title">): string {
@@ -192,7 +253,23 @@ function formatTime(value: string): string {
 
 function messageFor(cause: unknown): string {
   if (cause instanceof QaHubApiError) {
-    if (cause.status === 409) return "数据刚刚被其他人更新，已重新读取，请再操作一次。";
+    const qingyuMessages: Readonly<Record<string, string>> = {
+      QINGYU_AUTH_REQUIRED: "轻语登录已过期，请重新扫码连接。",
+      QINGYU_LINKED_SESSION_REQUIRED: "请先用导入这条 Bug 的轻语账号扫码连接，再执行关单。",
+      QINGYU_ACCOUNT_MISMATCH: "当前轻语账号与导入 Bug 时的账号不一致，请切换账号后重试。",
+      QINGYU_RESOLVE_TRANSITION_UNAVAILABLE:
+        "轻语当前状态没有可用的“已解决”流转，或当前账号没有关单权限。",
+      QINGYU_RESOLVE_VERSION_REQUIRED: "轻语要求填写解决版本，但项目没有可用版本。",
+      QINGYU_TRANSITION_FIELD_REQUIRED: "轻语关单还缺少必填字段，QA Hub 已保留为待确认状态。",
+      QINGYU_RESOLUTION_NOT_VERIFIED: "轻语未确认 Bug 已解决，QA Hub 未执行本地关单。",
+      QINGYU_TIMEOUT: "轻语响应超时，请稍后重试。",
+      QINGYU_UNAVAILABLE: "当前无法连接轻语，请检查网络后重试。",
+      QINGYU_UPSTREAM_FAILED: "轻语拒绝了本次请求，请稍后重试或检查账号权限。",
+    };
+    const qingyuMessage = cause.code === null ? undefined : qingyuMessages[cause.code];
+    if (qingyuMessage !== undefined) return qingyuMessage;
+    if (cause.status === 409 || cause.status === 412)
+      return "数据刚刚被其他人更新，已重新读取，请再操作一次。";
     if (cause.status === 403) return "当前身份没有执行这项操作的权限。";
     return cause.code === null ? `请求失败（HTTP ${cause.status}）` : `请求失败：${cause.code}`;
   }
@@ -225,6 +302,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [projects, setProjects] = useState<readonly VisibleProject[]>([]);
   const [projectId, setProjectId] = useState(DEFAULT_PROJECT_ID);
   const [members, setMembers] = useState<readonly ProjectMember[]>([]);
+  const [modules, setModules] = useState<readonly ProjectModule[]>([]);
   const [scopeId, setScopeId] = useState(principal.userId);
   const [category, setCategory] = useState<Category>("pending");
   const [query, setQuery] = useState("");
@@ -242,6 +320,10 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [previewImage, setPreviewImage] = useState<EvidenceImage | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
+  const [editingDetail, setEditingDetail] = useState(false);
+  const [detailDraft, setDetailDraft] = useState<BugDetailDraft | null>(null);
+  const [detailEditError, setDetailEditError] = useState<string | null>(null);
+  const [detailEditVersionConflict, setDetailEditVersionConflict] = useState(false);
   const [ownerId, setOwnerId] = useState("");
   const [verifierId, setVerifierId] = useState("");
   const [comment, setComment] = useState("");
@@ -253,6 +335,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [newVerifierId, setNewVerifierId] = useState(principal.userId);
   const [newSeverity, setNewSeverity] = useState<"S0" | "S1" | "S2" | "S3" | "S4">("S2");
   const [newFiles, setNewFiles] = useState<readonly File[]>([]);
+  const [qingyuLink, setQingyuLink] = useState<QingyuBugLink | null>(null);
+  const [qingyuOpen, setQingyuOpen] = useState(false);
+  const [qingyuSession, setQingyuSession] = useState<QingyuSession | null>(null);
+  const [qingyuProjects, setQingyuProjects] = useState<readonly QingyuProject[]>([]);
+  const [qingyuProjectId, setQingyuProjectId] = useState("");
+  const [qingyuDefects, setQingyuDefects] = useState<readonly QingyuDefect[]>([]);
+  const [qingyuBusy, setQingyuBusy] = useState(false);
+  const [qingyuError, setQingyuError] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const evidenceRef = useRef<readonly EvidenceImage[]>([]);
   const workbenchRequestRef = useRef(0);
@@ -350,6 +440,131 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     [projectId, scopeId],
   );
 
+  const loadQingyuDefects = useCallback(async (externalProjectId: string) => {
+    if (externalProjectId.length === 0) {
+      setQingyuDefects([]);
+      return;
+    }
+    const response = await listOwnQingyuDefects(externalProjectId);
+    setQingyuDefects(response.defects);
+  }, []);
+
+  const loadQingyuWorkspace = useCallback(async () => {
+    const nextProjects = await listQingyuProjects();
+    setQingyuProjects(nextProjects);
+    const selected =
+      nextProjects.find((project) => project.id === qingyuProjectId) ?? nextProjects[0];
+    const selectedId = selected?.id ?? "";
+    setQingyuProjectId(selectedId);
+    await loadQingyuDefects(selectedId);
+  }, [loadQingyuDefects, qingyuProjectId]);
+
+  const openQingyuImport = async () => {
+    setQingyuOpen(true);
+    setQingyuBusy(true);
+    setQingyuError(null);
+    try {
+      let session = await getQingyuSession();
+      if (!session.authenticated && session.login === null) session = await startQingyuLogin();
+      setQingyuSession(session);
+      if (session.authenticated) await loadQingyuWorkspace();
+    } catch (cause) {
+      setQingyuError(messageFor(cause));
+    } finally {
+      setQingyuBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      !qingyuOpen ||
+      qingyuSession?.authenticated !== false ||
+      qingyuSession.login === null ||
+      qingyuSession.login.status === "expired" ||
+      qingyuSession.login.status === "cancelled"
+    ) {
+      return;
+    }
+    let disposed = false;
+    let polling = false;
+    const poll = async () => {
+      if (polling) return;
+      polling = true;
+      try {
+        const session = await pollQingyuLogin();
+        if (disposed) return;
+        setQingyuSession(session);
+        if (session.authenticated) {
+          await loadQingyuWorkspace();
+        }
+      } catch (cause) {
+        if (!disposed) setQingyuError(messageFor(cause));
+      } finally {
+        polling = false;
+      }
+    };
+    const timer = window.setInterval(() => void poll(), 1_500);
+    void poll();
+    return () => {
+      disposed = true;
+      window.clearInterval(timer);
+    };
+  }, [loadQingyuWorkspace, qingyuOpen, qingyuSession]);
+
+  const importQingyuBugs = async () => {
+    if (qingyuProjectId.length === 0) return;
+    setQingyuBusy(true);
+    setQingyuError(null);
+    try {
+      const result = await importOwnQingyuDefects(qingyuProjectId);
+      const created = result.items.filter((item) => item.status === "created").length;
+      const existing = result.items.filter((item) => item.status === "already_imported").length;
+      const terminal = result.items.filter((item) => item.status === "skipped_terminal").length;
+      const failed = result.items.filter((item) => item.status === "failed");
+      if (failed.length > 0) {
+        setQingyuError(
+          `已导入 ${created} 条，${existing} 条已存在，${terminal} 条已结束；${failed.length} 条失败：${failed[0]?.errorMessage ?? failed[0]?.errorCode ?? "未知错误"}`,
+        );
+      } else {
+        setNotice(
+          `轻语导入完成：新增 ${created} 条，已存在 ${existing} 条，已结束 ${terminal} 条。`,
+        );
+      }
+      await Promise.all([loadQingyuDefects(qingyuProjectId), loadWorkbench(true)]);
+    } catch (cause) {
+      setQingyuError(messageFor(cause));
+    } finally {
+      setQingyuBusy(false);
+    }
+  };
+
+  const disconnectQingyu = async () => {
+    setQingyuBusy(true);
+    setQingyuError(null);
+    try {
+      setQingyuSession(await logoutQingyu());
+      setQingyuProjects([]);
+      setQingyuProjectId("");
+      setQingyuDefects([]);
+    } catch (cause) {
+      setQingyuError(messageFor(cause));
+    } finally {
+      setQingyuBusy(false);
+    }
+  };
+
+  const restartQingyuLogin = async () => {
+    setQingyuBusy(true);
+    setQingyuError(null);
+    try {
+      setQingyuSession(await startQingyuLogin());
+    } catch (cause) {
+      setQingyuError(messageFor(cause));
+    } finally {
+      setQingyuBusy(false);
+    }
+  };
+
   const clearEvidence = useCallback(() => {
     for (const item of evidenceRef.current) URL.revokeObjectURL(item.url);
     evidenceRef.current = [];
@@ -362,10 +577,16 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     setDetail(null);
     setEvents([]);
     setWorkflow(null);
+    setQingyuLink(null);
     setCaptures([]);
     setDetailLoading(false);
     setDetailError(null);
+    setEditingDetail(false);
+    setDetailDraft(null);
+    setDetailEditError(null);
+    setDetailEditVersionConflict(false);
     setPreviewImage(null);
+    setModules([]);
     clearEvidence();
   }, [clearEvidence]);
 
@@ -398,15 +619,29 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         setWorkflow(null);
         clearEvidence();
         setCaptures([]);
+        setModules([]);
       }
       try {
-        const [nextDetail, eventResponse, attachmentResponse, workflowResponse] = await Promise.all(
-          [getBug(bugId), listBugEvents(bugId), listBugAttachments(bugId), getHumanWorkflow(bugId)],
-        );
+        const nextDetail = await getBug(bugId);
+        const [
+          eventResponse,
+          attachmentResponse,
+          workflowResponse,
+          moduleResponse,
+          nextQingyuLink,
+        ] = await Promise.all([
+          listBugEvents(bugId),
+          listBugAttachments(bugId),
+          getHumanWorkflow(bugId),
+          listProjectModules(nextDetail.projectId),
+          getQingyuBugLink(bugId),
+        ]);
         if (requestId !== detailRequestRef.current) return;
         setDetail(nextDetail);
         setEvents(eventResponse.items);
         setWorkflow(workflowResponse);
+        setQingyuLink(nextQingyuLink);
+        setModules(moduleResponse.items.filter((item) => item.active));
         setOwnerId(nextDetail.ownerId ?? "");
         setVerifierId(nextDetail.verificationOwnerId ?? nextDetail.reporterId);
 
@@ -556,13 +791,18 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       }
       if (event.key === "Escape") {
         if (previewImage !== null) setPreviewImage(null);
-        else closeDetail();
+        else if (editingDetail) {
+          setEditingDetail(false);
+          setDetailDraft(null);
+          setDetailEditError(null);
+          setDetailEditVersionConflict(false);
+        } else closeDetail();
         setCreateOpen(false);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [closeDetail, previewImage]);
+  }, [closeDetail, editingDetail, previewImage]);
 
   const counts = useMemo(
     () => ({
@@ -609,7 +849,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       } catch (cause) {
         setError(messageFor(cause));
         const activeBugId = selectedIdRef.current;
-        if (cause instanceof QaHubApiError && cause.status === 409 && activeBugId !== null) {
+        if (
+          cause instanceof QaHubApiError &&
+          (cause.status === 409 || cause.status === 412) &&
+          activeBugId !== null
+        ) {
           await loadDetail(activeBugId);
         }
       } finally {
@@ -624,6 +868,73 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     await runMutation("分配已更新", async () => {
       await updateBugAssignments(detail.id, detail.version, ownerId, verifierId);
     });
+  };
+
+  const beginDetailEdit = () => {
+    if (detail === null || mutation !== null) return;
+    setDetailDraft(draftFromBug(detail));
+    setDetailEditError(null);
+    setDetailEditVersionConflict(false);
+    setEditingDetail(true);
+  };
+
+  const cancelDetailEdit = () => {
+    setEditingDetail(false);
+    setDetailDraft(null);
+    setDetailEditError(null);
+    setDetailEditVersionConflict(false);
+  };
+
+  const saveBugDetail = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (
+      detail === null ||
+      detailDraft === null ||
+      !canSaveBugDetailDraft(detailDraft, detail, mutation, detailEditVersionConflict)
+    ) {
+      return;
+    }
+    setMutation("正在保存 Bug 详情…");
+    setError(null);
+    setNotice(null);
+    setDetailEditError(null);
+    try {
+      const updated = await updateBugDetails(
+        detail.id,
+        detailDraft.expectedVersion,
+        {
+          ...(detailDraft.title.trim() === detail.title ? {} : { title: detailDraft.title.trim() }),
+          ...(detailDraft.description.trim() === detail.description
+            ? {}
+            : { description: detailDraft.description.trim() }),
+          ...(detailDraft.expectedBehavior.trim() === detail.expectedBehavior
+            ? {}
+            : { expectedBehavior: detailDraft.expectedBehavior.trim() }),
+          ...(detailDraft.moduleId === detail.moduleId ? {} : { moduleId: detailDraft.moduleId }),
+          ...(detailDraft.severity === detail.severity ? {} : { severity: detailDraft.severity }),
+          ...(detailDraft.priority === detail.priority ? {} : { priority: detailDraft.priority }),
+        },
+        crypto.randomUUID(),
+      );
+      setDetail(updated);
+      cancelDetailEdit();
+      setNotice(`${updated.key} 的 Bug 详情已更新`);
+      setOverviewRevision((value) => value + 1);
+      await loadWorkbench(true);
+      if (selectedIdRef.current === updated.id) await loadDetail(updated.id);
+    } catch (cause) {
+      const conflict =
+        cause instanceof QaHubApiError && (cause.status === 409 || cause.status === 412);
+      setDetailEditVersionConflict(conflict);
+      setDetailEditError(
+        conflict
+          ? "这条 Bug 刚刚被其他人更新。你的输入尚未保存，请取消编辑后重新打开最新内容。"
+          : messageFor(cause),
+      );
+      if (conflict) await loadDetail(detail.id);
+    } finally {
+      setMutation(null);
+    }
   };
 
   const beginWork = async () => {
@@ -893,9 +1204,18 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 <h1>你好，{principal.displayName}</h1>
                 <p className="hero-copy">先完成需要你动作的 Bug，其他进度会自动留在工作台里。</p>
               </div>
-              <button className="primary-button" onClick={openCreateBug} type="button">
-                <span>＋</span> 新建 Bug
-              </button>
+              <div className="hero-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() => void openQingyuImport()}
+                  type="button"
+                >
+                  从轻语导入
+                </button>
+                <button className="primary-button" onClick={openCreateBug} type="button">
+                  <span>＋</span> 新建 Bug
+                </button>
+              </div>
             </section>
 
             {error === null ? null : <div className="banner error-banner">{error}</div>}
@@ -1084,14 +1404,189 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       </button>
                     </div>
                   )}
+                  {qingyuLink === null ? null : (
+                    <section className={`qingyu-link-card sync-${qingyuLink.syncStatus}`}>
+                      <div>
+                        <strong>
+                          轻语 Bug
+                          {qingyuLink.defectCode === null ? "" : ` · ${qingyuLink.defectCode}`}
+                        </strong>
+                        <span>
+                          {qingyuLink.syncStatus === "succeeded"
+                            ? `已同步为${qingyuLink.externalStatus ?? "已解决"}`
+                            : qingyuLink.syncStatus === "failed"
+                              ? "上次同步关单失败，本地仍保留待确认"
+                              : "确认修复并关闭时，将同步解决轻语单"}
+                        </span>
+                      </div>
+                      <a href={qingyuLink.defectUrl} rel="noreferrer" target="_blank">
+                        打开轻语原单 ↗
+                      </a>
+                      {qingyuLink.lastSyncErrorMessage === null ? null : (
+                        <small>{qingyuLink.lastSyncErrorMessage}</small>
+                      )}
+                    </section>
+                  )}
                   <section className="detail-content-card">
                     <div className="detail-content-label">
                       <strong>Bug 内容</strong>
-                      <span>
-                        {memberName(detail.reporterId)} · {formatTime(detail.createdAt)}
-                      </span>
+                      <div>
+                        <span>
+                          {memberName(detail.reporterId)} · {formatTime(detail.createdAt)}
+                        </span>
+                        {editingDetail ? null : (
+                          <button
+                            className="detail-edit-trigger"
+                            disabled={mutation !== null || detailLoading}
+                            onClick={beginDetailEdit}
+                            type="button"
+                          >
+                            编辑详情
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <p>{bugContent(detail)}</p>
+                    {editingDetail && detailDraft !== null ? (
+                      <form
+                        className="detail-edit-form"
+                        id="bug-detail-edit-form"
+                        onSubmit={(event) => void saveBugDetail(event)}
+                      >
+                        <label>
+                          <span>标题</span>
+                          <input
+                            autoFocus
+                            maxLength={300}
+                            onChange={(event) =>
+                              setDetailDraft((current) =>
+                                current === null
+                                  ? current
+                                  : { ...current, title: event.target.value },
+                              )
+                            }
+                            required
+                            value={detailDraft.title}
+                          />
+                        </label>
+                        <label>
+                          <span>问题描述</span>
+                          <textarea
+                            maxLength={20000}
+                            onChange={(event) =>
+                              setDetailDraft((current) =>
+                                current === null
+                                  ? current
+                                  : { ...current, description: event.target.value },
+                              )
+                            }
+                            required
+                            rows={6}
+                            value={detailDraft.description}
+                          />
+                        </label>
+                        <label>
+                          <span>预期行为</span>
+                          <textarea
+                            maxLength={10000}
+                            onChange={(event) =>
+                              setDetailDraft((current) =>
+                                current === null
+                                  ? current
+                                  : { ...current, expectedBehavior: event.target.value },
+                              )
+                            }
+                            required
+                            rows={3}
+                            value={detailDraft.expectedBehavior}
+                          />
+                        </label>
+                        <div className="detail-edit-selects">
+                          <label>
+                            <span>模块</span>
+                            <select
+                              onChange={(event) =>
+                                setDetailDraft((current) =>
+                                  current === null
+                                    ? current
+                                    : { ...current, moduleId: event.target.value || null },
+                                )
+                              }
+                              value={detailDraft.moduleId ?? ""}
+                            >
+                              <option value="">未设置</option>
+                              {modules.map((module) => (
+                                <option key={module.id} value={module.id}>
+                                  {module.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span>严重程度</span>
+                            <select
+                              onChange={(event) =>
+                                setDetailDraft((current) =>
+                                  current === null
+                                    ? current
+                                    : {
+                                        ...current,
+                                        severity: event.target.value as BugSeverity,
+                                      },
+                                )
+                              }
+                              value={detailDraft.severity}
+                            >
+                              {(["S0", "S1", "S2", "S3", "S4"] as const).map((value) => (
+                                <option key={value}>{value}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span>优先级</span>
+                            <select
+                              onChange={(event) =>
+                                setDetailDraft((current) =>
+                                  current === null
+                                    ? current
+                                    : {
+                                        ...current,
+                                        priority: event.target.value as BugPriority,
+                                      },
+                                )
+                              }
+                              value={detailDraft.priority}
+                            >
+                              {(["P0", "P1", "P2", "P3", "P4"] as const).map((value) => (
+                                <option key={value}>{value}</option>
+                              ))}
+                            </select>
+                          </label>
+                        </div>
+                        {detailEditError === null ? null : (
+                          <p className="detail-edit-error" role="alert">
+                            {detailEditError}
+                          </p>
+                        )}
+                      </form>
+                    ) : (
+                      <div className="detail-content-view">
+                        <h2>{detail.title}</h2>
+                        <p>{detail.description}</p>
+                        <div className="detail-expectation">
+                          <strong>预期行为</strong>
+                          <p>{detail.expectedBehavior}</p>
+                        </div>
+                        <div className="detail-facts" aria-label="Bug 分类信息">
+                          <span>严重程度 {detail.severity}</span>
+                          <span>优先级 {detail.priority}</span>
+                          <span>
+                            模块{" "}
+                            {modules.find((module) => module.id === detail.moduleId)?.name ??
+                              "未设置"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </section>
                   <section className="detail-images-card">
                     <div className="detail-section-title">
@@ -1229,133 +1724,169 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                   <PocoContextPanel captures={captures} />
                 </div>
                 <footer className="detail-actions action-stack">
-                  {detail.state !== "closed" &&
-                  (repairAttempt === null || previousAttemptFailed) &&
-                  isOwner ? (
-                    <button
-                      className="primary-button wide"
-                      disabled={mutation !== null}
-                      onClick={() => void beginWork()}
-                      type="button"
-                    >
-                      {previousAttemptFailed ? "继续处理已打回 Bug" : "开始处理"}
-                    </button>
-                  ) : null}
-                  {repairAttempt?.status === "planned" && isOwner ? (
-                    <button
-                      className="primary-button wide"
-                      disabled={mutation !== null}
-                      onClick={() =>
-                        void runMutation("已开始处理", async () => {
-                          await startHumanRepairAttempt(repairAttempt.id, repairAttempt.version);
-                        })
-                      }
-                      type="button"
-                    >
-                      开始处理
-                    </button>
-                  ) : null}
-                  {repairAttempt?.status === "running" && isOwner ? (
-                    <button
-                      className="primary-button wide"
-                      disabled={mutation !== null}
-                      onClick={() => void completeWork()}
-                      type="button"
-                    >
-                      标记修复完成
-                    </button>
-                  ) : null}
-                  {detail.state === "ready_for_verification" &&
-                  verification?.status === "requested" &&
-                  isAssignedVerifier &&
-                  !isReporter ? (
-                    <button
-                      className="primary-button wide"
-                      disabled={mutation !== null}
-                      onClick={() =>
-                        void runMutation("已开始验收，等待提报人最终确认", async () => {
-                          await startVerification(verification.id, verification.version);
-                        })
-                      }
-                      type="button"
-                    >
-                      开始验收
-                    </button>
-                  ) : null}
-                  {detail.state === "ready_for_verification" &&
-                  verification !== null &&
-                  isReporter &&
-                  (verification.status === "requested"
-                    ? isAssignedVerifier
-                    : verification.status === "in_progress") ? (
+                  {editingDetail && detailDraft !== null ? (
                     <>
-                      <label className="return-reason">
-                        <span>打回原因</span>
-                        <input
-                          maxLength={500}
-                          onChange={(event) => setReturnReason(event.target.value)}
-                          value={returnReason}
-                        />
-                      </label>
+                      <p className="action-note action-note-left">正在编辑 Bug 详情</p>
                       <button
                         className="secondary-button"
-                        disabled={mutation !== null || returnReason.trim().length === 0}
-                        onClick={() => void returnBug()}
+                        disabled={mutation !== null}
+                        onClick={cancelDetailEdit}
                         type="button"
                       >
-                        打回修复人
+                        取消
                       </button>
                       <button
                         className="primary-button wide"
-                        disabled={mutation !== null}
-                        onClick={() => void acceptBug()}
-                        type="button"
+                        disabled={
+                          !canSaveBugDetailDraft(
+                            detailDraft,
+                            detail,
+                            mutation,
+                            detailEditVersionConflict,
+                          )
+                        }
+                        form="bug-detail-edit-form"
+                        type="submit"
                       >
-                        确认修复并关闭
+                        {mutation === null ? "保存修改" : "正在保存…"}
                       </button>
                     </>
-                  ) : null}
-                  {detail.state === "ready_for_verification" &&
-                  verification?.status === "requested" &&
-                  isReporter &&
-                  !isAssignedVerifier ? (
-                    <p className="action-note">
-                      等待验收人 {memberName(verification.verifierId)}{" "}
-                      开始验收后，由你最终确认或打回。
-                    </p>
-                  ) : null}
-                  {detail.state === "ready_for_verification" &&
-                  verification?.status === "in_progress" &&
-                  isAssignedVerifier &&
-                  !isReporter ? (
-                    <p className="action-note">
-                      验收已开始，最终关闭或打回由提报人 {memberName(detail.reporterId)} 确认。
-                    </p>
-                  ) : null}
-                  {detail.state !== "closed" &&
-                  (repairAttempt === null || previousAttemptFailed) &&
-                  isOwner ? (
-                    <button
-                      className="secondary-button"
-                      disabled={mutation !== null}
-                      onClick={() => void handoffRelay()}
-                      type="button"
-                    >
-                      可选：交给 Relay
-                    </button>
-                  ) : null}
-                  {detail.state === "closed" ? (
-                    <p className="action-note action-note-left">这条 Bug 已由提报人确认完成。</p>
-                  ) : null}
-                  {detail.state !== "closed" &&
-                  detail.state !== "ready_for_verification" &&
-                  !isOwner ? (
-                    <p className="action-note action-note-left">
-                      {detail.ownerId === null
-                        ? "当前尚未分配修复人。"
-                        : `当前等待修复人 ${memberName(detail.ownerId)} 处理。`}
-                    </p>
-                  ) : null}
+                  ) : (
+                    <>
+                      {detail.state !== "closed" &&
+                      (repairAttempt === null || previousAttemptFailed) &&
+                      isOwner ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() => void beginWork()}
+                          type="button"
+                        >
+                          {previousAttemptFailed ? "继续处理已打回 Bug" : "开始处理"}
+                        </button>
+                      ) : null}
+                      {repairAttempt?.status === "planned" && isOwner ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() =>
+                            void runMutation("已开始处理", async () => {
+                              await startHumanRepairAttempt(
+                                repairAttempt.id,
+                                repairAttempt.version,
+                              );
+                            })
+                          }
+                          type="button"
+                        >
+                          开始处理
+                        </button>
+                      ) : null}
+                      {repairAttempt?.status === "running" && isOwner ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() => void completeWork()}
+                          type="button"
+                        >
+                          标记修复完成
+                        </button>
+                      ) : null}
+                      {detail.state === "ready_for_verification" &&
+                      verification?.status === "requested" &&
+                      isAssignedVerifier &&
+                      !isReporter ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() =>
+                            void runMutation("已开始验收，等待提报人最终确认", async () => {
+                              await startVerification(verification.id, verification.version);
+                            })
+                          }
+                          type="button"
+                        >
+                          开始验收
+                        </button>
+                      ) : null}
+                      {detail.state === "ready_for_verification" &&
+                      verification !== null &&
+                      isReporter &&
+                      (verification.status === "requested"
+                        ? isAssignedVerifier
+                        : verification.status === "in_progress") ? (
+                        <>
+                          <label className="return-reason">
+                            <span>打回原因</span>
+                            <input
+                              maxLength={500}
+                              onChange={(event) => setReturnReason(event.target.value)}
+                              value={returnReason}
+                            />
+                          </label>
+                          <button
+                            className="secondary-button"
+                            disabled={mutation !== null || returnReason.trim().length === 0}
+                            onClick={() => void returnBug()}
+                            type="button"
+                          >
+                            打回修复人
+                          </button>
+                          <button
+                            className="primary-button wide"
+                            disabled={mutation !== null}
+                            onClick={() => void acceptBug()}
+                            type="button"
+                          >
+                            {qingyuLink === null ? "确认修复并关闭" : "确认修复并同步关单"}
+                          </button>
+                        </>
+                      ) : null}
+                      {detail.state === "ready_for_verification" &&
+                      verification?.status === "requested" &&
+                      isReporter &&
+                      !isAssignedVerifier ? (
+                        <p className="action-note">
+                          等待验收人 {memberName(verification.verifierId)}{" "}
+                          开始验收后，由你最终确认或打回。
+                        </p>
+                      ) : null}
+                      {detail.state === "ready_for_verification" &&
+                      verification?.status === "in_progress" &&
+                      isAssignedVerifier &&
+                      !isReporter ? (
+                        <p className="action-note">
+                          验收已开始，最终关闭或打回由提报人 {memberName(detail.reporterId)} 确认。
+                        </p>
+                      ) : null}
+                      {detail.state !== "closed" &&
+                      (repairAttempt === null || previousAttemptFailed) &&
+                      isOwner ? (
+                        <button
+                          className="secondary-button"
+                          disabled={mutation !== null}
+                          onClick={() => void handoffRelay()}
+                          type="button"
+                        >
+                          可选：交给 Relay
+                        </button>
+                      ) : null}
+                      {detail.state === "closed" ? (
+                        <p className="action-note action-note-left">
+                          这条 Bug 已由提报人确认完成。
+                        </p>
+                      ) : null}
+                      {detail.state !== "closed" &&
+                      detail.state !== "ready_for_verification" &&
+                      !isOwner ? (
+                        <p className="action-note action-note-left">
+                          {detail.ownerId === null
+                            ? "当前尚未分配修复人。"
+                            : `当前等待修复人 ${memberName(detail.ownerId)} 处理。`}
+                        </p>
+                      ) : null}
+                    </>
+                  )}
                 </footer>
               </>
             )}
@@ -1380,6 +1911,163 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           </figure>
         </div>
       )}
+
+      {qingyuOpen ? (
+        <div className="modal-backdrop" role="presentation">
+          <section
+            aria-label="从轻语导入 Bug"
+            aria-modal="true"
+            className="create-modal qingyu-modal"
+            role="dialog"
+          >
+            <div className="modal-head">
+              <div>
+                <p className="eyebrow">仅导入当前轻语账号负责的单</p>
+                <h2>从轻语导入 Bug</h2>
+              </div>
+              <button onClick={() => setQingyuOpen(false)} type="button">
+                ×
+              </button>
+            </div>
+            {qingyuError === null ? null : <div className="banner error-banner">{qingyuError}</div>}
+            {qingyuSession?.authenticated ? (
+              <>
+                <div className="qingyu-connected">
+                  <div>
+                    <span>已连接轻语账号</span>
+                    <strong>{qingyuSession.user?.name ?? "未知账号"}</strong>
+                  </div>
+                  <button
+                    className="secondary-button"
+                    disabled={qingyuBusy}
+                    onClick={() => void disconnectQingyu()}
+                    type="button"
+                  >
+                    断开连接
+                  </button>
+                </div>
+                <label>
+                  轻语项目
+                  <select
+                    disabled={qingyuBusy}
+                    onChange={(event) => {
+                      const nextProjectId = event.target.value;
+                      setQingyuProjectId(nextProjectId);
+                      setQingyuBusy(true);
+                      setQingyuError(null);
+                      void loadQingyuDefects(nextProjectId)
+                        .catch((cause: unknown) => setQingyuError(messageFor(cause)))
+                        .finally(() => setQingyuBusy(false));
+                    }}
+                    value={qingyuProjectId}
+                  >
+                    {qingyuProjects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="qingyu-import-summary">
+                  <strong>我的可处理 Bug</strong>
+                  <span>
+                    {
+                      qingyuDefects.filter(
+                        (defect) => defect.actionable && defect.importedBugId === null,
+                      ).length
+                    }{" "}
+                    条待导入 ·{" "}
+                    {qingyuDefects.filter((defect) => defect.importedBugId !== null).length} 条已在
+                    QA Hub
+                  </span>
+                </div>
+                <div className="qingyu-defect-list">
+                  {qingyuBusy && qingyuDefects.length === 0 ? <p>正在读取轻语 Bug…</p> : null}
+                  {!qingyuBusy && qingyuDefects.length === 0 ? (
+                    <p>这个项目下没有分配给你的 Bug。</p>
+                  ) : null}
+                  {qingyuDefects.slice(0, 100).map((defect) => (
+                    <article
+                      className={
+                        !defect.actionable || defect.importedBugId !== null ? "is-muted" : ""
+                      }
+                      key={defect.id}
+                    >
+                      <div>
+                        <strong>
+                          {defect.code === null ? defect.title : `${defect.code} · ${defect.title}`}
+                        </strong>
+                        <span>
+                          {[defect.status, defect.priority, defect.severity]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </span>
+                      </div>
+                      <em>
+                        {defect.importedBugId !== null
+                          ? "已导入"
+                          : defect.actionable
+                            ? "待导入"
+                            : "已结束"}
+                      </em>
+                    </article>
+                  ))}
+                </div>
+                <div className="modal-actions">
+                  <button
+                    className="secondary-button"
+                    onClick={() => setQingyuOpen(false)}
+                    type="button"
+                  >
+                    取消
+                  </button>
+                  <button
+                    className="primary-button"
+                    disabled={qingyuBusy || qingyuProjectId.length === 0}
+                    onClick={() => void importQingyuBugs()}
+                    type="button"
+                  >
+                    {qingyuBusy ? "正在导入…" : "一键导入我的 Bug"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="qingyu-login-panel">
+                {qingyuSession?.login === null || qingyuSession === null ? (
+                  <p>{qingyuBusy ? "正在生成轻语二维码…" : "需要扫码连接轻语账号。"}</p>
+                ) : (
+                  <>
+                    <QRCodeSVG
+                      bgColor="#ffffff"
+                      fgColor="#15201b"
+                      level="M"
+                      marginSize={2}
+                      size={220}
+                      value={qingyuSession.login.qrContent}
+                    />
+                    <strong>
+                      {qingyuSession.login.status === "scanned"
+                        ? "已扫码，请在轻语 APP 中确认"
+                        : "请使用轻语 APP 扫码登录"}
+                    </strong>
+                    <small>
+                      二维码和登录令牌只在本机 QA Hub 宿主中处理，不会返回给其他客户端。
+                    </small>
+                  </>
+                )}
+                <button
+                  className="secondary-button"
+                  disabled={qingyuBusy}
+                  onClick={() => void restartQingyuLogin()}
+                  type="button"
+                >
+                  重新生成二维码
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
+      ) : null}
 
       {createOpen ? (
         <div className="modal-backdrop" role="presentation">

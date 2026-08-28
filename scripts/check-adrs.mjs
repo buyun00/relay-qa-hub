@@ -13,6 +13,7 @@ const adrFiles = [
   "ADR-0005-reliable-integration-messaging.md",
   "ADR-0006-authentication-rbac-and-shared-devices.md",
   "ADR-0007-app-first-android-and-poco-bridge.md",
+  "ADR-0008-optional-qingyu-adapter.md",
 ];
 
 const requiredSections = [
@@ -62,7 +63,7 @@ for (let principle = 1; principle <= 10; principle += 1) {
   }
 }
 
-for (let adr = 1; adr <= 7; adr += 1) {
+for (let adr = 1; adr <= 8; adr += 1) {
   const identifier = `ADR-${String(adr).padStart(4, "0")}`;
   if (!indexBody.includes(`[${identifier}]`)) {
     failures.push(`README.md: ${identifier} is not indexed`);

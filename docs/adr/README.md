@@ -1,6 +1,6 @@
 # Architecture decision records
 
-These accepted records freeze the P0 architecture boundary for Relay QA Hub. Later changes require a superseding ADR and a contract compatibility review; editing history in place is not sufficient.
+These accepted records freeze the P0 architecture boundary for Relay QA Hub. Later changes require a superseding ADR and a contract compatibility review; editing history in place is not sufficient. ADR-0008 supersedes only ADR-0001 decision 7 and retains every source-of-truth and human-acceptance boundary.
 
 | ADR | Decision |
 |---|---|
@@ -11,6 +11,7 @@ These accepted records freeze the P0 architecture boundary for Relay QA Hub. Lat
 | [ADR-0005](ADR-0005-reliable-integration-messaging.md) | Integration uses transactional Outbox/Inbox, signed webhooks, and reconciliation |
 | [ADR-0006](ADR-0006-authentication-rbac-and-shared-devices.md) | Authentication, project RBAC, machine scopes, and shared-device isolation are first-class |
 | [ADR-0007](ADR-0007-app-first-android-and-poco-bridge.md) | Native Android is the primary client; Web is post-MVP; Poco is a loopback-only read-only enrichment bridge |
+| [ADR-0008](ADR-0008-optional-qingyu-adapter.md) | Qingyu is an optional server-side import/close adapter and cannot replace QA Hub authority or human acceptance |
 
 ## Immutable-principle coverage
 

@@ -39,6 +39,8 @@ $config = [ordered]@{
   allowPrivateLanHttp = $isPrivateLan
   autoStartAtLogin = $true
   startupHidden = $false
+  mcpEnabled = $true
+  mcpPort = 4320
 }
 
 New-Item -ItemType Directory -Path $runtimeDirectory -Force | Out-Null

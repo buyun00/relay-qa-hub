@@ -2,6 +2,7 @@ const ACTIONS = new Set([
   "snapshot",
   "login",
   "open-first-bug",
+  "open-bug-editor",
   "open-overview",
   "wait-marker",
   "wait-update-ready",
@@ -10,7 +11,7 @@ const ACTIONS = new Set([
 const action = process.argv[2] ?? "snapshot";
 if (!ACTIONS.has(action)) {
   throw new Error(
-    "action must be snapshot, login, open-first-bug, open-overview, wait-marker, wait-update-ready, or install-update",
+    "action must be snapshot, login, open-first-bug, open-bug-editor, open-overview, wait-marker, wait-update-ready, or install-update",
   );
 }
 
@@ -94,6 +95,11 @@ const snapshotExpression = `
       detailOpen: document.querySelector(".detail-modal") !== null,
       detailLoadingVisible: document.querySelector(".detail-loading") !== null,
       detailErrorText: detailError?.textContent?.trim() ?? null,
+      detailEditTriggerVisible: document.querySelector(".detail-edit-trigger") !== null,
+      detailEditorVisible: document.querySelector(".detail-edit-form") !== null,
+      detailEditorFieldCount: document.querySelectorAll(
+        ".detail-edit-form input, .detail-edit-form textarea, .detail-edit-form select",
+      ).length,
       evidenceImageCount: evidenceImages.length,
       evidenceLoadedCount: evidenceImages.filter((image) => image.complete && image.naturalWidth > 0).length,
       summaryLabels: [...document.querySelectorAll(".summary-label")].map((node) => node.textContent?.trim() ?? ""),
@@ -208,6 +214,28 @@ try {
       current?.detailLoadingVisible === true ||
       current?.detailErrorText !== null
     ) {
+      process.exitCode = 1;
+    }
+  } else if (action === "open-bug-editor") {
+    const result = await client.send("Runtime.evaluate", {
+      expression: `(() => {
+        const button = document.querySelector(".detail-edit-trigger");
+        if (!(button instanceof HTMLButtonElement)) return false;
+        button.click();
+        return true;
+      })()`,
+      returnByValue: true,
+    });
+    if (result.result?.value !== true) throw new Error("desktop Bug detail editor is unavailable");
+    const deadline = Date.now() + 5_000;
+    let current;
+    do {
+      current = await snapshot(client);
+      if (current?.detailEditorVisible === true && current?.detailEditorFieldCount === 6) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } while (Date.now() < deadline);
+    process.stdout.write(`${JSON.stringify({ action, snapshot: current })}\n`);
+    if (current?.detailEditorVisible !== true || current?.detailEditorFieldCount !== 6) {
       process.exitCode = 1;
     }
   } else if (action === "open-overview") {

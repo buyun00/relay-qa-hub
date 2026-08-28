@@ -125,6 +125,8 @@ try {
     allowPrivateLanHttp = $true
     autoStartAtLogin = $true
     startupHidden = $false
+    mcpEnabled = $true
+    mcpPort = 4320
   }
   [IO.File]::WriteAllText(
     (Join-Path $packageDirectory "desktop-runtime.json"),

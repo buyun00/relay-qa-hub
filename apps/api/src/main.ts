@@ -48,6 +48,8 @@ import {
   startMobileRelayOutboxPump,
   type MobileRelayOutboxPump,
 } from "./mobile-relay-outbox.js";
+import { QingyuClient } from "./qingyu-client.js";
+import { createQingyuIntegration, type QingyuLinkPersistence } from "./qingyu-integration.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   accountId: "10000000-0000-4000-8000-000000000020",
@@ -213,6 +215,24 @@ function readAndroidUpdateRoot(dataRoot: string): string {
   return resolve(updateRoot);
 }
 
+function readQingyuStatePath(dataRoot: string): string {
+  const configured = process.env["QA_HUB_QINGYU_STATE_FILE"]?.trim();
+  const statePath =
+    configured === undefined ? join(dataRoot, "integrations", "qingyu-state.enc.json") : configured;
+  if (!isAbsolute(statePath)) throw new Error("QA_HUB_QINGYU_STATE_FILE must be an absolute path");
+  return resolve(statePath);
+}
+
+function readQingyuBaseUrl(): string | undefined {
+  const value = process.env["QA_HUB_QINGYU_BASE_URL"]?.trim();
+  if (value === undefined) return undefined;
+  const url = new URL(value);
+  if (url.protocol !== "https:" && url.protocol !== "http:") {
+    throw new Error("QA_HUB_QINGYU_BASE_URL must use HTTP or HTTPS");
+  }
+  return url.origin;
+}
+
 async function closeRuntime(
   server: ApiServer | undefined,
   worker: SqliteStorageWorker,
@@ -319,6 +339,58 @@ async function run(): Promise<void> {
         now: new Date().toISOString(),
       });
     }
+    const mobileBugStore = createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE });
+    const mobileAttachmentStore = createSqliteMobileAttachmentStore({
+      worker,
+      scope: MOBILE_SCOPE,
+    });
+    const qingyuLinkStore: QingyuLinkPersistence = {
+      getBugLink: (bugId: string) =>
+        worker.getQingyuLink({
+          accountId: MOBILE_SCOPE.accountId,
+          projectId: MOBILE_SCOPE.projectId,
+          bugId,
+        }),
+      getByExternal: (externalProjectId: string, defectId: string) =>
+        worker.getQingyuLinkByExternal({
+          accountId: MOBILE_SCOPE.accountId,
+          projectId: MOBILE_SCOPE.projectId,
+          externalProjectId,
+          defectId,
+        }),
+      put: (link) =>
+        worker.putQingyuLink({
+          accountId: MOBILE_SCOPE.accountId,
+          projectId: MOBILE_SCOPE.projectId,
+          link,
+          updatedAt: new Date().toISOString(),
+        }),
+      updateSync: (link, values) =>
+        worker.updateQingyuLinkSync({
+          accountId: MOBILE_SCOPE.accountId,
+          projectId: MOBILE_SCOPE.projectId,
+          bugId: link.bugId,
+          expectedVersion: link.version,
+          syncStatus: values.syncStatus,
+          syncAttempts: values.syncAttempts,
+          syncedAt: values.syncedAt,
+          externalStatus: values.externalStatus,
+          lastSyncErrorCode: values.lastSyncErrorCode,
+          lastSyncErrorMessage: values.lastSyncErrorMessage,
+          lastSyncAt: values.lastSyncAt,
+          updatedAt: new Date().toISOString(),
+        }),
+    };
+    const qingyuBaseUrl = readQingyuBaseUrl();
+    const qingyuIntegration = await createQingyuIntegration({
+      statePath: readQingyuStatePath(storage.dataRoot),
+      secret: webSessionSecret ?? debugBearerToken,
+      qaProjectId: MOBILE_SCOPE.projectId,
+      mobileBugStore,
+      mobileAttachmentStore,
+      linkStore: qingyuLinkStore,
+      client: new QingyuClient(qingyuBaseUrl === undefined ? {} : { baseUrl: qingyuBaseUrl }),
+    });
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
@@ -332,8 +404,9 @@ async function run(): Promise<void> {
           resolveEvidenceMinFreeBytes(process.env["QA_HUB_EVIDENCE_MIN_FREE_BYTES"]),
         ),
       }),
-      mobileBugStore: createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE }),
-      mobileAttachmentStore: createSqliteMobileAttachmentStore({ worker, scope: MOBILE_SCOPE }),
+      mobileBugStore,
+      mobileAttachmentStore,
+      qingyuIntegration,
       mobileBuildStore: createSqliteMobileBuildStore({ worker, scope: MOBILE_SCOPE }),
       mobileVerificationStore: createSqliteMobileVerificationStore({ worker, scope: MOBILE_SCOPE }),
       mobileHumanWorkflowStore: createSqliteMobileHumanWorkflowStore({

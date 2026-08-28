@@ -20,7 +20,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsc -p tsconfig.json && node --test test/api.test.mjs",
+    "test": "tsc -p tsconfig.json && node --test test/api.test.mjs test/qingyu-integration.test.mjs",
     "start": "node dist/main.js"
   },
   "dependencies": {

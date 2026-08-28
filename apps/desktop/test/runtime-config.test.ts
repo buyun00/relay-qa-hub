@@ -32,6 +32,8 @@ test("double-click runtime reads a per-user token file without embedding it in c
         apiBaseUrl: "http://127.0.0.1:4319",
         allowLoopbackHttp: true,
         accessTokenFile: tokenFile,
+        mcpEnabled: true,
+        mcpPort: 54320,
       }),
       "utf8",
     );
@@ -39,6 +41,8 @@ test("double-click runtime reads a per-user token file without embedding it in c
     assert.equal(env["QA_HUB_DESKTOP_API_BASE_URL"], "http://127.0.0.1:4319");
     assert.equal(env["QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP"], "1");
     assert.equal(env["QA_HUB_DESKTOP_ACCESS_TOKEN"], "main-process-only-token");
+    assert.equal(env["QA_HUB_DESKTOP_MCP_ENABLED"], "1");
+    assert.equal(env["QA_HUB_DESKTOP_MCP_PORT"], "54320");
     assert.equal(resolveDesktopRuntimePaths(env).directory, runtimeDirectory);
   });
 });

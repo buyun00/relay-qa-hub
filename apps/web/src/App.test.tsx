@@ -1,7 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import App, { canSubmitNewBug, collectClipboardImages, mergeCreateBugImages } from "./App";
+import App, {
+  canSaveBugDetailDraft,
+  canSubmitNewBug,
+  collectClipboardImages,
+  mergeCreateBugImages,
+} from "./App";
+import type { BugDetail } from "./api";
 import { product } from "./product";
 
 describe("Relay QA Hub browser workbench", () => {
@@ -30,6 +36,7 @@ describe("Relay QA Hub browser workbench", () => {
     expect(markup).not.toContain("全部 Bug · 表格视图");
     expect(markup).toContain("人员范围");
     expect(markup).toContain("新建 Bug");
+    expect(markup).toContain("从轻语导入");
     expect(markup).not.toContain("验证无效项目错误");
     expect(markup.match(/class="nav-item is-active"/gu)).toHaveLength(1);
     expect(markup.match(/aria-current="page"/gu)).toHaveLength(1);
@@ -81,5 +88,61 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canSubmitNewBug(null, "verifier-id")).toBe(true);
     expect(canSubmitNewBug("正在提交", "verifier-id")).toBe(false);
     expect(canSubmitNewBug(null, "")).toBe(false);
+  });
+
+  it("only enables detail saving for a valid changed versioned draft", () => {
+    const bug: BugDetail = {
+      id: "20000000-0000-4000-8000-000000000001",
+      projectId: "30000000-0000-4000-8000-000000000001",
+      number: 1,
+      key: "LOCAL-1",
+      title: "原始标题",
+      description: "原始问题描述",
+      expectedBehavior: "原始预期行为",
+      moduleId: null,
+      state: "reported",
+      severity: "S2",
+      priority: "P2",
+      reporterId: "10000000-0000-4000-8000-000000000001",
+      ownerId: null,
+      verificationOwnerId: "10000000-0000-4000-8000-000000000002",
+      duplicateOfBugId: null,
+      occurrenceCount: 1,
+      reopenCount: 0,
+      version: 7,
+      createdAt: "2026-08-28T00:00:00.000Z",
+      updatedAt: "2026-08-28T00:00:00.000Z",
+      closedAt: null,
+    };
+    const unchangedDraft = {
+      expectedVersion: bug.version,
+      title: bug.title,
+      description: bug.description,
+      expectedBehavior: bug.expectedBehavior,
+      moduleId: bug.moduleId,
+      severity: bug.severity,
+      priority: bug.priority,
+    };
+
+    expect(canSaveBugDetailDraft(unchangedDraft, bug, null, false)).toBe(false);
+    expect(
+      canSaveBugDetailDraft(
+        { ...unchangedDraft, description: "补充后的问题描述" },
+        bug,
+        null,
+        false,
+      ),
+    ).toBe(true);
+    expect(
+      canSaveBugDetailDraft(
+        { ...unchangedDraft, description: "补充后的问题描述" },
+        bug,
+        null,
+        true,
+      ),
+    ).toBe(false);
+    expect(canSaveBugDetailDraft({ ...unchangedDraft, title: "   " }, bug, null, false)).toBe(
+      false,
+    );
   });
 });

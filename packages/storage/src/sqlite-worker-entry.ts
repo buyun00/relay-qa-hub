@@ -82,6 +82,16 @@ import {
   type RevokeBrowserSessionInput,
 } from "./browser-auth-store.js";
 import {
+  getQingyuLink,
+  getQingyuLinkByExternal,
+  putQingyuLink,
+  updateQingyuLinkSync,
+  type GetQingyuLinkByExternalInput,
+  type GetQingyuLinkInput,
+  type PutQingyuLinkInput,
+  type UpdateQingyuLinkSyncInput,
+} from "./qingyu-link-store.js";
+import {
   claimMobileRelayOutbox,
   completeMobileRelayOutbox,
   continueMobileRelay,
@@ -157,6 +167,10 @@ interface WorkerRequest {
     | "revokeBrowserSession"
     | "createMobileBug"
     | "getMobileBug"
+    | "getQingyuLink"
+    | "getQingyuLinkByExternal"
+    | "putQingyuLink"
+    | "updateQingyuLinkSync"
     | "listMobileBugs"
     | "getMobileMetricsOverview"
     | "listMobileVisibleProjects"
@@ -355,6 +369,29 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       readonly bugId: string;
     };
     return getMobileBug(requireDatabase(), payload, payload.bugId);
+  }
+
+  if (request.operation === "getQingyuLink") {
+    return getQingyuLink(requireDatabase(), request.payload as GetQingyuLinkInput);
+  }
+
+  if (request.operation === "getQingyuLinkByExternal") {
+    return getQingyuLinkByExternal(
+      requireDatabase(),
+      request.payload as GetQingyuLinkByExternalInput,
+    );
+  }
+
+  if (request.operation === "putQingyuLink") {
+    return inWriteTransaction((current) =>
+      putQingyuLink(current, request.payload as PutQingyuLinkInput),
+    );
+  }
+
+  if (request.operation === "updateQingyuLinkSync") {
+    return inWriteTransaction((current) =>
+      updateQingyuLinkSync(current, request.payload as UpdateQingyuLinkSyncInput),
+    );
   }
 
   if (request.operation === "listMobileBugs") {

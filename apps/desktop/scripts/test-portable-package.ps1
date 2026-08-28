@@ -33,12 +33,36 @@ if ([string]::IsNullOrWhiteSpace($NodeExe) -or -not (Test-Path -LiteralPath $Nod
 if ([string]::IsNullOrWhiteSpace($LoginName) -or $LoginName.Length -gt 100 -or $LoginName -match '[\x00-\x1f\x7f]') {
   throw "LoginName must contain 1 to 100 visible characters"
 }
+
+function Invoke-QAHubMcpRequest {
+  param(
+    [Parameter(Mandatory = $true)][int]$Id,
+    [Parameter(Mandatory = $true)][string]$Method,
+    [Parameter(Mandatory = $true)]$Params
+  )
+  $body = [ordered]@{
+    jsonrpc = "2.0"
+    id = $Id
+    method = $Method
+    params = $Params
+  } | ConvertTo-Json -Depth 20 -Compress
+  Invoke-RestMethod `
+    -Uri "http://127.0.0.1:4320/mcp" `
+    -Method Post `
+    -ContentType "application/json" `
+    -Body $body `
+    -TimeoutSec 10
+}
+
 $archiveEntries = @(& $NodeExe $asarCli list $asarArchive)
 if ($LASTEXITCODE -ne 0 -or $archiveEntries -notcontains "\assets\RelayQaHub.ico") {
   throw "Portable package does not contain the branded Windows tray icon"
 }
 if (Get-NetTCPConnection -State Listen -LocalPort 9333 -ErrorAction SilentlyContinue) {
   throw "CDP smoke port 9333 is already in use"
+}
+if (Get-NetTCPConnection -State Listen -LocalPort 4320 -ErrorAction SilentlyContinue) {
+  throw "MCP smoke port 4320 is already in use"
 }
 $existingPackageProcesses = @(
   Get-CimInstance Win32_Process -Filter "Name='RelayQaHub.exe'" |
@@ -49,6 +73,19 @@ $existingPackageProcesses = @(
 )
 if ($existingPackageProcesses.Count -gt 0) {
   throw "The packaged RelayQaHub is already running"
+}
+
+$startupRunKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+$startupSnapshot = @{}
+foreach ($startupName in @("com.relayqahub.desktop", "Relay QA Hub")) {
+  try {
+    $startupSnapshot[$startupName] = [pscustomobject]@{
+      present = $true
+      value = Get-ItemPropertyValue -LiteralPath $startupRunKey -Name $startupName -ErrorAction Stop
+    }
+  } catch {
+    $startupSnapshot[$startupName] = [pscustomobject]@{ present = $false; value = $null }
+  }
 }
 
 $smokeLeaf = "relay-qa-hub-portable-smoke-$([Guid]::NewGuid().ToString('N'))"
@@ -109,6 +146,55 @@ try {
     throw "Packaged fresh-profile renderer did not become ready"
   }
 
+  $mcpReady = $false
+  $mcpDeadline = [DateTime]::UtcNow.AddSeconds(10)
+  while ([DateTime]::UtcNow -lt $mcpDeadline) {
+    try {
+      $mcpHealth = Invoke-RestMethod -Uri "http://127.0.0.1:4320/health" -TimeoutSec 2
+      if ($mcpHealth.status -eq "ready") {
+        $mcpReady = $true
+        break
+      }
+    } catch {
+      Start-Sleep -Milliseconds 200
+    }
+  }
+  if (-not $mcpReady) {
+    throw "Packaged EXE MCP endpoint did not become ready"
+  }
+  $mcpInitialize = Invoke-QAHubMcpRequest `
+    -Id 1 `
+    -Method "initialize" `
+    -Params ([ordered]@{
+      protocolVersion = "2025-06-18"
+      capabilities = [ordered]@{}
+      clientInfo = [ordered]@{ name = "qa-hub-package-smoke"; version = "1" }
+    })
+  if ($mcpInitialize.result.serverInfo.name -ne "relay-qa-hub-desktop") {
+    throw "Packaged EXE MCP initialization returned the wrong server identity"
+  }
+  $mcpTools = Invoke-QAHubMcpRequest -Id 2 -Method "tools/list" -Params ([ordered]@{})
+  $expectedMcpTools = @(
+    "qa_list_projects",
+    "qa_list_bugs",
+    "qa_get_bug_context",
+    "qa_materialize_attachment",
+    "qa_begin_fix",
+    "qa_add_comment",
+    "qa_submit_fix"
+  )
+  if ((@($mcpTools.result.tools.name) -join "|") -ne ($expectedMcpTools -join "|")) {
+    throw "Packaged EXE MCP tool list is incomplete"
+  }
+  $mcpSignedOut = Invoke-QAHubMcpRequest `
+    -Id 3 `
+    -Method "tools/call" `
+    -Params ([ordered]@{ name = "qa_list_projects"; arguments = [ordered]@{} })
+  if (-not $mcpSignedOut.result.isError -or
+      [string]$mcpSignedOut.result.content[0].text -notmatch 'QA_HUB_LOGIN_REQUIRED') {
+    throw "Packaged EXE MCP did not fail closed before browser login"
+  }
+
   $snapshotOutput = & $NodeExe $smokeScript snapshot
   if ($LASTEXITCODE -ne 0) { throw "Packaged signed-out snapshot failed" }
   $snapshot = ($snapshotOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
@@ -125,6 +211,41 @@ try {
   $login = ($loginOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
   if (-not $login.appReady) {
     throw "Portable package login did not load the QA Hub workbench"
+  }
+  $mcpSignedIn = Invoke-QAHubMcpRequest `
+    -Id 4 `
+    -Method "tools/call" `
+    -Params ([ordered]@{ name = "qa_list_projects"; arguments = [ordered]@{} })
+  if ($mcpSignedIn.result.isError -or
+      [string]$mcpSignedIn.result.content[0].text -notmatch 'projects') {
+    throw "Packaged EXE MCP did not reuse the browser login session"
+  }
+  $mcpBugList = Invoke-QAHubMcpRequest `
+    -Id 5 `
+    -Method "tools/call" `
+    -Params ([ordered]@{
+      name = "qa_list_bugs"
+      arguments = [ordered]@{ limit = 5 }
+    })
+  if ($mcpBugList.result.isError -or $null -eq $mcpBugList.result.structuredContent.items) {
+    throw "Packaged EXE MCP could not read the current Bug list"
+  }
+  $mcpBugReadCount = @($mcpBugList.result.structuredContent.items).Count
+  $mcpContextReadSucceeded = $false
+  if ($mcpBugReadCount -gt 0) {
+    $mcpBugId = [string]$mcpBugList.result.structuredContent.items[0].id
+    $mcpBugContext = Invoke-QAHubMcpRequest `
+      -Id 6 `
+      -Method "tools/call" `
+      -Params ([ordered]@{
+        name = "qa_get_bug_context"
+        arguments = [ordered]@{ bugId = $mcpBugId }
+      })
+    if ($mcpBugContext.result.isError -or
+        [string]$mcpBugContext.result.structuredContent.bug.id -ne $mcpBugId) {
+      throw "Packaged EXE MCP could not read complete context for a current Bug"
+    }
+    $mcpContextReadSucceeded = $true
   }
   if ($login.workbenchLoading -or -not [string]::IsNullOrWhiteSpace([string]$login.workbenchErrorText)) {
     throw "Portable package login reached the shell but the real workbench API did not load"
@@ -155,6 +276,15 @@ try {
   }
   if (-not $detail.pocoRegionVisible -or [string]::IsNullOrWhiteSpace([string]$detail.pocoRegionText)) {
     throw "Packaged Bug detail did not keep a visible Poco context region"
+  }
+  if (-not $detail.detailEditTriggerVisible) {
+    throw "Packaged Bug detail does not expose manual editing"
+  }
+  $detailEditorOutput = & $NodeExe $smokeScript open-bug-editor
+  if ($LASTEXITCODE -ne 0) { throw "Packaged Bug detail editor smoke failed" }
+  $detailEditor = ($detailEditorOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
+  if (-not $detailEditor.detailEditorVisible -or [int]$detailEditor.detailEditorFieldCount -ne 6) {
+    throw "Packaged Bug detail editor does not expose all editable fields"
   }
 
   $overviewOutput = & $NodeExe $smokeScript open-overview
@@ -206,12 +336,20 @@ try {
     apiUnavailableBeforeLogin = [bool]$snapshot.authUnavailable
     notificationsCredentialState = [string]$snapshot.desktopConnection.state
     notificationsAfterLogin = $notificationState
+    mcpReady = $mcpReady
+    mcpToolCount = @($mcpTools.result.tools).Count
+    mcpSignedOutFailedClosed = [bool]$mcpSignedOut.result.isError
+    mcpSignedInReadSucceeded = -not [bool]$mcpSignedIn.result.isError
+    mcpBugReadCount = $mcpBugReadCount
+    mcpContextReadSucceeded = $mcpContextReadSucceeded
     nameLoginSucceeded = [bool]$login.appReady
     summaryLabels = @($login.summaryLabels) -join ", "
     bugRowCount = [int]$login.bugRowCount
     workbenchEmpty = [bool]$login.workbenchEmpty
     workbenchErrorText = [string]$login.workbenchErrorText
     bugDetailLoaded = [bool]($detail.detailOpen -and -not $detail.detailLoadingVisible)
+    bugDetailEditAvailable = [bool]$detail.detailEditTriggerVisible
+    bugDetailEditorFieldCount = [int]$detailEditor.detailEditorFieldCount
     pocoRegionVisible = [bool]$detail.pocoRegionVisible
     bugDetailErrorText = [string]$detail.detailErrorText
     evidenceImageCount = [int]$detail.evidenceImageCount
@@ -253,6 +391,21 @@ try {
     [DateTime]::UtcNow -lt $deadline
   ) {
     Start-Sleep -Milliseconds 100
+  }
+  foreach ($startupName in $startupSnapshot.Keys) {
+    $startupEntry = $startupSnapshot[$startupName]
+    if ($startupEntry.present) {
+      Set-ItemProperty `
+        -LiteralPath $startupRunKey `
+        -Name $startupName `
+        -Value ([string]$startupEntry.value)
+    } else {
+      Remove-ItemProperty `
+        -LiteralPath $startupRunKey `
+        -Name $startupName `
+        -Force `
+        -ErrorAction SilentlyContinue
+    }
   }
   if (Test-Path -LiteralPath $smokeRoot) {
     $resolvedSmokeRoot = (Resolve-Path -LiteralPath $smokeRoot).Path

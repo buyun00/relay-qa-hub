@@ -6972,6 +6972,43 @@ function multiActorHumanWorkflowSql(): string {
 
 const MULTI_ACTOR_HUMAN_WORKFLOW_SQL = multiActorHumanWorkflowSql();
 
+const QINGYU_BUG_LINK_SCHEMA_SQL = String.raw`
+CREATE TABLE qingyu_bug_links (
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  bug_id TEXT NOT NULL CHECK (length(bug_id) = 36),
+  external_project_id TEXT NOT NULL CHECK (length(external_project_id) BETWEEN 1 AND 200),
+  defect_id TEXT NOT NULL CHECK (length(defect_id) BETWEEN 1 AND 200),
+  defect_code TEXT CHECK (defect_code IS NULL OR length(defect_code) BETWEEN 1 AND 200),
+  defect_title TEXT NOT NULL CHECK (length(defect_title) BETWEEN 1 AND 300),
+  defect_url TEXT NOT NULL CHECK (length(defect_url) BETWEEN 1 AND 2000),
+  imported_by_actor_id TEXT NOT NULL CHECK (length(imported_by_actor_id) = 36),
+  qingyu_user_id TEXT NOT NULL CHECK (length(qingyu_user_id) BETWEEN 1 AND 200),
+  qingyu_user_name TEXT NOT NULL CHECK (length(qingyu_user_name) BETWEEN 1 AND 200),
+  imported_at TEXT NOT NULL CHECK (length(imported_at) >= 20),
+  sync_status TEXT NOT NULL CHECK (sync_status IN ('not_synced', 'syncing', 'succeeded', 'failed')),
+  sync_attempts INTEGER NOT NULL DEFAULT 0 CHECK (sync_attempts >= 0),
+  synced_at TEXT,
+  external_status TEXT CHECK (external_status IS NULL OR length(external_status) <= 200),
+  last_sync_error_code TEXT CHECK (last_sync_error_code IS NULL OR length(last_sync_error_code) <= 200),
+  last_sync_error_message TEXT CHECK (last_sync_error_message IS NULL OR length(last_sync_error_message) <= 2000),
+  last_sync_at TEXT,
+  updated_at TEXT NOT NULL CHECK (length(updated_at) >= 20 AND updated_at >= imported_at),
+  version INTEGER NOT NULL CHECK (version >= 1),
+  PRIMARY KEY (account_id, project_id, bug_id),
+  FOREIGN KEY (account_id, project_id, bug_id)
+    REFERENCES bugs(account_id, project_id, id) ON DELETE CASCADE,
+  FOREIGN KEY (account_id, imported_by_actor_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, project_id, external_project_id, defect_id),
+  CHECK ((sync_status = 'succeeded') = (synced_at IS NOT NULL)),
+  CHECK (last_sync_at IS NULL OR last_sync_at >= imported_at)
+) STRICT;
+
+CREATE INDEX qingyu_bug_links_importer_idx
+  ON qingyu_bug_links(account_id, project_id, imported_by_actor_id, imported_at DESC);
+`;
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -6988,6 +7025,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(3, "domain_audit_alignment", DOMAIN_AUDIT_ALIGNMENT_SQL),
   migration(4, "browser_sessions", BROWSER_SESSION_SCHEMA_SQL),
   migration(5, "multi_actor_human_workflow", MULTI_ACTOR_HUMAN_WORKFLOW_SQL),
+  migration(6, "qingyu_bug_links", QINGYU_BUG_LINK_SCHEMA_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

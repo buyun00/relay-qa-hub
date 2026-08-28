@@ -21,6 +21,8 @@ export interface DesktopConfig {
   readonly allowLoopbackHttp: boolean;
   readonly allowPrivateLanHttp: boolean;
   readonly startupHidden: boolean;
+  readonly mcpEnabled: boolean;
+  readonly mcpPort: number;
 }
 
 export class DesktopConfigError extends Error {
@@ -39,6 +41,19 @@ function parseBoolean(env: NodeJS.ProcessEnv, name: string, fallback: boolean): 
   const value = envValue(env, name);
   if (value === null) return fallback;
   return TRUE_VALUES.has(value.toLowerCase());
+}
+
+function parsePort(env: NodeJS.ProcessEnv, name: string, fallback: number): number {
+  const value = envValue(env, name);
+  if (value === null) return fallback;
+  if (!/^\d+$/u.test(value)) {
+    throw new DesktopConfigError(`${name} must be an integer from 1 through 65535`);
+  }
+  const port = Number(value);
+  if (!Number.isSafeInteger(port) || port < 1 || port > 65_535) {
+    throw new DesktopConfigError(`${name} must be an integer from 1 through 65535`);
+  }
+  return port;
 }
 
 function parseUrl(value: string, name: string): URL {
@@ -200,6 +215,8 @@ export function parseDesktopConfig(
     allowLoopbackHttp,
     allowPrivateLanHttp,
     startupHidden: parseBoolean(env, "QA_HUB_DESKTOP_START_HIDDEN", false),
+    mcpEnabled: parseBoolean(env, "QA_HUB_DESKTOP_MCP_ENABLED", true),
+    mcpPort: parsePort(env, "QA_HUB_DESKTOP_MCP_PORT", 4_320),
   };
 }
 

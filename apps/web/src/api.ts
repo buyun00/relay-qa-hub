@@ -18,6 +18,76 @@ export interface BrowserSessionPrincipal {
   readonly csrfToken: string;
 }
 
+export interface QingyuUser {
+  readonly id: string;
+  readonly name: string;
+  readonly avatar: string | null;
+}
+
+export interface QingyuSession {
+  readonly authenticated: boolean;
+  readonly user: QingyuUser | null;
+  readonly login: {
+    readonly status: "pending" | "scanned" | "expired" | "cancelled" | "error";
+    readonly qrContent: string;
+    readonly expiresAt: string;
+  } | null;
+}
+
+export interface QingyuProject {
+  readonly id: string;
+  readonly name: string;
+}
+
+export interface QingyuDefect {
+  readonly id: string;
+  readonly code: string | null;
+  readonly title: string;
+  readonly description: string;
+  readonly steps: readonly string[];
+  readonly actualBehavior: string;
+  readonly expectedBehavior: string;
+  readonly status: string | null;
+  readonly statusKey: string | null;
+  readonly priority: string | null;
+  readonly severity: string | null;
+  readonly assignee: string | null;
+  readonly updatedAt: string | null;
+  readonly images: readonly string[];
+  readonly url: string;
+  readonly actionable: boolean;
+  readonly importedBugId: string | null;
+}
+
+export interface QingyuBugLink {
+  readonly bugId: string;
+  readonly externalProjectId: string;
+  readonly defectId: string;
+  readonly defectCode: string | null;
+  readonly defectTitle: string;
+  readonly defectUrl: string;
+  readonly qingyuUserName: string;
+  readonly importedAt: string;
+  readonly syncStatus: "not_synced" | "syncing" | "succeeded" | "failed";
+  readonly syncAttempts: number;
+  readonly syncedAt: string | null;
+  readonly externalStatus: string | null;
+  readonly lastSyncErrorCode: string | null;
+  readonly lastSyncErrorMessage: string | null;
+  readonly lastSyncAt: string | null;
+}
+
+export interface QingyuImportResult {
+  readonly items: readonly {
+    readonly defectId: string;
+    readonly status: "created" | "already_imported" | "skipped_terminal" | "failed";
+    readonly bug: BugDetail | null;
+    readonly skippedImages: number;
+    readonly errorCode: string | null;
+    readonly errorMessage: string | null;
+  }[];
+}
+
 let browserCsrfToken: string | null = null;
 
 export function setBrowserCsrfToken(value: string | null): void {
@@ -156,6 +226,15 @@ export interface BugDetail extends BugListItem {
   readonly version: number;
   readonly createdAt: string;
   readonly closedAt: string | null;
+}
+
+export interface UpdateBugDetailsInput {
+  readonly title?: string;
+  readonly description?: string;
+  readonly expectedBehavior?: string;
+  readonly moduleId?: string | null;
+  readonly severity?: BugSeverity;
+  readonly priority?: BugPriority;
 }
 
 export interface AttachmentMetadata {
@@ -1018,6 +1097,23 @@ export async function updateBugAssignments(
   return requireRecord(body, "BUG") as unknown as BugDetail;
 }
 
+export async function updateBugDetails(
+  bugId: string,
+  expectedVersion: number,
+  input: UpdateBugDetailsInput,
+  clientMutationId: string,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `web:updateBugDetails:bug:${bugId}:v${expectedVersion}:${clientMutationId}`,
+    },
+    body: JSON.stringify({ expectedVersion, ...input }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
 export async function createBug(input: CreateBugInput): Promise<CreateBugResponse> {
   const body = await requestJson("/api/v1/bugs", {
     method: "POST",
@@ -1538,4 +1634,58 @@ export async function recordVerificationFailed(
     },
   );
   return requireRecord(body, "VERIFICATION_RESULT") as unknown as VerificationResultResponse;
+}
+
+export async function getQingyuSession(): Promise<QingyuSession> {
+  return (await requestJson("/api/v1/integrations/qingyu/session")) as QingyuSession;
+}
+
+export async function startQingyuLogin(): Promise<QingyuSession> {
+  return (await requestJson("/api/v1/integrations/qingyu/login/start", {
+    method: "POST",
+  })) as QingyuSession;
+}
+
+export async function pollQingyuLogin(): Promise<QingyuSession> {
+  return (await requestJson("/api/v1/integrations/qingyu/login/status")) as QingyuSession;
+}
+
+export async function logoutQingyu(): Promise<QingyuSession> {
+  return (await requestJson("/api/v1/integrations/qingyu/logout", {
+    method: "POST",
+  })) as QingyuSession;
+}
+
+export async function listQingyuProjects(): Promise<readonly QingyuProject[]> {
+  return (await requestJson("/api/v1/integrations/qingyu/projects")) as readonly QingyuProject[];
+}
+
+export async function listOwnQingyuDefects(
+  externalProjectId: string,
+): Promise<{ readonly defects: readonly QingyuDefect[]; readonly total: number }> {
+  return (await requestJson(
+    `/api/v1/integrations/qingyu/defects?projectId=${encodeURIComponent(externalProjectId)}`,
+  )) as { readonly defects: readonly QingyuDefect[]; readonly total: number };
+}
+
+export async function importOwnQingyuDefects(
+  externalProjectId: string,
+  defectIds?: readonly string[],
+): Promise<QingyuImportResult> {
+  return (await requestJson("/api/v1/integrations/qingyu/import", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      projectId: externalProjectId,
+      ...(defectIds === undefined ? {} : { defectIds }),
+    }),
+  })) as QingyuImportResult;
+}
+
+export async function getQingyuBugLink(bugId: string): Promise<QingyuBugLink | null> {
+  const body = requireRecord(
+    await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/integrations/qingyu`),
+    "QINGYU_BUG_LINK",
+  );
+  return (body["link"] ?? null) as QingyuBugLink | null;
 }

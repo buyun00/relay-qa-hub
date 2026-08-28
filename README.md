@@ -9,7 +9,8 @@ The authoritative implementation plan is [`docs/IMPLEMENTATION_PLAN.md`](docs/IM
 - Source: `D:\Relay-QA-Hub`
 - Persistent runtime data: `D:\Relay-QA-Hub-Data` (configurable and outside the repository)
 - Relay source/runtime/data: separate and never imported, shared, or used as the QA Hub database or attachment store
-- Qingyu: no runtime, data, authentication, state, or synchronization dependency
+- Qingyu: optional server-side import and close synchronization only; QA Hub does
+  not share Qingyu runtime or storage and remains the Bug lifecycle source of truth
 
 Runtime binaries and reproducible local commands are recorded in [`docs/RUNTIME_PATHS.md`](docs/RUNTIME_PATHS.md).
 
@@ -97,6 +98,27 @@ filters, including a one-click `未分配` view. Every row can be claimed by the
 current fixer or assigned/unassigned directly. New Bugs start with no fixer in
 both Web/EXE and Android; the verifier still defaults to the signed-in person.
 
+### Optional Qingyu import and close synchronization
+
+The Web and EXE workbench has a `从轻语导入` action. It starts Qingyu's QR login
+through the QA Hub API, lists only actionable Bug tasks assigned to the signed-in
+Qingyu account, refreshes every selected task detail, and imports them
+idempotently into the current QA Hub project. Qingyu access tokens never reach
+the browser or EXE page; the API stores them in an encrypted server-side state
+file under the active data root. Imported source links and close-sync results are
+stored in SQLite and are therefore included in normal recovery points.
+
+For a linked Bug, a human `确认修复并同步关单` first transitions the original
+Qingyu task to resolved and verifies that remote state, then records the local
+passed Verification. A Qingyu error leaves the QA Hub Verification pending so it
+can be retried safely. MCP and Relay delivery can still reach only `待验收`; they
+cannot trigger either local acceptance or Qingyu closure.
+
+The default Qingyu endpoint is `https://50qweb.jiaxianghudong.com`. Server
+operators may override it with `QA_HUB_QINGYU_BASE_URL`. The encrypted session
+file defaults to `<QA_HUB_DATA_ROOT>\integrations\qingyu-state.enc.json`; an
+absolute `QA_HUB_QINGYU_STATE_FILE` may override that location.
+
 For captures carrying Poco enrichment, the detail downloads both
 `poco_snapshot` and `poco_hierarchy`. It identifies visible `UIForm`/page
 instances, shows a bounded child hierarchy with runtime text, image/texture
@@ -155,6 +177,13 @@ Closing the window hides it to the tray and keeps the authenticated WSS/Inbox
 notification transport running. Use the tray's `退出 QA Hub` command to stop it.
 The first normal launch enables `登录时启动`; users can turn it off again from
 the tray and later releases do not overwrite that explicit choice.
+
+While the signed-in EXE is running it also hosts a loopback-only Streamable HTTP
+MCP endpoint at `http://127.0.0.1:4320/mcp`. Local AI editors can read Bug
+context and attachments, begin a RepairAttempt, and submit a tested Git delivery.
+The MCP deliberately cannot accept or close a Bug; exact-Build evidence and
+human verification remain authoritative. Setup and tool details are in
+[`docs/EXE-MCP.md`](docs/EXE-MCP.md).
 
 To publish a new signed Windows release on the QA Hub server computer:
 
