@@ -108,15 +108,31 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 12px;
+  color: #526159;
+  background: transparent;
+  box-shadow: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.nav-item:hover {
+  color: var(--forest);
+  background: #f1f5ef;
+}
+.nav-item.is-active {
   color: #fff;
   background: var(--forest);
   box-shadow: 0 10px 24px rgba(23, 43, 33, 0.14);
-  font-weight: 700;
-  cursor: pointer;
 }
 .nav-icon {
-  color: var(--lime);
+  color: #78904c;
   font-size: 19px;
+}
+.nav-item.is-active .nav-icon {
+  color: var(--lime);
 }
 .nav-count {
   margin-left: auto;
@@ -124,9 +140,12 @@ button:disabled {
   padding: 3px 7px;
   border-radius: 9px;
   color: var(--forest);
-  background: var(--lime);
+  background: #e9f3d9;
   font-size: 11px;
   text-align: center;
+}
+.nav-item.is-active .nav-count {
+  background: var(--lime);
 }
 .sidebar-note {
   margin-top: auto;

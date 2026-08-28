@@ -31,6 +31,8 @@ describe("Relay QA Hub browser workbench", () => {
     expect(markup).toContain("人员范围");
     expect(markup).toContain("新建 Bug");
     expect(markup).not.toContain("验证无效项目错误");
+    expect(markup.match(/class="nav-item is-active"/gu)).toHaveLength(1);
+    expect(markup.match(/aria-current="page"/gu)).toHaveLength(1);
   });
 
   it("exposes the build and frozen contract versions", () => {

@@ -197,6 +197,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const evidenceRef = useRef<readonly EvidenceImage[]>([]);
   const workbenchRequestRef = useRef(0);
   const detailRequestRef = useRef(0);
+  const detailBugIdRef = useRef<string | null>(null);
+  const selectedIdRef = useRef<string | null>(null);
   const [overviewRevision, setOverviewRevision] = useState(0);
 
   const currentProject = projects.find((project) => project.id === projectId) ?? null;
@@ -274,17 +276,49 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     setEvidence([]);
   }, []);
 
+  const resetDetail = useCallback(() => {
+    detailRequestRef.current += 1;
+    detailBugIdRef.current = null;
+    setDetail(null);
+    setEvents([]);
+    setWorkflow(null);
+    setCaptures([]);
+    setDetailLoading(false);
+    setDetailError(null);
+    setPreviewImage(null);
+    clearEvidence();
+  }, [clearEvidence]);
+
+  const closeDetail = useCallback(() => {
+    resetDetail();
+    selectedIdRef.current = null;
+    setSelectedId(null);
+  }, [resetDetail]);
+
+  const openDetail = useCallback(
+    (bugId: string) => {
+      if (detailBugIdRef.current !== bugId) resetDetail();
+      selectedIdRef.current = bugId;
+      setSelectedId(bugId);
+    },
+    [resetDetail],
+  );
+
   const loadDetail = useCallback(
     async (bugId: string) => {
       const requestId = ++detailRequestRef.current;
+      const isInitialLoad = detailBugIdRef.current !== bugId;
+      detailBugIdRef.current = bugId;
       setDetailLoading(true);
       setDetailError(null);
       setError(null);
-      setDetail(null);
-      setEvents([]);
-      setWorkflow(null);
-      clearEvidence();
-      setCaptures([]);
+      if (isInitialLoad) {
+        setDetail(null);
+        setEvents([]);
+        setWorkflow(null);
+        clearEvidence();
+        setCaptures([]);
+      }
       try {
         const [nextDetail, eventResponse, attachmentResponse, workflowResponse] = await Promise.all(
           [getBug(bugId), listBugEvents(bugId), listBugAttachments(bugId), getHumanWorkflow(bugId)],
@@ -313,8 +347,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           for (const image of images) URL.revokeObjectURL(image.url);
           return;
         }
+        const previousEvidence = evidenceRef.current;
         evidenceRef.current = images;
         setEvidence(images);
+        window.setTimeout(() => {
+          for (const item of previousEvidence) URL.revokeObjectURL(item.url);
+        }, 0);
         if (failedImageCount > 0) {
           setDetailError(`${failedImageCount} 张图片读取失败；Bug 内容和流转仍可正常使用。`);
         }
@@ -407,20 +445,21 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     const stopBugChanged = bridge.onBugChanged((change) => {
       void loadWorkbench(true, false);
       setOverviewRevision((value) => value + 1);
-      if (change.bugId !== null && change.bugId === selectedId) {
-        void loadDetail(change.bugId);
+      const activeBugId = selectedIdRef.current;
+      if (change.bugId !== null && change.bugId === activeBugId) {
+        void loadDetail(activeBugId);
       }
     });
     const stopOpenBug = bridge.onOpenBug((bugId) => {
       setScopeId("team");
-      setSelectedId(bugId);
+      openDetail(bugId);
       void loadWorkbench(true, false);
     });
     return () => {
       stopBugChanged();
       stopOpenBug();
     };
-  }, [loadDetail, loadWorkbench, selectedId]);
+  }, [loadDetail, loadWorkbench, openDetail]);
 
   useEffect(
     () => () => {
@@ -437,15 +476,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       }
       if (event.key === "Escape") {
         if (previewImage !== null) setPreviewImage(null);
-        else {
-          setSelectedId(null);
-          setCreateOpen(false);
-        }
+        else closeDetail();
+        setCreateOpen(false);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [previewImage]);
+  }, [closeDetail, previewImage]);
 
   const counts = useMemo(
     () => ({
@@ -471,7 +508,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   }, [bugs, category, memberName, query]);
 
   const runMutation = useCallback(
-    async (label: string, action: () => Promise<void>) => {
+    async (
+      label: string,
+      action: () => Promise<void>,
+      options: { readonly closeDetailOnSuccess?: boolean } = {},
+    ) => {
       setMutation(label);
       setError(null);
       setNotice(null);
@@ -479,18 +520,23 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         await action();
         setNotice(label);
         setOverviewRevision((value) => value + 1);
+        if (options.closeDetailOnSuccess === true) closeDetail();
         await loadWorkbench(true);
-        if (selectedId !== null) await loadDetail(selectedId);
+        const activeBugId = selectedIdRef.current;
+        if (options.closeDetailOnSuccess !== true && activeBugId !== null) {
+          await loadDetail(activeBugId);
+        }
       } catch (cause) {
         setError(messageFor(cause));
-        if (cause instanceof QaHubApiError && cause.status === 409 && selectedId !== null) {
-          await loadDetail(selectedId);
+        const activeBugId = selectedIdRef.current;
+        if (cause instanceof QaHubApiError && cause.status === 409 && activeBugId !== null) {
+          await loadDetail(activeBugId);
         }
       } finally {
         setMutation(null);
       }
     },
-    [loadDetail, loadWorkbench, selectedId],
+    [closeDetail, loadDetail, loadWorkbench],
   );
 
   const saveAssignments = async () => {
@@ -553,16 +599,20 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   };
 
   const acceptBug = async () => {
-    await runMutation("已由提报人确认关闭", async () => {
-      const verification = await ensureVerificationStarted();
-      if (verification === null) return;
-      await recordVerificationPassed(
-        verification.id,
-        verification.version,
-        "提报人确认修复有效，关闭 Bug",
-        crypto.randomUUID(),
-      );
-    });
+    await runMutation(
+      "已由提报人确认关闭",
+      async () => {
+        const verification = await ensureVerificationStarted();
+        if (verification === null) return;
+        await recordVerificationPassed(
+          verification.id,
+          verification.version,
+          "提报人确认修复有效，关闭 Bug",
+          crypto.randomUUID(),
+        );
+      },
+      { closeDetailOnSuccess: true },
+    );
   };
 
   const returnBug = async () => {
@@ -638,7 +688,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       setNewOwnerId("");
       setScopeId("team");
       setCategory("pending");
-      setSelectedId(created.bug.id);
+      openDetail(created.bug.id);
     });
   };
 
@@ -668,6 +718,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         <nav aria-label="主导航">
           <p className="nav-label">工作区</p>
           <button
+            aria-current={view === "workbench" ? "page" : undefined}
             className={`nav-item${view === "workbench" ? " is-active" : ""}`}
             onClick={() => setView("workbench")}
             type="button"
@@ -677,6 +728,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span className="nav-count">{counts.pending}</span>
           </button>
           <button
+            aria-current={view === "overview" ? "page" : undefined}
             className={`nav-item${view === "overview" ? " is-active" : ""}`}
             onClick={() => setView("overview")}
             type="button"
@@ -825,7 +877,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                     <button
                       className="table-row bug-row"
                       key={bug.id}
-                      onClick={() => setSelectedId(bug.id)}
+                      onClick={() => openDetail(bug.id)}
                       role="row"
                       type="button"
                     >
@@ -874,7 +926,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               setOverviewRevision((value) => value + 1);
               void loadWorkbench(true, false);
             }}
-            onOpenBug={setSelectedId}
+            onOpenBug={openDetail}
             principal={principal}
             projectId={projectId}
             refreshToken={overviewRevision}
@@ -887,7 +939,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           <button
             aria-label="关闭详情"
             className="detail-overlay-dismiss"
-            onClick={() => setSelectedId(null)}
+            onClick={closeDetail}
             type="button"
           />
           <section aria-label="Bug 详情" aria-modal="true" className="detail-modal" role="dialog">
@@ -896,7 +948,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 <button
                   aria-label="关闭详情"
                   className="detail-close detail-loading-close"
-                  onClick={() => setSelectedId(null)}
+                  onClick={closeDetail}
                   type="button"
                 >
                   ×
@@ -927,11 +979,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       {stateCopy[detail.state]}
                     </span>
                   </div>
-                  <button
-                    className="detail-close"
-                    onClick={() => setSelectedId(null)}
-                    type="button"
-                  >
+                  <button className="detail-close" onClick={closeDetail} type="button">
                     ×
                   </button>
                 </header>
