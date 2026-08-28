@@ -1,10 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 
 import {
   listBugs,
   updateBugOwner,
+  updateBugPriority,
+  updateBugVerificationOwner,
   type BrowserSessionPrincipal,
   type BugListItem,
+  type BugPriority,
   type BugListState,
   type BugSeverity,
   type ProjectMember,
@@ -13,6 +25,81 @@ import {
 type OwnerFilter = "all" | "unassigned" | "assigned" | `member:${string}`;
 type StateGroup = "all" | "pending" | "inProgress" | "verification" | "completed";
 type SortMode = "updated" | "created" | "priority";
+
+const EDITABLE_PRIORITIES = ["P0", "P1", "P2", "P3"] as const;
+const OVERVIEW_COLUMN_STORAGE_KEY = "relay-qa-hub:overview-column-widths:v1";
+
+const overviewColumns = [
+  { key: "key", label: "编号", defaultWidth: 86, minWidth: 72 },
+  { key: "title", label: "反馈问题", defaultWidth: 560, minWidth: 300 },
+  { key: "priority", label: "优先级", defaultWidth: 96, minWidth: 84 },
+  { key: "reporter", label: "提报人", defaultWidth: 102, minWidth: 88 },
+  { key: "owner", label: "负责人", defaultWidth: 190, minWidth: 150 },
+  { key: "verifier", label: "验收人", defaultWidth: 190, minWidth: 150 },
+  { key: "state", label: "处理状态", defaultWidth: 112, minWidth: 96 },
+  { key: "created", label: "提出时间", defaultWidth: 118, minWidth: 104 },
+  { key: "updated", label: "最后更新", defaultWidth: 118, minWidth: 104 },
+] as const;
+
+type OverviewColumnKey = (typeof overviewColumns)[number]["key"];
+type OverviewColumnWidths = Record<OverviewColumnKey, number>;
+
+interface ActiveColumnResize {
+  readonly pointerId: number;
+  readonly columnIndex: number;
+  readonly startX: number;
+  readonly startWidths: OverviewColumnWidths;
+}
+
+function defaultOverviewColumnWidths(): OverviewColumnWidths {
+  return Object.fromEntries(
+    overviewColumns.map((column) => [column.key, column.defaultWidth]),
+  ) as OverviewColumnWidths;
+}
+
+function loadOverviewColumnWidths(): OverviewColumnWidths {
+  const defaults = defaultOverviewColumnWidths();
+  if (typeof window === "undefined") return defaults;
+  try {
+    const stored = JSON.parse(
+      window.localStorage.getItem(OVERVIEW_COLUMN_STORAGE_KEY) ?? "null",
+    ) as Record<string, unknown> | null;
+    if (stored === null) return defaults;
+    return Object.fromEntries(
+      overviewColumns.map((column) => {
+        const value = stored[column.key];
+        return [
+          column.key,
+          typeof value === "number" && Number.isFinite(value)
+            ? Math.max(column.minWidth, Math.round(value))
+            : defaults[column.key],
+        ];
+      }),
+    ) as OverviewColumnWidths;
+  } catch {
+    return defaults;
+  }
+}
+
+function saveOverviewColumnWidths(widths: OverviewColumnWidths): void {
+  try {
+    window.localStorage.setItem(OVERVIEW_COLUMN_STORAGE_KEY, JSON.stringify(widths));
+  } catch {
+    // Column resizing remains available when persistent browser storage is disabled.
+  }
+}
+
+function resizedColumnWidths(
+  widths: OverviewColumnWidths,
+  columnIndex: number,
+  requestedDelta: number,
+): OverviewColumnWidths {
+  const column = overviewColumns[columnIndex];
+  if (column === undefined) return widths;
+  const minimumDelta = column.minWidth - widths[column.key];
+  const delta = Math.max(minimumDelta, Math.round(requestedDelta));
+  return { ...widths, [column.key]: widths[column.key] + delta };
+}
 
 interface OverviewPageProps {
   readonly projectId: string;
@@ -90,9 +177,19 @@ export default function OverviewPage({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [mutatingId, setMutatingId] = useState<string | null>(null);
+  const [columnWidths, setColumnWidths] = useState<OverviewColumnWidths>(loadOverviewColumnWidths);
+  const [resizingColumn, setResizingColumn] = useState<OverviewColumnKey | null>(null);
+  const sheetRef = useRef<HTMLElement>(null);
+  const columnWidthsRef = useRef(columnWidths);
+  const activeColumnResizeRef = useRef<ActiveColumnResize | null>(null);
+  const columnResizeCleanupRef = useRef<(() => void) | null>(null);
 
   const activeFixers = useMemo(
     () => members.filter((member) => member.active && member.roles.includes("developer")),
+    [members],
+  );
+  const activeVerifiers = useMemo(
+    () => members.filter((member) => member.active && member.roles.includes("verifier")),
     [members],
   );
   const memberName = useCallback(
@@ -147,6 +244,33 @@ export default function OverviewPage({
     return () => window.clearInterval(interval);
   }, [load]);
 
+  useEffect(() => {
+    const sheet = sheetRef.current;
+    if (sheet === null) return;
+    const fitTitleColumn = () => {
+      const availableWidth = sheet.clientWidth;
+      if (availableWidth === 0) return;
+      setColumnWidths((current) => {
+        const currentWidth = overviewColumns.reduce((sum, column) => sum + current[column.key], 0);
+        const titleColumn = overviewColumns[1];
+        const fittedTitleWidth = Math.max(
+          titleColumn.minWidth,
+          current.title + availableWidth - currentWidth,
+        );
+        if (fittedTitleWidth === current.title) return current;
+        const next = { ...current, title: fittedTitleWidth };
+        columnWidthsRef.current = next;
+        return next;
+      });
+    };
+    fitTitleColumn();
+    const observer = new ResizeObserver(fitTitleColumn);
+    observer.observe(sheet);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => () => columnResizeCleanupRef.current?.(), []);
+
   const visibleItems = useMemo(() => {
     const filtered = items.filter((bug) => stateMatches(stateGroup, bug.state));
     return [...filtered].sort((left, right) => {
@@ -182,6 +306,126 @@ export default function OverviewPage({
     }
   };
 
+  const assignVerificationOwner = async (bug: BugListItem, nextVerifierId: string) => {
+    setMutatingId(bug.id);
+    setError(null);
+    setNotice(null);
+    try {
+      const updated = await updateBugVerificationOwner(bug.id, bug.version, nextVerifierId);
+      setItems((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+      setNotice(`${bug.key} 的验收人已设为 ${memberName(nextVerifierId)}`);
+      onMutated();
+    } catch (cause) {
+      setError(errorMessage(cause));
+      await load(true);
+    } finally {
+      setMutatingId(null);
+    }
+  };
+
+  const setPriority = async (bug: BugListItem, priority: BugPriority) => {
+    if (priority === bug.priority) return;
+    setMutatingId(bug.id);
+    setError(null);
+    setNotice(null);
+    try {
+      const updated = await updateBugPriority(bug.id, bug.version, priority);
+      setItems((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+      setNotice(`${bug.key} 的优先级已设为 ${priority}`);
+      onMutated();
+    } catch (cause) {
+      setError(errorMessage(cause));
+      await load(true);
+    } finally {
+      setMutatingId(null);
+    }
+  };
+
+  const updateColumnWidths = (next: OverviewColumnWidths, persist = false) => {
+    columnWidthsRef.current = next;
+    setColumnWidths(next);
+    if (persist) saveOverviewColumnWidths(next);
+  };
+
+  const beginColumnResize = (event: ReactPointerEvent<HTMLButtonElement>, columnIndex: number) => {
+    event.preventDefault();
+    const column = overviewColumns[columnIndex];
+    if (column === undefined) return;
+    activeColumnResizeRef.current = {
+      pointerId: event.pointerId,
+      columnIndex,
+      startX: event.clientX,
+      startWidths: columnWidthsRef.current,
+    };
+    setResizingColumn(column.key);
+    columnResizeCleanupRef.current?.();
+    let cleanup = () => undefined;
+    const move = (moveEvent: PointerEvent) => {
+      const activeResize = activeColumnResizeRef.current;
+      if (activeResize === null || activeResize.pointerId !== moveEvent.pointerId) return;
+      updateColumnWidths(
+        resizedColumnWidths(
+          activeResize.startWidths,
+          activeResize.columnIndex,
+          moveEvent.clientX - activeResize.startX,
+        ),
+      );
+    };
+    const finish = (finishEvent: PointerEvent) => {
+      const activeResize = activeColumnResizeRef.current;
+      if (activeResize === null || activeResize.pointerId !== finishEvent.pointerId) return;
+      cleanup();
+      activeColumnResizeRef.current = null;
+      setResizingColumn(null);
+      saveOverviewColumnWidths(columnWidthsRef.current);
+    };
+    cleanup = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+      columnResizeCleanupRef.current = null;
+    };
+    columnResizeCleanupRef.current = cleanup;
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+  };
+
+  const resizeColumnWithKeyboard = (
+    event: ReactKeyboardEvent<HTMLButtonElement>,
+    columnIndex: number,
+  ) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    updateColumnWidths(
+      resizedColumnWidths(
+        columnWidthsRef.current,
+        columnIndex,
+        event.key === "ArrowLeft" ? -12 : 12,
+      ),
+      true,
+    );
+  };
+
+  const gridTemplateColumns = overviewColumns
+    .map((column) => `${columnWidths[column.key]}px`)
+    .join(" ");
+  const gridWidth = overviewColumns.reduce((sum, column) => sum + columnWidths[column.key], 0);
+  const overviewGridStyle = { gridTemplateColumns, minWidth: gridWidth } satisfies CSSProperties;
+  const overviewContentStyle = { minWidth: gridWidth } satisfies CSSProperties;
+
+  const verifierOptionsFor = (bug: BugListItem) => {
+    const candidateIds = [
+      bug.verificationOwnerId,
+      bug.reporterId,
+      principal.userId,
+      ...activeVerifiers.map((member) => member.userId),
+    ];
+    return candidateIds
+      .filter((userId): userId is string => userId !== null)
+      .filter((userId, index, ids) => ids.indexOf(userId) === index);
+  };
+
   const unassignedCount = items.filter(
     (bug) => bug.ownerId === null && bug.state !== "closed",
   ).length;
@@ -192,7 +436,7 @@ export default function OverviewPage({
         <div>
           <p className="eyebrow">共享总表</p>
           <h1>Bug 总览</h1>
-          <p>集中查看当前项目的全部单子，筛出未分配事项并直接认领或设置负责人。</p>
+          <p>集中查看当前项目的全部单子，筛出未分配事项并直接设置优先级、负责人或验收人。</p>
         </div>
         <button className="primary-button" onClick={onCreateBug} type="button">
           <span>＋</span> 新建 Bug
@@ -284,75 +528,132 @@ export default function OverviewPage({
         </button>
       </section>
 
-      <section className="overview-sheet" aria-label="全部 Bug 总览">
-        <div className="overview-sheet-meta">
+      <section
+        className={`overview-sheet${resizingColumn === null ? "" : " is-resizing"}`}
+        aria-label="全部 Bug 总览"
+        ref={sheetRef}
+      >
+        <div className="overview-sheet-meta" style={overviewContentStyle}>
           <strong>{visibleItems.length} 条当前结果</strong>
           <span>最多一次读取 500 条 · 自动刷新</span>
         </div>
-        <div className="overview-grid overview-grid-head" role="row">
-          <span>编号</span>
-          <span>反馈问题</span>
-          <span>优先级</span>
-          <span>提报人</span>
-          <span>负责人</span>
-          <span>处理状态</span>
-          <span>提出时间</span>
-          <span>最后更新</span>
+        <div className="overview-grid overview-grid-head" role="row" style={overviewGridStyle}>
+          {overviewColumns.map((column, columnIndex) => (
+            <span key={column.key}>
+              {column.label}
+              <button
+                aria-label={`拖拽调整${column.label}列宽`}
+                className="overview-column-resizer"
+                onKeyDown={(event) => resizeColumnWithKeyboard(event, columnIndex)}
+                onPointerDown={(event) => beginColumnResize(event, columnIndex)}
+                title={`拖拽调整${column.label}列宽`}
+                type="button"
+              />
+            </span>
+          ))}
         </div>
-        {loading ? <div className="overview-empty">正在读取全部 Bug…</div> : null}
-        {!loading && visibleItems.length === 0 ? (
-          <div className="overview-empty">当前筛选下没有 Bug。</div>
-        ) : null}
-        {visibleItems.map((bug) => (
-          <div
-            className={`overview-grid${bug.ownerId === null ? " is-unassigned" : ""}`}
-            key={bug.id}
-            role="row"
-          >
-            <button className="overview-key" onClick={() => onOpenBug(bug.id)} type="button">
-              {bug.key}
-            </button>
-            <button className="overview-title" onClick={() => onOpenBug(bug.id)} type="button">
-              <strong>{bug.description.trim() || bug.title}</strong>
-              <small>{bug.expectedBehavior}</small>
-            </button>
-            <span>
-              <b className={`priority ${bug.priority.toLowerCase()}`}>{bug.priority}</b>
-              <small>{bug.severity}</small>
-            </span>
-            <span>{memberName(bug.reporterId)}</span>
-            <span className="overview-owner-cell">
-              {bug.ownerId === null ? (
-                <button
-                  className="claim-button"
-                  disabled={mutatingId === bug.id}
-                  onClick={() => void assignOwner(bug, principal.userId)}
-                  type="button"
-                >
-                  认领
-                </button>
-              ) : null}
-              <select
-                aria-label={`设置 ${bug.key} 负责人`}
-                disabled={mutatingId === bug.id}
-                onChange={(event) => void assignOwner(bug, event.target.value || null)}
-                value={bug.ownerId ?? ""}
-              >
-                <option value="">未分配</option>
-                {activeFixers.map((member) => (
-                  <option key={member.userId} value={member.userId}>
-                    {member.displayName}
-                  </option>
-                ))}
-              </select>
-            </span>
-            <span>
-              <b className={`status-badge state-${bug.state}`}>{stateCopy[bug.state]}</b>
-            </span>
-            <span>{formatDate(bug.createdAt)}</span>
-            <span>{formatDate(bug.updatedAt)}</span>
+        {loading ? (
+          <div className="overview-empty" style={overviewContentStyle}>
+            正在读取全部 Bug…
           </div>
-        ))}
+        ) : null}
+        {!loading && visibleItems.length === 0 ? (
+          <div className="overview-empty" style={overviewContentStyle}>
+            当前筛选下没有 Bug。
+          </div>
+        ) : null}
+        {visibleItems.map((bug) => {
+          const effectiveVerifierId = bug.verificationOwnerId ?? bug.reporterId;
+          return (
+            <div
+              className={`overview-grid${bug.ownerId === null ? " is-unassigned" : ""}`}
+              key={bug.id}
+              role="row"
+              style={overviewGridStyle}
+            >
+              <button className="overview-key" onClick={() => onOpenBug(bug.id)} type="button">
+                {bug.key}
+              </button>
+              <button className="overview-title" onClick={() => onOpenBug(bug.id)} type="button">
+                <strong>{bug.description.trim() || bug.title}</strong>
+                <small>{bug.expectedBehavior}</small>
+              </button>
+              <span className="overview-priority-cell">
+                <select
+                  aria-label={`设置 ${bug.key} 优先级`}
+                  className={`overview-priority-select ${bug.priority.toLowerCase()}`}
+                  disabled={mutatingId === bug.id}
+                  onChange={(event) => void setPriority(bug, event.target.value as BugPriority)}
+                  title="点击设置 P0-P3 优先级"
+                  value={bug.priority}
+                >
+                  {bug.priority === "P4" ? <option value="P4">P4</option> : null}
+                  {EDITABLE_PRIORITIES.map((priority) => (
+                    <option key={priority} value={priority}>
+                      {priority}
+                    </option>
+                  ))}
+                </select>
+                <small>{bug.severity}</small>
+              </span>
+              <span>{memberName(bug.reporterId)}</span>
+              <span className="overview-owner-cell overview-person-cell">
+                {bug.ownerId === null ? (
+                  <button
+                    className="claim-button"
+                    disabled={mutatingId === bug.id}
+                    onClick={() => void assignOwner(bug, principal.userId)}
+                    type="button"
+                  >
+                    认领
+                  </button>
+                ) : null}
+                <select
+                  aria-label={`设置 ${bug.key} 负责人`}
+                  disabled={mutatingId === bug.id}
+                  onChange={(event) => void assignOwner(bug, event.target.value || null)}
+                  value={bug.ownerId ?? ""}
+                >
+                  <option value="">未分配</option>
+                  {activeFixers.map((member) => (
+                    <option key={member.userId} value={member.userId}>
+                      {member.displayName}
+                    </option>
+                  ))}
+                </select>
+              </span>
+              <span className="overview-verifier-cell overview-person-cell">
+                {effectiveVerifierId === principal.userId ? null : (
+                  <button
+                    className="claim-button"
+                    disabled={mutatingId === bug.id}
+                    onClick={() => void assignVerificationOwner(bug, principal.userId)}
+                    type="button"
+                  >
+                    认领
+                  </button>
+                )}
+                <select
+                  aria-label={`设置 ${bug.key} 验收人`}
+                  disabled={mutatingId === bug.id}
+                  onChange={(event) => void assignVerificationOwner(bug, event.target.value)}
+                  value={effectiveVerifierId}
+                >
+                  {verifierOptionsFor(bug).map((userId) => (
+                    <option key={userId} value={userId}>
+                      {memberName(userId)}
+                    </option>
+                  ))}
+                </select>
+              </span>
+              <span>
+                <b className={`status-badge state-${bug.state}`}>{stateCopy[bug.state]}</b>
+              </span>
+              <span>{formatDate(bug.createdAt)}</span>
+              <span>{formatDate(bug.updatedAt)}</span>
+            </div>
+          );
+        })}
       </section>
     </main>
   );

@@ -295,11 +295,13 @@ export type {
 export {
   createBrowserSession,
   ensureBrowserAdmin,
+  listActiveAccountUsers,
   loginBrowserSession,
   resolveBrowserSession,
   revokeBrowserSession,
 } from "./browser-auth-store.js";
 export type {
+  ActiveAccountUser,
   BrowserPrincipal,
   CreateBrowserSessionInput,
   EnsureBrowserAdminInput,

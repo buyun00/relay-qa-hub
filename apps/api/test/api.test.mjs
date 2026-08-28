@@ -23,6 +23,8 @@ import {
   MOBILE_VERIFICATION_COLLECTION_PATH,
   MOBILE_VERIFICATION_RESULT_PATH,
   MobileCaptureRequestError,
+  QaLoginDirectory,
+  canonicalizeMobileProjectMembers,
   createApiApp,
   createApiServer,
   loadQaPeopleConfig,
@@ -30,6 +32,7 @@ import {
   parseMobileBugListQuery,
   parseMobileCreateCaptureRequest,
   qaLoginEmail,
+  qaPinyinLoginAlias,
   qaUserId,
   resolveBuildSha,
   resolveWebOrigins,
@@ -47,6 +50,77 @@ test("backend account-name normalization is stable and preserves the display spe
   assert.equal(qaUserId(accountId, "NewUser"), qaUserId(accountId, " newuser "));
   assert.equal(qaLoginEmail(accountId, "NewUser"), qaLoginEmail(accountId, " newuser "));
   assert.throws(() => normalizeQaLoginName("   "), /name is invalid/u);
+});
+
+test("existing Chinese people are the unique canonical identity for full-pinyin login", () => {
+  const directory = new QaLoginDirectory([
+    { id: "10000000-0000-4000-8000-000000000101", displayName: "林步云" },
+    { id: "10000000-0000-4000-8000-000000000102", displayName: "饶小春" },
+    { id: "10000000-0000-4000-8000-000000000103", displayName: "raoxiaochun" },
+  ]);
+
+  assert.equal(qaPinyinLoginAlias("林步云"), "linbuyun");
+  assert.deepEqual(directory.resolveLogin(" LIN BU YUN "), {
+    id: "10000000-0000-4000-8000-000000000101",
+    displayName: "林步云",
+  });
+  assert.deepEqual(
+    directory.canonicalize({
+      id: "10000000-0000-4000-8000-000000000103",
+      displayName: "raoxiaochun",
+    }),
+    { id: "10000000-0000-4000-8000-000000000102", displayName: "饶小春" },
+  );
+  const ambiguous = new QaLoginDirectory([
+    { id: "10000000-0000-4000-8000-000000000104", displayName: "王月" },
+    { id: "10000000-0000-4000-8000-000000000105", displayName: "王悦" },
+  ]);
+  assert.equal(ambiguous.resolveLogin("wangyue"), undefined);
+  assert.equal(qaPinyinLoginAlias("Windows安装包验收账号"), undefined);
+});
+
+test("project people directory merges pinyin duplicates into one Chinese member", () => {
+  const projectId = "10000000-0000-4000-8000-000000000004";
+  const chineseId = "10000000-0000-4000-8000-000000000101";
+  const pinyinId = "10000000-0000-4000-8000-000000000102";
+  const directory = new QaLoginDirectory([
+    { id: chineseId, displayName: "林步云" },
+    { id: pinyinId, displayName: "linbuyun" },
+  ]);
+  const result = canonicalizeMobileProjectMembers(
+    {
+      projectId,
+      snapshotSequence: 9,
+      items: [
+        {
+          userId: pinyinId,
+          projectId,
+          displayName: "linbuyun",
+          roles: ["developer"],
+          active: true,
+        },
+        {
+          userId: chineseId,
+          projectId,
+          displayName: "林步云",
+          roles: ["reporter", "verifier"],
+          active: true,
+        },
+      ],
+      nextCursor: null,
+    },
+    directory,
+  );
+
+  assert.deepEqual(result.items, [
+    {
+      userId: chineseId,
+      projectId,
+      displayName: "林步云",
+      roles: ["developer", "reporter", "verifier"],
+      active: true,
+    },
+  ]);
 });
 
 test("backend people seed accepts only schema 4 without client-side aliases", async (t) => {
@@ -132,7 +206,7 @@ test("checked-in backend people seed contains the default QA team", () => {
   );
 });
 
-test("new Web and Android name login creates backend accounts and rejects the old pinyin contract", async (t) => {
+test("new Web and Android name login creates backend accounts and rejects the legacy pinyin body field", async (t) => {
   const accountId = "10000000-0000-4000-8000-000000000020";
   const userId = "30000000-0000-4000-8000-000000000021";
   const debugActorId = "10000000-0000-4000-8000-000000000003";

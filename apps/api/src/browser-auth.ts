@@ -316,19 +316,23 @@ export function createSqliteBrowserAuthStore(options: {
     } | null>;
     readonly revokeBrowserSession: (input: RevokeBrowserSessionInput) => Promise<boolean>;
   };
+  readonly canonicalizePrincipal?: (principal: BrowserAuthPrincipal) => BrowserAuthPrincipal;
 }): BrowserAuthStore {
   const withActor = (principal: {
     readonly accountId: string;
     readonly userId: string;
     readonly email: string;
     readonly displayName: string;
-  }): BrowserAuthPrincipal => ({
-    accountId: principal.accountId,
-    userId: principal.userId,
-    actorId: principal.userId,
-    email: principal.email,
-    displayName: principal.displayName,
-  });
+  }): BrowserAuthPrincipal => {
+    const resolved = {
+      accountId: principal.accountId,
+      userId: principal.userId,
+      actorId: principal.userId,
+      email: principal.email,
+      displayName: principal.displayName,
+    };
+    return options.canonicalizePrincipal?.(resolved) ?? resolved;
+  };
   return {
     ensureBrowserAdmin: async (input) => {
       await options.worker.ensureBrowserAdmin({

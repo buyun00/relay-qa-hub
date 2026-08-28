@@ -100,6 +100,12 @@ try {
     (($releaseDescriptor | ConvertTo-Json -Depth 3) + "`n"),
     $encoding
   )
+  $stageAssets = Join-Path $stageRoot "assets"
+  New-Item -ItemType Directory -Path $stageAssets -Force | Out-Null
+  Copy-Item `
+    -LiteralPath $iconFile `
+    -Destination (Join-Path $stageAssets "RelayQaHub.ico") `
+    -Force
   & $packager $stageRoot "RelayQaHub" --platform=win32 --arch=x64 --out=$outputRoot --overwrite --prune=true --asar --icon=$iconFile
   if ($LASTEXITCODE -ne 0) { throw "electron-packager failed with exit code $LASTEXITCODE." }
 

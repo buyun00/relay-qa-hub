@@ -72,6 +72,34 @@ export interface BrowserPrincipal {
   readonly displayName: string;
 }
 
+export interface ActiveAccountUser {
+  readonly userId: string;
+  readonly displayName: string;
+}
+
+export function listActiveAccountUsers(
+  database: DatabaseSync,
+  accountId: string,
+): readonly ActiveAccountUser[] {
+  const rows = database
+    .prepare(
+      `SELECT user.id AS user_id, user.display_name AS display_name
+       FROM accounts AS account
+       JOIN users AS user
+         ON user.account_id = account.id
+        AND user.status = 'active'
+       WHERE account.id = ? AND account.status = 'active'
+       ORDER BY user.display_name COLLATE NOCASE ASC, user.id ASC`,
+    )
+    .all(accountId) as unknown as {
+    readonly user_id: string;
+    readonly display_name: string;
+  }[];
+  return Object.freeze(
+    rows.map((row) => Object.freeze({ userId: row.user_id, displayName: row.display_name })),
+  );
+}
+
 function requireTransaction(database: DatabaseSync): void {
   if (!database.isTransaction) {
     throw new SqliteStorageError(

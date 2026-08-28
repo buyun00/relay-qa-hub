@@ -37,6 +37,9 @@ describe("Bug overview", () => {
     expect(markup).toContain("全部状态");
     expect(markup).toContain("反馈问题");
     expect(markup).toContain("负责人");
+    expect(markup).toContain("验收人");
+    expect(markup).toContain("拖拽调整负责人列宽");
+    expect(markup).toContain("拖拽调整验收人列宽");
     expect(markup).toContain("最多一次读取 500 条");
   });
 });

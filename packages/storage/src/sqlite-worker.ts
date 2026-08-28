@@ -95,6 +95,7 @@ import type {
 } from "./mobile-verification-store.js";
 import type { ListMobileNotificationsInput, MobileNotificationList } from "./mobile-inbox-store.js";
 import type {
+  ActiveAccountUser,
   BrowserPrincipal,
   CreateBrowserSessionInput,
   EnsureBrowserAdminInput,
@@ -171,15 +172,16 @@ export class SqliteStorageWorker {
 
   constructor(options: SqliteStorageWorkerOptions) {
     this.allowUnsafeTestCommands = options.allowUnsafeTestCommands === true;
-    this.relayRuntime = options.relayInstanceId === undefined
-      ? undefined
-      : Object.freeze({
-          relayInstanceId: options.relayInstanceId,
-          ...(options.qaInstanceId === undefined ? {} : { qaInstanceId: options.qaInstanceId }),
-          ...(options.relayPrincipalId === undefined
-            ? {}
-            : { relayPrincipalId: options.relayPrincipalId }),
-        });
+    this.relayRuntime =
+      options.relayInstanceId === undefined
+        ? undefined
+        : Object.freeze({
+            relayInstanceId: options.relayInstanceId,
+            ...(options.qaInstanceId === undefined ? {} : { qaInstanceId: options.qaInstanceId }),
+            ...(options.relayPrincipalId === undefined
+              ? {}
+              : { relayPrincipalId: options.relayPrincipalId }),
+          });
     this.worker = new Worker(workerEntryUrl(), { workerData: options });
     this.worker.on("message", (message: WorkerResponse) => this.onMessage(message));
     this.worker.on("error", (error) => this.terminateWithError(error));
@@ -229,6 +231,11 @@ export class SqliteStorageWorker {
   async ensureBrowserAdmin(input: EnsureBrowserAdminInput): Promise<EnsureBrowserAdminResult> {
     await this.initialization;
     return this.request<EnsureBrowserAdminResult>("ensureBrowserAdmin", input);
+  }
+
+  async listActiveAccountUsers(accountId: string): Promise<readonly ActiveAccountUser[]> {
+    await this.initialization;
+    return this.request<readonly ActiveAccountUser[]>("listActiveAccountUsers", accountId);
   }
 
   async loginBrowserSession(input: LoginBrowserSessionInput): Promise<BrowserPrincipal> {

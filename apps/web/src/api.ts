@@ -102,13 +102,15 @@ export interface NotificationList {
   readonly unreadCount: number;
 }
 
+export type BugPriority = "P0" | "P1" | "P2" | "P3" | "P4";
+
 export interface BugListItem {
   readonly id: string;
   readonly key: string;
   readonly title: string;
   readonly state: BugListState;
   readonly severity: BugSeverity;
-  readonly priority: string;
+  readonly priority: BugPriority;
   readonly updatedAt: string;
   readonly reporterId: string;
   readonly ownerId: string | null;
@@ -428,7 +430,7 @@ export interface CreateBugInput {
   readonly description: string;
   readonly expectedBehavior: string;
   readonly severity: BugSeverity;
-  readonly priority: "P0" | "P1" | "P2" | "P3" | "P4";
+  readonly priority: BugPriority;
   readonly ownerId: string | null;
   readonly verificationOwnerId: string;
   readonly attachmentIds: readonly string[];
@@ -963,6 +965,38 @@ export async function updateBugOwner(
       "Idempotency-Key": `web:updateBug:bug:${bugId}:v${expectedVersion}:owner:${ownerId ?? "null"}`,
     },
     body: JSON.stringify({ expectedVersion, ownerId }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
+export async function updateBugVerificationOwner(
+  bugId: string,
+  expectedVersion: number,
+  verificationOwnerId: string,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `web:updateBug:bug:${bugId}:v${expectedVersion}:verifier:${verificationOwnerId}`,
+    },
+    body: JSON.stringify({ expectedVersion, verificationOwnerId }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
+export async function updateBugPriority(
+  bugId: string,
+  expectedVersion: number,
+  priority: BugPriority,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `web:updateBug:bug:${bugId}:v${expectedVersion}:priority:${priority}`,
+    },
+    body: JSON.stringify({ expectedVersion, priority }),
   });
   return requireRecord(body, "BUG") as unknown as BugDetail;
 }

@@ -71,6 +71,7 @@ import {
 import {
   createBrowserSession,
   ensureBrowserAdmin,
+  listActiveAccountUsers,
   loginBrowserSession,
   resolveBrowserSession,
   revokeBrowserSession,
@@ -149,6 +150,7 @@ interface WorkerRequest {
     | "initialize"
     | "ensureMobileScope"
     | "ensureBrowserAdmin"
+    | "listActiveAccountUsers"
     | "loginBrowserSession"
     | "createBrowserSession"
     | "resolveBrowserSession"
@@ -305,6 +307,10 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return inWriteTransaction((current) =>
       ensureBrowserAdmin(current, request.payload as EnsureBrowserAdminInput),
     );
+  }
+
+  if (request.operation === "listActiveAccountUsers") {
+    return listActiveAccountUsers(requireDatabase(), request.payload as string);
   }
 
   if (request.operation === "loginBrowserSession") {

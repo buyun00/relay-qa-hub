@@ -7,6 +7,7 @@ import {
   BrowserWindow,
   Menu,
   nativeImage,
+  type NativeImage,
   Notification,
   ipcMain,
   protocol,
@@ -35,7 +36,8 @@ const APP_PROTOCOL = `${APP_SCHEME}:`;
 const MAX_ASSET_BYTES = 50 * 1024 * 1024;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 const FALLBACK_TRAY_ICON =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAMYSURBVFhHzZdrSBVBFMf92De7SmCf8lP1JfqS2O6mV9EsNB8INwQNboQZhhaE9tYLEdotKiG0h5VIJIFBVGRED+lBaVT0gF7QA8u8lN180ccT/6WdZs/o7kputPDjcmfOnPOfM2d2dhIS/rdnXjA4K9kwsgKGFplp4DcxGJzNY4onYGjbArr2M8nQyVd0vQkT5cEjiqGPBAzttAg+J5iW8k9mzkjWtIWmgGRNK+Gdk5GzLkx7Wlvo8s0eev/hJQ0OvqPrd2+YbeEd9Yq9O0s3e0p/at5y6jjfReMjQ45AzIJVBcr4qUBcVwEZa8rp1ZtnSrCpQFa8ZsNVAGbOgyP1R7s6qS7aRFWNO6mls52evnhksxn+OkBpZSHFH8dVAE87/kMUtwPR9lab7Z2+2zQ3O6jYyTgKKK3dqATnNpzavREaG3pN8XsnaPTjQ9p1+IBiI+MoAKm1gmMZ3GYD5ucso08dFRQ7XkTfLtSZRcltZBwFYLAlAGJ4PyclU6fe5nwzOEAWUJDcTsZRAAZbAlBsvJ/THVkpgg9faRRjF5eWKLYWUwpAulHJlpP19TXUUJ1LRmGm4gS0bMkTwXujxTT2/c9YbGNu7yoA9D15IJxcO1ZjOh9oK6LiUJbNbmtVrgj++GABra3fJMZhEtyvZwHY65ajvqunRBBZREVFtmh/e6SQFq3IsBUvJsH9ehaALWU5Am37qm0isCT4tf5nl2SaZ4U8BpPgfj0LQB3IbzikM9oYFiJkQmVZtP9kG8WHP9P4aMy0RxG7nQuOAgAKSC5GcOtcsy34od3lZtonJJvxkRhVNmxX/HFcBQC+FODH80vmiybef0a0TfyeuQWObLeXlycBAGuLQ4gL4YzEv0xLhGcBAIcQikrenhaolbMXu2nJ6pDS7yRiWgI4yEr+hkqlHUK9ivgrAU54FeGbADCZCCyTbOOrADCZCPlwEgKSdD3MB88UEIGvIwTHd4Xch4uQKQDf53zgTIOi5W24qpkCzCwYehc38JOArt0XwfHg0pik6z3c0A8QPDE9PdUmwHr8uhlb4BYmx/sF0/EiUq73hb4AAAAASUVORK5CYII=";
+const PACKAGED_TRAY_ICON_FILE = "RelayQaHub.ico";
 const AUTO_START_DEFAULT_MARKER = "auto-start-default-v1";
 
 const runtimeEnvironment = loadDesktopRuntimeEnvironment(process.env);
@@ -263,15 +265,31 @@ function handleSecondInstanceArguments(args: readonly unknown[]): void {
   openMainWindow();
 }
 
-function trayIcon() {
+function loadTrayImage(filePath: string): NativeImage | null {
+  const image = nativeImage.createFromPath(filePath);
+  return image.isEmpty() ? null : image;
+}
+
+async function trayIcon(): Promise<NativeImage> {
   const configured = process.env["QA_HUB_DESKTOP_TRAY_ICON"]?.trim();
   if (configured !== undefined && configured.length > 0) {
-    const image = nativeImage.createFromPath(path.resolve(configured));
-    if (!image.isEmpty()) return image;
+    const image = loadTrayImage(path.resolve(configured));
+    if (image !== null) return image;
   }
-  const webIcon = path.join(assetsDirectory, "icons", "qa-hub-192.svg");
-  const webImage = nativeImage.createFromPath(webIcon);
-  return webImage.isEmpty() ? nativeImage.createFromDataURL(FALLBACK_TRAY_ICON) : webImage;
+
+  const packagedImage = loadTrayImage(
+    path.join(app.getAppPath(), "assets", PACKAGED_TRAY_ICON_FILE),
+  );
+  if (packagedImage !== null) return packagedImage;
+
+  try {
+    const executableImage = await app.getFileIcon(process.execPath, { size: "small" });
+    if (!executableImage.isEmpty()) return executableImage;
+  } catch {
+    // The branded PNG below keeps the tray visible if Windows cannot read the EXE icon.
+  }
+
+  return nativeImage.createFromDataURL(FALLBACK_TRAY_ICON);
 }
 
 function statusLabel(status: TransportStatus): string {
@@ -584,7 +602,7 @@ async function startApplication(): Promise<void> {
   updater = await createUpdater();
   installIpcHandlers();
   await ensureDefaultAutoStart();
-  tray = new Tray(trayIcon());
+  tray = new Tray(await trayIcon());
   tray.setToolTip("Relay QA Hub");
   tray.on("click", openMainWindow);
   tray.on("double-click", openMainWindow);

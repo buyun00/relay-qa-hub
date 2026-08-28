@@ -184,6 +184,7 @@ export {
   parseMobileProjectDirectoryListQuery,
   requireMobileProjectUuid,
 } from "./mobile-project-directory.js";
+export { canonicalizeMobileProjectMembers } from "./sqlite-mobile-project-directory-store.js";
 export type {
   MobileProjectDirectoryStore,
   MobileProjectMember,
@@ -299,10 +300,13 @@ export {
 export {
   loadQaPeopleConfig,
   normalizeQaLoginName,
+  QaLoginDirectory,
+  qaPinyinLoginAlias,
   qaLoginEmail,
   qaMembershipId,
   qaUserId,
 } from "./people-config.js";
+export type { QaUserIdentity } from "./people-config.js";
 export type {
   BrowserAuthOptions,
   BrowserAuthPrincipal,

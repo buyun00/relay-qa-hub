@@ -38,6 +38,7 @@ import { createSqliteBrowserAuthStore } from "./browser-auth.js";
 import {
   loadQaPeopleConfig,
   normalizeQaLoginName,
+  QaLoginDirectory,
   qaLoginEmail,
   qaMembershipId,
   qaUserId,
@@ -234,9 +235,7 @@ async function run(): Promise<void> {
     throw new Error("QA Hub people config projectKey does not match the configured project scope");
   }
   const activePeople = peopleConfig.people.filter((person) => person.active);
-  const configuredPeople = new Map(
-    activePeople.map((person) => [normalizeQaLoginName(person.displayName).key, person] as const),
-  );
+  const loginDirectory = new QaLoginDirectory(activePeople);
   const webBootstrapPassword = process.env["QA_HUB_BOOTSTRAP_ADMIN_PASSWORD"];
   if (webAuthMode === "debug" && webBootstrapPassword !== undefined) {
     throw new Error("QA_HUB_BOOTSTRAP_ADMIN_PASSWORD requires session auth mode");
@@ -285,11 +284,30 @@ async function run(): Promise<void> {
       await worker.ensureMobileScope(personScope);
       await worker.ensureMobileRelayRoles(personScope);
     }
+    const activeAccountUsers = await worker.listActiveAccountUsers(MOBILE_SCOPE.accountId);
+    for (const user of activeAccountUsers) {
+      loginDirectory.register({ id: user.userId, displayName: user.displayName });
+    }
     const browserAuthStore =
       webAuthMode === "debug" || webSessionSecret === undefined
         ? undefined
         : createSqliteBrowserAuthStore({
             worker,
+            canonicalizePrincipal: (principal) => {
+              const canonical = loginDirectory.canonicalize({
+                id: principal.userId,
+                displayName: principal.displayName,
+              });
+              return canonical.id === principal.userId
+                ? principal
+                : {
+                    ...principal,
+                    userId: canonical.id,
+                    actorId: canonical.id,
+                    email: qaLoginEmail(MOBILE_SCOPE.accountId, canonical.displayName),
+                    displayName: canonical.displayName,
+                  };
+            },
           });
     if (browserAuthStore !== undefined && webBootstrapPassword !== undefined) {
       await browserAuthStore.ensureBrowserAdmin({
@@ -329,6 +347,7 @@ async function run(): Promise<void> {
       mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
         worker,
         scope: MOBILE_SCOPE,
+        identityDirectory: loginDirectory,
       }),
       mobileMetricsStore: createSqliteMobileMetricsStore({ worker, scope: MOBILE_SCOPE }),
       mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
@@ -359,21 +378,20 @@ async function run(): Promise<void> {
               adminEmail: `mvp-${MOBILE_SCOPE.actorId.replaceAll("-", "")}@local.invalid`,
               passwordlessLogin: async (name, now) => {
                 const normalized = normalizeQaLoginName(name);
-                const configured = configuredPeople.get(normalized.key);
-                const userId = configured?.id ?? qaUserId(MOBILE_SCOPE.accountId, normalized.key);
+                const canonical = loginDirectory.resolveLogin(normalized.displayName);
+                const userId = canonical?.id ?? qaUserId(MOBILE_SCOPE.accountId, normalized.key);
+                const displayName = canonical?.displayName ?? normalized.displayName;
                 const personScope: MobileScopeBootstrap = {
                   ...MOBILE_SCOPE,
                   createdAt: now,
                   actorId: userId,
                   membershipId: qaMembershipId(userId),
-                  actorDisplayName: configured?.displayName ?? normalized.displayName,
-                  actorEmail: qaLoginEmail(
-                    MOBILE_SCOPE.accountId,
-                    configured?.displayName ?? normalized.key,
-                  ),
+                  actorDisplayName: displayName,
+                  actorEmail: qaLoginEmail(MOBILE_SCOPE.accountId, displayName),
                 };
                 await worker.ensureMobileScope(personScope);
                 await worker.ensureMobileRelayRoles(personScope);
+                loginDirectory.register({ id: userId, displayName });
                 return { userId };
               },
               sessionSecret: webSessionSecret,

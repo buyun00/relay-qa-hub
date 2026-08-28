@@ -105,6 +105,9 @@ const snapshotExpression = `
       overviewErrorText: document.querySelector(".overview-page .error-banner")?.textContent?.trim() ?? null,
       overviewRowCount: document.querySelectorAll(".overview-grid:not(.overview-grid-head)").length,
       overviewOwnerSelectCount: document.querySelectorAll(".overview-owner-cell select").length,
+      overviewVerifierSelectCount: document.querySelectorAll(".overview-verifier-cell select").length,
+      overviewPrioritySelectCount: document.querySelectorAll(".overview-priority-select").length,
+      overviewColumnResizerCount: document.querySelectorAll(".overview-column-resizer").length,
       overviewHeaders: [...document.querySelectorAll(".overview-grid-head > span")].map((node) =>
         node.textContent?.trim() ?? ""),
       overviewUnassignedFilterAvailable: [...document.querySelectorAll(".overview-toolbar option")].some(

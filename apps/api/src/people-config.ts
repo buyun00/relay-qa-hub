@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { pinyin } from "pinyin-pro";
+
 export type QaPersonRole = "fixer" | "verifier";
 
 export interface QaPersonConfig {
@@ -32,6 +34,11 @@ export interface QaLoginName {
   readonly key: string;
 }
 
+export interface QaUserIdentity {
+  readonly id: string;
+  readonly displayName: string;
+}
+
 export function normalizeQaLoginName(value: string): QaLoginName {
   const displayName = value.normalize("NFKC").trim();
   if (
@@ -42,6 +49,81 @@ export function normalizeQaLoginName(value: string): QaLoginName {
     throw new TypeError("name is invalid");
   }
   return Object.freeze({ displayName, key: displayName.toLocaleLowerCase("en-US") });
+}
+
+const CHINESE_PERSON_NAME_PATTERN = /^(?:\p{Script=Han}|·){2,20}$/u;
+const PINYIN_LOGIN_PATTERN = /^[a-zv\s'-]+$/u;
+
+function pinyinLoginKey(value: string): string | undefined {
+  const normalized = normalizeQaLoginName(value).key;
+  if (!PINYIN_LOGIN_PATTERN.test(normalized)) return undefined;
+  const compact = normalized.replace(/[\s'-]/gu, "");
+  return compact.length > 0 ? compact : undefined;
+}
+
+export function qaPinyinLoginAlias(displayName: string): string | undefined {
+  const normalized = normalizeQaLoginName(displayName).displayName;
+  if (!CHINESE_PERSON_NAME_PATTERN.test(normalized) || !/\p{Script=Han}/u.test(normalized)) {
+    return undefined;
+  }
+  const alias = pinyin(normalized, {
+    type: "array",
+    toneType: "none",
+    surname: "head",
+    nonZh: "removed",
+    v: true,
+  }).join("");
+  return /^[a-zv]+$/u.test(alias) ? alias : undefined;
+}
+
+/**
+ * Resolves names only against Chinese identities that already exist. Pinyin
+ * collisions deliberately remain unresolved instead of selecting a person.
+ */
+export class QaLoginDirectory {
+  readonly #canonicalByDisplayName = new Map<string, QaUserIdentity>();
+  readonly #canonicalById = new Map<string, QaUserIdentity>();
+  readonly #canonicalByPinyin = new Map<string, QaUserIdentity | null>();
+
+  constructor(identities: readonly QaUserIdentity[] = []) {
+    for (const identity of identities) this.register(identity);
+  }
+
+  register(identity: QaUserIdentity): void {
+    const normalized = normalizeQaLoginName(identity.displayName);
+    const stored = Object.freeze({ id: identity.id, displayName: normalized.displayName });
+    const alias = qaPinyinLoginAlias(normalized.displayName);
+    if (alias === undefined) return;
+
+    const existingName = this.#canonicalByDisplayName.get(normalized.key);
+    const canonical = existingName ?? stored;
+    if (existingName === undefined) {
+      this.#canonicalByDisplayName.set(normalized.key, canonical);
+      this.#canonicalById.set(canonical.id, canonical);
+    }
+
+    const existingAlias = this.#canonicalByPinyin.get(alias);
+    if (existingAlias === undefined) this.#canonicalByPinyin.set(alias, canonical);
+    else if (existingAlias !== null && existingAlias.id !== canonical.id) {
+      this.#canonicalByPinyin.set(alias, null);
+    }
+  }
+
+  resolveLogin(loginName: string): QaUserIdentity | undefined {
+    const normalized = normalizeQaLoginName(loginName);
+    const exact = this.#canonicalByDisplayName.get(normalized.key);
+    if (exact !== undefined) return exact;
+    const alias = pinyinLoginKey(normalized.key);
+    if (alias === undefined) return undefined;
+    return this.#canonicalByPinyin.get(alias) ?? undefined;
+  }
+
+  canonicalize(identity: QaUserIdentity): QaUserIdentity {
+    const byId = this.#canonicalById.get(identity.id);
+    if (byId !== undefined) return byId;
+    return this.resolveLogin(identity.displayName) ?? identity;
+  }
+
 }
 
 export function qaLoginEmail(accountId: string, loginName: string): string {

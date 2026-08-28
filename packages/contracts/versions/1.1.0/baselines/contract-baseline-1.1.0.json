@@ -1,7 +1,7 @@
 {
   "contractVersion": "1.1.0",
   "baseContractVersion": "1.0.0",
-  "frozenAt": "2026-08-27T06:22:29.113Z",
+  "frozenAt": "2026-08-28T08:52:58.116Z",
   "canonicalSha256": {
     "README.md": "6a3aa7d04fcbde28d7a30642ea927eef06ca2ab27e32995f9e637b7b7a038fb4",
     "errors/error-codes.json": "f606037bd157e7e4ef52e9d7428cabe28370a488403eea5a74bfb94047be33e4",

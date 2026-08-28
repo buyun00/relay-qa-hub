@@ -15,8 +15,10 @@ if ([string]::IsNullOrWhiteSpace($PackageDirectory)) {
 $packageRoot = (Resolve-Path -LiteralPath $PackageDirectory).Path
 $exe = Join-Path $packageRoot "RelayQaHub.exe"
 $runtimeConfig = Join-Path $packageRoot "desktop-runtime.json"
+$asarArchive = Join-Path $packageRoot "resources\app.asar"
+$asarCli = Join-Path $repoRoot "node_modules\@electron\asar\bin\asar.js"
 $smokeScript = Join-Path $repoRoot "scripts\desktop-cdp-smoke.mjs"
-foreach ($requiredFile in @($exe, $runtimeConfig, $smokeScript)) {
+foreach ($requiredFile in @($exe, $runtimeConfig, $asarArchive, $asarCli, $smokeScript)) {
   if (-not (Test-Path -LiteralPath $requiredFile -PathType Leaf)) {
     throw "Portable smoke prerequisite is missing: $requiredFile"
   }
@@ -30,6 +32,10 @@ if ([string]::IsNullOrWhiteSpace($NodeExe) -or -not (Test-Path -LiteralPath $Nod
 }
 if ([string]::IsNullOrWhiteSpace($LoginName) -or $LoginName.Length -gt 100 -or $LoginName -match '[\x00-\x1f\x7f]') {
   throw "LoginName must contain 1 to 100 visible characters"
+}
+$archiveEntries = @(& $NodeExe $asarCli list $asarArchive)
+if ($LASTEXITCODE -ne 0 -or $archiveEntries -notcontains "\assets\RelayQaHub.ico") {
+  throw "Portable package does not contain the branded Windows tray icon"
 }
 if (Get-NetTCPConnection -State Listen -LocalPort 9333 -ErrorAction SilentlyContinue) {
   throw "CDP smoke port 9333 is already in use"
@@ -158,7 +164,7 @@ try {
       -not [string]::IsNullOrWhiteSpace([string]$overview.overviewErrorText)) {
     throw "Portable package did not load the shared Bug overview"
   }
-  $expectedOverviewHeaders = @("编号", "反馈问题", "优先级", "提报人", "负责人", "处理状态", "提出时间", "最后更新")
+  $expectedOverviewHeaders = @("编号", "反馈问题", "优先级", "提报人", "负责人", "验收人", "处理状态", "提出时间", "最后更新")
   if ((@($overview.overviewHeaders) -join "|") -ne ($expectedOverviewHeaders -join "|")) {
     throw "Packaged overview does not expose the dense shared-table columns"
   }
@@ -167,6 +173,15 @@ try {
   }
   if ([int]$overview.overviewRowCount -ne [int]$overview.overviewOwnerSelectCount) {
     throw "Packaged overview rows do not all expose direct owner assignment"
+  }
+  if ([int]$overview.overviewRowCount -ne [int]$overview.overviewVerifierSelectCount) {
+    throw "Packaged overview rows do not all expose direct verifier assignment"
+  }
+  if ([int]$overview.overviewRowCount -ne [int]$overview.overviewPrioritySelectCount) {
+    throw "Packaged overview rows do not all expose direct priority assignment"
+  }
+  if ([int]$overview.overviewColumnResizerCount -ne $expectedOverviewHeaders.Count) {
+    throw "Packaged overview columns do not all expose drag resize handles"
   }
 
   [pscustomobject][ordered]@{
@@ -189,6 +204,9 @@ try {
     overviewLoaded = [bool]$overview.overviewVisible
     overviewRowCount = [int]$overview.overviewRowCount
     overviewOwnerSelectCount = [int]$overview.overviewOwnerSelectCount
+    overviewVerifierSelectCount = [int]$overview.overviewVerifierSelectCount
+    overviewPrioritySelectCount = [int]$overview.overviewPrioritySelectCount
+    overviewColumnResizerCount = [int]$overview.overviewColumnResizerCount
     overviewUnassignedFilter = [bool]$overview.overviewUnassignedFilterAvailable
     overviewHeaders = @($overview.overviewHeaders) -join ", "
     rendererUrl = [string]$login.url

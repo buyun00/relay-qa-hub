@@ -289,8 +289,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     [members],
   );
   const verifiers = useMemo(
-    () => members.filter((member) => member.roles.includes("verifier")),
-    [members],
+    () =>
+      members.filter(
+        (member) => member.roles.includes("verifier") || member.userId === principal.userId,
+      ),
+    [members, principal.userId],
   );
 
   useEffect(() => {
@@ -778,6 +781,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const openCreateBug = () => {
     setNewOwnerId("");
+    setNewVerifierId(principal.userId);
     setCreateOpen(true);
   };
 
