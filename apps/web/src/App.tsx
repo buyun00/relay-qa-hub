@@ -74,6 +74,10 @@ const DEFAULT_EXPECTED_BEHAVIOR = "问题修复后不再复现";
 const AUTO_REFRESH_INTERVAL_MS = 5_000;
 const CREATE_BUG_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 
+export function canSubmitNewBug(mutation: string | null, verifierId: string): boolean {
+  return mutation === null && verifierId.length > 0;
+}
+
 function createBugImageKey(file: File): string {
   return `${file.name}\u0000${file.size}\u0000${file.type}\u0000${file.lastModified}`;
 }
@@ -1489,9 +1493,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               </button>
               <button
                 className="primary-button"
-                disabled={
-                  mutation !== null || newOwnerId.length === 0 || newVerifierId.length === 0
-                }
+                disabled={!canSubmitNewBug(mutation, newVerifierId)}
                 type="submit"
               >
                 {mutation === null ? "创建 Bug" : "正在提交…"}

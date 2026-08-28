@@ -134,7 +134,7 @@ try {
   while ([DateTime]::UtcNow -lt $deadline) {
     $matches = @(Get-ChildItem -LiteralPath $temporaryRoot -Filter "last-update-result.json" -Recurse -File -ErrorAction SilentlyContinue)
     if ($matches.Count -eq 1) {
-      $candidate = Get-Content -LiteralPath $matches[0].FullName -Raw | ConvertFrom-Json
+      $candidate = [IO.File]::ReadAllText($matches[0].FullName, [Text.Encoding]::Unicode) | ConvertFrom-Json
       if ([string]$candidate.status -eq "installed") {
         $resultFile = $matches[0].FullName
         break
@@ -174,8 +174,8 @@ try {
   if ($runtimeHashAfter -ne $runtimeHashBefore) { throw "Portable runtime config was not preserved" }
   $backupDirectories = @(Get-ChildItem -LiteralPath $oldOutput -Directory -Filter "QA Hub Renamed By User.backup-*")
   if ($backupDirectories.Count -ne 1) { throw "Updater did not retain exactly one rollback directory" }
-  $logFile = @(Get-ChildItem -LiteralPath $temporaryRoot -Filter "install-update.log" -Recurse -File)[0]
-  $logText = Get-Content -LiteralPath $logFile.FullName -Raw
+  $logFile = @(Get-ChildItem -LiteralPath $temporaryRoot -Filter "update.log" -Recurse -File)[0]
+  $logText = [IO.File]::ReadAllText($logFile.FullName, [Text.Encoding]::Unicode)
   if ($logText -notlike "*update installed*") { throw "Update helper success was not logged" }
 
   $result = [pscustomobject][ordered]@{

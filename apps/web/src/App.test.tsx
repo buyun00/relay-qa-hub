@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import App, { collectClipboardImages, mergeCreateBugImages } from "./App";
+import App, { canSubmitNewBug, collectClipboardImages, mergeCreateBugImages } from "./App";
 import { product } from "./product";
 
 describe("Relay QA Hub browser workbench", () => {
@@ -75,5 +75,11 @@ describe("Relay QA Hub browser workbench", () => {
     });
 
     expect(mergeCreateBugImages([png], [png, text])).toEqual([png]);
+  });
+
+  it("allows creating a Bug without assigning a fixer", () => {
+    expect(canSubmitNewBug(null, "verifier-id")).toBe(true);
+    expect(canSubmitNewBug("正在提交", "verifier-id")).toBe(false);
+    expect(canSubmitNewBug(null, "")).toBe(false);
   });
 });
