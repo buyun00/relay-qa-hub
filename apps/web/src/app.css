@@ -1621,6 +1621,50 @@ h1 {
   font-size: 9px;
   font-weight: 400;
 }
+.create-image-previews {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.create-image-previews figure {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #dfe6df;
+  border-radius: 12px;
+  background: #f6f8f5;
+}
+.create-image-previews img {
+  width: 100%;
+  height: 92px;
+  display: block;
+  object-fit: cover;
+  background: #e7ece7;
+}
+.create-image-previews figcaption {
+  padding: 7px 9px;
+  overflow: hidden;
+  color: #657169;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.create-image-previews button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  color: #fff;
+  background: rgba(18, 43, 33, 0.82);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+}
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -2154,6 +2198,9 @@ h1 {
   }
   .create-modal {
     padding: 20px;
+  }
+  .create-image-previews {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (prefers-reduced-motion: reduce) {

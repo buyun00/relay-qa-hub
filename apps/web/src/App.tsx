@@ -1,4 +1,12 @@
-import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ClipboardEvent,
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   addBugComment,
@@ -56,8 +64,56 @@ interface EvidenceImage {
   readonly url: string;
 }
 
+interface ClipboardImageItem {
+  readonly kind: string;
+  readonly type: string;
+  getAsFile(): File | null;
+}
+
 const DEFAULT_EXPECTED_BEHAVIOR = "问题修复后不再复现";
 const AUTO_REFRESH_INTERVAL_MS = 5_000;
+const CREATE_BUG_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+
+function createBugImageKey(file: File): string {
+  return `${file.name}\u0000${file.size}\u0000${file.type}\u0000${file.lastModified}`;
+}
+
+export function mergeCreateBugImages(
+  current: readonly File[],
+  incoming: readonly File[],
+): readonly File[] {
+  const seen = new Set(current.map(createBugImageKey));
+  return [
+    ...current,
+    ...incoming.filter((file) => {
+      if (!CREATE_BUG_IMAGE_TYPES.has(file.type) || seen.has(createBugImageKey(file))) return false;
+      seen.add(createBugImageKey(file));
+      return true;
+    }),
+  ];
+}
+
+export function collectClipboardImages(
+  items: readonly ClipboardImageItem[],
+  timestamp = Date.now(),
+): readonly File[] {
+  const images: File[] = [];
+  for (const item of items) {
+    if (item.kind !== "file") continue;
+    const file = item.getAsFile();
+    if (file === null) continue;
+    const mediaType = file.type || item.type;
+    if (!CREATE_BUG_IMAGE_TYPES.has(mediaType)) continue;
+    const extension = mediaType === "image/jpeg" ? "jpg" : mediaType.slice("image/".length);
+    images.push(
+      new File([file], `clipboard-${timestamp}-${images.length + 1}.${extension}`, {
+        type: mediaType,
+        lastModified: timestamp,
+      }),
+    );
+  }
+  return images;
+}
 
 function bugContent(bug: Pick<BugListItem, "description" | "title">): string {
   return bug.description.trim() || bug.title.trim();
@@ -200,6 +256,23 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const detailBugIdRef = useRef<string | null>(null);
   const selectedIdRef = useRef<string | null>(null);
   const [overviewRevision, setOverviewRevision] = useState(0);
+
+  const newFilePreviews = useMemo(
+    () =>
+      newFiles.map((file, index) => ({
+        file,
+        key: `${createBugImageKey(file)}\u0000${index}`,
+        url: URL.createObjectURL(file),
+      })),
+    [newFiles],
+  );
+
+  useEffect(
+    () => () => {
+      for (const preview of newFilePreviews) URL.revokeObjectURL(preview.url);
+    },
+    [newFilePreviews],
+  );
 
   const currentProject = projects.find((project) => project.id === projectId) ?? null;
   const memberName = useCallback(
@@ -690,6 +763,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       setCategory("pending");
       openDetail(created.bug.id);
     });
+  };
+
+  const appendNewFiles = (files: readonly File[]) => {
+    setNewFiles((current) => mergeCreateBugImages(current, files));
+  };
+
+  const pasteNewBugImages = (event: ClipboardEvent<HTMLFormElement>) => {
+    const pastedImages = collectClipboardImages([...event.clipboardData.items]);
+    if (pastedImages.length === 0) return;
+    event.preventDefault();
+    appendNewFiles(pastedImages);
   };
 
   const openCreateBug = () => {
@@ -1291,7 +1375,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
       {createOpen ? (
         <div className="modal-backdrop" role="presentation">
-          <form className="create-modal" onSubmit={(event) => void submitBug(event)}>
+          <form
+            className="create-modal"
+            onPaste={pasteNewBugImages}
+            onSubmit={(event) => void submitBug(event)}
+          >
             <div className="modal-head">
               <div>
                 <p className="eyebrow">统一事实源</p>
@@ -1356,15 +1444,37 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               <input
                 accept="image/png,image/jpeg,image/webp"
                 multiple
-                onChange={(event) => setNewFiles([...(event.target.files ?? [])])}
+                onChange={(event) => {
+                  appendNewFiles([...(event.target.files ?? [])]);
+                  event.currentTarget.value = "";
+                }}
                 type="file"
               />
-              <small>
+              <small aria-live="polite">
                 {newFiles.length === 0
-                  ? "可选；原图和标注图可以一起上传"
-                  : `已选择 ${newFiles.length} 张图片`}
+                  ? "可选择文件，或在弹窗内按 Ctrl+V 直接粘贴图片"
+                  : `已添加 ${newFiles.length} 张图片；还可以继续选择或 Ctrl+V 粘贴`}
               </small>
             </label>
+            {newFilePreviews.length === 0 ? null : (
+              <div aria-label="待上传图片" className="create-image-previews">
+                {newFilePreviews.map((preview) => (
+                  <figure key={preview.key}>
+                    <img alt={preview.file.name} src={preview.url} />
+                    <figcaption>{preview.file.name}</figcaption>
+                    <button
+                      aria-label={`移除图片 ${preview.file.name}`}
+                      onClick={() =>
+                        setNewFiles((current) => current.filter((file) => file !== preview.file))
+                      }
+                      type="button"
+                    >
+                      ×
+                    </button>
+                  </figure>
+                ))}
+              </div>
+            )}
             <div className="modal-actions">
               <button
                 className="secondary-button"

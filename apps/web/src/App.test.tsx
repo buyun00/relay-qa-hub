@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import App from "./App";
+import App, { collectClipboardImages, mergeCreateBugImages } from "./App";
 import { product } from "./product";
 
 describe("Relay QA Hub browser workbench", () => {
@@ -38,5 +38,42 @@ describe("Relay QA Hub browser workbench", () => {
   it("exposes the build and frozen contract versions", () => {
     expect(product.appVersion).toBe("1.1.0");
     expect(product.contractVersion).toBe("1.0.0");
+  });
+
+  it("collects supported clipboard images and gives them upload-safe names", () => {
+    const png = new File([new Uint8Array([1, 2, 3])], "image.png", {
+      type: "image/png",
+      lastModified: 1,
+    });
+    const gif = new File([new Uint8Array([4])], "image.gif", {
+      type: "image/gif",
+      lastModified: 2,
+    });
+    const pasted = collectClipboardImages(
+      [
+        { kind: "string", type: "text/plain", getAsFile: () => null },
+        { kind: "file", type: "", getAsFile: () => png },
+        { kind: "file", type: "image/gif", getAsFile: () => gif },
+      ],
+      1234,
+    );
+
+    expect(pasted).toHaveLength(1);
+    expect(pasted[0]?.name).toBe("clipboard-1234-1.png");
+    expect(pasted[0]?.type).toBe("image/png");
+    expect(pasted[0]?.size).toBe(3);
+  });
+
+  it("appends supported images without duplicating the same selected file", () => {
+    const png = new File([new Uint8Array([1])], "same.png", {
+      type: "image/png",
+      lastModified: 99,
+    });
+    const text = new File(["not an image"], "notes.txt", {
+      type: "text/plain",
+      lastModified: 100,
+    });
+
+    expect(mergeCreateBugImages([png], [png, text])).toEqual([png]);
   });
 });
