@@ -32,8 +32,6 @@ const OVERVIEW_COLUMN_STORAGE_KEY = "relay-qa-hub:overview-column-widths:v1";
 const overviewColumns = [
   { key: "key", label: "编号", defaultWidth: 86, minWidth: 72 },
   { key: "title", label: "反馈问题", defaultWidth: 560, minWidth: 300 },
-  { key: "priority", label: "优先级", defaultWidth: 96, minWidth: 84 },
-  { key: "reporter", label: "提报人", defaultWidth: 102, minWidth: 88 },
   { key: "owner", label: "负责人", defaultWidth: 190, minWidth: 150 },
   { key: "verifier", label: "验收人", defaultWidth: 190, minWidth: 150 },
   { key: "state", label: "处理状态", defaultWidth: 112, minWidth: 96 },
@@ -151,6 +149,10 @@ function formatDate(value: string): string {
     minute: "2-digit",
     hour12: false,
   }).format(date);
+}
+
+export function displayBugNumber(key: string): string {
+  return key.replace(/^LOCAL-/i, "");
 }
 
 function errorMessage(cause: unknown): string {
@@ -544,20 +546,15 @@ export default function OverviewPage({
               role="row"
               style={overviewGridStyle}
             >
-              <button className="overview-key" onClick={() => onOpenBug(bug.id)} type="button">
-                {bug.key}
-              </button>
-              <button className="overview-title" onClick={() => onOpenBug(bug.id)} type="button">
-                <strong>{bug.description.trim() || bug.title}</strong>
-                <small>{bug.expectedBehavior}</small>
-              </button>
-              <span className="overview-priority-cell">
+              <span className={`overview-key-priority ${bug.priority.toLowerCase()}`}>
+                <span className="overview-key-number">{displayBugNumber(bug.key)}</span>
+                <small>{bug.priority}</small>
                 <select
                   aria-label={`设置 ${bug.key} 优先级`}
-                  className={`overview-priority-select ${bug.priority.toLowerCase()}`}
+                  className="overview-key-priority-select"
                   disabled={mutatingId === bug.id}
                   onChange={(event) => void setPriority(bug, event.target.value as BugPriority)}
-                  title="点击设置 P0-P3 优先级"
+                  title="点击编号设置 P0-P3 优先级"
                   value={bug.priority}
                 >
                   {bug.priority === "P4" ? <option value="P4">P4</option> : null}
@@ -567,9 +564,10 @@ export default function OverviewPage({
                     </option>
                   ))}
                 </select>
-                <small>{bug.severity}</small>
               </span>
-              <span>{memberName(bug.reporterId)}</span>
+              <button className="overview-title" onClick={() => onOpenBug(bug.id)} type="button">
+                <strong>{bug.description.trim() || bug.title}</strong>
+              </button>
               <span className="overview-owner-cell overview-person-cell">
                 {bug.ownerId === null ? (
                   <button

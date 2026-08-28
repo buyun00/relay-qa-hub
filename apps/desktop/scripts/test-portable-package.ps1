@@ -164,7 +164,7 @@ try {
       -not [string]::IsNullOrWhiteSpace([string]$overview.overviewErrorText)) {
     throw "Portable package did not load the shared Bug overview"
   }
-  $expectedOverviewHeaders = @("编号", "反馈问题", "优先级", "提报人", "负责人", "验收人", "处理状态", "提出时间", "最后更新")
+  $expectedOverviewHeaders = @("编号", "反馈问题", "负责人", "验收人", "处理状态", "提出时间", "最后更新")
   if ((@($overview.overviewHeaders) -join "|") -ne ($expectedOverviewHeaders -join "|")) {
     throw "Packaged overview does not expose the dense shared-table columns"
   }
@@ -178,7 +178,22 @@ try {
     throw "Packaged overview rows do not all expose direct verifier assignment"
   }
   if ([int]$overview.overviewRowCount -ne [int]$overview.overviewPrioritySelectCount) {
-    throw "Packaged overview rows do not all expose direct priority assignment"
+    throw "Packaged overview numbers do not all expose direct priority assignment"
+  }
+  if ([int]$overview.overviewRowCount -ne [int]$overview.overviewPriorityLabelCount) {
+    throw "Packaged overview numbers do not all display their compact priority label"
+  }
+  if (@($overview.overviewDisplayedKeys | Where-Object { $_ -match '^LOCAL-' }).Count -ne 0) {
+    throw "Packaged overview still displays the LOCAL- task-number prefix"
+  }
+  if ([int]$overview.overviewTitleSupplementCount -ne 0) {
+    throw "Packaged overview still displays expected-behavior supplement text under the issue"
+  }
+  if ([int]$overview.overviewRowCount -ne [int]$overview.overviewWrappedTitleCount) {
+    throw "Packaged overview issue text does not wrap in every row"
+  }
+  if ([int]$overview.overviewRowCount -ne [int]$overview.overviewLargeTitleCount) {
+    throw "Packaged overview issue text is not enlarged in every row"
   }
   if ([int]$overview.overviewColumnResizerCount -ne $expectedOverviewHeaders.Count) {
     throw "Packaged overview columns do not all expose drag resize handles"
@@ -206,6 +221,10 @@ try {
     overviewOwnerSelectCount = [int]$overview.overviewOwnerSelectCount
     overviewVerifierSelectCount = [int]$overview.overviewVerifierSelectCount
     overviewPrioritySelectCount = [int]$overview.overviewPrioritySelectCount
+    overviewPriorityLabelCount = [int]$overview.overviewPriorityLabelCount
+    overviewTitleSupplementCount = [int]$overview.overviewTitleSupplementCount
+    overviewWrappedTitleCount = [int]$overview.overviewWrappedTitleCount
+    overviewLargeTitleCount = [int]$overview.overviewLargeTitleCount
     overviewColumnResizerCount = [int]$overview.overviewColumnResizerCount
     overviewUnassignedFilter = [bool]$overview.overviewUnassignedFilterAvailable
     overviewHeaders = @($overview.overviewHeaders) -join ", "

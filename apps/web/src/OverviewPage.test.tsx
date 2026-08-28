@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import OverviewPage from "./OverviewPage";
+import OverviewPage, { displayBugNumber } from "./OverviewPage";
 
 describe("Bug overview", () => {
   it("renders the shared-table filters and ownership controls", () => {
@@ -40,6 +40,14 @@ describe("Bug overview", () => {
     expect(markup).toContain("验收人");
     expect(markup).toContain("拖拽调整负责人列宽");
     expect(markup).toContain("拖拽调整验收人列宽");
+    expect(markup).not.toContain("拖拽调整优先级列宽");
+    expect(markup).not.toContain("拖拽调整提报人列宽");
     expect(markup).toContain("最多一次读取 500 条");
+  });
+
+  it("shows LOCAL keys as plain numeric task numbers", () => {
+    expect(displayBugNumber("LOCAL-18")).toBe("18");
+    expect(displayBugNumber("local-7")).toBe("7");
+    expect(displayBugNumber("QA-42")).toBe("QA-42");
   });
 });

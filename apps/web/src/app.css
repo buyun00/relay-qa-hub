@@ -1936,69 +1936,76 @@ h1 {
 .overview-grid-head > span:last-child .overview-column-resizer {
   right: 0;
 }
-.overview-key,
 .overview-title {
   background: transparent;
   cursor: pointer;
 }
-.overview-key {
-  color: #28735f !important;
-  font-size: 12px !important;
-  font-weight: 850 !important;
+.overview-key-priority {
+  cursor: pointer;
+  justify-content: center;
+  position: relative;
+}
+.overview-key-priority:focus-within {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+.overview-key-number {
+  color: var(--overview-priority-color);
+  font-size: 15px;
+  font-weight: 900;
+}
+.overview-key-priority > small {
+  bottom: 5px;
+  color: var(--overview-priority-color) !important;
+  font-size: 8px !important;
+  font-weight: 850;
+  line-height: 1;
+  position: absolute;
+  right: 7px;
+}
+.overview-key-priority-select {
+  border: 0;
+  cursor: pointer;
+  height: 100%;
+  inset: 0;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+}
+.overview-key-priority-select:disabled {
+  cursor: wait;
+}
+.overview-key-priority.p0 {
+  --overview-priority-color: #c83f52;
+}
+.overview-key-priority.p1 {
+  --overview-priority-color: #d66f18;
+}
+.overview-key-priority.p2 {
+  --overview-priority-color: #356bd1;
+}
+.overview-key-priority.p3 {
+  --overview-priority-color: #3f835f;
+}
+.overview-key-priority.p4 {
+  --overview-priority-color: #718078;
 }
 .overview-title {
   align-items: flex-start !important;
-  display: grid !important;
-  gap: 3px;
+  display: block !important;
 }
 .overview-title strong {
   color: #263a30;
-  font-size: 13px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: block;
+  font-size: 15px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
-.overview-title small,
 .overview-grid > span small {
   color: #8a958e;
   font-size: 10px;
-}
-.overview-priority-cell {
-  align-content: center;
-  display: grid;
-  gap: 4px;
-}
-.overview-priority-select {
-  appearance: auto;
-  border: 0;
-  border-radius: 10px;
-  color: #ffffff;
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 850;
-  height: 38px;
-  padding: 0 7px;
-  width: 58px;
-}
-.overview-priority-select.p0 {
-  background: #c83f52;
-}
-.overview-priority-select.p1 {
-  background: #df8128;
-}
-.overview-priority-select.p2 {
-  background: #4f7fe5;
-}
-.overview-priority-select.p3 {
-  background: #4e916e;
-}
-.overview-priority-select.p4 {
-  background: #91a099;
-}
-.overview-priority-select option {
-  background: #ffffff;
-  color: #2e4137;
 }
 .overview-person-cell {
   gap: 6px;

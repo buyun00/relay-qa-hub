@@ -106,7 +106,15 @@ const snapshotExpression = `
       overviewRowCount: document.querySelectorAll(".overview-grid:not(.overview-grid-head)").length,
       overviewOwnerSelectCount: document.querySelectorAll(".overview-owner-cell select").length,
       overviewVerifierSelectCount: document.querySelectorAll(".overview-verifier-cell select").length,
-      overviewPrioritySelectCount: document.querySelectorAll(".overview-priority-select").length,
+      overviewPrioritySelectCount: document.querySelectorAll(".overview-key-priority-select").length,
+      overviewPriorityLabelCount: document.querySelectorAll(".overview-key-priority > small").length,
+      overviewDisplayedKeys: [...document.querySelectorAll(".overview-key-number")].map((node) =>
+        node.textContent?.trim() ?? ""),
+      overviewTitleSupplementCount: document.querySelectorAll(".overview-title > small").length,
+      overviewWrappedTitleCount: [...document.querySelectorAll(".overview-title > strong")].filter(
+        (node) => getComputedStyle(node).whiteSpace !== "nowrap").length,
+      overviewLargeTitleCount: [...document.querySelectorAll(".overview-title > strong")].filter(
+        (node) => Number.parseFloat(getComputedStyle(node).fontSize) >= 15).length,
       overviewColumnResizerCount: document.querySelectorAll(".overview-column-resizer").length,
       overviewHeaders: [...document.querySelectorAll(".overview-grid-head > span")].map((node) =>
         node.textContent?.trim() ?? ""),
