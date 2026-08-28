@@ -179,7 +179,6 @@ export default function OverviewPage({
   const [mutatingId, setMutatingId] = useState<string | null>(null);
   const [columnWidths, setColumnWidths] = useState<OverviewColumnWidths>(loadOverviewColumnWidths);
   const [resizingColumn, setResizingColumn] = useState<OverviewColumnKey | null>(null);
-  const sheetRef = useRef<HTMLElement>(null);
   const columnWidthsRef = useRef(columnWidths);
   const activeColumnResizeRef = useRef<ActiveColumnResize | null>(null);
   const columnResizeCleanupRef = useRef<(() => void) | null>(null);
@@ -243,31 +242,6 @@ export default function OverviewPage({
     }, 5_000);
     return () => window.clearInterval(interval);
   }, [load]);
-
-  useEffect(() => {
-    const sheet = sheetRef.current;
-    if (sheet === null) return;
-    const fitTitleColumn = () => {
-      const availableWidth = sheet.clientWidth;
-      if (availableWidth === 0) return;
-      setColumnWidths((current) => {
-        const currentWidth = overviewColumns.reduce((sum, column) => sum + current[column.key], 0);
-        const titleColumn = overviewColumns[1];
-        const fittedTitleWidth = Math.max(
-          titleColumn.minWidth,
-          current.title + availableWidth - currentWidth,
-        );
-        if (fittedTitleWidth === current.title) return current;
-        const next = { ...current, title: fittedTitleWidth };
-        columnWidthsRef.current = next;
-        return next;
-      });
-    };
-    fitTitleColumn();
-    const observer = new ResizeObserver(fitTitleColumn);
-    observer.observe(sheet);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => () => columnResizeCleanupRef.current?.(), []);
 
@@ -531,7 +505,6 @@ export default function OverviewPage({
       <section
         className={`overview-sheet${resizingColumn === null ? "" : " is-resizing"}`}
         aria-label="全部 Bug 总览"
-        ref={sheetRef}
       >
         <div className="overview-sheet-meta" style={overviewContentStyle}>
           <strong>{visibleItems.length} 条当前结果</strong>
