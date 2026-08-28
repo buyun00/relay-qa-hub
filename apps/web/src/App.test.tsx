@@ -92,12 +92,11 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canSubmitNewBug(null, "")).toBe(false);
   });
 
-  it("lets the assigned closer directly close a ready Bug without reporter confirmation", () => {
-    expect(canDirectCloseBug("ready_for_verification", true, true, null)).toBe(true);
-    expect(canDirectCloseBug("ready_for_verification", true, true, "requested")).toBe(true);
-    expect(canDirectCloseBug("ready_for_verification", true, true, "in_progress")).toBe(true);
-    expect(canDirectCloseBug("ready_for_verification", false, true, "requested")).toBe(false);
-    expect(canDirectCloseBug("in_progress", true, true, null)).toBe(false);
+  it("lets any project member directly close a ready Bug without identity checks", () => {
+    expect(canDirectCloseBug("ready_for_verification", true, null)).toBe(true);
+    expect(canDirectCloseBug("ready_for_verification", true, "requested")).toBe(true);
+    expect(canDirectCloseBug("ready_for_verification", true, "in_progress")).toBe(true);
+    expect(canDirectCloseBug("in_progress", true, null)).toBe(false);
   });
 
   it("only enables detail saving for a valid changed versioned draft", () => {

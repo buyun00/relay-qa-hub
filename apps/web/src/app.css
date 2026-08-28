@@ -354,6 +354,20 @@ h1 {
 .secondary-button:not(:disabled):hover {
   background: #f4f7f3;
 }
+.danger-button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #c94d47;
+  border-radius: 12px;
+  color: #9b2f2b;
+  background: #fff7f6;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.danger-button:not(:disabled):hover {
+  background: #ffedeb;
+}
 .banner {
   margin: -8px 0 18px;
   padding: 12px 15px;

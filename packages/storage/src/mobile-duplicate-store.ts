@@ -193,7 +193,13 @@ function requireReadableSourceBug(
         AND membership.project_id = bug.project_id
         AND membership.user_id = actor.id
         AND membership.status = 'active'
-       WHERE bug.account_id = ? AND bug.project_id = ? AND bug.id = ?`,
+       WHERE bug.account_id = ? AND bug.project_id = ? AND bug.id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bug.account_id
+             AND deletion.project_id = bug.project_id
+             AND deletion.bug_id = bug.id
+         )`,
     )
     .get(input.actorId, input.accountId, input.projectId, input.bugId) as
     BugIdentityRow | undefined;
@@ -223,6 +229,12 @@ export function listMobileDuplicateCandidates(
          AND id <> ?
          AND state <> 'duplicate'
          AND duplicate_of_bug_id IS NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bugs.account_id
+             AND deletion.project_id = bugs.project_id
+             AND deletion.bug_id = bugs.id
+         )
        ORDER BY number ASC, id ASC`,
     )
     .all(input.accountId, input.projectId, source.id) as unknown as BugIdentityRow[];
@@ -284,7 +296,13 @@ export function markMobileBugDuplicate(
       `SELECT id
        FROM bugs
        WHERE account_id = ? AND project_id = ? AND id = ?
-         AND state <> 'duplicate' AND duplicate_of_bug_id IS NULL`,
+         AND state <> 'duplicate' AND duplicate_of_bug_id IS NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bugs.account_id
+             AND deletion.project_id = bugs.project_id
+             AND deletion.bug_id = bugs.id
+         )`,
     )
     .get(input.accountId, input.projectId, input.canonicalBugId);
   if (!canonical) {

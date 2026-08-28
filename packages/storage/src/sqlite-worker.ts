@@ -18,7 +18,9 @@ import type {
 } from "./mobile-attachment-store.js";
 import type {
   CreateMobileBugInput,
+  DeleteMobileBugInput,
   MobileBugCreation,
+  MobileBugDeletion,
   MobileBugRecord,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
@@ -268,6 +270,11 @@ export class SqliteStorageWorker {
   async createMobileBug(input: CreateMobileBugInput): Promise<MobileBugCreation> {
     await this.initialization;
     return this.request<MobileBugCreation>("createMobileBug", input);
+  }
+
+  async deleteMobileBug(input: DeleteMobileBugInput): Promise<MobileBugDeletion> {
+    await this.initialization;
+    return this.request<MobileBugDeletion>("deleteMobileBug", input);
   }
 
   async initMobileUpload(input: InitMobileUploadInput): Promise<MobileUploadSession> {

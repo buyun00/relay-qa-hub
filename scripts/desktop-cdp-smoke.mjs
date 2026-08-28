@@ -106,6 +106,7 @@ const snapshotExpression = `
       detailLoadingVisible: document.querySelector(".detail-loading") !== null,
       detailErrorText: detailError?.textContent?.trim() ?? null,
       detailEditTriggerVisible: document.querySelector(".detail-edit-trigger") !== null,
+      detailDeleteTriggerVisible: document.querySelector(".detail-actions .danger-button") !== null,
       detailEditorVisible: document.querySelector(".detail-edit-form") !== null,
       detailEditorFieldCount: document.querySelectorAll(
         ".detail-edit-form input, .detail-edit-form textarea, .detail-edit-form select",

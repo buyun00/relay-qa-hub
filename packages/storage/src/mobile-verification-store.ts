@@ -220,13 +220,11 @@ function requireVerificationIdentity(input: MobileRelayScope, verifierId: string
   requireUuid(verifierId, "verifierId");
 }
 
-function hasProjectRole(
+function hasProjectMembership(
   database: DatabaseSync,
   input: MobileRelayScope,
   userId: string,
-  roles: readonly ("reporter" | "triager" | "verifier")[],
 ): boolean {
-  const placeholders = roles.map(() => "?").join(", ");
   const row = database
     .prepare(
       `SELECT 1 AS present
@@ -242,23 +240,17 @@ function hasProjectRole(
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
         AND membership.status = 'active'
-       JOIN membership_roles AS role
-         ON role.account_id = membership.account_id
-        AND role.project_id = membership.project_id
-        AND role.membership_id = membership.id
-        AND role.role IN (${placeholders})
        WHERE account.id = ? AND account.status = 'active'`,
     )
-    .get(input.projectId, userId, ...roles, input.accountId) as
-    { readonly present: number } | undefined;
+    .get(input.projectId, userId, input.accountId) as { readonly present: number } | undefined;
   return row !== undefined;
 }
 
 function requireVerificationCreatorRole(database: DatabaseSync, input: MobileRelayScope): void {
-  if (!hasProjectRole(database, input, input.actorId, ["verifier", "triager"])) {
+  if (!hasProjectMembership(database, input, input.actorId)) {
     throw new MobileRelayStorageError(
       "FORBIDDEN",
-      "Verification creation requires verifier or triager authority",
+      "Verification creation requires active project membership",
     );
   }
 }
@@ -268,8 +260,8 @@ function requireVerifierRole(
   input: MobileRelayScope,
   verifierId = input.actorId,
 ): void {
-  if (!hasProjectRole(database, input, verifierId, ["verifier"])) {
-    throw new MobileRelayStorageError("FORBIDDEN", "assigned user lacks verifier authority");
+  if (!hasProjectMembership(database, input, verifierId)) {
+    throw new MobileRelayStorageError("FORBIDDEN", "assigned user is not an active project member");
   }
 }
 
@@ -755,9 +747,6 @@ export function startMobileVerification(
   requireVerifierRole(database, input);
   const current = readVerification(database, input, input.verificationId);
   if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
-  if (current.verifier_id !== input.actorId) {
-    throw new MobileRelayStorageError("FORBIDDEN", "actor is not the assigned verifier");
-  }
   if (current.status !== "requested" || current.version !== input.expectedVersion) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
@@ -794,9 +783,9 @@ export function startMobileVerification(
       `UPDATE verifications
        SET status = 'in_progress', updated_at = ?, version = version + 1
        WHERE account_id = ? AND project_id = ? AND id = ?
-         AND verifier_id = ? AND status = 'requested' AND version = ?`,
+         AND status = 'requested' AND version = ?`,
     )
-    .run(at, input.accountId, input.projectId, current.id, input.actorId, input.expectedVersion);
+    .run(at, input.accountId, input.projectId, current.id, input.expectedVersion);
   if (updated.changes !== 1) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
@@ -842,18 +831,8 @@ export function recordMobileVerificationResult(
   if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
   const bug = readBug(database, input, current.bug_id);
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Verification Bug was not found");
-  const assignedVerifierAuthorized =
-    current.verifier_id === input.actorId &&
-    hasProjectRole(database, input, input.actorId, ["verifier"]);
-  const reporterAuthorized =
-    bug.reporter_id === input.actorId &&
-    hasProjectRole(database, input, input.actorId, ["reporter"]);
-  if (!assignedVerifierAuthorized && !reporterAuthorized) {
-    throw new MobileRelayStorageError(
-      "FORBIDDEN",
-      "only the assigned verifier or Bug reporter can record a Verification result",
-    );
-  }
+  if (!hasProjectMembership(database, input, input.actorId))
+    throw new MobileRelayStorageError("FORBIDDEN", "actor has no active project membership");
   if (
     current.status !== "in_progress" ||
     current.version !== input.expectedVersion ||

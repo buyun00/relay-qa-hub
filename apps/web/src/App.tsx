@@ -15,6 +15,7 @@ import {
   createHumanRepairAttempt,
   createRelayAttempt,
   createVerification,
+  deleteBug,
   deliverHumanRepairAttemptNoCode,
   dispatchRelay,
   downloadAttachment,
@@ -238,13 +239,11 @@ function categoryMatches(category: Category, state: BugListState): boolean {
 
 export function canDirectCloseBug(
   state: BugListState,
-  isAssignedCloser: boolean,
   hasRepairAttempt: boolean,
   verificationStatus: VerificationRecord["status"] | null,
 ): boolean {
   return (
     state === "ready_for_verification" &&
-    isAssignedCloser &&
     hasRepairAttempt &&
     (verificationStatus === null ||
       verificationStatus === "requested" ||
@@ -1051,6 +1050,21 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     });
   };
 
+  const deleteSelectedBug = async () => {
+    if (detail === null) return;
+    const confirmed = window.confirm(
+      `确认删除 ${detail.key}？删除后会从 QA Hub 列表、详情和 MCP 中隐藏。`,
+    );
+    if (!confirmed) return;
+    await runMutation(
+      `${detail.key} 已删除`,
+      async () => {
+        await deleteBug(detail.id, detail.version);
+      },
+      { closeDetailOnSuccess: true },
+    );
+  };
+
   const handoffRelay = async () => {
     if (detail === null || detail.ownerId === null) return;
     await runMutation("已将 Bug 交给 Relay，QA Hub 仍保留生命周期控制", async () => {
@@ -1130,7 +1144,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const canManageDetail = detail !== null && mutation === null;
   const isOwner = detail?.ownerId === principal.userId;
-  const isAssignedVerifier = detail?.verificationOwnerId === principal.userId;
   const repairAttempt = workflow?.repairAttempt ?? null;
   const verification = workflow?.verification ?? null;
   const previousAttemptFailed = repairAttempt?.status === "verification_failed";
@@ -1821,7 +1834,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       ) : null}
                       {canDirectCloseBug(
                         detail.state,
-                        isAssignedVerifier,
                         repairAttempt !== null,
                         verification?.status ?? null,
                       ) ? (
@@ -1852,11 +1864,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           </button>
                         </>
                       ) : null}
-                      {detail.state === "ready_for_verification" && !isAssignedVerifier ? (
-                        <p className="action-note">
-                          等待关闭人 {memberName(detail.verificationOwnerId)} 直接关闭或打回。
-                        </p>
-                      ) : null}
                       {detail.state !== "closed" &&
                       (repairAttempt === null || previousAttemptFailed) &&
                       isOwner ? (
@@ -1883,6 +1890,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                             : `当前等待修复人 ${memberName(detail.ownerId)} 处理。`}
                         </p>
                       ) : null}
+                      <button
+                        className="danger-button"
+                        disabled={mutation !== null}
+                        onClick={() => void deleteSelectedBug()}
+                        type="button"
+                      >
+                        删除 Bug
+                      </button>
                     </>
                   )}
                 </footer>

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
 import { insertBugWithNextNumber, SqliteStorageError } from "./sqlite.js";
+import { MobileRelayStorageError } from "./mobile-relay-store.js";
 
 const NOTIFICATION_DESTINATION = "qa-hub.notifications";
 
@@ -94,6 +95,23 @@ export interface MobileBugCreation {
   readonly replayed: boolean;
 }
 
+export interface DeleteMobileBugInput {
+  readonly accountId: string;
+  readonly projectId: string;
+  readonly actorId: string;
+  readonly bugId: string;
+  readonly expectedVersion: number;
+  readonly idempotencyKey: string;
+  readonly requestDigest: string;
+  readonly createdAt: string;
+}
+
+export interface MobileBugDeletion {
+  readonly bugId: string;
+  readonly deletedAt: string;
+  readonly replayed: boolean;
+}
+
 interface MobileBugRow {
   readonly id: string;
   readonly project_id: string;
@@ -140,7 +158,13 @@ function readBug(
               verification_owner_id, duplicate_of_bug_id, occurrence_count,
               reopen_count, version, created_at, updated_at, closed_at
        FROM bugs
-       WHERE account_id = ? AND project_id = ? AND id = ?`,
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bugs.account_id
+             AND deletion.project_id = bugs.project_id
+             AND deletion.bug_id = bugs.id
+         )`,
     )
     .get(accountId, projectId, bugId) as MobileBugRow | undefined;
   if (!row) return null;
@@ -207,8 +231,7 @@ export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBoot
   requireTransaction(database);
   const suffix = scope.accountId.replaceAll("-", "").slice(-12).toLowerCase();
   const actorDisplayName = scope.actorDisplayName ?? "MuMu MVP reporter";
-  const actorEmail =
-    scope.actorEmail ?? `mvp-${scope.actorId.replaceAll("-", "")}@local.invalid`;
+  const actorEmail = scope.actorEmail ?? `mvp-${scope.actorId.replaceAll("-", "")}@local.invalid`;
   database
     .prepare(
       `INSERT OR IGNORE INTO accounts(
@@ -706,4 +729,101 @@ export function getMobileBug(
   bugId: string,
 ): MobileBugRecord | null {
   return readBug(database, scope.accountId, scope.projectId, bugId);
+}
+
+export function deleteMobileBug(
+  database: DatabaseSync,
+  input: DeleteMobileBugInput,
+): MobileBugDeletion {
+  requireTransaction(database);
+  const uuidPattern =
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
+  if (
+    !uuidPattern.test(input.accountId) ||
+    !uuidPattern.test(input.projectId) ||
+    !uuidPattern.test(input.actorId) ||
+    !uuidPattern.test(input.bugId) ||
+    !Number.isSafeInteger(input.expectedVersion) ||
+    input.expectedVersion < 1 ||
+    input.idempotencyKey.length < 1 ||
+    input.idempotencyKey.length > 200 ||
+    !/^[0-9a-f]{64}$/u.test(input.requestDigest) ||
+    !Number.isFinite(Date.parse(input.createdAt))
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Bug deletion input is invalid");
+  }
+  const membership = database
+    .prepare(
+      `SELECT 1 AS present
+       FROM accounts AS account
+       JOIN projects AS project
+         ON project.account_id = account.id
+        AND project.id = ? AND project.status = 'active'
+       JOIN users AS actor
+         ON actor.account_id = account.id
+        AND actor.id = ? AND actor.status = 'active'
+       JOIN memberships AS member
+         ON member.account_id = account.id
+        AND member.project_id = project.id
+        AND member.user_id = actor.id
+        AND member.status = 'active'
+       WHERE account.id = ? AND account.status = 'active'`,
+    )
+    .get(input.projectId, input.actorId, input.accountId);
+  if (!membership) {
+    throw new MobileRelayStorageError("FORBIDDEN", "actor has no active project membership");
+  }
+
+  const prior = database
+    .prepare(
+      `SELECT deleted_at, idempotency_key, request_digest
+       FROM bug_deletions
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId) as
+    | {
+        readonly deleted_at: string;
+        readonly idempotency_key: string;
+        readonly request_digest: string;
+      }
+    | undefined;
+  if (prior) {
+    if (
+      prior.idempotency_key !== input.idempotencyKey ||
+      prior.request_digest !== input.requestDigest
+    ) {
+      throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+    }
+    return Object.freeze({ bugId: input.bugId, deletedAt: prior.deleted_at, replayed: true });
+  }
+
+  const bug = database
+    .prepare(
+      `SELECT version FROM bugs
+       WHERE account_id = ? AND project_id = ? AND id = ?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId) as { readonly version: number } | undefined;
+  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+  if (bug.version !== input.expectedVersion) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug version changed before deletion");
+  }
+
+  database
+    .prepare(
+      `INSERT INTO bug_deletions(
+        account_id, project_id, bug_id, bug_version, deleted_by_actor_id,
+        deleted_at, idempotency_key, request_digest
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(
+      input.accountId,
+      input.projectId,
+      input.bugId,
+      bug.version,
+      input.actorId,
+      input.createdAt,
+      input.idempotencyKey,
+      input.requestDigest,
+    );
+  return Object.freeze({ bugId: input.bugId, deletedAt: input.createdAt, replayed: false });
 }

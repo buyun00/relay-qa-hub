@@ -11,7 +11,8 @@ import {
   openSqliteDatabaseForWorker,
   verifySqliteIntegrity,
 } from "../src/sqlite.ts";
-import { createMobileBug } from "../src/mobile-bug-store.ts";
+import { createMobileBug, deleteMobileBug, getMobileBug } from "../src/mobile-bug-store.ts";
+import { listMobileBugs } from "../src/mobile-bug-list-store.ts";
 import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.ts";
 import {
   createMobileManualRepairAttempt,
@@ -10547,7 +10548,7 @@ test("forward v3 requires developer authority for a RepairAttempt assignee", asy
   });
 });
 
-test("multi-actor no-code human workflow can be rejected and then closed by the reporter", async () => {
+test("multi-actor no-code human workflow can be managed by any project member", async () => {
   await withDatabase((database) => {
     const tenant = seedTenant(database, 5_400, "MHW");
     const bugId = identifier(5_410);
@@ -10562,6 +10563,21 @@ test("multi-actor no-code human workflow can be rejected and then closed by the 
       projectId: tenant.projectId,
       actorId: tenant.secondaryUserId,
     } as const;
+    const observerId = identifier(5_415);
+    const observerScope = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: observerId,
+    } as const;
+
+    database
+      .prepare(
+        `INSERT INTO users(
+          id, account_id, email, display_name, status, created_at, updated_at, version
+        ) VALUES (?, ?, ?, 'Project observer', 'active', ?, ?, 1)`,
+      )
+      .run(observerId, tenant.accountId, "observer-5400@example.invalid", CREATED_AT, CREATED_AT);
+    insertActiveMembershipRole(database, tenant, identifier(5_416), "viewer", observerId);
 
     insertActiveMembershipRole(database, tenant, identifier(5_411), "triager");
     insertActiveMembershipRole(database, tenant, identifier(5_412), "reporter");
@@ -10809,7 +10825,7 @@ test("multi-actor no-code human workflow can be rejected and then closed by the 
     );
     const startedPassedVerification = transaction(database, () =>
       startMobileVerification(database, {
-        ...developerScope,
+        ...observerScope,
         verificationId: passedVerification.id,
         expectedVersion: passedVerification.version,
         reason: null,
@@ -10820,7 +10836,7 @@ test("multi-actor no-code human workflow can be rejected and then closed by the 
     );
     const passedResult = transaction(database, () =>
       recordMobileVerificationResult(database, {
-        ...primaryScope,
+        ...observerScope,
         verificationId: passedVerification.id,
         expectedVersion: startedPassedVerification.version,
         status: "passed",
@@ -10883,6 +10899,64 @@ test("multi-actor no-code human workflow can be rejected and then closed by the 
           item.type === "verification.result_recorded" && item.title === "验收未通过，已退回",
       ),
       true,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("any project member can soft-delete a Bug and hide it from reads", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_500, "DELETE");
+    const bugId = identifier(5_510);
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(5_511),
+      "viewer",
+      tenant.secondaryUserId,
+    );
+    createBug(database, tenant, bugId, "Delete from details", {
+      ownerId: tenant.userId,
+      verificationOwnerId: tenant.userId,
+    });
+    const input = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.secondaryUserId,
+      bugId,
+      expectedVersion: 1,
+      idempotencyKey: `web:deleteBug:bug:${bugId}:v1`,
+      requestDigest: digest(5_512),
+      createdAt: UPDATED_AT,
+    } as const;
+
+    const deleted = transaction(database, () => deleteMobileBug(database, input));
+    assert.deepEqual(deleted, { bugId, deletedAt: UPDATED_AT, replayed: false });
+    const replay = transaction(database, () => deleteMobileBug(database, input));
+    assert.equal(replay.replayed, true);
+    assert.equal(
+      getMobileBug(database, { accountId: tenant.accountId, projectId: tenant.projectId }, bugId),
+      null,
+    );
+    assert.equal(
+      listMobileBugs(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.secondaryUserId,
+        limit: 100,
+      }).items.length,
+      0,
+    );
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT bug_version AS bugVersion, deleted_by_actor_id AS actorId
+             FROM bug_deletions WHERE bug_id = ?`,
+          )
+          .get(bugId),
+      },
+      { actorId: tenant.secondaryUserId, bugVersion: 1 },
     );
     assertIntegrity(database);
   });

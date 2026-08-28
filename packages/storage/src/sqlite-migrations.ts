@@ -7009,6 +7009,138 @@ CREATE INDEX qingyu_bug_links_importer_idx
   ON qingyu_bug_links(account_id, project_id, imported_by_actor_id, imported_at DESC);
 `;
 
+function sharedProjectBugManagementSql(): string {
+  const allProjectRoles =
+    "('viewer', 'reporter', 'developer', 'verifier', 'triager', 'release_manager')";
+  let sql = MULTI_ACTOR_HUMAN_WORKFLOW_SQL;
+  const replaceRequired = (search: string, replacement: string, label: string): void => {
+    if (!sql.includes(search)) {
+      throw new Error(`SQLite shared Bug management fragment is missing: ${label}`);
+    }
+    sql = sql.split(search).join(replacement);
+  };
+
+  replaceRequired(
+    `AND (
+          verification.verifier_id = new.actor_id
+          OR EXISTS (
+            SELECT 1 FROM bugs AS reporter_bug
+            WHERE reporter_bug.account_id = verification.account_id
+              AND reporter_bug.project_id = verification.project_id
+              AND reporter_bug.id = verification.bug_id
+              AND reporter_bug.reporter_id = new.actor_id
+          )
+        )`,
+    `AND EXISTS (
+          SELECT 1 FROM memberships AS result_membership
+          WHERE result_membership.account_id = verification.account_id
+            AND result_membership.project_id = verification.project_id
+            AND result_membership.user_id = new.actor_id
+            AND result_membership.status = 'active'
+        )`,
+    "Verification result submission project membership",
+  );
+  replaceRequired(
+    "role.role IN ('verifier', 'reporter')",
+    `role.role IN ${allProjectRoles}`,
+    "Verification result actor role",
+  );
+  replaceRequired(
+    "role.role IN ('verifier', 'triager')",
+    `role.role IN ${allProjectRoles}`,
+    "Verification creator role",
+  );
+  replaceRequired(
+    "assigned_role.role = 'verifier'",
+    `assigned_role.role IN ${allProjectRoles}`,
+    "assigned closer project membership",
+  );
+  replaceRequired(
+    "AND event.actor_user_id IN (verification.verifier_id, old.reporter_id)",
+    "AND event.actor_user_id IS NOT NULL",
+    "failed Verification Bug actor identity",
+  );
+  replaceRequired(
+    `AND event.actor_user_id IN (
+                verification.verifier_id,
+                (SELECT reporter_id FROM bugs
+                 WHERE account_id = new.account_id
+                   AND project_id = new.project_id
+                   AND id = new.bug_id)
+              )`,
+    "AND event.actor_user_id IS NOT NULL",
+    "verification-failed RepairAttempt actor identity",
+  );
+  replaceRequired(
+    `AND event.type = 'verification.started'
+        AND event.actor_user_id = new.verifier_id
+        AND role.role = 'verifier'`,
+    "AND event.type = 'verification.started'",
+    "Verification start assigned actor guard",
+  );
+  replaceRequired(
+    `AND new.status IN ('passed', 'failed', 'blocked')
+        AND (
+          (event.actor_user_id = new.verifier_id AND role.role = 'verifier')
+          OR (
+            role.role = 'reporter'
+            AND event.actor_user_id = (
+              SELECT reporter_id FROM bugs
+              WHERE account_id = new.account_id
+                AND project_id = new.project_id
+                AND id = new.bug_id
+            )
+          )
+        )
+        AND event.type = 'verification.result_recorded'`,
+    `AND new.status IN ('passed', 'failed', 'blocked')
+        AND event.type = 'verification.result_recorded'`,
+    "Verification result assigned actor guard",
+  );
+  replaceRequired(
+    "AND event.actor_user_id IN (verification.verifier_id, current_bug.reporter_id)",
+    "AND event.actor_user_id IS NOT NULL",
+    "human closure actor identity",
+  );
+  replaceRequired(
+    "AND (bug.severity NOT IN ('S0', 'S1') OR attempt.assignee_id <> new.verifier_id)",
+    "AND 1 = 1",
+    "Verification creator separation guard",
+  );
+  replaceRequired(
+    "AND (current_bug.severity NOT IN ('S0', 'S1') OR attempt.assignee_id <> verification.verifier_id)",
+    "AND 1 = 1",
+    "human closure separation guard",
+  );
+
+  return sql;
+}
+
+const SHARED_PROJECT_BUG_MANAGEMENT_SQL = String.raw`
+${sharedProjectBugManagementSql()}
+
+CREATE TABLE bug_deletions (
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  bug_id TEXT NOT NULL CHECK (length(bug_id) = 36),
+  bug_version INTEGER NOT NULL CHECK (bug_version >= 1),
+  deleted_by_actor_id TEXT NOT NULL CHECK (length(deleted_by_actor_id) = 36),
+  deleted_at TEXT NOT NULL CHECK (length(deleted_at) >= 20),
+  idempotency_key TEXT NOT NULL CHECK (length(idempotency_key) BETWEEN 1 AND 200),
+  request_digest TEXT NOT NULL
+    CHECK (length(request_digest) = 64 AND request_digest = lower(request_digest)),
+  PRIMARY KEY (account_id, project_id, bug_id),
+  FOREIGN KEY (account_id, project_id, bug_id)
+    REFERENCES bugs(account_id, project_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, deleted_by_actor_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, project_id, idempotency_key)
+) STRICT;
+
+CREATE INDEX bug_deletions_actor_idx
+  ON bug_deletions(account_id, project_id, deleted_by_actor_id, deleted_at DESC);
+`;
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -7026,6 +7158,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(4, "browser_sessions", BROWSER_SESSION_SCHEMA_SQL),
   migration(5, "multi_actor_human_workflow", MULTI_ACTOR_HUMAN_WORKFLOW_SQL),
   migration(6, "qingyu_bug_links", QINGYU_BUG_LINK_SCHEMA_SQL),
+  migration(7, "shared_project_bug_management", SHARED_PROJECT_BUG_MANAGEMENT_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

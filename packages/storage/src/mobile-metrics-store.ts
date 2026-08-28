@@ -148,6 +148,12 @@ export function getMobileMetricsOverview(
            ON bugs.account_id = ?
           AND bugs.project_id = ?
           AND bugs.state = state_order.state
+          AND NOT EXISTS (
+            SELECT 1 FROM bug_deletions AS deletion
+            WHERE deletion.account_id = bugs.account_id
+              AND deletion.project_id = bugs.project_id
+              AND deletion.bug_id = bugs.id
+          )
          GROUP BY state_order.state, state_order.ordinal
        )
        SELECT
@@ -163,7 +169,13 @@ export function getMobileMetricsOverview(
           WHERE account_id = ?
             AND project_id = ?
             AND created_at >= ?
-            AND created_at < ?) AS new_bug_count,
+            AND created_at < ?
+            AND NOT EXISTS (
+              SELECT 1 FROM bug_deletions AS deletion
+              WHERE deletion.account_id = bugs.account_id
+                AND deletion.project_id = bugs.project_id
+                AND deletion.bug_id = bugs.id
+            )) AS new_bug_count,
          state,
          state_count
        FROM state_counts

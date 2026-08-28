@@ -642,6 +642,14 @@ test("Android createBug persists an exact receipt, supports GET, and rejects a w
       assert.equal(query.actorId, actorId);
       return persisted.get(query.bugId) ?? null;
     },
+    async deleteBug(command) {
+      assert.equal(command.actorId, actorId);
+      assert.equal(command.bugId, bugId);
+      assert.equal(command.expectedVersion, 1);
+      assert.equal(command.idempotencyKey, `web:deleteBug:bug:${bugId}:v1`);
+      persisted.delete(command.bugId);
+      return { bugId: command.bugId, deletedAt: fixedTime.toISOString(), replayed: false };
+    },
   };
   const app = createApiApp({
     logger: false,
@@ -721,6 +729,23 @@ test("Android createBug persists an exact receipt, supports GET, and rejects a w
   assert.equal(loaded.statusCode, 200);
   assert.equal(loaded.headers["content-type"], MOBILE_API_CONTENT_TYPE);
   assert.deepEqual(loaded.json(), receipt.bug);
+
+  const deleted = await app.inject({
+    method: "DELETE",
+    url: `${MOBILE_BUG_COLLECTION_PATH}/${bugId}?expectedVersion=1`,
+    headers: {
+      authorization: `Bearer ${token}`,
+      "idempotency-key": `web:deleteBug:bug:${bugId}:v1`,
+    },
+  });
+  assert.equal(deleted.statusCode, 200);
+  assert.equal(deleted.json().bugId, bugId);
+  const deletedRead = await app.inject({
+    method: "GET",
+    url: `${MOBILE_BUG_COLLECTION_PATH}/${bugId}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(deletedRead.statusCode, 404);
 });
 
 test("Android attachment upload follows the frozen init, chunk, finalize, bind wire", async (t) => {

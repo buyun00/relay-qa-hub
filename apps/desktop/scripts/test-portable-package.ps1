@@ -292,6 +292,9 @@ try {
   if (-not $detail.detailEditTriggerVisible) {
     throw "Packaged Bug detail does not expose manual editing"
   }
+  if (-not $detail.detailDeleteTriggerVisible) {
+    throw "Packaged Bug detail does not expose deletion"
+  }
   $detailEditorOutput = & $NodeExe $smokeScript open-bug-editor
   if ($LASTEXITCODE -ne 0) { throw "Packaged Bug detail editor smoke failed" }
   $detailEditor = ($detailEditorOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
@@ -361,6 +364,7 @@ try {
     workbenchErrorText = [string]$login.workbenchErrorText
     bugDetailLoaded = [bool]($detail.detailOpen -and -not $detail.detailLoadingVisible)
     bugDetailEditAvailable = [bool]$detail.detailEditTriggerVisible
+    bugDetailDeleteAvailable = [bool]$detail.detailDeleteTriggerVisible
     bugDetailEditorFieldCount = [int]$detailEditor.detailEditorFieldCount
     qingyuImportDialogLoaded = [bool]$qingyu.snapshot.qingyuModalVisible
     qingyuQrLoaded = [bool]$qingyu.snapshot.qingyuQrVisible

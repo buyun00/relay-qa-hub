@@ -126,6 +126,19 @@ export interface UpdateMobileBugCommand {
   readonly request: MobileUpdateBugRequest;
 }
 
+export interface DeleteMobileBugCommand {
+  readonly actorId: string;
+  readonly bugId: string;
+  readonly expectedVersion: number;
+  readonly idempotencyKey: string;
+}
+
+export interface MobileDeleteBugResponse {
+  readonly bugId: string;
+  readonly deletedAt: string;
+  readonly replayed: boolean;
+}
+
 export interface MobileBugListQuery {
   readonly actorId: string;
   readonly projectId?: string;
@@ -152,6 +165,9 @@ export interface MobileBugStore {
   ) => MobileBugListResponse | Promise<MobileBugListResponse>;
   readonly getBug: (query: GetMobileBugQuery) => MobileBug | null | Promise<MobileBug | null>;
   readonly updateBug: (command: UpdateMobileBugCommand) => MobileBug | Promise<MobileBug>;
+  readonly deleteBug: (
+    command: DeleteMobileBugCommand,
+  ) => MobileDeleteBugResponse | Promise<MobileDeleteBugResponse>;
 }
 
 const UUID_PATTERN =

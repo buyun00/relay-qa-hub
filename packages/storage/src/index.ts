@@ -312,11 +312,14 @@ export type {
 } from "./browser-auth-store.js";
 export type {
   CreateMobileBugInput,
+  DeleteMobileBugInput,
   MobileBugCreation,
+  MobileBugDeletion,
   MobileBugRecord,
   MobileOccurrenceInput,
   MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
+export { deleteMobileBug, getMobileBug } from "./mobile-bug-store.js";
 export {
   getLatestMobileHumanWorkflow,
   getMobileHumanWorkflowForBug,

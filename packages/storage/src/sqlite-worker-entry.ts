@@ -20,9 +20,11 @@ import {
 } from "./mobile-attachment-store.js";
 import {
   createMobileBug,
+  deleteMobileBug,
   ensureMobileScope,
   getMobileBug,
   type CreateMobileBugInput,
+  type DeleteMobileBugInput,
   type MobileScopeBootstrap,
 } from "./mobile-bug-store.js";
 import { listMobileBugs, type ListMobileBugsInput } from "./mobile-bug-list-store.js";
@@ -166,6 +168,7 @@ interface WorkerRequest {
     | "resolveBrowserSession"
     | "revokeBrowserSession"
     | "createMobileBug"
+    | "deleteMobileBug"
     | "getMobileBug"
     | "getQingyuLink"
     | "getQingyuLinkByExternal"
@@ -360,6 +363,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
       if (current.isTransaction) current.exec("ROLLBACK");
       throw error;
     }
+  }
+
+  if (request.operation === "deleteMobileBug") {
+    return inWriteTransaction((current) =>
+      deleteMobileBug(current, request.payload as DeleteMobileBugInput),
+    );
   }
 
   if (request.operation === "getMobileBug") {

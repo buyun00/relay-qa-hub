@@ -296,7 +296,13 @@ function readAuthorizedBugPointers(
     .prepare(
       `SELECT active_repair_attempt_id, active_verification_id
        FROM bugs
-       WHERE account_id = ? AND project_id = ? AND id = ?`,
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bugs.account_id
+             AND deletion.project_id = bugs.project_id
+             AND deletion.bug_id = bugs.id
+         )`,
     )
     .get(input.accountId, input.projectId, input.bugId) as HumanWorkflowBugPointerRow | undefined;
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");

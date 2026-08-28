@@ -297,7 +297,7 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
   assert.equal(isActionableQingyuDefect({ status: "已解决", statusKey: "RESOLVED" }), false);
 });
 
-test("assigned closer resolves Qingyu and closes without reporter confirmation", async () => {
+test("unassigned project member resolves Qingyu and closes without identity checks", async () => {
   const actorId = "10000000-0000-4000-8000-000000000003";
   const bugId = "20000000-0000-4000-8000-000000000001";
   const verificationId = "30000000-0000-4000-8000-000000000001";
@@ -330,7 +330,7 @@ test("assigned closer resolves Qingyu and closes without reporter confirmation",
     priority: "P1",
     reporterId: "10000000-0000-4000-8000-000000000009",
     ownerId: actorId,
-    verificationOwnerId: actorId,
+    verificationOwnerId: "10000000-0000-4000-8000-000000000008",
     duplicateOfBugId: null,
     occurrenceCount: 1,
     reopenCount: 0,

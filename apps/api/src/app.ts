@@ -298,6 +298,9 @@ const unconfiguredMobileBugStore: MobileBugStore = {
   updateBug: () => {
     throw new Error("MobileBugStore is not configured");
   },
+  deleteBug: () => {
+    throw new Error("MobileBugStore is not configured");
+  },
 };
 
 const unconfiguredMobileAttachmentStore: MobileAttachmentStore = {
@@ -1239,6 +1242,57 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
   });
 
+  app.delete<{
+    Params: { bugId: string };
+    Querystring: { readonly expectedVersion?: string | readonly string[] };
+  }>(MOBILE_BUG_ITEM_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const rawVersion = request.query.expectedVersion;
+      if (typeof rawVersion !== "string" || !/^[1-9][0-9]*$/u.test(rawVersion)) {
+        throw new TypeError("expectedVersion must be a positive integer");
+      }
+      const expectedVersion = Number(rawVersion);
+      if (!Number.isSafeInteger(expectedVersion)) {
+        throw new TypeError("expectedVersion must be a safe integer");
+      }
+      const idempotencyKey = requireRelayIdempotencyKey(
+        readHeader(request.headers["idempotency-key"]),
+      );
+      if (idempotencyKey !== `web:deleteBug:bug:${bugId}:v${expectedVersion}`) {
+        throw new TypeError("Idempotency-Key does not match Bug deletion");
+      }
+      const result = await mobileBugStore.deleteBug({
+        actorId: authenticatedActorId(request, debugActorId),
+        bugId,
+        expectedVersion,
+        idempotencyKey,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "NOT_FOUND") {
+        return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "FORBIDDEN") {
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "VERSION_CONFLICT") {
+        return reply.code(412).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
+
   app.get<{ Params: { bugId: string } }>(
     MOBILE_BUG_DUPLICATE_CANDIDATES_PATH,
     async (request, reply) => {
@@ -1895,13 +1949,11 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           });
           if (verification !== null && verification.status !== "passed") {
             const bug = await mobileBugStore.getBug({ actorId, bugId: verification.bugId });
-            const authorized =
-              bug !== null && (verification.verifierId === actorId || bug.reporterId === actorId);
             const active =
               verification.status === "in_progress" &&
               verification.version === body.expectedVersion &&
               bug?.state === "ready_for_verification";
-            if (authorized && active) {
+            if (active) {
               await qingyuIntegration.beforeHumanClose(actorId, verification.bugId);
             }
           }

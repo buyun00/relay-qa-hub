@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import type {
   CreateMobileBugInput,
+  DeleteMobileBugInput,
   MobileOccurrenceInput,
   MobileScopeBootstrap,
   SqliteStorageWorker,
@@ -148,6 +149,23 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         createdAt: now().toISOString(),
       };
       return options.worker.updateMobileBug(input);
+    },
+
+    async deleteBug(command) {
+      const requestDigest = createHash("sha256")
+        .update(JSON.stringify({ bugId: command.bugId, expectedVersion: command.expectedVersion }))
+        .digest("hex");
+      const input: DeleteMobileBugInput = {
+        accountId: options.scope.accountId,
+        projectId: options.scope.projectId,
+        actorId: command.actorId,
+        bugId: command.bugId,
+        expectedVersion: command.expectedVersion,
+        idempotencyKey: command.idempotencyKey,
+        requestDigest,
+        createdAt: now().toISOString(),
+      };
+      return options.worker.deleteMobileBug(input);
     },
   };
 }

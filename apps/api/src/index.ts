@@ -250,6 +250,7 @@ export type {
 } from "./mobile-captures.js";
 export type {
   CreateMobileBugCommand,
+  DeleteMobileBugCommand,
   GetMobileBugQuery,
   MobileUpdateBugRequest,
   MobileBugListQuery,
@@ -261,6 +262,7 @@ export type {
   MobileBugStore,
   MobileCreateBugRequest,
   MobileCreateBugResponse,
+  MobileDeleteBugResponse,
   MobileOccurrenceDraft,
   MobileOccurrenceEnvironmentValue,
   MobileOccurrencePlatform,

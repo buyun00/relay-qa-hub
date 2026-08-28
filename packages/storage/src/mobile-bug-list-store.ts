@@ -170,7 +170,16 @@ export function listMobileBugs(database: DatabaseSync, input: ListMobileBugsInpu
     )
     .get(input.accountId, input.projectId) as { readonly snapshot_sequence: number };
 
-  const conditions = ["account_id = ?", "project_id = ?"];
+  const conditions = [
+    "account_id = ?",
+    "project_id = ?",
+    `NOT EXISTS (
+      SELECT 1 FROM bug_deletions AS deletion
+      WHERE deletion.account_id = bugs.account_id
+        AND deletion.project_id = bugs.project_id
+        AND deletion.bug_id = bugs.id
+    )`,
+  ];
   const parameters: SQLInputValue[] = [input.accountId, input.projectId];
   if (input.ownerId !== undefined) {
     conditions.push("owner_id = ?");

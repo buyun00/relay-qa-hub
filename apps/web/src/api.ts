@@ -1114,6 +1114,26 @@ export async function updateBugDetails(
   return requireRecord(body, "BUG") as unknown as BugDetail;
 }
 
+export async function deleteBug(
+  bugId: string,
+  expectedVersion: number,
+): Promise<{ readonly bugId: string; readonly deletedAt: string; readonly replayed: boolean }> {
+  const body = await requestJson(
+    `/api/v1/bugs/${encodeURIComponent(bugId)}?expectedVersion=${expectedVersion}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Idempotency-Key": `web:deleteBug:bug:${bugId}:v${expectedVersion}`,
+      },
+    },
+  );
+  return requireRecord(body, "BUG_DELETION") as unknown as {
+    readonly bugId: string;
+    readonly deletedAt: string;
+    readonly replayed: boolean;
+  };
+}
+
 export async function createBug(input: CreateBugInput): Promise<CreateBugResponse> {
   const body = await requestJson("/api/v1/bugs", {
     method: "POST",

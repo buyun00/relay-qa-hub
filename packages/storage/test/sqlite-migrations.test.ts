@@ -466,6 +466,37 @@ test("empty migration is repeatable and enables WAL, foreign keys, and integrity
   });
 });
 
+test("v6 to v7 preserves existing Bugs and adds shared management deletion facts", async () => {
+  await withDatabase(async ({ database, databaseFile, root }) => {
+    const initial = await migrateSqliteDatabase(database, databaseFile, { targetVersion: 6 });
+    assert.equal(initial.toVersion, 6);
+    const tenant = seedTenant(database, 75, "SHARED");
+    const bugId = identifier(78);
+    createBug(database, tenant, bugId, "Existing Bug before shared management");
+
+    const upgraded = await migrateSqliteDatabase(database, databaseFile, {
+      backupRoot: join(root, "backups"),
+    });
+    assert.deepEqual(upgraded.appliedVersions, [7]);
+    assert.equal(upgraded.fromVersion, 6);
+    assert.equal(upgraded.toVersion, 7);
+    assert.equal(currentSqliteSchemaVersion(database), 7);
+    assert.equal(
+      numberColumn(database, "SELECT count(*) AS count FROM bugs WHERE id = ?", "count", bugId),
+      1,
+    );
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table' AND name = 'bug_deletions'",
+        "count",
+      ),
+      1,
+    );
+    assert.equal(verifySqliteIntegrity(database).ok, true);
+  });
+});
+
 test("v1 to v2 migration creates a backup and backfills full-text search", async () => {
   await withDatabase(async ({ database, databaseFile, root }) => {
     const v1 = await migrateSqliteDatabase(database, databaseFile, { targetVersion: 1 });
