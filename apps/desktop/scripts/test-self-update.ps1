@@ -14,9 +14,10 @@ if ([string]::IsNullOrWhiteSpace($PackageDirectory)) {
 }
 $targetPackage = (Resolve-Path -LiteralPath $PackageDirectory).Path
 $targetRuntime = Join-Path $targetPackage "desktop-runtime.json"
+$targetUpdater = Join-Path $targetPackage "RelayQaHubUpdater.exe"
 $packager = Join-Path $repoRoot "node_modules\.bin\electron-packager.cmd"
 $cdpScript = Join-Path $repoRoot "scripts\desktop-cdp-smoke.mjs"
-foreach ($required in @($targetRuntime, $packager, $cdpScript)) {
+foreach ($required in @($targetRuntime, $targetUpdater, $packager, $cdpScript)) {
   if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
     throw "Self-update test prerequisite is missing: $required"
   }
@@ -78,6 +79,7 @@ try {
   & $packager $stageRoot "RelayQaHub" --platform=win32 --arch=x64 --out=$oldOutput --overwrite --prune=true --asar
   if ($LASTEXITCODE -ne 0) { throw "Old-client packaging failed with exit code $LASTEXITCODE" }
   Move-Item -LiteralPath (Join-Path $oldOutput "RelayQaHub-win32-x64") -Destination $renamedPackage
+  Copy-Item -LiteralPath $targetUpdater -Destination (Join-Path $renamedPackage "RelayQaHubUpdater.exe") -Force
 
   $runtime = Get-Content -LiteralPath $targetRuntime -Raw | ConvertFrom-Json
   $runtime.startupHidden = $true
