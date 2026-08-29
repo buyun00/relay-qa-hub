@@ -89,9 +89,30 @@ export interface QingyuImportResult {
 }
 
 let browserCsrfToken: string | null = null;
+const REMEMBERED_LOGIN_NAME_KEY = "relay.qa-hub.login-name.v1";
+const RECOVERABLE_SESSION_CODES = new Set(["UNAUTHENTICATED", "NATIVE_SESSION_INVALID"]);
+let browserSessionRecovery: Promise<BrowserSessionPrincipal> | null = null;
 
 export function setBrowserCsrfToken(value: string | null): void {
   browserCsrfToken = value;
+}
+
+function rememberedLoginName(): string | null {
+  try {
+    const value = globalThis.localStorage?.getItem(REMEMBERED_LOGIN_NAME_KEY)?.trim();
+    return value === undefined || value.length === 0 ? null : value;
+  } catch {
+    return null;
+  }
+}
+
+function rememberLoginName(value: string | null): void {
+  try {
+    if (value === null) globalThis.localStorage?.removeItem(REMEMBERED_LOGIN_NAME_KEY);
+    else globalThis.localStorage?.setItem(REMEMBERED_LOGIN_NAME_KEY, value);
+  } catch {
+    // A denied storage API must not make an otherwise valid session unusable.
+  }
 }
 
 export type BugSeverity = "S0" | "S1" | "S2" | "S3" | "S4";
@@ -768,7 +789,13 @@ function isCaptureBundleSummary(value: unknown, captureId: string): value is Cap
   );
 }
 
-async function requestJson(path: string, init?: RequestInit): Promise<unknown> {
+async function fetchJson(
+  path: string,
+  init?: RequestInit,
+): Promise<{
+  readonly response: Response;
+  readonly body: unknown;
+}> {
   const method = (init?.method ?? "GET").toUpperCase();
   const csrfHeaders =
     browserCsrfToken !== null && !["GET", "HEAD", "OPTIONS"].includes(method)
@@ -784,6 +811,50 @@ async function requestJson(path: string, init?: RequestInit): Promise<unknown> {
     },
   });
   const body: unknown = await response.json().catch(() => null);
+  return { response, body };
+}
+
+async function establishBrowserSession(name: string): Promise<BrowserSessionPrincipal> {
+  setBrowserCsrfToken(null);
+  const { response, body } = await fetchJson("/api/v1/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, client: "web" }),
+  });
+  if (!response.ok) throw new QaHubApiError(response.status, readErrorCode(body));
+  if (!isBrowserSessionPrincipal(body)) {
+    throw new QaHubApiError(200, "INVALID_AUTH_RESPONSE");
+  }
+  setBrowserCsrfToken(body.csrfToken);
+  rememberLoginName(body.displayName);
+  return body;
+}
+
+async function recoverBrowserSession(): Promise<BrowserSessionPrincipal> {
+  const name = rememberedLoginName();
+  if (name === null) throw new QaHubApiError(401, "UNAUTHENTICATED");
+  browserSessionRecovery ??= establishBrowserSession(name).finally(() => {
+    browserSessionRecovery = null;
+  });
+  return browserSessionRecovery;
+}
+
+async function requestJson(
+  path: string,
+  init?: RequestInit,
+  allowSessionRecovery = true,
+): Promise<unknown> {
+  let { response, body } = await fetchJson(path, init);
+  const errorCode = readErrorCode(body);
+  if (
+    allowSessionRecovery &&
+    response.status === 401 &&
+    errorCode !== null &&
+    RECOVERABLE_SESSION_CODES.has(errorCode)
+  ) {
+    await recoverBrowserSession();
+    ({ response, body } = await fetchJson(path, init));
+  }
   if (!response.ok) throw new QaHubApiError(response.status, readErrorCode(body));
   return body;
 }
@@ -811,22 +882,13 @@ export async function getBrowserSession(): Promise<BrowserSessionPrincipal> {
 }
 
 export async function loginBrowserSession(name: string): Promise<BrowserSessionPrincipal> {
-  setBrowserCsrfToken(null);
-  const body = await requestJson("/api/v1/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, client: "web" }),
-  });
-  if (!isBrowserSessionPrincipal(body)) {
-    throw new QaHubApiError(200, "INVALID_AUTH_RESPONSE");
-  }
-  setBrowserCsrfToken(body.csrfToken);
-  return body;
+  return establishBrowserSession(name);
 }
 
 export async function logoutBrowserSession(): Promise<void> {
-  await requestJson("/api/v1/auth/logout", { method: "POST" });
+  await requestJson("/api/v1/auth/logout", { method: "POST" }, false);
   setBrowserCsrfToken(null);
+  rememberLoginName(null);
 }
 
 function requireRecord(value: unknown, label: string): Record<string, unknown> {

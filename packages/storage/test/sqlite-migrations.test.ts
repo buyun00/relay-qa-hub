@@ -5,6 +5,11 @@ import { join } from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import test from "node:test";
 
+import {
+  createBrowserSession,
+  resolveBrowserSession,
+  revokeBrowserSession,
+} from "../src/browser-auth-store.ts";
 import { SQLITE_MIGRATIONS, SQLITE_SCHEMA_VERSION } from "../src/sqlite-migrations.ts";
 import {
   QA_HUB_SQLITE_APPLICATION_ID,
@@ -151,6 +156,47 @@ function createBug(
     }),
   );
 }
+
+test("browser identity ignores time expiry but still honors explicit revocation", async () => {
+  await withDatabase(async ({ database, databaseFile }) => {
+    await migrateSqliteDatabase(database, databaseFile);
+    const tenant = seedTenant(database, 50, "IDENTITY");
+    const tokenDigest = "a".repeat(64);
+    transaction(database, () =>
+      createBrowserSession(database, {
+        accountId: tenant.accountId,
+        userId: tenant.userId,
+        sessionId: identifier(53),
+        tokenDigest,
+        issuedAt: "2026-01-01T00:00:00.000Z",
+        expiresAt: "2026-01-02T00:00:00.000Z",
+      }),
+    );
+
+    assert.equal(
+      resolveBrowserSession(database, {
+        tokenDigest,
+        now: "2036-01-01T00:00:00.000Z",
+      })?.userId,
+      tenant.userId,
+    );
+
+    transaction(database, () =>
+      revokeBrowserSession(database, {
+        tokenDigest,
+        now: "2036-01-01T00:00:00.000Z",
+        reason: "logout",
+      }),
+    );
+    assert.equal(
+      resolveBrowserSession(database, {
+        tokenDigest,
+        now: "2036-01-01T00:00:01.000Z",
+      }),
+      null,
+    );
+  });
+});
 
 function insertSystemEvent(
   database: DatabaseSync,

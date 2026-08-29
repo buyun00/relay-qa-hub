@@ -1,8 +1,36 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { setBrowserCsrfToken, updateBugDetails, type BugDetail } from "./api";
+import {
+  getBrowserSession,
+  loginBrowserSession,
+  logoutBrowserSession,
+  setBrowserCsrfToken,
+  updateBugDetails,
+  type BrowserSessionPrincipal,
+  type BugDetail,
+} from "./api";
 
 const BUG_ID = "20000000-0000-4000-8000-000000000001";
+
+function principal(): BrowserSessionPrincipal {
+  return {
+    accountId: "10000000-0000-4000-8000-000000000001",
+    userId: "10000000-0000-4000-8000-000000000003",
+    email: "developer@example.test",
+    displayName: "开发者",
+    csrfToken: "csrf-token",
+  };
+}
+
+function installMemoryStorage(): Map<string, string> {
+  const values = new Map<string, string>();
+  vi.stubGlobal("localStorage", {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => values.set(key, value),
+    removeItem: (key: string) => values.delete(key),
+  });
+  return values;
+}
 
 function bug(): BugDetail {
   return {
@@ -82,5 +110,60 @@ describe("Bug detail API", () => {
       severity: "S1",
       priority: "P0",
     });
+  });
+});
+
+describe("permanent browser identity", () => {
+  it("silently recreates an invalid session from the remembered Chinese display name", async () => {
+    installMemoryStorage();
+    const current = principal();
+    const responses = [
+      new Response(JSON.stringify(current), { status: 200 }),
+      new Response(JSON.stringify({ code: "UNAUTHENTICATED" }), { status: 401 }),
+      new Response(JSON.stringify(current), { status: 200 }),
+      new Response(JSON.stringify(current), { status: 200 }),
+    ];
+    const fetchMock = vi.fn(async (_path: string, _init?: RequestInit) => {
+      void _path;
+      void _init;
+      const response = responses.shift();
+      if (response === undefined) throw new Error("Unexpected fetch");
+      return response;
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await loginBrowserSession("kaifazhe");
+    expect(await getBrowserSession()).toEqual(current);
+    expect(fetchMock.mock.calls.map(([path]) => path)).toEqual([
+      "/api/v1/auth/login",
+      "/api/v1/auth/me",
+      "/api/v1/auth/login",
+      "/api/v1/auth/me",
+    ]);
+    const recoveryBody = JSON.parse(String(fetchMock.mock.calls[2]?.[1]?.body)) as {
+      name: string;
+    };
+    expect(recoveryBody.name).toBe("开发者");
+  });
+
+  it("forgets the permanent identity only after an explicit logout", async () => {
+    const storage = installMemoryStorage();
+    const responses = [
+      new Response(JSON.stringify(principal()), { status: 200 }),
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    ];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        const response = responses.shift();
+        if (response === undefined) throw new Error("Unexpected fetch");
+        return response;
+      }),
+    );
+
+    await loginBrowserSession("开发者");
+    expect([...storage.values()]).toEqual(["开发者"]);
+    await logoutBrowserSession();
+    expect(storage.size).toBe(0);
   });
 });

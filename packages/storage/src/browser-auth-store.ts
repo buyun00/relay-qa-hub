@@ -359,11 +359,10 @@ export function resolveBrowserSession(
         AND user.id = session.user_id
        WHERE session.token_digest = ?
          AND session.revoked_at IS NULL
-         AND session.expires_at > ?
          AND account.status = 'active'
          AND user.status = 'active'`,
     )
-    .get(input.tokenDigest, input.now) as
+    .get(input.tokenDigest) as
     | {
         readonly account_id: string;
         readonly user_id: string;

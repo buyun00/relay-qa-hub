@@ -9,7 +9,11 @@ export const BROWSER_ME_PATH = "/api/v1/auth/me" as const;
 export const BROWSER_LOGOUT_PATH = "/api/v1/auth/logout" as const;
 export const BROWSER_SESSION_COOKIE = "qa_hub_browser_session" as const;
 export const BROWSER_CSRF_HEADER = "x-csrf-token" as const;
-export const BROWSER_SESSION_TTL_MS = 8 * 60 * 60 * 1_000;
+// Browser sessions are permanent user identities. They remain valid until the
+// user explicitly signs out or the backend disables the account/user. Keep a
+// finite cookie lifetime only because browsers require one; storage resolution
+// does not use expires_at as an authorization boundary.
+export const BROWSER_SESSION_TTL_MS = 2_147_483_647 * 1_000;
 
 const AUTHENTICATION_FAILED = { code: "AUTHENTICATION_FAILED" } as const;
 const UNAUTHENTICATED = { code: "UNAUTHENTICATED" } as const;
@@ -213,8 +217,8 @@ function requestNow(options: BrowserAuthOptions): Date {
 
 function sessionTtl(options: BrowserAuthOptions): number {
   const ttl = options.sessionTtlMs ?? BROWSER_SESSION_TTL_MS;
-  if (!Number.isSafeInteger(ttl) || ttl < 60_000 || ttl > 24 * 60 * 60 * 1_000) {
-    throw new Error("browser session TTL must be between one minute and 24 hours");
+  if (!Number.isSafeInteger(ttl) || ttl < 60_000 || ttl > BROWSER_SESSION_TTL_MS) {
+    throw new Error("browser session TTL must fit the permanent cookie lifetime");
   }
   return ttl;
 }

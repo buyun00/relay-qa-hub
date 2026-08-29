@@ -102,6 +102,38 @@ test("desktop API proxy retains the browser session when the custom protocol dro
       `qa_hub_browser_session=${TEST_BROWSER_SESSION_TOKEN}`,
     ]);
     assert.deepEqual(forwardedAuthorizations, [null, null]);
+    assert.equal(browserSession.rememberedLoginName(), "林步云");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("explicit desktop logout clears the remembered permanent identity", async () => {
+  const config = parseDesktopConfig({});
+  const browserSession = new DesktopBrowserSessionCookieStore();
+  browserSession.restoreLoginName("林步云");
+  browserSession.captureSetCookie(
+    `qa_hub_browser_session=${TEST_BROWSER_SESSION_TOKEN}; Path=/; HttpOnly`,
+  );
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json",
+        "set-cookie": "qa_hub_browser_session=; Path=/; Max-Age=0",
+      },
+    });
+
+  try {
+    const response = await proxyRendererApiRequest(
+      new Request("qa-hub://app/api/v1/auth/logout", { method: "POST" }),
+      config,
+      browserSession,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(browserSession.rememberedLoginName(), null);
+    assert.equal(browserSession.cookieHeader(null), null);
   } finally {
     globalThis.fetch = originalFetch;
   }

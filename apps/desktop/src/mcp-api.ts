@@ -13,6 +13,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const TERMINAL_STATES = new Set(["closed", "deferred", "rejected", "duplicate"]);
+const RECOVERABLE_SESSION_CODES = new Set(["UNAUTHENTICATED", "NATIVE_SESSION_INVALID"]);
 
 export interface QaHubJsonRequest {
   readonly method?: "GET" | "POST" | "PATCH";
@@ -61,22 +62,28 @@ function parseJsonBytes(bytes: Uint8Array): unknown {
 
 export class DesktopQaHubApiClient implements QaHubApiTransport {
   private readonly fetchImpl: FetchImplementation;
+  private sessionRecovery: Promise<void> | null = null;
 
   constructor(
     private readonly config: DesktopConfig,
     private readonly browserSession: DesktopBrowserSessionCookieStore,
     fetchImpl: FetchImplementation = fetch,
+    private readonly onSessionRenewed: () => void = () => undefined,
   ) {
     this.fetchImpl = fetchImpl;
   }
 
-  private credentialHeaders(): Headers {
+  private async credentialHeaders(): Promise<Headers> {
     const headers = new Headers({ Accept: QA_MEDIA_TYPE });
     if (this.config.accessToken !== null) {
       headers.set("Authorization", `Bearer ${this.config.accessToken}`);
       return headers;
     }
-    const cookie = this.browserSession.cookieHeader(null);
+    let cookie = this.browserSession.cookieHeader(null);
+    if (cookie === null) {
+      await this.recoverPermanentSession();
+      cookie = this.browserSession.cookieHeader(null);
+    }
     if (cookie === null) {
       throw new QaHubMcpError(
         "QA_HUB_LOGIN_REQUIRED",
@@ -86,6 +93,67 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     }
     headers.set("Cookie", cookie);
     return headers;
+  }
+
+  private async createPermanentSession(): Promise<void> {
+    const name = this.browserSession.rememberedLoginName();
+    if (name === null) {
+      throw new QaHubMcpError(
+        "QA_HUB_LOGIN_REQUIRED",
+        "Open Relay QA Hub EXE and sign in once before using its MCP tools",
+        401,
+      );
+    }
+    let response: Response;
+    try {
+      response = await this.fetchImpl(this.endpoint("/api/v1/auth/login"), {
+        method: "POST",
+        headers: {
+          Accept: QA_MEDIA_TYPE,
+          "Content-Type": "application/json",
+          Origin: this.config.csrfOrigin,
+        },
+        redirect: "manual",
+        body: JSON.stringify({ name, client: "web" }),
+      });
+    } catch {
+      throw new QaHubMcpError(
+        "QA_HUB_UNAVAILABLE",
+        "Relay QA Hub API is unavailable from the EXE",
+        503,
+      );
+    }
+    this.browserSession.captureSetCookie(response.headers.get("set-cookie"));
+    if (response.status >= 300 && response.status < 400) {
+      throw new QaHubMcpError("QA_HUB_REDIRECT_BLOCKED", "QA Hub API redirect was blocked", 502);
+    }
+    const bytes = await readBoundedBody(response, MAX_JSON_BYTES);
+    const parsed = parseJsonBytes(bytes);
+    if (!response.ok) {
+      const code = responseErrorCode(parsed, `QA_HUB_HTTP_${response.status}`);
+      throw new QaHubMcpError(
+        code,
+        `QA Hub rejected permanent identity recovery (${code})`,
+        response.status,
+      );
+    }
+    const principal = requireRecord(parsed, "principal");
+    this.browserSession.rememberLoginName(requireString(principal, "displayName", 1, 128));
+    if (this.browserSession.cookieHeader(null) === null) {
+      throw new QaHubMcpError(
+        "QA_HUB_INVALID_RESPONSE",
+        "QA Hub did not return a permanent browser session",
+        502,
+      );
+    }
+    this.onSessionRenewed();
+  }
+
+  private async recoverPermanentSession(): Promise<void> {
+    this.sessionRecovery ??= this.createPermanentSession().finally(() => {
+      this.sessionRecovery = null;
+    });
+    return this.sessionRecovery;
   }
 
   private endpoint(pathname: string): URL {
@@ -105,20 +173,22 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     return requireString(record, "csrfToken", 1, 512);
   }
 
-  private async request(
+  private async requestOnce(
     pathname: string,
     request: QaHubJsonRequest,
     includeCsrf: boolean,
     maxBytes: number,
   ): Promise<{ readonly bytes: Uint8Array; readonly headers: Headers; readonly status: number }> {
     const method = request.method ?? "GET";
-    const headers = this.credentialHeaders();
+    const csrfToken =
+      method !== "GET" && this.config.accessToken === null && includeCsrf
+        ? await this.csrfToken()
+        : null;
+    const headers = await this.credentialHeaders();
     for (const [name, value] of Object.entries(request.headers ?? {})) headers.set(name, value);
     if (method !== "GET") {
       headers.set("Origin", this.config.csrfOrigin);
-      if (this.config.accessToken === null && includeCsrf) {
-        headers.set("X-CSRF-Token", await this.csrfToken());
-      }
+      if (csrfToken !== null) headers.set("X-CSRF-Token", csrfToken);
     }
     let body: string | undefined;
     if (request.body !== undefined) {
@@ -166,6 +236,29 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
       throw new QaHubMcpError(code, `QA Hub rejected the MCP operation (${code})`, response.status);
     }
     return { bytes, headers: response.headers, status: response.status };
+  }
+
+  private async request(
+    pathname: string,
+    request: QaHubJsonRequest,
+    includeCsrf: boolean,
+    maxBytes: number,
+  ): Promise<{ readonly bytes: Uint8Array; readonly headers: Headers; readonly status: number }> {
+    try {
+      return await this.requestOnce(pathname, request, includeCsrf, maxBytes);
+    } catch (error) {
+      if (
+        this.config.accessToken !== null ||
+        pathname === "/api/v1/auth/login" ||
+        !(error instanceof QaHubMcpError) ||
+        error.status !== 401 ||
+        !RECOVERABLE_SESSION_CODES.has(error.code)
+      ) {
+        throw error;
+      }
+      await this.recoverPermanentSession();
+      return this.requestOnce(pathname, request, includeCsrf, maxBytes);
+    }
   }
 
   private async requestJson(

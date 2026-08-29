@@ -52,6 +52,7 @@ function browserSessionTokenFromCookieHeader(value: string | null): string | nul
  */
 export class DesktopBrowserSessionCookieStore {
   private sessionToken: string | null = null;
+  private loginName: string | null = null;
 
   cookieHeader(rendererCookieHeader: string | null): string | null {
     const rendererToken = browserSessionTokenFromCookieHeader(rendererCookieHeader);
@@ -75,6 +76,43 @@ export class DesktopBrowserSessionCookieStore {
       return;
     }
     this.sessionToken = BROWSER_SESSION_TOKEN_PATTERN.test(token) ? token : null;
+  }
+
+  rememberedLoginName(): string | null {
+    return this.loginName;
+  }
+
+  restoreLoginName(value: string | null): void {
+    this.loginName = normalizeLoginName(value);
+  }
+
+  rememberLoginName(value: string): void {
+    this.loginName = normalizeLoginName(value);
+  }
+
+  clearLoginName(): void {
+    this.loginName = null;
+  }
+}
+
+function normalizeLoginName(value: string | null): string | null {
+  const normalized = value?.trim() ?? "";
+  return normalized.length > 0 &&
+    normalized.length <= 128 &&
+    !/[\u0000-\u001f\u007f]/u.test(normalized)
+    ? normalized
+    : null;
+}
+
+function responseDisplayName(bytes: Uint8Array): string | null {
+  if (bytes.byteLength === 0) return null;
+  try {
+    const value = JSON.parse(Buffer.from(bytes).toString("utf8")) as unknown;
+    if (value === null || typeof value !== "object" || Array.isArray(value)) return null;
+    const displayName = (value as { readonly displayName?: unknown }).displayName;
+    return typeof displayName === "string" ? normalizeLoginName(displayName) : null;
+  } catch {
+    return null;
   }
 }
 
@@ -233,6 +271,12 @@ export async function proxyRendererApiRequest(
       });
     }
     throw cause;
+  }
+  if (response.ok && requestUrl.pathname === "/api/v1/auth/login") {
+    const displayName = responseDisplayName(responseBody);
+    if (displayName !== null) browserSession.rememberLoginName(displayName);
+  } else if (response.ok && requestUrl.pathname === "/api/v1/auth/logout") {
+    browserSession.clearLoginName();
   }
   const responseHeaders = new Headers();
   for (const header of FORWARDED_RESPONSE_HEADERS) {

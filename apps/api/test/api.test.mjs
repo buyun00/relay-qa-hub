@@ -300,6 +300,7 @@ test("new Web and Android name login creates backend accounts and rejects the le
   });
   assert.equal(webLogin.statusCode, 200);
   assert.match(webLogin.headers["set-cookie"], /^qa_hub_browser_session=/u);
+  assert.match(webLogin.headers["set-cookie"], /Max-Age=2147483647/u);
 
   const androidLogin = await app.inject({
     method: "POST",

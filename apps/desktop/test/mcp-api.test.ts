@@ -6,11 +6,14 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  DesktopQaHubApiClient,
   QaHubMcpTools,
   type QaHubApiTransport,
   type QaHubBinaryResponse,
   type QaHubJsonRequest,
 } from "../src/mcp-api.js";
+import { parseDesktopConfig } from "../src/config.js";
+import { DesktopBrowserSessionCookieStore } from "../src/network.js";
 
 const ACCOUNT_ID = "10000000-0000-4000-8000-000000000001";
 const USER_ID = "10000000-0000-4000-8000-000000000003";
@@ -208,4 +211,65 @@ test("qa_materialize_attachment verifies SHA-256 before returning a local path",
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test("desktop MCP silently replaces a rejected browser session from the permanent identity", async () => {
+  const config = parseDesktopConfig({});
+  const browserSession = new DesktopBrowserSessionCookieStore();
+  const staleToken = "A".repeat(43);
+  const permanentToken = "B".repeat(43);
+  browserSession.restoreLoginName("开发者");
+  browserSession.captureSetCookie(`qa_hub_browser_session=${staleToken}; Path=/; HttpOnly`);
+  const calls: Array<{ readonly pathname: string; readonly cookie: string | null }> = [];
+  let renewed = 0;
+  let bugRequestCount = 0;
+  const client = new DesktopQaHubApiClient(
+    config,
+    browserSession,
+    async (input, init) => {
+      const pathname = new URL(input.toString()).pathname;
+      const cookie = new Headers(init?.headers).get("cookie");
+      calls.push({ pathname, cookie });
+      if (pathname === "/api/v1/auth/login") {
+        return new Response(JSON.stringify(principal()), {
+          status: 200,
+          headers: {
+            "content-type": "application/json",
+            "set-cookie": `qa_hub_browser_session=${permanentToken}; Path=/; HttpOnly; Max-Age=2147483647`,
+          },
+        });
+      }
+      bugRequestCount += 1;
+      return bugRequestCount === 1
+        ? new Response(JSON.stringify({ code: "NATIVE_SESSION_INVALID" }), {
+            status: 401,
+            headers: { "content-type": "application/json" },
+          })
+        : new Response(JSON.stringify({ snapshotSequence: 1, items: [], nextCursor: null }), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          });
+    },
+    () => {
+      renewed += 1;
+    },
+  );
+
+  assert.deepEqual(await client.json("/api/v1/bugs?limit=1"), {
+    snapshotSequence: 1,
+    items: [],
+    nextCursor: null,
+  });
+  assert.deepEqual(calls, [
+    {
+      pathname: "/api/v1/bugs",
+      cookie: `qa_hub_browser_session=${staleToken}`,
+    },
+    { pathname: "/api/v1/auth/login", cookie: null },
+    {
+      pathname: "/api/v1/bugs",
+      cookie: `qa_hub_browser_session=${permanentToken}`,
+    },
+  ]);
+  assert.equal(renewed, 1);
 });

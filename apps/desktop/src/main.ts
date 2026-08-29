@@ -46,6 +46,10 @@ const runtimeEnvironment = loadDesktopRuntimeEnvironment(process.env);
 const runtimePaths = resolveDesktopRuntimePaths(runtimeEnvironment);
 const notificationHistory = new NotificationHistory(runtimePaths.notificationHistoryFile);
 const browserSession = new DesktopBrowserSessionCookieStore();
+const rememberedLoginNameFile =
+  runtimePaths.directory === null
+    ? null
+    : path.join(runtimePaths.directory, "remembered-login-name.json");
 const config = parseDesktopConfig(runtimeEnvironment, {
   webAssetsDirectory: path.resolve(currentDirectory, "../../../apps/web/dist"),
 });
@@ -58,6 +62,60 @@ let mcpServer: QaHubMcpHttpServer | null = null;
 let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
+
+async function loadRememberedLoginName(): Promise<void> {
+  if (rememberedLoginNameFile === null) return;
+  try {
+    const raw = await fs.readFile(rememberedLoginNameFile, "utf8");
+    if (Buffer.byteLength(raw, "utf8") > 4_096) throw new Error("IDENTITY_FILE_TOO_LARGE");
+    const parsed = JSON.parse(raw) as unknown;
+    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("IDENTITY_FILE_INVALID");
+    }
+    const record = parsed as { readonly schemaVersion?: unknown; readonly loginName?: unknown };
+    if (record.schemaVersion !== 1 || typeof record.loginName !== "string") {
+      throw new Error("IDENTITY_FILE_INVALID");
+    }
+    browserSession.restoreLoginName(record.loginName);
+    if (browserSession.rememberedLoginName() === null) throw new Error("IDENTITY_FILE_INVALID");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return;
+    process.stderr.write(
+      `${JSON.stringify({
+        event: "desktop.identity.load.failed",
+        code: error instanceof Error ? error.message : "UNKNOWN_ERROR",
+      })}\n`,
+    );
+  }
+}
+
+async function persistRememberedLoginName(): Promise<void> {
+  if (rememberedLoginNameFile === null) return;
+  const loginName = browserSession.rememberedLoginName();
+  if (loginName === null) {
+    await fs.rm(rememberedLoginNameFile, { force: true });
+    return;
+  }
+  await fs.mkdir(path.dirname(rememberedLoginNameFile), { recursive: true });
+  await fs.writeFile(
+    rememberedLoginNameFile,
+    `${JSON.stringify({ schemaVersion: 1, loginName })}\n`,
+    { encoding: "utf8", mode: 0o600 },
+  );
+}
+
+async function persistRememberedLoginNameSafely(): Promise<void> {
+  try {
+    await persistRememberedLoginName();
+  } catch (error) {
+    process.stderr.write(
+      `${JSON.stringify({
+        event: "desktop.identity.persist.failed",
+        code: error instanceof Error ? error.name : "UNKNOWN_ERROR",
+      })}\n`,
+    );
+  }
+}
 
 function responseJson(value: Record<string, string>, status: number): Response {
   return new Response(JSON.stringify(value), {
@@ -586,7 +644,11 @@ async function registerAppProtocol(): Promise<void> {
       return responseJson({ code: "APP_ORIGIN_NOT_ALLOWED" }, 403);
     }
     if (url.pathname.startsWith("/api/")) {
+      const previousLoginName = browserSession.rememberedLoginName();
       const response = await proxyRendererApiRequest(request, config, browserSession);
+      if (previousLoginName !== browserSession.rememberedLoginName()) {
+        await persistRememberedLoginNameSafely();
+      }
       syncNotificationCredential();
       return response;
     }
@@ -611,12 +673,16 @@ function createTransport(): NotificationTransport {
 
 async function startApplication(): Promise<void> {
   if (process.platform === "win32") app.setAppUserModelId("com.relayqahub.desktop");
+  await loadRememberedLoginName();
   await registerAppProtocol();
   transport = createTransport();
   updater = await createUpdater();
   if (config.mcpEnabled) {
     const mcpTools = new QaHubMcpTools(
-      new DesktopQaHubApiClient(config, browserSession),
+      new DesktopQaHubApiClient(config, browserSession, fetch, () => {
+        void persistRememberedLoginNameSafely();
+        syncNotificationCredential();
+      }),
       path.join(app.getPath("userData"), "mcp-attachments"),
     );
     mcpServer = new QaHubMcpHttpServer({
