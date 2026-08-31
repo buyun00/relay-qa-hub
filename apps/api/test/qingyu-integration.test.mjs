@@ -117,6 +117,27 @@ test("QingyuClient uses Relay-proven QR, own-defect, detail, and resolve protoco
   assert.equal(transitionCall.authorization, "Bearer token-1");
 });
 
+test("QingyuClient does not invent missing defect details", async () => {
+  const client = new QingyuClient({
+    baseUrl: "https://qingyu.example.test",
+    fetchImpl: async (input) => {
+      const url = new URL(input);
+      assert.equal(url.pathname, "/api/tasks/92");
+      return json({ code: 0, data: { id: 92, title: "棋牌背包预览不对" } });
+    },
+  });
+
+  const defect = await client.getDefect(
+    { token: "token-1", user: { id: "7", name: "测试用户", avatar: null } },
+    "92",
+  );
+
+  assert.equal(defect.description, "");
+  assert.deepEqual(defect.steps, ["棋牌背包预览不对"]);
+  assert.equal(defect.actualBehavior, "棋牌背包预览不对");
+  assert.equal(JSON.stringify(defect).includes("未填写详细描述"), false);
+});
+
 test("Qingyu integration persists encrypted sessions, imports idempotently, and resolves linked Bug", async () => {
   const root = await mkdtemp(join(tmpdir(), "qa-hub-qingyu-"));
   const statePath = join(root, "qingyu.enc.json");
@@ -141,6 +162,7 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
     url: "https://qingyu.example.test/tasks/91",
   };
   let creationCalls = 0;
+  let creationRequest = null;
   let resolveCalls = 0;
   let links = [];
   const fakeClient = {
@@ -183,6 +205,7 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
   const mobileBugStore = {
     async createBug(command) {
       creationCalls += 1;
+      creationRequest = command.request;
       return {
         clientSubmissionId: command.request.clientSubmissionId,
         qaItem: { type: "bug", id: bugId, key: "LOCAL-1" },
@@ -278,6 +301,11 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
   const imported = await integration.importOwnDefects(actorId, "project-3");
   assert.equal(imported.items[0].status, "created");
   assert.equal(creationCalls, 1);
+  assert.equal(creationRequest.title, "[轻语] 按钮无响应 点击后没有反应");
+  assert.equal(creationRequest.description, "[轻语] 按钮无响应 点击后没有反应");
+  assert.equal(creationRequest.description.includes("qingyu.example.test"), false);
+  assert.equal(creationRequest.description.includes("轻语编号"), false);
+  assert.equal(creationRequest.description.includes("导入时状态"), false);
   assert.equal((await integration.getBugLink(bugId)).defectId, "91");
 
   const encrypted = await readFile(statePath, "utf8");

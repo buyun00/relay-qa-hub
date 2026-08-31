@@ -427,19 +427,20 @@ export async function createQingyuIntegration(options: {
     const attachmentIds: string[] = [];
     for (const image of downloaded.images)
       attachmentIds.push(await uploadImage(actorId, clientSubmissionId, image));
-    const sourceLines = [
-      defect.description,
-      "",
-      `轻语来源：${defect.url}`,
-      defect.code === null ? null : `轻语编号：${defect.code}`,
-      defect.status === null ? null : `导入时状态：${defect.status}`,
-    ].filter((line): line is string => line !== null);
+    const qingyuTitle = defect.title.replace(/\s+/gu, " ").trim();
+    const qingyuDescription = defect.description.replace(/\s+/gu, " ").trim();
+    const content = `[轻语] ${[
+      qingyuTitle,
+      ...(qingyuDescription.length === 0 || qingyuDescription === qingyuTitle
+        ? []
+        : [qingyuDescription]),
+    ].join(" ")}`;
     const request: MobileCreateBugRequest = {
       submissionContractVersion: "1.1.0",
       projectId: options.qaProjectId,
       clientSubmissionId,
-      title: `${defect.code === null ? "" : `[${defect.code}] `}${defect.title}`.slice(0, 300),
-      description: sourceLines.join("\n").slice(0, 20_000),
+      title: content.slice(0, 300),
+      description: content.slice(0, 20_000),
       expectedBehavior: defect.expectedBehavior.slice(0, 10_000),
       severity: severity(defect.severity),
       priority: priority(defect.priority),

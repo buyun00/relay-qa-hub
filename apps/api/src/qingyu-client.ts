@@ -377,13 +377,15 @@ function normalizeDefect(value: unknown, baseUrl: string): QingyuDefect | null {
     ["status", "key"],
   ]);
   const title = plainText(first(value, ["title", "name", "subject", "summary"]));
+  const normalizedTitle = title || `未命名缺陷 ${code ?? id}`;
+  const normalizedDescription = description || actual;
   return {
     id,
     code,
-    title: title || `未命名缺陷 ${code ?? id}`,
-    description: description || actual || "该缺陷暂未填写详细描述。",
-    steps: steps.length === 0 ? ["按轻语缺陷描述复现"] : steps,
-    actualBehavior: actual || description || "见轻语缺陷描述",
+    title: normalizedTitle,
+    description: normalizedDescription,
+    steps: steps.length === 0 ? [normalizedDescription || normalizedTitle] : steps,
+    actualBehavior: actual || description || normalizedTitle,
     expectedBehavior: expected || "问题修复后不再复现",
     status: statusValue === null ? null : plainText(statusValue),
     statusKey: statusKeyValue === null ? null : String(statusKeyValue).trim().toUpperCase() || null,
