@@ -512,7 +512,7 @@ test("empty migration is repeatable and enables WAL, foreign keys, and integrity
   });
 });
 
-test("v6 to v7 preserves existing Bugs and adds shared management deletion facts", async () => {
+test("v6 through v8 preserves existing Bugs and adds shared management completion facts", async () => {
   await withDatabase(async ({ database, databaseFile, root }) => {
     const initial = await migrateSqliteDatabase(database, databaseFile, { targetVersion: 6 });
     assert.equal(initial.toVersion, 6);
@@ -522,11 +522,19 @@ test("v6 to v7 preserves existing Bugs and adds shared management deletion facts
 
     const upgraded = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "backups"),
+      targetVersion: 7,
     });
     assert.deepEqual(upgraded.appliedVersions, [7]);
     assert.equal(upgraded.fromVersion, 6);
     assert.equal(upgraded.toVersion, 7);
     assert.equal(currentSqliteSchemaVersion(database), 7);
+    const completed = await migrateSqliteDatabase(database, databaseFile, {
+      backupRoot: join(root, "backups"),
+    });
+    assert.deepEqual(completed.appliedVersions, [8]);
+    assert.equal(completed.fromVersion, 7);
+    assert.equal(completed.toVersion, SQLITE_SCHEMA_VERSION);
+    assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);
     assert.equal(
       numberColumn(database, "SELECT count(*) AS count FROM bugs WHERE id = ?", "count", bugId),
       1,

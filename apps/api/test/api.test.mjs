@@ -15,6 +15,7 @@ import {
   MOBILE_API_CONTENT_TYPE,
   MOBILE_API_MEDIA_TYPE,
   MOBILE_BUG_COLLECTION_PATH,
+  MOBILE_BUG_COMPLETE_PATH,
   MOBILE_PROJECT_COLLECTION_PATH,
   MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
   MOBILE_UPLOAD_CHUNK_PATH,
@@ -477,6 +478,10 @@ test("human workflow routes preserve no-code and failed Verification contracts",
         calls.push(["deliver", command]);
         return { id: attemptId, deliveryKind: command.request.deliveryKind };
       },
+      async completeBugForVerification(command) {
+        calls.push(["complete", command]);
+        return { id: bugId, state: "ready_for_verification", version: 5 };
+      },
     },
     mobileVerificationStore: {
       async createVerification(command) {
@@ -539,6 +544,34 @@ test("human workflow routes preserve no-code and failed Verification contracts",
     },
   ]);
 
+  const completed = await app.inject({
+    method: "POST",
+    url: MOBILE_BUG_COMPLETE_PATH.replace(":bugId", bugId),
+    headers: {
+      ...commonHeaders,
+      "idempotency-key": `workflow:completeBug:bug:${bugId}:v4`,
+    },
+    payload: JSON.stringify({
+      expectedVersion: 4,
+      repairAttemptId: attemptId,
+      reason: "Task is complete and ready for acceptance",
+    }),
+  });
+  assert.equal(completed.statusCode, 200);
+  assert.deepEqual(calls[1], [
+    "complete",
+    {
+      actorId,
+      bugId,
+      idempotencyKey: `workflow:completeBug:bug:${bugId}:v4`,
+      request: {
+        expectedVersion: 4,
+        repairAttemptId: attemptId,
+        reason: "Task is complete and ready for acceptance",
+      },
+    },
+  ]);
+
   const created = await app.inject({
     method: "POST",
     url: MOBILE_VERIFICATION_COLLECTION_PATH.replace(":bugId", bugId),
@@ -555,8 +588,8 @@ test("human workflow routes preserve no-code and failed Verification contracts",
     }),
   });
   assert.equal(created.statusCode, 201);
-  assert.equal(calls[1][1].request.buildId, null);
-  assert.equal(calls[1][1].request.verifierId, verifierId);
+  assert.equal(calls[2][1].request.buildId, null);
+  assert.equal(calls[2][1].request.verifierId, verifierId);
 
   const failed = await app.inject({
     method: "POST",
@@ -577,8 +610,8 @@ test("human workflow routes preserve no-code and failed Verification contracts",
     }),
   });
   assert.equal(failed.statusCode, 200);
-  assert.equal(calls[2][1].actorId, actorId);
-  assert.deepEqual(calls[2][1].request, {
+  assert.equal(calls[3][1].actorId, actorId);
+  assert.deepEqual(calls[3][1].request, {
     submissionContractVersion: "1.1.0",
     clientSubmissionId,
     expectedVersion: 2,

@@ -7141,6 +7141,169 @@ CREATE INDEX bug_deletions_actor_idx
   ON bug_deletions(account_id, project_id, deleted_by_actor_id, deleted_at DESC);
 `;
 
+function threeStateTaskCompletionSql(): string {
+  const allProjectRoles =
+    "('viewer', 'reporter', 'developer', 'verifier', 'triager', 'release_manager')";
+  let bugState = extractSchemaBlock(
+    SHARED_PROJECT_BUG_MANAGEMENT_SQL,
+    "CREATE TRIGGER bugs_typed_state_transition_guard",
+    "CREATE TRIGGER bugs_typed_same_state_pointer_guard",
+  );
+  bugState = replaceSchemaFragment(
+    bugState,
+    `        OR (
+          old.state = 'awaiting_build'
+          AND new.state = 'ready_for_verification'
+          AND role.role = 'release_manager'
+          AND event.type = 'build.repair_linked'`,
+    `        OR (
+          old.state = 'awaiting_build'
+          AND new.state = 'ready_for_verification'
+          AND role.role IN ${allProjectRoles}
+          AND event.type = 'bug.completed_for_verification'
+          AND event.aggregate_type = 'bug'
+          AND event.aggregate_id = old.id
+          AND event.resource_type = 'bug'
+          AND event.resource_id = old.id
+          AND event.resource_version_after = new.version
+          AND json_extract(event.payload_json, '$.status') = 'ready_for_verification'
+          AND json_extract(event.payload_json, '$.repairAttemptId') = old.active_repair_attempt_id
+          AND json_type(event.payload_json, '$.reason') = 'text'
+          AND length(trim(json_extract(event.payload_json, '$.reason'))) > 0
+          AND json_extract(event.payload_json, '$.fromVersion') = old.version
+          AND json_extract(event.payload_json, '$.toVersion') = new.version
+          AND old.active_repair_attempt_id IS NOT NULL
+          AND new.active_repair_attempt_id IS old.active_repair_attempt_id
+          AND new.active_verification_id IS old.active_verification_id
+          AND new.duplicate_of_bug_id IS old.duplicate_of_bug_id
+          AND new.closed_at IS old.closed_at
+          AND new.reopen_count = old.reopen_count
+          AND EXISTS (
+            SELECT 1
+            FROM repair_attempts AS attempt
+            JOIN build_requirements AS requirement
+              ON requirement.account_id = attempt.account_id
+             AND requirement.project_id = attempt.project_id
+             AND requirement.bug_id = attempt.bug_id
+             AND requirement.repair_attempt_id = attempt.id
+            WHERE attempt.account_id = old.account_id
+              AND attempt.project_id = old.project_id
+              AND attempt.bug_id = old.id
+              AND attempt.id = old.active_repair_attempt_id
+              AND attempt.status = 'delivered'
+              AND requirement.requirement = 'required'
+              AND requirement.decision_basis = 'code_requires_build'
+              AND requirement.version = 1
+              AND requirement.linked_build_id IS NULL
+              AND requirement.link_id IS NULL
+          )
+        )
+        OR (
+          old.state = 'awaiting_build'
+          AND new.state = 'ready_for_verification'
+          AND role.role = 'release_manager'
+          AND event.type = 'build.repair_linked'`,
+    "project member completion of a delivered awaiting-Build Bug",
+  );
+
+  let exactBuildRequirement = extractSchemaBlock(
+    CORE_SCHEMA_SQL,
+    "CREATE TRIGGER verifications_exact_build_requirement",
+    "CREATE TRIGGER verifications_identity_immutable",
+  );
+  exactBuildRequirement = replaceSchemaFragment(
+    exactBuildRequirement,
+    `      OR (
+        requirement.requirement = 'required'
+        AND requirement.version = 2`,
+    `      OR (
+        requirement.requirement = 'required'
+        AND requirement.decision_basis = 'code_requires_build'
+        AND requirement.version = 1
+        AND requirement.linked_build_id IS NULL
+        AND requirement.link_id IS NULL
+        AND new.build_id IS NULL
+        AND requirement.delivered_commit_sha IS NOT NULL
+        AND EXISTS (
+          SELECT 1 FROM events AS completion
+          WHERE completion.account_id = requirement.account_id
+            AND completion.project_id = requirement.project_id
+            AND completion.bug_id = requirement.bug_id
+            AND completion.source = 'qa_hub'
+            AND completion.actor_type = 'user'
+            AND completion.type = 'bug.completed_for_verification'
+            AND completion.aggregate_type = 'bug'
+            AND completion.aggregate_id = requirement.bug_id
+            AND completion.resource_type = 'bug'
+            AND completion.resource_id = requirement.bug_id
+            AND completion.from_state = 'awaiting_build'
+            AND completion.to_state = 'ready_for_verification'
+            AND json_extract(completion.payload_json, '$.repairAttemptId') = requirement.repair_attempt_id
+            AND json_type(completion.payload_json, '$.reason') = 'text'
+            AND length(trim(json_extract(completion.payload_json, '$.reason'))) > 0
+        )
+      )
+      OR (
+        requirement.requirement = 'required'
+        AND requirement.version = 2`,
+    "Verification after an audited task completion without a Build gate",
+  );
+
+  let closureView = extractSchemaBlock(
+    SHARED_PROJECT_BUG_MANAGEMENT_SQL,
+    "CREATE VIEW valid_human_bug_closures AS",
+    "CREATE TABLE bug_deletions",
+  );
+  closureView = replaceSchemaFragment(
+    closureView,
+    `    OR (
+      requirement.requirement = 'required'
+      AND requirement.decision_basis = 'code_requires_build'`,
+    `    OR (
+      requirement.requirement = 'required'
+      AND requirement.decision_basis = 'code_requires_build'
+      AND requirement.version = 1
+      AND requirement.linked_build_id IS NULL
+      AND requirement.link_id IS NULL
+      AND verification.build_id IS NULL
+      AND requirement.delivered_commit_sha = attempt.commit_sha
+      AND EXISTS (
+        SELECT 1 FROM events AS completion
+        WHERE completion.account_id = requirement.account_id
+          AND completion.project_id = requirement.project_id
+          AND completion.bug_id = requirement.bug_id
+          AND completion.source = 'qa_hub'
+          AND completion.actor_type = 'user'
+          AND completion.type = 'bug.completed_for_verification'
+          AND completion.aggregate_type = 'bug'
+          AND completion.aggregate_id = requirement.bug_id
+          AND completion.resource_type = 'bug'
+          AND completion.resource_id = requirement.bug_id
+          AND completion.from_state = 'awaiting_build'
+          AND completion.to_state = 'ready_for_verification'
+          AND json_extract(completion.payload_json, '$.repairAttemptId') = requirement.repair_attempt_id
+          AND json_type(completion.payload_json, '$.reason') = 'text'
+          AND length(trim(json_extract(completion.payload_json, '$.reason'))) > 0
+      )
+    )
+    OR (
+      requirement.requirement = 'required'
+      AND requirement.decision_basis = 'code_requires_build'`,
+    "human closure after an audited task completion without a Build gate",
+  );
+
+  return [
+    "DROP TRIGGER bugs_typed_state_transition_guard;",
+    "DROP TRIGGER verifications_exact_build_requirement;",
+    "DROP VIEW valid_human_bug_closures;",
+    bugState,
+    exactBuildRequirement,
+    closureView,
+  ].join("\n\n");
+}
+
+const THREE_STATE_TASK_COMPLETION_SQL = threeStateTaskCompletionSql();
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -7159,6 +7322,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(5, "multi_actor_human_workflow", MULTI_ACTOR_HUMAN_WORKFLOW_SQL),
   migration(6, "qingyu_bug_links", QINGYU_BUG_LINK_SCHEMA_SQL),
   migration(7, "shared_project_bug_management", SHARED_PROJECT_BUG_MANAGEMENT_SQL),
+  migration(8, "three_state_task_completion", THREE_STATE_TASK_COMPLETION_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

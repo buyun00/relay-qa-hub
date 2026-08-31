@@ -64,6 +64,7 @@ import type {
   MobileDuplicateCandidateList,
 } from "./mobile-duplicate-store.js";
 import type {
+  CompleteMobileBugForVerificationInput,
   CompleteMobileRelayOutboxInput,
   ContinueMobileRelayInput,
   CreateMobileManualRepairAttemptInput,
@@ -541,6 +542,13 @@ export class SqliteStorageWorker {
   ): Promise<MobileManualRepairAttemptRecord> {
     await this.initialization;
     return this.request<MobileManualRepairAttemptRecord>("deliverMobileRepairAttempt", input);
+  }
+
+  async completeMobileBugForVerification(
+    input: CompleteMobileBugForVerificationInput,
+  ): Promise<MobileBugRecord> {
+    await this.initialization;
+    return this.request<MobileBugRecord>("completeMobileBugForVerification", input);
   }
 
   async linkMobileBuildRepair(

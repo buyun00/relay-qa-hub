@@ -95,6 +95,7 @@ import {
 } from "./qingyu-link-store.js";
 import {
   claimMobileRelayOutbox,
+  completeMobileBugForVerification,
   completeMobileRelayOutbox,
   continueMobileRelay,
   createMobileManualRepairAttempt,
@@ -110,6 +111,7 @@ import {
   transitionMobileBugReady,
   updateMobileBug,
   type CompleteMobileRelayOutboxInput,
+  type CompleteMobileBugForVerificationInput,
   type ContinueMobileRelayInput,
   type CreateMobileManualRepairAttemptInput,
   type CreateMobileRelayAttemptInput,
@@ -202,6 +204,7 @@ interface WorkerRequest {
     | "getMobileManualRepairAttempt"
     | "startMobileRepairAttempt"
     | "deliverMobileRepairAttempt"
+    | "completeMobileBugForVerification"
     | "linkMobileBuildRepair"
     | "dispatchMobileRelay"
     | "continueMobileRelay"
@@ -616,6 +619,15 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   if (request.operation === "deliverMobileRepairAttempt") {
     return inWriteTransaction((current) =>
       deliverMobileRepairAttempt(current, request.payload as DeliverMobileRepairAttemptInput),
+    );
+  }
+
+  if (request.operation === "completeMobileBugForVerification") {
+    return inWriteTransaction((current) =>
+      completeMobileBugForVerification(
+        current,
+        request.payload as CompleteMobileBugForVerificationInput,
+      ),
     );
   }
 

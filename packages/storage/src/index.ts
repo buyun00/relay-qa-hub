@@ -380,6 +380,7 @@ export {
   MOBILE_FAKE_RELAY_PRINCIPAL_ID,
   MobileRelayStorageError,
   claimMobileRelayOutbox,
+  completeMobileBugForVerification,
   completeMobileRelayOutbox,
   continueMobileRelay,
   createMobileManualRepairAttempt,
@@ -394,6 +395,7 @@ export {
 } from "./mobile-relay-store.js";
 export type {
   CompleteMobileRelayOutboxInput,
+  CompleteMobileBugForVerificationInput,
   ContinueMobileRelayInput,
   CreateMobileManualRepairAttemptInput,
   CreateMobileRelayAttemptInput,

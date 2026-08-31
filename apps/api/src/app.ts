@@ -127,6 +127,7 @@ import {
   registerBrowserAuthRoutes,
 } from "./browser-auth.js";
 import {
+  MOBILE_BUG_COMPLETE_PATH,
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
@@ -136,6 +137,7 @@ import {
   MOBILE_RELAY_CONTINUE_PATH,
   MOBILE_RELAY_RECEIPT_PATH,
   parseMobileBugReadyRequest,
+  parseMobileBugCompleteRequest,
   parseMobileRepairAttemptDeliveryRequest,
   parseMobileRepairAttemptRequest,
   parseMobileRepairAttemptStartRequest,
@@ -336,6 +338,9 @@ const unconfiguredMobileCaptureStore: MobileCaptureStore = {
 
 const unconfiguredMobileRelayStore: MobileRelayStore = {
   transitionBugReady: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  completeBugForVerification: () => {
     throw new Error("MobileRelayStore is not configured");
   },
   createRelayAttempt: () => {
@@ -1386,6 +1391,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     if (code === "NOT_FOUND") {
       return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
+    if (code === "FORBIDDEN") {
+      return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+    }
     if (code === "VERSION_CONFLICT" || code === "IDEMPOTENCY_PAYLOAD_MISMATCH") {
       return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
@@ -1417,6 +1425,31 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         throw new TypeError("Idempotency-Key does not match the ready transition");
       }
       const result = await mobileRelayStore.transitionBugReady({
+        actorId: authenticatedActorId(request, debugActorId),
+        bugId,
+        idempotencyKey,
+        request: body,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      return relayErrorReply(error, reply);
+    }
+  });
+
+  app.post<{ Params: { bugId: string } }>(MOBILE_BUG_COMPLETE_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const body = parseMobileBugCompleteRequest(request.body);
+      const idempotencyKey = requireRelayIdempotencyKey(
+        readHeader(request.headers["idempotency-key"]),
+      );
+      if (idempotencyKey !== `workflow:completeBug:bug:${bugId}:v${body.expectedVersion}`) {
+        throw new TypeError("Idempotency-Key does not match task completion");
+      }
+      const result = await mobileRelayStore.completeBugForVerification({
         actorId: authenticatedActorId(request, debugActorId),
         bugId,
         idempotencyKey,

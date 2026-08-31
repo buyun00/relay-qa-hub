@@ -52,6 +52,18 @@ export function createSqliteMobileRelayStore(
         createdAt: now().toISOString(),
       });
     },
+    async completeBugForVerification(command) {
+      return options.worker.completeMobileBugForVerification({
+        ...actorScope(command.actorId),
+        bugId: command.bugId,
+        repairAttemptId: command.request.repairAttemptId,
+        expectedVersion: command.request.expectedVersion,
+        reason: command.request.reason,
+        idempotencyKey: command.idempotencyKey,
+        requestDigest: digest(command.request),
+        createdAt: now().toISOString(),
+      });
+    },
     async createRelayAttempt(command) {
       requireRelayDispatch(options);
       return options.worker.createMobileRelayAttempt({

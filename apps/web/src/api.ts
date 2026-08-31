@@ -1383,6 +1383,26 @@ export async function transitionBugReady(
   return requireRecord(body, "BUG") as unknown as BugDetail;
 }
 
+export async function completeBugForVerification(
+  bugId: string,
+  expectedVersion: number,
+  repairAttemptId: string,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/complete`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:completeBug:bug:${bugId}:v${expectedVersion}`,
+    },
+    body: JSON.stringify({
+      expectedVersion,
+      repairAttemptId,
+      reason: "任务已完成，进入人工验收；构建仅保留为可选进度记录",
+    }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
 export async function listBugEvents(bugId: string): Promise<BugEventsResponse> {
   const body = requireRecord(
     await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/events?limit=20`),

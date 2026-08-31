@@ -109,10 +109,8 @@ internal const val UNASSIGNED_OWNER_FILTER = "__unassigned__"
 internal enum class BugStatusFilter(val label: String) {
     ALL("全部状态"),
     PENDING("待处理"),
-    IN_PROGRESS("处理中"),
-    VERIFICATION("待验收"),
-    COMPLETED("已完成"),
-    OTHER("其他状态"),
+    VERIFICATION("已完成待验收"),
+    CLOSED("关闭"),
 }
 
 internal data class BugListFilters(
@@ -133,11 +131,15 @@ internal fun filterBugs(
     }
     val statusMatches = when (filters.status) {
         BugStatusFilter.ALL -> true
-        BugStatusFilter.PENDING -> bug.state in setOf("reported", "needs_info", "ready")
-        BugStatusFilter.IN_PROGRESS -> bug.state in setOf("in_progress", "awaiting_build")
+        BugStatusFilter.PENDING -> bug.state in setOf(
+            "reported",
+            "needs_info",
+            "ready",
+            "in_progress",
+            "awaiting_build",
+        )
         BugStatusFilter.VERIFICATION -> bug.state == "ready_for_verification"
-        BugStatusFilter.COMPLETED -> bug.state == "closed"
-        BugStatusFilter.OTHER -> bug.state in setOf("deferred", "rejected", "duplicate")
+        BugStatusFilter.CLOSED -> bug.state in setOf("closed", "deferred", "rejected", "duplicate")
     }
     reporterMatches && ownerMatches && statusMatches
 }
@@ -1240,10 +1242,8 @@ private fun BugStatusPill(state: String) {
 
 private fun bugStatusColors(state: String): Pair<Color, Color> = when (state) {
     "ready_for_verification" -> Color(0xFFFFEDE2) to Color(0xFFC95722)
-    "closed" -> Color(0xFFEAF8D5) to Color(0xFF4F7B17)
-    "in_progress", "awaiting_build" -> Color(0xFFE8F0FF) to Color(0xFF3568D4)
-    "needs_info" -> Color(0xFFFFE8E8) to Color(0xFFB84646)
-    "deferred", "rejected", "duplicate" -> Color(0xFFF0F1F2) to Color(0xFF626A66)
+    "closed", "deferred", "rejected", "duplicate" ->
+        Color(0xFFEAF8D5) to Color(0xFF4F7B17)
     else -> Color(0xFFE8F0FF) to Color(0xFF3568D4)
 }
 
@@ -1989,18 +1989,15 @@ private fun renderAnnotatedPng(
 private fun personName(people: List<QaPerson>, id: String?, fallback: String): String =
     id?.let { personId -> people.firstOrNull { it.id == personId }?.displayName } ?: fallback
 
-private fun bugStateLabel(state: String): String = when (state) {
+internal fun bugStateLabel(state: String): String = when (state) {
     "reported" -> "待处理"
-    "needs_info" -> "已打回"
+    "needs_info" -> "待处理"
     "ready" -> "待处理"
-    "in_progress" -> "处理中"
-    "awaiting_build" -> "等待构建"
-    "ready_for_verification" -> "待验收"
-    "closed" -> "已完成"
-    "deferred" -> "已延期"
-    "rejected" -> "已拒绝"
-    "duplicate" -> "重复"
-    else -> state
+    "in_progress" -> "待处理"
+    "awaiting_build" -> "待处理"
+    "ready_for_verification" -> "已完成待验收"
+    "closed", "deferred", "rejected", "duplicate" -> "关闭"
+    else -> "待处理"
 }
 
 private fun displayTime(value: String): String = runCatching {

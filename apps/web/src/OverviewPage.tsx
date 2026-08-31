@@ -21,9 +21,16 @@ import {
   type BugSeverity,
   type ProjectMember,
 } from "./api";
+import {
+  TASK_STATUS_ORDER,
+  taskStatusCopy,
+  taskStatusForBugState,
+  taskStatusLabel,
+  type TaskStatus,
+} from "./task-status";
 
 type OwnerFilter = "all" | "unassigned" | "assigned" | `member:${string}`;
-type StateGroup = "all" | "pending" | "inProgress" | "verification" | "completed";
+type StateGroup = "all" | TaskStatus;
 type SortMode = "updated" | "created" | "priority";
 
 const EDITABLE_PRIORITIES = ["P0", "P1", "P2", "P3"] as const;
@@ -109,34 +116,14 @@ interface OverviewPageProps {
   readonly onMutated: () => void;
 }
 
-const stateCopy: Readonly<Record<BugListState, string>> = {
-  reported: "待分配",
-  needs_info: "需补充",
-  ready: "待修复",
-  in_progress: "处理中",
-  awaiting_build: "等待构建",
-  ready_for_verification: "待关闭",
-  closed: "已完成",
-  deferred: "已延期",
-  rejected: "不处理",
-  duplicate: "重复项",
-};
-
-const stateGroupCopy: Readonly<Record<StateGroup, string>> = {
-  all: "全部状态",
-  pending: "待处理",
-  inProgress: "处理中",
-  verification: "待关闭",
-  completed: "已完成",
-};
+const stateGroupOrder: readonly StateGroup[] = ["all", ...TASK_STATUS_ORDER];
 
 function stateMatches(group: StateGroup, state: BugListState): boolean {
-  if (group === "all") return true;
-  if (group === "pending")
-    return state === "reported" || state === "needs_info" || state === "ready";
-  if (group === "inProgress") return state === "in_progress" || state === "awaiting_build";
-  if (group === "verification") return state === "ready_for_verification";
-  return state === "closed";
+  return group === "all" || taskStatusForBugState(state) === group;
+}
+
+function stateGroupLabel(group: StateGroup): string {
+  return group === "all" ? "全部状态" : taskStatusCopy[group].label;
 }
 
 function formatDate(value: string): string {
@@ -454,9 +441,9 @@ export default function OverviewPage({
             onChange={(event) => setStateGroup(event.target.value as StateGroup)}
             value={stateGroup}
           >
-            {(Object.keys(stateGroupCopy) as StateGroup[]).map((group) => (
+            {stateGroupOrder.map((group) => (
               <option key={group} value={group}>
-                {stateGroupCopy[group]}
+                {stateGroupLabel(group)}
               </option>
             ))}
           </select>
@@ -618,7 +605,7 @@ export default function OverviewPage({
                 </select>
               </span>
               <span>
-                <b className={`status-badge state-${bug.state}`}>{stateCopy[bug.state]}</b>
+                <b className={`status-badge state-${bug.state}`}>{taskStatusLabel(bug.state)}</b>
               </span>
               <span>{formatDate(bug.createdAt)}</span>
               <span>{formatDate(bug.updatedAt)}</span>

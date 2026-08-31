@@ -250,9 +250,9 @@ try {
   if ($login.workbenchLoading -or -not [string]::IsNullOrWhiteSpace([string]$login.workbenchErrorText)) {
     throw "Portable package login reached the shell but the real workbench API did not load"
   }
-  $expectedSummaryLabels = @("待处理", "处理中", "待关闭", "已完成")
+  $expectedSummaryLabels = @("待处理", "已完成待验收", "关闭")
   if ((@($login.summaryLabels) -join "|") -ne ($expectedSummaryLabels -join "|")) {
-    throw "Packaged workbench shortcuts do not match the four lifecycle categories"
+    throw "Packaged workbench shortcuts do not match the three task statuses"
   }
   $notificationState = [string]$login.desktopConnection.state
   $notificationDeadline = [DateTime]::UtcNow.AddSeconds(15)

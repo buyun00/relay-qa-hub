@@ -8,6 +8,7 @@ import type {
 } from "@relay-qa-hub/storage";
 
 export const MOBILE_BUG_TRANSITION_PATH = "/api/v1/bugs/:bugId/transitions" as const;
+export const MOBILE_BUG_COMPLETE_PATH = "/api/v1/bugs/:bugId/complete" as const;
 export const MOBILE_BUG_REPAIR_ATTEMPTS_PATH = "/api/v1/bugs/:bugId/repair-attempts" as const;
 export const MOBILE_RELAY_DISPATCH_PATH =
   "/api/v1/repair-attempts/:attemptId/dispatch/relay" as const;
@@ -23,6 +24,12 @@ export const MOBILE_REPAIR_ATTEMPT_DELIVER_PATH =
 export interface MobileBugReadyRequest {
   readonly expectedVersion: number;
   readonly toState: "ready";
+}
+
+export interface MobileBugCompleteRequest {
+  readonly expectedVersion: number;
+  readonly repairAttemptId: string;
+  readonly reason: string;
 }
 
 export interface MobileRelayAttemptRequest {
@@ -86,6 +93,12 @@ export interface MobileRelayStore {
     readonly bugId: string;
     readonly idempotencyKey: string;
     readonly request: MobileBugReadyRequest;
+  }) => MobileBugRecord | Promise<MobileBugRecord>;
+  readonly completeBugForVerification: (command: {
+    readonly actorId: string;
+    readonly bugId: string;
+    readonly idempotencyKey: string;
+    readonly request: MobileBugCompleteRequest;
   }) => MobileBugRecord | Promise<MobileBugRecord>;
   readonly createRelayAttempt: (command: {
     readonly actorId: string;
@@ -178,6 +191,16 @@ export function parseMobileBugReadyRequest(value: unknown): MobileBugReadyReques
   return {
     expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
     toState: "ready",
+  };
+}
+
+export function parseMobileBugCompleteRequest(value: unknown): MobileBugCompleteRequest {
+  const body = record(value);
+  onlyKeys(body, new Set(["expectedVersion", "repairAttemptId", "reason"]));
+  return {
+    expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
+    repairAttemptId: requireRelayUuid(body["repairAttemptId"], "repairAttemptId"),
+    reason: boundedDeliveryString(body["reason"], "reason", 1, 5_000),
   };
 }
 

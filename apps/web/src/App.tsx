@@ -11,6 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 import {
   addBugComment,
+  completeBugForVerification,
   createBug,
   createHumanRepairAttempt,
   createRelayAttempt,
@@ -65,11 +66,19 @@ import {
 } from "./api";
 import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
 import OverviewPage from "./OverviewPage";
+import {
+  TASK_STATUS_ORDER,
+  taskStatusCopy,
+  taskStatusForBugState,
+  taskStatusLabel,
+  taskStatusMatches,
+  type TaskStatus,
+} from "./task-status";
 
 const DEFAULT_PROJECT_ID =
   import.meta.env.VITE_QA_HUB_PROJECT_ID ?? "10000000-0000-4000-8000-000000000004";
 
-type Category = "pending" | "inProgress" | "verification" | "completed";
+type Category = TaskStatus;
 type WorkspaceView = "workbench" | "overview";
 
 interface AppProps {
@@ -190,51 +199,10 @@ function internalBugSummary(content: string): string {
   return content.replace(/\s+/gu, " ").trim().slice(0, 160);
 }
 
-const categoryCopy: Readonly<
-  Record<Category, { readonly label: string; readonly hint: string; readonly icon: string }>
-> = {
-  pending: {
-    label: "待处理",
-    hint: "待分配、需补充或等待开始修复",
-    icon: "✓",
-  },
-  inProgress: {
-    label: "处理中",
-    hint: "正在修复或等待构建交付",
-    icon: "…",
-  },
-  verification: {
-    label: "待关闭",
-    hint: "修复完成后由关闭人直接关闭",
-    icon: "↗",
-  },
-  completed: { label: "已完成", hint: "Bug 已关闭", icon: "◎" },
-};
-
 const DEFAULT_RETURN_REASON = "问题仍可复现，请继续处理";
 
-const stateCopy: Readonly<Record<BugListState, string>> = {
-  reported: "待分配",
-  needs_info: "需补充",
-  ready: "待修复",
-  in_progress: "处理中",
-  awaiting_build: "等待构建",
-  ready_for_verification: "待关闭",
-  closed: "已完成",
-  deferred: "已延期",
-  rejected: "不处理",
-  duplicate: "重复项",
-};
-
-const pendingStates = new Set<BugListState>(["reported", "needs_info", "ready"]);
-
-const inProgressStates = new Set<BugListState>(["in_progress", "awaiting_build"]);
-
 function categoryMatches(category: Category, state: BugListState): boolean {
-  if (category === "pending") return pendingStates.has(state);
-  if (category === "inProgress") return inProgressStates.has(state);
-  if (category === "verification") return state === "ready_for_verification";
-  return state === "closed";
+  return taskStatusMatches(category, state);
 }
 
 export function canDirectCloseBug(
@@ -249,6 +217,13 @@ export function canDirectCloseBug(
       verificationStatus === "requested" ||
       verificationStatus === "in_progress")
   );
+}
+
+export function canCompleteDeliveredTask(
+  state: BugListState,
+  repairAttemptStatus: NonNullable<HumanWorkflowSnapshot["repairAttempt"]>["status"] | null,
+): boolean {
+  return state === "awaiting_build" && repairAttemptStatus === "delivered";
 }
 
 function initials(name: string): string {
@@ -276,7 +251,7 @@ function messageFor(cause: unknown): string {
       QINGYU_RESOLVE_TRANSITION_UNAVAILABLE:
         "轻语当前状态没有可用的“已解决”流转，或当前账号没有关单权限。",
       QINGYU_RESOLVE_VERSION_REQUIRED: "轻语要求填写解决版本，但项目没有可用版本。",
-      QINGYU_TRANSITION_FIELD_REQUIRED: "轻语关单还缺少必填字段，QA Hub 已保留为待关闭状态。",
+      QINGYU_TRANSITION_FIELD_REQUIRED: "轻语关单还缺少必填字段，QA Hub 已保留为已完成待验收状态。",
       QINGYU_RESOLUTION_NOT_VERIFIED: "轻语未确认 Bug 已解决，QA Hub 未执行本地关单。",
       QINGYU_TIMEOUT: "轻语响应超时，请稍后重试。",
       QINGYU_UNAVAILABLE: "当前无法连接轻语，请检查网络后重试。",
@@ -294,9 +269,10 @@ function messageFor(cause: unknown): string {
 
 function eventCopy(event: BugEvent): string {
   const from =
-    typeof event.fromState === "string" ? stateCopy[event.fromState as BugListState] : null;
-  const to = typeof event.toState === "string" ? stateCopy[event.toState as BugListState] : null;
-  if (from !== null && to !== null) return `${from} → ${to}`;
+    typeof event.fromState === "string" ? taskStatusLabel(event.fromState as BugListState) : null;
+  const to =
+    typeof event.toState === "string" ? taskStatusLabel(event.toState as BugListState) : null;
+  if (from !== null && to !== null && from !== to) return `${from} → ${to}`;
   const labels: Readonly<Record<string, string>> = {
     "bug.created": "提交了 Bug",
     "bug.updated": "更新了分配或详情",
@@ -304,10 +280,11 @@ function eventCopy(event: BugEvent): string {
     "repair_attempt.created": "建立了处理任务",
     "repair_attempt.started": "开始处理",
     "repair_attempt.delivered": "标记修复完成",
-    "verification.requested": "进入待关闭",
-    "verification.started": "开始关闭处理",
-    "verification.failed": "关闭前打回",
-    "verification.passed": "关闭 Bug",
+    "bug.completed_for_verification": "已完成，等待验收",
+    "verification.requested": "修复已完成，等待验收",
+    "verification.started": "开始验收",
+    "verification.failed": "验收未通过",
+    "verification.passed": "验收通过并关闭 Bug",
     "relay.handoff_queued": "已交给 Relay",
   };
   return labels[event.type] ?? event.type;
@@ -823,9 +800,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const counts = useMemo(
     () => ({
       pending: bugs.filter((bug) => categoryMatches("pending", bug.state)).length,
-      inProgress: bugs.filter((bug) => categoryMatches("inProgress", bug.state)).length,
       verification: bugs.filter((bug) => categoryMatches("verification", bug.state)).length,
-      completed: bugs.filter((bug) => categoryMatches("completed", bug.state)).length,
+      closed: bugs.filter((bug) => categoryMatches("closed", bug.state)).length,
     }),
     [bugs],
   );
@@ -978,7 +954,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     )
       return;
     const attempt = workflow.repairAttempt;
-    await runMutation("修复已完成，等待关闭人处理", async () => {
+    await runMutation("已完成待验收，等待验收人处理", async () => {
       await deliverHumanRepairAttemptNoCode(
         attempt.id,
         attempt.version,
@@ -994,6 +970,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         verifierId: nextBug.verificationOwnerId ?? principal.userId,
         criteria: nextBug.expectedBehavior || "关闭人确认问题已解决且未引入回归",
       });
+    });
+  };
+
+  const completeDeliveredWork = async () => {
+    if (detail === null || repairAttempt === null) return;
+    await runMutation("已完成待验收，等待验收人处理", async () => {
+      await completeBugForVerification(detail.id, detail.version, repairAttempt.id);
     });
   };
 
@@ -1018,7 +1001,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const acceptBug = async () => {
     await runMutation(
-      "Bug 已关闭并计入已完成",
+      "Bug 已验收并关闭",
       async () => {
         const verification = await ensureVerificationStarted();
         if (verification === null) return;
@@ -1262,17 +1245,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             {notice === null ? null : <div className="banner success-banner">✓ {notice}</div>}
 
             <section aria-label="工作统计" className="summary-grid">
-              {(Object.keys(categoryCopy) as Category[]).map((value) => (
+              {TASK_STATUS_ORDER.map((value) => (
                 <button
                   className={`summary-card${category === value ? " is-selected" : ""}`}
                   key={value}
                   onClick={() => setCategory(value)}
                   type="button"
                 >
-                  <span className={`summary-icon icon-${value}`}>{categoryCopy[value].icon}</span>
+                  <span className={`summary-icon icon-${value}`}>{taskStatusCopy[value].icon}</span>
                   <span className="summary-value">{counts[value]}</span>
-                  <span className="summary-label">{categoryCopy[value].label}</span>
-                  <small>{categoryCopy[value].hint}</small>
+                  <span className="summary-label">{taskStatusCopy[value].label}</span>
+                  <small>{taskStatusCopy[value].hint}</small>
                 </button>
               ))}
             </section>
@@ -1356,7 +1339,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         </span>
                       </span>
                       <span className={`status-badge state-${bug.state}`} role="cell">
-                        {stateCopy[bug.state]}
+                        {taskStatusLabel(bug.state)}
                       </span>
                       <span className="updated-cell" role="cell">
                         {formatTime(bug.updatedAt)}
@@ -1428,7 +1411,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                     <span className="detail-key">{detail.key}</span>
                     <span className="priority-badge">{detail.priority}</span>
                     <span className={`status-badge state-${detail.state}`}>
-                      {stateCopy[detail.state]}
+                      {taskStatusLabel(detail.state)}
                     </span>
                   </div>
                   <button className="detail-close" onClick={closeDetail} type="button">
@@ -1455,7 +1438,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           {qingyuLink.syncStatus === "succeeded"
                             ? `已同步为${qingyuLink.externalStatus ?? "已解决"}`
                             : qingyuLink.syncStatus === "failed"
-                              ? "上次同步关单失败，本地仍保留待关闭"
+                              ? "上次同步关单失败，本地仍保留为已完成待验收"
                               : "直接关闭时，将同步解决轻语单"}
                         </span>
                       </div>
@@ -1661,19 +1644,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                     <div className="detail-support-card flow-section">
                       <div className="detail-section-title">
                         <strong>处理进度</strong>
-                        <span>{stateCopy[detail.state]}</span>
+                        <span>{taskStatusLabel(detail.state)}</span>
                       </div>
                       <div className="flow">
-                        {["已提交", "处理中", "待关闭", "已完成"].map((label, index) => {
+                        {["待处理", "已完成待验收", "关闭"].map((label, index) => {
+                          const activeStatus = taskStatusForBugState(detail.state);
                           const activeIndex =
-                            detail.state === "closed"
-                              ? 3
-                              : detail.state === "ready_for_verification"
-                                ? 2
-                                : detail.state === "in_progress" ||
-                                    detail.state === "awaiting_build"
-                                  ? 1
-                                  : 0;
+                            activeStatus === "closed" ? 2 : activeStatus === "verification" ? 1 : 0;
                           return (
                             <span
                               className={`flow-step${index < activeIndex ? " is-done" : index === activeIndex ? " is-active" : ""}`}
@@ -1832,6 +1809,16 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           标记修复完成
                         </button>
                       ) : null}
+                      {canCompleteDeliveredTask(detail.state, repairAttempt?.status ?? null) ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() => void completeDeliveredWork()}
+                          type="button"
+                        >
+                          已完成
+                        </button>
+                      ) : null}
                       {canDirectCloseBug(
                         detail.state,
                         repairAttempt !== null,
@@ -1877,9 +1864,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         </button>
                       ) : null}
                       {detail.state === "closed" ? (
-                        <p className="action-note action-note-left">
-                          这条 Bug 已关闭，并计入“已完成”。
-                        </p>
+                        <p className="action-note action-note-left">这条 Bug 已验收并关闭。</p>
                       ) : null}
                       {detail.state !== "closed" &&
                       detail.state !== "ready_for_verification" &&

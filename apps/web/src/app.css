@@ -389,7 +389,7 @@ h1 {
 .summary-grid {
   margin-bottom: 20px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 .summary-card {
@@ -431,13 +431,9 @@ h1 {
   color: #e9631d;
   background: var(--orange-soft);
 }
-.icon-completed {
+.icon-closed {
   color: #4c7e19;
   background: var(--lime-soft);
-}
-.icon-inProgress {
-  color: var(--blue);
-  background: var(--blue-soft);
 }
 .summary-value {
   display: block;
@@ -641,29 +637,24 @@ h1 {
   font-size: 12px;
   font-weight: 750;
 }
-.state-ready_for_verification {
-  color: #477521;
-  background: #eff8e5;
-}
+.state-ready,
 .state-in_progress,
-.state-awaiting_build {
-  color: #8153bd;
-  background: #f4edfc;
-}
+.state-awaiting_build,
 .state-needs_info,
 .state-reported {
   color: #416bc1;
   background: #edf3ff;
 }
-.state-closed {
-  color: #397455;
-  background: #e9f6ed;
+.state-ready_for_verification {
+  color: #c65818;
+  background: #fff1e5;
 }
+.state-closed,
 .state-rejected,
 .state-duplicate,
 .state-deferred {
-  color: #68756d;
-  background: #edf1ed;
+  color: #397455;
+  background: #e9f6ed;
 }
 .updated-cell {
   color: #69776f;
@@ -1039,7 +1030,7 @@ h1 {
 }
 .flow {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 .flow-step {
   position: relative;

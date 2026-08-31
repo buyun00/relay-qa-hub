@@ -15,6 +15,7 @@ import { createMobileBug, deleteMobileBug, getMobileBug } from "../src/mobile-bu
 import { listMobileBugs } from "../src/mobile-bug-list-store.ts";
 import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.ts";
 import {
+  completeMobileBugForVerification,
   createMobileManualRepairAttempt,
   createMobileRelayAttempt,
   deliverMobileRepairAttempt,
@@ -307,8 +308,8 @@ function createBug(
       severity: "S2",
       priority: "P2",
       reporterId: tenant.userId,
-      ownerId: assignments.ownerId,
-      verificationOwnerId: assignments.verificationOwnerId,
+      ownerId: assignments.ownerId ?? null,
+      verificationOwnerId: assignments.verificationOwnerId ?? null,
       createdAt: CREATED_AT,
     });
   });
@@ -10899,6 +10900,186 @@ test("multi-actor no-code human workflow can be managed by any project member", 
           item.type === "verification.result_recorded" && item.title === "验收未通过，已退回",
       ),
       true,
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("a project member can complete a delivered code task without making Build a task state", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_600, "DONE");
+    const bugId = identifier(5_610);
+    const scope = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.userId,
+    } as const;
+    const developerScope = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.secondaryUserId,
+    } as const;
+    insertActiveMembershipRole(database, tenant, identifier(5_611), "viewer");
+    insertActiveMembershipRole(database, tenant, identifier(5_612), "verifier");
+    insertActiveMembershipRole(database, tenant, identifier(5_614), "triager");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(5_613),
+      "developer",
+      tenant.secondaryUserId,
+    );
+    createBug(database, tenant, bugId, "Delivered code task can enter acceptance", {
+      ownerId: tenant.secondaryUserId,
+      verificationOwnerId: tenant.userId,
+    });
+
+    const ready = transaction(database, () =>
+      transitionMobileBugReady(database, {
+        ...scope,
+        bugId,
+        expectedVersion: 1,
+        idempotencyKey: "three-state-ready",
+        requestDigest: digest(5_620),
+        createdAt: UPDATED_AT,
+      }),
+    );
+    const planned = transaction(database, () =>
+      createMobileManualRepairAttempt(database, {
+        ...scope,
+        bugId,
+        expectedVersion: ready.version,
+        assigneeId: tenant.secondaryUserId,
+        summary: "Implement the code repair",
+        idempotencyKey: "three-state-create-attempt",
+        requestDigest: digest(5_621),
+        createdAt: UPDATED_AT,
+      }),
+    );
+    const running = transaction(database, () =>
+      startMobileRepairAttempt(database, {
+        ...developerScope,
+        attemptId: planned.id,
+        expectedVersion: planned.version,
+        reason: "Start implementation",
+        idempotencyKey: "three-state-start-attempt",
+        requestDigest: digest(5_622),
+        createdAt: UPDATED_AT,
+      }),
+    );
+    const commitSha = "6".repeat(40);
+    const delivered = transaction(database, () =>
+      deliverMobileRepairAttempt(database, {
+        ...developerScope,
+        attemptId: running.id,
+        expectedVersion: running.version,
+        deliveryKind: "code",
+        branch: "fix/three-state-task",
+        commitSha,
+        mergeRequestUrl: null,
+        patchUrl: null,
+        noCodeReason: null,
+        summary: "Code repair delivered",
+        idempotencyKey: "three-state-deliver-attempt",
+        requestDigest: digest(5_623),
+        createdAt: UPDATED_AT,
+      }),
+    );
+    assert.equal(delivered.status, "delivered");
+    const awaitingBuild = getMobileBug(database, scope, bugId);
+    assert.equal(awaitingBuild?.state, "awaiting_build");
+
+    const completionInput = {
+      ...scope,
+      bugId,
+      repairAttemptId: delivered.id,
+      expectedVersion: awaitingBuild?.version ?? 0,
+      reason: "Task is complete and ready for human acceptance",
+      idempotencyKey: `workflow:completeBug:bug:${bugId}:v${awaitingBuild?.version ?? 0}`,
+      requestDigest: digest(5_624),
+      createdAt: FINALIZED_AT,
+    } as const;
+    const completed = transaction(database, () =>
+      completeMobileBugForVerification(database, completionInput),
+    );
+    assert.equal(completed.state, "ready_for_verification");
+    assert.equal(completed.version, (awaitingBuild?.version ?? 0) + 1);
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT requirement, decision_basis AS decisionBasis, version,
+                    linked_build_id AS linkedBuildId, link_id AS linkId
+             FROM build_requirements WHERE repair_attempt_id = ?`,
+          )
+          .get(delivered.id),
+      },
+      {
+        requirement: "required",
+        decisionBasis: "code_requires_build",
+        version: 1,
+        linkedBuildId: null,
+        linkId: null,
+      },
+    );
+    assert.deepEqual(
+      transaction(database, () => completeMobileBugForVerification(database, completionInput)),
+      completed,
+    );
+
+    const verification = transaction(database, () =>
+      createMobileVerification(database, {
+        ...scope,
+        bugId,
+        expectedVersion: completed.version,
+        repairAttemptId: delivered.id,
+        buildId: null,
+        verifierId: tenant.userId,
+        criteria: "Confirm the delivered task works",
+        idempotencyKey: "three-state-create-verification",
+        requestDigest: digest(5_625),
+        createdAt: FINALIZED_AT,
+      }),
+    );
+    assert.equal(verification.buildId, null);
+    const started = transaction(database, () =>
+      startMobileVerification(database, {
+        ...scope,
+        verificationId: verification.id,
+        expectedVersion: verification.version,
+        reason: "Begin acceptance",
+        idempotencyKey: "three-state-start-verification",
+        requestDigest: digest(5_626),
+        createdAt: FINALIZED_AT,
+      }),
+    );
+    const passed = transaction(database, () =>
+      recordMobileVerificationResult(database, {
+        ...scope,
+        verificationId: verification.id,
+        expectedVersion: started.version,
+        status: "passed",
+        resultSummary: "Acceptance passed",
+        failureReason: null,
+        clientSubmissionId: identifier(5_627),
+        attachmentIds: [],
+        captureBundleId: null,
+        idempotencyKey: "three-state-pass-verification",
+        requestDigest: digest(5_628),
+        createdAt: FINALIZED_AT,
+      }),
+    );
+    assert.equal(passed.bug.state, "closed");
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT baseline_kind AS baselineKind, baseline_build_id AS baselineBuildId
+             FROM bug_closure_acceptances WHERE bug_id = ?`,
+          )
+          .get(bugId),
+      },
+      { baselineBuildId: null, baselineKind: "no_build" },
     );
     assertIntegrity(database);
   });

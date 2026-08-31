@@ -172,6 +172,7 @@ interface EligibleWorkflowRow extends BugRow {
   readonly requirement_linked_build_id: string | null;
   readonly requirement_link_id: string | null;
   readonly link_id: string | null;
+  readonly completion_event_id: string | null;
 }
 
 function requireTransaction(database: DatabaseSync): void {
@@ -414,7 +415,28 @@ function readEligibleWorkflow(
               requirement.version AS requirement_version,
               requirement.linked_build_id AS requirement_linked_build_id,
               requirement.link_id AS requirement_link_id,
-              link.id AS link_id
+              link.id AS link_id,
+              (
+                SELECT completion.id
+                FROM events AS completion
+                WHERE completion.account_id = requirement.account_id
+                  AND completion.project_id = requirement.project_id
+                  AND completion.bug_id = requirement.bug_id
+                  AND completion.source = 'qa_hub'
+                  AND completion.actor_type = 'user'
+                  AND completion.type = 'bug.completed_for_verification'
+                  AND completion.aggregate_type = 'bug'
+                  AND completion.aggregate_id = requirement.bug_id
+                  AND completion.resource_type = 'bug'
+                  AND completion.resource_id = requirement.bug_id
+                  AND completion.from_state = 'awaiting_build'
+                  AND completion.to_state = 'ready_for_verification'
+                  AND json_extract(completion.payload_json, '$.repairAttemptId') = attempt.id
+                  AND json_type(completion.payload_json, '$.reason') = 'text'
+                  AND length(trim(json_extract(completion.payload_json, '$.reason'))) > 0
+                ORDER BY completion.event_position DESC
+                LIMIT 1
+              ) AS completion_event_id
        FROM bugs AS bug
        JOIN repair_attempts AS attempt
          ON attempt.account_id = bug.account_id
@@ -629,6 +651,18 @@ export function createMobileVerification(
     workflow.link_id === null &&
     workflow.build_id === null &&
     workflow.attempt_commit_sha === null;
+  const completedWithoutBuildEligible =
+    input.buildId === null &&
+    workflow.requirement_requirement === "required" &&
+    workflow.requirement_decision_basis === "code_requires_build" &&
+    workflow.requirement_version === 1 &&
+    workflow.requirement_linked_build_id === null &&
+    workflow.requirement_link_id === null &&
+    workflow.link_id === null &&
+    workflow.build_id === null &&
+    workflow.requirement_commit_sha !== null &&
+    workflow.requirement_commit_sha === workflow.attempt_commit_sha &&
+    workflow.completion_event_id !== null;
   const requiredBuildEligible =
     input.buildId !== null &&
     workflow.requirement_requirement === "required" &&
@@ -647,7 +681,7 @@ export function createMobileVerification(
     workflow.attempt_mode !== "human" ||
     workflow.attempt_status !== "delivered" ||
     workflow.attempt_version !== 3 ||
-    (!noBuildEligible && !requiredBuildEligible)
+    (!noBuildEligible && !completedWithoutBuildEligible && !requiredBuildEligible)
   ) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",

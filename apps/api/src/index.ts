@@ -86,6 +86,7 @@ export {
 
 export {
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
+  MOBILE_BUG_COMPLETE_PATH,
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
   MOBILE_REPAIR_ATTEMPT_ITEM_PATH,
@@ -93,6 +94,7 @@ export {
   MOBILE_RELAY_DISPATCH_PATH,
   MOBILE_RELAY_RECEIPT_PATH,
   parseMobileBugReadyRequest,
+  parseMobileBugCompleteRequest,
   parseMobileManualRepairAttemptRequest,
   parseMobileRepairAttemptDeliveryRequest,
   parseMobileRepairAttemptRequest,
@@ -104,6 +106,7 @@ export {
 } from "./mobile-relay.js";
 export type {
   MobileBugReadyRequest,
+  MobileBugCompleteRequest,
   MobileManualRepairAttemptRequest,
   MobileRepairAttemptDeliveryRequest,
   MobileRepairAttemptRequest,
