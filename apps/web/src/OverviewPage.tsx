@@ -111,9 +111,16 @@ interface OverviewPageProps {
   readonly members: readonly ProjectMember[];
   readonly principal: BrowserSessionPrincipal;
   readonly refreshToken: number;
+  readonly selectedDate: string | null;
   readonly onCreateBug: () => void;
+  readonly onDateBucketsChange: (buckets: readonly OverviewDateBucket[]) => void;
   readonly onOpenBug: (bugId: string) => void;
   readonly onMutated: () => void;
+}
+
+export interface OverviewDateBucket {
+  readonly date: string;
+  readonly count: number;
 }
 
 const stateGroupOrder: readonly StateGroup[] = ["all", ...TASK_STATUS_ORDER];
@@ -138,6 +145,44 @@ function formatDate(value: string): string {
   }).format(date);
 }
 
+const overviewDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Shanghai",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+export function overviewDateKey(value: string): string | null {
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return null;
+  const parts = overviewDateFormatter.formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+  return year === undefined || month === undefined || day === undefined
+    ? null
+    : `${year}-${month}-${day}`;
+}
+
+export function buildOverviewDateBuckets(
+  items: readonly Pick<BugListItem, "createdAt">[],
+): readonly OverviewDateBucket[] {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    const date = overviewDateKey(item.createdAt);
+    if (date !== null) counts.set(date, (counts.get(date) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort(([left], [right]) => right.localeCompare(left))
+    .map(([date, count]) => ({ date, count }));
+}
+
+export function formatOverviewDateLabel(value: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/u.exec(value);
+  if (match === null) return value;
+  return `${Number(match[1])}年${Number(match[2])}月${Number(match[3])}日`;
+}
+
 export function displayBugNumber(key: string): string {
   return key.replace(/^LOCAL-/i, "");
 }
@@ -151,7 +196,9 @@ export default function OverviewPage({
   members,
   principal,
   refreshToken,
+  selectedDate,
   onCreateBug,
+  onDateBucketsChange,
   onOpenBug,
   onMutated,
 }: OverviewPageProps) {
@@ -234,8 +281,22 @@ export default function OverviewPage({
 
   useEffect(() => () => columnResizeCleanupRef.current?.(), []);
 
+  const dateBuckets = useMemo(() => buildOverviewDateBuckets(items), [items]);
+
+  useEffect(() => {
+    onDateBucketsChange(dateBuckets);
+  }, [dateBuckets, onDateBucketsChange]);
+
+  const dateScopedItems = useMemo(
+    () =>
+      selectedDate === null
+        ? items
+        : items.filter((bug) => overviewDateKey(bug.createdAt) === selectedDate),
+    [items, selectedDate],
+  );
+
   const visibleItems = useMemo(() => {
-    const filtered = items.filter((bug) => stateMatches(stateGroup, bug.state));
+    const filtered = dateScopedItems.filter((bug) => stateMatches(stateGroup, bug.state));
     return [...filtered].sort((left, right) => {
       if (sortMode === "priority") {
         const priority = left.priority.localeCompare(right.priority);
@@ -245,7 +306,7 @@ export default function OverviewPage({
       const rightTime = sortMode === "created" ? right.createdAt : right.updatedAt;
       return rightTime.localeCompare(leftTime) || right.key.localeCompare(left.key);
     });
-  }, [items, sortMode, stateGroup]);
+  }, [dateScopedItems, sortMode, stateGroup]);
 
   const assignOwner = async (bug: BugListItem, nextOwnerId: string | null) => {
     setMutatingId(bug.id);
@@ -389,17 +450,23 @@ export default function OverviewPage({
       .filter((userId, index, ids) => ids.indexOf(userId) === index);
   };
 
-  const unassignedCount = items.filter(
+  const unassignedCount = dateScopedItems.filter(
     (bug) => bug.ownerId === null && bug.state !== "closed",
   ).length;
+  const selectedDateLabel =
+    selectedDate === null ? "全部日期" : formatOverviewDateLabel(selectedDate);
 
   return (
     <main className="overview-page">
       <section className="overview-heading">
         <div>
           <p className="eyebrow">共享总表</p>
-          <h1>Bug 总览</h1>
-          <p>集中查看当前项目的全部单子，筛出未分配事项并直接设置优先级、负责人或关闭人。</p>
+          <h1>Bug 总览 · {selectedDateLabel}</h1>
+          <p>
+            {selectedDate === null
+              ? "集中查看当前项目的全部单子，或从左侧按提出日期分类。"
+              : `当前只显示 ${selectedDateLabel} 提出的单子，可继续叠加负责人、状态和级别筛选。`}
+          </p>
         </div>
         <button className="primary-button" onClick={onCreateBug} type="button">
           <span>＋</span> 新建 Bug
@@ -493,10 +560,12 @@ export default function OverviewPage({
 
       <section
         className={`overview-sheet${resizingColumn === null ? "" : " is-resizing"}`}
-        aria-label="全部 Bug 总览"
+        aria-label={`${selectedDateLabel} Bug 总览`}
       >
         <div className="overview-sheet-meta" style={overviewContentStyle}>
-          <strong>{visibleItems.length} 条当前结果</strong>
+          <strong>
+            {selectedDateLabel} · {visibleItems.length} 条当前结果
+          </strong>
           <span>最多一次读取 500 条 · 自动刷新</span>
         </div>
         <div className="overview-grid overview-grid-head" role="row" style={overviewGridStyle}>
@@ -521,7 +590,9 @@ export default function OverviewPage({
         ) : null}
         {!loading && visibleItems.length === 0 ? (
           <div className="overview-empty" style={overviewContentStyle}>
-            当前筛选下没有 Bug。
+            {selectedDate === null
+              ? "当前筛选下没有 Bug。"
+              : `${selectedDateLabel} 没有符合筛选的 Bug。`}
           </div>
         ) : null}
         {visibleItems.map((bug) => {
@@ -529,6 +600,7 @@ export default function OverviewPage({
           return (
             <div
               className={`overview-grid${bug.ownerId === null ? " is-unassigned" : ""}`}
+              data-created-date={overviewDateKey(bug.createdAt) ?? undefined}
               key={bug.id}
               role="row"
               style={overviewGridStyle}

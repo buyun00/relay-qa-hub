@@ -5,6 +5,7 @@ const ACTIONS = new Set([
   "open-bug-editor",
   "open-qingyu",
   "open-overview",
+  "select-overview-date",
   "wait-marker",
   "wait-update-ready",
   "install-update",
@@ -12,7 +13,7 @@ const ACTIONS = new Set([
 const action = process.argv[2] ?? "snapshot";
 if (!ACTIONS.has(action)) {
   throw new Error(
-    "action must be snapshot, login, open-first-bug, open-bug-editor, open-qingyu, open-overview, wait-marker, wait-update-ready, or install-update",
+    "action must be snapshot, login, open-first-bug, open-bug-editor, open-qingyu, open-overview, select-overview-date, wait-marker, wait-update-ready, or install-update",
   );
 }
 
@@ -143,6 +144,17 @@ const snapshotExpression = `
         node.textContent?.trim() ?? ""),
       overviewUnassignedFilterAvailable: [...document.querySelectorAll(".overview-toolbar option")].some(
         (option) => option.value === "unassigned" && (option.textContent ?? "").includes("未分配")),
+      overviewDateNavVisible: document.querySelector(".overview-date-nav") !== null,
+      overviewDatePageCount: document.querySelectorAll(".overview-date-pages .overview-date-page").length,
+      overviewDatePickerVisible: document.querySelector('.overview-date-picker input[type="date"]') !== null,
+      overviewSelectedDate: document.querySelector(".overview-date-picker input")?.value ?? "",
+      overviewActiveDatePageLabel: document.querySelector(".overview-date-page.is-active span")?.textContent?.trim() ?? null,
+      overviewAllDateCount: Number.parseInt(
+        document.querySelector(".overview-date-nav > .overview-date-page b")?.textContent ?? "0",
+        10,
+      ),
+      overviewRowDateKeys: [...document.querySelectorAll(".overview-grid[data-created-date]")].map(
+        (node) => node.getAttribute("data-created-date") ?? ""),
       markerVisible: ${JSON.stringify(marker)}.length > 0 && bodyText.includes(${JSON.stringify(marker)}),
       desktopConnection: status,
       desktopUpdate: updateState,
@@ -303,8 +315,8 @@ try {
         returnByValue: true,
       });
     }
-  } else if (action === "open-overview") {
-    const result = await client.send("Runtime.evaluate", {
+  } else if (action === "open-overview" || action === "select-overview-date") {
+    const navigation = await client.send("Runtime.evaluate", {
       expression: `(() => {
         const button = [...document.querySelectorAll(".nav-item")].find(
           (candidate) => (candidate.textContent ?? "").includes("总览"),
@@ -315,7 +327,7 @@ try {
       })()`,
       returnByValue: true,
     });
-    if (result.result?.value !== true)
+    if (navigation.result?.value !== true)
       throw new Error("desktop overview navigation is unavailable");
     const deadline = Date.now() + 10_000;
     let current;
@@ -330,11 +342,48 @@ try {
       }
       await new Promise((resolve) => setTimeout(resolve, 200));
     } while (Date.now() < deadline);
-    process.stdout.write(`${JSON.stringify({ action, snapshot: current })}\n`);
+    let selection = null;
+    if (
+      action === "select-overview-date" &&
+      current?.overviewVisible === true &&
+      current?.overviewLoading === false &&
+      current?.overviewErrorText === null
+    ) {
+      const selected = await client.send("Runtime.evaluate", {
+        expression: `(() => {
+          const button = document.querySelector(".overview-date-pages .overview-date-page");
+          if (!(button instanceof HTMLButtonElement)) return null;
+          const date = button.getAttribute("data-overview-date") ?? "";
+          const expectedCount = Number.parseInt(button.querySelector("b")?.textContent ?? "0", 10);
+          button.click();
+          return { date, expectedCount };
+        })()`,
+        returnByValue: true,
+      });
+      selection = selected.result?.value ?? null;
+      const selectionDeadline = Date.now() + 5_000;
+      do {
+        current = await snapshot(client);
+        if (
+          current?.overviewSelectedDate.length > 0 &&
+          current?.overviewRowDateKeys.every((date) => date === current.overviewSelectedDate)
+        ) {
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } while (Date.now() < selectionDeadline);
+    }
+    process.stdout.write(`${JSON.stringify({ action, selection, snapshot: current })}\n`);
     if (
       current?.overviewVisible !== true ||
       current?.overviewLoading === true ||
-      current?.overviewErrorText !== null
+      current?.overviewErrorText !== null ||
+      (action === "select-overview-date" &&
+        (selection === null ||
+          current?.overviewSelectedDate.length === 0 ||
+          current?.overviewSelectedDate !== selection.date ||
+          current?.overviewRowCount !== selection.expectedCount ||
+          current?.overviewRowDateKeys.some((date) => date !== current.overviewSelectedDate)))
     ) {
       process.exitCode = 1;
     }

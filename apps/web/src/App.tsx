@@ -65,7 +65,7 @@ import {
   type VisibleProject,
 } from "./api";
 import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
-import OverviewPage from "./OverviewPage";
+import OverviewPage, { formatOverviewDateLabel, type OverviewDateBucket } from "./OverviewPage";
 import {
   TASK_STATUS_ORDER,
   taskStatusCopy,
@@ -292,6 +292,8 @@ function eventCopy(event: BugEvent): string {
 
 export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [view, setView] = useState<WorkspaceView>("workbench");
+  const [overviewDate, setOverviewDate] = useState<string | null>(null);
+  const [overviewDateBuckets, setOverviewDateBuckets] = useState<readonly OverviewDateBucket[]>([]);
   const [projects, setProjects] = useState<readonly VisibleProject[]>([]);
   const [projectId, setProjectId] = useState(DEFAULT_PROJECT_ID);
   const [members, setMembers] = useState<readonly ProjectMember[]>([]);
@@ -362,6 +364,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   );
 
   const currentProject = projects.find((project) => project.id === projectId) ?? null;
+  const overviewBugCount = overviewDateBuckets.reduce((total, bucket) => total + bucket.count, 0);
+  const overviewDateLabel =
+    overviewDate === null ? "全部日期" : formatOverviewDateLabel(overviewDate);
+  const updateOverviewDateBuckets = useCallback(
+    (buckets: readonly OverviewDateBucket[]) => setOverviewDateBuckets(buckets),
+    [],
+  );
   const memberName = useCallback(
     (id: string | null): string => {
       if (id === null) return "未分配";
@@ -1163,6 +1172,47 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span>总览</span>
             <span className="nav-count">全部</span>
           </button>
+          {view === "overview" ? (
+            <div aria-label="总览日期分页" className="overview-date-nav">
+              <div className="overview-date-nav-head">
+                <span>按提出日期</span>
+                <small>{overviewDateBuckets.length} 天</small>
+              </div>
+              <button
+                aria-current={overviewDate === null ? "page" : undefined}
+                className={`overview-date-page${overviewDate === null ? " is-active" : ""}`}
+                onClick={() => setOverviewDate(null)}
+                type="button"
+              >
+                <span>全部日期</span>
+                <b>{overviewBugCount}</b>
+              </button>
+              <label className="overview-date-picker">
+                <span>选择日期</span>
+                <input
+                  aria-label="选择总览日期"
+                  onChange={(event) => setOverviewDate(event.target.value || null)}
+                  type="date"
+                  value={overviewDate ?? ""}
+                />
+              </label>
+              <div className="overview-date-pages">
+                {overviewDateBuckets.map((bucket) => (
+                  <button
+                    aria-current={overviewDate === bucket.date ? "page" : undefined}
+                    className={`overview-date-page${overviewDate === bucket.date ? " is-active" : ""}`}
+                    data-overview-date={bucket.date}
+                    key={bucket.date}
+                    onClick={() => setOverviewDate(bucket.date)}
+                    type="button"
+                  >
+                    <span>{formatOverviewDateLabel(bucket.date)}</span>
+                    <b>{bucket.count}</b>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </nav>
         <div className="sidebar-note">
           <span className="status-dot" />
@@ -1186,7 +1236,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           <div className="breadcrumb">
             <strong>{currentProject?.name ?? "QA Hub"}</strong>
             <span>/</span>
-            <span>{view === "workbench" ? "工作台" : "总览"}</span>
+            <span>{view === "workbench" ? "工作台" : `总览 · ${overviewDateLabel}`}</span>
           </div>
           {view === "workbench" ? (
             <label className="global-search">
@@ -1201,7 +1251,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               <kbd>Ctrl K</kbd>
             </label>
           ) : (
-            <div className="overview-topbar-copy">全部 Bug · 表格视图</div>
+            <div className="overview-topbar-copy">{overviewDateLabel} · 表格视图</div>
           )}
           <button
             aria-label="刷新"
@@ -1357,6 +1407,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           <OverviewPage
             members={members}
             onCreateBug={openCreateBug}
+            onDateBucketsChange={updateOverviewDateBuckets}
             onMutated={() => {
               setOverviewRevision((value) => value + 1);
               void loadWorkbench(true, false);
@@ -1365,6 +1416,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             principal={principal}
             projectId={projectId}
             refreshToken={overviewRevision}
+            selectedDate={overviewDate}
           />
         )}
       </section>

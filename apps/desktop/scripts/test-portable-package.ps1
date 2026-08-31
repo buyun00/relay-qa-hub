@@ -316,6 +316,13 @@ try {
   if (-not $overview.overviewUnassignedFilterAvailable) {
     throw "Packaged overview does not expose the unassigned-owner filter"
   }
+  if (-not $overview.overviewDateNavVisible -or
+      -not $overview.overviewDatePickerVisible) {
+    throw "Packaged overview does not expose creation-date subpages"
+  }
+  if ([int]$overview.overviewRowCount -gt 0 -and [int]$overview.overviewDatePageCount -lt 1) {
+    throw "Packaged overview did not classify its Bugs into creation-date subpages"
+  }
   if ([int]$overview.overviewRowCount -ne [int]$overview.overviewOwnerSelectCount) {
     throw "Packaged overview rows do not all expose direct owner assignment"
   }
@@ -342,6 +349,24 @@ try {
   }
   if ([int]$overview.overviewColumnResizerCount -ne $expectedOverviewHeaders.Count) {
     throw "Packaged overview columns do not all expose drag resize handles"
+  }
+
+  $overviewSelectedDate = ""
+  $overviewSelectedDateRowCount = 0
+  if ([int]$overview.overviewRowCount -gt 0) {
+    $datePageOutput = & $NodeExe $smokeScript select-overview-date
+    if ($LASTEXITCODE -ne 0) { throw "Packaged overview creation-date filter smoke failed" }
+    $datePage = ($datePageOutput | Select-Object -Last 1 | ConvertFrom-Json)
+    if ([string]::IsNullOrWhiteSpace([string]$datePage.snapshot.overviewSelectedDate) -or
+        [string]$datePage.snapshot.overviewSelectedDate -ne [string]$datePage.selection.date -or
+        [int]$datePage.snapshot.overviewRowCount -ne [int]$datePage.selection.expectedCount -or
+        @($datePage.snapshot.overviewRowDateKeys | Where-Object {
+          $_ -ne [string]$datePage.snapshot.overviewSelectedDate
+        }).Count -ne 0) {
+      throw "Packaged overview date page did not restrict the right-hand list to the selected day"
+    }
+    $overviewSelectedDate = [string]$datePage.snapshot.overviewSelectedDate
+    $overviewSelectedDateRowCount = [int]$datePage.snapshot.overviewRowCount
   }
 
   [pscustomobject][ordered]@{
@@ -374,6 +399,9 @@ try {
     evidenceImageCount = [int]$detail.evidenceImageCount
     evidenceLoadedCount = [int]$detail.evidenceLoadedCount
     overviewLoaded = [bool]$overview.overviewVisible
+    overviewDatePageCount = [int]$overview.overviewDatePageCount
+    overviewSelectedDate = $overviewSelectedDate
+    overviewSelectedDateRowCount = $overviewSelectedDateRowCount
     overviewRowCount = [int]$overview.overviewRowCount
     overviewOwnerSelectCount = [int]$overview.overviewOwnerSelectCount
     overviewVerifierSelectCount = [int]$overview.overviewVerifierSelectCount
