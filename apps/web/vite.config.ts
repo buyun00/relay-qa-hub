@@ -24,7 +24,7 @@ const windowsZipFile = fileURLToPath(
 );
 const windowsUpdateManifestPath = "/downloads/Relay-QA-Hub-Windows-x64-latest.json";
 const windowsUpdateManifestFile = fileURLToPath(
-  new URL("../desktop/release/RelayQaHub-win32-x64-latest.json", import.meta.url),
+  new URL("../desktop/release/installer/Relay-QA-Hub-Windows-x64-latest.json", import.meta.url),
 );
 const windowsInstallerDownloadPath = "/downloads/Relay-QA-Hub-Setup-x64.exe";
 const windowsInstallerFile = fileURLToPath(

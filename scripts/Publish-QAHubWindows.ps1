@@ -43,7 +43,7 @@ try {
   if ($LASTEXITCODE -ne 0) { throw "Desktop build failed." }
   $installer = & $installerScript -LanAddress $LanAddress -ReleaseId $releaseId
   if ($LASTEXITCODE -ne 0) { throw "Desktop installer build failed." }
-  $updateManifest = Join-Path $repoRoot "apps\desktop\release\RelayQaHub-win32-x64-latest.json"
+  $updateManifest = Join-Path $repoRoot "apps\desktop\release\installer\Relay-QA-Hub-Windows-x64-latest.json"
   & $nodeExecutable `
     $signUpdateScript `
     --archive ([string]$installer.stableAlias) `

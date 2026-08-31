@@ -17,7 +17,7 @@ $generateIconScript = Join-Path $PSScriptRoot "generate-windows-icon.mjs"
 $buildUpdaterScript = Join-Path $PSScriptRoot "build-updater.ps1"
 $assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
-$manifestFile = Join-Path $outputRoot "RelayQaHub-win32-x64-latest.json"
+$manifestFile = Join-Path $outputRoot "RelayQaHub-win32-x64-portable-latest.json"
 $stageRoot = Join-Path $desktopRoot (".packaging-stage-" + [Guid]::NewGuid().ToString("N"))
 $expectedStagePrefix = $desktopRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 if (-not $stageRoot.StartsWith($expectedStagePrefix, [StringComparison]::OrdinalIgnoreCase) -or
