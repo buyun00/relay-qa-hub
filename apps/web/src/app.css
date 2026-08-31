@@ -2302,9 +2302,27 @@ h1 {
   cursor: pointer;
 }
 .overview-key-priority {
+  --overview-priority-stripe-alpha: 7%;
+  --overview-priority-stripe-gap: 23px;
+  --overview-priority-stripe-width: 1px;
   cursor: pointer;
+  isolation: isolate;
   justify-content: center;
+  overflow: hidden;
   position: relative;
+}
+.overview-key-priority::before {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(var(--overview-priority-rgb) / var(--overview-priority-stripe-alpha)) 0
+      var(--overview-priority-stripe-width),
+    transparent var(--overview-priority-stripe-width) var(--overview-priority-stripe-gap)
+  );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
 }
 .overview-key-priority:focus-within {
   outline: 2px solid currentColor;
@@ -2314,6 +2332,11 @@ h1 {
   color: var(--overview-priority-color);
   font-size: 15px;
   font-weight: 900;
+  position: relative;
+  text-shadow:
+    0 1px 0 rgb(255 255 255 / 95%),
+    0 0 5px rgb(255 255 255 / 92%);
+  z-index: 1;
 }
 .overview-key-priority > small {
   bottom: 5px;
@@ -2323,6 +2346,10 @@ h1 {
   line-height: 1;
   position: absolute;
   right: 7px;
+  text-shadow:
+    0 1px 0 rgb(255 255 255 / 95%),
+    0 0 4px rgb(255 255 255 / 92%);
+  z-index: 1;
 }
 .overview-key-priority-select {
   border: 0;
@@ -2333,24 +2360,40 @@ h1 {
   padding: 0;
   position: absolute;
   width: 100%;
+  z-index: 2;
 }
 .overview-key-priority-select:disabled {
   cursor: wait;
 }
 .overview-key-priority.p0 {
   --overview-priority-color: #c83f52;
+  --overview-priority-rgb: 200 63 82;
+  --overview-priority-stripe-alpha: 12%;
+  --overview-priority-stripe-gap: 8px;
+  --overview-priority-stripe-width: 2px;
 }
 .overview-key-priority.p1 {
   --overview-priority-color: #d66f18;
+  --overview-priority-rgb: 214 111 24;
+  --overview-priority-stripe-alpha: 10%;
+  --overview-priority-stripe-gap: 12px;
+  --overview-priority-stripe-width: 2px;
 }
 .overview-key-priority.p2 {
   --overview-priority-color: #356bd1;
+  --overview-priority-rgb: 53 107 209;
+  --overview-priority-stripe-alpha: 8%;
+  --overview-priority-stripe-gap: 17px;
 }
 .overview-key-priority.p3 {
   --overview-priority-color: #3f835f;
+  --overview-priority-rgb: 63 131 95;
 }
 .overview-key-priority.p4 {
   --overview-priority-color: #718078;
+  --overview-priority-rgb: 113 128 120;
+  --overview-priority-stripe-alpha: 5%;
+  --overview-priority-stripe-gap: 30px;
 }
 .overview-title {
   align-items: flex-start !important;
