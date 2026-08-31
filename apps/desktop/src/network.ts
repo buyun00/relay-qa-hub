@@ -19,7 +19,7 @@ const ALLOWED_RENDERER_HEADERS = new Set([
   "if-match",
   "x-client-submission-id",
   "x-client-attachment-id",
-  "x-upload-version",
+  "x-chunk-sha256",
   "x-csrf-token",
 ]);
 const FORWARDED_RESPONSE_HEADERS = [
@@ -31,6 +31,7 @@ const FORWARDED_RESPONSE_HEADERS = [
   "content-length",
   "x-content-sha256",
   "content-disposition",
+  "x-upload-version",
 ] as const;
 
 function browserSessionTokenFromCookieHeader(value: string | null): string | null {
@@ -283,7 +284,9 @@ export async function proxyRendererApiRequest(
     const value = response.headers.get(header);
     if (value !== null) responseHeaders.set(header, value);
   }
-  return new Response(Buffer.from(responseBody), {
+  const responseHasNoBody =
+    request.method === "HEAD" || response.status === 204 || response.status === 205;
+  return new Response(responseHasNoBody ? null : Buffer.from(responseBody), {
     status: response.status,
     headers: responseHeaders,
   });

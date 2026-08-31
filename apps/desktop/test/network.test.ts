@@ -206,6 +206,50 @@ test("tokenless desktop Inbox uses the remembered browser session", async () => 
   }
 });
 
+test("desktop API proxy preserves upload chunk integrity and version metadata", async () => {
+  const config = parseDesktopConfig({});
+  const originalFetch = globalThis.fetch;
+  const bytes = new Uint8Array([1, 2, 3, 4]);
+  const chunkSha256 = "a".repeat(64);
+  let forwardedChunkSha256: string | null = null;
+  let forwardedIfMatch: string | null = null;
+  let forwardedBody = new Uint8Array();
+  globalThis.fetch = async (_input, init) => {
+    const headers = new Headers(init?.headers);
+    forwardedChunkSha256 = headers.get("x-chunk-sha256");
+    forwardedIfMatch = headers.get("if-match");
+    forwardedBody = new Uint8Array(init?.body as Uint8Array);
+    return new Response(null, {
+      status: 204,
+      headers: { etag: '"2"', "x-upload-version": "2" },
+    });
+  };
+
+  try {
+    const response = await proxyRendererApiRequest(
+      new Request("qa-hub://app/api/v1/uploads/session-1/chunks/0", {
+        method: "PUT",
+        headers: {
+          "content-type": "application/octet-stream",
+          "if-match": '"1"',
+          "x-chunk-sha256": chunkSha256,
+        },
+        body: bytes,
+      }),
+      config,
+    );
+    assert.equal(forwardedChunkSha256, chunkSha256);
+    assert.equal(forwardedIfMatch, '"1"');
+    assert.deepEqual(forwardedBody, bytes);
+    assert.equal(response.status, 204);
+    assert.equal(response.headers.get("etag"), '"2"');
+    assert.equal(response.headers.get("x-upload-version"), "2");
+    assert.equal((await response.arrayBuffer()).byteLength, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("desktop API proxy preserves large attachment bytes and integrity headers", async () => {
   const config = parseDesktopConfig({});
   const originalFetch = globalThis.fetch;
