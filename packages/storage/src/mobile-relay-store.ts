@@ -93,6 +93,7 @@ export interface UpdateMobileBugInput extends MobileRelayScope {
   readonly priority?: MobileBugRecord["priority"];
   readonly ownerId?: string | null;
   readonly verificationOwnerId?: string | null;
+  readonly attachmentIds?: readonly string[];
   readonly idempotencyKey: string;
   readonly requestDigest: string;
   readonly createdAt: string;
@@ -1082,18 +1083,13 @@ function assertBugUpdateActor(database: DatabaseSync, input: UpdateMobileBugInpu
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
         AND membership.status = 'active'
-       JOIN membership_roles AS role
-         ON role.account_id = membership.account_id
-        AND role.project_id = membership.project_id
-        AND role.membership_id = membership.id
-        AND role.role IN ('triager', 'project_admin')
        WHERE account_row.id = ?`,
     )
     .get(input.projectId, input.actorId, input.accountId);
   if (!authorized) {
     throw new MobileRelayStorageError(
       "FORBIDDEN",
-      "Bug updates require an active triager or project admin membership",
+      "Bug updates require an active project membership",
     );
   }
 }
@@ -1172,6 +1168,166 @@ function assertUpdateReferences(database: DatabaseSync, input: UpdateMobileBugIn
       "verificationOwnerId",
     );
   }
+  if (input.attachmentIds !== undefined) {
+    if (
+      input.attachmentIds.length > 20 ||
+      new Set(input.attachmentIds).size !== input.attachmentIds.length ||
+      input.attachmentIds.some((attachmentId) => !UUID_PATTERN.test(attachmentId))
+    ) {
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        "attachmentIds must be a unique list of at most 20 UUIDs",
+      );
+    }
+  }
+}
+
+function activeBugAttachmentIds(
+  database: DatabaseSync,
+  input: UpdateMobileBugInput,
+): readonly string[] {
+  return database
+    .prepare(
+      `SELECT bug_attachment.attachment_id
+       FROM bug_attachments AS bug_attachment
+       WHERE bug_attachment.account_id = ?
+         AND bug_attachment.project_id = ?
+         AND bug_attachment.bug_id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_attachment_removals AS removal
+           WHERE removal.account_id = bug_attachment.account_id
+             AND removal.project_id = bug_attachment.project_id
+             AND removal.bug_id = bug_attachment.bug_id
+             AND removal.attachment_id = bug_attachment.attachment_id
+         )
+       ORDER BY bug_attachment.attachment_id`,
+    )
+    .all(input.accountId, input.projectId, input.bugId)
+    .map((row) => String(row.attachment_id));
+}
+
+function claimBugUpdateAttachment(
+  database: DatabaseSync,
+  input: UpdateMobileBugInput,
+  attachmentId: string,
+): void {
+  const reservation = database
+    .prepare(
+      `SELECT binding.id AS binding_id, binding.version AS binding_version,
+              attachment.version AS attachment_version
+       FROM attachments AS attachment
+       JOIN attachment_bindings AS binding
+         ON binding.account_id = attachment.account_id
+        AND binding.project_id = attachment.project_id
+        AND binding.attachment_id = attachment.id
+       JOIN blobs AS blob
+         ON blob.account_id = attachment.account_id
+        AND blob.id = attachment.blob_id
+        AND blob.size_bytes = attachment.size_bytes
+        AND blob.sha256 = attachment.sha256
+        AND blob.state = 'ready'
+       JOIN upload_sessions AS upload
+         ON upload.account_id = attachment.account_id
+        AND upload.project_id = attachment.project_id
+        AND upload.id = attachment.upload_session_id
+        AND upload.status = 'finalized'
+        AND upload.finalized_attachment_id = attachment.id
+       WHERE attachment.account_id = ?
+         AND attachment.project_id = ?
+         AND attachment.id = ?
+         AND attachment.actor_id = ?
+         AND attachment.status = 'ready'
+         AND attachment.scan_state = 'clean'
+         AND binding.intent = 'bug_create'
+         AND binding.target_bug_id IS NULL
+         AND binding.state = 'reserved'
+         AND unixepoch(binding.expires_at) > unixepoch('now')`,
+    )
+    .get(input.accountId, input.projectId, attachmentId, input.actorId) as
+    | {
+        readonly binding_id: string;
+        readonly binding_version: number;
+        readonly attachment_version: number;
+      }
+    | undefined;
+  if (!reservation) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "new Bug attachment has no active reservation owned by the editing actor",
+    );
+  }
+  const bindingUpdate = database
+    .prepare(
+      `UPDATE attachment_bindings
+       SET target_bug_id = ?, state = 'claimed', expires_at = NULL,
+           claimed_at = ?, version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+    )
+    .run(
+      input.bugId,
+      input.createdAt,
+      input.accountId,
+      input.projectId,
+      reservation.binding_id,
+      reservation.binding_version,
+    );
+  const attachmentUpdate = database
+    .prepare(
+      `UPDATE attachments SET version = version + 1
+       WHERE account_id = ? AND project_id = ? AND id = ? AND version = ?`,
+    )
+    .run(input.accountId, input.projectId, attachmentId, reservation.attachment_version);
+  if (bindingUpdate.changes !== 1 || attachmentUpdate.changes !== 1) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug attachment reservation changed before it could be claimed",
+    );
+  }
+  database
+    .prepare(
+      `INSERT INTO bug_attachments(
+        account_id, project_id, bug_id, attachment_id, binding_id
+      ) VALUES (?, ?, ?, ?, ?)`,
+    )
+    .run(input.accountId, input.projectId, input.bugId, attachmentId, reservation.binding_id);
+}
+
+function reconcileBugUpdateAttachments(
+  database: DatabaseSync,
+  input: UpdateMobileBugInput,
+  bugVersionAfter: number,
+): { readonly added: number; readonly removed: number } {
+  if (input.attachmentIds === undefined) return { added: 0, removed: 0 };
+  const currentIds = activeBugAttachmentIds(database, input);
+  const current = new Set(currentIds);
+  const requested = new Set(input.attachmentIds);
+  const added = input.attachmentIds.filter((attachmentId) => !current.has(attachmentId));
+  const removed = currentIds.filter((attachmentId) => !requested.has(attachmentId));
+
+  for (const attachmentId of added) {
+    claimBugUpdateAttachment(database, input, attachmentId);
+  }
+  for (const attachmentId of removed) {
+    database
+      .prepare(
+        `INSERT INTO bug_attachment_removals(
+          account_id, project_id, bug_id, attachment_id, bug_version_after,
+          removed_by_actor_id, removed_at, idempotency_key, request_digest
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        input.accountId,
+        input.projectId,
+        input.bugId,
+        attachmentId,
+        bugVersionAfter,
+        input.actorId,
+        input.createdAt,
+        input.idempotencyKey,
+        input.requestDigest,
+      );
+  }
+  return { added: added.length, removed: removed.length };
 }
 
 function readMobileBugUpdateReplay(
@@ -1271,11 +1427,13 @@ export function updateMobileBug(
   assignments.push("version = version + 1", "updated_at = ?");
   values.push(at, input.accountId, input.projectId, input.bugId, bug.version);
 
+  const attachmentChanges = reconcileBugUpdateAttachments(database, input, bug.version + 1);
+
   const eventId = randomUUID();
   const changedFields = mutableColumns
     .filter(([inputKey]) => input[inputKey] !== undefined)
-    .map(([, column]) => column)
-    .join(",");
+    .map(([, column]) => column);
+  if (input.attachmentIds !== undefined) changedFields.push("attachment_ids");
   const resultingOwnerId = input.ownerId !== undefined ? input.ownerId : bug.owner_id;
   insertUserEvent(database, {
     ...input,
@@ -1292,7 +1450,10 @@ export function updateMobileBug(
     fromState: null,
     toState: null,
     payload: {
-      summary: `Bug fields updated; changedFields=${changedFields}; ownerId=${resultingOwnerId ?? "null"}`,
+      summary:
+        `Bug fields updated; changedFields=${changedFields.join(",")}; ` +
+        `ownerId=${resultingOwnerId ?? "null"}; attachmentsAdded=${attachmentChanges.added}; ` +
+        `attachmentsRemoved=${attachmentChanges.removed}`,
       fromVersion: bug.version,
       toVersion: bug.version + 1,
     },

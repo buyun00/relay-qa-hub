@@ -142,6 +142,9 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         ...(command.request.verificationOwnerId === undefined
           ? {}
           : { verificationOwnerId: command.request.verificationOwnerId }),
+        ...(command.request.attachmentIds === undefined
+          ? {}
+          : { attachmentIds: command.request.attachmentIds }),
         idempotencyKey: command.idempotencyKey,
         requestDigest: createHash("sha256")
           .update(JSON.stringify({ bugId: command.bugId, request: command.request }))

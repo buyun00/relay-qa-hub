@@ -32,6 +32,7 @@ import {
   normalizeQaLoginName,
   parseMobileBugListQuery,
   parseMobileCreateCaptureRequest,
+  parseMobileUpdateBugRequest,
   qaLoginEmail,
   qaPinyinLoginAlias,
   qaUserId,
@@ -41,6 +42,26 @@ import {
 
 const fixedTime = new Date("2026-08-24T08:00:00.000Z");
 const buildSha = "a".repeat(40);
+
+test("Bug update accepts a complete attachment set and rejects ambiguous image edits", () => {
+  const first = "50000000-0000-4000-8000-000000000001";
+  const second = "50000000-0000-4000-8000-000000000002";
+  assert.deepEqual(
+    parseMobileUpdateBugRequest({ expectedVersion: 4, attachmentIds: [first, second] }),
+    {
+      expectedVersion: 4,
+      attachmentIds: [first, second],
+    },
+  );
+  assert.throws(
+    () => parseMobileUpdateBugRequest({ expectedVersion: 4, attachmentIds: [first, first] }),
+    /unique/u,
+  );
+  assert.throws(
+    () => parseMobileUpdateBugRequest({ expectedVersion: 4, attachmentIds: ["not-a-uuid"] }),
+    /UUID/u,
+  );
+});
 
 test("backend account-name normalization is stable and preserves the display spelling", () => {
   const accountId = "10000000-0000-4000-8000-000000000020";

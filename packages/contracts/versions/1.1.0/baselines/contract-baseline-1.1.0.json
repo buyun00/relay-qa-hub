@@ -1,20 +1,20 @@
 {
   "contractVersion": "1.1.0",
   "baseContractVersion": "1.0.0",
-  "frozenAt": "2026-08-28T08:52:58.116Z",
+  "frozenAt": "2026-08-31T09:19:19.951Z",
   "canonicalSha256": {
     "README.md": "6a3aa7d04fcbde28d7a30642ea927eef06ca2ab27e32995f9e637b7b7a038fb4",
     "errors/error-codes.json": "f606037bd157e7e4ef52e9d7428cabe28370a488403eea5a74bfb94047be33e4",
     "examples/critical-scenarios.json": "6a8a91ae1f7366c658f414355bb4fca584ef2a7b61dc0e38ba4d0887ce18b003",
-    "examples/openapi-examples.json": "ac2835a3f16e8cc076e8b6802f037ce7bb1a48759e885d84eba2f63f5e1adc14",
-    "openapi/openapi.json": "f3528ac93d22b05be003722879164349941a8c6ab9b874df36a234aad4060200",
-    "schemas/app-first.schema.json": "89c3546b99e917e9528ba7f5b7e566404ec35c903fab4cb09277b6e7f4f6dcd6",
+    "examples/openapi-examples.json": "82a4c0c5b6d4c580f371666a10e07b38579d8194e9b3e14f9713db8ee5b8d344",
+    "openapi/openapi.json": "406b3c8d7afd8f6a024e9f989091b9ce4b3af35a1a04fed7ecb6708a1e53d458",
+    "schemas/app-first.schema.json": "77e41c573d3ae5e15cf7c835742691222a69b5790a78498180c2859bebbf724a",
     "scripts/check-additive.mjs": "b09d1736eba7dcfcdc8714ff75c0fbc0cfe3e16acfeb6f71edec9a81f196f9e2",
     "scripts/check-breaking.mjs": "57199ca81ae28c0f1eda175ce78ef9a6ad76215bb3b06180ae7e42f293e9113a",
     "scripts/generate-openapi.mjs": "76a3fd214b2e3ee16373518084c8c8e2959557b24926d4f97c7f705c26f2e306",
     "scripts/validate-contracts.mjs": "c07285094bd0a727b14eb87b81bff8501f158089718c901ba305dbfdb67d0a39",
     "semantics/behavior-scenarios.json": "07dfd85f93cf764711889e5b6fca95698dcd1826da3c749066a2f65da45e7cfa",
-    "src/api-manifest.json": "fe2083d9fa9025cba02e707510a8809aeb953b12238532d39ffb8307c454a376",
+    "src/api-manifest.json": "62fb6fcadadbf4fe27c2914d9a35166ca9b32b25ef456c58c646a1017ba3e489",
     "src/evaluate-app-first-behavior.mjs": "78f4d6ad9f867ca4eae5bdf945bda224142113b6559c687e59071cbdd44dc385"
   }
 }

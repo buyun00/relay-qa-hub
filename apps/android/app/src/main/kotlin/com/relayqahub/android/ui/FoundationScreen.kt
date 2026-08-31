@@ -10,6 +10,10 @@ import android.graphics.Canvas
 import android.graphics.Color as AndroidColor
 import android.graphics.Paint
 import android.graphics.Path
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -87,6 +91,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.relayqahub.android.BugDetailUiState
+import com.relayqahub.android.BugEditDraft
+import com.relayqahub.android.BugEditImageUpload
 import com.relayqahub.android.CaptureSessionUiStatus
 import com.relayqahub.android.CaptureDraftUiState
 import com.relayqahub.android.ApkDownloadUiState
@@ -103,6 +109,7 @@ import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 internal const val UNASSIGNED_OWNER_FILTER = "__unassigned__"
 
@@ -197,6 +204,7 @@ fun FoundationScreen(
                 onRefresh = viewModel::refreshBugWorkbench,
                 onOpenBug = { viewModel.openBugDetail(it.id) },
                 onCloseBug = viewModel::closeBugDetail,
+                onSaveBug = viewModel::saveBugDetail,
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -863,6 +871,7 @@ private fun BugListPage(
     onRefresh: () -> Unit,
     onOpenBug: (WorkbenchBug) -> Unit,
     onCloseBug: () -> Unit,
+    onSaveBug: (BugEditDraft) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var reporterId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -976,6 +985,7 @@ private fun BugListPage(
             state = state.bugDetail,
             people = state.people.people,
             onDismiss = onCloseBug,
+            onSave = onSaveBug,
         )
     }
 }
@@ -1270,6 +1280,7 @@ private fun BugDetailDialog(
     state: BugDetailUiState,
     people: List<QaPerson>,
     onDismiss: () -> Unit,
+    onSave: (BugEditDraft) -> Unit,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -1330,93 +1341,12 @@ private fun BugDetailDialog(
                         )
                     }
                     else -> state.bug?.let { bug ->
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize().testTag("bug-detail"),
-                            contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
-                            verticalArrangement = Arrangement.spacedBy(14.dp),
-                        ) {
-                            item {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(9.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        bug.key,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                    BugStatusPill(bug.state)
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = priorityContainerColor(bug.priority),
-                                    ) {
-                                        Text(
-                                            priorityLabel(bug.priority),
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                                            color = priorityContentColor(bug.priority),
-                                            style = MaterialTheme.typography.labelMedium,
-                                            fontWeight = FontWeight.Black,
-                                        )
-                                    }
-                                }
-                            }
-                            item {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                    shape = RoundedCornerShape(20.dp),
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                                ) {
-                                    Row(Modifier.fillMaxWidth()) {
-                                        Spacer(
-                                            Modifier
-                                                .width(6.dp)
-                                                .height(108.dp)
-                                                .background(MaterialTheme.colorScheme.primaryContainer),
-                                        )
-                                        Column(
-                                            modifier = Modifier.weight(1f).padding(17.dp),
-                                            verticalArrangement = Arrangement.spacedBy(7.dp),
-                                        ) {
-                                            Text(
-                                                "内容",
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                style = MaterialTheme.typography.labelMedium,
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                            Text(
-                                                bug.description.ifBlank { "暂无内容" },
-                                                style = MaterialTheme.typography.headlineSmall,
-                                                fontWeight = FontWeight.Black,
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            items(state.images, key = { it.attachmentId }) { image ->
-                                DetailImage(image)
-                            }
-                            if (state.images.isEmpty()) item {
-                                SectionCard("图片") {
-                                    Text("本单没有图片", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                            }
-                            state.imageErrorCode?.let { code ->
-                                item { Text("部分图片暂时无法读取：$code", color = MaterialTheme.colorScheme.error) }
-                            }
-                            item {
-                                SectionCard(title = "分工与进度", subtitle = "完整流转操作请在管理网页完成") {
-                                    DetailFact("提报人", personName(people, bug.reporterId, "未知"))
-                                    DetailFact("责任人", personName(people, bug.ownerId, "待分配"))
-                                    DetailFact("验收人", personName(people, bug.verificationOwnerId, "待分配"))
-                                    DetailFact("创建时间", displayTime(bug.createdAt))
-                                    DetailFact("最后更新", displayTime(bug.updatedAt))
-                                    DetailFact("出现次数", bug.occurrenceCount.toString())
-                                }
-                            }
-                        }
+                        EditableBugDetail(
+                            state = state,
+                            bug = bug,
+                            people = people,
+                            onSave = onSave,
+                        )
                     }
                 }
             }
@@ -1425,7 +1355,362 @@ private fun BugDetailDialog(
 }
 
 @Composable
-private fun DetailImage(image: WorkbenchBugImage) {
+private fun EditableBugDetail(
+    state: BugDetailUiState,
+    bug: WorkbenchBug,
+    people: List<QaPerson>,
+    onSave: (BugEditDraft) -> Unit,
+) {
+    val context = LocalContext.current
+    var editing by rememberSaveable(bug.id, bug.version) { mutableStateOf(false) }
+    var title by rememberSaveable(bug.id, bug.version) { mutableStateOf(bug.title) }
+    var description by rememberSaveable(bug.id, bug.version) { mutableStateOf(bug.description) }
+    var expectedBehavior by rememberSaveable(bug.id, bug.version) {
+        mutableStateOf(bug.expectedBehavior)
+    }
+    var severity by rememberSaveable(bug.id, bug.version) {
+        mutableStateOf(bug.severity.takeIf { it in listOf("S0", "S1", "S2", "S3", "S4") } ?: "S2")
+    }
+    var priority by rememberSaveable(bug.id, bug.version) {
+        mutableStateOf(priorityLabel(bug.priority))
+    }
+    var moduleId by rememberSaveable(bug.id, bug.version) { mutableStateOf(bug.moduleId) }
+    var ownerId by rememberSaveable(bug.id, bug.version) { mutableStateOf(bug.ownerId.orEmpty()) }
+    var verifierId by rememberSaveable(bug.id, bug.version) {
+        mutableStateOf(bug.verificationOwnerId.orEmpty())
+    }
+    var removedAttachmentIds by remember(bug.id, bug.version) { mutableStateOf<Set<String>>(emptySet()) }
+    var newImages by remember(bug.id, bug.version) { mutableStateOf<List<BugEditImageUpload>>(emptyList()) }
+    var selectionError by remember(bug.id, bug.version) { mutableStateOf<String?>(null) }
+    val saving = state.phase == "saving"
+    val activeAttachments = state.attachments.filter { it.attachmentId !in removedAttachmentIds }
+    val imageAttachments = activeAttachments.filter {
+        it.mediaType.startsWith("image/", ignoreCase = true)
+    }
+    val downloadedImages = state.images.associateBy { it.attachmentId }
+    val availableModules = state.modules.filter { it.active || it.id == bug.moduleId }
+    val moduleOptions = listOf(null to "未分模块") +
+        if (bug.moduleId != null && availableModules.none { it.id == bug.moduleId }) {
+            listOf(bug.moduleId to "当前模块（目录暂不可用）")
+        } else {
+            emptyList()
+        } + availableModules.map { it.id to it.name }
+    val resetDraft = {
+        title = bug.title
+        description = bug.description
+        expectedBehavior = bug.expectedBehavior
+        severity = bug.severity.takeIf { it in listOf("S0", "S1", "S2", "S3", "S4") } ?: "S2"
+        priority = priorityLabel(bug.priority)
+        moduleId = bug.moduleId
+        ownerId = bug.ownerId.orEmpty()
+        verifierId = bug.verificationOwnerId.orEmpty()
+        removedAttachmentIds = emptySet()
+        newImages = emptyList()
+        selectionError = null
+    }
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents(),
+    ) { uris: List<Uri> ->
+        val remaining = (20 - activeAttachments.size - newImages.size).coerceAtLeast(0)
+        val selected = uris.take(remaining).mapNotNull { uri ->
+            readBugEditImage(context, uri)
+        }
+        selectionError = when {
+            uris.size > remaining -> "每张 Bug 最多保留 20 个附件。"
+            selected.size != uris.take(remaining).size -> "部分图片格式不支持或超过 20 MB，未加入。"
+            else -> null
+        }
+        newImages = newImages + selected
+    }
+    val canSave =
+        !saving && title.trim().isNotEmpty() && description.trim().isNotEmpty() &&
+            expectedBehavior.trim().isNotEmpty() && verifierId.isNotEmpty() &&
+            activeAttachments.size + newImages.size <= 20
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().testTag("bug-detail"),
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(9.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        bug.key,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    BugStatusPill(bug.state)
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = priorityContainerColor(priority),
+                    ) {
+                        Text(
+                            priorityLabel(priority),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                            color = priorityContentColor(priority),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Black,
+                        )
+                    }
+                }
+                if (!editing) {
+                    OutlinedButton(
+                        onClick = {
+                            resetDraft()
+                            editing = true
+                        },
+                        modifier = Modifier.testTag("edit-bug-detail"),
+                    ) {
+                        Text("编辑")
+                    }
+                }
+            }
+        }
+        state.errorCode?.let { code ->
+            item {
+                Text(
+                    if (code == "VERSION_CONFLICT") {
+                        "保存失败：Bug 已被其他人更新，请关闭后重新打开详情。"
+                    } else {
+                        "保存失败：$code"
+                    },
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        }
+        if (editing) {
+            item {
+                SectionCard(title = "Bug 内容", subtitle = "标题、问题描述和预期结果均可修改") {
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { if (it.length <= 300) title = it },
+                        label = { Text("标题") },
+                        modifier = Modifier.fillMaxWidth().testTag("edit-bug-title"),
+                    )
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = { if (it.length <= 20_000) description = it },
+                        label = { Text("问题内容") },
+                        minLines = 5,
+                        modifier = Modifier.fillMaxWidth().testTag("edit-bug-description"),
+                    )
+                    OutlinedTextField(
+                        value = expectedBehavior,
+                        onValueChange = { if (it.length <= 10_000) expectedBehavior = it },
+                        label = { Text("预期结果") },
+                        minLines = 3,
+                        modifier = Modifier.fillMaxWidth().testTag("edit-bug-expected"),
+                    )
+                }
+            }
+            item {
+                SectionCard(title = "级别与模块") {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        FilterDropdown(
+                            label = "严重度",
+                            selectedKey = severity,
+                            options = listOf("S0", "S1", "S2", "S3", "S4").map { it to it },
+                            onSelected = { severity = it ?: severity },
+                            modifier = Modifier.weight(1f),
+                        )
+                        FilterDropdown(
+                            label = "优先级",
+                            selectedKey = priority,
+                            options = listOf("P0", "P1", "P2", "P3", "P4").map { it to it },
+                            onSelected = { priority = it ?: priority },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    FilterDropdown(
+                        label = "模块",
+                        selectedKey = moduleId,
+                        options = moduleOptions,
+                        onSelected = { moduleId = it },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    state.moduleErrorCode?.let { code ->
+                        Text("模块列表暂时无法读取：$code", color = MaterialTheme.colorScheme.error)
+                    }
+                }
+            }
+            item {
+                SectionCard(title = "分工", subtitle = "负责人可留空，验收人必选") {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        PersonPicker(
+                            label = "负责人",
+                            people = people.filter { it.active },
+                            role = QaPersonRole.FIXER,
+                            selectedId = ownerId,
+                            onSelected = { ownerId = it },
+                            allowUnassigned = true,
+                            modifier = Modifier.weight(1f),
+                        )
+                        PersonPicker(
+                            label = "验收人",
+                            people = people.filter { it.active },
+                            role = QaPersonRole.VERIFIER,
+                            selectedId = verifierId,
+                            onSelected = { verifierId = it },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+            }
+        } else {
+            item {
+                SectionCard(title = bug.title, subtitle = "问题内容") {
+                    Text(
+                        bug.description.ifBlank { "暂无内容" },
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                    Text("预期结果", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(bug.expectedBehavior.ifBlank { "暂无预期结果" })
+                    DetailFact("严重度", bug.severity)
+                    DetailFact("优先级", priorityLabel(bug.priority))
+                    DetailFact(
+                        "模块",
+                        state.modules.firstOrNull { it.id == bug.moduleId }?.name
+                            ?: bug.moduleId?.let { "模块 $it" }
+                            ?: "未分模块",
+                    )
+                }
+            }
+        }
+        item {
+            SectionCard(
+                title = "图片",
+                subtitle = if (editing) "可添加新图片，也可移除已有图片" else "${imageAttachments.size} 张",
+            ) {
+                if (editing) {
+                    OutlinedButton(
+                        onClick = { imagePicker.launch("image/*") },
+                        enabled = !saving && activeAttachments.size + newImages.size < 20,
+                        modifier = Modifier.fillMaxWidth().testTag("add-bug-images"),
+                    ) {
+                        Text("添加图片")
+                    }
+                }
+                if (imageAttachments.isEmpty() && newImages.isEmpty()) {
+                    Text("本单没有图片", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+        items(imageAttachments, key = { "existing-${it.attachmentId}" }) { metadata ->
+            val image = downloadedImages[metadata.attachmentId]
+            if (image == null) {
+                AttachmentPlaceholder(
+                    filename = metadata.filename,
+                    onRemove = if (editing) {
+                        { removedAttachmentIds = removedAttachmentIds + metadata.attachmentId }
+                    } else {
+                        null
+                    },
+                )
+            } else {
+                DetailImage(
+                    image = image,
+                    label = metadata.filename,
+                    onRemove = if (editing) {
+                        { removedAttachmentIds = removedAttachmentIds + metadata.attachmentId }
+                    } else {
+                        null
+                    },
+                )
+            }
+        }
+        items(newImages, key = { "new-${it.localId}" }) { pending ->
+            DetailImage(
+                image = WorkbenchBugImage(
+                    attachmentId = pending.localId,
+                    filename = pending.filename,
+                    mediaType = pending.mediaType,
+                    bytes = pending.bytes,
+                ),
+                label = "待上传 · ${pending.filename}",
+                onRemove = {
+                    newImages = newImages.filterNot { it.localId == pending.localId }
+                },
+            )
+        }
+        selectionError?.let { message ->
+            item { Text(message, color = MaterialTheme.colorScheme.error) }
+        }
+        state.imageErrorCode?.let { code ->
+            item { Text("部分图片暂时无法读取：$code", color = MaterialTheme.colorScheme.error) }
+        }
+        if (!editing) {
+            item {
+                SectionCard(title = "分工与进度", subtitle = "状态流转仍遵循 Bug 工作流") {
+                    DetailFact("提报人", personName(people, bug.reporterId, "未知"))
+                    DetailFact("责任人", personName(people, bug.ownerId, "待分配"))
+                    DetailFact("验收人", personName(people, bug.verificationOwnerId, "待分配"))
+                    DetailFact("创建时间", displayTime(bug.createdAt))
+                    DetailFact("最后更新", displayTime(bug.updatedAt))
+                    DetailFact("出现次数", bug.occurrenceCount.toString())
+                }
+            }
+        } else {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            resetDraft()
+                            editing = false
+                        },
+                        enabled = !saving,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("取消")
+                    }
+                    Button(
+                        onClick = {
+                            onSave(
+                                BugEditDraft(
+                                    bugId = bug.id,
+                                    expectedVersion = bug.version,
+                                    title = title,
+                                    description = description,
+                                    expectedBehavior = expectedBehavior,
+                                    moduleId = moduleId,
+                                    severity = severity,
+                                    priority = priority,
+                                    ownerId = ownerId.takeIf(String::isNotBlank),
+                                    verificationOwnerId = verifierId,
+                                    retainedAttachmentIds = activeAttachments.map { it.attachmentId },
+                                    newImages = newImages,
+                                ),
+                            )
+                        },
+                        enabled = canSave,
+                        modifier = Modifier.weight(1f).testTag("save-bug-detail"),
+                    ) {
+                        Text(if (saving) "正在保存…" else "保存全部修改")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailImage(
+    image: WorkbenchBugImage,
+    label: String = "现场图片",
+    onRemove: (() -> Unit)? = null,
+) {
     val bitmap = remember(image.attachmentId, image.bytes) {
         BitmapFactory.decodeByteArray(image.bytes, 0, image.bytes.size)?.asImageBitmap()
     }
@@ -1436,12 +1721,21 @@ private fun DetailImage(image: WorkbenchBugImage) {
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         ) {
             Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "现场图片",
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        label,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                    onRemove?.let { remove ->
+                        TextButton(onClick = remove) { Text("移除") }
+                    }
+                }
                 Image(
                     bitmap = bitmap,
                     contentDescription = "Bug 图片",
@@ -1452,6 +1746,73 @@ private fun DetailImage(image: WorkbenchBugImage) {
         }
     }
 }
+
+@Composable
+private fun AttachmentPlaceholder(filename: String, onRemove: (() -> Unit)?) {
+    SectionCard(title = filename, subtitle = "图片预览暂时不可用") {
+        onRemove?.let { remove ->
+            OutlinedButton(onClick = remove, modifier = Modifier.fillMaxWidth()) {
+                Text("移除这张图片")
+            }
+        }
+    }
+}
+
+private fun readBugEditImage(context: Context, uri: Uri): BugEditImageUpload? = runCatching {
+    val resolver = context.contentResolver
+    val rawMediaType = resolver.getType(uri)?.lowercase().orEmpty()
+    val mediaType = when (rawMediaType) {
+        "image/png" -> "image/png"
+        "image/jpeg", "image/jpg" -> "image/jpeg"
+        "image/webp" -> "image/webp"
+        else -> return null
+    }
+    val queriedName = resolver.query(
+        uri,
+        arrayOf(OpenableColumns.DISPLAY_NAME),
+        null,
+        null,
+        null,
+    )?.use { cursor ->
+        if (cursor.moveToFirst()) cursor.getString(0) else null
+    }
+    val extension = when (mediaType) {
+        "image/png" -> "png"
+        "image/jpeg" -> "jpg"
+        else -> "webp"
+    }
+    val filename = queriedName
+        ?.substringAfterLast('/', queriedName)
+        ?.trim()
+        ?.takeIf(String::isNotBlank)
+        ?.take(255)
+        ?: "bug-image-${UUID.randomUUID()}.$extension"
+    val bytes = resolver.openInputStream(uri)?.use { input ->
+        val output = ByteArrayOutputStream()
+        val buffer = ByteArray(16 * 1024)
+        var total = 0
+        while (true) {
+            val read = input.read(buffer)
+            if (read < 0) break
+            total += read
+            if (total > MAX_BUG_EDIT_IMAGE_BYTES) return null
+            output.write(buffer, 0, read)
+        }
+        output.toByteArray()
+    } ?: return null
+    if (bytes.isEmpty()) return null
+    val bounds = BitmapFactory.Options().also { it.inJustDecodeBounds = true }
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+    BugEditImageUpload(
+        localId = UUID.randomUUID().toString(),
+        filename = filename,
+        mediaType = mediaType,
+        bytes = bytes,
+    )
+}.getOrNull()
+
+private const val MAX_BUG_EDIT_IMAGE_BYTES = 20 * 1024 * 1024
 
 @Composable
 private fun DetailFact(label: String, value: String) {

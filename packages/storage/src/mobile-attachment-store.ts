@@ -1105,6 +1105,13 @@ export function listMobileBugAttachments(
         AND blob.state = 'ready'
        WHERE bug_attachment.account_id = ? AND bug_attachment.project_id = ?
          AND bug_attachment.bug_id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_attachment_removals AS removal
+           WHERE removal.account_id = bug_attachment.account_id
+             AND removal.project_id = bug_attachment.project_id
+             AND removal.bug_id = bug_attachment.bug_id
+             AND removal.attachment_id = bug_attachment.attachment_id
+         )
        ORDER BY attachment.created_at, attachment.id
        LIMIT ?`,
     )

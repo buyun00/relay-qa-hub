@@ -832,6 +832,18 @@
     "updateBug": {
       "status": 200,
       "pathParameters": { "bugId": "70000000-0000-4000-8000-000000000001" },
+      "request": {
+        "expectedVersion": 1,
+        "title": "Login button is obscured",
+        "description": "The lower action area is covered after rotation.",
+        "expectedBehavior": "The login action remains visible.",
+        "moduleId": "10000000-0000-4000-8000-000000000005",
+        "severity": "S1",
+        "priority": "P1",
+        "ownerId": null,
+        "verificationOwnerId": "10000000-0000-4000-8000-000000000003",
+        "attachmentIds": ["50000000-0000-4000-8000-000000000001"]
+      },
       "response": { "id": "70000000-0000-4000-8000-000000000001", "projectId": "10000000-0000-4000-8000-000000000004", "number": 1024, "key": "OZDQP-1024", "title": "Login button is obscured", "description": "The lower action area is covered after rotation.", "expectedBehavior": "The login action remains visible.", "moduleId": "10000000-0000-4000-8000-000000000005", "state": "reported", "severity": "S1", "priority": "P1", "reporterId": "10000000-0000-4000-8000-000000000003", "ownerId": null, "verificationOwnerId": null, "duplicateOfBugId": null, "occurrenceCount": 1, "reopenCount": 0, "version": 2, "createdAt": "2026-08-24T10:05:00Z", "updatedAt": "2026-08-24T10:15:00Z", "closedAt": null }
     },
     "transitionBug": {

@@ -7304,6 +7304,44 @@ function threeStateTaskCompletionSql(): string {
 
 const THREE_STATE_TASK_COMPLETION_SQL = threeStateTaskCompletionSql();
 
+const EDITABLE_BUG_ATTACHMENTS_SQL = String.raw`
+CREATE TABLE bug_attachment_removals (
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  bug_id TEXT NOT NULL CHECK (length(bug_id) = 36),
+  attachment_id TEXT NOT NULL CHECK (length(attachment_id) = 36),
+  bug_version_after INTEGER NOT NULL CHECK (bug_version_after >= 2),
+  removed_by_actor_id TEXT NOT NULL CHECK (length(removed_by_actor_id) = 36),
+  removed_at TEXT NOT NULL CHECK (length(removed_at) >= 20),
+  idempotency_key TEXT NOT NULL CHECK (length(idempotency_key) BETWEEN 1 AND 200),
+  request_digest TEXT NOT NULL
+    CHECK (length(request_digest) = 64 AND request_digest = lower(request_digest)),
+  PRIMARY KEY (account_id, project_id, bug_id, attachment_id),
+  FOREIGN KEY (account_id, project_id, bug_id, attachment_id)
+    REFERENCES bug_attachments(account_id, project_id, bug_id, attachment_id)
+    ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, removed_by_actor_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT
+) STRICT;
+
+CREATE INDEX bug_attachment_removals_actor_idx
+  ON bug_attachment_removals(
+    account_id, project_id, removed_by_actor_id, removed_at DESC
+  );
+
+CREATE TRIGGER bug_attachment_removals_no_update
+BEFORE UPDATE ON bug_attachment_removals
+BEGIN
+  SELECT RAISE(ABORT, 'Bug attachment removal history is immutable');
+END;
+
+CREATE TRIGGER bug_attachment_removals_no_delete
+BEFORE DELETE ON bug_attachment_removals
+BEGIN
+  SELECT RAISE(ABORT, 'Bug attachment removal history is append-only');
+END;
+`;
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -7323,6 +7361,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(6, "qingyu_bug_links", QINGYU_BUG_LINK_SCHEMA_SQL),
   migration(7, "shared_project_bug_management", SHARED_PROJECT_BUG_MANAGEMENT_SQL),
   migration(8, "three_state_task_completion", THREE_STATE_TASK_COMPLETION_SQL),
+  migration(9, "editable_bug_attachments", EDITABLE_BUG_ATTACHMENTS_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

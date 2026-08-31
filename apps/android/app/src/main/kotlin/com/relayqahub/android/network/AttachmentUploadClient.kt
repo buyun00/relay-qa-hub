@@ -98,6 +98,7 @@ class AttachmentUploadClient(
         pngBytes: ByteArray,
         accessToken: String,
         captureId: String? = null,
+        mediaType: String = PNG_MEDIA_TYPE_VALUE,
     ): AttachmentUploadReceipt = withContext(Dispatchers.IO) {
         requireUuid(scope.projectId, "projectId")
         requireUuid(scope.actorId, "actorId")
@@ -106,6 +107,7 @@ class AttachmentUploadClient(
         captureId?.let { requireUuid(it, "captureId") }
         require(filename.isNotBlank() && filename.length <= 255)
         require(pngBytes.isNotEmpty() && pngBytes.size <= MAX_SMOKE_PNG_BYTES)
+        require(mediaType in BUG_IMAGE_MEDIA_TYPES)
         require(accessToken.isNotBlank())
 
         val sha256 = pngBytes.sha256Hex()
@@ -119,7 +121,7 @@ class AttachmentUploadClient(
             .put("clientAttachmentId", clientAttachmentId)
             .put("uploadAttempt", UPLOAD_ATTEMPT)
             .put("filename", filename)
-            .put("mediaType", PNG_MEDIA_TYPE_VALUE)
+            .put("mediaType", mediaType)
             .put("expectedSize", pngBytes.size)
             .put("sha256", sha256)
             .apply { captureId?.let { put("captureId", it) } }
@@ -143,7 +145,7 @@ class AttachmentUploadClient(
         init.requireInt("uploadAttempt", UPLOAD_ATTEMPT)
         init.requireString("status", "open")
         init.requireString("filename", filename)
-        init.requireString("mediaType", PNG_MEDIA_TYPE_VALUE)
+        init.requireString("mediaType", mediaType)
         init.requireInt("expectedSize", pngBytes.size)
         init.requireString("sha256", sha256)
         if (captureId == null) {
@@ -652,6 +654,7 @@ class AttachmentUploadClient(
         const val MAX_CAPTURE_SKEW_MS = 5_000L
         val CAPTURE_ARTIFACT_MEDIA_TYPES =
             setOf("image/png", "image/jpeg", "image/webp", "application/json")
+        val BUG_IMAGE_MEDIA_TYPES = setOf("image/png", "image/jpeg", "image/webp")
         val POCO_ARTIFACT_KINDS =
             setOf("poco_screenshot", "poco_hierarchy", "poco_profiling", "poco_snapshot")
         val ALLOWED_POCO_METHODS = listOf(

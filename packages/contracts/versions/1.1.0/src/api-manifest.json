@@ -184,7 +184,7 @@
     "createBug": { "authorizationPolicy": "resolve the authenticated account, actor, reporter role, and writable project before idempotency; moduleId and optional ownerId/verificationOwnerId must resolve to active assignable members inside that project, and every capture/attachment claim must belong to the same scoped submission" },
     "listBugs": { "authorizationPolicy": "derive the visible project set from the current account membership, apply project/module/state/owner/text filters before pagination, and reject any item outside that set", "paginationPolicy": "cursor is integrity protected and bound to account, actor, authorized-project snapshot, normalized filters, sort, and snapshot sequence" },
     "getBug": { "authorizationPolicy": "resolve path bugId through a server-owned Bug inside the authenticated account and current project membership before returning any field" },
-    "updateBug": { "authorizationPolicy": "resolve path bugId and current version before idempotency; require an authorized role and prove every requested moduleId, ownerId, and verificationOwnerId belongs to the same Bug project" },
+    "updateBug": { "authorizationPolicy": "resolve path bugId and current version before idempotency; require active project membership and prove every requested moduleId, ownerId, verificationOwnerId, and attachment reservation belongs to the same Bug project and editing actor" },
     "transitionBug": { "authorizationPolicy": "resolve path bugId, current state/version, and actor role before idempotency; validate the requested human transition without allowing machine verification, acceptance, or closure" },
     "addOccurrence": { "authorizationPolicy": "resolve path bugId inside an authorized project before idempotency and bind the occurrence, capture bundle, and claimed attachments to that same Bug/project/submission" },
     "listDuplicateCandidates": { "authorizationPolicy": "resolve path bugId first; return a bounded, non-paginated top-five list whose candidates are server-filtered to distinct non-self Bugs readable in the same authorized project before scoring" },
@@ -281,6 +281,8 @@
     },
     {
       "operationId": "updateBug",
+      "requestRef": "../schemas/app-first.schema.json#/$defs/nativeUpdateBugRequest",
+      "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
       "responseRef": "../schemas/app-first.schema.json#/$defs/nativeBug",
       "responseMediaType": "application/vnd.relay-qa-hub.v1.1+json"
     },

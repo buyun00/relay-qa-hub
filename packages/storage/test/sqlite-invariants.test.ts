@@ -12,6 +12,7 @@ import {
   verifySqliteIntegrity,
 } from "../src/sqlite.ts";
 import { createMobileBug, deleteMobileBug, getMobileBug } from "../src/mobile-bug-store.ts";
+import { listMobileBugAttachments } from "../src/mobile-attachment-store.ts";
 import { listMobileBugs } from "../src/mobile-bug-list-store.ts";
 import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.ts";
 import {
@@ -21,6 +22,7 @@ import {
   deliverMobileRepairAttempt,
   startMobileRepairAttempt,
   transitionMobileBugReady,
+  updateMobileBug,
 } from "../src/mobile-relay-store.ts";
 import {
   createMobileVerification,
@@ -2164,6 +2166,33 @@ function insertClaimedBinding(
        WHERE id = ?`,
     )
     .run(targetBugId, databaseTime(database), bindingId);
+}
+
+function insertReservedBugBinding(
+  database: DatabaseSync,
+  tenant: TenantFixture,
+  attachmentId: string,
+  bindingId: string,
+  actorId = tenant.userId,
+): void {
+  const boundAt = databaseTime(database);
+  database
+    .prepare(
+      `INSERT INTO attachment_bindings(
+        id, account_id, project_id, attachment_id, intent, target_bug_id,
+        lease_generation, state, expires_at, claimed_at, bound_by_actor_id,
+        bound_at, version
+      ) VALUES (?, ?, ?, ?, 'bug_create', NULL, 1, 'reserved', ?, NULL, ?, ?, 1)`,
+    )
+    .run(
+      bindingId,
+      tenant.accountId,
+      tenant.projectId,
+      attachmentId,
+      databaseTime(database, "+1 hour"),
+      actorId,
+      boundAt,
+    );
 }
 
 test("a Bug cannot point at another Bug's active RepairAttempt", async () => {
@@ -11138,6 +11167,97 @@ test("any project member can soft-delete a Bug and hide it from reads", async ()
           .get(bugId),
       },
       { actorId: tenant.secondaryUserId, bugVersion: 1 },
+    );
+    assertIntegrity(database);
+  });
+});
+
+test("Bug editing claims new images and soft-removes old images without deleting evidence", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_700, "EDITIMG");
+    const bugId = identifier(5_710);
+    createBug(database, tenant, bugId, "Editable Bug images", {
+      ownerId: tenant.userId,
+      verificationOwnerId: tenant.userId,
+    });
+    insertActiveMembershipRole(database, tenant, identifier(5_711), "viewer");
+    const upload = createAttachment(database, tenant, 5_720);
+    const bindingId = identifier(5_730);
+    insertReservedBugBinding(database, tenant, upload.attachmentId, bindingId);
+    const createdAt = databaseTime(database);
+    const addInput = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.userId,
+      bugId,
+      expectedVersion: 1,
+      attachmentIds: [upload.attachmentId],
+      idempotencyKey: `android:updateBug:bug:${bugId}:v1:add-image`,
+      requestDigest: digest(5_731),
+      createdAt,
+    } as const;
+
+    const added = transaction(database, () => updateMobileBug(database, addInput));
+    assert.equal(added.version, 2);
+    assert.deepEqual(
+      listMobileBugAttachments(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.userId,
+        bugId,
+        limit: 20,
+      })?.items.map((item) => item.attachmentId),
+      [upload.attachmentId],
+    );
+
+    const removeInput = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.userId,
+      bugId,
+      expectedVersion: 2,
+      attachmentIds: [],
+      idempotencyKey: `android:updateBug:bug:${bugId}:v2:remove-image`,
+      requestDigest: digest(5_732),
+      createdAt: databaseTime(database),
+    } as const;
+    const removed = transaction(database, () => updateMobileBug(database, removeInput));
+    assert.equal(removed.version, 3);
+    assert.deepEqual(
+      transaction(database, () => updateMobileBug(database, removeInput)),
+      removed,
+    );
+    assert.equal(
+      listMobileBugAttachments(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.userId,
+        bugId,
+        limit: 20,
+      })?.items.length,
+      0,
+    );
+    assert.equal(
+      database.prepare("SELECT count(*) AS count FROM bug_attachments WHERE bug_id = ?").get(bugId)
+        ?.count,
+      1,
+    );
+    assert.deepEqual(
+      {
+        ...database
+          .prepare(
+            `SELECT bug_version_after AS bugVersionAfter,
+                    removed_by_actor_id AS removedByActorId
+             FROM bug_attachment_removals
+             WHERE bug_id = ? AND attachment_id = ?`,
+          )
+          .get(bugId, upload.attachmentId),
+      },
+      { bugVersionAfter: 3, removedByActorId: tenant.userId },
+    );
+    assert.throws(
+      () => database.prepare("DELETE FROM bug_attachment_removals WHERE bug_id = ?").run(bugId),
+      /append-only/i,
     );
     assertIntegrity(database);
   });

@@ -26,7 +26,10 @@ import com.relayqahub.android.network.BuildProjectionFailure
 import com.relayqahub.android.network.BuildProjectionResult
 import com.relayqahub.android.network.BugWorkbenchFailure
 import com.relayqahub.android.network.WorkbenchBug
+import com.relayqahub.android.network.WorkbenchBugAttachmentMetadata
 import com.relayqahub.android.network.WorkbenchBugImage
+import com.relayqahub.android.network.WorkbenchBugUpdate
+import com.relayqahub.android.network.WorkbenchProjectModule
 import com.relayqahub.android.network.CommentTimelineFailure
 import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
@@ -190,9 +193,34 @@ data class BugDetailUiState(
     val phase: String = "idle",
     val bugId: String? = null,
     val bug: WorkbenchBug? = null,
+    val attachments: List<WorkbenchBugAttachmentMetadata> = emptyList(),
     val images: List<WorkbenchBugImage> = emptyList(),
+    val modules: List<WorkbenchProjectModule> = emptyList(),
     val imageErrorCode: String? = null,
+    val moduleErrorCode: String? = null,
     val errorCode: String? = null,
+)
+
+data class BugEditImageUpload(
+    val localId: String,
+    val filename: String,
+    val mediaType: String,
+    val bytes: ByteArray,
+)
+
+data class BugEditDraft(
+    val bugId: String,
+    val expectedVersion: Int,
+    val title: String,
+    val description: String,
+    val expectedBehavior: String,
+    val moduleId: String?,
+    val severity: String,
+    val priority: String,
+    val ownerId: String?,
+    val verificationOwnerId: String,
+    val retainedAttachmentIds: List<String>,
+    val newImages: List<BugEditImageUpload>,
 )
 
 data class ManualRepairUiState(
@@ -1089,8 +1117,11 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     phase = "loaded",
                     bugId = bugId,
                     bug = detail.bug,
+                    attachments = detail.attachments,
                     images = detail.images,
+                    modules = detail.modules,
                     imageErrorCode = detail.imageErrorCode,
+                    moduleErrorCode = detail.moduleErrorCode,
                 )
             }.onFailure { failure ->
                 if (bugDetail.value.bugId != bugId) return@onFailure
@@ -1105,7 +1136,108 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun closeBugDetail() {
+        if (bugDetail.value.phase == "saving") return
         bugDetail.value = BugDetailUiState()
+    }
+
+    fun saveBugDetail(draft: BugEditDraft) {
+        val current = bugDetail.value
+        val currentBug = current.bug
+        if (
+            current.phase != "loaded" ||
+            currentBug == null ||
+            currentBug.id != draft.bugId ||
+            currentBug.version != draft.expectedVersion
+        ) return
+        val title = draft.title.trim()
+        val description = draft.description.trim()
+        val expectedBehavior = draft.expectedBehavior.trim()
+        val retainedIds = draft.retainedAttachmentIds.distinct()
+        val currentIds = current.attachments.map { it.attachmentId }.toSet()
+        if (
+            title.isBlank() || title.length > 300 ||
+            description.isBlank() || description.length > 20_000 ||
+            expectedBehavior.isBlank() || expectedBehavior.length > 10_000 ||
+            draft.severity !in setOf("S0", "S1", "S2", "S3", "S4") ||
+            draft.priority !in setOf("P0", "P1", "P2", "P3", "P4") ||
+            draft.verificationOwnerId.isBlank() ||
+            retainedIds.any { it !in currentIds } ||
+            retainedIds.size + draft.newImages.size > 20
+        ) {
+            bugDetail.value = current.copy(errorCode = "INVALID_EDIT_DRAFT")
+            return
+        }
+
+        val immutableImages = draft.newImages.map { image ->
+            image.copy(bytes = image.bytes.copyOf())
+        }
+        bugDetail.value = current.copy(phase = "saving", errorCode = null)
+        viewModelScope.launch {
+            val accessToken = currentAccessToken()
+            if (accessToken == null) {
+                bugDetail.value = current.copy(errorCode = "LOGIN_SESSION_MISSING")
+                return@launch
+            }
+            val result = runCatching {
+                val submissionId = UUID.randomUUID().toString()
+                val uploaded = immutableImages.map { image ->
+                    appContainer.attachmentUploadClient.uploadAndReserveBugCreate(
+                        scope = scope,
+                        clientSubmissionId = submissionId,
+                        clientAttachmentId = UUID.randomUUID().toString(),
+                        filename = image.filename,
+                        pngBytes = image.bytes,
+                        accessToken = accessToken,
+                        mediaType = image.mediaType,
+                    )
+                }
+                appContainer.bugWorkbenchClient.updateBug(
+                    request = WorkbenchBugUpdate(
+                        bugId = draft.bugId,
+                        expectedVersion = draft.expectedVersion,
+                        mutationId = UUID.randomUUID().toString(),
+                        title = title,
+                        description = description,
+                        expectedBehavior = expectedBehavior,
+                        moduleId = draft.moduleId,
+                        severity = draft.severity,
+                        priority = draft.priority,
+                        ownerId = draft.ownerId,
+                        verificationOwnerId = draft.verificationOwnerId,
+                        attachmentIds = retainedIds + uploaded.map { it.attachmentId },
+                    ),
+                    accessToken = accessToken,
+                )
+                appContainer.bugWorkbenchClient.getBugDetail(
+                    bugId = draft.bugId,
+                    accessToken = accessToken,
+                )
+            }
+            result.onSuccess { detail ->
+                if (bugDetail.value.bugId != draft.bugId) return@onSuccess
+                bugDetail.value = BugDetailUiState(
+                    phase = "loaded",
+                    bugId = draft.bugId,
+                    bug = detail.bug,
+                    attachments = detail.attachments,
+                    images = detail.images,
+                    modules = detail.modules,
+                    imageErrorCode = detail.imageErrorCode,
+                    moduleErrorCode = detail.moduleErrorCode,
+                )
+                lastAction.value = "${detail.bug.key} 的内容、分工、优先级和图片已更新。"
+                refreshBugWorkbench()
+            }.onFailure { failure ->
+                if (bugDetail.value.bugId != draft.bugId) return@onFailure
+                val code = when (failure) {
+                    is BugWorkbenchFailure -> failure.code
+                    is AttachmentUploadFailure -> failure.code
+                    else -> "UNEXPECTED_BUG_UPDATE_FAILURE"
+                }
+                bugDetail.value = current.copy(errorCode = code)
+                lastAction.value = "Bug 更新失败：$code。"
+            }
+        }
     }
 
     fun createManualRepairAttempt() {

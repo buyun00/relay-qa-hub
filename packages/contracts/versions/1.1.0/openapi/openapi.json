@@ -1901,13 +1901,32 @@
               "schema": {
                 "$ref": "../../../schemas/workflow.schema.json#/$defs/updateBugRequest"
               }
+            },
+            "application/vnd.relay-qa-hub.v1.1+json": {
+              "schema": {
+                "$ref": "../schemas/app-first.schema.json#/$defs/nativeUpdateBugRequest"
+              },
+              "example": {
+                "expectedVersion": 1,
+                "title": "Login button is obscured",
+                "description": "The lower action area is covered after rotation.",
+                "expectedBehavior": "The login action remains visible.",
+                "moduleId": "10000000-0000-4000-8000-000000000005",
+                "severity": "S1",
+                "priority": "P1",
+                "ownerId": null,
+                "verificationOwnerId": "10000000-0000-4000-8000-000000000003",
+                "attachmentIds": [
+                  "50000000-0000-4000-8000-000000000001"
+                ]
+              }
             }
           }
         },
         "x-human-auth": "browser-cookie-plus-csrf OR native-human-bearer",
         "x-idempotency-scope": "authenticated account + authenticated actor + project + operationId + Idempotency-Key",
         "x-idempotency-replay-authorization": "authenticate the actor and authorize the current resource account/project scope before any idempotency lookup or replay; a cross-account, cross-actor, or cross-project lookup returns NOT_FOUND without revealing whether a key exists",
-        "x-authorization-policy": "resolve path bugId and current version before idempotency; require an authorized role and prove every requested moduleId, ownerId, and verificationOwnerId belongs to the same Bug project"
+        "x-authorization-policy": "resolve path bugId and current version before idempotency; require active project membership and prove every requested moduleId, ownerId, verificationOwnerId, and attachment reservation belongs to the same Bug project and editing actor"
       }
     },
     "/bugs/{bugId}/transitions": {

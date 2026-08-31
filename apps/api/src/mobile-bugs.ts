@@ -117,6 +117,8 @@ export interface MobileUpdateBugRequest {
   readonly priority?: MobileBugPriority;
   readonly ownerId?: string | null;
   readonly verificationOwnerId?: string | null;
+  /** Complete ordered-independent set of attachments that should remain visible on the Bug. */
+  readonly attachmentIds?: readonly string[];
 }
 
 export interface UpdateMobileBugCommand {
@@ -335,6 +337,7 @@ const UPDATE_KEYS = new Set([
   "priority",
   "ownerId",
   "verificationOwnerId",
+  "attachmentIds",
 ]);
 
 function positiveInteger(value: unknown, key: string): number {
@@ -395,6 +398,20 @@ export function parseMobileUpdateBugRequest(value: unknown): MobileUpdateBugRequ
   ) {
     throw new TypeError("priority is unsupported");
   }
+  const attachmentValue = request["attachmentIds"];
+  let attachmentIds: readonly string[] | undefined;
+  if (attachmentValue !== undefined) {
+    if (!Array.isArray(attachmentValue) || attachmentValue.length > 20) {
+      throw new TypeError("attachmentIds must contain at most 20 UUIDs");
+    }
+    attachmentIds = attachmentValue.map((attachmentId) => {
+      if (typeof attachmentId !== "string") throw new TypeError("attachmentId must be a UUID");
+      return requireUuid(attachmentId, "attachmentId");
+    });
+    if (new Set(attachmentIds).size !== attachmentIds.length) {
+      throw new TypeError("attachmentIds must be unique");
+    }
+  }
   return {
     expectedVersion,
     ...(title === undefined ? {} : { title }),
@@ -405,6 +422,7 @@ export function parseMobileUpdateBugRequest(value: unknown): MobileUpdateBugRequ
     ...(priorityValue === undefined ? {} : { priority: priorityValue as MobileBugPriority }),
     ...(ownerId === undefined ? {} : { ownerId }),
     ...(verificationOwnerId === undefined ? {} : { verificationOwnerId }),
+    ...(attachmentIds === undefined ? {} : { attachmentIds }),
   };
 }
 
