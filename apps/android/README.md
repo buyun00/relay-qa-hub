@@ -10,7 +10,7 @@ Unity Jenkins, or any APK/CDN endpoint.
 - Android Gradle Plugin: `9.1.1`
 - Gradle wrapper: `9.3.1`
 - Built-in Kotlin / Compose compiler plugin: `2.2.10`
-- `minSdk`: `35`
+- `minSdk`: `29` (Android 10)
 - `compileSdk`: `37`
 - `targetSdk`: `37`
 - SDK Build-Tools: `36.0.0`

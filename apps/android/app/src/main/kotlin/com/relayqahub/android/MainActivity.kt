@@ -97,7 +97,11 @@ class MainActivity : ComponentActivity() {
     private val unknownSourcesPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        val pending = pendingInstall ?: return@registerForActivityResult
+        val pending = pendingInstall
+        if (pending == null) {
+            foundationViewModel?.reportApkInstallFailure("APK_INSTALL_REQUEST_LOST")
+            return@registerForActivityResult
+        }
         if (packageManager.canRequestPackageInstalls()) {
             launchPackageInstaller(pending)
         } else {
@@ -241,6 +245,7 @@ class MainActivity : ComponentActivity() {
         }
         try {
             startActivity(installIntent)
+            foundationViewModel?.reportApkInstallerLaunched(downloaded.artifact.id)
             pendingInstall = null
         } catch (_: ActivityNotFoundException) {
             foundationViewModel?.reportApkInstallFailure("APK_INSTALLER_UNAVAILABLE")

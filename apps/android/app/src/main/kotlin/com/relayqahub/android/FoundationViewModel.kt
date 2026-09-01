@@ -48,11 +48,11 @@ import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.UUID
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -148,6 +148,51 @@ data class ApkDownloadUiState(
     val progressPercent: Int = 0,
     val errorCode: String? = null,
 )
+
+internal data class SelfUpdateDecision(
+    val state: SelfUpdateUiState,
+    val autoDownload: ApkArtifact? = null,
+)
+
+internal fun resolveSelfUpdate(
+    release: AndroidUpdateRelease,
+    applicationId: String,
+    currentVersionCode: Long,
+    checkedAtEpochMs: Long,
+): SelfUpdateDecision = when {
+    release.packageName != applicationId -> SelfUpdateDecision(
+        state = SelfUpdateUiState(
+            phase = "failed",
+            errorCode = "UPDATE_PACKAGE_MISMATCH",
+            checkedAtEpochMs = checkedAtEpochMs,
+        ),
+    )
+    release.versionCode > currentVersionCode -> SelfUpdateDecision(
+        state = SelfUpdateUiState(
+            phase = "available",
+            release = release,
+            checkedAtEpochMs = checkedAtEpochMs,
+        ),
+        autoDownload = release.asArtifact(),
+    )
+    else -> SelfUpdateDecision(
+        state = SelfUpdateUiState(
+            phase = "up_to_date",
+            checkedAtEpochMs = checkedAtEpochMs,
+        ),
+    )
+}
+
+internal fun completeInstallerHandoff(
+    current: ApkDownloadUiState,
+    artifactId: String,
+): ApkDownloadUiState = if (
+    current.phase == "installing" && current.artifactId == artifactId
+) {
+    ApkDownloadUiState()
+} else {
+    current
+}
 
 private const val UPDATE_CHECK_INTERVAL_MS = 4L * 60L * 60L * 1_000L
 private const val GAME_CATALOG_REFRESH_INTERVAL_MS = 5L * 60L * 1_000L
@@ -347,7 +392,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val selfUpdate = MutableStateFlow(SelfUpdateUiState())
     private val gameApkCatalog = MutableStateFlow(GameApkCatalogUiState())
     private val apkDownload = MutableStateFlow(ApkDownloadUiState())
-    private val apkInstallRequestFlow = MutableSharedFlow<DownloadedApk>(extraBufferCapacity = 1)
+    private val apkInstallRequestChannel = Channel<DownloadedApk>(capacity = Channel.BUFFERED)
 
     init {
         // WorkManager persists operations, but an interrupted continuation may be absent. Reconcile
@@ -355,7 +400,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         appContainer.syncScheduler.enqueue(scope)
     }
 
-    val apkInstallRequests = apkInstallRequestFlow.asSharedFlow()
+    val apkInstallRequests = apkInstallRequestChannel.receiveAsFlow()
 
     private val scopeState = combine(
         appContainer.scopedRepository.observeAccount(scope.accountId),
@@ -529,22 +574,14 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             runCatching { appContainer.androidUpdateClient.latest() }
                 .onSuccess { release ->
                     val now = System.currentTimeMillis()
-                    selfUpdate.value = when {
-                        release.packageName != BuildConfig.APPLICATION_ID -> SelfUpdateUiState(
-                            phase = "failed",
-                            errorCode = "UPDATE_PACKAGE_MISMATCH",
-                            checkedAtEpochMs = now,
-                        )
-                        release.versionCode > BuildConfig.VERSION_CODE.toLong() -> SelfUpdateUiState(
-                            phase = "available",
-                            release = release,
-                            checkedAtEpochMs = now,
-                        )
-                        else -> SelfUpdateUiState(
-                            phase = "up_to_date",
-                            checkedAtEpochMs = now,
-                        )
-                    }
+                    val decision = resolveSelfUpdate(
+                        release = release,
+                        applicationId = BuildConfig.APPLICATION_ID,
+                        currentVersionCode = BuildConfig.VERSION_CODE.toLong(),
+                        checkedAtEpochMs = now,
+                    )
+                    selfUpdate.value = decision.state
+                    decision.autoDownload?.let(::downloadAndInstall)
                 }
                 .onFailure { error ->
                     selfUpdate.value = SelfUpdateUiState(
@@ -605,8 +642,12 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         apkDownload.value = current.copy(phase = "failed", errorCode = code)
     }
 
+    fun reportApkInstallerLaunched(artifactId: String) {
+        apkDownload.value = completeInstallerHandoff(apkDownload.value, artifactId)
+    }
+
     private fun downloadAndInstall(artifact: ApkArtifact) {
-        if (apkDownload.value.phase == "downloading") return
+        if (apkDownload.value.phase in setOf("downloading", "installing")) return
         apkDownload.value = ApkDownloadUiState(
             phase = "downloading",
             artifactId = artifact.id,
@@ -622,7 +663,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     phase = "installing",
                     progressPercent = 100,
                 )
-                apkInstallRequestFlow.emit(downloaded)
+                apkInstallRequestChannel.send(downloaded)
             }.onFailure { error ->
                 apkDownload.value = apkDownload.value.copy(
                     phase = "failed",

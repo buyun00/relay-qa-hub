@@ -694,13 +694,13 @@ private fun SelfUpdateSection(
             }
             TextButton(
                 onClick = onCheck,
-                enabled = update.phase != "checking" && download.phase != "downloading",
+                enabled = update.phase != "checking",
                 modifier = Modifier.testTag("check-apk-update"),
             ) { Text("重新检查") }
         }
         if (update.phase == "available" && release != null) {
             Text(
-                "${formatBytes(release.sizeBytes)} · 安装包会校验大小、SHA-256、应用包名和版本号。",
+                "${formatBytes(release.sizeBytes)} · 检测到新版后会自动下载并打开系统安装页。",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
             )
