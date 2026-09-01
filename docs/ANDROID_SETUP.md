@@ -36,7 +36,7 @@ available. The Android Gradle project has not yet been generated. At
 
 ## Current Android baseline
 
-- `minSdk = 31` (Android 12; Android 12L is API 32)
+- `minSdk = 29` (Android 10)
 - `compileSdk = 37`
 - `targetSdk = 37`
 - Android Gradle Plugin `9.1.1`
@@ -64,7 +64,7 @@ Install Android Studio with its bundled JDK, then use SDK Manager to install:
 - Android SDK Platform-Tools (`adb`)
 - Android SDK Command-line Tools
 - Android Emulator
-- Optional API 31/32, API 35, and API 36 system images for automated compatibility work; absence is not a blocker while MuMu supplies the API 35 regression lane
+- Optional API 29, API 31/32, API 35, and API 36 system images for automated compatibility work; absence is not a blocker while MuMu supplies the API 35 regression lane
 
 The project-local `local.properties` must point `sdk.dir` to the installed SDK;
 it is ignored by Git and must not contain credentials. Do not commit signing
@@ -95,7 +95,7 @@ Before any APK claim, record exact output for:
 5. `adb version` and `adb devices -l`.
 6. Clean Gradle configuration, compile, lint, unit tests, and the applicable
    connected/instrumented tests.
-7. `minSdk=31`, `compileSdk=37`, and `targetSdk=37` from the actual resolved
+7. `minSdk=29`, `compileSdk=37`, and `targetSdk=37` from the actual resolved
    module model, not only documentation.
 
 If any item is missing, report the exact missing command/path/package and keep
@@ -138,11 +138,11 @@ display                   1440x2560 @ density 360
 ```
 
 This is the current Android 15/API 35 regression emulator lane. Its permissive
-SELinux and hosted environment make it unsuitable as proof of Android 12
+SELinux and hosted environment make it unsuitable as proof of Android 10
 compatibility or production security boundaries.
 
-Required release evidence now starts at Android 12/API 31 and Android 12L/API
-32, includes the current Android 15/API 35 MuMu plus real-device coverage, then
+Required release evidence now starts at Android 10/API 29, includes Android
+12/API 31 and Android 12L/API 32, the current Android 15/API 35 MuMu plus real-device coverage, then
 covers Android 16/API 36 and Android 17/API 37 and at least one strongly managed
 OEM device. The current API 35 MuMu never replaces real-device evidence for
 installation, overlay, MediaProjection, system reclaim, SELinux, OEM power
@@ -353,7 +353,7 @@ default. The Android 17/API 37 slot must additionally verify:
 - notification custom-view limits and the user-visible MediaProjection
   foreground-service notification/lifecycle remain correct.
 
-Android 12/API31 through Android 16/API36 use the normal `INTERNET` permission
+Android 10/API29 through Android 16/API36 use the normal `INTERNET` permission
 and do not request the API37-only local-network runtime permission. Android 17/API37
 must grant it before direct LAN access. The current source follows the Android
 platform requirement, but an API37 runtime is still needed for release-gate

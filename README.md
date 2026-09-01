@@ -219,14 +219,13 @@ current controlled-device artifact is:
 
 ```text
 apps/android/app/build/outputs/apk/debug/app-debug.apk
-version 0.1.8-debug (code 9), Android 12/API31+
+version 0.1.10-debug (code 11), Android 10/API29+
 ```
 
-Phones on the controlled QA LAN can download the same verified bytes from
-`http://10.100.5.157:4174/downloads/Relay-QA-Hub-Android12-debug.apk`. The route
-uses the Android APK MIME type and disables caching so an OEM downloader does
-not reuse the previous Android-15-only package. Android 12 compatibility
-evidence is recorded in
+Phones on the controlled QA LAN can download the current stable APK from
+`http://10.100.5.157:4319/api/v1/android-updates/stable/Relay-QA-Hub-Android-11-0.1.10-debug.apk`.
+The stable manifest is available from the adjacent `latest.json` endpoint.
+Earlier Android 12 compatibility evidence is recorded in
 [`docs/evidence/ANDROID12-INSTALL-COMPAT-2026-08-27.md`](docs/evidence/ANDROID12-INSTALL-COMPAT-2026-08-27.md).
 The fixed credential packaging, split overlay/screen-capture permission flow,
 direct-LAN `LOCAL-14` creation, and 2560x1440 landscape capture evidence are in

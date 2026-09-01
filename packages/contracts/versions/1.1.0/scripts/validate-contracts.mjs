@@ -722,7 +722,7 @@ if (openapi) {
   }
   try {
     assert.deepStrictEqual(manifest.androidPlatform, {
-      minSdk: 31,
+      minSdk: 29,
       compileSdk: 37,
       targetSdk: 37,
       pocoEndpoint: "127.0.0.1 in the same Android profile",

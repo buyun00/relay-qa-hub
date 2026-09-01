@@ -1,20 +1,20 @@
 {
   "contractVersion": "1.1.0",
   "baseContractVersion": "1.0.0",
-  "frozenAt": "2026-08-31T09:19:19.951Z",
+  "frozenAt": "2026-09-01T04:15:40.372Z",
   "canonicalSha256": {
-    "README.md": "6a3aa7d04fcbde28d7a30642ea927eef06ca2ab27e32995f9e637b7b7a038fb4",
+    "README.md": "3fba3f1184d38178a146a59aef377b1bf7bcd3ba1304e55679ea6f8e1bf6a887",
     "errors/error-codes.json": "f606037bd157e7e4ef52e9d7428cabe28370a488403eea5a74bfb94047be33e4",
-    "examples/critical-scenarios.json": "6a8a91ae1f7366c658f414355bb4fca584ef2a7b61dc0e38ba4d0887ce18b003",
+    "examples/critical-scenarios.json": "82f75252f62e0260ebe567c4db112fece1eec37dbf023398c9894ca6193528d1",
     "examples/openapi-examples.json": "82a4c0c5b6d4c580f371666a10e07b38579d8194e9b3e14f9713db8ee5b8d344",
-    "openapi/openapi.json": "406b3c8d7afd8f6a024e9f989091b9ce4b3af35a1a04fed7ecb6708a1e53d458",
-    "schemas/app-first.schema.json": "77e41c573d3ae5e15cf7c835742691222a69b5790a78498180c2859bebbf724a",
+    "openapi/openapi.json": "921191b9683f28248da8958268fbcbbe51aeb0c156aeeca9e3f774c03d5f63a2",
+    "schemas/app-first.schema.json": "3cd66890c6efd2992016b4a846247eac073d0a19a348bdff425bb5a91a15c824",
     "scripts/check-additive.mjs": "b09d1736eba7dcfcdc8714ff75c0fbc0cfe3e16acfeb6f71edec9a81f196f9e2",
     "scripts/check-breaking.mjs": "57199ca81ae28c0f1eda175ce78ef9a6ad76215bb3b06180ae7e42f293e9113a",
     "scripts/generate-openapi.mjs": "76a3fd214b2e3ee16373518084c8c8e2959557b24926d4f97c7f705c26f2e306",
-    "scripts/validate-contracts.mjs": "c07285094bd0a727b14eb87b81bff8501f158089718c901ba305dbfdb67d0a39",
+    "scripts/validate-contracts.mjs": "a47e36f540ee254527a46ebe8d97d92cfe144eeee72e565166d4069aef9aeeb0",
     "semantics/behavior-scenarios.json": "07dfd85f93cf764711889e5b6fca95698dcd1826da3c749066a2f65da45e7cfa",
-    "src/api-manifest.json": "62fb6fcadadbf4fe27c2914d9a35166ca9b32b25ef456c58c646a1017ba3e489",
+    "src/api-manifest.json": "2edb1c2419d47291cd4a59cde1a50e39f230aa168e232f9108be24704c60fdc0",
     "src/evaluate-app-first-behavior.mjs": "78f4d6ad9f867ca4eae5bdf945bda224142113b6559c687e59071cbdd44dc385"
   }
 }

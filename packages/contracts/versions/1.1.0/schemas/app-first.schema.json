@@ -98,7 +98,7 @@
       "properties": {
         "manufacturer": { "type": "string", "minLength": 1, "maxLength": 100 },
         "model": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "androidApi": { "type": "integer", "minimum": 31, "maximum": 100 },
+        "androidApi": { "type": "integer", "minimum": 29, "maximum": 100 },
         "androidRelease": { "type": "string", "minLength": 1, "maxLength": 100 },
         "qaAppVersion": { "type": "string", "minLength": 1, "maxLength": 100 }
       }
@@ -2505,7 +2505,7 @@
       "properties": {
         "manufacturer": { "type": "string", "minLength": 1, "maxLength": 100 },
         "model": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "androidApi": { "type": "integer", "minimum": 31, "maximum": 100 },
+        "androidApi": { "type": "integer", "minimum": 29, "maximum": 100 },
         "androidRelease": { "type": "string", "minLength": 1, "maxLength": 100 },
         "qaAppVersion": { "type": "string", "minLength": 1, "maxLength": 100 },
         "buildId": { "oneOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },

@@ -349,6 +349,12 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val apkDownload = MutableStateFlow(ApkDownloadUiState())
     private val apkInstallRequestFlow = MutableSharedFlow<DownloadedApk>(extraBufferCapacity = 1)
 
+    init {
+        // WorkManager persists operations, but an interrupted continuation may be absent. Reconcile
+        // the current durable scope whenever the authenticated app surface is opened.
+        appContainer.syncScheduler.enqueue(scope)
+    }
+
     val apkInstallRequests = apkInstallRequestFlow.asSharedFlow()
 
     private val scopeState = combine(
@@ -863,7 +869,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             }
             result.onSuccess { operationId ->
                 lastAction.value =
-                    "$actionLabel 已持久排队 (${operationId.take(8)})；网络恢复后自动上传并创建。" +
+                    "$actionLabel 已安全保存 (${operationId.take(8)})，正在提交；服务端确认后会出现在列表中。" +
                         if (captureId == null) "" else " Poco 上下文将在线尽力附加，失败不阻断 Bug。"
                 if (navigateAfterQueue) finishNewBugForm()
             }.onFailure { failure ->

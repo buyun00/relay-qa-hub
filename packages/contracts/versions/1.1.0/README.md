@@ -1,10 +1,10 @@
 # QA Hub contract 1.1.0 — App-first additive layer
 
 This directory is an independently validated addition to the frozen flat
-`1.0.0` contract. The 2026-08-27 Android 12 compatibility review only loosened
-the accepted Android API floor from 35 to 31; it did not remove an operation,
-field, media type, status, or existing payload. The strict 1.1.0 baseline was
-re-recorded after that explicit additive review.
+`1.0.0` contract. The Android compatibility reviews loosened the accepted API
+floor from 35 to 31 on 2026-08-27 and from 31 to 29 on 2026-09-01; neither
+change removed an operation, field, media type, status, or existing payload.
+The strict 1.1.0 baseline was re-recorded after the explicit additive reviews.
 
 ## Wire compatibility and negotiation
 
@@ -20,7 +20,7 @@ Existing operations that need richer App payloads retain their 1.0
 application/vnd.relay-qa-hub.v1.1+json
 ```
 
-The Android App targets `minSdk=31`, `compileSdk=37`, and `targetSdk=37`. It
+The Android App targets `minSdk=29`, `compileSdk=37`, and `targetSdk=37`. It
 selects request and response media from each operation's advertised OpenAPI
 content. JSON operations prefer
 `Accept: application/vnd.relay-qa-hub.v1.1+json, application/json;q=0.9`;

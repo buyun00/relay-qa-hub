@@ -29,7 +29,7 @@ class OfflineSyncEngine(
     private val operationDao: OfflineOperationDao,
     private val apiClient: QaHubApiClient,
     private val credentialVault: CredentialVault,
-    private val attachmentDraftProcessor: OfflineAttachmentDraftProcessor? = null,
+    private val attachmentDraftProcessor: OfflineAttachmentDraftPromoter? = null,
     private val attachmentReceiptDao: AttachmentPipelineReceiptDao? = null,
     private val attachmentDraftStore: OfflineAttachmentDraftStore? = null,
     private val clock: () -> Long = System::currentTimeMillis,
@@ -96,7 +96,9 @@ class OfflineSyncEngine(
         var sawAuthFailure = false
         var exhaustedRetry = false
         ready.forEach { operation ->
-            if (operation.operationKind == OfflineAttachmentDraftContract.OPERATION_KIND) {
+            val executableOperation = if (
+                operation.operationKind == OfflineAttachmentDraftContract.OPERATION_KIND
+            ) {
                 when (
                     val stage = attachmentDraftProcessor?.promote(
                         scope,
@@ -106,7 +108,20 @@ class OfflineSyncEngine(
                         "OFFLINE_ATTACHMENT_PROCESSOR_UNAVAILABLE",
                     )
                 ) {
-                    OfflineAttachmentStageResult.Promoted -> Unit
+                    is OfflineAttachmentStageResult.Promoted -> {
+                        check(
+                            operationDao.markRunning(
+                                accountId = stage.operation.accountId,
+                                projectId = stage.operation.projectId,
+                                actorId = stage.operation.actorId,
+                                installationId = stage.operation.installationId,
+                                sessionId = stage.operation.sessionId,
+                                operationIds = listOf(stage.operation.operationId),
+                                nowEpochMs = stage.operation.updatedAtEpochMs,
+                            ) == 1,
+                        ) { "Promoted attachment submission lost its durable queue scope" }
+                        stage.operation.copy(state = QueueState.RUNNING)
+                    }
                     is OfflineAttachmentStageResult.AuthExpired -> {
                         sawAuthFailure = true
                         record(
@@ -116,14 +131,18 @@ class OfflineSyncEngine(
                             stage.errorCode,
                             now,
                         )
+                        null
                     }
-                    is OfflineAttachmentStageResult.PermanentFailure -> record(
-                        scope,
-                        operation,
-                        QueueState.FAILED_PERMANENT,
-                        stage.errorCode,
-                        now,
-                    )
+                    is OfflineAttachmentStageResult.PermanentFailure -> {
+                        record(
+                            scope,
+                            operation,
+                            QueueState.FAILED_PERMANENT,
+                            stage.errorCode,
+                            now,
+                        )
+                        null
+                    }
                     is OfflineAttachmentStageResult.Retryable -> {
                         val nextPersistentAttempt = operation.attemptCount + 1
                         if (nextPersistentAttempt >= MAX_OPERATION_ATTEMPTS) {
@@ -144,39 +163,43 @@ class OfflineSyncEngine(
                                 now + retryDelayMs(operation.attemptCount),
                             )
                         }
+                        null
                     }
                 }
-                return@forEach
+            } else {
+                operation
             }
-            when (val outcome = apiClient.execute(operation, credentials.accessToken)) {
+            if (executableOperation == null) return@forEach
+
+            when (val outcome = apiClient.execute(executableOperation, credentials.accessToken)) {
                 is ApiOutcome.Success -> {
                     val receipt = outcome.createBugReceipt
                     if (
                         outcome.httpStatus != 201 ||
-                        operation.operationKind != "CREATE_BUG" ||
+                        executableOperation.operationKind != "CREATE_BUG" ||
                         receipt == null ||
-                        receipt.projectId != operation.projectId ||
+                        receipt.projectId != executableOperation.projectId ||
                         receipt.bugId != receipt.qaItemId ||
-                        operation.idempotencyKey !=
+                        executableOperation.idempotencyKey !=
                         "submission:${receipt.clientSubmissionId}:commit"
                     ) {
                         record(
                             scope,
-                            operation,
+                            executableOperation,
                             QueueState.FAILED_PERMANENT,
                             "SUCCESS_RECEIPT_SCOPE_MISMATCH",
                             now,
                         )
                     } else {
                         operationDao.completeCreateBug(
-                            operation = operation,
+                            operation = executableOperation,
                             receipt = OfflineOperationReceiptEntity(
-                                operationId = operation.operationId,
-                                accountId = operation.accountId,
-                                projectId = operation.projectId,
-                                actorId = operation.actorId,
-                                installationId = operation.installationId,
-                                sessionId = operation.sessionId,
+                                operationId = executableOperation.operationId,
+                                accountId = executableOperation.accountId,
+                                projectId = executableOperation.projectId,
+                                actorId = executableOperation.actorId,
+                                installationId = executableOperation.installationId,
+                                sessionId = executableOperation.sessionId,
                                 clientSubmissionId = receipt.clientSubmissionId,
                                 qaItemId = receipt.qaItemId,
                                 qaItemKey = receipt.qaItemKey,
@@ -189,14 +212,14 @@ class OfflineSyncEngine(
                             ),
                             nowEpochMs = clock(),
                         )
-                        completeAttachmentSubmission(operation, receipt)
+                        completeAttachmentSubmission(executableOperation, receipt)
                     }
                 }
                 is ApiOutcome.AuthExpired -> {
                     sawAuthFailure = true
                     record(
                         scope,
-                        operation,
+                        executableOperation,
                         QueueState.BLOCKED_AUTH,
                         outcome.errorCode,
                         now,
@@ -204,18 +227,18 @@ class OfflineSyncEngine(
                 }
                 is ApiOutcome.PermanentFailure -> record(
                     scope,
-                    operation,
+                    executableOperation,
                     QueueState.FAILED_PERMANENT,
                     outcome.errorCode,
                     now,
                 )
                 is ApiOutcome.Retryable -> {
-                    val nextPersistentAttempt = operation.attemptCount + 1
+                    val nextPersistentAttempt = executableOperation.attemptCount + 1
                     if (nextPersistentAttempt >= MAX_OPERATION_ATTEMPTS) {
                         exhaustedRetry = true
                         record(
                             scope,
-                            operation,
+                            executableOperation,
                             QueueState.FAILED_PERMANENT,
                             "RETRY_EXHAUSTED_${outcome.errorCode}",
                             now,
@@ -223,10 +246,10 @@ class OfflineSyncEngine(
                     } else {
                         record(
                             scope,
-                            operation,
+                            executableOperation,
                             QueueState.RETRY,
                             outcome.errorCode,
-                            now + retryDelayMs(operation.attemptCount),
+                            now + retryDelayMs(executableOperation.attemptCount),
                         )
                     }
                 }

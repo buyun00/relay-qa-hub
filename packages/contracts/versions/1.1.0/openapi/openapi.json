@@ -21791,7 +21791,7 @@
   "x-base-contract-version": "1.0.0",
   "x-versioned-media-type": "application/vnd.relay-qa-hub.v1.1+json",
   "x-android-platform": {
-    "minSdk": 31,
+    "minSdk": 29,
     "compileSdk": 37,
     "targetSdk": 37,
     "pocoEndpoint": "127.0.0.1 in the same Android profile",

@@ -13,6 +13,7 @@ import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
 import com.relayqahub.android.data.OfflineAttachmentDraftDao
 import com.relayqahub.android.data.OfflineOperationEntity
+import com.relayqahub.android.data.QueueState
 import com.relayqahub.android.data.ScopedRepository
 import com.relayqahub.android.network.AttachmentUploadClient
 import com.relayqahub.android.network.AttachmentUploadFailure
@@ -334,10 +335,18 @@ internal data class StagedOfflineAttachmentMetadata(
 )
 
 sealed interface OfflineAttachmentStageResult {
-    data object Promoted : OfflineAttachmentStageResult
+    data class Promoted(val operation: OfflineOperationEntity) : OfflineAttachmentStageResult
     data class Retryable(val errorCode: String) : OfflineAttachmentStageResult
     data class AuthExpired(val errorCode: String) : OfflineAttachmentStageResult
     data class PermanentFailure(val errorCode: String) : OfflineAttachmentStageResult
+}
+
+interface OfflineAttachmentDraftPromoter {
+    suspend fun promote(
+        scope: AccountProjectScope,
+        operation: OfflineOperationEntity,
+        accessToken: String,
+    ): OfflineAttachmentStageResult
 }
 
 class OfflineAttachmentDraftProcessor(
@@ -348,8 +357,8 @@ class OfflineAttachmentDraftProcessor(
     private val pendingCaptureDraftStore: PendingCaptureDraftStore? = null,
     private val captureArtifactStore: CaptureArtifactStore? = null,
     private val clock: () -> Long = System::currentTimeMillis,
-) {
-    internal suspend fun promote(
+) : OfflineAttachmentDraftPromoter {
+    override suspend fun promote(
         scope: AccountProjectScope,
         operation: OfflineOperationEntity,
         accessToken: String,
@@ -399,6 +408,7 @@ class OfflineAttachmentDraftProcessor(
                 ownerId = staged.ownerId,
                 verificationOwnerId = staged.verificationOwnerId,
             )
+            val promotedAt = clock()
             check(
                 draftDao.promoteToCreateBug(
                     operationId = operation.operationId,
@@ -413,10 +423,21 @@ class OfflineAttachmentDraftProcessor(
                     httpMethod = createBug.httpMethod,
                     relativePath = createBug.relativePath,
                     payloadJson = createBug.payloadJson,
-                    nowEpochMs = clock(),
+                    nowEpochMs = promotedAt,
                 ) == 1,
             ) { "OFFLINE_ATTACHMENT_PROMOTION_LOST_SCOPE" }
-            OfflineAttachmentStageResult.Promoted
+            OfflineAttachmentStageResult.Promoted(
+                operation.copy(
+                    operationKind = createBug.operationKind,
+                    httpMethod = createBug.httpMethod,
+                    relativePath = createBug.relativePath,
+                    payloadJson = createBug.payloadJson,
+                    state = QueueState.PENDING,
+                    nextAttemptAtEpochMs = promotedAt,
+                    lastErrorCode = null,
+                    updatedAtEpochMs = promotedAt,
+                ),
+            )
         } catch (failure: CancellationException) {
             throw failure
         } catch (failure: AttachmentUploadFailure) {

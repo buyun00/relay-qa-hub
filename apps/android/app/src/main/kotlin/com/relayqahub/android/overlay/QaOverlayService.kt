@@ -7,10 +7,12 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -217,9 +219,14 @@ class QaOverlayService : Service() {
         bubbleView?.let { windowManager.updateViewLayout(it, params) }
     }
 
-    private fun displayBounds(): Pair<Int, Int> {
+    @Suppress("DEPRECATION")
+    private fun displayBounds(): Pair<Int, Int> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val bounds = windowManager.currentWindowMetrics.bounds
-        return bounds.width() to bounds.height()
+        bounds.width() to bounds.height()
+    } else {
+        DisplayMetrics().also(windowManager.defaultDisplay::getRealMetrics).let { metrics ->
+            metrics.widthPixels to metrics.heightPixels
+        }
     }
 
     private fun removeViewSafely(view: View?) {

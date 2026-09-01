@@ -79,6 +79,54 @@ class OfflineSyncEngineTest {
     }
 
     @Test
+    fun `attachment promotion posts bug and persists receipt in the same worker run`() = runBlocking {
+        val queued = operation().copy(
+            operationKind = OfflineAttachmentDraftContract.OPERATION_KIND,
+            payloadJson = "{\"staged\":true}",
+        )
+        val dao = FakeOperationDao(queued)
+        val promoted = queued.copy(
+            operationKind = "CREATE_BUG",
+            httpMethod = "POST",
+            relativePath = "/bugs",
+            payloadJson = "{\"promoted\":true}",
+            state = QueueState.PENDING,
+        )
+        val promoter = object : OfflineAttachmentDraftPromoter {
+            override suspend fun promote(
+                scope: AccountProjectScope,
+                operation: OfflineOperationEntity,
+                accessToken: String,
+            ): OfflineAttachmentStageResult {
+                assertEquals(OfflineAttachmentDraftContract.OPERATION_KIND, operation.operationKind)
+                dao.operations.replaceAll { current ->
+                    if (current.operationId == operation.operationId) promoted else current
+                }
+                return OfflineAttachmentStageResult.Promoted(promoted)
+            }
+        }
+        val api = FakeQaHubApiClient(
+            listOf(ApiOutcome.Success(201, promoted.syntheticCreateBugReceipt())),
+        )
+        val vault = FakeCredentialVault()
+        vault.put(SCOPE.nativeSessionScope(), credentials())
+        val engine = OfflineSyncEngine(
+            operationDao = dao,
+            apiClient = api,
+            credentialVault = vault,
+            attachmentDraftProcessor = promoter,
+            clock = { 0L },
+        )
+
+        val result = engine.run(SCOPE)
+
+        assertTrue(result is SyncRunResult.Completed)
+        assertEquals(listOf(promoted.operationId), api.calls.map { it.operationId })
+        assertEquals(QueueState.SUCCEEDED, dao.operations.single().state)
+        assertEquals(promoted.operationId, dao.receipts.single().operationId)
+    }
+
+    @Test
     fun `missing credentials blocks queue without invoking api`() = runBlocking {
         val dao = FakeOperationDao(operation())
         val api = FakeQaHubApiClient()
