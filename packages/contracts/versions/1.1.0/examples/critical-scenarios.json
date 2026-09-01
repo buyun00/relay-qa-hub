@@ -18,13 +18,13 @@
       "expectedValid": false
     },
     {
-      "id": "android-api-28-is-not-supported",
+      "id": "android-api-28-is-recorded-below-the-packaging-floor",
       "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/nativeLoginRequest",
       "source": { "operationId": "createNativeSession", "direction": "request" },
       "mutations": [
         { "op": "replace", "path": "/device/androidApi", "value": 28 }
       ],
-      "expectedValid": false
+      "expectedValid": true
     },
     {
       "id": "android-api-29-is-the-supported-floor",
@@ -45,13 +45,13 @@
       "expectedValid": true
     },
     {
-      "id": "capture-device-api-28-is-not-supported",
+      "id": "capture-device-api-28-is-recorded-below-the-packaging-floor",
       "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/createCaptureBundleRequest",
       "source": { "operationId": "createCaptureBundle", "direction": "request" },
       "mutations": [
         { "op": "replace", "path": "/capture/deviceMetadata/androidApi", "value": 28 }
       ],
-      "expectedValid": false
+      "expectedValid": true
     },
     {
       "id": "legacy-create-request-remains-frozen",

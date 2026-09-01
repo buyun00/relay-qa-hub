@@ -386,7 +386,7 @@ test("Bug overview query supports unassigned ownership and a 500-row window", ()
   assert.throws(() => parseMobileBugListQuery({ projectId, limit: "501" }), /1 through 500/);
 });
 
-test("Android 10 capture metadata is accepted while API 28 remains rejected", () => {
+test("capture metadata records positive Android API values without an admission floor", () => {
   const examples = JSON.parse(
     readFileSync(
       new URL(
@@ -404,6 +404,9 @@ test("Android 10 capture metadata is accepted while API 28 remains rejected", ()
   assert.equal(parseMobileCreateCaptureRequest(request).capture.deviceMetadata.androidApi, 29);
 
   request.capture.deviceMetadata.androidApi = 28;
+  assert.equal(parseMobileCreateCaptureRequest(request).capture.deviceMetadata.androidApi, 28);
+
+  request.capture.deviceMetadata.androidApi = 0;
   assert.throws(
     () => parseMobileCreateCaptureRequest(request),
     (error) =>

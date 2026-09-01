@@ -395,9 +395,8 @@ function parseDeviceMetadata(value: unknown): MobileCaptureDeviceMetadata {
   requireOnlyKeys(device, DEVICE_KEYS, "CAPTURE_BUNDLE_INVALID");
   const androidApi = device["androidApi"];
   if (
-    !Number.isInteger(androidApi) ||
-    (androidApi as number) < 29 ||
-    (androidApi as number) > 100
+    !Number.isSafeInteger(androidApi) ||
+    (androidApi as number) < 1
   ) {
     invalidCapture("deviceMetadata.androidApi is invalid");
   }

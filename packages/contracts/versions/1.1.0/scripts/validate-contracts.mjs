@@ -742,9 +742,9 @@ if (openapi) {
     ["nativeDeviceMetadata", appSchema.$defs.nativeDeviceMetadata.properties.androidApi.minimum],
     ["captureDeviceMetadata", appSchema.$defs.captureDeviceMetadata.properties.androidApi.minimum],
   ]) {
-    if (actualMinimum !== manifest.androidPlatform.minSdk) {
+    if (actualMinimum !== 1) {
       failures.push(
-        `${schemaName}.androidApi minimum ${actualMinimum} does not equal manifest minSdk ${manifest.androidPlatform.minSdk}`,
+        `${schemaName}.androidApi minimum ${actualMinimum} must accept positive telemetry independently of packaged minSdk ${manifest.androidPlatform.minSdk}`,
       );
     }
   }

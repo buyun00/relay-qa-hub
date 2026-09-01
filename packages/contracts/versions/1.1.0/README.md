@@ -28,6 +28,9 @@ content. JSON operations prefer
 prefers `text/event-stream`, and both still accept the versioned and legacy JSON
 error representations at lower quality values. `putUploadChunk` sends
 `application/octet-stream`.
+`minSdk` is a packaging/install floor, not a server admission rule: the backend
+records any positive integer `androidApi` reported by a structurally valid
+request and does not reject a submission merely because the client is older.
 The App must not invent a JSON fallback for binary or SSE operations. This is
 required because the frozen 1.0 response schemas use `additionalProperties:
 false`; silently adding required fields to `application/json` would not be
