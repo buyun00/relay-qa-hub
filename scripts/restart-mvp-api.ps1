@@ -2,9 +2,71 @@ param([string]$LanAddress)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version 2
+$statePath = "D:\Relay-QA-Hub-Data\mvp-e2e-current.json"
+
+function Test-IsAdministrator {
+  $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+  $principal = New-Object Security.Principal.WindowsPrincipal($identity)
+  return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+if (-not (Test-IsAdministrator)) {
+  $previousState = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+  $previousGeneration = [string]$previousState.generation
+  $arguments = @(
+    "-NoProfile",
+    "-ExecutionPolicy", "Bypass",
+    "-File", ('"' + $PSCommandPath + '"')
+  )
+  if (-not [string]::IsNullOrWhiteSpace($LanAddress)) {
+    $arguments += @("-LanAddress", $LanAddress)
+  }
+  Start-Process `
+    -FilePath "powershell.exe" `
+    -ArgumentList $arguments `
+    -Verb RunAs `
+    -WindowStyle Hidden
+
+  $restartedState = $null
+  $deadline = [DateTime]::UtcNow.AddSeconds(60)
+  while ([DateTime]::UtcNow -lt $deadline) {
+    Start-Sleep -Milliseconds 250
+    try {
+      $candidateState = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+      $listener = Get-NetTCPConnection `
+        -State Listen `
+        -LocalPort 4319 `
+        -ErrorAction SilentlyContinue
+      $response = Invoke-WebRequest `
+        -UseBasicParsing `
+        -Uri "http://127.0.0.1:4319/api/v1/health/ready" `
+        -TimeoutSec 2
+      if (
+        [string]$candidateState.generation -ne $previousGeneration -and
+        $listener.OwningProcess -contains [int]$candidateState.apiPid -and
+        $response.StatusCode -eq 200
+      ) {
+        $restartedState = $candidateState
+        break
+      }
+    } catch {
+      # The elevated process can briefly close the listener and rewrite the state file.
+    }
+  }
+  if ($null -eq $restartedState) {
+    throw "Elevated QA Hub API restart did not become ready within 60 seconds"
+  }
+  [pscustomobject]@{
+    apiPid = [int]$restartedState.apiPid
+    ready = $true
+    buildSha = [string]$restartedState.buildSha
+    generation = [string]$restartedState.generation
+    elevated = $true
+  }
+  return
+}
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$statePath = "D:\Relay-QA-Hub-Data\mvp-e2e-current.json"
 $nodeExe = "C:\Users\lin0\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
 $gitExe = "C:\Program Files\Git\cmd\git.exe"
 $apiEntry = Join-Path $repoRoot "apps\api\dist\main.js"
