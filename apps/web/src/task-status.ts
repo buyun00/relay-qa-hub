@@ -1,6 +1,6 @@
 import type { BugListState } from "./api";
 
-export const TASK_STATUS_ORDER = ["pending", "verification", "closed"] as const;
+export const TASK_STATUS_ORDER = ["pending", "inProgress", "verification", "closed"] as const;
 
 export type TaskStatus = (typeof TASK_STATUS_ORDER)[number];
 
@@ -9,8 +9,13 @@ export const taskStatusCopy: Readonly<
 > = {
   pending: {
     label: "待处理",
-    hint: "尚未完成；修复和构建只记录进度，不增加任务状态",
+    hint: "待分配、需补充或等待开始处理",
     icon: "✓",
+  },
+  inProgress: {
+    label: "处理中",
+    hint: "修复人正在处理",
+    icon: "…",
   },
   verification: {
     label: "已完成待验收",
@@ -27,7 +32,8 @@ export const taskStatusCopy: Readonly<
 // BugListState carries internal workflow/audit detail. Product surfaces must
 // project it through this function instead of presenting extra task statuses.
 export function taskStatusForBugState(state: BugListState): TaskStatus {
-  if (state === "ready_for_verification") return "verification";
+  if (state === "in_progress") return "inProgress";
+  if (state === "awaiting_build" || state === "ready_for_verification") return "verification";
   if (state === "closed" || state === "deferred" || state === "rejected" || state === "duplicate") {
     return "closed";
   }

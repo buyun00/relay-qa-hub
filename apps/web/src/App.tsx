@@ -842,6 +842,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const counts = useMemo(
     () => ({
       pending: bugs.filter((bug) => categoryMatches("pending", bug.state)).length,
+      inProgress: bugs.filter((bug) => categoryMatches("inProgress", bug.state)).length,
       verification: bugs.filter((bug) => categoryMatches("verification", bug.state)).length,
       closed: bugs.filter((bug) => categoryMatches("closed", bug.state)).length,
     }),
@@ -1389,8 +1390,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                   </div>
                 ) : null}
                 {visibleBugs.map((bug) => {
-                  const actionPersonId =
-                    bug.state === "ready_for_verification" ? bug.verificationOwnerId : bug.ownerId;
+                  const isAwaitingVerification =
+                    taskStatusForBugState(bug.state) === "verification";
+                  const actionPersonId = isAwaitingVerification
+                    ? bug.verificationOwnerId
+                    : bug.ownerId;
                   return (
                     <button
                       className="table-row bug-row"
@@ -1416,9 +1420,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <span className="person-mini">{initials(memberName(actionPersonId))}</span>
                         <span>
                           <strong>{memberName(actionPersonId)}</strong>
-                          <small>
-                            {bug.state === "ready_for_verification" ? "关闭人" : "修复人"}
-                          </small>
+                          <small>{isAwaitingVerification ? "关闭人" : "修复人"}</small>
                         </span>
                       </span>
                       <span className={`status-badge state-${bug.state}`} role="cell">
@@ -1732,17 +1734,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <span>{taskStatusLabel(detail.state)}</span>
                       </div>
                       <div className="flow">
-                        {["待处理", "已完成待验收", "关闭"].map((label, index) => {
-                          const activeStatus = taskStatusForBugState(detail.state);
-                          const activeIndex =
-                            activeStatus === "closed" ? 2 : activeStatus === "verification" ? 1 : 0;
+                        {TASK_STATUS_ORDER.map((status, index) => {
+                          const activeIndex = TASK_STATUS_ORDER.indexOf(
+                            taskStatusForBugState(detail.state),
+                          );
                           return (
                             <span
                               className={`flow-step${index < activeIndex ? " is-done" : index === activeIndex ? " is-active" : ""}`}
-                              key={label}
+                              key={status}
                             >
                               <i />
-                              {label}
+                              {taskStatusCopy[status].label}
                             </span>
                           );
                         })}

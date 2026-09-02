@@ -64,14 +64,9 @@ class BugListFiltersTest {
             bug(id = "duplicate", reporterId = "r", ownerId = "o", state = "duplicate"),
         )
         val expectedByStatus = mapOf(
-            BugStatusFilter.PENDING to listOf(
-                "reported",
-                "needs-info",
-                "ready",
-                "in-progress",
-                "awaiting-build",
-            ),
-            BugStatusFilter.VERIFICATION to listOf("verification"),
+            BugStatusFilter.PENDING to listOf("reported", "needs-info", "ready"),
+            BugStatusFilter.IN_PROGRESS to listOf("in-progress"),
+            BugStatusFilter.VERIFICATION to listOf("awaiting-build", "verification"),
             BugStatusFilter.CLOSED to listOf("closed", "deferred", "rejected", "duplicate"),
         )
 
@@ -85,10 +80,12 @@ class BugListFiltersTest {
     }
 
     @Test
-    fun `every backend workflow detail projects to exactly one of three task labels`() {
-        listOf("reported", "needs_info", "ready", "in_progress", "awaiting_build").forEach { state ->
+    fun `every backend workflow detail projects to exactly one of four task labels`() {
+        listOf("reported", "needs_info", "ready").forEach { state ->
             assertEquals("待处理", bugStateLabel(state))
         }
+        assertEquals("处理中", bugStateLabel("in_progress"))
+        assertEquals("已完成待验收", bugStateLabel("awaiting_build"))
         assertEquals("已完成待验收", bugStateLabel("ready_for_verification"))
         listOf("closed", "deferred", "rejected", "duplicate").forEach { state ->
             assertEquals("关闭", bugStateLabel(state))

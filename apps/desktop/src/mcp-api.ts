@@ -417,7 +417,7 @@ export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
     name: "qa_submit_fix",
     title: "提交已验证的代码修复",
     description:
-      "提交当前 RepairAttempt 的分支、40 位提交 SHA、修复摘要和实际验证命令。代码交付进入等待精确构建/待关闭；项目内任意成员均可在详情直接关闭，无需人员身份确认。",
+      "提交当前 RepairAttempt 的分支、40 位提交 SHA、修复摘要和实际验证命令。代码交付后任务显示为已完成待验收，精确构建匹配仍作为内部验收证据；项目内任意成员均可在详情直接关闭，无需人员身份确认。",
     inputSchema: {
       type: "object",
       properties: {

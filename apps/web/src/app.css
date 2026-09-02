@@ -477,7 +477,7 @@ h1 {
 .summary-grid {
   margin-bottom: 20px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 .summary-card {
@@ -514,6 +514,10 @@ h1 {
 .icon-pending {
   color: var(--lime);
   background: var(--forest);
+}
+.icon-inProgress {
+  color: #3568d4;
+  background: #e8f0ff;
 }
 .icon-verification {
   color: #e9631d;
@@ -727,12 +731,12 @@ h1 {
 }
 .state-ready,
 .state-in_progress,
-.state-awaiting_build,
 .state-needs_info,
 .state-reported {
   color: #416bc1;
   background: #edf3ff;
 }
+.state-awaiting_build,
 .state-ready_for_verification {
   color: #c65818;
   background: #fff1e5;
@@ -1118,7 +1122,7 @@ h1 {
 }
 .flow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 .flow-step {
   position: relative;

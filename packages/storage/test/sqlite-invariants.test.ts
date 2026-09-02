@@ -10910,10 +10910,10 @@ test("multi-actor no-code human workflow can be managed by any project member", 
       }),
     );
     const ownerCompleted = ownerInbox.items.find(
-      (item) => item.type === "verification.result_recorded" && item.title === "单子已完成",
+      (item) => item.type === "verification.result_recorded" && item.title === "状态更新 · 关闭",
     );
     const verifierCompleted = verifierInbox.items.find(
-      (item) => item.type === "verification.result_recorded" && item.title === "单子已完成",
+      (item) => item.type === "verification.result_recorded" && item.title === "状态更新 · 关闭",
     );
     assert.equal(ownerCompleted?.body, "MHW-1 · Invariant regression record");
     assert.equal(verifierCompleted?.body, "MHW-1 · Invariant regression record");
@@ -11017,6 +11017,20 @@ test("a project member can complete a delivered code task without making Build a
     assert.equal(delivered.status, "delivered");
     const awaitingBuild = getMobileBug(database, scope, bugId);
     assert.equal(awaitingBuild?.state, "awaiting_build");
+    const deliveryInbox = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        ...developerScope,
+        limit: 100,
+        now: FINALIZED_AT,
+      }),
+    );
+    assert.equal(
+      deliveryInbox.items.some(
+        (item) =>
+          item.type === "repair_attempt.delivered" && item.title === "状态更新 · 已完成待验收",
+      ),
+      true,
+    );
 
     const completionInput = {
       ...scope,

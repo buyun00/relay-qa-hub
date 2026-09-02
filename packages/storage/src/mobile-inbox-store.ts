@@ -276,18 +276,18 @@ function notificationPresentation(
   if (event.type === "occurrence.appended") return { title: "有一个新单子", body };
   if (event.type === "bug.updated") return { title: "单子信息已更新", body };
   if (event.type === "bug.triage.ready") return { title: "状态更新 · 待处理", body };
-  if (event.type === "repair_attempt.created") return { title: "状态更新 · 修复中", body };
-  if (event.to_state === "awaiting_build") return { title: "状态更新 · 待构建", body };
+  if (event.type === "repair_attempt.created") return { title: "状态更新 · 处理中", body };
+  if (event.to_state === "awaiting_build") return { title: "状态更新 · 已完成待验收", body };
   if (event.to_state === "ready_for_verification" || event.type === "verification.created") {
     return { title: "有一个单子待你验收", body };
   }
   if (event.type === "verification.started") return { title: "验收已开始", body };
   if (event.type === "verification.result_recorded") {
     return payload.status === "passed"
-      ? { title: "单子已完成", body }
+      ? { title: "状态更新 · 关闭", body }
       : { title: "验收未通过，已退回", body };
   }
-  if (event.type === "bug.mark_duplicate") return { title: "状态更新 · 已标记重复", body };
+  if (event.type === "bug.mark_duplicate") return { title: "状态更新 · 关闭", body };
   if (event.type === "build.registered") return { title: "Build 已登记", body };
   return { title: "单子状态已更新", body };
 }
