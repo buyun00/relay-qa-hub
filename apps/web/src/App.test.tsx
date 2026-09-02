@@ -9,10 +9,11 @@ import App, {
   canSubmitNewBug,
   collectClipboardImages,
   mergeCreateBugImages,
+  runRecoverableVerificationStep,
   selectableQingyuDefectIds,
   updateQingyuDefectSelection,
 } from "./App";
-import type { BugDetail } from "./api";
+import { QaHubApiError, type BugDetail } from "./api";
 import { product } from "./product";
 
 describe("Relay QA Hub browser workbench", () => {
@@ -129,6 +130,52 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canReturnCompletedBug("ready_for_verification", true, "in_progress")).toBe(true);
     expect(canReturnCompletedBug("awaiting_build", false, null)).toBe(false);
     expect(canReturnCompletedBug("in_progress", true, null)).toBe(false);
+  });
+
+  it("reconciles a committed Verification write instead of surfacing a SQLite error", async () => {
+    let attempts = 0;
+    const result = await runRecoverableVerificationStep(
+      async () => {
+        attempts += 1;
+        throw new QaHubApiError(500, "ERR_SQLITE_ERROR");
+      },
+      async () => ({ status: "committed", value: "already-written" }),
+      async () => undefined,
+    );
+
+    expect(result).toBe("already-written");
+    expect(attempts).toBe(1);
+  });
+
+  it("retries an uncommitted transient Verification write exactly once", async () => {
+    let attempts = 0;
+    const result = await runRecoverableVerificationStep(
+      async () => {
+        attempts += 1;
+        if (attempts === 1) throw new QaHubApiError(503, "STORAGE_WRITE_TEMPORARILY_UNAVAILABLE");
+        return "written-after-retry";
+      },
+      async () => ({ status: "retry" }),
+      async () => undefined,
+    );
+
+    expect(result).toBe("written-after-retry");
+    expect(attempts).toBe(2);
+  });
+
+  it("replaces a repeated SQLite failure with a stable Verification error", async () => {
+    await expect(
+      runRecoverableVerificationStep(
+        async () => {
+          throw new QaHubApiError(500, "ERR_SQLITE_ERROR");
+        },
+        async () => ({ status: "retry" }),
+        async () => undefined,
+      ),
+    ).rejects.toMatchObject({
+      status: 503,
+      code: "VERIFICATION_WRITE_TEMPORARILY_UNAVAILABLE",
+    });
   });
 
   it("offers completion for an existing delivered task that still awaits a Build", () => {

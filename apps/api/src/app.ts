@@ -1656,6 +1656,19 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   const buildErrorReply = (error: unknown, reply: FastifyReply) => {
     const code = (error as { code?: unknown })?.code;
+    if (
+      code === "ERR_SQLITE_ERROR" ||
+      code === "SQLITE_BUSY" ||
+      code === "SQLITE_LOCKED" ||
+      code === "SQLITE_WORKER_FAILED"
+    ) {
+      reply.log.error({ err: error }, "QA Hub workflow storage write failed");
+      return reply
+        .header("retry-after", "1")
+        .code(503)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "STORAGE_WRITE_TEMPORARILY_UNAVAILABLE" });
+    }
     if (code === "NOT_FOUND") {
       return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }

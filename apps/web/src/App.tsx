@@ -26,6 +26,7 @@ import {
   getHumanWorkflow,
   getQingyuBugLink,
   getQingyuSession,
+  getVerification,
   importOwnQingyuDefects,
   listBugAttachments,
   listBugEvents,
@@ -219,6 +220,62 @@ function internalBugSummary(content: string): string {
 }
 
 const DEFAULT_RETURN_REASON = "问题仍可复现，请继续处理";
+const VERIFICATION_RETRY_DELAY_MS = 200;
+
+export type VerificationStepReconciliation<T> =
+  | { readonly status: "committed"; readonly value: T }
+  | { readonly status: "retry" }
+  | { readonly status: "conflict" };
+
+export function isRecoverableVerificationWriteFailure(cause: unknown): boolean {
+  return (
+    cause instanceof TypeError ||
+    (cause instanceof QaHubApiError &&
+      (cause.status >= 500 ||
+        cause.code === "ERR_SQLITE_ERROR" ||
+        cause.code === "SQLITE_BUSY" ||
+        cause.code === "SQLITE_LOCKED" ||
+        cause.code === "SQLITE_WORKER_FAILED" ||
+        cause.code === "STORAGE_WRITE_TEMPORARILY_UNAVAILABLE"))
+  );
+}
+
+export async function runRecoverableVerificationStep<T>(
+  action: () => Promise<T>,
+  reconcile: () => Promise<VerificationStepReconciliation<T>>,
+  waitBeforeRetry: () => Promise<void> = () =>
+    new Promise((resolve) => window.setTimeout(resolve, VERIFICATION_RETRY_DELAY_MS)),
+): Promise<T> {
+  try {
+    return await action();
+  } catch (cause) {
+    if (!isRecoverableVerificationWriteFailure(cause)) throw cause;
+
+    let reconciliation: VerificationStepReconciliation<T>;
+    try {
+      reconciliation = await reconcile();
+    } catch (reconcileCause) {
+      if (isRecoverableVerificationWriteFailure(reconcileCause)) {
+        throw new QaHubApiError(503, "VERIFICATION_WRITE_TEMPORARILY_UNAVAILABLE");
+      }
+      throw reconcileCause;
+    }
+    if (reconciliation.status === "committed") return reconciliation.value;
+    if (reconciliation.status === "conflict") {
+      throw new QaHubApiError(412, "VERSION_CONFLICT");
+    }
+
+    await waitBeforeRetry();
+    try {
+      return await action();
+    } catch (retryCause) {
+      if (isRecoverableVerificationWriteFailure(retryCause)) {
+        throw new QaHubApiError(503, "VERIFICATION_WRITE_TEMPORARILY_UNAVAILABLE");
+      }
+      throw retryCause;
+    }
+  }
+}
 
 function categoryMatches(category: Category, state: BugListState): boolean {
   return taskStatusMatches(category, state);
@@ -289,6 +346,10 @@ function messageFor(cause: unknown): string {
       QINGYU_TIMEOUT: "轻语响应超时，请稍后重试。",
       QINGYU_UNAVAILABLE: "当前无法连接轻语，请检查网络后重试。",
       QINGYU_UPSTREAM_FAILED: "轻语拒绝了本次请求，请稍后重试或检查账号权限。",
+      STORAGE_WRITE_TEMPORARILY_UNAVAILABLE: "数据写入暂时繁忙，系统已保留原状态，请稍后重新操作。",
+      VERIFICATION_WRITE_TEMPORARILY_UNAVAILABLE:
+        "验收状态暂时无法写入，系统已保留原状态，请稍后重新操作。",
+      ERR_SQLITE_ERROR: "数据写入暂时失败，系统已保留原状态，请稍后重新操作。",
     };
     const qingyuMessage = cause.code === null ? undefined : qingyuMessages[cause.code];
     if (qingyuMessage !== undefined) return qingyuMessage;
@@ -1093,28 +1154,117 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     let current = workflow?.verification ?? null;
     if (verificationBug.state === "awaiting_build") {
       if (repairAttempt.status !== "delivered") return null;
-      verificationBug = await completeBugForVerification(
-        verificationBug.id,
-        verificationBug.version,
-        repairAttempt.id,
+      let expectedBugVersion = verificationBug.version;
+      verificationBug = await runRecoverableVerificationStep(
+        () => completeBugForVerification(verificationBug.id, expectedBugVersion, repairAttempt.id),
+        async () => {
+          const latest = await getBug(verificationBug.id);
+          if (latest.state === "ready_for_verification") {
+            return { status: "committed", value: latest };
+          }
+          if (latest.state === "awaiting_build") {
+            expectedBugVersion = latest.version;
+            return { status: "retry" };
+          }
+          return { status: "conflict" };
+        },
       );
       current = null;
     }
     if (verificationBug.state !== "ready_for_verification") return null;
     if (current === null) {
-      current = await createVerification({
-        bugId: verificationBug.id,
-        expectedBugVersion: verificationBug.version,
-        repairAttemptId: repairAttempt.id,
-        buildId: workflow?.build?.id ?? null,
-        verifierId: verificationBug.verificationOwnerId ?? principal.userId,
-        criteria: verificationBug.expectedBehavior || "关闭人确认问题已解决且未引入回归",
-      });
+      let expectedBugVersion = verificationBug.version;
+      let buildId = workflow?.build?.id ?? null;
+      current = await runRecoverableVerificationStep(
+        () =>
+          createVerification({
+            bugId: verificationBug.id,
+            expectedBugVersion,
+            repairAttemptId: repairAttempt.id,
+            buildId,
+            verifierId: verificationBug.verificationOwnerId ?? principal.userId,
+            criteria: verificationBug.expectedBehavior || "关闭人确认问题已解决且未引入回归",
+          }),
+        async () => {
+          const [latestBug, latestWorkflow] = await Promise.all([
+            getBug(verificationBug.id),
+            getHumanWorkflow(verificationBug.id),
+          ]);
+          const latestVerification = latestWorkflow.verification;
+          if (
+            latestVerification !== null &&
+            latestVerification.repairAttemptId === repairAttempt.id &&
+            (latestVerification.status === "requested" ||
+              latestVerification.status === "in_progress" ||
+              latestVerification.status === "passed" ||
+              latestVerification.status === "failed")
+          ) {
+            return { status: "committed", value: latestVerification };
+          }
+          if (
+            latestBug.state === "ready_for_verification" &&
+            latestWorkflow.repairAttempt?.id === repairAttempt.id &&
+            latestVerification === null
+          ) {
+            verificationBug = latestBug;
+            expectedBugVersion = latestBug.version;
+            buildId = latestWorkflow.build?.id ?? null;
+            return { status: "retry" };
+          }
+          return { status: "conflict" };
+        },
+      );
     }
     if (current.status === "requested") {
-      return startVerification(current.id, current.version);
+      let expectedVerificationVersion = current.version;
+      return runRecoverableVerificationStep(
+        () => startVerification(current.id, expectedVerificationVersion),
+        async () => {
+          const latest = await getVerification(current.id);
+          if (
+            latest.status === "in_progress" ||
+            latest.status === "passed" ||
+            latest.status === "failed"
+          ) {
+            return { status: "committed", value: latest };
+          }
+          if (latest.status === "requested") {
+            expectedVerificationVersion = latest.version;
+            return { status: "retry" };
+          }
+          return { status: "conflict" };
+        },
+      );
     }
     return current;
+  };
+
+  const recordVerificationResultReliably = async (
+    verification: VerificationRecord,
+    expectedStatus: "passed" | "failed",
+    action: (expectedVersion: number) => Promise<unknown>,
+  ) => {
+    if (verification.status === expectedStatus) return;
+    if (verification.status !== "in_progress") {
+      throw new QaHubApiError(412, "VERSION_CONFLICT");
+    }
+    let expectedVerificationVersion = verification.version;
+    await runRecoverableVerificationStep(
+      async () => {
+        await action(expectedVerificationVersion);
+      },
+      async () => {
+        const latest = await getVerification(verification.id);
+        if (latest.status === expectedStatus) {
+          return { status: "committed", value: undefined };
+        }
+        if (latest.status === "in_progress") {
+          expectedVerificationVersion = latest.version;
+          return { status: "retry" };
+        }
+        return { status: "conflict" };
+      },
+    );
   };
 
   const acceptBug = async () => {
@@ -1123,11 +1273,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       async () => {
         const verification = await ensureVerificationStarted();
         if (verification === null) return;
-        await recordVerificationPassed(
-          verification.id,
-          verification.version,
-          "关闭人确认修复有效，直接关闭 Bug",
-          crypto.randomUUID(),
+        const clientSubmissionId = crypto.randomUUID();
+        await recordVerificationResultReliably(verification, "passed", (expectedVersion) =>
+          recordVerificationPassed(
+            verification.id,
+            expectedVersion,
+            "关闭人确认修复有效，直接关闭 Bug",
+            clientSubmissionId,
+          ),
         );
       },
       { closeDetailOnSuccess: true },
@@ -1140,12 +1293,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     await runMutation("验收未通过，已打回待处理", async () => {
       const verification = await ensureVerificationStarted();
       if (verification === null) return;
-      await recordVerificationFailed(
-        verification.id,
-        verification.version,
-        reason,
-        reason,
-        crypto.randomUUID(),
+      const clientSubmissionId = crypto.randomUUID();
+      await recordVerificationResultReliably(verification, "failed", (expectedVersion) =>
+        recordVerificationFailed(
+          verification.id,
+          expectedVersion,
+          reason,
+          reason,
+          clientSubmissionId,
+        ),
       );
       setReturnReason(DEFAULT_RETURN_REASON);
     });

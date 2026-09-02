@@ -23,6 +23,7 @@ import {
   MOBILE_UPLOAD_INIT_PATH,
   MOBILE_VERIFICATION_COLLECTION_PATH,
   MOBILE_VERIFICATION_RESULT_PATH,
+  MOBILE_VERIFICATION_START_PATH,
   MobileCaptureRequestError,
   QaLoginDirectory,
   canonicalizeMobileProjectMembers,
@@ -645,6 +646,42 @@ test("human workflow routes preserve no-code and failed Verification contracts",
     attachmentIds: [],
     captureBundleId: null,
   });
+});
+
+test("Verification routes hide raw SQLite failures behind a retryable storage error", async (t) => {
+  const token = "verification-storage-error-token";
+  const actorId = "10000000-0000-4000-8000-000000000031";
+  const verificationId = "10000000-0000-4000-8000-000000000034";
+  const app = createApiApp({
+    logger: false,
+    debugBearerToken: token,
+    debugActorId: actorId,
+    mobileVerificationStore: {
+      async startVerification() {
+        throw Object.assign(new Error("Verification typed-audit trigger rejected the write"), {
+          code: "ERR_SQLITE_ERROR",
+        });
+      },
+    },
+  });
+  t.after(async () => app.close());
+
+  const response = await app.inject({
+    method: "POST",
+    url: MOBILE_VERIFICATION_START_PATH.replace(":verificationId", verificationId),
+    headers: {
+      authorization: `Bearer ${token}`,
+      "content-type": MOBILE_API_MEDIA_TYPE,
+      "x-qa-actor-id": actorId,
+      "idempotency-key": `workflow:startVerification:verification:${verificationId}:v1`,
+    },
+    payload: JSON.stringify({ expectedVersion: 1, reason: "Acceptance started" }),
+  });
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.headers["retry-after"], "1");
+  assert.deepEqual(response.json(), { code: "STORAGE_WRITE_TEMPORARILY_UNAVAILABLE" });
+  assert.doesNotMatch(response.body, /ERR_SQLITE_ERROR/u);
 });
 
 test("Android createBug persists an exact receipt, supports GET, and rejects a wrong token", async (t) => {
