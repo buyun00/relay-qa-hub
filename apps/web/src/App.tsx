@@ -236,6 +236,20 @@ export function canDirectCloseBug(
   );
 }
 
+export function canReturnCompletedBug(
+  state: BugListState,
+  hasRepairAttempt: boolean,
+  verificationStatus: VerificationRecord["status"] | null,
+): boolean {
+  return (
+    (state === "awaiting_build" || state === "ready_for_verification") &&
+    hasRepairAttempt &&
+    (verificationStatus === null ||
+      verificationStatus === "requested" ||
+      verificationStatus === "in_progress")
+  );
+}
+
 export function canCompleteDeliveredTask(
   state: BugListState,
   repairAttemptStatus: NonNullable<HumanWorkflowSnapshot["repairAttempt"]>["status"] | null,
@@ -1025,15 +1039,26 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const ensureVerificationStarted = async () => {
     if (detail === null || repairAttempt === null) return null;
+    let verificationBug = detail;
     let current = workflow?.verification ?? null;
+    if (verificationBug.state === "awaiting_build") {
+      if (repairAttempt.status !== "delivered") return null;
+      verificationBug = await completeBugForVerification(
+        verificationBug.id,
+        verificationBug.version,
+        repairAttempt.id,
+      );
+      current = null;
+    }
+    if (verificationBug.state !== "ready_for_verification") return null;
     if (current === null) {
       current = await createVerification({
-        bugId: detail.id,
-        expectedBugVersion: detail.version,
+        bugId: verificationBug.id,
+        expectedBugVersion: verificationBug.version,
         repairAttemptId: repairAttempt.id,
         buildId: workflow?.build?.id ?? null,
-        verifierId: detail.verificationOwnerId ?? principal.userId,
-        criteria: detail.expectedBehavior || "关闭人确认问题已解决且未引入回归",
+        verifierId: verificationBug.verificationOwnerId ?? principal.userId,
+        criteria: verificationBug.expectedBehavior || "关闭人确认问题已解决且未引入回归",
       });
     }
     if (current.status === "requested") {
@@ -1062,7 +1087,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const returnBug = async () => {
     const reason = returnReason.trim();
     if (reason.length === 0) return;
-    await runMutation("已打回修复人", async () => {
+    await runMutation("验收未通过，已打回待处理", async () => {
       const verification = await ensureVerificationStarted();
       if (verification === null) return;
       await recordVerificationFailed(
@@ -1896,17 +1921,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           标记修复完成
                         </button>
                       ) : null}
-                      {canCompleteDeliveredTask(detail.state, repairAttempt?.status ?? null) ? (
-                        <button
-                          className="primary-button wide"
-                          disabled={mutation !== null}
-                          onClick={() => void completeDeliveredWork()}
-                          type="button"
-                        >
-                          已完成
-                        </button>
-                      ) : null}
-                      {canDirectCloseBug(
+                      {canReturnCompletedBug(
                         detail.state,
                         repairAttempt !== null,
                         verification?.status ?? null,
@@ -1926,17 +1941,33 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                             onClick={() => void returnBug()}
                             type="button"
                           >
-                            打回修复人
-                          </button>
-                          <button
-                            className="primary-button wide"
-                            disabled={mutation !== null}
-                            onClick={() => void acceptBug()}
-                            type="button"
-                          >
-                            {qingyuLink === null ? "直接关闭" : "关闭并同步轻语"}
+                            验收不通过，打回待处理
                           </button>
                         </>
+                      ) : null}
+                      {canCompleteDeliveredTask(detail.state, repairAttempt?.status ?? null) ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() => void completeDeliveredWork()}
+                          type="button"
+                        >
+                          已完成
+                        </button>
+                      ) : null}
+                      {canDirectCloseBug(
+                        detail.state,
+                        repairAttempt !== null,
+                        verification?.status ?? null,
+                      ) ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() => void acceptBug()}
+                          type="button"
+                        >
+                          {qingyuLink === null ? "直接关闭" : "关闭并同步轻语"}
+                        </button>
                       ) : null}
                       {detail.state !== "closed" &&
                       (repairAttempt === null || previousAttemptFailed) &&

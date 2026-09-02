@@ -5,6 +5,7 @@ import App, {
   canSaveBugDetailDraft,
   canCompleteDeliveredTask,
   canDirectCloseBug,
+  canReturnCompletedBug,
   canSubmitNewBug,
   collectClipboardImages,
   mergeCreateBugImages,
@@ -119,6 +120,15 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canDirectCloseBug("ready_for_verification", true, "requested")).toBe(true);
     expect(canDirectCloseBug("ready_for_verification", true, "in_progress")).toBe(true);
     expect(canDirectCloseBug("in_progress", true, null)).toBe(false);
+  });
+
+  it("lets any project member reject a completed Bug back to pending", () => {
+    expect(canReturnCompletedBug("awaiting_build", true, null)).toBe(true);
+    expect(canReturnCompletedBug("ready_for_verification", true, null)).toBe(true);
+    expect(canReturnCompletedBug("ready_for_verification", true, "requested")).toBe(true);
+    expect(canReturnCompletedBug("ready_for_verification", true, "in_progress")).toBe(true);
+    expect(canReturnCompletedBug("awaiting_build", false, null)).toBe(false);
+    expect(canReturnCompletedBug("in_progress", true, null)).toBe(false);
   });
 
   it("offers completion for an existing delivered task that still awaits a Build", () => {
