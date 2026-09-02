@@ -1,7 +1,8 @@
 param(
   [string]$PackageDirectory,
   [string]$LoginName = "Windows安装包验收账号",
-  [string]$NodeExe = $env:QA_HUB_DESKTOP_NODE_EXE
+  [string]$NodeExe = $env:QA_HUB_DESKTOP_NODE_EXE,
+  [ValidateRange(1, 65535)][int]$McpPort = 4320
 )
 
 $ErrorActionPreference = "Stop"
@@ -47,7 +48,7 @@ function Invoke-QAHubMcpRequest {
     params = $Params
   } | ConvertTo-Json -Depth 20 -Compress
   Invoke-RestMethod `
-    -Uri "http://127.0.0.1:4320/mcp" `
+    -Uri "http://127.0.0.1:$McpPort/mcp" `
     -Method Post `
     -ContentType "application/json" `
     -Body $body `
@@ -61,8 +62,8 @@ if ($LASTEXITCODE -ne 0 -or $archiveEntries -notcontains "\assets\RelayQaHub.ico
 if (Get-NetTCPConnection -State Listen -LocalPort 9333 -ErrorAction SilentlyContinue) {
   throw "CDP smoke port 9333 is already in use"
 }
-if (Get-NetTCPConnection -State Listen -LocalPort 4320 -ErrorAction SilentlyContinue) {
-  throw "MCP smoke port 4320 is already in use"
+if (Get-NetTCPConnection -State Listen -LocalPort $McpPort -ErrorAction SilentlyContinue) {
+  throw "MCP smoke port $McpPort is already in use"
 }
 $existingPackageProcesses = @(
   Get-CimInstance Win32_Process -Filter "Name='RelayQaHub.exe'" |
@@ -116,6 +117,7 @@ try {
   foreach ($name in $environmentNames) {
     [Environment]::SetEnvironmentVariable($name, $null, "Process")
   }
+  $env:QA_HUB_DESKTOP_MCP_PORT = [string]$McpPort
   $env:LOCALAPPDATA = Join-Path $smokeRoot "local"
   $env:APPDATA = Join-Path $smokeRoot "roaming"
   $mainProcess = Start-Process `
@@ -150,7 +152,7 @@ try {
   $mcpDeadline = [DateTime]::UtcNow.AddSeconds(10)
   while ([DateTime]::UtcNow -lt $mcpDeadline) {
     try {
-      $mcpHealth = Invoke-RestMethod -Uri "http://127.0.0.1:4320/health" -TimeoutSec 2
+      $mcpHealth = Invoke-RestMethod -Uri "http://127.0.0.1:$McpPort/health" -TimeoutSec 2
       if ($mcpHealth.status -eq "ready") {
         $mcpReady = $true
         break
@@ -298,8 +300,10 @@ try {
   $detailEditorOutput = & $NodeExe $smokeScript open-bug-editor
   if ($LASTEXITCODE -ne 0) { throw "Packaged Bug detail editor smoke failed" }
   $detailEditor = ($detailEditorOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
-  if (-not $detailEditor.detailEditorVisible -or [int]$detailEditor.detailEditorFieldCount -ne 6) {
-    throw "Packaged Bug detail editor does not expose all editable fields"
+  if (-not $detailEditor.detailEditorVisible -or
+      [int]$detailEditor.detailEditorFieldCount -ne 6 -or
+      -not $detailEditor.detailEditorImageInputVisible) {
+    throw "Packaged Bug detail editor does not expose all editable fields and image input"
   }
 
   $overviewOutput = & $NodeExe $smokeScript open-overview
@@ -391,6 +395,7 @@ try {
     bugDetailEditAvailable = [bool]$detail.detailEditTriggerVisible
     bugDetailDeleteAvailable = [bool]$detail.detailDeleteTriggerVisible
     bugDetailEditorFieldCount = [int]$detailEditor.detailEditorFieldCount
+    bugDetailEditorImageInput = [bool]$detailEditor.detailEditorImageInputVisible
     qingyuImportDialogLoaded = [bool]$qingyu.snapshot.qingyuModalVisible
     qingyuQrLoaded = [bool]$qingyu.snapshot.qingyuQrVisible
     qingyuWorkspaceLoaded = [bool]$qingyu.snapshot.qingyuWorkspaceVisible

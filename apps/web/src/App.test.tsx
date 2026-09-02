@@ -172,6 +172,7 @@ describe("Relay QA Hub browser workbench", () => {
     };
 
     expect(canSaveBugDetailDraft(unchangedDraft, bug, null, false)).toBe(false);
+    expect(canSaveBugDetailDraft(unchangedDraft, bug, null, false, 1)).toBe(true);
     expect(
       canSaveBugDetailDraft(
         { ...unchangedDraft, description: "补充后的问题描述" },

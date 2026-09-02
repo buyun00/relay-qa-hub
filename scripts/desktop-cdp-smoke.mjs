@@ -109,8 +109,10 @@ const snapshotExpression = `
       detailEditTriggerVisible: document.querySelector(".detail-edit-trigger") !== null,
       detailDeleteTriggerVisible: document.querySelector(".detail-actions .danger-button") !== null,
       detailEditorVisible: document.querySelector(".detail-edit-form") !== null,
+      detailEditorImageInputVisible:
+        document.querySelector('.detail-edit-form input[type="file"]') !== null,
       detailEditorFieldCount: document.querySelectorAll(
-        ".detail-edit-form input, .detail-edit-form textarea, .detail-edit-form select",
+        '.detail-edit-form input:not([type="file"]), .detail-edit-form textarea, .detail-edit-form select',
       ).length,
       qingyuModalVisible: document.querySelector('.qingyu-modal[aria-label="从轻语导入 Bug"]') !== null,
       qingyuQrVisible: document.querySelector(".qingyu-login-panel svg") !== null,

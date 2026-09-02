@@ -256,6 +256,7 @@ export interface UpdateBugDetailsInput {
   readonly moduleId?: string | null;
   readonly severity?: BugSeverity;
   readonly priority?: BugPriority;
+  readonly attachmentIds?: readonly string[];
 }
 
 export interface AttachmentMetadata {

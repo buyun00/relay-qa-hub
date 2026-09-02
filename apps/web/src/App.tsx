@@ -192,6 +192,7 @@ export function canSaveBugDetailDraft(
   bug: BugDetail | null,
   mutation: string | null,
   versionConflict: boolean,
+  pendingImageCount = 0,
 ): boolean {
   if (draft === null || bug === null || mutation !== null || versionConflict) return false;
   const title = draft.title.trim();
@@ -204,7 +205,8 @@ export function canSaveBugDetailDraft(
     expectedBehavior !== bug.expectedBehavior ||
     draft.moduleId !== bug.moduleId ||
     draft.severity !== bug.severity ||
-    draft.priority !== bug.priority
+    draft.priority !== bug.priority ||
+    pendingImageCount > 0
   );
 }
 
@@ -350,6 +352,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [detailDraft, setDetailDraft] = useState<BugDetailDraft | null>(null);
   const [detailEditError, setDetailEditError] = useState<string | null>(null);
   const [detailEditVersionConflict, setDetailEditVersionConflict] = useState(false);
+  const [detailAttachmentIds, setDetailAttachmentIds] = useState<readonly string[]>([]);
+  const [detailNewFiles, setDetailNewFiles] = useState<readonly File[]>([]);
   const [ownerId, setOwnerId] = useState("");
   const [verifierId, setVerifierId] = useState("");
   const [comment, setComment] = useState("");
@@ -387,6 +391,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       })),
     [newFiles],
   );
+  const detailNewFilePreviews = useMemo(
+    () =>
+      detailNewFiles.map((file, index) => ({
+        file,
+        key: `${createBugImageKey(file)}\u0000${index}`,
+        url: URL.createObjectURL(file),
+      })),
+    [detailNewFiles],
+  );
   const qingyuSelectableDefectIds = useMemo(
     () => selectableQingyuDefectIds(qingyuDefects),
     [qingyuDefects],
@@ -401,6 +414,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       for (const preview of newFilePreviews) URL.revokeObjectURL(preview.url);
     },
     [newFilePreviews],
+  );
+  useEffect(
+    () => () => {
+      for (const preview of detailNewFilePreviews) URL.revokeObjectURL(preview.url);
+    },
+    [detailNewFilePreviews],
   );
 
   const currentProject = projects.find((project) => project.id === projectId) ?? null;
@@ -634,6 +653,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     setDetailDraft(null);
     setDetailEditError(null);
     setDetailEditVersionConflict(false);
+    setDetailAttachmentIds([]);
+    setDetailNewFiles([]);
     setPreviewImage(null);
     setModules([]);
     clearEvidence();
@@ -691,6 +712,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         setWorkflow(workflowResponse);
         setQingyuLink(nextQingyuLink);
         setModules(moduleResponse.items.filter((item) => item.active));
+        setDetailAttachmentIds(attachmentResponse.items.map((item) => item.attachmentId));
         setOwnerId(nextDetail.ownerId ?? "");
         setVerifierId(nextDetail.verificationOwnerId ?? nextDetail.reporterId);
 
@@ -845,6 +867,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           setDetailDraft(null);
           setDetailEditError(null);
           setDetailEditVersionConflict(false);
+          setDetailNewFiles([]);
         } else closeDetail();
         setCreateOpen(false);
       }
@@ -924,6 +947,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     setDetailDraft(draftFromBug(detail));
     setDetailEditError(null);
     setDetailEditVersionConflict(false);
+    setDetailNewFiles([]);
     setEditingDetail(true);
   };
 
@@ -932,6 +956,18 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     setDetailDraft(null);
     setDetailEditError(null);
     setDetailEditVersionConflict(false);
+    setDetailNewFiles([]);
+  };
+
+  const appendDetailFiles = (files: readonly File[]) => {
+    setDetailNewFiles((current) => mergeCreateBugImages(current, files));
+  };
+
+  const pasteDetailImages = (event: ClipboardEvent<HTMLFormElement>) => {
+    const pastedImages = collectClipboardImages([...event.clipboardData.items]);
+    if (pastedImages.length === 0) return;
+    event.preventDefault();
+    appendDetailFiles(pastedImages);
   };
 
   const saveBugDetail = async (event: FormEvent<HTMLFormElement>) => {
@@ -948,6 +984,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     setNotice(null);
     setDetailEditError(null);
     try {
+      const clientMutationId = crypto.randomUUID();
+      const uploadedAttachmentIds: string[] = [];
+      for (const file of detailNewFiles) {
+        uploadedAttachmentIds.push(
+          await uploadBugCreateAttachment({
+            projectId: detail.projectId,
+            clientSubmissionId: clientMutationId,
+            file,
+          }),
+        );
+      }
       const updated = await updateBugDetails(
         detail.id,
         detailDraft.expectedVersion,
@@ -962,8 +1009,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           ...(detailDraft.moduleId === detail.moduleId ? {} : { moduleId: detailDraft.moduleId }),
           ...(detailDraft.severity === detail.severity ? {} : { severity: detailDraft.severity }),
           ...(detailDraft.priority === detail.priority ? {} : { priority: detailDraft.priority }),
+          ...(uploadedAttachmentIds.length === 0
+            ? {}
+            : { attachmentIds: [...detailAttachmentIds, ...uploadedAttachmentIds] }),
         },
-        crypto.randomUUID(),
+        clientMutationId,
       );
       setDetail(updated);
       cancelDetailEdit();
@@ -1585,6 +1635,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       <form
                         className="detail-edit-form"
                         id="bug-detail-edit-form"
+                        onPaste={pasteDetailImages}
                         onSubmit={(event) => void saveBugDetail(event)}
                       >
                         <label>
@@ -1697,6 +1748,44 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                             </select>
                           </label>
                         </div>
+                        <label className="detail-edit-attachments">
+                          <span>添加截图 / 标注图</span>
+                          <input
+                            accept="image/png,image/jpeg,image/webp"
+                            multiple
+                            onChange={(event) => {
+                              appendDetailFiles([...(event.target.files ?? [])]);
+                              event.currentTarget.value = "";
+                            }}
+                            type="file"
+                          />
+                          <small aria-live="polite">
+                            {detailNewFiles.length === 0
+                              ? "可选择图片，或在编辑区域按 Ctrl+V 直接粘贴"
+                              : `待添加 ${detailNewFiles.length} 张图片；还可以继续选择或 Ctrl+V 粘贴`}
+                          </small>
+                        </label>
+                        {detailNewFilePreviews.length === 0 ? null : (
+                          <div aria-label="编辑详情待上传图片" className="create-image-previews">
+                            {detailNewFilePreviews.map((preview) => (
+                              <figure key={preview.key}>
+                                <img alt={preview.file.name} src={preview.url} />
+                                <figcaption>{preview.file.name}</figcaption>
+                                <button
+                                  aria-label={`移除图片 ${preview.file.name}`}
+                                  onClick={() =>
+                                    setDetailNewFiles((current) =>
+                                      current.filter((file) => file !== preview.file),
+                                    )
+                                  }
+                                  type="button"
+                                >
+                                  ×
+                                </button>
+                              </figure>
+                            ))}
+                          </div>
+                        )}
                         {detailEditError === null ? null : (
                           <p className="detail-edit-error" role="alert">
                             {detailEditError}
@@ -1872,6 +1961,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                             detail,
                             mutation,
                             detailEditVersionConflict,
+                            detailNewFiles.length,
                           )
                         }
                         form="bug-detail-edit-form"
