@@ -8,6 +8,8 @@ import App, {
   canSubmitNewBug,
   collectClipboardImages,
   mergeCreateBugImages,
+  selectableQingyuDefectIds,
+  updateQingyuDefectSelection,
 } from "./App";
 import type { BugDetail } from "./api";
 import { product } from "./product";
@@ -94,6 +96,21 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canSubmitNewBug(null, "verifier-id")).toBe(true);
     expect(canSubmitNewBug("正在提交", "verifier-id")).toBe(false);
     expect(canSubmitNewBug(null, "")).toBe(false);
+  });
+
+  it("supports selecting multiple eligible Qingyu defects without selecting imported or terminal ones", () => {
+    const defects = [
+      { id: "defect-1", actionable: true, importedBugId: null },
+      { id: "defect-2", actionable: true, importedBugId: null },
+      { id: "defect-3", actionable: false, importedBugId: null },
+      { id: "defect-4", actionable: true, importedBugId: "bug-4" },
+    ];
+
+    expect(selectableQingyuDefectIds(defects)).toEqual(["defect-1", "defect-2"]);
+    const first = updateQingyuDefectSelection([], "defect-1", true);
+    const both = updateQingyuDefectSelection(first, "defect-2", true);
+    expect(updateQingyuDefectSelection(both, "defect-2", true)).toEqual(["defect-1", "defect-2"]);
+    expect(updateQingyuDefectSelection(both, "defect-1", false)).toEqual(["defect-2"]);
   });
 
   it("lets any project member directly close a ready Bug without identity checks", () => {

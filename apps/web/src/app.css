@@ -1869,17 +1869,19 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   border: 1px solid #dce7df;
   border-radius: 12px;
   background: #f7faf8;
 }
 .qingyu-connected > div,
-.qingyu-import-summary {
+.qingyu-import-counts {
   color: #738178;
   font-size: 11px;
 }
-.qingyu-connected > div {
+.qingyu-connected > div,
+.qingyu-import-counts {
   display: grid;
   gap: 2px;
 }
@@ -1887,6 +1889,16 @@ h1 {
 .qingyu-import-summary strong {
   color: #2c4638;
   font-size: 13px;
+}
+.qingyu-selection-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+.qingyu-selection-actions .secondary-button {
+  padding: 7px 10px;
+  font-size: 10px;
 }
 .qingyu-defect-list {
   min-height: 130px;
@@ -1911,7 +1923,31 @@ h1 {
   border: 1px solid #e1e7e2;
   border-radius: 11px;
 }
-.qingyu-defect-list article > div {
+.qingyu-defect-list article.is-selected {
+  border-color: #9fca73;
+  background: #f7fcef;
+  box-shadow: 0 0 0 2px rgba(185, 243, 74, 0.14);
+}
+.qingyu-defect-select {
+  min-width: 0;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+}
+.qingyu-defect-select:has(input:disabled) {
+  cursor: default;
+}
+.create-modal .qingyu-defect-select input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  accent-color: #5d8e3e;
+}
+.qingyu-defect-copy {
   min-width: 0;
   display: grid;
   gap: 4px;

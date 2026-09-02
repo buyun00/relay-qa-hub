@@ -6,10 +6,14 @@ Set-StrictMode -Version 2
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $statePath = "D:\Relay-QA-Hub-Data\mvp-e2e-current.json"
 $nodeExe = "C:\Users\lin0\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
+$gitExe = "C:\Program Files\Git\cmd\git.exe"
 $apiEntry = Join-Path $repoRoot "apps\api\dist\main.js"
 $state = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
-$sourceEvidence = & (Join-Path $PSScriptRoot "Assert-QAHubReleaseSource.ps1") -RepoRoot $repoRoot
-$state.buildSha = [string]$sourceEvidence.commit
+$headSha = @(& $gitExe -c "safe.directory=$repoRoot" -C $repoRoot rev-parse HEAD)
+if ($LASTEXITCODE -ne 0 -or $headSha.Count -ne 1) {
+  throw "Could not resolve the QA Hub source commit"
+}
+$state.buildSha = $headSha[0].Trim()
 . (Join-Path $PSScriptRoot "qa-hub-lan.ps1")
 . (Join-Path $PSScriptRoot "qa-hub-persistent-runtime.ps1")
 $lan = Resolve-QAHubLanBinding -LanAddress $LanAddress

@@ -117,6 +117,23 @@ export function canSubmitNewBug(mutation: string | null, verifierId: string): bo
   return mutation === null && verifierId.length > 0;
 }
 
+export function selectableQingyuDefectIds(
+  defects: readonly Pick<QingyuDefect, "id" | "actionable" | "importedBugId">[],
+): readonly string[] {
+  return defects
+    .filter((defect) => defect.actionable && defect.importedBugId === null)
+    .map((defect) => defect.id);
+}
+
+export function updateQingyuDefectSelection(
+  current: readonly string[],
+  defectId: string,
+  selected: boolean,
+): readonly string[] {
+  if (selected) return current.includes(defectId) ? current : [...current, defectId];
+  return current.filter((id) => id !== defectId);
+}
+
 function createBugImageKey(file: File): string {
   return `${file.name}\u0000${file.size}\u0000${file.type}\u0000${file.lastModified}`;
 }
@@ -336,6 +353,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [qingyuProjects, setQingyuProjects] = useState<readonly QingyuProject[]>([]);
   const [qingyuProjectId, setQingyuProjectId] = useState("");
   const [qingyuDefects, setQingyuDefects] = useState<readonly QingyuDefect[]>([]);
+  const [qingyuSelectedDefectIds, setQingyuSelectedDefectIds] = useState<readonly string[]>([]);
   const [qingyuBusy, setQingyuBusy] = useState(false);
   const [qingyuError, setQingyuError] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -354,6 +372,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         url: URL.createObjectURL(file),
       })),
     [newFiles],
+  );
+  const qingyuSelectableDefectIds = useMemo(
+    () => selectableQingyuDefectIds(qingyuDefects),
+    [qingyuDefects],
+  );
+  const qingyuSelectedDefectIdSet = useMemo(
+    () => new Set(qingyuSelectedDefectIds),
+    [qingyuSelectedDefectIds],
   );
 
   useEffect(
@@ -445,10 +471,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const loadQingyuDefects = useCallback(async (externalProjectId: string) => {
     if (externalProjectId.length === 0) {
       setQingyuDefects([]);
+      setQingyuSelectedDefectIds([]);
       return;
     }
     const response = await listOwnQingyuDefects(externalProjectId);
     setQingyuDefects(response.defects);
+    const selectableIds = new Set(selectableQingyuDefectIds(response.defects));
+    setQingyuSelectedDefectIds((current) =>
+      current.filter((defectId) => selectableIds.has(defectId)),
+    );
   }, []);
 
   const loadQingyuWorkspace = useCallback(async () => {
@@ -463,6 +494,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const openQingyuImport = async () => {
     setQingyuOpen(true);
+    setQingyuSelectedDefectIds([]);
     setQingyuBusy(true);
     setQingyuError(null);
     try {
@@ -514,11 +546,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   }, [loadQingyuWorkspace, qingyuOpen, qingyuSession]);
 
   const importQingyuBugs = async () => {
-    if (qingyuProjectId.length === 0) return;
+    if (qingyuProjectId.length === 0 || qingyuSelectedDefectIds.length === 0) return;
     setQingyuBusy(true);
     setQingyuError(null);
     try {
-      const result = await importOwnQingyuDefects(qingyuProjectId);
+      const result = await importOwnQingyuDefects(qingyuProjectId, qingyuSelectedDefectIds);
       const created = result.items.filter((item) => item.status === "created").length;
       const existing = result.items.filter((item) => item.status === "already_imported").length;
       const terminal = result.items.filter((item) => item.status === "skipped_terminal").length;
@@ -548,6 +580,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       setQingyuProjects([]);
       setQingyuProjectId("");
       setQingyuDefects([]);
+      setQingyuSelectedDefectIds([]);
     } catch (cause) {
       setQingyuError(messageFor(cause));
     } finally {
@@ -1975,7 +2008,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 <p className="eyebrow">仅导入当前轻语账号负责的单</p>
                 <h2>从轻语导入 Bug</h2>
               </div>
-              <button onClick={() => setQingyuOpen(false)} type="button">
+              <button
+                onClick={() => {
+                  setQingyuOpen(false);
+                  setQingyuSelectedDefectIds([]);
+                }}
+                type="button"
+              >
                 ×
               </button>
             </div>
@@ -2003,6 +2042,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                     onChange={(event) => {
                       const nextProjectId = event.target.value;
                       setQingyuProjectId(nextProjectId);
+                      setQingyuSelectedDefectIds([]);
                       setQingyuBusy(true);
                       setQingyuError(null);
                       void loadQingyuDefects(nextProjectId)
@@ -2019,65 +2059,117 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                   </select>
                 </label>
                 <div className="qingyu-import-summary">
-                  <strong>我的可处理 Bug</strong>
-                  <span>
-                    {
-                      qingyuDefects.filter(
-                        (defect) => defect.actionable && defect.importedBugId === null,
-                      ).length
-                    }{" "}
-                    条待导入 ·{" "}
-                    {qingyuDefects.filter((defect) => defect.importedBugId !== null).length} 条已在
-                    QA Hub
-                  </span>
+                  <div className="qingyu-import-counts">
+                    <strong>我的可处理 Bug</strong>
+                    <span>
+                      {qingyuSelectableDefectIds.length} 条待导入 ·{" "}
+                      {qingyuDefects.filter((defect) => defect.importedBugId !== null).length}{" "}
+                      条已在 QA Hub
+                    </span>
+                  </div>
+                  <div className="qingyu-selection-actions">
+                    <strong>已选择 {qingyuSelectedDefectIds.length} 条</strong>
+                    <button
+                      className="secondary-button"
+                      disabled={
+                        qingyuBusy ||
+                        qingyuSelectableDefectIds.length === 0 ||
+                        qingyuSelectedDefectIds.length === qingyuSelectableDefectIds.length
+                      }
+                      onClick={() => setQingyuSelectedDefectIds(qingyuSelectableDefectIds)}
+                      type="button"
+                    >
+                      全选可导入
+                    </button>
+                    <button
+                      className="secondary-button"
+                      disabled={qingyuBusy || qingyuSelectedDefectIds.length === 0}
+                      onClick={() => setQingyuSelectedDefectIds([])}
+                      type="button"
+                    >
+                      清空
+                    </button>
+                  </div>
                 </div>
                 <div className="qingyu-defect-list">
                   {qingyuBusy && qingyuDefects.length === 0 ? <p>正在读取轻语 Bug…</p> : null}
                   {!qingyuBusy && qingyuDefects.length === 0 ? (
                     <p>这个项目下没有分配给你的 Bug。</p>
                   ) : null}
-                  {qingyuDefects.slice(0, 100).map((defect) => (
-                    <article
-                      className={
-                        !defect.actionable || defect.importedBugId !== null ? "is-muted" : ""
-                      }
-                      key={defect.id}
-                    >
-                      <div>
-                        <strong>
-                          {defect.code === null ? defect.title : `${defect.code} · ${defect.title}`}
-                        </strong>
-                        <span>
-                          {[defect.status, defect.priority, defect.severity]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </span>
-                      </div>
-                      <em>
-                        {defect.importedBugId !== null
-                          ? "已导入"
-                          : defect.actionable
-                            ? "待导入"
-                            : "已结束"}
-                      </em>
-                    </article>
-                  ))}
+                  {qingyuDefects.map((defect) => {
+                    const selectable = defect.actionable && defect.importedBugId === null;
+                    const selected = qingyuSelectedDefectIdSet.has(defect.id);
+                    return (
+                      <article
+                        className={selected ? "is-selected" : selectable ? "" : "is-muted"}
+                        key={defect.id}
+                      >
+                        <label className="qingyu-defect-select">
+                          <input
+                            aria-label={`选择 ${
+                              defect.code === null ? defect.title : `${defect.code} ${defect.title}`
+                            }`}
+                            checked={selected}
+                            disabled={qingyuBusy || !selectable}
+                            onChange={(event) =>
+                              setQingyuSelectedDefectIds((current) =>
+                                updateQingyuDefectSelection(
+                                  current,
+                                  defect.id,
+                                  event.target.checked,
+                                ),
+                              )
+                            }
+                            type="checkbox"
+                          />
+                          <div className="qingyu-defect-copy">
+                            <strong>
+                              {defect.code === null
+                                ? defect.title
+                                : `${defect.code} · ${defect.title}`}
+                            </strong>
+                            <span>
+                              {[defect.status, defect.priority, defect.severity]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </span>
+                          </div>
+                        </label>
+                        <em>
+                          {defect.importedBugId !== null
+                            ? "已导入"
+                            : defect.actionable
+                              ? selected
+                                ? "已选择"
+                                : "待选择"
+                              : "已结束"}
+                        </em>
+                      </article>
+                    );
+                  })}
                 </div>
                 <div className="modal-actions">
                   <button
                     className="secondary-button"
-                    onClick={() => setQingyuOpen(false)}
+                    onClick={() => {
+                      setQingyuOpen(false);
+                      setQingyuSelectedDefectIds([]);
+                    }}
                     type="button"
                   >
                     取消
                   </button>
                   <button
                     className="primary-button"
-                    disabled={qingyuBusy || qingyuProjectId.length === 0}
+                    disabled={
+                      qingyuBusy ||
+                      qingyuProjectId.length === 0 ||
+                      qingyuSelectedDefectIds.length === 0
+                    }
                     onClick={() => void importQingyuBugs()}
                     type="button"
                   >
-                    {qingyuBusy ? "正在导入…" : "一键导入我的 Bug"}
+                    {qingyuBusy ? "正在导入…" : `导入已选 ${qingyuSelectedDefectIds.length} 条`}
                   </button>
                 </div>
               </>
