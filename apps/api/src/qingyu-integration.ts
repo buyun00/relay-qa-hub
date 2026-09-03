@@ -25,6 +25,7 @@ export const QINGYU_PROJECTS_PATH = "/api/v1/integrations/qingyu/projects" as co
 export const QINGYU_DEFECTS_PATH = "/api/v1/integrations/qingyu/defects" as const;
 export const QINGYU_IMPORT_PATH = "/api/v1/integrations/qingyu/import" as const;
 export const QINGYU_BUG_LINK_PATH = "/api/v1/bugs/:bugId/integrations/qingyu" as const;
+export const QINGYU_BUG_RESOLVE_PATH = "/api/v1/bugs/:bugId/integrations/qingyu/resolve" as const;
 
 interface StoredSession {
   readonly actorId: string;
@@ -146,6 +147,7 @@ export interface QingyuIntegration {
   readonly beforeHumanClose: (
     actorId: string,
     bugId: string,
+    options?: { readonly verifyRemote?: boolean },
   ) => Promise<{ readonly link: QingyuBugLink; readonly alreadyResolved: boolean } | null>;
 }
 
@@ -666,11 +668,11 @@ export async function createQingyuIntegration(options: {
       return options.linkStore.getBugLink(bugId);
     },
 
-    async beforeHumanClose(actorId, bugId) {
+    async beforeHumanClose(actorId, bugId, syncOptions = {}) {
       return mutate(async () => {
         const link = await options.linkStore.getBugLink(bugId);
         if (link === null) return null;
-        if (link.syncStatus === "succeeded") {
+        if (link.syncStatus === "succeeded" && syncOptions.verifyRemote !== true) {
           return { link, alreadyResolved: true };
         }
         const session =

@@ -108,11 +108,14 @@ the browser or EXE page; the API stores them in an encrypted server-side state
 file under the active data root. Imported source links and close-sync results are
 stored in SQLite and are therefore included in normal recovery points.
 
-For a linked Bug, a human `确认修复并同步关单` first transitions the original
-Qingyu task to resolved and verifies that remote state, then records the local
-passed Verification. A Qingyu error leaves the QA Hub Verification pending so it
-can be retried safely. MCP and Relay delivery can still reach only `待验收`; they
-cannot trigger either local acceptance or Qingyu closure.
+For a linked Bug, a human acceptance first transitions the original Qingyu task
+to resolved and verifies that remote state, then records the local passed
+Verification. A Qingyu error leaves the QA Hub Verification pending so it can be
+retried safely. MCP and Relay delivery can still reach only `待验收` and cannot
+trigger local acceptance. The desktop MCP also exposes an idempotent
+`qa_resolve_qingyu_bug` recovery action: given a QA Hub number such as `LOCAL-83`,
+it finds the persisted Qingyu link and resolves that upstream Bug without
+changing the QA Hub acceptance state.
 
 The default Qingyu endpoint is `https://50qweb.jiaxianghudong.com`. Server
 operators may override it with `QA_HUB_QINGYU_BASE_URL`. The encrypted session

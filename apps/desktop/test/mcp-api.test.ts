@@ -65,6 +65,7 @@ function bug(state: string, version: number, ownerId: string | null): Record<str
   return {
     id: BUG_ID,
     projectId: PROJECT_ID,
+    number: 1,
     key: "LOCAL-1",
     title: "MCP test bug",
     description: "broken",
@@ -90,6 +91,50 @@ test("qa_list_bugs defaults to current non-terminal items and can scope owner to
   };
   assert.equal(result.count, 1);
   assert.equal(result.items[0]?.["state"], "reported");
+});
+
+test("qa_resolve_qingyu_bug finds a QA Hub number and resolves its persisted Qingyu link", async () => {
+  const api = new ScriptedApi();
+  const selectedBug = { ...bug("closed", 9, USER_ID), number: 83, key: "LOCAL-83" };
+  const link = {
+    bugId: BUG_ID,
+    defectId: "6715",
+    defectCode: "BUG-6715",
+    defectTitle: "按钮无响应",
+    defectUrl: "https://qingyu.example.test/tasks/6715",
+    syncStatus: "succeeded",
+    externalStatus: "已解决",
+    syncedAt: "2026-08-28T02:00:00.000Z",
+  };
+  api.queue("GET", "/api/v1/bugs?limit=500&q=83", {
+    snapshotSequence: 9,
+    items: [selectedBug],
+    nextCursor: null,
+  });
+  api.queue("POST", `/api/v1/bugs/${BUG_ID}/integrations/qingyu/resolve`, {
+    bug: selectedBug,
+    link,
+    alreadyResolved: false,
+  });
+  const tools = new QaHubMcpTools(api, path.join(tmpdir(), "unused-qa-hub-cache"));
+
+  const result = (await tools.call("qa_resolve_qingyu_bug", { bugNumber: 83 })) as {
+    defectId: string;
+    externalStatus: string;
+    qaHubStateChanged: boolean;
+    outcome: string;
+  };
+
+  assert.equal(result.defectId, "6715");
+  assert.equal(result.externalStatus, "已解决");
+  assert.equal(result.qaHubStateChanged, false);
+  assert.match(result.outcome, /6715.*已解决/u);
+  const definition = tools.definitions.find((item) => item.name === "qa_resolve_qingyu_bug");
+  assert.equal(definition?.annotations.openWorldHint, true);
+  assert.equal(definition?.annotations.destructiveHint, true);
+  const mutation = api.calls.find((call) => call.request.method === "POST");
+  assert.equal(mutation?.pathname, `/api/v1/bugs/${BUG_ID}/integrations/qingyu/resolve`);
+  assert.equal(mutation?.request.headers?.["Idempotency-Key"], `mcp:resolveQingyu:bug:${BUG_ID}`);
 });
 
 test("qa_begin_fix claims an unassigned Bug and follows the existing ready/attempt/start chain", async () => {

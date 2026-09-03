@@ -323,9 +323,13 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
   assert.equal(resolveCalls, 1);
   assert.equal((await integration.getBugLink(bugId)).externalStatus, "已解决");
   assert.equal(isActionableQingyuDefect({ status: "已解决", statusKey: "RESOLVED" }), false);
+
+  const checkedAgain = await integration.beforeHumanClose(actorId, bugId, { verifyRemote: true });
+  assert.equal(checkedAgain.alreadyResolved, true);
+  assert.equal(resolveCalls, 2);
 });
 
-test("unassigned project member resolves Qingyu and closes without identity checks", async () => {
+test("passed acceptance automatically resolves Qingyu before closing without identity checks", async () => {
   const actorId = "10000000-0000-4000-8000-000000000003";
   const bugId = "20000000-0000-4000-8000-000000000001";
   const verificationId = "30000000-0000-4000-8000-000000000001";
@@ -465,5 +469,103 @@ test("unassigned project member resolves Qingyu and closes without identity chec
   const succeeded = await request();
   assert.equal(succeeded.statusCode, 200);
   assert.deepEqual(order, ["qingyu", "qingyu", "local"]);
+  await app.close();
+});
+
+test("explicit Qingyu resolve API reuses the verified linked-Bug synchronization", async () => {
+  const actorId = "10000000-0000-4000-8000-000000000003";
+  const bugId = "20000000-0000-4000-8000-000000000001";
+  const bug = {
+    id: bugId,
+    projectId: "10000000-0000-4000-8000-000000000004",
+    number: 83,
+    key: "LOCAL-83",
+    title: "按钮无响应",
+    state: "closed",
+    version: 9,
+  };
+  const link = {
+    bugId,
+    qaProjectId: bug.projectId,
+    externalProjectId: "project-3",
+    defectId: "6715",
+    defectCode: "BUG-6715",
+    defectTitle: "按钮无响应",
+    defectUrl: "https://qingyu.example.test/tasks/6715",
+    importedByActorId: actorId,
+    qingyuUserId: "7",
+    qingyuUserName: "测试用户",
+    importedAt: "2026-08-28T01:00:00.000Z",
+    syncStatus: "succeeded",
+    syncAttempts: 1,
+    syncedAt: "2026-08-28T02:00:00.000Z",
+    externalStatus: "已解决",
+    lastSyncErrorCode: null,
+    lastSyncErrorMessage: null,
+    lastSyncAt: "2026-08-28T02:00:00.000Z",
+    version: 2,
+  };
+  const calls = [];
+  const app = createApiApp({
+    logger: false,
+    mobileBugStore: {
+      async getBug(query) {
+        assert.equal(query.actorId, actorId);
+        assert.equal(query.bugId, bugId);
+        return bug;
+      },
+      async createBug() {
+        throw new Error("not used");
+      },
+      async listBugs() {
+        throw new Error("not used");
+      },
+      async updateBug() {
+        throw new Error("not used");
+      },
+    },
+    qingyuIntegration: {
+      async beforeHumanClose(requestedActorId, requestedBugId, options) {
+        calls.push({ actorId: requestedActorId, bugId: requestedBugId, options });
+        return { link, alreadyResolved: false };
+      },
+      session() {
+        throw new Error("not used");
+      },
+      startLogin() {
+        throw new Error("not used");
+      },
+      pollLogin() {
+        throw new Error("not used");
+      },
+      logout() {
+        throw new Error("not used");
+      },
+      listProjects() {
+        throw new Error("not used");
+      },
+      listOwnDefects() {
+        throw new Error("not used");
+      },
+      importOwnDefects() {
+        throw new Error("not used");
+      },
+      getBugLink() {
+        return link;
+      },
+    },
+  });
+
+  const response = await app.inject({
+    method: "POST",
+    url: `/api/v1/bugs/${bugId}/integrations/qingyu/resolve`,
+    headers: { authorization: "Bearer relay-qa-hub-local-debug" },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(calls, [{ actorId, bugId, options: { verifyRemote: true } }]);
+  assert.equal(response.json().bug.key, "LOCAL-83");
+  assert.equal(response.json().link.defectId, "6715");
+  assert.equal(response.json().link.externalStatus, "已解决");
   await app.close();
 });

@@ -159,6 +159,7 @@ import {
 } from "./mobile-relay-webhook.js";
 import {
   QINGYU_BUG_LINK_PATH,
+  QINGYU_BUG_RESOLVE_PATH,
   QINGYU_DEFECTS_PATH,
   QINGYU_IMPORT_PATH,
   QINGYU_LOGIN_START_PATH,
@@ -722,6 +723,29 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         const bugId = requireVerificationUuid(request.params.bugId, "bugId");
         return { link: await qingyuIntegration.getBugLink(bugId) };
       }),
+    );
+    app.post<{ Params: { readonly bugId: string } }>(
+      QINGYU_BUG_RESOLVE_PATH,
+      async (request, reply) =>
+        qingyuReply(reply, async () => {
+          const actorId = qingyuActor(request);
+          const bugId = requireVerificationUuid(request.params.bugId, "bugId");
+          const bug = await mobileBugStore.getBug({ actorId, bugId });
+          if (bug === null) {
+            throw new QingyuError(404, "QINGYU_BUG_NOT_FOUND", "没有找到这个 QA Hub 单子");
+          }
+          const resolution = await qingyuIntegration.beforeHumanClose(actorId, bugId, {
+            verifyRemote: true,
+          });
+          if (resolution === null) {
+            throw new QingyuError(
+              404,
+              "QINGYU_LINK_NOT_FOUND",
+              `QA Hub 单子 ${bug.key} 没有关联的轻语单`,
+            );
+          }
+          return { bug, ...resolution };
+        }),
     );
   }
 

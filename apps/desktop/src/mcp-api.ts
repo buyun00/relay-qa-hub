@@ -310,6 +310,12 @@ const SAFE_WRITE = Object.freeze({
   idempotentHint: true,
   openWorldHint: false,
 });
+const EXTERNAL_STATE_WRITE = Object.freeze({
+  readOnlyHint: false,
+  destructiveHint: true,
+  idempotentHint: true,
+  openWorldHint: true,
+});
 
 export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
   {
@@ -439,6 +445,27 @@ export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
     },
     annotations: SAFE_WRITE,
   },
+  {
+    name: "qa_resolve_qingyu_bug",
+    title: "按 QA Hub 单号解决关联轻语单",
+    description:
+      "输入 QA Hub 单号（例如 LOCAL-83 或 83），定位唯一单子和它关联的轻语 Bug，并把轻语状态改为“已解决”后回读确认。此工具只补做轻语同步，不会跳过或改写 QA Hub 的人工验收状态。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        bugNumber: {
+          oneOf: [
+            { type: "string", minLength: 1, maxLength: 100 },
+            { type: "integer", minimum: 1 },
+          ],
+        },
+        projectId: { type: "string", format: "uuid" },
+      },
+      required: ["bugNumber"],
+      additionalProperties: false,
+    },
+    annotations: EXTERNAL_STATE_WRITE,
+  },
 ]);
 
 function requireRecord(value: unknown, label: string): Record<string, unknown> {
@@ -487,6 +514,15 @@ function requireUuid(record: Record<string, unknown>, key: string): string {
   const value = requireString(record, key, 36, 36).toLowerCase();
   if (!UUID_PATTERN.test(value)) throw new QaHubMcpError("INVALID_ARGUMENTS", `${key} is invalid`);
   return value;
+}
+
+function requireBugNumber(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  if (Number.isSafeInteger(value) && (value as number) > 0) return String(value);
+  if (typeof value !== "string" || value.trim().length < 1 || value.length > 100) {
+    throw new QaHubMcpError("INVALID_ARGUMENTS", `${key} is invalid`);
+  }
+  return value.trim();
 }
 
 function requirePrincipal(value: unknown): Record<string, unknown> {
@@ -638,6 +674,54 @@ export class QaHubMcpTools {
       count: filtered.length,
       terminalItemsExcluded: !(includeTerminal || state !== undefined),
     };
+  }
+
+  private async bugByNumber(
+    reference: string,
+    projectId?: string,
+  ): Promise<Record<string, unknown>> {
+    if (UUID_PATTERN.test(reference)) {
+      const bug = await this.getBug(reference.toLowerCase());
+      if (projectId !== undefined && bug["projectId"] !== projectId) {
+        throw new QaHubMcpError(
+          "BUG_NOT_FOUND",
+          "The QA Hub Bug does not belong to the requested project",
+          404,
+        );
+      }
+      return bug;
+    }
+    const query = new URLSearchParams({ limit: "500", q: reference });
+    if (projectId !== undefined) query.set("projectId", projectId);
+    const response = requireRecord(await this.api.json(`/api/v1/bugs?${query.toString()}`), "bugs");
+    const items = response["items"];
+    if (!Array.isArray(items)) {
+      throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "Bug list items are invalid");
+    }
+    const normalized = reference.toUpperCase();
+    const numeric = /^\d+$/u.test(reference) ? Number(reference) : null;
+    const matches = items
+      .map((item) => bugRecord(item))
+      .filter(
+        (item) =>
+          String(item["key"]).toUpperCase() === normalized ||
+          (numeric !== null && Number.isSafeInteger(numeric) && item["number"] === numeric),
+      );
+    if (matches.length === 0) {
+      throw new QaHubMcpError(
+        "BUG_NOT_FOUND",
+        `No visible QA Hub Bug exactly matches ${reference}`,
+        404,
+      );
+    }
+    if (matches.length > 1) {
+      throw new QaHubMcpError(
+        "BUG_NUMBER_AMBIGUOUS",
+        `More than one visible QA Hub Bug matches ${reference}; provide its full key and projectId`,
+        409,
+      );
+    }
+    return matches[0]!;
   }
 
   private async bugContext(argumentsValue: unknown): Promise<unknown> {
@@ -1068,6 +1152,57 @@ export class QaHubMcpTools {
     };
   }
 
+  private async resolveQingyuBug(argumentsValue: unknown): Promise<unknown> {
+    const input = requireRecord(argumentsValue, "arguments");
+    onlyKeys(input, ["bugNumber", "projectId"]);
+    const reference = requireBugNumber(input, "bugNumber");
+    const projectId =
+      input["projectId"] === undefined ? undefined : requireUuid(input, "projectId");
+    const selectedBug = await this.bugByNumber(reference, projectId);
+    const bugId = requireUuid(selectedBug, "id");
+    const resolution = requireRecord(
+      await this.api.json(`/api/v1/bugs/${encodeURIComponent(bugId)}/integrations/qingyu/resolve`, {
+        method: "POST",
+        headers: {
+          "Idempotency-Key": `mcp:resolveQingyu:bug:${bugId}`,
+        },
+      }),
+      "qingyuResolution",
+    );
+    const resolvedBug = bugRecord(resolution["bug"]);
+    if (resolvedBug["id"] !== bugId) {
+      throw new QaHubMcpError(
+        "QA_HUB_INVALID_RESPONSE",
+        "Qingyu resolution returned a different QA Hub Bug",
+      );
+    }
+    const link = requireRecord(resolution["link"], "qingyuLink");
+    const defectId = requireString(link, "defectId", 1, 200);
+    const externalStatus = requireString(link, "externalStatus", 1, 200);
+    if (link["syncStatus"] !== "succeeded") {
+      throw new QaHubMcpError(
+        "QINGYU_RESOLUTION_NOT_VERIFIED",
+        "QA Hub did not persist a verified Qingyu resolution",
+        409,
+      );
+    }
+    if (typeof resolution["alreadyResolved"] !== "boolean") {
+      throw new QaHubMcpError(
+        "QA_HUB_INVALID_RESPONSE",
+        "Qingyu resolution replay status is invalid",
+      );
+    }
+    return {
+      bug: resolvedBug,
+      qingyuLink: link,
+      defectId,
+      externalStatus,
+      alreadyResolved: resolution["alreadyResolved"],
+      qaHubStateChanged: false,
+      outcome: `轻语单 ${defectId} 已确认状态为“${externalStatus}”`,
+    };
+  }
+
   async call(name: string, argumentsValue: unknown): Promise<unknown> {
     switch (name) {
       case "qa_list_projects": {
@@ -1088,6 +1223,8 @@ export class QaHubMcpTools {
         return this.addComment(argumentsValue);
       case "qa_submit_fix":
         return this.submitFix(argumentsValue);
+      case "qa_resolve_qingyu_bug":
+        return this.resolveQingyuBug(argumentsValue);
       default:
         throw new QaHubMcpError("TOOL_NOT_FOUND", `Unknown QA Hub MCP tool: ${name}`, 404);
     }

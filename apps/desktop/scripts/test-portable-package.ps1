@@ -183,7 +183,8 @@ try {
     "qa_materialize_attachment",
     "qa_begin_fix",
     "qa_add_comment",
-    "qa_submit_fix"
+    "qa_submit_fix",
+    "qa_resolve_qingyu_bug"
   )
   if ((@($mcpTools.result.tools.name) -join "|") -ne ($expectedMcpTools -join "|")) {
     throw "Packaged EXE MCP tool list is incomplete"
