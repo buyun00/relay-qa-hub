@@ -67,6 +67,7 @@ import {
 } from "./api";
 import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
 import OverviewPage, { formatOverviewDateLabel, type OverviewDateBucket } from "./OverviewPage";
+import UserManagementPage from "./UserManagementPage";
 import {
   TASK_STATUS_ORDER,
   taskStatusCopy,
@@ -80,7 +81,7 @@ const DEFAULT_PROJECT_ID =
   import.meta.env.VITE_QA_HUB_PROJECT_ID ?? "10000000-0000-4000-8000-000000000004";
 
 type Category = TaskStatus;
-type WorkspaceView = "workbench" | "overview";
+type WorkspaceView = "workbench" | "overview" | "users";
 
 interface AppProps {
   readonly principal: BrowserSessionPrincipal;
@@ -332,6 +333,18 @@ function formatTime(value: string): string {
       }).format(date);
 }
 
+function canonicalProjectMemberId(
+  members: readonly ProjectMember[],
+  userId: string | null,
+): string | null {
+  if (userId === null) return null;
+  return (
+    members.find(
+      (member) => member.userId === userId || member.linkedUserIds?.includes(userId) === true,
+    )?.userId ?? userId
+  );
+}
+
 function messageFor(cause: unknown): string {
   if (cause instanceof QaHubApiError) {
     const qingyuMessages: Readonly<Record<string, string>> = {
@@ -442,6 +455,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const detailBugIdRef = useRef<string | null>(null);
   const selectedIdRef = useRef<string | null>(null);
   const [overviewRevision, setOverviewRevision] = useState(0);
+  const [userManagementRevision, setUserManagementRevision] = useState(0);
 
   const newFilePreviews = useMemo(
     () =>
@@ -495,7 +509,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     (id: string | null): string => {
       if (id === null) return "未分配";
       if (id === principal.userId) return principal.displayName;
-      return members.find((member) => member.userId === id)?.displayName ?? id.slice(0, 8);
+      return (
+        members.find(
+          (member) => member.userId === id || member.linkedUserIds?.includes(id) === true,
+        )?.displayName ?? id.slice(0, 8)
+      );
     },
     [members, principal.displayName, principal.userId],
   );
@@ -524,6 +542,16 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       );
     }
   }, [newOwnerId, newVerifierId, owners, principal.userId, verifiers]);
+
+  useEffect(() => {
+    if (scopeId === "team" || scopeId === principal.userId) return;
+    const canonicalScopeId = canonicalProjectMemberId(members, scopeId);
+    if (canonicalScopeId !== scopeId) {
+      setScopeId(canonicalScopeId ?? principal.userId);
+    } else if (!members.some((member) => member.userId === scopeId)) {
+      setScopeId(principal.userId);
+    }
+  }, [members, principal.userId, scopeId]);
 
   const loadProjects = useCallback(async () => {
     const response = await listVisibleProjects();
@@ -774,8 +802,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         setQingyuLink(nextQingyuLink);
         setModules(moduleResponse.items.filter((item) => item.active));
         setDetailAttachmentIds(attachmentResponse.items.map((item) => item.attachmentId));
-        setOwnerId(nextDetail.ownerId ?? "");
-        setVerifierId(nextDetail.verificationOwnerId ?? nextDetail.reporterId);
+        setOwnerId(canonicalProjectMemberId(members, nextDetail.ownerId) ?? "");
+        setVerifierId(
+          canonicalProjectMemberId(
+            members,
+            nextDetail.verificationOwnerId ?? nextDetail.reporterId,
+          ) ?? nextDetail.reporterId,
+        );
 
         const imageResults = await Promise.allSettled(
           attachmentResponse.items
@@ -856,7 +889,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         if (requestId === detailRequestRef.current) setDetailLoading(false);
       }
     },
-    [clearEvidence],
+    [clearEvidence, members],
   );
 
   useEffect(() => {
@@ -1400,7 +1433,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   };
 
   const canManageDetail = detail !== null && mutation === null;
-  const isOwner = detail?.ownerId === principal.userId;
+  const isOwner = canonicalProjectMemberId(members, detail?.ownerId ?? null) === principal.userId;
   const repairAttempt = workflow?.repairAttempt ?? null;
   const verification = workflow?.verification ?? null;
   const previousAttemptFailed = repairAttempt?.status === "verification_failed";
@@ -1436,6 +1469,16 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span className="nav-icon">▤</span>
             <span>总览</span>
             <span className="nav-count">全部</span>
+          </button>
+          <button
+            aria-current={view === "users" ? "page" : undefined}
+            className={`nav-item${view === "users" ? " is-active" : ""}`}
+            onClick={() => setView("users")}
+            type="button"
+          >
+            <span className="nav-icon">♙</span>
+            <span>用户管理</span>
+            <span className="nav-count">{members.length}</span>
           </button>
           {view === "overview" ? (
             <div aria-label="总览日期分页" className="overview-date-nav">
@@ -1501,7 +1544,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           <div className="breadcrumb">
             <strong>{currentProject?.name ?? "QA Hub"}</strong>
             <span>/</span>
-            <span>{view === "workbench" ? "工作台" : `总览 · ${overviewDateLabel}`}</span>
+            <span>
+              {view === "workbench"
+                ? "工作台"
+                : view === "overview"
+                  ? `总览 · ${overviewDateLabel}`
+                  : "用户管理"}
+            </span>
           </div>
           {view === "workbench" ? (
             <label className="global-search">
@@ -1515,8 +1564,10 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               />
               <kbd>Ctrl K</kbd>
             </label>
-          ) : (
+          ) : view === "overview" ? (
             <div className="overview-topbar-copy">{overviewDateLabel} · 表格视图</div>
+          ) : (
+            <div className="overview-topbar-copy">关联重复账号或停用多余用户</div>
           )}
           <button
             aria-label="刷新"
@@ -1524,7 +1575,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             disabled={refreshing}
             onClick={() => {
               if (view === "workbench") void loadWorkbench(true);
-              else setOverviewRevision((value) => value + 1);
+              else if (view === "overview") setOverviewRevision((value) => value + 1);
+              else setUserManagementRevision((value) => value + 1);
             }}
             type="button"
           >
@@ -1669,7 +1721,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               </div>
             </section>
           </main>
-        ) : (
+        ) : view === "overview" ? (
           <OverviewPage
             members={members}
             onCreateBug={openCreateBug}
@@ -1683,6 +1735,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             projectId={projectId}
             refreshToken={overviewRevision}
             selectedDate={overviewDate}
+          />
+        ) : (
+          <UserManagementPage
+            currentUserId={principal.userId}
+            onChanged={() => void loadWorkbench(true, false)}
+            projectId={projectId}
+            refreshRevision={userManagementRevision}
           />
         )}
       </section>

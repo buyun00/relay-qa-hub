@@ -35,6 +35,7 @@ describe("Relay QA Hub browser workbench", () => {
     expect(markup).toContain("统一事实源已连接");
     expect(markup).toContain("工作台");
     expect(markup).toContain("总览");
+    expect(markup).toContain("用户管理");
     expect(markup).toContain("待处理");
     expect(markup).toContain("处理中");
     expect(markup).toContain("已完成待验收");

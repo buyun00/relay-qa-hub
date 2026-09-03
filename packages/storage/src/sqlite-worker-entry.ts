@@ -145,6 +145,17 @@ import {
   type NewBugStorageRecord,
 } from "./sqlite.js";
 import { createSqliteOnlineBackup, type CreateSqliteOnlineBackupInput } from "./sqlite-backup.js";
+import {
+  disableManagedUser,
+  linkManagedUser,
+  listActiveUserIdentityLinks,
+  listManagedUsers,
+  unlinkManagedUser,
+  type DisableManagedUserInput,
+  type LinkManagedUserInput,
+  type ListManagedUsersInput,
+  type UnlinkManagedUserInput,
+} from "./user-management-store.js";
 
 interface WorkerConfiguration {
   readonly databaseFile: string;
@@ -165,6 +176,11 @@ interface WorkerRequest {
     | "ensureMobileScope"
     | "ensureBrowserAdmin"
     | "listActiveAccountUsers"
+    | "listActiveUserIdentityLinks"
+    | "listManagedUsers"
+    | "linkManagedUser"
+    | "unlinkManagedUser"
+    | "disableManagedUser"
     | "loginBrowserSession"
     | "createBrowserSession"
     | "resolveBrowserSession"
@@ -331,6 +347,32 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 
   if (request.operation === "listActiveAccountUsers") {
     return listActiveAccountUsers(requireDatabase(), request.payload as string);
+  }
+
+  if (request.operation === "listActiveUserIdentityLinks") {
+    return listActiveUserIdentityLinks(requireDatabase(), request.payload as string);
+  }
+
+  if (request.operation === "listManagedUsers") {
+    return listManagedUsers(requireDatabase(), request.payload as ListManagedUsersInput);
+  }
+
+  if (request.operation === "linkManagedUser") {
+    return inWriteTransaction((current) =>
+      linkManagedUser(current, request.payload as LinkManagedUserInput),
+    );
+  }
+
+  if (request.operation === "unlinkManagedUser") {
+    return inWriteTransaction((current) =>
+      unlinkManagedUser(current, request.payload as UnlinkManagedUserInput),
+    );
+  }
+
+  if (request.operation === "disableManagedUser") {
+    return inWriteTransaction((current) =>
+      disableManagedUser(current, request.payload as DisableManagedUserInput),
+    );
   }
 
   if (request.operation === "loginBrowserSession") {

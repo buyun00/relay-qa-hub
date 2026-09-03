@@ -84,6 +84,12 @@ export class QaLoginDirectory {
   readonly #canonicalByDisplayName = new Map<string, QaUserIdentity>();
   readonly #canonicalById = new Map<string, QaUserIdentity>();
   readonly #canonicalByPinyin = new Map<string, QaUserIdentity | null>();
+  readonly #linkedByDisplayName = new Map<string, QaUserIdentity>();
+  readonly #linkedById = new Map<string, QaUserIdentity>();
+  readonly #linksBySourceId = new Map<
+    string,
+    { readonly sourceKey: string; readonly canonical: QaUserIdentity }
+  >();
 
   constructor(identities: readonly QaUserIdentity[] = []) {
     for (const identity of identities) this.register(identity);
@@ -111,6 +117,8 @@ export class QaLoginDirectory {
 
   resolveLogin(loginName: string): QaUserIdentity | undefined {
     const normalized = normalizeQaLoginName(loginName);
+    const linked = this.#linkedByDisplayName.get(normalized.key);
+    if (linked !== undefined) return linked;
     const exact = this.#canonicalByDisplayName.get(normalized.key);
     if (exact !== undefined) return exact;
     const alias = pinyinLoginKey(normalized.key);
@@ -119,11 +127,48 @@ export class QaLoginDirectory {
   }
 
   canonicalize(identity: QaUserIdentity): QaUserIdentity {
+    const linked = this.#linkedById.get(identity.id);
+    if (linked !== undefined) return linked;
     const byId = this.#canonicalById.get(identity.id);
     if (byId !== undefined) return byId;
     return this.resolveLogin(identity.displayName) ?? identity;
   }
 
+  registerLink(source: QaUserIdentity, canonical: QaUserIdentity): void {
+    if (source.id === canonical.id) throw new TypeError("identity link cannot target itself");
+    const sourceName = normalizeQaLoginName(source.displayName);
+    const canonicalName = normalizeQaLoginName(canonical.displayName);
+    const storedCanonical = Object.freeze({
+      id: canonical.id,
+      displayName: canonicalName.displayName,
+    });
+    this.removeLink(source.id);
+    this.#linkedById.set(source.id, storedCanonical);
+    this.#linkedByDisplayName.set(sourceName.key, storedCanonical);
+    this.#linksBySourceId.set(source.id, {
+      sourceKey: sourceName.key,
+      canonical: storedCanonical,
+    });
+  }
+
+  removeLink(sourceId: string): void {
+    const existing = this.#linksBySourceId.get(sourceId);
+    if (existing === undefined) return;
+    this.#linksBySourceId.delete(sourceId);
+    this.#linkedById.delete(sourceId);
+    if (this.#linkedByDisplayName.get(existing.sourceKey)?.id === existing.canonical.id) {
+      this.#linkedByDisplayName.delete(existing.sourceKey);
+    }
+  }
+
+  linkedUserIds(canonicalUserId: string): readonly string[] {
+    return Object.freeze(
+      [...this.#linksBySourceId.entries()]
+        .filter(([, link]) => link.canonical.id === canonicalUserId)
+        .map(([sourceUserId]) => sourceUserId)
+        .sort(),
+    );
+  }
 }
 
 export function qaLoginEmail(accountId: string, loginName: string): string {

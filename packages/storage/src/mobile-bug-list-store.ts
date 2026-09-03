@@ -182,8 +182,16 @@ export function listMobileBugs(database: DatabaseSync, input: ListMobileBugsInpu
   ];
   const parameters: SQLInputValue[] = [input.accountId, input.projectId];
   if (input.ownerId !== undefined) {
-    conditions.push("owner_id = ?");
-    parameters.push(input.ownerId);
+    conditions.push(
+      `(owner_id = ? OR owner_id IN (
+        SELECT source_user_id
+        FROM user_identity_links
+        WHERE account_id = bugs.account_id
+          AND canonical_user_id = ?
+          AND status = 'active'
+      ))`,
+    );
+    parameters.push(input.ownerId, input.ownerId);
   }
   if (input.ownerState === "assigned") conditions.push("owner_id IS NOT NULL");
   if (input.ownerState === "unassigned") conditions.push("owner_id IS NULL");

@@ -227,11 +227,24 @@ export default function OverviewPage({
     () => members.filter((member) => member.active && member.roles.includes("verifier")),
     [members],
   );
+  const memberId = useCallback(
+    (userId: string | null): string | null => {
+      if (userId === null) return null;
+      return (
+        members.find(
+          (member) => member.userId === userId || member.linkedUserIds?.includes(userId) === true,
+        )?.userId ?? userId
+      );
+    },
+    [members],
+  );
   const memberName = useCallback(
     (userId: string | null) =>
       userId === null
         ? "未分配"
-        : (members.find((member) => member.userId === userId)?.displayName ?? userId.slice(0, 8)),
+        : (members.find(
+            (member) => member.userId === userId || member.linkedUserIds?.includes(userId) === true,
+          )?.displayName ?? userId.slice(0, 8)),
     [members],
   );
 
@@ -440,8 +453,8 @@ export default function OverviewPage({
 
   const verifierOptionsFor = (bug: BugListItem) => {
     const candidateIds = [
-      bug.verificationOwnerId,
-      bug.reporterId,
+      memberId(bug.verificationOwnerId),
+      memberId(bug.reporterId),
       principal.userId,
       ...activeVerifiers.map((member) => member.userId),
     ];
@@ -596,7 +609,9 @@ export default function OverviewPage({
           </div>
         ) : null}
         {visibleItems.map((bug) => {
-          const effectiveVerifierId = bug.verificationOwnerId ?? bug.reporterId;
+          const effectiveOwnerId = memberId(bug.ownerId);
+          const effectiveVerifierId =
+            memberId(bug.verificationOwnerId ?? bug.reporterId) ?? bug.reporterId;
           return (
             <div
               className={`overview-grid${bug.ownerId === null ? " is-unassigned" : ""}`}
@@ -642,7 +657,7 @@ export default function OverviewPage({
                   aria-label={`设置 ${bug.key} 负责人`}
                   disabled={mutatingId === bug.id}
                   onChange={(event) => void assignOwner(bug, event.target.value || null)}
-                  value={bug.ownerId ?? ""}
+                  value={effectiveOwnerId ?? ""}
                 >
                   <option value="">未分配</option>
                   {activeFixers.map((member) => (

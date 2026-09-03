@@ -7342,6 +7342,116 @@ BEGIN
 END;
 `;
 
+const USER_IDENTITY_MANAGEMENT_SQL = String.raw`
+CREATE TABLE user_identity_links (
+  id TEXT PRIMARY KEY CHECK (length(id) = 36),
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  source_user_id TEXT NOT NULL CHECK (length(source_user_id) = 36),
+  canonical_user_id TEXT NOT NULL CHECK (length(canonical_user_id) = 36),
+  status TEXT NOT NULL CHECK (status IN ('active', 'revoked')),
+  created_by_user_id TEXT NOT NULL CHECK (length(created_by_user_id) = 36),
+  created_at TEXT NOT NULL CHECK (length(created_at) >= 20),
+  revoked_by_user_id TEXT CHECK (revoked_by_user_id IS NULL OR length(revoked_by_user_id) = 36),
+  revoked_at TEXT,
+  version INTEGER NOT NULL CHECK (version >= 1),
+  CHECK (source_user_id <> canonical_user_id),
+  CHECK ((status = 'active') = (revoked_at IS NULL AND revoked_by_user_id IS NULL)),
+  FOREIGN KEY (account_id, source_user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, canonical_user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, created_by_user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, revoked_by_user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, id)
+) STRICT;
+
+CREATE UNIQUE INDEX user_identity_links_active_source_idx
+  ON user_identity_links(account_id, source_user_id)
+  WHERE status = 'active';
+
+CREATE INDEX user_identity_links_active_canonical_idx
+  ON user_identity_links(account_id, canonical_user_id, source_user_id)
+  WHERE status = 'active';
+
+CREATE TABLE user_management_events (
+  id TEXT PRIMARY KEY CHECK (length(id) = 36),
+  account_id TEXT NOT NULL CHECK (length(account_id) = 36),
+  project_id TEXT NOT NULL CHECK (length(project_id) = 36),
+  actor_user_id TEXT NOT NULL CHECK (length(actor_user_id) = 36),
+  subject_user_id TEXT NOT NULL CHECK (length(subject_user_id) = 36),
+  action TEXT NOT NULL CHECK (action IN ('identity_linked', 'identity_unlinked', 'user_disabled')),
+  related_user_id TEXT CHECK (related_user_id IS NULL OR length(related_user_id) = 36),
+  created_at TEXT NOT NULL CHECK (length(created_at) >= 20),
+  FOREIGN KEY (account_id, project_id)
+    REFERENCES projects(account_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, actor_user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, subject_user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  FOREIGN KEY (account_id, related_user_id)
+    REFERENCES users(account_id, id) ON DELETE RESTRICT,
+  UNIQUE (account_id, id)
+) STRICT;
+
+CREATE INDEX user_management_events_subject_idx
+  ON user_management_events(account_id, project_id, subject_user_id, created_at DESC);
+
+CREATE TRIGGER user_identity_links_initial_guard
+BEFORE INSERT ON user_identity_links
+WHEN new.status <> 'active'
+  OR new.version <> 1
+  OR new.revoked_at IS NOT NULL
+  OR new.revoked_by_user_id IS NOT NULL
+  OR NOT EXISTS (
+    SELECT 1 FROM users AS actor
+    WHERE actor.account_id = new.account_id
+      AND actor.id = new.created_by_user_id
+      AND actor.status = 'active'
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'user identity link must begin active at version one');
+END;
+
+CREATE TRIGGER user_identity_links_transition_guard
+BEFORE UPDATE ON user_identity_links
+WHEN NOT (
+  old.status = 'active'
+  AND new.status = 'revoked'
+  AND new.id IS old.id
+  AND new.account_id IS old.account_id
+  AND new.source_user_id IS old.source_user_id
+  AND new.canonical_user_id IS old.canonical_user_id
+  AND new.created_by_user_id IS old.created_by_user_id
+  AND new.created_at IS old.created_at
+  AND new.revoked_by_user_id IS NOT NULL
+  AND unixepoch(new.revoked_at) IS NOT NULL
+  AND new.version = old.version + 1
+)
+BEGIN
+  SELECT RAISE(ABORT, 'user identity links are revoked by an exact one-way transition');
+END;
+
+CREATE TRIGGER user_identity_links_no_delete
+BEFORE DELETE ON user_identity_links
+BEGIN
+  SELECT RAISE(ABORT, 'user identity link history is append-only');
+END;
+
+CREATE TRIGGER user_management_events_no_update
+BEFORE UPDATE ON user_management_events
+BEGIN
+  SELECT RAISE(ABORT, 'user management events are immutable');
+END;
+
+CREATE TRIGGER user_management_events_no_delete
+BEFORE DELETE ON user_management_events
+BEGIN
+  SELECT RAISE(ABORT, 'user management events are append-only');
+END;
+`;
+
 function migration(version: number, name: string, sql: string): SqliteMigration {
   const normalizedSql = `${sql.trim()}\n`;
   return Object.freeze({
@@ -7362,6 +7472,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(7, "shared_project_bug_management", SHARED_PROJECT_BUG_MANAGEMENT_SQL),
   migration(8, "three_state_task_completion", THREE_STATE_TASK_COMPLETION_SQL),
   migration(9, "editable_bug_attachments", EDITABLE_BUG_ATTACHMENTS_SQL),
+  migration(10, "user_identity_management", USER_IDENTITY_MANAGEMENT_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

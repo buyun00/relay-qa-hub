@@ -30,6 +30,7 @@ export interface MobileProjectMember {
   readonly projectId: string;
   readonly displayName: string;
   readonly roles: readonly MobileProjectRole[];
+  readonly linkedUserIds?: readonly string[];
   readonly active: true;
 }
 

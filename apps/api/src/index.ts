@@ -187,6 +187,19 @@ export {
   parseMobileProjectDirectoryListQuery,
   requireMobileProjectUuid,
 } from "./mobile-project-directory.js";
+export {
+  MOBILE_MANAGED_USER_COLLECTION_PATH,
+  MOBILE_MANAGED_USER_ITEM_PATH,
+  MOBILE_USER_IDENTITY_LINK_PATH,
+  parseIdentityLinkRequest,
+  parseManagedUserListQuery,
+} from "./mobile-user-management.js";
+export type {
+  ManagedProjectUser,
+  ManagedProjectUserList,
+  MobileUserManagementStore,
+} from "./mobile-user-management.js";
+export { createSqliteMobileUserManagementStore } from "./sqlite-mobile-user-management-store.js";
 export { canonicalizeMobileProjectMembers } from "./sqlite-mobile-project-directory-store.js";
 export type {
   MobileProjectDirectoryStore,

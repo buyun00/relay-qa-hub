@@ -12,6 +12,7 @@ interface QaIdentityDirectory {
     readonly id: string;
     readonly displayName: string;
   };
+  readonly linkedUserIds?: (canonicalUserId: string) => readonly string[];
 }
 
 export interface SqliteMobileProjectDirectoryStoreOptions {
@@ -53,6 +54,10 @@ export function canonicalizeMobileProjectMembers(
           projectId: input.projectId,
           displayName: member.displayName,
           roles: Object.freeze([...member.roles].sort()),
+          ...(directory.linkedUserIds === undefined ||
+          directory.linkedUserIds(member.userId).length === 0
+            ? {}
+            : { linkedUserIds: directory.linkedUserIds(member.userId) }),
           active: true as const,
         }),
       )

@@ -368,6 +368,23 @@ export type {
   MobileVisibleProject,
   MobileVisibleProjectList,
 } from "./mobile-project-directory-store.js";
+export {
+  disableManagedUser,
+  linkManagedUser,
+  listActiveUserIdentityLinks,
+  listManagedUsers,
+  unlinkManagedUser,
+} from "./user-management-store.js";
+export type {
+  ActiveUserIdentityLink,
+  DisableManagedUserInput,
+  LinkManagedUserInput,
+  ListManagedUsersInput,
+  ManagedUser,
+  ManagedUserList,
+  ManagedUserMutationResult,
+  UnlinkManagedUserInput,
+} from "./user-management-store.js";
 export { listMobileDuplicateCandidates, markMobileBugDuplicate } from "./mobile-duplicate-store.js";
 export type {
   ListMobileDuplicateCandidatesInput,

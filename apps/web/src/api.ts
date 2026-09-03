@@ -153,6 +153,7 @@ export interface ProjectMember {
   readonly projectId: string;
   readonly displayName: string;
   readonly roles: readonly ProjectRole[];
+  readonly linkedUserIds?: readonly string[];
   readonly active: true;
 }
 
@@ -161,6 +162,27 @@ export interface ProjectMemberList {
   readonly snapshotSequence: number;
   readonly items: readonly ProjectMember[];
   readonly nextCursor: null;
+}
+
+export interface ManagedProjectUser {
+  readonly userId: string;
+  readonly displayName: string;
+  readonly status: "active" | "disabled";
+  readonly membershipStatus: "active" | "revoked";
+  readonly roles: readonly ProjectRole[];
+  readonly linkedToUserId: string | null;
+  readonly linkedToDisplayName: string | null;
+  readonly linkedUserCount: number;
+  readonly taskCount: number;
+  readonly activeSessionCount: number;
+  readonly protected: boolean;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+export interface ManagedProjectUserList {
+  readonly projectId: string;
+  readonly items: readonly ManagedProjectUser[];
 }
 
 export interface ProjectModule {
@@ -950,6 +972,45 @@ export async function listProjectMembers(projectId: string): Promise<ProjectMemb
     throw new QaHubApiError(200, "INVALID_PROJECT_MEMBER_LIST");
   }
   return body as unknown as ProjectMemberList;
+}
+
+export async function listManagedProjectUsers(projectId: string): Promise<ManagedProjectUserList> {
+  const body = await requestJson(
+    `/api/v1/projects/${encodeURIComponent(projectId)}/users?limit=500`,
+  );
+  if (!isProjectScopedList(body, projectId)) {
+    throw new QaHubApiError(200, "INVALID_MANAGED_USER_LIST");
+  }
+  return body as unknown as ManagedProjectUserList;
+}
+
+export async function linkManagedProjectUser(
+  projectId: string,
+  userId: string,
+  canonicalUserId: string,
+): Promise<void> {
+  await requestJson(
+    `/api/v1/projects/${encodeURIComponent(projectId)}/users/${encodeURIComponent(userId)}/identity-link`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ canonicalUserId }),
+    },
+  );
+}
+
+export async function unlinkManagedProjectUser(projectId: string, userId: string): Promise<void> {
+  await requestJson(
+    `/api/v1/projects/${encodeURIComponent(projectId)}/users/${encodeURIComponent(userId)}/identity-link`,
+    { method: "DELETE" },
+  );
+}
+
+export async function disableManagedProjectUser(projectId: string, userId: string): Promise<void> {
+  await requestJson(
+    `/api/v1/projects/${encodeURIComponent(projectId)}/users/${encodeURIComponent(userId)}`,
+    { method: "DELETE" },
+  );
 }
 
 export async function listProjectModules(projectId: string): Promise<ProjectModuleList> {

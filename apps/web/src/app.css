@@ -2491,6 +2491,219 @@ h1 {
   text-align: center;
 }
 
+.user-management-page {
+  padding: 30px 34px 48px;
+}
+.user-management-hero {
+  align-items: flex-end;
+  display: flex;
+  gap: 28px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.user-management-hero h1 {
+  color: #21372c;
+  font-size: 32px;
+  margin: 4px 0 8px;
+}
+.user-management-hero > div:first-child > p:last-child {
+  color: #6f7d75;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 720px;
+}
+.user-management-summary {
+  background: #e8f2ed;
+  border: 1px solid #d1e2d9;
+  border-radius: 14px;
+  display: flex;
+  flex: none;
+  gap: 18px;
+  padding: 14px 18px;
+}
+.user-management-summary span {
+  color: #66776d;
+  display: grid;
+  font-size: 11px;
+  gap: 2px;
+  text-align: center;
+}
+.user-management-summary b {
+  color: #285b48;
+  font-size: 20px;
+}
+.user-management-panel {
+  background: #fff;
+  border: 1px solid #e0e7e2;
+  border-radius: 18px;
+  box-shadow: 0 14px 38px rgb(42 70 56 / 7%);
+  overflow: hidden;
+}
+.user-management-toolbar {
+  align-items: center;
+  border-bottom: 1px solid #e7ece9;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 20px 22px;
+}
+.user-management-toolbar > div {
+  display: grid;
+  gap: 4px;
+}
+.user-management-toolbar strong {
+  color: #2a4035;
+  font-size: 16px;
+}
+.user-management-toolbar > div > span {
+  color: #849088;
+  font-size: 12px;
+}
+.user-search {
+  align-items: center;
+  background: #f6f8f7;
+  border: 1px solid #dfe6e2;
+  border-radius: 10px;
+  display: flex;
+  gap: 8px;
+  min-width: 260px;
+  padding: 0 12px;
+}
+.user-search input {
+  background: transparent;
+  border: 0;
+  color: #2d4036;
+  font: inherit;
+  height: 40px;
+  min-width: 0;
+  outline: none;
+  width: 100%;
+}
+.user-management-table {
+  overflow-x: auto;
+}
+.user-management-row {
+  align-items: center;
+  border-bottom: 1px solid #edf1ef;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(210px, 1.3fr) 120px 90px minmax(190px, 1.15fr) minmax(180px, auto);
+  min-width: 960px;
+  padding: 14px 22px;
+}
+.user-management-row:last-child {
+  border-bottom: 0;
+}
+.user-management-header {
+  background: #f8faf9;
+  color: #8a958f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding-bottom: 11px;
+  padding-top: 11px;
+  text-transform: uppercase;
+}
+.managed-user-identity,
+.managed-user-identity > span:last-child,
+.linked-user-copy,
+.user-management-row > div[role="cell"]:nth-child(2) {
+  display: flex;
+}
+.managed-user-identity {
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.managed-user-identity > span:last-child,
+.linked-user-copy,
+.user-management-row > div[role="cell"]:nth-child(2) {
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.managed-user-identity strong,
+.linked-user-copy strong {
+  color: #30453a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.managed-user-identity small,
+.linked-user-copy small,
+.user-management-row > div[role="cell"] small,
+.managed-user-muted {
+  color: #89958e;
+  font-size: 11px;
+}
+.managed-user-status {
+  align-self: flex-start;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 9px;
+}
+.managed-user-status.is-active {
+  background: #e2f3eb;
+  color: #267054;
+}
+.managed-user-status.is-linked {
+  background: #e8eef9;
+  color: #4066a5;
+}
+.managed-user-status.is-disabled {
+  background: #f0f1f0;
+  color: #7d8781;
+}
+.managed-user-history {
+  display: grid;
+  gap: 1px;
+}
+.managed-user-history strong {
+  color: #31483c;
+  font-size: 18px;
+}
+.managed-user-history span {
+  color: #8a968f;
+  font-size: 11px;
+}
+.managed-user-link select {
+  background: #fff;
+  border: 1px solid #d8e1dc;
+  border-radius: 8px;
+  color: #35483e;
+  font: inherit;
+  font-size: 12px;
+  height: 36px;
+  max-width: 240px;
+  padding: 0 8px;
+  width: 100%;
+}
+.managed-user-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.compact-button {
+  min-height: 34px;
+  padding: 7px 11px;
+}
+.danger-text-button {
+  background: transparent;
+  border: 0;
+  color: #b14a55;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 7px 5px;
+}
+.danger-text-button:disabled {
+  color: #b7beb9;
+  cursor: not-allowed;
+}
+
 @media (max-width: 1200px) {
   .overview-toolbar {
     grid-template-columns: repeat(3, minmax(150px, 1fr));

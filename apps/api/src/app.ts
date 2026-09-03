@@ -103,6 +103,14 @@ import {
   type MobileProjectDirectoryStore,
 } from "./mobile-project-directory.js";
 import {
+  MOBILE_MANAGED_USER_COLLECTION_PATH,
+  MOBILE_MANAGED_USER_ITEM_PATH,
+  MOBILE_USER_IDENTITY_LINK_PATH,
+  parseIdentityLinkRequest,
+  parseManagedUserListQuery,
+  type MobileUserManagementStore,
+} from "./mobile-user-management.js";
+import {
   MOBILE_METRICS_OVERVIEW_PATH,
   parseMobileMetricsOverviewQuery,
   type MobileMetricsStore,
@@ -227,6 +235,7 @@ export interface CreateApiAppOptions {
   readonly mobileNotificationStore?: MobileNotificationStore;
   readonly notificationHintChannelEnabled?: boolean;
   readonly mobileProjectDirectoryStore?: MobileProjectDirectoryStore;
+  readonly mobileUserManagementStore?: MobileUserManagementStore;
   readonly mobileMetricsStore?: MobileMetricsStore;
   readonly mobileRelayWebhookStore?: MobileRelayWebhookStore;
   readonly relayWebhookSecret?: string;
@@ -432,6 +441,21 @@ const unconfiguredMobileProjectDirectoryStore: MobileProjectDirectoryStore = {
   },
 };
 
+const unconfiguredMobileUserManagementStore: MobileUserManagementStore = {
+  listUsers: () => {
+    throw new Error("MobileUserManagementStore is not configured");
+  },
+  linkUser: () => {
+    throw new Error("MobileUserManagementStore is not configured");
+  },
+  unlinkUser: () => {
+    throw new Error("MobileUserManagementStore is not configured");
+  },
+  disableUser: () => {
+    throw new Error("MobileUserManagementStore is not configured");
+  },
+};
+
 const unconfiguredMobileMetricsStore: MobileMetricsStore = {
   getOverview: () => {
     throw new Error("MobileMetricsStore is not configured");
@@ -512,6 +536,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     options.mobileNotificationStore ?? unconfiguredMobileNotificationStore;
   const mobileProjectDirectoryStore =
     options.mobileProjectDirectoryStore ?? unconfiguredMobileProjectDirectoryStore;
+  const mobileUserManagementStore =
+    options.mobileUserManagementStore ?? unconfiguredMobileUserManagementStore;
   const mobileMetricsStore = options.mobileMetricsStore ?? unconfiguredMobileMetricsStore;
   const mobileRelayWebhookStore =
     options.mobileRelayWebhookStore ?? unconfiguredMobileRelayWebhookStore;
@@ -853,6 +879,148 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       if (code === "FORBIDDEN") {
         return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
+
+  app.get<{
+    Params: { projectId: string };
+    Querystring: { readonly limit?: string | readonly string[] };
+  }>(MOBILE_MANAGED_USER_COLLECTION_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
+      const query = parseManagedUserListQuery(request.query);
+      const result = await mobileUserManagementStore.listUsers({
+        actorId: authenticatedActorId(request, debugActorId),
+        projectId,
+        limit: query.limit,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "FORBIDDEN") {
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
+
+  app.post<{
+    Params: { projectId: string; userId: string };
+    Body: unknown;
+  }>(MOBILE_USER_IDENTITY_LINK_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
+      const userId = requireMobileProjectUuid(request.params.userId, "userId");
+      const body = parseIdentityLinkRequest(request.body);
+      const result = await mobileUserManagementStore.linkUser({
+        actorId: authenticatedActorId(request, debugActorId),
+        projectId,
+        userId,
+        canonicalUserId: body.canonicalUserId,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "FORBIDDEN") {
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "NOT_FOUND") {
+        return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "VERSION_CONFLICT") {
+        return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
+
+  app.delete<{
+    Params: { projectId: string; userId: string };
+  }>(MOBILE_USER_IDENTITY_LINK_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
+      const userId = requireMobileProjectUuid(request.params.userId, "userId");
+      const result = await mobileUserManagementStore.unlinkUser({
+        actorId: authenticatedActorId(request, debugActorId),
+        projectId,
+        userId,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "FORBIDDEN") {
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "NOT_FOUND") {
+        return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "VERSION_CONFLICT") {
+        return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (error instanceof TypeError || code === "INVALID_REQUEST") {
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_REQUEST" });
+      }
+      throw error;
+    }
+  });
+
+  app.delete<{
+    Params: { projectId: string; userId: string };
+  }>(MOBILE_MANAGED_USER_ITEM_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const projectId = requireMobileProjectUuid(request.params.projectId, "projectId");
+      const userId = requireMobileProjectUuid(request.params.userId, "userId");
+      const result = await mobileUserManagementStore.disableUser({
+        actorId: authenticatedActorId(request, debugActorId),
+        projectId,
+        userId,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      const code = (error as { code?: unknown })?.code;
+      if (code === "FORBIDDEN") {
+        return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "NOT_FOUND") {
+        return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "VERSION_CONFLICT") {
+        return reply.code(409).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
       }
       if (error instanceof TypeError || code === "INVALID_REQUEST") {
         return reply

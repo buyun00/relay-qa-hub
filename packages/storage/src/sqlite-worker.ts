@@ -121,6 +121,15 @@ import type {
   QingyuLinkRecord,
   UpdateQingyuLinkSyncInput,
 } from "./qingyu-link-store.js";
+import type {
+  ActiveUserIdentityLink,
+  DisableManagedUserInput,
+  LinkManagedUserInput,
+  ListManagedUsersInput,
+  ManagedUserList,
+  ManagedUserMutationResult,
+  UnlinkManagedUserInput,
+} from "./user-management-store.js";
 
 export interface SqliteStorageWorkerOptions {
   readonly databaseFile: string;
@@ -246,6 +255,34 @@ export class SqliteStorageWorker {
   async listActiveAccountUsers(accountId: string): Promise<readonly ActiveAccountUser[]> {
     await this.initialization;
     return this.request<readonly ActiveAccountUser[]>("listActiveAccountUsers", accountId);
+  }
+
+  async listActiveUserIdentityLinks(accountId: string): Promise<readonly ActiveUserIdentityLink[]> {
+    await this.initialization;
+    return this.request<readonly ActiveUserIdentityLink[]>(
+      "listActiveUserIdentityLinks",
+      accountId,
+    );
+  }
+
+  async listManagedUsers(input: ListManagedUsersInput): Promise<ManagedUserList> {
+    await this.initialization;
+    return this.request<ManagedUserList>("listManagedUsers", input);
+  }
+
+  async linkManagedUser(input: LinkManagedUserInput): Promise<ManagedUserMutationResult> {
+    await this.initialization;
+    return this.request<ManagedUserMutationResult>("linkManagedUser", input);
+  }
+
+  async unlinkManagedUser(input: UnlinkManagedUserInput): Promise<ManagedUserMutationResult> {
+    await this.initialization;
+    return this.request<ManagedUserMutationResult>("unlinkManagedUser", input);
+  }
+
+  async disableManagedUser(input: DisableManagedUserInput): Promise<ManagedUserMutationResult> {
+    await this.initialization;
+    return this.request<ManagedUserMutationResult>("disableManagedUser", input);
   }
 
   async loginBrowserSession(input: LoginBrowserSessionInput): Promise<BrowserPrincipal> {

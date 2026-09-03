@@ -26,6 +26,7 @@ import { createSqliteMobileBuildStore } from "./sqlite-mobile-build-store.js";
 import { createSqliteMobileDuplicateStore } from "./sqlite-mobile-duplicate-store.js";
 import { createSqliteMobileInboxStore } from "./sqlite-mobile-inbox-store.js";
 import { createSqliteMobileProjectDirectoryStore } from "./sqlite-mobile-project-directory-store.js";
+import { createSqliteMobileUserManagementStore } from "./sqlite-mobile-user-management-store.js";
 import { createSqliteMobileBugStore } from "./sqlite-mobile-bug-store.js";
 import { createSqliteMobileCaptureStore } from "./sqlite-mobile-capture-store.js";
 import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
@@ -308,6 +309,13 @@ async function run(): Promise<void> {
     for (const user of activeAccountUsers) {
       loginDirectory.register({ id: user.userId, displayName: user.displayName });
     }
+    const activeIdentityLinks = await worker.listActiveUserIdentityLinks(MOBILE_SCOPE.accountId);
+    for (const link of activeIdentityLinks) {
+      loginDirectory.registerLink(
+        { id: link.sourceUserId, displayName: link.sourceDisplayName },
+        { id: link.canonicalUserId, displayName: link.canonicalDisplayName },
+      );
+    }
     const browserAuthStore =
       webAuthMode === "debug" || webSessionSecret === undefined
         ? undefined
@@ -420,6 +428,12 @@ async function run(): Promise<void> {
       mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
         worker,
         scope: MOBILE_SCOPE,
+        identityDirectory: loginDirectory,
+      }),
+      mobileUserManagementStore: createSqliteMobileUserManagementStore({
+        worker,
+        scope: MOBILE_SCOPE,
+        protectedUserIds: activePeople.map((person) => person.id),
         identityDirectory: loginDirectory,
       }),
       mobileMetricsStore: createSqliteMobileMetricsStore({ worker, scope: MOBILE_SCOPE }),

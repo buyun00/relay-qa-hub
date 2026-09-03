@@ -146,6 +146,97 @@ test("project people directory merges pinyin duplicates into one Chinese member"
   ]);
 });
 
+test("explicit identity links override spelling and expose old IDs for historical labels", () => {
+  const sourceId = "10000000-0000-4000-8000-000000000111";
+  const canonicalId = "10000000-0000-4000-8000-000000000112";
+  const directory = new QaLoginDirectory([
+    { id: sourceId, displayName: "AKKKKK" },
+    { id: canonicalId, displayName: "AKKKK" },
+  ]);
+  directory.registerLink(
+    { id: sourceId, displayName: "AKKKKK" },
+    { id: canonicalId, displayName: "AKKKK" },
+  );
+
+  assert.deepEqual(directory.resolveLogin("akkkkk"), {
+    id: canonicalId,
+    displayName: "AKKKK",
+  });
+  assert.deepEqual(directory.canonicalize({ id: sourceId, displayName: "AKKKKK" }), {
+    id: canonicalId,
+    displayName: "AKKKK",
+  });
+  assert.deepEqual(directory.linkedUserIds(canonicalId), [sourceId]);
+  directory.removeLink(sourceId);
+  assert.equal(directory.resolveLogin("akkkkk"), undefined);
+});
+
+test("user management routes preserve the explicit source and canonical IDs", async (t) => {
+  const projectId = "10000000-0000-4000-8000-000000000004";
+  const actorId = "10000000-0000-4000-8000-000000000003";
+  const sourceId = "10000000-0000-4000-8000-000000000111";
+  const canonicalId = "10000000-0000-4000-8000-000000000112";
+  const calls = [];
+  const app = createApiApp({
+    logger: false,
+    debugActorId: actorId,
+    debugBearerToken: "fixed-debug-token",
+    mobileUserManagementStore: {
+      async listUsers(query) {
+        calls.push(["list", query]);
+        return { projectId, items: [] };
+      },
+      async linkUser(command) {
+        calls.push(["link", command]);
+        return { userId: sourceId, status: "active", linkedToUserId: canonicalId };
+      },
+      async unlinkUser(command) {
+        calls.push(["unlink", command]);
+        return { userId: sourceId, status: "active", linkedToUserId: null };
+      },
+      async disableUser(command) {
+        calls.push(["disable", command]);
+        return { userId: sourceId, status: "disabled", linkedToUserId: null };
+      },
+    },
+  });
+  t.after(async () => app.close());
+  const headers = { authorization: "Bearer fixed-debug-token" };
+
+  const list = await app.inject({
+    method: "GET",
+    url: `/api/v1/projects/${projectId}/users?limit=300`,
+    headers,
+  });
+  assert.equal(list.statusCode, 200);
+  assert.deepEqual(list.json(), { projectId, items: [] });
+
+  const linked = await app.inject({
+    method: "POST",
+    url: `/api/v1/projects/${projectId}/users/${sourceId}/identity-link`,
+    headers: { ...headers, "content-type": "application/json" },
+    payload: JSON.stringify({ canonicalUserId: canonicalId }),
+  });
+  assert.equal(linked.statusCode, 200);
+  const unlinked = await app.inject({
+    method: "DELETE",
+    url: `/api/v1/projects/${projectId}/users/${sourceId}/identity-link`,
+    headers,
+  });
+  assert.equal(unlinked.statusCode, 200);
+  const disabled = await app.inject({
+    method: "DELETE",
+    url: `/api/v1/projects/${projectId}/users/${sourceId}`,
+    headers,
+  });
+  assert.equal(disabled.statusCode, 200);
+  assert.deepEqual(
+    calls.map(([operation]) => operation),
+    ["list", "link", "unlink", "disable"],
+  );
+  assert.equal(calls[1][1].canonicalUserId, canonicalId);
+});
+
 test("backend people seed accepts only schema 4 without client-side aliases", async (t) => {
   const directory = await mkdtemp(join(tmpdir(), "qa-hub-people-v4-"));
   t.after(async () => rm(directory, { recursive: true, force: true }));
