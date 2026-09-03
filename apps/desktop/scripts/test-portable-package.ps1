@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$PackageDirectory,
   [string]$LoginName = "Windows安装包验收账号",
   [string]$NodeExe = $env:QA_HUB_DESKTOP_NODE_EXE,
