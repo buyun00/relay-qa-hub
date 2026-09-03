@@ -36,6 +36,10 @@ function statusCopy(user: ManagedProjectUser): string {
   return "使用中";
 }
 
+export function mutationTargetsManagedUser(mutation: string | null, userId: string): boolean {
+  return mutation?.endsWith(`:${userId}`) === true;
+}
+
 export default function UserManagementPage({
   currentUserId,
   projectId,
@@ -97,16 +101,20 @@ export default function UserManagementPage({
     setMutation(key);
     setError(null);
     setNotice(null);
+    let succeeded = false;
     try {
       await action();
+      succeeded = true;
       setNotice(success);
-      await load();
-      onChanged();
     } catch (cause) {
       setError(userManagementError(cause));
     } finally {
+      // Do not keep the whole page locked while the post-mutation refresh is in flight.
       setMutation(null);
     }
+    if (!succeeded) return;
+    await load();
+    onChanged();
   };
 
   return (
@@ -169,7 +177,7 @@ export default function UserManagementPage({
           ) : null}
           {visibleUsers.map((user) => {
             const current = user.userId === currentUserId;
-            const busy = mutation !== null;
+            const busy = mutationTargetsManagedUser(mutation, user.userId);
             const candidates = candidatesFor(user);
             const selectedTarget = targets[user.userId] ?? "";
             const protectedReason = user.protected
@@ -179,8 +187,22 @@ export default function UserManagementPage({
                 : user.linkedUserCount > 0
                   ? "该用户是其他身份的主用户，请先取消这些关联。"
                   : null;
+            const linkRestrictionCopy = user.protected
+              ? "配置用户可作为主用户；请在重复账号那一行选择它。"
+              : current
+                ? "当前登录用户可作为主用户；请在重复账号那一行选择它。"
+                : user.linkedUserCount > 0
+                  ? `已作为 ${user.linkedUserCount} 个身份的主用户；如需调整，请先取消现有关联。`
+                  : candidates.length === 0
+                    ? "当前没有可关联的主用户。"
+                    : null;
             return (
-              <div className="user-management-row" key={user.userId} role="row">
+              <div
+                aria-busy={busy || undefined}
+                className="user-management-row"
+                key={user.userId}
+                role="row"
+              >
                 <div className="managed-user-identity" role="cell">
                   <span className="avatar">{[...user.displayName].at(-1)}</span>
                   <span>
@@ -220,10 +242,12 @@ export default function UserManagementPage({
                     </span>
                   ) : user.status === "disabled" ? (
                     <span className="managed-user-muted">已从人员选择器移除</span>
+                  ) : linkRestrictionCopy !== null ? (
+                    <span className="managed-user-muted">{linkRestrictionCopy}</span>
                   ) : (
                     <select
                       aria-label={`选择 ${user.displayName} 的主用户`}
-                      disabled={busy || protectedReason !== null || candidates.length === 0}
+                      disabled={busy}
                       onChange={(event) =>
                         setTargets((currentTargets) => ({
                           ...currentTargets,
@@ -258,7 +282,7 @@ export default function UserManagementPage({
                     >
                       取消关联
                     </button>
-                  ) : (
+                  ) : linkRestrictionCopy === null ? (
                     <button
                       className="secondary-button compact-button"
                       disabled={busy || protectedReason !== null || selectedTarget.length === 0}
@@ -282,29 +306,32 @@ export default function UserManagementPage({
                     >
                       确认关联
                     </button>
-                  )}
+                  ) : null}
                   {user.status === "active" && user.linkedToUserId === null ? (
-                    <button
-                      className="danger-text-button"
-                      disabled={busy || protectedReason !== null}
-                      onClick={() => {
-                        if (
-                          !globalThis.confirm(
-                            `停用“${user.displayName}”？其会话和项目成员资格会被撤销，但 ${user.taskCount} 个历史任务引用会保留。`,
+                    protectedReason === null ? (
+                      <button
+                        className="danger-text-button"
+                        disabled={busy}
+                        onClick={() => {
+                          if (
+                            !globalThis.confirm(
+                              `停用“${user.displayName}”？其会话和项目成员资格会被撤销，但 ${user.taskCount} 个历史任务引用会保留。`,
+                            )
                           )
-                        )
-                          return;
-                        void mutate(
-                          `disable:${user.userId}`,
-                          () => disableManagedProjectUser(projectId, user.userId),
-                          `${user.displayName} 已停用并从人员选择器移除。`,
-                        );
-                      }}
-                      title={protectedReason ?? undefined}
-                      type="button"
-                    >
-                      停用
-                    </button>
+                            return;
+                          void mutate(
+                            `disable:${user.userId}`,
+                            () => disableManagedProjectUser(projectId, user.userId),
+                            `${user.displayName} 已停用并从人员选择器移除。`,
+                          );
+                        }}
+                        type="button"
+                      >
+                        {busy ? "处理中…" : "停用"}
+                      </button>
+                    ) : (
+                      <span className="managed-user-muted">受保护</span>
+                    )
                   ) : user.status === "disabled" ? (
                     <span className="managed-user-muted">历史已保留</span>
                   ) : (
