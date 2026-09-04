@@ -321,7 +321,7 @@ export function EvidencePanel({ bugId, bugKey }: EvidencePanelProps) {
                     ) : captureContext.state === "unavailable" ? (
                       <>
                         <div className="evidence-context__heading">
-                          <strong>未连接</strong>
+                          <strong>Unity 上下文读取失败</strong>
                           <span>Unity / Poco context</span>
                         </div>
                         <p>

@@ -13,6 +13,11 @@ import {
 } from "../src/sqlite.ts";
 import { createMobileBug, deleteMobileBug, getMobileBug } from "../src/mobile-bug-store.ts";
 import { listMobileBugAttachments } from "../src/mobile-attachment-store.ts";
+import {
+  createMobileCapture,
+  getMobileCapture,
+  MOBILE_CAPTURE_ALLOWED_METHODS,
+} from "../src/mobile-capture-store.ts";
 import { listMobileBugs } from "../src/mobile-bug-list-store.ts";
 import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.ts";
 import {
@@ -3424,6 +3429,150 @@ test("expired native sessions cannot mint, activate, or consume refresh generati
           .run(databaseTime(database), pendingTokenId, rotationFamily.familyId, activeTokenId),
       expiredTokenError,
     );
+    assertIntegrity(database);
+  });
+});
+
+test("submitted capture context is shared with Bug readers while drafts and removed evidence stay private", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 5_800, "CAPREAD");
+    const otherTenant = seedTenant(database, 5_900, "OTHER");
+    insertActiveMembershipRole(database, tenant, identifier(5_804), "reporter");
+    const captureId = identifier(5_810);
+    const primary = uploadFixture(tenant, 5_820, { captureId });
+    insertUpload(database, tenant, primary);
+    insertBlob(database, tenant, primary);
+    insertAttachment(database, tenant, primary);
+    finalizeUpload(database, primary.uploadId, primary.attachmentId);
+    const created = transaction(database, () =>
+      createMobileCapture(database, {
+        accountId: tenant.accountId,
+        projectId: tenant.projectId,
+        actorId: tenant.userId,
+        clientSubmissionId: primary.clientSubmissionId,
+        captureId,
+        capturedAt: CREATED_AT,
+        source: "overlay_single_tap",
+        primaryEvidenceClientAttachmentId: primary.clientAttachmentId,
+        primaryEvidenceAttachmentId: primary.attachmentId,
+        artifacts: [
+          {
+            captureId,
+            clientAttachmentId: primary.clientAttachmentId,
+            attachmentId: primary.attachmentId,
+            kind: "system_screenshot",
+            status: "succeeded",
+            startedAt: CREATED_AT,
+            endedAt: CREATED_AT,
+            skewMs: 0,
+            truncated: false,
+            failureReason: null,
+          },
+        ],
+        poco: {
+          attempted: true,
+          connectedPort: 5001,
+          sdkVersion: "6",
+          snapshotCapability: "standard_only",
+          screenSize: null,
+          allowedReadOnlyMethods: MOBILE_CAPTURE_ALLOWED_METHODS,
+          negotiatedMethods: ["GetSDKVersion"],
+          succeededMethods: ["GetSDKVersion"],
+          failureReason: null,
+        },
+        deviceMetadata: {
+          manufacturer: "Test",
+          model: "Test",
+          androidApi: 31,
+          androidRelease: "12",
+          qaAppVersion: "0.1.11-debug",
+          networkType: "wifi",
+        },
+        createdAt: CREATED_AT,
+      }),
+    );
+    const scope = { accountId: tenant.accountId, projectId: tenant.projectId, captureId };
+    const read = (actorId: string) => getMobileCapture(database, { ...scope, actorId });
+    assert.deepEqual(read(tenant.userId), created.captureBundle);
+    assert.equal(read(tenant.secondaryUserId), null);
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(5_805),
+      "viewer",
+      tenant.secondaryUserId,
+    );
+    assert.equal(
+      read(tenant.secondaryUserId),
+      null,
+      "an unsubmitted capture belongs to its author",
+    );
+
+    const bugId = identifier(5_830);
+    const bindingId = identifier(5_831);
+    createBug(database, tenant, bugId, "Shared Poco context");
+    insertClaimedBinding(database, tenant, primary.attachmentId, bindingId, "bug_create", bugId);
+    database
+      .prepare(
+        `INSERT INTO bug_attachments(
+      account_id, project_id, bug_id, attachment_id, binding_id
+    ) VALUES (?, ?, ?, ?, ?)`,
+      )
+      .run(tenant.accountId, tenant.projectId, bugId, primary.attachmentId, bindingId);
+    database
+      .prepare(
+        `UPDATE capture_bundles
+      SET status = 'bound', updated_at = ?, version = version + 1 WHERE id = ?`,
+      )
+      .run(databaseTime(database), captureId);
+    assert.deepEqual(read(tenant.secondaryUserId), created.captureBundle);
+    assert.equal(read(identifier(5_899)), null, "nonmembers cannot read project evidence");
+    assert.equal(
+      getMobileCapture(database, {
+        accountId: otherTenant.accountId,
+        projectId: otherTenant.projectId,
+        actorId: otherTenant.userId,
+        captureId,
+      }),
+      null,
+    );
+    assert.equal(
+      getMobileCapture(database, {
+        ...scope,
+        actorId: tenant.userId,
+        projectId: otherTenant.projectId,
+      }),
+      null,
+    );
+
+    database.exec("SAVEPOINT removed_capture_evidence");
+    // Use the ordinary Bug edit path so removal has the same durable facts as production.
+    updateMobileBug(database, {
+      ...scope,
+      actorId: tenant.userId,
+      bugId,
+      expectedVersion: 1,
+      attachmentIds: [],
+      idempotencyKey: `remove-capture:${bugId}`,
+      requestDigest: digest(5_832),
+      createdAt: databaseTime(database),
+    });
+    assert.equal(read(tenant.secondaryUserId), null);
+    database.exec("ROLLBACK TO removed_capture_evidence; RELEASE removed_capture_evidence");
+    assert.deepEqual(read(tenant.secondaryUserId), created.captureBundle);
+    transaction(database, () =>
+      deleteMobileBug(database, {
+        ...scope,
+        actorId: tenant.secondaryUserId,
+        bugId,
+        expectedVersion: 1,
+        idempotencyKey: `delete-capture:${bugId}`,
+        requestDigest: digest(5_833),
+        createdAt: databaseTime(database),
+      }),
+    );
+    assert.equal(read(tenant.userId), null);
+    assert.equal(read(tenant.secondaryUserId), null);
     assertIntegrity(database);
   });
 });

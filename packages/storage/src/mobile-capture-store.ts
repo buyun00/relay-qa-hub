@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 
+import { hasActiveAttachmentReadMembership } from "./mobile-attachment-store.js";
 import { SqliteStorageError } from "./sqlite.js";
 
 export const MOBILE_CAPTURE_ALLOWED_METHODS = Object.freeze([
@@ -100,7 +101,7 @@ export interface CreateMobileCaptureInput {
   readonly evidenceRoot?: string;
 }
 
-export interface MobileCaptureArtifactRecord extends MobileCaptureArtifactInput {}
+export type MobileCaptureArtifactRecord = MobileCaptureArtifactInput;
 
 export interface MobileCapturePocoRecord extends MobileCapturePocoInput {
   readonly status: MobileCaptureEnrichmentStatus;
@@ -814,6 +815,7 @@ export function getMobileCapture(
   database: DatabaseSync,
   input: Pick<CreateMobileCaptureInput, "accountId" | "projectId" | "actorId" | "captureId">,
 ): MobileCaptureBundleRecord | null {
+  if (!hasActiveAttachmentReadMembership(database, input)) return null;
   const row = database
     .prepare(
       `SELECT id, account_id, project_id, actor_id, capture_id, client_submission_id,
@@ -821,8 +823,46 @@ export function getMobileCapture(
               started_at, ended_at, captured_at, device_metadata_json,
               enrichment_status, status, created_at, updated_at, version
        FROM capture_bundles
-       WHERE id = ? AND account_id = ? AND project_id = ? AND actor_id = ?`,
+       WHERE id = ? AND account_id = ? AND project_id = ?`,
     )
-    .get(input.captureId, input.accountId, input.projectId, input.actorId) as CaptureRow | undefined;
-  return row ? captureBundleRecord(database, row) : null;
+    .get(input.captureId, input.accountId, input.projectId) as CaptureRow | undefined;
+  if (!row || row.status === "discarded") return null;
+  if (row.status !== "bound") {
+    return row.actor_id === input.actorId ? captureBundleRecord(database, row) : null;
+  }
+
+  // A submitted capture is Bug evidence, readable by the same project members
+  // as its attachments. Only unsubmitted captures remain private to their author.
+  const visibleBug = database
+    .prepare(
+      `SELECT 1
+       FROM bug_attachments AS link
+       JOIN bugs AS bug
+         ON bug.account_id = link.account_id
+        AND bug.project_id = link.project_id
+        AND bug.id = link.bug_id
+       JOIN attachment_bindings AS binding
+         ON binding.account_id = link.account_id
+        AND binding.project_id = link.project_id
+        AND binding.id = link.binding_id
+        AND binding.attachment_id = link.attachment_id
+        AND binding.target_bug_id = bug.id
+        AND binding.state = 'claimed'
+       WHERE link.account_id = ? AND link.project_id = ? AND link.attachment_id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bug.account_id
+             AND deletion.project_id = bug.project_id
+             AND deletion.bug_id = bug.id
+         )
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_attachment_removals AS removal
+           WHERE removal.account_id = link.account_id
+             AND removal.project_id = link.project_id
+             AND removal.bug_id = link.bug_id
+             AND removal.attachment_id = link.attachment_id
+         )`,
+    )
+    .get(input.accountId, input.projectId, row.primary_attachment_id);
+  return visibleBug ? captureBundleRecord(database, row) : null;
 }

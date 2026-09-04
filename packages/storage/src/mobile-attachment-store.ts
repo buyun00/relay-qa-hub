@@ -961,7 +961,7 @@ export function bindMobileAttachment(
   });
 }
 
-function hasActiveAttachmentReadMembership(
+export function hasActiveAttachmentReadMembership(
   database: DatabaseSync,
   input: MobileAttachmentScope,
 ): boolean {
