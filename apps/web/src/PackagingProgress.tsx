@@ -158,19 +158,13 @@ function BuildHeading({ build }: { build: BuildProgress }) {
 export default function PackagingProgressPanel({
   progress,
   error,
-  watchedNumbers,
   pendingQueues = [],
 }: {
   progress: PackagingProgress | null;
   error: boolean;
-  watchedNumbers: number[];
   pendingQueues?: { id: number; reason: string }[];
 }) {
-  const latestWatched = progress?.builds.find((b) => watchedNumbers.includes(b.number))?.number;
-  const current =
-    progress?.builds.filter(
-      (build) => build.status === "BUILDING" || build.number === latestWatched,
-    ) ?? [];
+  const current = progress?.builds.filter((build) => build.status === "BUILDING") ?? [];
   const history = progress?.builds.filter((build) => build.status !== "BUILDING") ?? [];
   const queues = [
     ...(progress?.queues ?? []),
@@ -182,17 +176,24 @@ export default function PackagingProgressPanel({
           !progress?.builds.some((b) => b.queueId === q.id),
       )
       .map((q) => ({ ...q, status: "QUEUED" as const })),
-  ];
+  ].filter((queue) => queue.status !== "CANCELLED");
+  const hasActiveBuild = current.length > 0 || queues.length > 0;
+  if (!hasActiveBuild && !history.length && !error) return null;
   return (
-    <section className="package-progress-panel" aria-labelledby="package-progress-title">
-      <div className="package-section-heading">
-        <h2 id="package-progress-title">构建进度</h2>
-        <span>
-          {progress
-            ? `更新于 ${new Date(progress.checkedAt).toLocaleTimeString("zh-CN", { hour12: false })}`
-            : "正在读取历史与阶段…"}
-        </span>
-      </div>
+    <section
+      className={`package-progress-panel${hasActiveBuild ? "" : " is-idle"}`}
+      aria-labelledby={hasActiveBuild ? "package-progress-title" : undefined}
+    >
+      {hasActiveBuild ? (
+        <div className="package-section-heading">
+          <h2 id="package-progress-title">构建进度</h2>
+          <span>
+            {progress
+              ? `更新于 ${new Date(progress.checkedAt).toLocaleTimeString("zh-CN", { hour12: false })}`
+              : "正在读取历史与阶段…"}
+          </span>
+        </div>
+      ) : null}
       {error ? (
         <p className="package-progress-warning" role="status">
           进度连接暂时中断，显示上次读取的结果，正在自动重连。
@@ -202,15 +203,9 @@ export default function PackagingProgressPanel({
         <div className="package-queued-progress" key={queue.id}>
           <strong>
             排队 #{queue.id} ·{" "}
-            {queue.status === "CANCELLED"
-              ? "已取消"
-              : queue.status === "UNKNOWN"
-                ? "状态待确认"
-                : "等待执行"}
+            {queue.status === "UNKNOWN" ? "状态待确认" : "等待执行"}
           </strong>
-          {queue.status !== "CANCELLED" ? (
-            <ProgressMeter label={`排队 ${queue.id}`} value={null} active />
-          ) : null}
+          <ProgressMeter label={`排队 ${queue.id}`} value={null} active />
           <p>{queue.reason}</p>
         </div>
       ))}
@@ -254,9 +249,6 @@ export default function PackagingProgressPanel({
           <BuildStages build={build} />
         </article>
       ))}
-      {progress && !current.length && !queues.length ? (
-        <p className="package-hint">暂无正在执行的打包任务，发起后将在这里显示阶段进度。</p>
-      ) : null}
       {history.length ? (
         <details className="package-progress-history">
           <summary>历史构建与阶段耗时（{history.length}）</summary>

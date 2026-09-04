@@ -8,6 +8,14 @@
   border-radius: 16px;
   padding: 26px;
 }
+.package-progress-panel.is-idle {
+  padding: 8px 26px;
+}
+.package-progress-panel.is-idle .package-progress-history {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
 .package-current-build + .package-current-build {
   border-top: 1px solid var(--line);
   padding-top: 20px;
@@ -284,6 +292,9 @@
 @media (max-width: 800px) {
   .package-progress-panel {
     padding: 16px;
+  }
+  .package-progress-panel.is-idle {
+    padding: 8px 16px;
   }
   .package-stage {
     grid-template-columns: 26px minmax(0, 1fr);

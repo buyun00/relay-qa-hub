@@ -121,7 +121,6 @@ export function usePackagingProgress(
     pendingQueues: watched.current
       .filter((w) => !w.finished && w.number === undefined)
       .map((w) => w.queueId),
-    watchedNumbers: watched.current.flatMap((w) => (w.number !== undefined ? [w.number] : [])),
     dismiss: (id: string) => setNotices((items) => items.filter((n) => n.id !== id)),
   };
 }

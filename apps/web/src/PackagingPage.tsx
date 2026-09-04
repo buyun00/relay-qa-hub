@@ -371,7 +371,6 @@ export default function PackagingPage({
         <PackagingProgressPanel
           progress={monitor.progress}
           error={monitor.error}
-          watchedNumbers={monitor.watchedNumbers}
           pendingQueues={[
             ...monitor.pendingQueues.map((id) => ({
               id,
