@@ -5,6 +5,7 @@ const ACTIONS = new Set([
   "open-bug-editor",
   "open-qingyu",
   "open-overview",
+  "open-production",
   "select-overview-date",
   "wait-marker",
   "wait-update-ready",
@@ -219,6 +220,36 @@ try {
     ) {
       process.exitCode = 1;
     }
+  } else if (action === "open-production") {
+    await client.send("Runtime.evaluate", {
+      expression: `document.querySelectorAll('.nav-item').forEach(button => { if (button.textContent.includes('制作任务')) button.click(); })`,
+    });
+    const deadline = Date.now() + 20_000;
+    let production;
+    do {
+      const result = await client.send("Runtime.evaluate", {
+        expression: `(() => {
+          const page = document.querySelector('.production-page');
+          return { visible: Boolean(page && !page.closest('[hidden]')), rowCount: page?.querySelectorAll('tbody tr').length ?? 0, error: page?.querySelector('.error-banner')?.textContent?.trim() ?? null, loading: page?.textContent.includes('正在连接制作服务') ?? true };
+        })()`, returnByValue: true,
+      });
+      production = result.result?.value;
+      if (production?.visible && !production.loading && !production.error) break;
+      await new Promise(resolve => setTimeout(resolve, 200));
+    } while (Date.now() < deadline);
+    if (!production?.visible || production.loading || production.error) throw new Error(`Production page failed: ${JSON.stringify(production)}`);
+    const create = await client.send("Runtime.evaluate", {
+      expression: `(async () => {
+        document.querySelectorAll('.production-header button').forEach(button => { if (button.textContent.includes('新建')) button.click(); });
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const modal = document.querySelector('.production-modal');
+        const result = { createVisible: modal !== null, repository: modal?.querySelector('.production-repository')?.textContent ?? '', filePicker: modal?.querySelector('input[type=file]') !== null, advancedOptions: modal?.querySelector('.production-advanced') !== null };
+        modal?.querySelector('.production-modal-heading button')?.click();
+        return result;
+      })()`, awaitPromise: true, returnByValue: true,
+    });
+    if (!create.result?.value?.createVisible || !create.result.value.filePicker || !create.result.value.advancedOptions) throw new Error("Production creation form is incomplete");
+    process.stdout.write(`${JSON.stringify({ action, production: { ...production, ...create.result.value } })}\n`);
   } else if (action === "open-first-bug") {
     const result = await client.send("Runtime.evaluate", {
       expression: `(() => {

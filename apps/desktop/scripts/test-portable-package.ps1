@@ -183,6 +183,16 @@ try {
   }
   $mcpTools = Invoke-QAHubMcpRequest -Id 2 -Method "tools/list" -Params ([ordered]@{})
   $expectedMcpTools = @(
+    "qa_list_relay_projects",
+    "qa_list_relay_tasks",
+    "qa_get_relay_task",
+    "qa_create_relay_task",
+    "qa_start_relay_batch",
+    "qa_continue_relay_task",
+    "qa_relay_task_action",
+    "qa_get_relay_batch",
+    "qa_retry_relay_batch",
+    "qa_materialize_relay_attachment",
     "qa_list_projects",
     "qa_list_bugs",
     "qa_get_bug_context",
@@ -409,7 +419,24 @@ try {
     $overviewSelectedDateRowCount = [int]$datePage.snapshot.overviewRowCount
   }
 
+  $productionOutput = & $NodeExe $smokeScript open-production
+  if ($LASTEXITCODE -ne 0) { throw "Packaged production workbench did not load" }
+  $production = ($productionOutput | Select-Object -Last 1 | ConvertFrom-Json).production
+  $productionProjectId = [string]$mcpSignedIn.result.structuredContent.projects.items[0].id
+  $productionRepository = Invoke-QAHubMcpRequest -Id 7 -Method "tools/call" -Params ([ordered]@{
+    name = "qa_list_relay_projects"; arguments = [ordered]@{ projectId = $productionProjectId }
+  })
+  $productionTasks = Invoke-QAHubMcpRequest -Id 8 -Method "tools/call" -Params ([ordered]@{
+    name = "qa_list_relay_tasks"; arguments = [ordered]@{ projectId = $productionProjectId; includeClosed = $true }
+  })
+  if ($productionRepository.result.isError -or $productionTasks.result.isError) {
+    throw "Packaged MCP could not read production repository or tasks"
+  }
+
   [pscustomobject][ordered]@{
+    productionPage = $production
+    productionMcpTaskCount = @($productionTasks.result.structuredContent.items).Count
+    productionRepository = [string]$productionRepository.result.structuredContent.project.repoUrl
     freshProfile = $true
     portableSidecarAutoLoaded = $true
     loginVisibleBeforeLogin = [bool]$snapshot.loginVisible
