@@ -68,6 +68,7 @@ import {
 import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
 import OverviewPage, { formatOverviewDateLabel, type OverviewDateBucket } from "./OverviewPage";
 import UserManagementPage from "./UserManagementPage";
+import PackagingPage from "./PackagingPage";
 import {
   TASK_STATUS_ORDER,
   taskStatusCopy,
@@ -81,7 +82,7 @@ const DEFAULT_PROJECT_ID =
   import.meta.env.VITE_QA_HUB_PROJECT_ID ?? "10000000-0000-4000-8000-000000000004";
 
 type Category = TaskStatus;
-type WorkspaceView = "workbench" | "overview" | "users";
+type WorkspaceView = "workbench" | "overview" | "users" | "packaging";
 
 interface AppProps {
   readonly principal: BrowserSessionPrincipal;
@@ -473,6 +474,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const pendingMutationsRef = useRef(new Map<string, Readonly<{ label: string; token: symbol }>>());
   const [overviewRevision, setOverviewRevision] = useState(0);
   const [userManagementRevision, setUserManagementRevision] = useState(0);
+  const [packagingRevision, setPackagingRevision] = useState(0);
   const mutation = mutationLabelForScope(
     pendingMutationLabels,
     selectedId === null ? null : bugMutationScope(selectedId),
@@ -1547,6 +1549,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span>用户管理</span>
             <span className="nav-count">{members.length}</span>
           </button>
+          <button
+            aria-current={view === "packaging" ? "page" : undefined}
+            className={`nav-item${view === "packaging" ? " is-active" : ""}`}
+            onClick={() => setView("packaging")}
+            type="button"
+          >
+            <span className="nav-icon">↓</span>
+            <span>打包与下载</span>
+          </button>
           {view === "overview" ? (
             <div aria-label="总览日期分页" className="overview-date-nav">
               <div className="overview-date-nav-head">
@@ -1616,7 +1627,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 ? "工作台"
                 : view === "overview"
                   ? `总览 · ${overviewDateLabel}`
-                  : "用户管理"}
+                  : view === "packaging"
+                    ? "打包与下载"
+                    : "用户管理"}
             </span>
           </div>
           {view === "workbench" ? (
@@ -1633,6 +1646,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             </label>
           ) : view === "overview" ? (
             <div className="overview-topbar-copy">{overviewDateLabel} · 表格视图</div>
+          ) : view === "packaging" ? (
+            <div className="overview-topbar-copy">一键打包 · 内网下载</div>
           ) : (
             <div className="overview-topbar-copy">关联重复账号或停用多余用户</div>
           )}
@@ -1643,6 +1658,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             onClick={() => {
               if (view === "workbench") void loadWorkbench(true);
               else if (view === "overview") setOverviewRevision((value) => value + 1);
+              else if (view === "packaging") setPackagingRevision((value) => value + 1);
               else setUserManagementRevision((value) => value + 1);
             }}
             type="button"
@@ -1808,14 +1824,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             refreshToken={overviewRevision}
             selectedDate={overviewDate}
           />
-        ) : (
+        ) : view === "users" ? (
           <UserManagementPage
             currentUserId={principal.userId}
             onChanged={() => void loadWorkbench(true, false)}
             projectId={projectId}
             refreshRevision={userManagementRevision}
           />
-        )}
+        ) : null}
+        <div hidden={view !== "packaging"}>
+          <PackagingPage active={view === "packaging"} refreshRevision={packagingRevision} />
+        </div>
       </section>
 
       {selectedId === null ? null : (

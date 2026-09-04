@@ -1,0 +1,325 @@
+.packaging-page {
+  display: grid;
+  gap: 28px;
+}
+.package-build-panel,
+.package-file-table,
+.package-latest-card,
+.package-zip-card,
+.package-ipa-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.package-build-panel {
+  padding: 26px;
+}
+.package-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.package-section-heading h1 {
+  margin: 5px 0 0;
+  font-size: 27px;
+  letter-spacing: -0.04em;
+}
+.package-section-heading h2,
+.package-other-downloads h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.package-section-heading > span,
+.package-hint,
+.package-build-history,
+.package-latest-card small,
+.package-other-downloads small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.package-connection {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.package-connection::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a5aca8;
+}
+.package-connection.is-connected::before {
+  background: #439c50;
+}
+.package-build-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.package-build-button {
+  min-height: 58px;
+  padding: 14px;
+  border: 1px solid var(--forest);
+  border-radius: 10px;
+  background: var(--forest);
+  color: white;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.package-build-button:hover:enabled {
+  background: #294b39;
+}
+.package-build-button:last-child {
+  color: var(--forest);
+  background: var(--lime);
+  border-color: var(--lime);
+}
+.package-build-button:last-child:hover:enabled {
+  background: #a7e331;
+}
+.package-hint {
+  line-height: 1.7;
+  margin: 13px 0 0;
+}
+.package-build-history {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 17px;
+}
+.package-build-history > span:first-child {
+  margin-right: 4px;
+}
+.package-build-status {
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: #f3f5f3;
+  font-size: 11px;
+}
+.package-build-status.is-success {
+  color: #386b46;
+  background: #eff7ef;
+}
+.package-build-status.is-building {
+  color: #8d5718;
+  background: var(--orange-soft);
+}
+.package-latest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.package-latest-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  gap: 14px;
+}
+.package-latest-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.package-type {
+  color: #56715d;
+  font-size: 11px;
+  background: #f0f6ee;
+  border-radius: 5px;
+  padding: 4px 7px;
+  margin-bottom: 12px;
+}
+.package-latest-copy > strong {
+  font-size: 17px;
+}
+.package-latest-copy > p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  margin: 8px 0;
+}
+.package-latest-qr {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.package-latest-qr small {
+  font-size: 10px;
+}
+.package-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #eef4e9;
+  color: var(--forest);
+  border-radius: 7px;
+  text-decoration: none;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 650;
+  margin-top: 13px;
+}
+.package-download-button:hover {
+  background: #e1efcf;
+}
+.package-file-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 86px 105px 104px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+.package-file-header {
+  color: var(--muted);
+  border-top: 0;
+  font-size: 11px;
+}
+.package-filename {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.package-filename strong {
+  font-size: 12px;
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.package-filename small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.package-file-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.package-link {
+  color: #387644;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 550;
+}
+.package-link:hover {
+  text-decoration: underline;
+}
+.package-qr-details {
+  position: relative;
+}
+.package-qr-details summary {
+  list-style: none;
+  color: #387644;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.package-qr-popover {
+  position: absolute;
+  top: 26px;
+  right: 0;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  z-index: 3;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 13px;
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+}
+.package-qr-popover small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.package-older > summary {
+  padding: 16px 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.package-other-downloads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+.package-zip-card,
+.package-ipa-card {
+  padding: 22px;
+}
+.package-zip-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.package-zip-card > div,
+.package-ipa-card {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.package-other-downloads p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 10px 0;
+}
+.package-ipa-file {
+  overflow-wrap: anywhere;
+  margin: 12px 0 6px;
+}
+.package-ipa-card > small {
+  margin-top: 8px;
+}
+@media (max-width: 1280px) {
+  .package-latest-card {
+    padding: 15px;
+    flex-wrap: wrap;
+  }
+  .package-latest-copy {
+    flex: 1 1 130px;
+  }
+  .package-latest-qr svg {
+    width: 88px;
+    height: 88px;
+  }
+}
+@media (max-width: 800px) {
+  .package-build-buttons,
+  .package-latest-grid,
+  .package-other-downloads {
+    grid-template-columns: 1fr;
+  }
+  .package-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .package-file-row {
+    grid-template-columns: minmax(0, 1fr) 90px;
+    gap: 10px;
+    padding: 14px;
+  }
+  .package-file-row > :nth-child(2),
+  .package-file-row > :nth-child(3) {
+    display: none;
+  }
+  .package-build-panel {
+    padding: 20px;
+  }
+}

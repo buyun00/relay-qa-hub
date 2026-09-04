@@ -175,6 +175,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    server: { deps: { inline: ["qrcode.react"] } },
     include: ["src/**/*.test.{ts,tsx}"],
   },
 });

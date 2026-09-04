@@ -11,10 +11,12 @@ import {
   Notification,
   ipcMain,
   protocol,
+  shell,
   Tray,
 } from "electron";
 
 import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
+import { isPackageDownloadUrl } from "./package-downloads.js";
 import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
 import { NotificationHistory } from "./notification-history.js";
 import {
@@ -529,7 +531,10 @@ function installNavigationGuards(window: BrowserWindow): void {
   window.webContents.on("will-navigate", (event, url) => {
     if (!isTrustedRendererUrl(url)) event.preventDefault();
   });
-  window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    if (isPackageDownloadUrl(url)) void shell.openExternal(url).catch(() => undefined);
+    return { action: "deny" };
+  });
 }
 
 function createWindow(): BrowserWindow {

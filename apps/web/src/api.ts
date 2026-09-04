@@ -890,7 +890,7 @@ async function recoverBrowserSession(): Promise<BrowserSessionPrincipal> {
   return browserSessionRecovery;
 }
 
-async function requestJson(
+export async function requestJson(
   path: string,
   init?: RequestInit,
   allowSessionRecovery = true,

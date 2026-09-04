@@ -178,6 +178,7 @@ import {
   type QingyuIntegration,
 } from "./qingyu-integration.js";
 import { QingyuError } from "./qingyu-client.js";
+import { JenkinsBuildService, registerPackagingRoutes } from "./jenkins-builds.js";
 
 export const LIVE_HEALTH_PATH = "/api/v1/health/live" as const;
 export const READY_HEALTH_PATH = "/api/v1/health/ready" as const;
@@ -250,6 +251,7 @@ export interface CreateApiAppOptions {
   readonly debugActorId?: string;
   readonly browserAuth?: BrowserAuthOptions;
   readonly androidUpdateRoot?: string;
+  readonly jenkinsBuildService?: JenkinsBuildService;
 }
 
 const liveHealthResponseSchema = {
@@ -2480,6 +2482,14 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
+  registerPackagingRoutes(
+    app,
+    options.jenkinsBuildService ?? new JenkinsBuildService(),
+    (request) =>
+      readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
+        ? authenticatedActorId(request, debugActorId)
+        : null,
+  );
   registerAndroidUpdateRoutes(app, options.androidUpdateRoot);
   return app;
 }
