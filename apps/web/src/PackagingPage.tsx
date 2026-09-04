@@ -277,6 +277,7 @@ export default function PackagingPage({
       void refresh();
     }
   };
+  if (!active) return null;
   return (
     <main className="packaging-page">
       <section className="package-build-panel" aria-labelledby="packaging-title">

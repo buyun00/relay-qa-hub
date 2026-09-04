@@ -38,6 +38,7 @@ describe("Relay QA Hub browser workbench", () => {
     expect(markup).toContain("总览");
     expect(markup).toContain("用户管理");
     expect(markup).toContain("打包与下载");
+    expect(markup).not.toContain("正在读取可下载文件");
     expect(markup).toContain("待处理");
     expect(markup).toContain("处理中");
     expect(markup).toContain("已完成待验收");

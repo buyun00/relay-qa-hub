@@ -5,7 +5,7 @@ import { type PackagingStatus } from "./packaging-api";
 
 describe("packaging page", () => {
   it("has precisely three build buttons and no editable Jenkins settings", () => {
-    const markup = renderToStaticMarkup(<PackagingPage active={false} refreshRevision={0} />);
+    const markup = renderToStaticMarkup(<PackagingPage active={true} refreshRevision={0} />);
     expect(markup.match(/<button /gu)).toHaveLength(3);
     expect(markup).toContain("打不带 SDK 的内网包");
     expect(markup).toContain("打带 SDK 的内网包");
