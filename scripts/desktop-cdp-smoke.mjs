@@ -252,12 +252,24 @@ try {
     process.stdout.write(`${JSON.stringify({ action, production: { ...production, ...create.result.value } })}\n`);
   } else if (action === "open-first-bug") {
     const result = await client.send("Runtime.evaluate", {
-      expression: `(() => {
-        const row = document.querySelector(".bug-row");
+      expression: `(async () => {
+        let row = document.querySelector(".bug-row");
+        if (!row) {
+          const scope = document.querySelector(".person-filter select");
+          if (scope instanceof HTMLSelectElement) {
+            scope.value = "team";
+            scope.dispatchEvent(new Event("change", { bubbles: true }));
+            for (let attempt = 0; attempt < 50 && !row; attempt++) {
+              await new Promise(resolve => setTimeout(resolve, 200));
+              row = document.querySelector(".bug-row");
+            }
+          }
+        }
         if (!(row instanceof HTMLButtonElement)) return false;
         row.click();
         return true;
       })()`,
+      awaitPromise: true,
       returnByValue: true,
     });
     if (result.result?.value !== true) throw new Error("desktop bug row is unavailable");
