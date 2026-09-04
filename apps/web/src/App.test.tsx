@@ -9,6 +9,7 @@ import App, {
   canSubmitNewBug,
   collectClipboardImages,
   mergeCreateBugImages,
+  mutationLabelForScope,
   runRecoverableVerificationStep,
   selectableQingyuDefectIds,
   updateQingyuDefectSelection,
@@ -55,7 +56,7 @@ describe("Relay QA Hub browser workbench", () => {
   });
 
   it("exposes the build and frozen contract versions", () => {
-    expect(product.appVersion).toBe("1.2.1");
+    expect(product.appVersion).toBe("1.2.2");
     expect(product.contractVersion).toBe("1.0.0");
   });
 
@@ -100,6 +101,17 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canSubmitNewBug(null, "verifier-id")).toBe(true);
     expect(canSubmitNewBug("正在提交", "verifier-id")).toBe(false);
     expect(canSubmitNewBug(null, "")).toBe(false);
+  });
+
+  it("keeps a slow mutation scoped to its own Bug", () => {
+    const mutations = new Map([
+      ["bug:bug-a", "正在保存 Bug A"],
+      ["create-bug", "正在创建 Bug"],
+    ]);
+
+    expect(mutationLabelForScope(mutations, "bug:bug-a")).toBe("正在保存 Bug A");
+    expect(mutationLabelForScope(mutations, "bug:bug-b")).toBeNull();
+    expect(mutationLabelForScope(mutations, "create-bug")).toBe("正在创建 Bug");
   });
 
   it("supports selecting multiple eligible Qingyu defects without selecting imported or terminal ones", () => {

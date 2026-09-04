@@ -114,6 +114,18 @@ interface ClipboardImageItem {
 const DEFAULT_EXPECTED_BEHAVIOR = "问题修复后不再复现";
 const AUTO_REFRESH_INTERVAL_MS = 5_000;
 const CREATE_BUG_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+const CREATE_BUG_MUTATION_SCOPE = "create-bug";
+
+function bugMutationScope(bugId: string): string {
+  return `bug:${bugId}`;
+}
+
+export function mutationLabelForScope(
+  mutations: ReadonlyMap<string, string>,
+  scope: string | null,
+): string | null {
+  return scope === null ? null : (mutations.get(scope) ?? null);
+}
 
 export function canSubmitNewBug(mutation: string | null, verifierId: string): boolean {
   return mutation === null && verifierId.length > 0;
@@ -359,6 +371,7 @@ function messageFor(cause: unknown): string {
       QINGYU_TIMEOUT: "轻语响应超时，请稍后重试。",
       QINGYU_UNAVAILABLE: "当前无法连接轻语，请检查网络后重试。",
       QINGYU_UPSTREAM_FAILED: "轻语拒绝了本次请求，请稍后重试或检查账号权限。",
+      REQUEST_TIMEOUT: "请求等待超时，当前界面已解除占用；你可以继续操作或稍后重试。",
       STORAGE_WRITE_TEMPORARILY_UNAVAILABLE: "数据写入暂时繁忙，系统已保留原状态，请稍后重新操作。",
       VERIFICATION_WRITE_TEMPORARILY_UNAVAILABLE:
         "验收状态暂时无法写入，系统已保留原状态，请稍后重新操作。",
@@ -432,7 +445,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [verifierId, setVerifierId] = useState("");
   const [comment, setComment] = useState("");
   const [returnReason, setReturnReason] = useState(DEFAULT_RETURN_REASON);
-  const [mutation, setMutation] = useState<string | null>(null);
+  const [pendingMutationLabels, setPendingMutationLabels] = useState<ReadonlyMap<string, string>>(
+    () => new Map(),
+  );
   const [createOpen, setCreateOpen] = useState(false);
   const [newContent, setNewContent] = useState("");
   const [newOwnerId, setNewOwnerId] = useState("");
@@ -454,8 +469,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const detailRequestRef = useRef(0);
   const detailBugIdRef = useRef<string | null>(null);
   const selectedIdRef = useRef<string | null>(null);
+  const pendingMutationsRef = useRef(new Map<string, Readonly<{ label: string; token: symbol }>>());
   const [overviewRevision, setOverviewRevision] = useState(0);
   const [userManagementRevision, setUserManagementRevision] = useState(0);
+  const mutation = mutationLabelForScope(
+    pendingMutationLabels,
+    selectedId === null ? null : bugMutationScope(selectedId),
+  );
+  const createMutation = mutationLabelForScope(pendingMutationLabels, CREATE_BUG_MUTATION_SCOPE);
 
   const newFilePreviews = useMemo(
     () =>
@@ -993,25 +1014,49 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     });
   }, [bugs, category, memberName, query]);
 
+  const beginMutation = useCallback((scope: string, label: string): symbol | null => {
+    if (pendingMutationsRef.current.has(scope)) return null;
+    const token = Symbol(scope);
+    pendingMutationsRef.current.set(scope, { label, token });
+    setPendingMutationLabels(
+      new Map([...pendingMutationsRef.current].map(([key, value]) => [key, value.label])),
+    );
+    return token;
+  }, []);
+
+  const endMutation = useCallback((scope: string, token: symbol): void => {
+    if (pendingMutationsRef.current.get(scope)?.token !== token) return;
+    pendingMutationsRef.current.delete(scope);
+    setPendingMutationLabels(
+      new Map([...pendingMutationsRef.current].map(([key, value]) => [key, value.label])),
+    );
+  }, []);
+
   const runMutation = useCallback(
     async (
+      scope: string,
       label: string,
       action: () => Promise<void>,
       options: { readonly closeDetailOnSuccess?: boolean } = {},
     ) => {
-      setMutation(label);
+      const token = beginMutation(scope, label);
+      if (token === null) return;
       setError(null);
       setNotice(null);
       try {
         await action();
         setNotice(label);
         setOverviewRevision((value) => value + 1);
-        if (options.closeDetailOnSuccess === true) closeDetail();
+        if (
+          options.closeDetailOnSuccess === true &&
+          selectedIdRef.current !== null &&
+          scope === bugMutationScope(selectedIdRef.current)
+        ) {
+          closeDetail();
+        }
         await loadWorkbench(true);
         const activeBugId = selectedIdRef.current;
-        if (options.closeDetailOnSuccess !== true && activeBugId !== null) {
-          await loadDetail(activeBugId);
-        }
+        if (activeBugId !== null) await loadDetail(activeBugId);
       } catch (cause) {
         setError(messageFor(cause));
         const activeBugId = selectedIdRef.current;
@@ -1023,15 +1068,28 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           await loadDetail(activeBugId);
         }
       } finally {
-        setMutation(null);
+        endMutation(scope, token);
       }
     },
-    [closeDetail, loadDetail, loadWorkbench],
+    [beginMutation, closeDetail, endMutation, loadDetail, loadWorkbench],
+  );
+
+  const runCurrentBugMutation = useCallback(
+    async (
+      label: string,
+      action: () => Promise<void>,
+      options: { readonly closeDetailOnSuccess?: boolean } = {},
+    ) => {
+      const bugId = selectedIdRef.current;
+      if (bugId === null) return;
+      await runMutation(bugMutationScope(bugId), label, action, options);
+    },
+    [runMutation],
   );
 
   const saveAssignments = async () => {
     if (detail === null || ownerId.length === 0 || verifierId.length === 0) return;
-    await runMutation("分配已更新", async () => {
+    await runCurrentBugMutation("分配已更新", async () => {
       await updateBugAssignments(detail.id, detail.version, ownerId, verifierId);
     });
   };
@@ -1073,7 +1131,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     ) {
       return;
     }
-    setMutation("正在保存 Bug 详情…");
+    const mutationScope = bugMutationScope(detail.id);
+    const mutationToken = beginMutation(mutationScope, "正在保存 Bug 详情…");
+    if (mutationToken === null) return;
     setError(null);
     setNotice(null);
     setDetailEditError(null);
@@ -1109,8 +1169,10 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         },
         clientMutationId,
       );
-      setDetail(updated);
-      cancelDetailEdit();
+      if (selectedIdRef.current === updated.id) {
+        setDetail(updated);
+        cancelDetailEdit();
+      }
       setNotice(`${updated.key} 的 Bug 详情已更新`);
       setOverviewRevision((value) => value + 1);
       await loadWorkbench(true);
@@ -1118,21 +1180,25 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     } catch (cause) {
       const conflict =
         cause instanceof QaHubApiError && (cause.status === 409 || cause.status === 412);
-      setDetailEditVersionConflict(conflict);
-      setDetailEditError(
-        conflict
-          ? "这条 Bug 刚刚被其他人更新。你的输入尚未保存，请取消编辑后重新打开最新内容。"
-          : messageFor(cause),
-      );
-      if (conflict) await loadDetail(detail.id);
+      if (selectedIdRef.current === detail.id) {
+        setDetailEditVersionConflict(conflict);
+        setDetailEditError(
+          conflict
+            ? "这条 Bug 刚刚被其他人更新。你的输入尚未保存，请取消编辑后重新打开最新内容。"
+            : messageFor(cause),
+        );
+        if (conflict) await loadDetail(detail.id);
+      } else {
+        setError(messageFor(cause));
+      }
     } finally {
-      setMutation(null);
+      endMutation(mutationScope, mutationToken);
     }
   };
 
   const beginWork = async () => {
     if (detail === null || detail.ownerId === null) return;
-    await runMutation("已开始处理", async () => {
+    await runCurrentBugMutation("已开始处理", async () => {
       let nextBug = detail;
       if (nextBug.state !== "ready") {
         nextBug = await transitionBugReady(nextBug.id, nextBug.version);
@@ -1155,7 +1221,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     )
       return;
     const attempt = workflow.repairAttempt;
-    await runMutation("已完成待验收，等待验收人处理", async () => {
+    await runCurrentBugMutation("已完成待验收，等待验收人处理", async () => {
       await deliverHumanRepairAttemptNoCode(
         attempt.id,
         attempt.version,
@@ -1176,7 +1242,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const completeDeliveredWork = async () => {
     if (detail === null || repairAttempt === null) return;
-    await runMutation("已完成待验收，等待验收人处理", async () => {
+    await runCurrentBugMutation("已完成待验收，等待验收人处理", async () => {
       await completeBugForVerification(detail.id, detail.version, repairAttempt.id);
     });
   };
@@ -1301,7 +1367,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   };
 
   const acceptBug = async () => {
-    await runMutation(
+    await runCurrentBugMutation(
       "Bug 已验收并关闭",
       async () => {
         const verification = await ensureVerificationStarted();
@@ -1323,7 +1389,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const returnBug = async () => {
     const reason = returnReason.trim();
     if (reason.length === 0) return;
-    await runMutation("验收未通过，已打回待处理", async () => {
+    await runCurrentBugMutation("验收未通过，已打回待处理", async () => {
       const verification = await ensureVerificationStarted();
       if (verification === null) return;
       const clientSubmissionId = crypto.randomUUID();
@@ -1336,7 +1402,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           clientSubmissionId,
         ),
       );
-      setReturnReason(DEFAULT_RETURN_REASON);
+      if (selectedIdRef.current === detail?.id) setReturnReason(DEFAULT_RETURN_REASON);
     });
   };
 
@@ -1346,7 +1412,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       `确认删除 ${detail.key}？删除后会从 QA Hub 列表、详情和 MCP 中隐藏。`,
     );
     if (!confirmed) return;
-    await runMutation(
+    await runCurrentBugMutation(
       `${detail.key} 已删除`,
       async () => {
         await deleteBug(detail.id, detail.version);
@@ -1357,7 +1423,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   const handoffRelay = async () => {
     if (detail === null || detail.ownerId === null) return;
-    await runMutation("已将 Bug 交给 Relay，QA Hub 仍保留生命周期控制", async () => {
+    await runCurrentBugMutation("已将 Bug 交给 Relay，QA Hub 仍保留生命周期控制", async () => {
       let nextBug = detail;
       if (nextBug.state !== "ready")
         nextBug = await transitionBugReady(nextBug.id, nextBug.version);
@@ -1374,9 +1440,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     event.preventDefault();
     if (selectedId === null || comment.trim().length === 0) return;
     const body = comment.trim();
-    await runMutation("处理记录已添加", async () => {
+    await runCurrentBugMutation("处理记录已添加", async () => {
       await addBugComment(selectedId, body, crypto.randomUUID());
-      setComment("");
+      if (selectedIdRef.current === selectedId) setComment("");
     });
   };
 
@@ -1384,7 +1450,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     event.preventDefault();
     const content = newContent.trim();
     if (content.length === 0) return;
-    await runMutation("Bug 已创建并同步到统一后端", async () => {
+    await runMutation(CREATE_BUG_MUTATION_SCOPE, "Bug 已创建并同步到统一后端", async () => {
       const clientSubmissionId = crypto.randomUUID();
       const attachmentIds: string[] = [];
       for (const file of newFiles) {
@@ -1610,6 +1676,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
             {error === null ? null : <div className="banner error-banner">{error}</div>}
             {notice === null ? null : <div className="banner success-banner">✓ {notice}</div>}
+            {pendingMutationLabels.size === 0 ? null : (
+              <div className="banner pending-banner" role="status">
+                后台正在处理 {pendingMutationLabels.size} 项请求，你可以继续使用其他功能。
+              </div>
+            )}
 
             <section aria-label="工作统计" className="summary-grid">
               {TASK_STATUS_ORDER.map((value) => (
@@ -2204,7 +2275,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           className="primary-button wide"
                           disabled={mutation !== null}
                           onClick={() =>
-                            void runMutation("已开始处理", async () => {
+                            void runCurrentBugMutation("已开始处理", async () => {
                               await startHumanRepairAttempt(
                                 repairAttempt.id,
                                 repairAttempt.version,
@@ -2661,10 +2732,10 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               </button>
               <button
                 className="primary-button"
-                disabled={!canSubmitNewBug(mutation, newVerifierId)}
+                disabled={!canSubmitNewBug(createMutation, newVerifierId)}
                 type="submit"
               >
-                {mutation === null ? "创建 Bug" : "正在提交…"}
+                {createMutation === null ? "创建 Bug" : "正在提交…"}
               </button>
             </div>
           </form>

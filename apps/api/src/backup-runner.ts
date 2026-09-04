@@ -3,11 +3,12 @@ import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync } from "nod
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import {
-  archiveSqliteRecoveryPointWithAttachments,
   validateSqliteBackupBundle,
   type SqliteOnlineBackupResult,
   type SqliteStorageWorker,
 } from "@relay-qa-hub/storage";
+
+import { archiveRecoveryPointOffThread } from "./backup-archive-worker-client.js";
 
 const MINIMUM_BACKUP_INTERVAL_MINUTES = 15;
 const MAXIMUM_BACKUP_INTERVAL_MINUTES = 7 * 24 * 60;
@@ -388,7 +389,7 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
     readonly manifestPath: string;
   }): Promise<void> => {
     if (config.archiveRoot === undefined) return;
-    const archived = await archiveSqliteRecoveryPointWithAttachments({
+    const archived = await archiveRecoveryPointOffThread({
       backupPath: recoveryPoint.backupPath,
       manifestPath: recoveryPoint.manifestPath,
       evidenceRoot: config.evidenceRoot,

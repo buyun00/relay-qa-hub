@@ -313,3 +313,32 @@ test("desktop API proxy maps an oversized binary response to a bounded error", a
     globalThis.fetch = originalFetch;
   }
 });
+
+test("desktop API proxy bounds a request whose upstream never responds", async () => {
+  const config = parseDesktopConfig({});
+  let forwardedSignal: AbortSignal | null | undefined;
+
+  const response = await proxyRendererApiRequest(
+    new Request("qa-hub://app/api/v1/bugs?limit=1"),
+    config,
+    new DesktopBrowserSessionCookieStore(),
+    {
+      timeoutMs: 20,
+      fetchImpl: async (_input, init) => {
+        forwardedSignal = init?.signal;
+        return await new Promise<Response>((_resolve, reject) => {
+          const signal = init?.signal;
+          if (signal?.aborted === true) {
+            reject(signal.reason);
+            return;
+          }
+          signal?.addEventListener("abort", () => reject(signal.reason), { once: true });
+        });
+      },
+    },
+  );
+
+  assert.equal(forwardedSignal?.aborted, true);
+  assert.equal(response.status, 504);
+  assert.deepEqual(await response.json(), { code: "REQUEST_TIMEOUT" });
+});

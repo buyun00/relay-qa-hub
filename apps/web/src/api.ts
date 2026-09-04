@@ -91,6 +91,8 @@ export interface QingyuImportResult {
 let browserCsrfToken: string | null = null;
 const REMEMBERED_LOGIN_NAME_KEY = "relay.qa-hub.login-name.v1";
 const RECOVERABLE_SESSION_CODES = new Set(["UNAUTHENTICATED", "NATIVE_SESSION_INVALID"]);
+const API_REQUEST_TIMEOUT_MS = 25_000;
+const API_TRANSFER_TIMEOUT_MS = 65_000;
 let browserSessionRecovery: Promise<BrowserSessionPrincipal> | null = null;
 
 export function setBrowserCsrfToken(value: string | null): void {
@@ -812,6 +814,21 @@ function isCaptureBundleSummary(value: unknown, captureId: string): value is Cap
   );
 }
 
+async function fetchWithTimeout(
+  path: string,
+  init: RequestInit | undefined,
+  timeoutMs: number,
+): Promise<Response> {
+  const timeoutSignal = AbortSignal.timeout(timeoutMs);
+  const signal = init?.signal ? AbortSignal.any([init.signal, timeoutSignal]) : timeoutSignal;
+  try {
+    return await fetch(path, { ...init, signal });
+  } catch (cause) {
+    if (timeoutSignal.aborted) throw new QaHubApiError(504, "REQUEST_TIMEOUT");
+    throw cause;
+  }
+}
+
 async function fetchJson(
   path: string,
   init?: RequestInit,
@@ -824,17 +841,28 @@ async function fetchJson(
     browserCsrfToken !== null && !["GET", "HEAD", "OPTIONS"].includes(method)
       ? { "X-CSRF-Token": browserCsrfToken }
       : {};
-  const response = await fetch(path, {
-    ...init,
-    credentials: "same-origin",
-    headers: {
-      Accept: "application/vnd.relay-qa-hub.v1.1+json",
-      ...csrfHeaders,
-      ...(init?.headers ?? {}),
-    },
-  });
-  const body: unknown = await response.json().catch(() => null);
-  return { response, body };
+  try {
+    const response = await fetchWithTimeout(
+      path,
+      {
+        ...init,
+        credentials: "same-origin",
+        headers: {
+          Accept: "application/vnd.relay-qa-hub.v1.1+json",
+          ...csrfHeaders,
+          ...(init?.headers ?? {}),
+        },
+      },
+      API_REQUEST_TIMEOUT_MS,
+    );
+    const body: unknown = await response.json().catch(() => null);
+    return { response, body };
+  } catch (cause) {
+    if (cause instanceof DOMException && cause.name === "TimeoutError") {
+      throw new QaHubApiError(504, "REQUEST_TIMEOUT");
+    }
+    throw cause;
+  }
 }
 
 async function establishBrowserSession(name: string): Promise<BrowserSessionPrincipal> {
@@ -1056,10 +1084,14 @@ export async function listBugAttachments(bugId: string): Promise<BugAttachmentLi
 }
 
 export async function downloadAttachment(metadata: AttachmentMetadata): Promise<Blob> {
-  const response = await fetch(`/api/v1/attachments/${encodeURIComponent(metadata.attachmentId)}`, {
-    credentials: "same-origin",
-    headers: { Accept: "application/octet-stream" },
-  });
+  const response = await fetchWithTimeout(
+    `/api/v1/attachments/${encodeURIComponent(metadata.attachmentId)}`,
+    {
+      credentials: "same-origin",
+      headers: { Accept: "application/octet-stream" },
+    },
+    API_TRANSFER_TIMEOUT_MS,
+  );
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
     throw new QaHubApiError(response.status, readErrorCode(body));
@@ -1090,11 +1122,12 @@ export async function downloadCaptureArtifact(
   captureId: string,
   artifactKind: CaptureArtifactKind,
 ): Promise<CaptureArtifactBinary> {
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `/api/v1/bugs/${encodeURIComponent(bugId)}/capture-bundles/${encodeURIComponent(
       captureId,
     )}/artifacts/${encodeURIComponent(artifactKind)}`,
     { credentials: "same-origin", headers: { Accept: "application/octet-stream" } },
+    API_TRANSFER_TIMEOUT_MS,
   );
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
@@ -1344,7 +1377,7 @@ export async function uploadBugCreateAttachment(input: {
   for (let offset = 0; offset < input.file.size; offset += initBody.chunkSize) {
     const chunk = input.file.slice(offset, Math.min(input.file.size, offset + initBody.chunkSize));
     const chunkSha256 = await sha256Hex(chunk);
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `/api/v1/uploads/${encodeURIComponent(initBody.sessionId)}/chunks/${chunkNumber}`,
       {
         method: "PUT",
@@ -1361,6 +1394,7 @@ export async function uploadBugCreateAttachment(input: {
         },
         body: chunk,
       },
+      API_TRANSFER_TIMEOUT_MS,
     );
     if (!response.ok) {
       const errorBody: unknown = await response.json().catch(() => null);

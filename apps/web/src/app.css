@@ -473,6 +473,11 @@ h1 {
   border-color: #cee5d2;
   background: #eff9f0;
 }
+.pending-banner {
+  color: #315c75;
+  border-color: #c9deea;
+  background: #eff8fc;
+}
 
 .summary-grid {
   margin-bottom: 20px;

@@ -10,6 +10,8 @@ import {
 const MAX_PROXY_REQUEST_BYTES = 8 * 1024 * 1024;
 const MAX_PROXY_RESPONSE_BYTES = 4 * 1024 * 1024;
 const MAX_PROXY_BINARY_RESPONSE_BYTES = 32 * 1024 * 1024;
+export const API_REQUEST_TIMEOUT_MS = 20_000;
+export const API_TRANSFER_TIMEOUT_MS = 60_000;
 const BROWSER_SESSION_COOKIE_NAME = "qa_hub_browser_session";
 const BROWSER_SESSION_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/u;
 const ALLOWED_RENDERER_HEADERS = new Set([
@@ -126,6 +128,20 @@ function responseByteLimit(pathname: string): number {
     : MAX_PROXY_RESPONSE_BYTES;
 }
 
+function proxyRequestTimeoutMs(pathname: string): number {
+  return /^\/api\/v1\/uploads\//u.test(pathname) ||
+    responseByteLimit(pathname) > MAX_PROXY_RESPONSE_BYTES
+    ? API_TRANSFER_TIMEOUT_MS
+    : API_REQUEST_TIMEOUT_MS;
+}
+
+function proxyError(code: "NETWORK_ERROR" | "REQUEST_TIMEOUT", status: 503 | 504): Response {
+  return new Response(JSON.stringify({ code }), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
+
 async function readBoundedBody(
   source: Pick<Response, "body">,
   maxBytes: number,
@@ -206,6 +222,7 @@ export async function proxyRendererApiRequest(
   request: Request,
   config: DesktopConfig,
   browserSession: DesktopBrowserSessionCookieStore = new DesktopBrowserSessionCookieStore(),
+  options: Readonly<{ fetchImpl?: typeof fetch; timeoutMs?: number }> = {},
 ): Promise<Response> {
   const requestUrl = new URL(request.url);
   if (!requestUrl.pathname.startsWith(API_PATH)) {
@@ -246,13 +263,16 @@ export async function proxyRendererApiRequest(
     redirect: "manual",
   };
   if (body !== undefined) requestInit.body = Buffer.from(body);
+  const timeoutSignal = AbortSignal.timeout(
+    options.timeoutMs ?? proxyRequestTimeoutMs(requestUrl.pathname),
+  );
+  requestInit.signal = AbortSignal.any([request.signal, timeoutSignal]);
   try {
-    response = await fetch(target, requestInit);
+    response = await (options.fetchImpl ?? fetch)(target, requestInit);
   } catch {
-    return new Response(JSON.stringify({ code: "NETWORK_ERROR" }), {
-      status: 503,
-      headers: { "content-type": "application/json" },
-    });
+    return timeoutSignal.aborted
+      ? proxyError("REQUEST_TIMEOUT", 504)
+      : proxyError("NETWORK_ERROR", 503);
   }
   browserSession.captureSetCookie(response.headers.get("set-cookie"));
   if (response.status >= 300 && response.status < 400) {
@@ -265,6 +285,7 @@ export async function proxyRendererApiRequest(
   try {
     responseBody = await readBoundedBody(response, responseByteLimit(requestUrl.pathname));
   } catch (cause) {
+    if (timeoutSignal.aborted) return proxyError("REQUEST_TIMEOUT", 504);
     if (cause instanceof Error && cause.message === "RESPONSE_TOO_LARGE") {
       return new Response(JSON.stringify({ code: "RESPONSE_TOO_LARGE" }), {
         status: 502,

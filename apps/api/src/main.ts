@@ -512,9 +512,6 @@ async function run(): Promise<void> {
       worker,
       logger: server.app.log,
     });
-    await backupRunner.start();
-    if (shutdownStarted) return;
-
     const address = await server.start({
       host: process.env["QA_HUB_API_HOST"] ?? DEFAULT_API_HOST,
       port: resolvePort(process.env["QA_HUB_API_PORT"]),
@@ -523,6 +520,12 @@ async function run(): Promise<void> {
       { address, databaseFile: storage.databaseFile },
       "Relay QA Hub API started",
     );
+
+    // Archive I/O runs in its own worker. Start listening first so a slow
+    // archive volume cannot make the API appear offline during startup.
+    await backupRunner.start();
+    if (shutdownStarted) return;
+
     if (relayRuntime.endpoint !== undefined && relayRuntime.bearerToken !== undefined) {
       relayPump = startMobileRelayOutboxPump({
         worker,
