@@ -60,6 +60,7 @@ export type DesktopUpdateState =
 interface PortableUpdaterOptions {
   readonly currentReleaseFile: string;
   readonly updatesDirectory: string;
+  readonly userDataDirectory?: string;
   readonly installDirectory: string;
   readonly executableName: string;
   readonly manifestUrl: URL;
@@ -432,6 +433,7 @@ export class PortableUpdater {
       const configValues = {
         PackagePath: packageFile,
         AppPath: path.join(this.options.installDirectory, this.options.executableName),
+        UserDataPath: this.options.userDataDirectory ?? "",
         ParentPid: String(this.options.currentPid ?? process.pid),
         ResultPath: resultFile,
         ReleaseId: manifest.releaseId,

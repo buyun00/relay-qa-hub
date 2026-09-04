@@ -17,6 +17,7 @@ VIAddVersionKey /LANG=1033 "ProductVersion" "${PRODUCT_VERSION}"
 
 Var PackagePath
 Var AppPath
+Var UserDataPath
 Var ParentPid
 Var ResultPath
 Var ReleaseId
@@ -58,6 +59,7 @@ Section
 
   ReadINIStr $PackagePath "$EXEDIR\update.ini" "Update" "PackagePath"
   ReadINIStr $AppPath "$EXEDIR\update.ini" "Update" "AppPath"
+  ReadINIStr $UserDataPath "$EXEDIR\update.ini" "Update" "UserDataPath"
   ReadINIStr $ParentPid "$EXEDIR\update.ini" "Update" "ParentPid"
   ReadINIStr $ResultPath "$EXEDIR\update.ini" "Update" "ResultPath"
   ReadINIStr $ReleaseId "$EXEDIR\update.ini" "Update" "ReleaseId"
@@ -110,7 +112,12 @@ app_installed:
   Call WriteResult
   Push "update installed; relaunching application"
   Call AppendLog
+  StrCmp $UserDataPath "" relaunch_default_profile
+  Exec '$\"$AppPath$\" --updated --user-data-dir=$\"$UserDataPath$\"'
+  Goto relaunch_finished
+relaunch_default_profile:
   Exec '$\"$AppPath$\" --updated'
+relaunch_finished:
   SetErrorLevel 0
   Quit
 
@@ -134,6 +141,10 @@ update_failed:
 skip_failure_result:
   IfFileExists "$AppPath" relaunch_previous_app updater_exit_failed
 relaunch_previous_app:
+  StrCmp $UserDataPath "" relaunch_previous_default_profile
+  Exec '$\"$AppPath$\" --update-failed --user-data-dir=$\"$UserDataPath$\"'
+  Goto updater_exit_failed
+relaunch_previous_default_profile:
   Exec '$\"$AppPath$\" --update-failed'
 updater_exit_failed:
   SetErrorLevel 1

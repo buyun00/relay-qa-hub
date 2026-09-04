@@ -647,6 +647,7 @@ async function createUpdater(): Promise<PortableUpdater> {
   const instance = new PortableUpdater({
     currentReleaseFile: path.join(app.getAppPath(), "release.json"),
     updatesDirectory: path.join(app.getPath("userData"), "updates"),
+    userDataDirectory: app.getPath("userData"),
     installDirectory: path.dirname(process.execPath),
     executableName: path.basename(process.execPath),
     manifestUrl: updateManifestUrl,

@@ -161,6 +161,10 @@ try {
     Start-Sleep -Milliseconds 200
   } while ([DateTime]::UtcNow -lt $deadline)
   if ($updatedProcesses.Count -lt 1) { throw "Updated client was not relaunched" }
+  $sameProfileProcesses = @($updatedProcesses | Where-Object {
+    -not [string]::IsNullOrWhiteSpace($_.CommandLine) -and $_.CommandLine.Contains($chromiumRoot)
+  })
+  if ($sameProfileProcesses.Count -lt 1) { throw "Updated client did not retain its user profile directory" }
   $testProcesses += @($updatedProcesses.ProcessId)
 
   $asarFile = Join-Path $renamedPackage "resources\app.asar"
@@ -185,6 +189,7 @@ try {
     signedManifestReleaseId = [string]$manifest.releaseId
     installResult = "installed"
     relaunched = $true
+    userProfilePreserved = $true
     runtimeConfigPreserved = $true
     rollbackDirectoryRetained = $true
   }
