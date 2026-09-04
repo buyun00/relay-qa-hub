@@ -201,6 +201,9 @@ try {
   $snapshotOutput = & $NodeExe $smokeScript snapshot
   if ($LASTEXITCODE -ne 0) { throw "Packaged signed-out snapshot failed" }
   $snapshot = ($snapshotOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
+  if (-not $snapshot.desktopPackagingBridgeAvailable) {
+    throw "Packaged build progress notification bridge is unavailable"
+  }
   if (-not $snapshot.loginVisible -or $snapshot.authUnavailable) {
     throw "Portable package did not reach the name login page"
   }

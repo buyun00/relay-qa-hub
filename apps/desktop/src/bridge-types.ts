@@ -39,6 +39,8 @@ export type DesktopUpdateState =
   | { readonly status: "error"; readonly message: string };
 
 export interface QaHubDesktopBridge {
+  readonly notifyPackaging: (notice: DesktopPackagingNotice) => Promise<boolean>;
+  readonly onOpenPackaging: (listener: () => void) => () => void;
   readonly getConnectionStatus: () => Promise<DesktopConnectionStatus>;
   readonly getRuntimeInfo: () => Promise<DesktopRuntimeInfo>;
   readonly getNotificationsPaused: () => Promise<boolean>;
@@ -49,4 +51,11 @@ export interface QaHubDesktopBridge {
   readonly onBugChanged: (listener: (change: DesktopBugChange) => void) => () => void;
   readonly onOpenBug: (listener: (bugId: string) => void) => () => void;
   readonly onUpdateState: (listener: (state: DesktopUpdateState) => void) => () => void;
+}
+
+export interface DesktopPackagingNotice {
+  readonly id: string;
+  readonly kind: "success" | "warning" | "failure";
+  readonly title: string;
+  readonly body: string;
 }

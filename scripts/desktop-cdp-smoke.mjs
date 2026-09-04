@@ -159,6 +159,7 @@ const snapshotExpression = `
         (node) => node.getAttribute("data-created-date") ?? ""),
       markerVisible: ${JSON.stringify(marker)}.length > 0 && bodyText.includes(${JSON.stringify(marker)}),
       desktopConnection: status,
+      desktopPackagingBridgeAvailable: typeof window.qaHubDesktop?.notifyPackaging === "function" && typeof window.qaHubDesktop?.onOpenPackaging === "function",
       desktopUpdate: updateState,
       visibilityState: document.visibilityState
     };

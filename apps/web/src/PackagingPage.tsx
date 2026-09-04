@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { createPortal } from "react-dom";
+import PackagingProgressPanel from "./PackagingProgress";
+import { usePackagingProgress } from "./usePackagingProgress";
 import { QaHubApiError } from "./api";
 import {
   BUILD_PRESETS,
@@ -39,16 +42,6 @@ function submissionError(error: unknown): string {
   }
   return "暂时无法连接打包服务，请稍后重试。";
 }
-const BUILD_STATUS: Record<string, string> = {
-  BUILDING: "打包中",
-  SUCCESS: "已完成",
-  FAILURE: "失败",
-  ABORTED: "已取消",
-  UNSTABLE: "不稳定",
-  NOT_BUILT: "未执行",
-  UNKNOWN: "未知",
-};
-
 export function PackageDownloads({ status }: { status: PackagingStatus }) {
   const latest = BUILD_PRESETS.map((preset) => ({
     ...preset,
@@ -224,9 +217,13 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
 export default function PackagingPage({
   active,
   refreshRevision,
+  userId = "current",
+  onOpen,
 }: {
   active: boolean;
   refreshRevision: number;
+  userId?: string;
+  onOpen?: () => void;
 }) {
   const [status, setStatus] = useState<PackagingStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -234,6 +231,7 @@ export default function PackagingPage({
   const [pending, setPending] = useState<BuildPreset | null>(null);
   const submitting = useRef(false);
   const request = useRef(0);
+  const completedRefresh = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const refresh = useCallback(async (signal?: AbortSignal) => {
     const id = ++request.current;
     try {
@@ -246,6 +244,13 @@ export default function PackagingPage({
         setError("打包服务暂时无法连接，稍后自动重试。");
     }
   }, []);
+  const onCompleted = useCallback(() => {
+    void refresh();
+    clearTimeout(completedRefresh.current);
+    completedRefresh.current = setTimeout(() => void refresh(), 6_000);
+  }, [refresh]);
+  useEffect(() => () => clearTimeout(completedRefresh.current), []);
+  const monitor = usePackagingProgress(userId, active, refreshRevision, onCompleted);
   useEffect(() => {
     if (!active) return;
     const controller = new AbortController();
@@ -268,6 +273,7 @@ export default function PackagingPage({
     setNotice(null);
     try {
       const receipt = await triggerJenkinsBuild(preset, crypto.randomUUID());
+      monitor.watch(receipt.queueId);
       setNotice(`${packageLabel(preset)}已提交，排队编号 #${receipt.queueId}。`);
     } catch (cause) {
       setNotice(submissionError(cause));
@@ -277,85 +283,109 @@ export default function PackagingPage({
       void refresh();
     }
   };
-  if (!active) return null;
-  return (
-    <main className="packaging-page">
-      <section className="package-build-panel" aria-labelledby="packaging-title">
-        <div className="package-section-heading">
-          <div>
-            <p className="eyebrow">OZDQP / ANDROID</p>
-            <h1 id="packaging-title">打包与下载</h1>
-          </div>
-          <span className={`package-connection${status?.jenkins && !error ? " is-connected" : ""}`}>
-            {status?.jenkins && !error
-              ? "Jenkins 已连接"
-              : status
-                ? "正在重连 Jenkins"
-                : "正在连接 Jenkins…"}
-          </span>
-        </div>
-        <div className="package-build-buttons">
-          {BUILD_PRESETS.map(({ id, label }) => (
-            <button
-              className="package-build-button"
-              type="button"
-              key={id}
-              disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
-              onClick={() => void build(id)}
-            >
-              {pending === id ? "正在提交…" : label}
-            </button>
+  const notifications = monitor.notices.length
+    ? createPortal(
+        <div className="package-notifications" aria-label="打包通知">
+          {monitor.notices.map((item) => (
+            <article className={`package-notification is-${item.kind}`} role="alert" key={item.id}>
+              <strong>{item.title}</strong>
+              <p>{item.body}</p>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpen?.();
+                    monitor.dismiss(item.id);
+                  }}
+                >
+                  查看构建
+                </button>
+                <button
+                  type="button"
+                  aria-label="关闭打包通知"
+                  onClick={() => monitor.dismiss(item.id)}
+                >
+                  关闭
+                </button>
+              </div>
+            </article>
           ))}
-        </div>
-        <p className="package-hint">
-          使用 Jenkins 当前默认参数。内网会自动判断资源更新或整包；下载区展示已生成的文件。
-        </p>
-        {notice ? (
-          <p className="banner pending-banner" role="status">
-            {notice}
-          </p>
-        ) : null}
-        {error ? (
-          <p className="banner error-banner" role="alert">
-            {error} 下方为上次读取的下载列表。
-          </p>
-        ) : status?.jenkinsError ? (
-          <p className="banner error-banner">
-            Jenkins 暂时无法连接，正在自动重试；已有文件仍可下载。
-          </p>
-        ) : status?.jenkins && !status.jenkins.buildable ? (
-          <p className="banner error-banner">Jenkins 已禁用当前打包任务。</p>
-        ) : null}
-        {status?.jenkins ? (
-          <div className="package-build-history" aria-label="最近构建">
-            <span>最近构建</span>
-            {status.jenkins.queue.map((item) => (
-              <span
-                className="package-build-status is-building"
-                key={`q${item.id}`}
-                title={item.reason}
+        </div>,
+        document.body,
+      )
+    : null;
+  if (!active) return notifications;
+  return (
+    <>
+      {notifications}
+      <main className="packaging-page">
+        <section className="package-build-panel" aria-labelledby="packaging-title">
+          <div className="package-section-heading">
+            <div>
+              <p className="eyebrow">OZDQP / ANDROID</p>
+              <h1 id="packaging-title">打包与下载</h1>
+            </div>
+            <span
+              className={`package-connection${status?.jenkins && !error ? " is-connected" : ""}`}
+            >
+              {status?.jenkins && !error
+                ? "Jenkins 已连接"
+                : status
+                  ? "正在重连 Jenkins"
+                  : "正在连接 Jenkins…"}
+            </span>
+          </div>
+          <div className="package-build-buttons">
+            {BUILD_PRESETS.map(({ id, label }) => (
+              <button
+                className="package-build-button"
+                type="button"
+                key={id}
+                disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
+                onClick={() => void build(id)}
               >
-                排队 #{item.id} · {packageLabel(item.preset)}
-              </span>
-            ))}
-            {status.jenkins.builds.slice(0, 4).map((item) => (
-              <span
-                className={`package-build-status${item.status === "BUILDING" ? " is-building" : item.status === "SUCCESS" ? " is-success" : ""}`}
-                key={item.number}
-                title={formatTime(item.startedAt)}
-              >
-                #{item.number} · {packageLabel(item.preset)} ·{" "}
-                {BUILD_STATUS[item.status] ?? item.status}
-              </span>
+                {pending === id ? "正在提交…" : label}
+              </button>
             ))}
           </div>
-        ) : null}
-      </section>
-      {status ? (
-        <PackageDownloads status={status} />
-      ) : (
-        <div className="loading-row">正在读取可下载文件…</div>
-      )}
-    </main>
+          <p className="package-hint">
+            使用 Jenkins 当前默认参数。内网会自动判断资源更新或整包；下载区展示已生成的文件。
+          </p>
+          {notice ? (
+            <p className="banner pending-banner" role="status">
+              {notice}
+            </p>
+          ) : null}
+          {error ? (
+            <p className="banner error-banner" role="alert">
+              {error} 下方为上次读取的下载列表。
+            </p>
+          ) : status?.jenkinsError ? (
+            <p className="banner error-banner">
+              Jenkins 暂时无法连接，正在自动重试；已有文件仍可下载。
+            </p>
+          ) : status?.jenkins && !status.jenkins.buildable ? (
+            <p className="banner error-banner">Jenkins 已禁用当前打包任务。</p>
+          ) : null}
+        </section>
+        <PackagingProgressPanel
+          progress={monitor.progress}
+          error={monitor.error}
+          watchedNumbers={monitor.watchedNumbers}
+          pendingQueues={[
+            ...monitor.pendingQueues.map((id) => ({
+              id,
+              reason: "已提交，正在等待 Jenkins 分配构建编号",
+            })),
+            ...(status?.jenkins?.queue ?? []),
+          ]}
+        />
+        {status ? (
+          <PackageDownloads status={status} />
+        ) : (
+          <div className="loading-row">正在读取可下载文件…</div>
+        )}
+      </main>
+    </>
   );
 }

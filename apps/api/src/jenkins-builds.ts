@@ -1,4 +1,12 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import {
+  applyBuildHistory,
+  describeBuild,
+  parseBuildLog,
+  type JenkinsBuildRecord,
+  type PackagingProgress,
+  type ParsedBuildLog,
+} from "./jenkins-progress.js";
 
 // Fixed intranet installation, as requested. Credentials stay in the API process.
 const JENKINS_ORIGIN = "http://10.100.5.129:8080";
@@ -22,13 +30,7 @@ interface JenkinsParameters {
 }
 interface JenkinsJob {
   buildable: boolean;
-  builds: {
-    number: number;
-    timestamp: number;
-    building: boolean;
-    result: string | null;
-    actions?: JenkinsParameters[];
-  }[];
+  builds: JenkinsBuildRecord[];
   property?: { parameterDefinitions?: ParameterDefinition[] }[];
 }
 interface DirectoryFile {
@@ -109,6 +111,9 @@ export class JenkinsBuildService {
   private crumb: { crumbRequestField: string; crumb: string } | null = null;
   private crumbLoading: Promise<void> | null = null;
   private cachedStatus: { until: number; value: Promise<PackagingStatus> } | null = null;
+  private progressCache = new Map<string, { until: number; value: Promise<PackagingProgress> }>();
+  private logCache = new Map<number, { until: number; value: Promise<ParsedBuildLog> }>();
+  private observedStages = new Map<string, number>();
   private submissions = new Map<
     string,
     {
@@ -184,9 +189,10 @@ export class JenkinsBuildService {
     }
   }
 
-  private async job(signal?: AbortSignal): Promise<JenkinsJob> {
-    const tree =
-      "buildable,property[parameterDefinitions[name,choices]],builds[number,timestamp,building,result,actions[parameters[name,value]]]{0,10}";
+  private async job(signal?: AbortSignal, progress = false): Promise<JenkinsJob> {
+    const tree = progress
+      ? "buildable,builds[number,timestamp,duration,estimatedDuration,queueId,builtOn,building,result,actions[causes[userName],parameters[name,value]]]{0,24}"
+      : "buildable,property[parameterDefinitions[name,choices]],builds[number,timestamp,building,result,actions[parameters[name,value]]]{0,10}";
     let response = await this.request(
       `${JOB_PATH}api/json?tree=${encodeURIComponent(tree)}`,
       signal ? { signal } : {},
@@ -373,6 +379,164 @@ export class JenkinsBuildService {
     this.cachedStatus = { until: Date.now() + 5_000, value };
     return value;
   }
+
+  private buildLog(build: JenkinsBuildRecord, signal: AbortSignal): Promise<ParsedBuildLog> {
+    const previous = this.logCache.get(build.number);
+    if (previous && previous.until > Date.now()) return previous.value;
+    const value = (async () => {
+      const response = await this.request(
+        `${JOB_PATH}${build.number}/timestamps/?elapsed=HH:mm:ss.SSS&appendLog`,
+        { signal },
+      );
+      if (!response.ok) {
+        await response.body?.cancel();
+        throw new PackagingError("PACKAGING_LOG_UNAVAILABLE");
+      }
+      const reader = response.body?.getReader();
+      if (!reader) throw new PackagingError("PACKAGING_LOG_UNAVAILABLE");
+      const chunks: Uint8Array[] = [];
+      let length = 0;
+      try {
+        while (true) {
+          const part = await reader.read();
+          if (part.done) break;
+          length += part.value.byteLength;
+          if (length > 2 * 1024 * 1024) throw new PackagingError("PACKAGING_LOG_TOO_LARGE");
+          chunks.push(part.value);
+        }
+        return parseBuildLog(Buffer.concat(chunks).toString("utf8"));
+      } catch {
+        await reader.cancel().catch(() => undefined);
+        throw new PackagingError("PACKAGING_LOG_UNAVAILABLE");
+      } finally {
+        reader.releaseLock();
+      }
+    })();
+    this.logCache.set(build.number, {
+      until: Date.now() + (build.building ? 4_000 : 86_400_000),
+      value,
+    });
+    void value.catch(() => {
+      this.logCache.delete(build.number);
+    });
+    while (this.logCache.size > 80) this.logCache.delete(this.logCache.keys().next().value!);
+    return value;
+  }
+
+  private async readProgress(
+    queueIds: number[],
+    buildNumbers: number[],
+  ): Promise<PackagingProgress> {
+    const signal = AbortSignal.timeout(18_000);
+    const job = await this.job(signal, true);
+    const builds = [...job.builds];
+    const queues: PackagingProgress["queues"] = [];
+    const buildTree =
+      "number,timestamp,duration,estimatedDuration,queueId,builtOn,building,result,actions[causes[userName],parameters[name,value]]";
+    const loadBuild = async (number: number) => {
+      if (builds.some((b) => b.number === number)) return;
+      const build = await this.readJson<JenkinsBuildRecord>(
+        await this.request(`${JOB_PATH}${number}/api/json?tree=${encodeURIComponent(buildTree)}`, {
+          signal,
+        }),
+      );
+      if (build.number !== number || !Number.isFinite(build.timestamp))
+        throw new PackagingError("PACKAGING_INVALID_RESPONSE");
+      if (!builds.some((b) => b.number === number)) builds.push(build);
+    };
+    // Explicit build numbers keep a tracked task resolvable after it leaves recent history.
+    await Promise.all(buildNumbers.map(loadBuild));
+    await Promise.all(
+      queueIds.map(async (id) => {
+        if (builds.some((b) => b.queueId === id)) return;
+        try {
+          const response = await this.request(
+            `/queue/item/${id}/api/json?tree=id,cancelled,why,task[url],executable[number]`,
+            { signal },
+          );
+          if (response.status === 404) {
+            await response.body?.cancel();
+            throw new Error("Queue expired");
+          }
+          const item = await this.readJson<{
+            id: number;
+            cancelled?: boolean;
+            why?: string;
+            task?: { url: string };
+            executable?: { number: number };
+          }>(response);
+          if (
+            item.id !== id ||
+            decodeURI(item.task?.url ?? "") !== decodeURI(`${JENKINS_ORIGIN}${JOB_PATH}`)
+          )
+            throw new Error("Unrelated queue item");
+          if (item.cancelled)
+            queues.push({ id, status: "CANCELLED", reason: "Jenkins 已取消排队" });
+          else if (Number.isSafeInteger(item.executable?.number) && item.executable!.number > 0)
+            await loadBuild(item.executable!.number);
+          else
+            queues.push({
+              id,
+              status: "QUEUED",
+              reason: item.why?.slice(0, 500) || "等待 Jenkins 执行器",
+            });
+        } catch {
+          queues.push({
+            id,
+            status: "UNKNOWN",
+            reason: "暂时无法确认排队状态，正在重试；不会重复提交",
+          });
+        }
+      }),
+    );
+    const descriptions: ReturnType<typeof describeBuild>[] = [];
+    let index = 0;
+    // Cap concurrent console reads so inspecting history does not flood Jenkins.
+    await Promise.all(
+      Array.from({ length: Math.min(3, builds.length) }, async () => {
+        while (index < builds.length) {
+          const build = builds[index++]!;
+          try {
+            descriptions.push(
+              describeBuild(
+                build,
+                await this.buildLog(build, signal),
+                Date.now(),
+                this.observedStages,
+              ),
+            );
+          } catch {
+            descriptions.push(
+              describeBuild(build, parseBuildLog(""), Date.now(), this.observedStages, true),
+            );
+          }
+        }
+      }),
+    );
+    for (const [key, value] of this.observedStages)
+      if (value < Date.now() - 7 * 86_400_000) this.observedStages.delete(key);
+    return {
+      checkedAt: new Date().toISOString(),
+      builds: applyBuildHistory(descriptions).sort((a, b) => b.number - a.number),
+      queues: queues.sort((a, b) => a.id - b.id),
+    };
+  }
+
+  progress(queueIds: number[] = [], buildNumbers: number[] = []): Promise<PackagingProgress> {
+    const key = `${[...queueIds].sort((a, b) => a - b)}:${[...buildNumbers].sort((a, b) => a - b)}`;
+    const previous = this.progressCache.get(key);
+    if (previous && previous.until > Date.now()) return previous.value;
+    const value = this.readProgress(queueIds, buildNumbers);
+    this.progressCache.set(key, { until: Date.now() + 5_000, value });
+    void value.catch(() => {
+      this.progressCache.delete(key);
+    });
+    for (const [key, entry] of this.progressCache)
+      if (entry.until < Date.now()) this.progressCache.delete(key);
+    while (this.progressCache.size > 100)
+      this.progressCache.delete(this.progressCache.keys().next().value!);
+    return value;
+  }
 }
 
 export interface PackagingStatus {
@@ -412,6 +576,21 @@ export function registerPackagingRoutes(
     }
   };
   app.get(JENKINS_BUILDS_PATH, (request, reply) => respond(request, reply, () => service.status()));
+  app.get(`${JENKINS_BUILDS_PATH}/progress`, (request, reply) =>
+    respond(request, reply, () => {
+      const query = request.query as Record<string, unknown>;
+      const ids = (value: unknown): number[] => {
+        if (value === undefined) return [];
+        if (typeof value !== "string" || !/^\d{1,10}(,\d{1,10}){0,9}$/u.test(value))
+          throw new PackagingError("INVALID_REQUEST", 400);
+        const numbers = [...new Set(value.split(",").map(Number))];
+        if (numbers.some((n) => !Number.isSafeInteger(n) || n <= 0))
+          throw new PackagingError("INVALID_REQUEST", 400);
+        return numbers;
+      };
+      return service.progress(ids(query["queues"]), ids(query["builds"]));
+    }),
+  );
   app.post(`${JENKINS_BUILDS_PATH}/builds`, (request, reply) =>
     respond(request, reply, async (actorId) => {
       const body = request.body as { preset?: unknown } | null;

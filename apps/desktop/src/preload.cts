@@ -171,6 +171,18 @@ ipcRenderer.on("desktop:update-state", (_event: IpcRendererEvent, value: unknown
 });
 
 const bridge: QaHubDesktopBridge = {
+  notifyPackaging: async (notice) =>
+    (await ipcRenderer.invoke("desktop:notify-packaging", {
+      id: notice.id,
+      kind: notice.kind,
+      title: notice.title,
+      body: notice.body,
+    })) === true,
+  onOpenPackaging: (listener) => {
+    const handler = () => listener();
+    ipcRenderer.on("desktop:open-packaging", handler);
+    return () => ipcRenderer.removeListener("desktop:open-packaging", handler);
+  },
   getConnectionStatus: async () =>
     parseStatus(await ipcRenderer.invoke("desktop:get-connection-status")),
   getRuntimeInfo: async () =>

@@ -959,9 +959,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       openDetail(bugId);
       void loadWorkbench(true, false);
     });
+    const stopOpenPackaging = bridge.onOpenPackaging?.(() => setView("packaging"));
     return () => {
       stopBugChanged();
       stopOpenBug();
+      stopOpenPackaging?.();
     };
   }, [loadDetail, loadWorkbench, openDetail]);
 
@@ -1833,7 +1835,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           />
         ) : null}
         <div hidden={view !== "packaging"}>
-          <PackagingPage active={view === "packaging"} refreshRevision={packagingRevision} />
+          <PackagingPage
+            key={principal.userId}
+            userId={principal.userId}
+            active={view === "packaging"}
+            refreshRevision={packagingRevision}
+            onOpen={() => setView("packaging")}
+          />
         </div>
       </section>
 

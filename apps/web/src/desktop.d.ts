@@ -30,6 +30,13 @@ type QaHubDesktopUpdateState =
   | { readonly status: "error"; readonly message: string };
 
 interface QaHubDesktopBridge {
+  readonly notifyPackaging?: (notice: {
+    id: string;
+    kind: "success" | "warning" | "failure";
+    title: string;
+    body: string;
+  }) => Promise<boolean>;
+  readonly onOpenPackaging?: (listener: () => void) => () => void;
   readonly getRuntimeInfo: () => Promise<QaHubDesktopRuntimeInfo>;
   readonly getUpdateState: () => Promise<QaHubDesktopUpdateState>;
   readonly checkForUpdate: () => Promise<boolean>;

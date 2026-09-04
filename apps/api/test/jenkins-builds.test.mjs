@@ -220,6 +220,7 @@ test("routes require QA Hub authentication, validate preset and reject additiona
   });
   t.after(() => app.close());
   assert.equal((await app.inject({ url: "/api/v1/packaging" })).statusCode, 401);
+  assert.equal((await app.inject({ url: "/api/v1/packaging/progress" })).statusCode, 401);
   assert.equal(
     (
       await app.inject({
@@ -234,6 +235,12 @@ test("routes require QA Hub authentication, validate preset and reject additiona
     authorization: "Bearer fixture-token",
     "idempotency-key": "test-request-key-12345",
   };
+  for (const query of ["queues=0", "queues=1%2F2", "builds=-1", "queues=1,2,3,4,5,6,7,8,9,10,11"]) {
+    assert.equal(
+      (await app.inject({ url: `/api/v1/packaging/progress?${query}`, headers })).statusCode,
+      400,
+    );
+  }
   for (const payload of [
     { preset: "wrong" },
     { preset: "external", version: "99" },

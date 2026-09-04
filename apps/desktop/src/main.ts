@@ -17,6 +17,7 @@ import {
 
 import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
 import { isPackageDownloadUrl } from "./package-downloads.js";
+import { parsePackagingNotice } from "./packaging-notifications.js";
 import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
 import { NotificationHistory } from "./notification-history.js";
 import {
@@ -57,6 +58,7 @@ const config = parseDesktopConfig(runtimeEnvironment, {
 });
 
 let mainWindow: BrowserWindow | null = null;
+const packagingNotices = new Set<string>();
 let tray: Tray | null = null;
 let transport: NotificationTransport;
 let updater: PortableUpdater | null = null;
@@ -553,6 +555,7 @@ function createWindow(): BrowserWindow {
       sandbox: true,
       webSecurity: true,
       spellcheck: false,
+      backgroundThrottling: false,
     },
   });
   installNavigationGuards(window);
@@ -572,6 +575,27 @@ function createWindow(): BrowserWindow {
 }
 
 function installIpcHandlers(): void {
+  ipcMain.removeHandler("desktop:notify-packaging");
+  ipcMain.handle("desktop:notify-packaging", (event, value: unknown) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "") || !Notification.isSupported())
+      return false;
+    const notice = parsePackagingNotice(value);
+    if (!notice || packagingNotices.has(notice.id)) return false;
+    const notification = new Notification({
+      title: `QA Hub · ${notice.title}`,
+      body: notice.body,
+      silent: false,
+    });
+    notification.once("click", () => {
+      openMainWindow();
+      mainWindow?.webContents.send("desktop:open-packaging");
+    });
+    notification.show();
+    packagingNotices.add(notice.id);
+    while (packagingNotices.size > 200)
+      packagingNotices.delete(packagingNotices.values().next().value!);
+    return true;
+  });
   ipcMain.removeHandler("desktop:get-connection-status");
   ipcMain.removeHandler("desktop:get-runtime-info");
   ipcMain.removeHandler("desktop:get-notifications-paused");

@@ -1,0 +1,313 @@
+import type { BuildPreset } from "./jenkins-builds.js";
+
+export interface JenkinsBuildRecord {
+  number: number;
+  timestamp: number;
+  duration?: number;
+  estimatedDuration?: number;
+  queueId?: number;
+  builtOn?: string;
+  building: boolean;
+  result: string | null;
+  actions?: {
+    parameters?: { name: string; value?: unknown }[];
+    causes?: { userName?: string }[];
+  }[];
+}
+
+const MINUTE = 60_000;
+export const BUILD_STAGES = [
+  {
+    id: "prepare",
+    label: "准备环境",
+    work: "获取构建锁、分配版本、同步代码并判断构建方式",
+    limit: 5 * MINUTE,
+  },
+  {
+    id: "unity",
+    label: "Unity 导出",
+    work: "生成热更资源、编译脚本并导出 Android 工程",
+    limit: 30 * MINUTE,
+  },
+  {
+    id: "apk",
+    label: "编译 APK",
+    work: "Gradle / IL2CPP 编译、签名并复制 APK 到下载目录",
+    limit: 15 * MINUTE,
+  },
+  { id: "publish", label: "发布资源", work: "上传热更资源并更新 CDN", limit: 10 * MINUTE },
+  {
+    id: "zip",
+    label: "生成增量 ZIP",
+    work: "从 CDN 目录汇总模块并生成可下载 ZIP",
+    limit: 10 * MINUTE,
+  },
+  {
+    id: "finalize",
+    label: "完成校验",
+    work: "记录发布版本、保存包体基线并完成 Jenkins 任务",
+    limit: 3 * MINUTE,
+  },
+] as const;
+export type StageId = (typeof BUILD_STAGES)[number]["id"];
+export interface BuildStageProgress {
+  id: StageId;
+  label: string;
+  work: string;
+  state: "waiting" | "running" | "complete" | "skipped" | "failed";
+  elapsedMs: number | null;
+  toolElapsedMs: number | null;
+  timing: "recorded" | "observed" | "unavailable";
+  expectedMs: number | null;
+  sampleCount: number;
+  alertAfterMs: number;
+  alertBasis: "history" | "initial";
+  percent: number | null;
+  alert: boolean;
+}
+export interface BuildProgress {
+  number: number;
+  queueId: number | null;
+  preset: BuildPreset | null;
+  status: string;
+  startedAt: string;
+  elapsedMs: number;
+  expectedMs: number | null;
+  triggeredBy: string;
+  executor: string;
+  mode: "App" | "Res" | "Script" | null;
+  includesZip: boolean | null;
+  percent: number;
+  stages: BuildStageProgress[];
+  logError: boolean;
+}
+export interface PackagingProgress {
+  checkedAt: string;
+  builds: BuildProgress[];
+  queues: { id: number; status: "QUEUED" | "CANCELLED" | "UNKNOWN"; reason: string }[];
+}
+export interface ParsedBuildLog {
+  markers: Partial<Record<StageId, number | null>>;
+  mode: BuildProgress["mode"];
+  zip: boolean | null;
+  gradleMs: number | null;
+}
+
+/** Only known stage markers are exported. Console output can contain credentials. */
+export function parseBuildLog(log: string): ParsedBuildLog {
+  const parsed: ParsedBuildLog = { markers: { prepare: 0 }, mode: null, zip: null, gradleMs: null };
+  for (const raw of log.split(/\r?\n/u)) {
+    const timed = /^(\d+):(\d{2}):(\d{2})\.(\d{3})\s+(.*)$/u.exec(raw.trimStart());
+    const elapsed = timed
+      ? ((Number(timed[1]) * 60 + Number(timed[2])) * 60 + Number(timed[3])) * 1000 +
+        Number(timed[4])
+      : null;
+    const line = (timed ? timed[5]! : raw).trim();
+    const policy = /^\[JenkinsPlayerPolicy\].*\beffective=(App|Res|Script)\b/u.exec(line);
+    if (policy) parsed.mode = policy[1] as ParsedBuildLog["mode"];
+    const zip = /^\[init\] MAKE_PKG_ZIP_VAL=(true|false)$/u.exec(line);
+    if (zip) parsed.zip = zip[1] === "true";
+    const gradle = /^BUILD SUCCESSFUL in (?:(\d+)h )?(?:(\d+)m )?(\d+)(?:\.\d+)?s$/u.exec(line);
+    if (gradle)
+      parsed.gradleMs =
+        ((Number(gradle[1] ?? 0) * 60 + Number(gradle[2] ?? 0)) * 60 + Number(gradle[3])) * 1000;
+    let stage: StageId | undefined;
+    if (/^\+ notify_stage ['"].*Unity 导出中/u.test(line)) stage = "unity";
+    else if (/^\+ notify_stage ['"].*开始编译 APK/u.test(line)) stage = "apk";
+    else if (/^\+ notify_stage ['"].*上传热更资源到 CDN/u.test(line)) stage = "publish";
+    else if (/^\+ notify_stage ['"].*开始打整包 ZIP/u.test(line)) stage = "zip";
+    else if (
+      /^\[OZDQP-PUBLISH\] finalize\b/u.test(line) ||
+      /^\+ record_player_base_revision\b/u.test(line)
+    )
+      stage = "finalize";
+    if (stage && !(stage in parsed.markers)) parsed.markers[stage] = elapsed;
+  }
+  return parsed;
+}
+
+export function buildPreset(build: JenkinsBuildRecord): BuildPreset | null {
+  const params = Object.fromEntries(
+    (build.actions ?? []).flatMap((a) => a.parameters ?? []).map((p) => [p.name, p.value]),
+  );
+  return params["networkScope"] === "外网_保留原参数"
+    ? "external"
+    : params["networkScope"] === "内网_自动判断"
+      ? params["internalUseSdk"] === "接入SDK"
+        ? "internal-sdk"
+        : "internal-nosdk"
+      : null;
+}
+export function median(values: number[]): number | null {
+  if (!values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
+}
+
+export function describeBuild(
+  build: JenkinsBuildRecord,
+  parsed: ParsedBuildLog,
+  now: number,
+  observed: Map<string, number>,
+  logError = false,
+): BuildProgress {
+  const elapsedMs = build.building
+    ? Math.max(0, now - build.timestamp)
+    : Math.max(0, build.duration ?? 0);
+  const seen = BUILD_STAGES.filter((s) => s.id in parsed.markers);
+  const current = seen.at(-1)!.id;
+  const currentIndex = BUILD_STAGES.findIndex((s) => s.id === current);
+  const stages = BUILD_STAGES.map((definition, index): BuildStageProgress => {
+    const start = parsed.markers[definition.id];
+    const next = seen[seen.findIndex((s) => s.id === definition.id) + 1];
+    const end = next ? parsed.markers[next.id] : elapsedMs;
+    const seenStage = start !== undefined;
+    const skipped =
+      !seenStage &&
+      (index < currentIndex ||
+        (!build.building && build.result === "SUCCESS") ||
+        (definition.id === "apk" && parsed.mode === "Res") ||
+        (definition.id === "zip" && parsed.zip === false));
+    const state = skipped
+      ? "skipped"
+      : !seenStage
+        ? "waiting"
+        : definition.id !== current
+          ? "complete"
+          : build.building
+            ? "running"
+            : build.result === "SUCCESS"
+              ? "complete"
+              : "failed";
+    let timing: BuildStageProgress["timing"] = "unavailable";
+    let duration: number | null = null;
+    // Preparation has a known start, but its end still needs a timestamp.
+    if (
+      seenStage &&
+      start !== null &&
+      end != null &&
+      end >= start &&
+      !(logError && build.building)
+    ) {
+      duration = end - start;
+      timing = "recorded";
+    } else if (state === "running" && !logError) {
+      const key = `${build.number}:${definition.id}`;
+      if (!observed.has(key)) observed.set(key, now);
+      duration = Math.max(0, now - observed.get(key)!);
+      timing = "observed";
+    }
+    return {
+      id: definition.id,
+      label: definition.label,
+      work: definition.work,
+      state,
+      elapsedMs: duration,
+      toolElapsedMs: definition.id === "apk" ? parsed.gradleMs : null,
+      timing,
+      expectedMs: null,
+      sampleCount: 0,
+      alertAfterMs: definition.limit,
+      alertBasis: "initial",
+      percent: state === "complete" ? 100 : null,
+      alert: false,
+    };
+  });
+  return {
+    number: build.number,
+    queueId: build.queueId ?? null,
+    preset: buildPreset(build),
+    status: build.building ? "BUILDING" : (build.result ?? "UNKNOWN"),
+    startedAt: new Date(build.timestamp).toISOString(),
+    elapsedMs,
+    expectedMs: null,
+    triggeredBy:
+      (build.actions ?? [])
+        .flatMap((a) => a.causes ?? [])
+        .find((c) => c.userName)
+        ?.userName?.slice(0, 100) ?? "自动触发 / 未记录",
+    executor: `Jenkins · ${build.builtOn || "内置节点"}`,
+    mode: parsed.mode,
+    includesZip: parsed.zip ?? ("zip" in parsed.markers ? true : null),
+    percent: 0,
+    stages,
+    logError,
+  };
+}
+
+/** Compare matching environment and effective mode, excluding failures and partial observations. */
+export function applyBuildHistory(builds: BuildProgress[]): BuildProgress[] {
+  return builds.map((build) => {
+    const peers = builds.filter(
+      (other) =>
+        other.number !== build.number &&
+        other.status === "SUCCESS" &&
+        !other.logError &&
+        build.preset !== null &&
+        other.preset === build.preset &&
+        build.mode !== null &&
+        other.mode === build.mode &&
+        other.includesZip === build.includesZip,
+    );
+    const stages = build.stages.map((stage) => {
+      const samples = peers.flatMap((p) =>
+        p.stages
+          .filter(
+            (s) =>
+              s.id === stage.id &&
+              s.state === "complete" &&
+              s.timing === "recorded" &&
+              s.elapsedMs !== null,
+          )
+          .map((s) => s.elapsedMs!),
+      );
+      const expectedMs = median(samples);
+      const ordered = [...samples].sort((a, b) => a - b);
+      const alertAfterMs =
+        samples.length >= 3 && expectedMs !== null
+          ? Math.max(
+              expectedMs * 2,
+              expectedMs + MINUTE,
+              ordered[Math.ceil(ordered.length * 0.9) - 1]! + 30_000,
+            )
+          : stage.alertAfterMs;
+      return {
+        ...stage,
+        expectedMs,
+        sampleCount: samples.length,
+        alertAfterMs,
+        alertBasis: samples.length >= 3 ? ("history" as const) : ("initial" as const),
+        percent:
+          stage.state === "complete"
+            ? 100
+            : stage.state === "running" && expectedMs && stage.elapsedMs !== null
+              ? Math.min(95, Math.floor((stage.elapsedMs / expectedMs) * 100))
+              : null,
+        alert:
+          !build.logError &&
+          stage.state === "running" &&
+          stage.elapsedMs !== null &&
+          stage.elapsedMs > alertAfterMs,
+      };
+    });
+    const required = stages.filter((s) => s.state !== "skipped");
+    const percent =
+      build.status === "SUCCESS"
+        ? 100
+        : Math.min(
+            99,
+            Math.floor(
+              (required.reduce(
+                (n, s) =>
+                  n +
+                  (s.state === "complete" ? 1 : s.state === "running" ? (s.percent ?? 0) / 100 : 0),
+                0,
+              ) /
+                required.length) *
+                100,
+            ),
+          );
+    return { ...build, stages, percent, expectedMs: median(peers.map((p) => p.elapsedMs)) };
+  });
+}
