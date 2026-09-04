@@ -2,7 +2,8 @@
   [string]$PackageDirectory,
   [string]$LoginName = "Windows安装包验收账号",
   [string]$NodeExe = $env:QA_HUB_DESKTOP_NODE_EXE,
-  [ValidateRange(1, 65535)][int]$McpPort = 4320
+  [ValidateRange(1, 65535)][int]$McpPort = 4320,
+  [switch]$VerifyPackagingNotification
 )
 
 $ErrorActionPreference = "Stop"
@@ -113,6 +114,9 @@ foreach ($name in $environmentNames) {
 }
 
 $mainProcess = $null
+$packagingNotificationProof = $null
+$nativeOutput = Join-Path $smokeRoot 'native.stdout.log'
+$nativeError = Join-Path $smokeRoot 'native.stderr.log'
 try {
   foreach ($name in $environmentNames) {
     [Environment]::SetEnvironmentVariable($name, $null, "Process")
@@ -128,6 +132,8 @@ try {
       "--user-data-dir=$(Join-Path $smokeRoot 'chromium')"
     ) `
     -WindowStyle Hidden `
+    -RedirectStandardOutput $nativeOutput `
+    -RedirectStandardError $nativeError `
     -PassThru
 
   $ready = $false
@@ -217,6 +223,32 @@ try {
   $login = ($loginOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
   if (-not $login.appReady) {
     throw "Portable package login did not load the QA Hub workbench"
+  }
+  if ($VerifyPackagingNotification) {
+    $packagingOutput = & $NodeExe $smokeScript notify-packaging
+    if ($LASTEXITCODE -ne 0) { throw "Packaged system notification request failed" }
+    $delivery = ($packagingOutput | Select-Object -Last 1 | ConvertFrom-Json).delivery
+    $notificationShown = $false
+    $packagingDeadline = [DateTime]::UtcNow.AddSeconds(12)
+    while ([DateTime]::UtcNow -lt $packagingDeadline) {
+      $nativeLines = @(Get-Content -LiteralPath $nativeOutput -ErrorAction SilentlyContinue)
+      foreach ($nativeLine in $nativeLines) {
+        if ($nativeLine -notmatch 'desktop.packaging.notification.shown') { continue }
+        try {
+          $nativeEvent = $nativeLine | ConvertFrom-Json
+          if ($nativeEvent.id -eq $delivery.id) { $notificationShown = $true }
+        } catch { }
+      }
+      if ($notificationShown) { break }
+      Start-Sleep -Milliseconds 200
+    }
+    if (-not $notificationShown) { throw "Windows did not acknowledge the packaging system notification" }
+    $packagingNotificationProof = [ordered]@{
+      id = $delivery.id
+      nativeShown = $notificationShown
+      duplicateSuppressed = -not [bool]$delivery.duplicate
+      inAppNotificationCount = [int]$delivery.inAppNotificationCount
+    }
   }
   $mcpSignedIn = Invoke-QAHubMcpRequest `
     -Id 4 `
@@ -384,6 +416,7 @@ try {
     apiUnavailableBeforeLogin = [bool]$snapshot.authUnavailable
     notificationsCredentialState = [string]$snapshot.desktopConnection.state
     notificationsAfterLogin = $notificationState
+    packagingSystemNotification = $packagingNotificationProof
     mcpReady = $mcpReady
     mcpToolCount = @($mcpTools.result.tools).Count
     mcpSignedOutFailedClosed = [bool]$mcpSignedOut.result.isError

@@ -9,11 +9,12 @@ const ACTIONS = new Set([
   "wait-marker",
   "wait-update-ready",
   "install-update",
+  "notify-packaging",
 ]);
 const action = process.argv[2] ?? "snapshot";
 if (!ACTIONS.has(action)) {
   throw new Error(
-    "action must be snapshot, login, open-first-bug, open-bug-editor, open-qingyu, open-overview, select-overview-date, wait-marker, wait-update-ready, or install-update",
+    "action must be snapshot, login, open-first-bug, open-bug-editor, open-qingyu, open-overview, select-overview-date, wait-marker, wait-update-ready, install-update, or notify-packaging",
   );
 }
 
@@ -401,6 +402,22 @@ try {
     } while (Date.now() < deadline);
     process.stdout.write(`${JSON.stringify({ action, snapshot: current })}\n`);
     if (current?.desktopUpdate?.status !== "ready") process.exitCode = 1;
+  } else if (action === "notify-packaging") {
+    const result = await client.send("Runtime.evaluate", {
+      expression: `(async () => {
+        const id = "build-" + Math.floor(Date.now() / 1000) + "-finished";
+        const notice = { id, kind: "success", title: "打包系统通知验证", body: "这是一条系统通知验证消息，未触发真实构建。" };
+        const accepted = await window.qaHubDesktop.notifyPackaging(notice);
+        const duplicate = await window.qaHubDesktop.notifyPackaging(notice);
+        return { id, accepted, duplicate, inAppNotificationCount: document.querySelectorAll(".package-notifications").length };
+      })()`,
+      awaitPromise: true,
+      returnByValue: true,
+    });
+    const delivery = result.result?.value;
+    if (!delivery?.accepted || delivery.duplicate || delivery.inAppNotificationCount !== 0)
+      throw new Error("Native packaging notification delivery or deduplication failed");
+    process.stdout.write(`${JSON.stringify({ action, delivery })}\n`);
   } else if (action === "install-update") {
     const result = await client.send("Runtime.evaluate", {
       expression: "window.qaHubDesktop?.installUpdate() ?? Promise.resolve(false)",

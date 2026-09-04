@@ -582,11 +582,24 @@ function installIpcHandlers(): void {
     const notice = parsePackagingNotice(value);
     if (!notice || packagingNotices.has(notice.id)) return false;
     const notification = new Notification({
-      title: `QA Hub · ${notice.title}`,
+      title: `OZDQP · ${notice.title}`,
       body: notice.body,
       silent: false,
     });
+    notification.once("show", () => {
+      process.stdout.write(
+        `${JSON.stringify({ event: "desktop.packaging.notification.shown", id: notice.id, kind: notice.kind })}\n`,
+      );
+    });
+    notification.once("failed", (_event, error: string) => {
+      process.stderr.write(
+        `${JSON.stringify({ event: "desktop.packaging.notification.failed", id: notice.id, error })}\n`,
+      );
+    });
     notification.once("click", () => {
+      process.stdout.write(
+        `${JSON.stringify({ event: "desktop.packaging.notification.clicked", id: notice.id })}\n`,
+      );
       openMainWindow();
       mainWindow?.webContents.send("desktop:open-packaging");
     });

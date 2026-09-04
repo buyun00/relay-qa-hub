@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { createPortal } from "react-dom";
 import PackagingProgressPanel from "./PackagingProgress";
 import { usePackagingProgress } from "./usePackagingProgress";
+import { requestPackagingNotificationPermission } from "./packaging-notifications";
 import { QaHubApiError } from "./api";
 import {
   BUILD_PRESETS,
@@ -250,7 +250,7 @@ export default function PackagingPage({
     completedRefresh.current = setTimeout(() => void refresh(), 6_000);
   }, [refresh]);
   useEffect(() => () => clearTimeout(completedRefresh.current), []);
-  const monitor = usePackagingProgress(userId, active, refreshRevision, onCompleted);
+  const monitor = usePackagingProgress(userId, active, refreshRevision, onCompleted, onOpen);
   useEffect(() => {
     if (!active) return;
     const controller = new AbortController();
@@ -268,6 +268,7 @@ export default function PackagingPage({
 
   const build = async (preset: BuildPreset) => {
     if (submitting.current) return;
+    requestPackagingNotificationPermission();
     submitting.current = true;
     setPending(preset);
     setNotice(null);
@@ -283,41 +284,9 @@ export default function PackagingPage({
       void refresh();
     }
   };
-  const notifications = monitor.notices.length
-    ? createPortal(
-        <div className="package-notifications" aria-label="打包通知">
-          {monitor.notices.map((item) => (
-            <article className={`package-notification is-${item.kind}`} role="alert" key={item.id}>
-              <strong>{item.title}</strong>
-              <p>{item.body}</p>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onOpen?.();
-                    monitor.dismiss(item.id);
-                  }}
-                >
-                  查看构建
-                </button>
-                <button
-                  type="button"
-                  aria-label="关闭打包通知"
-                  onClick={() => monitor.dismiss(item.id)}
-                >
-                  关闭
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>,
-        document.body,
-      )
-    : null;
-  if (!active) return notifications;
+  if (!active) return null;
   return (
     <>
-      {notifications}
       <main className="packaging-page">
         <section className="package-build-panel" aria-labelledby="packaging-title">
           <div className="package-section-heading">

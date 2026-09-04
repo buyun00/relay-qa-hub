@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getPackagingProgress, type PackagingProgress } from "./packaging-api";
-import {
-  readWatchedBuilds,
-  reconcileBuilds,
-  type PackagingNotice,
-  type WatchedBuild,
-} from "./packaging-monitor";
+import { readWatchedBuilds, reconcileBuilds, type WatchedBuild } from "./packaging-monitor";
+import { notifyPackagingSystem } from "./packaging-notifications";
 
 export function usePackagingProgress(
   userId: string,
   active: boolean,
   refreshRevision: number,
   onCompleted: () => void,
+  onOpen?: () => void,
 ) {
   const storageKey = `qa-hub:packaging-watch:${userId}`;
   const [initialWatched] = useState<WatchedBuild[]>(() => {
@@ -26,7 +23,10 @@ export function usePackagingProgress(
   const watched = useRef(initialWatched);
   const [progress, setProgress] = useState<PackagingProgress | null>(null);
   const [error, setError] = useState(false);
-  const [notices, setNotices] = useState<PackagingNotice[]>([]);
+  const openPackaging = useRef(onOpen);
+  useEffect(() => {
+    openPackaging.current = onOpen;
+  }, [onOpen]);
   const [revision, setRevision] = useState(0);
   const persist = useCallback(() => {
     try {
@@ -90,9 +90,10 @@ export function usePackagingProgress(
         setProgress(snapshot);
         setError(false);
         if (result.notices.length) {
-          setNotices((old) => [...old, ...result.notices].slice(-5));
           for (const notice of result.notices)
-            void window.qaHubDesktop?.notifyPackaging?.(notice).catch(() => undefined);
+            void notifyPackagingSystem(notice, () => openPackaging.current?.()).catch(
+              () => undefined,
+            );
         }
         if (result.completed) onCompleted();
       } catch {
@@ -116,11 +117,9 @@ export function usePackagingProgress(
   return {
     progress,
     error,
-    notices,
     watch,
     pendingQueues: watched.current
       .filter((w) => !w.finished && w.number === undefined)
       .map((w) => w.queueId),
-    dismiss: (id: string) => setNotices((items) => items.filter((n) => n.id !== id)),
   };
 }

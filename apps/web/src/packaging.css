@@ -246,49 +246,6 @@
   font-size: 12px;
   margin: 0;
 }
-.package-notifications {
-  position: fixed;
-  z-index: 1500;
-  right: 24px;
-  bottom: 24px;
-  width: min(400px, calc(100vw - 32px));
-  display: grid;
-  gap: 10px;
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
-}
-.package-notification {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-left: 5px solid var(--forest);
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 10px 32px #132a2525;
-}
-.package-notification.is-warning,
-.package-notification.is-failure {
-  border-left-color: #b54a18;
-}
-.package-notification > strong {
-  font-size: 15px;
-}
-.package-notification p {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
-}
-.package-notification > div {
-  display: flex;
-  gap: 12px;
-}
-.package-notification button {
-  cursor: pointer;
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--forest);
-  background: var(--surface);
-}
 @media (max-width: 800px) {
   .package-progress-panel {
     padding: 16px;
@@ -303,10 +260,6 @@
   .package-stage-time {
     grid-column: 2;
     text-align: left;
-  }
-  .package-notifications {
-    right: 16px;
-    bottom: 16px;
   }
 }
 .package-build-panel,
