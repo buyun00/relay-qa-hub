@@ -74,6 +74,7 @@ export interface RealRelayAttachment {
 }
 
 export interface RealRelayHandoffBody {
+  readonly execution?: Readonly<Record<string, unknown>>;
   readonly qaInstanceId: string;
   readonly handoffId: string;
   readonly attemptId: string;
@@ -474,6 +475,7 @@ async function buildCreateBody(
     handoffId: requireString(claim.handoffId, "REAL_RELAY_HANDOFF_ID_INVALID", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN),
     attemptId: requireString(claim.repairAttemptId, "REAL_RELAY_ATTEMPT_ID_INVALID", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN),
     defect: normalizeDefect(claim.defect ?? claim.defectFacts),
+    ...(claim.execution === undefined ? {} : { execution: claim.execution }),
     selectedAttachments: await materializeAttachments(claimAttachments(claim), options),
   });
   return { body, requestHash: requestHash(body) };

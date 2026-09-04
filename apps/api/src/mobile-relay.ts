@@ -75,6 +75,7 @@ export interface MobileRepairAttemptStartRequest {
 }
 
 export interface MobileRelayDispatchRequest {
+  readonly execution?: Readonly<Record<string, unknown>>;
   readonly expectedVersion: number;
   readonly handoffId: string;
   readonly selectedAttachmentIds: readonly string[];

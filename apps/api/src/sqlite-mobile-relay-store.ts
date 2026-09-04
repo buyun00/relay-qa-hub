@@ -143,6 +143,9 @@ export function createSqliteMobileRelayStore(
         attemptId: command.attemptId,
         expectedVersion: command.request.expectedVersion,
         handoffId: command.request.handoffId,
+        ...(command.request.execution === undefined
+          ? {}
+          : { execution: command.request.execution }),
         selectedAttachmentIds: command.request.selectedAttachmentIds,
         idempotencyKey: command.idempotencyKey,
         requestDigest: digest(command.request),

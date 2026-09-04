@@ -405,6 +405,16 @@ async function run(): Promise<void> {
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
+      ...(relayRuntime.endpoint && relayRuntime.bearerToken && relayRuntime.qaInstanceId
+        ? {
+            productionConfig: {
+              endpoint: relayRuntime.endpoint.toString(),
+              bearerToken: relayRuntime.bearerToken,
+              qaInstanceId: relayRuntime.qaInstanceId,
+              stateRoot: join(storage.dataRoot, "integrations", "production"),
+            },
+          }
+        : {}),
       healthProbe: createSqliteApiHealthProbe({
         worker,
         evidenceRoot: storage.evidenceRoot,

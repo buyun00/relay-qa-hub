@@ -69,6 +69,7 @@ import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
 import OverviewPage, { formatOverviewDateLabel, type OverviewDateBucket } from "./OverviewPage";
 import UserManagementPage from "./UserManagementPage";
 import PackagingPage from "./PackagingPage";
+import ProductionPage from "./ProductionPage";
 import ozdqpLogo from "./assets/ozdqp-logo.png";
 import {
   TASK_STATUS_ORDER,
@@ -83,7 +84,7 @@ const DEFAULT_PROJECT_ID =
   import.meta.env.VITE_QA_HUB_PROJECT_ID ?? "10000000-0000-4000-8000-000000000004";
 
 type Category = TaskStatus;
-type WorkspaceView = "workbench" | "overview" | "users" | "packaging";
+type WorkspaceView = "workbench" | "overview" | "users" | "packaging" | "production";
 
 interface AppProps {
   readonly principal: BrowserSessionPrincipal;
@@ -476,6 +477,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [overviewRevision, setOverviewRevision] = useState(0);
   const [userManagementRevision, setUserManagementRevision] = useState(0);
   const [packagingRevision, setPackagingRevision] = useState(0);
+  const [productionRevision, setProductionRevision] = useState(0);
   const mutation = mutationLabelForScope(
     pendingMutationLabels,
     selectedId === null ? null : bugMutationScope(selectedId),
@@ -1533,6 +1535,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span className="nav-count">{counts.pending}</span>
           </button>
           <button
+            aria-current={view === "production" ? "page" : undefined}
+            className={`nav-item${view === "production" ? " is-active" : ""}`}
+            onClick={() => setView("production")}
+            type="button"
+          >
+            <span className="nav-icon">▷</span>
+            <span>制作任务</span>
+          </button>
+          <button
             aria-current={view === "overview" ? "page" : undefined}
             className={`nav-item${view === "overview" ? " is-active" : ""}`}
             onClick={() => setView("overview")}
@@ -1643,7 +1654,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                   ? `总览 · ${overviewDateLabel}`
                   : view === "packaging"
                     ? "打包与下载"
-                    : "用户管理"}
+                    : view === "production"
+                      ? "制作任务"
+                      : "用户管理"}
             </span>
           </div>
           {view === "workbench" ? (
@@ -1662,6 +1675,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <div className="overview-topbar-copy">{overviewDateLabel} · 表格视图</div>
           ) : view === "packaging" ? (
             <div className="overview-topbar-copy">一键打包 · 内网下载</div>
+          ) : view === "production" ? (
+            <div className="overview-topbar-copy">任务进展 · 新建制作</div>
           ) : (
             <div className="overview-topbar-copy">关联重复账号或停用多余用户</div>
           )}
@@ -1673,6 +1688,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               if (view === "workbench") void loadWorkbench(true);
               else if (view === "overview") setOverviewRevision((value) => value + 1);
               else if (view === "packaging") setPackagingRevision((value) => value + 1);
+              else if (view === "production") setProductionRevision((value) => value + 1);
               else setUserManagementRevision((value) => value + 1);
             }}
             type="button"
@@ -1846,6 +1862,18 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             refreshRevision={userManagementRevision}
           />
         ) : null}
+        <div hidden={view !== "production"}>
+          <ProductionPage
+            key={`${principal.userId}:${projectId}`}
+            active={view === "production"}
+            refreshRevision={productionRevision}
+            userId={principal.userId}
+            projectId={projectId}
+            members={members}
+            onOpenBug={openDetail}
+            onImport={() => void openQingyuImport()}
+          />
+        </div>
         <div hidden={view !== "packaging"}>
           <PackagingPage
             key={principal.userId}

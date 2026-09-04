@@ -1557,6 +1557,7 @@ export async function dispatchRelay(
   attemptId: string,
   expectedVersion: number,
   handoffId: string,
+  selectedAttachmentIds: readonly string[] = [],
 ): Promise<RelayDispatchAccepted> {
   const body = await requestJson(
     `/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/dispatch/relay`,
@@ -1566,7 +1567,7 @@ export async function dispatchRelay(
         "Content-Type": "application/json",
         "Idempotency-Key": `relay:dispatch:${handoffId}`,
       },
-      body: JSON.stringify({ expectedVersion, handoffId, selectedAttachmentIds: [] }),
+      body: JSON.stringify({ expectedVersion, handoffId, selectedAttachmentIds }),
     },
   );
   return requireRecord(body, "RELAY_DISPATCH") as unknown as RelayDispatchAccepted;

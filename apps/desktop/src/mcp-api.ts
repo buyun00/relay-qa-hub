@@ -5,6 +5,7 @@ import path from "node:path";
 import type { DesktopConfig } from "./config.js";
 import { isAllowedNetworkUrl } from "./config.js";
 import { DesktopBrowserSessionCookieStore, readBoundedBody } from "./network.js";
+import { callProductionTool, PRODUCTION_MCP_TOOLS } from "./mcp-production.js";
 
 const QA_MEDIA_TYPE = "application/vnd.relay-qa-hub.v1.1+json";
 const MAX_JSON_BYTES = 4 * 1024 * 1024;
@@ -193,7 +194,10 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     let body: string | undefined;
     if (request.body !== undefined) {
       body = JSON.stringify(request.body);
-      if (Buffer.byteLength(body, "utf8") > 1024 * 1024) {
+      if (
+        Buffer.byteLength(body, "utf8") >
+        (pathname === "/api/v1/production/uploads" ? 36 * 1024 * 1024 : 1024 * 1024)
+      ) {
         throw new QaHubMcpError("QA_HUB_REQUEST_TOO_LARGE", "QA Hub MCP request is too large");
       }
       if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
@@ -204,6 +208,7 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
         method,
         headers,
         redirect: "manual",
+        signal: AbortSignal.timeout(pathname === "/api/v1/production/uploads" ? 60_000 : 20_000),
         ...(body === undefined ? {} : { body }),
       });
     } catch {
@@ -266,7 +271,12 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     request: QaHubJsonRequest,
     includeCsrf: boolean,
   ): Promise<unknown> {
-    const response = await this.request(pathname, request, includeCsrf, MAX_JSON_BYTES);
+    const response = await this.request(
+      pathname,
+      request,
+      includeCsrf,
+      pathname.startsWith("/api/v1/production/attachments/") ? 36 * 1024 * 1024 : MAX_JSON_BYTES,
+    );
     return parseJsonBytes(response.bytes);
   }
 
@@ -318,6 +328,7 @@ const EXTERNAL_STATE_WRITE = Object.freeze({
 });
 
 export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
+  ...PRODUCTION_MCP_TOOLS,
   {
     name: "qa_list_projects",
     title: "列出 QA Hub 项目",
@@ -1204,6 +1215,8 @@ export class QaHubMcpTools {
   }
 
   async call(name: string, argumentsValue: unknown): Promise<unknown> {
+    if (PRODUCTION_MCP_TOOLS.some((tool) => tool.name === name))
+      return callProductionTool(name, argumentsValue, this.api, this.attachmentCacheRoot);
     switch (name) {
       case "qa_list_projects": {
         const input = requireRecord(argumentsValue, "arguments");

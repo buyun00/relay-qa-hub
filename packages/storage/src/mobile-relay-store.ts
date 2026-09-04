@@ -271,6 +271,7 @@ export interface GetMobileManualRepairAttemptInput extends MobileRelayScope {
 }
 
 export interface DispatchMobileRelayInput extends MobileRelayScope {
+  readonly execution?: Readonly<Record<string, unknown>>;
   readonly attemptId: string;
   readonly expectedVersion: number;
   readonly handoffId: string;
@@ -359,6 +360,7 @@ export interface MobileRelayReceipt {
 }
 
 export interface MobileRelayOutboxClaim {
+  readonly execution?: Readonly<Record<string, unknown>>;
   readonly outboxMessageId: string;
   readonly bugId: string;
   readonly repairAttemptId: string;
@@ -3045,6 +3047,7 @@ export function dispatchMobileRelay(
       JSON.stringify({
         operation: "create",
         bugId: attempt.bug_id,
+        ...(input.execution === undefined ? {} : { execution: input.execution }),
         repairAttemptId: attempt.id,
         handoffId: input.handoffId,
         relayInstanceId,
@@ -3944,6 +3947,7 @@ export function claimMobileRelayOutbox(
     projectKey: project.project_key,
     defect,
     selectedAttachments: Object.freeze(selectedAttachments),
+    ...(isRecord(payload.execution) ? { execution: payload.execution } : {}),
     operation,
     actionId: typeof payload.actionId === "string" ? payload.actionId : null,
     prompt: typeof payload.prompt === "string" ? payload.prompt : null,

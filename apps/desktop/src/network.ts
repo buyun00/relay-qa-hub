@@ -120,6 +120,7 @@ function responseDisplayName(bytes: Uint8Array): string | null {
 }
 
 function responseByteLimit(pathname: string): number {
+  if (/^\/api\/v1\/production\/attachments\/[^/]+$/u.test(pathname)) return 36 * 1024 * 1024;
   const isAttachment = /^\/api\/v1\/attachments\/[^/]+$/.test(pathname);
   const isCaptureArtifact =
     /^\/api\/v1\/bugs\/[^/]+\/capture-bundles\/[^/]+\/artifacts\/[^/]+$/.test(pathname);
@@ -129,7 +130,8 @@ function responseByteLimit(pathname: string): number {
 }
 
 function proxyRequestTimeoutMs(pathname: string): number {
-  return /^\/api\/v1\/uploads\//u.test(pathname) ||
+  return pathname === "/api/v1/production/uploads" ||
+    /^\/api\/v1\/uploads\//u.test(pathname) ||
     responseByteLimit(pathname) > MAX_PROXY_RESPONSE_BYTES
     ? API_TRANSFER_TIMEOUT_MS
     : API_REQUEST_TIMEOUT_MS;
@@ -247,7 +249,12 @@ export async function proxyRendererApiRequest(
   let body: Uint8Array | undefined;
   if (request.method !== "GET" && request.method !== "HEAD") {
     try {
-      body = await readBoundedBody(request, MAX_PROXY_REQUEST_BYTES);
+      body = await readBoundedBody(
+        request,
+        requestUrl.pathname === "/api/v1/production/uploads"
+          ? 36 * 1024 * 1024
+          : MAX_PROXY_REQUEST_BYTES,
+      );
     } catch (cause) {
       if (!(cause instanceof Error) || cause.message !== "RESPONSE_TOO_LARGE") throw cause;
       return new Response(JSON.stringify({ code: "REQUEST_TOO_LARGE" }), {
