@@ -12,6 +12,8 @@ export interface MobileScopeBootstrap {
   readonly actorId: string;
   readonly membershipId: string;
   readonly projectKey: string;
+  readonly projectName?: string;
+  readonly accountDisplayName?: string;
   readonly createdAt: string;
   readonly actorDisplayName?: string;
   readonly actorEmail?: string;
@@ -230,15 +232,17 @@ function assertInitialAssignment(
 export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBootstrap): void {
   requireTransaction(database);
   const suffix = scope.accountId.replaceAll("-", "").slice(-12).toLowerCase();
-  const actorDisplayName = scope.actorDisplayName ?? "MuMu MVP reporter";
+  const actorDisplayName = scope.actorDisplayName ?? "OZDQP reporter";
+  const projectName = scope.projectName ?? scope.projectKey;
+  const accountDisplayName = scope.accountDisplayName ?? "OZDQP";
   const actorEmail = scope.actorEmail ?? `mvp-${scope.actorId.replaceAll("-", "")}@local.invalid`;
   database
     .prepare(
       `INSERT OR IGNORE INTO accounts(
         id, slug, display_name, status, created_at, updated_at, version
-      ) VALUES (?, ?, 'MuMu MVP account', 'active', ?, ?, 1)`,
+      ) VALUES (?, ?, ?, 'active', ?, ?, 1)`,
     )
-    .run(scope.accountId, `mvp-${suffix}`, scope.createdAt, scope.createdAt);
+    .run(scope.accountId, `mvp-${suffix}`, accountDisplayName, scope.createdAt, scope.createdAt);
   database
     .prepare(
       `INSERT OR IGNORE INTO users(
@@ -273,9 +277,16 @@ export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBoot
     .prepare(
       `INSERT OR IGNORE INTO projects(
         id, account_id, project_key, name, status, created_at, updated_at, version
-      ) VALUES (?, ?, ?, 'MuMu MVP project', 'active', ?, ?, 1)`,
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, 1)`,
     )
-    .run(scope.projectId, scope.accountId, scope.projectKey, scope.createdAt, scope.createdAt);
+    .run(
+      scope.projectId,
+      scope.accountId,
+      scope.projectKey,
+      projectName,
+      scope.createdAt,
+      scope.createdAt,
+    );
   database
     .prepare(
       `INSERT OR IGNORE INTO memberships(
@@ -324,6 +335,31 @@ export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBoot
       "SQLITE_MOBILE_SCOPE_CONFLICT",
       "mobile scope conflicts with existing tenant identity",
     );
+  }
+  // Apply the configured display names to the exact existing scope as well as new installs.
+  // IDs and project keys remain the identity of all historical records.
+  if (scope.projectName !== undefined) {
+    database
+      .prepare(
+        `UPDATE projects SET name = ?, updated_at = ?, version = version + 1
+       WHERE account_id = ? AND id = ? AND project_key = ? AND name <> ?`,
+      )
+      .run(
+        projectName,
+        scope.createdAt,
+        scope.accountId,
+        scope.projectId,
+        scope.projectKey,
+        projectName,
+      );
+  }
+  if (scope.accountDisplayName !== undefined) {
+    database
+      .prepare(
+        `UPDATE accounts SET display_name = ?, updated_at = ?, version = version + 1
+       WHERE id = ? AND display_name <> ?`,
+      )
+      .run(accountDisplayName, scope.createdAt, scope.accountId, accountDisplayName);
   }
 }
 

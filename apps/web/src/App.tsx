@@ -69,6 +69,7 @@ import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
 import OverviewPage, { formatOverviewDateLabel, type OverviewDateBucket } from "./OverviewPage";
 import UserManagementPage from "./UserManagementPage";
 import PackagingPage from "./PackagingPage";
+import ozdqpLogo from "./assets/ozdqp-logo.png";
 import {
   TASK_STATUS_ORDER,
   taskStatusCopy,
@@ -1622,7 +1623,18 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       <section className="page">
         <header className="topbar">
           <div className="breadcrumb">
-            <strong>{currentProject?.name ?? "QA Hub"}</strong>
+            {currentProject?.id === DEFAULT_PROJECT_ID ? (
+              <img
+                className="project-logo"
+                src={ozdqpLogo}
+                alt="OZDQP"
+                title="OZDQP"
+                width={136}
+                height={48}
+              />
+            ) : (
+              <strong>{currentProject?.name ?? "OZDQP"}</strong>
+            )}
             <span>/</span>
             <span>
               {view === "workbench"

@@ -58,7 +58,7 @@ describe("Relay QA Hub browser workbench", () => {
   });
 
   it("exposes the build and frozen contract versions", () => {
-    expect(product.appVersion).toBe("1.2.6");
+    expect(product.appVersion).toBe("1.2.7");
     expect(product.contractVersion).toBe("1.0.0");
   });
 

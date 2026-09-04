@@ -58,6 +58,8 @@ const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   actorId: "10000000-0000-4000-8000-000000000003",
   membershipId: "10000000-0000-4000-8000-000000000005",
   projectKey: "LOCAL",
+  projectName: "OZDQP",
+  accountDisplayName: "OZDQP",
   createdAt: "2026-08-25T00:00:00.000Z",
 });
 

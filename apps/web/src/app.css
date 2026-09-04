@@ -318,9 +318,17 @@ button:disabled {
   align-items: center;
   gap: 8px;
   font-size: 13px;
+  white-space: nowrap;
 }
 .breadcrumb span {
   color: #929b96;
+}
+.project-logo {
+  display: block;
+  width: 136px;
+  height: 48px;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 .global-search {
   height: 42px;
@@ -2814,6 +2822,10 @@ h1 {
   .topbar {
     height: 54px;
     padding: 0 16px;
+  }
+  .project-logo {
+    width: 108px;
+    height: 38px;
   }
   main {
     padding: 24px 14px 50px;

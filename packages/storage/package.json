@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.test.json",
-    "test": "npm run build && tsx --test test/storage.test.ts test/sqlite-migrations.test.ts test/sqlite-invariants.test.ts test/sqlite-backup.test.ts test/sqlite-restore.test.ts test/attachment-restore.test.ts test/sqlite-archive.test.ts test/qingyu-link-store.test.ts test/user-management-store.test.ts"
+    "test": "npm run build && tsx --test test/storage.test.ts test/sqlite-migrations.test.ts test/sqlite-invariants.test.ts test/sqlite-backup.test.ts test/sqlite-restore.test.ts test/attachment-restore.test.ts test/sqlite-archive.test.ts test/qingyu-link-store.test.ts test/user-management-store.test.ts test/mobile-scope-branding.test.ts"
   },
   "engines": {
     "node": ">=24.19 <25"
