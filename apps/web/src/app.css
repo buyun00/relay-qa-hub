@@ -2771,7 +2771,8 @@ h1 {
     grid-template-columns: 1fr auto;
     padding: 0 22px;
   }
-  .global-search {
+  .global-search,
+  .overview-topbar-copy {
     display: none;
   }
   main {

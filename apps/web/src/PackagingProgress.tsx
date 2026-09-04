@@ -26,6 +26,36 @@ const STAGES = {
   failed: "中止于此",
 };
 
+function ProgressMeter({
+  label,
+  value,
+  active = false,
+  tone = "running",
+}: {
+  label: string;
+  value: number | null;
+  active?: boolean;
+  tone?: "running" | "success" | "warning" | "failure" | "paused";
+}) {
+  const percent = value === null ? undefined : Math.max(0, Math.min(100, value));
+  return (
+    <div
+      className={`package-meter is-${tone}${active ? " is-active" : ""}${percent === undefined ? " is-indeterminate" : ""}`}
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={percent}
+      aria-valuetext={percent === undefined ? "等待进度数据" : `${percent}%`}
+    >
+      <span
+        className="package-meter-fill"
+        style={percent === undefined ? undefined : { width: `${percent}%` }}
+      />
+    </div>
+  );
+}
+
 export function BuildStages({ build }: { build: BuildProgress }) {
   return (
     <div className="package-stage-list">
@@ -50,10 +80,11 @@ export function BuildStages({ build }: { build: BuildProgress }) {
               <small>执行：{build.executor}</small>
               {stage.state === "running" ? (
                 <div className="package-stage-meter">
-                  <progress
-                    aria-label={`${stage.label}阶段进度${stage.percent === null ? "，等待耗时样本" : "，估算"}`}
-                    max={100}
-                    {...(stage.percent === null ? {} : { value: stage.percent })}
+                  <ProgressMeter
+                    label={`${stage.label}阶段进度${stage.percent === null ? "，等待耗时样本" : "，估算"}`}
+                    value={stage.percent}
+                    active
+                    tone={stage.alert ? "warning" : "running"}
                   />
                   <small>
                     {stage.percent === null
@@ -177,7 +208,9 @@ export default function PackagingProgressPanel({
                 ? "状态待确认"
                 : "等待执行"}
           </strong>
-          {queue.status !== "CANCELLED" ? <progress aria-label={`排队 ${queue.id}`} /> : null}
+          {queue.status !== "CANCELLED" ? (
+            <ProgressMeter label={`排队 ${queue.id}`} value={null} active />
+          ) : null}
           <p>{queue.reason}</p>
         </div>
       ))}
@@ -187,7 +220,22 @@ export default function PackagingProgressPanel({
             <BuildHeading build={build} />
           </div>
           <div className="package-overall-progress">
-            <progress aria-label={`构建 ${build.number} 总进度`} max={100} value={build.percent} />
+            <ProgressMeter
+              label={`构建 ${build.number} 总进度`}
+              value={build.percent}
+              active={build.status === "BUILDING"}
+              tone={
+                build.status === "SUCCESS"
+                  ? "success"
+                  : build.status === "FAILURE"
+                    ? "failure"
+                    : build.status === "UNSTABLE" || build.stages.some((stage) => stage.alert)
+                      ? "warning"
+                      : build.status === "BUILDING"
+                        ? "running"
+                        : "paused"
+              }
+            />
             <strong>{build.percent}%</strong>
           </div>
           <div className="package-build-meta">

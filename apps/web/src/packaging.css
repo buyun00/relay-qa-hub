@@ -40,15 +40,94 @@
   margin: 18px 0 8px;
   color: var(--forest);
 }
-.package-progress-panel progress {
-  appearance: auto;
-  accent-color: var(--forest);
+.package-meter {
+  --meter-gradient: linear-gradient(100deg, #14b8a6, #38bdf8 55%, #6366f1);
+  position: relative;
   flex: 1;
+  min-width: 0;
   width: 100%;
-  height: 10px;
+  height: 11px;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 999px;
+  background: #eaf0f3;
+  box-shadow: inset 0 1px 3px #18372b0d;
 }
-.package-overall-progress progress {
-  height: 18px;
+.package-overall-progress .package-meter {
+  height: 16px;
+}
+.package-overall-progress > strong {
+  min-width: 3.5ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.package-meter-fill {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--meter-gradient);
+  box-shadow: inset 0 1px 0 #ffffff55;
+  transition: width 0.65s ease;
+}
+.package-meter.is-active .package-meter-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0 -32px;
+  background: linear-gradient(
+      135deg,
+      #ffffff38 25%,
+      transparent 25% 50%,
+      #ffffff38 50% 75%,
+      transparent 75%
+    )
+    0 0 / 32px 32px;
+  animation: package-meter-flow 1.15s linear infinite;
+}
+.package-meter.is-indeterminate .package-meter-fill {
+  width: 42%;
+}
+.package-meter.is-indeterminate.is-active .package-meter-fill {
+  animation: package-meter-travel 2.1s ease-in-out infinite;
+}
+.package-meter.is-success {
+  --meter-gradient: linear-gradient(100deg, #059669, #34d399 70%, #a3e635);
+  background: #e7f5ed;
+}
+.package-meter.is-warning {
+  --meter-gradient: linear-gradient(100deg, #f59e0b, #fb923c 60%, #ef6b46);
+  background: #fff0d8;
+}
+.package-meter.is-failure {
+  --meter-gradient: linear-gradient(100deg, #e11d48, #fb7185);
+  background: #fce9ed;
+}
+.package-meter.is-paused {
+  --meter-gradient: linear-gradient(100deg, #64748b, #a0b0c2);
+}
+@keyframes package-meter-flow {
+  to {
+    transform: translateX(32px);
+  }
+}
+@keyframes package-meter-travel {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .package-meter .package-meter-fill,
+  .package-meter.is-active .package-meter-fill::after {
+    animation: none !important;
+    transition: none;
+  }
+  .package-meter.is-indeterminate .package-meter-fill {
+    transform: translateX(69%);
+  }
 }
 .package-stage {
   display: grid;
@@ -105,8 +184,8 @@
 }
 .package-stage-meter {
   display: grid;
-  gap: 3px;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 12px;
   max-width: 430px;
 }
 .package-stage.has-alert .package-stage-dot {
@@ -302,6 +381,11 @@
 .package-hint {
   line-height: 1.7;
   margin: 13px 0 0;
+}
+.package-build-panel > .banner {
+  margin: 14px 0 0;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 .package-build-history {
   display: flex;
