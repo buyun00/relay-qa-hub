@@ -1,8 +1,15 @@
-param([string]$LanAddress)
+param([string]$LanAddress, [switch]$IfUnhealthy)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version 2
+. (Join-Path $PSScriptRoot 'qa-hub-guardian-common.ps1')
 
+$runtimeLock = Enter-QAHubRuntimeLock
+try {
+if ($IfUnhealthy -and (Get-QAHubServiceProbe -Service web).healthy) {
+  [pscustomobject]@{ ready = $true; skipped = $true }
+  return
+}
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $statePath = "D:\Relay-QA-Hub-Data\mvp-e2e-current.json"
 $nodeExe = "C:\Users\lin0\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
@@ -110,7 +117,7 @@ $state | Add-Member -NotePropertyName lanSubnet -NotePropertyValue $lan.Cidr -Fo
 $state | Add-Member -NotePropertyName webUrl -NotePropertyValue "http://$($lan.Address):4174/" -Force
 $state | Add-Member -NotePropertyName androidApkUrl -NotePropertyValue $apkDownloadUrl -Force
 $state | Add-Member -NotePropertyName androidApkSha256 -NotePropertyValue $apkSha256 -Force
-$state | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $statePath -Encoding UTF8
+Write-QAHubJsonAtomic -Path $statePath -Value $state
 
 [pscustomobject]@{
   webPid = $web.Id
@@ -122,4 +129,8 @@ $state | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $statePath -Encoding
   androidApkSha256 = $apkSha256
   lanSubnet = $lan.Cidr
   serving = "apps/web/dist"
+}
+} finally {
+  $runtimeLock.ReleaseMutex()
+  $runtimeLock.Dispose()
 }

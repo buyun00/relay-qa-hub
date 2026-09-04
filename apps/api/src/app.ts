@@ -760,7 +760,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           if (bug === null) {
             throw new QingyuError(404, "QINGYU_BUG_NOT_FOUND", "没有找到这个 QA Hub 单子");
           }
-          const resolution = await qingyuIntegration.beforeHumanClose(actorId, bugId, {
+          const resolution = await qingyuIntegration.syncHumanClosure(actorId, bugId, {
             verifyRemote: true,
           });
           if (resolution === null) {
@@ -2180,36 +2180,36 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           throw new TypeError("Idempotency-Key does not match Verification result");
         }
         const actorId = authenticatedActorId(request, debugActorId);
-        if (body.status === "passed" && qingyuIntegration !== undefined) {
-          const verification = await mobileVerificationStore.getVerification({
-            actorId,
-            verificationId,
-          });
-          if (verification !== null && verification.status !== "passed") {
-            const bug = await mobileBugStore.getBug({ actorId, bugId: verification.bugId });
-            const active =
-              verification.status === "in_progress" &&
-              verification.version === body.expectedVersion &&
-              bug?.state === "ready_for_verification";
-            if (active) {
-              await qingyuIntegration.beforeHumanClose(actorId, verification.bugId);
-            }
-          }
-        }
         const result = await mobileVerificationStore.recordResult({
           actorId,
           verificationId,
           idempotencyKey,
           request: body,
         });
+        if (
+          qingyuIntegration !== undefined &&
+          body.status === "passed" &&
+          result.verification.status === "passed" &&
+          result.bug.state === "closed" &&
+          !result.replayed
+        ) {
+          // Local acceptance is authoritative and committed before optional upstream sync.
+          // The adapter retains its own failure state; never turn a saved closure into an error.
+          try {
+            await qingyuIntegration.syncHumanClosure(actorId, result.bug.id);
+          } catch (error: unknown) {
+            request.log.warn(
+              {
+                bugId: result.bug.id,
+                verificationId,
+                code: error instanceof QingyuError ? error.code : "QINGYU_SYNC_FAILED",
+              },
+              "Qingyu synchronization failed after QA Hub closure",
+            );
+          }
+        }
         return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
       } catch (error: unknown) {
-        if (error instanceof QingyuError) {
-          return reply
-            .code(error.status)
-            .header("content-type", MOBILE_API_CONTENT_TYPE)
-            .send({ code: error.code, message: error.message, details: error.details });
-        }
         return buildErrorReply(error, reply);
       }
     },

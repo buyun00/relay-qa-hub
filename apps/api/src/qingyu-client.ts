@@ -317,8 +317,8 @@ export function isActionableQingyuDefect(
 function isResolved(value: unknown): boolean {
   const status = statusIdentity(value);
   return (
-    ["RESOLVED", "CLOSED", "VERIFIED"].includes(status.key) ||
-    ["已解决", "已关闭", "已验证"].includes(status.name)
+    ["RESOLVED", "CLOSED", "VERIFIED", "COMPLETED", "DONE"].includes(canonicalStatus(status.key)) ||
+    ["已解决", "已关闭", "已验证", "已完成"].includes(status.name)
   );
 }
 
@@ -871,6 +871,11 @@ export class QingyuClient {
     );
     if (task === null)
       throw new QingyuError(502, "QINGYU_DEFECT_INVALID", "轻语返回的 Bug 详情不完整");
+    const taskStatus = task["bug_status"] ?? task["status"];
+    if (isResolved(taskStatus)) {
+      const status = statusIdentity(taskStatus);
+      return { defectId: input.defectId, status: status.name || status.key, alreadyResolved: true };
+    }
     const transitionsPayload = await this.authenticated(
       credentials,
       `/tasks/${encoded}/bug-transitions`,

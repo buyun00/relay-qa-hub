@@ -117,6 +117,68 @@ test("QingyuClient uses Relay-proven QR, own-defect, detail, and resolve protoco
   assert.equal(transitionCall.authorization, "Bearer token-1");
 });
 
+test("QingyuClient recognizes already-completed tasks without requesting another transition", async (t) => {
+  for (const status of [
+    { key: "RESOLVED", name: "已解决" },
+    { key: "CLOSED", name: "已关闭" },
+    { key: "COMPLETED", name: "已完成" },
+    "已完成",
+    "done",
+  ]) {
+    await t.test(JSON.stringify(status), async () => {
+      const calls = [];
+      const client = new QingyuClient({
+        baseUrl: "https://qingyu.example.test",
+        fetchImpl: async (input, init = {}) => {
+          const url = new URL(input);
+          calls.push(url.pathname);
+          assert.equal(init.method ?? "GET", "GET");
+          assert.equal(url.pathname, "/api/tasks/91");
+          return json({ code: 0, data: { id: 91, bug_status: status } });
+        },
+      });
+      const result = await client.resolveDefect(
+        { token: "token-1", user: { id: "7", name: "测试用户", avatar: null } },
+        {
+          defectId: "91",
+          externalProjectId: "project-3",
+          expectedUserId: "7",
+          expectedUserName: "测试用户",
+        },
+      );
+      assert.equal(result.alreadyResolved, true);
+      assert.deepEqual(calls, ["/api/tasks/91"]);
+    });
+  }
+});
+
+test("QingyuClient does not label a cancelled upstream task as successfully resolved", async () => {
+  const client = new QingyuClient({
+    baseUrl: "https://qingyu.example.test",
+    fetchImpl: async (input, init = {}) => {
+      assert.equal(init.method ?? "GET", "GET");
+      const url = new URL(input);
+      const status = { key: "CANCELLED", name: "已取消" };
+      if (url.pathname === "/api/tasks/91")
+        return json({ code: 0, data: { id: 91, bug_status: status } });
+      assert.equal(url.pathname, "/api/tasks/91/bug-transitions");
+      return json({ code: 0, data: { current_status: status, list: [] } });
+    },
+  });
+  await assert.rejects(
+    client.resolveDefect(
+      { token: "token-1", user: { id: "7", name: "测试用户", avatar: null } },
+      {
+        defectId: "91",
+        externalProjectId: "project-3",
+        expectedUserId: "7",
+        expectedUserName: "测试用户",
+      },
+    ),
+    { code: "QINGYU_RESOLVE_TRANSITION_UNAVAILABLE" },
+  );
+});
+
 test("QingyuClient does not invent missing defect details", async () => {
   const client = new QingyuClient({
     baseUrl: "https://qingyu.example.test",
@@ -138,7 +200,7 @@ test("QingyuClient does not invent missing defect details", async () => {
   assert.equal(JSON.stringify(defect).includes("未填写详细描述"), false);
 });
 
-test("Qingyu integration persists encrypted sessions, imports idempotently, and resolves linked Bug", async () => {
+test("Qingyu integration persists encrypted sessions, imports idempotently, and resolves linked Bug", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "qa-hub-qingyu-"));
   const statePath = join(root, "qingyu.enc.json");
   const actorId = "10000000-0000-4000-8000-000000000003";
@@ -164,6 +226,7 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
   let creationCalls = 0;
   let creationRequest = null;
   let resolveCalls = 0;
+  let resolveError = null;
   let links = [];
   const fakeClient = {
     async startLogin() {
@@ -199,6 +262,7 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
     async resolveDefect(credentials, input) {
       resolveCalls += 1;
       assert.equal(credentials.user.id, input.expectedUserId);
+      if (resolveError !== null) throw resolveError;
       return { defectId: input.defectId, status: "已解决", alreadyResolved: resolveCalls > 1 };
     },
   };
@@ -318,23 +382,62 @@ test("Qingyu integration persists encrypted sessions, imports idempotently, and 
   assert.equal(replay.items[0].status, "already_imported");
   assert.equal(creationCalls, 1);
 
-  const sync = await integration.beforeHumanClose(actorId, bugId);
+  const sync = await integration.syncHumanClosure(actorId, bugId);
   assert.equal(sync.link.syncStatus, "succeeded");
   assert.equal(resolveCalls, 1);
   assert.equal((await integration.getBugLink(bugId)).externalStatus, "已解决");
   assert.equal(isActionableQingyuDefect({ status: "已解决", statusKey: "RESOLVED" }), false);
 
-  const checkedAgain = await integration.beforeHumanClose(actorId, bugId, { verifyRemote: true });
+  const checkedAgain = await integration.syncHumanClosure(actorId, bugId, { verifyRemote: true });
   assert.equal(checkedAgain.alreadyResolved, true);
   assert.equal(resolveCalls, 2);
+
+  await t.test(
+    "expired session persists sync failure without claiming upstream completion",
+    async () => {
+      resolveError = new QingyuError(401, "QINGYU_AUTH_REQUIRED", "轻语登录已过期，请重新扫码");
+      await assert.rejects(integration.syncHumanClosure(actorId, bugId, { verifyRemote: true }), {
+        code: "QINGYU_AUTH_REQUIRED",
+      });
+      const failed = await integration.getBugLink(bugId);
+      assert.equal(failed.syncStatus, "failed");
+      assert.equal(failed.lastSyncErrorCode, "QINGYU_AUTH_REQUIRED");
+      assert.equal(failed.syncedAt, null);
+      assert.equal(failed.syncAttempts, 3);
+      integration = await create();
+      assert.equal(integration.session(actorId).authenticated, false);
+    },
+  );
+
+  await t.test("missing session is recorded as a failed sync and remains retryable", async () => {
+    await assert.rejects(integration.syncHumanClosure(actorId, bugId), {
+      code: "QINGYU_LINKED_SESSION_REQUIRED",
+    });
+    const failed = await integration.getBugLink(bugId);
+    assert.equal(failed.syncStatus, "failed");
+    assert.equal(failed.lastSyncErrorCode, "QINGYU_LINKED_SESSION_REQUIRED");
+    assert.match(failed.lastSyncErrorMessage, /不影响 QA Hub 关单/u);
+    assert.equal(failed.syncAttempts, 4);
+    assert.equal(resolveCalls, 3);
+    resolveError = null;
+    await integration.startLogin(actorId);
+    await integration.pollLogin(actorId);
+    const retried = await integration.syncHumanClosure(actorId, bugId);
+    assert.equal(retried.link.syncStatus, "succeeded");
+    assert.equal(retried.link.lastSyncErrorCode, null);
+    assert.equal(retried.link.syncAttempts, 5);
+    assert.equal(retried.alreadyResolved, true);
+  });
 });
 
-test("passed acceptance automatically resolves Qingyu before closing without identity checks", async () => {
+test("human acceptance commits locally before best-effort Qingyu synchronization", async (t) => {
   const actorId = "10000000-0000-4000-8000-000000000003";
   const bugId = "20000000-0000-4000-8000-000000000001";
   const verificationId = "30000000-0000-4000-8000-000000000001";
   const order = [];
-  let failExternal = true;
+  let externalError = null;
+  let localError = null;
+  let replayed = false;
   const verification = {
     id: verificationId,
     bugId,
@@ -391,14 +494,15 @@ test("passed acceptance automatically resolves Qingyu before closing without ide
       async getVerification() {
         return verification;
       },
-      async recordResult() {
+      async recordResult(command) {
         order.push("local");
+        if (localError !== null) throw localError;
         return {
-          bug: { ...bug, state: "closed" },
-          verification: { ...verification, status: "passed" },
+          bug: { ...bug, state: command.request.status === "passed" ? "closed" : "in_progress" },
+          verification: { ...verification, status: command.request.status },
           repairAttempt: null,
           eventId: "50000000-0000-4000-8000-000000000001",
-          replayed: false,
+          replayed,
         };
       },
       async createVerification() {
@@ -409,10 +513,12 @@ test("passed acceptance automatically resolves Qingyu before closing without ide
       },
     },
     qingyuIntegration: {
-      async beforeHumanClose() {
+      async syncHumanClosure(requestedActorId, requestedBugId) {
+        assert.equal(requestedActorId, actorId);
+        assert.equal(requestedBugId, bugId);
+        assert.deepEqual(order, ["local"]);
         order.push("qingyu");
-        if (failExternal)
-          throw new QingyuError(409, "QINGYU_RESOLUTION_NOT_VERIFIED", "轻语没有确认已解决");
+        if (externalError !== null) throw externalError;
         return null;
       },
       session() {
@@ -441,7 +547,8 @@ test("passed acceptance automatically resolves Qingyu before closing without ide
       },
     },
   });
-  const request = () =>
+  t.after(() => app.close());
+  const request = (status = "passed") =>
     app.inject({
       method: "POST",
       url: `/api/v1/verifications/${verificationId}/result`,
@@ -454,22 +561,75 @@ test("passed acceptance automatically resolves Qingyu before closing without ide
         submissionContractVersion: "1.1.0",
         clientSubmissionId: "60000000-0000-4000-8000-000000000001",
         expectedVersion: 2,
-        status: "passed",
+        status,
         resultSummary: "确认修复有效",
+        ...(status === "failed" ? { failureReason: "仍可复现" } : {}),
         attachmentIds: [],
       },
     });
 
-  const failed = await request();
-  assert.equal(failed.statusCode, 409);
-  assert.equal(failed.json().code, "QINGYU_RESOLUTION_NOT_VERIFIED");
-  assert.deepEqual(order, ["qingyu"]);
+  for (const [label, error] of [
+    ["successful or unlinked sync", null],
+    ["not logged in", new QingyuError(401, "QINGYU_LINKED_SESSION_REQUIRED", "未登录")],
+    ["expired login", new QingyuError(401, "QINGYU_AUTH_REQUIRED", "登录已过期")],
+    [
+      "completed upstream has no transition",
+      new QingyuError(409, "QINGYU_RESOLVE_TRANSITION_UNAVAILABLE", "无可用流转"),
+    ],
+    [
+      "upstream did not confirm resolution",
+      new QingyuError(409, "QINGYU_RESOLUTION_NOT_VERIFIED", "未确认解决"),
+    ],
+    ["timeout", new QingyuError(504, "QINGYU_TIMEOUT", "超时")],
+    ["offline", new QingyuError(502, "QINGYU_UNAVAILABLE", "无法连接")],
+    ["unexpected adapter failure", new Error("adapter unavailable")],
+  ]) {
+    await t.test(`${label} still returns a closed QA Hub Bug`, async () => {
+      order.length = 0;
+      externalError = error;
+      const response = await request();
+      assert.equal(response.statusCode, 200, response.body);
+      assert.equal(response.json().bug.state, "closed");
+      assert.equal(response.json().verification.status, "passed");
+      assert.equal(response.json().eventId, "50000000-0000-4000-8000-000000000001");
+      assert.deepEqual(order, ["local", "qingyu"]);
+    });
+  }
 
-  failExternal = false;
-  const succeeded = await request();
-  assert.equal(succeeded.statusCode, 200);
-  assert.deepEqual(order, ["qingyu", "qingyu", "local"]);
-  await app.close();
+  await t.test("acceptance replay does not repeat upstream synchronization", async () => {
+    order.length = 0;
+    replayed = true;
+    const response = await request();
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.json().bug.state, "closed");
+    assert.equal(response.json().replayed, true);
+    assert.deepEqual(order, ["local"]);
+    replayed = false;
+  });
+
+  await t.test("failed verification does not close or synchronize upstream", async () => {
+    order.length = 0;
+    const response = await request("failed");
+    assert.equal(response.statusCode, 200, response.body);
+    assert.equal(response.json().bug.state, "in_progress");
+    assert.deepEqual(order, ["local"]);
+  });
+
+  for (const [code, status] of [
+    ["VERSION_CONFLICT", 412],
+    ["FORBIDDEN", 403],
+    ["INVALID_TRANSITION", 409],
+    ["SQLITE_BUSY", 503],
+  ]) {
+    await t.test(`local ${code} prevents upstream synchronization`, async () => {
+      order.length = 0;
+      localError = Object.assign(new Error(code), { code });
+      const response = await request();
+      assert.equal(response.statusCode, status, response.body);
+      assert.deepEqual(order, ["local"]);
+      localError = null;
+    });
+  }
 });
 
 test("explicit Qingyu resolve API reuses the verified linked-Bug synchronization", async () => {
@@ -525,7 +685,7 @@ test("explicit Qingyu resolve API reuses the verified linked-Bug synchronization
       },
     },
     qingyuIntegration: {
-      async beforeHumanClose(requestedActorId, requestedBugId, options) {
+      async syncHumanClosure(requestedActorId, requestedBugId, options) {
         calls.push({ actorId: requestedActorId, bugId: requestedBugId, options });
         return { link, alreadyResolved: false };
       },

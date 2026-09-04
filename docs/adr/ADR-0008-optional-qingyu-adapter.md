@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-08-28
+- Superseded in part by: ADR-0009 (closure ordering and failure handling only)
 - Owners: Relay QA Hub architecture
 - Supersedes: ADR-0001 decision 7 only
 

@@ -1,8 +1,9 @@
-param([string]$LanAddress)
+param([string]$LanAddress, [switch]$IfUnhealthy)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version 2
 $statePath = "D:\Relay-QA-Hub-Data\mvp-e2e-current.json"
+. (Join-Path $PSScriptRoot 'qa-hub-guardian-common.ps1')
 
 function Test-IsAdministrator {
   $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -11,6 +12,10 @@ function Test-IsAdministrator {
 }
 
 if (-not (Test-IsAdministrator)) {
+  if ($IfUnhealthy -and (Get-QAHubServiceProbe -Service api).healthy) {
+    [pscustomobject]@{ ready = $true; skipped = $true }
+    return
+  }
   $previousState = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
   $previousGeneration = [string]$previousState.generation
   $arguments = @(
@@ -21,6 +26,7 @@ if (-not (Test-IsAdministrator)) {
   if (-not [string]::IsNullOrWhiteSpace($LanAddress)) {
     $arguments += @("-LanAddress", $LanAddress)
   }
+  if ($IfUnhealthy) { $arguments += '-IfUnhealthy' }
   Start-Process `
     -FilePath "powershell.exe" `
     -ArgumentList $arguments `
@@ -42,7 +48,7 @@ if (-not (Test-IsAdministrator)) {
         -Uri "http://127.0.0.1:4319/api/v1/health/ready" `
         -TimeoutSec 2
       if (
-        [string]$candidateState.generation -ne $previousGeneration -and
+        ($IfUnhealthy -or [string]$candidateState.generation -ne $previousGeneration) -and
         $listener.OwningProcess -contains [int]$candidateState.apiPid -and
         $response.StatusCode -eq 200
       ) {
@@ -66,6 +72,12 @@ if (-not (Test-IsAdministrator)) {
   return
 }
 
+$runtimeLock = Enter-QAHubRuntimeLock
+try {
+if ($IfUnhealthy -and (Get-QAHubServiceProbe -Service api).healthy) {
+  [pscustomobject]@{ ready = $true; skipped = $true }
+  return
+}
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $nodeExe = "C:\Users\lin0\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
 $gitExe = "C:\Program Files\Git\cmd\git.exe"
@@ -84,7 +96,8 @@ $backupPolicy = Initialize-QAHubPersistentRuntime -State $state -RepositoryRoot 
 $listeners = @(Get-NetTCPConnection -State Listen -LocalPort 4319 -ErrorAction SilentlyContinue)
 foreach ($listener in $listeners) {
   $currentProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$($listener.OwningProcess)"
-  if ($null -eq $currentProcess -or $currentProcess.CommandLine -notlike "*apps\api\dist\main.js*") {
+  if ($null -eq $currentProcess -or $currentProcess.Name -ne 'node.exe' -or
+      $currentProcess.CommandLine -notmatch [regex]::Escape($apiEntry)) {
     throw "Port 4319 is owned by an unexpected process $($listener.OwningProcess)"
   }
   Stop-Process -Id $listener.OwningProcess -Force
@@ -167,6 +180,9 @@ while ([DateTime]::UtcNow -lt $deadline) {
   }
 }
 if (-not $ready) {
+  if (-not (Get-QAHubServiceProbe -Service api).healthy -and -not $api.HasExited) {
+    Stop-Process -InputObject $api -Force
+  }
   $tail = Get-Content -LiteralPath $stderr -Tail 30 -ErrorAction SilentlyContinue
   throw "API failed to become ready. $tail"
 }
@@ -177,7 +193,7 @@ $state.startedAt = [DateTime]::UtcNow.ToString("o")
 $state | Add-Member -NotePropertyName lanAddress -NotePropertyValue $lan.Address -Force
 $state | Add-Member -NotePropertyName lanSubnet -NotePropertyValue $lan.Cidr -Force
 $state | Add-Member -NotePropertyName apiUrl -NotePropertyValue "http://$($lan.Address):4319" -Force
-$state | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $statePath -Encoding UTF8
+Write-QAHubJsonAtomic -Path $statePath -Value $state
 
 [pscustomobject]@{
   apiPid = $api.Id
@@ -189,4 +205,8 @@ $state | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $statePath -Encoding
   lanAddress = $lan.Address
   lanSubnet = $lan.Cidr
   url = "http://$($lan.Address):4319"
+}
+} finally {
+  $runtimeLock.ReleaseMutex()
+  $runtimeLock.Dispose()
 }

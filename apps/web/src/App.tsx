@@ -361,13 +361,14 @@ function messageFor(cause: unknown): string {
   if (cause instanceof QaHubApiError) {
     const qingyuMessages: Readonly<Record<string, string>> = {
       QINGYU_AUTH_REQUIRED: "轻语登录已过期，请重新扫码连接。",
-      QINGYU_LINKED_SESSION_REQUIRED: "请先用导入这条 Bug 的轻语账号扫码连接，再执行关单。",
+      QINGYU_LINKED_SESSION_REQUIRED:
+        "请用导入这条 Bug 的轻语账号扫码连接后重试同步；不影响 QA Hub 关单。",
       QINGYU_ACCOUNT_MISMATCH: "当前轻语账号与导入 Bug 时的账号不一致，请切换账号后重试。",
       QINGYU_RESOLVE_TRANSITION_UNAVAILABLE:
         "轻语当前状态没有可用的“已解决”流转，或当前账号没有关单权限。",
       QINGYU_RESOLVE_VERSION_REQUIRED: "轻语要求填写解决版本，但项目没有可用版本。",
-      QINGYU_TRANSITION_FIELD_REQUIRED: "轻语关单还缺少必填字段，QA Hub 已保留为已完成待验收状态。",
-      QINGYU_RESOLUTION_NOT_VERIFIED: "轻语未确认 Bug 已解决，QA Hub 未执行本地关单。",
+      QINGYU_TRANSITION_FIELD_REQUIRED: "轻语关单还缺少必填字段；不影响 QA Hub 关单。",
+      QINGYU_RESOLUTION_NOT_VERIFIED: "轻语未确认 Bug 已解决；不影响 QA Hub 关单。",
       QINGYU_TIMEOUT: "轻语响应超时，请稍后重试。",
       QINGYU_UNAVAILABLE: "当前无法连接轻语，请检查网络后重试。",
       QINGYU_UPSTREAM_FAILED: "轻语拒绝了本次请求，请稍后重试或检查账号权限。",
@@ -1886,8 +1887,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           {qingyuLink.syncStatus === "succeeded"
                             ? `已同步为${qingyuLink.externalStatus ?? "已解决"}`
                             : qingyuLink.syncStatus === "failed"
-                              ? "上次同步关单失败，本地仍保留为已完成待验收"
-                              : "直接关闭时，将同步解决轻语单"}
+                              ? "轻语同步关单失败，不影响 QA Hub 关单"
+                              : "关闭后将尝试同步轻语，同步失败不影响 QA Hub 关单"}
                         </span>
                       </div>
                       <a href={qingyuLink.defectUrl} rel="noreferrer" target="_blank">
@@ -2342,7 +2343,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           onClick={() => void acceptBug()}
                           type="button"
                         >
-                          {qingyuLink === null ? "直接关闭" : "关闭并同步轻语"}
+                          直接关闭
                         </button>
                       ) : null}
                       {detail.state !== "closed" &&

@@ -144,7 +144,7 @@ export interface QingyuIntegration {
     defectIds?: readonly string[],
   ) => Promise<{ readonly items: readonly QingyuImportItemResult[] }>;
   readonly getBugLink: (bugId: string) => Promise<QingyuBugLink | null>;
-  readonly beforeHumanClose: (
+  readonly syncHumanClosure: (
     actorId: string,
     bugId: string,
     options?: { readonly verifyRemote?: boolean },
@@ -668,7 +668,7 @@ export async function createQingyuIntegration(options: {
       return options.linkStore.getBugLink(bugId);
     },
 
-    async beforeHumanClose(actorId, bugId, syncOptions = {}) {
+    async syncHumanClosure(actorId, bugId, syncOptions = {}) {
       return mutate(async () => {
         const link = await options.linkStore.getBugLink(bugId);
         if (link === null) return null;
@@ -679,12 +679,6 @@ export async function createQingyuIntegration(options: {
           [storedSession(link.importedByActorId), storedSession(actorId)].find(
             (item) => item?.credentials.user.id === link.qingyuUserId,
           ) ?? null;
-        if (session === null)
-          throw new QingyuError(
-            401,
-            "QINGYU_LINKED_SESSION_REQUIRED",
-            `请先用轻语账号“${link.qingyuUserName}”扫码连接，再关闭这个 Bug`,
-          );
         const attemptAt = now().toISOString();
         const syncing = await options.linkStore.updateSync(link, {
           syncStatus: "syncing",
@@ -696,6 +690,12 @@ export async function createQingyuIntegration(options: {
           lastSyncAt: attemptAt,
         });
         try {
+          if (session === null)
+            throw new QingyuError(
+              401,
+              "QINGYU_LINKED_SESSION_REQUIRED",
+              `请用轻语账号“${link.qingyuUserName}”扫码连接后重试同步；不影响 QA Hub 关单`,
+            );
           const result = await client.resolveDefect(session.credentials, {
             defectId: link.defectId,
             externalProjectId: link.externalProjectId,
@@ -723,7 +723,7 @@ export async function createQingyuIntegration(options: {
             lastSyncErrorMessage: details.message,
             lastSyncAt: syncing.lastSyncAt,
           });
-          if (error instanceof QingyuError && error.status === 401)
+          if (session !== null && error instanceof QingyuError && error.status === 401)
             state = {
               ...state,
               sessions: state.sessions.filter((item) => item.actorId !== session.actorId),
