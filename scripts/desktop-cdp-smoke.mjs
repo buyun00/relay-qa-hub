@@ -523,7 +523,7 @@ try {
       !shell.cardLayout ||
       !shell.chrome.enabled ||
       !shell.chrome.visible ||
-      shell.chrome.height !== 64 ||
+      shell.chrome.height !== 32 ||
       !shell.chrome.draggable ||
       !shell.chrome.searchClickable ||
       shell.mcp.state !== "listening" ||

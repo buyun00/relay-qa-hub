@@ -1523,21 +1523,23 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark">Q</span>
-          <div>
+          <span className="brand-symbol">
+            <span className="brand-mark">Q</span>
+            <ConnectionLight
+              state={backendState}
+              label={
+                backendState === "connected"
+                  ? "QA Hub 已连接"
+                  : backendState === "offline"
+                    ? "QA Hub 连接中断"
+                    : "QA Hub 连接中"
+              }
+            />
+          </span>
+          <div className="brand-copy">
             <strong>QA Hub</strong>
-            <span>Bug 工作台</span>
+            <span>团队协作空间</span>
           </div>
-          <ConnectionLight
-            state={backendState}
-            label={
-              backendState === "connected"
-                ? "QA Hub 已连接"
-                : backendState === "offline"
-                  ? "QA Hub 连接中断"
-                  : "QA Hub 连接中"
-            }
-          />
         </div>
         <nav aria-label="主导航">
           <p className="nav-label">工作区</p>
@@ -1641,35 +1643,47 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       <section className="page">
         <header className="topbar">
           <div className="breadcrumb">
-            {currentProject?.id === DEFAULT_PROJECT_ID ? (
-              <img
-                className="project-logo"
-                src={ozdqpLogo}
-                alt="OZDQP"
-                title="OZDQP"
-                width={136}
-                height={48}
-              />
-            ) : (
-              <strong>{currentProject?.name ?? "OZDQP"}</strong>
-            )}
-            <span>/</span>
-            <span>
-              {view === "workbench"
-                ? "工作台"
-                : view === "overview"
-                  ? `总览 · ${overviewDateLabel}`
-                  : view === "packaging"
-                    ? "打包下载"
-                    : view === "production"
-                      ? "制作任务"
-                      : "用户管理"}
+            <span className="project-brand">
+              {currentProject === null || currentProject?.id === DEFAULT_PROJECT_ID ? (
+                <img className="project-logo" src={ozdqpLogo} alt="OZDQP" width={136} height={48} />
+              ) : (
+                <span className="project-monogram" aria-hidden="true">
+                  {initials(currentProject.name)}
+                </span>
+              )}
             </span>
+            <div className="workspace-context">
+              <span className="workspace-project">{currentProject?.name ?? "OZDQP"}</span>
+              <strong className="workspace-page">
+                {view === "workbench"
+                  ? "工作台"
+                  : view === "overview"
+                    ? `总览 · ${overviewDateLabel}`
+                    : view === "packaging"
+                      ? "打包下载"
+                      : view === "production"
+                        ? "制作任务"
+                        : "用户管理"}
+              </strong>
+            </div>
           </div>
           {view === "workbench" ? (
             <label className="global-search">
-              <span aria-hidden="true">⌕</span>
+              <svg
+                className="search-icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                aria-hidden="true"
+              >
+                <circle cx="10.5" cy="10.5" r="6.5" />
+                <path d="m16 16 4 4" strokeLinecap="round" />
+              </svg>
               <input
+                aria-label="搜索编号、内容或人员"
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="搜索编号、内容或人员"
                 ref={searchRef}
@@ -1700,7 +1714,21 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             }}
             type="button"
           >
-            ↻
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              aria-hidden="true"
+            >
+              <path
+                d="M19.3 8A8 8 0 1 0 20 14M20 4v5h-5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         </header>
 

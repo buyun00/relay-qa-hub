@@ -9,6 +9,58 @@
 .brand {
   position: relative;
 }
+.brand-symbol {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+}
+.brand-symbol .connection-light {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  margin: 0;
+  border: 2px solid #fbfcfa;
+  width: 12px;
+  height: 12px;
+}
+.project-brand {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.workspace-context {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.breadcrumb .workspace-project {
+  color: #889487;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.workspace-page {
+  color: #35483a;
+  font-size: 14px;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.project-monogram {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #e9efdf;
+  font-size: 19px;
+}
+.search-icon {
+  flex-shrink: 0;
+  color: #83917f;
+}
 .connection-light {
   flex: 0 0 8px;
   width: 8px;
@@ -122,20 +174,74 @@
 .desktop-window .sidebar {
   padding: 0 16px 16px;
 }
-.desktop-window .brand {
-  height: 64px;
-  flex-shrink: 0;
-  padding: 0 10px;
-  margin-bottom: 24px;
-  -webkit-app-region: drag;
+.desktop-window .sidebar > nav {
+  padding-bottom: 8px;
 }
-.desktop-window .topbar {
-  height: 64px;
-  padding: 0 156px 0 28px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 20px;
+.desktop-window .brand {
+  height: 112px;
+  width: calc(100% + 32px);
+  flex-shrink: 0;
+  padding: 32px 26px 16px;
+  margin: 0 -16px 20px;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
   background: #fbfcfa;
   -webkit-app-region: drag;
+}
+.desktop-window .brand-symbol > .brand-mark {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #304635;
+  border-radius: 16px;
+  font-size: 25px;
+  background: linear-gradient(145deg, #2c4430, #172b21);
+  box-shadow: 0 7px 16px #213e2521;
+}
+.desktop-window .brand-copy {
+  gap: 5px;
+}
+.desktop-window .brand-copy strong {
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+}
+.desktop-window .brand-copy > span {
+  color: #85917e;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+.desktop-window .topbar {
+  height: 112px;
+  padding: 34px 36px 18px;
+  grid-template-columns: minmax(0, auto) minmax(160px, 1fr) 42px;
+  gap: 24px;
+  background: #fbfcfa;
+  -webkit-app-region: drag;
+}
+.desktop-window .breadcrumb {
+  min-width: 0;
+  gap: 18px;
+}
+.desktop-window .project-brand {
+  width: 148px;
+  height: 60px;
+  padding: 6px 10px;
+  border: 1px solid #e5e9de;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff, #f2f5eb);
+  box-shadow: 0 3px 9px #354b2910;
+}
+.desktop-window .project-logo {
+  width: 128px;
+  height: 46px;
+}
+.desktop-window .workspace-page {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.desktop-window .workspace-project {
+  font-size: 11px;
 }
 .desktop-window .topbar button,
 .desktop-window .global-search,
@@ -144,8 +250,20 @@
 }
 .desktop-window .global-search {
   width: 100%;
-  max-width: 480px;
+  height: 44px;
+  max-width: 420px;
+  padding: 0 14px;
+  border-color: #e3e8de;
+  border-radius: 14px;
+  background: #fff;
   justify-self: end;
+}
+.desktop-window .topbar > .icon-button {
+  width: 42px;
+  height: 42px;
+  border-color: #e3e8de;
+  border-radius: 14px;
+  color: #6c7d64;
 }
 .desktop-window .global-search input {
   min-width: 0;
@@ -166,7 +284,7 @@
   top: 0;
   left: 0;
   right: 138px;
-  height: 64px;
+  height: 32px;
   z-index: 10;
   -webkit-app-region: drag;
 }
@@ -310,22 +428,24 @@
 
 @media (max-width: 1100px) {
   .desktop-window .topbar {
+    gap: 16px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .desktop-window .breadcrumb {
     gap: 12px;
-    padding-left: 20px;
+  }
+  .desktop-window .project-brand {
+    width: 122px;
   }
   .desktop-window .project-logo {
-    width: 100px;
+    width: 106px;
   }
   .desktop-window .global-search kbd {
     display: none;
   }
 }
 @media (max-width: 900px) {
-  .brand .connection-light {
-    position: absolute;
-    top: 0;
-    right: 3px;
-  }
   .users-card {
     justify-content: center;
     padding: 12px;
@@ -362,9 +482,6 @@
   .users-card {
     padding: 8px;
     border: 0;
-  }
-  .brand .connection-light {
-    right: -2px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
