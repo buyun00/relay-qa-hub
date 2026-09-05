@@ -1709,6 +1709,14 @@ export function createMobileRelayAttempt(
     );
   }
   assertRepairAttemptAssignee(database, input);
+  const sequenceRow = database
+    .prepare(
+      `SELECT COALESCE(MAX(sequence), 0) + 1 AS next_sequence
+       FROM repair_attempts
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?`,
+    )
+    .get(input.accountId, input.projectId, bug.id) as { readonly next_sequence: number };
+  const sequence = sequenceRow.next_sequence;
   const at = nextTimestamp(input.createdAt, bug.updated_at);
   const attemptId = randomUUID();
   const eventId = randomUUID();
@@ -1747,7 +1755,7 @@ export function createMobileRelayAttempt(
         id, account_id, project_id, bug_id, sequence, mode, status, assignee_id,
         parent_attempt_id, summary, branch, commit_sha, merge_request_url, patch_url,
         no_code_reason, target_build_id, created_at, updated_at, version, failure_reason
-      ) VALUES (?, ?, ?, ?, 1, 'relay', 'planned', ?, NULL, ?, NULL, NULL, NULL,
+      ) VALUES (?, ?, ?, ?, ?, 'relay', 'planned', ?, NULL, ?, NULL, NULL, NULL,
                 NULL, NULL, NULL, ?, ?, 1, NULL)`,
     )
     .run(
@@ -1755,6 +1763,7 @@ export function createMobileRelayAttempt(
       input.accountId,
       input.projectId,
       bug.id,
+      sequence,
       input.assigneeId,
       input.summary,
       at,

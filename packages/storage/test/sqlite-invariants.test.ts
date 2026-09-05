@@ -10791,6 +10791,55 @@ test("multi-actor no-code human workflow can be managed by any project member", 
     );
     assert.equal(readyBug.state, "ready");
 
+    const checkRelaySequence = (expectedVersion: number, sequence: number) => {
+      const history = database
+        .prepare("SELECT * FROM repair_attempts WHERE bug_id = ? ORDER BY sequence")
+        .all(bugId);
+      database.exec("SAVEPOINT relay_sequence_regression");
+      try {
+        const attempt = createMobileRelayAttempt(database, {
+          ...primaryScope,
+          bugId,
+          expectedVersion,
+          assigneeId: tenant.secondaryUserId,
+          summary: "Relay repair after the previous acceptance result",
+          idempotencyKey: `relay-sequence-${sequence}`,
+          requestDigest: digest(5_470 + sequence),
+          createdAt: workflowAt,
+        });
+        assert.equal(attempt.sequence, sequence);
+        assert.equal(attempt.status, "planned");
+        assert.equal(attempt.version, 1);
+        assert.deepEqual(
+          database
+            .prepare("SELECT * FROM repair_attempts WHERE bug_id = ? AND id <> ? ORDER BY sequence")
+            .all(bugId, attempt.id),
+          history,
+        );
+        const bug = database
+          .prepare("SELECT state, active_repair_attempt_id, version FROM bugs WHERE id = ?")
+          .get(bugId);
+        assert.equal(bug?.state, "in_progress");
+        assert.equal(bug?.active_repair_attempt_id, attempt.id);
+        assert.equal(bug?.version, expectedVersion + 1);
+        const events = database
+          .prepare(
+            `SELECT type, resource_version_after, from_state, to_state
+             FROM events WHERE aggregate_type = 'repair_attempt' AND aggregate_id = ?`,
+          )
+          .all(attempt.id);
+        assert.equal(events.length, 1);
+        assert.equal(events[0]?.type, "repair_attempt.created");
+        assert.equal(events[0]?.resource_version_after, 1);
+        assert.equal(events[0]?.from_state, "ready");
+        assert.equal(events[0]?.to_state, "in_progress");
+        assertIntegrity(database);
+      } finally {
+        database.exec("ROLLBACK TO relay_sequence_regression; RELEASE relay_sequence_regression");
+      }
+    };
+    checkRelaySequence(readyBug.version, 1);
+
     for (const createAttempt of [createMobileRelayAttempt, createMobileManualRepairAttempt]) {
       assert.throws(
         () =>
@@ -10987,6 +11036,7 @@ test("multi-actor no-code human workflow can be managed by any project member", 
       { activeRepairAttemptId: null, activeVerificationId: null },
     );
 
+    checkRelaySequence(failedResult.bug.version, 2);
     const passedTarget = deliverNoCode(failedResult.bug.version, 5_450);
     const passedVerification = transaction(database, () =>
       createMobileVerification(database, {
