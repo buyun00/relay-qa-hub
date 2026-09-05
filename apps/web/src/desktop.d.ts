@@ -7,6 +7,19 @@ interface QaHubDesktopBugChange {
 interface QaHubDesktopRuntimeInfo {
   readonly apiBaseUrl: string;
   readonly notificationsEnabled: boolean;
+  readonly version?: string;
+  readonly mcp?: {
+    readonly state: "disabled" | "stopped" | "starting" | "listening" | "failed";
+    readonly port: number;
+    readonly url: string;
+    readonly lastError: string | null;
+  };
+}
+
+interface QaHubDesktopConnectionStatus {
+  readonly state: "disabled" | "stopped" | "connecting" | "connected" | "reconnecting" | "paused";
+  readonly reconnectAttempt: number;
+  readonly lastError: string | null;
 }
 
 type QaHubDesktopUpdateState =
@@ -30,6 +43,11 @@ type QaHubDesktopUpdateState =
   | { readonly status: "error"; readonly message: string };
 
 interface QaHubDesktopBridge {
+  readonly windowControlsOverlay?: boolean;
+  readonly getConnectionStatus?: () => Promise<QaHubDesktopConnectionStatus>;
+  readonly onConnectionStatus?: (
+    listener: (status: QaHubDesktopConnectionStatus) => void,
+  ) => () => void;
   readonly notifyPackaging?: (notice: {
     id: string;
     kind: "success" | "warning" | "failure";

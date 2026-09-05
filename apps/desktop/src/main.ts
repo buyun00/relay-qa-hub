@@ -548,6 +548,9 @@ function createWindow(): BrowserWindow {
     show: false,
     backgroundColor: "#f4f7f5",
     title: "Relay QA Hub",
+    titleBarStyle: "hidden",
+    titleBarOverlay: { color: "#fbfcfa", symbolColor: "#526159", height: 64 },
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(currentDirectory, "preload.cjs"),
       nodeIntegration: false,
@@ -628,7 +631,13 @@ function installIpcHandlers(): void {
     return {
       apiBaseUrl: config.apiBaseUrl.origin,
       notificationsEnabled: notificationCredential() !== null,
-      mcpUrl: mcpServer?.status.state === "listening" ? mcpServer.status.url : null,
+      version: app.getVersion(),
+      mcp: {
+        state: config.mcpEnabled ? (mcpServer?.status.state ?? "stopped") : "disabled",
+        port: config.mcpPort,
+        url: `http://127.0.0.1:${config.mcpPort}/mcp`,
+        lastError: mcpServer?.status.lastError ?? null,
+      },
     };
   });
   ipcMain.handle("desktop:get-notifications-paused", (event) => {
@@ -715,6 +724,7 @@ function createTransport(): NotificationTransport {
 }
 
 async function startApplication(): Promise<void> {
+  Menu.setApplicationMenu(null);
   if (process.platform === "win32") app.setAppUserModelId("com.relayqahub.desktop");
   await loadRememberedLoginName();
   await registerAppProtocol();

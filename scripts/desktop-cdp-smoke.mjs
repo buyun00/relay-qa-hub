@@ -11,6 +11,7 @@ const ACTIONS = new Set([
   "wait-update-ready",
   "install-update",
   "notify-packaging",
+  "shell-settings",
 ]);
 const action = process.argv[2] ?? "snapshot";
 if (!ACTIONS.has(action)) {
@@ -231,13 +232,15 @@ try {
         expression: `(() => {
           const page = document.querySelector('.production-page');
           return { visible: Boolean(page && !page.closest('[hidden]')), rowCount: page?.querySelectorAll('tbody tr').length ?? 0, error: page?.querySelector('.error-banner')?.textContent?.trim() ?? null, loading: page?.textContent.includes('正在连接制作服务') ?? true };
-        })()`, returnByValue: true,
+        })()`,
+        returnByValue: true,
       });
       production = result.result?.value;
       if (production?.visible && !production.loading && !production.error) break;
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
     } while (Date.now() < deadline);
-    if (!production?.visible || production.loading || production.error) throw new Error(`Production page failed: ${JSON.stringify(production)}`);
+    if (!production?.visible || production.loading || production.error)
+      throw new Error(`Production page failed: ${JSON.stringify(production)}`);
     const create = await client.send("Runtime.evaluate", {
       expression: `(async () => {
         document.querySelectorAll('.production-header button').forEach(button => { if (button.textContent.includes('新建')) button.click(); });
@@ -246,10 +249,19 @@ try {
         const result = { createVisible: modal !== null, repository: modal?.querySelector('.production-repository')?.textContent ?? '', filePicker: modal?.querySelector('input[type=file]') !== null, advancedOptions: modal?.querySelector('.production-advanced') !== null };
         modal?.querySelector('.production-modal-heading button')?.click();
         return result;
-      })()`, awaitPromise: true, returnByValue: true,
+      })()`,
+      awaitPromise: true,
+      returnByValue: true,
     });
-    if (!create.result?.value?.createVisible || !create.result.value.filePicker || !create.result.value.advancedOptions) throw new Error("Production creation form is incomplete");
-    process.stdout.write(`${JSON.stringify({ action, production: { ...production, ...create.result.value } })}\n`);
+    if (
+      !create.result?.value?.createVisible ||
+      !create.result.value.filePicker ||
+      !create.result.value.advancedOptions
+    )
+      throw new Error("Production creation form is incomplete");
+    process.stdout.write(
+      `${JSON.stringify({ action, production: { ...production, ...create.result.value } })}\n`,
+    );
   } else if (action === "open-first-bug") {
     const result = await client.send("Runtime.evaluate", {
       expression: `(async () => {
@@ -445,6 +457,87 @@ try {
     } while (Date.now() < deadline);
     process.stdout.write(`${JSON.stringify({ action, snapshot: current })}\n`);
     if (current?.desktopUpdate?.status !== "ready") process.exitCode = 1;
+  } else if (action === "shell-settings") {
+    const result = await client.send("Runtime.evaluate", {
+      expression: `(async () => {
+        const delay = () => new Promise(resolve => setTimeout(resolve, 100));
+        const runtime = await window.qaHubDesktop.getRuntimeInfo();
+        const nav = [...document.querySelectorAll('nav[aria-label="主导航"] > button')]
+          .map(button => button.querySelector('span:nth-child(2)')?.textContent.trim());
+        const cards = [...document.querySelectorAll('.utility-card')];
+        const rectangles = cards.map(card => card.getBoundingClientRect());
+        const cardLayout = rectangles.length === 3 && rectangles[0].bottom <= rectangles[1].top
+          && Math.abs(rectangles[1].top - rectangles[2].top) < 1
+          && rectangles[1].right < rectangles[2].left;
+        const overlay = navigator.windowControlsOverlay;
+        const titlebar = overlay?.getTitlebarAreaRect();
+        const search = document.querySelector('.global-search');
+        const chrome = {
+          enabled: window.qaHubDesktop.windowControlsOverlay === true,
+          visible: overlay?.visible === true,
+          height: titlebar?.height ?? 0,
+          draggable: getComputedStyle(document.querySelector('.topbar')).getPropertyValue('-webkit-app-region') === 'drag',
+          searchClickable: !search || getComputedStyle(search).getPropertyValue('-webkit-app-region') === 'no-drag'
+        };
+        const mcpCard = cards.find(card => card.textContent.includes('MCP 设置'));
+        mcpCard?.click();
+        await delay();
+        let dialog = document.querySelector('.desktop-tools-dialog[open]');
+        const config = JSON.parse(dialog?.querySelector('.desktop-config')?.textContent ?? 'null');
+        const mcp = {
+          state: runtime.mcp?.state,
+          port: runtime.mcp?.port,
+          configMatchesRuntime: config?.mcpServers?.qahub?.url === runtime.mcp?.url,
+          statusVisible: dialog?.textContent.includes('运行中') === true,
+          copyButtons: dialog?.querySelectorAll('.secondary-button').length ?? 0
+        };
+        dialog?.querySelector('[aria-label="关闭设置"]')?.click();
+        await delay();
+        cards.find(card => card.textContent.includes('当前状态'))?.click();
+        await delay();
+        dialog = document.querySelector('.desktop-tools-dialog[open]');
+        const versionVisible = dialog?.textContent.includes('当前版本 v' + runtime.version) === true;
+        const checkButton = dialog?.querySelector('.desktop-tools-actions button');
+        if (checkButton?.textContent === '检查更新') checkButton.click();
+        let update = await window.qaHubDesktop.getUpdateState();
+        const deadline = Date.now() + 15000;
+        while (update.status === 'checking' && Date.now() < deadline) {
+          await delay();
+          update = await window.qaHubDesktop.getUpdateState();
+        }
+        await delay();
+        const updateFeedback = dialog?.textContent.includes('已是最新版本') === true;
+        dialog?.querySelector('[aria-label="关闭设置"]')?.click();
+        return { nav, cardLayout, chrome, mcp, version: runtime.version, versionVisible,
+          updateStatus: update.status, updateFeedback,
+          connectionLight: document.querySelector('.brand .connection-light')?.getAttribute('aria-label') };
+      })()`,
+      awaitPromise: true,
+      returnByValue: true,
+      userGesture: true,
+    });
+    const shell = result.result?.value;
+    if (
+      !shell ||
+      shell.nav.join("|") !== "工作台|总览|制作任务|打包下载" ||
+      !shell.cardLayout ||
+      !shell.chrome.enabled ||
+      !shell.chrome.visible ||
+      shell.chrome.height !== 64 ||
+      !shell.chrome.draggable ||
+      !shell.chrome.searchClickable ||
+      shell.mcp.state !== "listening" ||
+      !shell.mcp.configMatchesRuntime ||
+      !shell.mcp.statusVisible ||
+      shell.mcp.copyButtons !== 2 ||
+      !shell.versionVisible ||
+      shell.updateStatus !== "up-to-date" ||
+      !shell.updateFeedback ||
+      shell.connectionLight !== "QA Hub 已连接"
+    ) {
+      throw new Error("Packaged immersive shell check failed: " + JSON.stringify(shell ?? result));
+    }
+    process.stdout.write(JSON.stringify({ action, shell }) + "\n");
   } else if (action === "notify-packaging") {
     const result = await client.send("Runtime.evaluate", {
       expression: `(async () => {

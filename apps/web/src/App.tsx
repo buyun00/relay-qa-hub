@@ -70,6 +70,7 @@ import OverviewPage, { formatOverviewDateLabel, type OverviewDateBucket } from "
 import UserManagementPage from "./UserManagementPage";
 import PackagingPage from "./PackagingPage";
 import ProductionPage from "./ProductionPage";
+import DesktopTools, { ConnectionLight, useDesktopStatus } from "./DesktopTools";
 import ozdqpLogo from "./assets/ozdqp-logo.png";
 import {
   TASK_STATUS_ORDER,
@@ -427,6 +428,10 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [query, setQuery] = useState("");
   const [bugs, setBugs] = useState<readonly BugListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [backendState, setBackendState] = useState<"checking" | "connected" | "offline">(
+    "checking",
+  );
+  const desktop = useDesktopStatus();
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -602,8 +607,10 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         if (requestId !== workbenchRequestRef.current) return;
         setMembers(memberResponse.items);
         setBugs(bugResponse.items);
+        setBackendState("connected");
         setError(null);
       } catch (cause) {
+        if (requestId === workbenchRequestRef.current) setBackendState("offline");
         if (requestId === workbenchRequestRef.current && (!quiet || indicateRefresh)) {
           setError(messageFor(cause));
         }
@@ -1518,9 +1525,19 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         <div className="brand">
           <span className="brand-mark">Q</span>
           <div>
-            <strong>Relay QA</strong>
+            <strong>QA Hub</strong>
             <span>Bug 工作台</span>
           </div>
+          <ConnectionLight
+            state={backendState}
+            label={
+              backendState === "connected"
+                ? "QA Hub 已连接"
+                : backendState === "offline"
+                  ? "QA Hub 连接中断"
+                  : "QA Hub 连接中"
+            }
+          />
         </div>
         <nav aria-label="主导航">
           <p className="nav-label">工作区</p>
@@ -1535,15 +1552,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span className="nav-count">{counts.pending}</span>
           </button>
           <button
-            aria-current={view === "production" ? "page" : undefined}
-            className={`nav-item${view === "production" ? " is-active" : ""}`}
-            onClick={() => setView("production")}
-            type="button"
-          >
-            <span className="nav-icon">▷</span>
-            <span>制作任务</span>
-          </button>
-          <button
             aria-current={view === "overview" ? "page" : undefined}
             className={`nav-item${view === "overview" ? " is-active" : ""}`}
             onClick={() => setView("overview")}
@@ -1554,14 +1562,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span className="nav-count">全部</span>
           </button>
           <button
-            aria-current={view === "users" ? "page" : undefined}
-            className={`nav-item${view === "users" ? " is-active" : ""}`}
-            onClick={() => setView("users")}
+            aria-current={view === "production" ? "page" : undefined}
+            className={`nav-item${view === "production" ? " is-active" : ""}`}
+            onClick={() => setView("production")}
             type="button"
           >
-            <span className="nav-icon">♙</span>
-            <span>用户管理</span>
-            <span className="nav-count">{members.length}</span>
+            <span className="nav-icon">▷</span>
+            <span>制作任务</span>
           </button>
           <button
             aria-current={view === "packaging" ? "page" : undefined}
@@ -1570,7 +1577,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             type="button"
           >
             <span className="nav-icon">↓</span>
-            <span>打包与下载</span>
+            <span>打包下载</span>
           </button>
           {view === "overview" ? (
             <div aria-label="总览日期分页" className="overview-date-nav">
@@ -1614,13 +1621,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             </div>
           ) : null}
         </nav>
-        <div className="sidebar-note">
-          <span className="status-dot" />
-          <div>
-            <strong>统一事实源已连接</strong>
-            <span>Web 与 Android 使用同一套数据</span>
-          </div>
-        </div>
+        <DesktopTools
+          desktop={desktop}
+          backendState={backendState}
+          usersActive={view === "users"}
+          memberCount={members.length}
+          onOpenUsers={() => setView("users")}
+        />
         <button className="profile" disabled={signingOut} onClick={onSignOut} type="button">
           <span className="avatar">{initials(principal.displayName)}</span>
           <span className="profile-copy">
@@ -1653,7 +1660,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 : view === "overview"
                   ? `总览 · ${overviewDateLabel}`
                   : view === "packaging"
-                    ? "打包与下载"
+                    ? "打包下载"
                     : view === "production"
                       ? "制作任务"
                       : "用户管理"}
@@ -2697,7 +2704,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           >
             <div className="modal-head">
               <div>
-                <p className="eyebrow">统一事实源</p>
+                <p className="eyebrow">QA HUB</p>
                 <h2>新建 Bug</h2>
               </div>
               <button onClick={() => setCreateOpen(false)} type="button">

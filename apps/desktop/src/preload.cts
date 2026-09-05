@@ -44,8 +44,9 @@ function parseStatus(value: unknown): DesktopConnectionStatus {
 }
 
 function parseRuntimeInfo(value: unknown): DesktopRuntimeInfo {
-  if (!isRecord(value)) return { apiBaseUrl: "", notificationsEnabled: false };
-  const apiBaseUrl = value["apiBaseUrl"];
+  if (!isRecord(value)) value = {};
+  const record = value as Record<string, unknown>;
+  const apiBaseUrl = record["apiBaseUrl"];
   let safeApiBaseUrl = "";
   if (typeof apiBaseUrl === "string" && apiBaseUrl.length <= 2_048) {
     try {
@@ -60,9 +61,28 @@ function parseRuntimeInfo(value: unknown): DesktopRuntimeInfo {
       // Invalid main-process data is reduced to the empty safe fallback.
     }
   }
+  const mcp = isRecord(record["mcp"]) ? record["mcp"] : {};
+  const port =
+    Number.isSafeInteger(mcp["port"]) &&
+    (mcp["port"] as number) > 0 &&
+    (mcp["port"] as number) <= 65535
+      ? (mcp["port"] as number)
+      : 4320;
+  const state = mcp["state"];
   return {
     apiBaseUrl: safeApiBaseUrl,
-    notificationsEnabled: value["notificationsEnabled"] === true,
+    notificationsEnabled: record["notificationsEnabled"] === true,
+    version: shortText(record["version"], "unknown"),
+    mcp: {
+      state:
+        typeof state === "string" &&
+        ["disabled", "stopped", "starting", "listening", "failed"].includes(state)
+          ? (state as DesktopRuntimeInfo["mcp"]["state"])
+          : "stopped",
+      port,
+      url: `http://127.0.0.1:${port}/mcp`,
+      lastError: typeof mcp["lastError"] === "string" ? mcp["lastError"].slice(0, 200) : null,
+    },
   };
 }
 
@@ -171,6 +191,7 @@ ipcRenderer.on("desktop:update-state", (_event: IpcRendererEvent, value: unknown
 });
 
 const bridge: QaHubDesktopBridge = {
+  windowControlsOverlay: true,
   notifyPackaging: async (notice) =>
     (await ipcRenderer.invoke("desktop:notify-packaging", {
       id: notice.id,

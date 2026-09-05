@@ -234,6 +234,12 @@ try {
   if (-not $login.appReady) {
     throw "Portable package login did not load the QA Hub workbench"
   }
+  $shellOutput = & $NodeExe $smokeScript shell-settings
+  if ($LASTEXITCODE -ne 0) { throw "Packaged immersive shell or desktop settings failed" }
+  $shellProof = ($shellOutput | Select-Object -Last 1 | ConvertFrom-Json).shell
+  if ([int]$shellProof.mcp.port -ne $McpPort) {
+    throw "Packaged MCP settings did not use the configured smoke port"
+  }
   if ($VerifyPackagingNotification) {
     $packagingOutput = & $NodeExe $smokeScript notify-packaging
     if ($LASTEXITCODE -ne 0) { throw "Packaged system notification request failed" }
@@ -434,6 +440,7 @@ try {
   }
 
   [pscustomobject][ordered]@{
+    desktopShell = $shellProof
     productionPage = $production
     productionMcpTaskCount = @($productionTasks.result.structuredContent.items).Count
     productionRepository = [string]$productionRepository.result.structuredContent.project.repoUrl

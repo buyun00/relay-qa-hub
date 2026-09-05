@@ -33,11 +33,12 @@ describe("Relay QA Hub browser workbench", () => {
       />,
     );
 
-    expect(markup).toContain("统一事实源已连接");
+    expect(markup).not.toContain("统一事实源");
+    expect(markup).toContain('aria-label="QA Hub 连接中"');
     expect(markup).toContain("工作台");
     expect(markup).toContain("总览");
     expect(markup).toContain("用户管理");
-    expect(markup).toContain("打包与下载");
+    expect(markup).toContain("打包下载");
     expect(markup).not.toContain("正在读取可下载文件");
     expect(markup).toContain("待处理");
     expect(markup).toContain("处理中");
@@ -58,7 +59,7 @@ describe("Relay QA Hub browser workbench", () => {
   });
 
   it("exposes the build and frozen contract versions", () => {
-    expect(product.appVersion).toBe("1.2.10");
+    expect(product.appVersion).toBe("1.3.1");
     expect(product.contractVersion).toBe("1.0.0");
   });
 

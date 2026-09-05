@@ -16,6 +16,13 @@ export interface DesktopBugChange {
 export interface DesktopRuntimeInfo {
   readonly apiBaseUrl: string;
   readonly notificationsEnabled: boolean;
+  readonly version: string;
+  readonly mcp: {
+    readonly state: "disabled" | "stopped" | "starting" | "listening" | "failed";
+    readonly port: number;
+    readonly url: string;
+    readonly lastError: string | null;
+  };
 }
 
 export type DesktopUpdateState =
@@ -39,6 +46,7 @@ export type DesktopUpdateState =
   | { readonly status: "error"; readonly message: string };
 
 export interface QaHubDesktopBridge {
+  readonly windowControlsOverlay: boolean;
   readonly notifyPackaging: (notice: DesktopPackagingNotice) => Promise<boolean>;
   readonly onOpenPackaging: (listener: () => void) => () => void;
   readonly getConnectionStatus: () => Promise<DesktopConnectionStatus>;

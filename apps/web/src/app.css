@@ -79,8 +79,7 @@ button:disabled {
   box-shadow: 0 8px 20px rgba(23, 43, 33, 0.18);
 }
 .brand div,
-.profile-copy,
-.sidebar-note div {
+.profile-copy {
   display: grid;
   gap: 2px;
 }
@@ -231,15 +230,6 @@ button:disabled {
   padding-right: 2px;
   scrollbar-width: thin;
 }
-.sidebar-note {
-  margin-top: auto;
-  padding: 14px;
-  display: flex;
-  gap: 10px;
-  border: 1px solid #e6ebe6;
-  border-radius: 16px;
-  background: #f8faf7;
-}
 .status-dot {
   width: 9px;
   height: 9px;
@@ -247,14 +237,6 @@ button:disabled {
   border-radius: 50%;
   background: #74bd32;
   box-shadow: 0 0 0 4px #e7f4dc;
-}
-.sidebar-note strong {
-  font-size: 12px;
-}
-.sidebar-note div span {
-  color: #89938d;
-  font-size: 10px;
-  line-height: 1.5;
 }
 .profile {
   width: 100%;
@@ -2744,7 +2726,6 @@ h1 {
   .brand div,
   .nav-label,
   .nav-item span:not(.nav-count):not(.nav-icon),
-  .sidebar-note,
   .profile-copy,
   .profile-arrow {
     display: none;
