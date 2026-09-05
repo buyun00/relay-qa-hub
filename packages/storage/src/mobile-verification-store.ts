@@ -1,3 +1,4 @@
+import { queueRelayRework, queueRelayAcceptance } from "./relay-lifecycle-store.js";
 import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
@@ -173,6 +174,7 @@ interface EligibleWorkflowRow extends BugRow {
   readonly requirement_link_id: string | null;
   readonly link_id: string | null;
   readonly completion_event_id: string | null;
+  readonly relay_delivery: number;
 }
 
 function requireTransaction(database: DatabaseSync): void {
@@ -310,7 +312,7 @@ function toVerification(row: VerificationRow): MobileVerificationRecord {
 
 function toAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
   if (
-    row.mode !== "human" ||
+    (row.mode !== "human" && row.mode !== "relay") ||
     (row.status !== "delivered" && row.status !== "verification_failed")
   ) {
     throw new MobileRelayStorageError(
@@ -322,7 +324,7 @@ function toAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     id: row.id,
     bugId: row.bug_id,
     sequence: row.sequence,
-    mode: "human",
+    mode: row.mode,
     status: row.status,
     assigneeId: row.assignee_id,
     parentAttemptId: null,
@@ -416,6 +418,9 @@ function readEligibleWorkflow(
               requirement.linked_build_id AS requirement_linked_build_id,
               requirement.link_id AS requirement_link_id,
               link.id AS link_id,
+              EXISTS (SELECT 1 FROM valid_relay_deliveries AS delivery
+                WHERE delivery.attempt_id=attempt.id AND delivery.commit_sha=attempt.commit_sha
+                  AND delivery.branch=attempt.branch) AS relay_delivery,
               (
                 SELECT completion.id
                 FROM events AS completion
@@ -443,7 +448,7 @@ function readEligibleWorkflow(
         AND attempt.project_id = bug.project_id
         AND attempt.bug_id = bug.id
         AND attempt.id = bug.active_repair_attempt_id
-       JOIN build_requirements AS requirement
+       LEFT JOIN build_requirements AS requirement
          ON requirement.account_id = attempt.account_id
         AND requirement.project_id = attempt.project_id
         AND requirement.bug_id = attempt.bug_id
@@ -678,10 +683,17 @@ export function createMobileVerification(
   if (
     workflow.version !== input.expectedVersion ||
     workflow.state !== "ready_for_verification" ||
-    workflow.attempt_mode !== "human" ||
+    (workflow.attempt_mode !== "human" && workflow.attempt_mode !== "relay") ||
     workflow.attempt_status !== "delivered" ||
     workflow.attempt_version !== 3 ||
-    (!noBuildEligible && !completedWithoutBuildEligible && !requiredBuildEligible)
+    (!noBuildEligible &&
+      !completedWithoutBuildEligible &&
+      !requiredBuildEligible &&
+      !(
+        workflow.attempt_mode === "relay" &&
+        workflow.relay_delivery === 1 &&
+        input.buildId === null
+      ))
   ) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
@@ -1028,5 +1040,24 @@ export function recordMobileVerificationResult(
       }),
       at,
     );
+  if (input.status === "failed" && attempt.mode === "relay") {
+    queueRelayRework(database, {
+      accountId: input.accountId,
+      projectId: input.projectId,
+      actorId: input.actorId,
+      bugId: bug.id,
+      verificationId: current.id,
+      previousAttemptId: attempt.id,
+      expectedBugVersion: bug.version + 1,
+      createdAt: at,
+    });
+  } else if (input.status === "passed" && attempt.mode === "relay") {
+    queueRelayAcceptance(database, {
+      ...input,
+      attemptId: attempt.id,
+      verificationId: current.id,
+      createdAt: at,
+    });
+  }
   return loadResultResponse(database, input, false);
 }

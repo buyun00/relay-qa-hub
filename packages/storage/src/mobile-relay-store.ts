@@ -1,3 +1,4 @@
+import { projectRelayDeliveries, processRelayReworkRequests } from "./relay-lifecycle-store.js";
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
@@ -29,7 +30,7 @@ export interface MobileRelayAttachmentClaim {
   readonly storageKey: string;
 }
 
-export type MobileRelayOutboxOperation = "create" | "continue";
+export type MobileRelayOutboxOperation = "create" | "continue" | "accept";
 
 export type MobileRelayWebhookStatus =
   "submitted" | "running" | "needs_input" | "blocked" | "failed" | "fix_delivered";
@@ -188,7 +189,7 @@ export interface MobileManualRepairAttemptRecord {
   readonly id: string;
   readonly bugId: string;
   readonly sequence: number;
-  readonly mode: "human";
+  readonly mode: "human" | "relay";
   readonly status: "planned" | "running" | "delivered" | "verification_failed";
   readonly assigneeId: string;
   readonly parentAttemptId: null;
@@ -271,6 +272,7 @@ export interface GetMobileManualRepairAttemptInput extends MobileRelayScope {
 }
 
 export interface DispatchMobileRelayInput extends MobileRelayScope {
+  readonly previousHandoffId?: string;
   readonly execution?: Readonly<Record<string, unknown>>;
   readonly attemptId: string;
   readonly expectedVersion: number;
@@ -286,6 +288,8 @@ export interface DispatchMobileRelayInput extends MobileRelayScope {
 }
 
 export interface ContinueMobileRelayInput extends MobileRelayScope {
+  /** Internal use only, after the exact human Verification has passed. */
+  readonly operation?: "accept";
   readonly attemptId: string;
   readonly handoffId: string;
   readonly actionId: string;
@@ -321,7 +325,7 @@ export interface MobileRelayContinueAccepted {
   readonly outboxMessageId: string;
   readonly requestId: string;
   readonly status: "queued";
-  readonly operation: "continue";
+  readonly operation: "continue" | "accept";
   readonly replayed: boolean;
 }
 
@@ -360,6 +364,7 @@ export interface MobileRelayReceipt {
 }
 
 export interface MobileRelayOutboxClaim {
+  readonly previousHandoffId?: string;
   readonly execution?: Readonly<Record<string, unknown>>;
   readonly outboxMessageId: string;
   readonly bugId: string;
@@ -3055,6 +3060,7 @@ export function dispatchMobileRelay(
       eventId,
       JSON.stringify({
         operation: "create",
+        ...(input.previousHandoffId ? { previousHandoffId: input.previousHandoffId } : {}),
         bugId: attempt.bug_id,
         ...(input.execution === undefined ? {} : { execution: input.execution }),
         repairAttemptId: attempt.id,
@@ -3184,6 +3190,36 @@ export function continueMobileRelay(
   if (receipt.mode !== "relay" || ["cancelled", "superseded"].includes(receipt.status)) {
     throw new MobileRelayStorageError("VERSION_CONFLICT", "Relay handoff cannot be continued");
   }
+  if (input.operation === "accept") {
+    const accepted = database
+      .prepare(
+        `SELECT 1 FROM verifications AS verification
+      JOIN bugs AS bug ON bug.id=verification.bug_id
+      JOIN events AS event ON event.aggregate_id=verification.id AND event.type='verification.result_recorded'
+      WHERE verification.id=? AND verification.repair_attempt_id=? AND verification.status='passed'
+        AND bug.state='closed' AND event.actor_user_id=? AND event.request_digest=?
+        AND event.account_id=? AND event.project_id=? AND event.source='qa_hub' AND event.actor_type='user'
+        AND event.resource_version_after=verification.version`,
+      )
+      .get(
+        input.actionId,
+        input.attemptId,
+        input.actorId,
+        input.requestDigest,
+        input.accountId,
+        input.projectId,
+      );
+    if (!accepted)
+      throw new MobileRelayStorageError(
+        "VERSION_CONFLICT",
+        "Relay acceptance requires the exact human passed Verification",
+      );
+  } else if (["delivered", "verification_failed"].includes(receipt.status)) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Delivered Relay repairs require a human acceptance or rejection before the next round",
+    );
+  }
   const attachments = readSelectedRelayAttachments(database, input, receipt.bug_id);
   const at = nextTimestamp(input.createdAt, receipt.updated_at);
   const idempotencyId = randomUUID();
@@ -3263,7 +3299,7 @@ export function continueMobileRelay(
       `qa:${qaInstanceId}:action:${input.actionId}`,
       eventId,
       JSON.stringify({
-        operation: "continue",
+        operation: input.operation ?? "continue",
         bugId: receipt.bug_id,
         repairAttemptId: input.attemptId,
         handoffId: input.handoffId,
@@ -3286,7 +3322,7 @@ export function continueMobileRelay(
     outboxMessageId,
     requestId,
     status: "queued",
-    operation: "continue",
+    operation: input.operation ?? "continue",
     replayed: false,
   });
   database
@@ -3784,6 +3820,7 @@ export function receiveMobileRelayWebhook(
     );
 
   const inboxMessageId = insertRelayWebhookInbox(database, input, "applied", eventAt);
+  projectRelayDeliveries(database, input.receivedAt, input.attemptId);
   return Object.freeze({
     inboxMessageId,
     replayed: false,
@@ -3813,6 +3850,8 @@ export function claimMobileRelayOutbox(
   },
 ): MobileRelayOutboxClaim | null {
   requireTransaction(database);
+  projectRelayDeliveries(database, input.now);
+  processRelayReworkRequests(database, input.now);
   const relayInstanceId = relayInstanceIdFor(input);
   const row = database
     .prepare(
@@ -3840,10 +3879,7 @@ export function claimMobileRelayOutbox(
              AND earlier.aggregate_version < outbox.aggregate_version
              AND earlier.status <> 'sent'
          )
-         AND (
-           json_extract(outbox.payload_json, '$.operation') = 'continue'
-           OR receipt.handoff_status = 'queued'
-         )
+         AND json_extract(outbox.payload_json, '$.operation') IN ('create','continue','accept')
        ORDER BY outbox.next_attempt_at, outbox.id
        LIMIT 1`,
     )
@@ -3934,7 +3970,12 @@ export function claimMobileRelayOutbox(
       .run(row.id, input.leaseOwner);
     return null;
   }
-  const operation = payload.operation === "continue" ? "continue" : "create";
+  const operation =
+    payload.operation === "accept"
+      ? "accept"
+      : payload.operation === "continue"
+        ? "continue"
+        : "create";
   const qaInstanceId = typeof payload.qaInstanceId === "string" ? payload.qaInstanceId : null;
   const defect = Object.freeze({
     id: bug.id,
@@ -3954,9 +3995,14 @@ export function claimMobileRelayOutbox(
     relayInstanceId: row.destination,
     qaInstanceId,
     projectKey: project.project_key,
-    defect,
+    defect: isRecord(payload.defect)
+      ? (payload.defect as unknown as MobileRelayOutboxClaim["defect"])
+      : defect,
     selectedAttachments: Object.freeze(selectedAttachments),
     ...(isRecord(payload.execution) ? { execution: payload.execution } : {}),
+    ...(typeof payload.previousHandoffId === "string"
+      ? { previousHandoffId: payload.previousHandoffId }
+      : {}),
     operation,
     actionId: typeof payload.actionId === "string" ? payload.actionId : null,
     prompt: typeof payload.prompt === "string" ? payload.prompt : null,

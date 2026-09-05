@@ -457,7 +457,7 @@ export interface HumanRepairAttempt {
   readonly id: string;
   readonly bugId: string;
   readonly sequence: number;
-  readonly mode: "human";
+  readonly mode: "human" | "relay";
   readonly status: "planned" | "running" | "delivered" | "verification_failed";
   readonly assigneeId: string;
   readonly summary: string | null;
@@ -511,6 +511,8 @@ export interface LinkBuildRepairResponse {
 }
 
 export interface HumanWorkflowSnapshot {
+  readonly relayAcceptance?: { readonly status: string; readonly lastError: string | null } | null;
+  readonly relayRework?: { readonly status: string; readonly lastError: string | null } | null;
   readonly bugId: string;
   readonly repairAttempt: HumanRepairAttempt | null;
   readonly buildRequirement: {

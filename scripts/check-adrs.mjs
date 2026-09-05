@@ -15,6 +15,7 @@ const adrFiles = [
   "ADR-0007-app-first-android-and-poco-bridge.md",
   "ADR-0008-optional-qingyu-adapter.md",
   "ADR-0009-independent-local-closure.md",
+  "ADR-0010-relay-delivery-and-verification-sync.md",
 ];
 
 const requiredSections = [

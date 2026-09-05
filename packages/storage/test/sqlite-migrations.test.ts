@@ -512,7 +512,7 @@ test("empty migration is repeatable and enables WAL, foreign keys, and integrity
   });
 });
 
-test("v6 through v10 preserves existing Bugs and adds shared management completion facts", async () => {
+test("v6 through v11 preserves existing Bugs and adds shared management and Relay lifecycle facts", async () => {
   await withDatabase(async ({ database, databaseFile, root }) => {
     const initial = await migrateSqliteDatabase(database, databaseFile, { targetVersion: 6 });
     assert.equal(initial.toVersion, 6);
@@ -531,7 +531,7 @@ test("v6 through v10 preserves existing Bugs and adds shared management completi
     const completed = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "backups"),
     });
-    assert.deepEqual(completed.appliedVersions, [8, 9, 10]);
+    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11]);
     assert.equal(completed.fromVersion, 7);
     assert.equal(completed.toVersion, SQLITE_SCHEMA_VERSION);
     assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);

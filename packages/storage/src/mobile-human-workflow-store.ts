@@ -27,6 +27,8 @@ export interface MobileHumanWorkflowForBugProjection {
   /** The Build reached through the exact immutable build_repair_links row. */
   readonly build: MobileBuildRecord | null;
   readonly verification: MobileVerificationRecord | null;
+  readonly relayRework?: { readonly status: string; readonly lastError: string | null } | null;
+  readonly relayAcceptance?: { readonly status: string; readonly lastError: string | null } | null;
 }
 
 export interface MobileHumanWorkflowProjection {
@@ -350,7 +352,7 @@ function readHumanRepairAttempt(
               no_code_reason, failure_reason, version
        FROM repair_attempts
        WHERE account_id = ? AND project_id = ? AND bug_id = ?
-         AND id = ? AND mode = 'human'`,
+         AND id = ? AND mode IN ('human','relay')`,
     )
     .get(input.accountId, input.projectId, input.bugId, attemptId) as
     HumanWorkflowAttemptRow | undefined;
@@ -362,7 +364,7 @@ function readHumanRepairAttempt(
     id: row.id,
     bugId: row.bug_id,
     sequence: row.sequence,
-    mode: "human" as const,
+    mode: row.mode as "human" | "relay",
     status: row.status,
     assigneeId: row.assignee_id,
     parentAttemptId: null,
@@ -551,11 +553,29 @@ export function getMobileHumanWorkflowForBug(
   const repairAttempt = readHumanRepairAttempt(database, input, pointers.active_repair_attempt_id);
   const buildRequirement = readBuildRequirement(database, input, repairAttempt?.id ?? null);
   const verification = readActiveVerification(database, input, pointers.active_verification_id);
+  const rework = database
+    .prepare(
+      `SELECT status, last_error AS lastError FROM relay_rework_requests
+    WHERE account_id=? AND project_id=? AND bug_id=? AND status IN ('pending','blocked')
+    ORDER BY created_at DESC LIMIT 1`,
+    )
+    .get(input.accountId, input.projectId, input.bugId) as
+    { status: string; lastError: string | null } | undefined;
+  const acceptance = database
+    .prepare(
+      `SELECT status,last_error_code AS lastError FROM outbox
+    WHERE account_id=? AND project_id=? AND json_extract(payload_json,'$.bugId')=?
+      AND json_extract(payload_json,'$.operation')='accept' ORDER BY created_at DESC LIMIT 1`,
+    )
+    .get(input.accountId, input.projectId, input.bugId) as
+    { status: string; lastError: string | null } | undefined;
   return Object.freeze({
     bugId: input.bugId,
     repairAttempt,
     buildRequirement,
     build: readExactLinkedBuild(database, input, buildRequirement),
     verification,
+    ...(rework ? { relayRework: rework } : {}),
+    ...(acceptance ? { relayAcceptance: acceptance } : {}),
   });
 }

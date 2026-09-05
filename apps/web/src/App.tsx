@@ -954,6 +954,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   }, [loadDetail, selectedId]);
 
   useEffect(() => {
+    if (!detail || detailLoading || editingDetail || mutation !== null) return;
+    const latest = bugs.find((bug) => bug.id === detail.id);
+    if (latest && latest.version > detail.version) void loadDetail(detail.id);
+  }, [bugs, detail, detailLoading, editingDetail, mutation, loadDetail]);
+
+  useEffect(() => {
     const bridge = window.qaHubDesktop;
     if (bridge === undefined) return;
     const stopBugChanged = bridge.onBugChanged((change) => {
@@ -1404,21 +1410,26 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const returnBug = async () => {
     const reason = returnReason.trim();
     if (reason.length === 0) return;
-    await runCurrentBugMutation("验收未通过，已打回待处理", async () => {
-      const verification = await ensureVerificationStarted();
-      if (verification === null) return;
-      const clientSubmissionId = crypto.randomUUID();
-      await recordVerificationResultReliably(verification, "failed", (expectedVersion) =>
-        recordVerificationFailed(
-          verification.id,
-          expectedVersion,
-          reason,
-          reason,
-          clientSubmissionId,
-        ),
-      );
-      if (selectedIdRef.current === detail?.id) setReturnReason(DEFAULT_RETURN_REASON);
-    });
+    await runCurrentBugMutation(
+      repairAttempt?.mode === "relay"
+        ? "打回理由已保存，Relay 将自动开始下一轮制作"
+        : "验收未通过，已打回待处理",
+      async () => {
+        const verification = await ensureVerificationStarted();
+        if (verification === null) return;
+        const clientSubmissionId = crypto.randomUUID();
+        await recordVerificationResultReliably(verification, "failed", (expectedVersion) =>
+          recordVerificationFailed(
+            verification.id,
+            expectedVersion,
+            reason,
+            reason,
+            clientSubmissionId,
+          ),
+        );
+        if (selectedIdRef.current === detail?.id) setReturnReason(DEFAULT_RETURN_REASON);
+      },
+    );
   };
 
   const deleteSelectedBug = async () => {
@@ -2361,6 +2372,24 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                     </>
                   ) : (
                     <>
+                      {workflow?.relayRework ? (
+                        <p className="action-note action-note-left" role="status">
+                          {workflow.relayRework.status === "blocked"
+                            ? "打回理由已保存，单子已发生变化，请检查当前处理状态。"
+                            : workflow.relayRework.lastError
+                              ? "打回理由已保存，Relay 续作暂未成功，系统会自动重试。"
+                              : "打回理由已保存，正在安排 Relay 下一轮制作。"}
+                        </p>
+                      ) : null}
+                      {detail.state === "closed" && workflow?.relayAcceptance ? (
+                        <p className="action-note action-note-left" role="status">
+                          {workflow.relayAcceptance.status === "sent"
+                            ? "验收通过，Relay 任务也已关闭。"
+                            : workflow.relayAcceptance.status === "dead"
+                              ? "本单已验收关闭；Relay 同步失败，请检查制作服务。"
+                              : "本单已验收关闭，正在同步 Relay 状态。"}
+                        </p>
+                      ) : null}
                       {detail.state !== "closed" &&
                       (repairAttempt === null || previousAttemptFailed) &&
                       isOwner ? (
@@ -2373,7 +2402,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           {previousAttemptFailed ? "继续处理已打回 Bug" : "开始处理"}
                         </button>
                       ) : null}
-                      {repairAttempt?.status === "planned" && isOwner ? (
+                      {repairAttempt?.mode === "human" &&
+                      repairAttempt.status === "planned" &&
+                      isOwner ? (
                         <button
                           className="primary-button wide"
                           disabled={mutation !== null}
@@ -2390,7 +2421,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           开始处理
                         </button>
                       ) : null}
-                      {repairAttempt?.status === "running" && isOwner ? (
+                      {repairAttempt?.mode === "human" &&
+                      repairAttempt.status === "running" &&
+                      isOwner ? (
                         <button
                           className="primary-button wide"
                           disabled={mutation !== null}
@@ -2408,8 +2441,10 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <>
                           <label className="return-reason">
                             <span>打回原因</span>
-                            <input
-                              maxLength={500}
+                            <textarea
+                              maxLength={5000}
+                              rows={3}
+                              placeholder="说明仍可复现的问题和需要调整的地方"
                               onChange={(event) => setReturnReason(event.target.value)}
                               value={returnReason}
                             />
@@ -2420,7 +2455,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                             onClick={() => void returnBug()}
                             type="button"
                           >
-                            验收不通过，打回待处理
+                            {repairAttempt?.mode === "relay"
+                              ? "打回并让 Relay 继续制作"
+                              : "验收不通过，打回待处理"}
                           </button>
                         </>
                       ) : null}

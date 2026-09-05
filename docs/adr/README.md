@@ -13,6 +13,7 @@ These accepted records freeze the P0 architecture boundary for Relay QA Hub. Lat
 | [ADR-0007](ADR-0007-app-first-android-and-poco-bridge.md) | Native Android is the primary client; Web is post-MVP; Poco is a loopback-only read-only enrichment bridge |
 | [ADR-0008](ADR-0008-optional-qingyu-adapter.md) | Qingyu is an optional server-side import/close adapter and cannot replace QA Hub authority or human acceptance |
 | [ADR-0009](ADR-0009-independent-local-closure.md) | Local human closure commits before optional Qingyu synchronization; upstream failure never blocks it |
+| [ADR-0010](ADR-0010-relay-delivery-and-verification-sync.md) | Verified Relay delivery enters human acceptance; rejection continues the original task and acceptance synchronizes closure |
 
 ## Immutable-principle coverage
 

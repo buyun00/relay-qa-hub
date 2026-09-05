@@ -28,7 +28,6 @@ const SAFE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/u;
 const DEFECT_KEY_PATTERN = /^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$/u;
 const PROJECT_KEY_PATTERN = /^[A-Z][A-Z0-9]{1,15}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
-const INLINE_BASE64_PATTERN = /^[A-Za-z0-9+/]*={0,2}$/u;
 const ALLOWED_MEDIA_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -74,6 +73,7 @@ export interface RealRelayAttachment {
 }
 
 export interface RealRelayHandoffBody {
+  readonly previousHandoffId?: string;
   readonly execution?: Readonly<Record<string, unknown>>;
   readonly qaInstanceId: string;
   readonly handoffId: string;
@@ -121,7 +121,7 @@ export type RealRelayAttachmentReader = (
  * these facts when the real Relay outbox lane is enabled.
  */
 type RealRelayClaimProjection = MobileRelayOutboxClaim & {
-  readonly kind?: "create" | "continue";
+  readonly kind?: "create" | "continue" | "accept";
   readonly defectFacts?: unknown;
   readonly selectedAttachmentFacts?: unknown;
 };
@@ -245,7 +245,9 @@ function canonicalize(value: unknown, parentKey: string | null = null): unknown 
 }
 
 function requestHash(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(canonicalize(value)), "utf8").digest("hex");
+  return createHash("sha256")
+    .update(JSON.stringify(canonicalize(value)), "utf8")
+    .digest("hex");
 }
 
 function isContainedPath(root: string, candidate: string): boolean {
@@ -258,7 +260,10 @@ function isContainedPath(root: string, candidate: string): boolean {
   );
 }
 
-async function readContainedEvidenceFile(evidenceRoot: string, storageKey: string): Promise<Buffer> {
+async function readContainedEvidenceFile(
+  evidenceRoot: string,
+  storageKey: string,
+): Promise<Buffer> {
   if (storageKey.length < 1 || storageKey.includes("\0") || isAbsolute(storageKey)) {
     clientError("REAL_RELAY_ATTACHMENT_PATH_INVALID");
   }
@@ -306,7 +311,12 @@ function normalizeDefect(value: unknown): RealRelayDefectFacts {
   );
   const verificationCriteria = defect["verificationCriteria"] ?? defect["expectedBehavior"];
   return Object.freeze({
-    id: requireString(defect["id"], "REAL_RELAY_DEFECT_ID_INVALID", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN),
+    id: requireString(
+      defect["id"],
+      "REAL_RELAY_DEFECT_ID_INVALID",
+      MAX_SAFE_ID_LENGTH,
+      SAFE_ID_PATTERN,
+    ),
     key: requireString(defect["key"], "REAL_RELAY_DEFECT_KEY_INVALID", 32, DEFECT_KEY_PATTERN),
     revision: requirePositiveInteger(defect["revision"], "REAL_RELAY_DEFECT_REVISION_INVALID"),
     projectKey: requireString(
@@ -321,12 +331,12 @@ function normalizeDefect(value: unknown): RealRelayDefectFacts {
       "REAL_RELAY_DEFECT_DESCRIPTION_INVALID",
       MAX_DESCRIPTION_LENGTH,
     ),
-    severity: requireString(defect["severity"], "REAL_RELAY_DEFECT_SEVERITY_INVALID", 2, /^S[0-4]$/u) as
-      | "S0"
-      | "S1"
-      | "S2"
-      | "S3"
-      | "S4",
+    severity: requireString(
+      defect["severity"],
+      "REAL_RELAY_DEFECT_SEVERITY_INVALID",
+      2,
+      /^S[0-4]$/u,
+    ) as "S0" | "S1" | "S2" | "S3" | "S4",
     verificationCriteria: requireString(
       verificationCriteria,
       "REAL_RELAY_DEFECT_CRITERIA_INVALID",
@@ -364,7 +374,8 @@ function normalizeAttachmentFact(value: unknown, index: number): RealRelayAttach
     "REAL_RELAY_ATTACHMENT_MEDIA_TYPE_INVALID",
     MAX_MEDIA_TYPE_LENGTH,
   );
-  if (!ALLOWED_MEDIA_TYPES.has(parsedMediaType)) clientError("REAL_RELAY_ATTACHMENT_MEDIA_TYPE_INVALID");
+  if (!ALLOWED_MEDIA_TYPES.has(parsedMediaType))
+    clientError("REAL_RELAY_ATTACHMENT_MEDIA_TYPE_INVALID");
   const size = requirePositiveInteger(fact["size"], "REAL_RELAY_ATTACHMENT_SIZE_INVALID");
   if (size > MAX_ATTACHMENT_BYTES) clientError("REAL_RELAY_ATTACHMENT_TOO_LARGE");
   if (fact["scanStatus"] !== undefined && fact["scanStatus"] !== "clean") {
@@ -376,7 +387,11 @@ function normalizeAttachmentFact(value: unknown, index: number): RealRelayAttach
   if (fact["bindingStatus"] !== undefined && fact["bindingStatus"] !== "claimed") {
     clientError("REAL_RELAY_ATTACHMENT_NOT_VERIFIED");
   }
-  const storageKey = requireString(fact["storageKey"], "REAL_RELAY_ATTACHMENT_STORAGE_KEY_INVALID", 4_096);
+  const storageKey = requireString(
+    fact["storageKey"],
+    "REAL_RELAY_ATTACHMENT_STORAGE_KEY_INVALID",
+    4_096,
+  );
   if (storageKey.includes("\0") || isAbsolute(storageKey)) {
     clientError("REAL_RELAY_ATTACHMENT_STORAGE_KEY_INVALID");
   }
@@ -387,7 +402,11 @@ function normalizeAttachmentFact(value: unknown, index: number): RealRelayAttach
       MAX_SAFE_ID_LENGTH,
       SAFE_ID_PATTERN,
     ),
-    filename: requireString(fact["filename"], "REAL_RELAY_ATTACHMENT_FILENAME_INVALID", MAX_FILENAME_LENGTH),
+    filename: requireString(
+      fact["filename"],
+      "REAL_RELAY_ATTACHMENT_FILENAME_INVALID",
+      MAX_FILENAME_LENGTH,
+    ),
     mediaType: parsedMediaType,
     size,
     sha256: requireSha256(fact["sha256"], "REAL_RELAY_ATTACHMENT_SHA256_INVALID"),
@@ -399,9 +418,10 @@ function claimProjection(claim: MobileRelayOutboxClaim): RealRelayClaimProjectio
   return claim as RealRelayClaimProjection;
 }
 
-function claimKind(claim: RealRelayClaimProjection): "create" | "continue" {
+function claimKind(claim: RealRelayClaimProjection): "create" | "continue" | "accept" {
   const kind = claim.kind ?? claim.operation ?? "create";
-  if (kind !== "create" && kind !== "continue") clientError("REAL_RELAY_OUTBOX_KIND_INVALID");
+  if (kind !== "create" && kind !== "continue" && kind !== "accept")
+    clientError("REAL_RELAY_OUTBOX_KIND_INVALID");
   return kind;
 }
 
@@ -420,7 +440,8 @@ function claimQaInstanceId(
 function claimAttachments(claim: RealRelayClaimProjection): readonly RealRelayAttachmentFact[] {
   const raw = claim.selectedAttachments ?? claim.selectedAttachmentFacts;
   if (raw === undefined) {
-    if (claim.selectedAttachmentIds.length !== 0) clientError("REAL_RELAY_ATTACHMENT_FACTS_MISSING");
+    if (claim.selectedAttachmentIds.length !== 0)
+      clientError("REAL_RELAY_ATTACHMENT_FACTS_MISSING");
     return Object.freeze([]);
   }
   const entries = requireArray(raw, "REAL_RELAY_ATTACHMENT_FACTS_INVALID");
@@ -472,10 +493,21 @@ async function buildCreateBody(
 ): Promise<{ readonly body: RealRelayHandoffBody; readonly requestHash: string }> {
   const body: RealRelayHandoffBody = Object.freeze({
     qaInstanceId: claimQaInstanceId(claim, options),
-    handoffId: requireString(claim.handoffId, "REAL_RELAY_HANDOFF_ID_INVALID", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN),
-    attemptId: requireString(claim.repairAttemptId, "REAL_RELAY_ATTEMPT_ID_INVALID", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN),
+    handoffId: requireString(
+      claim.handoffId,
+      "REAL_RELAY_HANDOFF_ID_INVALID",
+      MAX_SAFE_ID_LENGTH,
+      SAFE_ID_PATTERN,
+    ),
+    attemptId: requireString(
+      claim.repairAttemptId,
+      "REAL_RELAY_ATTEMPT_ID_INVALID",
+      MAX_SAFE_ID_LENGTH,
+      SAFE_ID_PATTERN,
+    ),
     defect: normalizeDefect(claim.defect ?? claim.defectFacts),
     ...(claim.execution === undefined ? {} : { execution: claim.execution }),
+    ...(claim.previousHandoffId ? { previousHandoffId: claim.previousHandoffId } : {}),
     selectedAttachments: await materializeAttachments(claimAttachments(claim), options),
   });
   return { body, requestHash: requestHash(body) };
@@ -487,8 +519,18 @@ async function buildContinueBody(
 ): Promise<{ readonly body: RealRelayContinueBody; readonly requestHash: string }> {
   const body: RealRelayContinueBody = Object.freeze({
     qaInstanceId: claimQaInstanceId(claim, options),
-    actionId: requireString(claim.actionId, "REAL_RELAY_ACTION_ID_INVALID", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN),
-    attemptId: requireString(claim.repairAttemptId, "REAL_RELAY_ATTEMPT_ID_INVALID", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN),
+    actionId: requireString(
+      claim.actionId,
+      "REAL_RELAY_ACTION_ID_INVALID",
+      MAX_SAFE_ID_LENGTH,
+      SAFE_ID_PATTERN,
+    ),
+    attemptId: requireString(
+      claim.repairAttemptId,
+      "REAL_RELAY_ATTEMPT_ID_INVALID",
+      MAX_SAFE_ID_LENGTH,
+      SAFE_ID_PATTERN,
+    ),
     prompt: requireString(claim.prompt, "REAL_RELAY_PROMPT_INVALID", MAX_DESCRIPTION_LENGTH),
     selectedAttachments: await materializeAttachments(claimAttachments(claim), options),
   });
@@ -499,18 +541,27 @@ function expectedIdempotencyKey(
   claim: RealRelayClaimProjection,
   body: RealRelayHandoffBody | RealRelayContinueBody,
 ): string {
-  const key = requireString(claim.idempotencyKey, "REAL_RELAY_IDEMPOTENCY_KEY_INVALID", MAX_IDEMPOTENCY_KEY_LENGTH);
-  const expected = "actionId" in body
-    ? `qa:${body.qaInstanceId}:action:${body.actionId}`
-    : `qa:${body.qaInstanceId}:handoff:${body.handoffId}`;
+  const key = requireString(
+    claim.idempotencyKey,
+    "REAL_RELAY_IDEMPOTENCY_KEY_INVALID",
+    MAX_IDEMPOTENCY_KEY_LENGTH,
+  );
+  const expected =
+    "actionId" in body
+      ? `qa:${body.qaInstanceId}:action:${body.actionId}`
+      : `qa:${body.qaInstanceId}:handoff:${body.handoffId}`;
   if (key !== expected) clientError("REAL_RELAY_IDEMPOTENCY_KEY_MISMATCH");
   return key;
 }
 
-function endpointForOperation(endpoint: URL, claim: RealRelayClaimProjection, kind: "create" | "continue"): URL {
+function endpointForOperation(
+  endpoint: URL,
+  claim: RealRelayClaimProjection,
+  kind: "create" | "continue" | "accept",
+): URL {
   if (kind === "create") return endpoint;
   const target = new URL(endpoint.href);
-  target.pathname = `${endpoint.pathname}/${encodeURIComponent(claim.handoffId)}/turns`;
+  target.pathname = `${endpoint.pathname}/${encodeURIComponent(claim.handoffId)}/${kind === "accept" ? "accept" : "turns"}`;
   return target;
 }
 
@@ -521,15 +572,31 @@ function requireReceiptString(value: unknown, code: string, maximumLength: numbe
 
 function parseWorkspace(value: unknown): RealRelayWorkspaceReceipt {
   const workspace = requireObject(value, "REAL_RELAY_RECEIPT_WORKSPACE_INVALID");
-  requireExactKeys(workspace, new Set(["projectId", "branchName", "threadId"]), "REAL_RELAY_RECEIPT_WORKSPACE_INVALID");
+  requireExactKeys(
+    workspace,
+    new Set(["projectId", "branchName", "threadId"]),
+    "REAL_RELAY_RECEIPT_WORKSPACE_INVALID",
+  );
   const branchName = workspace["branchName"];
   const threadId = workspace["threadId"];
-  if (branchName !== null && typeof branchName !== "string") clientError("REAL_RELAY_RECEIPT_WORKSPACE_INVALID");
-  if (threadId !== null && typeof threadId !== "string") clientError("REAL_RELAY_RECEIPT_WORKSPACE_INVALID");
+  if (branchName !== null && typeof branchName !== "string")
+    clientError("REAL_RELAY_RECEIPT_WORKSPACE_INVALID");
+  if (threadId !== null && typeof threadId !== "string")
+    clientError("REAL_RELAY_RECEIPT_WORKSPACE_INVALID");
   return Object.freeze({
-    projectId: requireString(workspace["projectId"], "REAL_RELAY_RECEIPT_WORKSPACE_INVALID", MAX_SAFE_ID_LENGTH),
-    branchName: branchName === null ? null : requireString(branchName, "REAL_RELAY_RECEIPT_WORKSPACE_INVALID", 300),
-    threadId: threadId === null ? null : requireString(threadId, "REAL_RELAY_RECEIPT_WORKSPACE_INVALID", MAX_SAFE_ID_LENGTH),
+    projectId: requireString(
+      workspace["projectId"],
+      "REAL_RELAY_RECEIPT_WORKSPACE_INVALID",
+      MAX_SAFE_ID_LENGTH,
+    ),
+    branchName:
+      branchName === null
+        ? null
+        : requireString(branchName, "REAL_RELAY_RECEIPT_WORKSPACE_INVALID", 300),
+    threadId:
+      threadId === null
+        ? null
+        : requireString(threadId, "REAL_RELAY_RECEIPT_WORKSPACE_INVALID", MAX_SAFE_ID_LENGTH),
   });
 }
 
@@ -538,7 +605,8 @@ export function parseRealRelayReceipt(
   claim: MobileRelayOutboxClaim,
   expectedRequestHash: string,
 ): RealRelayHandoffReceipt {
-  if (Buffer.byteLength(text, "utf8") > MAX_RECEIPT_BYTES) clientError("REAL_RELAY_RECEIPT_TOO_LARGE");
+  if (Buffer.byteLength(text, "utf8") > MAX_RECEIPT_BYTES)
+    clientError("REAL_RELAY_RECEIPT_TOO_LARGE");
   let parsed: unknown;
   try {
     parsed = JSON.parse(text) as unknown;
@@ -567,37 +635,75 @@ export function parseRealRelayReceipt(
   );
   const projection = claimProjection(claim);
   const kind = claimKind(projection);
-  const parsedHandoffId = requireString(receipt["handoffId"], "REAL_RELAY_RECEIPT_HANDOFF_MISMATCH", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN);
-  const parsedAttemptId = requireString(receipt["attemptId"], "REAL_RELAY_RECEIPT_ATTEMPT_MISMATCH", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN);
+  const parsedHandoffId = requireString(
+    receipt["handoffId"],
+    "REAL_RELAY_RECEIPT_HANDOFF_MISMATCH",
+    MAX_SAFE_ID_LENGTH,
+    SAFE_ID_PATTERN,
+  );
+  const parsedAttemptId = requireString(
+    receipt["attemptId"],
+    "REAL_RELAY_RECEIPT_ATTEMPT_MISMATCH",
+    MAX_SAFE_ID_LENGTH,
+    SAFE_ID_PATTERN,
+  );
   if (parsedHandoffId !== claim.handoffId || parsedAttemptId !== claim.repairAttemptId) {
     clientError("REAL_RELAY_RECEIPT_IDENTITY_MISMATCH");
   }
-  const actionId = receipt["actionId"] === undefined
-    ? undefined
-    : requireString(receipt["actionId"], "REAL_RELAY_RECEIPT_ACTION_MISMATCH", MAX_SAFE_ID_LENGTH, SAFE_ID_PATTERN);
-  if (kind === "continue" && actionId !== projection.actionId) clientError("REAL_RELAY_RECEIPT_ACTION_MISMATCH");
+  const actionId =
+    receipt["actionId"] === undefined
+      ? undefined
+      : requireString(
+          receipt["actionId"],
+          "REAL_RELAY_RECEIPT_ACTION_MISMATCH",
+          MAX_SAFE_ID_LENGTH,
+          SAFE_ID_PATTERN,
+        );
+  if (kind !== "create" && actionId !== projection.actionId)
+    clientError("REAL_RELAY_RECEIPT_ACTION_MISMATCH");
   const responseHash = requireSha256(receipt["requestHash"], "REAL_RELAY_RECEIPT_HASH_INVALID");
   if (responseHash !== expectedRequestHash) clientError("REAL_RELAY_RECEIPT_HASH_MISMATCH");
   const replayed = receipt["replayed"];
   if (typeof replayed !== "boolean") clientError("REAL_RELAY_RECEIPT_REPLAYED_INVALID");
   const branchName = receipt["branchName"];
   const threadId = receipt["threadId"];
-  if (branchName !== null && typeof branchName !== "string") clientError("REAL_RELAY_RECEIPT_INVALID");
+  if (branchName !== null && typeof branchName !== "string")
+    clientError("REAL_RELAY_RECEIPT_INVALID");
   if (threadId !== null && typeof threadId !== "string") clientError("REAL_RELAY_RECEIPT_INVALID");
   const status = receipt["status"];
-  if (status !== undefined && (typeof status !== "string" || status.length < 1 || status.length > 64)) {
+  if (
+    status !== undefined &&
+    (typeof status !== "string" || status.length < 1 || status.length > 64)
+  ) {
     clientError("REAL_RELAY_RECEIPT_INVALID");
   }
   return Object.freeze({
-    relayInstanceId: requireString(receipt["relayInstanceId"], "REAL_RELAY_RECEIPT_INSTANCE_INVALID", 64, /^[a-z0-9][a-z0-9_-]{2,63}$/u),
+    relayInstanceId: requireString(
+      receipt["relayInstanceId"],
+      "REAL_RELAY_RECEIPT_INSTANCE_INVALID",
+      64,
+      /^[a-z0-9][a-z0-9_-]{2,63}$/u,
+    ),
     handoffId: parsedHandoffId,
     attemptId: parsedAttemptId,
     ...(actionId === undefined ? {} : { actionId }),
-    taskId: requireReceiptString(receipt["taskId"], "REAL_RELAY_RECEIPT_TASK_INVALID", MAX_SAFE_ID_LENGTH),
-    turnId: requireReceiptString(receipt["turnId"], "REAL_RELAY_RECEIPT_TURN_INVALID", MAX_SAFE_ID_LENGTH),
+    taskId: requireReceiptString(
+      receipt["taskId"],
+      "REAL_RELAY_RECEIPT_TASK_INVALID",
+      MAX_SAFE_ID_LENGTH,
+    ),
+    turnId: requireReceiptString(
+      receipt["turnId"],
+      "REAL_RELAY_RECEIPT_TURN_INVALID",
+      MAX_SAFE_ID_LENGTH,
+    ),
     ...(status === undefined ? {} : { status }),
-    branchName: branchName === null ? null : requireString(branchName, "REAL_RELAY_RECEIPT_INVALID", 300),
-    threadId: threadId === null ? null : requireString(threadId, "REAL_RELAY_RECEIPT_INVALID", MAX_SAFE_ID_LENGTH),
+    branchName:
+      branchName === null ? null : requireString(branchName, "REAL_RELAY_RECEIPT_INVALID", 300),
+    threadId:
+      threadId === null
+        ? null
+        : requireString(threadId, "REAL_RELAY_RECEIPT_INVALID", MAX_SAFE_ID_LENGTH),
     workspace: parseWorkspace(receipt["workspace"]),
     requestHash: responseHash,
     replayed,
@@ -664,6 +770,7 @@ function deliveryFailurePlan(
   error: unknown,
   attemptCount: number,
   failedAt: Date,
+  persistentLifecycle = false,
 ): {
   readonly errorCode: string;
   readonly deadLetter: boolean;
@@ -673,7 +780,8 @@ function deliveryFailurePlan(
     error instanceof RealRelayHttpError
       ? isRetryableHttpStatus(error.status)
       : !(error instanceof RealRelayClientError);
-  const deadLetter = !retryable || attemptCount >= RELAY_MAX_DELIVERY_ATTEMPTS;
+  const deadLetter =
+    !retryable || (!persistentLifecycle && attemptCount >= RELAY_MAX_DELIVERY_ATTEMPTS);
   const retryAfterMs = error instanceof RealRelayHttpError ? error.retryAfterMs : null;
   const delayMs = deadLetter
     ? 0
@@ -726,9 +834,10 @@ async function deliverOne(
     }
     const projection = claimProjection(claim);
     const kind = claimKind(projection);
-    const built = kind === "create"
-      ? await buildCreateBody(projection, options)
-      : await buildContinueBody(projection, options);
+    const built =
+      kind === "create"
+        ? await buildCreateBody(projection, options)
+        : await buildContinueBody(projection, options);
     const idempotencyKey = expectedIdempotencyKey(projection, built.body);
     const endpoint = endpointForOperation(options.endpoint, projection, kind);
     const response = await fetch(endpoint, {
@@ -756,7 +865,12 @@ async function deliverOne(
     await options.worker.completeMobileRelayOutbox(completionPayload(claim, leaseOwner, receipt));
     options.onDelivery?.(claim, "submitted", receipt);
   } catch (error: unknown) {
-    const failure = deliveryFailurePlan(error, claim.attemptCount, new Date());
+    const failure = deliveryFailurePlan(
+      error,
+      claim.attemptCount,
+      new Date(),
+      claim.operation === "accept" || claim.previousHandoffId !== undefined,
+    );
     await options.worker.retryMobileRelayOutbox({
       outboxMessageId: claim.outboxMessageId,
       leaseOwner,

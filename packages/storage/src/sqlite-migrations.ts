@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { relayLifecycleMigration } from "./relay-lifecycle-migration.js";
 
 export interface SqliteMigration {
   readonly version: number;
@@ -7473,6 +7474,19 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
   migration(8, "three_state_task_completion", THREE_STATE_TASK_COMPLETION_SQL),
   migration(9, "editable_bug_attachments", EDITABLE_BUG_ATTACHMENTS_SQL),
   migration(10, "user_identity_management", USER_IDENTITY_MANAGEMENT_SQL),
+  migration(
+    11,
+    "relay_delivery_and_rework",
+    relayLifecycleMigration(
+      [
+        CORE_SCHEMA_SQL,
+        DOMAIN_AUDIT_ALIGNMENT_SQL,
+        MULTI_ACTOR_HUMAN_WORKFLOW_SQL,
+        SHARED_PROJECT_BUG_MANAGEMENT_SQL,
+        THREE_STATE_TASK_COMPLETION_SQL,
+      ].join("\n"),
+    ),
+  ),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

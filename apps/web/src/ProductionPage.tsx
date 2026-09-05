@@ -42,6 +42,10 @@ const emptyDraft = (): Draft => ({
   extra: {},
 });
 const label = (status: string) => productionStatuses[status] ?? status;
+const taskLabel = (task: ProductionTask) =>
+  task.bugId && task.status === "waiting_user" && task.latestTurn?.status === "success"
+    ? "待验收"
+    : label(task.status);
 const date = (value: string) =>
   new Date(value).toLocaleString("zh-CN", {
     month: "2-digit",
@@ -626,7 +630,7 @@ export default function ProductionPage({
                   </td>
                   <td>
                     <span className={`production-status state-${task.status}`}>
-                      {label(task.status)}
+                      {taskLabel(task)}
                     </span>
                     {task.bugId && bugById.get(task.bugId) && (
                       <small>
@@ -667,7 +671,7 @@ export default function ProductionPage({
                 <span className="production-eyebrow">任务 #{detail.task.number}</span>
                 <h2>{detail.task.title}</h2>
                 <span className={`production-status state-${detail.task.status}`}>
-                  {label(detail.task.status)}
+                  {taskLabel(detail.task)}
                 </span>
                 {detail.task.bugId && (
                   <button
@@ -677,7 +681,7 @@ export default function ProductionPage({
                       if (detail.task.bugId) onOpenBug(detail.task.bugId);
                     }}
                   >
-                    打开关联 Bug / 验收
+                    打开关联 Bug / 验收 / 填写打回理由
                   </button>
                 )}
                 <div className="production-detail-meta">
@@ -880,7 +884,7 @@ export default function ProductionPage({
                         (item.status === "existing"
                           ? "已有任务"
                           : task
-                            ? label(task.status)
+                            ? taskLabel(task)
                             : item.status === "accepted"
                               ? item.delivery
                                 ? `移交：${label(item.delivery.status)}`

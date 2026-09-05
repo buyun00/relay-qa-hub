@@ -4,6 +4,18 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type DatabaseSync } from "node:sqlite";
 import test from "node:test";
+import { createHash } from "node:crypto";
+import {
+  projectRelayDeliveries,
+  processRelayReworkRequests,
+} from "../src/relay-lifecycle-store.ts";
+import { getMobileHumanWorkflowForBug } from "../src/mobile-human-workflow-store.ts";
+import {
+  dispatchMobileRelay,
+  receiveMobileRelayWebhook,
+  claimMobileRelayOutbox,
+  completeMobileRelayOutbox,
+} from "../src/mobile-relay-store.ts";
 
 import {
   insertBugWithNextNumber,
@@ -38,6 +50,278 @@ import {
 const CREATED_AT = "2026-08-25T00:00:00.000Z";
 const UPDATED_AT = "2026-08-25T00:01:00.000Z";
 const FINALIZED_AT = "2026-08-25T00:02:00.000Z";
+
+test("verified Relay delivery, human rejection, durable next round and human acceptance preserve history", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 8_100, "RLC");
+    const bugId = identifier(8_110),
+      principalId = identifier(8_111),
+      handoffId = identifier(8_112);
+    const scope = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.userId,
+    };
+    const verifierScope = { ...scope, actorId: tenant.secondaryUserId };
+    const at = databaseTime(database);
+    const later = (minutes: number) => new Date(Date.parse(at) + minutes * 60_000).toISOString();
+    insertActiveMembershipRole(database, tenant, identifier(8_113), "triager");
+    insertActiveMembershipRole(database, tenant, identifier(8_114), "developer");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(8_115),
+      "viewer",
+      tenant.secondaryUserId,
+    );
+    insertServicePrincipal(database, tenant, principalId);
+    createBug(database, tenant, bugId, "Relay lifecycle", {
+      ownerId: tenant.userId,
+      verificationOwnerId: tenant.secondaryUserId,
+    });
+    const ready = transaction(database, () =>
+      transitionMobileBugReady(database, {
+        ...scope,
+        bugId,
+        expectedVersion: 1,
+        idempotencyKey: "relay-ready",
+        requestDigest: digest(8_116),
+        createdAt: at,
+      }),
+    );
+    const attempt = transaction(database, () =>
+      createMobileRelayAttempt(database, {
+        ...scope,
+        bugId,
+        expectedVersion: ready.version,
+        assigneeId: tenant.userId,
+        summary: null,
+        idempotencyKey: "relay-attempt",
+        requestDigest: digest(8_117),
+        createdAt: at,
+      }),
+    );
+    transaction(database, () =>
+      dispatchMobileRelay(database, {
+        ...scope,
+        attemptId: attempt.id,
+        expectedVersion: 1,
+        handoffId,
+        selectedAttachmentIds: [],
+        relayInstanceId: "relay-main",
+        qaInstanceId: "qa-local",
+        relayPrincipalId: principalId,
+        idempotencyKey: "relay-dispatch",
+        requestDigest: digest(8_118),
+        createdAt: at,
+        execution: { executionProfile: "codex", model: "gpt-5.5", extraPrompt: "initial repair" },
+      }),
+    );
+    let revision = 100;
+    const deliver = (attemptId: string, handoff: string, verified = true) => {
+      const externalRevision = ++revision;
+      const payload = {
+        schemaVersion: "1.0",
+        relayInstanceId: "relay-main",
+        attemptId,
+        handoffId: handoff,
+        deliveryId: `relay-main:event:${externalRevision}`,
+        eventId: String(externalRevision),
+        eventType: "fix_delivered",
+        externalRevision,
+        occurredAt: at,
+        payload: {
+          taskId: "task-original",
+          turnId: `turn-${externalRevision}`,
+          deliveryEvidence: {
+            pushed: true,
+            verified,
+            branch: "codex/task-original",
+            commitSha: "a".repeat(40),
+            remoteSha: "a".repeat(40),
+          },
+        },
+      };
+      const rawPayloadJson = JSON.stringify(payload);
+      const input = {
+        ...scope,
+        ...payload,
+        taskId: "task-original",
+        turnId: `turn-${externalRevision}`,
+        commitSha: "a".repeat(40),
+        remoteSha: "a".repeat(40),
+        branch: "codex/task-original",
+        eventType: "fix_delivered" as const,
+        rawPayloadJson,
+        receivedAt: at,
+        payloadDigest: createHash("sha256").update(rawPayloadJson).digest("hex"),
+      };
+      transaction(database, () => receiveMobileRelayWebhook(database, input));
+      return input;
+    };
+    // Unverified evidence cannot advance QA lifecycle.
+    assert.throws(() => deliver(attempt.id, handoffId, false), /delivery|verified/i);
+    assert.equal(
+      database.prepare("SELECT state FROM bugs WHERE id=?").get(bugId)?.state,
+      "in_progress",
+    );
+    const first = deliver(attempt.id, handoffId);
+    assert.equal(
+      database.prepare("SELECT state FROM bugs WHERE id=?").get(bugId)?.state,
+      "ready_for_verification",
+    );
+    assert.equal(
+      database.prepare("SELECT status FROM repair_attempts WHERE id=?").get(attempt.id)?.status,
+      "delivered",
+    );
+    assert.equal(
+      getMobileHumanWorkflowForBug(database, { ...scope, bugId }).repairAttempt?.mode,
+      "relay",
+    );
+    assert.equal(
+      transaction(database, () => projectRelayDeliveries(database, at)),
+      0,
+    );
+    assert.equal(
+      transaction(database, () => receiveMobileRelayWebhook(database, first)).replayed,
+      true,
+    );
+    const verify = (attemptId: string, status: "passed" | "failed", suffix: number) => {
+      const bugVersion = Number(
+        database.prepare("SELECT version FROM bugs WHERE id=?").get(bugId)?.version,
+      );
+      const verification = transaction(database, () =>
+        createMobileVerification(database, {
+          ...verifierScope,
+          bugId,
+          expectedVersion: bugVersion,
+          repairAttemptId: attemptId,
+          buildId: null,
+          verifierId: tenant.secondaryUserId,
+          criteria: "Verify repaired behavior",
+          idempotencyKey: `verification-${suffix}`,
+          requestDigest: digest(suffix),
+          createdAt: at,
+        }),
+      );
+      const started = transaction(database, () =>
+        startMobileVerification(database, {
+          ...verifierScope,
+          verificationId: verification.id,
+          expectedVersion: verification.version,
+          reason: null,
+          idempotencyKey: `verification-start-${suffix}`,
+          requestDigest: digest(suffix + 1),
+          createdAt: at,
+        }),
+      );
+      const input = {
+        ...verifierScope,
+        verificationId: verification.id,
+        expectedVersion: started.version,
+        resultSummary: status === "failed" ? "仍可复现，按钮位置不对" : "已解决",
+        clientSubmissionId: identifier(suffix + 2),
+        attachmentIds: [],
+        captureBundleId: null,
+        idempotencyKey: `verification-result-${suffix}`,
+        requestDigest: digest(suffix + 2),
+        createdAt: at,
+        ...(status === "failed"
+          ? { status: "failed" as const, failureReason: "仍可复现，按钮位置不对\n请与右侧图标对齐" }
+          : { status: "passed" as const, failureReason: null }),
+      };
+      const result = transaction(database, () => recordMobileVerificationResult(database, input));
+      assert.equal(
+        transaction(database, () => recordMobileVerificationResult(database, input)).replayed,
+        true,
+      );
+      return result;
+    };
+    const failed = verify(attempt.id, "failed", 8_120);
+    assert.equal(failed.bug.state, "ready");
+    assert.equal(database.prepare("SELECT COUNT(*) AS n FROM relay_rework_requests").get()?.n, 1);
+    // Restart/retry boundary: rejection is already durable before the background pump creates a round.
+    transaction(database, () => processRelayReworkRequests(database, later(1)));
+    const queued = database.prepare("SELECT * FROM relay_rework_requests").get()!;
+    assert.equal(queued.status, "queued", String(queued.last_error));
+    transaction(database, () => processRelayReworkRequests(database, later(2)));
+    assert.equal(
+      database.prepare("SELECT COUNT(*) AS n FROM repair_attempts WHERE bug_id=?").get(bugId)?.n,
+      2,
+    );
+    assert.equal(
+      database.prepare("SELECT status FROM repair_attempts WHERE id=?").get(attempt.id)?.status,
+      "verification_failed",
+    );
+    const claim = transaction(database, () =>
+      claimMobileRelayOutbox(database, {
+        leaseOwner: "rework-test",
+        relayInstanceId: "relay-main",
+        now: later(3),
+        leaseExpiresAt: later(4),
+      }),
+    );
+    const acknowledge = (value: NonNullable<typeof claim>) =>
+      transaction(database, () =>
+        completeMobileRelayOutbox(database, {
+          outboxMessageId: value.outboxMessageId,
+          leaseOwner: value.leaseOwner,
+          relayInstanceId: "relay-main",
+          relayTaskId: "task-original",
+          relayTurnId: "turn-last",
+          handoffStatus: "submitted",
+          externalRevision: 1,
+          lastEventAt: later(3),
+          payloadDigest: value.payloadDigest,
+          receivedAt: later(3),
+        }),
+      );
+    // The original create response was lost even though delivery arrived. Its idempotent replay still drains.
+    assert.equal(claim?.repairAttemptId, attempt.id);
+    acknowledge(claim!);
+    const nextClaim = transaction(database, () =>
+      claimMobileRelayOutbox(database, {
+        leaseOwner: "rework-test",
+        relayInstanceId: "relay-main",
+        now: later(3),
+        leaseExpiresAt: later(4),
+      }),
+    );
+    assert.equal(nextClaim?.previousHandoffId, handoffId);
+    assert.match(
+      String(nextClaim?.execution?.extraPrompt),
+      /仍可复现，按钮位置不对\n请与右侧图标对齐/,
+    );
+    acknowledge(nextClaim!);
+    // Late old-round events cannot deliver the new active round or erase failed acceptance.
+    deliver(attempt.id, handoffId);
+    assert.equal(
+      database.prepare("SELECT state FROM bugs WHERE id=?").get(bugId)?.state,
+      "in_progress",
+    );
+    deliver(String(queued.attempt_id), String(queued.handoff_id));
+    const passed = verify(String(queued.attempt_id), "passed", 8_130);
+    assert.equal(passed.bug.state, "closed");
+    assert.equal(
+      database.prepare("SELECT COUNT(*) AS n FROM verifications WHERE bug_id=?").get(bugId)?.n,
+      2,
+    );
+    assert.equal(database.prepare("SELECT COUNT(*) AS n FROM relay_rework_requests").get()?.n, 1);
+    const acceptClaim = transaction(database, () =>
+      claimMobileRelayOutbox(database, {
+        leaseOwner: "accept-test",
+        relayInstanceId: "relay-main",
+        now: later(4),
+        leaseExpiresAt: later(5),
+      }),
+    );
+    assert.equal(acceptClaim?.operation, "accept");
+    assert.equal(acceptClaim?.actionId, passed.verification.id);
+    acknowledge(acceptClaim!);
+    assert.equal(database.prepare("SELECT state FROM bugs WHERE id=?").get(bugId)?.state, "closed");
+    assertIntegrity(database);
+  });
+});
 
 interface TenantFixture {
   readonly accountId: string;
