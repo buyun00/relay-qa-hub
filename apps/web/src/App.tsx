@@ -1563,24 +1563,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <span>总览</span>
             <span className="nav-count">全部</span>
           </button>
-          <button
-            aria-current={view === "production" ? "page" : undefined}
-            className={`nav-item${view === "production" ? " is-active" : ""}`}
-            onClick={() => setView("production")}
-            type="button"
-          >
-            <span className="nav-icon">▷</span>
-            <span>制作任务</span>
-          </button>
-          <button
-            aria-current={view === "packaging" ? "page" : undefined}
-            className={`nav-item${view === "packaging" ? " is-active" : ""}`}
-            onClick={() => setView("packaging")}
-            type="button"
-          >
-            <span className="nav-icon">↓</span>
-            <span>打包下载</span>
-          </button>
           {view === "overview" ? (
             <div aria-label="总览日期分页" className="overview-date-nav">
               <div className="overview-date-nav-head">
@@ -1622,6 +1604,24 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               </div>
             </div>
           ) : null}
+          <button
+            aria-current={view === "production" ? "page" : undefined}
+            className={`nav-item${view === "production" ? " is-active" : ""}`}
+            onClick={() => setView("production")}
+            type="button"
+          >
+            <span className="nav-icon">▷</span>
+            <span>制作任务</span>
+          </button>
+          <button
+            aria-current={view === "packaging" ? "page" : undefined}
+            className={`nav-item${view === "packaging" ? " is-active" : ""}`}
+            onClick={() => setView("packaging")}
+            type="button"
+          >
+            <span className="nav-icon">↓</span>
+            <span>打包下载</span>
+          </button>
         </nav>
         <DesktopTools
           desktop={desktop}
