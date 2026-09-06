@@ -284,7 +284,6 @@ export interface UpdateBugDetailsInput {
 }
 
 export interface AttachmentMetadata {
-  readonly verificationId?: string;
   readonly attachmentId: string;
   readonly projectId: string;
   readonly clientSubmissionId: string;

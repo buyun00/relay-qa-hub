@@ -862,11 +862,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         setWorkflow(workflowResponse);
         setQingyuLink(nextQingyuLink);
         setModules(moduleResponse.items.filter((item) => item.active));
-        setDetailAttachmentIds(
-          attachmentResponse.items
-            .filter((item) => !item.verificationId)
-            .map((item) => item.attachmentId),
-        );
+        setDetailAttachmentIds(attachmentResponse.items.map((item) => item.attachmentId));
         setOwnerId(canonicalProjectMemberId(members, nextDetail.ownerId) ?? "");
         setVerifierId(
           canonicalProjectMemberId(

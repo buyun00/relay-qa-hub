@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type DatabaseSync } from "node:sqlite";
@@ -296,7 +296,14 @@ test("verified Relay delivery, human rejection, durable next round and human acc
     assert.equal(failed.bug.state, "ready");
     const evidence = listMobileBugAttachments(database, { ...scope, bugId, limit: 100 });
     assert.equal(evidence?.items[0]?.attachmentId, failed.attachmentIds[0]);
-    assert.equal(evidence?.items[0]?.verificationId, failed.verification.id);
+    const metadataContract = JSON.parse(
+      readFileSync(
+        new URL("../../contracts/versions/1.1.0/schemas/app-first.schema.json", import.meta.url),
+        "utf8",
+      ),
+    ).$defs.attachmentMetadata;
+    assert.equal(metadataContract.additionalProperties, false);
+    assert.ok(Object.keys(evidence!.items[0]!).every((key) => key in metadataContract.properties));
     // Old clients may echo all visible images when saving Bug details.
     transaction(database, () =>
       updateMobileBug(database, {

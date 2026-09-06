@@ -155,7 +155,6 @@ export interface GetMobileCaptureArtifactInput extends MobileAttachmentScope {
 }
 
 export interface MobileAttachmentMetadata {
-  readonly verificationId?: string;
   readonly attachmentId: string;
   readonly projectId: string;
   readonly clientSubmissionId: string;
@@ -255,7 +254,6 @@ interface AttachmentRow {
 }
 
 interface ClaimedAttachmentRow extends AttachmentRow {
-  readonly verification_id?: string | null;
   readonly storage_key: string;
 }
 
@@ -1016,7 +1014,6 @@ export function hasActiveAttachmentReadMembership(
 
 function claimedAttachmentMetadata(row: ClaimedAttachmentRow): MobileAttachmentMetadata {
   return Object.freeze({
-    ...(row.verification_id ? { verificationId: row.verification_id } : {}),
     attachmentId: row.id,
     projectId: row.project_id,
     clientSubmissionId: row.client_submission_id,
@@ -1046,7 +1043,7 @@ function selectClaimedAttachment(
                 attachment.client_attachment_id, attachment.capture_id,
                 attachment.file_name, attachment.media_type, attachment.size_bytes,
                 attachment.sha256, attachment.status, attachment.scan_state,
-                attachment.version, blob.storage_key, bug_attachment.verification_id
+                attachment.version, blob.storage_key
          FROM attachments AS attachment
          JOIN blobs AS blob
            ON blob.account_id = attachment.account_id
@@ -1108,7 +1105,7 @@ export function listMobileBugAttachments(
               attachment.client_attachment_id, attachment.capture_id,
               attachment.file_name, attachment.media_type, attachment.size_bytes,
               attachment.sha256, attachment.status, attachment.scan_state,
-              attachment.version, blob.storage_key, bug_attachment.verification_id
+              attachment.version, blob.storage_key
        FROM ${BUG_ATTACHMENT_LINKS_SQL} AS bug_attachment
        JOIN attachments AS attachment
          ON attachment.account_id = bug_attachment.account_id
