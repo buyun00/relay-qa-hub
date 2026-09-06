@@ -24,7 +24,7 @@ import {
   verifySqliteIntegrity,
 } from "../src/sqlite.ts";
 import { createMobileBug, deleteMobileBug, getMobileBug } from "../src/mobile-bug-store.ts";
-import { listMobileBugAttachments } from "../src/mobile-attachment-store.ts";
+import { listMobileBugAttachments, bindMobileAttachment } from "../src/mobile-attachment-store.ts";
 import {
   createMobileCapture,
   getMobileCapture,
@@ -215,13 +215,44 @@ test("verified Relay delivery, human rejection, durable next round and human acc
           createdAt: at,
         }),
       );
+      const attachmentIds: string[] = [];
+      if (status === "failed") {
+        const upload = uploadFixture(tenant, suffix + 500, {
+          actorId: verifierScope.actorId,
+          clientSubmissionId: identifier(suffix + 2),
+        });
+        insertUpload(database, tenant, upload);
+        insertBlob(database, tenant, upload);
+        insertAttachment(database, tenant, upload);
+        finalizeUpload(database, upload.uploadId, upload.attachmentId);
+        const bindingInput = {
+          ...verifierScope,
+          attachmentId: upload.attachmentId,
+          expectedVersion: Number(
+            database.prepare("SELECT version FROM upload_sessions WHERE id=?").get(upload.uploadId)
+              ?.version,
+          ),
+          clientSubmissionId: upload.clientSubmissionId,
+          clientAttachmentId: upload.clientAttachmentId,
+          leaseGeneration: 1,
+          intent: "verification_result" as const,
+          targetQaItemId: bugId,
+          boundAt: databaseTime(database),
+        };
+        transaction(database, () => bindMobileAttachment(database, bindingInput));
+        assert.equal(
+          transaction(database, () => bindMobileAttachment(database, bindingInput)).replayed,
+          true,
+        );
+        attachmentIds.push(upload.attachmentId);
+      }
       const input = {
         ...verifierScope,
         verificationId: verification.id,
         expectedVersion: started.version,
         resultSummary: status === "failed" ? "仍可复现，按钮位置不对" : "已解决",
         clientSubmissionId: identifier(suffix + 2),
-        attachmentIds: [],
+        attachmentIds,
         captureBundleId: null,
         idempotencyKey: `verification-result-${suffix}`,
         requestDigest: digest(suffix + 2),
@@ -230,7 +261,31 @@ test("verified Relay delivery, human rejection, durable next round and human acc
           ? { status: "failed" as const, failureReason: "仍可复现，按钮位置不对\n请与右侧图标对齐" }
           : { status: "passed" as const, failureReason: null }),
       };
+      if (attachmentIds.length > 0) {
+        for (const invalid of [
+          { ...input, attachmentIds: [...attachmentIds, identifier(suffix + 599)] },
+          { ...input, clientSubmissionId: identifier(suffix + 598) },
+          { ...input, actorId: tenant.userId },
+        ]) {
+          assert.throws(
+            () => transaction(database, () => recordMobileVerificationResult(database, invalid)),
+            /reservation/,
+          );
+          assert.equal(
+            database
+              .prepare("SELECT state FROM attachment_bindings WHERE attachment_id=?")
+              .get(attachmentIds[0]!)?.state,
+            "reserved",
+          );
+          assert.equal(
+            database.prepare("SELECT status FROM verifications WHERE id=?").get(verification.id)
+              ?.status,
+            "in_progress",
+          );
+        }
+      }
       const result = transaction(database, () => recordMobileVerificationResult(database, input));
+      assert.deepEqual(result.attachmentIds, attachmentIds);
       assert.equal(
         transaction(database, () => recordMobileVerificationResult(database, input)).replayed,
         true,
@@ -239,6 +294,26 @@ test("verified Relay delivery, human rejection, durable next round and human acc
     };
     const failed = verify(attempt.id, "failed", 8_120);
     assert.equal(failed.bug.state, "ready");
+    const evidence = listMobileBugAttachments(database, { ...scope, bugId, limit: 100 });
+    assert.equal(evidence?.items[0]?.attachmentId, failed.attachmentIds[0]);
+    assert.equal(evidence?.items[0]?.verificationId, failed.verification.id);
+    // Old clients may echo all visible images when saving Bug details.
+    transaction(database, () =>
+      updateMobileBug(database, {
+        ...scope,
+        bugId,
+        expectedVersion: failed.bug.version,
+        attachmentIds: failed.attachmentIds,
+        idempotencyKey: "legacy-client-edit",
+        requestDigest: digest(8_140),
+        createdAt: databaseTime(database),
+      }),
+    );
+    assert.equal(
+      database.prepare("SELECT COUNT(*) AS n FROM verification_attachments").get()?.n,
+      1,
+    );
+    assert.equal(database.prepare("SELECT COUNT(*) AS n FROM bug_attachments").get()?.n, 0);
     assert.equal(database.prepare("SELECT COUNT(*) AS n FROM relay_rework_requests").get()?.n, 1);
     // Restart/retry boundary: rejection is already durable before the background pump creates a round.
     transaction(database, () => processRelayReworkRequests(database, later(1)));
@@ -288,6 +363,8 @@ test("verified Relay delivery, human rejection, durable next round and human acc
       }),
     );
     assert.equal(nextClaim?.previousHandoffId, handoffId);
+    assert.deepEqual(nextClaim?.selectedAttachmentIds, failed.attachmentIds);
+    assert.equal(nextClaim?.selectedAttachments[0]?.attachmentId, failed.attachmentIds[0]);
     assert.match(
       String(nextClaim?.execution?.extraPrompt),
       /仍可复现，按钮位置不对\n请与右侧图标对齐/,

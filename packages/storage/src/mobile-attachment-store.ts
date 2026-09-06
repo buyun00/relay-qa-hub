@@ -12,6 +12,7 @@ import type { DatabaseSync } from "node:sqlite";
 
 import type { MobileCaptureArtifactKind } from "./mobile-capture-store.js";
 import { SqliteStorageError } from "./sqlite.js";
+import { BUG_ATTACHMENT_LINKS_SQL } from "./bug-attachment-links.js";
 
 const MOBILE_MIN_CHUNK_SIZE_BYTES = 256 * 1024;
 const MOBILE_MAX_CHUNK_SIZE_BYTES = 8 * 1024 * 1024;
@@ -118,7 +119,8 @@ export interface BindMobileAttachmentInput extends MobileAttachmentScope {
   readonly clientSubmissionId: string;
   readonly clientAttachmentId: string;
   readonly leaseGeneration: number;
-  readonly intent: "bug_create";
+  readonly intent: "bug_create" | "verification_result";
+  readonly targetQaItemId?: string;
   readonly boundAt: string;
 }
 
@@ -129,8 +131,8 @@ export interface MobileAttachmentReservation {
   readonly clientSubmissionId: string;
   readonly clientAttachmentId: string;
   readonly leaseGeneration: number;
-  readonly intent: "bug_create";
-  readonly targetQaItemId: null;
+  readonly intent: "bug_create" | "verification_result";
+  readonly targetQaItemId: string | null;
   readonly status: "reserved";
   readonly expiresAt: string;
   readonly version: number;
@@ -153,6 +155,7 @@ export interface GetMobileCaptureArtifactInput extends MobileAttachmentScope {
 }
 
 export interface MobileAttachmentMetadata {
+  readonly verificationId?: string;
   readonly attachmentId: string;
   readonly projectId: string;
   readonly clientSubmissionId: string;
@@ -252,6 +255,7 @@ interface AttachmentRow {
 }
 
 interface ClaimedAttachmentRow extends AttachmentRow {
+  readonly verification_id?: string | null;
   readonly storage_key: string;
 }
 
@@ -856,6 +860,25 @@ export function bindMobileAttachment(
   input: BindMobileAttachmentInput,
 ): MobileAttachmentReservation {
   requireTransaction(database);
+  const targetBugId = input.targetQaItemId ?? null;
+  if (
+    (input.intent === "bug_create" && targetBugId !== null) ||
+    (input.intent === "verification_result" && targetBugId === null) ||
+    !["bug_create", "verification_result"].includes(input.intent)
+  )
+    throw new SqliteStorageError("SQLITE_UPLOAD_INVALID", "invalid attachment reservation target");
+  if (
+    targetBugId !== null &&
+    (!hasActiveAttachmentReadMembership(database, input) ||
+      !database
+        .prepare(
+          `SELECT 1 FROM bugs WHERE account_id=? AND project_id=? AND id=?
+      AND NOT EXISTS (SELECT 1 FROM bug_deletions WHERE bug_id=bugs.id)`,
+        )
+        .get(input.accountId, input.projectId, targetBugId))
+  ) {
+    throw new SqliteStorageError("SQLITE_UPLOAD_NOT_FOUND", "attachment target Bug was not found");
+  }
   const attachment = readAttachment(database, input, input.attachmentId);
   if (!attachment) throw new SqliteStorageError("SQLITE_UPLOAD_NOT_FOUND", "attachment not found");
   if (
@@ -899,7 +922,7 @@ export function bindMobileAttachment(
     if (
       existing.lease_generation !== input.leaseGeneration ||
       existing.intent !== input.intent ||
-      existing.target_bug_id !== null ||
+      existing.target_bug_id !== targetBugId ||
       existing.state !== "reserved" ||
       existing.expires_at === null
     ) {
@@ -915,8 +938,8 @@ export function bindMobileAttachment(
       clientSubmissionId: attachment.client_submission_id,
       clientAttachmentId: attachment.client_attachment_id,
       leaseGeneration: existing.lease_generation,
-      intent: "bug_create",
-      targetQaItemId: null,
+      intent: input.intent,
+      targetQaItemId: targetBugId,
       status: "reserved",
       expiresAt: existing.expires_at,
       version: finalizedUpload.version + existing.lease_generation,
@@ -934,13 +957,15 @@ export function bindMobileAttachment(
         id, account_id, project_id, attachment_id, intent, target_bug_id,
         lease_generation, state, expires_at, claimed_at, bound_by_actor_id,
         bound_at, version
-      ) VALUES (?, ?, ?, ?, 'bug_create', NULL, 1, 'reserved', ?, NULL, ?, ?, 1)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, 1, 'reserved', ?, NULL, ?, ?, 1)`,
     )
     .run(
       bindingId,
       input.accountId,
       input.projectId,
       attachment.id,
+      input.intent,
+      targetBugId,
       expiresAt,
       input.actorId,
       input.boundAt,
@@ -952,8 +977,8 @@ export function bindMobileAttachment(
     clientSubmissionId: attachment.client_submission_id,
     clientAttachmentId: attachment.client_attachment_id,
     leaseGeneration: 1,
-    intent: "bug_create",
-    targetQaItemId: null,
+    intent: input.intent,
+    targetQaItemId: targetBugId,
     status: "reserved",
     expiresAt,
     version: finalizedUpload.version + 1,
@@ -991,6 +1016,7 @@ export function hasActiveAttachmentReadMembership(
 
 function claimedAttachmentMetadata(row: ClaimedAttachmentRow): MobileAttachmentMetadata {
   return Object.freeze({
+    ...(row.verification_id ? { verificationId: row.verification_id } : {}),
     attachmentId: row.id,
     projectId: row.project_id,
     clientSubmissionId: row.client_submission_id,
@@ -1020,7 +1046,7 @@ function selectClaimedAttachment(
                 attachment.client_attachment_id, attachment.capture_id,
                 attachment.file_name, attachment.media_type, attachment.size_bytes,
                 attachment.sha256, attachment.status, attachment.scan_state,
-                attachment.version, blob.storage_key
+                attachment.version, blob.storage_key, bug_attachment.verification_id
          FROM attachments AS attachment
          JOIN blobs AS blob
            ON blob.account_id = attachment.account_id
@@ -1034,7 +1060,7 @@ function selectClaimedAttachment(
           AND binding.attachment_id = attachment.id
           AND binding.state = 'claimed'
           AND binding.target_bug_id IS NOT NULL
-         JOIN bug_attachments AS bug_attachment
+         JOIN ${BUG_ATTACHMENT_LINKS_SQL} AS bug_attachment
            ON bug_attachment.account_id = binding.account_id
           AND bug_attachment.project_id = binding.project_id
           AND bug_attachment.bug_id = binding.target_bug_id
@@ -1082,8 +1108,8 @@ export function listMobileBugAttachments(
               attachment.client_attachment_id, attachment.capture_id,
               attachment.file_name, attachment.media_type, attachment.size_bytes,
               attachment.sha256, attachment.status, attachment.scan_state,
-              attachment.version, blob.storage_key
-       FROM bug_attachments AS bug_attachment
+              attachment.version, blob.storage_key, bug_attachment.verification_id
+       FROM ${BUG_ATTACHMENT_LINKS_SQL} AS bug_attachment
        JOIN attachments AS attachment
          ON attachment.account_id = bug_attachment.account_id
         AND attachment.project_id = bug_attachment.project_id

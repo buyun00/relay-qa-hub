@@ -6,6 +6,7 @@ import {
   logoutBrowserSession,
   setBrowserCsrfToken,
   updateBugDetails,
+  recordVerificationFailed,
   type BrowserSessionPrincipal,
   type BugDetail,
 } from "./api";
@@ -61,6 +62,22 @@ function bug(): BugDetail {
 afterEach(() => {
   setBrowserCsrfToken(null);
   vi.unstubAllGlobals();
+});
+
+it("submits rejection screenshots with the same Verification result identity", async () => {
+  const fetch = vi
+    .fn()
+    .mockResolvedValue(new Response(JSON.stringify({ replayed: false }), { status: 200 }));
+  vi.stubGlobal("fetch", fetch);
+  const attachmentIds = ["40000000-0000-4000-8000-000000000001"];
+  await recordVerificationFailed(BUG_ID, 2, "位置不对", "见截图", "submission-1", attachmentIds);
+  const request = fetch.mock.calls[0]?.[1] as RequestInit;
+  expect(JSON.parse(String(request.body))).toMatchObject({
+    status: "failed",
+    failureReason: "见截图",
+    clientSubmissionId: "submission-1",
+    attachmentIds,
+  });
 });
 
 describe("Bug detail API", () => {

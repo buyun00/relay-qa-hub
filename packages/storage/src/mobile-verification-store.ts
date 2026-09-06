@@ -843,6 +843,72 @@ export function startMobileVerification(
   return toVerification(row);
 }
 
+function claimVerificationAttachments(
+  database: DatabaseSync,
+  input: RecordMobileVerificationResultInput,
+  bugId: string,
+): void {
+  let totalBytes = 0;
+  for (const attachmentId of input.attachmentIds) {
+    const reservation = database
+      .prepare(
+        `
+      SELECT binding.id, binding.version, attachment.size_bytes
+      FROM attachment_bindings AS binding
+      JOIN attachments AS attachment ON attachment.account_id=binding.account_id
+        AND attachment.project_id=binding.project_id AND attachment.id=binding.attachment_id
+      JOIN blobs AS blob ON blob.account_id=attachment.account_id AND blob.id=attachment.blob_id
+        AND blob.sha256=attachment.sha256 AND blob.size_bytes=attachment.size_bytes AND blob.state='ready'
+      JOIN upload_sessions AS upload ON upload.account_id=attachment.account_id
+        AND upload.project_id=attachment.project_id AND upload.id=attachment.upload_session_id
+        AND upload.status='finalized' AND upload.finalized_attachment_id=attachment.id
+      WHERE binding.account_id=? AND binding.project_id=? AND binding.attachment_id=?
+        AND binding.intent='verification_result' AND binding.target_bug_id=?
+        AND binding.state='reserved' AND unixepoch(binding.expires_at)>unixepoch('now')
+        AND binding.bound_by_actor_id=? AND attachment.actor_id=?
+        AND attachment.client_submission_id=? AND attachment.status='ready' AND attachment.scan_state='clean'
+    `,
+      )
+      .get(
+        input.accountId,
+        input.projectId,
+        attachmentId,
+        bugId,
+        input.actorId,
+        input.actorId,
+        input.clientSubmissionId,
+      ) as { id: string; version: number; size_bytes: number } | undefined;
+    if (!reservation)
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        "Verification attachment requires its exact active reservation",
+      );
+    totalBytes += reservation.size_bytes;
+    if (totalBytes > 100 * 1024 * 1024)
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        "Verification attachments must total at most 100 MB",
+      );
+    database
+      .prepare(
+        `UPDATE attachment_bindings SET state='claimed', expires_at=NULL,
+      claimed_at=?, version=version+1 WHERE id=? AND version=? AND state='reserved'`,
+      )
+      .run(input.createdAt, reservation.id, reservation.version);
+    database
+      .prepare(
+        `UPDATE attachments SET version=version+1 WHERE account_id=? AND project_id=? AND id=?`,
+      )
+      .run(input.accountId, input.projectId, attachmentId);
+    database
+      .prepare(
+        `INSERT INTO verification_attachments(account_id,project_id,verification_id,attachment_id,binding_id)
+      VALUES (?,?,?,?,?)`,
+      )
+      .run(input.accountId, input.projectId, input.verificationId, attachmentId, reservation.id);
+  }
+}
+
 export function recordMobileVerificationResult(
   database: DatabaseSync,
   input: RecordMobileVerificationResultInput,
@@ -857,12 +923,17 @@ export function recordMobileVerificationResult(
   }
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
-  if (input.attachmentIds.length !== 0 || input.captureBundleId !== null) {
+  if (
+    input.attachmentIds.length > 8 ||
+    new Set(input.attachmentIds).size !== input.attachmentIds.length ||
+    input.captureBundleId !== null
+  ) {
     throw new MobileRelayStorageError(
       "INVALID_REQUEST",
-      "the first Verification result slice accepts only inline result evidence",
+      "Verification accepts at most 8 unique attachments and no capture bundle",
     );
   }
+  for (const attachmentId of input.attachmentIds) requireUuid(attachmentId, "attachmentId");
   const prior = readVerificationSubmission(database, input);
   if (prior) {
     if (prior.intent !== "verification_result" || prior.payload_digest !== input.requestDigest) {
@@ -900,6 +971,7 @@ export function recordMobileVerificationResult(
   // Starting a Verification advances the Verification clock without mutating the Bug.
   // The result writes both facts, so its timestamp must advance from the newer Verification.
   const at = nextTimestamp(input.createdAt, current.updated_at);
+  claimVerificationAttachments(database, input, bug.id);
   const eventId = randomUUID();
   const nextBugState = input.status === "passed" ? "closed" : "ready";
   insertVerificationEvent(database, input, {

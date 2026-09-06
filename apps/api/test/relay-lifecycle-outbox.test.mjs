@@ -20,6 +20,8 @@ test("durable Relay transport carries prior handoff and human acceptance, and re
     completions = [],
     retries = [];
   let failFirstAcceptance = true;
+  const screenshot = Buffer.from("rejection screenshot bytes");
+  const screenshotHash = createHash("sha256").update(screenshot).digest("hex");
   const server = createServer(async (req, res) => {
     let bytes = "";
     for await (const chunk of req) bytes += chunk;
@@ -82,6 +84,17 @@ test("durable Relay transport carries prior handoff and human acceptance, and re
       outboxMessageId: "rework",
       operation: "create",
       previousHandoffId: "handoff-1",
+      selectedAttachmentIds: ["rejection-screenshot"],
+      selectedAttachments: [
+        {
+          attachmentId: "rejection-screenshot",
+          filename: "rejection.png",
+          mediaType: "image/png",
+          size: screenshot.length,
+          sha256: screenshotHash,
+          storageKey: "test-only-screenshot",
+        },
+      ],
       execution: { extraPrompt: "打回理由：仍有偏移，请继续修复" },
       idempotencyKey: "qa:qa-local:handoff:handoff-2",
     },
@@ -115,6 +128,7 @@ test("durable Relay transport carries prior handoff and human acceptance, and re
     worker,
     endpoint: new URL(`http://127.0.0.1:${server.address().port}/api/integrations/qa/v1/handoffs`),
     bearerToken: "test-only-token",
+    readAttachment: async () => screenshot,
   });
   t.after(() => pump.stop());
   await Promise.race([
@@ -127,6 +141,11 @@ test("durable Relay transport carries prior handoff and human acceptance, and re
   await pump.stop();
   assert.equal(observed[0].body.previousHandoffId, "handoff-1");
   assert.match(observed[0].body.execution.extraPrompt, /打回理由/);
+  assert.deepEqual(
+    Buffer.from(observed[0].body.selectedAttachments[0].contentBase64, "base64"),
+    screenshot,
+  );
+  assert.equal(observed[0].body.selectedAttachments[0].sha256, screenshotHash);
   assert.equal(observed[1].path, "/api/integrations/qa/v1/handoffs/handoff-2/accept");
   assert.deepEqual(observed[2], observed[1]);
   assert.equal(retries.length, 1);

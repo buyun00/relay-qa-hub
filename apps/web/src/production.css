@@ -461,6 +461,37 @@
   border-bottom: 1px solid #edf1f4;
   padding: 10px 13px;
 }
+.production-bug-choices > .production-bug-choice-pending {
+  border-left: 4px solid #2875c7;
+  background: #edf5ff;
+}
+.production-bug-choices > .production-bug-choice-inProgress {
+  border-left: 4px solid #c28a24;
+  background: #fffaf0;
+}
+.production-bug-choices > .production-bug-choice-verification {
+  border-left: 4px solid #4f9770;
+  background: #f2f8f3;
+}
+.production-bug-status {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.production-bug-status-pending {
+  background: #d6e8ff;
+  color: #17599d;
+}
+.production-bug-status-inProgress {
+  background: #f9ebc7;
+  color: #855c12;
+}
+.production-bug-status-verification {
+  background: #dfefe2;
+  color: #356c48;
+}
 .production-bug-choices > div > label {
   display: flex;
   align-items: center;

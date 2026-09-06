@@ -284,6 +284,7 @@ export interface UpdateBugDetailsInput {
 }
 
 export interface AttachmentMetadata {
+  readonly verificationId?: string;
   readonly attachmentId: string;
   readonly projectId: string;
   readonly clientSubmissionId: string;
@@ -1352,6 +1353,29 @@ export async function uploadBugCreateAttachment(input: {
   readonly clientSubmissionId: string;
   readonly file: File;
 }): Promise<string> {
+  return uploadSubmissionAttachment({ ...input, intent: "bug_create" });
+}
+
+export async function uploadVerificationAttachment(input: {
+  readonly projectId: string;
+  readonly bugId: string;
+  readonly clientSubmissionId: string;
+  readonly file: File;
+}): Promise<string> {
+  return uploadSubmissionAttachment({
+    ...input,
+    intent: "verification_result",
+    targetQaItemId: input.bugId,
+  });
+}
+
+async function uploadSubmissionAttachment(input: {
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly file: File;
+  readonly intent: "bug_create" | "verification_result";
+  readonly targetQaItemId?: string;
+}): Promise<string> {
   const clientAttachmentId = crypto.randomUUID();
   const uploadAttempt = 1;
   const sha256 = await sha256Hex(input.file);
@@ -1444,7 +1468,8 @@ export async function uploadBugCreateAttachment(input: {
       clientSubmissionId: input.clientSubmissionId,
       clientAttachmentId,
       leaseGeneration: 1,
-      intent: "bug_create",
+      intent: input.intent,
+      ...(input.targetQaItemId ? { targetQaItemId: input.targetQaItemId } : {}),
     }),
   });
   return finalized.attachmentId;
@@ -1814,6 +1839,7 @@ export async function recordVerificationFailed(
   resultSummary: string,
   failureReason: string,
   clientSubmissionId: string,
+  attachmentIds: readonly string[] = [],
 ): Promise<VerificationResultResponse> {
   const body = await requestJson(
     `/api/v1/verifications/${encodeURIComponent(verificationId)}/result`,
@@ -1830,7 +1856,7 @@ export async function recordVerificationFailed(
         status: "failed",
         resultSummary,
         failureReason,
-        attachmentIds: [],
+        attachmentIds,
       }),
     },
   );

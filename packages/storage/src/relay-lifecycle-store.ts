@@ -303,7 +303,13 @@ export function processRelayReworkRequests(database: DatabaseSync, now: string):
         expectedVersion: 1,
         handoffId,
         previousHandoffId: request.handoff_id,
-        selectedAttachmentIds: [],
+        selectedAttachmentIds: database
+          .prepare(
+            `SELECT attachment_id FROM verification_attachments
+          WHERE account_id=? AND project_id=? AND verification_id=? ORDER BY attachment_id`,
+          )
+          .all(request.account_id, request.project_id, request.verification_id)
+          .map((row) => String(row.attachment_id)),
         relayInstanceId: request.relay_instance_id,
         qaInstanceId: metadata.qaInstanceId,
         relayPrincipalId: metadata.relayPrincipalId,

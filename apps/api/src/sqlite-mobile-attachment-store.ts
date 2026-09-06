@@ -18,11 +18,12 @@ export function createSqliteMobileAttachmentStore(
   options: SqliteMobileAttachmentStoreOptions,
 ): MobileAttachmentStore {
   const now = options.now ?? (() => new Date());
-  const actorScope = (actorId: string) => ({
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId,
-  } as const);
+  const actorScope = (actorId: string) =>
+    ({
+      accountId: options.scope.accountId,
+      projectId: options.scope.projectId,
+      actorId,
+    }) as const;
 
   return {
     async initUpload(command) {
@@ -100,8 +101,11 @@ export function createSqliteMobileAttachmentStore(
 
     async bindAttachment(command) {
       requireProject(command.request.projectId, options.scope);
-      if (command.request.intent !== "bug_create" || command.request.targetQaItemId !== undefined) {
-        throw new TypeError("the current mobile slice only supports bug_create reservations");
+      if (
+        command.request.intent !== "bug_create" &&
+        command.request.intent !== "verification_result"
+      ) {
+        throw new TypeError("only Bug creation and Verification result reservations are supported");
       }
       return options.worker.bindMobileAttachment({
         ...actorScope(command.actorId),
@@ -110,7 +114,10 @@ export function createSqliteMobileAttachmentStore(
         clientSubmissionId: command.request.clientSubmissionId,
         clientAttachmentId: command.request.clientAttachmentId,
         leaseGeneration: command.request.leaseGeneration,
-        intent: "bug_create",
+        intent: command.request.intent,
+        ...(command.request.targetQaItemId
+          ? { targetQaItemId: command.request.targetQaItemId }
+          : {}),
         boundAt: now().toISOString(),
       });
     },

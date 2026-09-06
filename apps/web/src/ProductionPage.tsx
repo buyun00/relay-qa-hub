@@ -6,7 +6,7 @@ import {
   type BugListItem,
   type ProjectMember,
 } from "./api";
-import { taskStatusLabel } from "./task-status";
+import { taskStatusLabel, taskStatusForBugState, TASK_STATUS_ORDER } from "./task-status";
 import {
   defaultExecution,
   downloadProductionFile,
@@ -53,6 +53,17 @@ const date = (value: string) =>
     hour: "2-digit",
     minute: "2-digit",
   });
+export function compareProductionBugPriority(
+  a: Pick<BugListItem, "state">,
+  b: Pick<BugListItem, "state">,
+): number {
+  return (
+    TASK_STATUS_ORDER.indexOf(taskStatusForBugState(a.state)) -
+    TASK_STATUS_ORDER.indexOf(taskStatusForBugState(b.state))
+  );
+}
+const importStatusLabel = (bug: BugListItem) =>
+  taskStatusForBugState(bug.state) === "pending" ? "待制作" : taskStatusLabel(bug.state);
 function readDraft(key: string): Draft {
   try {
     const saved = JSON.parse(localStorage.getItem(key) ?? "null") as Partial<Draft> | null;
@@ -467,12 +478,14 @@ export default function ProductionPage({
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
-  const bugChoices = bugs.filter(
-    (bug) =>
-      !["closed", "deferred", "rejected", "duplicate"].includes(bug.state) &&
-      (!bugOwner || bug.ownerId === bugOwner) &&
-      `${bug.key} ${bug.title}`.toLowerCase().includes(bugSearch.toLowerCase()),
-  );
+  const bugChoices = bugs
+    .filter(
+      (bug) =>
+        !["closed", "deferred", "rejected", "duplicate"].includes(bug.state) &&
+        (!bugOwner || bug.ownerId === bugOwner) &&
+        `${bug.key} ${bug.title}`.toLowerCase().includes(bugSearch.toLowerCase()),
+    )
+    .sort(compareProductionBugPriority);
   const selection = tasks.filter((task) => checked.includes(task.id));
   const currentBusy = selectedId ? [...busy].some((key) => key.includes(selectedId)) : false;
   const draftHasFiles = files.length > 0;
@@ -1045,7 +1058,10 @@ export default function ProductionPage({
                   </div>
                   <div className="production-bug-choices">
                     {bugChoices.map((bug) => (
-                      <div key={bug.id}>
+                      <div
+                        key={bug.id}
+                        className={`production-bug-choice production-bug-choice-${taskStatusForBugState(bug.state)}`}
+                      >
                         <label>
                           <input
                             type="checkbox"
@@ -1065,7 +1081,12 @@ export default function ProductionPage({
                               {bug.key} · {bug.title}
                             </strong>
                             <small>
-                              {taskStatusLabel(bug.state)} ·{" "}
+                              <span
+                                className={`production-bug-status production-bug-status-${taskStatusForBugState(bug.state)}`}
+                              >
+                                {importStatusLabel(bug)}
+                              </span>
+                              {" · "}
                               {members.find((m) => m.userId === bug.ownerId)?.displayName ??
                                 "未分配"}
                             </small>

@@ -1308,7 +1308,20 @@ function reconcileBugUpdateAttachments(
   const currentIds = activeBugAttachmentIds(database, input);
   const current = new Set(currentIds);
   const requested = new Set(input.attachmentIds);
-  const added = input.attachmentIds.filter((attachmentId) => !current.has(attachmentId));
+  // Older clients echo every visible image. Acceptance evidence stays immutable
+  // and must never be re-claimed as an original Bug attachment by an edit.
+  const verificationEvidence = new Set(
+    database
+      .prepare(
+        `SELECT attachment_id FROM ${BUG_ATTACHMENT_LINKS_SQL}
+    WHERE account_id=? AND project_id=? AND bug_id=? AND verification_id IS NOT NULL`,
+      )
+      .all(input.accountId, input.projectId, input.bugId)
+      .map((row) => String(row.attachment_id)),
+  );
+  const added = input.attachmentIds.filter(
+    (attachmentId) => !current.has(attachmentId) && !verificationEvidence.has(attachmentId),
+  );
   const removed = currentIds.filter((attachmentId) => !requested.has(attachmentId));
 
   for (const attachmentId of added) {
@@ -2798,7 +2811,7 @@ function readSelectedRelayAttachments(
     .prepare(
       `SELECT attachment.id, attachment.file_name, attachment.media_type,
               attachment.size_bytes, attachment.sha256, blob.storage_key
-       FROM bug_attachments AS bug_attachment
+       FROM ${BUG_ATTACHMENT_LINKS_SQL} AS bug_attachment
        JOIN attachments AS attachment
          ON attachment.account_id = bug_attachment.account_id
         AND attachment.project_id = bug_attachment.project_id
@@ -4244,3 +4257,4 @@ export function retryMobileRelayOutbox(
     );
   return result.changes === 1;
 }
+import { BUG_ATTACHMENT_LINKS_SQL } from "./bug-attachment-links.js";

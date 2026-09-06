@@ -48,6 +48,7 @@ import {
   updateBugAssignments,
   updateBugDetails,
   uploadBugCreateAttachment,
+  uploadVerificationAttachment,
   type BrowserSessionPrincipal,
   type BugDetail,
   type BugEvent,
@@ -114,6 +115,13 @@ interface ClipboardImageItem {
   readonly type: string;
   getAsFile(): File | null;
 }
+
+interface ReturnDraft {
+  readonly reason: string;
+  readonly files: readonly File[];
+  readonly clientSubmissionId: string;
+}
+const EMPTY_RETURN_FILES: readonly File[] = [];
 
 const DEFAULT_EXPECTED_BEHAVIOR = "问题修复后不再复现";
 const AUTO_REFRESH_INTERVAL_MS = 5_000;
@@ -453,7 +461,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [ownerId, setOwnerId] = useState("");
   const [verifierId, setVerifierId] = useState("");
   const [comment, setComment] = useState("");
-  const [returnReason, setReturnReason] = useState(DEFAULT_RETURN_REASON);
+  const [returnDrafts, setReturnDrafts] = useState<Readonly<Record<string, ReturnDraft>>>({});
+  const returnUploads = useRef(
+    new Map<string, WeakMap<File, { id: string; uploadedAt: number }>>(),
+  );
+  const returnDraftKey = `${selectedId}:${workflow?.repairAttempt?.id ?? ""}`;
+  const returnDraft = returnDrafts[returnDraftKey];
+  const returnReason = returnDraft?.reason ?? DEFAULT_RETURN_REASON;
+  const returnFiles = returnDraft?.files ?? EMPTY_RETURN_FILES;
+  const [returnImageError, setReturnImageError] = useState<string | null>(null);
   const [pendingMutationLabels, setPendingMutationLabels] = useState<ReadonlyMap<string, string>>(
     () => new Map(),
   );
@@ -497,6 +513,16 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         url: URL.createObjectURL(file),
       })),
     [newFiles],
+  );
+  const returnFilePreviews = useMemo(
+    () => returnFiles.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    [returnFiles],
+  );
+  useEffect(
+    () => () => {
+      for (const preview of returnFilePreviews) URL.revokeObjectURL(preview.url);
+    },
+    [returnFilePreviews],
   );
   const detailNewFilePreviews = useMemo(
     () =>
@@ -778,6 +804,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     setDetailEditVersionConflict(false);
     setDetailAttachmentIds([]);
     setDetailNewFiles([]);
+    setReturnImageError(null);
     setPreviewImage(null);
     setModules([]);
     clearEvidence();
@@ -835,7 +862,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         setWorkflow(workflowResponse);
         setQingyuLink(nextQingyuLink);
         setModules(moduleResponse.items.filter((item) => item.active));
-        setDetailAttachmentIds(attachmentResponse.items.map((item) => item.attachmentId));
+        setDetailAttachmentIds(
+          attachmentResponse.items
+            .filter((item) => !item.verificationId)
+            .map((item) => item.attachmentId),
+        );
         setOwnerId(canonicalProjectMemberId(members, nextDetail.ownerId) ?? "");
         setVerifierId(
           canonicalProjectMemberId(
@@ -1364,7 +1395,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     expectedStatus: "passed" | "failed",
     action: (expectedVersion: number) => Promise<unknown>,
   ) => {
-    if (verification.status === expectedStatus) return;
     if (verification.status !== "in_progress") {
       throw new QaHubApiError(412, "VERSION_CONFLICT");
     }
@@ -1376,6 +1406,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       async () => {
         const latest = await getVerification(verification.id);
         if (latest.status === expectedStatus) {
+          // Only our exact idempotent submission may count as a recovered success.
+          // A concurrent verifier's result must not discard this user's evidence draft.
+          await action(expectedVerificationVersion);
           return { status: "committed", value: undefined };
         }
         if (latest.status === "in_progress") {
@@ -1407,9 +1440,42 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     );
   };
 
+  const updateReturnDraft = (patch: Partial<ReturnDraft>) => {
+    if (mutation !== null) return;
+    setReturnDrafts((current) => ({
+      ...current,
+      [returnDraftKey]: {
+        ...(current[returnDraftKey] ?? {
+          reason: DEFAULT_RETURN_REASON,
+          files: EMPTY_RETURN_FILES,
+          clientSubmissionId: crypto.randomUUID(),
+        }),
+        ...patch,
+      },
+    }));
+  };
+  const appendReturnImages = (files: readonly File[]) => {
+    if (mutation !== null) return;
+    const next = mergeCreateBugImages(returnFiles, files);
+    if (next.length > 8 || next.reduce((sum, file) => sum + file.size, 0) > 100 * 1024 * 1024) {
+      setReturnImageError("每次打回最多 8 张截图，总计不超过 100 MB。");
+      return;
+    }
+    setReturnImageError(null);
+    updateReturnDraft({ files: next });
+  };
+  const pasteReturnImages = (event: ClipboardEvent<HTMLElement>) => {
+    const images = collectClipboardImages([...event.clipboardData.items]);
+    if (images.length === 0) return;
+    event.preventDefault();
+    appendReturnImages(images);
+  };
+
   const returnBug = async () => {
     const reason = returnReason.trim();
-    if (reason.length === 0) return;
+    if (reason.length === 0 || detail === null || mutation !== null) return;
+    const clientSubmissionId = returnDraft?.clientSubmissionId ?? crypto.randomUUID();
+    updateReturnDraft({ clientSubmissionId });
     await runCurrentBugMutation(
       repairAttempt?.mode === "relay"
         ? "打回理由已保存，Relay 将自动开始下一轮制作"
@@ -1417,7 +1483,26 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       async () => {
         const verification = await ensureVerificationStarted();
         if (verification === null) return;
-        const clientSubmissionId = crypto.randomUUID();
+        const uploaded =
+          returnUploads.current.get(clientSubmissionId) ??
+          new WeakMap<File, { id: string; uploadedAt: number }>();
+        returnUploads.current.set(clientSubmissionId, uploaded);
+        const attachmentIds: string[] = [];
+        for (const file of returnFiles) {
+          const cached = uploaded.get(file);
+          let attachmentId =
+            cached && Date.now() - cached.uploadedAt < 10 * 60_000 ? cached.id : undefined;
+          if (!attachmentId) {
+            attachmentId = await uploadVerificationAttachment({
+              projectId: detail.projectId,
+              bugId: detail.id,
+              clientSubmissionId,
+              file,
+            });
+            uploaded.set(file, { id: attachmentId, uploadedAt: Date.now() });
+          }
+          attachmentIds.push(attachmentId);
+        }
         await recordVerificationResultReliably(verification, "failed", (expectedVersion) =>
           recordVerificationFailed(
             verification.id,
@@ -1425,9 +1510,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             reason,
             reason,
             clientSubmissionId,
+            attachmentIds,
           ),
         );
-        if (selectedIdRef.current === detail?.id) setReturnReason(DEFAULT_RETURN_REASON);
+        setReturnDrafts((current) => {
+          return Object.fromEntries(
+            Object.entries(current).filter(([key]) => key !== returnDraftKey),
+          );
+        });
+        returnUploads.current.delete(clientSubmissionId);
       },
     );
   };
@@ -2439,16 +2530,66 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         verification?.status ?? null,
                       ) ? (
                         <>
-                          <label className="return-reason">
-                            <span>打回原因</span>
-                            <textarea
-                              maxLength={5000}
-                              rows={3}
-                              placeholder="说明仍可复现的问题和需要调整的地方"
-                              onChange={(event) => setReturnReason(event.target.value)}
-                              value={returnReason}
-                            />
-                          </label>
+                          <section
+                            className="return-evidence"
+                            aria-label="打回理由和截图"
+                            onPaste={pasteReturnImages}
+                          >
+                            <label className="return-reason">
+                              <span>打回原因</span>
+                              <textarea
+                                maxLength={5000}
+                                rows={3}
+                                placeholder="说明仍可复现的问题和需要调整的地方，可直接 Ctrl+V 粘贴截图"
+                                disabled={mutation !== null}
+                                onChange={(event) =>
+                                  updateReturnDraft({ reason: event.target.value })
+                                }
+                                value={returnReason}
+                              />
+                            </label>
+                            <div className="return-image-tools">
+                              <span>在原因框内 Ctrl+V 粘贴截图 · {returnFiles.length}/8 张</span>
+                              <label>
+                                选择截图
+                                <input
+                                  aria-label="添加打回截图"
+                                  type="file"
+                                  accept="image/png,image/jpeg,image/webp"
+                                  multiple
+                                  disabled={mutation !== null}
+                                  onChange={(event) => {
+                                    appendReturnImages([...(event.target.files ?? [])]);
+                                    event.target.value = "";
+                                  }}
+                                />
+                              </label>
+                            </div>
+                            {returnImageError && <p role="alert">{returnImageError}</p>}
+                            {returnFilePreviews.length > 0 && (
+                              <div className="create-image-previews return-image-previews">
+                                {returnFilePreviews.map((preview, index) => (
+                                  <figure key={preview.url}>
+                                    <img src={preview.url} alt={`打回截图 ${index + 1}`} />
+                                    <figcaption>{preview.file.name}</figcaption>
+                                    <button
+                                      type="button"
+                                      aria-label={`移除打回截图 ${index + 1}`}
+                                      disabled={mutation !== null}
+                                      onClick={() => {
+                                        updateReturnDraft({
+                                          files: returnFiles.filter((_, i) => i !== index),
+                                        });
+                                        setReturnImageError(null);
+                                      }}
+                                    >
+                                      ×
+                                    </button>
+                                  </figure>
+                                ))}
+                              </div>
+                            )}
+                          </section>
                           <button
                             className="secondary-button"
                             disabled={mutation !== null || returnReason.trim().length === 0}
