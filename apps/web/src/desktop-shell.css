@@ -3,7 +3,6 @@
   min-height: 0;
   overflow-y: auto;
   padding-bottom: 12px;
-  scrollbar-width: thin;
 }
 
 .brand {
@@ -297,6 +296,19 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+body:has(.desktop-window) {
+  background: var(--window-bar-background);
+}
+.desktop-window {
+  --window-corner-radius: 8px;
+  height: 100vh;
+  overflow: clip;
+  background: var(--canvas);
+  border-radius: var(--window-corner-radius);
+}
+.desktop-window.is-square {
+  --window-corner-radius: 0px;
+}
 .desktop-window::after {
   content: "";
   position: fixed;
@@ -304,6 +316,7 @@
   z-index: 150;
   box-sizing: border-box;
   border: 2px solid var(--window-bar-background);
+  border-radius: var(--window-corner-radius);
   pointer-events: none;
 }
 .desktop-window .sidebar {

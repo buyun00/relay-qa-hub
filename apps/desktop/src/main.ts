@@ -546,7 +546,7 @@ function createWindow(): BrowserWindow {
     minWidth: 960,
     minHeight: 640,
     show: false,
-    backgroundColor: "#f4f7f5",
+    backgroundColor: "#192f25",
     title: "Relay QA Hub",
     titleBarStyle: "hidden",
     titleBarOverlay: { color: "#192f25", symbolColor: "#e8f0e8", height: 60 },
@@ -562,6 +562,16 @@ function createWindow(): BrowserWindow {
     },
   });
   installNavigationGuards(window);
+  const sendWindowState = () => {
+    window.webContents.send("desktop:window-state", {
+      maximized: window.isMaximized(),
+      fullScreen: window.isFullScreen(),
+    });
+  };
+  window.on("maximize", sendWindowState);
+  window.on("unmaximize", sendWindowState);
+  window.on("enter-full-screen", sendWindowState);
+  window.on("leave-full-screen", sendWindowState);
   window.on("close", (event) => {
     if (quitting) return;
     event.preventDefault();
@@ -578,6 +588,14 @@ function createWindow(): BrowserWindow {
 }
 
 function installIpcHandlers(): void {
+  ipcMain.handle("desktop:get-window-state", (event) => {
+    if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return null;
+    const window = BrowserWindow.fromWebContents(event.sender);
+    return {
+      maximized: window?.isMaximized() ?? false,
+      fullScreen: window?.isFullScreen() ?? false,
+    };
+  });
   ipcMain.removeHandler("desktop:notify-packaging");
   ipcMain.handle("desktop:notify-packaging", (event, value: unknown) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "") || !Notification.isSupported())

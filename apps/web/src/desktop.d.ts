@@ -44,6 +44,10 @@ type QaHubDesktopUpdateState =
 
 interface QaHubDesktopBridge {
   readonly windowControlsOverlay?: boolean;
+  readonly getWindowState?: () => Promise<{ maximized: boolean; fullScreen: boolean }>;
+  readonly onWindowState?: (
+    listener: (state: { maximized: boolean; fullScreen: boolean }) => void,
+  ) => () => void;
   readonly getConnectionStatus?: () => Promise<QaHubDesktopConnectionStatus>;
   readonly onConnectionStatus?: (
     listener: (status: QaHubDesktopConnectionStatus) => void,

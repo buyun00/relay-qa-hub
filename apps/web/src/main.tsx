@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import AuthGate from "./AuthGate";
+import DesktopWindow from "./DesktopWindow";
 import "./app.css";
 import "./desktop-shell.css";
 
@@ -13,8 +14,8 @@ if (rootElement === null) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <div className={window.qaHubDesktop?.windowControlsOverlay ? "desktop-window" : undefined}>
+    <DesktopWindow>
       <AuthGate />
-    </div>
+    </DesktopWindow>
   </StrictMode>,
 );

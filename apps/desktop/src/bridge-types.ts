@@ -47,6 +47,8 @@ export type DesktopUpdateState =
 
 export interface QaHubDesktopBridge {
   readonly windowControlsOverlay: boolean;
+  readonly getWindowState: () => Promise<DesktopWindowState>;
+  readonly onWindowState: (listener: (state: DesktopWindowState) => void) => () => void;
   readonly notifyPackaging: (notice: DesktopPackagingNotice) => Promise<boolean>;
   readonly onOpenPackaging: (listener: () => void) => () => void;
   readonly getConnectionStatus: () => Promise<DesktopConnectionStatus>;
@@ -59,6 +61,11 @@ export interface QaHubDesktopBridge {
   readonly onBugChanged: (listener: (change: DesktopBugChange) => void) => () => void;
   readonly onOpenBug: (listener: (bugId: string) => void) => () => void;
   readonly onUpdateState: (listener: (state: DesktopUpdateState) => void) => () => void;
+}
+
+export interface DesktopWindowState {
+  readonly maximized: boolean;
+  readonly fullScreen: boolean;
 }
 
 export interface DesktopPackagingNotice {

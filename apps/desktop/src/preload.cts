@@ -5,6 +5,7 @@ import type {
   DesktopConnectionStatus,
   DesktopRuntimeInfo,
   DesktopUpdateState,
+  DesktopWindowState,
   QaHubDesktopBridge,
 } from "./bridge-types.js";
 
@@ -23,6 +24,13 @@ const STATES = new Set([
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseWindowState(value: unknown): DesktopWindowState {
+  return {
+    maximized: isRecord(value) && value["maximized"] === true,
+    fullScreen: isRecord(value) && value["fullScreen"] === true,
+  };
 }
 
 function parseStatus(value: unknown): DesktopConnectionStatus {
@@ -192,6 +200,13 @@ ipcRenderer.on("desktop:update-state", (_event: IpcRendererEvent, value: unknown
 
 const bridge: QaHubDesktopBridge = {
   windowControlsOverlay: true,
+  getWindowState: async () =>
+    parseWindowState(await ipcRenderer.invoke("desktop:get-window-state")),
+  onWindowState: (listener) => {
+    const handler = (_event: IpcRendererEvent, value: unknown) => listener(parseWindowState(value));
+    ipcRenderer.on("desktop:window-state", handler);
+    return () => ipcRenderer.removeListener("desktop:window-state", handler);
+  },
   notifyPackaging: async (notice) =>
     (await ipcRenderer.invoke("desktop:notify-packaging", {
       id: notice.id,
