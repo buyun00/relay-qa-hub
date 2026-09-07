@@ -311,13 +311,7 @@ export function canDirectCloseBug(
   hasRepairAttempt: boolean,
   verificationStatus: VerificationRecord["status"] | null,
 ): boolean {
-  return (
-    state === "ready_for_verification" &&
-    hasRepairAttempt &&
-    (verificationStatus === null ||
-      verificationStatus === "requested" ||
-      verificationStatus === "in_progress")
-  );
+  return canReturnCompletedBug(state, hasRepairAttempt, verificationStatus);
 }
 
 export function canReturnCompletedBug(
@@ -326,7 +320,7 @@ export function canReturnCompletedBug(
   verificationStatus: VerificationRecord["status"] | null,
 ): boolean {
   return (
-    (state === "awaiting_build" || state === "ready_for_verification") &&
+    taskStatusForBugState(state) === "verification" &&
     hasRepairAttempt &&
     (verificationStatus === null ||
       verificationStatus === "requested" ||
@@ -335,7 +329,8 @@ export function canReturnCompletedBug(
 }
 
 export function canManuallyCompleteBug(state: BugListState): boolean {
-  return ["reported", "needs_info", "ready", "in_progress", "awaiting_build"].includes(state);
+  const status = taskStatusForBugState(state);
+  return status === "pending" || status === "inProgress";
 }
 
 export function canCompleteDeliveredTask(
@@ -2574,9 +2569,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                             onClick={() => void returnBug()}
                             type="button"
                           >
-                            {repairAttempt?.mode === "relay"
-                              ? "打回并让 Relay 继续制作"
-                              : "验收不通过，打回待处理"}
+                            验收不通过，打回待处理
                           </button>
                         </>
                       ) : null}
@@ -2591,7 +2584,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           onClick={() => void acceptBug()}
                           type="button"
                         >
-                          直接关闭
+                          验收通过并关闭
                         </button>
                       ) : null}
                       {detail.state !== "closed" &&
@@ -2610,7 +2603,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <p className="action-note action-note-left">这条 Bug 已验收并关闭。</p>
                       ) : null}
                       {detail.state !== "closed" &&
-                      detail.state !== "ready_for_verification" &&
+                      taskStatusForBugState(detail.state) !== "verification" &&
                       !isOwner ? (
                         <p className="action-note action-note-left">
                           {detail.ownerId === null

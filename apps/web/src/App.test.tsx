@@ -20,15 +20,10 @@ import { product } from "./product";
 
 describe("Relay QA Hub browser workbench", () => {
   it("keeps manual completion available independently of executor and assignee", () => {
-    for (const state of [
-      "reported",
-      "needs_info",
-      "ready",
-      "in_progress",
-      "awaiting_build",
-    ] as const)
+    for (const state of ["reported", "needs_info", "ready", "in_progress"] as const)
       expect(canManuallyCompleteBug(state)).toBe(true);
     for (const state of [
+      "awaiting_build",
       "ready_for_verification",
       "closed",
       "duplicate",
@@ -78,7 +73,7 @@ describe("Relay QA Hub browser workbench", () => {
   });
 
   it("exposes the build and frozen contract versions", () => {
-    expect(product.appVersion).toBe("2.0.6");
+    expect(product.appVersion).toBe("2.0.7");
     expect(product.contractVersion).toBe("1.0.0");
   });
 
@@ -151,11 +146,21 @@ describe("Relay QA Hub browser workbench", () => {
     expect(updateQingyuDefectSelection(both, "defect-1", false)).toEqual(["defect-2"]);
   });
 
-  it("lets any project member directly close a ready Bug without identity checks", () => {
-    expect(canDirectCloseBug("ready_for_verification", true, null)).toBe(true);
-    expect(canDirectCloseBug("ready_for_verification", true, "requested")).toBe(true);
-    expect(canDirectCloseBug("ready_for_verification", true, "in_progress")).toBe(true);
+  it("offers the same acceptance actions for both completed workflow stages", () => {
+    for (const state of ["awaiting_build", "ready_for_verification"] as const) {
+      for (const status of [null, "requested", "in_progress"] as const) {
+        expect(canDirectCloseBug(state, true, status)).toBe(true);
+        expect(canReturnCompletedBug(state, true, status)).toBe(true);
+      }
+      expect(canManuallyCompleteBug(state)).toBe(false);
+      expect(canDirectCloseBug(state, false, null)).toBe(false);
+      for (const status of ["passed", "failed", "blocked"] as const) {
+        expect(canDirectCloseBug(state, true, status)).toBe(false);
+        expect(canReturnCompletedBug(state, true, status)).toBe(false);
+      }
+    }
     expect(canDirectCloseBug("in_progress", true, null)).toBe(false);
+    expect(canDirectCloseBug("closed", true, "passed")).toBe(false);
   });
 
   it("lets any project member reject a completed Bug back to pending", () => {
