@@ -96,6 +96,7 @@ import {
 import {
   claimMobileRelayOutbox,
   completeMobileBugForVerification,
+  manuallyCompleteMobileBug,
   completeMobileRelayOutbox,
   continueMobileRelay,
   createMobileManualRepairAttempt,
@@ -112,6 +113,7 @@ import {
   updateMobileBug,
   type CompleteMobileRelayOutboxInput,
   type CompleteMobileBugForVerificationInput,
+  type ManuallyCompleteMobileBugInput,
   type ContinueMobileRelayInput,
   type CreateMobileManualRepairAttemptInput,
   type CreateMobileRelayAttemptInput,
@@ -221,6 +223,7 @@ interface WorkerRequest {
     | "startMobileRepairAttempt"
     | "deliverMobileRepairAttempt"
     | "completeMobileBugForVerification"
+    | "manuallyCompleteMobileBug"
     | "linkMobileBuildRepair"
     | "dispatchMobileRelay"
     | "continueMobileRelay"
@@ -670,6 +673,12 @@ async function execute(request: WorkerRequest): Promise<unknown> {
         current,
         request.payload as CompleteMobileBugForVerificationInput,
       ),
+    );
+  }
+
+  if (request.operation === "manuallyCompleteMobileBug") {
+    return inWriteTransaction((current) =>
+      manuallyCompleteMobileBug(current, request.payload as ManuallyCompleteMobileBugInput),
     );
   }
 

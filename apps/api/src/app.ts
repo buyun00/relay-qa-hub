@@ -136,6 +136,7 @@ import {
 } from "./browser-auth.js";
 import {
   MOBILE_BUG_COMPLETE_PATH,
+  MOBILE_BUG_MANUAL_COMPLETE_PATH,
   MOBILE_BUG_REPAIR_ATTEMPTS_PATH,
   MOBILE_BUG_TRANSITION_PATH,
   MOBILE_REPAIR_ATTEMPT_DELIVER_PATH,
@@ -146,6 +147,7 @@ import {
   MOBILE_RELAY_RECEIPT_PATH,
   parseMobileBugReadyRequest,
   parseMobileBugCompleteRequest,
+  parseMobileBugManualCompleteRequest,
   parseMobileRepairAttemptDeliveryRequest,
   parseMobileRepairAttemptRequest,
   parseMobileRepairAttemptStartRequest,
@@ -356,6 +358,9 @@ const unconfiguredMobileCaptureStore: MobileCaptureStore = {
 
 const unconfiguredMobileRelayStore: MobileRelayStore = {
   transitionBugReady: () => {
+    throw new Error("MobileRelayStore is not configured");
+  },
+  manuallyCompleteBug: () => {
     throw new Error("MobileRelayStore is not configured");
   },
   completeBugForVerification: () => {
@@ -1660,6 +1665,34 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       return relayErrorReply(error, reply);
     }
   });
+
+  app.post<{ Params: { bugId: string } }>(
+    MOBILE_BUG_MANUAL_COMPLETE_PATH,
+    async (request, reply) => {
+      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+        return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+      }
+      try {
+        const bugId = requireRelayUuid(request.params.bugId, "bugId");
+        const body = parseMobileBugManualCompleteRequest(request.body);
+        const idempotencyKey = requireRelayIdempotencyKey(
+          readHeader(request.headers["idempotency-key"]),
+        );
+        if (idempotencyKey !== `workflow:manualCompleteBug:bug:${bugId}:v${body.expectedVersion}`) {
+          throw new TypeError("Idempotency-Key does not match task completion");
+        }
+        const result = await mobileRelayStore.manuallyCompleteBug({
+          actorId: authenticatedActorId(request, debugActorId),
+          bugId,
+          idempotencyKey,
+          request: body,
+        });
+        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+      } catch (error: unknown) {
+        return relayErrorReply(error, reply);
+      }
+    },
+  );
 
   app.post<{ Params: { bugId: string } }>(
     MOBILE_BUG_REPAIR_ATTEMPTS_PATH,

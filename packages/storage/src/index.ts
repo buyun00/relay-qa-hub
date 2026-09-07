@@ -398,6 +398,7 @@ export {
   MobileRelayStorageError,
   claimMobileRelayOutbox,
   completeMobileBugForVerification,
+  manuallyCompleteMobileBug,
   completeMobileRelayOutbox,
   continueMobileRelay,
   createMobileManualRepairAttempt,
@@ -413,6 +414,7 @@ export {
 export type {
   CompleteMobileRelayOutboxInput,
   CompleteMobileBugForVerificationInput,
+  ManuallyCompleteMobileBugInput,
   ContinueMobileRelayInput,
   CreateMobileManualRepairAttemptInput,
   CreateMobileRelayAttemptInput,

@@ -169,6 +169,11 @@ export interface CompleteMobileBugForVerificationInput extends MobileRelayScope 
   readonly createdAt: string;
 }
 
+export type ManuallyCompleteMobileBugInput = Omit<
+  CompleteMobileBugForVerificationInput,
+  "repairAttemptId"
+>;
+
 export interface MobileRepairAttemptRecord {
   readonly id: string;
   readonly bugId: string;
@@ -2204,6 +2209,219 @@ export function deliverMobileRepairAttempt(
   if (!row)
     throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt disappeared after delivery");
   return toManualAttempt(row);
+}
+
+/** One local transaction replaces executor authority with a recorded human decision. */
+export function manuallyCompleteMobileBug(
+  database: DatabaseSync,
+  input: ManuallyCompleteMobileBugInput,
+): MobileBugRecord {
+  requireTransaction(database);
+  requireWorkflowText(input.reason, "reason", 5_000);
+  requireWorkflowText(input.idempotencyKey, "idempotencyKey", 200);
+  if (!SHA256_PATTERN.test(input.requestDigest)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "requestDigest is invalid");
+  }
+  assertBugUpdateActor(database, input);
+  const bug = readBugRow(database, input, input.bugId);
+  if (!bug || database.prepare("SELECT 1 FROM bug_deletions WHERE bug_id=?").get(input.bugId)) {
+    throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+  }
+  const replay = database
+    .prepare(
+      `SELECT request_digest, attempt_id FROM manual_completion_requests
+    WHERE account_id=? AND project_id=? AND bug_id=? AND actor_id=? AND idempotency_key=?`,
+    )
+    .get(input.accountId, input.projectId, input.bugId, input.actorId, input.idempotencyKey) as
+    { request_digest: string; attempt_id: string } | undefined;
+  if (replay) {
+    if (replay.request_digest !== input.requestDigest) {
+      throw new MobileRelayStorageError(
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "Manual completion key has a different payload",
+      );
+    }
+    return toBug(bug);
+  }
+  if (
+    bug.version !== input.expectedVersion ||
+    !["reported", "needs_info", "ready", "in_progress", "awaiting_build"].includes(bug.state)
+  ) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Bug is no longer open at the expected version",
+    );
+  }
+  const pointers = database
+    .prepare(`SELECT active_repair_attempt_id, active_verification_id FROM bugs WHERE id=?`)
+    .get(bug.id) as {
+    active_repair_attempt_id: string | null;
+    active_verification_id: string | null;
+  };
+  if (pointers.active_verification_id !== null) {
+    throw new MobileRelayStorageError("VERSION_CONFLICT", "Bug already has an active verification");
+  }
+  const previous =
+    pointers.active_repair_attempt_id === null
+      ? null
+      : (database
+          .prepare("SELECT id,status,version,updated_at FROM repair_attempts WHERE id=?")
+          .get(pointers.active_repair_attempt_id) as {
+          id: string;
+          status: string;
+          version: number;
+          updated_at: string;
+        } | null);
+  const at = nextTimestamp(
+    input.createdAt,
+    previous && previous.updated_at > bug.updated_at ? previous.updated_at : bug.updated_at,
+  );
+  const attemptId = randomUUID();
+  const eventId = randomUUID();
+  insertUserEvent(database, {
+    ...input,
+    id: eventId,
+    type: "bug.manual_completion_started",
+    aggregateType: "bug",
+    aggregateId: bug.id,
+    aggregateSequence: nextBugAggregateSequence(database, input, bug.id),
+    resourceType: "bug",
+    resourceId: bug.id,
+    resourceVersionAfter: bug.version + 1,
+    correlationId: eventId,
+    fromState: bug.state,
+    toState: "ready",
+    payload: {
+      status: "ready",
+      repairAttemptId: attemptId,
+      reason: toBoundedAuditText(input.reason),
+      fromVersion: bug.version,
+      toVersion: bug.version + 1,
+    },
+    createdAt: at,
+  });
+  database
+    .prepare(
+      `INSERT INTO manual_completion_requests(account_id,project_id,bug_id,actor_id,
+    idempotency_key,request_digest,expected_bug_version,previous_attempt_id,attempt_id,event_id,created_at)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+    )
+    .run(
+      input.accountId,
+      input.projectId,
+      bug.id,
+      input.actorId,
+      input.idempotencyKey,
+      input.requestDigest,
+      bug.version,
+      pointers.active_repair_attempt_id,
+      attemptId,
+      eventId,
+      at,
+    );
+  if (
+    previous &&
+    ["planned", "queued", "running", "needs_input", "blocked"].includes(previous.status)
+  ) {
+    insertUserEvent(database, {
+      ...input,
+      id: randomUUID(),
+      type: "repair_attempt.superseded",
+      aggregateType: "repair_attempt",
+      aggregateId: previous.id,
+      aggregateSequence: nextAttemptAggregateSequence(database, input, previous.id),
+      resourceType: "repair_attempt",
+      resourceId: previous.id,
+      resourceVersionAfter: previous.version + 1,
+      correlationId: eventId,
+      fromState: null,
+      toState: null,
+      payload: {
+        status: "superseded",
+        repairAttemptId: previous.id,
+        reason: toBoundedAuditText(input.reason),
+        fromVersion: previous.version,
+        toVersion: previous.version + 1,
+      },
+      createdAt: at,
+    });
+    database
+      .prepare(
+        "UPDATE repair_attempts SET status='superseded',version=version+1,updated_at=? WHERE id=? AND version=?",
+      )
+      .run(at, previous.id, previous.version);
+  }
+  database
+    .prepare(
+      `UPDATE bugs SET state='ready',active_repair_attempt_id=NULL,updated_at=?,version=version+1
+    WHERE id=? AND version=?`,
+    )
+    .run(at, bug.id, bug.version);
+  const startedAt = nextTimestamp(at, at);
+  insertUserEvent(database, {
+    ...input,
+    id: randomUUID(),
+    type: "repair_attempt.created",
+    aggregateType: "repair_attempt",
+    aggregateId: attemptId,
+    aggregateSequence: 1,
+    resourceType: "repair_attempt",
+    resourceId: attemptId,
+    resourceVersionAfter: 1,
+    correlationId: eventId,
+    fromState: "ready",
+    toState: "in_progress",
+    payload: {
+      status: "planned",
+      repairAttemptId: attemptId,
+      fromVersion: bug.version + 1,
+      toVersion: bug.version + 2,
+    },
+    createdAt: startedAt,
+  });
+  database
+    .prepare(
+      `INSERT INTO repair_attempts(id,account_id,project_id,bug_id,sequence,mode,status,assignee_id,
+    summary,parent_attempt_id,created_at,updated_at,version) VALUES (?,?,?,?,
+      (SELECT COALESCE(MAX(sequence),0)+1 FROM repair_attempts WHERE bug_id=?), 'human','planned',?,?,?,?, ?,1)`,
+    )
+    .run(
+      attemptId,
+      input.accountId,
+      input.projectId,
+      bug.id,
+      bug.id,
+      input.actorId,
+      input.reason,
+      previous?.id ?? null,
+      startedAt,
+      startedAt,
+    );
+  database
+    .prepare(
+      "UPDATE bugs SET state='in_progress',active_repair_attempt_id=?,updated_at=?,version=version+1 WHERE id=? AND version=?",
+    )
+    .run(attemptId, startedAt, bug.id, bug.version + 1);
+  const started = startMobileRepairAttempt(database, {
+    ...input,
+    attemptId,
+    expectedVersion: 1,
+    createdAt: startedAt,
+  });
+  deliverMobileRepairAttempt(database, {
+    ...input,
+    attemptId,
+    expectedVersion: started.version,
+    summary: input.reason,
+    createdAt: startedAt,
+    deliveryKind: "no_code",
+    branch: null,
+    commitSha: null,
+    mergeRequestUrl: null,
+    patchUrl: null,
+    noCodeReason: "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+  });
+  return toBug(readBugRow(database, input, bug.id)!);
 }
 
 export function completeMobileBugForVerification(

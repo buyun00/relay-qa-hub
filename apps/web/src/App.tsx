@@ -17,7 +17,7 @@ import {
   createRelayAttempt,
   createVerification,
   deleteBug,
-  deliverHumanRepairAttemptNoCode,
+  manuallyCompleteBug,
   dispatchRelay,
   downloadAttachment,
   downloadCaptureArtifact,
@@ -334,6 +334,10 @@ export function canReturnCompletedBug(
   );
 }
 
+export function canManuallyCompleteBug(state: BugListState): boolean {
+  return ["reported", "needs_info", "ready", "in_progress", "awaiting_build"].includes(state);
+}
+
 export function canCompleteDeliveredTask(
   state: BugListState,
   repairAttemptStatus: NonNullable<HumanWorkflowSnapshot["repairAttempt"]>["status"] | null,
@@ -412,6 +416,8 @@ function eventCopy(event: BugEvent): string {
     "bug.comment_added": "添加了处理记录",
     "repair_attempt.created": "建立了处理任务",
     "repair_attempt.started": "开始处理",
+    "bug.manual_completion_started": "人工接管并标记完成",
+    "repair_attempt.superseded": "原修复记录已由人工接管",
     "repair_attempt.delivered": "标记修复完成",
     "bug.completed_for_verification": "已完成，等待验收",
     "verification.requested": "修复已完成，等待验收",
@@ -1262,36 +1268,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   };
 
   const completeWork = async () => {
-    if (
-      detail === null ||
-      workflow?.repairAttempt === null ||
-      workflow?.repairAttempt === undefined
-    )
-      return;
-    const attempt = workflow.repairAttempt;
+    if (detail === null) return;
     await runCurrentBugMutation("已完成待验收，等待验收人处理", async () => {
-      await deliverHumanRepairAttemptNoCode(
-        attempt.id,
-        attempt.version,
-        "已由人工完成修复并提交关闭",
-        "本次处理无需独立代码或构建产物",
-      );
-      const nextBug = await getBug(detail.id);
-      await createVerification({
-        bugId: nextBug.id,
-        expectedBugVersion: nextBug.version,
-        repairAttemptId: attempt.id,
-        buildId: null,
-        verifierId: nextBug.verificationOwnerId ?? principal.userId,
-        criteria: nextBug.expectedBehavior || "关闭人确认问题已解决且未引入回归",
-      });
-    });
-  };
-
-  const completeDeliveredWork = async () => {
-    if (detail === null || repairAttempt === null) return;
-    await runCurrentBugMutation("已完成待验收，等待验收人处理", async () => {
-      await completeBugForVerification(detail.id, detail.version, repairAttempt.id);
+      await manuallyCompleteBug(detail.id, detail.version);
     });
   };
 
@@ -2508,16 +2487,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           开始处理
                         </button>
                       ) : null}
-                      {repairAttempt?.mode === "human" &&
-                      repairAttempt.status === "running" &&
-                      isOwner ? (
+                      {canManuallyCompleteBug(detail.state) ? (
                         <button
                           className="primary-button wide"
                           disabled={mutation !== null}
                           onClick={() => void completeWork()}
                           type="button"
                         >
-                          标记修复完成
+                          人工标记完成
                         </button>
                       ) : null}
                       {canReturnCompletedBug(
@@ -2597,16 +2574,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                               : "验收不通过，打回待处理"}
                           </button>
                         </>
-                      ) : null}
-                      {canCompleteDeliveredTask(detail.state, repairAttempt?.status ?? null) ? (
-                        <button
-                          className="primary-button wide"
-                          disabled={mutation !== null}
-                          onClick={() => void completeDeliveredWork()}
-                          type="button"
-                        >
-                          已完成
-                        </button>
                       ) : null}
                       {canDirectCloseBug(
                         detail.state,

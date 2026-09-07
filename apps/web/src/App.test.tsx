@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import App, {
   canSaveBugDetailDraft,
   canCompleteDeliveredTask,
+  canManuallyCompleteBug,
   canDirectCloseBug,
   canReturnCompletedBug,
   canSubmitNewBug,
@@ -18,6 +19,24 @@ import { QaHubApiError, type BugDetail } from "./api";
 import { product } from "./product";
 
 describe("Relay QA Hub browser workbench", () => {
+  it("keeps manual completion available independently of executor and assignee", () => {
+    for (const state of [
+      "reported",
+      "needs_info",
+      "ready",
+      "in_progress",
+      "awaiting_build",
+    ] as const)
+      expect(canManuallyCompleteBug(state)).toBe(true);
+    for (const state of [
+      "ready_for_verification",
+      "closed",
+      "duplicate",
+      "rejected",
+      "deferred",
+    ] as const)
+      expect(canManuallyCompleteBug(state)).toBe(false);
+  });
   it("keeps exactly four task statuses and exposes the shared overview", () => {
     const markup = renderToStaticMarkup(
       <App
@@ -59,7 +78,7 @@ describe("Relay QA Hub browser workbench", () => {
   });
 
   it("exposes the build and frozen contract versions", () => {
-    expect(product.appVersion).toBe("2.0.2");
+    expect(product.appVersion).toBe("2.0.3");
     expect(product.contractVersion).toBe("1.0.0");
   });
 

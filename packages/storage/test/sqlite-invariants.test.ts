@@ -34,6 +34,7 @@ import { listMobileBugs } from "../src/mobile-bug-list-store.ts";
 import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.ts";
 import {
   completeMobileBugForVerification,
+  manuallyCompleteMobileBug,
   createMobileManualRepairAttempt,
   createMobileRelayAttempt,
   deliverMobileRepairAttempt,
@@ -50,6 +51,271 @@ import {
 const CREATED_AT = "2026-08-25T00:00:00.000Z";
 const UPDATED_AT = "2026-08-25T00:01:00.000Z";
 const FINALIZED_AT = "2026-08-25T00:02:00.000Z";
+
+test("manual completion takes priority over every Relay status, preserves history and remains verifiable", async () => {
+  await withDatabase((database) => {
+    const tenant = seedTenant(database, 8_500, "MANUAL");
+    const scope = {
+      accountId: tenant.accountId,
+      projectId: tenant.projectId,
+      actorId: tenant.userId,
+    };
+    const human = { ...scope, actorId: tenant.secondaryUserId };
+    const at = databaseTime(database);
+    insertActiveMembershipRole(database, tenant, identifier(8_501), "triager");
+    insertActiveMembershipRole(database, tenant, identifier(8_502), "developer");
+    insertActiveMembershipRole(
+      database,
+      tenant,
+      identifier(8_503),
+      "viewer",
+      tenant.secondaryUserId,
+    );
+    const principalId = identifier(8_504);
+    insertServicePrincipal(database, tenant, principalId);
+    for (const [index, status] of (
+      ["failed", "needs_input", "running", "submitted", "blocked"] as const
+    ).entries()) {
+      const bugId = identifier(8_520 + index),
+        handoffId = identifier(8_530 + index);
+      createBug(database, tenant, bugId, "Manual completion " + status, {
+        ownerId: tenant.userId,
+        verificationOwnerId: tenant.userId,
+      });
+      const common = {
+        ...scope,
+        bugId,
+        createdAt: at,
+        idempotencyKey: "ready-" + index,
+        requestDigest: digest(8_600 + index),
+      };
+      const ready = transaction(database, () =>
+        transitionMobileBugReady(database, { ...common, expectedVersion: 1 }),
+      );
+      const attempt = transaction(database, () =>
+        createMobileRelayAttempt(database, {
+          ...common,
+          expectedVersion: ready.version,
+          assigneeId: tenant.userId,
+          summary: null,
+        }),
+      );
+      transaction(database, () =>
+        dispatchMobileRelay(database, {
+          ...common,
+          attemptId: attempt.id,
+          expectedVersion: 1,
+          handoffId,
+          selectedAttachmentIds: [],
+          relayInstanceId: "relay-main",
+          qaInstanceId: "qa-local",
+          relayPrincipalId: principalId,
+        }),
+      );
+      const webhook = (eventType: typeof status | "fix_delivered", revision: number) => {
+        const payload = {
+          schemaVersion: "1.0",
+          relayInstanceId: "relay-main",
+          attemptId: attempt.id,
+          handoffId,
+          deliveryId: handoffId + revision,
+          eventId: handoffId + revision,
+          eventType,
+          externalRevision: revision,
+          occurredAt: at,
+          payload: {
+            taskId: "task-" + index,
+            turnId: "turn-" + revision,
+            ...(eventType === "fix_delivered"
+              ? {
+                  deliveryEvidence: {
+                    pushed: true,
+                    verified: true,
+                    branch: "codex/manual",
+                    commitSha: "a".repeat(40),
+                    remoteSha: "a".repeat(40),
+                  },
+                }
+              : {}),
+          },
+        };
+        const rawPayloadJson = JSON.stringify(payload);
+        return {
+          ...scope,
+          ...payload,
+          taskId: "task-" + index,
+          turnId: "turn-" + revision,
+          rawPayloadJson,
+          receivedAt: at,
+          payloadDigest: createHash("sha256").update(rawPayloadJson).digest("hex"),
+          ...(eventType === "fix_delivered"
+            ? { branch: "codex/manual", commitSha: "a".repeat(40), remoteSha: "a".repeat(40) }
+            : {}),
+        };
+      };
+      transaction(database, () => receiveMobileRelayWebhook(database, webhook(status, 1)));
+      const input = {
+        ...human,
+        bugId,
+        expectedVersion: 3,
+        reason: "Human confirms the fix, submit for acceptance",
+        idempotencyKey: "manual-" + index,
+        requestDigest: digest(8_700 + index),
+        createdAt: at,
+      };
+      assert.throws(
+        () =>
+          transaction(database, () =>
+            manuallyCompleteMobileBug(database, { ...input, expectedVersion: 2 }),
+          ),
+        /expected version/,
+      );
+      const completed = transaction(database, () => manuallyCompleteMobileBug(database, input));
+      assert.equal(completed.state, "ready_for_verification");
+      assert.equal(completed.ownerId, tenant.userId);
+      assert.equal(completed.verificationOwnerId, tenant.userId);
+      const workflow = getMobileHumanWorkflowForBug(database, { ...human, bugId });
+      assert.equal(workflow.repairAttempt?.mode, "human");
+      assert.equal(workflow.repairAttempt?.status, "delivered");
+      assert.equal(workflow.repairAttempt?.assigneeId, human.actorId);
+      assert.equal(
+        database.prepare("SELECT status FROM repair_attempts WHERE id=?").get(attempt.id)?.status,
+        "superseded",
+      );
+      assert.equal(
+        database.prepare("SELECT count(*) AS n FROM repair_attempts WHERE bug_id=?").get(bugId)?.n,
+        2,
+      );
+      assert.equal(database.prepare("SELECT count(*) AS n FROM builds").get()?.n, 0);
+      assert.deepEqual(
+        transaction(database, () => manuallyCompleteMobileBug(database, input)),
+        completed,
+      );
+      assert.throws(
+        () =>
+          transaction(database, () =>
+            manuallyCompleteMobileBug(database, {
+              ...input,
+              reason: "different",
+              requestDigest: digest(8_800 + index),
+            }),
+          ),
+        /different payload/,
+      );
+      // Old receipts may be retained or refused; they must never take the active round back.
+      try {
+        transaction(database, () =>
+          receiveMobileRelayWebhook(database, webhook("fix_delivered", 2)),
+        );
+      } catch (error) {
+        assert.match(String(error), /active exact handoff/);
+      }
+      assert.equal(
+        transaction(database, () => projectRelayDeliveries(database, at)),
+        0,
+      );
+      assert.deepEqual(
+        getMobileHumanWorkflowForBug(database, { ...human, bugId }).repairAttempt,
+        workflow.repairAttempt,
+      );
+      const verification = transaction(database, () =>
+        createMobileVerification(database, {
+          ...scope,
+          bugId,
+          expectedVersion: completed.version,
+          repairAttemptId: workflow.repairAttempt!.id,
+          buildId: null,
+          verifierId: tenant.userId,
+          criteria: "Verify the human fix",
+          idempotencyKey: "verify-" + index,
+          requestDigest: digest(8_900 + index),
+          createdAt: at,
+        }),
+      );
+      assert.equal(verification.status, "requested");
+      const started = transaction(database, () =>
+        startMobileVerification(database, {
+          ...scope,
+          verificationId: verification.id,
+          expectedVersion: verification.version,
+          reason: null,
+          idempotencyKey: "start-" + index,
+          requestDigest: digest(9_000 + index),
+          createdAt: at,
+        }),
+      );
+      const result = transaction(database, () =>
+        recordMobileVerificationResult(database, {
+          ...scope,
+          verificationId: verification.id,
+          expectedVersion: started.version,
+          status: "passed",
+          failureReason: null,
+          resultSummary: "Human acceptance passed",
+          clientSubmissionId: identifier(9_100 + index),
+          attachmentIds: [],
+          captureBundleId: null,
+          idempotencyKey: "result-" + index,
+          requestDigest: digest(9_200 + index),
+          createdAt: at,
+        }),
+      );
+      assert.equal(result.bug.state, "closed");
+    }
+    // A pending/unassigned Bug can also be completed by another active member.
+    const pendingId = identifier(8_550);
+    createBug(database, tenant, pendingId, "Manual completion without executor");
+    const pendingInput = {
+      ...human,
+      bugId: pendingId,
+      expectedVersion: 1,
+      reason: "Handled by a person",
+      idempotencyKey: "rollback-proof",
+      requestDigest: digest(8_951),
+      createdAt: at,
+    };
+    assert.throws(
+      () =>
+        transaction(database, () =>
+          manuallyCompleteMobileBug(database, { ...pendingInput, actorId: identifier(8_999) }),
+        ),
+      /membership/,
+    );
+    const beforeFailure = database.prepare("SELECT count(*) AS n FROM events").get()?.n;
+    database.exec(
+      "CREATE TEMP TRIGGER reject_manual_delivery BEFORE INSERT ON build_requirements BEGIN SELECT RAISE(ABORT,'forced delivery failure'); END;",
+    );
+    assert.throws(
+      () => transaction(database, () => manuallyCompleteMobileBug(database, pendingInput)),
+      /forced delivery failure/,
+    );
+    database.exec("DROP TRIGGER reject_manual_delivery");
+    assert.equal(
+      database.prepare("SELECT state FROM bugs WHERE id=?").get(pendingId)?.state,
+      "reported",
+    );
+    assert.equal(database.prepare("SELECT count(*) AS n FROM events").get()?.n, beforeFailure);
+    assert.equal(
+      database
+        .prepare("SELECT count(*) AS n FROM manual_completion_requests WHERE bug_id=?")
+        .get(pendingId)?.n,
+      0,
+    );
+    const pending = transaction(database, () =>
+      manuallyCompleteMobileBug(database, {
+        ...human,
+        bugId: pendingId,
+        expectedVersion: 1,
+        reason: "Handled by a person",
+        idempotencyKey: "manual-pending",
+        requestDigest: digest(8_950),
+        createdAt: at,
+      }),
+    );
+    assert.equal(pending.state, "ready_for_verification");
+    assertIntegrity(database);
+  });
+});
 
 test("verified Relay delivery, human rejection, durable next round and human acceptance preserve history", async () => {
   await withDatabase((database) => {

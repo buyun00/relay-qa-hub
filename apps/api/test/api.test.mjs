@@ -1187,3 +1187,45 @@ test("normalizes an explicit set of exact browser origins", () => {
     /not both/u,
   );
 });
+
+test("manual completion route binds the authenticated human, exact version and idempotency key", async (t) => {
+  const bugId = "10000000-0000-4000-8000-000000000032";
+  const actorId = "10000000-0000-4000-8000-000000000031";
+  const calls = [];
+  const app = createApiApp({
+    logger: false,
+    debugBearerToken: "manual-test-token",
+    debugActorId: actorId,
+    mobileRelayStore: {
+      async manuallyCompleteBug(command) {
+        calls.push(command);
+        return { id: bugId, state: "ready_for_verification" };
+      },
+    },
+  });
+  t.after(() => app.close());
+  const url = `/api/v1/bugs/${bugId}/manual-complete`;
+  const key = `workflow:manualCompleteBug:bug:${bugId}:v3`;
+  const payload = { expectedVersion: 3, reason: "Human confirms completion" };
+  const headers = { authorization: "Bearer manual-test-token", "idempotency-key": key };
+  assert.equal((await app.inject({ method: "POST", url, payload })).statusCode, 401);
+  assert.equal(
+    (
+      await app.inject({
+        method: "POST",
+        url,
+        payload,
+        headers: { ...headers, "idempotency-key": "wrong" },
+      })
+    ).statusCode,
+    400,
+  );
+  assert.equal(
+    (await app.inject({ method: "POST", url, payload: { ...payload, actorId: "forged" }, headers }))
+      .statusCode,
+    400,
+  );
+  const result = await app.inject({ method: "POST", url, payload, headers });
+  assert.equal(result.statusCode, 200);
+  assert.deepEqual(calls, [{ actorId, bugId, idempotencyKey: key, request: payload }]);
+});

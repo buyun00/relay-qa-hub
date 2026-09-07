@@ -16,6 +16,7 @@ const adrFiles = [
   "ADR-0008-optional-qingyu-adapter.md",
   "ADR-0009-independent-local-closure.md",
   "ADR-0010-relay-delivery-and-verification-sync.md",
+  "ADR-0011-human-completion-priority.md",
 ];
 
 const requiredSections = [

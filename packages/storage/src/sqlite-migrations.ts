@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { manualCompletionMigration } from "./manual-completion-migration.js";
 import { relayLifecycleMigration } from "./relay-lifecycle-migration.js";
 
 export interface SqliteMigration {
@@ -7463,7 +7464,7 @@ function migration(version: number, name: string, sql: string): SqliteMigration 
   });
 }
 
-export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
+const baseMigrations: readonly SqliteMigration[] = Object.freeze([
   migration(1, "app_first_core", CORE_SCHEMA_SQL),
   migration(2, "bug_full_text_search", FTS_SCHEMA_SQL),
   migration(3, "domain_audit_alignment", DOMAIN_AUDIT_ALIGNMENT_SQL),
@@ -7486,6 +7487,15 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
         THREE_STATE_TASK_COMPLETION_SQL,
       ].join("\n"),
     ),
+  ),
+]);
+
+export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
+  ...baseMigrations,
+  migration(
+    12,
+    "human_completion_priority",
+    manualCompletionMigration(baseMigrations.map((entry) => entry.sql).join("\n")),
   ),
 ]);
 

@@ -15,6 +15,8 @@ These accepted records freeze the P0 architecture boundary for Relay QA Hub. Lat
 | [ADR-0009](ADR-0009-independent-local-closure.md) | Local human closure commits before optional Qingyu synchronization; upstream failure never blocks it |
 | [ADR-0010](ADR-0010-relay-delivery-and-verification-sync.md) | Verified Relay delivery enters human acceptance; rejection continues the original task and acceptance synchronizes closure |
 
+| [ADR-0011](ADR-0011-human-completion-priority.md) | Human completion takes priority over executor state and preserves acceptance, audit and prior repair history |
+
 ## Immutable-principle coverage
 
 The numbering below matches section 1 of `docs/IMPLEMENTATION_PLAN.md`.

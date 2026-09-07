@@ -8,6 +8,7 @@ import type {
 } from "@relay-qa-hub/storage";
 
 export const MOBILE_BUG_TRANSITION_PATH = "/api/v1/bugs/:bugId/transitions" as const;
+export const MOBILE_BUG_MANUAL_COMPLETE_PATH = "/api/v1/bugs/:bugId/manual-complete" as const;
 export const MOBILE_BUG_COMPLETE_PATH = "/api/v1/bugs/:bugId/complete" as const;
 export const MOBILE_BUG_REPAIR_ATTEMPTS_PATH = "/api/v1/bugs/:bugId/repair-attempts" as const;
 export const MOBILE_RELAY_DISPATCH_PATH =
@@ -31,6 +32,8 @@ export interface MobileBugCompleteRequest {
   readonly repairAttemptId: string;
   readonly reason: string;
 }
+
+export type MobileBugManualCompleteRequest = Omit<MobileBugCompleteRequest, "repairAttemptId">;
 
 export interface MobileRelayAttemptRequest {
   readonly expectedVersion: number;
@@ -94,6 +97,12 @@ export interface MobileRelayStore {
     readonly bugId: string;
     readonly idempotencyKey: string;
     readonly request: MobileBugReadyRequest;
+  }) => MobileBugRecord | Promise<MobileBugRecord>;
+  readonly manuallyCompleteBug: (command: {
+    readonly actorId: string;
+    readonly bugId: string;
+    readonly idempotencyKey: string;
+    readonly request: MobileBugManualCompleteRequest;
   }) => MobileBugRecord | Promise<MobileBugRecord>;
   readonly completeBugForVerification: (command: {
     readonly actorId: string;
@@ -192,6 +201,17 @@ export function parseMobileBugReadyRequest(value: unknown): MobileBugReadyReques
   return {
     expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
     toState: "ready",
+  };
+}
+
+export function parseMobileBugManualCompleteRequest(
+  value: unknown,
+): MobileBugManualCompleteRequest {
+  const body = record(value);
+  onlyKeys(body, new Set(["expectedVersion", "reason"]));
+  return {
+    expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
+    reason: boundedDeliveryString(body["reason"], "reason", 1, 5_000),
   };
 }
 

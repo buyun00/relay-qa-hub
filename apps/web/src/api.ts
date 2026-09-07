@@ -1505,6 +1505,21 @@ export async function transitionBugReady(
   return requireRecord(body, "BUG") as unknown as BugDetail;
 }
 
+export async function manuallyCompleteBug(
+  bugId: string,
+  expectedVersion: number,
+): Promise<BugDetail> {
+  const body = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/manual-complete`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": `workflow:manualCompleteBug:bug:${bugId}:v${expectedVersion}`,
+    },
+    body: JSON.stringify({ expectedVersion, reason: "人工确认修复完成，提交原验收人验收" }),
+  });
+  return requireRecord(body, "BUG") as unknown as BugDetail;
+}
+
 export async function completeBugForVerification(
   bugId: string,
   expectedVersion: number,
