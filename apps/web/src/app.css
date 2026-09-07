@@ -16,6 +16,8 @@
   --blue: #4978e8;
   --blue-soft: #edf3ff;
   --shadow: 0 20px 55px rgba(23, 43, 33, 0.09);
+  --window-bar-height: 60px;
+  --window-bar-background: #192f25;
 }
 
 * {
@@ -45,15 +47,18 @@ button:disabled {
 }
 
 .app-shell {
+  height: 100vh;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 236px minmax(0, 1fr);
+  grid-template-rows: var(--window-bar-height) minmax(0, 1fr);
+  overflow: hidden;
 }
 .sidebar {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 4;
-  height: 100vh;
+  height: 100%;
+  min-height: 0;
   padding: 27px 20px 20px;
   display: flex;
   flex-direction: column;
@@ -281,6 +286,8 @@ button:disabled {
 
 .page {
   min-width: 0;
+  min-height: 0;
+  overflow: auto;
 }
 .topbar {
   position: sticky;
@@ -2800,6 +2807,11 @@ h1 {
 @media (max-width: 620px) {
   .app-shell {
     display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .page {
+    overflow: visible;
   }
   .sidebar {
     position: static;

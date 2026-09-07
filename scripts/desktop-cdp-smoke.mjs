@@ -524,12 +524,29 @@ try {
         const overlay = navigator.windowControlsOverlay;
         const titlebar = overlay?.getTitlebarAreaRect();
         const search = document.querySelector('.global-search');
+        const header = document.querySelector('.topbar');
+        const headerRect = header.getBoundingClientRect();
+        const identity = header.querySelector('.window-identity').getBoundingClientRect();
+        const refresh = header.querySelector('[aria-label="刷新"]').getBoundingClientRect();
+        const searchRect = search?.getBoundingClientRect();
         const chrome = {
           enabled: window.qaHubDesktop.windowControlsOverlay === true,
           visible: overlay?.visible === true,
           height: titlebar?.height ?? 0,
           draggable: getComputedStyle(document.querySelector('.topbar')).getPropertyValue('-webkit-app-region') === 'drag',
-          searchClickable: !search || getComputedStyle(search).getPropertyValue('-webkit-app-region') === 'no-drag'
+          searchClickable: !search || getComputedStyle(search).getPropertyValue('-webkit-app-region') === 'no-drag',
+          toolbarHeight: headerRect.height,
+          fullWidth: headerRect.left === 0 && Math.abs(headerRect.width - innerWidth) < 1,
+          unifiedBrand: document.querySelectorAll('.brand').length === 1 &&
+            header.contains(document.querySelector('.brand')) &&
+            header.querySelectorAll('.project-brand').length === 1 &&
+            !document.querySelector('.sidebar .brand, .workspace-context'),
+          darkBackground: getComputedStyle(header).backgroundColor === 'rgb(25, 47, 37)',
+          aligned: [identity, refresh, ...(searchRect ? [searchRect] : [])].every(rect =>
+            Math.abs(rect.top + rect.height / 2 - (headerRect.top + headerRect.height / 2)) <= 1),
+          controlsReserved: refresh.right + 8 <= (titlebar?.x ?? 0) + (titlebar?.width ?? 0),
+          contentBelowHeader: Math.abs(document.querySelector('.page').getBoundingClientRect().top - headerRect.bottom) < 1 &&
+            Math.abs(document.querySelector('.sidebar').getBoundingClientRect().top - headerRect.bottom) < 1
         };
         const mcpCard = cards.find(card => card.textContent.includes('MCP 设置'));
         mcpCard?.click();
@@ -575,7 +592,14 @@ try {
       !shell.cardLayout ||
       !shell.chrome.enabled ||
       !shell.chrome.visible ||
-      shell.chrome.height !== 32 ||
+      shell.chrome.height !== 60 ||
+      Math.abs(shell.chrome.toolbarHeight - 60) >= 1 ||
+      !shell.chrome.fullWidth ||
+      !shell.chrome.unifiedBrand ||
+      !shell.chrome.darkBackground ||
+      !shell.chrome.aligned ||
+      !shell.chrome.controlsReserved ||
+      !shell.chrome.contentBelowHeader ||
       !shell.chrome.draggable ||
       !shell.chrome.searchClickable ||
       shell.mcp.state !== "listening" ||

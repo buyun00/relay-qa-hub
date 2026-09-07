@@ -549,7 +549,7 @@ function createWindow(): BrowserWindow {
     backgroundColor: "#f4f7f5",
     title: "Relay QA Hub",
     titleBarStyle: "hidden",
-    titleBarOverlay: { color: "#fbfcfa", symbolColor: "#526159", height: 32 },
+    titleBarOverlay: { color: "#192f25", symbolColor: "#e8f0e8", height: 60 },
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(currentDirectory, "preload.cjs"),
