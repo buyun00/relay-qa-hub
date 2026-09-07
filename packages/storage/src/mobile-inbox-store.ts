@@ -93,6 +93,10 @@ interface NotificationRow {
   readonly created_at: string;
   readonly read_at: string | null;
   readonly version: number;
+  readonly event_type: string;
+  readonly event_to_state: string | null;
+  readonly event_aggregate_sequence: number;
+  readonly event_payload_json: string;
 }
 
 function requireTransaction(database: DatabaseSync): void {
@@ -260,6 +264,43 @@ function notificationRecipients(
   );
 }
 
+function notificationTitle(
+  event: Pick<EventRow, "type" | "to_state" | "aggregate_sequence" | "payload_json">,
+): string {
+  const payload = parsePayload(event.payload_json);
+  if (event.type === "bug.verification.passed") return "这个单子已验收";
+  if (event.type === "verification.result_recorded") {
+    return payload.status === "passed" ? "这个单子已验收" : "这个单子验收未通过，已退回";
+  }
+  if (event.type === "bug.mark_duplicate") return "这个单子已关闭";
+  if (["closed", "deferred", "rejected", "duplicate"].includes(event.to_state ?? "")) {
+    return "这个单子已关闭";
+  }
+  if (
+    event.to_state === "awaiting_build" ||
+    event.to_state === "ready_for_verification" ||
+    event.type === "repair_attempt.delivered"
+  ) {
+    return "这个单子已完成，待验收";
+  }
+  if (event.type === "verification.created") return "这个单子待验收";
+  if (event.type === "verification.started") return "这个单子开始验收";
+  if (event.type === "bug.reopen.newer_occurrence") return "这个单子已重新打开";
+  if (event.to_state === "in_progress" || event.type === "repair_attempt.started") {
+    return "这个单子正在处理";
+  }
+  if (["reported", "needs_info", "ready"].includes(event.to_state ?? "")) {
+    return "这个单子待处理";
+  }
+  if (event.type === "occurrence.appended") {
+    return event.aggregate_sequence === 1 ? "这个单子已创建" : "这个单子有新的反馈";
+  }
+  if (event.type === "bug.updated") return "这个单子信息已更新";
+  if (event.type === "repair_attempt.created") return "这个单子已创建修复轮次";
+  if (event.type === "build.registered") return "Build 已登记";
+  return "这个单子状态已改变";
+}
+
 function notificationPresentation(
   event: EventRow,
   bug: BugNotificationRow | null,
@@ -273,23 +314,7 @@ function notificationPresentation(
         )
       : boundedNotificationText(`${bug.key} · ${bug.description.trim() || bug.title}`, 500);
 
-  if (event.type === "occurrence.appended") return { title: "有一个新单子", body };
-  if (event.type === "bug.updated") return { title: "单子信息已更新", body };
-  if (event.type === "bug.triage.ready") return { title: "状态更新 · 待处理", body };
-  if (event.type === "repair_attempt.created") return { title: "状态更新 · 处理中", body };
-  if (event.to_state === "awaiting_build") return { title: "状态更新 · 已完成待验收", body };
-  if (event.to_state === "ready_for_verification" || event.type === "verification.created") {
-    return { title: "有一个单子待你验收", body };
-  }
-  if (event.type === "verification.started") return { title: "验收已开始", body };
-  if (event.type === "verification.result_recorded") {
-    return payload.status === "passed"
-      ? { title: "状态更新 · 关闭", body }
-      : { title: "验收未通过，已退回", body };
-  }
-  if (event.type === "bug.mark_duplicate") return { title: "状态更新 · 关闭", body };
-  if (event.type === "build.registered") return { title: "Build 已登记", body };
-  return { title: "单子状态已更新", body };
+  return { title: notificationTitle(event), body };
 }
 
 function consumeNotificationOutbox(
@@ -422,7 +447,14 @@ function toNotification(row: NotificationRow): MobileNotificationRecord {
     projectId: row.project_id,
     userId: row.user_id,
     type: row.type,
-    title: row.title,
+    // Re-project legacy wording from the immutable event without changing IDs,
+    // read status or delivery history (and without replaying notifications).
+    title: notificationTitle({
+      type: row.event_type,
+      to_state: row.event_to_state,
+      aggregate_sequence: row.event_aggregate_sequence,
+      payload_json: row.event_payload_json,
+    }),
     body,
     bugId: row.bug_id,
     buildId,
@@ -447,11 +479,17 @@ export function syncAndListMobileNotifications(
   const sync = consumeNotificationOutbox(database, input);
   const rows = database
     .prepare(
-      `SELECT id, account_id, project_id, user_id, type, title, bug_id,
-              source_event_id, payload_json, created_at, read_at, version
-       FROM notifications
-       WHERE account_id = ? AND project_id = ? AND user_id = ?
-       ORDER BY created_at DESC, id DESC
+      `SELECT notification.id, notification.account_id, notification.project_id,
+              notification.user_id, notification.type, notification.title, notification.bug_id,
+              notification.source_event_id, notification.payload_json, notification.created_at,
+              notification.read_at, notification.version, event.type AS event_type,
+              event.to_state AS event_to_state, event.aggregate_sequence AS event_aggregate_sequence,
+              event.payload_json AS event_payload_json
+       FROM notifications AS notification
+       JOIN events AS event ON event.account_id = notification.account_id
+         AND event.project_id = notification.project_id AND event.id = notification.source_event_id
+       WHERE notification.account_id = ? AND notification.project_id = ? AND notification.user_id = ?
+       ORDER BY notification.created_at DESC, notification.id DESC
        LIMIT ?`,
     )
     .all(

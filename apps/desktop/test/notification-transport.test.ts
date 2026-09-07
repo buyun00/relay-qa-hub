@@ -146,7 +146,11 @@ test("transport fetches durable Inbox once, dedupes reconnect replay, and deep-l
     openSocket: () => socket,
     fetchInbox: async () => {
       inboxReads += 1;
-      return parseDurableInbox({ items: [inboxItem()], nextCursor: null, unreadCount: 1 });
+      return parseDurableInbox({
+        items: [{ ...inboxItem(), type: "verification.result_recorded", title: "这个单子已验收" }],
+        nextCursor: null,
+        unreadCount: 1,
+      });
     },
     showNotification: (notification) => notifications.push(notification),
   });
@@ -159,13 +163,14 @@ test("transport fetches durable Inbox once, dedupes reconnect replay, and deep-l
       notificationId: NOTIFICATION_ID,
       eventId: EVENT_ID,
       bugId: BUG_ID,
-      summary: "Bug moved to ready",
+      summary: "有一个新单子",
     }),
   );
   await flush();
   assert.equal(inboxReads, 2);
   assert.equal(notifications.length, 1);
   assert.equal((notifications[0] as { readonly bugId: string }).bugId, BUG_ID);
+  assert.equal((notifications[0] as { readonly title: string }).title, "这个单子已验收");
   assert.equal(
     (notifications[0] as { readonly body: string }).body,
     "QA-12 · Login button does not respond",

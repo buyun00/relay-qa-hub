@@ -1405,7 +1405,7 @@ test("new Bug notifications include content and route unassigned versus assigned
     );
     assert.equal(primaryInbox.consumed, 1);
     assert.equal(primaryInbox.items.length, 1);
-    assert.equal(primaryInbox.items[0]?.title, "有一个新单子");
+    assert.equal(primaryInbox.items[0]?.title, "这个单子已创建");
     assert.equal(primaryInbox.items[0]?.body, "NOTIFY-1 · New notification Bug content");
     assert.equal(primaryInbox.items[0]?.bugId, created.bug.id);
     assert.equal(primaryInbox.items[0]?.sourceEventId, created.eventId);
@@ -1457,7 +1457,7 @@ test("new Bug notifications include content and route unassigned versus assigned
     const assignedNotification = secondaryAfterAssigned.items.find(
       (item) => item.sourceEventId === assigned.eventId,
     );
-    assert.equal(assignedNotification?.title, "有一个新单子");
+    assert.equal(assignedNotification?.title, "这个单子已创建");
     assert.equal(assignedNotification?.body, "NOTIFY-2 · Assigned notification Bug content");
 
     const replayed = transaction(database, () => createMobileBug(database, input));
@@ -11743,25 +11743,56 @@ test("multi-actor no-code human workflow can be managed by any project member", 
       }),
     );
     const ownerCompleted = ownerInbox.items.find(
-      (item) => item.type === "verification.result_recorded" && item.title === "状态更新 · 关闭",
+      (item) => item.type === "verification.result_recorded" && item.title === "这个单子已验收",
     );
     const verifierCompleted = verifierInbox.items.find(
-      (item) => item.type === "verification.result_recorded" && item.title === "状态更新 · 关闭",
+      (item) => item.type === "verification.result_recorded" && item.title === "这个单子已验收",
     );
     assert.equal(ownerCompleted?.body, "MHW-1 · Invariant regression record");
     assert.equal(verifierCompleted?.body, "MHW-1 · Invariant regression record");
     assert.equal(
       verifierInbox.items.some(
-        (item) => item.type === "repair_attempt.delivered" && item.title === "有一个单子待你验收",
+        (item) =>
+          item.type === "repair_attempt.delivered" && item.title === "这个单子已完成，待验收",
       ),
       true,
     );
     assert.equal(
       ownerInbox.items.some(
         (item) =>
-          item.type === "verification.result_recorded" && item.title === "验收未通过，已退回",
+          item.type === "verification.result_recorded" &&
+          item.title === "这个单子验收未通过，已退回",
       ),
       true,
+    );
+    // Old persisted wording is rendered from its source event, even after the
+    // Bug is closed, without rewriting delivery identity or read status.
+    const completedId = ownerCompleted?.id;
+    assert.ok(completedId);
+    database
+      .prepare("UPDATE notifications SET title = '有一个新单子' WHERE account_id = ?")
+      .run(tenant.accountId);
+    database
+      .prepare("UPDATE notifications SET read_at = ?, version = 2 WHERE id = ?")
+      .run(notificationAt, completedId);
+    const reread = transaction(database, () =>
+      syncAndListMobileNotifications(database, {
+        ...primaryScope,
+        limit: 100,
+        now: notificationAt,
+      }),
+    );
+    assert.equal(reread.consumed, 0);
+    assert.deepEqual(
+      reread.items.map((item) => [item.id, item.title, item.body]),
+      ownerInbox.items.map((item) => [item.id, item.title, item.body]),
+    );
+    assert.equal(reread.items.find((item) => item.id === completedId)?.readAt, notificationAt);
+    assert.equal(reread.items.find((item) => item.id === completedId)?.version, 2);
+    assert.equal(
+      database.prepare("SELECT title FROM notifications WHERE id = ?").get(completedId)?.title,
+      "有一个新单子",
+      "legacy storage and delivery history are not rewritten",
     );
     assertIntegrity(database);
   });
@@ -11860,7 +11891,7 @@ test("a project member can complete a delivered code task without making Build a
     assert.equal(
       deliveryInbox.items.some(
         (item) =>
-          item.type === "repair_attempt.delivered" && item.title === "状态更新 · 已完成待验收",
+          item.type === "repair_attempt.delivered" && item.title === "这个单子已完成，待验收",
       ),
       true,
     );
