@@ -297,6 +297,15 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.desktop-window::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  box-sizing: border-box;
+  border: 2px solid var(--window-bar-background);
+  pointer-events: none;
+}
 .desktop-window .sidebar {
   padding: 24px 16px 16px;
 }
