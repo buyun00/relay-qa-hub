@@ -1,7 +1,10 @@
 param(
   [string]$PackageDirectory,
   [string]$NodeExe = $env:QA_HUB_DESKTOP_NODE_EXE,
-  [string]$UpdateManifestUrl = "http://127.0.0.1:4174/downloads/Relay-QA-Hub-Windows-x64-latest.json"
+  [string]$UpdateManifestUrl = "http://127.0.0.1:4174/downloads/Relay-QA-Hub-Windows-x64-latest.json",
+  [string]$SupersededManifestFile,
+  [string]$SupersededInstallerFile,
+  [int]$McpPort = 4321
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,6 +30,12 @@ if ([string]::IsNullOrWhiteSpace($NodeExe) -or -not (Test-Path -LiteralPath $Nod
 }
 if (Get-NetTCPConnection -State Listen -LocalPort 9333 -ErrorAction SilentlyContinue) {
   throw "Self-update CDP port 9333 is already in use"
+}
+if (Get-NetTCPConnection -State Listen -LocalPort $McpPort -ErrorAction SilentlyContinue) {
+  throw "Self-update MCP port $McpPort is already in use"
+}
+if ([string]::IsNullOrWhiteSpace($SupersededManifestFile) -ne [string]::IsNullOrWhiteSpace($SupersededInstallerFile)) {
+  throw "Superseded manifest and installer must be supplied together"
 }
 
 $manifest = Invoke-RestMethod -Uri $UpdateManifestUrl -TimeoutSec 10
@@ -54,6 +63,10 @@ foreach ($name in @("APPDATA", "LOCALAPPDATA")) {
 $testProcesses = @()
 $result = $null
 $succeeded = $false
+$channelProcess = $null
+$channelOrigin = $null
+$channelRequests = @()
+$initialManifest = $manifest
 
 try {
   New-Item -ItemType Directory -Path $stageRoot -Force | Out-Null
@@ -65,6 +78,35 @@ try {
   Copy-Item -LiteralPath (Join-Path $desktopRoot "dist") -Destination (Join-Path $stageRoot "dist") -Recurse
   Copy-Item -LiteralPath (Join-Path $repoRoot "apps\web\dist") -Destination (Join-Path $stageRoot "web") -Recurse
   $encoding = [Text.UTF8Encoding]::new($false)
+  if (-not [string]::IsNullOrWhiteSpace($SupersededManifestFile)) {
+    $initialManifest = Get-Content -LiteralPath $SupersededManifestFile -Raw | ConvertFrom-Json
+    $channelReadyFile = Join-Path $temporaryRoot "channel-ready.json"
+    $channelAdvanceFile = Join-Path $temporaryRoot "channel-advance"
+    $channelReceiptFile = Join-Path $temporaryRoot "channel-requests.json"
+    $channelConfigFile = Join-Path $temporaryRoot "channel-config.json"
+    $channelConfig = @{
+      readyFile = $channelReadyFile
+      advanceFile = $channelAdvanceFile
+      receiptFile = $channelReceiptFile
+      releases = @(
+        @{ manifestFile = (Resolve-Path -LiteralPath $SupersededManifestFile).Path; installerFile = (Resolve-Path -LiteralPath $SupersededInstallerFile).Path },
+        @{ manifestFile = (Join-Path $desktopRoot "release\installer\Relay-QA-Hub-Windows-x64-latest.json"); installerFile = (Join-Path $desktopRoot "release\installer\Relay-QA-Hub-Setup-x64.exe") }
+      )
+    }
+    [IO.File]::WriteAllText($channelConfigFile, ($channelConfig | ConvertTo-Json -Depth 5), $encoding)
+    $channelScript = Join-Path $PSScriptRoot "self-update-test-channel.mjs"
+    $channelProcess = Start-Process -FilePath $NodeExe `
+      -ArgumentList @("`"$channelScript`"", "`"$channelConfigFile`"") `
+      -WindowStyle Hidden -PassThru `
+      -RedirectStandardOutput (Join-Path $temporaryRoot "channel.stdout.log") `
+      -RedirectStandardError (Join-Path $temporaryRoot "channel.stderr.log")
+    $deadline = [DateTime]::UtcNow.AddSeconds(15)
+    while (-not (Test-Path -LiteralPath $channelReadyFile)) {
+      if ($channelProcess.HasExited -or [DateTime]::UtcNow -ge $deadline) { throw "Isolated update channel did not start" }
+      Start-Sleep -Milliseconds 100
+    }
+    $channelOrigin = [string](Get-Content -LiteralPath $channelReadyFile -Raw | ConvertFrom-Json).origin
+  }
   $oldRelease = [ordered]@{
     schemaVersion = 1
     releaseId = $oldReleaseId
@@ -78,11 +120,22 @@ try {
   $env:PATH = "$(Split-Path -Parent $NodeExe);$env:PATH"
   & $packager $stageRoot "RelayQaHub" --platform=win32 --arch=x64 --out=$oldOutput --overwrite --prune=true --asar
   if ($LASTEXITCODE -ne 0) { throw "Old-client packaging failed with exit code $LASTEXITCODE" }
-  Move-Item -LiteralPath (Join-Path $oldOutput "RelayQaHub-win32-x64") -Destination $renamedPackage
+  $packagedSource = (Resolve-Path -LiteralPath (Join-Path $oldOutput "RelayQaHub-win32-x64")).Path
+  $outputPrefix = [IO.Path]::GetFullPath($oldOutput).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  if (-not $packagedSource.StartsWith($outputPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+      -not [IO.Path]::GetFullPath($renamedPackage).StartsWith($outputPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Unsafe self-update package move"
+  }
+  Move-Item -LiteralPath $packagedSource -Destination $renamedPackage
   Copy-Item -LiteralPath $targetUpdater -Destination (Join-Path $renamedPackage "RelayQaHubUpdater.exe") -Force
 
   $runtime = Get-Content -LiteralPath $targetRuntime -Raw | ConvertFrom-Json
   $runtime.startupHidden = $true
+  $runtime.mcpPort = $McpPort
+  if ($null -ne $channelOrigin) {
+    $runtime.csrfOrigin = $channelOrigin
+    $runtime | Add-Member -NotePropertyName allowLoopbackHttp -NotePropertyValue $true -Force
+  }
   [IO.File]::WriteAllText(
     (Join-Path $renamedPackage "desktop-runtime.json"),
     (($runtime | ConvertTo-Json -Depth 5) + [Environment]::NewLine),
@@ -123,8 +176,11 @@ try {
   $readyOutput = & $NodeExe $cdpScript wait-update-ready
   if ($LASTEXITCODE -ne 0) { throw "Old packaged client did not download the signed update" }
   $readyState = ($readyOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot.desktopUpdate
-  if ([string]$readyState.releaseId -ne [string]$manifest.releaseId) {
+  if ([string]$readyState.releaseId -ne [string]$initialManifest.releaseId) {
     throw "Old packaged client downloaded an unexpected release"
+  }
+  if ($null -ne $channelOrigin) {
+    [IO.File]::WriteAllText($channelAdvanceFile, "latest", $encoding)
   }
   $installOutput = & $NodeExe $cdpScript install-update
   if ($LASTEXITCODE -ne 0) { throw "Old packaged client did not accept install-update" }
@@ -181,10 +237,25 @@ try {
   $logFile = @(Get-ChildItem -LiteralPath $temporaryRoot -Filter "update.log" -Recurse -File)[0]
   $logText = [IO.File]::ReadAllText($logFile.FullName, [Text.Encoding]::Unicode)
   if ($logText -notlike "*update installed*") { throw "Update helper success was not logged" }
+  if ($null -ne $channelOrigin) {
+    $channelRequests = @(Get-Content -LiteralPath $channelReceiptFile -Raw | ConvertFrom-Json)
+    $installerRequests = @($channelRequests | Where-Object { $_.kind -eq "installer" })
+    if ($installerRequests.Count -ne 2 -or
+        $installerRequests[0].releaseId -ne $initialManifest.releaseId -or
+        $installerRequests[1].releaseId -ne $manifest.releaseId) {
+      throw "Expected exactly one cached old download and one latest download"
+    }
+    $handoffs = @(Get-ChildItem -LiteralPath $chromiumRoot -Filter "update.ini" -Recurse -File)
+    if ($handoffs.Count -ne 1 -or
+        [IO.File]::ReadAllText($handoffs[0].FullName, [Text.Encoding]::Unicode) -notlike "*ReleaseId=$($manifest.releaseId)*") {
+      throw "Expected one native handoff directly to the latest release"
+    }
+  }
 
   $result = [pscustomobject][ordered]@{
     renamedPortableDirectory = $true
     oldReleaseId = $oldReleaseId
+    initiallyDownloadedReleaseId = [string]$initialManifest.releaseId
     installedReleaseId = [string]$installedRelease.releaseId
     signedManifestReleaseId = [string]$manifest.releaseId
     installResult = "installed"
@@ -192,9 +263,12 @@ try {
     userProfilePreserved = $true
     runtimeConfigPreserved = $true
     rollbackDirectoryRetained = $true
+    channelRequests = $channelRequests
+    supersededDownloadSkipped = $null -ne $channelOrigin
   }
   $succeeded = $true
 } finally {
+  if ($null -ne $channelProcess -and -not $channelProcess.HasExited) { $channelProcess.Kill() }
   foreach ($process in @(Get-CimInstance Win32_Process -Filter "Name='RelayQaHub.exe'" -ErrorAction SilentlyContinue)) {
     if (-not [string]::IsNullOrWhiteSpace($process.ExecutablePath) -and
         $process.ExecutablePath.StartsWith($temporaryRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {

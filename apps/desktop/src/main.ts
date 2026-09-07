@@ -662,6 +662,7 @@ function installIpcHandlers(): void {
 }
 
 async function createUpdater(): Promise<PortableUpdater> {
+  const notifiedReleases = new Set<string>();
   const updateManifestUrl = new URL(
     "/downloads/Relay-QA-Hub-Windows-x64-latest.json",
     config.csrfOrigin,
@@ -676,7 +677,10 @@ async function createUpdater(): Promise<PortableUpdater> {
     requestQuit: quitApplication,
     onState: (state) => {
       sendUpdateState(state);
-      if (state.status === "ready") showUpdateReadyNotification(state);
+      if (state.status === "ready" && !notifiedReleases.has(state.releaseId)) {
+        notifiedReleases.add(state.releaseId);
+        showUpdateReadyNotification(state);
+      }
     },
   });
   await instance.initialize();

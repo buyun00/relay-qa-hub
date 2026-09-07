@@ -1,5 +1,5 @@
 import { createHash, createPublicKey, verify } from "node:crypto";
-import { createWriteStream, promises as fs } from "node:fs";
+import { createReadStream, createWriteStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -225,6 +225,7 @@ export class PortableUpdater {
   private readyManifest: SignedUpdateManifest | null = null;
   private readyArchive: string | null = null;
   private operation: Promise<void> | null = null;
+  private installOperation: Promise<boolean> | null = null;
 
   constructor(private readonly options: PortableUpdaterOptions) {}
 
@@ -267,6 +268,7 @@ export class PortableUpdater {
   }
 
   check(): Promise<void> {
+    if (this.installOperation !== null) return this.installOperation.then(() => undefined);
     if (this.operation !== null) return this.operation;
     this.operation = this.performCheck().finally(() => {
       this.operation = null;
@@ -280,46 +282,81 @@ export class PortableUpdater {
       this.emit({ status: "disabled", message: "CURRENT_RELEASE_UNAVAILABLE" });
       return;
     }
-    if (this.stateValue.status === "ready" || this.stateValue.status === "installing") return;
+    if (this.stateValue.status === "installing") return;
     this.emit({
       status: "checking",
       currentReleaseId: current.releaseId,
       version: current.version,
     });
     try {
-      const response = await (this.options.fetchImpl ?? fetch)(this.options.manifestUrl, {
-        cache: "no-store",
-        redirect: "error",
-        signal: AbortSignal.timeout(15_000),
-      });
-      if (!response.ok) throw new Error(`UPDATE_MANIFEST_HTTP_${response.status}`);
-      const text = await readBoundedText(response);
-      let parsed: unknown;
-      try {
-        parsed = JSON.parse(text) as unknown;
-      } catch {
-        throw new Error("UPDATE_MANIFEST_JSON_INVALID");
+      // Re-read after downloading: the stable channel can advance while a full
+      // installer is in flight. Bound retries if releases keep changing.
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        const manifest = await this.fetchLatestManifest();
+        if (manifest.releaseId <= current.releaseId) {
+          this.readyManifest = null;
+          this.readyArchive = null;
+          this.emit({
+            status: "up-to-date",
+            currentReleaseId: current.releaseId,
+            version: current.version,
+          });
+          return;
+        }
+        const archiveUrl = new URL(manifest.archive.url, this.options.manifestUrl);
+        if (archiveUrl.origin !== this.options.manifestUrl.origin) {
+          throw new Error("UPDATE_ARCHIVE_ORIGIN_NOT_ALLOWED");
+        }
+        if (await this.hasVerifiedArchive(manifest)) {
+          this.emit({
+            status: "ready",
+            releaseId: manifest.releaseId,
+            version: manifest.version,
+            publishedAt: manifest.publishedAt,
+          });
+          return;
+        }
+        await this.download(manifest, archiveUrl);
       }
-      const manifest = parseAndVerifyUpdateManifest(
-        parsed,
-        this.options.publicKeyPem ?? UPDATE_PUBLIC_KEY_PEM,
-      );
-      if (manifest === null) throw new Error("UPDATE_MANIFEST_SIGNATURE_INVALID");
-      if (manifest.releaseId <= current.releaseId) {
-        this.emit({
-          status: "up-to-date",
-          currentReleaseId: current.releaseId,
-          version: current.version,
-        });
-        return;
-      }
-      const archiveUrl = new URL(manifest.archive.url, this.options.manifestUrl);
-      if (archiveUrl.origin !== this.options.manifestUrl.origin) {
-        throw new Error("UPDATE_ARCHIVE_ORIGIN_NOT_ALLOWED");
-      }
-      await this.download(manifest, archiveUrl);
+      throw new Error("UPDATE_RELEASE_CHANGED_RETRY");
     } catch (cause) {
       this.emit({ status: "error", message: safeError(cause) });
+    }
+  }
+
+  private async fetchLatestManifest(): Promise<SignedUpdateManifest> {
+    const response = await (this.options.fetchImpl ?? fetch)(this.options.manifestUrl, {
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) throw new Error(`UPDATE_MANIFEST_HTTP_${response.status}`);
+    const text = await readBoundedText(response);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(text) as unknown;
+    } catch {
+      throw new Error("UPDATE_MANIFEST_JSON_INVALID");
+    }
+    const manifest = parseAndVerifyUpdateManifest(
+      parsed,
+      this.options.publicKeyPem ?? UPDATE_PUBLIC_KEY_PEM,
+    );
+    if (manifest === null) throw new Error("UPDATE_MANIFEST_SIGNATURE_INVALID");
+    return manifest;
+  }
+
+  private async hasVerifiedArchive(manifest: SignedUpdateManifest): Promise<boolean> {
+    if (this.readyManifest?.signature !== manifest.signature || this.readyArchive === null) {
+      return false;
+    }
+    try {
+      if ((await fs.stat(this.readyArchive)).size !== manifest.archive.size) return false;
+      const hash = createHash("sha256");
+      for await (const chunk of createReadStream(this.readyArchive)) hash.update(chunk as Buffer);
+      return hash.digest("hex") === manifest.archive.sha256;
+    } catch {
+      return false;
     }
   }
 
@@ -392,15 +429,22 @@ export class PortableUpdater {
     }
     this.readyManifest = manifest;
     this.readyArchive = archiveFile;
-    this.emit({
-      status: "ready",
-      releaseId: manifest.releaseId,
-      version: manifest.version,
-      publishedAt: manifest.publishedAt,
-    });
   }
 
-  async install(): Promise<boolean> {
+  install(): Promise<boolean> {
+    if (this.installOperation !== null) return this.installOperation;
+    if (this.stateValue.status === "installing") return Promise.resolve(false);
+    this.installOperation = this.performInstall().finally(() => {
+      this.installOperation = null;
+    });
+    return this.installOperation;
+  }
+
+  private async performInstall(): Promise<boolean> {
+    // Serialize all entry points, then confirm the latest signed release at the
+    // installation boundary instead of trusting an earlier ready notification.
+    await this.operation;
+    await this.performCheck();
     const manifest = this.readyManifest;
     const packageFile = this.readyArchive;
     if (manifest === null || packageFile === null || this.stateValue.status !== "ready") {
