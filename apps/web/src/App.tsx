@@ -2042,7 +2042,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       {taskStatusLabel(detail.state)}
                     </span>
                   </div>
-                  <button className="detail-close" onClick={closeDetail} type="button">
+                  <button
+                    aria-label="关闭详情"
+                    className="detail-close"
+                    onClick={closeDetail}
+                    type="button"
+                  >
                     ×
                   </button>
                 </header>

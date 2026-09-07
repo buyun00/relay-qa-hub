@@ -248,6 +248,15 @@
 .desktop-window .topbar input {
   -webkit-app-region: no-drag;
 }
+.desktop-window .detail-overlay,
+.desktop-window .detail-close {
+  -webkit-app-region: no-drag;
+}
+/* Native drag regions can intercept controls in an overlapping HTML modal. */
+.desktop-window:has(.detail-overlay) .topbar,
+.desktop-window:has(.detail-overlay) .brand {
+  -webkit-app-region: no-drag;
+}
 .desktop-window .global-search {
   width: 100%;
   height: 44px;

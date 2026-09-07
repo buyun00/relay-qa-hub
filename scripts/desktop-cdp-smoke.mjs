@@ -2,6 +2,7 @@ const ACTIONS = new Set([
   "snapshot",
   "login",
   "open-first-bug",
+  "close-detail",
   "open-bug-editor",
   "open-qingyu",
   "open-overview",
@@ -15,9 +16,7 @@ const ACTIONS = new Set([
 ]);
 const action = process.argv[2] ?? "snapshot";
 if (!ACTIONS.has(action)) {
-  throw new Error(
-    "action must be snapshot, login, open-first-bug, open-bug-editor, open-qingyu, open-overview, select-overview-date, wait-marker, wait-update-ready, install-update, or notify-packaging",
-  );
+  throw new Error(`action must be one of: ${[...ACTIONS].join(", ")}`);
 }
 
 const marker = process.env.QA_HUB_DESKTOP_SMOKE_MARKER?.trim() ?? "";
@@ -306,6 +305,59 @@ try {
     ) {
       process.exitCode = 1;
     }
+  } else if (action === "close-detail") {
+    const before = await client.send("Runtime.evaluate", {
+      expression: `(() => {
+        const button = document.querySelector('.detail-modal .detail-close');
+        if (!button) return null;
+        const rect = button.getBoundingClientRect();
+        const region = selector => getComputedStyle(document.querySelector(selector)).getPropertyValue('-webkit-app-region');
+        return {
+          x: rect.x + rect.width / 2, y: rect.y + rect.height / 2,
+          label: button.getAttribute('aria-label'),
+          buttonRegion: region('.detail-modal .detail-close'),
+          overlayRegion: region('.detail-overlay'),
+          topbarRegion: region('.topbar'), brandRegion: region('.brand')
+        };
+      })()`,
+      returnByValue: true,
+    });
+    const target = before.result?.value;
+    if (
+      !target ||
+      target.label !== "关闭详情" ||
+      [target.buttonRegion, target.overlayRegion, target.topbarRegion, target.brandRegion].some(
+        (region) => region !== "no-drag",
+      )
+    )
+      throw new Error("Detail close button overlaps an active native drag region");
+    for (const type of ["mousePressed", "mouseReleased"]) {
+      await client.send("Input.dispatchMouseEvent", {
+        type,
+        x: target.x,
+        y: target.y,
+        button: "left",
+        clickCount: 1,
+      });
+    }
+    const deadline = Date.now() + 5_000;
+    let current;
+    do {
+      current = await snapshot(client);
+      if (current?.detailOpen === false) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } while (Date.now() < deadline);
+    if (current?.detailOpen !== false)
+      throw new Error("Detail close button did not dismiss the modal");
+    const restored = await client.send("Runtime.evaluate", {
+      expression: `['.topbar', '.brand'].every(selector => getComputedStyle(document.querySelector(selector)).getPropertyValue('-webkit-app-region') === 'drag')`,
+      returnByValue: true,
+    });
+    if (restored.result?.value !== true)
+      throw new Error("Window dragging was not restored after closing detail");
+    process.stdout.write(
+      `${JSON.stringify({ action, closed: true, dragRestored: true, before: target })}\n`,
+    );
   } else if (action === "open-bug-editor") {
     const result = await client.send("Runtime.evaluate", {
       expression: `(() => {

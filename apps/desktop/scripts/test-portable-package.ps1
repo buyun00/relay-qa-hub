@@ -349,6 +349,11 @@ try {
   if (-not $detail.detailDeleteTriggerVisible) {
     throw "Packaged Bug detail does not expose deletion"
   }
+  $detailCloseOutput = & $NodeExe $smokeScript close-detail
+  if ($LASTEXITCODE -ne 0) { throw "Packaged detail close button failed" }
+  $detailClose = $detailCloseOutput | Select-Object -Last 1 | ConvertFrom-Json
+  & $NodeExe $smokeScript open-first-bug | Out-Null
+  if ($LASTEXITCODE -ne 0) { throw "Packaged detail did not reopen after closing" }
   $detailEditorOutput = & $NodeExe $smokeScript open-bug-editor
   if ($LASTEXITCODE -ne 0) { throw "Packaged Bug detail editor smoke failed" }
   $detailEditor = ($detailEditorOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot
@@ -463,6 +468,9 @@ try {
     workbenchEmpty = [bool]$login.workbenchEmpty
     workbenchErrorText = [string]$login.workbenchErrorText
     bugDetailLoaded = [bool]($detail.detailOpen -and -not $detail.detailLoadingVisible)
+    bugDetailCloseButton = [bool]$detailClose.closed
+    bugDetailCloseRegions = $detailClose.before
+    windowDragRestoredAfterDetail = [bool]$detailClose.dragRestored
     bugDetailEditAvailable = [bool]$detail.detailEditTriggerVisible
     bugDetailDeleteAvailable = [bool]$detail.detailDeleteTriggerVisible
     bugDetailEditorFieldCount = [int]$detailEditor.detailEditorFieldCount

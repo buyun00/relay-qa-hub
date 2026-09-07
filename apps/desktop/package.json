@@ -1,6 +1,6 @@
 {
   "name": "@relay-qa-hub/desktop",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "private": true,
   "description": "Secure Windows Electron shell for the Relay QA Hub management Web.",
   "license": "UNLICENSED",
