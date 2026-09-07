@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import {
   DesktopQaHubApiClient,
+  QaHubMcpError,
   QaHubMcpTools,
   type QaHubApiTransport,
   type QaHubBinaryResponse,
@@ -21,6 +22,8 @@ const BUG_ID = "20000000-0000-4000-8000-000000000001";
 const PROJECT_ID = "30000000-0000-4000-8000-000000000001";
 const ATTEMPT_ID = "40000000-0000-4000-8000-000000000001";
 const ATTACHMENT_ID = "50000000-0000-4000-8000-000000000001";
+const PRIMARY_ATTACHMENT_ID = "50000000-0000-4000-8000-000000000002";
+const CAPTURE_ID = "60000000-0000-4000-8000-000000000001";
 
 interface RecordedCall {
   readonly pathname: string;
@@ -30,6 +33,7 @@ interface RecordedCall {
 class ScriptedApi implements QaHubApiTransport {
   readonly calls: RecordedCall[] = [];
   readonly responses = new Map<string, unknown[]>();
+  readonly binaryCalls: string[] = [];
   binaryResponse: QaHubBinaryResponse = { bytes: new Uint8Array(), headers: new Headers() };
 
   queue(method: string, pathname: string, ...responses: unknown[]): void {
@@ -43,10 +47,13 @@ class ScriptedApi implements QaHubApiTransport {
     if (queue === undefined || queue.length === 0) {
       throw new Error(`Unexpected API call: ${method} ${pathname}`);
     }
-    return queue.shift();
+    const response = queue.shift();
+    if (response instanceof Error) throw response;
+    return response;
   }
 
-  async binary(): Promise<QaHubBinaryResponse> {
+  async binary(pathname: string): Promise<QaHubBinaryResponse> {
+    this.binaryCalls.push(pathname);
     return this.binaryResponse;
   }
 }
@@ -253,6 +260,159 @@ test("qa_materialize_attachment verifies SHA-256 before returning a local path",
     })) as { localPath: string; sha256: string };
     assert.equal(result.sha256, sha256);
     assert.equal(readFileSync(result.localPath, "utf8"), "verified attachment");
+    assert.deepEqual(api.binaryCalls, [`/api/v1/attachments/${ATTACHMENT_ID}`]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+function captureDownloadFixture(kind = "poco_snapshot", mediaType = "application/json") {
+  const bytes = Buffer.from('{"data":{"recentLogs":[{"message":"captured error"}]}}');
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const api = new ScriptedApi();
+  api.queue("GET", `/api/v1/bugs/${BUG_ID}`, bug("reported", 1, null));
+  api.queue("GET", `/api/v1/bugs/${BUG_ID}/attachments?limit=50`, {
+    items: [{ attachmentId: PRIMARY_ATTACHMENT_ID, captureId: CAPTURE_ID }],
+  });
+  const artifact = {
+    attachmentId: ATTACHMENT_ID,
+    captureId: CAPTURE_ID,
+    kind,
+    status: "succeeded",
+  };
+  const capture = {
+    captureId: CAPTURE_ID,
+    projectId: PROJECT_ID,
+    primaryEvidenceAttachmentId: PRIMARY_ATTACHMENT_ID,
+    artifacts: [artifact],
+  };
+  api.queue("GET", `/api/v1/capture-bundles/${CAPTURE_ID}`, capture);
+  api.binaryResponse = {
+    bytes,
+    headers: new Headers({
+      "content-type": mediaType,
+      "content-length": String(bytes.length),
+      "x-content-sha256": sha256,
+    }),
+  };
+  return { api, capture, artifact, bytes, sha256 };
+}
+
+test("qa_materialize_attachment downloads capture-only evidence and reuses verified cache", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "qa-hub-mcp-capture-"));
+  try {
+    for (const [kind, mediaType, extension] of [
+      ["poco_snapshot", "application/json", "json"],
+      ["poco_hierarchy", "application/json", "json"],
+      ["poco_profiling", "application/json", "json"],
+      ["poco_screenshot", "image/jpeg", "jpg"],
+    ]) {
+      for (const cached of [false, true]) {
+        const { api, bytes, sha256 } = captureDownloadFixture(kind, mediaType);
+        const tools = new QaHubMcpTools(api, root);
+        const result = (await tools.call("qa_materialize_attachment", {
+          bugId: BUG_ID,
+          attachmentId: ATTACHMENT_ID,
+        })) as { localPath: string; filename: string; sha256: string; cached: boolean };
+        assert.equal(result.cached, cached);
+        assert.equal(result.filename, `capture-${CAPTURE_ID}-${kind}.${extension}`);
+        assert.equal(result.sha256, sha256);
+        assert.deepEqual(readFileSync(result.localPath), bytes);
+        assert.deepEqual(api.binaryCalls, [
+          `/api/v1/bugs/${BUG_ID}/capture-bundles/${CAPTURE_ID}/artifacts/${kind}`,
+        ]);
+      }
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("capture downloads reject unrelated, failed and inconsistent evidence before reading bytes", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "qa-hub-mcp-capture-"));
+  try {
+    for (const scenario of ["unrelated", "failed", "project", "primary", "capture", "kind"]) {
+      const { api, capture, artifact } = captureDownloadFixture();
+      if (scenario === "unrelated") artifact.attachmentId = PRIMARY_ATTACHMENT_ID;
+      if (scenario === "failed") artifact.status = "failed";
+      if (scenario === "project") capture.projectId = BUG_ID;
+      if (scenario === "primary") capture.primaryEvidenceAttachmentId = ATTACHMENT_ID;
+      if (scenario === "capture") artifact.captureId = BUG_ID;
+      if (scenario === "kind") artifact.kind = "../poco_snapshot";
+      await assert.rejects(
+        new QaHubMcpTools(api, root).call("qa_materialize_attachment", {
+          bugId: BUG_ID,
+          attachmentId: ATTACHMENT_ID,
+        }),
+        {
+          code: ["unrelated", "failed"].includes(scenario)
+            ? "ATTACHMENT_NOT_BOUND_TO_BUG"
+            : "QA_HUB_INVALID_RESPONSE",
+        },
+        scenario,
+      );
+      assert.deepEqual(api.binaryCalls, []);
+    }
+    assert.deepEqual(readdirSync(root), []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("capture downloads verify response size, SHA-256 and media type before caching", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "qa-hub-mcp-capture-"));
+  try {
+    for (const [header, value, code] of [
+      ["content-length", "1", "ATTACHMENT_INTEGRITY_MISMATCH"],
+      ["x-content-sha256", "0".repeat(64), "ATTACHMENT_INTEGRITY_MISMATCH"],
+      ["content-type", "text/html", "QA_HUB_INVALID_RESPONSE"],
+      ["content-length", "", "QA_HUB_INVALID_RESPONSE"],
+    ]) {
+      const { api } = captureDownloadFixture();
+      api.binaryResponse.headers.set(header!, value!);
+      await assert.rejects(
+        new QaHubMcpTools(api, root).call("qa_materialize_attachment", {
+          bugId: BUG_ID,
+          attachmentId: ATTACHMENT_ID,
+        }),
+        { code },
+      );
+    }
+    assert.deepEqual(readdirSync(root), []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("capture lookup skips unavailable bundles but preserves authentication failures", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "qa-hub-mcp-capture-"));
+  try {
+    const missingCaptureId = "60000000-0000-4000-8000-000000000002";
+    for (const status of [404, 401]) {
+      const { api } = captureDownloadFixture();
+      api.queue("GET", `/api/v1/bugs/${BUG_ID}/attachments?limit=50`, {
+        items: [
+          { attachmentId: PRIMARY_ATTACHMENT_ID, captureId: missingCaptureId },
+          { attachmentId: PRIMARY_ATTACHMENT_ID, captureId: CAPTURE_ID },
+        ],
+      });
+      api.queue(
+        "GET",
+        `/api/v1/capture-bundles/${missingCaptureId}`,
+        new QaHubMcpError("READ_FAILED", "read failed", status),
+      );
+      const operation = new QaHubMcpTools(api, root).call("qa_materialize_attachment", {
+        bugId: BUG_ID,
+        attachmentId: ATTACHMENT_ID,
+      });
+      if (status === 404) {
+        await operation;
+        assert.equal(api.binaryCalls.length, 1);
+      } else {
+        await assert.rejects(operation, { code: "READ_FAILED", status: 401 });
+        assert.equal(api.binaryCalls.length, 0);
+      }
+    }
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

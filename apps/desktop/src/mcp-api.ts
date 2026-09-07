@@ -15,6 +15,22 @@ const COMMIT_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const TERMINAL_STATES = new Set(["closed", "deferred", "rejected", "duplicate"]);
 const RECOVERABLE_SESSION_CODES = new Set(["UNAUTHENTICATED", "NATIVE_SESSION_INVALID"]);
+const CAPTURE_ARTIFACT_MEDIA_TYPES: Readonly<Record<string, readonly string[]>> = {
+  system_screenshot: ["image/png", "image/jpeg", "image/webp"],
+  system_recording: ["video/mp4", "video/webm"],
+  poco_screenshot: ["image/png", "image/jpeg", "image/webp"],
+  poco_hierarchy: ["application/json"],
+  poco_profiling: ["application/json"],
+  poco_snapshot: ["application/json"],
+};
+const CAPTURE_MEDIA_EXTENSIONS: Readonly<Record<string, string>> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+  "application/json": "json",
+};
 
 export interface QaHubJsonRequest {
   readonly method?: "GET" | "POST" | "PATCH";
@@ -387,7 +403,7 @@ export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
     name: "qa_materialize_attachment",
     title: "下载 Bug 附件到本机",
     description:
-      "把已扫描且绑定到 Bug 的附件下载到 EXE 的只读 MCP 缓存，校验大小和 SHA-256，并返回本地绝对路径供 AI 编辑器读取。",
+      "把 Bug 的普通附件或关联采集包中的 Poco 快照、UI 树等附件下载到 EXE 的只读 MCP 缓存，校验大小和 SHA-256，并返回本地绝对路径供 AI 编辑器读取。",
     inputSchema: {
       type: "object",
       properties: {
@@ -594,6 +610,18 @@ function safeFilename(value: string): string {
   return bounded.length === 0 || bounded === "." || bounded === ".." ? "attachment.bin" : bounded;
 }
 
+function attachmentCaptureIds(items: readonly unknown[]): string[] {
+  return [
+    ...new Set(
+      items.flatMap((item) => {
+        if (typeof item !== "object" || item === null || Array.isArray(item)) return [];
+        const captureId = (item as Record<string, unknown>)["captureId"];
+        return typeof captureId === "string" && UUID_PATTERN.test(captureId) ? [captureId] : [];
+      }),
+    ),
+  ];
+}
+
 function requireUrl(record: Record<string, unknown>, key: string): string | undefined {
   const value = optionalString(record, key, 4_000);
   if (value === undefined) return undefined;
@@ -754,15 +782,7 @@ export class QaHubMcpTools {
     if (!Array.isArray(attachmentItems)) {
       throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "attachment list is invalid");
     }
-    const captureIds = [
-      ...new Set(
-        attachmentItems.flatMap((item) => {
-          if (typeof item !== "object" || item === null || Array.isArray(item)) return [];
-          const captureId = (item as Record<string, unknown>)["captureId"];
-          return typeof captureId === "string" && UUID_PATTERN.test(captureId) ? [captureId] : [];
-        }),
-      ),
-    ];
+    const captureIds = attachmentCaptureIds(attachmentItems);
     const captures = await Promise.all(
       captureIds.map(async (captureId) => {
         try {
@@ -790,12 +810,90 @@ export class QaHubMcpTools {
     };
   }
 
+  private async downloadCaptureAttachment(
+    bug: Record<string, unknown>,
+    items: readonly unknown[],
+    attachmentId: string,
+  ): Promise<{
+    readonly metadata: Record<string, unknown>;
+    readonly response: QaHubBinaryResponse;
+  } | null> {
+    // Capture artifacts inherit the Bug binding through the primary screenshot.
+    // They are intentionally absent from the ordinary Bug attachment list.
+    for (const captureId of attachmentCaptureIds(items)) {
+      let value: unknown;
+      try {
+        value = await this.api.json(`/api/v1/capture-bundles/${encodeURIComponent(captureId)}`);
+      } catch (error) {
+        if (error instanceof QaHubMcpError && error.status === 404) continue;
+        throw error;
+      }
+      const capture = requireRecord(value, "capture");
+      if (
+        capture["captureId"] !== captureId ||
+        capture["projectId"] !== bug["projectId"] ||
+        !items.some(
+          (item) =>
+            typeof item === "object" &&
+            item !== null &&
+            !Array.isArray(item) &&
+            (item as Record<string, unknown>)["captureId"] === captureId &&
+            (item as Record<string, unknown>)["attachmentId"] ===
+              capture["primaryEvidenceAttachmentId"],
+        )
+      ) {
+        throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "capture binding is invalid");
+      }
+      const artifacts = capture["artifacts"];
+      if (!Array.isArray(artifacts)) {
+        throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "capture artifacts are invalid");
+      }
+      const artifactValue = artifacts.find(
+        (item) =>
+          typeof item === "object" &&
+          item !== null &&
+          !Array.isArray(item) &&
+          (item as Record<string, unknown>)["attachmentId"] === attachmentId &&
+          (item as Record<string, unknown>)["status"] === "succeeded",
+      );
+      if (artifactValue === undefined) continue;
+      const artifact = requireRecord(artifactValue, "capture artifact");
+      const kind = requireString(artifact, "kind", 1, 100);
+      const mediaTypes = Object.hasOwn(CAPTURE_ARTIFACT_MEDIA_TYPES, kind)
+        ? CAPTURE_ARTIFACT_MEDIA_TYPES[kind]
+        : undefined;
+      if (artifact["captureId"] !== captureId || mediaTypes === undefined) {
+        throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "capture artifact identity is invalid");
+      }
+      const response = await this.api.binary(
+        `/api/v1/bugs/${encodeURIComponent(String(bug["id"]))}/capture-bundles/${encodeURIComponent(captureId)}/artifacts/${encodeURIComponent(kind)}`,
+      );
+      const mediaType = response.headers.get("content-type")?.split(";", 1)[0]?.trim() ?? "";
+      if (!mediaTypes.includes(mediaType)) {
+        throw new QaHubMcpError(
+          "QA_HUB_INVALID_RESPONSE",
+          "capture artifact media type is invalid",
+        );
+      }
+      return {
+        metadata: {
+          filename: `capture-${captureId}-${kind}.${CAPTURE_MEDIA_EXTENSIONS[mediaType]}`,
+          mediaType,
+          size: Number(response.headers.get("content-length")),
+          sha256: response.headers.get("x-content-sha256"),
+        },
+        response,
+      };
+    }
+    return null;
+  }
+
   private async materializeAttachment(argumentsValue: unknown): Promise<unknown> {
     const input = requireRecord(argumentsValue, "arguments");
     onlyKeys(input, ["bugId", "attachmentId"]);
     const bugId = requireUuid(input, "bugId");
     const attachmentId = requireUuid(input, "attachmentId");
-    await this.getBug(bugId);
+    const bug = await this.getBug(bugId);
     const list = requireRecord(
       await this.api.json(`/api/v1/bugs/${encodeURIComponent(bugId)}/attachments?limit=50`),
       "attachments",
@@ -804,13 +902,19 @@ export class QaHubMcpTools {
     if (!Array.isArray(items)) {
       throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "attachment list is invalid");
     }
-    const metadataValue = items.find(
+    let metadataValue = items.find(
       (item) =>
         typeof item === "object" &&
         item !== null &&
         !Array.isArray(item) &&
         (item as Record<string, unknown>)["attachmentId"] === attachmentId,
     );
+    let captureResponse: QaHubBinaryResponse | undefined;
+    if (metadataValue === undefined) {
+      const capture = await this.downloadCaptureAttachment(bug, items, attachmentId);
+      metadataValue = capture?.metadata;
+      captureResponse = capture?.response;
+    }
     if (metadataValue === undefined) {
       throw new QaHubMcpError(
         "ATTACHMENT_NOT_BOUND_TO_BUG",
@@ -825,13 +929,14 @@ export class QaHubMcpTools {
     if (
       !SHA256_PATTERN.test(expectedSha) ||
       !Number.isSafeInteger(expectedSize) ||
-      (expectedSize as number) < 1
+      (expectedSize as number) < 1 ||
+      (expectedSize as number) > MAX_ATTACHMENT_BYTES
     ) {
       throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "attachment metadata is invalid");
     }
-    const response = await this.api.binary(
-      `/api/v1/attachments/${encodeURIComponent(attachmentId)}`,
-    );
+    const response =
+      captureResponse ??
+      (await this.api.binary(`/api/v1/attachments/${encodeURIComponent(attachmentId)}`));
     const actualSha = createHash("sha256").update(response.bytes).digest("hex");
     if (response.bytes.byteLength !== expectedSize || actualSha !== expectedSha) {
       throw new QaHubMcpError(
