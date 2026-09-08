@@ -27,3 +27,15 @@ Validation completed before release:
 These checks made no new COS upload or platform release. Local receipts and the
 read-only download are retained in `work/ios-upload`; Windows release receipts are
 retained in `work/windows-3.3.4-release`.
+
+Release verified on 2026-09-08:
+
+- Source: `b05d93686dd27d2e34e8b3f7e601cb9a3611085f`; release ID `20260908T095214316Z`.
+- Live Web assets match the package. Signed update manifests and downloaded
+  installer/portable hashes match; API is ready with worker 0.4.3.
+- Packaged EXE selects iOS/channel 2004 and reads the server-owned upload service.
+- Isolated 3.3.3 to 3.3.4 download, installation and restart passed; profile,
+  runtime configuration, upload checkpoints/accounts and rollback remain intact.
+- Existing Android 2.4.31 digest and published record remain unchanged. The
+  real iOS download also matches its publisher-provided SHA-256 sidecar.
+- The four daily-client processes and startup registry entries were preserved.
