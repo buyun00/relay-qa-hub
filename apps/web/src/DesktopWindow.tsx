@@ -1,10 +1,27 @@
 import { useEffect, useState, type PropsWithChildren } from "react";
+import { createPortal } from "react-dom";
 import AppIcon from "./AppIcon";
 
 export default function DesktopWindow({ children }: PropsWithChildren) {
   const bridge = window.qaHubDesktop;
   const [square, setSquare] = useState(false);
   const [error, setError] = useState(false);
+  const [controlsHost, setControlsHost] = useState<HTMLDialogElement | null>(null);
+  useEffect(() => {
+    if (!bridge?.windowAction) return;
+    // A modal dialog makes the rest of the document inert. Keep the native
+    // window actions inside that top layer without changing or closing drafts.
+    const updateHost = () => setControlsHost(document.querySelector("dialog[open]"));
+    updateHost();
+    const observer = new MutationObserver(updateHost);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["open"],
+    });
+    return () => observer.disconnect();
+  }, [bridge]);
   const windowAction = async (action: "minimize" | "toggle-maximize" | "close") => {
     try {
       setError((await bridge?.windowAction?.(action)) !== true);
@@ -30,6 +47,44 @@ export default function DesktopWindow({ children }: PropsWithChildren) {
     };
   }, [bridge]);
 
+  const controls = bridge?.windowAction ? (
+    <div className="window-controls" role="group" aria-label="窗口控制">
+      <button
+        type="button"
+        className="window-control window-minimize"
+        aria-label="最小化"
+        title="最小化"
+        onClick={() => void windowAction("minimize")}
+      >
+        <AppIcon name="minimize" />
+      </button>
+      <button
+        type="button"
+        className={`window-control window-maximize${square ? " is-maximized" : ""}`}
+        aria-label={square ? "还原窗口" : "最大化"}
+        title={square ? "还原窗口" : "最大化"}
+        aria-pressed={square}
+        onClick={() => void windowAction("toggle-maximize")}
+      >
+        <AppIcon name={square ? "restore" : "maximize"} />
+      </button>
+      <button
+        type="button"
+        className="window-control window-close"
+        aria-label="关闭窗口"
+        title="关闭窗口，继续在托盘运行"
+        onClick={() => void windowAction("close")}
+      >
+        <AppIcon name="close" />
+      </button>
+      {error ? (
+        <span className="window-control-error" role="alert">
+          窗口操作失败，请重试
+        </span>
+      ) : null}
+    </div>
+  ) : null;
+
   return (
     <div
       className={
@@ -39,43 +94,7 @@ export default function DesktopWindow({ children }: PropsWithChildren) {
       }
     >
       {children}
-      {bridge?.windowAction ? (
-        <div className="window-controls" role="group" aria-label="窗口控制">
-          <button
-            type="button"
-            className="window-control window-minimize"
-            aria-label="最小化"
-            title="最小化"
-            onClick={() => void windowAction("minimize")}
-          >
-            <AppIcon name="minimize" />
-          </button>
-          <button
-            type="button"
-            className={`window-control window-maximize${square ? " is-maximized" : ""}`}
-            aria-label={square ? "还原窗口" : "最大化"}
-            title={square ? "还原窗口" : "最大化"}
-            aria-pressed={square}
-            onClick={() => void windowAction("toggle-maximize")}
-          >
-            <AppIcon name={square ? "restore" : "maximize"} />
-          </button>
-          <button
-            type="button"
-            className="window-control window-close"
-            aria-label="关闭窗口"
-            title="关闭窗口，继续在托盘运行"
-            onClick={() => void windowAction("close")}
-          >
-            <AppIcon name="close" />
-          </button>
-          {error ? (
-            <span className="window-control-error" role="alert">
-              窗口操作失败，请重试
-            </span>
-          ) : null}
-        </div>
-      ) : null}
+      {controlsHost ? createPortal(controls, controlsHost) : controls}
     </div>
   );
 }

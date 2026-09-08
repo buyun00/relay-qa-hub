@@ -534,7 +534,7 @@ try {
         const chrome = {
           enabled: window.qaHubDesktop.windowControlsOverlay === true,
           visible: customControls ? getComputedStyle(customControls).visibility === 'visible' : overlay?.visible === true,
-          height: customRect?.height ?? titlebar?.height ?? 0,
+          height: Math.round(customRect?.height ?? titlebar?.height ?? 0),
           draggable: getComputedStyle(document.querySelector('.topbar')).getPropertyValue('-webkit-app-region') === 'drag',
           searchClickable: !search || getComputedStyle(search).getPropertyValue('-webkit-app-region') === 'no-drag',
           toolbarHeight: headerRect.height,

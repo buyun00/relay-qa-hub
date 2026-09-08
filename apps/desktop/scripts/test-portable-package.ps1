@@ -363,6 +363,8 @@ try {
     throw "Packaged Bug detail editor does not expose all editable fields and image input"
   }
 
+  & $NodeExe $smokeScript close-detail | Out-Null
+  if ($LASTEXITCODE -ne 0) { throw "Packaged detail editor did not close before navigation" }
   $overviewOutput = & $NodeExe $smokeScript open-overview
   if ($LASTEXITCODE -ne 0) { throw "Packaged Bug overview smoke failed" }
   $overview = ($overviewOutput | Select-Object -Last 1 | ConvertFrom-Json).snapshot

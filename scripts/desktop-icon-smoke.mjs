@@ -145,6 +145,18 @@ try {
   );
   await click('.summary-card[data-status="pending"]');
   await screenshot("icons-workbench");
+  await click(".utility-card.compact-card");
+  const modalControls = await evaluate(`!!document.querySelector('dialog[open] .window-controls')`);
+  assert.ok(modalControls, "Window actions must stay usable in modal dialogs");
+  await click('[aria-label="最大化"]');
+  assert.ok(
+    await evaluate(
+      `window.qaHubDesktop.getWindowState().then(state => state.maximized && !!document.querySelector('dialog[open]'))`,
+    ),
+  );
+  await click('[aria-label="还原窗口"]');
+  await click('[aria-label="关闭设置"]');
+  assert.equal(await evaluate(`!!document.querySelector('dialog[open]')`), false);
   await click('[aria-label="最大化"]');
   const maximized = await evaluate(
     `(async () => ({state:await window.qaHubDesktop.getWindowState(), square:document.querySelector('.desktop-window').classList.contains('is-square'), pressed:document.querySelector('.window-maximize').getAttribute('aria-pressed'), icon:document.querySelector('.window-maximize .app-icon').dataset.icon}))()`,
@@ -194,6 +206,7 @@ try {
     shell,
     morphFrames: frames.length,
     selection,
+    modalControls,
     maximized,
     compact,
     reducedMotion: reduced,

@@ -282,10 +282,6 @@ input[type="radio"] {
   background: #fff0f2;
   color: #9e1730;
 }
-/* Modal backdrop covers the window buttons just as it covers the app underneath. */
-.desktop-window:has(.detail-overlay, dialog[open]) .window-controls {
-  visibility: hidden;
-}
 @media (prefers-reduced-motion: reduce) {
   .app-icon,
   .window-control,
