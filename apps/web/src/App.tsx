@@ -1949,11 +1949,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           <span className="bug-meta">
                             <b className="bug-key">{bug.key}</b>
                             <span>·</span>
+                            <span className="bug-fixer">{memberName(bug.ownerId)} 修复</span>
+                            <span>·</span>
                             <span>{memberName(bug.verificationOwnerId)} 关闭</span>
                           </span>
                         </span>
                       </span>
-                      <span className="person-cell" role="cell">
+                      <span
+                        className="person-cell"
+                        role="cell"
+                        title={`${memberName(actionPersonId)} · ${isAwaitingVerification ? "关闭人" : "修复人"}`}
+                      >
                         <span className="person-mini">{initials(memberName(actionPersonId))}</span>
                         <span>
                           <strong>{memberName(actionPersonId)}</strong>

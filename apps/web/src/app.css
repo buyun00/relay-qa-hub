@@ -651,7 +651,7 @@ h1 {
   min-height: 86px;
   padding: 0 24px;
   display: grid;
-  grid-template-columns: minmax(360px, 2.2fr) minmax(145px, 0.8fr) 142px 126px 28px;
+  grid-template-columns: minmax(0, 2.2fr) minmax(120px, 0.8fr) 142px 126px 28px;
   gap: 16px;
   align-items: center;
   border: 0;
@@ -668,6 +668,8 @@ h1 {
   letter-spacing: 0.04em;
 }
 .bug-row {
+  padding-top: 14px;
+  padding-bottom: 14px;
   cursor: pointer;
   transition: background 0.15s ease;
 }
@@ -725,6 +727,7 @@ h1 {
 .bug-meta {
   margin-top: 5px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 7px;
   color: #7f8c85;
@@ -735,6 +738,7 @@ h1 {
   font-weight: 750;
 }
 .person-cell {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -751,10 +755,14 @@ h1 {
   font-weight: 800;
 }
 .person-cell > span:last-child {
+  min-width: 0;
   display: grid;
   gap: 2px;
 }
 .person-cell strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 13px;
 }
 .person-cell small {
@@ -2779,12 +2787,37 @@ h1 {
   }
 }
 
-@media (max-width: 1050px) {
+@media (min-width: 621px) and (max-width: 1200px) {
   .table-row {
-    grid-template-columns: minmax(280px, 2fr) 110px 105px 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(112px, 0.55fr) 102px 18px;
+    column-gap: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
-  .table-row > :nth-child(2) {
+  .table-header > :nth-child(4) {
     display: none;
+  }
+  .bug-row {
+    row-gap: 4px;
+  }
+  .bug-row > .bug-main,
+  .bug-row > .person-cell,
+  .bug-row > .open-arrow {
+    grid-row: 1 / span 2;
+  }
+  .bug-row > .status-badge {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: end;
+  }
+  .bug-row > .updated-cell {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: start;
+    font-size: 11px;
+  }
+  .bug-row > .open-arrow {
+    grid-column: 4;
   }
 }
 @media (max-width: 900px) {
@@ -2937,6 +2970,9 @@ h1 {
     white-space: normal;
   }
   .bug-meta span:last-child {
+    display: none;
+  }
+  .bug-meta .bug-fixer + span {
     display: none;
   }
   .evidence-grid,

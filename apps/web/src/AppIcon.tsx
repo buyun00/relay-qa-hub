@@ -26,6 +26,7 @@ import {
   FolderDown,
   FolderOpen,
   LayoutDashboard,
+  LayoutGrid,
   ListChecks,
   ListTodo,
   LoaderCircle,
@@ -57,7 +58,7 @@ import type { IconInput } from "morphicons";
 
 // Import icon data explicitly so unused Lucide icons stay out of the EXE.
 const icons = {
-  dashboard: [LayoutDashboard, TableProperties],
+  dashboard: [LayoutDashboard, LayoutGrid],
   overview: [Table, TableProperties],
   production: [Play, Sparkles],
   package: [Package, PackageOpen],
@@ -81,7 +82,7 @@ const icons = {
   inProgress: [Timer, Clock],
   verification: [ClipboardCheck, FileCheck],
   closed: [CircleCheck, ShieldCheck],
-  minimize: [Minus, ArrowDownToLine],
+  minimize: [Minus, "M5 12h14"],
   maximize: [Square, Maximize2],
   restore: [Copy, Minimize2],
   settings: [Settings, CodeXml],

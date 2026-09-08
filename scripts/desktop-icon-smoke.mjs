@@ -113,6 +113,28 @@ try {
   assert.equal(shell.controls.length, 3);
   assert.ok(shell.controls.every((item) => item.clickable));
   assert.ok(shell.nativeOverlayHidden && shell.draggable && shell.iconCount >= 15);
+  const navigation = await evaluate(
+    `([...document.querySelectorAll('.nav-item .nav-icon')].map(icon => ({name:icon.dataset.icon,color:getComputedStyle(icon).color,path:icon.querySelector('path').getAttribute('d')})))`,
+  );
+  assert.equal(new Set(navigation.map((icon) => icon.color)).size, 5);
+  assert.notEqual(
+    navigation[0].path,
+    navigation[1].path,
+    "Workbench and overview must have distinct shapes",
+  );
+  const minimizeHover = await evaluate(
+    `(() => {const r=document.querySelector('[aria-label="最小化"]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`,
+  );
+  const minimizeSample = evaluate(
+    `new Promise(resolve => {const heights=[];const frame=()=>{heights.push(document.querySelector('[data-icon="minimize"] path').getBBox().height);if(heights.length<40)setTimeout(frame,20);else resolve(heights)};frame()})`,
+  );
+  await send("Input.dispatchMouseEvent", { type: "mouseMoved", ...minimizeHover });
+  const minimizeHeights = await minimizeSample;
+  assert.ok(
+    minimizeHeights.every((height) => height < 0.01),
+    "Minimize must remain a horizontal line throughout its animation",
+  );
+  await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 5, y: 80 });
   console.error("Testing morph geometry");
   const sample = evaluate(`new Promise(resolve => {
     const values = [];
@@ -144,6 +166,18 @@ try {
     ),
   );
   await click('.summary-card[data-status="pending"]');
+  const list = await evaluate(
+    `([...document.querySelectorAll('.bug-row')].map(row => ({priority:row.querySelector('.priority').textContent,color:getComputedStyle(row.querySelector('.priority')).backgroundColor,fixer:row.querySelector('.bug-fixer').textContent,person:row.querySelector('.person-cell').innerText})))`,
+  );
+  assert.ok(
+    list.length > 0 &&
+      list.every(
+        (row) =>
+          row.color !== "rgba(0, 0, 0, 0)" &&
+          row.fixer.includes("修复") &&
+          row.person.trim().length > 0,
+      ),
+  );
   await screenshot("icons-workbench");
   await click(".utility-card.compact-card");
   const modalControls = await evaluate(`!!document.querySelector('dialog[open] .window-controls')`);
@@ -178,6 +212,15 @@ try {
     `({width:innerWidth,height:innerHeight,overflow:document.documentElement.scrollWidth>innerWidth,controlsOverlap:document.querySelector('.topbar [aria-label="刷新"]').getBoundingClientRect().right>=document.querySelector('.window-controls').getBoundingClientRect().left})`,
   );
   assert.ok(!compact.overflow && !compact.controlsOverlap && compact.width <= 960);
+  const compactPeople = await evaluate(
+    `([...document.querySelectorAll('.bug-row')].map(row => {const person=row.querySelector('.person-cell').getBoundingClientRect();const main=row.querySelector('.bug-main').getBoundingClientRect();const updated=row.querySelector('.updated-cell').getBoundingClientRect();return {personVisible:person.width>0 && person.height>0,personOverlapsTitle:person.left<main.right,updatedVisible:updated.width>0 && updated.height>0};}))`,
+  );
+  assert.ok(
+    compactPeople.length > 0 &&
+      compactPeople.every(
+        (row) => row.personVisible && !row.personOverlapsTitle && row.updatedVisible,
+      ),
+  );
   await screenshot("icons-compact");
   await send("Emulation.setEmulatedMedia", {
     features: [{ name: "prefers-reduced-motion", value: "reduce" }],
@@ -204,11 +247,15 @@ try {
   assert.deepEqual(errors, []);
   const proof = {
     shell,
+    navigation,
+    minimizeLineMaxHeight: Math.max(...minimizeHeights),
+    list,
     morphFrames: frames.length,
     selection,
     modalControls,
     maximized,
     compact,
+    compactPeople,
     reducedMotion: reduced,
     minimized: true,
     closeToTray,
