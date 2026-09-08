@@ -18,8 +18,8 @@ $buildUpdaterScript = Join-Path $PSScriptRoot "build-updater.ps1"
 $uploaderDirectory = Join-Path $desktopRoot "vendor\ozdqp-uploader"
 $uploaderExecutable = Join-Path $uploaderDirectory "ozdqp-uploader.exe"
 if (-not (Test-Path -LiteralPath $uploaderExecutable -PathType Leaf) -or
-    (Get-FileHash -LiteralPath $uploaderExecutable -Algorithm SHA256).Hash.ToLowerInvariant() -ne "1291cb0cc397cc53ca4f9af3fde42f95f49bba9a9b3f6f2b0e4bbb0dde42e663") {
-  throw "Pinned OZDQP uploader 0.3.1 is missing or has changed."
+    (Get-FileHash -LiteralPath $uploaderExecutable -Algorithm SHA256).Hash.ToLowerInvariant() -ne "43a3ba2d30f4b1792e0406aa92ead1a61624c7aa491bfa9ae7e5be2b559b7a3d") {
+  throw "Pinned OZDQP uploader 0.3.2 is missing or has changed."
 }
 $assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
