@@ -15,6 +15,12 @@ $portableClientScript = Join-Path $PSScriptRoot "Configure-QAHubPortableClient.p
 $signUpdateScript = Join-Path $PSScriptRoot "sign-update.mjs"
 $generateIconScript = Join-Path $PSScriptRoot "generate-windows-icon.mjs"
 $buildUpdaterScript = Join-Path $PSScriptRoot "build-updater.ps1"
+$uploaderDirectory = Join-Path $desktopRoot "vendor\ozdqp-uploader"
+$uploaderExecutable = Join-Path $uploaderDirectory "ozdqp-uploader.exe"
+if (-not (Test-Path -LiteralPath $uploaderExecutable -PathType Leaf) -or
+    (Get-FileHash -LiteralPath $uploaderExecutable -Algorithm SHA256).Hash.ToLowerInvariant() -ne "9ffa226d0c6dc6e971963e7d1fc838dd2e1110f3120c716e548d33e80934dc23") {
+  throw "Pinned OZDQP uploader 0.2.0 is missing or has changed."
+}
 $assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
 $manifestFile = Join-Path $outputRoot "RelayQaHub-win32-x64-portable-latest.json"
@@ -113,6 +119,7 @@ try {
   if (-not (Test-Path -LiteralPath $packageDirectory -PathType Container)) {
     throw "Packaged desktop directory is missing."
   }
+  Copy-Item -LiteralPath $uploaderDirectory -Destination (Join-Path $packageDirectory "resources\uploader") -Recurse
   Copy-Item `
     -LiteralPath ([string]$nativeUpdater.updater) `
     -Destination (Join-Path $packageDirectory "RelayQaHubUpdater.exe") `

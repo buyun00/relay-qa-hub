@@ -1,3 +1,5 @@
+import type { UploaderBridge } from "../../desktop/src/uploader-types";
+
 interface QaHubDesktopBugChange {
   readonly notificationId: string;
   readonly eventId: string | null;
@@ -43,6 +45,7 @@ type QaHubDesktopUpdateState =
   | { readonly status: "error"; readonly message: string };
 
 interface QaHubDesktopBridge {
+  readonly uploader?: UploaderBridge;
   readonly windowControlsOverlay?: boolean;
   readonly getWindowState?: () => Promise<{ maximized: boolean; fullScreen: boolean }>;
   readonly onWindowState?: (

@@ -1,0 +1,115 @@
+import type { UploadJob, UploadMode } from "../../desktop/src/uploader-types";
+
+export const UPLOAD_MODES: { id: UploadMode; label: string; description: string }[] = [
+  {
+    id: "publish_workflow",
+    label: "完整发布",
+    description: "上传、提测，按已有测试结论继续正式发布",
+  },
+  { id: "prepare_test", label: "上传并提测", description: "测试包就绪后提测，等待人工测试" },
+  { id: "upload_only", label: "仅上传", description: "上传并等待测试目录解压完成" },
+];
+export const UPLOAD_STEPS = [
+  { label: "登录与下载", stages: ["NEW", "AUTHENTICATING", "DOWNLOADING"], done: "CREATE_VERSION" },
+  { label: "创建版本", stages: ["CREATE_VERSION", "PREPARE_VERSION"], done: "PREPARE_VERSION" },
+  {
+    label: "上传增量包",
+    stages: ["RESOLVE_OBJECT", "UPLOADING", "REGISTER_OBJECT"],
+    done: "OBJECT_READY",
+  },
+  {
+    label: "绑定与解压",
+    stages: ["BIND_PACKAGE", "WAIT_TEST_ASSETS", "TEST_ASSETS_READY"],
+    done: "WAIT_TEST_ASSETS",
+  },
+  {
+    label: "提测与测试结论",
+    stages: ["REQUEST_TEST", "TEST_REQUESTED", "START_TEST", "PASS_TEST"],
+    done: "PASS_TEST",
+  },
+  {
+    label: "复制与正式发布",
+    stages: [
+      "WAIT_RELEASE_COPY",
+      "WAIT_RELEASE_ASSETS",
+      "PREPARE_PUBLISH",
+      "REQUEST_PUBLISH",
+      "WAIT_PUBLISHED",
+      "PUBLISHED",
+    ],
+    done: "WAIT_PUBLISHED",
+  },
+];
+const STAGES: Record<string, string> = {
+  NEW: "等待启动",
+  AUTHENTICATING: "正在检查登录",
+  DOWNLOADING: "下载并校验增量包",
+  CREATE_VERSION: "创建版本",
+  PREPARE_VERSION: "准备版本",
+  RESOLVE_OBJECT: "检查文件是否已上传",
+  UPLOADING: "上传增量包",
+  REGISTER_OBJECT: "登记上传文件",
+  BIND_PACKAGE: "绑定版本与增量包",
+  WAIT_TEST_ASSETS: "等待测试目录解压",
+  TEST_ASSETS_READY: "上传完成 · 测试包已就绪",
+  REQUEST_TEST: "提交测试",
+  TEST_REQUESTED: "已提测 · 等待人工测试",
+  START_TEST: "登记测试状态",
+  PASS_TEST: "提交已有测试结论",
+  WAIT_RELEASE_ASSETS: "等待复制正式资源",
+  WAIT_RELEASE_COPY: "等待正式资源复制",
+  PREPARE_PUBLISH: "准备正式发布",
+  REQUEST_PUBLISH: "提交正式发布",
+  WAIT_PUBLISHED: "核验最终发布状态",
+  PUBLISHED: "正式发布完成",
+};
+const ERRORS: Record<string, string> = {
+  AUTH_REQUIRED: "登录已失效或尚未配置，请登录后恢复任务。",
+  FORBIDDEN: "当前账号没有操作权限，请核对平台账号。",
+  INVALID_INPUT: "请检查产品、渠道、版本概述、说明和测试人 ID。",
+  TEST_RESULT_REQUIRED: "增量包已提测。请填写本次测试人 ID 和实际测试结论引用，然后继续发布。",
+  TEST_RESULT_LOCKED: "本任务已开始登记测试状态，测试人和测试结论不能再替换。",
+  REMOTE_RESULT_UNKNOWN: "上次操作结果尚不明确。恢复时工具会先核对远端状态，无法确认时会继续停留。",
+  VERSION_CONFLICT: "版本或任务配置与原断点冲突，请到平台核对当前版本。",
+  OBJECT_CONFLICT: "上传对象与本任务不一致，请核对平台文件。",
+  FILE_CHANGED: "原任务的增量文件已改变或丢失。请保留现场并恢复原文件。",
+  JOB_LOCKED: "这个任务已在另一个上传进程中运行。",
+  UPLOADER_BUSY: "当前有操作或上传任务正在运行，请等待完成。",
+  UPLOADER_MISSING: "上传工具文件缺失，请重新安装完整的桌面版本。",
+  UPLOADER_INTEGRITY_FAILED: "上传工具文件校验不一致，请重新安装完整的桌面版本。",
+  UPLOADER_START_FAILED: "上传进程未能启动。任务记录已保留，可重试启动。",
+  LOGIN_SCHEMA_CHANGED: "平台登录响应与当前接口不一致，请到平台检查是否需要网页登录验证。",
+  NETWORK_FAILED: "暂时无法连接平台，请检查网络后重试。",
+  PLATFORM_FAILED: "平台暂时无法处理请求，请稍后重试。",
+  LOCAL_STATE_INVALID: "本机账号或任务记录无法读取，请保留记录并检查本地文件。",
+  PROCESSING_TIMEOUT: "等待平台处理超时，恢复任务可继续查询进度。",
+  NETWORK_TIMEOUT: "平台请求超时，任务断点已保留。",
+  JOB_COMPLETED: "该任务已完成，获取最新增量包请新建任务。",
+  JOB_NOT_FOUND: "未找到本机任务记录。",
+  REMOTE_PROCESSING_FAILED: "平台解压或复制失败，请查看平台处理结果后恢复。",
+};
+export const uploadStageLabel = (stage: string): string => STAGES[stage] ?? "正在处理";
+export const uploadErrorLabel = (code: string): string =>
+  ERRORS[code] ?? `操作暂未完成，记录已保留（${code || "UNKNOWN"}）。`;
+export function uploadJobLabel(job: UploadJob): string {
+  if (job.active) return uploadStageLabel(job.stage);
+  if (job.published) return "正式发布完成";
+  if (job.status === "succeeded") return uploadStageLabel(job.stage);
+  if (job.status === "awaiting_test") return "等待测试结论";
+  return job.status === "interrupted" ? "已中断 · 可恢复" : "待处理 · 可恢复";
+}
+export function uploadProgress(job: UploadJob) {
+  const event = [...job.events]
+    .reverse()
+    .find(
+      (event) => event.kind === (job.stage === "DOWNLOADING" ? "downloadProgress" : "progress"),
+    );
+  if (!event || !["DOWNLOADING", "UPLOADING"].includes(job.stage)) return null;
+  return {
+    ...event,
+    percent:
+      event.totalBytes > 0
+        ? Math.min(100, Math.round((event.completedBytes / event.totalBytes) * 100))
+        : null,
+  };
+}

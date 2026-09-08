@@ -18,6 +18,7 @@ import {
 import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
 import { isPackageDownloadUrl } from "./package-downloads.js";
 import { parsePackagingNotice } from "./packaging-notifications.js";
+import { UploaderHost } from "./uploader-host.js";
 import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
 import { NotificationHistory } from "./notification-history.js";
 import {
@@ -66,6 +67,22 @@ let mcpServer: QaHubMcpHttpServer | null = null;
 let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
+let uploader: UploaderHost | null = null;
+
+function getUploader(): UploaderHost {
+  const local = process.env["LOCALAPPDATA"];
+  if (!local) throw new Error("LOCAL_STORAGE_FAILED");
+  uploader ??= new UploaderHost({
+    root: path.join(local, "OZDQP-Uploader", "qa-hub-jobs"),
+    authFile: path.join(local, "OZDQP-Uploader", "auth", "fq2ivi.ipwana.com-443.json"),
+    executable: app.isPackaged
+      ? path.join(process.resourcesPath, "uploader", "ozdqp-uploader.exe")
+      : path.join(app.getAppPath(), "vendor", "ozdqp-uploader", "ozdqp-uploader.exe"),
+    runner: path.join(currentDirectory, "uploader-runner.js"),
+    nodeExecutable: process.execPath,
+  });
+  return uploader;
+}
 
 async function loadRememberedLoginName(): Promise<void> {
   if (rememberedLoginNameFile === null) return;
@@ -588,6 +605,39 @@ function createWindow(): BrowserWindow {
 }
 
 function installIpcHandlers(): void {
+  const uploadActions: Record<string, (value: unknown) => Promise<unknown>> = {
+    snapshot: () => getUploader().snapshot(),
+    login: (value) => getUploader().login(value),
+    "check-auth": () => getUploader().checkAuth(),
+    logout: () => getUploader().logout(),
+    start: (value) => getUploader().start(value),
+    resume: (value) => getUploader().resume(value),
+    "open-folder": async (value) => {
+      const directory = getUploader().folder(value);
+      await fs.access(path.join(directory, "desktop.json"));
+      if (await shell.openPath(directory)) throw new Error("OPEN_FOLDER_FAILED");
+      return true;
+    },
+  };
+  for (const [action, handler] of Object.entries(uploadActions)) {
+    ipcMain.handle(`desktop:uploader:${action}`, async (event, value: unknown) => {
+      if (
+        !isTrustedRendererUrl(event.senderFrame?.url ?? "") ||
+        event.senderFrame !== event.sender.mainFrame
+      )
+        return { ok: false, code: "UNTRUSTED_SENDER" };
+      try {
+        return { ok: true, value: await handler(value) };
+      } catch (error) {
+        // Never transport exception details, credentials or remote responses to the renderer/logs.
+        const code =
+          error instanceof Error && /^[A-Z_]{3,80}$/.test(error.message)
+            ? error.message
+            : "UPLOADER_FAILED";
+        return { ok: false, code };
+      }
+    });
+  }
   ipcMain.handle("desktop:get-window-state", (event) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return null;
     const window = BrowserWindow.fromWebContents(event.sender);

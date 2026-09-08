@@ -70,6 +70,7 @@ import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
 import OverviewPage, { formatOverviewDateLabel, type OverviewDateBucket } from "./OverviewPage";
 import UserManagementPage from "./UserManagementPage";
 import PackagingPage from "./PackagingPage";
+import UploadIncrementPage from "./UploadIncrementPage";
 import ProductionPage from "./ProductionPage";
 import DesktopTools, { ConnectionLight, useDesktopStatus } from "./DesktopTools";
 import ozdqpLogo from "./assets/ozdqp-logo.png";
@@ -86,7 +87,7 @@ const DEFAULT_PROJECT_ID =
   import.meta.env.VITE_QA_HUB_PROJECT_ID ?? "10000000-0000-4000-8000-000000000004";
 
 type Category = TaskStatus;
-type WorkspaceView = "workbench" | "overview" | "users" | "packaging" | "production";
+type WorkspaceView = "workbench" | "overview" | "users" | "packaging" | "production" | "upload";
 
 interface AppProps {
   readonly principal: BrowserSessionPrincipal;
@@ -515,6 +516,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [overviewRevision, setOverviewRevision] = useState(0);
   const [userManagementRevision, setUserManagementRevision] = useState(0);
   const [packagingRevision, setPackagingRevision] = useState(0);
+  const [uploadRevision, setUploadRevision] = useState(0);
   const [productionRevision, setProductionRevision] = useState(0);
   const mutation = mutationLabelForScope(
     pendingMutationLabels,
@@ -1685,6 +1687,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           <div className="overview-topbar-copy">{overviewDateLabel} · 表格视图</div>
         ) : view === "packaging" ? (
           <div className="overview-topbar-copy">一键打包 · 内网下载</div>
+        ) : view === "upload" ? (
+          <div className="overview-topbar-copy">上传增量 · 版本发布</div>
         ) : view === "production" ? (
           <div className="overview-topbar-copy">任务进展 · 新建制作</div>
         ) : (
@@ -1698,6 +1702,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             if (view === "workbench") void loadWorkbench(true);
             else if (view === "overview") setOverviewRevision((value) => value + 1);
             else if (view === "packaging") setPackagingRevision((value) => value + 1);
+            else if (view === "upload") setUploadRevision((value) => value + 1);
             else if (view === "production") setProductionRevision((value) => value + 1);
             else setUserManagementRevision((value) => value + 1);
           }}
@@ -1801,6 +1806,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           >
             <span className="nav-icon">↓</span>
             <span>打包下载</span>
+          </button>
+          <button
+            aria-current={view === "upload" ? "page" : undefined}
+            className={`nav-item${view === "upload" ? " is-active" : ""}`}
+            onClick={() => setView("upload")}
+            type="button"
+          >
+            <span className="nav-icon" aria-hidden="true">
+              ↑
+            </span>
+            <span>上传增量</span>
           </button>
         </nav>
         <DesktopTools
@@ -2005,6 +2021,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             active={view === "packaging"}
             refreshRevision={packagingRevision}
             onOpen={() => setView("packaging")}
+          />
+        </div>
+        <div hidden={view !== "upload"}>
+          <UploadIncrementPage
+            key={principal.userId}
+            userId={principal.userId}
+            active={view === "upload"}
+            refreshRevision={uploadRevision}
           />
         </div>
       </section>

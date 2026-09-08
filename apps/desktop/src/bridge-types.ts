@@ -1,3 +1,5 @@
+import type { UploaderBridge } from "./uploader-types.js";
+
 export type DesktopConnectionState =
   "disabled" | "stopped" | "connecting" | "connected" | "reconnecting" | "paused";
 
@@ -46,6 +48,7 @@ export type DesktopUpdateState =
   | { readonly status: "error"; readonly message: string };
 
 export interface QaHubDesktopBridge {
+  readonly uploader: UploaderBridge;
   readonly windowControlsOverlay: boolean;
   readonly getWindowState: () => Promise<DesktopWindowState>;
   readonly onWindowState: (listener: (state: DesktopWindowState) => void) => () => void;

@@ -199,6 +199,25 @@ ipcRenderer.on("desktop:update-state", (_event: IpcRendererEvent, value: unknown
 });
 
 const bridge: QaHubDesktopBridge = {
+  uploader: {
+    snapshot: () => ipcRenderer.invoke("desktop:uploader:snapshot"),
+    login: (input) =>
+      ipcRenderer.invoke("desktop:uploader:login", {
+        account: input.account,
+        password: input.password,
+        kind: input.kind,
+      }),
+    checkAuth: () => ipcRenderer.invoke("desktop:uploader:check-auth"),
+    logout: () => ipcRenderer.invoke("desktop:uploader:logout"),
+    start: (input) => ipcRenderer.invoke("desktop:uploader:start", input),
+    resume: (input) =>
+      ipcRenderer.invoke("desktop:uploader:resume", {
+        id: input.id,
+        testerId: input.testerId,
+        testResultReference: input.testResultReference,
+      }),
+    openFolder: (id) => ipcRenderer.invoke("desktop:uploader:open-folder", id),
+  },
   windowControlsOverlay: true,
   getWindowState: async () =>
     parseWindowState(await ipcRenderer.invoke("desktop:get-window-state")),

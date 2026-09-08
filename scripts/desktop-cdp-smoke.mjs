@@ -588,7 +588,7 @@ try {
     const shell = result.result?.value;
     if (
       !shell ||
-      shell.nav.join("|") !== "工作台|总览|制作任务|打包下载" ||
+      shell.nav.join("|") !== "工作台|总览|制作任务|打包下载|上传增量" ||
       !shell.cardLayout ||
       !shell.chrome.enabled ||
       !shell.chrome.visible ||
