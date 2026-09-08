@@ -1,0 +1,137 @@
+{
+  "recordedAt": "2026-09-08T20:43:09.134Z",
+  "sourceCommit": "09f7150fc1c671d867bbdbc257cab0e61c78d20f",
+  "rawProof": "docs/evidence/project-components/runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+  "rawProofSha256": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+  "rawCallCount": 31,
+  "responseMediaChecks": [
+    {
+      "label": "vendor create repair",
+      "expected": "application/vnd.relay-qa-hub.v1.1+json",
+      "actual": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "vendor start repair",
+      "expected": "application/vnd.relay-qa-hub.v1.1+json",
+      "actual": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "vendor no-code delivery",
+      "expected": "application/vnd.relay-qa-hub.v1.1+json",
+      "actual": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "vendor create verification",
+      "expected": "application/vnd.relay-qa-hub.v1.1+json",
+      "actual": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "vendor start verification",
+      "expected": "application/vnd.relay-qa-hub.v1.1+json",
+      "actual": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "vendor result",
+      "expected": "application/vnd.relay-qa-hub.v1.1+json",
+      "actual": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "vendor same request other response media",
+      "expected": "application/json",
+      "actual": "application/json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "legacy-response create repair",
+      "expected": "application/json",
+      "actual": "application/json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "legacy-response start repair",
+      "expected": "application/json",
+      "actual": "application/json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "legacy-response no-code delivery",
+      "expected": "application/json",
+      "actual": "application/json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "legacy-response create verification",
+      "expected": "application/json",
+      "actual": "application/json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "legacy-response start verification",
+      "expected": "application/json",
+      "actual": "application/json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "legacy-response result",
+      "expected": "application/json",
+      "actual": "application/json; charset=utf-8",
+      "passed": true
+    },
+    {
+      "label": "legacy-response same request other response media",
+      "expected": "application/vnd.relay-qa-hub.v1.1+json",
+      "actual": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "passed": true
+    }
+  ],
+  "sourceHashesStillMatch": {
+    "apps/api/dist/app.js": "1b34f9494ee0347ae5fc82bfc766150f5bdc9989717088ece00e82fe723e72ca",
+    "apps/api/dist/frozen-workflow-response.js": "26f69cbbb666684efe4ee40019db108620f57f1e2a9736f3dd980c0988036506",
+    "packages/storage/dist/repair-attempt-detail-store.js": "8bd7d6b2c1c059c5496483203dd2b28c0c1d224ffaecba81df5d538b99412cbc"
+  },
+  "previewApi": {
+    "pid": 18644,
+    "createdAt": "2026-09-08T20:39:13.7225210Z",
+    "instanceId": "qa-hub-preview-7c86",
+    "ready": {
+      "status": "ready",
+      "schemaVersion": "14",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    }
+  },
+  "existingDesktopBusiness": {
+    "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+    "state": "closed",
+    "version": 14,
+    "commentCount": 1,
+    "attachmentId": "bbeaafee-effa-4265-873e-881111e40ae8",
+    "attachmentSha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+    "attachmentBytes": 184872
+  },
+  "limits": [
+    "These are six registered mutation response contracts with 1.1 requests; inherited absent routes and legacy blocked request support remain unimplemented.",
+    "No external build/upload/Relay/Qingyu task was created.",
+    "The default script idempotency keys were corrected to canonical route keys before the first live execution.",
+    "Response media values were independently checked from captured raw HTTP responses; the same check was then added to future script runs."
+  ],
+  "passed": true
+}

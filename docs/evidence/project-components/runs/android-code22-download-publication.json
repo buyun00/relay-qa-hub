@@ -1,0 +1,45 @@
+{
+  "recordedAt": "2026-09-08T20:53:58.368Z",
+  "status": "passed",
+  "scope": "Immutable preview APK download publication and complete HTTP body verification only",
+  "instanceId": "qa-hub-preview-7c86",
+  "compatibleApiContract": "1.1.0",
+  "functionalBatch": "project-components-v2.1",
+  "sourceCommit": "1be772469671d75cbb5e31240bf345dcc7c4a267",
+  "sourceFilesMatchCommittedHead": true,
+  "sourceHashes": {
+    "apps/android/app/build.gradle.kts": "2b4cff7e120888fe6c0053cbb774b03e3eab0c6d8203f006d99173641ea11d0a",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/network/BugLifecycleClient.kt": "d8a7b083245e41132234c0301e0510352e0c2a9945192517940266f552105eaa",
+    "apps/android/app/src/test/kotlin/com/relayqahub/android/network/BugLifecycleClientTest.kt": "aebc17b6e6272c742ce9703c2163be0b1b432e34d73d2ae928489bace20d480f"
+  },
+  "buildProvenance": "The accepted APK was built before this commit; the reviewed Android source content matches committed HEAD. No rebuild or reinstall was performed by publication.",
+  "apk": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+    "bytes": 35471405,
+    "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+    "package": "com.relayqahub.android.preview.debug",
+    "versionCode": 22,
+    "versionName": "0.2.0-preview.8",
+    "signatureCertificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83",
+    "oldPackagePath": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code22-acceptance/retained-code21.apk",
+    "oldPackageSha256": "d783e9908e7dacdd660565cf15e1624c567a820e973d01190a38a0981afe7255",
+    "url": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk"
+  },
+  "http": {
+    "status": 200,
+    "bytes": 35471405,
+    "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+    "contentType": "application/vnd.android.package-archive",
+    "instanceHeader": "qa-hub-preview-7c86"
+  },
+  "acceptanceEvidence": {
+    "path": "android-code22-no-code.json",
+    "sha256": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
+  },
+  "windowsManifestUnchanged": true,
+  "limits": [
+    "This is a debug-certificate-signed APK at an immutable download URL.",
+    "The receipt is not an Android signed-update manifest; in-app self-update and physical-device acceptance remain not_run.",
+    "No daily application or production source, service, data or release channel was modified."
+  ]
+}

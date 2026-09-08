@@ -81,10 +81,33 @@ async function call(label, method, path, body, options = {}) {
     recordedAt: new Date().toISOString(),
   });
   assert.equal(response.status, options.status ?? 200, `${label}: ${JSON.stringify(clean(value))}`);
+  if (options.accept && response.ok)
+    assert.ok(response.headers.get("content-type")?.startsWith(options.accept), label);
   return value;
 }
+function requestKey(path, body) {
+  if (path === "/api/v1/bugs") return `submission:${body.clientSubmissionId}:commit`;
+  const bugRoute = /^\/api\/v1\/bugs\/([^/]+)\/(transitions|repair-attempts|verifications)$/u.exec(
+    path,
+  );
+  if (bugRoute) {
+    const [, id, action] = bugRoute;
+    if (action === "transitions")
+      return `workflow:transitionBug:bug:${id}:v${body.expectedVersion}:ready`;
+    if (action === "repair-attempts")
+      return `workflow:createRepairAttempt:bug:${id}:v${body.expectedVersion}`;
+    return `workflow:createVerification:bug:${id}:attempt:${body.repairAttemptId}:v${body.expectedVersion}`;
+  }
+  const attemptRoute = /^\/api\/v1\/repair-attempts\/([^/]+)\/(start|deliver)$/u.exec(path);
+  if (attemptRoute)
+    return `workflow:${attemptRoute[2] === "start" ? "start" : "deliver"}RepairAttempt:attempt:${attemptRoute[1]}:v${body.expectedVersion}`;
+  const verificationRoute = /^\/api\/v1\/verifications\/([^/]+)\/(start|result)$/u.exec(path);
+  if (verificationRoute)
+    return `workflow:${verificationRoute[2] === "start" ? "startVerification" : "recordVerificationResult"}:verification:${verificationRoute[1]}:v${body.expectedVersion}`;
+  return undefined;
+}
 const post = (label, path, body, options = {}) =>
-  call(label, "POST", path, body, { key: `frozen-live:${randomUUID()}`, ...options });
+  call(label, "POST", path, body, { key: requestKey(path, body), ...options });
 try {
   const ready = await call("ready", "GET", "/api/v1/health/ready");
   assert.equal(ready.status, "ready");
@@ -204,7 +227,7 @@ try {
       attachmentIds: [],
       ...(status === "failed" ? { failureReason: "测试验收退回原因必须仍可读取" } : {}),
     };
-    const resultKey = `frozen-live:${randomUUID()}`;
+    const resultKey = `workflow:recordVerificationResult:verification:${verification.id}:v${verification.version}`;
     const result = await post(
       `${label} result`,
       `/api/v1/verifications/${verification.id}/result`,
