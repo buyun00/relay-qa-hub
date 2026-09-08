@@ -52,10 +52,20 @@ identity and reads the original worker result instead of repeating launches. A
 machine restart leaves interrupted work recoverable with the original ZIP. Unknown
 writes are reconciled only on explicit recovery, never blindly replayed.
 
-Worker 0.4.0 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
+Worker 0.4.2 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
 The API does not accept client-selected paths, executables, origins or historical
-version IDs. Four 5 MB COS parts remain concurrent, with serialized STS renewal and
-checkpoint writes; recovery sends only missing verified parts.
+version IDs. Eight 5 MiB COS parts run concurrently, with serialized STS renewal and
+checkpoint writes; recovery sends only missing verified parts. The SDK's synchronous
+request deadline is 180 seconds (its `ConnectionTimeoutMs` also bounds transfer),
+with a 90-second read/write timeout. COS error diagnostics retain status codes and
+transport exception types, excluding messages, signed URLs and credentials.
+
+Completion always serializes parts in numeric order. If a previous merge has an
+uncertain result and the finished object cannot be inspected, recovery may continue
+only when the original upload ID is still active and every expected remote part
+matches the original local bytes by size and MD5. An unavailable upload, mismatched
+object, missing part or mismatched digest stops recovery. It never creates a new
+upload or replaces the original package to resolve an uncertain merge.
 
 ## Build and upload
 
