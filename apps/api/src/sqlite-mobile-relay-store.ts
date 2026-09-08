@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 
-import type { MobileScopeBootstrap, SqliteStorageWorker } from "@relay-qa-hub/storage";
+import type {
+  MobileScopeBootstrap,
+  SqliteStorageWorker,
+  MobileRelayComponentRoute,
+} from "@relay-qa-hub/storage";
 
 import type { MobileRelayStore } from "./mobile-relay.js";
 
@@ -10,6 +14,10 @@ export interface SqliteMobileRelayStoreOptions {
   readonly now?: () => Date;
   /** Production sets this only when the complete real Relay runtime is configured. */
   readonly relayDispatchEnabled?: boolean;
+  readonly relayInstanceId?: string;
+  readonly qaInstanceId?: string;
+  readonly componentRoute?: MobileRelayComponentRoute;
+  readonly canStart?: () => Promise<boolean>;
 }
 
 function digest(value: unknown): string {
@@ -25,10 +33,14 @@ class RelayIntegrationNotConfiguredError extends Error {
   }
 }
 
-function requireRelayDispatch(options: SqliteMobileRelayStoreOptions): void {
+async function requireRelayDispatch(options: SqliteMobileRelayStoreOptions): Promise<void> {
   if (options.relayDispatchEnabled === false) {
     throw new RelayIntegrationNotConfiguredError();
   }
+  if (options.canStart && !(await options.canStart()))
+    throw Object.assign(new Error("Relay component execution is paused"), {
+      code: "COMPONENT_DISABLED",
+    });
 }
 
 export function createSqliteMobileRelayStore(
@@ -76,7 +88,7 @@ export function createSqliteMobileRelayStore(
       });
     },
     async createRelayAttempt(command) {
-      requireRelayDispatch(options);
+      await requireRelayDispatch(options);
       return options.worker.createMobileRelayAttempt({
         ...actorScope(command.actorId),
         bugId: command.bugId,
@@ -148,9 +160,12 @@ export function createSqliteMobileRelayStore(
           });
     },
     async dispatchRelay(command) {
-      requireRelayDispatch(options);
+      await requireRelayDispatch(options);
       return options.worker.dispatchMobileRelay({
         ...actorScope(command.actorId),
+        ...(options.relayInstanceId ? { relayInstanceId: options.relayInstanceId } : {}),
+        ...(options.qaInstanceId ? { qaInstanceId: options.qaInstanceId } : {}),
+        ...(options.componentRoute ? { componentRoute: options.componentRoute } : {}),
         attemptId: command.attemptId,
         expectedVersion: command.request.expectedVersion,
         handoffId: command.request.handoffId,
@@ -164,9 +179,12 @@ export function createSqliteMobileRelayStore(
       });
     },
     async continueRelay(command) {
-      requireRelayDispatch(options);
+      await requireRelayDispatch(options);
       return options.worker.continueMobileRelay({
         ...actorScope(command.actorId),
+        ...(options.relayInstanceId ? { relayInstanceId: options.relayInstanceId } : {}),
+        ...(options.qaInstanceId ? { qaInstanceId: options.qaInstanceId } : {}),
+        ...(options.componentRoute ? { componentRoute: options.componentRoute } : {}),
         attemptId: command.attemptId,
         handoffId: command.request.handoffId,
         actionId: command.request.actionId,

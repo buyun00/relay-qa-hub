@@ -35,6 +35,7 @@ sealed interface CaptureResult {
         val requestedAtEpochMs: Long,
         val poco: CapturePocoSummary,
         val pocoArtifacts: List<CapturePocoArtifactRef>,
+        val scopeKey: String = "",
     ) : CaptureResult
 
     data class Unavailable(
@@ -49,7 +50,7 @@ sealed interface CaptureResult {
 /** Package-local result transport. Large PNG bytes always remain in app-private storage. */
 object CaptureResultBridge {
     private const val ACTION_CAPTURE_RESULT =
-        "com.relayqahub.android.capture.action.RESULT"
+        "com.relayqahub.android.preview.capture.action.RESULT"
     private const val EXTRA_KIND = "kind"
     private const val EXTRA_CAPTURE_ID = "captureId"
     private const val EXTRA_PRIVATE_PATH = "privatePath"
@@ -104,6 +105,7 @@ object CaptureResultBridge {
         val intent = Intent(ACTION_CAPTURE_RESULT).setPackage(context.packageName)
         when (result) {
             is CaptureResult.Ready -> intent
+                .putExtra("previewScopeKey", result.scopeKey)
                 .putExtra(EXTRA_KIND, KIND_READY)
                 .putExtra(EXTRA_CAPTURE_ID, result.captureId)
                 .putExtra(EXTRA_PRIVATE_PATH, result.privatePath)
@@ -182,6 +184,7 @@ object CaptureResultBridge {
                     ?: return null
                 val pocoArtifacts = readPocoArtifactRefs() ?: return null
                 CaptureResult.Ready(
+                    scopeKey = getStringExtra("previewScopeKey").orEmpty(),
                     captureId = captureId,
                     privatePath = privatePath,
                     width = width,

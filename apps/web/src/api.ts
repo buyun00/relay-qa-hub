@@ -1,3 +1,10 @@
+import {
+  assertProjectRequest,
+  getActiveProjectId,
+  projectRequestSnapshot,
+  projectStorageKey,
+} from "./project-context";
+
 export type BugListState =
   | "reported"
   | "needs_info"
@@ -16,6 +23,8 @@ export interface BrowserSessionPrincipal {
   readonly email: string;
   readonly displayName: string;
   readonly csrfToken: string;
+  readonly projectId?: string | null;
+  readonly isGm?: boolean;
 }
 
 export interface QingyuUser {
@@ -89,7 +98,6 @@ export interface QingyuImportResult {
 }
 
 let browserCsrfToken: string | null = null;
-const REMEMBERED_LOGIN_NAME_KEY = "relay.qa-hub.login-name.v1";
 const RECOVERABLE_SESSION_CODES = new Set(["UNAUTHENTICATED", "NATIVE_SESSION_INVALID"]);
 const API_REQUEST_TIMEOUT_MS = 25_000;
 const API_TRANSFER_TIMEOUT_MS = 65_000;
@@ -101,7 +109,9 @@ export function setBrowserCsrfToken(value: string | null): void {
 
 function rememberedLoginName(): string | null {
   try {
-    const value = globalThis.localStorage?.getItem(REMEMBERED_LOGIN_NAME_KEY)?.trim();
+    const value = globalThis.localStorage
+      ?.getItem(projectStorageKey("login-name", getActiveProjectId(), ""))
+      ?.trim();
     return value === undefined || value.length === 0 ? null : value;
   } catch {
     return null;
@@ -110,8 +120,9 @@ function rememberedLoginName(): string | null {
 
 function rememberLoginName(value: string | null): void {
   try {
-    if (value === null) globalThis.localStorage?.removeItem(REMEMBERED_LOGIN_NAME_KEY);
-    else globalThis.localStorage?.setItem(REMEMBERED_LOGIN_NAME_KEY, value);
+    const key = projectStorageKey("login-name", getActiveProjectId(), "");
+    if (value === null) globalThis.localStorage?.removeItem(key);
+    else globalThis.localStorage?.setItem(key, value);
   } catch {
     // A denied storage API must not make an otherwise valid session unusable.
   }
@@ -157,6 +168,7 @@ export interface ProjectMember {
   readonly roles: readonly ProjectRole[];
   readonly linkedUserIds?: readonly string[];
   readonly active: true;
+  readonly membershipVersion?: number;
 }
 
 export interface ProjectMemberList {
@@ -171,6 +183,7 @@ export interface ManagedProjectUser {
   readonly displayName: string;
   readonly status: "active" | "disabled";
   readonly membershipStatus: "active" | "revoked";
+  readonly membershipVersion?: number;
   readonly roles: readonly ProjectRole[];
   readonly linkedToUserId: string | null;
   readonly linkedToDisplayName: string | null;
@@ -402,6 +415,18 @@ export interface CommentCreationResponse {
     readonly version: number;
   };
   readonly correlationId: string;
+}
+
+export interface BugComment {
+  id: string;
+  body: string;
+  authorId: string;
+  createdAt: string;
+}
+export async function listBugComments(bugId: string): Promise<{ items: BugComment[] }> {
+  return (await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/comments`)) as {
+    items: BugComment[];
+  };
 }
 
 export interface RelayRepairAttempt {
@@ -821,10 +846,14 @@ async function fetchWithTimeout(
   init: RequestInit | undefined,
   timeoutMs: number,
 ): Promise<Response> {
+  init = projectRequestSnapshot(init);
+  assertProjectRequest(init);
   const timeoutSignal = AbortSignal.timeout(timeoutMs);
   const signal = init?.signal ? AbortSignal.any([init.signal, timeoutSignal]) : timeoutSignal;
   try {
-    return await fetch(path, { ...init, signal });
+    const response = await fetch(path, { ...init, signal });
+    assertProjectRequest(init);
+    return response;
   } catch (cause) {
     if (timeoutSignal.aborted) throw new QaHubApiError(504, "REQUEST_TIMEOUT");
     throw cause;
@@ -839,25 +868,22 @@ async function fetchJson(
   readonly body: unknown;
 }> {
   const method = (init?.method ?? "GET").toUpperCase();
-  const csrfHeaders =
-    browserCsrfToken !== null && !["GET", "HEAD", "OPTIONS"].includes(method)
-      ? { "X-CSRF-Token": browserCsrfToken }
-      : {};
+  const headers = new Headers(init?.headers);
+  headers.set("Accept", "application/vnd.relay-qa-hub.v1.1+json");
+  if (browserCsrfToken !== null && !["GET", "HEAD", "OPTIONS"].includes(method))
+    headers.set("X-CSRF-Token", browserCsrfToken);
   try {
     const response = await fetchWithTimeout(
       path,
       {
         ...init,
         credentials: "same-origin",
-        headers: {
-          Accept: "application/vnd.relay-qa-hub.v1.1+json",
-          ...csrfHeaders,
-          ...(init?.headers ?? {}),
-        },
+        headers,
       },
       API_REQUEST_TIMEOUT_MS,
     );
     const body: unknown = await response.json().catch(() => null);
+    if (init) assertProjectRequest(init);
     return { response, body };
   } catch (cause) {
     if (cause instanceof DOMException && cause.name === "TimeoutError") {
@@ -867,13 +893,20 @@ async function fetchJson(
   }
 }
 
-async function establishBrowserSession(name: string): Promise<BrowserSessionPrincipal> {
+async function establishBrowserSession(
+  name: string,
+  projectId = getActiveProjectId(),
+): Promise<BrowserSessionPrincipal> {
   setBrowserCsrfToken(null);
-  const { response, body } = await fetchJson("/api/v1/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, client: "web" }),
-  });
+  const init = projectRequestSnapshot(
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, projectId, client: "web" }),
+    },
+    projectId,
+  );
+  const { response, body } = await fetchJson("/api/v1/auth/login", init);
   if (!response.ok) throw new QaHubApiError(response.status, readErrorCode(body));
   if (!isBrowserSessionPrincipal(body)) {
     throw new QaHubApiError(200, "INVALID_AUTH_RESPONSE");
@@ -897,6 +930,12 @@ export async function requestJson(
   init?: RequestInit,
   allowSessionRecovery = true,
 ): Promise<unknown> {
+  const pathProject = path.match(/^\/api\/v1\/(?:gm\/)?projects\/([^/?]+)/u)?.[1];
+  const queryProject = new URL(path, "http://qa.local").searchParams.get("projectId");
+  init = projectRequestSnapshot(
+    init,
+    pathProject ? decodeURIComponent(pathProject) : (queryProject ?? getActiveProjectId()),
+  );
   let { response, body } = await fetchJson(path, init);
   const errorCode = readErrorCode(body);
   if (
@@ -906,9 +945,22 @@ export async function requestJson(
     RECOVERABLE_SESSION_CODES.has(errorCode)
   ) {
     await recoverBrowserSession();
+    assertProjectRequest(init);
     ({ response, body } = await fetchJson(path, init));
   }
-  if (!response.ok) throw new QaHubApiError(response.status, readErrorCode(body));
+  if (!response.ok) {
+    const code = readErrorCode(body);
+    if (
+      typeof window !== "undefined" &&
+      ["PROJECT_NOT_ACCESSIBLE", "PROJECT_MEMBERSHIP_DISABLED"].includes(code ?? "")
+    )
+      window.dispatchEvent(
+        new CustomEvent("qa-hub:project-access-denied", {
+          detail: new Headers(init.headers).get("x-qa-project-id"),
+        }),
+      );
+    throw new QaHubApiError(response.status, code);
+  }
   return body;
 }
 
@@ -934,8 +986,27 @@ export async function getBrowserSession(): Promise<BrowserSessionPrincipal> {
   return body;
 }
 
-export async function loginBrowserSession(name: string): Promise<BrowserSessionPrincipal> {
-  return establishBrowserSession(name);
+export async function loginBrowserSession(
+  name: string,
+  projectId = getActiveProjectId(),
+): Promise<BrowserSessionPrincipal> {
+  return establishBrowserSession(name, projectId);
+}
+
+export async function loginGmSession(password: string): Promise<BrowserSessionPrincipal> {
+  const body = await requestJson(
+    "/api/v1/auth/gm/login",
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ password, client: "web" }),
+    },
+    false,
+  );
+  if (!isBrowserSessionPrincipal(body) || !body.isGm)
+    throw new QaHubApiError(403, "GM_LOGIN_REQUIRED");
+  setBrowserCsrfToken(body.csrfToken);
+  return body;
 }
 
 export async function logoutBrowserSession(): Promise<void> {
@@ -1375,9 +1446,11 @@ async function uploadSubmissionAttachment(input: {
   readonly intent: "bug_create" | "verification_result";
   readonly targetQaItemId?: string;
 }): Promise<string> {
+  const scope = projectRequestSnapshot({}, input.projectId);
   const clientAttachmentId = crypto.randomUUID();
   const uploadAttempt = 1;
   const sha256 = await sha256Hex(input.file);
+  assertProjectRequest(scope);
   const initBody = (await requestJson("/api/v1/uploads/init", {
     method: "POST",
     headers: {
@@ -1402,6 +1475,7 @@ async function uploadSubmissionAttachment(input: {
   for (let offset = 0; offset < input.file.size; offset += initBody.chunkSize) {
     const chunk = input.file.slice(offset, Math.min(input.file.size, offset + initBody.chunkSize));
     const chunkSha256 = await sha256Hex(chunk);
+    assertProjectRequest(scope);
     const response = await fetchWithTimeout(
       `/api/v1/uploads/${encodeURIComponent(initBody.sessionId)}/chunks/${chunkNumber}`,
       {

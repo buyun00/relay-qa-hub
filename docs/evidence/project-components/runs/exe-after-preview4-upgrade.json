@@ -1,0 +1,30 @@
+{
+  "at": "2026-09-08T17:59:30.4950626Z",
+  "dailyPid": 17160,
+  "dailyStarted": "2026-09-08T10:24:12.5269521Z",
+  "previewVersion": "0.2.0-preview.4",
+  "configSha256": "AA98507FD6DBE84C360E845859AF69C4F5ED1724975ECC10B7561015CF76AC83",
+  "remembered": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4419",
+    "loginName": "EXE实际验收0909",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "userId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "identity": "employee"
+  },
+  "backups": [
+    "RelayQaHubPreview.backup-20260908T172125402Z",
+    "RelayQaHubPreview.backup-20260908T174125783Z",
+    "RelayQaHubPreview.backup-20260908T175032165Z"
+  ],
+  "result": {
+    "\u0000s\u0000c\u0000h\u0000e\u0000m\u0000a\u0000V\u0000e\u0000r\u0000s\u0000i\u0000o\u0000n\u0000": 1,
+    "\u0000s\u0000t\u0000a\u0000t\u0000u\u0000s\u0000": "\u0000i\u0000n\u0000s\u0000t\u0000a\u0000l\u0000l\u0000e\u0000d\u0000",
+    "\u0000r\u0000e\u0000l\u0000e\u0000a\u0000s\u0000e\u0000I\u0000d\u0000": "\u00002\u00000\u00002\u00006\u00000\u00009\u00000\u00008\u0000T\u00001\u00007\u00005\u00000\u00003\u00002\u00001\u00006\u00005\u0000Z\u0000",
+    "\u0000v\u0000e\u0000r\u0000s\u0000i\u0000o\u0000n\u0000": "\u00000\u0000.\u00002\u0000.\u00000\u0000-\u0000p\u0000r\u0000e\u0000v\u0000i\u0000e\u0000w\u0000.\u00004\u0000",
+    "\u0000r\u0000e\u0000c\u0000o\u0000r\u0000d\u0000e\u0000d\u0000A\u0000t\u0000": "\u00002\u00000\u00002\u00006\u0000-\u00000\u00009\u0000-\u00000\u00009\u0000T\u00001\u0000:\u00005\u00006\u0000:\u00002\u00005\u0000.\u00000\u00000\u00000\u0000Z\u0000"
+  },
+  "loginRestoredWithoutUserInput": true,
+  "draftScreenshot": "exe-preview4-restored-draft.jpg",
+  "draftText": "exe-preview4-restored-draft.txt"
+}

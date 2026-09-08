@@ -54,6 +54,7 @@ import kotlinx.coroutines.launch
 
 class CaptureSessionService : Service() {
     private data class PendingCapture(
+        val scopeKey: String,
         val captureId: String,
         val requestedAtEpochMs: Long,
         val mode: CapturedDraftMode,
@@ -263,6 +264,11 @@ class CaptureSessionService : Service() {
             }
         }
         val pending = PendingCapture(
+            scopeKey = (application as com.relayqahub.android.QaHubApplication).container.let { container ->
+                val identity = container.identityStore
+                com.relayqahub.android.draftScopeKey(container.apiBaseUrl, identity.projectId(),
+                    checkNotNull(identity.actorIdOrNull()) { "Capture requires a project login" })
+            },
             captureId = id,
             requestedAtEpochMs = requestedAtEpochMs,
             mode = mode,
@@ -383,6 +389,7 @@ class CaptureSessionService : Service() {
                     val screenSize = poco.artifacts[PocoReadOnlyMethod.GET_SCREEN_SIZE]
                         as? PocoArtifact.ScreenSize
                     val ready = CaptureResult.Ready(
+                            scopeKey = pending.scopeKey,
                             captureId = pending.captureId,
                             privatePath = file.absolutePath,
                             width = width,
@@ -555,16 +562,16 @@ class CaptureSessionService : Service() {
 
     companion object {
         private const val ACTION_START_SESSION =
-            "com.relayqahub.android.capture.action.START_SESSION"
+            "com.relayqahub.android.preview.capture.action.START_SESSION"
         private const val ACTION_CAPTURE_NOW =
-            "com.relayqahub.android.capture.action.CAPTURE_NOW"
+            "com.relayqahub.android.preview.capture.action.CAPTURE_NOW"
         private const val ACTION_STOP_SESSION =
-            "com.relayqahub.android.capture.action.STOP_SESSION"
+            "com.relayqahub.android.preview.capture.action.STOP_SESSION"
         private const val EXTRA_RESULT_CODE = "resultCode"
         private const val EXTRA_RESULT_DATA = "resultData"
         private const val EXTRA_CAPTURE_ID = "captureId"
         private const val EXTRA_REQUESTED_AT_EPOCH_MS = "requestedAtEpochMs"
-        private const val NOTIFICATION_CHANNEL_ID = "qa_capture_session"
+        private const val NOTIFICATION_CHANNEL_ID = "qa_preview_capture_session"
         private const val NOTIFICATION_ID = 3701
         private const val STOP_REQUEST_CODE = 3702
         private const val OPEN_APP_REQUEST_CODE = 3703

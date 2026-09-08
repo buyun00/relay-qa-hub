@@ -1,0 +1,40 @@
+{
+  "recordedBy": "production_inventory executing agent",
+  "evidenceType": "Retained summary of tool outputs from this session, not a newly rerun test",
+  "testStartedLocal": "2026-09-09 02:48:16 Asia/Shanghai",
+  "passed": true,
+  "web": { "files": 14, "tests": 61, "passed": 61, "failed": 0 },
+  "checks": [
+    { "command": "QA_HUB_API_BASE_URL=http://127.0.0.1:4419 node ../../node_modules/vitest/vitest.mjs run", "cwd": "apps/web", "exitCode": 0 },
+    { "command": "node ../../node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit", "cwd": "apps/web", "exitCode": 0 },
+    { "command": "node ../../node_modules/eslint/bin/eslint.js src/ComponentHistoryPage.tsx src/RelayOutboxPanel.tsx src/relay-outbox-api.ts src/RelayOutboxPanel.test.tsx --max-warnings=0", "cwd": "apps/web", "exitCode": 0 },
+    { "command": "QA_HUB_API_BASE_URL=http://127.0.0.1:4419 node ../../node_modules/vite/bin/vite.js build", "cwd": "apps/web", "exitCode": 0, "bundle": "dist/assets/index-CUjaBP8S.js" }
+  ],
+  "outboxFixture": {
+    "tests": 2,
+    "storage": "temporary real SQLite",
+    "http": "real existing API routes and ProjectComponentsRuntime at ephemeral loopback port",
+    "actor": "injected dedicated fixture principal; authentication end-to-end is not covered here",
+    "checks": [
+      "disabled component leaves readable paused record and disables rendered resume control",
+      "disabled resume returns COMPONENT_DISABLED",
+      "re-enabling component does not resume queued handoff",
+      "import-held resume returns IMPORT_EXECUTION_HELD and retains paused record",
+      "explicit resume returns pending with attemptCount 0 and one audit event",
+      "repeat resume returns TASK_NOT_PAUSED",
+      "all requests use exact project header/path; POST resume body is empty JSON object",
+      "cross-project list response and attempted mutation rejected",
+      "late response after project switch throws AbortError"
+    ],
+    "externalRequests": 0,
+    "preview4419Requests": 0,
+    "rendering": "React static markup with actual SQLite outbox record; no browser click proof",
+    "browserPausedRowAcceptance": "not_run"
+  },
+  "earlierFailures": [
+    "first Vitest startup lacked explicit QA_HUB_API_BASE_URL and was rejected before tests",
+    "first fixture run closed runtime twice; corrected test cleanup and subsequent focused 2/2 plus full 61/61 passed"
+  ],
+  "retainedTemporaryDirectory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-web-outbox-K7wqMz",
+  "retentionReason": "automatic approval review rejected exact-directory cleanup with blocked by policy; no alternate cleanup attempted"
+}

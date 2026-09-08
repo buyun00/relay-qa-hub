@@ -1,7 +1,5 @@
 import { basename, extname } from "node:path";
 
-export const DEFAULT_QINGYU_BASE_URL = "https://50qweb.jiaxianghudong.com";
-
 const LOGIN_STATUS = new Map([
   ["0", "pending"],
   ["1", "scanned"],
@@ -497,7 +495,16 @@ export class QingyuClient {
       readonly fetchImpl?: typeof fetch;
     } = {},
   ) {
-    this.baseUrl = new URL(options.baseUrl ?? DEFAULT_QINGYU_BASE_URL).origin;
+    if (!options.baseUrl)
+      throw new QingyuError(409, "COMPONENT_NOT_CONFIGURED", "轻语服务地址必须由项目配置提供");
+    const configured = new URL(options.baseUrl);
+    if (
+      !["https:", "http:"].includes(configured.protocol) ||
+      configured.username ||
+      configured.password
+    )
+      throw new QingyuError(409, "COMPONENT_NOT_CONFIGURED", "轻语服务地址无效");
+    this.baseUrl = configured.origin;
     this.timeoutMs = options.timeoutMs ?? 10_000;
     this.fetchImpl = options.fetchImpl ?? fetch;
   }

@@ -4,10 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import {
-  MAX_NOTIFICATION_HISTORY,
-  NotificationHistory,
-} from "../src/notification-history.js";
+import { MAX_NOTIFICATION_HISTORY, NotificationHistory } from "../src/notification-history.js";
 
 function notificationId(sequence: number): string {
   return `10000000-0000-4000-8000-${String(sequence).padStart(12, "0")}`;

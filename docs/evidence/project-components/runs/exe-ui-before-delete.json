@@ -1,0 +1,98 @@
+{
+  "recordedAt": "2026-09-08T18:53:13.682Z",
+  "context": {
+    "bug": {
+      "id": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "number": 14,
+      "key": "TA1788885078625-14",
+      "title": "EXE删除验收 2026-09-09：只删除本预览测试记录，保留审计及证据。",
+      "description": "EXE删除验收 2026-09-09：只删除本预览测试记录，保留审计及证据。",
+      "expectedBehavior": "问题修复后不再复现",
+      "moduleId": null,
+      "state": "reported",
+      "severity": "S2",
+      "priority": "P2",
+      "reporterId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "ownerId": null,
+      "verificationOwnerId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "duplicateOfBugId": null,
+      "occurrenceCount": 1,
+      "reopenCount": 0,
+      "version": 1,
+      "createdAt": "2026-09-08T18:52:02.354Z",
+      "updatedAt": "2026-09-08T18:52:02.354Z",
+      "closedAt": null
+    },
+    "comments": {
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "bugId": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+      "items": [],
+      "nextCursor": null
+    },
+    "events": {
+      "items": [
+        {
+          "schemaVersion": "1.0",
+          "id": "21321639-9507-42d9-a793-f73715a45d8b",
+          "type": "occurrence.appended",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+          "aggregate": {
+            "type": "bug",
+            "id": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+            "version": 1
+          },
+          "sequence": 1,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "31f8ac77-e655-4060-9436-6984e7c47907",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:52:02.354Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "occurrenceId": "8375b1a5-e72c-4853-b8c1-84843681ddf3",
+            "fromVersion": 1,
+            "toVersion": 2
+          }
+        }
+      ],
+      "nextCursor": null
+    },
+    "attachments": {
+      "bugId": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "snapshotSequence": 155,
+      "items": [
+        {
+          "attachmentId": "371a4cc7-d271-4cc8-aee5-8ad52df2ff58",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "clientSubmissionId": "a4372cb4-8ae3-4aee-b37e-9ba86e7ca960",
+          "clientAttachmentId": "8b56adb1-2d27-463c-bace-b2af7ee3e264",
+          "captureId": null,
+          "filename": "exe-test-input.png",
+          "mediaType": "image/png",
+          "size": 184872,
+          "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+          "scanStatus": "clean",
+          "readyToBind": true,
+          "bindingStatus": "claimed",
+          "version": 2
+        }
+      ],
+      "nextCursor": null
+    },
+    "humanWorkflow": {
+      "bugId": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+      "repairAttempt": null,
+      "buildRequirement": null,
+      "build": null,
+      "verification": null,
+      "latestVerification": null
+    }
+  }
+}

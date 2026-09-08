@@ -512,7 +512,7 @@ test("empty migration is repeatable and enables WAL, foreign keys, and integrity
   });
 });
 
-test("v6 through v12 preserves existing Bugs and adds shared management and Relay lifecycle facts", async () => {
+test("v6 through v14 preserves existing Bugs and adds shared management, project configuration and GM command authority", async () => {
   await withDatabase(async ({ database, databaseFile, root }) => {
     const initial = await migrateSqliteDatabase(database, databaseFile, { targetVersion: 6 });
     assert.equal(initial.toVersion, 6);
@@ -531,10 +531,18 @@ test("v6 through v12 preserves existing Bugs and adds shared management and Rela
     const completed = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "backups"),
     });
-    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12]);
+    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12, 13, 14]);
     assert.equal(completed.fromVersion, 7);
     assert.equal(completed.toVersion, SQLITE_SCHEMA_VERSION);
     assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table' AND name IN ('project_components', 'project_identity_links', 'project_management_events')",
+        "count",
+      ),
+      3,
+    );
     assert.equal(
       numberColumn(database, "SELECT count(*) AS count FROM bugs WHERE id = ?", "count", bugId),
       1,

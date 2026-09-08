@@ -1,3 +1,5 @@
+import { listBugComments, type BugComment } from "./api";
+import ComponentHistoryPage from "./ComponentHistoryPage";
 import AppIcon from "./AppIcon";
 import {
   type ClipboardEvent,
@@ -74,7 +76,9 @@ import PackagingPage from "./PackagingPage";
 import UploadIncrementPage from "./UploadIncrementPage";
 import ProductionPage from "./ProductionPage";
 import DesktopTools, { ConnectionLight, useDesktopStatus } from "./DesktopTools";
-import ozdqpLogo from "./assets/ozdqp-logo.png";
+import ProjectManagementPage from "./ProjectManagementPage";
+import { listProjectComponents, type ProjectComponent, type ComponentKey } from "./project-api";
+import { getActiveProjectId, projectStorageKey } from "./project-context";
 import {
   TASK_STATUS_ORDER,
   taskStatusCopy,
@@ -84,16 +88,25 @@ import {
   type TaskStatus,
 } from "./task-status";
 
-const DEFAULT_PROJECT_ID =
-  import.meta.env.VITE_QA_HUB_PROJECT_ID ?? "10000000-0000-4000-8000-000000000004";
-
 type Category = TaskStatus;
-type WorkspaceView = "workbench" | "overview" | "users" | "packaging" | "production" | "upload";
+type WorkspaceView =
+  | "workbench"
+  | "overview"
+  | "users"
+  | "packaging"
+  | "production"
+  | "upload"
+  | "settings"
+  | "history";
 
 interface AppProps {
   readonly principal: BrowserSessionPrincipal;
   readonly signingOut: boolean;
   readonly onSignOut: () => void;
+  readonly projectId?: string;
+  readonly onProjectChange?: (projectId: string) => void;
+  readonly initialDraft?: AppDraft | undefined;
+  readonly onDraftChange?: (draft: AppDraft) => void;
 }
 
 interface EvidenceImage {
@@ -127,6 +140,22 @@ interface ReturnDraft {
   readonly reason: string;
   readonly files: readonly File[];
   readonly clientSubmissionId: string;
+}
+export interface AppDraft {
+  newContent: string;
+  newOwnerId: string;
+  newVerifierId: string;
+  newSeverity: BugSeverity;
+  newFiles: readonly File[];
+  createOpen: boolean;
+  selectedId: string | null;
+  comment: string;
+  detailDraft: BugDetailDraft | null;
+  detailNewFiles: readonly File[];
+  detailAttachmentIds: readonly string[];
+  editingDetail: boolean;
+  assignmentDrafts: Readonly<Record<string, AssignmentDraft>>;
+  returnDrafts: Readonly<Record<string, ReturnDraft>>;
 }
 const EMPTY_RETURN_FILES: readonly File[] = [];
 
@@ -416,6 +445,9 @@ function eventCopy(event: BugEvent): string {
     "bug.created": "提交了 Bug",
     "bug.updated": "更新了分配或详情",
     "bug.comment_added": "添加了处理记录",
+    "comment.created": "添加了评论",
+    "occurrence.appended": "记录了问题",
+    "verification.created": "发起了验收",
     "repair_attempt.created": "建立了处理任务",
     "repair_attempt.started": "开始处理",
     "bug.manual_completion_started": "人工接管并标记完成",
@@ -431,12 +463,36 @@ function eventCopy(event: BugEvent): string {
   return labels[event.type] ?? event.type;
 }
 
-export default function App({ principal, signingOut, onSignOut }: AppProps) {
+export default function App({
+  principal,
+  signingOut,
+  onSignOut,
+  projectId = principal.projectId ?? getActiveProjectId(),
+  onProjectChange,
+  initialDraft,
+  onDraftChange,
+}: AppProps) {
   const [view, setView] = useState<WorkspaceView>("workbench");
   const [overviewDate, setOverviewDate] = useState<string | null>(null);
   const [overviewDateBuckets, setOverviewDateBuckets] = useState<readonly OverviewDateBucket[]>([]);
   const [projects, setProjects] = useState<readonly VisibleProject[]>([]);
-  const [projectId, setProjectId] = useState(DEFAULT_PROJECT_ID);
+  const [components, setComponents] = useState<readonly ProjectComponent[]>([]);
+  const [componentError, setComponentError] = useState("");
+  const componentConfig = (key: string) =>
+    components.find((component) => component.key === key)?.config ?? {};
+  const uploadDefaults = (componentConfig("upload.incremental").defaults ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const buildConfig = componentConfig("build");
+  const presetOptions = Array.isArray(buildConfig.presetOptions)
+    ? buildConfig.presetOptions.filter((value): value is string => typeof value === "string")
+    : Object.keys((buildConfig.presets ?? {}) as object);
+  const enabled = useCallback(
+    (key: ComponentKey) =>
+      components.some((component) => component.key === key && component.enabled),
+    [components],
+  );
   const [members, setMembers] = useState<readonly ProjectMember[]>([]);
   const [modules, setModules] = useState<readonly ProjectModule[]>([]);
   const [scopeId, setScopeId] = useState(principal.userId);
@@ -451,7 +507,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialDraft?.selectedId ?? null);
   const [detail, setDetail] = useState<BugDetail | null>(null);
   const [events, setEvents] = useState<readonly BugEvent[]>([]);
   const [workflow, setWorkflow] = useState<HumanWorkflowSnapshot | null>(null);
@@ -460,15 +516,21 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [previewImage, setPreviewImage] = useState<EvidenceImage | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
-  const [editingDetail, setEditingDetail] = useState(false);
-  const [detailDraft, setDetailDraft] = useState<BugDetailDraft | null>(null);
+  const [editingDetail, setEditingDetail] = useState(initialDraft?.editingDetail ?? false);
+  const [detailDraft, setDetailDraft] = useState<BugDetailDraft | null>(
+    initialDraft?.detailDraft ?? null,
+  );
   const [detailEditError, setDetailEditError] = useState<string | null>(null);
   const [detailEditVersionConflict, setDetailEditVersionConflict] = useState(false);
-  const [detailAttachmentIds, setDetailAttachmentIds] = useState<readonly string[]>([]);
-  const [detailNewFiles, setDetailNewFiles] = useState<readonly File[]>([]);
+  const [detailAttachmentIds, setDetailAttachmentIds] = useState<readonly string[]>(
+    initialDraft?.detailAttachmentIds ?? [],
+  );
+  const [detailNewFiles, setDetailNewFiles] = useState<readonly File[]>(
+    initialDraft?.detailNewFiles ?? [],
+  );
   const [assignmentDrafts, setAssignmentDrafts] = useState<
     Readonly<Record<string, AssignmentDraft>>
-  >({});
+  >(initialDraft?.assignmentDrafts ?? {});
   const assignmentDraft = detail === null ? undefined : assignmentDrafts[detail.id];
   const ownerId =
     canonicalProjectMemberId(members, assignmentDraft?.ownerId ?? detail?.ownerId ?? null) ?? "";
@@ -479,8 +541,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     ) ??
     detail?.reporterId ??
     "";
-  const [comment, setComment] = useState("");
-  const [returnDrafts, setReturnDrafts] = useState<Readonly<Record<string, ReturnDraft>>>({});
+  const [comments, setComments] = useState<BugComment[]>([]);
+  const [commentLoadError, setCommentLoadError] = useState("");
+  const [comment, setComment] = useState(initialDraft?.comment ?? "");
+  const [returnDrafts, setReturnDrafts] = useState<Readonly<Record<string, ReturnDraft>>>(
+    initialDraft?.returnDrafts ?? {},
+  );
   const returnUploads = useRef(
     new Map<string, WeakMap<File, { id: string; uploadedAt: number }>>(),
   );
@@ -492,12 +558,14 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [pendingMutationLabels, setPendingMutationLabels] = useState<ReadonlyMap<string, string>>(
     () => new Map(),
   );
-  const [createOpen, setCreateOpen] = useState(false);
-  const [newContent, setNewContent] = useState("");
-  const [newOwnerId, setNewOwnerId] = useState("");
-  const [newVerifierId, setNewVerifierId] = useState(principal.userId);
-  const [newSeverity, setNewSeverity] = useState<"S0" | "S1" | "S2" | "S3" | "S4">("S2");
-  const [newFiles, setNewFiles] = useState<readonly File[]>([]);
+  const [createOpen, setCreateOpen] = useState(initialDraft?.createOpen ?? false);
+  const [newContent, setNewContent] = useState(initialDraft?.newContent ?? "");
+  const [newOwnerId, setNewOwnerId] = useState(initialDraft?.newOwnerId ?? "");
+  const [newVerifierId, setNewVerifierId] = useState(
+    initialDraft?.newVerifierId ?? principal.userId,
+  );
+  const [newSeverity, setNewSeverity] = useState<BugSeverity>(initialDraft?.newSeverity ?? "S2");
+  const [newFiles, setNewFiles] = useState<readonly File[]>(initialDraft?.newFiles ?? []);
   const [qingyuLink, setQingyuLink] = useState<QingyuBugLink | null>(null);
   const [qingyuOpen, setQingyuOpen] = useState(false);
   const [qingyuSession, setQingyuSession] = useState<QingyuSession | null>(null);
@@ -512,7 +580,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const workbenchRequestRef = useRef(0);
   const detailRequestRef = useRef(0);
   const detailBugIdRef = useRef<string | null>(null);
-  const selectedIdRef = useRef<string | null>(null);
+  const selectedIdRef = useRef<string | null>(initialDraft?.selectedId ?? null);
   const pendingMutationsRef = useRef(new Map<string, Readonly<{ label: string; token: symbol }>>());
   const [overviewRevision, setOverviewRevision] = useState(0);
   const [userManagementRevision, setUserManagementRevision] = useState(0);
@@ -596,20 +664,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     [members, principal.displayName, principal.userId],
   );
 
-  const owners = useMemo(
-    () => members.filter((member) => member.roles.includes("developer")),
-    [members],
-  );
-  const verifiers = useMemo(
-    () =>
-      members.filter(
-        (member) => member.roles.includes("verifier") || member.userId === principal.userId,
-      ),
-    [members, principal.userId],
-  );
+  const owners = members;
+  const verifiers = members;
 
   useEffect(() => {
-    if (newOwnerId.length > 0 && !owners.some((member) => member.userId === newOwnerId)) {
+    if (
+      owners.length > 0 &&
+      newOwnerId.length > 0 &&
+      !owners.some((member) => member.userId === newOwnerId)
+    ) {
       setNewOwnerId("");
     }
     if (verifiers.length > 0 && !verifiers.some((member) => member.userId === newVerifierId)) {
@@ -634,13 +697,71 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const loadProjects = useCallback(async () => {
     const response = await listVisibleProjects();
     setProjects(response.items);
-    const preferred = response.items.find((project) => project.id === DEFAULT_PROJECT_ID);
-    const nextProject = preferred ?? response.items[0];
-    if (nextProject !== undefined) setProjectId(nextProject.id);
   }, []);
+
+  const refreshComponents = useCallback(async () => {
+    if (!projectId) return;
+    try {
+      const response = await listProjectComponents(projectId);
+      setComponents(response.items);
+      setComponentError("");
+    } catch {
+      setComponents([]);
+      setComponentError("组件设置暂时不可用，Bug 管理仍可使用。");
+    }
+  }, [projectId]);
+  useEffect(() => {
+    void refreshComponents();
+    const timer = window.setInterval(() => void refreshComponents(), 5000);
+    return () => window.clearInterval(timer);
+  }, [refreshComponents]);
+  useEffect(() => {
+    if (
+      (view === "production" && !enabled("relay.production")) ||
+      (view === "packaging" && !enabled("build")) ||
+      (view === "upload" && !enabled("upload.incremental"))
+    )
+      setView("workbench");
+    if (!enabled("qingyu.sync")) setQingyuOpen(false);
+  }, [enabled, view]);
+  useEffect(() => {
+    onDraftChange?.({
+      newContent,
+      newOwnerId,
+      newVerifierId,
+      newSeverity,
+      newFiles,
+      createOpen,
+      selectedId,
+      comment,
+      detailDraft,
+      detailNewFiles,
+      detailAttachmentIds,
+      editingDetail,
+      assignmentDrafts,
+      returnDrafts,
+    });
+  }, [
+    onDraftChange,
+    newContent,
+    newOwnerId,
+    newVerifierId,
+    newSeverity,
+    newFiles,
+    createOpen,
+    selectedId,
+    comment,
+    detailDraft,
+    detailNewFiles,
+    detailAttachmentIds,
+    editingDetail,
+    assignmentDrafts,
+    returnDrafts,
+  ]);
 
   const loadWorkbench = useCallback(
     async (quiet = false, indicateRefresh = quiet) => {
+      if (!projectId) return;
       const requestId = ++workbenchRequestRef.current;
       if (indicateRefresh) setRefreshing(true);
       else if (!quiet) setLoading(true);
@@ -813,6 +934,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     detailBugIdRef.current = null;
     setDetail(null);
     setEvents([]);
+    setComments([]);
+    setCommentLoadError("");
     setWorkflow(null);
     setQingyuLink(null);
     setCaptures([]);
@@ -856,6 +979,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       if (isInitialLoad) {
         setDetail(null);
         setEvents([]);
+        setComments([]);
+        setCommentLoadError("");
         setWorkflow(null);
         clearEvidence();
         setCaptures([]);
@@ -869,20 +994,25 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           workflowResponse,
           moduleResponse,
           nextQingyuLink,
+          commentResponse,
         ] = await Promise.all([
           listBugEvents(bugId),
           listBugAttachments(bugId),
           getHumanWorkflow(bugId),
           listProjectModules(nextDetail.projectId),
-          getQingyuBugLink(bugId),
+          enabled("qingyu.sync") ? getQingyuBugLink(bugId) : Promise.resolve(null),
+          listBugComments(bugId).catch(() => ({ items: [], unavailable: true })),
         ]);
         if (requestId !== detailRequestRef.current) return;
         setDetail(nextDetail);
         setEvents(eventResponse.items);
+        setComments(commentResponse.items);
+        setCommentLoadError("unavailable" in commentResponse ? "评论暂时无法读取。" : "");
         setWorkflow(workflowResponse);
         setQingyuLink(nextQingyuLink);
         setModules(moduleResponse.items.filter((item) => item.active));
-        setDetailAttachmentIds(attachmentResponse.items.map((item) => item.attachmentId));
+        if (!editingDetail)
+          setDetailAttachmentIds(attachmentResponse.items.map((item) => item.attachmentId));
 
         const imageResults = await Promise.allSettled(
           attachmentResponse.items
@@ -963,7 +1093,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         if (requestId === detailRequestRef.current) setDetailLoading(false);
       }
     },
-    [clearEvidence],
+    [clearEvidence, enabled, editingDetail],
   );
 
   useEffect(() => {
@@ -1025,6 +1155,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
 
   useEffect(
     () => () => {
+      workbenchRequestRef.current += 1;
+      detailRequestRef.current += 1;
       for (const item of evidenceRef.current) URL.revokeObjectURL(item.url);
     },
     [],
@@ -1608,8 +1740,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   };
 
   const openCreateBug = () => {
-    setNewOwnerId("");
-    setNewVerifierId(principal.userId);
     setCreateOpen(true);
   };
 
@@ -1642,21 +1772,24 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             </div>
           </div>
           <span className="brand-divider" aria-hidden="true" />
-          <span className="project-brand" title={currentProject?.name ?? "BaLOOT GO"}>
-            {currentProject === null || currentProject.id === DEFAULT_PROJECT_ID ? (
-              <img
-                className="project-logo"
-                src={ozdqpLogo}
-                alt="BaLOOT GO"
-                width={96}
-                height={34}
-              />
-            ) : (
-              <span className="project-monogram" aria-label={currentProject.name}>
-                {initials(currentProject.name)}
-              </span>
-            )}
-          </span>
+          <label className="project-switcher">
+            <span>项目</span>
+            <select
+              aria-label="切换项目"
+              value={projectId}
+              onChange={(event) => onProjectChange?.(event.target.value)}
+            >
+              {!projects.some((project) => project.id === projectId) && (
+                <option value={projectId}>{currentProject?.name ?? "当前项目"}</option>
+              )}
+              {projects.map((project) => (
+                <option value={project.id} key={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+            <small>预览</small>
+          </label>
         </div>
         {view === "workbench" ? (
           <label className="global-search">
@@ -1768,38 +1901,69 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               </div>
             </div>
           ) : null}
-          <button
-            aria-current={view === "production" ? "page" : undefined}
-            className={`nav-item${view === "production" ? " is-active" : ""}`}
-            onClick={() => setView("production")}
-            type="button"
-          >
-            <AppIcon
-              name="production"
-              active={view === "production"}
-              className="nav-icon"
-              size={21}
-            />
-            <span>制作任务</span>
-          </button>
-          <button
-            aria-current={view === "packaging" ? "page" : undefined}
-            className={`nav-item${view === "packaging" ? " is-active" : ""}`}
-            onClick={() => setView("packaging")}
-            type="button"
-          >
-            <AppIcon name="package" active={view === "packaging"} className="nav-icon" size={21} />
-            <span>打包下载</span>
-          </button>
-          <button
-            aria-current={view === "upload" ? "page" : undefined}
-            className={`nav-item${view === "upload" ? " is-active" : ""}`}
-            onClick={() => setView("upload")}
-            type="button"
-          >
-            <AppIcon name="upload" active={view === "upload"} className="nav-icon" size={21} />
-            <span>上传增量</span>
-          </button>
+          {enabled("relay.production") && (
+            <button
+              aria-current={view === "production" ? "page" : undefined}
+              className={`nav-item${view === "production" ? " is-active" : ""}`}
+              onClick={() => setView("production")}
+              type="button"
+            >
+              <AppIcon
+                name="production"
+                active={view === "production"}
+                className="nav-icon"
+                size={21}
+              />
+              <span>制作任务</span>
+            </button>
+          )}
+          {enabled("build") && (
+            <button
+              aria-current={view === "packaging" ? "page" : undefined}
+              className={`nav-item${view === "packaging" ? " is-active" : ""}`}
+              onClick={() => setView("packaging")}
+              type="button"
+            >
+              <AppIcon
+                name="package"
+                active={view === "packaging"}
+                className="nav-icon"
+                size={21}
+              />
+              <span>打包下载</span>
+            </button>
+          )}
+          {enabled("upload.incremental") && (
+            <button
+              aria-current={view === "upload" ? "page" : undefined}
+              className={`nav-item${view === "upload" ? " is-active" : ""}`}
+              onClick={() => setView("upload")}
+              type="button"
+            >
+              <AppIcon name="upload" active={view === "upload"} className="nav-icon" size={21} />
+              <span>上传增量</span>
+            </button>
+          )}
+          {
+            <button
+              type="button"
+              className={`nav-item${view === "history" ? " is-active" : ""}`}
+              onClick={() => setView("history")}
+            >
+              <AppIcon name="overview" className="nav-icon" />
+              <span>组件历史</span>
+            </button>
+          }
+          {principal.isGm && (
+            <button
+              className={`nav-item${view === "settings" ? " is-active" : ""}`}
+              onClick={() => setView("settings")}
+              type="button"
+            >
+              <AppIcon name="settings" className="nav-icon" />
+              <span>项目管理</span>
+            </button>
+          )}
         </nav>
         <DesktopTools
           desktop={desktop}
@@ -1819,6 +1983,11 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       </aside>
 
       <section className="page">
+        {componentError && (
+          <div className="banner error-banner" role="status">
+            {componentError}
+          </div>
+        )}
         {view === "workbench" ? (
           <main>
             <section className="hero">
@@ -1830,13 +1999,15 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 <p className="hero-copy">先完成需要你动作的 Bug，其他进度会自动留在工作台里。</p>
               </div>
               <div className="hero-actions">
-                <button
-                  className="secondary-button"
-                  onClick={() => void openQingyuImport()}
-                  type="button"
-                >
-                  从轻语导入
-                </button>
+                {enabled("qingyu.sync") && (
+                  <button
+                    className="secondary-button"
+                    onClick={() => void openQingyuImport()}
+                    type="button"
+                  >
+                    从轻语导入
+                  </button>
+                )}
                 <button className="primary-button" onClick={openCreateBug} type="button">
                   <AppIcon name="plus" /> 新建 Bug
                 </button>
@@ -2000,43 +2171,66 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             projectId={projectId}
             refreshRevision={userManagementRevision}
           />
-        ) : null}
-        <div hidden={view !== "production"}>
-          <ProductionPage
-            key={`${principal.userId}:${projectId}`}
-            active={view === "production"}
-            refreshRevision={productionRevision}
-            userId={principal.userId}
+        ) : view === "history" ? (
+          <ComponentHistoryPage projectId={projectId} components={components} />
+        ) : view === "settings" && principal.isGm ? (
+          <ProjectManagementPage
             projectId={projectId}
-            members={members}
-            onOpenBug={openDetail}
-            onImport={() => void openQingyuImport()}
-          />
-        </div>
-        <div hidden={view !== "packaging"}>
-          <PackagingPage
-            key={principal.userId}
-            userId={principal.userId}
-            active={view === "packaging"}
-            refreshRevision={packagingRevision}
-            onOpen={() => setView("packaging")}
-            onOpenUpload={(jobId) => {
-              setView("upload");
-              setUploadRevision((value) => value + 1);
-              window.dispatchEvent(
-                new CustomEvent("qa-hub:select-upload", { detail: jobId ?? "" }),
-              );
+            onSelectProject={(id) => onProjectChange?.(id)}
+            onChanged={() => {
+              void loadProjects();
+              void refreshComponents();
             }}
           />
-        </div>
-        <div hidden={view !== "upload"}>
-          <UploadIncrementPage
-            key={principal.userId}
-            userId={principal.userId}
-            active={view === "upload"}
-            refreshRevision={uploadRevision}
-          />
-        </div>
+        ) : null}
+        {enabled("relay.production") && (
+          <div hidden={view !== "production"}>
+            <ProductionPage
+              key={`${principal.userId}:${projectId}`}
+              active={view === "production"}
+              refreshRevision={productionRevision}
+              userId={principal.userId}
+              projectId={projectId}
+              members={members}
+              onOpenBug={openDetail}
+              onImport={() => void openQingyuImport()}
+              canImport={enabled("qingyu.sync")}
+            />
+          </div>
+        )}
+        {enabled("build") && (
+          <div hidden={view !== "packaging"}>
+            <PackagingPage
+              key={projectStorageKey("packaging", projectId, principal.userId)}
+              userId={principal.userId}
+              buildUploadEnabled={enabled("build_upload.single")}
+              presetOptions={presetOptions}
+              singleBuildPreset={String(componentConfig("build_upload.single").buildPreset ?? "")}
+              uploadDefaults={uploadDefaults}
+              active={view === "packaging"}
+              refreshRevision={packagingRevision}
+              onOpen={() => setView("packaging")}
+              onOpenUpload={(jobId) => {
+                setView("upload");
+                setUploadRevision((value) => value + 1);
+                window.dispatchEvent(
+                  new CustomEvent("qa-hub:select-upload", { detail: jobId ?? "" }),
+                );
+              }}
+            />
+          </div>
+        )}
+        {enabled("upload.incremental") && (
+          <div hidden={view !== "upload"}>
+            <UploadIncrementPage
+              key={projectStorageKey("upload", projectId, principal.userId)}
+              userId={principal.userId}
+              defaults={uploadDefaults}
+              active={view === "upload"}
+              refreshRevision={uploadRevision}
+            />
+          </div>
+        )}
       </section>
 
       {selectedId === null ? null : (
@@ -2438,6 +2632,16 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                           </span>
                         </p>
                       ))}
+                      {commentLoadError && <p role="status">{commentLoadError}</p>}
+                      {comments.map((item) => (
+                        <p key={item.id}>
+                          <span className="tiny-avatar">{initials(memberName(item.authorId))}</span>
+                          <span>
+                            <strong>{memberName(item.authorId)}</strong> {item.body}
+                            <small>{formatTime(item.createdAt)}</small>
+                          </span>
+                        </p>
+                      ))}
                       <form
                         className="comment-form"
                         onSubmit={(event) => void submitComment(event)}
@@ -2640,7 +2844,8 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       ) : null}
                       {detail.state !== "closed" &&
                       (repairAttempt === null || previousAttemptFailed) &&
-                      isOwner ? (
+                      isOwner &&
+                      enabled("relay.production") ? (
                         <button
                           className="secondary-button"
                           disabled={mutation !== null}

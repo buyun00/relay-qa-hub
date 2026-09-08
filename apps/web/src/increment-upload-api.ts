@@ -1,3 +1,4 @@
+import { projectStorageKey } from "./project-context";
 import type { UploaderBridge, UploadReply } from "@relay-qa-hub/upload-contract";
 import { requestJson, QaHubApiError } from "./api";
 
@@ -15,13 +16,7 @@ export function createUploadRequestId(): string {
 // Keep an uncertain submission's key across retries and page reloads. Actor namespacing
 // prevents one signed-in user from reusing another user's submission key.
 function requestKey(action: string, value: unknown): { key: string; clear: () => void } {
-  let actor = "session";
-  try {
-    actor = localStorage.getItem("relay.qa-hub.login-name.v1") ?? actor;
-  } catch {
-    /* Retain the in-memory submission if storage is unavailable. */
-  }
-  const storage = `qa-hub:server-upload-request:${actor}:${action}`;
+  const storage = projectStorageKey(`server-upload-request:${action}`);
   const fingerprint = JSON.stringify(value);
   const previous = pending.get(storage);
   let key = previous?.fingerprint === fingerprint ? previous.key : createUploadRequestId();

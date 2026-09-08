@@ -1,0 +1,591 @@
+{
+  "recordedAt": "2026-09-08T18:35:54.690Z",
+  "context": {
+    "bug": {
+      "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "number": 13,
+      "key": "TA1788885078625-13",
+      "title": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。",
+      "description": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。",
+      "expectedBehavior": "问题修复后不再复现",
+      "moduleId": null,
+      "state": "ready_for_verification",
+      "severity": "S2",
+      "priority": "P2",
+      "reporterId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "ownerId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "verificationOwnerId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "duplicateOfBugId": null,
+      "occurrenceCount": 1,
+      "reopenCount": 0,
+      "version": 11,
+      "createdAt": "2026-09-08T18:31:56.292Z",
+      "updatedAt": "2026-09-08T18:35:54.093Z",
+      "closedAt": null
+    },
+    "comments": {
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "items": []
+    },
+    "events": {
+      "items": [
+        {
+          "schemaVersion": "1.0",
+          "id": "ce65ab1e-6264-4363-86d0-5e5bd8d1871f",
+          "type": "repair_attempt.delivered",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+            "version": 11
+          },
+          "sequence": 3,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "3bd552fb-fd4d-4fbb-9315-707d92bdcb03",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:35:54.093Z",
+          "fromState": "in_progress",
+          "toState": "ready_for_verification",
+          "payload": {
+            "status": "delivered",
+            "repairAttemptId": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+            "reason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+            "fromVersion": 2,
+            "toVersion": 3
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "72debb1e-0dec-42d9-8656-e01322246953",
+          "type": "repair_attempt.started",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+            "version": 11
+          },
+          "sequence": 2,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "81bf1173-bb88-4ac3-a9f9-0747801eeb14",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:35:54.092Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "status": "running",
+            "repairAttemptId": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+            "fromVersion": 1,
+            "toVersion": 2,
+            "reason": "人工确认修复完成，提交原验收人验收"
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "221b4de5-dcd9-49f1-8d60-9e6e0352007b",
+          "type": "repair_attempt.created",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+            "version": 11
+          },
+          "sequence": 1,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "ec725a78-b7b2-4572-b73a-f573e58bb90c",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:35:54.091Z",
+          "fromState": "ready",
+          "toState": "in_progress",
+          "payload": {
+            "status": "planned",
+            "repairAttemptId": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+            "fromVersion": 9,
+            "toVersion": 10
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "ec725a78-b7b2-4572-b73a-f573e58bb90c",
+          "type": "bug.manual_completion_started",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+            "version": 11
+          },
+          "sequence": 4,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "ec725a78-b7b2-4572-b73a-f573e58bb90c",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:35:54.090Z",
+          "fromState": "ready",
+          "toState": "ready",
+          "payload": {
+            "status": "ready",
+            "repairAttemptId": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+            "reason": "人工确认修复完成，提交原验收人验收",
+            "fromVersion": 8,
+            "toVersion": 9
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "e5a06322-20d5-4164-b5ea-c19bb880220a",
+          "type": "verification.result_recorded",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "c61f217d-ad5c-4043-b218-93dc398a3193",
+            "version": 11
+          },
+          "sequence": 3,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "6ea12ad4-2e05-4f1e-921d-6f594c87293b",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:34:18.780Z",
+          "fromState": "ready_for_verification",
+          "toState": "ready",
+          "payload": {
+            "status": "failed",
+            "summary": "问题仍可复现，请继续处理EXE真实验收退回：验证未通过路径和再次人工完成，附件必须保留。",
+            "reason": "问题仍可复现，请继续处理EXE真实验收退回：验证未通过路径和再次人工完成，附件必须保留。",
+            "verificationId": "c61f217d-ad5c-4043-b218-93dc398a3193",
+            "repairAttemptId": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "fromVersion": 2,
+            "toVersion": 3
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "dc29677c-da1f-4b06-98ba-65de98e1947c",
+          "type": "verification.started",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "c61f217d-ad5c-4043-b218-93dc398a3193",
+            "version": 11
+          },
+          "sequence": 2,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "a58f12c2-bb37-47e9-b75c-020cc22396ae",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:34:18.764Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "status": "in_progress",
+            "verificationId": "c61f217d-ad5c-4043-b218-93dc398a3193",
+            "fromVersion": 1,
+            "toVersion": 2,
+            "reason": "Human verifier started exact-Build acceptance"
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "2d29ca0e-e531-4f32-a6cf-d56ee64fc2d2",
+          "type": "verification.created",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "c61f217d-ad5c-4043-b218-93dc398a3193",
+            "version": 11
+          },
+          "sequence": 1,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "9d31e7ed-b637-4184-9304-864a85e5c603",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:34:18.718Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "status": "requested",
+            "verificationId": "c61f217d-ad5c-4043-b218-93dc398a3193",
+            "repairAttemptId": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "toVersion": 1
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "45faba7a-3810-4c03-a6f5-afe58533d36e",
+          "type": "repair_attempt.delivered",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "version": 11
+          },
+          "sequence": 3,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "9d7389e7-ba34-4fc5-9e01-c7d8a360b965",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:33:55.844Z",
+          "fromState": "in_progress",
+          "toState": "ready_for_verification",
+          "payload": {
+            "status": "delivered",
+            "repairAttemptId": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "reason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+            "fromVersion": 2,
+            "toVersion": 3
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "f59e08e4-eb77-4b73-99a0-2c813be2900c",
+          "type": "repair_attempt.started",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "version": 11
+          },
+          "sequence": 2,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "b096a469-9a61-456c-853e-e290a1b5b11c",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:33:55.843Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "status": "running",
+            "repairAttemptId": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "fromVersion": 1,
+            "toVersion": 2,
+            "reason": "人工确认修复完成，提交原验收人验收"
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "a654dd34-651e-4430-953b-eb373e7bdcbf",
+          "type": "repair_attempt.created",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "version": 11
+          },
+          "sequence": 1,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "88f6e8af-7bfa-4169-aee2-639ef484d681",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:33:55.842Z",
+          "fromState": "ready",
+          "toState": "in_progress",
+          "payload": {
+            "status": "planned",
+            "repairAttemptId": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "fromVersion": 4,
+            "toVersion": 5
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "0e3e572a-1e0e-4abe-b536-454d99332d1b",
+          "type": "repair_attempt.superseded",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "e7e1badf-b8e2-4cea-9849-f0e7a78190fc",
+            "version": 11
+          },
+          "sequence": 3,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "88f6e8af-7bfa-4169-aee2-639ef484d681",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:33:55.841Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "status": "superseded",
+            "repairAttemptId": "e7e1badf-b8e2-4cea-9849-f0e7a78190fc",
+            "reason": "人工确认修复完成，提交原验收人验收",
+            "fromVersion": 2,
+            "toVersion": 3
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "88f6e8af-7bfa-4169-aee2-639ef484d681",
+          "type": "bug.manual_completion_started",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+            "version": 11
+          },
+          "sequence": 3,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "88f6e8af-7bfa-4169-aee2-639ef484d681",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:33:55.841Z",
+          "fromState": "in_progress",
+          "toState": "ready",
+          "payload": {
+            "status": "ready",
+            "repairAttemptId": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+            "reason": "人工确认修复完成，提交原验收人验收",
+            "fromVersion": 3,
+            "toVersion": 4
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "595868ed-0a6d-49b5-b3fc-bea3860ede65",
+          "type": "repair_attempt.started",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "e7e1badf-b8e2-4cea-9849-f0e7a78190fc",
+            "version": 11
+          },
+          "sequence": 2,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "ed6f5183-1e0a-4e49-85d9-2b73ea6d0802",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:32:38.829Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "status": "running",
+            "repairAttemptId": "e7e1badf-b8e2-4cea-9849-f0e7a78190fc",
+            "fromVersion": 1,
+            "toVersion": 2,
+            "reason": "Developer started the Web-managed repair"
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "055547a0-af84-4644-935f-05fa6b47e2fb",
+          "type": "repair_attempt.created",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "e7e1badf-b8e2-4cea-9849-f0e7a78190fc",
+            "version": 11
+          },
+          "sequence": 1,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "0cc6240d-6ff4-48d8-a626-b412f0ec7b1d",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:32:38.790Z",
+          "fromState": "ready",
+          "toState": "in_progress",
+          "payload": {
+            "status": "planned",
+            "repairAttemptId": "e7e1badf-b8e2-4cea-9849-f0e7a78190fc",
+            "fromVersion": 2,
+            "toVersion": 3
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "35ad3d1c-f9be-41af-b188-832195315881",
+          "type": "bug.triage.ready",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+            "version": 11
+          },
+          "sequence": 2,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "089ea06c-3fe7-49e2-8e7c-6f29f1dd1e74",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:32:38.747Z",
+          "fromState": "reported",
+          "toState": "ready",
+          "payload": {
+            "status": "ready",
+            "fromVersion": 1,
+            "toVersion": 2
+          }
+        },
+        {
+          "schemaVersion": "1.0",
+          "id": "52fe2626-e935-4688-9763-ca310bb6b9e9",
+          "type": "occurrence.appended",
+          "source": "qa_hub",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+          "aggregate": {
+            "type": "bug",
+            "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+            "version": 11
+          },
+          "sequence": 1,
+          "actor": {
+            "type": "user",
+            "id": "5ef57049-0e33-4476-8a3c-b320aa26bf68"
+          },
+          "correlationId": "134ba239-67a9-4145-98d0-08176a12d52e",
+          "causationId": null,
+          "occurredAt": "2026-09-08T18:31:56.292Z",
+          "fromState": null,
+          "toState": null,
+          "payload": {
+            "occurrenceId": "007e8672-4c28-45fa-b537-43b0313b911d",
+            "fromVersion": 1,
+            "toVersion": 2
+          }
+        }
+      ],
+      "nextCursor": null
+    },
+    "attachments": {
+      "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "snapshotSequence": 149,
+      "items": [
+        {
+          "attachmentId": "bbeaafee-effa-4265-873e-881111e40ae8",
+          "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+          "clientSubmissionId": "f845261a-e1f1-46d3-8a48-3c3af7385db5",
+          "clientAttachmentId": "334ab010-b482-4c8b-b3ea-55b3d32bfbe7",
+          "captureId": null,
+          "filename": "31C9B4~1.PNG",
+          "mediaType": "image/png",
+          "size": 184872,
+          "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+          "scanStatus": "clean",
+          "readyToBind": true,
+          "bindingStatus": "claimed",
+          "version": 2
+        }
+      ],
+      "nextCursor": null
+    },
+    "humanWorkflow": {
+      "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "repairAttempt": {
+        "id": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+        "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+        "sequence": 3,
+        "mode": "human",
+        "status": "delivered",
+        "assigneeId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+        "parentAttemptId": null,
+        "summary": "人工确认修复完成，提交原验收人验收",
+        "branch": null,
+        "commitSha": null,
+        "mergeRequestUrl": null,
+        "patchUrl": null,
+        "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+        "failureReason": null,
+        "targetBuildId": null,
+        "version": 3
+      },
+      "buildRequirement": {
+        "id": "5953ed63-d2e2-4f3f-8b06-ec43f60ee205",
+        "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+        "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+        "repairAttemptId": "3d35fd52-9d1b-4464-a0cd-d5a644305cd8",
+        "sourceDeliveryVersion": 3,
+        "deliveredCommitSha": null,
+        "requirement": "not_required",
+        "decisionBasis": "no_code_delivery",
+        "decisionReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+        "decisionActorId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+        "decisionAuditEventId": "ce65ab1e-6264-4363-86d0-5e5bd8d1871f",
+        "linkedBuildId": null,
+        "linkId": null,
+        "policyVersion": "1.0.0",
+        "bugVersionAtDelivery": 11,
+        "createdAt": "2026-09-08T18:35:54.093Z",
+        "updatedAt": "2026-09-08T18:35:54.093Z",
+        "version": 1
+      },
+      "build": null,
+      "verification": null,
+      "latestVerification": {
+        "id": "c61f217d-ad5c-4043-b218-93dc398a3193",
+        "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+        "repairAttemptId": "881e3a17-561f-4ac0-8a20-8b6518dba450",
+        "buildId": null,
+        "status": "failed",
+        "verifierId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+        "criteriaSnapshot": "问题修复后不再复现",
+        "resultSummary": "问题仍可复现，请继续处理EXE真实验收退回：验证未通过路径和再次人工完成，附件必须保留。",
+        "failureReason": "问题仍可复现，请继续处理EXE真实验收退回：验证未通过路径和再次人工完成，附件必须保留。",
+        "blockedReason": null,
+        "version": 3
+      }
+    }
+  }
+}

@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -8,9 +10,15 @@ fun String.asBuildConfigString(): String =
     "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
 val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
-    .orElse("http://10.100.5.157:4319/api/v1/")
+    .orElse("")
+val qaHubProjectId = providers.gradleProperty("qaHubProjectId").orElse("")
+require(qaHubApiBaseUrl.get().isNotBlank()) { "Preview requires explicit -PqaHubApiBaseUrl; production fallback is forbidden" }
+require(qaHubProjectId.get().matches(Regex("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}"))) {
+    "Preview requires explicit -PqaHubProjectId UUID"
+}
+require(URI(qaHubApiBaseUrl.get()).port != 4319) { "Preview cannot use production API port 4319" }
 val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
-    .orElse("http://10.100.5.129:8000/apk/")
+    .orElse("https://qa-hub.invalid/disabled/")
 val qaHubVersionCode = providers.gradleProperty("qaHubVersionCode")
     .orElse("14")
     .map { value ->
@@ -32,7 +40,7 @@ android {
     buildToolsVersion = "36.0.0"
 
     defaultConfig {
-        applicationId = "com.relayqahub.android"
+        applicationId = "com.relayqahub.android.preview"
         minSdk = 29
         targetSdk = 37
         versionCode = qaHubVersionCode.get()
@@ -47,6 +55,8 @@ android {
             qaHubApiBaseUrl.get().asBuildConfigString(),
         )
         buildConfigField("String", "QA_HUB_CONTRACT_VERSION", "\"1.1.0\"")
+        buildConfigField("String", "QA_HUB_PROJECT_ID", qaHubProjectId.get().asBuildConfigString())
+        buildConfigField("String", "QA_HUB_UPDATE_CHANNEL", "\"preview\"")
         buildConfigField(
             "String",
             "QA_HUB_GAME_APK_DIRECTORY_URL",
@@ -131,6 +141,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
+    implementation("com.google.zxing:core:3.5.3")
 
     testImplementation(libs.junit)
 

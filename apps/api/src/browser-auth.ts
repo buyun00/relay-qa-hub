@@ -24,6 +24,8 @@ export interface BrowserAuthPrincipal {
   readonly actorId: string;
   readonly email: string;
   readonly displayName: string;
+  readonly projectId?: string;
+  readonly isGm?: boolean;
 }
 
 export interface EnsureBrowserAdminInput {
@@ -48,6 +50,8 @@ export interface LoginBrowserSessionInput {
 export interface CreateBrowserSessionInput {
   readonly accountId: string;
   readonly userId: string;
+  readonly projectId?: string;
+  readonly isGm?: boolean;
   readonly sessionId: string;
   readonly tokenDigest: string;
   readonly issuedAt: string;
@@ -86,6 +90,14 @@ export interface BrowserAuthOptions {
   readonly actorId: string;
   readonly adminEmail: string;
   readonly passwordlessLogin: (name: string, now: string) => Promise<{ readonly userId: string }>;
+  readonly projectLogin?: (
+    name: string,
+    projectId: string,
+    now: string,
+  ) => Promise<{ readonly userId: string; readonly projectId: string }>;
+  readonly legacyProjectId?: string;
+  readonly cookieName?: string;
+  readonly gm?: { readonly userId: string; readonly password: string };
   readonly sessionSecret: string;
   readonly webOrigins: readonly string[];
   readonly now?: () => Date;
@@ -101,11 +113,13 @@ interface BrowserAuthRequest extends FastifyRequest {
 interface LoginBody {
   readonly name?: unknown;
   readonly client?: unknown;
+  readonly projectId?: unknown;
 }
 
 function parsePasswordlessLoginBody(body: unknown): {
   readonly name: string;
   readonly client: "web" | "android";
+  readonly projectId?: string;
 } {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
     throw new TypeError("login body is invalid");
@@ -115,7 +129,13 @@ function parsePasswordlessLoginBody(body: unknown): {
   if (value.client !== "web" && value.client !== "android") {
     throw new TypeError("client is invalid");
   }
-  return { name, client: value.client };
+  return {
+    name,
+    client: value.client,
+    ...(value.projectId === undefined
+      ? {}
+      : { projectId: requireText(value.projectId, "projectId", 100) }),
+  };
 }
 
 function requireText(value: unknown, field: string, maxLength: number): string {
@@ -127,6 +147,7 @@ function requireText(value: unknown, field: string, maxLength: number): string {
 
 export function browserSessionTokenFromCookieHeader(
   value: string | readonly string[] | undefined,
+  cookieName: string = BROWSER_SESSION_COOKIE,
 ): string | undefined {
   const raw = typeof value === "string" ? value : undefined;
   if (raw === undefined) return undefined;
@@ -134,7 +155,7 @@ export function browserSessionTokenFromCookieHeader(
     const separator = item.indexOf("=");
     if (separator < 1) continue;
     const name = item.slice(0, separator).trim();
-    if (name !== BROWSER_SESSION_COOKIE) continue;
+    if (name !== cookieName) continue;
     const token = item.slice(separator + 1).trim();
     if (/^[A-Za-z0-9_-]{43}$/u.test(token)) return token;
     return undefined;
@@ -165,9 +186,9 @@ function requestNeedsCsrf(request: FastifyRequest): boolean {
   return request.method !== "GET" && request.method !== "HEAD" && request.method !== "OPTIONS";
 }
 
-function cookieHeader(token: string, secure: boolean, maxAgeSeconds: number): string {
+function cookieHeader(token: string, secure: boolean, maxAgeSeconds: number, name: string): string {
   return [
-    `${BROWSER_SESSION_COOKIE}=${token}`,
+    `${name}=${token}`,
     "Path=/",
     "HttpOnly",
     "SameSite=Lax",
@@ -176,9 +197,9 @@ function cookieHeader(token: string, secure: boolean, maxAgeSeconds: number): st
   ].join("; ");
 }
 
-function clearCookieHeader(secure: boolean): string {
+function clearCookieHeader(secure: boolean, name: string): string {
   return [
-    `${BROWSER_SESSION_COOKIE}=`,
+    `${name}=`,
     "Path=/",
     "HttpOnly",
     "SameSite=Lax",
@@ -201,6 +222,8 @@ function principalResponse(
   readonly email: string;
   readonly displayName: string;
   readonly csrfToken: string;
+  readonly projectId?: string;
+  readonly isGm: boolean;
 } {
   return {
     accountId: principal.accountId,
@@ -208,6 +231,8 @@ function principalResponse(
     email: principal.email,
     displayName: principal.displayName,
     csrfToken,
+    ...(principal.projectId === undefined ? {} : { projectId: principal.projectId }),
+    isGm: principal.isGm === true,
   };
 }
 
@@ -223,8 +248,11 @@ function sessionTtl(options: BrowserAuthOptions): number {
   return ttl;
 }
 
-export function browserAuthSession(request: FastifyRequest): string | undefined {
-  const token = browserSessionTokenFromCookieHeader(request.headers.cookie);
+export function browserAuthSession(
+  request: FastifyRequest,
+  cookieName: string = BROWSER_SESSION_COOKIE,
+): string | undefined {
+  const token = browserSessionTokenFromCookieHeader(request.headers.cookie, cookieName);
   if (token === undefined) return undefined;
   return token;
 }
@@ -234,7 +262,7 @@ export async function authenticateBrowserRequest(
   reply: FastifyReply,
   options: BrowserAuthOptions,
 ): Promise<BrowserAuthPrincipal | undefined> {
-  const token = browserAuthSession(request);
+  const token = browserAuthSession(request, options.cookieName);
   if (token === undefined) return undefined;
   const now = requestNow(options);
   const principal = await options.store.resolveBrowserSession({
@@ -311,12 +339,16 @@ export function createSqliteBrowserAuthStore(options: {
       readonly userId: string;
       readonly email: string;
       readonly displayName: string;
+      readonly projectId?: string;
+      readonly isGm?: boolean;
     }>;
     readonly resolveBrowserSession: (input: ResolveBrowserSessionInput) => Promise<{
       readonly accountId: string;
       readonly userId: string;
       readonly email: string;
       readonly displayName: string;
+      readonly projectId?: string;
+      readonly isGm?: boolean;
     } | null>;
     readonly revokeBrowserSession: (input: RevokeBrowserSessionInput) => Promise<boolean>;
   };
@@ -327,6 +359,8 @@ export function createSqliteBrowserAuthStore(options: {
     readonly userId: string;
     readonly email: string;
     readonly displayName: string;
+    readonly projectId?: string;
+    readonly isGm?: boolean;
   }): BrowserAuthPrincipal => {
     const resolved = {
       accountId: principal.accountId,
@@ -334,6 +368,8 @@ export function createSqliteBrowserAuthStore(options: {
       actorId: principal.userId,
       email: principal.email,
       displayName: principal.displayName,
+      ...(principal.projectId === undefined ? {} : { projectId: principal.projectId }),
+      ...(principal.isGm ? { isGm: true } : {}),
     };
     return options.canonicalizePrincipal?.(resolved) ?? resolved;
   };
@@ -375,6 +411,9 @@ export function createSqliteBrowserAuthStore(options: {
 }
 
 export function registerBrowserAuthRoutes(app: FastifyInstance, options: BrowserAuthOptions): void {
+  const cookieName = options.cookieName ?? BROWSER_SESSION_COOKIE;
+  if (!/^[A-Za-z0-9_-]{1,100}$/u.test(cookieName))
+    throw new Error("browser cookie name is invalid");
   const secureCookie =
     options.secureCookie ?? options.webOrigins.every((origin) => origin.startsWith("https://"));
   const ttl = sessionTtl(options);
@@ -397,9 +436,22 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
         issuedAt: issuedAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
       };
-      const principal = await passwordless(passwordlessBody.name, issuedAt.toISOString()).then(
-        (identity) => options.store.createBrowserSession({ ...session, userId: identity.userId }),
-      );
+      const projectId = passwordlessBody.projectId ?? options.legacyProjectId;
+      if (options.projectLogin && !projectId)
+        return writeJson(reply, 400, { code: "PROJECT_REQUIRED", message: "请选择项目" });
+      const identity =
+        options.projectLogin && projectId
+          ? await options.projectLogin(passwordlessBody.name, projectId, issuedAt.toISOString())
+          : await passwordless(passwordlessBody.name, issuedAt.toISOString());
+      if (options.gm?.userId === identity.userId)
+        return writeJson(reply, 403, { code: "GM_PASSWORD_REQUIRED" });
+      const principal = await options.store.createBrowserSession({
+        ...session,
+        userId: identity.userId,
+        ...("projectId" in identity && typeof identity.projectId === "string"
+          ? { projectId: identity.projectId }
+          : {}),
+      });
       if (principal === null) return writeJson(reply, 401, AUTHENTICATION_FAILED);
       if (passwordlessBody?.client === "android") {
         return writeJson(reply, 200, {
@@ -409,11 +461,19 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
         });
       }
       return reply
-        .header("set-cookie", cookieHeader(token, secureCookie, ttlSeconds))
+        .header("set-cookie", cookieHeader(token, secureCookie, ttlSeconds, cookieName))
         .code(200)
         .header("content-type", MOBILE_API_CONTENT_TYPE)
         .send(principalResponse(principal, browserCsrfToken(token, options.sessionSecret)));
     } catch (error: unknown) {
+      const code = (error as { readonly code?: string })?.code;
+      if (
+        ["PROJECT_MEMBERSHIP_DISABLED", "PROJECT_NOT_ACCESSIBLE", "GM_PASSWORD_REQUIRED"].includes(
+          code ?? "",
+        )
+      )
+        return writeJson(reply, 403, { code });
+      if (code === "NOT_FOUND") return writeJson(reply, 404, { code });
       if ((error as { readonly code?: unknown })?.code === "SQLITE_MOBILE_SCOPE_CONFLICT") {
         return writeJson(reply, 401, AUTHENTICATION_FAILED);
       }
@@ -422,8 +482,58 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
     }
   });
 
+  app.post("/api/v1/auth/gm/login", async (request, reply) => {
+    const value = request.body as {
+      password?: unknown;
+      client?: unknown;
+      projectId?: unknown;
+    } | null;
+    if (
+      !value ||
+      (value.client !== "web" && value.client !== "android") ||
+      typeof value.password !== "string"
+    )
+      return writeJson(reply, 400, { code: "INVALID_REQUEST" });
+    if (
+      value.projectId !== undefined &&
+      (typeof value.projectId !== "string" ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu.test(value.projectId))
+    )
+      return writeJson(reply, 400, { code: "INVALID_REQUEST" });
+    if (value.client === "web" && !originMatches(request, options.webOrigins))
+      return writeJson(reply, 403, { code: "CSRF_ORIGIN_INVALID" });
+    if (!options.gm || !equalSecret(value.password, options.gm.password))
+      return writeJson(reply, 401, AUTHENTICATION_FAILED);
+    const token = randomBytes(32).toString("base64url");
+    const issuedAt = requestNow(options);
+    const expiresAt = new Date(issuedAt.getTime() + ttl);
+    const principal = await options.store.createBrowserSession({
+      accountId: options.accountId,
+      userId: options.gm.userId,
+      isGm: true,
+      ...(typeof value.projectId === "string" ? { projectId: value.projectId } : {}),
+      sessionId: randomUUID(),
+      tokenDigest: digestBrowserSessionToken(token),
+      issuedAt: issuedAt.toISOString(),
+      expiresAt: expiresAt.toISOString(),
+    });
+    if (!principal) return writeJson(reply, 401, AUTHENTICATION_FAILED);
+    const result = principalResponse(principal, browserCsrfToken(token, options.sessionSecret));
+    if (value.client === "android")
+      return writeJson(reply, 200, {
+        ...result,
+        accessToken: token,
+        expiresAt: expiresAt.toISOString(),
+      });
+    return reply
+      .header("set-cookie", cookieHeader(token, secureCookie, ttlSeconds, cookieName))
+      .send(result);
+  });
+
   app.get(BROWSER_ME_PATH, async (request, reply) => {
-    const principal = await authenticateBrowserRequest(request, reply, options);
+    const principal =
+      (await authenticateBrowserBearerRequest(request, options)) ??
+      (await authenticateBrowserRequest(request, reply, options));
     if (principal === undefined) return reply.sent ? reply : writeJson(reply, 401, UNAUTHENTICATED);
     const token = (request as BrowserAuthRequest).browserSessionToken;
     if (token === undefined) return writeJson(reply, 401, UNAUTHENTICATED);
@@ -435,7 +545,9 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
   });
 
   app.post(BROWSER_LOGOUT_PATH, async (request, reply) => {
-    const principal = await authenticateBrowserRequest(request, reply, options);
+    const principal =
+      (await authenticateBrowserBearerRequest(request, options)) ??
+      (await authenticateBrowserRequest(request, reply, options));
     if (principal === undefined) return reply.sent ? reply : writeJson(reply, 401, UNAUTHENTICATED);
     const token = (request as BrowserAuthRequest).browserSessionToken;
     if (token === undefined) return writeJson(reply, 401, UNAUTHENTICATED);
@@ -445,7 +557,7 @@ export function registerBrowserAuthRoutes(app: FastifyInstance, options: Browser
       reason: "logout",
     });
     return reply
-      .header("set-cookie", clearCookieHeader(secureCookie))
+      .header("set-cookie", clearCookieHeader(secureCookie, cookieName))
       .code(200)
       .header("content-type", MOBILE_API_CONTENT_TYPE)
       .send({ ok: true });

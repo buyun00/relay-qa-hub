@@ -8,15 +8,8 @@ import {
   parseDesktopConfig,
 } from "../src/config.js";
 
-test("desktop double-click defaults to the local QA Hub debug service", () => {
-  const config = parseDesktopConfig({}, { webAssetsDirectory: "./web-dist" });
-  assert.equal(config.apiBaseUrl.toString(), "http://127.0.0.1:4319/");
-  assert.equal(config.wssUrl.toString(), "ws://127.0.0.1:4319/api/v1/notifications/stream");
-  assert.equal(config.csrfOrigin, "http://127.0.0.1:4174");
-  assert.equal(config.allowLoopbackHttp, true);
-  assert.equal(config.allowPrivateLanHttp, false);
-  assert.equal(config.mcpEnabled, true);
-  assert.equal(config.mcpPort, 4_320);
+test("desktop refuses startup without an explicit API service", () => {
+  assert.throws(() => parseDesktopConfig({}), /explicitly configured/);
 });
 
 test("desktop config derives the authenticated notification WSS path", () => {
@@ -101,6 +94,7 @@ test("URLs with embedded credentials or query state are rejected", () => {
 
 test("MCP host is enabled on the fixed loopback port and validates overrides", () => {
   const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "https://qa.example.test",
     QA_HUB_DESKTOP_MCP_ENABLED: "0",
     QA_HUB_DESKTOP_MCP_PORT: "54321",
   });

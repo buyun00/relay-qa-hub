@@ -1,6 +1,7 @@
 package com.relayqahub.android.network
 
 import android.content.Context
+import com.relayqahub.android.BuildConfig
 import java.io.File
 import java.io.FileOutputStream
 import java.security.MessageDigest
@@ -75,7 +76,7 @@ class AndroidUpdateClient(
 ) {
     private val feedUrl = QaHubRelativePath.resolve(
         QaHubApiEndpoint.parse(apiBaseUrl, allowPrivateHttp),
-        "/android-updates/stable/latest.json",
+        "/android-updates/${BuildConfig.QA_HUB_UPDATE_CHANNEL}/latest.json",
     )
 
     suspend fun latest(): AndroidUpdateRelease = withContext(Dispatchers.IO) {

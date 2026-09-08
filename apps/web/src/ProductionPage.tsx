@@ -1,3 +1,5 @@
+import { useProjectFiles } from "./useProjectFiles";
+import { projectStorageKey } from "./project-context";
 import AppIcon from "./AppIcon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -245,6 +247,7 @@ export default function ProductionPage({
   members,
   onOpenBug,
   onImport,
+  canImport = false,
 }: {
   active: boolean;
   refreshRevision?: number;
@@ -253,8 +256,9 @@ export default function ProductionPage({
   members: readonly ProjectMember[];
   onOpenBug: (id: string) => void;
   onImport: () => void;
+  canImport?: boolean;
 }) {
-  const draftKey = `qa-production-draft:${userId}:${projectId}`,
+  const draftKey = projectStorageKey("production-draft", projectId, userId),
     pendingKey = `${draftKey}:pending`;
   const [draft, setDraft] = useState(() => readDraft(draftKey));
   const [pending, setPending] = useState<ProductionSubmission[]>(() => readPending(pendingKey));
@@ -269,12 +273,14 @@ export default function ProductionPage({
     [state, setState] = useState("current"),
     [checked, setChecked] = useState<string[]>([]);
   const [creating, setCreating] = useState(false),
-    [files, setFiles] = useState<File[]>([]),
     [attachmentChoices, setAttachmentChoices] = useState<Record<string, string[]>>({});
+  const [files, setFiles, fileStorageError] = useProjectFiles(`${draftKey}:files`);
+  const [continueFiles, setContinueFiles, continueStorageError] = useProjectFiles(
+    `${draftKey}:continue-files:${selectedId ?? ""}`,
+  );
   const [bugSearch, setBugSearch] = useState(""),
     [bugOwner, setBugOwner] = useState(""),
-    [message, setMessage] = useState(""),
-    [continueFiles, setContinueFiles] = useState<File[]>([]);
+    [message, setMessage] = useState("");
   const [busy, setBusy] = useState<ReadonlySet<string>>(new Set()),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
@@ -350,7 +356,6 @@ export default function ProductionPage({
     const revision = ++detailRevision.current;
     setSelectedId(id);
     setDetail(null);
-    setContinueFiles([]);
     setCreating(false);
     try {
       setMessage(localStorage.getItem(`${draftKey}:continue:${id}`) ?? "");
@@ -1004,7 +1009,12 @@ export default function ProductionPage({
                     />
                   </label>
                   <FilePicker files={files} onChange={setFiles} />
-                  {draftHasFiles && <small>文件保留在当前窗口；关闭 EXE 后需重新选择。</small>}
+                  {(fileStorageError || continueStorageError) && (
+                    <p role="alert">{fileStorageError || continueStorageError}</p>
+                  )}
+                  {draftHasFiles && (
+                    <small>文件按当前服务、项目和人员保存在本机，重新打开后可继续。</small>
+                  )}
                 </>
               ) : (
                 <>
@@ -1027,15 +1037,17 @@ export default function ProductionPage({
                         </option>
                       ))}
                     </select>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCreating(false);
-                        onImport();
-                      }}
-                    >
-                      从轻语导入
-                    </button>
+                    {canImport && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCreating(false);
+                          onImport();
+                        }}
+                      >
+                        从轻语导入
+                      </button>
+                    )}
                   </div>
                   <div className="production-bug-select">
                     <strong>已选择 {draft.bugIds.length} 张 / 最多 50 张</strong>

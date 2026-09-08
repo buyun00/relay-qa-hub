@@ -1,11 +1,59 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
 import { isActionableQingyuDefect, QingyuClient, QingyuError } from "../dist/qingyu-client.js";
 import { createQingyuIntegration } from "../dist/qingyu-integration.js";
+
+test("project Qingyu component rejects polling/import when disabled and excludes other external projects", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "qa-qingyu-component-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  let enabled = false,
+    calls = 0;
+  const integration = await createQingyuIntegration({
+    statePath: join(root, "project-a.enc.json"),
+    secret: "independent-test-state-secret",
+    qaProjectId: "project-a",
+    externalProjectId: "external-a",
+    canStart: async () => enabled,
+    initialCredentials: {
+      token: "fixture-only",
+      user: { id: "user-external", name: "Test", avatar: null },
+    },
+    mobileBugStore: {},
+    mobileAttachmentStore: {},
+    linkStore: { getBugLink: async () => null },
+    client: {
+      listProjects: async () => {
+        calls++;
+        return [
+          { id: "external-a", name: "A" },
+          { id: "external-b", name: "B" },
+        ];
+      },
+    },
+  });
+  await assert.rejects(integration.pollLogin("actor"), { code: "COMPONENT_DISABLED" });
+  await assert.rejects(integration.listOwnDefects("actor", "external-a"), {
+    code: "COMPONENT_DISABLED",
+  });
+  await assert.rejects(integration.importOwnDefects("actor", "external-a", []), {
+    code: "COMPONENT_DISABLED",
+  });
+  assert.equal(await integration.getBugLink("any"), null);
+  assert.equal(calls, 0);
+  enabled = true;
+  await assert.rejects(integration.listOwnDefects("actor", "external-b"), {
+    code: "EXTERNAL_PROJECT_MISMATCH",
+  });
+  assert.deepEqual(await integration.listProjects("actor"), [{ id: "external-a", name: "A" }]);
+  enabled = false;
+  await assert.rejects(integration.listProjects("actor"), { code: "COMPONENT_DISABLED" });
+  assert.equal(calls, 1);
+  assert.throws(() => new QingyuClient(), { code: "COMPONENT_NOT_CONFIGURED" });
+});
 import { createApiApp } from "../dist/app.js";
 
 function json(value, status = 200, headers = {}) {

@@ -1,0 +1,15 @@
+✔ GM migration changes only membership reads in existing typed audit guards (75.1075ms)
+✔ entry login enrolls only selected project, retains stable identity and employee compatibility (74.04ms)
+✔ disable and restore are project local; login never restores and B session stays usable (74.9503ms)
+✔ project links affect only matching login, directory and historical owner filters (78.4733ms)
+✔ components default disabled, redact configuration, enforce versions and dependency cascade (75.0328ms)
+✔ project disable blocks login and reads without deleting history; reactivation uses version CAS (71.1046ms)
+✔ record project guard rejects wrong project while same employee can work in both (73.6649ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 745.7265

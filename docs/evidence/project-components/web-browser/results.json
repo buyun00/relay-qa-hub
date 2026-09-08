@@ -1,0 +1,348 @@
+{
+  "generatedAt": "2026-09-08T17:47:27.087Z",
+  "kind": "real_browser_acceptance_subset",
+  "instance": {
+    "web": "http://127.0.0.1:4274",
+    "api": "http://127.0.0.1:4419",
+    "webPidAtLaunch": 21368,
+    "apiPidForFinalReadback": 23460
+  },
+  "operator": "Web验收0909",
+  "checks": [
+    {
+      "id": "project_entry",
+      "status": "passed",
+      "detail": "真实浏览器从项目A入口以Web验收0909首次姓名登录；当时选择器仅A。",
+      "evidence": "02-project-a-restored.txt"
+    },
+    {
+      "id": "multi_project",
+      "status": "passed",
+      "detail": "同名登录B登记第二个项目，选择器A/B；两者保持同一稳定userId。",
+      "evidence": "07-project-b-draft.txt"
+    },
+    {
+      "id": "draft_scope",
+      "status": "passed",
+      "detail": "A内容/修复人/关闭人/1个File切到B不显示；B另写草稿后切A原样恢复。",
+      "evidence": "02-project-a-restored.txt"
+    },
+    {
+      "id": "draft_reload",
+      "status": "passed",
+      "detail": "完整页面reload后，A内容/两个人员选择和File仍在IndexedDB恢复；B也在reload后保留。",
+      "evidence": "03-reload-restored.txt"
+    },
+    {
+      "id": "base_lifecycle",
+      "status": "passed",
+      "detail": "五组件均disabled时A Bug创建→评论→开始处理→人工完成→验收退回→再次人工完成→关闭；最终closed/v13。",
+      "evidence": "06-manual-closed.txt"
+    },
+    {
+      "id": "attachment",
+      "status": "passed",
+      "detail": "正确JPEG在B上传、绑定、读取回显；独立HTTP下载43311字节与本地文件逐字节相同。",
+      "evidence": "08-jpeg-upload-readback.txt"
+    },
+    {
+      "id": "comments",
+      "status": "passed",
+      "detail": "B评论正文提交后可见，reload后仍读回；A评论也由真实HTTP读回。",
+      "evidence": "09-comment-reloaded.txt"
+    },
+    {
+      "id": "login_url",
+      "status": "passed",
+      "detail": "修复登录框改变项目但URL保留旧值的问题；B地址下改填A登录后URL和选择器均A。",
+      "evidence": "10-login-project-url-fixed.txt"
+    },
+    {
+      "id": "late_responses",
+      "status": "unit_passed_not_full_e2e",
+      "detail": "四项专项回归证明请求头冻结、响应体迟到拒绝、GM指定路径及服务/项目/用户键隔离；真实浏览未注入网络延迟。",
+      "evidence": "../coverage-matrix.json"
+    },
+    {
+      "id": "multi_window",
+      "status": "passed",
+      "detail": "两个实际标签分别A/B，A撤权后锁定并可导出本地文本和JPEG；B仍提交成功；A资格显式恢复后原草稿和File恢复。",
+      "evidence": "dual-window-results.json"
+    },
+    {
+      "id": "gm_ui",
+      "status": "not_run",
+      "detail": "GM界面已实现和构建；本轮浏览只测普通员工。",
+      "evidence": null
+    },
+    {
+      "id": "external_components",
+      "status": "not_run",
+      "detail": "本轮所有可选组件disabled；未运行Jenkins、上传外部发布、Relay或第三方同步完整链路。",
+      "evidence": null
+    },
+    {
+      "id": "revoked_draft_recovery",
+      "status": "passed",
+      "detail": "A membership v1→revoked/v2，A轮询后自动移除业务页面并显示本地草稿恢复；B保持可操作。 A撤权期间B实际创建DWB1788889232622-1；后端读回B正确project/reporter/文本，0附件；A仍0个Bug。 真实点击文本与JPEG保存，Downloads生成701字节JSON和43311字节JPEG；导出projectId/A文本/人员/File元数据正确，JPEG哈希与原始完全相同。 GM显式恢复A至membership v3；重新姓名登录自动恢复原A草稿、修复人、关闭人及JPEG。B页面保持自己的项目。",
+      "evidence": "dual-window-results.json"
+    }
+  ],
+  "testInputRejection": {
+    "reason": "Screenshot API returned JPEG/JFIF bytes; initial file was mistakenly named .png and declared image/png. Finalize correctly refused SQLITE_UPLOAD_INVALID. Original input and failure evidence retained; same bytes using .jpg succeeded.",
+    "sessionId": "df885405-26de-4fec-98cb-2324a77fd68a",
+    "input": "01-project-a-draft.png",
+    "retry": "qa-preview-evidence.jpg"
+  },
+  "readback": [
+    {
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "components": [
+        {
+          "key": "build",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "build_upload.single",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "upload.incremental",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "relay.production",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "qingyu.sync",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        }
+      ],
+      "bug": {
+        "id": "5128877f-21c5-4889-9dd0-15134e24b291",
+        "key": "TA1788885078625-4",
+        "state": "closed",
+        "version": 13,
+        "ownerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+        "verificationOwnerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1"
+      },
+      "comments": [
+        {
+          "id": "5223390b-1864-4968-89f1-cc87fffe8a37",
+          "body": "WEB-评论-0909：所有可选组件关闭，人工验收继续执行。",
+          "authorId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+          "createdAt": "2026-09-08T17:01:58.103Z"
+        }
+      ],
+      "attachments": [],
+      "binary": null
+    },
+    {
+      "projectId": "383a122d-5c4b-478c-9bd7-7bb2196cf5b2",
+      "components": [
+        {
+          "key": "build",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "build_upload.single",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "upload.incremental",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "relay.production",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "qingyu.sync",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        }
+      ],
+      "bug": {
+        "id": "434a4f1f-0144-4f96-9125-47d85fcfba8c",
+        "key": "TB1788885078632-1",
+        "state": "reported",
+        "version": 1,
+        "ownerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+        "verificationOwnerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1"
+      },
+      "comments": [
+        {
+          "id": "8bd7b159-5e7b-41d7-b83a-d5397f523108",
+          "body": "WEB-B-评论正文-0909：JPEG 已上传并可读取，记录正文必须在刷新后仍显示。",
+          "authorId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+          "createdAt": "2026-09-08T17:06:09.572Z"
+        }
+      ],
+      "attachments": [
+        {
+          "attachmentId": "ab9970ed-6e72-451e-bbdd-e43f40aefe29",
+          "filename": "qa-preview-evidence.jpg",
+          "mediaType": "image/jpeg",
+          "size": 43311,
+          "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+        }
+      ],
+      "binary": {
+        "size": 43311,
+        "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+        "matchesLocal": true
+      }
+    }
+  ],
+  "validation": {
+    "typecheck": "passed",
+    "eslint": "passed",
+    "vitest": {
+      "files": 13,
+      "passed": 59
+    },
+    "buildAsset": "apps/web/dist/assets/index-CMbnNjtl.js"
+  },
+  "artifacts": [
+    {
+      "name": "01-project-a-draft.png",
+      "bytes": 43311,
+      "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+      "capturedAt": "2026-09-08T17:00:01.219Z",
+      "actualMediaType": "image/jpeg"
+    },
+    {
+      "name": "02-project-a-restored.png",
+      "bytes": 46519,
+      "sha256": "ad5e1c5aafc1507c9ff3c3da6396ddcb881e48c1dd07e76ea2357035d24a0995",
+      "capturedAt": "2026-09-08T17:00:53.689Z",
+      "actualMediaType": "image/jpeg"
+    },
+    {
+      "name": "02-project-a-restored.txt",
+      "bytes": 3987,
+      "sha256": "9df49e6de3fc5f78c855f7676897d9d0b48d7c619b82cc954264f00b8625e2c8",
+      "capturedAt": "2026-09-08T17:00:53.703Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "03-reload-restored.txt",
+      "bytes": 3987,
+      "sha256": "9df49e6de3fc5f78c855f7676897d9d0b48d7c619b82cc954264f00b8625e2c8",
+      "capturedAt": "2026-09-08T17:00:58.967Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "04-attachment-upload-failed.png",
+      "bytes": 43693,
+      "sha256": "6c6b033b54e878ed3aede7f24fab26549303e6eceb7be399c5eaa218b32522e7",
+      "capturedAt": "2026-09-08T17:01:39.805Z",
+      "actualMediaType": "image/jpeg"
+    },
+    {
+      "name": "04-attachment-upload-failed.txt",
+      "bytes": 3978,
+      "sha256": "a5d3757f299d5ca4b54e0a5ad5e765a2bfb271505d41be3272a2d59b8b608935",
+      "capturedAt": "2026-09-08T17:01:39.818Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "05-manual-rejected.txt",
+      "bytes": 6915,
+      "sha256": "dd36f59b93f3f8ee6ec520144b894ca85863273b0c01666053456d3c6ea7ae5a",
+      "capturedAt": "2026-09-08T17:02:40.822Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "06-manual-closed.png",
+      "bytes": 69026,
+      "sha256": "0f5ae409ad493a3b0666a6713b12e1b161e3a3ea8a7736eb9975661fec29b562",
+      "capturedAt": "2026-09-08T17:02:53.945Z",
+      "actualMediaType": "image/jpeg"
+    },
+    {
+      "name": "06-manual-closed.txt",
+      "bytes": 3289,
+      "sha256": "8233347057b40e19fc84113dadaa61b0ba4168f0b36b3729916e872d8cd200bf",
+      "capturedAt": "2026-09-08T17:02:53.964Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "07-project-b-draft.png",
+      "bytes": 42884,
+      "sha256": "0b1410539cb714447eb0f9c844fa6187e2e1adf7ffd80f4cbde2a1f146811029",
+      "capturedAt": "2026-09-08T17:03:11.410Z",
+      "actualMediaType": "image/jpeg"
+    },
+    {
+      "name": "07-project-b-draft.txt",
+      "bytes": 3550,
+      "sha256": "f0e136fd3949e027b59982e0fbcf13dea95bf78aef2c282100d59a2daeac90d1",
+      "capturedAt": "2026-09-08T17:03:11.440Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "08-jpeg-upload-readback.jpg",
+      "bytes": 56779,
+      "sha256": "1674c8ada3f4ef81f2576b2fcbfc9365e8d6582c3673eb9016f3db0299599a7d",
+      "capturedAt": "2026-09-08T17:06:04.236Z",
+      "actualMediaType": "image/jpeg"
+    },
+    {
+      "name": "08-jpeg-upload-readback.txt",
+      "bytes": 5025,
+      "sha256": "3adeb5761394255e53c23250b8b1c6d318c3a422c681be5825323d42a4000989",
+      "capturedAt": "2026-09-08T17:06:04.251Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "09-comment-reloaded.txt",
+      "bytes": 5486,
+      "sha256": "f69c247bc4b54636d6e2ff63f140ef2e00cf46f7653c6c3c7d72dec424adfd4e",
+      "capturedAt": "2026-09-08T17:06:15.910Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "10-login-project-url-fixed.txt",
+      "bytes": 2524,
+      "sha256": "35728b628e5d057cf7e34ba30697c7c9bdac822cdd6bf2f171c8c806a0391b29",
+      "capturedAt": "2026-09-08T17:06:30.216Z",
+      "actualMediaType": "text/plain"
+    },
+    {
+      "name": "http-readback.json",
+      "bytes": 3517,
+      "sha256": "adae52cdeaa5c965b3c100f49bfb92c98ee65c5ba0e90ae04b1e1fd0b1f48285",
+      "capturedAt": "2026-09-08T17:09:04.378Z",
+      "actualMediaType": "application/json"
+    },
+    {
+      "name": "qa-preview-evidence.jpg",
+      "bytes": 43311,
+      "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+      "capturedAt": "2026-09-08T17:00:01.219Z",
+      "actualMediaType": "image/jpeg"
+    }
+  ],
+  "scope": "No production service restart, production DB read/write, production release or daily-client operations. Web-only preview service started by ownership-checking launcher."
+}

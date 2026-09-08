@@ -1,60 +1,23 @@
 package com.relayqahub.android.ui
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.relayqahub.android.FoundationViewModel
-import com.relayqahub.android.QaHubApplication
-import com.relayqahub.android.QaPerson
-import com.relayqahub.android.network.AccountSessionFailure
-import com.relayqahub.android.security.NativeCredentials
-import com.relayqahub.android.security.VaultResult
-import com.relayqahub.android.security.nativeSessionScope
+import com.relayqahub.android.*
+import com.relayqahub.android.network.*
+import com.relayqahub.android.security.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,83 +26,82 @@ fun QaHubRoot(
     onStartCaptureSession: () -> Unit,
     onCaptureNow: () -> Unit,
     onStopCaptureSession: () -> Unit,
+    entryProjectId: String? = null,
 ) {
     val application = LocalContext.current.applicationContext as QaHubApplication
     val container = application.container
     val identityStore = container.identityStore
     val coroutineScope = rememberCoroutineScope()
-    val rememberedPerson = remember { identityStore.current() }
-    var signedInPerson by remember { mutableStateOf<QaPerson?>(null) }
-    var loginPending by rememberSaveable { mutableStateOf(rememberedPerson != null) }
-    var loginError by rememberSaveable { mutableStateOf<String?>(null) }
-    val establishSession: suspend (String) -> QaPerson = { name ->
-        val session = container.accountSessionClient.login(name)
-        val scope = FoundationViewModel.foundationScope(session.userId)
-        when (
-            container.credentialVault.put(
-                scope.nativeSessionScope(),
-                NativeCredentials(
-                    accessToken = session.accessToken,
-                    refreshToken = "backend-name-login-no-refresh",
-                    accessTokenExpiresAtEpochMs = session.accessTokenExpiresAtEpochMs,
-                    sharedDeviceSession = false,
-                ),
-            )
-        ) {
-            is VaultResult.Success -> identityStore.select(session.userId, session.displayName)
-            is VaultResult.Missing -> throw AccountSessionFailure("SESSION_PERSIST_MISSING")
-            is VaultResult.Unavailable -> throw AccountSessionFailure("SESSION_PERSIST_FAILED")
+    var person by remember { mutableStateOf<QaPerson?>(null) }
+    var project by remember { mutableStateOf<QaProject?>(null) }
+    var projects by remember { mutableStateOf<List<QaProject>>(emptyList()) }
+    var token by remember { mutableStateOf<String?>(null) }
+    var loginPending by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var projectInput by rememberSaveable { mutableStateOf(entryProjectId ?: identityStore.projectId()) }
+    var toolsOpen by rememberSaveable { mutableStateOf(false) }
+    var projectPickerOpen by remember { mutableStateOf(false) }
+    val savedPages = rememberSaveableStateHolder()
+    val establish: suspend (String, String) -> Unit = { name, requestedProject ->
+        val entry = container.projectOperationsClient.entry(requestedProject.trim())
+        val session = container.accountSessionClient.login(name, entry.id)
+        NativeProjectBindings.register(session.accessToken, entry.id)
+        val sessionScope = scopedIdentity(container.apiBaseUrl, session.accountId, entry.id, session.userId)
+        when (container.credentialVault.put(sessionScope.nativeSessionScope(), NativeCredentials(
+            session.accessToken, "backend-name-login-no-refresh", session.accessTokenExpiresAtEpochMs, false,
+        ))) {
+            is VaultResult.Success -> Unit
+            else -> throw AccountSessionFailure("SESSION_PERSIST_FAILED")
+        }
+        val availableProjects = container.projectOperationsClient.projects(session.accessToken)
+        check(availableProjects.any { it.id == entry.id }) { "PROJECT_NOT_ACCESSIBLE" }
+        person = identityStore.select(session.accountId, session.userId, session.displayName, entry.id, entry.name, entry.key)
+        project = entry
+        projectInput = entry.id
+        projects = availableProjects
+        token = session.accessToken
+    }
+    fun signIn(name: String, target: String) {
+        if (loginPending) return
+        loginPending = true
+        error = null
+        coroutineScope.launch {
+            try { establish(name, target) }
+            catch (failure: Exception) { error = loginFailureMessage(failure) }
+            finally { loginPending = false }
         }
     }
-    LaunchedEffect(rememberedPerson?.id) {
-        val remembered = rememberedPerson ?: return@LaunchedEffect
-        try {
-            signedInPerson = establishSession(remembered.displayName)
-        } catch (failure: AccountSessionFailure) {
-            identityStore.clear()
-            loginError = when (failure.code) {
-                "NETWORK_IO" -> "无法连接 QA Hub，请检查内网后重新登录。"
-                else -> "原登录已失效，请重新输入姓名。"
-            }
-        } finally {
-            loginPending = false
+    LaunchedEffect(entryProjectId) {
+        val target = entryProjectId ?: identityStore.projectId()
+        projectInput = target
+        val remembered = identityStore.current()
+        if (entryProjectId != null && project?.id != target) {
+            onStopCaptureSession()
+            person = null
+            project = null
+            token = null
+            toolsOpen = false
         }
+        if (remembered != null && person == null) signIn(remembered.displayName, target)
     }
-    val person = signedInPerson
-    if (person == null) {
-        DisposableEffect(Unit) {
-            onViewModelActive(null)
-            onDispose { }
-        }
-        IdentityGate(
-            pending = loginPending,
-            error = loginError,
-            onLogin = { name ->
-                if (!loginPending) {
-                    loginPending = true
-                    loginError = null
-                    coroutineScope.launch {
-                        try {
-                            signedInPerson = establishSession(name)
-                        } catch (failure: AccountSessionFailure) {
-                            loginError = when (failure.code) {
-                                "NETWORK_IO" -> "无法连接 QA Hub，请检查内网。"
-                                "INVALID_ACCOUNT_NAME", "INVALID_REQUEST" -> "请输入有效姓名。"
-                                "SESSION_PERSIST_MISSING", "SESSION_PERSIST_FAILED" ->
-                                    "登录会话保存失败，请重试。"
-                                else -> "登录失败：${failure.code}"
-                            }
-                        } finally {
-                            loginPending = false
-                        }
-                    }
-                }
-            },
-        )
+    val currentPerson = person
+    val currentProject = project
+    val currentToken = token
+    if (currentPerson == null || currentProject == null || currentToken == null) {
+        DisposableEffect(Unit) { onViewModelActive(null); onDispose { } }
+        IdentityGate(projectInput, { projectInput = it }, container.apiBaseUrl, loginPending, error) { name -> signIn(name, projectInput) }
         return
     }
-
-    val foundationViewModel: FoundationViewModel = viewModel(key = "foundation:${person.id}")
+    // Clearing this owned store cancels old project coroutines; private drafts are durable.
+    val owner = remember(currentProject.id, currentPerson.id) {
+        object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() }
+    }
+    DisposableEffect(owner) { onDispose { owner.viewModelStore.clear() } }
+    val foundationViewModel: FoundationViewModel = viewModel(
+        viewModelStoreOwner = owner,
+        key = "foundation:${currentProject.id}:${currentPerson.id}",
+        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application),
+    )
     DisposableEffect(foundationViewModel) {
         onViewModelActive(foundationViewModel)
         onDispose { onViewModelActive(null) }
@@ -149,182 +111,81 @@ fun QaHubRoot(
         foundationViewModel.restoreLatestCaptureDraft()
         foundationViewModel.refreshBugWorkbench()
     }
-    FoundationScreen(
-        viewModel = foundationViewModel,
-        signedInPerson = person,
-        onSwitchIdentity = {
-            coroutineScope.launch {
-                container.credentialVault.deleteSession(
-                    FoundationViewModel.foundationScope(person.id).nativeSessionScope(),
-                )
-                identityStore.clear()
-                signedInPerson = null
-            }
-        },
-        onStartCaptureSession = onStartCaptureSession,
-        onCaptureNow = onCaptureNow,
-        onStopCaptureSession = onStopCaptureSession,
-    )
-}
-
-@Composable
-private fun IdentityGate(
-    pending: Boolean,
-    error: String?,
-    onLogin: (String) -> Unit,
-) {
-    var name by rememberSaveable { mutableStateOf("") }
-    val submit: () -> Unit = {
-        if (name.isNotBlank() && !pending) onLogin(name)
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 22.dp, vertical = 28.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            BrandLockup()
-            Spacer(Modifier.height(24.dp))
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(max = 520.dp),
-                shape = RoundedCornerShape(28.dp),
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                shadowElevation = 8.dp,
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 28.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(100.dp),
-                        color = QaLime.copy(alpha = 0.22f),
-                    ) {
-                        Text(
-                            text = "内部 QA 工作台",
-                            modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp),
-                            color = QaForest,
-                            style = MaterialTheme.typography.labelLarge,
-                        )
+    Column(Modifier.fillMaxSize()) {
+        Surface(tonalElevation = 2.dp) {
+            Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Box {
+                    TextButton(onClick = { projectPickerOpen = true }, enabled = !loginPending,
+                        modifier = Modifier.testTag("project-switch")) { Text("${currentProject.name} ▾") }
+                    DropdownMenu(expanded = projectPickerOpen, onDismissRequest = { projectPickerOpen = false }) {
+                        projects.forEach { available -> DropdownMenuItem(text = { Text(available.name) }, onClick = {
+                            projectPickerOpen = false
+                            if (available.id != currentProject.id) {
+                                onStopCaptureSession()
+                                toolsOpen = false
+                                signIn(currentPerson.displayName, available.id)
+                            }
+                        }) }
                     }
-                    Text(
-                        text = "欢迎回来",
-                        modifier = Modifier.padding(top = 20.dp),
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = "输入姓名；未登记的姓名会由后端自动创建账号",
-                        modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = {
-                            name = it
-                        },
-                        singleLine = true,
-                        label = { Text("姓名") },
-                        placeholder = { Text("例如：罗东乐") },
-                        supportingText = error?.let { message -> ({ Text(message) }) },
-                        isError = error != null,
-                        shape = RoundedCornerShape(16.dp),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(onDone = { submit() }),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = QaForest,
-                            focusedLabelColor = QaForest,
-                            cursorColor = QaForest,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("identity-name"),
-                    )
-                    Button(
-                        onClick = submit,
-                        enabled = name.isNotBlank() && !pending,
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = QaForest,
-                            contentColor = Color.White,
-                            disabledContainerColor = QaForest.copy(alpha = 0.32f),
-                            disabledContentColor = Color.White.copy(alpha = 0.72f),
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 14.dp)
-                            .height(56.dp)
-                            .testTag("identity-login"),
-                    ) {
-                        Text(if (pending) "正在登录…" else "进入工作台", fontWeight = FontWeight.Bold)
-                    }
-                    Text(
-                        text = "账号和团队成员均由 QA Hub 后端统一管理",
-                        modifier = Modifier.padding(top = 16.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
+                }
+                TextButton(onClick = { toolsOpen = !toolsOpen }, modifier = Modifier.testTag("project-tools")) {
+                    Text(if (toolsOpen) "Bug 工作台" else "项目与组件")
                 }
             }
         }
+        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(12.dp)) }
+        Box(Modifier.weight(1f)) { savedPages.SaveableStateProvider("${container.apiBaseUrl}:${currentProject.id}:${currentPerson.id}:$toolsOpen") {
+            if (toolsOpen) ProjectToolsScreen(container.projectOperationsClient, currentProject, currentPerson, currentToken)
+            else key(container.apiBaseUrl, currentProject.id, currentPerson.id) { FoundationScreen(
+                viewModel = foundationViewModel, signedInPerson = currentPerson,
+                onSwitchIdentity = {
+                    onStopCaptureSession()
+                    coroutineScope.launch {
+                        container.credentialVault.deleteSession(identityStore.scope().nativeSessionScope())
+                        identityStore.clear()
+                        person = null; project = null; token = null; toolsOpen = false
+                    }
+                },
+                onStartCaptureSession = onStartCaptureSession,
+                onCaptureNow = onCaptureNow,
+                onStopCaptureSession = onStopCaptureSession,
+            ) }
+        } }
     }
 }
 
+private fun loginFailureMessage(failure: Exception): String = when ((failure as? AccountSessionFailure)?.code) {
+    "NETWORK_IO" -> "无法连接预览服务，请检查内网与服务地址。"
+    "PROJECT_MEMBERSHIP_DISABLED", "PROJECT_MEMBERSHIP_REVOKED", "MEMBERSHIP_DISABLED" -> "当前项目的人员关系已停用，请联系项目人员恢复。"
+    else -> "操作失败：${failure.message ?: "UNKNOWN"}"
+}
+
 @Composable
-private fun BrandLockup() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(13.dp),
-    ) {
-        Surface(
-            modifier = Modifier.size(52.dp),
-            shape = RoundedCornerShape(16.dp),
-            color = QaForest,
-            shadowElevation = 3.dp,
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = "✓",
-                    color = QaLime,
-                    fontSize = 27.sp,
-                    fontWeight = FontWeight.Black,
-                )
-            }
+private fun IdentityGate(projectId: String, onProjectChange: (String) -> Unit, serviceUrl: String,
+    pending: Boolean, error: String?, onLogin: (String) -> Unit) {
+    var name by rememberSaveable { mutableStateOf("") }
+    val container = (LocalContext.current.applicationContext as QaHubApplication).container
+    var projectLabel by remember(projectId) { mutableStateOf<String?>(null) }
+    LaunchedEffect(projectId) {
+        if (runCatching { java.util.UUID.fromString(projectId) }.isSuccess) {
+            kotlinx.coroutines.delay(300)
+            projectLabel = runCatching { container.projectOperationsClient.entry(projectId).name }.getOrNull()
         }
-        Column {
-            Text(
-                text = "Relay QA Hub",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = QaForest,
-            )
-            Text(
-                text = "记录问题，推动完成",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+    }
+    Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()
+        .verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.Center) {
+        Text("QA Hub 项目预览", style = MaterialTheme.typography.headlineMedium)
+        Text("从项目入口进入，填写姓名即可登记到该项目。", Modifier.padding(vertical = 16.dp))
+        Text(serviceUrl, style = MaterialTheme.typography.bodySmall)
+        projectLabel?.let { Text("登录项目：$it", style = MaterialTheme.typography.titleMedium) }
+        OutlinedTextField(projectId, onProjectChange, label = { Text("项目入口 ID") }, singleLine = true,
+            enabled = !pending, modifier = Modifier.fillMaxWidth().testTag("identity-project"))
+        OutlinedTextField(name, { name = it }, label = { Text("姓名") }, singleLine = true,
+            enabled = !pending, modifier = Modifier.fillMaxWidth().testTag("identity-name"))
+        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(vertical = 8.dp)) }
+        Button(onClick = { onLogin(name) }, enabled = name.isNotBlank() && projectId.isNotBlank() && !pending,
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp).testTag("identity-login")) {
+            Text(if (pending) "正在进入项目…" else "进入项目")
         }
     }
 }

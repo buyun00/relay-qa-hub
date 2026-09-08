@@ -411,16 +411,16 @@ class BugWorkbenchClient(
             occurrenceCount = occurrenceCount,
             updatedAt = updatedAt,
             reporterId = reporterId,
-            ownerId = item.optString("ownerId").takeIf(String::isNotBlank),
+            ownerId = item.optString("ownerId").takeIf { !item.isNull("ownerId") && it.isNotBlank() },
             verificationOwnerId = item.optString("verificationOwnerId")
-                .takeIf(String::isNotBlank),
+                .takeIf { !item.isNull("verificationOwnerId") && it.isNotBlank() },
             description = item.optString("description"),
             expectedBehavior = item.optString("expectedBehavior"),
-            moduleId = item.optString("moduleId").takeIf(String::isNotBlank),
+            moduleId = item.optString("moduleId").takeIf { !item.isNull("moduleId") && it.isNotBlank() },
             severity = item.optString("severity"),
             priority = item.optString("priority"),
             createdAt = item.optString("createdAt").ifBlank { updatedAt },
-            closedAt = item.optString("closedAt").takeIf(String::isNotBlank),
+            closedAt = item.optString("closedAt").takeIf { !item.isNull("closedAt") && it.isNotBlank() },
             version = item.optInt("version", 1).coerceAtLeast(1),
         )
     }

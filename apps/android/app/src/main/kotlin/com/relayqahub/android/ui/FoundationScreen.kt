@@ -191,7 +191,13 @@ fun FoundationScreen(
             )
             QaHubPage.NEW_BUG -> NewBugPage(
                 state = state,
-                onCaptureNow = onCaptureNow,
+                draftKey = viewModel.draftKey,
+                initialDraft = viewModel.readNewBugDraft(),
+                onDraftChange = viewModel::saveNewBugDraft,
+                onCaptureNow = {
+                    if (state.captureSessionStatus == CaptureSessionUiStatus.ACTIVE) onCaptureNow()
+                    else onStartCaptureSession()
+                },
                 onDeleteImage = viewModel::deleteCaptureDraft,
                 onSubmit = viewModel::submitNewBug,
                 modifier = Modifier.padding(innerPadding),
@@ -591,7 +597,7 @@ private fun CaptureSettingsPage(
                     onDownload = onDownloadSelfUpdate,
                 )
             }
-            item {
+            if (!com.relayqahub.android.BuildConfig.QA_HUB_GAME_APK_DIRECTORY_URL.contains("qa-hub.invalid")) item {
                 GameApkSection(
                     state = state,
                     onRefresh = onRefreshGameApks,
@@ -729,7 +735,7 @@ private fun GameApkSection(
     val catalog = state.gameApkCatalog
     SectionCard(
         title = "最新游戏 APK",
-        subtitle = "来自 10.100.5.129:8000/apk，按上传时间显示最新 5 个",
+        subtitle = "来自当前预览配置的下载目录，按上传时间显示最新 5 个",
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -983,6 +989,7 @@ private fun BugListPage(
             people = state.people.people,
             onDismiss = onCloseBug,
             onSave = onSaveBug,
+            onWorkflowChanged = { deleted -> if (deleted) onCloseBug() else state.bugDetail.bug?.let(onOpenBug); onRefresh() },
         )
     }
 }
@@ -1278,6 +1285,7 @@ private fun BugDetailDialog(
     people: List<QaPerson>,
     onDismiss: () -> Unit,
     onSave: (BugEditDraft) -> Unit,
+    onWorkflowChanged: (Boolean) -> Unit,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -1343,6 +1351,7 @@ private fun BugDetailDialog(
                             bug = bug,
                             people = people,
                             onSave = onSave,
+                            onWorkflowChanged = onWorkflowChanged,
                         )
                     }
                 }
@@ -1357,6 +1366,7 @@ private fun EditableBugDetail(
     bug: WorkbenchBug,
     people: List<QaPerson>,
     onSave: (BugEditDraft) -> Unit,
+    onWorkflowChanged: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     var editing by rememberSaveable(bug.id, bug.version) { mutableStateOf(false) }
@@ -1646,6 +1656,7 @@ private fun EditableBugDetail(
             item { Text("部分图片暂时无法读取：$code", color = MaterialTheme.colorScheme.error) }
         }
         if (!editing) {
+            item { BugLifecyclePanel(bug = bug, onChanged = onWorkflowChanged) }
             item {
                 SectionCard(title = "分工与进度", subtitle = "状态流转仍遵循 Bug 工作流") {
                     DetailFact("提报人", personName(people, bug.reporterId, "未知"))
@@ -1826,19 +1837,22 @@ private fun DetailFact(label: String, value: String) {
 @Composable
 private fun NewBugPage(
     state: FoundationUiState,
+    draftKey: String,
+    initialDraft: com.relayqahub.android.SavedBugDraft,
+    onDraftChange: (com.relayqahub.android.SavedBugDraft) -> Unit,
     onCaptureNow: () -> Unit,
     onDeleteImage: () -> Unit,
     onSubmit: (ByteArray?, String, String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var content by rememberSaveable(state.currentActorId, state.newBugFormRevision) {
-        mutableStateOf("")
+    var content by remember(draftKey, state.newBugFormRevision) {
+        mutableStateOf(initialDraft.content)
     }
-    var fixerId by rememberSaveable(state.currentActorId, state.newBugFormRevision) {
-        mutableStateOf("")
+    var fixerId by remember(draftKey, state.newBugFormRevision) {
+        mutableStateOf(initialDraft.fixerId)
     }
-    var verifierId by rememberSaveable(state.currentActorId, state.newBugFormRevision) {
-        mutableStateOf("")
+    var verifierId by remember(draftKey, state.newBugFormRevision) {
+        mutableStateOf(initialDraft.verifierId)
     }
     var savedStrokes by remember(state.newBugFormRevision) {
         mutableStateOf<List<List<Offset>>>(emptyList())
@@ -1854,8 +1868,8 @@ private fun NewBugPage(
         savedStrokes = emptyList()
         editorOpen = false
     }
-    LaunchedEffect(state.currentActorId, state.newBugFormRevision) {
-        fixerId = ""
+    LaunchedEffect(draftKey, content, fixerId, verifierId) {
+        onDraftChange(com.relayqahub.android.SavedBugDraft(content, fixerId, verifierId))
     }
     LaunchedEffect(state.currentActorId, verifiers) {
         if (verifiers.none { it.id == verifierId }) {
@@ -1960,10 +1974,10 @@ private fun NewBugPage(
                             )
                             OutlinedButton(
                                 onClick = onCaptureNow,
-                                enabled = !draft.isDeleting && !draft.isSubmitting,
+                                enabled = !draft.isDeleting && !draft.isSubmitting && state.captureSessionStatus != CaptureSessionUiStatus.STARTING,
                                 modifier = Modifier.testTag("new-bug-capture-now"),
                             ) {
-                                Text("立即截图")
+                                Text(if (state.captureSessionStatus == CaptureSessionUiStatus.ACTIVE) "立即截图" else "开启截图授权")
                             }
                         }
                     }

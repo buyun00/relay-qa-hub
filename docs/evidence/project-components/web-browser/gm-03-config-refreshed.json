@@ -1,0 +1,48 @@
+{
+  "at": "2026-09-08T17:58:45.127Z",
+  "data": {
+    "fields": [
+      {
+        "checked": false,
+        "type": "checkbox",
+        "value": "on"
+      },
+      {
+        "checked": false,
+        "type": "text",
+        "value": "http://127.0.0.1:1"
+      },
+      {
+        "checked": false,
+        "type": "text",
+        "value": "gm-ui-disabled-fixture"
+      },
+      {
+        "checked": false,
+        "type": "text",
+        "value": ""
+      },
+      {
+        "checked": false,
+        "type": "text",
+        "value": ""
+      },
+      {
+        "checked": false,
+        "type": "text",
+        "value": ""
+      },
+      {
+        "checked": false,
+        "type": "text",
+        "value": ""
+      },
+      {
+        "checked": false,
+        "type": "textarea",
+        "value": "{\n  \"uiFixture\": {\n    \"preview\": \"true\"\n  }\n}"
+      }
+    ],
+    "text": "打包\n未启用\n为此项目启用\nJenkins 地址\n独立测试 Job\n产物下载源\n增量 ZIP 路径\n本次产物地址模板（含 {buildNumber}）\n凭据引用名\n打包预设参数 JSON\n例如 {\"external\": {\"mode\": \"App\"}}\n\n连接仅用于此项目。停用后保留历史；排队任务暂停，正在运行的任务按原配置安全收尾。\n\n保存组件"
+  }
+}

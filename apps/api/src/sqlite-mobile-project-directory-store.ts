@@ -74,6 +74,13 @@ export function createSqliteMobileProjectDirectoryStore(
   options: SqliteMobileProjectDirectoryStoreOptions,
 ): MobileProjectDirectoryStore {
   return {
+    async getProjectAccess(query) {
+      return options.worker.getMobileProjectAccess({
+        accountId: options.scope.accountId,
+        actorId: query.actorId,
+        projectId: query.projectId,
+      });
+    },
     async listProjects(query) {
       return options.worker.listMobileVisibleProjects({
         accountId: options.scope.accountId,

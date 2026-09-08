@@ -19,11 +19,12 @@ export function createSqliteMobileDuplicateStore(
   options: SqliteMobileDuplicateStoreOptions,
 ): MobileDuplicateStore {
   const now = options.now ?? (() => new Date());
-  const actorScope = (actorId: string) => ({
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId,
-  } as const);
+  const actorScope = (actorId: string) =>
+    ({
+      accountId: options.scope.accountId,
+      projectId: options.scope.projectId,
+      actorId,
+    }) as const;
 
   return {
     async listCandidates(query): Promise<MobileDuplicateCandidateList> {

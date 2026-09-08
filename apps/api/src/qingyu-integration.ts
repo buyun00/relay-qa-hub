@@ -278,11 +278,24 @@ export async function createQingyuIntegration(options: {
   readonly linkStore: QingyuLinkPersistence;
   readonly client?: QingyuClient;
   readonly now?: () => Date;
+  readonly externalProjectId?: string;
+  readonly canStart?: () => Promise<boolean>;
+  readonly initialCredentials?: QingyuCredentials;
 }): Promise<QingyuIntegration> {
   const stateFile = new EncryptedStateFile(options.statePath, options.secret);
   let state = await stateFile.load();
   const client = options.client ?? new QingyuClient();
   const now = options.now ?? (() => new Date());
+  const requireEnabled = async (externalProjectId?: string): Promise<void> => {
+    if (options.canStart && !(await options.canStart()))
+      throw new QingyuError(409, "COMPONENT_DISABLED", "该项目未启用同步组件");
+    if (
+      externalProjectId &&
+      options.externalProjectId &&
+      options.externalProjectId !== externalProjectId
+    )
+      throw new QingyuError(403, "EXTERNAL_PROJECT_MISMATCH", "第三方项目不属于当前组件配置");
+  };
   const loginChallenges = new Map<string, QingyuLoginChallenge>();
   let mutationQueue = Promise.resolve();
 
@@ -305,6 +318,7 @@ export async function createQingyuIntegration(options: {
     state.sessions.find((item) => item.actorId === actorId) ?? null;
   const credentials = (actorId: string): QingyuCredentials => {
     const session = storedSession(actorId);
+    if (session === null && options.initialCredentials) return options.initialCredentials;
     if (session === null)
       throw new QingyuError(401, "QINGYU_AUTH_REQUIRED", "请先使用轻语 APP 扫码登录");
     return session.credentials;
@@ -562,6 +576,7 @@ export async function createQingyuIntegration(options: {
 
     async startLogin(actorId) {
       return mutate(async () => {
+        await requireEnabled();
         const challenge = await client.startLogin();
         loginChallenges.set(actorId, challenge);
         state = { ...state, sessions: state.sessions.filter((item) => item.actorId !== actorId) };
@@ -572,6 +587,7 @@ export async function createQingyuIntegration(options: {
 
     async pollLogin(actorId) {
       return mutate(async () => {
+        await requireEnabled();
         const challenge = loginChallenges.get(actorId);
         if (challenge === undefined) return publicSession(actorId);
         const result = await client.pollLogin(challenge);
@@ -601,14 +617,19 @@ export async function createQingyuIntegration(options: {
     },
 
     async listProjects(actorId) {
+      await requireEnabled();
       try {
-        return await client.listProjects(credentials(actorId));
+        const projects = await client.listProjects(credentials(actorId));
+        return options.externalProjectId
+          ? projects.filter((project) => project.id === options.externalProjectId)
+          : projects;
       } catch (error: unknown) {
         return removeSessionOnUnauthorized(actorId, error);
       }
     },
 
     async listOwnDefects(actorId, externalProjectId) {
+      await requireEnabled(externalProjectId);
       try {
         const result = await client.listOwnDefects(credentials(actorId), externalProjectId);
         return {
@@ -628,6 +649,7 @@ export async function createQingyuIntegration(options: {
 
     async importOwnDefects(actorId, externalProjectId, defectIds) {
       return mutate(async () => {
+        await requireEnabled(externalProjectId);
         const sessionCredentials = credentials(actorId);
         try {
           const selected =
@@ -643,6 +665,7 @@ export async function createQingyuIntegration(options: {
           const items: QingyuImportItemResult[] = [];
           for (const defectId of selected) {
             try {
+              await requireEnabled(externalProjectId);
               items.push(await importOne(actorId, externalProjectId, defectId, sessionCredentials));
             } catch (error: unknown) {
               if (error instanceof QingyuError && error.status === 401) throw error;
@@ -672,13 +695,19 @@ export async function createQingyuIntegration(options: {
       return mutate(async () => {
         const link = await options.linkStore.getBugLink(bugId);
         if (link === null) return null;
+        await requireEnabled(link.externalProjectId);
+        if (link.qaProjectId !== options.qaProjectId)
+          throw new QingyuError(403, "PROJECT_MISMATCH", "同步记录不属于当前项目");
         if (link.syncStatus === "succeeded" && syncOptions.verifyRemote !== true) {
           return { link, alreadyResolved: true };
         }
         const session =
           [storedSession(link.importedByActorId), storedSession(actorId)].find(
             (item) => item?.credentials.user.id === link.qingyuUserId,
-          ) ?? null;
+          ) ??
+          (options.initialCredentials?.user.id === link.qingyuUserId
+            ? { actorId, credentials: options.initialCredentials }
+            : null);
         const attemptAt = now().toISOString();
         const syncing = await options.linkStore.updateSync(link, {
           syncStatus: "syncing",

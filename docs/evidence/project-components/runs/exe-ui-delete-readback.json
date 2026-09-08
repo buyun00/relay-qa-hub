@@ -1,0 +1,32 @@
+{
+  "recordedAt": "2026-09-08T18:54:30.587Z",
+  "passed": true,
+  "client": "installed EXE 0.2.0-preview.5 native UI",
+  "deletedBugId": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+  "context": {
+    "status": 200,
+    "error": true,
+    "value": {
+      "ok": false,
+      "code": "NOT_FOUND",
+      "message": "QA Hub rejected the MCP operation (NOT_FOUND)",
+      "status": 404
+    }
+  },
+  "attachment": {
+    "status": 200,
+    "error": true,
+    "value": {
+      "ok": false,
+      "code": "NOT_FOUND",
+      "message": "QA Hub rejected the MCP operation (NOT_FOUND)",
+      "status": 404
+    }
+  },
+  "listed": false,
+  "originalClosedBug": {
+    "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+    "state": "closed",
+    "version": 14
+  }
+}

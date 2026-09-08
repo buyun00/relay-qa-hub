@@ -136,7 +136,7 @@ class FoundationViewModelContractTest {
 
     @Test
     fun `foundation identity fixture uses UUID contract identities`() {
-        val scope = FoundationViewModel.foundationScope(ACTOR_ID)
+        val scope = scopedIdentity("https://preview.example/api/v1/", PROJECT_ID, PROJECT_ID, ACTOR_ID)
 
         listOf(
             scope.accountId,

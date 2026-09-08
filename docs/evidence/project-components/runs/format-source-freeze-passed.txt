@@ -1,0 +1,4 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug format:check
+npm notice run prettier --check "**/*.{ts,tsx,js,mjs,css,html}"
+Checking formatting...
+All matched files use Prettier code style!

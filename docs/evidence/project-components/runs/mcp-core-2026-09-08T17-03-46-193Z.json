@@ -1,0 +1,9 @@
+{
+  "runId": "2026-09-08T17-03-46-193Z",
+  "instanceId": "qa-hub-preview-7c86",
+  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+  "url": "http://127.0.0.1:4421/mcp",
+  "passed": false,
+  "checks": [],
+  "note": "Real independent MCP protocol and isolated API/SQLite. Remaining tools and platform acceptance are not implied."
+}

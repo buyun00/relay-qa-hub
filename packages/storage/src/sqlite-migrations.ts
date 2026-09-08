@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import { manualCompletionMigration } from "./manual-completion-migration.js";
 import { relayLifecycleMigration } from "./relay-lifecycle-migration.js";
+import { PROJECT_MANAGEMENT_SQL } from "./project-management-migration.js";
+import { gmCommandMigration } from "./gm-command-migration.js";
 
 export interface SqliteMigration {
   readonly version: number;
@@ -7490,12 +7492,22 @@ const baseMigrations: readonly SqliteMigration[] = Object.freeze([
   ),
 ]);
 
-export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
+const projectMigrations: readonly SqliteMigration[] = Object.freeze([
   ...baseMigrations,
   migration(
     12,
     "human_completion_priority",
     manualCompletionMigration(baseMigrations.map((entry) => entry.sql).join("\n")),
+  ),
+  migration(13, "project_identity_and_components", PROJECT_MANAGEMENT_SQL),
+]);
+
+export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
+  ...projectMigrations,
+  migration(
+    14,
+    "authenticated_gm_command_authority",
+    gmCommandMigration(projectMigrations.map((entry) => entry.sql).join("\n")),
   ),
 ]);
 

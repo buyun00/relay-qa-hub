@@ -75,7 +75,7 @@ test("backend account-name normalization is stable and preserves the display spe
   assert.throws(() => normalizeQaLoginName("   "), /name is invalid/u);
 });
 
-test("existing Chinese people are the unique canonical identity for full-pinyin login", () => {
+test("unique Chinese pinyin login preserves an existing exact account identity", () => {
   const directory = new QaLoginDirectory([
     { id: "10000000-0000-4000-8000-000000000101", displayName: "林步云" },
     { id: "10000000-0000-4000-8000-000000000102", displayName: "饶小春" },
@@ -92,7 +92,7 @@ test("existing Chinese people are the unique canonical identity for full-pinyin 
       id: "10000000-0000-4000-8000-000000000103",
       displayName: "raoxiaochun",
     }),
-    { id: "10000000-0000-4000-8000-000000000102", displayName: "饶小春" },
+    { id: "10000000-0000-4000-8000-000000000103", displayName: "raoxiaochun" },
   );
   const ambiguous = new QaLoginDirectory([
     { id: "10000000-0000-4000-8000-000000000104", displayName: "王月" },
@@ -102,7 +102,7 @@ test("existing Chinese people are the unique canonical identity for full-pinyin 
   assert.equal(qaPinyinLoginAlias("Windows安装包验收账号"), undefined);
 });
 
-test("project people directory merges pinyin duplicates into one Chinese member", () => {
+test("project people directory preserves distinct stable IDs until explicitly linked", () => {
   const projectId = "10000000-0000-4000-8000-000000000004";
   const chineseId = "10000000-0000-4000-8000-000000000101";
   const pinyinId = "10000000-0000-4000-8000-000000000102";
@@ -140,9 +140,10 @@ test("project people directory merges pinyin duplicates into one Chinese member"
       userId: chineseId,
       projectId,
       displayName: "林步云",
-      roles: ["developer", "reporter", "verifier"],
+      roles: ["reporter", "verifier"],
       active: true,
     },
+    { userId: pinyinId, projectId, displayName: "linbuyun", roles: ["developer"], active: true },
   ]);
 });
 
@@ -168,7 +169,7 @@ test("explicit identity links override spelling and expose old IDs for historica
   });
   assert.deepEqual(directory.linkedUserIds(canonicalId), [sourceId]);
   directory.removeLink(sourceId);
-  assert.equal(directory.resolveLogin("akkkkk"), undefined);
+  assert.deepEqual(directory.resolveLogin("akkkkk"), { id: sourceId, displayName: "AKKKKK" });
 });
 
 test("user management routes preserve the explicit source and canonical IDs", async (t) => {

@@ -1,0 +1,25 @@
+{
+  "projectId": "b79a70c9-ef3e-4d85-b376-247c473789a9",
+  "draft": {
+    "newContent": "双窗口 A 草稿：撤销项目 A 成员资格后，必须保留这段内容和 JPEG 文件。",
+    "newOwnerId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+    "newVerifierId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+    "newSeverity": "S2",
+    "newFiles": [
+      {
+        "name": "qa-preview-evidence.jpg",
+        "size": 43311,
+        "type": "image/jpeg"
+      }
+    ],
+    "createOpen": true,
+    "selectedId": null,
+    "comment": "",
+    "detailDraft": null,
+    "detailNewFiles": [],
+    "detailAttachmentIds": [],
+    "editingDetail": false,
+    "assignmentDrafts": {},
+    "returnDrafts": {}
+  }
+}

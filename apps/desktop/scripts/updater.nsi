@@ -41,7 +41,8 @@ FunctionEnd
 
 Function WriteResult
   Exch $9
-  ${GetTime} "" "L" $0 $1 $2 $3 $4 $5 $6
+  ${GetTime} "" "LS" $0 $1 $2 $3 $4 $5 $6
+  IntFmt $4 "%02u" $4
   StrCpy $7 "$2-$1-$0T$4:$5:$6.000Z"
   ClearErrors
   FileOpen $8 "$ResultPath" w

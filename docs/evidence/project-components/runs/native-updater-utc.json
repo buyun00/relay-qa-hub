@@ -1,0 +1,22 @@
+{
+  "observedAt": "2026-09-08T19:06:50.604Z",
+  "passed": true,
+  "purpose": "Actual preview6 native helper UTC serialization with deliberate invalid empty config",
+  "helperSha256": "f421cbb0f0ecf8bd6dfcd0e4ff6e8cec18cabe3f41077b6a30656104ea731dfa",
+  "startedAt": "2026-09-08T19:06:50.417Z",
+  "finishedAt": "2026-09-08T19:06:50.604Z",
+  "exitCode": 1,
+  "result": {
+    "schemaVersion": 1,
+    "status": "failed",
+    "releaseId": "clock-validation-20260908T1907Z",
+    "version": "0.2.0-preview.6",
+    "recordedAt": "2026-09-08T19:06:50.000Z"
+  },
+  "appPathEmpty": true,
+  "installerInvoked": false,
+  "priorFixtureNotes": [
+    "1905Z malformed ResultPath retained; no result written",
+    "1906Z emitted correct UTC but PowerShell ConvertFrom-Json converted timestamp before comparison; raw result retained. 1907Z checks raw JSON with Date.parse."
+  ]
+}

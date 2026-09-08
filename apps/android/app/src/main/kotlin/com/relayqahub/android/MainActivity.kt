@@ -15,6 +15,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
@@ -36,6 +39,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private var entryProjectId by mutableStateOf<String?>(null)
     private var foundationViewModel: FoundationViewModel? = null
     private var captureResultRegistration: Closeable? = null
     private var installRequestJob: Job? = null
@@ -113,12 +117,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        entryProjectId = previewProjectEntry(intent)
         captureResultRegistration = CaptureResultBridge.register(this, ::onCaptureResult)
         requestLocalNetworkPermissionIfNeeded()
         enableEdgeToEdge()
         setContent {
             QaHubTheme {
                 QaHubRoot(
+                    entryProjectId = entryProjectId,
                     onViewModelActive = ::activateViewModel,
                     onStartCaptureSession = ::startCaptureSession,
                     onCaptureNow = { CaptureSessionController.captureNow(this) },
@@ -135,6 +141,18 @@ class MainActivity : ComponentActivity() {
         installRequestJob = null
         foundationViewModel = null
         super.onDestroy()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        previewProjectEntry(intent)?.let { entryProjectId = it }
+    }
+
+    private fun previewProjectEntry(intent: Intent): String? {
+        val uri = intent.data ?: return null
+        if (uri.scheme != "qahub-preview" || uri.host != "project") return null
+        return uri.lastPathSegment?.let { runCatching { java.util.UUID.fromString(it).toString() }.getOrNull() }
     }
 
     override fun onResume() {
@@ -273,6 +291,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun onCaptureResult(result: CaptureResult) {
+        if (result is CaptureResult.Ready && result.scopeKey != foundationViewModel?.draftKey) return
         val viewModel = foundationViewModel ?: return
         when (result) {
             is CaptureResult.SessionState -> viewModel.reportCaptureSessionState(result.active)

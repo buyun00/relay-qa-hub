@@ -55,7 +55,7 @@ it("routes a permitted browser system notification click back to packaging", asy
   const open = vi.fn();
   expect(await notifyPackagingSystem(notice, open)).toBe(true);
   expect(created[0]?.options.tag).toBe(notice.id);
-  expect(created[0]?.title).toContain("OZDQP");
+  expect(created[0]?.title).toContain("QA Hub");
   created[0]?.onclick?.();
   expect(environment.focus).toHaveBeenCalledOnce();
   expect(open).toHaveBeenCalledOnce();

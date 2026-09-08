@@ -1,0 +1,199 @@
+{
+  "recordedAt": "2026-09-08T18:02:11.668Z",
+  "projectId": "fb81f6b5-43ed-4e8f-b848-502c0dcf9848",
+  "api": "http://127.0.0.1:4419",
+  "passed": true,
+  "checks": [
+    {
+      "label": "preview remains ready at schema14",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "status": 200,
+      "passed": true,
+      "at": "2026-09-08T18:02:11.650Z",
+      "response": {
+        "status": "ready",
+        "schemaVersion": "14",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      }
+    },
+    {
+      "label": "browser project restored with stable ID and shortcode",
+      "method": "GET",
+      "path": "/api/v1/gm/projects",
+      "status": 200,
+      "passed": true,
+      "at": "2026-09-08T18:02:11.653Z",
+      "response": {
+        "id": "fb81f6b5-43ed-4e8f-b848-502c0dcf9848",
+        "key": "GB1788890272232",
+        "name": "GM 浏览验收 1788890272232",
+        "active": true,
+        "version": 5,
+        "roles": [
+          "gm"
+        ]
+      }
+    },
+    {
+      "label": "all five components off and disabled build configuration persisted",
+      "method": "GET",
+      "path": "/api/v1/projects/fb81f6b5-43ed-4e8f-b848-502c0dcf9848/components",
+      "status": 200,
+      "passed": true,
+      "at": "2026-09-08T18:02:11.657Z",
+      "response": {
+        "projectId": "fb81f6b5-43ed-4e8f-b848-502c0dcf9848",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "presets": {
+                "uiFixture": {
+                  "preview": "true"
+                }
+              },
+              "baseUrl": "http://127.0.0.1:1",
+              "job": "gm-ui-disabled-fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:58:33.510Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "browser membership restored at version3",
+      "method": "GET",
+      "path": "/api/v1/projects/fb81f6b5-43ed-4e8f-b848-502c0dcf9848/users",
+      "status": 200,
+      "passed": true,
+      "at": "2026-09-08T18:02:11.663Z",
+      "response": {
+        "projectId": "fb81f6b5-43ed-4e8f-b848-502c0dcf9848",
+        "items": [
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 10,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          },
+          {
+            "userId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+            "displayName": "Web双窗1788889232622",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 3,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 3,
+            "createdAt": "2026-09-08T17:40:32.637Z",
+            "updatedAt": "2026-09-08T17:40:32.637Z",
+            "protected": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "no build task created by configuration edits",
+      "method": "GET",
+      "path": "/api/v1/projects/fb81f6b5-43ed-4e8f-b848-502c0dcf9848/packaging/tasks",
+      "status": 200,
+      "passed": true,
+      "at": "2026-09-08T18:02:11.668Z",
+      "response": {
+        "projectId": "fb81f6b5-43ed-4e8f-b848-502c0dcf9848",
+        "items": []
+      }
+    }
+  ],
+  "note": "Read-only readback after actual browser writes. Authentication credentials stay in process memory and are excluded from evidence."
+}

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { JenkinsBuildService, packageFiles } from "../dist/jenkins-builds.js";
 import { createApiApp } from "../dist/app.js";
+import { jenkinsConfig } from "./component-test-config.mjs";
 
 const jobPath = `/job/${encodeURIComponent("01-【OZDQP】【Android】")}/`;
 const definitions = [
@@ -18,7 +19,14 @@ const job = {
       timestamp: 1788507462526,
       building: false,
       result: "SUCCESS",
-      actions: [{ parameters: [{ name: "networkScope", value: "外网_保留原参数" }] }],
+      actions: [
+        {
+          parameters: Object.entries(jenkinsConfig.presets.external).map(([name, value]) => ({
+            name,
+            value,
+          })),
+        },
+      ],
     },
   ],
 };
@@ -91,7 +99,7 @@ function fixture({ post, overrideJob, failJenkins = false } = {}) {
           });
     }
     throw new Error(`Unexpected request ${url.pathname}`);
-  });
+  }, jenkinsConfig);
   return { service, posts, crumbs: () => crumbs, reads: () => reads };
 }
 

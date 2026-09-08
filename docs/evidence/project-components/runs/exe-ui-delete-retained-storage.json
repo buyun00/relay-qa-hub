@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-09-08T18:55:20.438Z",
+  "readOnly": true,
+  "passed": true,
+  "deletion": {
+    "account_id": "10000000-0000-4000-8000-000000000020",
+    "project_id": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "bug_id": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+    "bug_version": 1,
+    "deleted_by_actor_id": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "deleted_at": "2026-09-08T18:54:01.241Z",
+    "idempotency_key": "web:deleteBug:bug:fb21808d-cf4e-4aca-b121-fc091a81d440:v1",
+    "request_digest": "dd9142df6fd30ce1b43199b1011e9b64412c7fff8998bd2e167c45ce6d5963c8"
+  },
+  "bugRetained": {
+    "id": "fb21808d-cf4e-4aca-b121-fc091a81d440",
+    "project_id": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "title": "EXE删除验收 2026-09-09：只删除本预览测试记录，保留审计及证据。",
+    "version": 1
+  },
+  "tables": [
+    {
+      "name": "attachments"
+    },
+    {
+      "name": "attachment_bindings"
+    },
+    {
+      "name": "bug_attachments"
+    },
+    {
+      "name": "occurrence_attachments"
+    },
+    {
+      "name": "comment_attachments"
+    },
+    {
+      "name": "verification_attachments"
+    },
+    {
+      "name": "bug_attachment_removals"
+    }
+  ]
+}

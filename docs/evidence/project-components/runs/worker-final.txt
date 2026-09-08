@@ -1,0 +1,14 @@
+npm notice run @relay-qa-hub/worker@0.1.0-debug test
+npm notice run tsx --test test/worker.test.ts
+✔ worker config is independent and validates the polling boundary (2.1528ms)
+✔ worker polls immediately and exits gracefully through AbortSignal (1.5996ms)
+✔ worker records a sanitized degraded snapshot and remains stoppable (0.461ms)
+✔ an external abort stops an in-flight poll without requiring Relay (0.3795ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 258.0244

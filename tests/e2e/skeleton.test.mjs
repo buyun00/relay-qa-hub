@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { randomBytes } from "node:crypto";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { randomBytes, randomUUID } from "node:crypto";
+import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
@@ -15,7 +15,6 @@ const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const apiEntryPoint = path.join(repositoryRoot, "apps", "api", "dist", "main.js");
 const livePath = "/api/v1/health/live";
 const buildSha = "0123456789abcdef0123456789abcdef01234567";
-const debugBearerToken = randomBytes(32).toString("base64url");
 
 async function loadJson(relativePath) {
   return JSON.parse(await readFile(path.join(repositoryRoot, relativePath), "utf8"));
@@ -52,18 +51,14 @@ async function reservePort() {
   return port;
 }
 
-function startApi(port, dataRoot) {
+function startApi(configFile) {
   const output = [];
   const child = spawn(process.execPath, [apiEntryPoint], {
     cwd: repositoryRoot,
     env: {
       ...process.env,
-      QA_HUB_API_HOST: "127.0.0.1",
-      QA_HUB_API_PORT: String(port),
+      QA_HUB_INSTANCE_CONFIG_FILE: configFile,
       QA_HUB_BUILD_SHA: buildSha,
-      QA_HUB_DATA_ROOT: dataRoot,
-      QA_HUB_MVP_ACCESS_TOKEN: debugBearerToken,
-      QA_HUB_WEB_AUTH_MODE: "debug",
     },
     stdio: ["ignore", "pipe", "pipe"],
     windowsHide: true,
@@ -120,9 +115,62 @@ async function stopChild(child) {
 
 test("built API process starts healthy and can be restarted on the same port", async (t) => {
   const port = await reservePort();
-  const dataRoot = await mkdtemp(path.join(os.tmpdir(), "relay-qa-hub-e2e-"));
-  t.after(async () => rm(dataRoot, { recursive: true, force: true }));
-  const first = startApi(port, dataRoot);
+  const runtimeRoot = await mkdtemp(path.join(os.tmpdir(), "qa-hub-preview-e2e-"));
+  const ports = new Set([port]);
+  while (ports.size < 4) ports.add(await reservePort());
+  const [, webPort, mcpPort, desktopMcpPort] = [...ports];
+  const instanceId = "qa-hub-preview-e2e";
+  const config = {
+    schemaVersion: 1,
+    instanceId,
+    sourceRoot: repositoryRoot,
+    runtimeRoot,
+    dataRoot: path.join(runtimeRoot, "data"),
+    backupRoot: path.join(runtimeRoot, "backups"),
+    downloadsRoot: path.join(runtimeRoot, "downloads"),
+    logsRoot: path.join(runtimeRoot, "logs"),
+    desktopRoot: path.join(runtimeRoot, "desktop"),
+    apiHost: "127.0.0.1",
+    apiPort: port,
+    webHost: "127.0.0.1",
+    webPort,
+    mcpPort,
+    desktopMcpPort,
+    cookieName: `${instanceId}-session`,
+    releaseChannel: instanceId,
+    gmUserId: randomUUID(),
+    secretsFile: path.join(runtimeRoot, "secrets.json"),
+    peopleFile: path.join(runtimeRoot, "people.json"),
+  };
+  for (const root of [
+    config.dataRoot,
+    config.backupRoot,
+    config.downloadsRoot,
+    config.logsRoot,
+    config.desktopRoot,
+    path.join(config.dataRoot, "evidence"),
+    path.join(config.dataRoot, "evidence", "quarantine"),
+  ])
+    await mkdir(root, { recursive: true });
+  await writeFile(
+    config.secretsFile,
+    JSON.stringify(
+      Object.fromEntries(
+        ["sessionSecret", "debugToken", "gmPassword"].map((key) => [
+          key,
+          randomBytes(48).toString("base64url"),
+        ]),
+      ),
+    ),
+    { mode: 0o600, flag: "wx" },
+  );
+  await writeFile(
+    config.peopleFile,
+    JSON.stringify({ schemaVersion: 4, projectKey: "LOCAL", people: [] }),
+  );
+  const configFile = path.join(runtimeRoot, "instance.json");
+  await writeFile(configFile, JSON.stringify(config));
+  const first = startApi(configFile);
   t.after(async () => stopChild(first.child));
 
   const firstResponse = await waitForHealth(port, first.child, first.output);
@@ -132,10 +180,15 @@ test("built API process starts healthy and can be restarted on the same port", a
   assert.equal(firstHealth.status, "ok");
   assert.equal(firstHealth.service, "relay-qa-hub-api");
   assert.equal(firstHealth.version, "0.1.0-debug");
-  assert.equal(firstHealth.buildSha, buildSha);
+  assert.equal(firstHealth.buildSha, "dev", "untrusted inherited QA_HUB overrides are discarded");
+  const firstReady = await fetch(`http://127.0.0.1:${port}/api/v1/health/ready`).then((r) =>
+    r.json(),
+  );
+  assert.equal(firstReady.status, "ready");
+  assert.equal(firstReady.schemaVersion, "14");
   await stopChild(first.child);
 
-  const second = startApi(port, dataRoot);
+  const second = startApi(configFile);
   t.after(async () => stopChild(second.child));
   const secondResponse = await waitForHealth(port, second.child, second.output);
   assert.equal(secondResponse.status, 200);

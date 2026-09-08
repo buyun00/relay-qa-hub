@@ -1,0 +1,92 @@
+{
+  "recordedAt": "2026-09-08T18:04:04.745Z",
+  "scope": "Isolated preview source, temporary real HTTP/SQLite regression, persistent schema14 HTTP and actual browser management",
+  "schemaVersion": 14,
+  "fixes": [
+    "Canonical project entry accepts UUID or case-insensitive short key.",
+    "GM authority requires authenticated isGm plus configured unique GM user ID and account ID.",
+    "Each worker message snapshots the account/project/actor capability; only an exact payload match receives authority.",
+    "The single worker command transaction inserts its capability, runs existing typed guards, deletes it before commit and rolls back on error.",
+    "Ordinary membership records and directory output are retained as real facts.",
+    "Management short key input matches the server format; explicit upload directories and Relay instance configuration are editable."
+  ],
+  "checks": [
+    {
+      "name": "storage migrations, invariants, project identity and user management",
+      "status": "passed",
+      "count": 93,
+      "evidence": "runs/gm-storage-regression.txt"
+    },
+    {
+      "name": "real temporary HTTP project management and concurrent scope regression",
+      "status": "passed",
+      "count": 2,
+      "detail": "Contains non-member GM create/edit/comment/manual-complete/reject/complete/close, worker scope mismatch, exception rollback, concurrent employee denial, empty committed capability table and unchanged revoked GM membership."
+    },
+    {
+      "name": "Web unit regression",
+      "status": "passed",
+      "count": 59
+    },
+    {
+      "name": "TypeScript storage/API/Web and Web lint/build",
+      "status": "passed"
+    },
+    {
+      "name": "Persistent preview management smoke after schema14 restart",
+      "status": "passed",
+      "count": 96,
+      "evidence": "runs/management-2026-09-08T17-53-20-441Z.json",
+      "detail": "Schema14 ready; GM nonmember complete manual loop closed MA1788890000532-1 at version12; configured target witness received zero outbound requests."
+    },
+    {
+      "name": "GM browser UI interaction",
+      "status": "passed",
+      "detail": "Actual GM login/create, component configuration, add/disable/restore employee, project disable/restore, lowercase shortcode name login, all-disabled component history. Dedicated readback 5/5 passed.",
+      "count": 6,
+      "evidence": "web-browser/gm-results.json"
+    }
+  ],
+  "files": [
+    {
+      "path": "packages/storage/src/gm-command-migration.ts",
+      "sha256": "2d60757f1434fe20d3df24f15de9792b908384db52499bcf8235c93651cec87b"
+    },
+    {
+      "path": "apps/api/src/project-request-context.ts",
+      "sha256": "b39ace1eccdfac4cae7c8bc6d791aeea0a713eee9b3df71907f563a4ec5dcbf0"
+    },
+    {
+      "path": "apps/api/src/project-management.ts",
+      "sha256": "7f59ce43990cadc517d804f8819c0a8fcb933093192cf74df7d9c7eb2a975dc6"
+    },
+    {
+      "path": "apps/api/test/project-management.test.mjs",
+      "sha256": "1183c09216ed753d9550e4e0f93e661d84b23f0a08bc8531c5fa8397e9782d3a"
+    },
+    {
+      "path": "scripts/project-components/gm-business-loop.mjs",
+      "sha256": "5d6fec36c7d4b8fdd4237c2cfa4577373a027ecf236b9ccd3bf98c73940e14b1"
+    },
+    {
+      "path": "scripts/project-components/management.smoke.mjs",
+      "sha256": "bb4ecfe2dc1644110bca9bbc21da4c4f237f63143b8c5c8945b9bdcea9123378"
+    },
+    {
+      "path": "apps/web/src/ProjectManagementPage.tsx",
+      "sha256": "61719cdedef092ec47c6d119bf105f1bf2162e207419346c63e59be108e96bcd"
+    }
+  ],
+  "browserFix": {
+    "file": "apps/web/src/ProjectManagementPage.tsx",
+    "problem": "Successful project deactivation followed by forbidden active-project reads caused false error.",
+    "resolution": "Refresh only fetches component/personnel records for an active selected project; inactive project shows restore guidance.",
+    "evidence": "web-browser/gm-06-project-disabled-fixed.json"
+  },
+  "persistentGmClosure": {
+    "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+    "bugKey": "MA1788890000532-1",
+    "state": "closed",
+    "version": 12
+  }
+}

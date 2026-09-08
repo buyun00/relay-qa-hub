@@ -1,0 +1,38 @@
+{
+  "draft": {
+    "text": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。",
+    "screenshot": "exe-preview4-text-image-draft.jpg",
+    "imageSha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+    "imageCount": 1
+  },
+  "timestamp": "2026-09-08T18:18:32.5358251Z",
+  "daily": {
+    "pid": 17160,
+    "createdAt": "2026-09-08T10:24:12.5269520Z",
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+  },
+  "preview": {
+    "pid": 14340,
+    "createdAt": "2026-09-08T17:56:25.2245410Z",
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+    "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --updated --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\""
+  },
+  "productionReadiness": {
+    "status": "ready",
+    "schemaVersion": "12",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  }
+}

@@ -20,6 +20,7 @@ const MAX_SENT_NOTIFICATION_IDS = 256;
 interface HintConnection {
   socket: Socket;
   actorId: string;
+  projectSession?: ProjectHintSession;
   sentNotificationIds: Set<string>;
   onData: (chunk: Buffer) => void;
   onError: () => void;
@@ -29,12 +30,22 @@ interface HintConnection {
   closed: boolean;
 }
 
+export interface ProjectHintSession {
+  readonly actorId: string;
+  readonly projectId: string;
+  readonly tokenDigest: string;
+}
+
 export interface MobileNotificationHintChannelOptions {
   readonly server: HttpServer;
   readonly store: MobileNotificationStore;
   readonly actorId: string;
   readonly bearerToken: string;
   readonly resolveBrowserSession?: (cookieHeader: string) => Promise<string | null>;
+  readonly resolveProjectSession?: (request: IncomingMessage) => Promise<ProjectHintSession | null>;
+  readonly listProjectNotifications?: (
+    session: ProjectHintSession,
+  ) => Promise<Awaited<ReturnType<MobileNotificationStore["listNotifications"]>> | null>;
   readonly now?: () => Date;
   readonly logger?: {
     readonly warn?: (object: unknown, message?: string) => void;
@@ -236,8 +247,16 @@ export function startMobileNotificationHintChannel(
       headerValue(request.headers.authorization) === `Bearer ${options.bearerToken}` ||
       protocols.includes(expectedProtocolToken);
     const cookieHeader = headerValue(request.headers.cookie);
-    let actorId: string | null = bearerAuthenticated ? options.actorId : null;
+    const projectSession = options.resolveProjectSession
+      ? await options.resolveProjectSession(request)
+      : null;
+    let actorId: string | null = options.resolveProjectSession
+      ? (projectSession?.actorId ?? null)
+      : bearerAuthenticated
+        ? options.actorId
+        : null;
     if (
+      options.resolveProjectSession === undefined &&
       actorId === null &&
       cookieHeader !== undefined &&
       options.resolveBrowserSession !== undefined
@@ -284,6 +303,7 @@ export function startMobileNotificationHintChannel(
     const connection: HintConnection = {
       socket,
       actorId,
+      ...(projectSession ? { projectSession } : {}),
       sentNotificationIds: new Set(),
       onData,
       onError,
@@ -317,29 +337,38 @@ export function startMobileNotificationHintChannel(
         string,
         Awaited<ReturnType<MobileNotificationStore["listNotifications"]>>
       >();
+      const connectionKey = (connection: HintConnection) =>
+        connection.projectSession
+          ? `${connection.projectSession.tokenDigest}:${connection.projectSession.projectId}`
+          : connection.actorId;
       await Promise.all(
-        [...new Set([...connections].map((connection) => connection.actorId))].map(
-          async (actorId) => {
-            try {
-              actorResults.set(
-                actorId,
-                await options.store.listNotifications({
-                  actorId,
-                  limit: 100,
-                  now: now().toISOString(),
-                }),
-              );
-            } catch (error: unknown) {
-              options.logger?.warn?.(
-                { error, actorId },
-                "notification hint materialization failed",
-              );
+        [
+          ...new Map(
+            [...connections].map((connection) => [connectionKey(connection), connection]),
+          ).values(),
+        ].map(async (connection) => {
+          const actorId = connection.actorId;
+          try {
+            const notifications =
+              connection.projectSession && options.listProjectNotifications
+                ? await options.listProjectNotifications(connection.projectSession)
+                : await options.store.listNotifications({
+                    actorId,
+                    limit: 100,
+                    now: now().toISOString(),
+                  });
+            if (notifications === null) {
+              removeConnection(connection);
+              return;
             }
-          },
-        ),
+            actorResults.set(connectionKey(connection), notifications);
+          } catch (error: unknown) {
+            options.logger?.warn?.({ error, actorId }, "notification hint materialization failed");
+          }
+        }),
       );
       for (const connection of connections) {
-        const result = actorResults.get(connection.actorId);
+        const result = actorResults.get(connectionKey(connection));
         if (result === undefined) continue;
         for (const notification of result.items) {
           sendNotificationHint(connection, notification);

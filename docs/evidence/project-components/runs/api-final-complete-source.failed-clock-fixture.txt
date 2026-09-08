@@ -1,0 +1,196 @@
+npm notice run @relay-qa-hub/api@0.1.0-debug test
+npm notice run tsc -p tsconfig.json && node --test test/*.test.mjs && node --import tsx --test test/*.test.ts
+✔ Bug update accepts a complete attachment set and rejects ambiguous image edits (5.4258ms)
+✔ backend account-name normalization is stable and preserves the display spelling (1.0677ms)
+✔ unique Chinese pinyin login preserves an existing exact account identity (42.1336ms)
+✔ project people directory preserves distinct stable IDs until explicitly linked (31.2371ms)
+✔ explicit identity links override spelling and expose old IDs for historical labels (1.228ms)
+✔ user management routes preserve the explicit source and canonical IDs (403.8172ms)
+✔ backend people seed accepts only schema 4 without client-side aliases (52.4903ms)
+✔ checked-in backend people seed contains the default QA team (1.9111ms)
+✔ new Web and Android name login creates backend accounts and rejects the legacy pinyin body field (101.3343ms)
+✔ Bug overview query supports unassigned ownership and a 500-row window (1.4024ms)
+✔ capture metadata records positive Android API values without an admission floor (4.0821ms)
+✔ GET /api/v1/health/live returns the frozen liveness shape (35.1187ms)
+✔ android update feed serves uncached metadata and immutable APK ranges (212.217ms)
+✔ human workflow routes preserve no-code and failed Verification contracts (60.9055ms)
+✔ Verification routes hide raw SQLite failures behind a retryable storage error (22.7753ms)
+✔ Android createBug persists an exact receipt, supports GET, and rejects a wrong token (25.3179ms)
+✔ Android attachment upload follows the frozen init, chunk, finalize, bind wire (33.3463ms)
+✔ server defaults to loopback and supports graceful stop plus restart (175.9584ms)
+✔ rejects ambiguous build provenance (0.4877ms)
+✔ normalizes an explicit set of exact browser origins (0.7169ms)
+✔ manual completion route binds the authenticated human, exact version and idempotency key (25.5865ms)
+▶ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation
+  ✔ secondary artifact fallback preserves exact bytes for another reader of the bound Bug (166.1234ms)
+  ✔ wrong Bug, project, membership, resource URI and nested capture project cannot expose evidence (165.9736ms)
+  ✔ only validated clean content is exposed; disk and transport checksum failures are rejected (248.2199ms)
+  ✔ soft deletion denies capture metadata and raw artifacts while preserving stored evidence (90.6977ms)
+✔ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation (2564.1632ms)
+✔ actual MCP HTTP and SQLite: attachment upload, resource read, project isolation and API parity (1871.5851ms)
+✖ actual HTTP and SQLite paginate 501 comments and 101 bound attachments without scope or content loss (5408.997ms)
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (783.9744ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (193.8804ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (127.6334ms)
+✔ actual MCP HTTP reports protocol errors separately and retains the 90 business tools (189.8321ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (275.6503ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (18.0572ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (799.1318ms)
+✔ archive failure preserves local backups, startup and the next backup attempt (2012.3252ms)
+✔ blocking archive work runs outside the API event loop (327.0663ms)
+✔ the production archive worker preserves the complete recovery-point contract (1071.1774ms)
+✔ keeps two newest and only the current 09:00 Shanghai anchor (4.541ms)
+✔ schedules 09:00 precisely and catches a boundary crossed during a backup (0.7059ms)
+✔ retention configuration requires both archive and cadence (1.1351ms)
+✔ deletes whole obsolete groups on both volumes, audits, and is idempotent (4969.6728ms)
+✔ corrupt retained archive prevents every deletion, including local backups (1680.0166ms)
+✔ a live cleanup lock refuses overlap and a dead owner's lock is recovered (1405.9835ms)
+✔ a junction inside an obsolete attachment group is preserved and never traversed for deletion (1338.8828ms)
+✔ production worker applies retention and reports cleanup failures without losing backup success (2152.1632ms)
+✔ submission is durable, idempotent, actor-bound and does not launch in the request (235.6719ms)
+✔ iOS source configuration survives queue restart and cannot use the Android build button (131.2686ms)
+✔ all users see existing upload progress and diagnostics without sharing account configuration (144.8454ms)
+✔ shared build records retain creator, queue and handoff across restart without exposing account binding (249.613ms)
+✔ global queue serializes workers across users; confirmation reserves the channel (170.3201ms)
+✔ unfinished failed task blocks its channel but not other products (154.3706ms)
+✔ restart retains active and failed checkpoints without replaying writes (144.2773ms)
+✔ a second API instance cannot claim the scheduler while the owner lives (136.1132ms)
+✔ lost dispatch acknowledgement reconciles the new run receipt (145.5864ms)
+✔ failed preflight retries the same queued identity and original input (119.1009ms)
+✔ queued tasks can be cancelled; started work and another user's tasks cannot (134.1246ms)
+✔ account replacement cannot retarget queued uploads (74.1553ms)
+✔ combined build is queued without HTTP waiting and server restart does not resubmit (153.6784ms)
+{"level":30,"time":1788894693152,"pid":19912,"hostname":"win11-lin-main","reqId":"req-1","req":{"method":"GET","url":"/api/v1/increment-upload","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788894693160,"pid":19912,"hostname":"win11-lin-main","reqId":"req-1","res":{"statusCode":401},"responseTime":7.356499999999869,"msg":"request completed"}
+{"level":30,"time":1788894693161,"pid":19912,"hostname":"win11-lin-main","reqId":"req-2","req":{"method":"POST","url":"/api/v1/increment-upload/jobs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788894693175,"pid":19912,"hostname":"win11-lin-main","reqId":"req-2","res":{"statusCode":200},"responseTime":13.32930000000033,"msg":"request completed"}
+{"level":30,"time":1788894693176,"pid":19912,"hostname":"win11-lin-main","reqId":"req-3","req":{"method":"GET","url":"/api/v1/increment-upload/jobs/8ae23f39-27a2-4c67-b903-4559352410c7/logs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788894693177,"pid":19912,"hostname":"win11-lin-main","reqId":"req-3","res":{"statusCode":200},"responseTime":1.0383999999999105,"msg":"request completed"}
+{"level":30,"time":1788894693177,"pid":19912,"hostname":"win11-lin-main","reqId":"req-4","req":{"method":"GET","url":"/api/v1/increment-upload","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788894693179,"pid":19912,"hostname":"win11-lin-main","reqId":"req-4","res":{"statusCode":200},"responseTime":1.2291999999997643,"msg":"request completed"}
+{"level":30,"time":1788894693179,"pid":19912,"hostname":"win11-lin-main","reqId":"req-5","req":{"method":"GET","url":"/api/v1/increment-upload/jobs/8ae23f39-27a2-4c67-b903-4559352410c7/logs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788894693180,"pid":19912,"hostname":"win11-lin-main","reqId":"req-5","res":{"statusCode":200},"responseTime":0.9158000000002176,"msg":"request completed"}
+{"level":30,"time":1788894693181,"pid":19912,"hostname":"win11-lin-main","reqId":"req-6","req":{"method":"GET","url":"/api/v1/increment-upload/jobs/8ae23f39-27a2-4c67-b903-4559352410c7/logs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788894693181,"pid":19912,"hostname":"win11-lin-main","reqId":"req-6","res":{"statusCode":401},"responseTime":0.28629999999975553,"msg":"request completed"}
+✔ authenticated API exposes queue and diagnostics without local bridge or credentials (429.6311ms)
+✔ lost launch acknowledgement still reserves the actual worker's channel (106.9877ms)
+✔ completed build hands off to upload before the next queued build can overwrite its ZIP (162.9945ms)
+✔ new submissions are accepted while server build polling is waiting on Jenkins (105.2153ms)
+✔ cancelling a queued recovery preserves the original failed task and its channel reservation (127.6851ms)
+✔ disabled queued work stays paused after re-enable until its owner explicitly resumes (103.8053ms)
+✔ disabling preserves a started build's source handoff while pausing the next build (108.8334ms)
+✔ the three presets match Jenkins UI and leave all unrelated defaults unset (48.8818ms)
+✔ expired crumb/session reauthenticates once, then submits with the new cookie (3.278ms)
+✔ concurrent duplicate submissions reuse the receipt; conflicting reuse is rejected (3.0494ms)
+✔ ambiguous timeout never automatically repeats a possibly accepted build (2.2656ms)
+✔ ambiguous server-error never automatically repeats a possibly accepted build (2.0303ms)
+✔ ambiguous redirect-login never automatically repeats a possibly accepted build (1.6279ms)
+✔ disabled or changed jobs cannot silently launch the wrong build (1.6927ms)
+✔ status uses actual directories, scopes queue to this job and coalesces polling (8.5722ms)
+✔ Jenkins outage does not hide available APK/IPA/ZIP files (1.7743ms)
+✔ download list rejects directories, traversal and empty files; classifies names independently (0.7297ms)
+✔ routes require QA Hub authentication, validate preset and reject additional settings (494.2978ms)
+✔ a started Jenkins run blocked by the shared build lock is queued without preparation alarms (16.1207ms)
+✔ recorded lock wait is subtracted from preparation and execution history, not raw build time (1.8272ms)
+✔ untimed lock wait has a lower bound and preparation timing starts after acquisition (0.925ms)
+✔ cancellation while waiting and non-whitelisted log content do not pretend to execute preparation (0.6031ms)
+✔ positive stage evidence ends the queue display even when the acquisition marker is absent (0.4671ms)
+✔ timestamped stages carry actual boundaries, worker work and a separate Gradle timer (3.1876ms)
+✔ legacy logs retain stage order without inventing stage durations or exposing console secrets (0.6298ms)
+✔ resource-only history skips APK and ZIP, failures stop at the observed stage (1.773ms)
+✔ matching successful stage history sets robust alarms; failures and other modes cannot skew it (1.1792ms)
+✔ untimed running stages use lower-bound observation and initial alarms, never become samples (0.6264ms)
+✔ monitor follows the precise queue executable, handles canceled/expired queues and tolerates log loss (94.3218ms)
+✔ missing explicit config fails before startup (2.4176ms)
+✔ preview overrides discard inherited production connections and secrets (105.5141ms)
+✔ production ports, shared cookie, shared update channel and escaping roots fail (223.4304ms)
+✔ nested junction cannot redirect database or evidence to another directory (26.2741ms)
+✔ overlapping data and backup paths are rejected (36.2382ms)
+✔ actual HTTP and SQLite authorize the 101st Relay member/project and recheck revocation, GM and disabled scope (2689.054ms)
+✔ project component pauses queued work without reenable replay and retains local history (886.0583ms)
+✔ eight bugs keep independent results, resume failed steps, and never resubmit successes (1055.7979ms)
+✔ lost creation response replays the durable request after restart without duplicate task (132.1058ms)
+✔ existing linked task is reused and continuation follows its original QA receipt (50.8476ms)
+✔ project authorization and attachment integrity are checked before submission (19.3281ms)
+✔ HTTP routes require authentication and a merge confirmation before any mutation (253.3485ms)
+✔ project build queue pauses without replay; running task retains original version and verified artifact (1264.1408ms)
+✔ missing or escaping project configuration refuses execution before network (713.5499ms)
+✔ import execution hold prevents submission, retry and polling while local history remains readable (660.4491ms)
+✔ Relay actions retain the task's original component endpoint after configuration changes (715.5236ms)
+✔ build-upload enqueue returns the persisted queued chain and performs no external execution (596.6495ms)
+✔ component HTTP routes preserve JSON string receipts and accept batch and outbox identifiers (200.3456ms)
+✔ iOS project source keeps its directory separator for scoped listing and ZIP resolution (1022.4796ms)
+✔ real HTTP project name login, protected GM identity, scoped membership and isolated cookie (1202.6168ms)
+✔ actual API isolates concurrent users, explicit project headers and record-derived project context (1991.8942ms)
+✔ real SQLite Relay claims isolate projects, versions and legacy lanes; disabled queue needs explicit audited resume (1705.1243ms)
+✔ worker import hold and transport second gate stop queued work without HTTP while history remains available (837.5499ms)
+✔ project Qingyu component rejects polling/import when disabled and excludes other external projects (96.2063ms)
+✔ QingyuClient uses Relay-proven QR, own-defect, detail, and resolve protocols (58.0132ms)
+▶ QingyuClient recognizes already-completed tasks without requesting another transition
+  ✔ {"key":"RESOLVED","name":"已解决"} (1.6059ms)
+  ✔ {"key":"CLOSED","name":"已关闭"} (0.8272ms)
+  ✔ {"key":"COMPLETED","name":"已完成"} (0.7004ms)
+  ✔ "已完成" (0.8307ms)
+  ✔ "done" (1.272ms)
+✔ QingyuClient recognizes already-completed tasks without requesting another transition (7.3195ms)
+✔ QingyuClient does not label a cancelled upstream task as successfully resolved (3.3217ms)
+✔ QingyuClient does not invent missing defect details (1.8639ms)
+▶ Qingyu integration persists encrypted sessions, imports idempotently, and resolves linked Bug
+  ✔ expired session persists sync failure without claiming upstream completion (47.414ms)
+  ✔ missing session is recorded as a failed sync and remains retryable (60.5896ms)
+✔ Qingyu integration persists encrypted sessions, imports idempotently, and resolves linked Bug (243.3205ms)
+▶ human acceptance commits locally before best-effort Qingyu synchronization
+  ✔ successful or unlinked sync still returns a closed QA Hub Bug (94.507ms)
+  ✔ not logged in still returns a closed QA Hub Bug (2.8686ms)
+  ✔ expired login still returns a closed QA Hub Bug (2.1738ms)
+  ✔ completed upstream has no transition still returns a closed QA Hub Bug (6.3963ms)
+  ✔ upstream did not confirm resolution still returns a closed QA Hub Bug (2.3548ms)
+  ✔ timeout still returns a closed QA Hub Bug (2.3751ms)
+  ✔ offline still returns a closed QA Hub Bug (2.6422ms)
+  ✔ unexpected adapter failure still returns a closed QA Hub Bug (1.8926ms)
+  ✔ acceptance replay does not repeat upstream synchronization (2.1701ms)
+  ✔ failed verification does not close or synchronize upstream (2.3934ms)
+  ✔ local VERSION_CONFLICT prevents upstream synchronization (2.1775ms)
+  ✔ local FORBIDDEN prevents upstream synchronization (1.8183ms)
+  ✔ local INVALID_TRANSITION prevents upstream synchronization (1.6476ms)
+  ✔ local SQLITE_BUSY prevents upstream synchronization (2.2493ms)
+✔ human acceptance commits locally before best-effort Qingyu synchronization (418.8657ms)
+✔ explicit Qingyu resolve API reuses the verified linked-Bug synchronization (48.0533ms)
+✔ durable Relay transport carries prior handoff and human acceptance, and retries a transient failure (135.6272ms)
+✔ real server supervisor records the worker result after the API closes (1746.3177ms)
+ℹ tests 142
+ℹ suites 0
+ℹ pass 141
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12112.6399
+
+✖ failing tests:
+
+test at test\automation-pagination.test.mjs:22:1
+✖ actual HTTP and SQLite paginate 501 comments and 101 bound attachments without scope or content loss (5408.997ms)
+  AssertionError [ERR_ASSERTION]: qa_bind_attachment: {"code":"ERR_SQLITE_ERROR","status":500,"details":{"statusCode":500,"code":"ERR_SQLITE_ERROR","error":"Internal Server Error","message":"attachment binding must begin at generation one with a server-clock lease"}}
+  
+  true !== false
+  
+      at call (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-pagination.test.mjs:117:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-pagination.test.mjs:213:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api
+npm error workspace @relay-qa-hub/api@0.1.0-debug
+npm error location C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c tsc -p tsconfig.json && node --test test/*.test.mjs && node --import tsx --test test/*.test.ts

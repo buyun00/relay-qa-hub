@@ -70,7 +70,7 @@ class AppPrivateCredentialVault(context: Context) : CredentialVault {
         "$KEY_PREFIX$accountId:$actorId:$installationId:$sessionId:"
 
     private companion object {
-        const val PREFERENCES_NAME = "qa-hub-account-sessions-v1"
+        const val PREFERENCES_NAME = "qa-hub-preview-account-sessions-v1"
         const val KEY_PREFIX = "session:"
         const val KEY_ACCESS_TOKEN = "access_token"
         const val KEY_REFRESH_TOKEN = "refresh_token"

@@ -1,0 +1,22 @@
+{
+  "at": "2026-09-08T18:00:02.149Z",
+  "instanceId": "qa-hub-preview-7c86",
+  "desktopVersion": "0.2.0-preview.4",
+  "tools": 90,
+  "passed": true,
+  "materialized": {
+    "bugId": "b817a6cc-f096-415d-bdb8-faa9b6005c36",
+    "attachmentId": "31c9b4be-d0f6-4c9a-864e-032cc9130562",
+    "filename": "capture-4c082d57-db8a-4d84-94de-762a49675d92.png",
+    "mediaType": "image/png",
+    "size": 184872,
+    "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+    "localPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\mcp-attachments\\27d123dcb8ae089507d07de071e5b7b4d75b02090617cdec91d2ac374b3a54ee\\b817a6cc-f096-415d-bdb8-faa9b6005c36\\31c9b4be-d0f6-4c9a-864e-032cc9130562-e0ed7b4b9693-capture-4c082d57-db8a-4d84-94de-762a49675d92.png",
+    "cached": true
+  },
+  "resource": {
+    "uri": "qa-hub://attachment/fb914b3b-4169-47f8-8dec-76f3a3cc780d/b817a6cc-f096-415d-bdb8-faa9b6005c36/31c9b4be-d0f6-4c9a-864e-032cc9130562",
+    "size": 184872,
+    "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+  }
+}

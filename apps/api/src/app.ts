@@ -181,6 +181,17 @@ import {
 } from "./qingyu-integration.js";
 import { QingyuError } from "./qingyu-client.js";
 import { JenkinsBuildService, registerPackagingRoutes } from "./jenkins-builds.js";
+import {
+  registerProjectManagementRoutes,
+  type ProjectManagementService,
+} from "./project-management.js";
+import type { ProjectRequestContext } from "./project-request-context.js";
+import { registerBugActionRoutes } from "./bug-actions.js";
+import { registerAutomationRoutes } from "./automation.js";
+import {
+  registerProjectComponentRoutes,
+  type ProjectComponentsRuntime,
+} from "./project-components-runtime.js";
 import { IncrementUploadService, registerIncrementUploadRoutes } from "./increment-upload.js";
 import {
   ProductionTasks,
@@ -227,6 +238,11 @@ export interface DependencyHealth {
 }
 
 export interface CreateApiAppOptions {
+  readonly projectComponentsRuntime?: ProjectComponentsRuntime;
+  readonly automationPublicApiOrigin?: string;
+  readonly projectManagementService?: ProjectManagementService;
+  readonly projectRequestContext?: ProjectRequestContext;
+  readonly isolateLegacyComponents?: boolean;
   readonly version?: string;
   readonly buildSha?: string;
   readonly now?: () => Date;
@@ -569,6 +585,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     app.addHook("preHandler", async (request, reply) => {
       if (
         request.url.startsWith(BROWSER_LOGIN_PATH) ||
+        request.url.startsWith("/api/v1/auth/gm/login") ||
+        request.url.startsWith("/api/v1/project-entry/") ||
         request.url.startsWith(BROWSER_ME_PATH) ||
         request.url.startsWith(BROWSER_LOGOUT_PATH)
       ) {
@@ -576,7 +594,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       if (
         readHeader(request.headers.authorization) !== undefined &&
-        browserAuthSession(request) === undefined
+        browserAuthSession(request, browserAuth.cookieName) === undefined
       ) {
         const principal = await authenticateBrowserBearerRequest(request, browserAuth);
         if (principal?.accountId === browserAuth.accountId) {
@@ -601,6 +619,59 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       request.headers.authorization = `Bearer ${debugBearerToken}`;
     });
     registerBrowserAuthRoutes(app, browserAuth);
+  }
+
+  if (options.projectManagementService) {
+    options.projectRequestContext?.register(app, options.projectManagementService);
+    registerProjectManagementRoutes(app, options.projectManagementService, async (request) =>
+      getBrowserPrincipal(request),
+    );
+    registerBugActionRoutes(app, {
+      bugs: mobileBugStore,
+      relay: mobileRelayStore,
+      verification: mobileVerificationStore,
+    });
+    for (const path of [
+      "/api/v1/projects/:projectId/bugs/:bugId/comments",
+      "/api/v1/bugs/:bugId/comments",
+    ]) {
+      app.get<{
+        Params: { projectId?: string; bugId: string };
+        Querystring: { limit?: string; cursor?: string };
+      }>(path, async (request, reply) => {
+        const actor = getBrowserPrincipal(request);
+        if (!actor) return reply.code(401).send({ code: "UNAUTHENTICATED" });
+        const context = await options.projectManagementService!.execute<{ projectId: string }>(
+          actor,
+          {
+            operation: "recordProject",
+            recordType: "bug",
+            recordId: request.params.bugId,
+            ...(request.params.projectId ? { projectId: request.params.projectId } : {}),
+          },
+        );
+        try {
+          if (
+            request.query.limit !== undefined &&
+            (typeof request.query.limit !== "string" || !/^[1-9][0-9]*$/u.test(request.query.limit))
+          )
+            return reply.code(400).send({ code: "INVALID_REQUEST" });
+          return await options.projectManagementService!.execute(actor, {
+            operation: "comments",
+            projectId: context.projectId,
+            bugId: request.params.bugId,
+            limit: request.query.limit === undefined ? 100 : Number(request.query.limit),
+            ...(request.query.cursor === undefined ? {} : { cursor: request.query.cursor }),
+          });
+        } catch (error) {
+          const code = (error as { code?: string }).code;
+          if (code === "INVALID_CURSOR" || code === "INVALID_REQUEST")
+            return reply.code(400).send({ code });
+          if (code === "NOT_FOUND") return reply.code(404).send({ code });
+          throw error;
+        }
+      });
+    }
   }
 
   app.addHook("preHandler", async (request, reply) => {
@@ -640,7 +711,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         ? {}
         : {
             resolveBrowserSession: async (cookieHeader: string): Promise<string | null> => {
-              const token = browserSessionTokenFromCookieHeader(cookieHeader);
+              const token = browserSessionTokenFromCookieHeader(
+                cookieHeader,
+                browserAuth.cookieName,
+              );
               if (token === undefined) return null;
               const principal = await browserAuth.store.resolveBrowserSession({
                 tokenDigest: digestBrowserSessionToken(token),
@@ -649,6 +723,70 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
               return principal?.accountId === browserAuth.accountId ? principal.actorId : null;
             },
           }),
+      ...(browserAuth && options.projectManagementService && options.projectRequestContext
+        ? {
+            resolveProjectSession: async (request) => {
+              const origin = readHeader(request.headers.origin);
+              if (origin && !browserAuth.webOrigins.includes(origin)) return null;
+              const authorization = readHeader(request.headers.authorization);
+              const protocolToken = readHeader(request.headers["sec-websocket-protocol"])
+                ?.split(",")
+                .map((value) => value.trim())
+                .find((value) => value.startsWith("bearer."))
+                ?.slice(7);
+              const token = authorization?.startsWith("Bearer ")
+                ? authorization.slice(7)
+                : (protocolToken ??
+                  browserSessionTokenFromCookieHeader(
+                    readHeader(request.headers.cookie),
+                    browserAuth.cookieName,
+                  ));
+              if (!token) return null;
+              const tokenDigest = digestBrowserSessionToken(token);
+              const principal = await browserAuth.store.resolveBrowserSession({
+                tokenDigest,
+                now: (options.now ?? (() => new Date()))().toISOString(),
+              });
+              if (!principal || principal.accountId !== browserAuth.accountId) return null;
+              const projectId =
+                new URL(request.url ?? "/", "http://127.0.0.1").searchParams.get("projectId") ??
+                principal.projectId;
+              if (!projectId) return null;
+              await options.projectManagementService!.execute(principal, {
+                operation: "authorize",
+                projectId,
+              });
+              return { actorId: principal.actorId, projectId, tokenDigest };
+            },
+            listProjectNotifications: async (session) => {
+              const principal = await browserAuth.store.resolveBrowserSession({
+                tokenDigest: session.tokenDigest,
+                now: (options.now ?? (() => new Date()))().toISOString(),
+              });
+              if (
+                !principal ||
+                principal.actorId !== session.actorId ||
+                principal.accountId !== browserAuth.accountId
+              )
+                return null;
+              try {
+                await options.projectManagementService!.execute(principal, {
+                  operation: "authorize",
+                  projectId: session.projectId,
+                });
+              } catch {
+                return null;
+              }
+              return options.projectRequestContext!.runInProject(session.projectId, () =>
+                mobileNotificationStore.listNotifications({
+                  actorId: session.actorId,
+                  limit: 100,
+                  now: (options.now ?? (() => new Date()))().toISOString(),
+                }),
+              );
+            },
+          }
+        : {}),
       ...(options.now === undefined ? {} : { now: options.now }),
       logger: app.log,
     });
@@ -1309,7 +1447,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   app.get<{
     Params: { bugId: string };
-    Querystring: { readonly limit?: string | readonly string[] };
+    Querystring: { readonly limit?: string | readonly string[]; readonly cursor?: string };
   }>(MOBILE_BUG_ATTACHMENTS_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
       return reply
@@ -1322,6 +1460,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         actorId: authenticatedActorId(request, debugActorId),
         bugId: requireMobileUuid(request.params.bugId, "bugId"),
         limit: parseMobileAttachmentListLimit(request.query.limit),
+        ...(request.query.cursor === undefined ? {} : { cursor: request.query.cursor }),
       });
       if (result === null) {
         return reply
@@ -1331,6 +1470,11 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
     } catch (error: unknown) {
+      if ((error as { code?: string }).code === "INVALID_CURSOR")
+        return reply
+          .code(400)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "INVALID_CURSOR" });
       if (!(error instanceof TypeError)) throw error;
       return reply
         .code(400)
@@ -2477,6 +2621,12 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         });
         return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(response);
       } catch (error: unknown) {
+        if ((error as { code?: string }).code === "SQLITE_UPLOAD_INVALID") {
+          return reply.code(400).header("content-type", MOBILE_API_CONTENT_TYPE).send({
+            code: "UPLOAD_CONTENT_INVALID",
+            message: "附件内容与声明的类型、大小或校验值不一致，请保留草稿并选择正确的原始文件。",
+          });
+        }
         if (!(error instanceof TypeError)) throw error;
         return reply
           .code(400)
@@ -2524,42 +2674,57 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
-  registerProductionRoutes(
-    app,
-    options.productionConfig
-      ? new ProductionTasks(options.productionConfig, {
-          bugs: mobileBugStore,
-          relay: mobileRelayStore,
-          attachments: mobileAttachmentStore,
-          projects: mobileProjectDirectoryStore,
-        })
-      : undefined,
-    (request) =>
-      readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
-        ? authenticatedActorId(request, debugActorId)
-        : null,
-  );
-
-  const jenkinsBuildService = options.jenkinsBuildService ?? new JenkinsBuildService();
-  registerIncrementUploadRoutes(
-    app,
-    options.incrementUploadService ??
-      (options.incrementUploadRoot
-        ? new IncrementUploadService({
-            root: options.incrementUploadRoot,
-            jenkins: jenkinsBuildService,
+  if (!options.isolateLegacyComponents) {
+    registerProductionRoutes(
+      app,
+      options.productionConfig
+        ? new ProductionTasks(options.productionConfig, {
+            bugs: mobileBugStore,
+            relay: mobileRelayStore,
+            attachments: mobileAttachmentStore,
+            projects: mobileProjectDirectoryStore,
           })
-        : undefined),
-    (request) =>
+        : undefined,
+      (request) =>
+        readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
+          ? authenticatedActorId(request, debugActorId)
+          : null,
+    );
+
+    const jenkinsBuildService = options.jenkinsBuildService ?? new JenkinsBuildService();
+    registerIncrementUploadRoutes(
+      app,
+      options.incrementUploadService ??
+        (options.incrementUploadRoot
+          ? new IncrementUploadService({
+              root: options.incrementUploadRoot,
+              jenkins: jenkinsBuildService,
+            })
+          : undefined),
+      (request) =>
+        readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
+          ? authenticatedActorId(request, debugActorId)
+          : null,
+    );
+    registerPackagingRoutes(app, jenkinsBuildService, (request) =>
       readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
         ? authenticatedActorId(request, debugActorId)
         : null,
-  );
-  registerPackagingRoutes(app, jenkinsBuildService, (request) =>
-    readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
-      ? authenticatedActorId(request, debugActorId)
-      : null,
-  );
+    );
+  }
   registerAndroidUpdateRoutes(app, options.androidUpdateRoot);
+  if (options.projectComponentsRuntime && options.projectRequestContext) {
+    registerProjectComponentRoutes(app, {
+      runtime: options.projectComponentsRuntime,
+      actor: getBrowserPrincipal,
+      projectId: () => options.projectRequestContext!.currentProjectId(),
+    });
+  }
+  if (options.automationPublicApiOrigin)
+    registerAutomationRoutes(
+      app,
+      options.automationPublicApiOrigin,
+      options.browserAuth?.webOrigins ?? [],
+    );
   return app;
 }

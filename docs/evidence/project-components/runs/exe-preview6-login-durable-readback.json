@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-09-08T19:22:59.273Z",
+  "responseCompletedAt": "2026-09-08T19:22:59.271Z",
+  "passed": true,
+  "identityPresentImmediatelyOnSuccessfulRpc": true,
+  "identity": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4419",
+    "loginName": "EXE实际验收0909",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "userId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "identity": "employee"
+  },
+  "immediateForceStopNotRun": "Automatic approval rejected the combined login and force-stop command before execution; no immediate process termination was retried."
+}

@@ -266,6 +266,61 @@ test("qa_materialize_attachment verifies SHA-256 before returning a local path",
   }
 });
 
+test("materialize follows attachment pages and refuses repeated cursors", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "qa-hub-mcp-pages-"));
+  const bytes = Buffer.from("attachment beyond first page");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  for (const repeated of [false, true]) {
+    const api = new ScriptedApi();
+    api.queue("GET", `/api/v1/bugs/${BUG_ID}`, bug("reported", 1, null));
+    api.queue("GET", `/api/v1/bugs/${BUG_ID}/attachments?limit=50`, {
+      items: Array.from({ length: 50 }, () => ({ attachmentId: PRIMARY_ATTACHMENT_ID })),
+      nextCursor: "next-page",
+    });
+    api.queue("GET", `/api/v1/bugs/${BUG_ID}/attachments?limit=50&cursor=next-page`, {
+      items: repeated
+        ? []
+        : [
+            {
+              attachmentId: ATTACHMENT_ID,
+              filename: "later.txt",
+              mediaType: "text/plain",
+              size: bytes.length,
+              sha256,
+            },
+          ],
+      nextCursor: repeated ? "next-page" : null,
+    });
+    api.binaryResponse = { bytes, headers: new Headers({ "content-type": "text/plain" }) };
+    const result = new QaHubMcpTools(api, root).call("qa_materialize_attachment", {
+      bugId: BUG_ID,
+      attachmentId: ATTACHMENT_ID,
+    });
+    if (repeated) {
+      await assert.rejects(result, { code: "QA_HUB_INVALID_RESPONSE" });
+      assert.equal(api.binaryCalls.length, 0);
+    } else {
+      const value = (await result) as { localPath: string };
+      assert.deepEqual(readFileSync(value.localPath), bytes);
+    }
+  }
+});
+
+test("shared GM login rejects conflicting projects before changing its session", async () => {
+  const api = new ScriptedApi();
+  api.queue("GET", "/api/v1/mcp/tools", { tools: [{ name: "qa_login_gm" }] });
+  const tools = new QaHubMcpTools(api, tmpdir(), { sharedApi: true });
+  await tools.refreshDefinitions();
+  await assert.rejects(
+    tools.call("qa_login_gm", {
+      projectId: PROJECT_ID,
+      request: { projectId: BUG_ID, password: "fixture" },
+    }),
+    { code: "PROJECT_MISMATCH", status: 400 },
+  );
+  assert.equal(api.calls.length, 1);
+});
+
 function captureDownloadFixture(kind = "poco_snapshot", mediaType = "application/json") {
   const bytes = Buffer.from('{"data":{"recentLogs":[{"message":"captured error"}]}}');
   const sha256 = createHash("sha256").update(bytes).digest("hex");
@@ -419,11 +474,20 @@ test("capture lookup skips unavailable bundles but preserves authentication fail
 });
 
 test("desktop MCP silently replaces a rejected browser session from the permanent identity", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   const browserSession = new DesktopBrowserSessionCookieStore();
   const staleToken = "A".repeat(43);
   const permanentToken = "B".repeat(43);
-  browserSession.restoreLoginName("开发者");
+  browserSession.rememberPrincipal({
+    displayName: "开发者",
+    projectId: "11111111-1111-4111-8111-111111111111",
+    userId: "22222222-2222-4222-8222-222222222222",
+    identity: "employee",
+  });
   browserSession.captureSetCookie(`qa_hub_browser_session=${staleToken}; Path=/; HttpOnly`);
   const calls: Array<{ readonly pathname: string; readonly cookie: string | null }> = [];
   let renewed = 0;
@@ -436,6 +500,10 @@ test("desktop MCP silently replaces a rejected browser session from the permanen
       const cookie = new Headers(init?.headers).get("cookie");
       calls.push({ pathname, cookie });
       if (pathname === "/api/v1/auth/login") {
+        assert.equal(
+          JSON.parse(String(init?.body)).projectId,
+          "11111111-1111-4111-8111-111111111111",
+        );
         return new Response(JSON.stringify(principal()), {
           status: 200,
           headers: {

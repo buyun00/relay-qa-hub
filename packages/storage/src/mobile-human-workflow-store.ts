@@ -27,6 +27,8 @@ export interface MobileHumanWorkflowForBugProjection {
   /** The Build reached through the exact immutable build_repair_links row. */
   readonly build: MobileBuildRecord | null;
   readonly verification: MobileVerificationRecord | null;
+  /** Most recent verification, including a completed round after closure. */
+  readonly latestVerification: MobileVerificationRecord | null;
   readonly relayRework?: { readonly status: string; readonly lastError: string | null } | null;
   readonly relayAcceptance?: { readonly status: string; readonly lastError: string | null } | null;
 }
@@ -123,7 +125,7 @@ export function getLatestMobileHumanWorkflow(
          ON actor.account_id = closure.account_id
         AND actor.id = ?
         AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = project.account_id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
@@ -321,7 +323,7 @@ function readAuthorizedBugPointers(
          ON actor.account_id = account.id
         AND actor.id = ?
         AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
@@ -553,6 +555,18 @@ export function getMobileHumanWorkflowForBug(
   const repairAttempt = readHumanRepairAttempt(database, input, pointers.active_repair_attempt_id);
   const buildRequirement = readBuildRequirement(database, input, repairAttempt?.id ?? null);
   const verification = readActiveVerification(database, input, pointers.active_verification_id);
+  const latestVerificationRow = database
+    .prepare(
+      `SELECT id FROM verifications
+     WHERE account_id = ? AND project_id = ? AND bug_id = ?
+     ORDER BY created_at DESC, id DESC LIMIT 1`,
+    )
+    .get(input.accountId, input.projectId, input.bugId) as { id: string } | undefined;
+  const latestVerification = readActiveVerification(
+    database,
+    input,
+    latestVerificationRow?.id ?? null,
+  );
   const rework = database
     .prepare(
       `SELECT status, last_error AS lastError FROM relay_rework_requests
@@ -575,6 +589,7 @@ export function getMobileHumanWorkflowForBug(
     buildRequirement,
     build: readExactLinkedBuild(database, input, buildRequirement),
     verification,
+    latestVerification,
     ...(rework ? { relayRework: rework } : {}),
     ...(acceptance ? { relayAcceptance: acceptance } : {}),
   });

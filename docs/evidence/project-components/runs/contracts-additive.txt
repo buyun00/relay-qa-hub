@@ -1,0 +1,3 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug check:contract-additive
+npm notice run node packages/contracts/versions/1.1.0/scripts/check-additive.mjs
+Additive compatibility passed: all 35 version 1.0.0 operations are byte-shape equivalent after declared media/security/parameter overlays; 19 operations are new in 1.1.0.

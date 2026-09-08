@@ -54,6 +54,17 @@ export interface MobileProjectModuleList {
 }
 
 export interface MobileProjectDirectoryStore {
+  /** Required by execution services; optional for list-only directory implementations. */
+  readonly getProjectAccess?: (query: {
+    readonly actorId: string;
+    readonly projectId: string;
+  }) => Promise<{
+    readonly projectId: string;
+    readonly projectKey: string;
+    readonly actorId: string;
+    readonly actorName: string;
+    readonly roles: readonly MobileProjectRole[];
+  } | null>;
   readonly listProjects: (query: {
     readonly actorId: string;
     readonly limit: number;

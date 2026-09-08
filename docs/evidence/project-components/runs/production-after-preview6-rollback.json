@@ -1,0 +1,73 @@
+{
+  "recordedAt": "2026-09-08T19:02:22.0909466Z",
+  "files": [
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\mvp-e2e-current.json",
+      "matchesBaseline": true,
+      "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Config\\qa-people.json",
+      "matchesBaseline": true,
+      "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Windows-x64-latest.json",
+      "matchesBaseline": true,
+      "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Setup-x64.exe",
+      "matchesBaseline": true,
+      "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+      "matchesBaseline": true,
+      "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+      "matchesBaseline": true,
+      "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c"
+    }
+  ],
+  "processes": [
+    {
+      "exists": true,
+      "createdAt": "2026-09-08T10:24:12.5269520Z",
+      "pid": 17160,
+      "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+    },
+    {
+      "exists": true,
+      "createdAt": "2026-09-08T11:09:25.9817720Z",
+      "pid": 10844,
+      "executable": null
+    },
+    {
+      "exists": true,
+      "createdAt": "2026-09-07T09:37:15.3473300Z",
+      "pid": 7420,
+      "executable": null
+    }
+  ],
+  "readiness": {
+    "status": "ready",
+    "schemaVersion": "12",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  }
+}

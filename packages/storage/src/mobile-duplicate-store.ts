@@ -121,12 +121,12 @@ function requireTriager(database: DatabaseSync, input: MarkMobileBugDuplicateInp
          ON project.account_id = account.id AND project.id = ? AND project.status = 'active'
        JOIN users AS actor
          ON actor.account_id = account.id AND actor.id = ? AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
         AND membership.status = 'active'
-       JOIN membership_roles AS role
+       JOIN command_project_roles AS role
          ON role.account_id = membership.account_id
         AND role.project_id = membership.project_id
         AND role.membership_id = membership.id
@@ -188,7 +188,7 @@ function requireReadableSourceBug(
          ON actor.account_id = bug.account_id
         AND actor.id = ?
         AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = bug.account_id
         AND membership.project_id = bug.project_id
         AND membership.user_id = actor.id

@@ -1,0 +1,4 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug lint
+npm notice run eslint . --ignore-pattern apps/web && npm run lint --workspace @relay-qa-hub/web
+npm notice run @relay-qa-hub/web@3.3.5 lint
+npm notice run eslint . --max-warnings=0

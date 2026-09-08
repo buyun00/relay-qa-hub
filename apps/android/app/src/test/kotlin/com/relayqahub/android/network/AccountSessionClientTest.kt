@@ -13,12 +13,12 @@ class AccountSessionClientTest {
             httpClient = OkHttpClient(),
         )
 
-        val request = client.buildLoginRequest("  新账号  ")
+        val request = client.buildLoginRequest("  新账号  ", "10000000-0000-4000-8000-000000000099")
         val body = okio.Buffer().also { request.body?.writeTo(it) }.readUtf8()
 
         assertEquals("https://qa-hub.example/api/v1/auth/login", request.url.toString())
         assertEquals("POST", request.method)
         assertNull(request.header("Authorization"))
-        assertEquals("{\"name\":\"  新账号  \",\"client\":\"android\"}", body)
+        assertEquals("{\"name\":\"  新账号  \",\"client\":\"android\",\"projectId\":\"10000000-0000-4000-8000-000000000099\"}", body)
     }
 }

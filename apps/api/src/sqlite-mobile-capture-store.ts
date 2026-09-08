@@ -5,9 +5,7 @@ import type {
   SqliteStorageWorker,
 } from "@relay-qa-hub/storage";
 
-import type {
-  MobileCaptureStore,
-} from "./mobile-captures.js";
+import type { MobileCaptureStore } from "./mobile-captures.js";
 
 export interface SqliteMobileCaptureStoreOptions {
   readonly worker: SqliteStorageWorker;
@@ -16,18 +14,20 @@ export interface SqliteMobileCaptureStoreOptions {
 }
 
 function requireProject(projectId: string, scope: MobileScopeBootstrap): void {
-  if (projectId !== scope.projectId) throw new TypeError("projectId does not match the authenticated mobile scope");
+  if (projectId !== scope.projectId)
+    throw new TypeError("projectId does not match the authenticated mobile scope");
 }
 
 export function createSqliteMobileCaptureStore(
   options: SqliteMobileCaptureStoreOptions,
 ): MobileCaptureStore {
   const now = options.now ?? (() => new Date());
-  const actorScope = (actorId: string) => ({
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId,
-  } as const);
+  const actorScope = (actorId: string) =>
+    ({
+      accountId: options.scope.accountId,
+      projectId: options.scope.projectId,
+      actorId,
+    }) as const;
 
   return {
     async createCapture(command) {

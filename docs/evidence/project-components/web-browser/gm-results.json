@@ -1,0 +1,78 @@
+{
+  "recordedAt": "2026-09-08T18:02:40.450Z",
+  "status": "passed",
+  "api": "http://127.0.0.1:4419",
+  "web": "http://127.0.0.1:4274",
+  "projectId": "fb81f6b5-43ed-4e8f-b848-502c0dcf9848",
+  "projectKey": "GB1788890272232",
+  "projectName": "GM 浏览验收 1788890272232",
+  "build": "index-WAJtVpCO.js",
+  "checks": [
+    {
+      "id": "gm_login_create",
+      "status": "passed",
+      "detail": "Actual management password login and UI create; uppercase 15-character shortcode accepted; all five components default off.",
+      "evidence": [
+        "gm-01-created.json",
+        "gm-01-created.jpg"
+      ]
+    },
+    {
+      "id": "component_toggle_configuration",
+      "status": "passed",
+      "detail": "Enable empty build -> needs_configuration; disable, save loopback dummy target/job/presets and refresh; private form retains values at version2. No task execution requested.",
+      "evidence": [
+        "gm-02-needs-configuration.json",
+        "gm-03-config-refreshed.json",
+        "gm-http-readback.json"
+      ]
+    },
+    {
+      "id": "membership_manage",
+      "status": "passed",
+      "detail": "Add existing employee, disable, restore through real UI; readback active membership version3.",
+      "evidence": [
+        "gm-04-member-disabled.json",
+        "gm-04-member-disabled.jpg",
+        "gm-http-readback.json"
+      ]
+    },
+    {
+      "id": "project_disable_restore",
+      "status": "passed",
+      "detail": "Initial successful disable falsely displayed PROJECT_NOT_ACCESSIBLE due follow-up active-project queries. Fixed Web refresh to skip inactive business reads; fresh bundle disable/restore shows success, disables enter, preserves configuration and memberships; readback active version5.",
+      "evidence": [
+        "gm-05-project-disabled-before-fix.json",
+        "gm-06-project-disabled-fixed.json",
+        "gm-06-project-disabled-fixed.jpg",
+        "gm-07-project-restored.json",
+        "gm-http-readback.json"
+      ]
+    },
+    {
+      "id": "shortcode_login",
+      "status": "passed",
+      "detail": "Logged out GM; lowercase shortcode and existing employee name entered correct stable UUID project. Selector retained three actual memberships.",
+      "evidence": [
+        "gm-08-shortcode-login.json",
+        "gm-08-shortcode-login.jpg"
+      ]
+    },
+    {
+      "id": "disabled_history",
+      "status": "passed",
+      "detail": "All five disabled; actual component-history navigation rendered empty build/upload/chain/Relay/Qingyu local histories without error.",
+      "evidence": [
+        "gm-09-disabled-history.json",
+        "gm-09-disabled-history.jpg",
+        "gm-http-readback.json"
+      ]
+    }
+  ],
+  "limits": [
+    "No external build/upload/Relay/Qingyu execution; external full chains remain not_run.",
+    "GM nonmember full manual lifecycle is proven by persistent HTTP management smoke, not repeated in browser.",
+    "UI rename prompt, stale-version conflict, every component field and every history action were not exercised by this run.",
+    "Credential was read only inside tool process for the explicitly authorized local login; password/token not emitted or included in artifacts."
+  ]
+}

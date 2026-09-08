@@ -19,13 +19,14 @@ const input = {
   testResultReference: "",
   mode: "prepare_publish",
 };
-async function fixture(t) {
+async function fixture(t, projectOverrides = {}) {
   const root = await mkdtemp(path.join(os.tmpdir(), "server-upload-test-")),
     owner = randomUUID(),
     other = randomUUID(),
     hosts = new Map(),
     launches = [];
   let failLaunch = false;
+  let enabled = true;
   const factory = (id) => {
     if (hosts.has(id)) return hosts.get(id);
     const jobs = [],
@@ -101,6 +102,20 @@ async function fixture(t) {
     };
   const options = {
     root,
+    project: {
+      projectId: randomUUID(),
+      componentVersion: 3,
+      apiBase: "https://upload.fixture.invalid",
+      loginBase: "https://login.fixture.invalid",
+      sourceUrl: "https://artifacts.fixture.invalid/test.zip",
+      sourceKind: "file",
+      targetPrefix: "fixture-only",
+      defaults: input,
+      credentialRef: "fixture-only",
+      ...projectOverrides,
+    },
+    buildPreset: "external",
+    canStart: async () => enabled,
     jenkins,
     hostFactory: factory,
     fetch: async () => new Response(null, { status: 404 }),
@@ -129,6 +144,9 @@ async function fixture(t) {
       service = new IncrementUploadService(options);
     },
     options,
+    setEnabled: (value) => {
+      enabled = value;
+    },
   };
 }
 test("submission is durable, idempotent, actor-bound and does not launch in the request", async (t) => {
@@ -138,6 +156,11 @@ test("submission is durable, idempotent, actor-bound and does not launch in the 
   assert.equal(await f.service.enqueue(f.owner, id, input), id);
   assert.equal(f.launches.length, 0);
   assert.equal((await f.service.snapshot(f.owner)).jobs[0].status, "queued");
+  assert.equal((await f.service.snapshot(f.owner)).jobs[0].projectId, f.options.project.projectId);
+  assert.equal(
+    (await f.service.snapshot(f.owner)).jobs[0].componentVersion,
+    f.options.project.componentVersion,
+  );
   await assert.rejects(f.service.enqueue(f.other, id, input), /UPLOAD_REQUEST_CONFLICT/);
   await assert.rejects(
     f.service.enqueue(f.owner, id, { ...input, version: "different" }),
@@ -150,8 +173,12 @@ test("submission is durable, idempotent, actor-bound and does not launch in the 
   assert.equal(f.launches.length, 1);
   assert.equal((await f.service.snapshot(f.owner)).execution, "server");
 });
-test("iOS persists channel 2004 through queue restart and cannot use the Android build button", async (t) => {
-  const f = await fixture(t),
+test("iOS source configuration survives queue restart and cannot use the Android build button", async (t) => {
+  const f = await fixture(t, {
+      sourceKind: "ios_directory",
+      sourceUrl: "https://artifacts.fixture.invalid/ios/",
+      defaults: { ...input, channelId: "2004" },
+    }),
     id = randomUUID();
   const ios = { ...input, channelId: "2004", belongName: "iOS fixture" };
   await f.service.enqueue(f.owner, id, ios);
@@ -546,4 +573,69 @@ test("cancelling a queued recovery preserves the original failed task and its ch
   await f.service.continue(f.owner, id, randomUUID(), "resume", {});
   await f.service.tick();
   assert.equal(f.launches.length, 2);
+});
+
+test("disabled queued work stays paused after re-enable until its owner explicitly resumes", async (t) => {
+  const f = await fixture(t),
+    id = randomUUID();
+  await f.service.enqueue(f.owner, id, input);
+  f.setEnabled(false);
+  await f.service.pausePending();
+  assert.equal((await f.service.snapshot(f.owner)).jobs[0].status, "paused");
+  await assert.rejects(f.service.resumeQueued(f.owner, id), /COMPONENT_DISABLED/);
+  f.setEnabled(true);
+  await f.restart();
+  await f.service.tick();
+  assert.equal(f.launches.length, 0);
+  assert.equal((await f.service.snapshot(f.owner)).jobs[0].status, "paused");
+  await assert.rejects(f.service.resumeQueued(f.other, id), /JOB_NOT_FOUND/);
+  await f.service.resumeQueued(f.owner, id);
+  await f.service.tick();
+  assert.equal(f.launches.length, 1);
+  assert.equal(f.launches[0].id, id);
+});
+
+test("disabling preserves a started build's source handoff while pausing the next build", async (t) => {
+  const f = await fixture(t),
+    first = randomUUID(),
+    second = randomUUID();
+  let reads = 0,
+    polls = 0;
+  const modified = new Date().toUTCString();
+  f.options.fetch = async () =>
+    ++reads === 1
+      ? new Response(null, { status: 404 })
+      : new Response(null, { headers: { "content-length": "100", "last-modified": modified } });
+  f.jenkins.progress = async () => {
+    polls++;
+    return {
+      queues: [],
+      builds: [
+        {
+          number: 10159,
+          queueId: 760,
+          preset: "external",
+          status: "SUCCESS",
+          startedAt: new Date(Date.parse(modified) - 1000).toISOString(),
+          elapsedMs: 2000,
+          includesZip: true,
+          stages: [{ id: "zip", state: "complete" }],
+        },
+      ],
+    };
+  };
+  await f.service.enqueue(f.owner, first, input, "build");
+  await f.service.enqueue(f.other, second, input, "build");
+  await f.service.tick();
+  assert.equal(f.builds.length, 1);
+  f.setEnabled(false);
+  await f.service.pausePending();
+  await f.service.tick();
+  assert.ok(polls > 0);
+  assert.equal(f.launches.length, 1);
+  assert.equal(f.launches[0].id, first);
+  assert.equal(f.builds.length, 1);
+  const chains = await f.service.buildChains(f.owner);
+  assert.equal(chains.find((item) => item.id === first).uploadJobId, first);
+  assert.equal(chains.find((item) => item.id === second).status, "paused");
 });

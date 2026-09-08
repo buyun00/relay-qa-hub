@@ -237,6 +237,21 @@ export function parseStorageEnvironment(environment: StorageEnvironment): Storag
 export { SqliteStorageWorker, SqliteStorageWorkerError } from "./sqlite-worker.js";
 export type { SqliteStorageWorkerOptions, SqliteWorkerInitialization } from "./sqlite-worker.js";
 export {
+  PROJECT_COMPONENT_KEYS,
+  ProjectManagementError,
+  projectManagement,
+  projectMembershipId,
+  requireProjectAccess,
+} from "./project-management-store.js";
+export type {
+  ProjectComponentKey,
+  ProjectComponentRecord,
+  ProjectComponentList,
+  ProjectManagementInput,
+  ProjectPrincipal,
+  ProjectRecord,
+} from "./project-management-store.js";
+export {
   backupFileSha256,
   backupManifestFileName,
   createSqliteOnlineBackup,
@@ -351,11 +366,14 @@ export type {
   MobileMetricsState,
 } from "./mobile-metrics-store.js";
 export {
+  getMobileProjectAccess,
   listMobileProjectMembers,
   listMobileProjectModules,
   listMobileVisibleProjects,
 } from "./mobile-project-directory-store.js";
 export type {
+  GetMobileProjectAccessInput,
+  MobileProjectAccess,
   ListMobileProjectMembersInput,
   ListMobileProjectModulesInput,
   ListMobileVisibleProjectsInput,
@@ -424,6 +442,7 @@ export type {
   MobileRelayContinueAccepted,
   MobileRelayAttachmentClaim,
   MobileRelayOutboxClaim,
+  MobileRelayComponentRoute,
   MobileRelayReceipt,
   MobileRelayScope,
   MobileRelayRuntimeConfig,
@@ -528,3 +547,4 @@ export type {
   MobileCapturePocoRecord,
   MobileCaptureScreenSize,
 } from "./mobile-capture-store.js";
+export { isImportExecutionHeld } from "./import-execution-hold.js";

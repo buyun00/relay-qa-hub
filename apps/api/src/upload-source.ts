@@ -1,4 +1,3 @@
-import { UPLOAD_TARGETS } from "./uploader-types.js";
 import type { UploadSourceIdentity } from "./uploader-types.js";
 
 export interface ResolvedUploadSource {
@@ -6,7 +5,6 @@ export interface ResolvedUploadSource {
   sourceFileName: string;
   expectedSource: UploadSourceIdentity;
 }
-const directory = UPLOAD_TARGETS.ios.sourceUrl;
 const maxListingBytes = 4 * 1024 * 1024;
 const validName = (name: unknown): name is string =>
   typeof name === "string" &&
@@ -15,7 +13,9 @@ const validName = (name: unknown): name is string =>
 
 export async function latestIosUploadSource(
   fetcher: typeof fetch = fetch,
+  directory?: string,
 ): Promise<ResolvedUploadSource> {
+  if (!directory) throw new Error("COMPONENT_NOT_CONFIGURED");
   try {
     const listing = await fetcher(directory + "?json=true", {
       signal: AbortSignal.timeout(15_000),

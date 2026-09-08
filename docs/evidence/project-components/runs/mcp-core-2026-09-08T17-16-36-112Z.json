@@ -1,0 +1,3082 @@
+{
+  "runId": "2026-09-08T17-16-36-112Z",
+  "instanceId": "qa-hub-preview-7c86",
+  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+  "url": "http://127.0.0.1:4421/mcp",
+  "passed": true,
+  "checks": [
+    {
+      "method": "initialize",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 1,
+        "result": {
+          "protocolVersion": "2025-06-18",
+          "capabilities": {
+            "tools": {
+              "listChanged": false
+            }
+          },
+          "serverInfo": {
+            "name": "qa-hub-project-preview",
+            "version": "2.1"
+          },
+          "instructions": "Use explicit project IDs and project name sessions. Bug human acceptance is independent from optional integrations. Never report unexecuted checks as passed."
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.153Z"
+    },
+    {
+      "method": "tools/list",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 2,
+        "result": {
+          "tools": [
+            {
+              "name": "qa_login",
+              "title": "项目姓名登录并取得会话令牌",
+              "description": "项目姓名登录并取得会话令牌。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "name"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_projects",
+              "title": "查询自己的项目",
+              "description": "查询自己的项目。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_bugs",
+              "title": "查询项目 Bug 列表",
+              "description": "查询项目 Bug 列表。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_get_bug_context",
+              "title": "读取 Bug、评论、附件及人工流程",
+              "description": "读取 Bug、评论、附件及人工流程。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_create_bug",
+              "title": "创建 Bug",
+              "description": "创建 Bug。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "request"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_update_bug",
+              "title": "编辑 Bug",
+              "description": "编辑 Bug。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId",
+                  "request",
+                  "idempotencyKey"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_delete_bug",
+              "title": "保留审计删除 Bug",
+              "description": "保留审计删除 Bug。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId",
+                  "expectedVersion"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_bug_action",
+              "title": "人工修复、验收通过、退回与关闭",
+              "description": "人工修复、验收通过、退回与关闭。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId",
+                  "action",
+                  "expectedVersion",
+                  "idempotencyKey"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_add_comment",
+              "title": "添加评论",
+              "description": "添加评论。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId",
+                  "request"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_comments",
+              "title": "读取评论正文",
+              "description": "读取评论正文。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_events",
+              "title": "读取 Bug 操作历史",
+              "description": "读取 Bug 操作历史。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_members",
+              "title": "读取项目员工",
+              "description": "读取项目员工。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_users",
+              "title": "读取项目人员管理列表",
+              "description": "读取项目人员管理列表。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_modules",
+              "title": "读取 Bug 分类",
+              "description": "读取 Bug 分类。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_get_components",
+              "title": "读取项目组件开关和可用状态",
+              "description": "读取项目组件开关和可用状态。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_set_component",
+              "title": "GM 配置项目组件",
+              "description": "GM 配置项目组件。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "componentKey",
+                  "request"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_set_membership",
+              "title": "停用或恢复项目员工",
+              "description": "停用或恢复项目员工。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "userId",
+                  "request"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_create_project",
+              "title": "GM 创建纯 Bug 项目",
+              "description": "GM 创建纯 Bug 项目。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "request"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_update_project",
+              "title": "GM 更新项目",
+              "description": "GM 更新项目。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "request"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": false,
+                "destructiveHint": true,
+                "idempotentHint": false,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_list_attachments",
+              "title": "读取 Bug 附件元数据",
+              "description": "读取 Bug 附件元数据。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            },
+            {
+              "name": "qa_materialize_attachment",
+              "title": "取得可下载的远端附件资源",
+              "description": "取得可下载的远端附件资源。使用明确项目；写入返回同一 HTTP 业务服务的真实结果。",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "bugId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attachmentId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "manual_complete",
+                      "complete",
+                      "plan_fix",
+                      "begin_fix",
+                      "submit_fix",
+                      "create_verification",
+                      "start_verification",
+                      "verify_pass",
+                      "verify_fail",
+                      "close",
+                      "reject"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "attemptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "verificationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "componentKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "bugId",
+                  "attachmentId"
+                ],
+                "additionalProperties": false
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              }
+            }
+          ]
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.156Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_login",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 3,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"accountId\":\"10000000-0000-4000-8000-000000000020\",\"userId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"email\":\"qa-66bf2cefb08fb947a71745acb5eb1b607f6f025efbbd07eb9d3750c3a9153390@local.invalid\",\"displayName\":\"MCP真实验收1788887796156\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"isGm\":false,\"expiresAt\":\"2094-09-26T20:30:43.167Z\"}"
+            }
+          ],
+          "structuredContent": {
+            "accountId": "10000000-0000-4000-8000-000000000020",
+            "userId": "82c5597c-8e26-4025-874a-1770a095e664",
+            "email": "qa-66bf2cefb08fb947a71745acb5eb1b607f6f025efbbd07eb9d3750c3a9153390@local.invalid",
+            "displayName": "MCP真实验收1788887796156",
+            "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+            "isGm": false,
+            "expiresAt": "2094-09-26T20:30:43.167Z"
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.176Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_list_projects",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 4,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"snapshotSequence\":60,\"items\":[{\"id\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"key\":\"TA1788885078625\",\"name\":\"真实HTTP验收A 2026-09-08T16-31-18-569Z\",\"active\":true,\"identity\":\"employee\",\"roles\":[\"developer\",\"project_admin\",\"release_manager\",\"reporter\",\"triager\",\"verifier\",\"viewer\"]}],\"nextCursor\":null}"
+            }
+          ],
+          "structuredContent": {
+            "snapshotSequence": 60,
+            "items": [
+              {
+                "id": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                "key": "TA1788885078625",
+                "name": "真实HTTP验收A 2026-09-08T16-31-18-569Z",
+                "active": true,
+                "identity": "employee",
+                "roles": [
+                  "developer",
+                  "project_admin",
+                  "release_manager",
+                  "reporter",
+                  "triager",
+                  "verifier",
+                  "viewer"
+                ]
+              }
+            ],
+            "nextCursor": null
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.182Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_create_bug",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 5,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"clientSubmissionId\":\"912f3e5f-c5ac-41d7-b98f-c7d1698bcef9\",\"qaItem\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"key\":\"TA1788885078625-7\"},\"disposition\":\"created\",\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"reported\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":1,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.188Z\",\"closedAt\":null},\"occurrenceId\":\"47d40a3d-437d-43a8-bdd2-b3f2cc927f31\",\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"f2005331-39ec-4b0c-89ea-0508a5c72e0e\",\"replayed\":false}"
+            }
+          ],
+          "structuredContent": {
+            "clientSubmissionId": "912f3e5f-c5ac-41d7-b98f-c7d1698bcef9",
+            "qaItem": {
+              "type": "bug",
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "key": "TA1788885078625-7"
+            },
+            "disposition": "created",
+            "bug": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "reported",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 1,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.188Z",
+              "closedAt": null
+            },
+            "occurrenceId": "47d40a3d-437d-43a8-bdd2-b3f2cc927f31",
+            "attachmentIds": [],
+            "captureBundleId": null,
+            "eventId": "f2005331-39ec-4b0c-89ea-0508a5c72e0e",
+            "replayed": false
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.196Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_add_comment",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 6,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"comment\":{\"id\":\"8a833247-cc41-4d8b-a777-b5d73538e599\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"authorId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"body\":\"真实MCP评论正文\",\"clientSubmissionId\":\"1cbb02d2-932d-4fef-84d9-f3cd265fe7e4\",\"createdAt\":\"2026-09-08T17:16:36.200Z\",\"version\":1},\"correlationId\":\"1cbb02d2-932d-4fef-84d9-f3cd265fe7e4\"}"
+            }
+          ],
+          "structuredContent": {
+            "comment": {
+              "id": "8a833247-cc41-4d8b-a777-b5d73538e599",
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "authorId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "body": "真实MCP评论正文",
+              "clientSubmissionId": "1cbb02d2-932d-4fef-84d9-f3cd265fe7e4",
+              "createdAt": "2026-09-08T17:16:36.200Z",
+              "version": 1
+            },
+            "correlationId": "1cbb02d2-932d-4fef-84d9-f3cd265fe7e4"
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.206Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_list_comments",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 7,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"items\":[{\"id\":\"8a833247-cc41-4d8b-a777-b5d73538e599\",\"body\":\"真实MCP评论正文\",\"authorId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"createdAt\":\"2026-09-08T17:16:36.200Z\"}]}"
+            }
+          ],
+          "structuredContent": {
+            "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+            "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+            "items": [
+              {
+                "id": "8a833247-cc41-4d8b-a777-b5d73538e599",
+                "body": "真实MCP评论正文",
+                "authorId": "82c5597c-8e26-4025-874a-1770a095e664",
+                "createdAt": "2026-09-08T17:16:36.200Z"
+              }
+            ]
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.211Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_bug_action",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 8,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"manual_complete\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"result\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":4,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.217Z\",\"closedAt\":null},\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":4,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.217Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "manual_complete",
+            "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+            "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+            "result": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 4,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.217Z",
+              "closedAt": null
+            },
+            "bug": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 4,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.217Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.282Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_get_bug_context",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 9,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":4,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.217Z\",\"closedAt\":null},\"comments\":{\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"items\":[{\"id\":\"8a833247-cc41-4d8b-a777-b5d73538e599\",\"body\":\"真实MCP评论正文\",\"authorId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"createdAt\":\"2026-09-08T17:16:36.200Z\"}]},\"events\":{\"items\":[{\"schemaVersion\":\"1\",\"id\":\"fb7e4df5-c4a2-47d4-8382-604e3780f630\",\"type\":\"repair_attempt.delivered\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"version\":4},\"sequence\":3,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"89bb40b3-7ce6-441d-b74b-57a0342f9af9\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.217Z\",\"fromState\":\"in_progress\",\"toState\":\"ready_for_verification\",\"payload\":{\"status\":\"delivered\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"reason\":\"人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1\",\"id\":\"b62ec9f2-82b9-4887-a847-27a11d5da5e7\",\"type\":\"repair_attempt.started\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"version\":4},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"ea93f213-937b-4527-bb4a-b51375e47bdf\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.216Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"status\":\"running\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"fromVersion\":1,\"toVersion\":2,\"reason\":\"人工修复已交付，等待验收\"}},{\"schemaVersion\":\"1\",\"id\":\"d16033be-ec88-401f-b3d0-84c51e4544b9\",\"type\":\"repair_attempt.created\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"version\":4},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"0671862e-28ba-4d2c-81f1-16a54b3bd38c\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.215Z\",\"fromState\":\"ready\",\"toState\":\"in_progress\",\"payload\":{\"status\":\"planned\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1\",\"id\":\"0671862e-28ba-4d2c-81f1-16a54b3bd38c\",\"type\":\"bug.manual_completion_started\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"version\":4},\"sequence\":3,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"0671862e-28ba-4d2c-81f1-16a54b3bd38c\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.214Z\",\"fromState\":\"reported\",\"toState\":\"ready\",\"payload\":{\"status\":\"ready\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"reason\":\"人工修复已交付，等待验收\",\"fromVersion\":1,\"toVersion\":2}},{\"schemaVersion\":\"1\",\"id\":\"35a059b3-cef6-45d3-8bf2-5ae5eade7248\",\"type\":\"comment.created\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"version\":4},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"1cbb02d2-932d-4fef-84d9-f3cd265fe7e4\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.200Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"commentId\":\"8a833247-cc41-4d8b-a777-b5d73538e599\"}},{\"schemaVersion\":\"1\",\"id\":\"f2005331-39ec-4b0c-89ea-0508a5c72e0e\",\"type\":\"occurrence.appended\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"version\":4},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"3bb3fdc4-85f5-4592-b344-0e9bdb0f6414\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.188Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"occurrenceId\":\"47d40a3d-437d-43a8-bdd2-b3f2cc927f31\",\"fromVersion\":1,\"toVersion\":2}}],\"nextCursor\":null},\"attachments\":{\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"snapshotSequence\":66,\"items\":[],\"nextCursor\":null},\"humanWorkflow\":{\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"repairAttempt\":{\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"sequence\":1,\"mode\":\"human\",\"status\":\"delivered\",\"assigneeId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"parentAttemptId\":null,\"summary\":\"人工修复已交付，等待验收\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":\"人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。\",\"failureReason\":null,\"targetBuildId\":null,\"version\":3},\"buildRequirement\":{\"id\":\"8142cd9d-5f5d-48ee-95ad-2dba6413c5b9\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"sourceDeliveryVersion\":3,\"deliveredCommitSha\":null,\"requirement\":\"not_required\",\"decisionBasis\":\"no_code_delivery\",\"decisionReason\":\"人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。\",\"decisionActorId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"decisionAuditEventId\":\"fb7e4df5-c4a2-47d4-8382-604e3780f630\",\"linkedBuildId\":null,\"linkId\":null,\"policyVersion\":\"1.0.0\",\"bugVersionAtDelivery\":4,\"createdAt\":\"2026-09-08T17:16:36.217Z\",\"updatedAt\":\"2026-09-08T17:16:36.217Z\",\"version\":1},\"build\":null,\"verification\":null,\"latestVerification\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "bug": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 4,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.217Z",
+              "closedAt": null
+            },
+            "comments": {
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "items": [
+                {
+                  "id": "8a833247-cc41-4d8b-a777-b5d73538e599",
+                  "body": "真实MCP评论正文",
+                  "authorId": "82c5597c-8e26-4025-874a-1770a095e664",
+                  "createdAt": "2026-09-08T17:16:36.200Z"
+                }
+              ]
+            },
+            "events": {
+              "items": [
+                {
+                  "schemaVersion": "1",
+                  "id": "fb7e4df5-c4a2-47d4-8382-604e3780f630",
+                  "type": "repair_attempt.delivered",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "version": 4
+                  },
+                  "sequence": 3,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "89bb40b3-7ce6-441d-b74b-57a0342f9af9",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.217Z",
+                  "fromState": "in_progress",
+                  "toState": "ready_for_verification",
+                  "payload": {
+                    "status": "delivered",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "reason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "b62ec9f2-82b9-4887-a847-27a11d5da5e7",
+                  "type": "repair_attempt.started",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "version": 4
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "ea93f213-937b-4527-bb4a-b51375e47bdf",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.216Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "status": "running",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "fromVersion": 1,
+                    "toVersion": 2,
+                    "reason": "人工修复已交付，等待验收"
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "d16033be-ec88-401f-b3d0-84c51e4544b9",
+                  "type": "repair_attempt.created",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "version": 4
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "0671862e-28ba-4d2c-81f1-16a54b3bd38c",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.215Z",
+                  "fromState": "ready",
+                  "toState": "in_progress",
+                  "payload": {
+                    "status": "planned",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "0671862e-28ba-4d2c-81f1-16a54b3bd38c",
+                  "type": "bug.manual_completion_started",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                    "version": 4
+                  },
+                  "sequence": 3,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "0671862e-28ba-4d2c-81f1-16a54b3bd38c",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.214Z",
+                  "fromState": "reported",
+                  "toState": "ready",
+                  "payload": {
+                    "status": "ready",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "reason": "人工修复已交付，等待验收",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "35a059b3-cef6-45d3-8bf2-5ae5eade7248",
+                  "type": "comment.created",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                    "version": 4
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "1cbb02d2-932d-4fef-84d9-f3cd265fe7e4",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.200Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "commentId": "8a833247-cc41-4d8b-a777-b5d73538e599"
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "f2005331-39ec-4b0c-89ea-0508a5c72e0e",
+                  "type": "occurrence.appended",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                    "version": 4
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "3bb3fdc4-85f5-4592-b344-0e9bdb0f6414",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.188Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "occurrenceId": "47d40a3d-437d-43a8-bdd2-b3f2cc927f31",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                }
+              ],
+              "nextCursor": null
+            },
+            "attachments": {
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "snapshotSequence": 66,
+              "items": [],
+              "nextCursor": null
+            },
+            "humanWorkflow": {
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "repairAttempt": {
+                "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                "sequence": 1,
+                "mode": "human",
+                "status": "delivered",
+                "assigneeId": "82c5597c-8e26-4025-874a-1770a095e664",
+                "parentAttemptId": null,
+                "summary": "人工修复已交付，等待验收",
+                "branch": null,
+                "commitSha": null,
+                "mergeRequestUrl": null,
+                "patchUrl": null,
+                "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+                "failureReason": null,
+                "targetBuildId": null,
+                "version": 3
+              },
+              "buildRequirement": {
+                "id": "8142cd9d-5f5d-48ee-95ad-2dba6413c5b9",
+                "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                "sourceDeliveryVersion": 3,
+                "deliveredCommitSha": null,
+                "requirement": "not_required",
+                "decisionBasis": "no_code_delivery",
+                "decisionReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+                "decisionActorId": "82c5597c-8e26-4025-874a-1770a095e664",
+                "decisionAuditEventId": "fb7e4df5-c4a2-47d4-8382-604e3780f630",
+                "linkedBuildId": null,
+                "linkId": null,
+                "policyVersion": "1.0.0",
+                "bugVersionAtDelivery": 4,
+                "createdAt": "2026-09-08T17:16:36.217Z",
+                "updatedAt": "2026-09-08T17:16:36.217Z",
+                "version": 1
+              },
+              "build": null,
+              "verification": null,
+              "latestVerification": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.291Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_bug_action",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 10,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"create_verification\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"result\":{\"id\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"buildId\":null,\"status\":\"requested\",\"verifierId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"criteriaSnapshot\":\"在无可选组件下实际验收\",\"resultSummary\":null,\"failureReason\":null,\"blockedReason\":null,\"version\":1},\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":5,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.294Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "create_verification",
+            "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+            "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+            "result": {
+              "id": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+              "buildId": null,
+              "status": "requested",
+              "verifierId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "criteriaSnapshot": "在无可选组件下实际验收",
+              "resultSummary": null,
+              "failureReason": null,
+              "blockedReason": null,
+              "version": 1
+            },
+            "bug": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 5,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.294Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.317Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_bug_action",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 11,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"start_verification\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"result\":{\"id\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"buildId\":null,\"status\":\"in_progress\",\"verifierId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"criteriaSnapshot\":\"在无可选组件下实际验收\",\"resultSummary\":null,\"failureReason\":null,\"blockedReason\":null,\"version\":2},\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":5,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.294Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "start_verification",
+            "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+            "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+            "result": {
+              "id": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+              "buildId": null,
+              "status": "in_progress",
+              "verifierId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "criteriaSnapshot": "在无可选组件下实际验收",
+              "resultSummary": null,
+              "failureReason": null,
+              "blockedReason": null,
+              "version": 2
+            },
+            "bug": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 5,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.294Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.327Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_bug_action",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 12,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"close\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"result\":{\"clientSubmissionId\":\"be586652-2e32-48ba-b9ab-8ff310a31cc4\",\"qaItem\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"key\":\"TA1788885078625-7\"},\"verification\":{\"id\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"buildId\":null,\"status\":\"passed\",\"verifierId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"criteriaSnapshot\":\"在无可选组件下实际验收\",\"resultSummary\":\"已真实核验通过\",\"failureReason\":null,\"blockedReason\":null,\"version\":3},\"repairAttempt\":{\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"sequence\":1,\"mode\":\"human\",\"status\":\"delivered\",\"assigneeId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"parentAttemptId\":null,\"summary\":\"人工修复已交付，等待验收\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":\"人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。\",\"failureReason\":null,\"targetBuildId\":null,\"version\":3},\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"closed\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.331Z\",\"closedAt\":\"2026-09-08T17:16:36.331Z\"},\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"dd46aa0a-562a-49f4-92da-cb54135e6987\",\"replayed\":false},\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"closed\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.331Z\",\"closedAt\":\"2026-09-08T17:16:36.331Z\"}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "close",
+            "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+            "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+            "result": {
+              "clientSubmissionId": "be586652-2e32-48ba-b9ab-8ff310a31cc4",
+              "qaItem": {
+                "type": "bug",
+                "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                "key": "TA1788885078625-7"
+              },
+              "verification": {
+                "id": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                "buildId": null,
+                "status": "passed",
+                "verifierId": "82c5597c-8e26-4025-874a-1770a095e664",
+                "criteriaSnapshot": "在无可选组件下实际验收",
+                "resultSummary": "已真实核验通过",
+                "failureReason": null,
+                "blockedReason": null,
+                "version": 3
+              },
+              "repairAttempt": {
+                "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                "sequence": 1,
+                "mode": "human",
+                "status": "delivered",
+                "assigneeId": "82c5597c-8e26-4025-874a-1770a095e664",
+                "parentAttemptId": null,
+                "summary": "人工修复已交付，等待验收",
+                "branch": null,
+                "commitSha": null,
+                "mergeRequestUrl": null,
+                "patchUrl": null,
+                "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+                "failureReason": null,
+                "targetBuildId": null,
+                "version": 3
+              },
+              "bug": {
+                "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                "number": 7,
+                "key": "TA1788885078625-7",
+                "title": "服务端MCP真实人工闭环",
+                "description": "不依赖新版EXE进程的真实MCP验收",
+                "expectedBehavior": "完整人工作业",
+                "moduleId": null,
+                "state": "closed",
+                "severity": "S3",
+                "priority": "P3",
+                "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+                "ownerId": null,
+                "verificationOwnerId": null,
+                "duplicateOfBugId": null,
+                "occurrenceCount": 1,
+                "reopenCount": 0,
+                "version": 6,
+                "createdAt": "2026-09-08T17:16:36.188Z",
+                "updatedAt": "2026-09-08T17:16:36.331Z",
+                "closedAt": "2026-09-08T17:16:36.331Z"
+              },
+              "attachmentIds": [],
+              "captureBundleId": null,
+              "eventId": "dd46aa0a-562a-49f4-92da-cb54135e6987",
+              "replayed": false
+            },
+            "bug": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "closed",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 6,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.331Z",
+              "closedAt": "2026-09-08T17:16:36.331Z"
+            }
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.354Z"
+    },
+    {
+      "method": "tools/call",
+      "tool": "qa_get_bug_context",
+      "httpStatus": 200,
+      "result": {
+        "jsonrpc": "2",
+        "id": 13,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"bug\":{\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"number\":7,\"key\":\"TA1788885078625-7\",\"title\":\"服务端MCP真实人工闭环\",\"description\":\"不依赖新版EXE进程的真实MCP验收\",\"expectedBehavior\":\"完整人工作业\",\"moduleId\":null,\"state\":\"closed\",\"severity\":\"S3\",\"priority\":\"P3\",\"reporterId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"ownerId\":null,\"verificationOwnerId\":null,\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-08T17:16:36.188Z\",\"updatedAt\":\"2026-09-08T17:16:36.331Z\",\"closedAt\":\"2026-09-08T17:16:36.331Z\"},\"comments\":{\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"items\":[{\"id\":\"8a833247-cc41-4d8b-a777-b5d73538e599\",\"body\":\"真实MCP评论正文\",\"authorId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"createdAt\":\"2026-09-08T17:16:36.200Z\"}]},\"events\":{\"items\":[{\"schemaVersion\":\"1\",\"id\":\"dd46aa0a-562a-49f4-92da-cb54135e6987\",\"type\":\"verification.result_recorded\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"version\":6},\"sequence\":3,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"98b14d5b-0ac9-4710-b3c8-1b5898728c36\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.331Z\",\"fromState\":\"ready_for_verification\",\"toState\":\"closed\",\"payload\":{\"status\":\"passed\",\"summary\":\"已真实核验通过\",\"verificationId\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1\",\"id\":\"8027b740-9ae3-464e-a48b-1bdbc44fafcd\",\"type\":\"verification.started\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"version\":6},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"b7cfbcd5-a60f-4ea9-8ea3-3e9fe91009e0\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.321Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"status\":\"in_progress\",\"verificationId\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"fromVersion\":1,\"toVersion\":2}},{\"schemaVersion\":\"1\",\"id\":\"b52b7ad9-79d9-4871-aa60-28375a2c3d03\",\"type\":\"verification.created\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"version\":6},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"5ef95bac-3fbf-4edb-883b-10c2884f2b9e\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.294Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"status\":\"requested\",\"verificationId\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"toVersion\":1}},{\"schemaVersion\":\"1\",\"id\":\"fb7e4df5-c4a2-47d4-8382-604e3780f630\",\"type\":\"repair_attempt.delivered\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"version\":6},\"sequence\":3,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"89bb40b3-7ce6-441d-b74b-57a0342f9af9\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.217Z\",\"fromState\":\"in_progress\",\"toState\":\"ready_for_verification\",\"payload\":{\"status\":\"delivered\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"reason\":\"人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1\",\"id\":\"b62ec9f2-82b9-4887-a847-27a11d5da5e7\",\"type\":\"repair_attempt.started\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"version\":6},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"ea93f213-937b-4527-bb4a-b51375e47bdf\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.216Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"status\":\"running\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"fromVersion\":1,\"toVersion\":2,\"reason\":\"人工修复已交付，等待验收\"}},{\"schemaVersion\":\"1\",\"id\":\"d16033be-ec88-401f-b3d0-84c51e4544b9\",\"type\":\"repair_attempt.created\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"version\":6},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"0671862e-28ba-4d2c-81f1-16a54b3bd38c\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.215Z\",\"fromState\":\"ready\",\"toState\":\"in_progress\",\"payload\":{\"status\":\"planned\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1\",\"id\":\"0671862e-28ba-4d2c-81f1-16a54b3bd38c\",\"type\":\"bug.manual_completion_started\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"version\":6},\"sequence\":3,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"0671862e-28ba-4d2c-81f1-16a54b3bd38c\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.214Z\",\"fromState\":\"reported\",\"toState\":\"ready\",\"payload\":{\"status\":\"ready\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"reason\":\"人工修复已交付，等待验收\",\"fromVersion\":1,\"toVersion\":2}},{\"schemaVersion\":\"1\",\"id\":\"35a059b3-cef6-45d3-8bf2-5ae5eade7248\",\"type\":\"comment.created\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"version\":6},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"1cbb02d2-932d-4fef-84d9-f3cd265fe7e4\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.200Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"commentId\":\"8a833247-cc41-4d8b-a777-b5d73538e599\"}},{\"schemaVersion\":\"1\",\"id\":\"f2005331-39ec-4b0c-89ea-0508a5c72e0e\",\"type\":\"occurrence.appended\",\"source\":\"qa_hub\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"aggregate\":{\"type\":\"bug\",\"id\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"version\":6},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"82c5597c-8e26-4025-874a-1770a095e664\"},\"correlationId\":\"3bb3fdc4-85f5-4592-b344-0e9bdb0f6414\",\"causationId\":null,\"occurredAt\":\"2026-09-08T17:16:36.188Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"occurrenceId\":\"47d40a3d-437d-43a8-bdd2-b3f2cc927f31\",\"fromVersion\":1,\"toVersion\":2}}],\"nextCursor\":null},\"attachments\":{\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"projectId\":\"fb914b3b-4169-47f8-8dec-76f3a3cc780d\",\"snapshotSequence\":69,\"items\":[],\"nextCursor\":null},\"humanWorkflow\":{\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"repairAttempt\":null,\"buildRequirement\":null,\"build\":null,\"verification\":null,\"latestVerification\":{\"id\":\"342989c9-ca80-410b-a39e-90bef8e6aea3\",\"bugId\":\"c1417457-0e54-4b4a-adf5-501dc95256df\",\"repairAttemptId\":\"5f5f899d-c68c-4438-ab3f-ab830f2c289f\",\"buildId\":null,\"status\":\"passed\",\"verifierId\":\"82c5597c-8e26-4025-874a-1770a095e664\",\"criteriaSnapshot\":\"在无可选组件下实际验收\",\"resultSummary\":\"已真实核验通过\",\"failureReason\":null,\"blockedReason\":null,\"version\":3}}}"
+            }
+          ],
+          "structuredContent": {
+            "bug": {
+              "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "number": 7,
+              "key": "TA1788885078625-7",
+              "title": "服务端MCP真实人工闭环",
+              "description": "不依赖新版EXE进程的真实MCP验收",
+              "expectedBehavior": "完整人工作业",
+              "moduleId": null,
+              "state": "closed",
+              "severity": "S3",
+              "priority": "P3",
+              "reporterId": "82c5597c-8e26-4025-874a-1770a095e664",
+              "ownerId": null,
+              "verificationOwnerId": null,
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 6,
+              "createdAt": "2026-09-08T17:16:36.188Z",
+              "updatedAt": "2026-09-08T17:16:36.331Z",
+              "closedAt": "2026-09-08T17:16:36.331Z"
+            },
+            "comments": {
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "items": [
+                {
+                  "id": "8a833247-cc41-4d8b-a777-b5d73538e599",
+                  "body": "真实MCP评论正文",
+                  "authorId": "82c5597c-8e26-4025-874a-1770a095e664",
+                  "createdAt": "2026-09-08T17:16:36.200Z"
+                }
+              ]
+            },
+            "events": {
+              "items": [
+                {
+                  "schemaVersion": "1",
+                  "id": "dd46aa0a-562a-49f4-92da-cb54135e6987",
+                  "type": "verification.result_recorded",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                    "version": 6
+                  },
+                  "sequence": 3,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "98b14d5b-0ac9-4710-b3c8-1b5898728c36",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.331Z",
+                  "fromState": "ready_for_verification",
+                  "toState": "closed",
+                  "payload": {
+                    "status": "passed",
+                    "summary": "已真实核验通过",
+                    "verificationId": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "8027b740-9ae3-464e-a48b-1bdbc44fafcd",
+                  "type": "verification.started",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                    "version": 6
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "b7cfbcd5-a60f-4ea9-8ea3-3e9fe91009e0",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.321Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "status": "in_progress",
+                    "verificationId": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "b52b7ad9-79d9-4871-aa60-28375a2c3d03",
+                  "type": "verification.created",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                    "version": 6
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "5ef95bac-3fbf-4edb-883b-10c2884f2b9e",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.294Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "status": "requested",
+                    "verificationId": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "toVersion": 1
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "fb7e4df5-c4a2-47d4-8382-604e3780f630",
+                  "type": "repair_attempt.delivered",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "version": 6
+                  },
+                  "sequence": 3,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "89bb40b3-7ce6-441d-b74b-57a0342f9af9",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.217Z",
+                  "fromState": "in_progress",
+                  "toState": "ready_for_verification",
+                  "payload": {
+                    "status": "delivered",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "reason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "b62ec9f2-82b9-4887-a847-27a11d5da5e7",
+                  "type": "repair_attempt.started",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "version": 6
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "ea93f213-937b-4527-bb4a-b51375e47bdf",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.216Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "status": "running",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "fromVersion": 1,
+                    "toVersion": 2,
+                    "reason": "人工修复已交付，等待验收"
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "d16033be-ec88-401f-b3d0-84c51e4544b9",
+                  "type": "repair_attempt.created",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "version": 6
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "0671862e-28ba-4d2c-81f1-16a54b3bd38c",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.215Z",
+                  "fromState": "ready",
+                  "toState": "in_progress",
+                  "payload": {
+                    "status": "planned",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "0671862e-28ba-4d2c-81f1-16a54b3bd38c",
+                  "type": "bug.manual_completion_started",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                    "version": 6
+                  },
+                  "sequence": 3,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "0671862e-28ba-4d2c-81f1-16a54b3bd38c",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.214Z",
+                  "fromState": "reported",
+                  "toState": "ready",
+                  "payload": {
+                    "status": "ready",
+                    "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                    "reason": "人工修复已交付，等待验收",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "35a059b3-cef6-45d3-8bf2-5ae5eade7248",
+                  "type": "comment.created",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                    "version": 6
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "1cbb02d2-932d-4fef-84d9-f3cd265fe7e4",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.200Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "commentId": "8a833247-cc41-4d8b-a777-b5d73538e599"
+                  }
+                },
+                {
+                  "schemaVersion": "1",
+                  "id": "f2005331-39ec-4b0c-89ea-0508a5c72e0e",
+                  "type": "occurrence.appended",
+                  "source": "qa_hub",
+                  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+                  "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                    "version": 6
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "82c5597c-8e26-4025-874a-1770a095e664"
+                  },
+                  "correlationId": "3bb3fdc4-85f5-4592-b344-0e9bdb0f6414",
+                  "causationId": null,
+                  "occurredAt": "2026-09-08T17:16:36.188Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "occurrenceId": "47d40a3d-437d-43a8-bdd2-b3f2cc927f31",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                }
+              ],
+              "nextCursor": null
+            },
+            "attachments": {
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+              "snapshotSequence": 69,
+              "items": [],
+              "nextCursor": null
+            },
+            "humanWorkflow": {
+              "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+              "repairAttempt": null,
+              "buildRequirement": null,
+              "build": null,
+              "verification": null,
+              "latestVerification": {
+                "id": "342989c9-ca80-410b-a39e-90bef8e6aea3",
+                "bugId": "c1417457-0e54-4b4a-adf5-501dc95256df",
+                "repairAttemptId": "5f5f899d-c68c-4438-ab3f-ab830f2c289f",
+                "buildId": null,
+                "status": "passed",
+                "verifierId": "82c5597c-8e26-4025-874a-1770a095e664",
+                "criteriaSnapshot": "在无可选组件下实际验收",
+                "resultSummary": "已真实核验通过",
+                "failureReason": null,
+                "blockedReason": null,
+                "version": 3
+              }
+            }
+          },
+          "isError": false
+        }
+      },
+      "recordedAt": "2026-09-08T17:16:36.363Z"
+    }
+  ],
+  "note": "Real independent MCP protocol and isolated API/SQLite. Remaining tools and platform acceptance are not implied."
+}

@@ -1,0 +1,4132 @@
+{
+  "runId": "2026-09-08T17-53-20-441Z",
+  "instanceId": "qa-hub-preview-7c86",
+  "api": "http://127.0.0.1:4419",
+  "projects": {
+    "a": {
+      "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "key": "MA1788890000532",
+      "name": "管理验收A 2026-09-08T17-53-20-441Z",
+      "active": true,
+      "version": 1
+    },
+    "b": {
+      "id": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+      "key": "MB1788890000542",
+      "name": "管理验收B 2026-09-08T17-53-20-441Z",
+      "active": true,
+      "version": 1
+    }
+  },
+  "names": {
+    "operator": "管理验收-operator-2026-09-08T17-53-20-441Z",
+    "both": "管理验收-both-2026-09-08T17-53-20-441Z",
+    "alias": "管理验收-alias-2026-09-08T17-53-20-441Z"
+  },
+  "passed": true,
+  "note": "Real isolated HTTP management/membership subset. No task execution or live external service used. GM password and access tokens stayed in process memory and are omitted from evidence.",
+  "outbound": [],
+  "checks": [
+    {
+      "label": "independent API readiness",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "status": "ready",
+        "schemaVersion": "14",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.514Z"
+    },
+    {
+      "label": "incorrect GM password rejected",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "expectedStatus": 401,
+      "status": 401,
+      "passed": true,
+      "response": {
+        "code": "AUTHENTICATION_FAILED"
+      },
+      "at": "2026-09-08T17:53:20.523Z"
+    },
+    {
+      "label": "configured GM password login",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "email": "qa-b92dcb64da744e5245c8ad99ceeca75c6d719402fc65e323ea07fff842e5d657@local.invalid",
+        "displayName": "Preview GM",
+        "isGm": true,
+        "expiresAt": "2094-09-26T21:07:27.528Z"
+      },
+      "at": "2026-09-08T17:53:20.532Z"
+    },
+    {
+      "label": "GM create isolated project A",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "key": "MA1788890000532",
+        "name": "管理验收A 2026-09-08T17-53-20-441Z",
+        "active": true,
+        "version": 1
+      },
+      "at": "2026-09-08T17:53:20.542Z"
+    },
+    {
+      "label": "GM create isolated project B",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+        "key": "MB1788890000542",
+        "name": "管理验收B 2026-09-08T17-53-20-441Z",
+        "active": true,
+        "version": 1
+      },
+      "at": "2026-09-08T17:53:20.551Z"
+    },
+    {
+      "label": "project shortcode resolves stable ID",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/project-entry/MA1788890000532",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "key": "MA1788890000532",
+        "name": "管理验收A 2026-09-08T17-53-20-441Z",
+        "active": true,
+        "version": 1
+      },
+      "at": "2026-09-08T17:53:20.556Z"
+    },
+    {
+      "label": "shortcode returns project A",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "expected": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "actual": "5f00f444-8c48-4aea-9e66-659ea0a1b04f"
+      },
+      "at": "2026-09-08T17:53:20.556Z"
+    },
+    {
+      "label": "ordinary operator joins A",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+        "email": "qa-7dd280454498ea40b91cbd8595bc4a4b64589ac7954490ed278b310672a3fdc4@local.invalid",
+        "displayName": "管理验收-operator-2026-09-08T17-53-20-441Z",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.560Z"
+      },
+      "at": "2026-09-08T17:53:20.567Z"
+    },
+    {
+      "label": "shared employee joins A",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "email": "qa-979bbd91527be53cab6e8fa67378a31c7fdef194a3d40f2578ac24daa0473669@local.invalid",
+        "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.571Z"
+      },
+      "at": "2026-09-08T17:53:20.579Z"
+    },
+    {
+      "label": "shared employee joins B",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "email": "qa-979bbd91527be53cab6e8fa67378a31c7fdef194a3d40f2578ac24daa0473669@local.invalid",
+        "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+        "projectId": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.582Z"
+      },
+      "at": "2026-09-08T17:53:20.591Z"
+    },
+    {
+      "label": "alias joins A",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+        "email": "qa-6f3709f230e793d99ffc60e3829a3e1d1fcea4bc9543a61eebfb32b75f5a9219@local.invalid",
+        "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.598Z"
+      },
+      "at": "2026-09-08T17:53:20.605Z"
+    },
+    {
+      "label": "alias joins B",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+        "email": "qa-6f3709f230e793d99ffc60e3829a3e1d1fcea4bc9543a61eebfb32b75f5a9219@local.invalid",
+        "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+        "projectId": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.609Z"
+      },
+      "at": "2026-09-08T17:53:20.615Z"
+    },
+    {
+      "label": "same name keeps stable user across projects",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "shared": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "alias": "ac4e8471-5b65-4a16-8328-5f65783337bc"
+      },
+      "at": "2026-09-08T17:53:20.615Z"
+    },
+    {
+      "label": "ordinary name gm logs in without privilege",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+        "email": "qa-41078433c36e9c949d16473bfd94f1dcb589f2a0ed26ec688a858dafbe333b9c@local.invalid",
+        "displayName": "gm",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.618Z"
+      },
+      "at": "2026-09-08T17:53:20.625Z"
+    },
+    {
+      "label": "name gm cannot grant GM",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "userId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+        "isGm": false
+      },
+      "at": "2026-09-08T17:53:20.625Z"
+    },
+    {
+      "label": "ordinary gm name denied project management",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/gm/projects",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "FORBIDDEN",
+        "message": "GM login is required"
+      },
+      "at": "2026-09-08T17:53:20.628Z"
+    },
+    {
+      "label": "single-project employee directory",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "snapshotSequence": 0,
+        "items": [
+          {
+            "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "key": "MA1788890000532",
+            "name": "管理验收A 2026-09-08T17-53-20-441Z",
+            "active": true,
+            "identity": "employee",
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ]
+          }
+        ],
+        "nextCursor": null
+      },
+      "at": "2026-09-08T17:53:20.633Z"
+    },
+    {
+      "label": "only effective membership visible",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "snapshotSequence": 0,
+        "items": [
+          {
+            "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "key": "MA1788890000532",
+            "name": "管理验收A 2026-09-08T17-53-20-441Z",
+            "active": true,
+            "identity": "employee",
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ]
+          }
+        ],
+        "nextCursor": null
+      },
+      "at": "2026-09-08T17:53:20.633Z"
+    },
+    {
+      "label": "non-member project Bug list denied",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=2f84d35f-126b-4d33-b16b-9a542431a35f",
+      "projectId": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "PROJECT_NOT_ACCESSIBLE"
+      },
+      "at": "2026-09-08T17:53:20.638Z"
+    },
+    {
+      "label": "non-member personnel directory denied",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/2f84d35f-126b-4d33-b16b-9a542431a35f/users",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "PROJECT_NOT_ACCESSIBLE"
+      },
+      "at": "2026-09-08T17:53:20.642Z"
+    },
+    {
+      "label": "new project has five disabled components",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.649Z"
+    },
+    {
+      "label": "Bug-only default",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.649Z"
+    },
+    {
+      "label": "employee cannot configure components",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/build",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "FORBIDDEN",
+        "message": "GM login is required"
+      },
+      "at": "2026-09-08T17:53:20.654Z"
+    },
+    {
+      "label": "GM enable build_upload.single",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/build_upload.single",
+      "expectedStatus": 409,
+      "status": 409,
+      "passed": true,
+      "response": {
+        "code": "COMPONENT_DEPENDENCY_REQUIRED",
+        "message": "enable build and upload.incremental first"
+      },
+      "at": "2026-09-08T17:53:20.662Z"
+    },
+    {
+      "label": "GM enable build",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/build",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "needs_configuration",
+            "version": 1,
+            "config": {},
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.664Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.672Z"
+    },
+    {
+      "label": "missing configuration remains visible",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "needs_configuration",
+            "version": 1,
+            "config": {},
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.664Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.677Z"
+    },
+    {
+      "label": "enabled build without target needs configuration",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "needs_configuration",
+            "version": 1,
+            "config": {},
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.664Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.677Z"
+    },
+    {
+      "label": "GM enable build",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/build",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "ready",
+            "version": 2,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.688Z"
+    },
+    {
+      "label": "GM enable upload.incremental",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/upload.incremental",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "ready",
+            "version": 2,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.701Z"
+    },
+    {
+      "label": "GM enable build_upload.single",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/build_upload.single",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "ready",
+            "version": 2,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.707Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.713Z"
+    },
+    {
+      "label": "employee receives public configuration only",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "ready",
+            "version": 2,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.707Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.720Z"
+    },
+    {
+      "label": "employee configuration hides targets and credential references",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "ready",
+            "version": 2,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.707Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.720Z"
+    },
+    {
+      "label": "GM can edit existing private connection configuration",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": true,
+            "status": "ready",
+            "version": 2,
+            "config": {
+              "baseUrl": "http://127.0.0.1:58129",
+              "job": "management-only",
+              "downloadOrigin": "http://127.0.0.1:58129",
+              "zipPath": "/preview.zip",
+              "artifactUrlTemplate": "http://127.0.0.1:58129/artifacts/{buildNumber}.zip",
+              "credentialRef": "fixture-credential-not-a-secret",
+              "presets": {
+                "fixture": {
+                  "preview": "true"
+                }
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.707Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "sourceUrl": "http://127.0.0.1:58129/preview.zip",
+              "apiBase": "http://127.0.0.1:58129",
+              "loginBase": "http://127.0.0.1:58129",
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              },
+              "credentialRef": "fixture-credential-not-a-secret",
+              "targetPrefix": "isolated/5f00f444-8c48-4aea-9e66-659ea0a1b04f/",
+              "testDirectoryPrefix": "isolated/5f00f444-8c48-4aea-9e66-659ea0a1b04f/test/",
+              "releaseDirectoryPrefix": "isolated/5f00f444-8c48-4aea-9e66-659ea0a1b04f/release/"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.727Z"
+    },
+    {
+      "label": "GM receives named target and presets",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "build": {
+          "key": "build",
+          "displayName": "打包",
+          "enabled": true,
+          "status": "ready",
+          "version": 2,
+          "config": {
+            "baseUrl": "http://127.0.0.1:58129",
+            "job": "management-only",
+            "downloadOrigin": "http://127.0.0.1:58129",
+            "zipPath": "/preview.zip",
+            "artifactUrlTemplate": "http://127.0.0.1:58129/artifacts/{buildNumber}.zip",
+            "credentialRef": "fixture-credential-not-a-secret",
+            "presets": {
+              "fixture": {
+                "preview": "true"
+              }
+            }
+          },
+          "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "updatedAt": "2026-09-08T17:53:20.681Z"
+        }
+      },
+      "at": "2026-09-08T17:53:20.727Z"
+    },
+    {
+      "label": "project B component configuration remains off",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/2f84d35f-126b-4d33-b16b-9a542431a35f/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.732Z"
+    },
+    {
+      "label": "component switch is project-scoped",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "projectId": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.732Z"
+    },
+    {
+      "label": "GM disable build",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/build",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 3,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.743Z"
+    },
+    {
+      "label": "dependency disable closes combined entry",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 3,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.747Z"
+    },
+    {
+      "label": "combined component is disabled with build dependency",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 3,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": true,
+            "status": "ready",
+            "version": 1,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.747Z"
+    },
+    {
+      "label": "GM disable upload.incremental",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/upload.incremental",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 3,
+            "config": {
+              "job": "management-only",
+              "presetOptions": [
+                "fixture"
+              ]
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.751Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.757Z"
+    },
+    {
+      "label": "GM enable build",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components/build",
+      "expectedStatus": 409,
+      "status": 409,
+      "passed": true,
+      "response": {
+        "code": "VERSION_CONFLICT",
+        "message": "refresh the current version before saving"
+      },
+      "at": "2026-09-08T17:53:20.764Z"
+    },
+    {
+      "label": "management operations do not contact configured targets",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "outbound": []
+      },
+      "at": "2026-09-08T17:53:20.764Z"
+    },
+    {
+      "label": "read current project A personnel",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/users",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "userId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "displayName": "gm",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:13:46.010Z",
+            "updatedAt": "2026-09-08T17:13:46.010Z",
+            "protected": false
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 9,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          },
+          {
+            "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:53:20.598Z",
+            "updatedAt": "2026-09-08T17:53:20.598Z",
+            "protected": false
+          },
+          {
+            "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:53:20.571Z",
+            "updatedAt": "2026-09-08T17:53:20.571Z",
+            "protected": false
+          },
+          {
+            "userId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "displayName": "管理验收-operator-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 1,
+            "createdAt": "2026-09-08T17:53:20.560Z",
+            "updatedAt": "2026-09-08T17:53:20.560Z",
+            "protected": false
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.772Z"
+    },
+    {
+      "label": "employee disables shared employee only in A",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/members/592acc25-d9f3-457a-8e6b-cadb52897fbd",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "active": false,
+        "version": 2
+      },
+      "at": "2026-09-08T17:53:20.779Z"
+    },
+    {
+      "label": "same-name login cannot restore revoked A membership",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "PROJECT_MEMBERSHIP_DISABLED"
+      },
+      "at": "2026-09-08T17:53:20.785Z"
+    },
+    {
+      "label": "same-name employee still enters B",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "email": "qa-979bbd91527be53cab6e8fa67378a31c7fdef194a3d40f2578ac24daa0473669@local.invalid",
+        "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+        "projectId": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.787Z"
+      },
+      "at": "2026-09-08T17:53:20.792Z"
+    },
+    {
+      "label": "B identity survives A disable",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd"
+      },
+      "at": "2026-09-08T17:53:20.792Z"
+    },
+    {
+      "label": "old shared session cannot read revoked A",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "PROJECT_NOT_ACCESSIBLE"
+      },
+      "at": "2026-09-08T17:53:20.797Z"
+    },
+    {
+      "label": "old shared session can still read B",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=2f84d35f-126b-4d33-b16b-9a542431a35f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "snapshotSequence": 0,
+        "items": [],
+        "nextCursor": null
+      },
+      "at": "2026-09-08T17:53:20.803Z"
+    },
+    {
+      "label": "stale member restoration is refused",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/members/592acc25-d9f3-457a-8e6b-cadb52897fbd",
+      "expectedStatus": 409,
+      "status": 409,
+      "passed": true,
+      "response": {
+        "code": "VERSION_CONFLICT",
+        "message": "refresh the current version before saving"
+      },
+      "at": "2026-09-08T17:53:20.809Z"
+    },
+    {
+      "label": "read current project A personnel",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/users",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "userId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "displayName": "gm",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:13:46.010Z",
+            "updatedAt": "2026-09-08T17:13:46.010Z",
+            "protected": false
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 9,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          },
+          {
+            "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:53:20.598Z",
+            "updatedAt": "2026-09-08T17:53:20.598Z",
+            "protected": false
+          },
+          {
+            "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+            "status": "disabled",
+            "membershipStatus": "revoked",
+            "membershipVersion": 2,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 3,
+            "createdAt": "2026-09-08T17:53:20.571Z",
+            "updatedAt": "2026-09-08T17:53:20.571Z",
+            "protected": false
+          },
+          {
+            "userId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "displayName": "管理验收-operator-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 1,
+            "createdAt": "2026-09-08T17:53:20.560Z",
+            "updatedAt": "2026-09-08T17:53:20.560Z",
+            "protected": false
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.817Z"
+    },
+    {
+      "label": "employee restores A membership with current version",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/members/592acc25-d9f3-457a-8e6b-cadb52897fbd",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "active": true,
+        "version": 3
+      },
+      "at": "2026-09-08T17:53:20.826Z"
+    },
+    {
+      "label": "restored employee can enter A with original ID",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "email": "qa-979bbd91527be53cab6e8fa67378a31c7fdef194a3d40f2578ac24daa0473669@local.invalid",
+        "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.829Z"
+      },
+      "at": "2026-09-08T17:53:20.834Z"
+    },
+    {
+      "label": "restoration preserves stable user",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd"
+      },
+      "at": "2026-09-08T17:53:20.834Z"
+    },
+    {
+      "label": "employee links duplicate name only in A",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/users/ac4e8471-5b65-4a16-8328-5f65783337bc/identity-link",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+        "status": "active",
+        "linkedToUserId": "592acc25-d9f3-457a-8e6b-cadb52897fbd"
+      },
+      "at": "2026-09-08T17:53:20.845Z"
+    },
+    {
+      "label": "A linked name resolves canonical user",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "email": "qa-979bbd91527be53cab6e8fa67378a31c7fdef194a3d40f2578ac24daa0473669@local.invalid",
+        "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.848Z"
+      },
+      "at": "2026-09-08T17:53:20.853Z"
+    },
+    {
+      "label": "B same alias remains independent",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+        "email": "qa-6f3709f230e793d99ffc60e3829a3e1d1fcea4bc9543a61eebfb32b75f5a9219@local.invalid",
+        "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+        "projectId": "2f84d35f-126b-4d33-b16b-9a542431a35f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.856Z"
+      },
+      "at": "2026-09-08T17:53:20.860Z"
+    },
+    {
+      "label": "identity links do not cross projects",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "canonical": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "linked": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+        "bAlias": "ac4e8471-5b65-4a16-8328-5f65783337bc"
+      },
+      "at": "2026-09-08T17:53:20.860Z"
+    },
+    {
+      "label": "employee unlinks duplicate name in A",
+      "kind": "http",
+      "method": "DELETE",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/users/ac4e8471-5b65-4a16-8328-5f65783337bc/identity-link",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+        "status": "active",
+        "linkedToUserId": null
+      },
+      "at": "2026-09-08T17:53:20.870Z"
+    },
+    {
+      "label": "unlinked name returns original user",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+        "email": "qa-6f3709f230e793d99ffc60e3829a3e1d1fcea4bc9543a61eebfb32b75f5a9219@local.invalid",
+        "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "isGm": false,
+        "expiresAt": "2094-09-26T21:07:27.872Z"
+      },
+      "at": "2026-09-08T17:53:20.877Z"
+    },
+    {
+      "label": "unlink preserves original identity",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc"
+      },
+      "at": "2026-09-08T17:53:20.877Z"
+    },
+    {
+      "label": "read current project A personnel",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/users",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "userId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "displayName": "gm",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:13:46.010Z",
+            "updatedAt": "2026-09-08T17:13:46.010Z",
+            "protected": false
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 9,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          },
+          {
+            "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 4,
+            "createdAt": "2026-09-08T17:53:20.598Z",
+            "updatedAt": "2026-09-08T17:53:20.598Z",
+            "protected": false
+          },
+          {
+            "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 3,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 5,
+            "createdAt": "2026-09-08T17:53:20.571Z",
+            "updatedAt": "2026-09-08T17:53:20.571Z",
+            "protected": false
+          },
+          {
+            "userId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "displayName": "管理验收-operator-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 1,
+            "createdAt": "2026-09-08T17:53:20.560Z",
+            "updatedAt": "2026-09-08T17:53:20.560Z",
+            "protected": false
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.884Z"
+    },
+    {
+      "label": "GM removes own ordinary A membership for non-member test",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/gm/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/members/850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "active": false,
+        "version": 2
+      },
+      "at": "2026-09-08T17:53:20.890Z"
+    },
+    {
+      "label": "GM without A membership still reads components",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/components",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 3,
+            "config": {
+              "baseUrl": "http://127.0.0.1:58129",
+              "job": "management-only",
+              "downloadOrigin": "http://127.0.0.1:58129",
+              "zipPath": "/preview.zip",
+              "artifactUrlTemplate": "http://127.0.0.1:58129/artifacts/{buildNumber}.zip",
+              "credentialRef": "fixture-credential-not-a-secret",
+              "presets": {
+                "fixture": {
+                  "preview": "true"
+                }
+              }
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "buildPreset": "fixture"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 2,
+            "config": {
+              "sourceUrl": "http://127.0.0.1:58129/preview.zip",
+              "apiBase": "http://127.0.0.1:58129",
+              "loginBase": "http://127.0.0.1:58129",
+              "defaults": {
+                "productId": "999",
+                "channelId": "998",
+                "belongName": "Management test",
+                "testerId": 73
+              },
+              "credentialRef": "fixture-credential-not-a-secret",
+              "targetPrefix": "isolated/5f00f444-8c48-4aea-9e66-659ea0a1b04f/",
+              "testDirectoryPrefix": "isolated/5f00f444-8c48-4aea-9e66-659ea0a1b04f/test/",
+              "releaseDirectoryPrefix": "isolated/5f00f444-8c48-4aea-9e66-659ea0a1b04f/release/"
+            },
+            "updatedBy": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "updatedAt": "2026-09-08T17:53:20.751Z"
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.897Z"
+    },
+    {
+      "label": "GM without A membership still lists personnel",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/users",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "userId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "displayName": "gm",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:13:46.010Z",
+            "updatedAt": "2026-09-08T17:13:46.010Z",
+            "protected": false
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "disabled",
+            "membershipStatus": "revoked",
+            "membershipVersion": 2,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 9,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          },
+          {
+            "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 4,
+            "createdAt": "2026-09-08T17:53:20.598Z",
+            "updatedAt": "2026-09-08T17:53:20.598Z",
+            "protected": false
+          },
+          {
+            "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 3,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 5,
+            "createdAt": "2026-09-08T17:53:20.571Z",
+            "updatedAt": "2026-09-08T17:53:20.571Z",
+            "protected": false
+          },
+          {
+            "userId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "displayName": "管理验收-operator-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 1,
+            "createdAt": "2026-09-08T17:53:20.560Z",
+            "updatedAt": "2026-09-08T17:53:20.560Z",
+            "protected": false
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.905Z"
+    },
+    {
+      "label": "GM without A membership still reads Bug list",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "snapshotSequence": 0,
+        "items": [],
+        "nextCursor": null
+      },
+      "at": "2026-09-08T17:53:20.913Z"
+    },
+    {
+      "label": "non-member GM creates assigned Bug",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/bugs",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 201,
+      "status": 201,
+      "passed": true,
+      "response": {
+        "clientSubmissionId": "c6d51525-b572-4b09-9758-62f3a6d80851",
+        "qaItem": {
+          "type": "bug",
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "key": "MA1788890000532-1"
+        },
+        "disposition": "created",
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "GM 普通成员已撤销",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "reported",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 1,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:20.918Z",
+          "closedAt": null
+        },
+        "occurrenceId": "df8a2964-b11a-4a79-8230-b8615a82c10f",
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "03a3ee33-c681-41ea-8f8f-54a17fa92b81",
+        "replayed": false
+      },
+      "at": "2026-09-08T17:53:20.928Z"
+    },
+    {
+      "label": "non-member GM edits Bug with CAS",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/bugs/ea6d8311-e2da-443f-997d-9efabd45758e",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "number": 1,
+        "key": "MA1788890000532-1",
+        "title": "GM 非成员人工闭环验收",
+        "description": "非成员 GM 已实际修改描述",
+        "expectedBehavior": "独立 GM 权限保留人工操作",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 2,
+        "createdAt": "2026-09-08T17:53:20.918Z",
+        "updatedAt": "2026-09-08T17:53:20.934Z",
+        "closedAt": null
+      },
+      "at": "2026-09-08T17:53:20.976Z"
+    },
+    {
+      "label": "non-member GM comments",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/comments",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 201,
+      "status": 201,
+      "passed": true,
+      "response": {
+        "comment": {
+          "id": "a8582497-a541-4e00-b11e-f46f07ac193e",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "authorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "body": "GM 非成员评论读回证明",
+          "clientSubmissionId": "6b052a2f-530b-41fe-9600-980165ff7d08",
+          "createdAt": "2026-09-08T17:53:20.981Z",
+          "version": 1
+        },
+        "correlationId": "6b052a2f-530b-41fe-9600-980165ff7d08"
+      },
+      "at": "2026-09-08T17:53:20.988Z"
+    },
+    {
+      "label": "GM comment body reads back",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/comments",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "items": [
+          {
+            "id": "a8582497-a541-4e00-b11e-f46f07ac193e",
+            "body": "GM 非成员评论读回证明",
+            "authorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "createdAt": "2026-09-08T17:53:20.981Z"
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:20.996Z"
+    },
+    {
+      "label": "non-member GM manually completes",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "manual_complete",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 5,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.004Z",
+          "closedAt": null
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 5,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.004Z",
+          "closedAt": null
+        }
+      },
+      "at": "2026-09-08T17:53:21.144Z"
+    },
+    {
+      "label": "non-member GM reads human workflow",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/human-workflow",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "repairAttempt": {
+          "id": "38b1b331-4a20-4756-a945-27acf2d2882c",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "sequence": 1,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "parentAttemptId": null,
+          "summary": "人工完成，继续本地验收",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "patchUrl": null,
+          "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+          "failureReason": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "buildRequirement": {
+          "id": "1856b076-3531-4648-bf39-46babbccf0c2",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "38b1b331-4a20-4756-a945-27acf2d2882c",
+          "sourceDeliveryVersion": 3,
+          "deliveredCommitSha": null,
+          "requirement": "not_required",
+          "decisionBasis": "no_code_delivery",
+          "decisionReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+          "decisionActorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "decisionAuditEventId": "0ae13f6f-4308-4e0f-8242-7da6aa88c931",
+          "linkedBuildId": null,
+          "linkId": null,
+          "policyVersion": "1.0.0",
+          "bugVersionAtDelivery": 5,
+          "createdAt": "2026-09-08T17:53:21.004Z",
+          "updatedAt": "2026-09-08T17:53:21.004Z",
+          "version": 1
+        },
+        "build": null,
+        "verification": null,
+        "latestVerification": null
+      },
+      "at": "2026-09-08T17:53:21.149Z"
+    },
+    {
+      "label": "non-member GM creates verification",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "create_verification",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "id": "31b87e29-a668-4778-90d7-73427b7e9356",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "38b1b331-4a20-4756-a945-27acf2d2882c",
+          "buildId": null,
+          "status": "requested",
+          "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "criteriaSnapshot": "GM 无普通成员也能人工验收",
+          "resultSummary": null,
+          "failureReason": null,
+          "blockedReason": null,
+          "version": 1
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.153Z",
+          "closedAt": null
+        }
+      },
+      "at": "2026-09-08T17:53:21.196Z"
+    },
+    {
+      "label": "non-member GM starts verification",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "start_verification",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "id": "31b87e29-a668-4778-90d7-73427b7e9356",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "38b1b331-4a20-4756-a945-27acf2d2882c",
+          "buildId": null,
+          "status": "in_progress",
+          "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "criteriaSnapshot": "GM 无普通成员也能人工验收",
+          "resultSummary": null,
+          "failureReason": null,
+          "blockedReason": null,
+          "version": 2
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.153Z",
+          "closedAt": null
+        }
+      },
+      "at": "2026-09-08T17:53:21.210Z"
+    },
+    {
+      "label": "non-member GM rejects verification",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "reject",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "clientSubmissionId": "15a68ed9-2660-495a-aa41-227db16ad7be",
+          "qaItem": {
+            "type": "bug",
+            "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "key": "MA1788890000532-1"
+          },
+          "verification": {
+            "id": "31b87e29-a668-4778-90d7-73427b7e9356",
+            "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "repairAttemptId": "38b1b331-4a20-4756-a945-27acf2d2882c",
+            "buildId": null,
+            "status": "failed",
+            "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "criteriaSnapshot": "GM 无普通成员也能人工验收",
+            "resultSummary": "第一次验收退回",
+            "failureReason": "仍需修改",
+            "blockedReason": null,
+            "version": 3
+          },
+          "repairAttempt": {
+            "id": "38b1b331-4a20-4756-a945-27acf2d2882c",
+            "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "sequence": 1,
+            "mode": "human",
+            "status": "verification_failed",
+            "assigneeId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "parentAttemptId": null,
+            "summary": "人工完成，继续本地验收",
+            "branch": null,
+            "commitSha": null,
+            "mergeRequestUrl": null,
+            "patchUrl": null,
+            "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+            "failureReason": null,
+            "targetBuildId": null,
+            "version": 4
+          },
+          "bug": {
+            "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "number": 1,
+            "key": "MA1788890000532-1",
+            "title": "GM 非成员人工闭环验收",
+            "description": "非成员 GM 已实际修改描述",
+            "expectedBehavior": "独立 GM 权限保留人工操作",
+            "moduleId": null,
+            "state": "ready",
+            "severity": "S3",
+            "priority": "P3",
+            "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 7,
+            "createdAt": "2026-09-08T17:53:20.918Z",
+            "updatedAt": "2026-09-08T17:53:21.217Z",
+            "closedAt": null
+          },
+          "attachmentIds": [],
+          "captureBundleId": null,
+          "eventId": "58c97b87-ddea-43eb-96a9-2265e54a3b98",
+          "replayed": false
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 7,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.217Z",
+          "closedAt": null
+        }
+      },
+      "at": "2026-09-08T17:53:21.260Z"
+    },
+    {
+      "label": "non-member GM manually completes",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "manual_complete",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 10,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.267Z",
+          "closedAt": null
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 10,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.267Z",
+          "closedAt": null
+        }
+      },
+      "at": "2026-09-08T17:53:21.394Z"
+    },
+    {
+      "label": "non-member GM reads human workflow",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/human-workflow",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "repairAttempt": {
+          "id": "667666fc-4230-412e-aa41-64a919cf0623",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "sequence": 2,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "parentAttemptId": null,
+          "summary": "人工完成，继续本地验收",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "patchUrl": null,
+          "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+          "failureReason": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "buildRequirement": {
+          "id": "5638e647-2ead-4061-9e28-d6b5540a936e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "667666fc-4230-412e-aa41-64a919cf0623",
+          "sourceDeliveryVersion": 3,
+          "deliveredCommitSha": null,
+          "requirement": "not_required",
+          "decisionBasis": "no_code_delivery",
+          "decisionReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+          "decisionActorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "decisionAuditEventId": "ee901d0d-b4c9-4193-bb46-4086336c6190",
+          "linkedBuildId": null,
+          "linkId": null,
+          "policyVersion": "1.0.0",
+          "bugVersionAtDelivery": 10,
+          "createdAt": "2026-09-08T17:53:21.267Z",
+          "updatedAt": "2026-09-08T17:53:21.267Z",
+          "version": 1
+        },
+        "build": null,
+        "verification": null,
+        "latestVerification": {
+          "id": "31b87e29-a668-4778-90d7-73427b7e9356",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "38b1b331-4a20-4756-a945-27acf2d2882c",
+          "buildId": null,
+          "status": "failed",
+          "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "criteriaSnapshot": "GM 无普通成员也能人工验收",
+          "resultSummary": "第一次验收退回",
+          "failureReason": "仍需修改",
+          "blockedReason": null,
+          "version": 3
+        }
+      },
+      "at": "2026-09-08T17:53:21.400Z"
+    },
+    {
+      "label": "non-member GM creates verification",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "create_verification",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "id": "aec19145-f0be-4631-a75e-779140562f04",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "667666fc-4230-412e-aa41-64a919cf0623",
+          "buildId": null,
+          "status": "requested",
+          "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "criteriaSnapshot": "GM 无普通成员也能人工验收",
+          "resultSummary": null,
+          "failureReason": null,
+          "blockedReason": null,
+          "version": 1
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 11,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.405Z",
+          "closedAt": null
+        }
+      },
+      "at": "2026-09-08T17:53:21.446Z"
+    },
+    {
+      "label": "non-member GM starts verification",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "start_verification",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "id": "aec19145-f0be-4631-a75e-779140562f04",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "667666fc-4230-412e-aa41-64a919cf0623",
+          "buildId": null,
+          "status": "in_progress",
+          "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "criteriaSnapshot": "GM 无普通成员也能人工验收",
+          "resultSummary": null,
+          "failureReason": null,
+          "blockedReason": null,
+          "version": 2
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 11,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.405Z",
+          "closedAt": null
+        }
+      },
+      "at": "2026-09-08T17:53:21.459Z"
+    },
+    {
+      "label": "non-member GM accepts and closes",
+      "kind": "http",
+      "method": "POST",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/actions",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "action": "close",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "result": {
+          "clientSubmissionId": "176538d8-fdbe-48db-a069-681b907551ba",
+          "qaItem": {
+            "type": "bug",
+            "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "key": "MA1788890000532-1"
+          },
+          "verification": {
+            "id": "aec19145-f0be-4631-a75e-779140562f04",
+            "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "repairAttemptId": "667666fc-4230-412e-aa41-64a919cf0623",
+            "buildId": null,
+            "status": "passed",
+            "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "criteriaSnapshot": "GM 无普通成员也能人工验收",
+            "resultSummary": "第二次验收通过",
+            "failureReason": null,
+            "blockedReason": null,
+            "version": 3
+          },
+          "repairAttempt": {
+            "id": "667666fc-4230-412e-aa41-64a919cf0623",
+            "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "sequence": 2,
+            "mode": "human",
+            "status": "delivered",
+            "assigneeId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "parentAttemptId": null,
+            "summary": "人工完成，继续本地验收",
+            "branch": null,
+            "commitSha": null,
+            "mergeRequestUrl": null,
+            "patchUrl": null,
+            "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+            "failureReason": null,
+            "targetBuildId": null,
+            "version": 3
+          },
+          "bug": {
+            "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+            "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "number": 1,
+            "key": "MA1788890000532-1",
+            "title": "GM 非成员人工闭环验收",
+            "description": "非成员 GM 已实际修改描述",
+            "expectedBehavior": "独立 GM 权限保留人工操作",
+            "moduleId": null,
+            "state": "closed",
+            "severity": "S3",
+            "priority": "P3",
+            "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 12,
+            "createdAt": "2026-09-08T17:53:20.918Z",
+            "updatedAt": "2026-09-08T17:53:21.466Z",
+            "closedAt": "2026-09-08T17:53:21.466Z"
+          },
+          "attachmentIds": [],
+          "captureBundleId": null,
+          "eventId": "8d09fe49-566a-4e27-9d07-983c725876ee",
+          "replayed": false
+        },
+        "bug": {
+          "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+          "number": 1,
+          "key": "MA1788890000532-1",
+          "title": "GM 非成员人工闭环验收",
+          "description": "非成员 GM 已实际修改描述",
+          "expectedBehavior": "独立 GM 权限保留人工操作",
+          "moduleId": null,
+          "state": "closed",
+          "severity": "S3",
+          "priority": "P3",
+          "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 12,
+          "createdAt": "2026-09-08T17:53:20.918Z",
+          "updatedAt": "2026-09-08T17:53:21.466Z",
+          "closedAt": "2026-09-08T17:53:21.466Z"
+        }
+      },
+      "at": "2026-09-08T17:53:21.516Z"
+    },
+    {
+      "label": "closed GM Bug final readback",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs/ea6d8311-e2da-443f-997d-9efabd45758e",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "number": 1,
+        "key": "MA1788890000532-1",
+        "title": "GM 非成员人工闭环验收",
+        "description": "非成员 GM 已实际修改描述",
+        "expectedBehavior": "独立 GM 权限保留人工操作",
+        "moduleId": null,
+        "state": "closed",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "ownerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "verificationOwnerId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 12,
+        "createdAt": "2026-09-08T17:53:20.918Z",
+        "updatedAt": "2026-09-08T17:53:21.466Z",
+        "closedAt": "2026-09-08T17:53:21.466Z"
+      },
+      "at": "2026-09-08T17:53:21.521Z"
+    },
+    {
+      "label": "GM final acceptance history retained",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs/ea6d8311-e2da-443f-997d-9efabd45758e/human-workflow",
+      "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "repairAttempt": null,
+        "buildRequirement": null,
+        "build": null,
+        "verification": null,
+        "latestVerification": {
+          "id": "aec19145-f0be-4631-a75e-779140562f04",
+          "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+          "repairAttemptId": "667666fc-4230-412e-aa41-64a919cf0623",
+          "buildId": null,
+          "status": "passed",
+          "verifierId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+          "criteriaSnapshot": "GM 无普通成员也能人工验收",
+          "resultSummary": "第二次验收通过",
+          "failureReason": null,
+          "blockedReason": null,
+          "version": 3
+        }
+      },
+      "at": "2026-09-08T17:53:21.527Z"
+    },
+    {
+      "label": "GM non-member complete manual loop closes",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "bugId": "ea6d8311-e2da-443f-997d-9efabd45758e",
+        "bugKey": "MA1788890000532-1",
+        "state": "closed",
+        "version": 12
+      },
+      "at": "2026-09-08T17:53:21.527Z"
+    },
+    {
+      "label": "read current project A personnel",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/users",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "userId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "displayName": "gm",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 2,
+            "createdAt": "2026-09-08T17:13:46.010Z",
+            "updatedAt": "2026-09-08T17:13:46.010Z",
+            "protected": false
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "disabled",
+            "membershipStatus": "revoked",
+            "membershipVersion": 2,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 1,
+            "activeSessionCount": 9,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          },
+          {
+            "userId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "displayName": "管理验收-alias-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 4,
+            "createdAt": "2026-09-08T17:53:20.598Z",
+            "updatedAt": "2026-09-08T17:53:20.598Z",
+            "protected": false
+          },
+          {
+            "userId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "displayName": "管理验收-both-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 3,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 5,
+            "createdAt": "2026-09-08T17:53:20.571Z",
+            "updatedAt": "2026-09-08T17:53:20.571Z",
+            "protected": false
+          },
+          {
+            "userId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "displayName": "管理验收-operator-2026-09-08T17-53-20-441Z",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 1,
+            "createdAt": "2026-09-08T17:53:20.560Z",
+            "updatedAt": "2026-09-08T17:53:20.560Z",
+            "protected": false
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:21.536Z"
+    },
+    {
+      "label": "GM business loop never restores membership",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "displayName": "Preview GM",
+        "status": "disabled",
+        "membershipStatus": "revoked",
+        "membershipVersion": 2,
+        "roles": [
+          "developer",
+          "project_admin",
+          "release_manager",
+          "reporter",
+          "triager",
+          "verifier",
+          "viewer"
+        ],
+        "identity": "employee",
+        "linkedToUserId": null,
+        "linkedToDisplayName": null,
+        "linkedUserCount": 0,
+        "taskCount": 1,
+        "activeSessionCount": 9,
+        "createdAt": "2026-09-08T16:24:05.236Z",
+        "updatedAt": "2026-09-08T16:24:05.236Z",
+        "protected": true
+      },
+      "at": "2026-09-08T17:53:21.536Z"
+    },
+    {
+      "label": "GM without A membership can rename project",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/gm/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "key": "MA1788890000532",
+        "name": "管理验收A 已改名 2026-09-08T17-53-20-441Z",
+        "active": true,
+        "version": 2
+      },
+      "at": "2026-09-08T17:53:21.543Z"
+    },
+    {
+      "label": "stale project update rejected",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/gm/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 409,
+      "status": 409,
+      "passed": true,
+      "response": {
+        "code": "VERSION_CONFLICT",
+        "message": "refresh the current version before saving"
+      },
+      "at": "2026-09-08T17:53:21.549Z"
+    },
+    {
+      "label": "GM restores own ordinary membership after proof",
+      "kind": "http",
+      "method": "PUT",
+      "path": "/api/v1/gm/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/members/850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "active": true,
+        "version": 3
+      },
+      "at": "2026-09-08T17:53:21.557Z"
+    },
+    {
+      "label": "GM disables project with version",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/gm/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "key": "MA1788890000532",
+        "name": "管理验收A 已改名 2026-09-08T17-53-20-441Z",
+        "active": false,
+        "version": 3
+      },
+      "at": "2026-09-08T17:53:21.565Z"
+    },
+    {
+      "label": "disabled project entrance is unavailable",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/project-entry/5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "PROJECT_NOT_ACCESSIBLE",
+        "message": "project is disabled"
+      },
+      "at": "2026-09-08T17:53:21.570Z"
+    },
+    {
+      "label": "disabled A no longer serves employee Bug list",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 403,
+      "status": 403,
+      "passed": true,
+      "response": {
+        "code": "PROJECT_NOT_ACCESSIBLE"
+      },
+      "at": "2026-09-08T17:53:21.575Z"
+    },
+    {
+      "label": "other project remains available",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=2f84d35f-126b-4d33-b16b-9a542431a35f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "snapshotSequence": 0,
+        "items": [],
+        "nextCursor": null
+      },
+      "at": "2026-09-08T17:53:21.580Z"
+    },
+    {
+      "label": "GM restores project with version",
+      "kind": "http",
+      "method": "PATCH",
+      "path": "/api/v1/gm/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "id": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "key": "MA1788890000532",
+        "name": "管理验收A 已改名 2026-09-08T17-53-20-441Z",
+        "active": true,
+        "version": 4
+      },
+      "at": "2026-09-08T17:53:21.585Z"
+    },
+    {
+      "label": "management events readable with stable actor attribution",
+      "kind": "http",
+      "method": "GET",
+      "path": "/api/v1/projects/5f00f444-8c48-4aea-9e66-659ea0a1b04f/management-events",
+      "expectedStatus": 200,
+      "status": 200,
+      "passed": true,
+      "response": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "id": "caba941e-31ab-47b5-ad39-7884c49e3003",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.updated",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"name\":\"管理验收A 已改名 2026-09-08T17-53-20-441Z\",\"active\":true,\"previousVersion\":3}",
+            "createdAt": "2026-09-08T17:53:21.583Z"
+          },
+          {
+            "id": "981543c9-adfa-4074-83d3-b5f2c2758a49",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.updated",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"name\":\"管理验收A 已改名 2026-09-08T17-53-20-441Z\",\"active\":false,\"previousVersion\":2}",
+            "createdAt": "2026-09-08T17:53:21.561Z"
+          },
+          {
+            "id": "51afb18f-7290-457d-ab33-c9ee1eb1cb01",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "membership.activated",
+            "subjectId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "summaryJson": "{\"active\":true,\"previousVersion\":2}",
+            "createdAt": "2026-09-08T17:53:21.554Z"
+          },
+          {
+            "id": "5554fffb-bd26-4877-9b8a-419c98c7d2c5",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.updated",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"name\":\"管理验收A 已改名 2026-09-08T17-53-20-441Z\",\"active\":true,\"previousVersion\":1}",
+            "createdAt": "2026-09-08T17:53:21.539Z"
+          },
+          {
+            "id": "012cb1c4-1f9b-46c1-bcca-073db385d3f0",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "membership.disabled",
+            "subjectId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "summaryJson": "{\"active\":false,\"previousVersion\":1}",
+            "createdAt": "2026-09-08T17:53:20.888Z"
+          },
+          {
+            "id": "f240cfcf-adbb-4e06-ae7e-27eac7552f2a",
+            "actorId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "action": "membership.activated",
+            "subjectId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "summaryJson": "{\"active\":true,\"previousVersion\":2}",
+            "createdAt": "2026-09-08T17:53:20.822Z"
+          },
+          {
+            "id": "c37c2afa-15ff-4019-af05-beb3cf271da9",
+            "actorId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "action": "membership.disabled",
+            "subjectId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "summaryJson": "{\"active\":false,\"previousVersion\":1}",
+            "createdAt": "2026-09-08T17:53:20.776Z"
+          },
+          {
+            "id": "f5ffecd9-5738-40d2-b167-1ac6e710748d",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "upload.incremental",
+            "summaryJson": "{\"enabled\":false,\"previousVersion\":1,\"changedConfigKeys\":[\"apiBase\",\"credentialRef\",\"defaults\",\"loginBase\",\"releaseDirectoryPrefix\",\"sourceUrl\",\"targetPrefix\",\"testDirectoryPrefix\"]}",
+            "createdAt": "2026-09-08T17:53:20.751Z"
+          },
+          {
+            "id": "e2cd8401-d219-4536-9144-c7bfd987612c",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build",
+            "summaryJson": "{\"enabled\":false,\"previousVersion\":2,\"changedConfigKeys\":[\"artifactUrlTemplate\",\"baseUrl\",\"credentialRef\",\"downloadOrigin\",\"job\",\"presets\",\"zipPath\"]}",
+            "createdAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "id": "9b6f9b08-0b7f-4e5f-b6cb-23ba8d63b324",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.dependency_disabled",
+            "subjectId": "build_upload.single",
+            "summaryJson": "{\"dependency\":\"build\"}",
+            "createdAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "id": "0cddb4e2-de25-474d-a949-e1e6b9cb7770",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build_upload.single",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":0,\"changedConfigKeys\":[\"buildPreset\"]}",
+            "createdAt": "2026-09-08T17:53:20.707Z"
+          },
+          {
+            "id": "ba3cc239-5097-40b6-875a-c4bd263a6aef",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "upload.incremental",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":0,\"changedConfigKeys\":[\"apiBase\",\"credentialRef\",\"defaults\",\"loginBase\",\"releaseDirectoryPrefix\",\"sourceUrl\",\"targetPrefix\",\"testDirectoryPrefix\"]}",
+            "createdAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "id": "13c70709-be0b-4287-8e17-ab860e93a5fc",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":1,\"changedConfigKeys\":[\"artifactUrlTemplate\",\"baseUrl\",\"credentialRef\",\"downloadOrigin\",\"job\",\"presets\",\"zipPath\"]}",
+            "createdAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "id": "364d3a70-2015-4891-ac0b-af215b8630e0",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":0,\"changedConfigKeys\":[]}",
+            "createdAt": "2026-09-08T17:53:20.664Z"
+          },
+          {
+            "id": "1b40c07d-d408-4662-9c25-1c4e7f607fa9",
+            "actorId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "action": "membership.joined",
+            "subjectId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.618Z"
+          },
+          {
+            "id": "20e67b71-8322-4f03-b02f-2e7156f53c5d",
+            "actorId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "action": "membership.joined",
+            "subjectId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.598Z"
+          },
+          {
+            "id": "db5e5a85-06e2-4916-b993-3d470189421b",
+            "actorId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "action": "membership.joined",
+            "subjectId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.571Z"
+          },
+          {
+            "id": "7f8659b6-c6a3-404d-b979-d75a25f1d114",
+            "actorId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "action": "membership.joined",
+            "subjectId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.560Z"
+          },
+          {
+            "id": "daf56f98-3c1c-4cb6-800c-7df7ab57d9b4",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.created",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"key\":\"MA1788890000532\",\"name\":\"管理验收A 2026-09-08T17-53-20-441Z\"}",
+            "createdAt": "2026-09-08T17:53:20.537Z"
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:21.592Z"
+    },
+    {
+      "label": "management events are recorded",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "projectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+        "items": [
+          {
+            "id": "caba941e-31ab-47b5-ad39-7884c49e3003",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.updated",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"name\":\"管理验收A 已改名 2026-09-08T17-53-20-441Z\",\"active\":true,\"previousVersion\":3}",
+            "createdAt": "2026-09-08T17:53:21.583Z"
+          },
+          {
+            "id": "981543c9-adfa-4074-83d3-b5f2c2758a49",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.updated",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"name\":\"管理验收A 已改名 2026-09-08T17-53-20-441Z\",\"active\":false,\"previousVersion\":2}",
+            "createdAt": "2026-09-08T17:53:21.561Z"
+          },
+          {
+            "id": "51afb18f-7290-457d-ab33-c9ee1eb1cb01",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "membership.activated",
+            "subjectId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "summaryJson": "{\"active\":true,\"previousVersion\":2}",
+            "createdAt": "2026-09-08T17:53:21.554Z"
+          },
+          {
+            "id": "5554fffb-bd26-4877-9b8a-419c98c7d2c5",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.updated",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"name\":\"管理验收A 已改名 2026-09-08T17-53-20-441Z\",\"active\":true,\"previousVersion\":1}",
+            "createdAt": "2026-09-08T17:53:21.539Z"
+          },
+          {
+            "id": "012cb1c4-1f9b-46c1-bcca-073db385d3f0",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "membership.disabled",
+            "subjectId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "summaryJson": "{\"active\":false,\"previousVersion\":1}",
+            "createdAt": "2026-09-08T17:53:20.888Z"
+          },
+          {
+            "id": "f240cfcf-adbb-4e06-ae7e-27eac7552f2a",
+            "actorId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "action": "membership.activated",
+            "subjectId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "summaryJson": "{\"active\":true,\"previousVersion\":2}",
+            "createdAt": "2026-09-08T17:53:20.822Z"
+          },
+          {
+            "id": "c37c2afa-15ff-4019-af05-beb3cf271da9",
+            "actorId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "action": "membership.disabled",
+            "subjectId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "summaryJson": "{\"active\":false,\"previousVersion\":1}",
+            "createdAt": "2026-09-08T17:53:20.776Z"
+          },
+          {
+            "id": "f5ffecd9-5738-40d2-b167-1ac6e710748d",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "upload.incremental",
+            "summaryJson": "{\"enabled\":false,\"previousVersion\":1,\"changedConfigKeys\":[\"apiBase\",\"credentialRef\",\"defaults\",\"loginBase\",\"releaseDirectoryPrefix\",\"sourceUrl\",\"targetPrefix\",\"testDirectoryPrefix\"]}",
+            "createdAt": "2026-09-08T17:53:20.751Z"
+          },
+          {
+            "id": "e2cd8401-d219-4536-9144-c7bfd987612c",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build",
+            "summaryJson": "{\"enabled\":false,\"previousVersion\":2,\"changedConfigKeys\":[\"artifactUrlTemplate\",\"baseUrl\",\"credentialRef\",\"downloadOrigin\",\"job\",\"presets\",\"zipPath\"]}",
+            "createdAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "id": "9b6f9b08-0b7f-4e5f-b6cb-23ba8d63b324",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.dependency_disabled",
+            "subjectId": "build_upload.single",
+            "summaryJson": "{\"dependency\":\"build\"}",
+            "createdAt": "2026-09-08T17:53:20.737Z"
+          },
+          {
+            "id": "0cddb4e2-de25-474d-a949-e1e6b9cb7770",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build_upload.single",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":0,\"changedConfigKeys\":[\"buildPreset\"]}",
+            "createdAt": "2026-09-08T17:53:20.707Z"
+          },
+          {
+            "id": "ba3cc239-5097-40b6-875a-c4bd263a6aef",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "upload.incremental",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":0,\"changedConfigKeys\":[\"apiBase\",\"credentialRef\",\"defaults\",\"loginBase\",\"releaseDirectoryPrefix\",\"sourceUrl\",\"targetPrefix\",\"testDirectoryPrefix\"]}",
+            "createdAt": "2026-09-08T17:53:20.694Z"
+          },
+          {
+            "id": "13c70709-be0b-4287-8e17-ab860e93a5fc",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":1,\"changedConfigKeys\":[\"artifactUrlTemplate\",\"baseUrl\",\"credentialRef\",\"downloadOrigin\",\"job\",\"presets\",\"zipPath\"]}",
+            "createdAt": "2026-09-08T17:53:20.681Z"
+          },
+          {
+            "id": "364d3a70-2015-4891-ac0b-af215b8630e0",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "component.updated",
+            "subjectId": "build",
+            "summaryJson": "{\"enabled\":true,\"previousVersion\":0,\"changedConfigKeys\":[]}",
+            "createdAt": "2026-09-08T17:53:20.664Z"
+          },
+          {
+            "id": "1b40c07d-d408-4662-9c25-1c4e7f607fa9",
+            "actorId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "action": "membership.joined",
+            "subjectId": "ee684be3-87b6-422d-86f6-f87acc496c2f",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.618Z"
+          },
+          {
+            "id": "20e67b71-8322-4f03-b02f-2e7156f53c5d",
+            "actorId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "action": "membership.joined",
+            "subjectId": "ac4e8471-5b65-4a16-8328-5f65783337bc",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.598Z"
+          },
+          {
+            "id": "db5e5a85-06e2-4916-b993-3d470189421b",
+            "actorId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "action": "membership.joined",
+            "subjectId": "592acc25-d9f3-457a-8e6b-cadb52897fbd",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.571Z"
+          },
+          {
+            "id": "7f8659b6-c6a3-404d-b979-d75a25f1d114",
+            "actorId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "action": "membership.joined",
+            "subjectId": "12e9f2b4-0380-40e7-8bf2-ee7b2c774085",
+            "summaryJson": "{\"status\":\"active\"}",
+            "createdAt": "2026-09-08T17:53:20.560Z"
+          },
+          {
+            "id": "daf56f98-3c1c-4cb6-800c-7df7ab57d9b4",
+            "actorId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "action": "project.created",
+            "subjectId": "5f00f444-8c48-4aea-9e66-659ea0a1b04f",
+            "summaryJson": "{\"key\":\"MA1788890000532\",\"name\":\"管理验收A 2026-09-08T17-53-20-441Z\"}",
+            "createdAt": "2026-09-08T17:53:20.537Z"
+          }
+        ]
+      },
+      "at": "2026-09-08T17:53:21.592Z"
+    },
+    {
+      "label": "no execution was dispatched by all configuration changes",
+      "kind": "assertion",
+      "passed": true,
+      "detail": {
+        "outbound": []
+      },
+      "at": "2026-09-08T17:53:21.592Z"
+    }
+  ]
+}

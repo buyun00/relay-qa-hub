@@ -46,6 +46,8 @@ export interface LoginBrowserSessionInput {
 export interface CreateBrowserSessionInput {
   readonly accountId: string;
   readonly userId: string;
+  readonly projectId?: string;
+  readonly isGm?: boolean;
   readonly sessionId: string;
   readonly tokenDigest: string;
   readonly issuedAt: string;
@@ -70,6 +72,8 @@ export interface BrowserPrincipal {
   readonly actorId: string;
   readonly email: string;
   readonly displayName: string;
+  readonly projectId?: string;
+  readonly isGm?: boolean;
 }
 
 export interface ActiveAccountUser {
@@ -315,12 +319,23 @@ export function createBrowserSession(
       }
     | undefined;
   if (!row) authenticationFailed();
+  if (
+    input.projectId !== undefined &&
+    !database
+      .prepare(
+        `SELECT 1 FROM projects AS project
+    WHERE project.account_id = ? AND project.id = ? AND project.status = 'active'
+    AND (? = 1 OR EXISTS (SELECT 1 FROM memberships WHERE account_id = project.account_id AND project_id = project.id AND user_id = ? AND status = 'active'))`,
+      )
+      .get(input.accountId, input.projectId, input.isGm ? 1 : 0, input.userId)
+  )
+    authenticationFailed();
   database
     .prepare(
       `INSERT INTO browser_sessions(
         id, account_id, user_id, token_digest, issued_at, expires_at,
-        last_seen_at, revoked_at, revoked_reason, version
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, 1)`,
+        last_seen_at, revoked_at, revoked_reason, version, login_project_id, is_gm
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, 1, ?, ?)`,
     )
     .run(
       input.sessionId,
@@ -330,6 +345,8 @@ export function createBrowserSession(
       input.issuedAt,
       input.expiresAt,
       input.lastSeenAt ?? input.issuedAt,
+      input.projectId ?? null,
+      input.isGm ? 1 : 0,
     );
   return Object.freeze({
     accountId: input.accountId,
@@ -337,6 +354,8 @@ export function createBrowserSession(
     actorId: row.user_id,
     email: row.email,
     displayName: row.display_name,
+    ...(input.projectId === undefined ? {} : { projectId: input.projectId }),
+    ...(input.isGm ? { isGm: true } : {}),
   });
 }
 
@@ -349,6 +368,8 @@ export function resolveBrowserSession(
     .prepare(
       `SELECT session.account_id AS account_id,
               session.user_id AS user_id,
+              session.login_project_id AS login_project_id,
+              session.is_gm AS is_gm,
               user.email AS email,
               user.display_name AS display_name
        FROM browser_sessions AS session
@@ -366,6 +387,8 @@ export function resolveBrowserSession(
     | {
         readonly account_id: string;
         readonly user_id: string;
+        readonly login_project_id: string | null;
+        readonly is_gm: number;
         readonly email: string;
         readonly display_name: string;
       }
@@ -377,6 +400,8 @@ export function resolveBrowserSession(
     actorId: row.user_id,
     email: row.email,
     displayName: row.display_name,
+    ...(row.login_project_id === null ? {} : { projectId: row.login_project_id }),
+    ...(row.is_gm === 1 ? { isGm: true } : {}),
   });
 }
 

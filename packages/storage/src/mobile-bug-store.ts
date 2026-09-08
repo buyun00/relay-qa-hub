@@ -208,12 +208,12 @@ function assertInitialAssignment(
     .prepare(
       `SELECT 1 AS assignable
        FROM users AS user
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = user.account_id
         AND membership.user_id = user.id
         AND membership.project_id = ?
         AND membership.status = 'active'
-       JOIN membership_roles AS role
+       JOIN command_project_roles AS role
          ON role.account_id = membership.account_id
         AND role.project_id = membership.project_id
         AND role.membership_id = membership.id
@@ -301,13 +301,21 @@ export function ensureMobileScope(database: DatabaseSync, scope: MobileScopeBoot
       scope.createdAt,
       scope.createdAt,
     );
-  database
-    .prepare(
-      `INSERT OR IGNORE INTO membership_roles(
-        account_id, project_id, membership_id, role, granted_at
-      ) VALUES (?, ?, ?, 'reporter', ?)`,
-    )
-    .run(scope.accountId, scope.projectId, scope.membershipId, scope.createdAt);
+  for (const role of [
+    "viewer",
+    "reporter",
+    "developer",
+    "verifier",
+    "triager",
+    "release_manager",
+    "project_admin",
+  ]) {
+    database
+      .prepare(
+        `INSERT OR IGNORE INTO membership_roles(account_id, project_id, membership_id, role, granted_at) VALUES (?, ?, ?, ?, ?)`,
+      )
+      .run(scope.accountId, scope.projectId, scope.membershipId, role, scope.createdAt);
+  }
 
   const exact = database
     .prepare(
@@ -798,7 +806,7 @@ export function deleteMobileBug(
        JOIN users AS actor
          ON actor.account_id = account.id
         AND actor.id = ? AND actor.status = 'active'
-       JOIN memberships AS member
+       JOIN command_project_memberships AS member
          ON member.account_id = account.id
         AND member.project_id = project.id
         AND member.user_id = actor.id

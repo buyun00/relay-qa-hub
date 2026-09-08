@@ -1,4 +1,5 @@
 import { projectRelayDeliveries, processRelayReworkRequests } from "./relay-lifecycle-store.js";
+import { projectRelayQueue, relayComponentEnabled } from "./project-relay-queue.js";
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
@@ -276,7 +277,14 @@ export interface GetMobileManualRepairAttemptInput extends MobileRelayScope {
   readonly attemptId: string;
 }
 
+export interface MobileRelayComponentRoute {
+  readonly componentVersion: number;
+  readonly snapshotDigest: string;
+  readonly externalProjectKey: string;
+}
+
 export interface DispatchMobileRelayInput extends MobileRelayScope {
+  readonly componentRoute?: MobileRelayComponentRoute;
   readonly previousHandoffId?: string;
   readonly execution?: Readonly<Record<string, unknown>>;
   readonly attemptId: string;
@@ -293,6 +301,7 @@ export interface DispatchMobileRelayInput extends MobileRelayScope {
 }
 
 export interface ContinueMobileRelayInput extends MobileRelayScope {
+  readonly componentRoute?: MobileRelayComponentRoute;
   /** Internal use only, after the exact human Verification has passed. */
   readonly operation?: "accept";
   readonly attemptId: string;
@@ -369,6 +378,9 @@ export interface MobileRelayReceipt {
 }
 
 export interface MobileRelayOutboxClaim {
+  readonly accountId?: string;
+  readonly projectId?: string;
+  readonly componentRoute?: MobileRelayComponentRoute;
   readonly previousHandoffId?: string;
   readonly execution?: Readonly<Record<string, unknown>>;
   readonly outboxMessageId: string;
@@ -1090,7 +1102,7 @@ function assertBugUpdateActor(database: DatabaseSync, input: UpdateMobileBugInpu
          ON actor.account_id = account_row.id
         AND actor.id = ?
         AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account_row.id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
@@ -1125,12 +1137,12 @@ function assertAssignableMember(
          ON assigned_user.account_id = account_row.id
         AND assigned_user.id = ?
         AND assigned_user.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account_row.id
         AND membership.project_id = project.id
         AND membership.user_id = assigned_user.id
         AND membership.status = 'active'
-       JOIN membership_roles AS role
+       JOIN command_project_roles AS role
          ON role.account_id = membership.account_id
         AND role.project_id = membership.project_id
         AND role.membership_id = membership.id
@@ -1697,12 +1709,12 @@ function assertRepairAttemptAssignee(
          ON assignee.account_id = account.id
         AND assignee.id = ?
         AND assignee.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = assignee.id
         AND membership.status = 'active'
-       JOIN membership_roles AS role
+       JOIN command_project_roles AS role
          ON role.account_id = membership.account_id
         AND role.project_id = membership.project_id
         AND role.membership_id = membership.id
@@ -2524,7 +2536,7 @@ export function completeMobileBugForVerification(
          ON user.account_id = account.id
         AND user.id = ?
         AND user.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = user.id
@@ -3110,6 +3122,51 @@ function readDispatchReplay(
   });
 }
 
+function resolveComponentRoute(
+  database: DatabaseSync,
+  input: MobileRelayScope & { readonly componentRoute?: MobileRelayComponentRoute },
+  handoffId?: string,
+): MobileRelayComponentRoute | undefined {
+  const previous = handoffId
+    ? (database
+        .prepare(
+          `SELECT json_extract(payload_json, '$.componentRoute') AS route FROM outbox
+    WHERE account_id=? AND project_id=? AND json_extract(payload_json, '$.handoffId')=?
+      AND json_extract(payload_json, '$.operation')='create' ORDER BY created_at,id LIMIT 1`,
+        )
+        .get(input.accountId, input.projectId, handoffId) as { route: string | null } | undefined)
+    : undefined;
+  const inherited = previous?.route
+    ? (JSON.parse(previous.route) as MobileRelayComponentRoute)
+    : undefined;
+  const route = input.componentRoute ?? inherited;
+  if (!route) return undefined;
+  if (
+    !Number.isSafeInteger(route.componentVersion) ||
+    route.componentVersion < 1 ||
+    !SHA256_PATTERN.test(route.snapshotDigest) ||
+    !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/u.test(route.externalProjectKey)
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Relay component snapshot is invalid");
+  }
+  if (
+    inherited &&
+    (inherited.componentVersion !== route.componentVersion ||
+      inherited.snapshotDigest !== route.snapshotDigest ||
+      inherited.externalProjectKey !== route.externalProjectKey)
+  ) {
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Relay handoff must retain its original component snapshot",
+    );
+  }
+  return Object.freeze({
+    componentVersion: route.componentVersion,
+    snapshotDigest: route.snapshotDigest,
+    externalProjectKey: route.externalProjectKey,
+  });
+}
+
 export function dispatchMobileRelay(
   database: DatabaseSync,
   input: DispatchMobileRelayInput,
@@ -3117,6 +3174,17 @@ export function dispatchMobileRelay(
   requireTransaction(database);
   const replay = readDispatchReplay(database, input);
   if (replay) return replay;
+  const componentRoute = resolveComponentRoute(database, input, input.previousHandoffId);
+  if (
+    componentRoute &&
+    (!input.relayInstanceId ||
+      !input.qaInstanceId ||
+      !relayComponentEnabled(database, input.accountId, input.projectId))
+  )
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "Relay component is disabled or its instance binding is missing",
+    );
   const relayInstanceId = relayInstanceIdFor(input);
   const qaInstanceId = qaInstanceIdFor(input);
   const relayPrincipalId = relayPrincipalIdFor(input);
@@ -3159,7 +3227,7 @@ export function dispatchMobileRelay(
     id: bugFacts.id,
     key: bugFacts.key,
     revision: bugFacts.version,
-    projectKey: project.project_key,
+    projectKey: componentRoute?.externalProjectKey ?? project.project_key,
     title: bugFacts.title,
     description: bugFacts.description,
     severity: bugFacts.severity,
@@ -3240,7 +3308,7 @@ export function dispatchMobileRelay(
         relayInstanceId,
         qaInstanceId,
         relayPrincipalId,
-        projectKey: project.project_key,
+        projectKey: componentRoute?.externalProjectKey ?? project.project_key,
       }),
       at,
       at,
@@ -3291,6 +3359,7 @@ export function dispatchMobileRelay(
       eventId,
       JSON.stringify({
         operation: "create",
+        ...(componentRoute ? { componentRoute, projectId: input.projectId } : {}),
         ...(input.previousHandoffId ? { previousHandoffId: input.previousHandoffId } : {}),
         bugId: attempt.bug_id,
         ...(input.execution === undefined ? {} : { execution: input.execution }),
@@ -3298,7 +3367,7 @@ export function dispatchMobileRelay(
         handoffId: input.handoffId,
         relayInstanceId,
         qaInstanceId,
-        projectKey: project.project_key,
+        projectKey: componentRoute?.externalProjectKey ?? project.project_key,
         defect,
         selectedAttachments: attachments,
         selectedAttachmentIds: input.selectedAttachmentIds,
@@ -3347,6 +3416,7 @@ export function continueMobileRelay(
   input: ContinueMobileRelayInput,
 ): MobileRelayContinueAccepted {
   requireTransaction(database);
+  const componentRoute = resolveComponentRoute(database, input, input.handoffId);
   const relayInstanceId = relayInstanceIdFor(input);
   const qaInstanceId = qaInstanceIdFor(input);
   if (qaInstanceId === null) {
@@ -3531,6 +3601,7 @@ export function continueMobileRelay(
       eventId,
       JSON.stringify({
         operation: input.operation ?? "continue",
+        ...(componentRoute ? { componentRoute, projectId: input.projectId } : {}),
         bugId: receipt.bug_id,
         repairAttemptId: input.attemptId,
         handoffId: input.handoffId,
@@ -3556,6 +3627,13 @@ export function continueMobileRelay(
     operation: input.operation ?? "continue",
     replayed: false,
   });
+  if (componentRoute)
+    projectRelayQueue(database, {
+      operation: "pause",
+      accountId: input.accountId,
+      projectId: input.projectId,
+      now: at,
+    });
   database
     .prepare(
       `UPDATE idempotency_records
@@ -4078,11 +4156,45 @@ export function claimMobileRelayOutbox(
     readonly now: string;
     readonly leaseExpiresAt: string;
     readonly relayInstanceId?: string;
+    readonly accountId?: string;
+    readonly projectId?: string;
+    readonly componentVersion?: number;
+    readonly snapshotDigest?: string;
   },
 ): MobileRelayOutboxClaim | null {
   requireTransaction(database);
-  projectRelayDeliveries(database, input.now);
-  processRelayReworkRequests(database, input.now);
+  const scoped =
+    input.projectId !== undefined ||
+    input.componentVersion !== undefined ||
+    input.snapshotDigest !== undefined ||
+    input.accountId !== undefined;
+  if (
+    scoped &&
+    (!input.accountId ||
+      !input.projectId ||
+      !UUID_PATTERN.test(input.projectId) ||
+      !UUID_PATTERN.test(input.accountId) ||
+      !input.relayInstanceId ||
+      !Number.isSafeInteger(input.componentVersion) ||
+      Number(input.componentVersion) < 1 ||
+      !SHA256_PATTERN.test(input.snapshotDigest ?? ""))
+  ) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "Relay claim requires a complete immutable project snapshot",
+    );
+  }
+  if (scoped && !relayComponentEnabled(database, input.accountId!, input.projectId!)) {
+    projectRelayQueue(database, {
+      operation: "pause",
+      accountId: input.accountId!,
+      projectId: input.projectId!,
+      now: input.now,
+    });
+    return null;
+  }
+  projectRelayDeliveries(database, input.now, null, input);
+  processRelayReworkRequests(database, input.now, input);
   const relayInstanceId = relayInstanceIdFor(input);
   const row = database
     .prepare(
@@ -4096,9 +4208,19 @@ export function claimMobileRelayOutbox(
         AND receipt.repair_attempt_id = outbox.aggregate_id
         AND receipt.relay_instance_id = outbox.destination
        WHERE outbox.destination = ?
+         AND ((? = 0 AND json_extract(outbox.payload_json, '$.componentRoute') IS NULL)
+           OR (? = 1 AND outbox.account_id = ? AND outbox.project_id = ?
+             AND json_extract(outbox.payload_json, '$.projectId') = outbox.project_id
+             AND json_extract(outbox.payload_json, '$.componentRoute.componentVersion') = ?
+             AND json_extract(outbox.payload_json, '$.componentRoute.snapshotDigest') = ?
+             AND EXISTS (SELECT 1 FROM project_components AS component JOIN projects AS project
+               ON project.account_id=component.account_id AND project.id=component.project_id
+               WHERE component.account_id=outbox.account_id AND component.project_id=outbox.project_id
+                 AND component.component_key='relay.production' AND component.enabled=1 AND project.status='active')))
          AND (outbox.status IN ('pending', 'retry')
               OR (outbox.status = 'claimed' AND outbox.lease_expires_at <= ?))
-         AND outbox.next_attempt_at <= ?
+           AND outbox.next_attempt_at <= ?
+           AND COALESCE(outbox.last_error_code,'') <> 'COMPONENT_DISABLED_PAUSED'
          AND NOT EXISTS (
            SELECT 1
            FROM outbox AS earlier
@@ -4114,7 +4236,17 @@ export function claimMobileRelayOutbox(
        ORDER BY outbox.next_attempt_at, outbox.id
        LIMIT 1`,
     )
-    .get(relayInstanceId, input.now, input.now) as MobileRelayOutboxRow | undefined;
+    .get(
+      relayInstanceId,
+      scoped ? 1 : 0,
+      scoped ? 1 : 0,
+      input.accountId ?? null,
+      input.projectId ?? null,
+      input.componentVersion ?? null,
+      input.snapshotDigest ?? null,
+      input.now,
+      input.now,
+    ) as MobileRelayOutboxRow | undefined;
   if (!row) return null;
 
   let payload: Record<string, unknown>;
@@ -4208,11 +4340,14 @@ export function claimMobileRelayOutbox(
         ? "continue"
         : "create";
   const qaInstanceId = typeof payload.qaInstanceId === "string" ? payload.qaInstanceId : null;
+  const componentRoute = isRecord(payload.componentRoute)
+    ? (payload.componentRoute as unknown as MobileRelayComponentRoute)
+    : undefined;
   const defect = Object.freeze({
     id: bug.id,
     key: bug.key,
     revision: bug.version,
-    projectKey: project.project_key,
+    projectKey: componentRoute?.externalProjectKey ?? project.project_key,
     title: bug.title,
     description: bug.description,
     severity: bug.severity,
@@ -4220,12 +4355,15 @@ export function claimMobileRelayOutbox(
   });
   return Object.freeze({
     outboxMessageId: row.id,
+    accountId: row.account_id,
+    projectId: row.project_id,
+    ...(componentRoute ? { componentRoute } : {}),
     bugId,
     repairAttemptId,
     handoffId,
     relayInstanceId: row.destination,
     qaInstanceId,
-    projectKey: project.project_key,
+    projectKey: componentRoute?.externalProjectKey ?? project.project_key,
     defect: isRecord(payload.defect)
       ? (payload.defect as unknown as MobileRelayOutboxClaim["defect"])
       : defect,

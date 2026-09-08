@@ -1,0 +1,124 @@
+{
+  "recordedAt": "2026-09-08T18:25:33.746Z",
+  "scope": "Read-only Git and filesystem audit; only this evidence file and its companion Markdown were written. No schema/baseline modification or baseline rewrite.",
+  "result": "existing_failure",
+  "gateStatus": "failed",
+  "head": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+  "contractWorkingTreeStatus": "",
+  "contractTrackedDiffFromHead": "",
+  "contractStagedDiff": "",
+  "frozenBaseline": {
+    "path": "packages/contracts/baselines/contract-baseline.json",
+    "version": "1.0.0",
+    "frozenAt": "2026-08-24T09:31:43.013Z",
+    "canonicalWorkflowSha256": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+    "sameCanonicalJsonAsHead": true
+  },
+  "currentWorkflow": {
+    "path": "packages/contracts/schemas/workflow.schema.json",
+    "canonicalSha256": "38330d9691930409d4ac12c5384a51379748fb99c63df98e51c1ccbc02032b3c",
+    "sameCanonicalJsonAsHead": true,
+    "headGitBlob": "0dd4865cb5e8b050ebe97e907d8014d171fd5ad1"
+  },
+  "knownMatchingRevision": {
+    "commit": "525f81b3c87749e00b4118c866fb26a68c88175c",
+    "canonicalSha256": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+    "matchesFrozen": true
+  },
+  "firstChange": {
+    "commit": "abd3a861e9ab52839f4dc45e3e5db6a2dad6459e",
+    "metadata": "abd3a861e9ab52839f4dc45e3e5db6a2dad6459e\n2026-08-27T17:36:51+08:00\nfeat: preserve current QA Hub product mainline",
+    "parentCanonicalSha256": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+    "changedCanonicalSha256": "38330d9691930409d4ac12c5384a51379748fb99c63df98e51c1ccbc02032b3c",
+    "patch": "diff --git a/packages/contracts/schemas/workflow.schema.json b/packages/contracts/schemas/workflow.schema.json\nindex b1e71da..0dd4865 100644\n--- a/packages/contracts/schemas/workflow.schema.json\n+++ b/packages/contracts/schemas/workflow.schema.json\n@@ -178,6 +178,9 @@\n         \"branch\": { \"type\": [\"string\", \"null\"], \"maxLength\": 300 },\n         \"commitSha\": { \"type\": [\"string\", \"null\"], \"pattern\": \"^[0-9a-f]{40}$\" },\n         \"mergeRequestUrl\": { \"type\": [\"string\", \"null\"], \"format\": \"uri\" },\n+        \"patchUrl\": { \"type\": [\"string\", \"null\"], \"format\": \"uri\" },\n+        \"noCodeReason\": { \"type\": [\"string\", \"null\"], \"maxLength\": 5000 },\n+        \"failureReason\": { \"type\": [\"string\", \"null\"], \"maxLength\": 5000 },\n         \"targetBuildId\": {\n           \"oneOf\": [\n             { \"$ref\": \"https://qa-hub.local/contracts/common.schema.json#/$defs/uuid\" },\n@@ -217,6 +220,8 @@\n         \"verifierId\": { \"$ref\": \"https://qa-hub.local/contracts/common.schema.json#/$defs/uuid\" },\n         \"criteriaSnapshot\": { \"type\": \"string\", \"minLength\": 1, \"maxLength\": 10000 },\n         \"resultSummary\": { \"type\": [\"string\", \"null\"], \"maxLength\": 10000 },\n+        \"failureReason\": { \"type\": [\"string\", \"null\"], \"maxLength\": 5000 },\n+        \"blockedReason\": { \"type\": [\"string\", \"null\"], \"maxLength\": 5000 },\n         \"version\": { \"type\": \"integer\", \"minimum\": 1 }\n       }\n     },"
+  },
+  "headFrozenFileCheck": {
+    "count": 24,
+    "drifts": [
+      {
+        "file": "schemas/workflow.schema.json",
+        "expected": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+        "actual": "38330d9691930409d4ac12c5384a51379748fb99c63df98e51c1ccbc02032b3c"
+      }
+    ]
+  },
+  "semanticChanges": [
+    {
+      "path": "/$defs/repairAttempt/properties/patchUrl",
+      "before": "absent",
+      "after": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uri"
+      },
+      "required": false,
+      "previousAdditionalProperties": false
+    },
+    {
+      "path": "/$defs/repairAttempt/properties/noCodeReason",
+      "before": "absent",
+      "after": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 5000
+      },
+      "required": false,
+      "previousAdditionalProperties": false
+    },
+    {
+      "path": "/$defs/repairAttempt/properties/failureReason",
+      "before": "absent",
+      "after": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 5000
+      },
+      "required": false,
+      "previousAdditionalProperties": false
+    },
+    {
+      "path": "/$defs/verification/properties/failureReason",
+      "before": "absent",
+      "after": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 5000
+      },
+      "required": false,
+      "previousAdditionalProperties": false
+    },
+    {
+      "path": "/$defs/verification/properties/blockedReason",
+      "before": "absent",
+      "after": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 5000
+      },
+      "required": false,
+      "previousAdditionalProperties": false
+    }
+  ],
+  "onlyFivePropertyAdditions": true,
+  "interpretation": "Five optional nullable response properties were added. Existing required fields, commands and transitions are unchanged in this schema diff. Both affected objects have additionalProperties:false; frozen validators reject objects containing these added fields, whereas HEAD validators accept them. This is an unresolved strict frozen-contract drift and requires compatibility review; calling it additive is not a gate pass.",
+  "evidence": "runs/contracts-final-retry.txt",
+  "gateSequence": {
+    "checkContracts": "passed in existing root log",
+    "checkContractBreaking": "failed: schemas/workflow.schema.json canonical contract changed",
+    "remainingThreeContractChecks": "not reached by the && chain in the cited invocation"
+  },
+  "untouched": {
+    "schema": true,
+    "baseline": true
+  }
+}

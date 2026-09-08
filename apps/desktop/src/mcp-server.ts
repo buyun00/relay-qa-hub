@@ -2,12 +2,12 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 
 import { QA_HUB_MCP_TOOLS, QaHubMcpError, type QaHubMcpTools } from "./mcp-api.js";
 
-const MAX_REQUEST_BYTES = 1024 * 1024;
-const SUPPORTED_PROTOCOL_VERSIONS = new Set(["2025-06-18", "2025-03-26", "2024-11-05"]);
+const MAX_REQUEST_BYTES = 36 * 1024 * 1024;
+const SUPPORTED_PROTOCOL_VERSIONS = new Set(["2025-06-18"]);
 const LATEST_PROTOCOL_VERSION = "2025-06-18";
 
 export const QA_HUB_MCP_INSTRUCTIONS =
-  "QA Hub 是 Bug 生命周期唯一事实源。先调用 qa_list_projects、qa_list_bugs 和 qa_get_bug_context；需要修复时调用 qa_begin_fix，然后在编辑器内做窄改动、运行真实验证、提交 Git，再用 qa_submit_fix 回写实际命令与提交 SHA。qa_submit_fix 记录代码交付，任务对用户显示为已完成待验收，精确构建匹配仍作为内部验收证据；进入已完成待验收后项目内任意已登录成员都能在详情中直接关闭，也能从详情删除单子，不再检查提报人、负责人或关闭人身份。验收通过会先自动把关联轻语单同步为已解决；需要单独补同步时，调用 qa_resolve_qingyu_bug 并传入 QA Hub 单号，它只解决关联轻语单，不替代本地验收。不要报告未执行的测试，不要抢占他人单子。附件先用 qa_materialize_attachment 下载并校验。";
+  "先用项目姓名登录，再列出自己的项目。每个工具必须使用明确项目；本地 MCP 与独立服务端 MCP 共用 HTTP 业务。Bug 人工完成、验收通过、退回和关闭独立于五项可选组件。代码交付和第三方同步不代表验收关闭。附件 materialize 在本地校验后返回作用域隔离的文件。不要报告未执行的验证。";
 
 type JsonRpcId = string | number;
 
@@ -28,7 +28,8 @@ export interface QaHubMcpServerStatus {
 
 export interface QaHubMcpServerOptions {
   readonly port: number;
-  readonly tools: Pick<QaHubMcpTools, "definitions" | "call">;
+  readonly tools: Pick<QaHubMcpTools, "definitions" | "call"> &
+    Partial<Pick<QaHubMcpTools, "refreshDefinitions">>;
   readonly serverVersion: string;
   readonly onStatus?: (status: QaHubMcpServerStatus) => void;
 }
@@ -102,7 +103,7 @@ async function readRequestBody(request: IncomingMessage): Promise<Uint8Array> {
     const chunk = Buffer.isBuffer(value) ? value : Buffer.from(value as Uint8Array);
     total += chunk.length;
     if (total > MAX_REQUEST_BYTES) {
-      throw new QaHubMcpError("MCP_REQUEST_TOO_LARGE", "MCP request exceeded 1 MiB", 413);
+      throw new QaHubMcpError("MCP_REQUEST_TOO_LARGE", "MCP request exceeded 36 MiB", 413);
     }
     chunks.push(chunk);
   }
@@ -117,6 +118,12 @@ function parseRequest(value: unknown): JsonRpcRequest {
   if (id !== undefined && typeof id !== "string" && typeof id !== "number") {
     throw new QaHubMcpError("MCP_INVALID_REQUEST", "JSON-RPC id must be a string or number", 400);
   }
+  if (typeof id === "number" && !Number.isSafeInteger(id))
+    throw new QaHubMcpError(
+      "MCP_INVALID_REQUEST",
+      "JSON-RPC numeric id must be a safe integer",
+      400,
+    );
   return {
     jsonrpc: "2.0",
     ...(id === undefined ? {} : { id }),
@@ -194,22 +201,84 @@ export class QaHubMcpHttpServer {
           return jsonRpcError(request.id, -32602, "initialize params must be an object");
         }
         const requestedVersion = request.params["protocolVersion"];
-        if (typeof requestedVersion !== "string") {
-          return jsonRpcError(request.id, -32602, "protocolVersion is required");
+        const clientInfo = request.params["clientInfo"];
+        if (
+          typeof requestedVersion !== "string" ||
+          !requestedVersion ||
+          !isRecord(request.params["capabilities"]) ||
+          !isRecord(clientInfo) ||
+          typeof clientInfo["name"] !== "string" ||
+          !clientInfo["name"] ||
+          typeof clientInfo["version"] !== "string" ||
+          !clientInfo["version"]
+        ) {
+          return jsonRpcError(
+            request.id,
+            -32602,
+            "protocolVersion, capabilities and clientInfo are required",
+          );
         }
         const protocolVersion = SUPPORTED_PROTOCOL_VERSIONS.has(requestedVersion)
           ? requestedVersion
           : LATEST_PROTOCOL_VERSION;
         return jsonRpcResult(request.id, {
           protocolVersion,
-          capabilities: { tools: { listChanged: false } },
-          serverInfo: { name: "relay-qa-hub-desktop", version: this.options.serverVersion },
+          capabilities: {
+            tools: { listChanged: false },
+            resources: { subscribe: false, listChanged: false },
+          },
+          serverInfo: { name: "qa-hub-desktop-preview", version: this.options.serverVersion },
           instructions: QA_HUB_MCP_INSTRUCTIONS,
         });
       }
       case "ping":
         return jsonRpcResult(request.id, {});
+      case "resources/list":
+        return jsonRpcResult(request.id, { resources: [] });
+      case "resources/templates/list":
+        return jsonRpcResult(request.id, {
+          resourceTemplates: [
+            {
+              uriTemplate: "qa-hub://attachment/{projectId}/{bugId}/{attachmentId}",
+              name: "Project Bug attachment",
+            },
+          ],
+        });
+      case "resources/read": {
+        const uri = isRecord(request.params) ? request.params["uri"] : undefined;
+        const match =
+          typeof uri === "string"
+            ? /^qa-hub:\/\/attachment\/([a-f0-9-]{36})\/([a-f0-9-]{36})\/([a-f0-9-]{36})$/iu.exec(
+                uri,
+              )
+            : null;
+        if (!match) return jsonRpcError(request.id, -32602, "Invalid resource URI");
+        try {
+          await this.options.tools.refreshDefinitions?.();
+          const value = await this.options.tools.call("qa_read_attachment", {
+            projectId: match[1],
+            bugId: match[2],
+            attachmentId: match[3],
+          });
+          if (!isRecord(value))
+            throw new QaHubMcpError("RESOURCE_INVALID", "Invalid attachment resource");
+          return jsonRpcResult(request.id, {
+            contents: [{ uri, mimeType: value["mimeType"], blob: value["blob"] }],
+          });
+        } catch (error) {
+          return jsonRpcError(
+            request.id,
+            -32002,
+            error instanceof QaHubMcpError ? error.code : "RESOURCE_READ_FAILED",
+          );
+        }
+      }
       case "tools/list":
+        try {
+          await this.options.tools.refreshDefinitions?.();
+        } catch {
+          return jsonRpcError(request.id, -32001, "QA Hub server tool catalog is unavailable");
+        }
         return jsonRpcResult(request.id, { tools: this.options.tools.definitions });
       case "tools/call": {
         if (!isRecord(request.params) || typeof request.params["name"] !== "string") {
@@ -260,6 +329,14 @@ export class QaHubMcpHttpServer {
     if (request.method !== "POST") {
       response.setHeader("Allow", "POST");
       sendJson(response, 405, { code: "MCP_METHOD_NOT_ALLOWED" });
+      return;
+    }
+    const protocolVersion = request.headers["mcp-protocol-version"];
+    if (
+      protocolVersion !== undefined &&
+      (typeof protocolVersion !== "string" || !SUPPORTED_PROTOCOL_VERSIONS.has(protocolVersion))
+    ) {
+      sendJson(response, 400, { code: "MCP_PROTOCOL_VERSION_UNSUPPORTED" });
       return;
     }
     const contentType = request.headers["content-type"]?.split(";", 1)[0]?.trim().toLowerCase();

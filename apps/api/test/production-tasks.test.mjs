@@ -7,7 +7,7 @@ import test from "node:test";
 import { ProductionTasks, registerProductionRoutes } from "../dist/production-tasks.js";
 import Fastify from "fastify";
 
-async function fixture(t) {
+async function fixture(t, component = {}) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "qa-production-"));
   const bugs = new Map(
     Array.from({ length: 8 }, (_, i) => [
@@ -43,6 +43,16 @@ async function fixture(t) {
   };
   const stores = {
     projects: {
+      getProjectAccess: async ({ actorId, projectId }) =>
+        actorId === "outsider" || projectId !== "project-1"
+          ? null
+          : {
+              projectId,
+              projectKey: "LOCAL",
+              actorId,
+              actorName: actorId === "viewer" ? "观察" : "开发",
+              roles: actorId === "viewer" ? ["viewer"] : ["developer"],
+            },
       listProjects: async ({ actorId }) => ({
         items:
           actorId === "outsider"
@@ -135,6 +145,7 @@ async function fixture(t) {
     endpoint: "http://127.0.0.1:4317",
     bearerToken: "fixture-only",
     qaInstanceId: "qa-local",
+    ...component,
   };
   const services = [];
   const create = () => {
@@ -153,6 +164,7 @@ async function fixture(t) {
     tasks,
     mutations,
     bugs,
+    config,
     resolveFailure: () => {
       failBug = null;
     },
@@ -166,6 +178,41 @@ async function settled(service, id) {
   }
   throw new Error("Batch did not settle");
 }
+
+test("project component pauses queued work without reenable replay and retains local history", async (t) => {
+  let enabled = true;
+  const f = await fixture(t, {
+    projectId: "project-1",
+    componentVersion: 7,
+    externalProjectKey: "isolated-relay",
+    canStart: async () => enabled,
+  });
+  // Keep accepted intent queued so the disable transition is deterministic.
+  await f.service.close();
+  const initial = await f.service.submit("user-1", {
+    projectId: "project-1",
+    requestId: "paused-component",
+    kind: "bugs",
+    items: [{ bugId: "bug-0" }],
+  });
+  enabled = false;
+  await f.service.pausePending();
+  assert.equal((await f.service.history("viewer", "project-1")).items[0].status, "paused");
+  const restarted = f.create();
+  enabled = true;
+  assert.equal((await restarted.history("viewer", "project-1")).items[0].componentVersion, 7);
+  assert.equal((await restarted.history("viewer", "project-1")).items[0].status, "paused");
+  assert.equal(f.calls.length, 0, "enable and local history do not issue external mutations");
+  enabled = false;
+  await assert.rejects(restarted.tasks("user-1", "project-1"), { code: "COMPONENT_DISABLED" });
+  await assert.rejects(restarted.batch("user-1", "project-1", initial.id, true), {
+    code: "COMPONENT_DISABLED",
+  });
+  enabled = true;
+  await restarted.batch("user-1", "project-1", initial.id, true);
+  assert.equal((await settled(restarted, initial.id)).status, "completed");
+  await assert.rejects(restarted.history("user-1", "project-2"), { code: "PROJECT_FORBIDDEN" });
+});
 test("eight bugs keep independent results, resume failed steps, and never resubmit successes", async (t) => {
   const f = await fixture(t),
     input = {

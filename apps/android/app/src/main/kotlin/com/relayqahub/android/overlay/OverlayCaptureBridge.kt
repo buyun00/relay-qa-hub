@@ -30,7 +30,7 @@ data class OverlayCaptureRequest(
  */
 object OverlayCaptureBridge {
     private const val ACTION_CAPTURE_COMMAND =
-        "com.relayqahub.android.overlay.action.CAPTURE_COMMAND"
+        "com.relayqahub.android.preview.overlay.action.CAPTURE_COMMAND"
     private const val EXTRA_COMMAND = "command"
     private const val EXTRA_CAPTURE_ID = "captureId"
     private const val EXTRA_REQUESTED_AT_EPOCH_MS = "requestedAtEpochMs"

@@ -1,0 +1,39 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug typecheck
+npm notice run npm run typecheck --workspaces --if-present
+npm notice run @relay-qa-hub/api@0.1.0-debug typecheck
+npm notice run tsc -p tsconfig.json --noEmit
+npm notice run @relay-qa-hub/desktop@3.3.5 typecheck
+npm notice run @relay-qa-hub/web@3.3.5 typecheck
+npm notice run tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit
+vite.config.ts(50,5): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '{ "/api": { target: string; changeOrigin: boolean; ws: boolean; }; } | { "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions> | undefined'.
+      Type '{ "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions>'.
+        Property '"/api"' is incompatible with index signature.
+          Type 'undefined' is not assignable to type 'string | ProxyOptions'.
+            Type '{ "/api": { target: string; changeOrigin: boolean; ws: boolean; }; } | { "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions> | undefined'.
+              Type '{ "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions>'.
+                Property '"/api"' is incompatible with index signature.
+                  Type 'undefined' is not assignable to type 'string | ProxyOptions'.
+vite.config.ts(56,5): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '{ "/api": { target: string; changeOrigin: boolean; ws: boolean; }; } | { "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions> | undefined'.
+      Type '{ "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions>'.
+        Property '"/api"' is incompatible with index signature.
+          Type 'undefined' is not assignable to type 'string | ProxyOptions'.
+            Type '{ "/api": { target: string; changeOrigin: boolean; ws: boolean; }; } | { "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions> | undefined'.
+              Type '{ "/api"?: undefined; }' is not assignable to type 'Record<string, string | ProxyOptions>'.
+                Property '"/api"' is incompatible with index signature.
+                  Type 'undefined' is not assignable to type 'string | ProxyOptions'.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\web
+npm error workspace @relay-qa-hub/web@3.3.5
+npm error location C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\web
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit
+
+npm notice run @relay-qa-hub/worker@0.1.0-debug typecheck
+npm notice run tsc --noEmit -p tsconfig.test.json
+npm notice run @relay-qa-hub/domain@0.1.0-debug typecheck
+npm notice run @relay-qa-hub/storage@0.1.0-debug typecheck

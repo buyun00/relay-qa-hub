@@ -1,3 +1,4 @@
+import type { BuildTask } from "./BuildTasksPanel";
 import { requestJson } from "./api";
 
 export const BUILD_PRESETS = [
@@ -5,7 +6,7 @@ export const BUILD_PRESETS = [
   { id: "internal-sdk", label: "打带 SDK 的内网包", packageLabel: "内网 · 带 SDK" },
   { id: "external", label: "打外网包", packageLabel: "外网包" },
 ] as const;
-export type BuildPreset = (typeof BUILD_PRESETS)[number]["id"];
+export type BuildPreset = string;
 export interface BuildStageProgress {
   id: string;
   label: string;
@@ -94,10 +95,10 @@ export async function getPackagingProgress(
 export async function triggerJenkinsBuild(
   preset: BuildPreset,
   requestId: string,
-): Promise<{ queueId: number }> {
+): Promise<BuildTask> {
   return (await requestJson("/api/v1/packaging/builds", {
     method: "POST",
     headers: { "content-type": "application/json", "idempotency-key": requestId },
     body: JSON.stringify({ preset }),
-  })) as { queueId: number };
+  })) as BuildTask;
 }

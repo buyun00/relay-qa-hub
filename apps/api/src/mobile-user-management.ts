@@ -10,7 +10,9 @@ export interface ManagedProjectUser {
   readonly displayName: string;
   readonly status: "active" | "disabled";
   readonly membershipStatus: "active" | "revoked";
+  readonly membershipVersion: number;
   readonly roles: readonly MobileProjectRole[];
+  readonly identity: "employee";
   readonly linkedToUserId: string | null;
   readonly linkedToDisplayName: string | null;
   readonly linkedUserCount: number;

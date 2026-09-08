@@ -1,0 +1,94 @@
+✔ Windows path boundaries reject equal, nested, and parent data roots (0.9499ms)
+✔ Windows path boundaries allow sibling and cross-drive data roots (0.2327ms)
+✖ portable packaging cannot overwrite the installer update manifest (3.3656ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 130.8555
+
+✖ failing tests:
+
+test at tests\unit\windows-update-manifest-boundary.test.mjs:12:1
+✖ portable packaging cannot overwrite the installer update manifest (3.3656ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\.\.\/desktop\/release\/installer\/Relay-QA-Hub-Windows-x64-latest\.json/u. Input:
+  
+  'import react from "@vitejs/plugin-react";\n' +
+    'import { defineConfig } from "vitest/config";\n' +
+    'import type { Plugin } from "vite";\n' +
+    'import packageJson from "./package.json" with { type: "json" };\n' +
+    '\n' +
+    'const configuredApi = process.env.QA_HUB_API_BASE_URL?.trim();\n' +
+    'const configuredPort = Number(process.env.QA_HUB_WEB_PORT ?? 4274);\n' +
+    'if (\n' +
+    '  !Number.isSafeInteger(configuredPort) ||\n' +
+    '  configuredPort < 1024 ||\n' +
+    '  configuredPort > 65535 ||\n' +
+    '  [4174, 4319, 4320].includes(configuredPort)\n' +
+    ')\n' +
+    '  throw new Error("PREVIEW_WEB_PORT_INVALID");\n' +
+    'if (configuredApi) {\n' +
+    '  const target = new URL(configuredApi);\n' +
+    '  if (\n' +
+    '    !["http:", "https:"].includes(target.protocol) ||\n' +
+    '    target.username ||\n' +
+    '    target.password ||\n' +
+    '    ["4319", "4174", "4320"].includes(target.port)\n' +
+    '  )\n' +
+    '    throw new Error("PREVIEW_API_TARGET_INVALID");\n' +
+    '}\n' +
+    'const requireExplicitService: Plugin = {\n' +
+    '  name: "qa-hub-explicit-preview-service",\n' +
+    '  configureServer() {\n' +
+    '    if (!configuredApi)\n' +
+    '      throw new Error("QA_HUB_API_BASE_URL is required for the preview development server");\n' +
+    '  },\n' +
+    '  configurePreviewServer() {\n' +
+    '    if (!configuredApi) throw new Error("QA_HUB_API_BASE_URL is required for the preview server");\n' +
+    '  },\n' +
+    '};\n' +
+    'const proxy = configuredApi\n' +
+    '  ? { "/api": { target: configuredApi, changeOrigin: true, ws: true } }\n' +
+    '  : {};\n' +
+    'export default defineConfig({\n' +
+    '  plugins: [requireExplicitService, react()],\n' +
+    '  resolve: { dedupe: ["react", "react-dom"] },\n' +
+    '  define: {\n' +
+    '    __APP_VERSION__: JSON.stringify(packageJson.version),\n' +
+    '    __CONTRACT_VERSION__: JSON.stringify("1.1.0"),\n' +
+    '  },\n' +
+    '  build: { target: "es2022", sourcemap: true },\n' +
+    '  server: {\n' +
+    '    host: process.env.QA_HUB_WEB_HOST ?? "127.0.0.1",\n' +
+    '    port: configuredPort,\n' +
+    '    strictPort: true,\n' +
+    '    proxy,\n' +
+    '  },\n' +
+    '  preview: {\n' +
+    '    host: process.env.QA_HUB_WEB_HOST ?? "127.0.0.1",\n' +
+    '    port: configuredPort,\n' +
+    '    strictPort: true,\n' +
+    '    proxy,\n' +
+    '  },\n' +
+    '  test: {\n' +
+    '    environment: "node",\n' +
+    '    server: { deps: { inline: ["qrcode.react"] } },\n' +
+    '    include: ["src/**/*.test.{ts,tsx}"],\n' +
+    '  },\n' +
+    '});\n'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/tests/unit/windows-update-manifest-boundary.test.mjs:24:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'import react from "@vitejs/plugin-react";\nimport { defineConfig } from "vitest/config";\nimport type { Plugin } from "vite";\nimport packageJson from "./package.json" with { type: "json" };\n\nconst configuredApi = process.env.QA_HUB_API_BASE_URL?.trim();\nconst configuredPort = Number(process.env.QA_HUB_WEB_PORT ?? 4274);\nif (\n  !Number.isSafeInteger(configuredPort) ||\n  configuredPort < 1024 ||\n  configuredPort > 65535 ||\n  [4174, 4319, 4320].includes(configuredPort)\n)\n  throw new Error("PREVIEW_WEB_PORT_INVALID");\nif (configuredApi) {\n  const target = new URL(configuredApi);\n  if (\n    !["http:", "https:"].includes(target.protocol) ||\n    target.username ||\n    target.password ||\n    ["4319", "4174", "4320"].includes(target.port)\n  )\n    throw new Error("PREVIEW_API_TARGET_INVALID");\n}\nconst requireExplicitService: Plugin = {\n  name: "qa-hub-explicit-preview-service",\n  configureServer() {\n    if (!configuredApi)\n      throw new Error("QA_HUB_API_BASE_URL is required for the preview development server");\n  },\n  configurePreviewServer() {\n    if (!configuredApi) throw new Error("QA_HUB_API_BASE_URL is required for the preview server");\n  },\n};\nconst proxy = configuredApi\n  ? { "/api": { target: configuredApi, changeOrigin: true, ws: true } }\n  : {};\nexport default defineConfig({\n  plugins: [requireExplicitService, react()],\n  resolve: { dedupe: ["react", "react-dom"] },\n  define: {\n    __APP_VERSION__: JSON.stringify(packageJson.version),\n    __CONTRACT_VERSION__: JSON.stringify("1.1.0"),\n  },\n  build: { target: "es2022", sourcemap: true },\n  server: {\n    host: process.env.QA_HUB_WEB_HOST ?? "127.0.0.1",\n    port: configuredPort,\n    strictPort: true,\n    proxy,\n  },\n  preview: {\n    host: process.env.QA_HUB_WEB_HOST ?? "127.0.0.1",\n    port: configuredPort,\n    strictPort: true,\n    proxy,\n  },\n  test: {\n    environment: "node",\n    server: { deps: { inline: ["qrcode.react"] } },\n    include: ["src/**/*.test.{ts,tsx}"],\n  },\n});\n',
+    expected: /\.\.\/desktop\/release\/installer\/Relay-QA-Hub-Windows-x64-latest\.json/u,
+    operator: 'match',
+    diff: 'simple'
+  }

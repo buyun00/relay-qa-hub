@@ -1,3 +1,4 @@
+import BuildTasksPanel from "./BuildTasksPanel";
 import AppIcon from "./AppIcon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
@@ -45,9 +46,16 @@ function submissionError(error: unknown): string {
   return "暂时无法连接打包服务，请稍后重试。";
 }
 export function PackageDownloads({ status }: { status: PackagingStatus }) {
-  const latest = BUILD_PRESETS.map((preset) => ({
-    ...preset,
-    file: status.apks.find((file) => file.preset === preset.id),
+  const available = [
+    ...new Set(
+      status.apks.map((file) => file.preset).filter((preset): preset is string => !!preset),
+    ),
+  ];
+  const latest = available.map((id) => ({
+    id,
+    label: BUILD_PRESETS.find((preset) => preset.id === id)?.label ?? `打包 ${id}`,
+    packageLabel: BUILD_PRESETS.find((preset) => preset.id === id)?.packageLabel ?? id,
+    file: status.apks.find((file) => file.preset === id),
   }));
   const rows = (files: PackageFile[]) =>
     files.map((file) => (
@@ -151,7 +159,7 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
         <article className="package-zip-card">
           <div>
             <h2>增量 ZIP</h2>
-            <p>_pkg_cfg_2001_1002.zip</p>
+            <p>{status.zip?.name ?? "本项目增量包"}</p>
             {status.zip ? (
               <>
                 <small>
@@ -183,14 +191,6 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
         <article className="package-ipa-card">
           <h2>IPA 下载</h2>
           <p>iOS 包从 IPA 目录下载</p>
-          <a
-            className="package-link"
-            href="http://10.100.5.129:8000/ipa/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            打开 IPA 下载目录 <AppIcon name="external" />
-          </a>
           {status.ipaError ? (
             <small>IPA 目录暂时无法读取</small>
           ) : status.ipas[0] ? (
@@ -222,12 +222,20 @@ export default function PackagingPage({
   userId = "current",
   onOpen,
   onOpenUpload,
+  buildUploadEnabled = false,
+  presetOptions,
+  singleBuildPreset,
+  uploadDefaults,
 }: {
   active: boolean;
   refreshRevision: number;
   userId?: string;
   onOpen?: () => void;
   onOpenUpload?: (jobId?: string) => void;
+  buildUploadEnabled?: boolean;
+  presetOptions: string[];
+  singleBuildPreset: string;
+  uploadDefaults: Record<string, unknown>;
 }) {
   const [status, setStatus] = useState<PackagingStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -278,8 +286,10 @@ export default function PackagingPage({
     setNotice(null);
     try {
       const receipt = await triggerJenkinsBuild(preset, crypto.randomUUID());
-      monitor.watch(receipt.queueId);
-      setNotice(`${packageLabel(preset)}已提交，排队编号 #${receipt.queueId}。`);
+      if (receipt.queueId) monitor.watch(receipt.queueId);
+      setNotice(
+        `${packageLabel(preset)}已提交，任务 ${receipt.taskId ?? receipt.id}；${receipt.queueId ? `排队 #${receipt.queueId}` : "等待服务端执行"}，请查看下方最终结果。`,
+      );
     } catch (cause) {
       setNotice(submissionError(cause));
     } finally {
@@ -295,7 +305,7 @@ export default function PackagingPage({
         <section className="package-build-panel" aria-labelledby="packaging-title">
           <div className="package-section-heading">
             <div>
-              <p className="eyebrow">OZDQP / ANDROID</p>
+              <p className="eyebrow">项目打包 / ANDROID</p>
               <h1 id="packaging-title">打包与下载</h1>
             </div>
             <span
@@ -309,11 +319,14 @@ export default function PackagingPage({
             </span>
           </div>
           <div className="package-build-buttons">
-            {BUILD_PRESETS.map(({ id, label }) =>
-              id === "external" ? (
+            {presetOptions.map((id) => {
+              const label = BUILD_PRESETS.find((preset) => preset.id === id)?.label ?? `打包 ${id}`;
+              return id === singleBuildPreset && buildUploadEnabled ? (
                 <BuildUploadControls
                   key={id}
                   userId={userId}
+                  uploadDefaults={uploadDefaults}
+                  label={label}
                   disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
                   onBuildOnly={() => void build(id)}
                   onSubmitted={(queueId) => {
@@ -332,11 +345,11 @@ export default function PackagingPage({
                 >
                   {pending === id ? "正在提交…" : label}
                 </button>
-              ),
-            )}
+              );
+            })}
           </div>
           <p className="package-hint">
-            使用 Jenkins 当前默认参数。内网会自动判断资源更新或整包；下载区展示已生成的文件。
+            按此项目的打包预设执行；任务显示已完成并生成本次产物后，再核对下载结果。
           </p>
           {notice ? (
             <p className="banner pending-banner" role="status">
@@ -355,6 +368,7 @@ export default function PackagingPage({
             <p className="banner error-banner">Jenkins 已禁用当前打包任务。</p>
           ) : null}
         </section>
+        <BuildTasksPanel enabled={true} revision={refreshRevision} />
         <PackagingProgressPanel
           progress={monitor.progress}
           error={monitor.error}

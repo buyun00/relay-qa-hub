@@ -1,0 +1,15 @@
+Browser tab: 1, Title: "Relay QA Hub", URL: "http://127.0.0.1:4274/?projectId=b79a70c9-ef3e-4d85-b376-247c473789a9".
+1 AXWebArea Relay QA Hub, URL: 127.0.0.1:4274/?projectId=b79a70c9-ef3e-4d85-b376-247c473789a9
+	2 container
+		3 heading 当前项目访问已停用, Value: 1
+			4 text 当前项目访问已停用
+		5 text 请联系 GM 或项目人员恢复资格。
+		6 heading 本地未提交内容, Value: 2
+			7 text 本地未提交内容
+		8 container
+			9 text 项目  b79a70c9-ef3e-4d85-b376-247c473789a9  的个人草稿仍保留在本机，恢复项目资格后可以继续处理。
+		10 button 保存草稿文本
+		11 link Description: 保存 qa-preview-evidence.jpg, Value: blob:http://127.0.0.1:4274/db0daa43-f5f6-4770-bb58-9525ac0b015e
+		12 button 返回登录
+
+The focused UI element is 1 AXWebArea Relay QA Hub, URL: 127.0.0.1:4274/?projectId=b79a70c9-ef3e-4d85-b376-247c473789a9

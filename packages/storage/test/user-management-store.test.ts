@@ -100,7 +100,7 @@ test("explicit user links are reversible and retained as append-only history", (
         createdAt: ACTION_AT,
       }),
     );
-    assert.deepEqual(listActiveUserIdentityLinks(database, ACCOUNT_ID), [
+    assert.deepEqual(listActiveUserIdentityLinks(database, ACCOUNT_ID, PROJECT_ID), [
       {
         sourceUserId: DUPLICATE_ID,
         sourceDisplayName: "AKKKKK",
@@ -123,9 +123,9 @@ test("explicit user links are reversible and retained as append-only history", (
         createdAt: "2026-09-03T08:01:00.000Z",
       }),
     );
-    assert.deepEqual(listActiveUserIdentityLinks(database, ACCOUNT_ID), []);
+    assert.deepEqual(listActiveUserIdentityLinks(database, ACCOUNT_ID, PROJECT_ID), []);
     assert.equal(
-      database.prepare("SELECT COUNT(*) AS count FROM user_identity_links").get()?.["count"],
+      database.prepare("SELECT COUNT(*) AS count FROM project_identity_links").get()?.["count"],
       1,
     );
     assert.equal(

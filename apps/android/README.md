@@ -32,13 +32,45 @@ $env:ANDROID_HOME = 'C:\Users\lin0\AppData\Local\Android\Sdk'
 ./gradlew.bat clean assembleDebug lint testDebugUnitTest
 ```
 
-The default API URL is the non-routable
-`https://qa-hub.invalid/api/v1/`. Inject an HTTPS development endpoint without
-editing source:
+This branch produces the independent **QA Hub 项目预览** application:
+`com.relayqahub.android.preview.debug` (debug) and
+`com.relayqahub.android.preview` (release). It has no production endpoint fallback.
+Both the API address and the entry project UUID are mandatory Gradle properties;
+production API port 4319 is rejected. Use an actual project created in the
+isolated preview API. For compilation only, the following unused test UUID and
+loopback endpoint do not contact a server:
 
 ```powershell
-./gradlew.bat assembleDebug -PqaHubApiBaseUrl='https://qa-hub.example/api/v1/'
+./gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug `
+  --no-daemon --max-workers=2 '-Dorg.gradle.parallel=false' '-Dorg.gradle.jvmargs=-Xmx2g' `
+  '-PqaHubApiBaseUrl=http://127.0.0.1:4419/api/v1/' `
+  '-PqaHubProjectId=10000000-0000-4000-8000-000000000099'
 ```
+
+Loopback on Android refers to that Android device. Runtime testing therefore
+requires either a deliberately selected device with `adb reverse tcp:4419
+tcp:4419`, or a build with the separately verified preview LAN endpoint. Do not
+run the production publishing scripts. The project entry deep link is
+`qahub-preview://project/<project UUID>`; it cannot replace the configured API
+address. The login page also accepts the project's UUID directly.
+
+The update feed is `/api/v1/android-updates/preview/latest.json`. Package
+identity, version, file size and SHA-256 remain verified before installer
+handoff. An unset game APK directory is disabled and never requests the legacy
+production APK catalog.
+
+API origin, project and person form independent credential/draft keys. The
+Room database is named from the configured API origin, while Room operations
+retain project/person scope. Switching projects clears only that page's
+ViewModel store to cancel old UI requests; it retains offline operations and
+capture sidecars. A capture is bound when requested, so a late capture cannot
+be attached to the newly selected project. Old sidecars without a scope remain
+on disk and are not guessed into a project.
+
+Device installation, old/new coexistence, upgrade recovery, MediaProjection,
+notifications and component results still require separate real acceptance
+against explicitly selected test devices and external test resources. A
+successful Gradle run does not establish those results.
 
 ## Device test injection
 

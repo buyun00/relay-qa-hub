@@ -55,6 +55,21 @@ export function uploadDraftDefaults(value: unknown): UploadInput {
   };
 }
 
+export function projectUploadDraft(value: unknown, defaults: Record<string, unknown>): UploadInput {
+  const draft =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Partial<UploadInput>)
+      : {};
+  const input = uploadDraftDefaults({ ...defaults, ...draft });
+  return {
+    ...input,
+    productId: String(defaults.productId ?? ""),
+    channelId: String(defaults.channelId ?? ""),
+    belongName: String(defaults.belongName ?? ""),
+    testerId: Number(draft.testerId ?? defaults.testerId ?? 0),
+  };
+}
+
 export const UPLOAD_MODES: { id: UploadMode; label: string; description: string }[] = [
   {
     id: "publish_workflow",
@@ -160,6 +175,7 @@ export const uploadStageLabel = (stage: string): string => STAGES[stage] ?? "正
 export const uploadErrorLabel = (code: string): string =>
   ERRORS[code] ?? `操作暂未完成，记录已保留（${code || "UNKNOWN"}）。`;
 export function uploadJobLabel(job: UploadJob): string {
+  if (job.status === "paused") return "已暂停 · 等待明确恢复";
   if (job.status === "queued") return "服务端排队中";
   if (job.status === "cancelled") return "已取消排队";
   if (job.active) return uploadStageLabel(job.stage);

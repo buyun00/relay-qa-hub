@@ -1,0 +1,124 @@
+{
+  "capturedAt": "2026-09-08T17:09:04.377Z",
+  "source": "Independent read-only HTTP readback of UI-created records; cookies remain in memory",
+  "results": [
+    {
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "components": [
+        {
+          "key": "build",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "build_upload.single",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "upload.incremental",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "relay.production",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "qingyu.sync",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        }
+      ],
+      "bug": {
+        "id": "5128877f-21c5-4889-9dd0-15134e24b291",
+        "key": "TA1788885078625-4",
+        "state": "closed",
+        "version": 13,
+        "ownerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+        "verificationOwnerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1"
+      },
+      "comments": [
+        {
+          "id": "5223390b-1864-4968-89f1-cc87fffe8a37",
+          "body": "WEB-评论-0909：所有可选组件关闭，人工验收继续执行。",
+          "authorId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+          "createdAt": "2026-09-08T17:01:58.103Z"
+        }
+      ],
+      "attachments": [],
+      "binary": null
+    },
+    {
+      "projectId": "383a122d-5c4b-478c-9bd7-7bb2196cf5b2",
+      "components": [
+        {
+          "key": "build",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "build_upload.single",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "upload.incremental",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "relay.production",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        },
+        {
+          "key": "qingyu.sync",
+          "enabled": false,
+          "status": "disabled",
+          "version": 0
+        }
+      ],
+      "bug": {
+        "id": "434a4f1f-0144-4f96-9125-47d85fcfba8c",
+        "key": "TB1788885078632-1",
+        "state": "reported",
+        "version": 1,
+        "ownerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+        "verificationOwnerId": "26b6341f-da74-4c0f-87a7-57d76328e4b1"
+      },
+      "comments": [
+        {
+          "id": "8bd7b159-5e7b-41d7-b83a-d5397f523108",
+          "body": "WEB-B-评论正文-0909：JPEG 已上传并可读取，记录正文必须在刷新后仍显示。",
+          "authorId": "26b6341f-da74-4c0f-87a7-57d76328e4b1",
+          "createdAt": "2026-09-08T17:06:09.572Z"
+        }
+      ],
+      "attachments": [
+        {
+          "attachmentId": "ab9970ed-6e72-451e-bbdd-e43f40aefe29",
+          "filename": "qa-preview-evidence.jpg",
+          "mediaType": "image/jpeg",
+          "size": 43311,
+          "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+        }
+      ],
+      "binary": {
+        "size": 43311,
+        "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+        "matchesLocal": true
+      }
+    }
+  ]
+}

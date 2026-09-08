@@ -1,17 +1,12 @@
-# OZDQP 独立上传工具 0.4.0
+# QA Hub 项目上传执行器 0.5.0
 
-QA Hub 3.2.0 服务端使用的 Windows x64 自包含 EXE，基于 2026-09-08 交接包 0.2.0 源码修改。原始交接目录未修改，原始说明保留在 README.upstream-0.2.0.md。
+Windows x64 自包含 EXE，当前工作树源码位于 `apps/desktop/uploader`，以独立 .NET SDK 10.0.400 / Runtime 10.0.11 构建。此产物尚未向生产发布。
 
-一键打包任务可传入 `expectedSource`（大小和 Last-Modified）。下载时发送 If-Unmodified-Since，核对响应并在完成后再次 HEAD 检查，确认本次 ZIP 没被替换才开始平台写操作。完整下载仍属于原任务，恢复不会改取最新包；没有该字段的旧任务保持原身份摘要。
+SHA-256：`0d5e930bd6421550ac18d816a4f08ca444c3a8f078df26e2c051e960649fc907`。
 
-默认 `uploadConcurrency=4`，四个 5 MB 分片并行上传；CLI 支持 1–8。每片成功即保存断点，STS 续期和状态写入分别串行保护。失败/取消会等待在途请求结束，恢复只补传缺失分片。并发数不改变任务身份、uploadId 或分片布局。34 项本地自检通过，包括真实腾讯 SDK 的本机并发传输测试；实际 COS 网络速度仍需下一次上传验证。
+每项任务必须配置 `projectId`、`componentVersion`、`apiBase`、`loginBase`、`downloadUrl`、`sourceRoot`、`targetPrefix`、`testDirectoryPrefix`、`releaseDirectoryPrefix`，并明确产品、渠道和测试人。没有生产地址、固定产品或渠道默认值。来源只允许配置目录内的直接 ZIP 子项，拒绝跨来源、路径逃逸和重定向。
 
-本程序只部署到服务端，不再随 Windows 客户端分发。服务器按用户设置 OZDQP_AUTH_FILE，所有用户共用 OZDQP_LOCK_ROOT。SHA-256：`095352393e09e526b23b255398737798e93381879f9163ffbc6a2ed2b992d0fe`。
-
-页面新建任务仅提供两种执行方式：
-
-- `publish_workflow`：完成上传、提测、测试状态登记和资源准备，确认正式发布并核验状态 100。
-- `prepare_publish`：完成相同前序步骤，到状态 60 停下，等待最终确认；普通 `resume` 仍会等待。
+服务端通过独立实例下的 `OZDQP_AUTH_FILE` 和 `OZDQP_LOCK_ROOT` 指定凭据与锁文件，进程环境中的 `QA_HUB_PROJECT_ID` / `QA_HUB_COMPONENT_VERSION` 必须与任务配置一致。配置摘要绑定项目和版本；未绑定项目的旧任务不可直接恢复。凭据文件与 API / 登录服务来源不符会在网络请求前拒绝。
 
 ```powershell
 .\ozdqp-uploader.exe run --config .\job.json
@@ -19,10 +14,8 @@ QA Hub 3.2.0 服务端使用的 Windows x64 自包含 EXE，基于 2026-09-08 �
 .\ozdqp-uploader.exe confirm-publish --config .\job.json
 ```
 
-只有等待最终确认的任务才能使用 `confirm-publish`。操作会保存明确确认时间，再检查远端版本身份、状态和正式目录；重复/不明确的写操作沿用原来的断点核对规则。
+`prepare_publish` 在最终确认前停止；只有显式 `confirm-publish` 才推进最终发布。`publish_workflow` 包含最终发布核对，状态 99 不算成功。`recordedTestWorkflow` 只沿用明确选择的状态登记流程，不代表完成游戏测试。
 
-QA Hub 按最近完整操作 JSON 默认填入产品 2002、渠道 1002、测试人 11562。`useVersionText: true` 让概述和说明只使用实际版本号，自动生成版本号也适用。`recordedTestWorkflow: true` 表示用户选择沿用录制中的测试状态流程，日志记录来源，不生成虚构测试报告，也不执行游戏测试。
+`expectedSource` 绑定构建产物大小和 Last-Modified，下载时使用条件请求并再次核对来源。完整下载留在原任务目录，恢复不更换来源。分片默认并发 4（支持 1–8）；成功分片持久保存，失败或取消等待在途请求结束，恢复只补传缺失片。
 
-0.2.0 的旧任务仍可恢复，保持原模式和实际测试结论要求。新增选项加入任务身份摘要，旧任务的摘要算法保持不变。ZIP 固定地址、登录缓存格式、文件校验、任务/渠道锁、COS 分片和失败核对行为保持原有协议。
-
-源码：`apps/desktop/uploader`，使用 .NET 10 SDK；完整集成说明见仓库 `docs/SERVER-INCREMENT-UPLOAD.md`。34 项本地自检通过，真实业务平台上传发布仍需用指定新版本验收。
+本机自检 40/40 通过，包括真实腾讯 SDK 对本机回环服务的字节、并发和恢复验证，以及项目/来源/凭据约束。这些合同测试没有调用真实外部平台；真实 Jenkins、COS 与业务发布链路尚未验证。原始交接说明保留在 `README.upstream-0.2.0.md`，其中旧默认地址和无参数命令不适用于 0.5.0。

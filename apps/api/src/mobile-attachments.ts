@@ -126,7 +126,7 @@ export interface MobileBugAttachmentListResponse {
   readonly projectId: string;
   readonly snapshotSequence: number;
   readonly items: readonly MobileAttachmentMetadata[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface MobileAttachmentDownload {
@@ -195,6 +195,7 @@ export interface ListMobileBugAttachmentsQuery {
   readonly actorId: string;
   readonly bugId: string;
   readonly limit: number;
+  readonly cursor?: string;
 }
 
 export interface GetMobileAttachmentQuery {

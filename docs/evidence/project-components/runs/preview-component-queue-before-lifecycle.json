@@ -1,0 +1,20 @@
+{
+  "recordedAt": "2026-09-08T19:24:37.798Z",
+  "readOnly": true,
+  "instanceId": "qa-hub-preview-7c86",
+  "root": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/components",
+  "tables": [
+    {
+      "table": "build_tasks",
+      "count": 0
+    },
+    {
+      "table": "component_audit",
+      "count": 0
+    },
+    {
+      "table": "sync_tasks",
+      "count": 0
+    }
+  ]
+}

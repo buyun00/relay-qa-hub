@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-09-08T19:09:10.556Z",
+  "passed": true,
+  "profileFiles": 102,
+  "profileBytes": 663514299,
+  "profileSha256": "1fca7a79fba25ea03ce974bf22e03debe77660def84ab83c11ba1ede968f275c",
+  "allProfileBytesUnchanged": true,
+  "installedDirectoryAbsent": true,
+  "uninstalledDirectoryRetained": "RelayQaHubPreview.uninstalled-20260908T185123338Z",
+  "nativeReinstallPending": true
+}

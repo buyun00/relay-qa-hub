@@ -9,6 +9,7 @@ import com.relayqahub.android.capture.PendingCaptureDraftStore
 import com.relayqahub.android.capture.CaptureArtifactStore
 import com.relayqahub.android.network.AttachmentUploadClient
 import com.relayqahub.android.network.AccountSessionClient
+import com.relayqahub.android.network.ProjectOperationsClient
 import com.relayqahub.android.network.AndroidUpdateClient
 import com.relayqahub.android.network.ApkDownloadClient
 import com.relayqahub.android.network.BuildProjectionClient
@@ -19,7 +20,6 @@ import com.relayqahub.android.network.InboxClient
 import com.relayqahub.android.network.HumanWorkflowClient
 import com.relayqahub.android.network.GameApkCatalogClient
 import com.relayqahub.android.network.OkHttpQaHubApiClient
-import com.relayqahub.android.network.QA_HUB_ACTOR_ID_HEADER
 import com.relayqahub.android.network.RelayHandoffClient
 import com.relayqahub.android.network.RepairAttemptClient
 import com.relayqahub.android.security.AppPrivateCredentialVault
@@ -31,9 +31,12 @@ import com.relayqahub.android.work.OfflineAttachmentDraftStore
 import com.relayqahub.android.work.DeviceSecurityResumeCoordinator
 import com.relayqahub.android.work.SyncScheduler
 import java.util.concurrent.TimeUnit
+import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 
 class AppContainer private constructor(
+    val apiBaseUrl: String,
+    val projectOperationsClient: ProjectOperationsClient,
     val identityStore: QaIdentityStore,
     val accountSessionClient: AccountSessionClient,
     val bugDraftPreferences: BugDraftPreferences,
@@ -70,11 +73,11 @@ class AppContainer private constructor(
                 applicationContext,
                 BuildConfig.QA_HUB_API_BASE_URL,
             ).apiBaseUrl
-            val identityStore = QaIdentityStore(applicationContext)
+            val identityStore = QaIdentityStore(applicationContext, apiBaseUrl)
             val database = Room.databaseBuilder(
                 applicationContext,
                 QaHubDatabase::class.java,
-                "qa-hub-cache-v1.db",
+                "qa-hub-preview-${namespaceId(apiBaseUrl)}.db",
             ).addMigrations(
                 QaHubDatabase.MIGRATION_1_2,
                 QaHubDatabase.MIGRATION_2_3,
@@ -88,18 +91,14 @@ class AppContainer private constructor(
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(false)
+                // Mutations must not replay automatically; avoid reusing an idle socket closed by the service.
+                .connectionPool(ConnectionPool(0, 1, TimeUnit.SECONDS))
                 .addInterceptor { chain ->
                     val request = chain.request()
-                    if (request.header(QA_HUB_ACTOR_ID_HEADER) != null) {
-                        chain.proceed(request)
-                    } else {
-                        val actorId = identityStore.actorIdOrNull()
-                        chain.proceed(
-                            if (actorId == null) request else request.newBuilder()
-                                .header(QA_HUB_ACTOR_ID_HEADER, actorId)
-                                .build(),
-                        )
-                    }
+                    val token = request.header("Authorization")?.removePrefix("Bearer ")
+                    val projectId = token?.let(NativeProjectBindings::projectFor)
+                    chain.proceed(if (projectId == null) request else request.newBuilder()
+                        .header("x-qa-project-id", projectId).build())
                 }
                 .build()
             val distributionHttpClient = OkHttpClient.Builder()
@@ -109,6 +108,7 @@ class AppContainer private constructor(
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(false)
+                .connectionPool(ConnectionPool(0, 1, TimeUnit.SECONDS))
                 .build()
             val accountSessionClient = AccountSessionClient(
                 baseUrl = apiBaseUrl,
@@ -186,6 +186,8 @@ class AppContainer private constructor(
             val pendingCaptureDraftStore = PendingCaptureDraftStore(applicationContext)
             val syncScheduler = SyncScheduler(WorkManager.getInstance(applicationContext))
             return AppContainer(
+                apiBaseUrl = apiBaseUrl,
+                projectOperationsClient = ProjectOperationsClient(apiBaseUrl, distributionHttpClient),
                 identityStore = identityStore,
                 accountSessionClient = accountSessionClient,
                 bugDraftPreferences = BugDraftPreferences(applicationContext),

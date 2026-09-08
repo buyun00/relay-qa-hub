@@ -1,0 +1,24 @@
+▶ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation
+  ✔ secondary artifact fallback preserves exact bytes for another reader of the bound Bug (64.9493ms)
+  ✔ wrong Bug, project, membership, resource URI and nested capture project cannot expose evidence (57.6287ms)
+  ✔ only validated clean content is exposed; disk and transport checksum failures are rejected (118.4935ms)
+✔ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation (1014.5959ms)
+✔ actual MCP HTTP and SQLite: attachment upload, resource read, project isolation and API parity (755.9043ms)
+✔ actual HTTP and SQLite paginate 501 comments and 101 bound attachments without scope or content loss (7958.214ms)
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (256.266ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (79.5436ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (34.0844ms)
+✔ actual MCP HTTP reports protocol errors separately and retains the 90 business tools (84.0737ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (98.5029ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (9.809ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (391.5119ms)
+✔ real HTTP project name login, protected GM identity, scoped membership and isolated cookie (532.5257ms)
+✔ actual API isolates concurrent users, explicit project headers and record-derived project context (1107.7434ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8401.3497

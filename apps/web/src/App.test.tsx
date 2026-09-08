@@ -52,7 +52,7 @@ describe("Relay QA Hub browser workbench", () => {
     expect(markup).toContain("工作台");
     expect(markup).toContain("总览");
     expect(markup).toContain("用户管理");
-    expect(markup).toContain("打包下载");
+    expect(markup).not.toContain("打包下载");
     expect(markup).not.toContain("正在读取可下载文件");
     expect(markup).toContain("待处理");
     expect(markup).toContain("处理中");
@@ -66,7 +66,7 @@ describe("Relay QA Hub browser workbench", () => {
     expect(markup).not.toContain("全部 Bug · 表格视图");
     expect(markup).toContain("人员范围");
     expect(markup).toContain("新建 Bug");
-    expect(markup).toContain("从轻语导入");
+    expect(markup).not.toContain("从轻语导入");
     expect(markup).not.toContain("验证无效项目错误");
     expect(markup.match(/class="nav-item is-active"/gu)).toHaveLength(1);
     expect(markup.match(/aria-current="page"/gu)).toHaveLength(1);
@@ -74,7 +74,7 @@ describe("Relay QA Hub browser workbench", () => {
 
   it("exposes the build and frozen contract versions", () => {
     expect(product.appVersion).toBe("3.3.5");
-    expect(product.contractVersion).toBe("1.0.0");
+    expect(product.contractVersion).toBe("1.1.0");
   });
 
   it("collects supported clipboard images and gives them upload-safe names", () => {

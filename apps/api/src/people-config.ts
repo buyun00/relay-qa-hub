@@ -99,8 +99,6 @@ export class QaLoginDirectory {
     const normalized = normalizeQaLoginName(identity.displayName);
     const stored = Object.freeze({ id: identity.id, displayName: normalized.displayName });
     const alias = qaPinyinLoginAlias(normalized.displayName);
-    if (alias === undefined) return;
-
     const existingName = this.#canonicalByDisplayName.get(normalized.key);
     const canonical = existingName ?? stored;
     if (existingName === undefined) {
@@ -108,6 +106,7 @@ export class QaLoginDirectory {
       this.#canonicalById.set(canonical.id, canonical);
     }
 
+    if (alias === undefined) return;
     const existingAlias = this.#canonicalByPinyin.get(alias);
     if (existingAlias === undefined) this.#canonicalByPinyin.set(alias, canonical);
     else if (existingAlias !== null && existingAlias.id !== canonical.id) {
@@ -267,7 +266,13 @@ export function loadQaPeopleConfig(configuredFile?: string): QaPeopleConfig {
   return Object.freeze({ schemaVersion: 4, projectKey, people: Object.freeze(people) });
 }
 
-export function qaMembershipId(userId: string): string {
+export function qaMembershipId(userId: string, projectId?: string): string {
+  if (projectId !== undefined) {
+    const digest = createHash("sha256")
+      .update(`qa-hub-project-membership:${projectId}:${userId}`, "utf8")
+      .digest("hex");
+    return `${digest.slice(0, 8)}-${digest.slice(8, 12)}-4${digest.slice(13, 16)}-8${digest.slice(17, 20)}-${digest.slice(20, 32)}`;
+  }
   if (userId === LEGACY_MEMBERSHIP_USER_ID) return LEGACY_MEMBERSHIP_ID;
   const digest = createHash("sha256").update(`qa-hub-membership:${userId}`, "utf8").digest("hex");
   const value = `${digest.slice(0, 12)}4${digest.slice(13, 16)}8${digest.slice(17, 32)}`;

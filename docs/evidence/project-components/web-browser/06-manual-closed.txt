@@ -1,0 +1,86 @@
+- banner "QA Hub 窗口栏":
+  - generic: Q
+  - img "QA Hub 已连接"
+  - strong: QA Hub
+  - generic: 项目
+  - combobox "切换项目":
+    - option "真实HTTP验收A 2026-09-08T16-31-18-569Z" [selected]
+    - option "真实HTTP验收B 2026-09-08T16-31-18-569Z"
+  - generic: 预览
+  - searchbox "搜索编号、内容或人员"
+  - generic: Ctrl K
+  - button "刷新":
+- complementary:
+  - navigation "主导航":
+    - paragraph: 工作区
+    - button "工作台 0":
+      - generic: 工作台
+      - generic: "0"
+    - button "总览 全部":
+      - generic: 总览
+      - generic: 全部
+  - generic "管理与设置":
+    - button "用户管理 6 位项目成员":
+      - strong: 用户管理
+      - generic: 6 位项目成员
+  - button "9 Web验收0909 点击退出登录":
+    - generic: "9"
+    - strong: Web验收0909
+    - generic: 点击退出登录
+- main:
+  - paragraph: 2026年9月9日
+  - heading "你好，Web验收0909" [level=1]
+  - paragraph: 先完成需要你动作的 Bug，其他进度会自动留在工作台里。
+  - button "新建 Bug":
+    - text: 新建 Bug
+  - text: Bug 已验收并关闭
+  - region "工作统计":
+    - button "0 待处理 待分配、需补充或等待开始处理":
+      - generic: "0"
+      - generic: 待处理
+      - generic: 待分配、需补充或等待开始处理
+    - button "0 处理中 修复人正在处理":
+      - generic: "0"
+      - generic: 处理中
+      - generic: 修复人正在处理
+    - button "0 已完成待验收 修复已完成，等待人工验收":
+      - generic: "0"
+      - generic: 已完成待验收
+      - generic: 修复已完成，等待人工验收
+    - button "已选中 1 关闭 已验收并关闭" [active] [pressed]:
+      - text: 已选中
+      - generic: "1"
+      - generic: 关闭
+      - generic: 已验收并关闭
+  - generic: 人员范围
+  - combobox "人员范围":
+    - option "我 · Web验收0909" [selected]
+    - option "整个团队"
+    - option "AndroidPreviewQA"
+    - option "MCP真实验收1788885978783"
+    - option "Preview GM"
+    - option "仅甲1788885078637"
+    - option "双项目1788885078674"
+  - generic: 1 个事项
+  - button "刷新列表":
+  - table "Bug 列表":
+    - row "事项 当前动作人 进度 最后更新":
+      - columnheader "事项"
+      - columnheader "当前动作人"
+      - columnheader "进度"
+      - columnheader "最后更新"
+    - row "P2 WEB-A-0909：全部可选组件关闭时，验证人工 Bug 闭环。此草稿仅属于项目 A。 TA1788885078625-4 · Web验收0909 修复 · Web验收0909 关闭 9 Web验收0909 修复人 关闭 9/9 01:02":
+      - cell "P2 WEB-A-0909：全部可选组件关闭时，验证人工 Bug 闭环。此草稿仅属于项目 A。 TA1788885078625-4 · Web验收0909 修复 · Web验收0909 关闭":
+        - generic: P2
+        - strong: WEB-A-0909：全部可选组件关闭时，验证人工 Bug 闭环。此草稿仅属于项目 A。
+        - generic: TA1788885078625-4
+        - generic: ·
+        - generic: Web验收0909 修复
+        - generic: ·
+        - generic: Web验收0909 关闭
+      - cell "9 Web验收0909 修复人":
+        - generic: "9"
+        - strong: Web验收0909
+        - generic: 修复人
+      - cell "关闭"
+      - cell "9/9 01:02"

@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-09-08T19:25:23.539Z",
+  "passed": true,
+  "sequence": [
+    "Native EXE logout",
+    "Immediate disk identity absent and local MCP auth rejection",
+    "Local MCP login returns only after identity file is present",
+    "Native form login to the same project and employee",
+    "Original draft text and one PNG restored"
+  ],
+  "nativeEvidence": [
+    "exe-preview6-explicit-logout.jpg",
+    "exe-preview6-relogin-draft.jpg",
+    "exe-preview6-relogin-draft.txt"
+  ],
+  "processRestartNotTestedInThisSequence": true
+}

@@ -70,10 +70,6 @@ export function createSqliteMobileUserManagementStore(
         protectedUserIds,
         createdAt: now().toISOString(),
       });
-      options.identityDirectory.registerLink(
-        { id: source.userId, displayName: source.displayName },
-        { id: canonical.userId, displayName: canonical.displayName },
-      );
       return result;
     },
 
@@ -86,7 +82,6 @@ export function createSqliteMobileUserManagementStore(
         protectedUserIds,
         createdAt: now().toISOString(),
       });
-      options.identityDirectory.removeLink(command.userId);
       return result;
     },
 

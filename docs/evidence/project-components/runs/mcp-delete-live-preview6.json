@@ -1,0 +1,55 @@
+{
+  "recordedAt": "2026-09-08T19:18:27.351Z",
+  "passed": true,
+  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+  "checks": [
+    {
+      "entry": "server MCP",
+      "port": 4421,
+      "bugId": "05af3d44-0888-46ce-a478-f1864756e777",
+      "key": "TA1788885078625-15",
+      "deleted": {
+        "bugId": "05af3d44-0888-46ce-a478-f1864756e777",
+        "deletedAt": "2026-09-08T19:18:27.239Z",
+        "replayed": false
+      },
+      "replay": {
+        "bugId": "05af3d44-0888-46ce-a478-f1864756e777",
+        "deletedAt": "2026-09-08T19:18:27.239Z",
+        "replayed": true
+      },
+      "contextCode": "NOT_FOUND",
+      "audit": {
+        "bug_id": "05af3d44-0888-46ce-a478-f1864756e777",
+        "bug_version": 1,
+        "deleted_by_actor_id": "622256cf-37a9-4ddc-8f80-9399bb3b3ad5",
+        "deleted_at": "2026-09-08T19:18:27.239Z"
+      },
+      "originalRecordRetained": true
+    },
+    {
+      "entry": "installed EXE preview6 local MCP",
+      "port": 4420,
+      "bugId": "21c4dcf1-b6a0-4570-ab55-2c6184f56cb4",
+      "key": "TA1788885078625-16",
+      "deleted": {
+        "bugId": "21c4dcf1-b6a0-4570-ab55-2c6184f56cb4",
+        "deletedAt": "2026-09-08T19:18:27.302Z",
+        "replayed": false
+      },
+      "replay": {
+        "bugId": "21c4dcf1-b6a0-4570-ab55-2c6184f56cb4",
+        "deletedAt": "2026-09-08T19:18:27.302Z",
+        "replayed": true
+      },
+      "contextCode": "NOT_FOUND",
+      "audit": {
+        "bug_id": "21c4dcf1-b6a0-4570-ab55-2c6184f56cb4",
+        "bug_version": 1,
+        "deleted_by_actor_id": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+        "deleted_at": "2026-09-08T19:18:27.302Z"
+      },
+      "originalRecordRetained": true
+    }
+  ]
+}

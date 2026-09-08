@@ -14,14 +14,21 @@ public static class Json
 }
 public sealed class JobConfig
 {
-    public string ApiBase { get; set; } = "https://fq2ivi.ipwana.com";
+    public string ApiBase { get; set; } = "";
+    public string LoginBase { get; set; } = "";
+    public string ProjectId { get; set; } = "";
+    public int ComponentVersion { get; set; }
+    public string SourceRoot { get; set; } = "";
+    public string TargetPrefix { get; set; } = "";
+    public string TestDirectoryPrefix { get; set; } = "";
+    public string ReleaseDirectoryPrefix { get; set; } = "";
     public string FilePath { get; set; } = "";
-    public string ProductId { get; set; } = "2002";
-    public string ChannelId { get; set; } = "1002";
+    public string ProductId { get; set; } = "";
+    public string ChannelId { get; set; } = "";
     public string? Version { get; set; }
     public string Summary { get; set; } = "";
     public string Description { get; set; } = "";
-    public string BelongName { get; set; } = "[2002]Baloot Go|[1002]谷歌-国际正式";
+    public string BelongName { get; set; } = "";
     public int? ExistingVersionId { get; set; }
     public int TesterId { get; set; }
     public string Mode { get; set; } = "publish_workflow";
@@ -40,6 +47,8 @@ public sealed class JobConfig
 public sealed record SourceIdentity(long Size, string LastModified);
 public sealed class JobState
 {
+    public string ProjectId { get; set; } = "";
+    public int ComponentVersion { get; set; }
     public string JobId { get; set; } = Guid.NewGuid().ToString();
     public string ConfigDigest { get; set; } = "";
     public bool PublishConfirmed { get; set; }

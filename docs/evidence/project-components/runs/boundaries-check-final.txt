@@ -1,0 +1,3 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug check:boundaries
+npm notice run node scripts/check-boundaries.mjs
+Boundary check passed: 6 workspace manifests are valid and data root D:\Relay-QA-Hub-Data is external. Source text and user content are not inspected.

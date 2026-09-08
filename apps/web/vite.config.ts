@@ -1,177 +1,59 @@
 import react from "@vitejs/plugin-react";
-import { createReadStream, statSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import type { Connect, Plugin, ProxyOptions } from "vite";
 import { defineConfig } from "vitest/config";
-
+import type { Plugin, ProxyOptions } from "vite";
 import packageJson from "./package.json" with { type: "json" };
-import desktopPackageJson from "../desktop/package.json" with { type: "json" };
 
-const contractVersion = "1.0.0";
-const webAuthMode = process.env.QA_HUB_WEB_AUTH_MODE?.trim().toLowerCase() || "session";
-if (webAuthMode !== "session" && webAuthMode !== "debug") {
-  throw new Error("QA_HUB_WEB_AUTH_MODE must be session or debug");
+const configuredApi = process.env.QA_HUB_API_BASE_URL?.trim();
+const configuredPort = Number(process.env.QA_HUB_WEB_PORT ?? 4274);
+if (
+  !Number.isSafeInteger(configuredPort) ||
+  configuredPort < 1024 ||
+  configuredPort > 65535 ||
+  [4174, 4319, 4320].includes(configuredPort)
+)
+  throw new Error("PREVIEW_WEB_PORT_INVALID");
+if (configuredApi) {
+  const target = new URL(configuredApi);
+  if (
+    !["http:", "https:"].includes(target.protocol) ||
+    target.username ||
+    target.password ||
+    ["4319", "4174", "4320"].includes(target.port)
+  )
+    throw new Error("PREVIEW_API_TARGET_INVALID");
 }
-const debugProxyToken = process.env.QA_HUB_MVP_ACCESS_TOKEN?.trim();
-const webHost = process.env.QA_HUB_WEB_HOST?.trim() || "127.0.0.1";
-const androidApkDownloadPath = "/downloads/Relay-QA-Hub-Android12-debug.apk";
-const androidApkFile = fileURLToPath(
-  new URL("../android/app/build/outputs/apk/debug/app-debug.apk", import.meta.url),
-);
-const windowsZipDownloadPath = "/downloads/Relay-QA-Hub-Windows-x64.zip";
-const windowsZipFile = fileURLToPath(
-  new URL("../desktop/release/RelayQaHub-win32-x64.zip", import.meta.url),
-);
-const windowsUpdateManifestPath = "/downloads/Relay-QA-Hub-Windows-x64-latest.json";
-const windowsUpdateManifestFile = fileURLToPath(
-  new URL("../desktop/release/installer/Relay-QA-Hub-Windows-x64-latest.json", import.meta.url),
-);
-const windowsInstallerDownloadPath = "/downloads/Relay-QA-Hub-Setup-x64.exe";
-const windowsInstallerFile = fileURLToPath(
-  new URL("../desktop/release/installer/Relay-QA-Hub-Setup-x64.exe", import.meta.url),
-);
-if (webAuthMode === "debug" && !debugProxyToken) {
-  throw new Error("QA_HUB_MVP_ACCESS_TOKEN is required in debug Web auth mode");
-}
-
-function createApiProxy(): Record<string, ProxyOptions> {
-  return {
-    "/api": {
-      target: process.env.QA_HUB_API_BASE_URL ?? "http://127.0.0.1:4319",
-      changeOrigin: true,
-      configure(proxy) {
-        proxy.on("proxyReq", (proxyRequest) => {
-          if (webAuthMode === "session") return;
-          proxyRequest.setHeader("authorization", `Bearer ${debugProxyToken}`);
-        });
-      },
-    },
-  };
-}
-
-interface DownloadableArtifact {
-  readonly file: string;
-  readonly contentType: string;
-  readonly fileName: string;
-  readonly missingMessage: string;
-  readonly attachment?: boolean;
-}
-
-const downloadableArtifacts: ReadonlyMap<string, DownloadableArtifact> = new Map([
-  [
-    androidApkDownloadPath,
-    {
-      file: androidApkFile,
-      contentType: "application/vnd.android.package-archive",
-      fileName: "Relay-QA-Hub-Android12-debug.apk",
-      missingMessage: "Android APK has not been built yet.",
-    },
-  ],
-  [
-    windowsZipDownloadPath,
-    {
-      file: windowsZipFile,
-      contentType: "application/zip",
-      fileName: "Relay-QA-Hub-Windows-x64.zip",
-      missingMessage: "Windows package has not been built yet.",
-    },
-  ],
-  [
-    windowsUpdateManifestPath,
-    {
-      file: windowsUpdateManifestFile,
-      contentType: "application/json; charset=utf-8",
-      fileName: "Relay-QA-Hub-Windows-x64-latest.json",
-      missingMessage: "Windows update manifest has not been published yet.",
-      attachment: false,
-    },
-  ],
-  [
-    windowsInstallerDownloadPath,
-    {
-      file: windowsInstallerFile,
-      contentType: "application/vnd.microsoft.portable-executable",
-      fileName: `Relay-QA-Hub-Setup-${desktopPackageJson.version}-x64.exe`,
-      missingMessage: "Windows installer has not been published yet.",
-    },
-  ],
-]);
-
-function artifactDownloadPlugin(): Plugin {
-  const attachDownloadRoute = (middlewares: Connect.Server): void => {
-    middlewares.use((request, response, next) => {
-      const requestPath = new URL(request.url ?? "/", "http://127.0.0.1").pathname;
-      const artifact = downloadableArtifacts.get(requestPath);
-      if (artifact === undefined) return next();
-      if (request.method !== "GET" && request.method !== "HEAD") {
-        response.statusCode = 405;
-        response.setHeader("allow", "GET, HEAD");
-        response.end();
-        return;
-      }
-
-      let size: number;
-      try {
-        size = statSync(artifact.file).size;
-      } catch {
-        response.statusCode = 404;
-        response.end(artifact.missingMessage);
-        return;
-      }
-
-      response.statusCode = 200;
-      response.setHeader("content-type", artifact.contentType);
-      if (artifact.attachment !== false) {
-        response.setHeader("content-disposition", `attachment; filename="${artifact.fileName}"`);
-      }
-      response.setHeader("content-length", size.toString());
-      response.setHeader("cache-control", "no-store");
-      response.setHeader("x-content-type-options", "nosniff");
-      if (request.method === "HEAD") {
-        response.end();
-        return;
-      }
-      createReadStream(artifact.file).pipe(response);
-    });
-  };
-  return {
-    name: "relay-qa-hub-artifact-downloads",
-    configureServer(server) {
-      attachDownloadRoute(server.middlewares);
-    },
-    configurePreviewServer(server) {
-      attachDownloadRoute(server.middlewares);
-    },
-  };
-}
-
-export default defineConfig({
-  plugins: [artifactDownloadPlugin(), react()],
-  resolve: {
-    // qrcode.react is a peer-dependency consumer. Force it and the app to use
-    // the same React module even when Windows workspace links point at two
-    // physically distinct copies of the same package.
-    dedupe: ["react", "react-dom"],
+const requireExplicitService: Plugin = {
+  name: "qa-hub-explicit-preview-service",
+  configureServer() {
+    if (!configuredApi)
+      throw new Error("QA_HUB_API_BASE_URL is required for the preview development server");
   },
+  configurePreviewServer() {
+    if (!configuredApi) throw new Error("QA_HUB_API_BASE_URL is required for the preview server");
+  },
+};
+const proxy: Record<string, string | ProxyOptions> = configuredApi
+  ? { "/api": { target: configuredApi, changeOrigin: true, ws: true } }
+  : {};
+export default defineConfig({
+  plugins: [requireExplicitService, react()],
+  resolve: { dedupe: ["react", "react-dom"] },
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
-    __CONTRACT_VERSION__: JSON.stringify(contractVersion),
+    __CONTRACT_VERSION__: JSON.stringify("1.1.0"),
   },
-  build: {
-    target: "es2022",
-    sourcemap: true,
-  },
+  build: { target: "es2022", sourcemap: true },
   server: {
-    host: webHost,
-    port: 4174,
+    host: process.env.QA_HUB_WEB_HOST ?? "127.0.0.1",
+    port: configuredPort,
     strictPort: true,
-    proxy: createApiProxy(),
+    proxy,
   },
   preview: {
-    host: webHost,
-    port: 4174,
+    host: process.env.QA_HUB_WEB_HOST ?? "127.0.0.1",
+    port: configuredPort,
     strictPort: true,
-    proxy: createApiProxy(),
+    proxy,
   },
   test: {
     environment: "node",

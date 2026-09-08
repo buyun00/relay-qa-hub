@@ -1,6 +1,6 @@
+import { projectStorageKey } from "./project-context";
 import AppIcon from "./AppIcon";
 import { serverUploader } from "./increment-upload-api";
-import { UPLOAD_TARGETS } from "@relay-qa-hub/upload-contract";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type {
   UploadInput,
@@ -11,17 +11,16 @@ import type {
 import {
   UPLOAD_MODES,
   UPLOAD_STEPS,
-  uploadDraftDefaults,
   uploadErrorLabel,
   uploadJobLabel,
   uploadProgress,
   uploadStageLabel,
   uploadPlatform,
-  selectUploadPlatform,
+  projectUploadDraft,
 } from "./upload-model";
 import "./upload-increment.css";
 
-const EMPTY = uploadDraftDefaults(null);
+const EMPTY = projectUploadDraft(null, {});
 const size = (value: number) =>
   value >= 1024 ** 3
     ? `${(value / 1024 ** 3).toFixed(2)} GB`
@@ -178,20 +177,28 @@ export default function UploadIncrementPage({
   active,
   refreshRevision,
   userId,
+  defaults,
 }: {
   active: boolean;
   refreshRevision: number;
   userId: string;
+  defaults: Record<string, unknown>;
 }) {
   const bridge = serverUploader;
-  const draftKey = `qa-hub:upload-draft:${userId}`;
+  const draftKey = projectStorageKey("upload-draft", undefined, userId);
   const [form, setForm] = useState<UploadInput>(() => {
     try {
-      return uploadDraftDefaults(JSON.parse(localStorage.getItem(draftKey) ?? "{}"));
+      return projectUploadDraft(JSON.parse(localStorage.getItem(draftKey) ?? "{}"), defaults);
     } catch {
-      return { ...EMPTY };
+      return projectUploadDraft(null, defaults);
     }
   });
+  const defaultsFingerprint = JSON.stringify(defaults);
+  useEffect(() => {
+    setForm((current) =>
+      projectUploadDraft(current, JSON.parse(defaultsFingerprint) as Record<string, unknown>),
+    );
+  }, [defaultsFingerprint]);
   const [snapshot, setSnapshot] = useState<UploaderSnapshot | null>(null);
   const [selectedId, setSelectedId] = useState("");
   useEffect(() => {
@@ -215,7 +222,20 @@ export default function UploadIncrementPage({
   const [review, setReview] = useState(false);
   const [testDrafts, setTestDrafts] = useState<
     Record<string, { testerId: number; testResultReference: string }>
-  >({});
+  >(() => {
+    try {
+      return JSON.parse(localStorage.getItem(`${draftKey}:test-results`) ?? "{}");
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(`${draftKey}:test-results`, JSON.stringify(testDrafts));
+    } catch {
+      /* Retain the visible draft in memory. */
+    }
+  }, [draftKey, testDrafts]);
   const job = snapshot?.jobs.find((item) => item.id === selectedId) ?? snapshot?.jobs[0];
   const hasActive = snapshot?.jobs.some((item) => item.active) ?? false;
   const testDraft = job ? (testDrafts[job.id] ?? job.input) : EMPTY;
@@ -280,7 +300,7 @@ export default function UploadIncrementPage({
   const start = () => {
     if (!bridge) return;
     void action("start", async () => {
-      const id = unwrap(await bridge.start(form));
+      const id = unwrap(await bridge.start(projectUploadDraft(form, defaults)));
       setSelectedId(id);
       setReview(false);
       setNotice("任务已提交服务端排队，退出客户端或关闭电脑不影响执行。");
@@ -311,7 +331,7 @@ export default function UploadIncrementPage({
     <div className="upload-page">
       <header className="upload-heading">
         <div>
-          <span className="upload-eyebrow">OZDQP · 版本交付</span>
+          <span className="upload-eyebrow">项目版本交付</span>
           <h1>上传增量</h1>
           <p>服务端统一排队，自动完成上传、提测与发布。关闭客户端后继续执行。</p>
         </div>
@@ -442,9 +462,7 @@ export default function UploadIncrementPage({
                 <span>ZIP</span>
                 <div>
                   <strong>
-                    {uploadPlatform(form) === "ios"
-                      ? "iOS · 最新 ZIP"
-                      : "Android · _pkg_cfg_2001_1002.zip"}
+                    {uploadPlatform(form) === "ios" ? "iOS · 最新 ZIP" : "本项目增量 ZIP"}
                   </strong>
                   <small>
                     {uploadPlatform(form) === "ios"
@@ -453,7 +471,7 @@ export default function UploadIncrementPage({
                   </small>
                   <details>
                     <summary>查看取包地址</summary>
-                    <code>{UPLOAD_TARGETS[uploadPlatform(form)].sourceUrl}</code>
+                    <code>{snapshot?.sourceUrl || "由此项目配置提供"}</code>
                   </details>
                 </div>
               </div>
@@ -464,72 +482,7 @@ export default function UploadIncrementPage({
                   setReview(true);
                 }}
               >
-                <label>
-                  包类型
-                  <select
-                    aria-label="包类型"
-                    value={uploadPlatform(form)}
-                    onChange={(event) => {
-                      setForm((current) =>
-                        selectUploadPlatform(
-                          current,
-                          event.target.value === "ios" ? "ios" : "android",
-                        ),
-                      );
-                      setReview(false);
-                    }}
-                  >
-                    <option value="android">Android</option>
-                    <option value="ios">iOS</option>
-                  </select>
-                </label>
-                <div className="upload-field-pair">
-                  <label>
-                    产品 ID
-                    <input
-                      required
-                      inputMode="numeric"
-                      pattern="[1-9][0-9]*"
-                      maxLength={20}
-                      value={form.productId}
-                      placeholder="例如 2002"
-                      onChange={(event) => setField("productId", event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    渠道 ID
-                    <input
-                      required
-                      inputMode="numeric"
-                      pattern="[1-9][0-9]*"
-                      maxLength={20}
-                      value={form.channelId}
-                      placeholder="例如 1002"
-                      onChange={(event) => {
-                        const channelId = event.target.value;
-                        setForm((current) =>
-                          ["1002", "2004"].includes(channelId)
-                            ? selectUploadPlatform(
-                                current,
-                                channelId === "2004" ? "ios" : "android",
-                              )
-                            : { ...current, channelId },
-                        );
-                        setReview(false);
-                      }}
-                    />
-                  </label>
-                </div>
-                <label>
-                  产品 / 渠道名称
-                  <input
-                    required
-                    maxLength={300}
-                    value={form.belongName}
-                    placeholder="例如 [2002]Baloot Go|[1002]谷歌-国际正式"
-                    onChange={(event) => setField("belongName", event.target.value)}
-                  />
-                </label>
+                <p>上传目标：{form.belongName || "等待 GM 配置此项目"}</p>
                 <label>
                   版本号 <span className="upload-muted">留空由平台生成</span>
                   <input
@@ -583,8 +536,8 @@ export default function UploadIncrementPage({
                     <p>
                       {form.belongName}
                       <br />
-                      {UPLOAD_TARGETS[uploadPlatform(form)].label} · 产品 {form.productId} · 渠道{" "}
-                      {form.channelId} · 版本 {form.version || "自动生成"} · 测试人 {form.testerId}
+                      目标 · 产品 {form.productId} · 渠道 {form.channelId} · 版本{" "}
+                      {form.version || "自动生成"} · 测试人 {form.testerId}
                     </p>
                     <p>
                       {form.mode === "publish_workflow"

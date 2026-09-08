@@ -1,0 +1,180 @@
+{
+  "version": "0.5.0",
+  "verification": "local-loopback-and-handler-fixtures",
+  "passed": 40,
+  "failed": 0,
+  "realPlatformTested": false,
+  "realAccountLoginTested": false,
+  "tencentSdkTransferTested": false,
+  "fixture": {
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\OZDQP-Uploader-self-test\\db132e0d887e4d6c8fb92033dec5578b\\fixture.zip",
+    "size": 53477496,
+    "lastWriteUtc": "2026-09-08T17:29:31.3295566Z",
+    "md5": "1a6e792802ee17b91cd0f721764515a7",
+    "sha256": "e9bb379e6ef7b6aa91ba81b10e7f11d475fb62e7ef3ecfca164d81daacba2695",
+    "zipEntries": 1
+  },
+  "tests": [
+    {
+      "name": "fresh_upload_full_workflow",
+      "passed": true
+    },
+    {
+      "name": "md5_hit_skips_object_transfer",
+      "passed": true
+    },
+    {
+      "name": "lost_update_ack_reconciles_without_rewrite",
+      "passed": true
+    },
+    {
+      "name": "lost_create_ack_stops_without_adopting_other_version",
+      "passed": true
+    },
+    {
+      "name": "lost_object_registration_ack_reconciles_without_reupload",
+      "passed": true
+    },
+    {
+      "name": "existing_version_conflict_leaves_no_write_intent",
+      "passed": true
+    },
+    {
+      "name": "test_result_checkpoint_and_resume",
+      "passed": true
+    },
+    {
+      "name": "prepare_publish_stops_at_60_and_resume_does_not_publish",
+      "passed": true
+    },
+    {
+      "name": "changed_release_directory_is_not_published",
+      "passed": true
+    },
+    {
+      "name": "early_confirmation_and_changed_remote_state_do_not_publish",
+      "passed": true
+    },
+    {
+      "name": "recorded_full_workflow_needs_no_fabricated_test_result",
+      "passed": true
+    },
+    {
+      "name": "publishing_99_is_not_success_and_poll_resumes",
+      "passed": true
+    },
+    {
+      "name": "release_processing_error_blocks_publish",
+      "passed": true
+    },
+    {
+      "name": "authorization_failure_has_no_business_writes",
+      "passed": true
+    },
+    {
+      "name": "invalid_business_code_is_not_success",
+      "passed": true
+    },
+    {
+      "name": "changed_file_and_unsafe_zip_are_rejected",
+      "passed": true
+    },
+    {
+      "name": "journal_excludes_concurrent_task_owner",
+      "passed": true
+    },
+    {
+      "name": "fixed_download_url_no_auth_and_completed_snapshot_reused",
+      "passed": true
+    },
+    {
+      "name": "partial_download_never_promoted_and_retry_starts_fresh",
+      "passed": true
+    },
+    {
+      "name": "download_html_is_rejected",
+      "passed": true
+    },
+    {
+      "name": "password_login_matches_live_frontend_contract",
+      "passed": true
+    },
+    {
+      "name": "subaccount_token_parsed_without_following_untrusted_redirect",
+      "passed": true
+    },
+    {
+      "name": "refresh_token_rotation_contract",
+      "passed": true
+    },
+    {
+      "name": "plaintext_login_config_roundtrip_and_origin_binding",
+      "passed": true
+    },
+    {
+      "name": "expired_refresh_uses_saved_password_once",
+      "passed": true
+    },
+    {
+      "name": "expired_business_token_refreshes_once_before_retrying_write",
+      "passed": true
+    },
+    {
+      "name": "expired_token_retry_is_bounded",
+      "passed": true
+    },
+    {
+      "name": "cos_completion_serializes_parts_in_numeric_order_after_parallel_acks",
+      "passed": true
+    },
+    {
+      "name": "cos_diagnostics_preserve_status_without_credentials",
+      "passed": true
+    },
+    {
+      "name": "sdk_parallel_parts_have_correct_bytes_and_bounded_concurrency",
+      "passed": true
+    },
+    {
+      "name": "failed_parallel_request_drains_acks_and_resume_sends_only_missing_parts",
+      "passed": true
+    },
+    {
+      "name": "parallel_cancellation_finishes_before_journal_closes",
+      "passed": true
+    },
+    {
+      "name": "ios_pinned_source_download_and_completed_snapshot_reuse",
+      "passed": true
+    },
+    {
+      "name": "ios_source_rejects_other_hosts_paths_and_traversal",
+      "passed": true
+    },
+    {
+      "name": "build_source_stable",
+      "passed": true
+    },
+    {
+      "name": "build_source_changed_before",
+      "passed": true
+    },
+    {
+      "name": "build_source_changed_during",
+      "passed": true
+    },
+    {
+      "name": "project_binding_requires_explicit_scope_and_targets",
+      "passed": true
+    },
+    {
+      "name": "source_binding_has_no_default_and_cannot_escape_project_root",
+      "passed": true
+    },
+    {
+      "name": "server_auth_cache_is_explicit_and_separate_from_desktop",
+      "passed": true
+    }
+  ],
+  "at": "2026-09-08T17:29:41.5073647+00:00"
+}

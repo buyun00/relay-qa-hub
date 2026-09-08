@@ -66,6 +66,10 @@ object QaRuntimeConfigLoader {
             baseUrl = configuredUrl,
             allowPrivateHttp = true,
         ).toString()
+        val endpoint = java.net.URI(normalizedUrl)
+        require(endpoint.port != 4319 && endpoint.host != "qa-hub.invalid") {
+            "Preview requires a configured isolated API; production port 4319 is forbidden"
+        }
         return QaRuntimeConfig(SCHEMA_VERSION, normalizedUrl)
     }
 
@@ -104,17 +108,8 @@ object QaRuntimeConfigLoader {
     }
 
     private fun seedConfig(context: Context, buildDefaultApiBaseUrl: String): QaRuntimeConfig {
-        val assetSeed = context.assets.open(FILE_NAME).use { input ->
-            val bytes = input.readBytes()
-            require(bytes.size <= MAX_CONFIG_BYTES) { "qa runtime config is too large" }
-            parse(bytes.toString(Charsets.UTF_8))
-        }
         val buildDefault = buildDefaultApiBaseUrl.trim()
-        if (buildDefault.isEmpty() || buildDefault == assetSeed.apiBaseUrl) return assetSeed
-        val normalizedBuildDefault = QaHubApiEndpoint.parse(
-            baseUrl = buildDefault,
-            allowPrivateHttp = true,
-        ).toString()
-        return assetSeed.copy(apiBaseUrl = normalizedBuildDefault)
+        require(buildDefault.isNotEmpty()) { "Preview API configuration is required" }
+        return parse("{\"schemaVersion\":1,\"apiBaseUrl\":${JsonPrimitive(buildDefault)}}")
     }
 }

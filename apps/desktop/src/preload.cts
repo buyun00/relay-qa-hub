@@ -75,7 +75,7 @@ function parseRuntimeInfo(value: unknown): DesktopRuntimeInfo {
     (mcp["port"] as number) > 0 &&
     (mcp["port"] as number) <= 65535
       ? (mcp["port"] as number)
-      : 4320;
+      : 4420;
   const state = mcp["state"];
   return {
     apiBaseUrl: safeApiBaseUrl,

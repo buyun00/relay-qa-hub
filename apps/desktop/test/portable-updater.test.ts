@@ -191,6 +191,38 @@ test("a missing or modified cached installer is downloaded and verified again", 
   assert.equal(f.updater.state.status, "ready");
 });
 
+test("retries retain interrupted downloads and rejected installer bytes", async (t) => {
+  const f = await updateFixture(t);
+  const directory = path.join(f.root, "updates");
+  const archiveName = `${f.intermediate.manifest.releaseId}.exe`;
+  await fs.mkdir(directory, { recursive: true });
+  const interruptedName = `${archiveName}.previous.partial`;
+  const interrupted = Buffer.from("previous interrupted download");
+  await fs.writeFile(path.join(directory, interruptedName), interrupted);
+  f.server.corruptArchive = true;
+  await f.updater.check();
+  assert.deepEqual(f.updater.state, { status: "error", message: "UPDATE_ARCHIVE_HASH_MISMATCH" });
+  const failedName = (await fs.readdir(directory)).find((name) => name.endsWith(".partial.failed"));
+  assert.ok(failedName);
+  const rejected = await fs.readFile(path.join(directory, failedName));
+  assert.equal(rejected.length, f.intermediate.archive.length);
+  assert.notDeepEqual(rejected, f.intermediate.archive);
+  f.server.corruptArchive = false;
+  await f.updater.check();
+  assert.equal(f.updater.state.status, "ready");
+  const modified = Buffer.alloc(f.intermediate.archive.length, 7);
+  await fs.writeFile(path.join(directory, archiveName), modified);
+  await f.updater.check();
+  const retainedName = (await fs.readdir(directory)).find((name) =>
+    name.startsWith(`${archiveName}.retained-`),
+  );
+  assert.ok(retainedName);
+  assert.deepEqual(await fs.readFile(path.join(directory, retainedName)), modified);
+  assert.deepEqual(await fs.readFile(path.join(directory, interruptedName)), interrupted);
+  assert.deepEqual(await fs.readFile(path.join(directory, failedName)), rejected);
+  assert.deepEqual(await fs.readFile(path.join(directory, archiveName)), f.intermediate.archive);
+});
+
 function signedManifest() {
   const { privateKey, publicKey } = generateKeyPairSync("ed25519");
   const payload = {

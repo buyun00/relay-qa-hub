@@ -1,4 +1,4 @@
-import { createHash, createPublicKey, verify } from "node:crypto";
+import { createHash, createPublicKey, randomUUID, verify } from "node:crypto";
 import { createReadStream, createWriteStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { Readable, Transform } from "node:stream";
@@ -367,9 +367,13 @@ export class PortableUpdater {
       this.options.updatesDirectory,
       `${manifest.releaseId}${archiveExtension}`,
     );
-    const temporaryFile = `${archiveFile}.partial`;
-    await fs.rm(temporaryFile, { force: true });
-    await fs.rm(archiveFile, { force: true });
+    const temporaryFile = `${archiveFile}.${randomUUID()}.partial`;
+    // Keep prior downloads and incomplete attempts available for recovery review.
+    try {
+      await fs.rename(archiveFile, `${archiveFile}.retained-${randomUUID()}`);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
     this.emit({
       status: "downloading",
       releaseId: manifest.releaseId,
@@ -424,7 +428,7 @@ export class PortableUpdater {
       }
       await fs.rename(temporaryFile, archiveFile);
     } catch (cause) {
-      await fs.rm(temporaryFile, { force: true }).catch(() => undefined);
+      await fs.rename(temporaryFile, `${temporaryFile}.failed`).catch(() => undefined);
       throw cause;
     }
     this.readyManifest = manifest;
@@ -465,7 +469,7 @@ export class PortableUpdater {
 
     const stagingDirectory = path.join(
       this.options.updatesDirectory,
-      `updater-${manifest.releaseId}-${this.options.currentPid ?? process.pid}`,
+      `updater-${manifest.releaseId}-${this.options.currentPid ?? process.pid}-${randomUUID()}`,
     );
     const updaterFile = path.join(stagingDirectory, "RelayQaHubUpdater.exe");
     const configFile = path.join(stagingDirectory, "update.ini");
@@ -492,7 +496,6 @@ export class PortableUpdater {
         "",
       ].join("\r\n");
 
-      await fs.rm(stagingDirectory, { recursive: true, force: true });
       await fs.mkdir(stagingDirectory, { recursive: true });
       await fs.copyFile(updaterSource, updaterFile);
       await fs.writeFile(
@@ -500,7 +503,14 @@ export class PortableUpdater {
         Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(configText, "utf16le")]),
         { mode: 0o600 },
       );
-      await fs.rm(resultFile, { force: true });
+      try {
+        await fs.rename(
+          resultFile,
+          path.join(this.options.updatesDirectory, `retained-update-result-${randomUUID()}.json`),
+        );
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
 
       this.emit({ status: "installing", releaseId: manifest.releaseId, version: manifest.version });
       const updater = spawn(updaterFile, [], {

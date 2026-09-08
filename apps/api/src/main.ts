@@ -1,4 +1,10 @@
-import { readFileSync } from "node:fs";
+import { importExecutionHeld } from "./import-execution-hold.js";
+import { mkdirSync, readFileSync } from "node:fs";
+import { applyParallelInstanceEnvironment } from "./parallel-instance.js";
+import { ProjectManagementService } from "./project-management.js";
+import { ProjectRequestContext } from "./project-request-context.js";
+import { ProjectComponentsRuntime } from "./project-components-runtime.js";
+import type { QingyuLinkPersistence } from "./qingyu-integration.js";
 import { isAbsolute, join, resolve } from "node:path";
 
 import {
@@ -19,7 +25,7 @@ import {
   resolvePort,
   resolveWebOrigins,
 } from "./config.js";
-import { createApiServer, type ApiServer } from "./server.js";
+import { closeApiRuntime, createApiServer, type ApiServer } from "./server.js";
 import { createSqliteApiHealthProbe } from "./health.js";
 import { createSqliteMobileAttachmentStore } from "./sqlite-mobile-attachment-store.js";
 import { createSqliteMobileBuildStore } from "./sqlite-mobile-build-store.js";
@@ -44,13 +50,7 @@ import {
   qaMembershipId,
   qaUserId,
 } from "./people-config.js";
-import {
-  parseRelayEndpoint,
-  startMobileRelayOutboxPump,
-  type MobileRelayOutboxPump,
-} from "./mobile-relay-outbox.js";
-import { QingyuClient } from "./qingyu-client.js";
-import { createQingyuIntegration, type QingyuLinkPersistence } from "./qingyu-integration.js";
+import { parseRelayEndpoint, type MobileRelayOutboxPump } from "./mobile-relay-outbox.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   accountId: "10000000-0000-4000-8000-000000000020",
@@ -218,37 +218,17 @@ function readAndroidUpdateRoot(dataRoot: string): string {
   return resolve(updateRoot);
 }
 
-function readQingyuStatePath(dataRoot: string): string {
-  const configured = process.env["QA_HUB_QINGYU_STATE_FILE"]?.trim();
-  const statePath =
-    configured === undefined ? join(dataRoot, "integrations", "qingyu-state.enc.json") : configured;
-  if (!isAbsolute(statePath)) throw new Error("QA_HUB_QINGYU_STATE_FILE must be an absolute path");
-  return resolve(statePath);
-}
-
-function readQingyuBaseUrl(): string | undefined {
-  const value = process.env["QA_HUB_QINGYU_BASE_URL"]?.trim();
-  if (value === undefined) return undefined;
-  const url = new URL(value);
-  if (url.protocol !== "https:" && url.protocol !== "http:") {
-    throw new Error("QA_HUB_QINGYU_BASE_URL must use HTTP or HTTPS");
-  }
-  return url.origin;
-}
-
-async function closeRuntime(
-  server: ApiServer | undefined,
-  worker: SqliteStorageWorker,
-  relayPump: MobileRelayOutboxPump | undefined,
-  backupRunner: ApiBackupRunner | undefined,
-): Promise<void> {
-  await backupRunner?.stop();
-  await relayPump?.stop();
-  await server?.stop();
-  await worker.close();
-}
-
 async function run(): Promise<void> {
+  const parallelInstance = applyParallelInstanceEnvironment(process.env);
+  console.info(
+    JSON.stringify({
+      event: "parallel-instance.validated",
+      instanceId: parallelInstance.instanceId,
+      sourceRoot: parallelInstance.sourceRoot,
+      dataRoot: parallelInstance.dataRoot,
+      apiPort: parallelInstance.apiPort,
+    }),
+  );
   const relayRuntime = readRelayRuntimeConfiguration();
   const webAuthMode = readWebAuthMode();
   const webSessionSecret = readWebSessionSecret(webAuthMode);
@@ -264,6 +244,8 @@ async function run(): Promise<void> {
     throw new Error("QA_HUB_BOOTSTRAP_ADMIN_PASSWORD requires session auth mode");
   }
   const storage = parseStorageEnvironment(process.env);
+  mkdirSync(storage.evidenceRoot, { recursive: true });
+  mkdirSync(storage.quarantineRoot, { recursive: true });
   const debugBearerToken = requireMobileAccessToken();
   const backupConfig = parseApiBackupEnvironment(process.env, {
     dataRoot: storage.dataRoot,
@@ -277,6 +259,7 @@ async function run(): Promise<void> {
   const worker = new SqliteStorageWorker({
     databaseFile: storage.databaseFile,
     busyTimeoutMs: storage.busyTimeoutMs,
+    executionHoldFile: join(storage.dataRoot, ".qa-hub-import-hold.json"),
     ...(backupConfig.enabled ? { backupRoot: join(backupConfig.backupRoot, "migration") } : {}),
     evidenceRoot: storage.evidenceRoot,
     quarantineRoot: storage.quarantineRoot,
@@ -289,12 +272,34 @@ async function run(): Promise<void> {
       : { relayPrincipalId: relayRuntime.relayPrincipalId }),
   });
   let server: ApiServer | undefined;
+  let projectComponentsRuntime: ProjectComponentsRuntime | undefined;
   let relayPump: MobileRelayOutboxPump | undefined;
   let backupRunner: ApiBackupRunner | undefined;
   let shutdownStarted = false;
+  const projectContext = new ProjectRequestContext();
+  const requestScope = projectContext.scope(MOBILE_SCOPE);
+  const projectManagementService = new ProjectManagementService({
+    worker,
+    accountId: MOBILE_SCOPE.accountId,
+    gmUserId: parallelInstance.gmUserId,
+  });
 
   try {
     const peopleSeededAt = new Date().toISOString();
+    await worker.ensureMobileScope({
+      ...MOBILE_SCOPE,
+      actorId: parallelInstance.gmUserId,
+      membershipId: qaMembershipId(parallelInstance.gmUserId),
+      actorDisplayName: "Preview GM",
+      actorEmail: qaLoginEmail(MOBILE_SCOPE.accountId, "Preview GM"),
+      createdAt: peopleSeededAt,
+    });
+    await worker.ensureMobileRelayRoles({
+      ...MOBILE_SCOPE,
+      actorId: parallelInstance.gmUserId,
+      membershipId: qaMembershipId(parallelInstance.gmUserId),
+      createdAt: peopleSeededAt,
+    });
     for (const person of activePeople) {
       const personScope: MobileScopeBootstrap = {
         ...MOBILE_SCOPE,
@@ -311,34 +316,10 @@ async function run(): Promise<void> {
     for (const user of activeAccountUsers) {
       loginDirectory.register({ id: user.userId, displayName: user.displayName });
     }
-    const activeIdentityLinks = await worker.listActiveUserIdentityLinks(MOBILE_SCOPE.accountId);
-    for (const link of activeIdentityLinks) {
-      loginDirectory.registerLink(
-        { id: link.sourceUserId, displayName: link.sourceDisplayName },
-        { id: link.canonicalUserId, displayName: link.canonicalDisplayName },
-      );
-    }
     const browserAuthStore =
       webAuthMode === "debug" || webSessionSecret === undefined
         ? undefined
-        : createSqliteBrowserAuthStore({
-            worker,
-            canonicalizePrincipal: (principal) => {
-              const canonical = loginDirectory.canonicalize({
-                id: principal.userId,
-                displayName: principal.displayName,
-              });
-              return canonical.id === principal.userId
-                ? principal
-                : {
-                    ...principal,
-                    userId: canonical.id,
-                    actorId: canonical.id,
-                    email: qaLoginEmail(MOBILE_SCOPE.accountId, canonical.displayName),
-                    displayName: canonical.displayName,
-                  };
-            },
-          });
+        : createSqliteBrowserAuthStore({ worker });
     if (browserAuthStore !== undefined && webBootstrapPassword !== undefined) {
       await browserAuthStore.ensureBrowserAdmin({
         accountId: MOBILE_SCOPE.accountId,
@@ -349,60 +330,115 @@ async function run(): Promise<void> {
         now: new Date().toISOString(),
       });
     }
-    const mobileBugStore = createSqliteMobileBugStore({ worker, scope: MOBILE_SCOPE });
+    const mobileBugStore = createSqliteMobileBugStore({ worker, scope: requestScope });
     const mobileAttachmentStore = createSqliteMobileAttachmentStore({
       worker,
-      scope: MOBILE_SCOPE,
-    });
-    const qingyuLinkStore: QingyuLinkPersistence = {
-      getBugLink: (bugId: string) =>
-        worker.getQingyuLink({
-          accountId: MOBILE_SCOPE.accountId,
-          projectId: MOBILE_SCOPE.projectId,
-          bugId,
-        }),
-      getByExternal: (externalProjectId: string, defectId: string) =>
-        worker.getQingyuLinkByExternal({
-          accountId: MOBILE_SCOPE.accountId,
-          projectId: MOBILE_SCOPE.projectId,
-          externalProjectId,
-          defectId,
-        }),
-      put: (link) =>
-        worker.putQingyuLink({
-          accountId: MOBILE_SCOPE.accountId,
-          projectId: MOBILE_SCOPE.projectId,
-          link,
-          updatedAt: new Date().toISOString(),
-        }),
-      updateSync: (link, values) =>
-        worker.updateQingyuLinkSync({
-          accountId: MOBILE_SCOPE.accountId,
-          projectId: MOBILE_SCOPE.projectId,
-          bugId: link.bugId,
-          expectedVersion: link.version,
-          syncStatus: values.syncStatus,
-          syncAttempts: values.syncAttempts,
-          syncedAt: values.syncedAt,
-          externalStatus: values.externalStatus,
-          lastSyncErrorCode: values.lastSyncErrorCode,
-          lastSyncErrorMessage: values.lastSyncErrorMessage,
-          lastSyncAt: values.lastSyncAt,
-          updatedAt: new Date().toISOString(),
-        }),
-    };
-    const qingyuBaseUrl = readQingyuBaseUrl();
-    const qingyuIntegration = await createQingyuIntegration({
-      statePath: readQingyuStatePath(storage.dataRoot),
-      secret: webSessionSecret ?? debugBearerToken,
-      qaProjectId: MOBILE_SCOPE.projectId,
-      mobileBugStore,
-      mobileAttachmentStore,
-      linkStore: qingyuLinkStore,
-      client: new QingyuClient(qingyuBaseUrl === undefined ? {} : { baseUrl: qingyuBaseUrl }),
+      scope: requestScope,
     });
     const configuredBuildSha = process.env["QA_HUB_BUILD_SHA"];
+    projectComponentsRuntime = new ProjectComponentsRuntime({
+      root: join(parallelInstance.runtimeRoot, "components"),
+      credentialRoot: join(parallelInstance.runtimeRoot, "credentials"),
+      instanceId: parallelInstance.instanceId,
+      evidenceRoot: storage.evidenceRoot,
+      executionHeld: () => importExecutionHeld(storage.dataRoot),
+      management: projectManagementService,
+      worker,
+      storesForProject: (projectId, componentVersion, relayBinding) => {
+        const scope = Object.freeze({ ...MOBILE_SCOPE, projectId });
+        const forActor = <T extends object>(store: T): T =>
+          new Proxy(store, {
+            get(target, property, receiver) {
+              const method: unknown = Reflect.get(target, property, receiver);
+              if (typeof method !== "function") return method;
+              return (command: unknown, ...rest: unknown[]) => {
+                const actorId =
+                  command && typeof command === "object" && "actorId" in command
+                    ? command.actorId
+                    : undefined;
+                return worker.runWithRequestAuthorization(
+                  actorId === parallelInstance.gmUserId
+                    ? {
+                        gm: {
+                          accountId: scope.accountId,
+                          projectId,
+                          actorId: parallelInstance.gmUserId,
+                        },
+                      }
+                    : {},
+                  () => Reflect.apply(method, target, [command, ...rest]),
+                );
+              };
+            },
+          });
+        const qingyuLinks: QingyuLinkPersistence = {
+          getBugLink: (bugId) =>
+            worker.getQingyuLink({ accountId: scope.accountId, projectId, bugId }),
+          getByExternal: (externalProjectId, defectId) =>
+            worker.getQingyuLinkByExternal({
+              accountId: scope.accountId,
+              projectId,
+              externalProjectId,
+              defectId,
+            }),
+          put: (link) =>
+            worker.putQingyuLink({
+              accountId: scope.accountId,
+              projectId,
+              link,
+              updatedAt: new Date().toISOString(),
+            }),
+          updateSync: (link, values) =>
+            worker.updateQingyuLinkSync({
+              accountId: scope.accountId,
+              projectId,
+              bugId: link.bugId,
+              expectedVersion: link.version,
+              syncStatus: values.syncStatus,
+              syncAttempts: values.syncAttempts,
+              syncedAt: values.syncedAt,
+              externalStatus: values.externalStatus,
+              lastSyncErrorCode: values.lastSyncErrorCode,
+              lastSyncErrorMessage: values.lastSyncErrorMessage,
+              lastSyncAt: values.lastSyncAt,
+              updatedAt: new Date().toISOString(),
+            }),
+        };
+        return {
+          bugs: forActor(createSqliteMobileBugStore({ worker, scope })),
+          relay: forActor(
+            createSqliteMobileRelayStore({
+              worker,
+              scope,
+              relayDispatchEnabled: relayBinding !== undefined && componentVersion > 0,
+              ...(relayBinding ?? {}),
+              canStart: async () => {
+                if (importExecutionHeld(storage.dataRoot)) return false;
+                const result = await worker.projectManagement<{
+                  items: { key: string; enabled: boolean }[];
+                }>({
+                  operation: "components",
+                  accountId: scope.accountId,
+                  projectId,
+                  actorId: parallelInstance.gmUserId,
+                  isGm: true,
+                });
+                return result.items.some((item) => item.key === "relay.production" && item.enabled);
+              },
+            }),
+          ),
+          attachments: forActor(createSqliteMobileAttachmentStore({ worker, scope })),
+          projects: forActor(createSqliteMobileProjectDirectoryStore({ worker, scope })),
+          qingyuLinks,
+        };
+      },
+    });
     server = createApiServer({
+      projectComponentsRuntime,
+      automationPublicApiOrigin: `http://${parallelInstance.apiHost}:${parallelInstance.apiPort}`,
+      projectManagementService,
+      projectRequestContext: projectContext,
+      isolateLegacyComponents: true,
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
       incrementUploadRoot: join(storage.dataRoot, "integrations", "increment-upload"),
@@ -427,33 +463,33 @@ async function run(): Promise<void> {
       }),
       mobileBugStore,
       mobileAttachmentStore,
-      qingyuIntegration,
-      mobileBuildStore: createSqliteMobileBuildStore({ worker, scope: MOBILE_SCOPE }),
-      mobileVerificationStore: createSqliteMobileVerificationStore({ worker, scope: MOBILE_SCOPE }),
+      // Legacy singleton integrations remain disconnected until their per-project
+      // adapters are configured. Creating this service does not authorize execution.
+      mobileBuildStore: createSqliteMobileBuildStore({ worker, scope: requestScope }),
+      mobileVerificationStore: createSqliteMobileVerificationStore({ worker, scope: requestScope }),
       mobileHumanWorkflowStore: createSqliteMobileHumanWorkflowStore({
         worker,
-        scope: MOBILE_SCOPE,
+        scope: requestScope,
       }),
-      mobileCommentStore: createSqliteMobileCommentStore({ worker, scope: MOBILE_SCOPE }),
-      mobileDuplicateStore: createSqliteMobileDuplicateStore({ worker, scope: MOBILE_SCOPE }),
-      mobileNotificationStore: createSqliteMobileInboxStore({ worker, scope: MOBILE_SCOPE }),
+      mobileCommentStore: createSqliteMobileCommentStore({ worker, scope: requestScope }),
+      mobileDuplicateStore: createSqliteMobileDuplicateStore({ worker, scope: requestScope }),
+      mobileNotificationStore: createSqliteMobileInboxStore({ worker, scope: requestScope }),
       notificationHintChannelEnabled: readNotificationHintChannelEnabled(),
       mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
         worker,
-        scope: MOBILE_SCOPE,
-        identityDirectory: loginDirectory,
+        scope: requestScope,
       }),
       mobileUserManagementStore: createSqliteMobileUserManagementStore({
         worker,
-        scope: MOBILE_SCOPE,
-        protectedUserIds: activePeople.map((person) => person.id),
+        scope: requestScope,
+        protectedUserIds: [...activePeople.map((person) => person.id), parallelInstance.gmUserId],
         identityDirectory: loginDirectory,
       }),
-      mobileMetricsStore: createSqliteMobileMetricsStore({ worker, scope: MOBILE_SCOPE }),
-      mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: MOBILE_SCOPE }),
+      mobileMetricsStore: createSqliteMobileMetricsStore({ worker, scope: requestScope }),
+      mobileCaptureStore: createSqliteMobileCaptureStore({ worker, scope: requestScope }),
       mobileRelayStore: createSqliteMobileRelayStore({
         worker,
-        scope: MOBILE_SCOPE,
+        scope: requestScope,
         relayDispatchEnabled: relayRuntime.endpoint !== undefined,
       }),
       ...(relayRuntime.webhookSecret === undefined
@@ -471,6 +507,13 @@ async function run(): Promise<void> {
         ? {}
         : {
             browserAuth: {
+              projectLogin: (name, projectId, now) =>
+                projectManagementService.login(name, projectId, now),
+              cookieName: parallelInstance.cookieName,
+              gm: {
+                userId: parallelInstance.gmUserId,
+                password: process.env["QA_HUB_GM_PASSWORD"]!,
+              },
               store: browserAuthStore,
               accountId: MOBILE_SCOPE.accountId,
               userId: MOBILE_SCOPE.actorId,
@@ -509,7 +552,13 @@ async function run(): Promise<void> {
       shutdownStarted = true;
       server?.app.log.info({ signal }, "stopping Relay QA Hub API");
       try {
-        await closeRuntime(server, worker, relayPump, backupRunner);
+        await closeApiRuntime({
+          server,
+          componentsRuntime: projectComponentsRuntime,
+          worker,
+          relayPump,
+          backupRunner,
+        });
         process.exitCode = 0;
       } catch (error: unknown) {
         server?.app.log.error({ error, signal }, "failed to stop Relay QA Hub API");
@@ -539,39 +588,7 @@ async function run(): Promise<void> {
     await backupRunner.start();
     if (shutdownStarted) return;
 
-    if (relayRuntime.endpoint !== undefined && relayRuntime.bearerToken !== undefined) {
-      relayPump = startMobileRelayOutboxPump({
-        worker,
-        endpoint: relayRuntime.endpoint,
-        bearerToken: relayRuntime.bearerToken,
-        ...(relayRuntime.qaInstanceId === undefined
-          ? {}
-          : { qaInstanceId: relayRuntime.qaInstanceId }),
-        evidenceRoot: storage.evidenceRoot,
-        onDelivery: (claim, _status, receipt) =>
-          server?.app.log.info(
-            {
-              outboxMessageId: claim.outboxMessageId,
-              handoffId: claim.handoffId,
-              relayTaskId: receipt.taskId,
-              relayTurnId: receipt.turnId,
-            },
-            "Relay handoff submitted",
-          ),
-        onRetry: (claim, errorCode, schedule) =>
-          server?.app.log.warn(
-            {
-              outboxMessageId: claim.outboxMessageId,
-              errorCode,
-              deadLetter: schedule.deadLetter,
-              nextAttemptAt: schedule.nextAttemptAt,
-            },
-            schedule.deadLetter
-              ? "Relay handoff moved to dead letter"
-              : "Relay handoff scheduled for retry",
-          ),
-      });
-    }
+    // Relay pumps belong to immutable project component versions.
   } catch (error: unknown) {
     if (server) {
       server.app.log.error({ error }, "Relay QA Hub API failed to start");
@@ -579,7 +596,16 @@ async function run(): Promise<void> {
       console.error("Relay QA Hub API failed to initialize", error);
     }
     process.exitCode = 1;
-    await closeRuntime(server, worker, relayPump, backupRunner).catch(() => undefined);
+    await closeApiRuntime({
+      server,
+      componentsRuntime: projectComponentsRuntime,
+      worker,
+      relayPump,
+      backupRunner,
+    }).catch((cleanupError: unknown) => {
+      if (server) server.app.log.error({ error: cleanupError }, "API startup cleanup failed");
+      else console.error("API startup cleanup failed", cleanupError);
+    });
   }
 }
 

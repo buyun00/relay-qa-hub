@@ -105,7 +105,7 @@ function requireProjectMembership(database: DatabaseSync, input: ListMobileBugsI
          ON actor.account_id = account.id
         AND actor.id = ?
         AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
@@ -185,8 +185,9 @@ export function listMobileBugs(database: DatabaseSync, input: ListMobileBugsInpu
     conditions.push(
       `(owner_id = ? OR owner_id IN (
         SELECT source_user_id
-        FROM user_identity_links
+        FROM project_identity_links
         WHERE account_id = bugs.account_id
+          AND project_id = bugs.project_id
           AND canonical_user_id = ?
           AND status = 'active'
       ))`,

@@ -1,0 +1,26 @@
+▶ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation
+  ✔ secondary artifact fallback preserves exact bytes for another reader of the bound Bug (67.3802ms)
+  ✔ wrong Bug, project, membership, resource URI and nested capture project cannot expose evidence (55.1139ms)
+  ✔ only validated clean content is exposed; disk and transport checksum failures are rejected (113.4213ms)
+  ✔ soft deletion denies capture metadata and raw artifacts while preserving stored evidence (47.5466ms)
+✔ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation (1147.7967ms)
+✔ actual MCP HTTP and SQLite: attachment upload, resource read, project isolation and API parity (854.2974ms)
+✔ actual HTTP and SQLite paginate 501 comments and 101 bound attachments without scope or content loss (8269.5087ms)
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (294.7232ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (90.7867ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (36.8675ms)
+✔ actual MCP HTTP reports protocol errors separately and retains the 90 business tools (90.6841ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (98.2311ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (12.7596ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (425.2144ms)
+✔ actual HTTP and SQLite authorize the 101st Relay member/project and recheck revocation, GM and disabled scope (1308.2383ms)
+✔ real HTTP project name login, protected GM identity, scoped membership and isolated cookie (656.0223ms)
+✔ actual API isolates concurrent users, explicit project headers and record-derived project context (1111.0651ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8782.0062

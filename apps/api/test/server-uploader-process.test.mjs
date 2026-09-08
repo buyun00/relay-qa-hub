@@ -20,7 +20,7 @@ test("real server supervisor records the worker result after the API closes", as
       account: "local-process-fixture",
       kind: "email",
       apiBase: "https://wrong-origin.invalid",
-      loginBase: "https://54cetx.jiaxiangxm.com",
+      loginBase: "https://login.fixture.invalid",
       accessToken: "fixture-invalid",
       refreshToken: "",
       password: "",
@@ -28,6 +28,23 @@ test("real server supervisor records the worker result after the API closes", as
   );
   const options = {
     root,
+    project: {
+      projectId: randomUUID(),
+      componentVersion: 1,
+      apiBase: "https://api.fixture.invalid",
+      loginBase: "https://login.fixture.invalid",
+      sourceUrl: "https://artifacts.fixture.invalid/preview.zip",
+      targetPrefix: "isolated-supervisor-test/pkg/",
+      testDirectoryPrefix: "isolated-supervisor-test/dir/",
+      releaseDirectoryPrefix: "isolated-supervisor-test/release/",
+      credentialRef: "fixture",
+      defaults: {
+        productId: "2002",
+        channelId: "1002",
+        belongName: "Local process fixture",
+        testerId: 11562,
+      },
+    },
     jenkins: {
       trigger: () => {
         throw new Error("NO_BUSINESS_WRITES");
@@ -67,8 +84,8 @@ test("real server supervisor records the worker result after the API closes", as
     await new Promise((r) => setTimeout(r, 100));
   }
   assert.equal(receipt?.finished, true);
-  assert.equal(receipt.exitCode, 3);
   const output = await readFile(path.join(jobRoot, `run-${meta.runId}.jsonl`), "utf8");
+  assert.equal(receipt.exitCode, 3, output);
   const event = output
     .split(/\r?\n/)
     .filter(Boolean)

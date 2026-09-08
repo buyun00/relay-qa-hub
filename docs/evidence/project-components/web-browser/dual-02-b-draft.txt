@@ -1,0 +1,4 @@
+Browser tab: 2, Title: "Relay QA Hub", URL: "http://127.0.0.1:4274/?projectId=25e1d898-9e59-4dbb-998e-bfebf2abc0bf".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+~			89 text entry area (settable) Bug 内容 填写完整问题内容即可。, Value: 双窗口 B 草稿：A 的内容和附件不得进入这里，A 撤权以后 B 仍可以创建。
+The focused UI element is 89 text entry area (settable) Bug 内容 填写完整问题内容即可。, Value: 双窗口 B 草稿：A 的内容和附件不得进入这里，A 撤权以后 B 仍可以创建。

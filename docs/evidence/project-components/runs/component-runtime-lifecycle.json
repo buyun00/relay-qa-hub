@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "completedAt": "2026-09-08T19:35:18.438Z",
+  "scope": "Isolated real API listener, component runtime and SQLite worker; injected external transport only; no preview/production service operations.",
+  "finding": "Existing onReady hook dispatched queued component work before a successful listen; startup construction failure could omit cleanup of the constructed runtime.",
+  "beforeFix": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-api-runtime-lifecycle-20260908T192240481Z\\before-fix-success\\before-fix.json",
+    "sha256": "a79eb383d47964381fe842eac03f0bdfe79fa2dc883fc8c1c5037d2345eb1e3e",
+    "recordedAt": "2026-09-08T19:22:56.304Z",
+    "kind": "original-behavior-reproduction",
+    "source": "apps/api/src/project-components-runtime.ts onReady hook",
+    "queuedBeforeListen": "queued",
+    "listenError": "EADDRINUSE",
+    "interceptedExternalRequests": 1,
+    "requests": [
+      {
+        "path": "/job/fixture/api/json",
+        "method": "GET"
+      }
+    ],
+    "actualExternalNetworkRequests": 0,
+    "fixtureRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-api-runtime-lifecycle-20260908T192240481Z\\before-fix-success",
+    "compiledRuntimeSha256": "436ac5ec9abcdad5a16b36a449995983179f9dfad475a96fa613d815449b6c76",
+    "finding": "The queued runtime starts during Fastify onReady before the occupied port makes listen fail."
+  },
+  "implementation": {
+    "start": "After successful app.listen and no pending stop",
+    "stop": "Stop accepting and drain HTTP, onClose drains component work and closes its database exactly once, then worker; fallback cleanup attempts remaining resources on errors",
+    "constructionFailure": "Runtime reference retained outside main try and passed to shared ordered cleanup",
+    "runtimeInternalSchedulingChanged": false
+  },
+  "validation": {
+    "newLifecycleTests": {
+      "passed": 9,
+      "failed": 0
+    },
+    "relatedApiRegression": {
+      "passed": 39,
+      "failed": 0
+    },
+    "fullApi": {
+      "command": "node .tools/npm-12.0.2/package/bin/npm-cli.js run test --workspace @relay-qa-hub/api",
+      "exitCode": 0,
+      "typeScriptBuildPassed": true,
+      "mjs": 151,
+      "ts": 33,
+      "total": 184,
+      "failed": 0,
+      "log": "docs/evidence/project-components/runs/api-final-lifecycle-source.txt",
+      "logSha256": "16a98d45f8a469b8162e91ed554982babd6071f49d6aff0099962c6047017ee4"
+    },
+    "web": {
+      "tests": 61,
+      "failed": 0,
+      "appTypecheckPassed": true,
+      "nodeTypecheckPassed": true,
+      "lintPassed": true,
+      "apiTestPlaceholder": "http://127.0.0.1:1",
+      "productBundleRebuilt": false
+    },
+    "formatPassed": true,
+    "diffCheckPassed": true,
+    "actualExternalNetworkRequests": 0
+  },
+  "sourceHashes": {
+    "apps/api/src/main.ts": "22a2f014fc18c6113dd473c57a2e8588de1d515e403a9acd353ae5a97cce4eba",
+    "apps/api/src/server.ts": "679f7834b88188ffdfd39e51d0d06e29ef76df7194d7ad76ad967f2319f6fba8",
+    "apps/api/src/project-components-runtime.ts": "cc626cdbf0da7e2761efcc5495c2b7ada38322a01697bb3108fccb6fc499376f",
+    "apps/api/test/component-runtime-lifecycle.test.mjs": "9f625553f82f1461b9c7c52cb93aa86c993c32b3078018e7b14b3f1ffddc63f2",
+    "apps/api/test/project-components-runtime.test.mjs": "55acd43e3e94d9b69144db2b7325fdc6123ac3e420a4ee5cb79b4fce7d0e97d7",
+    "apps/web/src/RelayOutboxPanel.test.tsx": "2deae09346f797daf2cc31864e387507f3ea6dd6747ae05e463f7a5a8395edc7"
+  },
+  "limitations": [
+    "No external executor end-to-end result is claimed.",
+    "Initial fixture setup and test-probe corrections are documented in component-runtime-lifecycle.md."
+  ]
+}

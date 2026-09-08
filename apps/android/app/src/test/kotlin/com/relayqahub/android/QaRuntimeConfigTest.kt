@@ -9,11 +9,11 @@ class QaRuntimeConfigTest {
     @Test
     fun `runtime config accepts the documented LAN endpoint`() {
         val config = QaRuntimeConfigLoader.parse(
-            """{"schemaVersion":1,"apiBaseUrl":"http://10.100.5.157:4319/api/v1"}""",
+            """{"schemaVersion":1,"apiBaseUrl":"http://127.0.0.1:4419/api/v1"}""",
         )
 
         assertEquals(1, config.schemaVersion)
-        assertEquals("http://10.100.5.157:4319/api/v1/", config.apiBaseUrl)
+        assertEquals("http://127.0.0.1:4419/api/v1/", config.apiBaseUrl)
     }
 
     @Test

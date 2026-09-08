@@ -1,0 +1,193 @@
+{
+  "recordedAt": "2026-09-08T19:30:39.7568456Z",
+  "readOnly": true,
+  "baseline": "runs/production-after-preview6-rollback.json",
+  "baselineRecordedAt": "2026-09-08T19:02:22.0909466Z",
+  "scope": "Only six file hashes, three process identities, production readiness/public update manifest and existing-device package metadata. No configuration bodies, credentials, app start/stop, restart, install or runtime/source mutation.",
+  "files": [
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\mvp-e2e-current.json",
+      "observedAt": "2026-09-08T19:30:37.8331867Z",
+      "bytes": 2014,
+      "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e",
+      "baselineSha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Config\\qa-people.json",
+      "observedAt": "2026-09-08T19:30:37.8420662Z",
+      "bytes": 2268,
+      "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374",
+      "baselineSha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Windows-x64-latest.json",
+      "observedAt": "2026-09-08T19:30:37.8426894Z",
+      "bytes": 413,
+      "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+      "baselineSha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Setup-x64.exe",
+      "observedAt": "2026-09-08T19:30:38.0271226Z",
+      "bytes": 150473551,
+      "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+      "baselineSha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+      "matchesBaseline": true
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+      "observedAt": "2026-09-08T19:30:38.0281697Z",
+      "bytes": 272,
+      "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a",
+      "baselineSha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a",
+      "matchesBaseline": true
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+      "observedAt": "2026-09-08T19:30:38.0289496Z",
+      "bytes": 355,
+      "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c",
+      "baselineSha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c",
+      "matchesBaseline": true
+    }
+  ],
+  "processes": [
+    {
+      "pid": 17160,
+      "exists": true,
+      "name": "RelayQaHub.exe",
+      "createdAt": "2026-09-08T10:24:12.5269520Z",
+      "baselineCreatedAt": "2026-09-08T10:24:12.5269520Z",
+      "sameStart": true,
+      "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+      "baselineExecutable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+      "executableMatch": true,
+      "observedAt": "2026-09-08T19:30:38.1493051Z",
+      "startComparisonPrecision": "100 ns UTC string normalization"
+    },
+    {
+      "pid": 10844,
+      "exists": true,
+      "name": "node.exe",
+      "createdAt": "2026-09-08T11:09:25.9817720Z",
+      "baselineCreatedAt": "2026-09-08T11:09:25.9817720Z",
+      "sameStart": true,
+      "executable": null,
+      "baselineExecutable": null,
+      "executableMatch": null,
+      "observedAt": "2026-09-08T19:30:38.2035294Z",
+      "startComparisonPrecision": "100 ns UTC string normalization"
+    },
+    {
+      "pid": 7420,
+      "exists": true,
+      "name": "node.exe",
+      "createdAt": "2026-09-07T09:37:15.3473300Z",
+      "baselineCreatedAt": "2026-09-07T09:37:15.3473300Z",
+      "sameStart": true,
+      "executable": null,
+      "baselineExecutable": null,
+      "executableMatch": null,
+      "observedAt": "2026-09-08T19:30:38.2474588Z",
+      "startComparisonPrecision": "100 ns UTC string normalization"
+    }
+  ],
+  "readiness": {
+    "observedAt": "2026-09-08T19:30:38.5138001Z",
+    "url": "http://127.0.0.1:4319/api/v1/health/ready",
+    "httpStatus": 200,
+    "status": "ready",
+    "schemaVersion": "12",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ],
+    "matchesBaseline": true
+  },
+  "windowsManifest": {
+    "observedAt": "2026-09-08T19:30:38.5446781Z",
+    "url": "http://127.0.0.1:4174/downloads/Relay-QA-Hub-Windows-x64-latest.json",
+    "httpStatus": 200,
+    "bytes": 413,
+    "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+    "baselineSha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+    "bytesMatchBaseline": true,
+    "version": "3.3.5",
+    "releaseId": "20260908T110747982Z",
+    "archiveSha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+    "archiveBytes": 150473551,
+    "signatureReverified": false
+  },
+  "android": {
+    "observedAt": "2026-09-08T19:30:38.5510195Z",
+    "device": "127.0.0.1:16384",
+    "daemonAlreadyListening": true,
+    "appsStartedOrStopped": false,
+    "packages": [
+      {
+        "package": "com.relayqahub.android.debug",
+        "queryExitCode": 0,
+        "versionCode": "14",
+        "versionName": "0.1.13-debug",
+        "pid": "5051",
+        "firstInstallTime": "2026-08-25 08:18:02",
+        "lastUpdateTime": "2026-09-08 16:57:11",
+        "expectedVersionCode": "14",
+        "versionMatches": true,
+        "dailyPidMatches": true,
+        "dailyInstallTimesMatch": true
+      },
+      {
+        "package": "com.relayqahub.android.preview.debug",
+        "queryExitCode": 0,
+        "versionCode": "21",
+        "versionName": "0.2.0-preview.7",
+        "pid": "16998",
+        "firstInstallTime": "2026-09-09 00:42:56",
+        "lastUpdateTime": "2026-09-09 02:45:55",
+        "expectedVersionCode": "21",
+        "versionMatches": true,
+        "dailyPidMatches": null,
+        "dailyInstallTimesMatch": null
+      }
+    ],
+    "deviceState": "device"
+  },
+  "passed": true,
+  "limitations": [
+    "No new manifest signature verification or installer download was performed.",
+    "App listener/version retention does not prove all business, queues or external tasks work.",
+    "ADB queries used the existing daemon and connected emulator; this is not physical Android evidence."
+  ],
+  "comparisonCorrection": {
+    "at": "2026-09-08T19:31:45.059Z",
+    "initialSameStart": [
+      {
+        "pid": 17160,
+        "sameStart": false
+      },
+      {
+        "pid": 10844,
+        "sameStart": false
+      },
+      {
+        "pid": 7420,
+        "sameStart": false
+      }
+    ],
+    "reason": "PowerShell ConvertFrom-Json converted baseline strings to DateTime; Parse on implicit culture string lost fractional seconds. Corrected with raw JSON timestamps normalized to exact seven UTC fractional digits. Original observed timestamps retained."
+  }
+}

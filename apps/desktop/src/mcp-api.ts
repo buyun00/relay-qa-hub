@@ -5,10 +5,11 @@ import path from "node:path";
 import type { DesktopConfig } from "./config.js";
 import { isAllowedNetworkUrl } from "./config.js";
 import { DesktopBrowserSessionCookieStore, readBoundedBody } from "./network.js";
+import { commitRememberedIdentity, RememberedIdentityCommitError } from "./remembered-identity.js";
 import { callProductionTool, PRODUCTION_MCP_TOOLS } from "./mcp-production.js";
 
 const QA_MEDIA_TYPE = "application/vnd.relay-qa-hub.v1.1+json";
-const MAX_JSON_BYTES = 4 * 1024 * 1024;
+const MAX_JSON_BYTES = 48 * 1024 * 1024;
 const MAX_ATTACHMENT_BYTES = 32 * 1024 * 1024;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/u;
@@ -46,6 +47,7 @@ export interface QaHubBinaryResponse {
 export interface QaHubApiTransport {
   readonly json: (pathname: string, request?: QaHubJsonRequest) => Promise<unknown>;
   readonly binary: (pathname: string) => Promise<QaHubBinaryResponse>;
+  readonly scopeEpoch?: () => number;
 }
 
 export class QaHubMcpError extends Error {
@@ -79,18 +81,38 @@ function parseJsonBytes(bytes: Uint8Array): unknown {
 
 export class DesktopQaHubApiClient implements QaHubApiTransport {
   private readonly fetchImpl: FetchImplementation;
-  private sessionRecovery: Promise<void> | null = null;
+  private sessionRecovery: { readonly epoch: number; readonly promise: Promise<void> } | null =
+    null;
 
   constructor(
     private readonly config: DesktopConfig,
     private readonly browserSession: DesktopBrowserSessionCookieStore,
     fetchImpl: FetchImplementation = fetch,
-    private readonly onSessionRenewed: () => void = () => undefined,
+    private readonly onSessionRenewed: () => void | Promise<void> = () => undefined,
   ) {
     this.fetchImpl = fetchImpl;
   }
 
-  private async credentialHeaders(): Promise<Headers> {
+  scopeEpoch(): number {
+    return this.browserSession.scopeEpoch();
+  }
+
+  private assertAuthentication(epoch: number): void {
+    if (!this.browserSession.isCurrentAuthentication(epoch))
+      throw new QaHubMcpError("QA_HUB_SESSION_CHANGED", "The active QA Hub identity changed", 409);
+  }
+
+  private async commitSessionIdentity(): Promise<void> {
+    try {
+      await commitRememberedIdentity(this.browserSession, this.onSessionRenewed);
+    } catch (error) {
+      if (!(error instanceof RememberedIdentityCommitError)) throw error;
+      throw new QaHubMcpError(error.code, error.message, error.status);
+    }
+  }
+
+  private async credentialHeaders(epoch: number): Promise<Headers> {
+    this.assertAuthentication(epoch);
     const headers = new Headers({ Accept: QA_MEDIA_TYPE });
     if (this.config.accessToken !== null) {
       headers.set("Authorization", `Bearer ${this.config.accessToken}`);
@@ -98,7 +120,8 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     }
     let cookie = this.browserSession.cookieHeader(null);
     if (cookie === null) {
-      await this.recoverPermanentSession();
+      await this.recoverPermanentSession(epoch);
+      this.assertAuthentication(epoch);
       cookie = this.browserSession.cookieHeader(null);
     }
     if (cookie === null) {
@@ -112,9 +135,16 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     return headers;
   }
 
-  private async createPermanentSession(): Promise<void> {
+  private async createPermanentSession(epoch: number): Promise<void> {
+    this.assertAuthentication(epoch);
     const name = this.browserSession.rememberedLoginName();
-    if (name === null) {
+    const projectId = this.browserSession.rememberedProjectId();
+    if (
+      name === null ||
+      projectId === null ||
+      this.browserSession.rememberedIdentity() !== "employee" ||
+      !this.browserSession.canRecoverAuthentication(epoch)
+    ) {
       throw new QaHubMcpError(
         "QA_HUB_LOGIN_REQUIRED",
         "Open Relay QA Hub EXE and sign in once before using its MCP tools",
@@ -131,20 +161,23 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
           Origin: this.config.csrfOrigin,
         },
         redirect: "manual",
-        body: JSON.stringify({ name, client: "web" }),
+        signal: AbortSignal.timeout(15000),
+        body: JSON.stringify({ name, projectId, client: "web" }),
       });
     } catch {
+      this.assertAuthentication(epoch);
       throw new QaHubMcpError(
         "QA_HUB_UNAVAILABLE",
         "Relay QA Hub API is unavailable from the EXE",
         503,
       );
     }
-    this.browserSession.captureSetCookie(response.headers.get("set-cookie"));
+    this.assertAuthentication(epoch);
     if (response.status >= 300 && response.status < 400) {
       throw new QaHubMcpError("QA_HUB_REDIRECT_BLOCKED", "QA Hub API redirect was blocked", 502);
     }
     const bytes = await readBoundedBody(response, MAX_JSON_BYTES);
+    this.assertAuthentication(epoch);
     const parsed = parseJsonBytes(bytes);
     if (!response.ok) {
       const code = responseErrorCode(parsed, `QA_HUB_HTTP_${response.status}`);
@@ -155,7 +188,8 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
       );
     }
     const principal = requireRecord(parsed, "principal");
-    this.browserSession.rememberLoginName(requireString(principal, "displayName", 1, 128));
+    this.browserSession.captureSetCookie(response.headers.get("set-cookie"));
+    this.browserSession.rememberPrincipal(principal);
     if (this.browserSession.cookieHeader(null) === null) {
       throw new QaHubMcpError(
         "QA_HUB_INVALID_RESPONSE",
@@ -163,14 +197,18 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
         502,
       );
     }
-    this.onSessionRenewed();
+    await this.commitSessionIdentity();
   }
 
-  private async recoverPermanentSession(): Promise<void> {
-    this.sessionRecovery ??= this.createPermanentSession().finally(() => {
-      this.sessionRecovery = null;
-    });
-    return this.sessionRecovery;
+  private async recoverPermanentSession(epoch: number): Promise<void> {
+    this.assertAuthentication(epoch);
+    if (this.sessionRecovery?.epoch !== epoch) {
+      const promise = this.createPermanentSession(epoch).finally(() => {
+        if (this.sessionRecovery?.promise === promise) this.sessionRecovery = null;
+      });
+      this.sessionRecovery = { epoch, promise };
+    }
+    return this.sessionRecovery.promise;
   }
 
   private endpoint(pathname: string): URL {
@@ -184,8 +222,8 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     return endpoint;
   }
 
-  private async csrfToken(): Promise<string> {
-    const principal = await this.requestJson("/api/v1/auth/me", { method: "GET" }, false);
+  private async csrfToken(epoch: number): Promise<string> {
+    const principal = await this.requestJson("/api/v1/auth/me", { method: "GET" }, false, epoch);
     const record = requireRecord(principal, "principal");
     return requireString(record, "csrfToken", 1, 512);
   }
@@ -195,13 +233,21 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     request: QaHubJsonRequest,
     includeCsrf: boolean,
     maxBytes: number,
+    epoch: number,
   ): Promise<{ readonly bytes: Uint8Array; readonly headers: Headers; readonly status: number }> {
     const method = request.method ?? "GET";
+    const publicRequest = [
+      "/api/v1/auth/login",
+      "/api/v1/auth/gm/login",
+      "/api/v1/mcp/tools",
+    ].includes(pathname);
     const csrfToken =
-      method !== "GET" && this.config.accessToken === null && includeCsrf
-        ? await this.csrfToken()
+      !publicRequest && method !== "GET" && this.config.accessToken === null && includeCsrf
+        ? await this.csrfToken(epoch)
         : null;
-    const headers = await this.credentialHeaders();
+    const headers = publicRequest
+      ? new Headers({ Accept: QA_MEDIA_TYPE })
+      : await this.credentialHeaders(epoch);
     for (const [name, value] of Object.entries(request.headers ?? {})) headers.set(name, value);
     if (method !== "GET") {
       headers.set("Origin", this.config.csrfOrigin);
@@ -212,13 +258,16 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
       body = JSON.stringify(request.body);
       if (
         Buffer.byteLength(body, "utf8") >
-        (pathname === "/api/v1/production/uploads" ? 36 * 1024 * 1024 : 1024 * 1024)
+        (["/api/v1/production/uploads", "/api/v1/mcp/call"].includes(pathname)
+          ? 36 * 1024 * 1024
+          : 1024 * 1024)
       ) {
         throw new QaHubMcpError("QA_HUB_REQUEST_TOO_LARGE", "QA Hub MCP request is too large");
       }
       if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
     }
     let response: Response;
+    this.assertAuthentication(epoch);
     try {
       response = await this.fetchImpl(this.endpoint(pathname), {
         method,
@@ -234,7 +283,7 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
         503,
       );
     }
-    this.browserSession.captureSetCookie(response.headers.get("set-cookie"));
+    this.assertAuthentication(epoch);
     if (response.status >= 300 && response.status < 400) {
       throw new QaHubMcpError("QA_HUB_REDIRECT_BLOCKED", "QA Hub API redirect was blocked", 502);
     }
@@ -251,6 +300,8 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
       }
       throw error;
     }
+    this.assertAuthentication(epoch);
+    this.browserSession.captureSetCookie(response.headers.get("set-cookie"));
     if (!response.ok) {
       const parsed = parseJsonBytes(bytes);
       const code = responseErrorCode(parsed, `QA_HUB_HTTP_${response.status}`);
@@ -264,21 +315,24 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     request: QaHubJsonRequest,
     includeCsrf: boolean,
     maxBytes: number,
+    epoch: number,
   ): Promise<{ readonly bytes: Uint8Array; readonly headers: Headers; readonly status: number }> {
     try {
-      return await this.requestOnce(pathname, request, includeCsrf, maxBytes);
+      return await this.requestOnce(pathname, request, includeCsrf, maxBytes, epoch);
     } catch (error) {
+      this.assertAuthentication(epoch);
       if (
         this.config.accessToken !== null ||
-        pathname === "/api/v1/auth/login" ||
+        ["/api/v1/auth/login", "/api/v1/auth/gm/login", "/api/v1/auth/logout"].includes(pathname) ||
         !(error instanceof QaHubMcpError) ||
         error.status !== 401 ||
         !RECOVERABLE_SESSION_CODES.has(error.code)
       ) {
         throw error;
       }
-      await this.recoverPermanentSession();
-      return this.requestOnce(pathname, request, includeCsrf, maxBytes);
+      await this.recoverPermanentSession(epoch);
+      this.assertAuthentication(epoch);
+      return this.requestOnce(pathname, request, includeCsrf, maxBytes, epoch);
     }
   }
 
@@ -286,18 +340,39 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
     pathname: string,
     request: QaHubJsonRequest,
     includeCsrf: boolean,
+    epoch: number,
   ): Promise<unknown> {
     const response = await this.request(
       pathname,
       request,
       includeCsrf,
       pathname.startsWith("/api/v1/production/attachments/") ? 36 * 1024 * 1024 : MAX_JSON_BYTES,
+      epoch,
     );
-    return parseJsonBytes(response.bytes);
+    this.assertAuthentication(epoch);
+    const value = parseJsonBytes(response.bytes);
+    if (["/api/v1/auth/login", "/api/v1/auth/gm/login"].includes(pathname)) {
+      this.browserSession.rememberPrincipal(value);
+      await this.commitSessionIdentity();
+    } else if (pathname === "/api/v1/auth/logout") {
+      this.browserSession.clearLoginName();
+      await this.commitSessionIdentity();
+    }
+    return value;
   }
 
   async json(pathname: string, request: QaHubJsonRequest = {}): Promise<unknown> {
-    return this.requestJson(pathname, request, true);
+    const authenticationChange =
+      request.method === "POST" &&
+      ["/api/v1/auth/login", "/api/v1/auth/gm/login", "/api/v1/auth/logout"].includes(pathname);
+    const epoch = authenticationChange
+      ? this.browserSession.beginAuthenticationChange()
+      : this.browserSession.authenticationEpoch();
+    try {
+      return await this.requestJson(pathname, request, true, epoch);
+    } finally {
+      if (authenticationChange) this.browserSession.finishAuthenticationChange(epoch);
+    }
   }
 
   async binary(pathname: string): Promise<QaHubBinaryResponse> {
@@ -306,6 +381,7 @@ export class DesktopQaHubApiClient implements QaHubApiTransport {
       { method: "GET", headers: { Accept: "application/octet-stream" } },
       false,
       MAX_ATTACHMENT_BYTES,
+      this.browserSession.authenticationEpoch(),
     );
     return { bytes: response.bytes, headers: response.headers };
   }
@@ -638,12 +714,31 @@ function requireUrl(record: Record<string, unknown>, key: string): string | unde
 }
 
 export class QaHubMcpTools {
-  readonly definitions = QA_HUB_MCP_TOOLS;
+  private sharedDefinitions: readonly McpToolDefinition[] = [];
+  get definitions(): readonly McpToolDefinition[] {
+    return this.options.sharedApi ? this.sharedDefinitions : QA_HUB_MCP_TOOLS;
+  }
 
   constructor(
     private readonly api: QaHubApiTransport,
     private readonly attachmentCacheRoot: string,
+    private readonly options: {
+      readonly sharedApi?: boolean;
+      readonly serviceOrigin?: string;
+    } = {},
   ) {}
+
+  async refreshDefinitions(): Promise<void> {
+    if (!this.options.sharedApi) return;
+    const catalog = requireRecord(await this.api.json("/api/v1/mcp/tools"), "catalog");
+    if (!Array.isArray(catalog["tools"]))
+      throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "Invalid server tool catalog");
+    this.sharedDefinitions = catalog["tools"].map((value) => {
+      const tool = requireRecord(value, "tool");
+      requireString(tool, "name", 1, 128);
+      return tool as unknown as McpToolDefinition;
+    });
+  }
 
   private async principal(): Promise<Record<string, unknown>> {
     return requirePrincipal(await this.api.json("/api/v1/auth/me"));
@@ -890,18 +985,63 @@ export class QaHubMcpTools {
 
   private async materializeAttachment(argumentsValue: unknown): Promise<unknown> {
     const input = requireRecord(argumentsValue, "arguments");
-    onlyKeys(input, ["bugId", "attachmentId"]);
+    onlyKeys(input, ["projectId", "bugId", "attachmentId"]);
     const bugId = requireUuid(input, "bugId");
     const attachmentId = requireUuid(input, "attachmentId");
+    const scopeEpoch = this.api.scopeEpoch?.();
+    const assertScope = () => {
+      if (scopeEpoch !== undefined && this.api.scopeEpoch?.() !== scopeEpoch)
+        throw new QaHubMcpError(
+          "QA_HUB_SESSION_CHANGED",
+          "The attachment request belongs to a previous identity or project",
+          409,
+        );
+    };
+    const principal = this.options.sharedApi ? await this.principal() : null;
+    assertScope();
     const bug = await this.getBug(bugId);
-    const list = requireRecord(
-      await this.api.json(`/api/v1/bugs/${encodeURIComponent(bugId)}/attachments?limit=50`),
-      "attachments",
-    );
-    const items = list["items"];
-    if (!Array.isArray(items)) {
-      throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "attachment list is invalid");
+    assertScope();
+    if (this.options.sharedApi && bug["projectId"] !== requireUuid(input, "projectId")) {
+      throw new QaHubMcpError(
+        "PROJECT_MISMATCH",
+        "Attachment project does not match the requested Bug",
+        404,
+      );
     }
+    const items: unknown[] = [];
+    const seenCursors = new Set<string>();
+    let cursor: string | null = null;
+    do {
+      const suffix = cursor === null ? "" : `&cursor=${encodeURIComponent(cursor)}`;
+      const list = requireRecord(
+        await this.api.json(
+          `/api/v1/bugs/${encodeURIComponent(bugId)}/attachments?limit=50${suffix}`,
+        ),
+        "attachments",
+      );
+      assertScope();
+      if (!Array.isArray(list["items"]))
+        throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "attachment list is invalid");
+      items.push(...list["items"]);
+      const next = list["nextCursor"];
+      if (next === null || next === undefined) cursor = null;
+      else if (typeof next !== "string" || !next || next.length > 8192 || seenCursors.has(next))
+        throw new QaHubMcpError("QA_HUB_INVALID_RESPONSE", "attachment cursor is invalid");
+      else {
+        cursor = next;
+        seenCursors.add(next);
+      }
+      if (
+        items.some(
+          (item) =>
+            typeof item === "object" &&
+            item !== null &&
+            !Array.isArray(item) &&
+            (item as Record<string, unknown>)["attachmentId"] === attachmentId,
+        )
+      )
+        break;
+    } while (cursor !== null);
     let metadataValue = items.find(
       (item) =>
         typeof item === "object" &&
@@ -937,6 +1077,7 @@ export class QaHubMcpTools {
     const response =
       captureResponse ??
       (await this.api.binary(`/api/v1/attachments/${encodeURIComponent(attachmentId)}`));
+    assertScope();
     const actualSha = createHash("sha256").update(response.bytes).digest("hex");
     if (response.bytes.byteLength !== expectedSize || actualSha !== expectedSha) {
       throw new QaHubMcpError(
@@ -944,7 +1085,15 @@ export class QaHubMcpTools {
         "Downloaded attachment did not match its QA Hub size and SHA-256",
       );
     }
-    const directory = path.resolve(this.attachmentCacheRoot, bugId);
+    const cacheScope =
+      principal === null
+        ? "legacy"
+        : createHash("sha256")
+            .update(
+              JSON.stringify([this.options.serviceOrigin, input["projectId"], principal["userId"]]),
+            )
+            .digest("hex");
+    const directory = path.resolve(this.attachmentCacheRoot, cacheScope, bugId);
     const target = path.resolve(
       directory,
       `${attachmentId}-${expectedSha.slice(0, 12)}-${safeFilename(filename)}`,
@@ -955,6 +1104,7 @@ export class QaHubMcpTools {
         "Attachment cache path is not allowed",
       );
     }
+    assertScope();
     await fs.mkdir(directory, { recursive: true });
     let cached = false;
     try {
@@ -971,8 +1121,10 @@ export class QaHubMcpTools {
       if (error instanceof QaHubMcpError) throw error;
       const code = (error as NodeJS.ErrnoException).code;
       if (code !== "ENOENT") throw error;
+      assertScope();
       await fs.writeFile(target, response.bytes, { flag: "wx", mode: 0o600 });
     }
+    assertScope();
     return {
       bugId,
       attachmentId,
@@ -1320,6 +1472,48 @@ export class QaHubMcpTools {
   }
 
   async call(name: string, argumentsValue: unknown): Promise<unknown> {
+    if (this.options.sharedApi) {
+      if (!this.sharedDefinitions.some((tool) => tool.name === name))
+        throw new QaHubMcpError("TOOL_NOT_FOUND", `Unknown QA Hub MCP tool: ${name}`, 404);
+      if (name === "qa_materialize_attachment") return this.materializeAttachment(argumentsValue);
+      if (name === "qa_logout")
+        return this.api.json("/api/v1/auth/logout", { method: "POST", body: {} });
+      if (name === "qa_login_gm") {
+        const args = requireRecord(argumentsValue, "arguments");
+        onlyKeys(args, ["request", "projectId"]);
+        const request = requireRecord(args["request"], "request");
+        if (
+          args["projectId"] !== undefined &&
+          request["projectId"] !== undefined &&
+          args["projectId"] !== request["projectId"]
+        )
+          throw new QaHubMcpError("PROJECT_MISMATCH", "Project identifiers must match", 400);
+        return this.api.json("/api/v1/auth/gm/login", {
+          method: "POST",
+          body: {
+            ...request,
+            ...(args["projectId"] ? { projectId: args["projectId"] } : {}),
+            client: "web",
+          },
+        });
+      }
+      if (name === "qa_login") {
+        const args = requireRecord(argumentsValue, "arguments");
+        onlyKeys(args, ["name", "projectId"]);
+        return this.api.json("/api/v1/auth/login", {
+          method: "POST",
+          body: {
+            name: requireString(args, "name", 1, 128),
+            projectId: requireUuid(args, "projectId"),
+            client: "web",
+          },
+        });
+      }
+      return this.api.json("/api/v1/mcp/call", {
+        method: "POST",
+        body: { name, arguments: argumentsValue },
+      });
+    }
     if (PRODUCTION_MCP_TOOLS.some((tool) => tool.name === name))
       return callProductionTool(name, argumentsValue, this.api, this.attachmentCacheRoot);
     switch (name) {

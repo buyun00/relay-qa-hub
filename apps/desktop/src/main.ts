@@ -1,4 +1,4 @@
-import { promises as fs } from "node:fs";
+import { promises as fs, mkdirSync } from "node:fs";
 import { applyWindowAction } from "./window-actions.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -33,7 +33,12 @@ import {
 } from "./network.js";
 import { DesktopQaHubApiClient, QaHubMcpTools } from "./mcp-api.js";
 import { QaHubMcpHttpServer, type QaHubMcpServerStatus } from "./mcp-server.js";
-import { loadDesktopRuntimeEnvironment, resolveDesktopRuntimePaths } from "./runtime-config.js";
+import { resolveDesktopRuntimePaths } from "./runtime-config.js";
+import { loadPreviewDesktopIdentity } from "./preview-config.js";
+import {
+  RememberedIdentityStore,
+  persistRendererAuthenticationResponse,
+} from "./remembered-identity.js";
 import { createAuthenticatedWssClient, createBrowserSessionWssClient } from "./wss-client.js";
 import { PortableUpdater, type DesktopUpdateState } from "./portable-updater.js";
 
@@ -46,10 +51,14 @@ const FALLBACK_TRAY_ICON =
 const PACKAGED_TRAY_ICON_FILE = "RelayQaHub.ico";
 const AUTO_START_DEFAULT_MARKER = "auto-start-default-v1";
 
-const runtimeEnvironment = loadDesktopRuntimeEnvironment(process.env);
+const previewIdentity = loadPreviewDesktopIdentity(process.env);
+const runtimeEnvironment = previewIdentity.environment;
+app.setName("QA Hub Preview");
+mkdirSync(previewIdentity.profileDirectory, { recursive: true });
+app.setPath("userData", previewIdentity.profileDirectory);
 const runtimePaths = resolveDesktopRuntimePaths(runtimeEnvironment);
 const notificationHistory = new NotificationHistory(runtimePaths.notificationHistoryFile);
-const browserSession = new DesktopBrowserSessionCookieStore();
+const browserSession = new DesktopBrowserSessionCookieStore(previewIdentity.cookieName);
 const rememberedLoginNameFile =
   runtimePaths.directory === null
     ? null
@@ -57,6 +66,11 @@ const rememberedLoginNameFile =
 const config = parseDesktopConfig(runtimeEnvironment, {
   webAssetsDirectory: path.resolve(currentDirectory, "../../../apps/web/dist"),
 });
+const rememberedIdentity = new RememberedIdentityStore(
+  rememberedLoginNameFile,
+  config.apiBaseUrl.origin,
+  browserSession,
+);
 
 let mainWindow: BrowserWindow | null = null;
 const packagingNotices = new Set<string>();
@@ -64,24 +78,13 @@ let tray: Tray | null = null;
 let transport: NotificationTransport;
 let updater: PortableUpdater | null = null;
 let mcpServer: QaHubMcpHttpServer | null = null;
+let apiClient: DesktopQaHubApiClient | null = null;
 let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
 async function loadRememberedLoginName(): Promise<void> {
-  if (rememberedLoginNameFile === null) return;
   try {
-    const raw = await fs.readFile(rememberedLoginNameFile, "utf8");
-    if (Buffer.byteLength(raw, "utf8") > 4_096) throw new Error("IDENTITY_FILE_TOO_LARGE");
-    const parsed = JSON.parse(raw) as unknown;
-    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new Error("IDENTITY_FILE_INVALID");
-    }
-    const record = parsed as { readonly schemaVersion?: unknown; readonly loginName?: unknown };
-    if (record.schemaVersion !== 1 || typeof record.loginName !== "string") {
-      throw new Error("IDENTITY_FILE_INVALID");
-    }
-    browserSession.restoreLoginName(record.loginName);
-    if (browserSession.rememberedLoginName() === null) throw new Error("IDENTITY_FILE_INVALID");
+    await rememberedIdentity.load();
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return;
     process.stderr.write(
@@ -93,19 +96,8 @@ async function loadRememberedLoginName(): Promise<void> {
   }
 }
 
-async function persistRememberedLoginName(): Promise<void> {
-  if (rememberedLoginNameFile === null) return;
-  const loginName = browserSession.rememberedLoginName();
-  if (loginName === null) {
-    await fs.rm(rememberedLoginNameFile, { force: true });
-    return;
-  }
-  await fs.mkdir(path.dirname(rememberedLoginNameFile), { recursive: true });
-  await fs.writeFile(
-    rememberedLoginNameFile,
-    `${JSON.stringify({ schemaVersion: 1, loginName })}\n`,
-    { encoding: "utf8", mode: 0o600 },
-  );
+function persistRememberedLoginName(): Promise<void> {
+  return rememberedIdentity.persist();
 }
 
 async function persistRememberedLoginNameSafely(): Promise<void> {
@@ -266,7 +258,12 @@ function notificationCredential(): string | null {
 }
 
 function syncNotificationCredential(): void {
-  transport?.updateAccessToken(notificationCredential());
+  const nextScope = browserSession.snapshot();
+  if (notificationScope !== nextScope && transport !== undefined) {
+    transport.stop();
+    transport = createTransport();
+    transport.start();
+  } else transport?.updateAccessToken(notificationCredential());
 }
 
 function sendUpdateState(state: DesktopUpdateState): void {
@@ -392,6 +389,7 @@ function setAutoStartAtLogin(enabled: boolean): void {
 }
 
 async function ensureDefaultAutoStart(): Promise<void> {
+  if (!config.autoStartAtLogin) return;
   const marker = path.join(app.getPath("userData"), AUTO_START_DEFAULT_MARKER);
   try {
     await fs.access(marker);
@@ -547,7 +545,7 @@ function createWindow(): BrowserWindow {
     minHeight: 640,
     show: false,
     backgroundColor: "#192f25",
-    title: "Relay QA Hub",
+    title: "QA Hub 项目预览",
     titleBarStyle: "hidden",
     titleBarOverlay: false,
     autoHideMenuBar: true,
@@ -708,10 +706,7 @@ function installIpcHandlers(): void {
 
 async function createUpdater(): Promise<PortableUpdater> {
   const notifiedReleases = new Set<string>();
-  const updateManifestUrl = new URL(
-    "/downloads/Relay-QA-Hub-Windows-x64-latest.json",
-    config.csrfOrigin,
-  );
+  const updateManifestUrl = new URL(previewIdentity.updateManifestUrl);
   const instance = new PortableUpdater({
     currentReleaseFile: path.join(app.getAppPath(), "release.json"),
     updatesDirectory: path.join(app.getPath("userData"), "updates"),
@@ -719,6 +714,7 @@ async function createUpdater(): Promise<PortableUpdater> {
     installDirectory: path.dirname(process.execPath),
     executableName: path.basename(process.execPath),
     manifestUrl: updateManifestUrl,
+    publicKeyPem: previewIdentity.updatePublicKeyPem,
     requestQuit: quitApplication,
     onState: (state) => {
       sendUpdateState(state);
@@ -745,9 +741,35 @@ async function registerAppProtocol(): Promise<void> {
       return responseJson({ code: "APP_ORIGIN_NOT_ALLOWED" }, 403);
     }
     if (url.pathname.startsWith("/api/")) {
-      const previousLoginName = browserSession.rememberedLoginName();
+      const previousLoginName = browserSession.snapshot();
+      if (
+        url.pathname === "/api/v1/auth/me" &&
+        request.method === "GET" &&
+        browserSession.cookieHeader(null) === null &&
+        browserSession.rememberedLoginName() !== null &&
+        browserSession.rememberedIdentity() === "employee"
+      ) {
+        try {
+          await apiClient?.json("/api/v1/auth/me");
+        } catch {
+          /* Preserve the identity and drafts; normal authentication response stays visible. */
+        }
+      }
       const response = await proxyRendererApiRequest(request, config, browserSession);
-      if (previousLoginName !== browserSession.rememberedLoginName()) {
+      const explicitAuthentication =
+        request.method === "POST" &&
+        ["/api/v1/auth/login", "/api/v1/auth/gm/login", "/api/v1/auth/logout"].includes(
+          url.pathname,
+        );
+      if (response.ok && explicitAuthentication) {
+        syncNotificationCredential();
+        return persistRendererAuthenticationResponse(
+          response,
+          browserSession,
+          persistRememberedLoginName,
+        );
+      }
+      if (previousLoginName !== browserSession.snapshot()) {
         await persistRememberedLoginNameSafely();
       }
       syncNotificationCredential();
@@ -757,16 +779,27 @@ async function registerAppProtocol(): Promise<void> {
   });
 }
 
+let notificationScope = "";
 function createTransport(): NotificationTransport {
+  const scope = browserSession.snapshot();
+  notificationScope = scope;
+  const projectId = browserSession.rememberedProjectId();
+  const socketUrl = new URL(config.wssUrl);
+  if (projectId !== null) socketUrl.searchParams.set("projectId", projectId);
   return new NotificationTransport({
-    socketUrl: config.wssUrl,
+    socketUrl,
     accessToken: notificationCredential(),
     openSocket: (url, credential) =>
       config.accessToken === null
         ? createBrowserSessionWssClient(url, credential)
         : createAuthenticatedWssClient(url, credential),
-    fetchInbox: () => fetchDurableInbox(config, browserSession.cookieHeader(null)),
-    showNotification: showNativeNotification,
+    fetchInbox: async () => {
+      const items = await fetchDurableInbox(config, browserSession.cookieHeader(null), projectId);
+      return browserSession.snapshot() === scope ? items : [];
+    },
+    showNotification: (notice) => {
+      if (browserSession.snapshot() === scope) showNativeNotification(notice);
+    },
     seenNotificationIds: notificationHistory.notificationIds,
     onStatus: sendConnectionStatus,
   });
@@ -774,20 +807,26 @@ function createTransport(): NotificationTransport {
 
 async function startApplication(): Promise<void> {
   Menu.setApplicationMenu(null);
-  if (process.platform === "win32") app.setAppUserModelId("com.relayqahub.desktop");
+  if (process.platform === "win32") app.setAppUserModelId("com.relayqahub.desktop.preview");
   await loadRememberedLoginName();
   await registerAppProtocol();
   transport = createTransport();
   updater = await createUpdater();
-  const apiClient = new DesktopQaHubApiClient(config, browserSession, fetch, () => {
-    void persistRememberedLoginNameSafely();
+  apiClient = new DesktopQaHubApiClient(config, browserSession, fetch, () => {
     syncNotificationCredential();
+    return persistRememberedLoginName();
   });
   if (config.mcpEnabled) {
     const mcpTools = new QaHubMcpTools(
       apiClient,
       path.join(app.getPath("userData"), "mcp-attachments"),
+      { sharedApi: true, serviceOrigin: config.apiBaseUrl.origin },
     );
+    try {
+      await mcpTools.refreshDefinitions();
+    } catch {
+      process.stderr.write('{"event":"desktop.mcp.catalog.unavailable"}\n');
+    }
     mcpServer = new QaHubMcpHttpServer({
       port: config.mcpPort,
       tools: mcpTools,
@@ -812,7 +851,7 @@ async function startApplication(): Promise<void> {
   installIpcHandlers();
   await ensureDefaultAutoStart();
   tray = new Tray(await trayIcon());
-  tray.setToolTip("Relay QA Hub");
+  tray.setToolTip("QA Hub 项目预览");
   tray.on("click", openMainWindow);
   tray.on("double-click", openMainWindow);
   rebuildTrayMenu();

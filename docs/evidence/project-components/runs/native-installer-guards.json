@@ -1,0 +1,788 @@
+{
+  "schemaVersion": 1,
+  "testType": "native-extracted-installer-onInit-guards",
+  "completedAt": "2026-09-08T19:10:05.493Z",
+  "scope": "Real original .onInit function compiled into isolated native NSIS fixtures; not a clean-user full installation test.",
+  "source": "scripts/project-components/preview-installer.nsi",
+  "sourceSha256": "ce7f07b501aeca5a0b49cea07e30e44a4567e06616ff8fd52e3eda377760bf78",
+  "sourceUnchanged": true,
+  "originalFunctionSha256": "85ab519ffc24d8e1fb254d1fc5614bcfa949e9c4ca940f7554ec0ac5a8e59068",
+  "originalFunctionLocalAppDataOccurrences": 3,
+  "transformation": "Extract the single original Function .onInit through FunctionEnd verbatim, substitute only literal $LOCALAPPDATA with each isolated case root. Harness defines ExistingIdentity and synthetic INSTANCE_ID, sets InstallDir, and writes an accepted sentinel only if the guard returns.",
+  "compiler": {
+    "path": "C:/Users/lin0/AppData/Local/electron-builder/Cache/nsis-3.0.4.1/nsis-3.0.4.1-1mx3n/makensis.exe",
+    "sha256": "f2b2b7726ac0d4e720dff52bfca11a5518d550fc75ed34a48dc47921527293f0",
+    "version": "v3.04"
+  },
+  "fixtureRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z",
+  "actualUserProgramsTouched": false,
+  "userRegistryOperationsIncluded": false,
+  "installationOrUninstallationBodiesIncluded": false,
+  "existingClientsTouched": false,
+  "junctionTargetsAllWithinFixtureRoot": true,
+  "fixturesRetained": true,
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "notRun": 0
+  },
+  "cases": [
+    {
+      "id": "missing-programs-created",
+      "expectedExitCode": 0,
+      "setup": "missing",
+      "status": "passed",
+      "startedAt": "2026-09-08T19:10:03.619Z",
+      "completedAt": "2026-09-08T19:10:03.856Z",
+      "actualExitCode": 0,
+      "signal": null,
+      "processError": null,
+      "directory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created",
+      "paths": {
+        "programs": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\local-appdata\\Programs",
+        "installDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\local-appdata\\Programs\\RelayQaHubPreview",
+        "marker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\local-appdata\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+        "accepted": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\accepted.txt",
+        "outside": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\outside",
+        "junctionTarget": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\junction-target",
+        "junctionSentinel": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\junction-target\\sentinel.txt",
+        "junctionMarker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\junction-target\\.preview-instance-id"
+      },
+      "artifacts": {
+        "harness": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\native-guard.nsi",
+        "harnessSha256": "2a08a92bdc29ea73cfaec2e02d08b5bf58b73bfe61fb147284ea0c65c31fd8b2",
+        "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\native-guard.exe",
+        "executableSha256": "a5af6c3f6ae93f260d449c3cd6144a091411428bb5b00aff5e37d8b0d1b91c74",
+        "compileLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\missing-programs-created\\compile.log"
+      },
+      "originalFunctionOnlyLocalAppDataSubstituted": true,
+      "before": {
+        "programs": {
+          "exists": false
+        },
+        "installDirectory": {
+          "exists": false
+        },
+        "marker": {
+          "exists": false
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "after": {
+        "programs": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "installDirectory": {
+          "exists": false
+        },
+        "marker": {
+          "exists": false
+        },
+        "accepted": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 14,
+          "sha256": "033b01ebc912891ff4362074c5b5582aa9d104eb1c032654fdbddfc60ed0a75d"
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "checks": {
+        "exitCode": true,
+        "acceptedSentinel": true,
+        "markerUnchanged": true,
+        "junctionTargetSentinelUnchanged": true,
+        "junctionTargetMarkerUnchanged": true,
+        "firstRunProgramsCreated": true,
+        "guardDidNotInstallDirectory": true,
+        "outOfScopeRejectedBeforeDirectoryCreation": true
+      }
+    },
+    {
+      "id": "existing-matching-marker",
+      "expectedExitCode": 0,
+      "setup": "matching-marker",
+      "status": "passed",
+      "startedAt": "2026-09-08T19:10:03.937Z",
+      "completedAt": "2026-09-08T19:10:04.187Z",
+      "actualExitCode": 0,
+      "signal": null,
+      "processError": null,
+      "directory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker",
+      "paths": {
+        "programs": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\local-appdata\\Programs",
+        "installDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\local-appdata\\Programs\\RelayQaHubPreview",
+        "marker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\local-appdata\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+        "accepted": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\accepted.txt",
+        "outside": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\outside",
+        "junctionTarget": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\junction-target",
+        "junctionSentinel": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\junction-target\\sentinel.txt",
+        "junctionMarker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\junction-target\\.preview-instance-id"
+      },
+      "artifacts": {
+        "harness": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\native-guard.nsi",
+        "harnessSha256": "c564a32681a9fe7b31368da750cdab604bad50955c61a7611c7fda132fb70b85",
+        "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\native-guard.exe",
+        "executableSha256": "adb81e42279d3684462bc61c72fb4dd00fd358adbbc3a3d80e54d37fadab022e",
+        "compileLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-matching-marker\\compile.log"
+      },
+      "originalFunctionOnlyLocalAppDataSubstituted": true,
+      "before": {
+        "programs": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "installDirectory": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "marker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "after": {
+        "programs": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "installDirectory": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "marker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        },
+        "accepted": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 14,
+          "sha256": "033b01ebc912891ff4362074c5b5582aa9d104eb1c032654fdbddfc60ed0a75d"
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "checks": {
+        "exitCode": true,
+        "acceptedSentinel": true,
+        "markerUnchanged": true,
+        "junctionTargetSentinelUnchanged": true,
+        "junctionTargetMarkerUnchanged": true,
+        "firstRunProgramsCreated": true,
+        "guardDidNotInstallDirectory": true,
+        "outOfScopeRejectedBeforeDirectoryCreation": true
+      }
+    },
+    {
+      "id": "existing-different-marker",
+      "expectedExitCode": 12,
+      "setup": "different-marker",
+      "status": "passed",
+      "startedAt": "2026-09-08T19:10:04.272Z",
+      "completedAt": "2026-09-08T19:10:04.521Z",
+      "actualExitCode": 12,
+      "signal": null,
+      "processError": null,
+      "directory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker",
+      "paths": {
+        "programs": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\local-appdata\\Programs",
+        "installDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\local-appdata\\Programs\\RelayQaHubPreview",
+        "marker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\local-appdata\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+        "accepted": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\accepted.txt",
+        "outside": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\outside",
+        "junctionTarget": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\junction-target",
+        "junctionSentinel": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\junction-target\\sentinel.txt",
+        "junctionMarker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\junction-target\\.preview-instance-id"
+      },
+      "artifacts": {
+        "harness": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\native-guard.nsi",
+        "harnessSha256": "312d3e6e47e7f23d3ed8346f2616defd63597621b3d3f0479706b10ff09e88ba",
+        "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\native-guard.exe",
+        "executableSha256": "7c89528f3e77a4e70cbd8f8c4350cf3374969bc31b5e79cfe11bf6ffc6c0e185",
+        "compileLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\existing-different-marker\\compile.log"
+      },
+      "originalFunctionOnlyLocalAppDataSubstituted": true,
+      "before": {
+        "programs": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "installDirectory": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "marker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 33,
+          "sha256": "b9701d8c59ce0239492c6694a7fc0992dcdf81a973e9a57ceb3b1b799ff6ec44"
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "after": {
+        "programs": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "installDirectory": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "marker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 33,
+          "sha256": "b9701d8c59ce0239492c6694a7fc0992dcdf81a973e9a57ceb3b1b799ff6ec44"
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "checks": {
+        "exitCode": true,
+        "acceptedSentinel": true,
+        "markerUnchanged": true,
+        "junctionTargetSentinelUnchanged": true,
+        "junctionTargetMarkerUnchanged": true,
+        "firstRunProgramsCreated": true,
+        "guardDidNotInstallDirectory": true,
+        "outOfScopeRejectedBeforeDirectoryCreation": true
+      }
+    },
+    {
+      "id": "programs-junction-rejected",
+      "expectedExitCode": 11,
+      "setup": "programs-junction",
+      "status": "passed",
+      "startedAt": "2026-09-08T19:10:04.605Z",
+      "completedAt": "2026-09-08T19:10:04.845Z",
+      "actualExitCode": 11,
+      "signal": null,
+      "processError": null,
+      "directory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected",
+      "paths": {
+        "programs": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\local-appdata\\Programs",
+        "installDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\local-appdata\\Programs\\RelayQaHubPreview",
+        "marker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\local-appdata\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+        "accepted": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\accepted.txt",
+        "outside": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\outside",
+        "junctionTarget": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\junction-target",
+        "junctionSentinel": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\junction-target\\sentinel.txt",
+        "junctionMarker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\junction-target\\.preview-instance-id"
+      },
+      "artifacts": {
+        "harness": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\native-guard.nsi",
+        "harnessSha256": "e48fccf920d7091e9eb62eed1d43e1eb39471cb007b4a627fd0dc57764d760a1",
+        "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\native-guard.exe",
+        "executableSha256": "38c56d867017c016d5807b568aa0186713e96d7c55ac1687c6341626cd22393a",
+        "compileLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\compile.log"
+      },
+      "originalFunctionOnlyLocalAppDataSubstituted": true,
+      "before": {
+        "programs": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": true,
+          "bytes": 145,
+          "target": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\junction-target"
+        },
+        "installDirectory": {
+          "exists": false
+        },
+        "marker": {
+          "exists": false
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "junctionSentinel": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 34,
+          "sha256": "0c508fea562e26c0a46856334c777a3f3ba9755efd466427b82722ddd57e9941"
+        },
+        "junctionMarker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        }
+      },
+      "after": {
+        "programs": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": true,
+          "bytes": 145,
+          "target": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\junction-target"
+        },
+        "installDirectory": {
+          "exists": false
+        },
+        "marker": {
+          "exists": false
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "junctionSentinel": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 34,
+          "sha256": "0c508fea562e26c0a46856334c777a3f3ba9755efd466427b82722ddd57e9941"
+        },
+        "junctionMarker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        }
+      },
+      "checks": {
+        "exitCode": true,
+        "acceptedSentinel": true,
+        "markerUnchanged": true,
+        "junctionTargetSentinelUnchanged": true,
+        "junctionTargetMarkerUnchanged": true,
+        "firstRunProgramsCreated": true,
+        "guardDidNotInstallDirectory": true,
+        "outOfScopeRejectedBeforeDirectoryCreation": true
+      }
+    },
+    {
+      "id": "install-directory-junction-rejected",
+      "expectedExitCode": 11,
+      "setup": "install-junction",
+      "status": "passed",
+      "startedAt": "2026-09-08T19:10:04.93Z",
+      "completedAt": "2026-09-08T19:10:05.186Z",
+      "actualExitCode": 11,
+      "signal": null,
+      "processError": null,
+      "directory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected",
+      "paths": {
+        "programs": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\local-appdata\\Programs",
+        "installDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\local-appdata\\Programs\\RelayQaHubPreview",
+        "marker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\local-appdata\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+        "accepted": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\accepted.txt",
+        "outside": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\outside",
+        "junctionTarget": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\junction-target",
+        "junctionSentinel": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\junction-target\\sentinel.txt",
+        "junctionMarker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\junction-target\\.preview-instance-id"
+      },
+      "artifacts": {
+        "harness": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\native-guard.nsi",
+        "harnessSha256": "23f04382b900f42170b7d3b1ca340d33c3ca97d94972adea5769bdbc9e34222e",
+        "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\native-guard.exe",
+        "executableSha256": "4e6f09247167ea4b736ed671f065b707c5095df869cb40764c2f5ba29dece457",
+        "compileLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\compile.log"
+      },
+      "originalFunctionOnlyLocalAppDataSubstituted": true,
+      "before": {
+        "programs": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "installDirectory": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": true,
+          "bytes": 154,
+          "target": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\junction-target"
+        },
+        "marker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "junctionSentinel": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 34,
+          "sha256": "0c508fea562e26c0a46856334c777a3f3ba9755efd466427b82722ddd57e9941"
+        },
+        "junctionMarker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        }
+      },
+      "after": {
+        "programs": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "installDirectory": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": true,
+          "bytes": 154,
+          "target": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\junction-target"
+        },
+        "marker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": true,
+          "directory": true,
+          "junctionOrSymlink": false,
+          "bytes": 0
+        },
+        "junctionSentinel": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 34,
+          "sha256": "0c508fea562e26c0a46856334c777a3f3ba9755efd466427b82722ddd57e9941"
+        },
+        "junctionMarker": {
+          "exists": true,
+          "directory": false,
+          "junctionOrSymlink": false,
+          "bytes": 31,
+          "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+        }
+      },
+      "checks": {
+        "exitCode": true,
+        "acceptedSentinel": true,
+        "markerUnchanged": true,
+        "junctionTargetSentinelUnchanged": true,
+        "junctionTargetMarkerUnchanged": true,
+        "firstRunProgramsCreated": true,
+        "guardDidNotInstallDirectory": true,
+        "outOfScopeRejectedBeforeDirectoryCreation": true
+      }
+    },
+    {
+      "id": "outside-instdir-rejected",
+      "expectedExitCode": 10,
+      "setup": "outside",
+      "status": "passed",
+      "startedAt": "2026-09-08T19:10:05.265Z",
+      "completedAt": "2026-09-08T19:10:05.493Z",
+      "actualExitCode": 10,
+      "signal": null,
+      "processError": null,
+      "directory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected",
+      "paths": {
+        "programs": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\local-appdata\\Programs",
+        "installDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\local-appdata\\Programs\\RelayQaHubPreview",
+        "marker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\local-appdata\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+        "accepted": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\accepted.txt",
+        "outside": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\outside",
+        "junctionTarget": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\junction-target",
+        "junctionSentinel": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\junction-target\\sentinel.txt",
+        "junctionMarker": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\junction-target\\.preview-instance-id"
+      },
+      "artifacts": {
+        "harness": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\native-guard.nsi",
+        "harnessSha256": "a4dde43b1c9487b3683432287d4be0bbb7599fd12b6246331e0d3da3aba4e96c",
+        "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\native-guard.exe",
+        "executableSha256": "2ed96945c5c7cb4f582969a7a023b9cf91f027ca107c64417a9d3859660f066d",
+        "compileLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\outside-instdir-rejected\\compile.log"
+      },
+      "originalFunctionOnlyLocalAppDataSubstituted": true,
+      "before": {
+        "programs": {
+          "exists": false
+        },
+        "installDirectory": {
+          "exists": false
+        },
+        "marker": {
+          "exists": false
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "after": {
+        "programs": {
+          "exists": false
+        },
+        "installDirectory": {
+          "exists": false
+        },
+        "marker": {
+          "exists": false
+        },
+        "accepted": {
+          "exists": false
+        },
+        "outside": {
+          "exists": false
+        },
+        "junctionTarget": {
+          "exists": false
+        },
+        "junctionSentinel": {
+          "exists": false
+        },
+        "junctionMarker": {
+          "exists": false
+        }
+      },
+      "checks": {
+        "exitCode": true,
+        "acceptedSentinel": true,
+        "markerUnchanged": true,
+        "junctionTargetSentinelUnchanged": true,
+        "junctionTargetMarkerUnchanged": true,
+        "firstRunProgramsCreated": true,
+        "guardDidNotInstallDirectory": true,
+        "outOfScopeRejectedBeforeDirectoryCreation": true
+      }
+    }
+  ],
+  "fixtureRelocation": {
+    "completedAt": "2026-09-08T19:16:19.2591045Z",
+    "reason": "Fixture junctions inside validated preview runtime caused INSTANCE_RUNTIME_LINK_REFUSED; only the two link entries were moved outside preview runtime.",
+    "sourceFixtureRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z",
+    "destinationRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-installer-guard-links-20260908T191619057Z",
+    "operation": "One PowerShell Move-Item invocation with two exact LiteralPath link entries; no recursive move or deletion.",
+    "originalCasePathsAreHistorical": true,
+    "previewAppDataProfileConfigUntouched": true,
+    "entries": [
+      {
+        "case": "programs-junction-rejected",
+        "oldLink": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\local-appdata\\Programs",
+        "newLink": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-installer-guard-links-20260908T191619057Z\\Programs",
+        "target": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\programs-junction-rejected\\junction-target",
+        "oldLinkAbsent": true,
+        "newLinkType": "Junction",
+        "newLinkAttributes": "Directory, ReparsePoint",
+        "targetPreserved": true,
+        "targetFiles": [
+          {
+            "name": ".preview-instance-id",
+            "bytes": 31,
+            "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+          },
+          {
+            "name": "sentinel.txt",
+            "bytes": 34,
+            "sha256": "0c508fea562e26c0a46856334c777a3f3ba9755efd466427b82722ddd57e9941"
+          }
+        ]
+      },
+      {
+        "case": "install-directory-junction-rejected",
+        "oldLink": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\local-appdata\\Programs\\RelayQaHubPreview",
+        "newLink": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-installer-guard-links-20260908T191619057Z\\RelayQaHubPreview",
+        "target": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\native-installer-guards-20260908T191003318Z\\install-directory-junction-rejected\\junction-target",
+        "oldLinkAbsent": true,
+        "newLinkType": "Junction",
+        "newLinkAttributes": "Directory, ReparsePoint",
+        "targetPreserved": true,
+        "targetFiles": [
+          {
+            "name": ".preview-instance-id",
+            "bytes": 31,
+            "sha256": "83ffea67c6fa63182daf1370e281ccc4c0a868d1a31f9b133ade6dd648675675"
+          },
+          {
+            "name": "sentinel.txt",
+            "bytes": 34,
+            "sha256": "0c508fea562e26c0a46856334c777a3f3ba9755efd466427b82722ddd57e9941"
+          }
+        ]
+      }
+    ],
+    "managerStatus": {
+      "checkedAt": "2026-09-08T19:17:02.771Z",
+      "command": "Manage-QAHubPreview.ps1 -Action Status -ConfigFile <preview runtime>/instance.json",
+      "exitCode": 0,
+      "runtimeValidationAccepted": true,
+      "services": [
+        {
+          "service": "api",
+          "running": true,
+          "pid": 9580
+        },
+        {
+          "service": "web",
+          "running": true,
+          "pid": 20284
+        },
+        {
+          "service": "mcp",
+          "running": true,
+          "pid": 15736
+        }
+      ],
+      "actionWasReadOnly": true
+    },
+    "futureFixturePlacement": "Future guard fixtures containing junctions must be created outside the validated preview runtime. The retained original runner describes historical paths and must not be rerun there unchanged."
+  }
+}

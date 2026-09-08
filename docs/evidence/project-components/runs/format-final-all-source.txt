@@ -1,0 +1,5 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug format:check
+npm notice run prettier --check "**/*.{ts,tsx,js,mjs,css,html}"
+Checking formatting...
+[warn] scripts/project-components/map-coverage-evidence.mjs
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.

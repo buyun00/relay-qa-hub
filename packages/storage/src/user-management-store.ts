@@ -12,7 +12,9 @@ export interface ManagedUser {
   readonly displayName: string;
   readonly status: "active" | "disabled";
   readonly membershipStatus: "active" | "revoked";
+  readonly membershipVersion: number;
   readonly roles: readonly MobileProjectRole[];
+  readonly identity: "employee";
   readonly linkedToUserId: string | null;
   readonly linkedToDisplayName: string | null;
   readonly linkedUserCount: number;
@@ -62,6 +64,7 @@ interface ManagedUserRow {
   readonly display_name: string;
   readonly status: "active" | "disabled";
   readonly membership_status: "active" | "revoked";
+  readonly membership_version: number;
   readonly membership_id: string;
   readonly linked_to_user_id: string | null;
   readonly linked_to_display_name: string | null;
@@ -118,7 +121,7 @@ function requireManager(database: DatabaseSync, input: MobileRelayScope): void {
          ON actor.account_id = account.id
         AND actor.id = ?
         AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
@@ -214,13 +217,15 @@ export function listManagedUsers(
               user.display_name,
               user.status,
               membership.status AS membership_status,
+              membership.version AS membership_version,
               membership.id AS membership_id,
               link.canonical_user_id AS linked_to_user_id,
               canonical.display_name AS linked_to_display_name,
               (
                 SELECT COUNT(*)
-                FROM user_identity_links AS inbound
+                FROM project_identity_links AS inbound
                 WHERE inbound.account_id = user.account_id
+                  AND inbound.project_id = membership.project_id
                   AND inbound.canonical_user_id = user.id
                   AND inbound.status = 'active'
               ) AS linked_user_count,
@@ -230,8 +235,9 @@ export function listManagedUsers(
        JOIN users AS user
          ON user.account_id = membership.account_id
         AND user.id = membership.user_id
-       LEFT JOIN user_identity_links AS link
+       LEFT JOIN project_identity_links AS link
          ON link.account_id = user.account_id
+        AND link.project_id = membership.project_id
         AND link.source_user_id = user.id
         AND link.status = 'active'
        LEFT JOIN users AS canonical
@@ -250,9 +256,11 @@ export function listManagedUsers(
         Object.freeze({
           userId: row.user_id,
           displayName: row.display_name,
-          status: row.status,
+          status: row.membership_status === "revoked" ? "disabled" : row.status,
           membershipStatus: row.membership_status,
+          membershipVersion: row.membership_version,
           roles: rolesForMembership(database, input, row.membership_id),
+          identity: "employee" as const,
           linkedToUserId: row.linked_to_user_id,
           linkedToDisplayName: row.linked_to_display_name,
           linkedUserCount: row.linked_user_count,
@@ -269,6 +277,7 @@ export function listManagedUsers(
 export function listActiveUserIdentityLinks(
   database: DatabaseSync,
   accountId: string,
+  projectId?: string,
 ): readonly ActiveUserIdentityLink[] {
   requireUuid(accountId, "accountId");
   const rows = database
@@ -277,15 +286,18 @@ export function listActiveUserIdentityLinks(
               source.display_name AS source_display_name,
               canonical.id AS canonical_user_id,
               canonical.display_name AS canonical_display_name
-       FROM user_identity_links AS link
+       FROM ${projectId === undefined ? "user_identity_links" : "project_identity_links"} AS link
        JOIN users AS source
          ON source.account_id = link.account_id AND source.id = link.source_user_id
        JOIN users AS canonical
          ON canonical.account_id = link.account_id AND canonical.id = link.canonical_user_id
        WHERE link.account_id = ? AND link.status = 'active'
+         ${projectId === undefined ? "" : "AND link.project_id = ?"}
        ORDER BY source.display_name COLLATE NOCASE ASC, source.id ASC`,
     )
-    .all(accountId) as unknown as IdentityLinkRow[];
+    .all(
+      ...(projectId === undefined ? [accountId] : [accountId, projectId]),
+    ) as unknown as IdentityLinkRow[];
   return Object.freeze(
     rows.map((row) =>
       Object.freeze({
@@ -384,10 +396,11 @@ export function linkManagedUser(
   const existing = database
     .prepare(
       `SELECT canonical_user_id
-       FROM user_identity_links
-       WHERE account_id = ? AND source_user_id = ? AND status = 'active'`,
+       FROM project_identity_links
+       WHERE account_id = ? AND source_user_id = ? AND project_id = ? AND status = 'active'`,
     )
-    .get(input.accountId, input.userId) as { readonly canonical_user_id: string } | undefined;
+    .get(input.accountId, input.userId, input.projectId) as
+    { readonly canonical_user_id: string } | undefined;
   if (existing?.canonical_user_id === input.canonicalUserId) {
     const user = database
       .prepare("SELECT status FROM users WHERE account_id = ? AND id = ?")
@@ -406,16 +419,16 @@ export function linkManagedUser(
   }
   const targetIsAlias = database
     .prepare(
-      `SELECT 1 AS present FROM user_identity_links
-       WHERE account_id = ? AND source_user_id = ? AND status = 'active'`,
+      `SELECT 1 AS present FROM project_identity_links
+       WHERE account_id = ? AND source_user_id = ? AND project_id = ? AND status = 'active'`,
     )
-    .get(input.accountId, input.canonicalUserId);
+    .get(input.accountId, input.canonicalUserId, input.projectId);
   const sourceIsCanonical = database
     .prepare(
-      `SELECT 1 AS present FROM user_identity_links
-       WHERE account_id = ? AND canonical_user_id = ? AND status = 'active'`,
+      `SELECT 1 AS present FROM project_identity_links
+       WHERE account_id = ? AND canonical_user_id = ? AND project_id = ? AND status = 'active'`,
     )
-    .get(input.accountId, input.userId);
+    .get(input.accountId, input.userId, input.projectId);
   if (targetIsAlias || sourceIsCanonical) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
@@ -424,16 +437,17 @@ export function linkManagedUser(
   }
   database
     .prepare(
-      `INSERT INTO user_identity_links(
-        id, account_id, source_user_id, canonical_user_id, status,
+      `INSERT INTO project_identity_links(
+        id, account_id, source_user_id, canonical_user_id, status, project_id,
         created_by_user_id, created_at, revoked_by_user_id, revoked_at, version
-      ) VALUES (?, ?, ?, ?, 'active', ?, ?, NULL, NULL, 1)`,
+      ) VALUES (?, ?, ?, ?, 'active', ?, ?, ?, NULL, NULL, 1)`,
     )
     .run(
       randomUUID(),
       input.accountId,
       input.userId,
       input.canonicalUserId,
+      input.projectId,
       input.actorId,
       input.createdAt,
     );
@@ -456,16 +470,16 @@ export function unlinkManagedUser(
   const link = database
     .prepare(
       `SELECT id, canonical_user_id, version
-       FROM user_identity_links
-       WHERE account_id = ? AND source_user_id = ? AND status = 'active'`,
+       FROM project_identity_links
+       WHERE account_id = ? AND source_user_id = ? AND project_id = ? AND status = 'active'`,
     )
-    .get(input.accountId, input.userId) as
+    .get(input.accountId, input.userId, input.projectId) as
     | { readonly id: string; readonly canonical_user_id: string; readonly version: number }
     | undefined;
   if (!link) throw new MobileRelayStorageError("NOT_FOUND", "active identity link was not found");
   const updated = database
     .prepare(
-      `UPDATE user_identity_links
+      `UPDATE project_identity_links
        SET status = 'revoked', revoked_by_user_id = ?, revoked_at = ?, version = version + 1
        WHERE id = ? AND account_id = ? AND status = 'active' AND version = ?`,
     )
@@ -485,75 +499,27 @@ export function disableManagedUser(
   input: DisableManagedUserInput,
 ): ManagedUserMutationResult {
   requireMutation(database, input);
-  const user = database
-    .prepare("SELECT status FROM users WHERE account_id = ? AND id = ?")
-    .get(input.accountId, input.userId) as { readonly status: "active" | "disabled" };
-  if (user.status === "disabled") {
-    const link = database
-      .prepare(
-        `SELECT canonical_user_id FROM user_identity_links
-         WHERE account_id = ? AND source_user_id = ? AND status = 'active'`,
-      )
-      .get(input.accountId, input.userId) as { readonly canonical_user_id: string } | undefined;
-    return Object.freeze({
-      userId: input.userId,
-      status: "disabled",
-      linkedToUserId: link?.canonical_user_id ?? null,
-    });
-  }
-  const activeLink = database
+  const membership = database
     .prepare(
-      `SELECT 1 AS present FROM user_identity_links
-       WHERE account_id = ?
-         AND (canonical_user_id = ? OR source_user_id = ?)
-         AND status = 'active'`,
+      "SELECT status FROM memberships WHERE account_id = ? AND project_id = ? AND user_id = ?",
     )
-    .get(input.accountId, input.userId, input.userId);
-  if (activeLink) {
-    throw new MobileRelayStorageError(
-      "VERSION_CONFLICT",
-      "remove active identity links before disabling a user",
-    );
-  }
-
-  database
-    .prepare(
-      `UPDATE native_sessions
-       SET revoked_at = ?, revoked_reason = 'user disabled in user management', version = version + 1
-       WHERE account_id = ? AND user_id = ? AND revoked_at IS NULL`,
-    )
-    .run(input.createdAt, input.accountId, input.userId);
-  database
-    .prepare(
-      `UPDATE browser_sessions
-       SET revoked_at = ?, revoked_reason = 'user disabled in user management', version = version + 1
-       WHERE account_id = ? AND user_id = ? AND revoked_at IS NULL`,
-    )
-    .run(input.createdAt, input.accountId, input.userId);
-  database
-    .prepare(
-      `UPDATE memberships
-       SET status = 'revoked', updated_at = ?, version = version + 1
-       WHERE account_id = ? AND user_id = ? AND status = 'active'`,
-    )
-    .run(input.createdAt, input.accountId, input.userId);
-  const disabled = database
-    .prepare(
-      `UPDATE users
-       SET status = 'disabled', updated_at = ?, version = version + 1
-       WHERE account_id = ? AND id = ? AND status = 'active'`,
-    )
-    .run(input.createdAt, input.accountId, input.userId);
-  if (disabled.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "user changed concurrently");
-  }
-  insertManagementEvent(database, input, "user_disabled", null);
+    .get(input.accountId, input.projectId, input.userId) as { status: string };
   const link = database
     .prepare(
-      `SELECT canonical_user_id FROM user_identity_links
-       WHERE account_id = ? AND source_user_id = ? AND status = 'active'`,
+      "SELECT canonical_user_id FROM project_identity_links WHERE account_id = ? AND project_id = ? AND source_user_id = ? AND status = 'active'",
     )
-    .get(input.accountId, input.userId) as { readonly canonical_user_id: string } | undefined;
+    .get(input.accountId, input.projectId, input.userId) as
+    { canonical_user_id: string } | undefined;
+  if (membership.status !== "revoked") {
+    database
+      .prepare(
+        "UPDATE memberships SET status = 'revoked', updated_at = ?, version = version + 1 WHERE account_id = ? AND project_id = ? AND user_id = ? AND status = 'active'",
+      )
+      .run(input.createdAt, input.accountId, input.projectId, input.userId);
+    insertManagementEvent(database, input, "user_disabled", null);
+  }
+  // Sessions identify a person, not a globally selected project. The access
+  // boundary checks membership on each request, retaining access to project B.
   return Object.freeze({
     userId: input.userId,
     status: "disabled",

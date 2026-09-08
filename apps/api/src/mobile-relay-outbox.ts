@@ -135,6 +135,16 @@ export interface MobileRelayOutboxPumpOptions {
   readonly endpoint: URL;
   /** A scoped M2M token supplied by the caller; it is never logged or persisted. */
   readonly bearerToken: string;
+  readonly scope?: {
+    accountId: string;
+    projectId: string;
+    componentVersion: number;
+    snapshotDigest: string;
+    relayInstanceId: string;
+  };
+  readonly canStart?: () => Promise<boolean>;
+  readonly executionHeld?: () => boolean;
+  readonly fetch?: typeof fetch;
   /** Fallback for claims produced before qaInstanceId was added to the claim. */
   readonly qaInstanceId?: string;
   /** Root of QA Hub's evidence store. Only ordinary contained files are read. */
@@ -650,6 +660,8 @@ export function parseRealRelayReceipt(
   if (parsedHandoffId !== claim.handoffId || parsedAttemptId !== claim.repairAttemptId) {
     clientError("REAL_RELAY_RECEIPT_IDENTITY_MISMATCH");
   }
+  if (receipt["relayInstanceId"] !== claim.relayInstanceId)
+    clientError("REAL_RELAY_RECEIPT_INSTANCE_MISMATCH");
   const actionId =
     receipt["actionId"] === undefined
       ? undefined
@@ -732,8 +744,20 @@ export function parseRelayEndpoint(value: string | undefined): URL | undefined {
   return endpoint;
 }
 
-function assertRelayEndpoint(endpoint: URL): void {
-  parseRelayEndpoint(endpoint.href);
+function assertRelayEndpoint(endpoint: URL, configured = false): void {
+  if (!configured) {
+    parseRelayEndpoint(endpoint.href);
+    return;
+  }
+  if (
+    !["http:", "https:"].includes(endpoint.protocol) ||
+    endpoint.username ||
+    endpoint.password ||
+    endpoint.search ||
+    endpoint.hash ||
+    endpoint.pathname !== REAL_RELAY_HANDOFF_PATH
+  )
+    clientError("REAL_RELAY_ENDPOINT_INVALID");
 }
 
 function deliveryErrorCode(error: unknown): string {
@@ -820,8 +844,25 @@ async function deliverOne(
   options: MobileRelayOutboxPumpOptions,
   leaseOwner: string,
 ): Promise<boolean> {
+  const gate = async () =>
+    options.executionHeld?.()
+      ? "IMPORT_EXECUTION_HELD"
+      : options.canStart && !(await options.canStart())
+        ? "COMPONENT_DISABLED_PAUSED"
+        : "";
+  if (await gate()) {
+    if (options.scope && !options.executionHeld?.())
+      await options.worker.projectRelayQueue({
+        operation: "pause",
+        accountId: options.scope.accountId,
+        projectId: options.scope.projectId,
+        now: new Date().toISOString(),
+      });
+    return false;
+  }
   const now = new Date();
   const claim = await options.worker.claimMobileRelayOutbox({
+    ...options.scope,
     leaseOwner,
     now: now.toISOString(),
     leaseExpiresAt: new Date(now.getTime() + 5_000).toISOString(),
@@ -829,6 +870,15 @@ async function deliverOne(
   if (claim === null) return false;
 
   try {
+    if (
+      options.scope &&
+      (claim.accountId !== options.scope.accountId ||
+        claim.projectId !== options.scope.projectId ||
+        claim.relayInstanceId !== options.scope.relayInstanceId ||
+        claim.componentRoute?.componentVersion !== options.scope.componentVersion ||
+        claim.componentRoute?.snapshotDigest !== options.scope.snapshotDigest)
+    )
+      clientError("REAL_RELAY_CLAIM_SCOPE_MISMATCH");
     if (options.bearerToken.length < 1 || /\s/u.test(options.bearerToken)) {
       clientError("REAL_RELAY_AUTH_INVALID");
     }
@@ -840,7 +890,19 @@ async function deliverOne(
         : await buildContinueBody(projection, options);
     const idempotencyKey = expectedIdempotencyKey(projection, built.body);
     const endpoint = endpointForOperation(options.endpoint, projection, kind);
-    const response = await fetch(endpoint, {
+    const blocked = await gate();
+    if (blocked) {
+      await options.worker.retryMobileRelayOutbox({
+        outboxMessageId: claim.outboxMessageId,
+        leaseOwner,
+        relayInstanceId: claim.relayInstanceId,
+        errorCode: blocked,
+        nextAttemptAt: new Date().toISOString(),
+        deadLetter: false,
+      });
+      return false;
+    }
+    const response = await (options.fetch ?? fetch)(endpoint, {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -877,6 +939,7 @@ async function deliverOne(
       errorCode: failure.errorCode,
       nextAttemptAt: failure.nextAttemptAt,
       deadLetter: failure.deadLetter,
+      relayInstanceId: claim.relayInstanceId,
     });
     options.onRetry?.(claim, failure.errorCode, {
       deadLetter: failure.deadLetter,
@@ -889,7 +952,7 @@ async function deliverOne(
 export function startMobileRelayOutboxPump(
   options: MobileRelayOutboxPumpOptions,
 ): MobileRelayOutboxPump {
-  assertRelayEndpoint(options.endpoint);
+  assertRelayEndpoint(options.endpoint, options.scope !== undefined);
   const leaseOwner = `qa-hub-api-${randomUUID()}`;
   let stopped = false;
   let timer: NodeJS.Timeout | undefined;

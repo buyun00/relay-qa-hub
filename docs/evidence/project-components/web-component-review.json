@@ -1,0 +1,142 @@
+{
+  "recordedAt": "2026-09-08T18:04:57.120Z",
+  "kind": "source route/form review; not runtime acceptance",
+  "allRowsAcceptanceStatus": "not_run",
+  "components": [
+    {
+      "component": "build",
+      "pages": [
+        "PackagingPage",
+        "BuildTasksPanel"
+      ],
+      "configuration": [
+        "baseUrl",
+        "job",
+        "downloadOrigin",
+        "zipPath",
+        "artifactUrlTemplate",
+        "credentialRef",
+        "presets"
+      ],
+      "requests": [
+        "GET /api/v1/packaging",
+        "POST /api/v1/packaging/builds",
+        "GET /api/v1/projects/:projectId/packaging/tasks",
+        "POST /api/v1/projects/:projectId/packaging/tasks/:id/resume|cancel"
+      ],
+      "state": "Implemented; taskId and queued/paused/running/final state distinction present.",
+      "remaining": [
+        "Real Jenkins fixture final artifact/hash/download and disable/re-enable acceptance not_run."
+      ]
+    },
+    {
+      "component": "build_upload.single",
+      "pages": [
+        "BuildUploadControls",
+        "ComponentHistoryPage"
+      ],
+      "configuration": [
+        "buildPreset"
+      ],
+      "requests": [
+        "POST /api/v1/increment-upload/build-chains",
+        "GET /api/v1/increment-upload/build-chains",
+        "POST /api/v1/projects/:projectId/increment-upload/build-chains/:id/resume|cancel"
+      ],
+      "state": "Implemented; explicit dependency on build and upload, upload_started does not claim final completion.",
+      "remaining": [
+        "Real build→exact new ZIP→upload→platform final result acceptance not_run."
+      ]
+    },
+    {
+      "component": "upload.incremental",
+      "pages": [
+        "UploadIncrementPage",
+        "ComponentHistoryPage"
+      ],
+      "configuration": [
+        "sourceUrl",
+        "apiBase",
+        "loginBase",
+        "credentialRef",
+        "targetPrefix",
+        "testDirectoryPrefix",
+        "releaseDirectoryPrefix",
+        "defaults"
+      ],
+      "requests": [
+        "GET /api/v1/increment-upload",
+        "POST /api/v1/increment-upload/jobs",
+        "POST /api/v1/increment-upload/login|check-auth|logout",
+        "POST /api/v1/increment-upload/jobs/:id/resume|cancel|confirm-publish",
+        "POST /api/v1/projects/:projectId/increment-upload/jobs/:id/resume-queued",
+        "GET /api/v1/projects/:projectId/increment-upload/jobs/:id/logs"
+      ],
+      "state": "Implemented; project defaults replace legacy production target fallbacks, draft and pending file scopes retained.",
+      "remaining": [
+        "Isolated platform credentials/product/channel/relative prefixes and final result validation unavailable; execution not_run."
+      ]
+    },
+    {
+      "component": "relay.production",
+      "pages": [
+        "ProductionPage",
+        "ComponentHistoryPage"
+      ],
+      "configuration": [
+        "baseUrl",
+        "relayInstanceId",
+        "externalProjectId (Relay project key)",
+        "credentialRef"
+      ],
+      "requests": [
+        "GET /api/v1/production/project|tasks|batches",
+        "POST /api/v1/production/batches",
+        "POST /api/v1/production/uploads",
+        "GET /api/v1/projects/:projectId/production/tasks/history",
+        "POST /api/v1/projects/:projectId/production/batches/:id/retry"
+      ],
+      "state": "Create/continue/batch/task operations and file drafts exist; paused historical batch now has explicit resume. History remains accessible with all components disabled.",
+      "remaining": [
+        "Actual isolated Relay task/executor/callback/outbox acceptance not_run.",
+        "Disabled history currently displays state/time/version; richer historical result/detail display remains limited."
+      ]
+    },
+    {
+      "component": "qingyu.sync",
+      "pages": [
+        "App (import dialog and Bug resolve action)",
+        "ComponentHistoryPage"
+      ],
+      "configuration": [
+        "baseUrl",
+        "externalProjectId (external project ID)",
+        "credentialRef"
+      ],
+      "requests": [
+        "GET /api/v1/integrations/qingyu/session|login/status|projects|defects",
+        "POST /api/v1/integrations/qingyu/import|login/start|logout",
+        "POST /api/v1/bugs/:id/integrations/qingyu/resolve",
+        "GET /api/v1/projects/:projectId/qingyu/history"
+      ],
+      "state": "Original import/resolve UI retained behind project switch; paused history explains deliberate retry through original form.",
+      "remaining": [
+        "Independent external account/project/order and resolve-failure/nonblocking local closure acceptance not_run.",
+        "Disabled history currently displays state/time/version; richer historical result/detail display remains limited."
+      ]
+    }
+  ],
+  "shared": [
+    "Every requestJson call and binary upload/download captures service/project/user plus x-qa-project-id; project switch remounts and invalidates earlier requests.",
+    "GM project key input is 2–16 uppercase letters/digits with leading letter; public shortcode entry resolves canonical UUID.",
+    "History entry is always visible, including imported old history while components have never been enabled.",
+    "History requests settle independently so one unavailable integration does not hide successful local histories.",
+    "Build quick-download cards derive their preset keys from actual returned artifacts.",
+    "Actual GM browser login/create/configuration/member and project disable/restore, lowercase shortcode entry and disabled-history navigation passed; see web-browser/gm-results.json."
+  ],
+  "blockingGaps": [
+    "Real external component fixture execution remains not_run for all five optional components.",
+    "Web two-tab project isolation and visual local-draft recovery after revocation passed in web-browser/dual-window-results.json; deliberately delayed network and independent browser-profile/device concurrency remain not_run.",
+    "The complete static matrix still carries not_run; limited successful Web/HTTP evidence is documented separately and must not be promoted to whole-baseline passes."
+  ]
+}

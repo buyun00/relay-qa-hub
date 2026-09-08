@@ -1,12 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import {
-  parseNewUploadInput,
-  readJson,
-  record,
-  UPLOAD_SOURCE,
-  writeJson,
-} from "./uploader-host.js";
+import { parseNewUploadInput, readJson, record, writeJson } from "./uploader-host.js";
 import type { BuildUploadChain, UploadInput, UploadSourceIdentity } from "./uploader-types.js";
 interface QaHubJsonRequest {
   method?: "GET" | "POST";
@@ -32,6 +26,11 @@ interface Options {
     ) => Promise<string>;
   };
   fetch?: typeof fetch;
+  sourceUrl?: string;
+  preset?: string;
+  projectId?: string;
+  componentVersion?: number;
+  defaults?: Partial<UploadInput>;
 }
 function sourceFromHeaders(headers: Headers): UploadSourceIdentity {
   const size = Number(headers.get("content-length"));
@@ -103,6 +102,12 @@ export class BuildUploadHost {
       )
         throw new Error("LOCAL_STATE_INVALID");
       const chain = raw as unknown as BuildUploadChain;
+      if (
+        this.options.projectId &&
+        (chain.projectId !== this.options.projectId ||
+          chain.componentVersion !== this.options.componentVersion)
+      )
+        throw new Error("BUILD_UPLOAD_PROJECT_SCOPE_MISMATCH");
       chain.input = parseNewUploadInput(chain.input);
       if (
         !Number.isFinite(Date.parse(chain.createdAt)) ||
@@ -125,7 +130,8 @@ export class BuildUploadHost {
     return (await this.all()).filter((c) => c.ownerId === owner).slice(0, 20);
   }
   private async source(allowMissing = false): Promise<UploadSourceIdentity | null> {
-    const response = await (this.options.fetch ?? fetch)(UPLOAD_SOURCE, {
+    if (!this.options.sourceUrl) throw new Error("COMPONENT_NOT_CONFIGURED");
+    const response = await (this.options.fetch ?? fetch)(this.options.sourceUrl, {
       method: "HEAD",
       redirect: "error",
       signal: AbortSignal.timeout(15000),
@@ -139,9 +145,9 @@ export class BuildUploadHost {
       const raw = record(value),
         id = raw["requestId"];
       this.file(id);
-      const input = parseNewUploadInput(raw["upload"]),
+      const input = parseNewUploadInput(raw["upload"], this.options.defaults),
         ownerId = await this.owner();
-      if (input.channelId === "2004") throw new Error("BUILD_PLATFORM_UNSUPPORTED");
+      if (!this.options.preset) throw new Error("COMPONENT_NOT_CONFIGURED");
       const chains = await this.all(),
         prior = chains.find((c) => c.id === id);
       if (prior) {
@@ -155,6 +161,9 @@ export class BuildUploadHost {
       const baseline = await this.source(true);
       const now = new Date().toISOString();
       const chain: BuildUploadChain = {
+        ...(this.options.projectId
+          ? { projectId: this.options.projectId, componentVersion: this.options.componentVersion! }
+          : {}),
         id: String(id),
         ownerId,
         accountIdentity,
@@ -175,7 +184,7 @@ export class BuildUploadHost {
           await this.options.api.json("/api/v1/packaging/builds", {
             method: "POST",
             headers: { "idempotency-key": chain.id },
-            body: { preset: "external" },
+            body: { preset: this.options.preset },
           }),
         );
         if (!Number.isSafeInteger(result["queueId"]) || Number(result["queueId"]) <= 0)
@@ -313,7 +322,7 @@ export class BuildUploadHost {
     }
     if (
       build["queueId"] !== chain.queueId ||
-      build["preset"] !== "external" ||
+      (build["preset"] !== null && build["preset"] !== this.options.preset) ||
       !Number.isSafeInteger(build["number"]) ||
       Number(build["number"]) <= 0
     )

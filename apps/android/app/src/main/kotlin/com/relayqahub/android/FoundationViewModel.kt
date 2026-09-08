@@ -367,11 +367,12 @@ private data class CommentAuditResult(
 
 class FoundationViewModel(application: Application) : AndroidViewModel(application) {
     private val appContainer = (application as QaHubApplication).container
-    private val scope = foundationScope(
-        checkNotNull(appContainer.identityStore.actorIdOrNull()) {
-            "QA identity must be selected before FoundationViewModel is created"
-        },
-    )
+    private val scope = appContainer.identityStore.scope()
+    private val selectedProjectKey = appContainer.identityStore.projectKey()
+    private val selectedProjectName = appContainer.identityStore.projectName()
+    val draftKey = draftScopeKey(appContainer.apiBaseUrl, scope.projectId, scope.actorId)
+    fun readNewBugDraft(): SavedBugDraft = appContainer.bugDraftPreferences.read(draftKey)
+    fun saveNewBugDraft(draft: SavedBugDraft) = appContainer.bugDraftPreferences.save(draftKey, draft)
     private val lastAction = MutableStateFlow("Ready for offline-first QA work.")
     private val latestRelayHandoff = MutableStateFlow<RelayHandoffResult?>(null)
     private val buildProjection = MutableStateFlow(BuildProjectionUiState())
@@ -464,7 +465,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         FoundationUiState(
             currentActorId = scope.actorId,
             accountName = values.accountName,
-            projectName = values.projectName,
+            projectName = selectedProjectName,
             cachedItemCount = values.cachedItemCount,
             queuedOperationCount = values.queuedOperationCount,
             latestQaItemId = values.latestQaItemId,
@@ -523,7 +524,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 runCatching {
                     appContainer.accountSessionClient.listPeople(
                         projectId = scope.projectId,
-                        projectKey = FOUNDATION_PROJECT_KEY,
+                        projectKey = selectedProjectKey,
                         accessToken = accessToken,
                     )
                 }.onSuccess { backendPeople ->
@@ -537,7 +538,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             appContainer.scopedRepository.seedFoundationScope(scope)
         }
         checkForSelfUpdate()
-        refreshGameApkCatalog()
         viewModelScope.launch {
             appContainer.scopedRepository.observeLatestSubmission(scope).collect { latestSubmission ->
                 refreshPendingCaptureState()
@@ -550,7 +550,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     private suspend fun currentAccessToken(): String? =
         when (val result = appContainer.credentialVault.read(scope.nativeSessionScope())) {
-            is VaultResult.Success -> result.value.accessToken
+            is VaultResult.Success -> result.value.accessToken.also { NativeProjectBindings.register(it, scope.projectId) }
             is VaultResult.Missing -> null
             is VaultResult.Unavailable -> null
         }
@@ -560,7 +560,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         if (page == QaHubPage.BUG_LIST) refreshBugWorkbench()
         if (page == QaHubPage.CAPTURE_SETTINGS) {
             checkForSelfUpdate()
-            refreshGameApkCatalog()
         }
     }
 
@@ -601,6 +600,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun refreshGameApkCatalog(force: Boolean = false) {
+        if (BuildConfig.QA_HUB_GAME_APK_DIRECTORY_URL.contains("qa-hub.invalid")) return
         val current = gameApkCatalog.value
         if (current.phase == "loading") return
         val refreshedAt = current.refreshedAtEpochMs
@@ -701,7 +701,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch {
             val previous = captureDraft.value
             if (previous.isDeleting || previous.isSubmitting) return@launch
-            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }.getOrNull()
+            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest(draftKey) }.getOrNull()
                 ?: return@launch
             val queued = appContainer.scopedRepository.findOperationByIdempotencyKey(
                 scope = scope,
@@ -729,7 +729,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         val captureId = captureDraft.value.captureId
         captureDraft.value = CaptureDraftUiState()
         viewModelScope.launch {
-            appContainer.pendingCaptureDraftStore.latest()
+            appContainer.pendingCaptureDraftStore.latest(draftKey)
                 ?.takeIf { it.captureId == captureId }
                 ?.let { runCatching { appContainer.pendingCaptureDraftStore.delete(it) } }
         }
@@ -968,6 +968,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun finishNewBugForm() {
+        appContainer.bugDraftPreferences.clear(draftKey)
         captureDraft.value = CaptureDraftUiState()
         newBugFormRevision.value += 1
         page.value = QaHubPage.BUG_LIST
@@ -1055,7 +1056,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             runCatching {
                 appContainer.buildProjectionClient.adoptFixAndBindQaBuild(
                     projectId = scope.projectId,
-                    projectKey = FOUNDATION_PROJECT_KEY,
+                    projectKey = selectedProjectKey,
                     handoff = handoff,
                     accessToken = accessToken,
                     deliveredCommitShaOverride = null,
@@ -1406,7 +1407,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             runCatching {
                 appContainer.repairAttemptClient.deliverAndLinkManualBuild(
                     projectId = scope.projectId,
-                    projectKey = FOUNDATION_PROJECT_KEY,
+                    projectKey = selectedProjectKey,
                     attemptId = attemptId,
                     accessToken = accessToken,
                 )
@@ -1853,7 +1854,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         if (!current.available || current.deliveryState != "SAVED") return
         pendingCapture.value = current.copy(deliveryState = "QUEUEING")
         viewModelScope.launch {
-            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }
+            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest(draftKey) }
                 .getOrNull()
             if (draft == null) {
                 pendingCapture.value = PendingCaptureUiState()
@@ -1882,7 +1883,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private suspend fun refreshPendingCaptureState() {
-        val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }.getOrNull()
+        val draft = runCatching { appContainer.pendingCaptureDraftStore.latest(draftKey) }.getOrNull()
         if (draft == null) {
             pendingCapture.value = PendingCaptureUiState()
             return
@@ -2074,13 +2075,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             "10000000-0000-4000-8000-000000000099"
         private const val MISSING_COMMENT_BUG_ID =
             "20000000-0000-4000-8000-000000000099"
-        internal fun foundationScope(actorId: String) = AccountProjectScope(
-            accountId = "10000000-0000-4000-8000-000000000020",
-            projectId = "10000000-0000-4000-8000-000000000004",
-            actorId = actorId,
-            installationId = "10000000-0000-4000-8000-000000000001",
-            sessionId = "10000000-0000-4000-8000-000000000002",
-        )
     }
 }
 

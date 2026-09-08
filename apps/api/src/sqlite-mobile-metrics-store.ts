@@ -5,7 +5,7 @@ import type {
   SqliteStorageWorker,
 } from "@relay-qa-hub/storage";
 
-import type { MobileMetricsOverviewQuery, MobileMetricsStore } from "./mobile-metrics.js";
+import type { MobileMetricsStore } from "./mobile-metrics.js";
 
 export interface SqliteMobileMetricsStoreOptions {
   readonly worker: SqliteStorageWorker;
@@ -15,16 +15,10 @@ export interface SqliteMobileMetricsStoreOptions {
 export function createSqliteMobileMetricsStore(
   options: SqliteMobileMetricsStoreOptions,
 ): MobileMetricsStore {
-  const scope = {
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId: options.scope.actorId,
-  } as const;
-
   return {
     async getOverview(query): Promise<MobileMetricsOverview> {
       const input: GetMobileMetricsOverviewInput = {
-        accountId: scope.accountId,
+        accountId: options.scope.accountId,
         actorId: query.actorId,
         projectId: query.projectId,
         from: query.from,

@@ -1,0 +1,907 @@
+{
+  "capturedAt": "2026-09-09T00:12:13.8735207+08:00",
+  "elevatedReadOnly": true,
+  "processes": [
+    {
+      "pid": 9220,
+      "parentPid": 2772,
+      "name": "node.exe",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" --env-file-if-exists=.env.local D:\\Relay-Unity-Orchestrator\\server\\guardian.mjs",
+      "createdAt": "2026-09-07T09:35:47.967Z"
+    },
+    {
+      "pid": 16300,
+      "parentPid": 9220,
+      "name": "node.exe",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe --env-file-if-exists=.env.local server/web.mjs",
+      "createdAt": "2026-09-07T09:36:26.506Z"
+    },
+    {
+      "pid": 14120,
+      "parentPid": 16300,
+      "name": "node.exe",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe D:\\Relay-Unity-Orchestrator\\node_modules\\vinext\\dist\\cli.js start --port 3001 --hostname 127.0.0.1",
+      "createdAt": "2026-09-07T09:36:26.771Z"
+    },
+    {
+      "pid": 7420,
+      "parentPid": 16928,
+      "name": "node.exe",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" D:\\Relay-QA-Hub\\node_modules\\vite\\bin\\vite.js preview --host 0.0.0.0 --port 4174 --strictPort ",
+      "createdAt": "2026-09-07T09:37:15.347Z"
+    },
+    {
+      "pid": 23984,
+      "parentPid": 9220,
+      "name": "node.exe",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe --env-file-if-exists=.env.local server/index.mjs",
+      "createdAt": "2026-09-08T10:18:13.191Z"
+    },
+    {
+      "pid": 17160,
+      "parentPid": 24088,
+      "name": "RelayQaHub.exe",
+      "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+      "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --updated --user-data-dir=\"C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop\"",
+      "createdAt": "2026-09-08T10:24:12.526Z"
+    },
+    {
+      "pid": 10844,
+      "parentPid": 21736,
+      "name": "node.exe",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" D:\\Relay-QA-Hub\\apps\\api\\dist\\main.js ",
+      "createdAt": "2026-09-08T11:09:25.981Z"
+    }
+  ],
+  "services": [],
+  "scheduledTasks": [
+    {
+      "name": "Relay QA Hub Backend",
+      "taskPath": "\\",
+      "state": "Disabled",
+      "lastRun": "2026-08-31T12:25:12Z",
+      "lastResult": 0,
+      "nextRun": null,
+      "actions": [
+        {
+          "execute": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "workingDirectory": "D:\\Relay-QA-Hub",
+          "arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File \"D:\\Relay-QA-Hub\\scripts\\restart-mvp-api.ps1\""
+        }
+      ]
+    },
+    {
+      "name": "Relay QA Hub Guardian Primary",
+      "taskPath": "\\",
+      "state": "Running",
+      "lastRun": "2026-09-08T16:11:18Z",
+      "lastResult": 2147946720,
+      "nextRun": "2026-09-08T16:12:17Z",
+      "actions": [
+        {
+          "execute": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "workingDirectory": "D:\\Relay-QA-Hub",
+          "arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File \"D:\\Relay-QA-Hub\\scripts\\Start-QAHubGuardian.ps1\" -Role Primary"
+        }
+      ]
+    },
+    {
+      "name": "Relay QA Hub Guardian Secondary",
+      "taskPath": "\\",
+      "state": "Running",
+      "lastRun": "2026-09-08T16:11:18Z",
+      "lastResult": 2147946720,
+      "nextRun": "2026-09-08T16:12:17Z",
+      "actions": [
+        {
+          "execute": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "workingDirectory": "D:\\Relay-QA-Hub",
+          "arguments": "-NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File \"D:\\Relay-QA-Hub\\scripts\\Start-QAHubGuardian.ps1\" -Role Secondary"
+        }
+      ]
+    },
+    {
+      "name": "Relay Unity Guardian",
+      "taskPath": "\\",
+      "state": "Running",
+      "lastRun": "2026-09-07T09:35:40Z",
+      "lastResult": 267009,
+      "nextRun": null,
+      "actions": [
+        {
+          "execute": "powershell.exe",
+          "workingDirectory": "D:\\Relay-Unity-Orchestrator",
+          "arguments": "-NoLogo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"D:\\Relay-Unity-Orchestrator\\scripts\\Start-RelayGuardian.ps1\" -ProjectRoot \"D:\\Relay-Unity-Orchestrator\" -NodePath \"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\""
+        }
+      ]
+    }
+  ],
+  "virtualMachines": [
+    {
+      "Name": "lin-worker-01",
+      "State": 4,
+      "CPUUsage": 0,
+      "MemoryAssigned": 0,
+      "Status": "正常运行"
+    },
+    {
+      "Name": "lin-worker-02",
+      "State": 2,
+      "CPUUsage": 0,
+      "MemoryAssigned": 12884901888,
+      "Status": "正常运行"
+    },
+    {
+      "Name": "lin-worker-03",
+      "State": 3,
+      "CPUUsage": 0,
+      "MemoryAssigned": 0,
+      "Status": "正常运行"
+    },
+    {
+      "Name": "ozdqp-build",
+      "State": 2,
+      "CPUUsage": 1,
+      "MemoryAssigned": 2344615936,
+      "Status": "正常运行"
+    }
+  ],
+  "vmQueryError": null,
+  "otherRelayScheduledTaskCount": 152,
+  "finishedAt": "2026-09-09T00:16:14.3056958+08:00",
+  "runtimeState": {
+    "dataRoot": "D:\\Relay-QA-Hub-Data\\production",
+    "logsRoot": "D:\\Relay-QA-Hub-Data\\mvp-e2e-20260826021925294\\logs",
+    "apiPort": 4319,
+    "apiPid": 10844,
+    "webPort": 4174,
+    "webPid": 7420,
+    "apiUrl": "http://10.100.5.157:4319",
+    "webUrl": "http://10.100.5.157:4174/",
+    "apkPath": "D:\\Relay-QA-Hub\\apps\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "androidApkUrl": "http://10.100.5.157:4174/downloads/Relay-QA-Hub-Android12-debug.apk",
+    "buildSha": "f0416eb4da824291fad3c47d0018688754393b18",
+    "generation": "20260908110925973",
+    "startedAt": "2026-09-08T11:09:27.3380981Z",
+    "backupRoot": "D:\\Relay-QA-Hub-Backups\\production",
+    "backupArchiveRoot": "E:\\Relay-QA-Hub-Archives\\production",
+    "peopleConfigFile": "D:\\Relay-QA-Hub-Config\\qa-people.json"
+  },
+  "source": {
+    "worktree": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+    "branch": "codex/project-components-v2-1",
+    "head": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+    "productionRoot": "D:\\Relay-QA-Hub",
+    "productionBranch": "main",
+    "productionHead": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+    "productionStatus": [
+      "?? docs/design/"
+    ],
+    "gitdir": "gitdir: D:/Relay-QA-Hub/.git/worktrees/Relay-QA-Hub2",
+    "designVersion": "2.1",
+    "designSha256": "8dabd8c8542f33659579bb0692a5831ef902abf710941655779513548c21af42",
+    "instructions": [
+      "C:\\Users\\lin0\\.codex\\AGENTS.md",
+      "user-supplied AGENTS instructions"
+    ]
+  },
+  "healthReadback": [
+    {
+      "observedAt": "2026-09-09T00:16:14.7775994+08:00",
+      "url": "http://127.0.0.1:4319/api/v1/health/ready",
+      "status": 200,
+      "body": {
+        "status": "ready",
+        "schemaVersion": "12",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      },
+      "hasRootElement": false
+    },
+    {
+      "observedAt": "2026-09-09T00:16:14.8391991+08:00",
+      "url": "http://127.0.0.1:4174/",
+      "status": 200,
+      "body": null,
+      "hasRootElement": true
+    },
+    {
+      "observedAt": "2026-09-09T00:16:14.8431725+08:00",
+      "url": "http://127.0.0.1:4174/api/v1/auth/me",
+      "status": 401,
+      "body": null,
+      "hasRootElement": false
+    }
+  ],
+  "listeners": [
+    {
+      "LocalAddress": "::",
+      "LocalPort": 49682,
+      "OwningProcess": 7784
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 49681,
+      "OwningProcess": 1484
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 49669,
+      "OwningProcess": 4656
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 49668,
+      "OwningProcess": 4264
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 49667,
+      "OwningProcess": 3240
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 49666,
+      "OwningProcess": 2272
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 49665,
+      "OwningProcess": 1364
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 49664,
+      "OwningProcess": 1560
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 42050,
+      "OwningProcess": 11844
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 7680,
+      "OwningProcess": 4048
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 3389,
+      "OwningProcess": 7900
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 2179,
+      "OwningProcess": 2948
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 445,
+      "OwningProcess": 4
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 135,
+      "OwningProcess": 1840
+    },
+    {
+      "LocalAddress": "::",
+      "LocalPort": 22,
+      "OwningProcess": 4632
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 57755,
+      "OwningProcess": 22372
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 55293,
+      "OwningProcess": 12032
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 50238,
+      "OwningProcess": 13016
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 49682,
+      "OwningProcess": 7784
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 49681,
+      "OwningProcess": 1484
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 49668,
+      "OwningProcess": 4264
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 49667,
+      "OwningProcess": 3240
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 49666,
+      "OwningProcess": 2272
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 49665,
+      "OwningProcess": 1364
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 49664,
+      "OwningProcess": 1560
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 32419,
+      "OwningProcess": 13016
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 24576,
+      "OwningProcess": 21788
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 23574,
+      "OwningProcess": 21788
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 20241,
+      "OwningProcess": 4724
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 16384,
+      "OwningProcess": 21788
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 7555,
+      "OwningProcess": 21788
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 5555,
+      "OwningProcess": 21788
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 5040,
+      "OwningProcess": 12492
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 5037,
+      "OwningProcess": 19700
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 4320,
+      "OwningProcess": 17160
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 4319,
+      "OwningProcess": 10844
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 4318,
+      "OwningProcess": 9220
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 4317,
+      "OwningProcess": 23984
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 4174,
+      "OwningProcess": 7420
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 3389,
+      "OwningProcess": 7900
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 3001,
+      "OwningProcess": 14120
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 3000,
+      "OwningProcess": 16300
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 2179,
+      "OwningProcess": 2948
+    },
+    {
+      "LocalAddress": "172.30.240.1",
+      "LocalPort": 139,
+      "OwningProcess": 4
+    },
+    {
+      "LocalAddress": "172.17.128.1",
+      "LocalPort": 139,
+      "OwningProcess": 4
+    },
+    {
+      "LocalAddress": "10.100.5.157",
+      "LocalPort": 139,
+      "OwningProcess": 4
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 135,
+      "OwningProcess": 1840
+    },
+    {
+      "LocalAddress": "0.0.0.0",
+      "LocalPort": 22,
+      "OwningProcess": 4632
+    }
+  ],
+  "candidatePorts": [
+    {
+      "port": 4419,
+      "listening": false,
+      "reserved": false,
+      "note": "Observation only; recheck on startup and fail on collision."
+    },
+    {
+      "port": 4274,
+      "listening": false,
+      "reserved": false,
+      "note": "Observation only; recheck on startup and fail on collision."
+    },
+    {
+      "port": 4421,
+      "listening": false,
+      "reserved": false,
+      "note": "Observation only; recheck on startup and fail on collision."
+    },
+    {
+      "port": 4420,
+      "listening": false,
+      "reserved": false,
+      "note": "Observation only; recheck on startup and fail on collision."
+    }
+  ],
+  "pathChecks": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+      "fullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-09T00:15:37.4377372+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub",
+      "fullName": "D:\\Relay-QA-Hub",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-08T15:24:47.1022094+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-08-28T19:50:31.9913059+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\db\\qa-hub.sqlite",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\db\\qa-hub.sqlite",
+      "directory": false,
+      "length": 29720576,
+      "lastWriteTime": "2026-09-08T20:11:08.1816573+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\db\\qa-hub.sqlite-wal",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\db\\qa-hub.sqlite-wal",
+      "directory": false,
+      "length": 4326032,
+      "lastWriteTime": "2026-09-08T22:44:14.0580122+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\db\\qa-hub.sqlite-shm",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\db\\qa-hub.sqlite-shm",
+      "directory": false,
+      "length": 32768,
+      "lastWriteTime": "2026-09-08T19:09:26.3223973+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\evidence",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\evidence",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-09T00:16:14.5807624+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\quarantine",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\quarantine",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-09T00:16:14.5797862+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-08T16:14:51.1128580+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite",
+      "directory": false,
+      "length": 24576,
+      "lastWriteTime": "2026-09-09T00:03:00.6611166+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-wal",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-wal",
+      "directory": false,
+      "length": 4120032,
+      "lastWriteTime": "2026-09-09T00:16:15.0600677+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-shm",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-shm",
+      "directory": false,
+      "length": 32768,
+      "lastWriteTime": "2026-09-08T19:09:26.6224810+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-04T19:35:24.5617633+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\qingyu-state.enc.json",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\integrations\\qingyu-state.enc.json",
+      "directory": false,
+      "length": 1011,
+      "lastWriteTime": "2026-09-07T17:16:04.4827417+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\android-updates",
+      "fullName": "D:\\Relay-QA-Hub-Data\\production\\android-updates",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-08-27T17:33:06.8139886+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\desktop-updates",
+      "fullName": "D:\\Relay-QA-Hub-Data\\desktop-updates",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-08-27T18:03:33.9528311+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\guardian",
+      "fullName": "D:\\Relay-QA-Hub-Data\\guardian",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-09T00:16:15.0776466+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\mvp-e2e-20260826021925294\\logs",
+      "fullName": "D:\\Relay-QA-Hub-Data\\mvp-e2e-20260826021925294\\logs",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-08T19:09:25.9804334+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Backups\\production",
+      "fullName": "D:\\Relay-QA-Hub-Backups\\production",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-09T00:01:45.0854460+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production",
+      "fullName": "E:\\Relay-QA-Hub-Archives\\production",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-09T00:01:34.2600149+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Config",
+      "fullName": "D:\\Relay-QA-Hub-Config",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-08-27T19:24:33.9391272+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release",
+      "fullName": "D:\\Relay-QA-Hub\\apps\\desktop\\release",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-08T19:08:02.0946668+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-08T18:24:12.3378515+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-02T10:12:22.6505725+08:00",
+      "reparseAncestors": []
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop",
+      "fullName": "C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop",
+      "directory": true,
+      "length": null,
+      "lastWriteTime": "2026-09-08T18:26:12.7072309+08:00",
+      "reparseAncestors": []
+    }
+  ],
+  "worktreeReparsePointsWithinTwoLevels": [
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\api",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\api"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\contracts",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\packages\\contracts"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\desktop",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\desktop"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\domain",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\packages\\domain"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\fake-relay",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\fake-relay"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\storage",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\packages\\storage"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\upload-contract",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\packages\\upload-contract"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\web",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\web"
+    },
+    {
+      "FullName": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\node_modules\\@relay-qa-hub\\worker",
+      "LinkType": "Junction",
+      "Target": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\worker"
+    }
+  ],
+  "configurationAndReleaseHashes": [
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\mvp-e2e-current.json",
+      "length": 2014,
+      "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e",
+      "lastWriteTime": "2026-09-08T19:09:27.3508301+08:00"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Config\\qa-people.json",
+      "length": 2268,
+      "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374",
+      "lastWriteTime": "2026-08-27T19:22:09.8479219+08:00"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Windows-x64-latest.json",
+      "length": 413,
+      "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+      "lastWriteTime": "2026-09-08T19:08:55.5696098+08:00"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Setup-x64.exe",
+      "length": 150473551,
+      "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+      "lastWriteTime": "2026-09-08T19:08:54.8087879+08:00"
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+      "length": 272,
+      "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a",
+      "lastWriteTime": "2026-08-28T17:16:24.0000000+08:00"
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+      "length": 355,
+      "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c",
+      "lastWriteTime": "2026-08-26T22:37:57.9423902+08:00"
+    }
+  ],
+  "windowsRelease": {
+    "manifestUrl": "http://127.0.0.1:4174/downloads/Relay-QA-Hub-Windows-x64-latest.json",
+    "manifest": {
+      "schemaVersion": 1,
+      "releaseId": "20260908T110747982Z",
+      "version": "3.3.5",
+      "publishedAt": "2026-09-08T11:08:55.482Z",
+      "archive": {
+        "url": "/downloads/Relay-QA-Hub-Setup-x64.exe",
+        "size": 150473551,
+        "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+      },
+      "signature": "3677j/dTMoFHlhAfdcEtWLvS6CNLgHQrlVe0cNWJqFQAczOqML1r1aj3K3ON/NTuGeadl9c2wcYhCP4J+6ZtDw=="
+    },
+    "installedVersion": "3.3.4",
+    "remoteInstallerDownloadValidated": false,
+    "signatureCryptographicallyVerifiedThisPass": false
+  },
+  "resources": {
+    "volumes": [
+      {
+        "DriveLetter": "D",
+        "Size": 644285984768,
+        "SizeRemaining": 83925835776,
+        "HealthStatus": "Healthy"
+      },
+      {
+        "DriveLetter": "C",
+        "Size": 379589750784,
+        "SizeRemaining": 111401672704,
+        "HealthStatus": "Healthy"
+      },
+      {
+        "DriveLetter": "E",
+        "Size": 960126517248,
+        "SizeRemaining": 296555196416,
+        "HealthStatus": "Healthy"
+      }
+    ],
+    "memory": {
+      "TotalVisibleMemorySize": 66904736,
+      "FreePhysicalMemory": 26540596
+    },
+    "workerCapacityVerified": false,
+    "productionWorkersReservedForTest": false
+  },
+  "externalTargets": [
+    {
+      "component": "build",
+      "endpoint": "http://10.100.5.129:8080",
+      "job": "01-【OZDQP】【Android】",
+      "downloads": "http://10.100.5.129:8000",
+      "source": "apps/api/src/jenkins-builds.ts:12-17",
+      "scope": "production defaults; no network request or job triggered"
+    },
+    {
+      "component": "upload.incremental",
+      "api": "https://fq2ivi.ipwana.com",
+      "login": "https://54cetx.jiaxiangxm.com",
+      "sourceZip": "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip",
+      "source": "apps/api/src/uploader-host.ts:17-20",
+      "scope": "production defaults; credentials not copied"
+    },
+    {
+      "component": "relay.production",
+      "endpoint": "http://127.0.0.1:4317/api/integrations/qa/v1/handoffs",
+      "instance": "relay-main",
+      "qaInstance": "qa-local",
+      "secretDirectory": "C:\\ProgramData\\Relay\\secrets",
+      "source": "scripts/restart-mvp-api.ps1:151-166",
+      "scope": "production mapping; not queried or reused"
+    },
+    {
+      "component": "qingyu.sync",
+      "endpoint": "https://50qweb.jiaxianghudong.com",
+      "source": "apps/api/src/qingyu-client.ts:3",
+      "scope": "default endpoint; no external order accessed"
+    }
+  ],
+  "backupCandidate": {
+    "database": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T16-01-26.301Z.2267bc98-a0b9-45dc-b951-f3f7da669d99.sqlite",
+    "manifest": {
+      "manifestVersion": 1,
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T16:01:26.301Z",
+      "sourceDatabase": {
+        "applicationId": 1363232834,
+        "schemaVersion": 12
+      },
+      "backup": {
+        "sizeBytes": 29790208,
+        "sha256": "4f4023a122fbcd37bd8225909d540d778fa9d6024ab75846893e1326a6c58a65"
+      },
+      "integrity": {
+        "ok": true,
+        "integrityMessages": [
+          "ok"
+        ],
+        "foreignKeyViolations": []
+      }
+    },
+    "attachments": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T16-01-26.301Z.2267bc98-a0b9-45dc-b951-f3f7da669d99.sqlite.attachments",
+    "completeMarkerExists": true,
+    "bindingExists": true,
+    "fullVerificationPerformed": false,
+    "copied": false,
+    "note": "Candidate only. Pin and verify all manifest hashes, attachment binding and restore completion before import; imported tasks must be paused."
+  },
+  "limitations": [
+    "No live SQLite connection, migration, copy, mutation, integrity pragma, checkpoint, queue submission, service restart, client stop or external business request was performed.",
+    "Only path metadata was read for active SQLite/WAL/SHM; active database hashes are deliberately not used as evidence.",
+    "Process environment blocks were not extracted; runtime state, process command line, source wiring and healthy probes are separate evidence.",
+    "Nested production descendants were not exhaustively scanned for junctions. Every proposed writable path must be rechecked at startup.",
+    "External test Jenkins Job, upload target, Relay test workspace/project, third-party test order and spare production Worker capacity remain unverified.",
+    "Physical Android device access, dedicated coexistence target and upgrade target were not verified in this bounded inventory.",
+    "The service task query found no matching Win32 service; only QA Hub and Relay Guardian task details are retained; unrelated recovery task arguments omitted.",
+    "Source head, running API buildSha and installed EXE are intentionally recorded separately; no attempt was made to reconcile by changing production."
+  ]
+}

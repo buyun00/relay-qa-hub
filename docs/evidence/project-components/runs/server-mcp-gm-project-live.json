@@ -1,0 +1,31 @@
+{
+  "recordedAt": "2026-09-08T18:29:35.986Z",
+  "passed": true,
+  "endpoint": "http://127.0.0.1:4421/mcp",
+  "checks": [
+    "GM top-level projectId persisted in login",
+    "HTTP auth/me reads same project and user",
+    "API ready schema14"
+  ],
+  "projectId": "383a122d-5c4b-478c-9bd7-7bb2196cf5b2",
+  "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+  "isGm": true,
+  "readiness": {
+    "status": "ready",
+    "schemaVersion": "14",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  }
+}

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { parseBuildLog, describeBuild, applyBuildHistory } from "../dist/jenkins-progress.js";
 import { JenkinsBuildService } from "../dist/jenkins-builds.js";
+import { jenkinsConfig } from "./component-test-config.mjs";
 
 const timed = `00:00:01.000 [JenkinsPlayerPolicy] profile=sdk-external requested=App effective=App reason=external_profile_unchanged
 00:00:01.100 [init] MAKE_PKG_ZIP_VAL=true
@@ -223,8 +224,8 @@ test("monitor follows the precise queue executable, handles canceled/expired que
     if (url.pathname === `${jobPath}1/timestamps/`) return new Response(timed);
     if (url.pathname === `${jobPath}2/timestamps/`) return json({}, 503);
     throw new Error(`Unexpected path ${url.pathname}`);
-  });
-  const result = await service.progress([101, 103, 104]);
+  }, jenkinsConfig);
+  const result = await service.progress([101, 103, 104], [2]);
   assert.equal(result.builds.find((b) => b.queueId === 101).number, 1);
   assert.equal(result.builds.find((b) => b.number === 2).logError, true);
   assert.deepEqual(
@@ -232,6 +233,6 @@ test("monitor follows the precise queue executable, handles canceled/expired que
     ["CANCELLED", "UNKNOWN"],
   );
   const before = seen.length;
-  assert.deepEqual(await service.progress([104, 103, 101]), result);
+  assert.deepEqual(await service.progress([104, 103, 101], [2]), result);
   assert.equal(seen.length, before, "identical watches share cached requests");
 });

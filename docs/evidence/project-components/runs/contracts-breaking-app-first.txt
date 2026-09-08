@@ -1,0 +1,3 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug check:contract-breaking:app-first
+npm notice run node packages/contracts/versions/1.1.0/scripts/check-breaking.mjs
+Breaking-change check passed: 13 versioned files match contract 1.1.0; base 1.0.0 remains separate.

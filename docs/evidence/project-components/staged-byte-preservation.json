@@ -1,0 +1,10 @@
+{
+  "recordedAt": "2026-09-08T19:41:25.433Z",
+  "passed": true,
+  "stagedChangedFiles": 441,
+  "checkedEvidenceAndFrozenDesignFiles": 223,
+  "checkedBytes": 9395047,
+  "allStagedBytesEqualWorkingEvidence": true,
+  "disallowedArtifactPaths": [],
+  "attributes": "Captured evidence and frozen design use -text -whitespace so raw CRLF and Markdown hard breaks are retained."
+}

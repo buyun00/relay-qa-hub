@@ -1,0 +1,45 @@
+{
+  "observedAt": "2026-09-08T18:58:33.646Z",
+  "version": "0.2.0-preview.6",
+  "releaseId": "20260908T185123338Z",
+  "installerSha256": "989b9c9c7ddd51310c5d2a5dc94b5875643d50c769e42a1f84d2d4cb7bc281f1",
+  "installerBytes": 108378454,
+  "result": {
+    "schemaVersion": 1,
+    "status": "installed",
+    "releaseId": "20260908T185123338Z",
+    "version": "0.2.0-preview.6",
+    "recordedAt": "2026-09-09T2:57:52.000Z"
+  },
+  "legacyResultTimestampNote": "The native helper copied from installed preview5 still labels local time as UTC; use observedAt. Preview6 contains the corrected helper for its next invocation.",
+  "configSha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+  "identity": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4419",
+    "loginName": "EXE实际验收0909",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "userId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "identity": "employee"
+  },
+  "retained": [
+    {
+      "name": "retained-update-result-8ec5010d-c688-4b88-a25a-673a966872f6.json",
+      "sha256": "ad07403b517582f8c1052ad674d6e780e18555d1282446dd9c82e2de2d5d0aee"
+    }
+  ],
+  "backups": [
+    "RelayQaHubPreview.backup-20260908T172125402Z",
+    "RelayQaHubPreview.backup-20260908T174125783Z",
+    "RelayQaHubPreview.backup-20260908T175032165Z",
+    "RelayQaHubPreview.backup-20260908T182326239Z",
+    "RelayQaHubPreview.backup-20260908T185123338Z"
+  ],
+  "draft": {
+    "text": "EXE第6版升级与回退保留草稿 2026-09-09：同一员工、项目A、PNG附件与未提交正文必须保留。",
+    "imageCount": 1,
+    "imageName": "exe-test-input.png",
+    "nativeScreenshot": "exe-preview6-restored-draft.jpg",
+    "nativeTree": "exe-preview6-restored-draft.txt"
+  },
+  "passed": true
+}

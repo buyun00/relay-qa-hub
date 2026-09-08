@@ -349,13 +349,13 @@ class QaOverlayService : Service() {
 
     companion object {
         private const val ACTION_START =
-            "com.relayqahub.android.overlay.action.START"
+            "com.relayqahub.android.preview.overlay.action.START"
         private const val ACTION_HIDE_FOR_CAPTURE =
-            "com.relayqahub.android.overlay.action.HIDE_FOR_CAPTURE"
+            "com.relayqahub.android.preview.overlay.action.HIDE_FOR_CAPTURE"
         private const val ACTION_RESTORE_AFTER_CAPTURE =
-            "com.relayqahub.android.overlay.action.RESTORE_AFTER_CAPTURE"
+            "com.relayqahub.android.preview.overlay.action.RESTORE_AFTER_CAPTURE"
         private const val ACTION_STOP_SERVICE =
-            "com.relayqahub.android.overlay.action.STOP_SERVICE"
+            "com.relayqahub.android.preview.overlay.action.STOP_SERVICE"
         private const val EXTRA_SHOW_STOP_CONTROL = "showStopControl"
 
         fun startIntent(context: Context): Intent =

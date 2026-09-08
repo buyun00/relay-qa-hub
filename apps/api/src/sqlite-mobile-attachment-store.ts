@@ -127,6 +127,7 @@ export function createSqliteMobileAttachmentStore(
         ...actorScope(query.actorId),
         bugId: query.bugId,
         limit: query.limit,
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
       });
     },
 

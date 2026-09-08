@@ -1,4 +1,6 @@
 import { parentPort, workerData } from "node:worker_threads";
+import { isImportExecutionHeld } from "./import-execution-hold.js";
+import { projectRelayQueue, type ProjectRelayQueueInput } from "./project-relay-queue.js";
 import type { DatabaseSync } from "node:sqlite";
 
 import {
@@ -33,6 +35,8 @@ import {
   type GetMobileMetricsOverviewInput,
 } from "./mobile-metrics-store.js";
 import {
+  getMobileProjectAccess,
+  type GetMobileProjectAccessInput,
   listMobileProjectMembers,
   listMobileProjectModules,
   listMobileVisibleProjects,
@@ -165,17 +169,22 @@ interface WorkerConfiguration {
   readonly backupRoot?: string;
   readonly evidenceRoot?: string;
   readonly quarantineRoot?: string;
+  readonly executionHoldFile?: string;
   readonly relayInstanceId?: string;
   readonly qaInstanceId?: string;
   readonly relayPrincipalId?: string;
   readonly allowUnsafeTestCommands?: boolean;
 }
 
+import { projectManagement, type ProjectManagementInput } from "./project-management-store.js";
+
 interface WorkerRequest {
+  readonly authorization?: Readonly<{ accountId: string; projectId: string; actorId: string }>;
   readonly id: number;
   readonly operation:
     | "initialize"
     | "ensureMobileScope"
+    | "projectManagement"
     | "ensureBrowserAdmin"
     | "listActiveAccountUsers"
     | "listActiveUserIdentityLinks"
@@ -198,6 +207,7 @@ interface WorkerRequest {
     | "getMobileMetricsOverview"
     | "listMobileVisibleProjects"
     | "listMobileProjectMembers"
+    | "getMobileProjectAccess"
     | "listMobileProjectModules"
     | "getLatestMobileHumanWorkflow"
     | "getMobileHumanWorkflowForBug"
@@ -230,6 +240,7 @@ interface WorkerRequest {
     | "getMobileRelayReceipt"
     | "receiveMobileRelayWebhook"
     | "claimMobileRelayOutbox"
+    | "projectRelayQueue"
     | "completeMobileRelayOutbox"
     | "retryMobileRelayOutbox"
     | "initMobileUpload"
@@ -290,6 +301,8 @@ function requireAttachmentRoots(): MobileAttachmentRoots {
 
 function inWriteTransaction<T>(work: (current: DatabaseSync) => T): T {
   const current = requireDatabase();
+  // A GM command owns the outer transaction, including its temporary authorization.
+  if (current.isTransaction) return work(current);
   current.exec("BEGIN IMMEDIATE");
   try {
     const value = work(current);
@@ -302,6 +315,22 @@ function inWriteTransaction<T>(work: (current: DatabaseSync) => T): T {
 }
 
 async function execute(request: WorkerRequest): Promise<unknown> {
+  if (isImportExecutionHeld(configuration.executionHoldFile)) {
+    if (request.operation === "claimMobileRelayOutbox") return null;
+    if (
+      ["createMobileRelayAttempt", "dispatchMobileRelay", "continueMobileRelay"].includes(
+        request.operation,
+      )
+    )
+      throw Object.assign(new Error("Imported execution remains held"), {
+        code: "IMPORT_EXECUTION_HELD",
+      });
+  }
+  if (request.operation === "projectManagement") {
+    return inWriteTransaction((current) =>
+      projectManagement(current, request.payload as ProjectManagementInput),
+    );
+  }
   if (request.operation === "initialize") {
     if (database) throw new Error("sqlite worker is already initialized");
     database = openSqliteDatabaseForWorker(configuration);
@@ -317,29 +346,16 @@ async function execute(request: WorkerRequest): Promise<unknown> {
         code: "SQLITE_TEST_COMMAND_DISABLED",
       });
     }
-    const current = requireDatabase();
-    current.exec("BEGIN IMMEDIATE");
-    try {
-      const identity = insertBugWithNextNumber(current, request.payload as NewBugStorageRecord);
-      current.exec("COMMIT");
-      return identity;
-    } catch (error) {
-      if (current.isTransaction) current.exec("ROLLBACK");
-      throw error;
-    }
+    return inWriteTransaction((current) =>
+      insertBugWithNextNumber(current, request.payload as NewBugStorageRecord),
+    );
   }
 
   if (request.operation === "ensureMobileScope") {
-    const current = requireDatabase();
-    current.exec("BEGIN IMMEDIATE");
-    try {
+    return inWriteTransaction((current) => {
       ensureMobileScope(current, request.payload as MobileScopeBootstrap);
-      current.exec("COMMIT");
       return { ready: true };
-    } catch (error) {
-      if (current.isTransaction) current.exec("ROLLBACK");
-      throw error;
-    }
+    });
   }
 
   if (request.operation === "ensureBrowserAdmin") {
@@ -401,16 +417,9 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   }
 
   if (request.operation === "createMobileBug") {
-    const current = requireDatabase();
-    current.exec("BEGIN IMMEDIATE");
-    try {
-      const result = createMobileBug(current, request.payload as CreateMobileBugInput);
-      current.exec("COMMIT");
-      return result;
-    } catch (error) {
-      if (current.isTransaction) current.exec("ROLLBACK");
-      throw error;
-    }
+    return inWriteTransaction((current) =>
+      createMobileBug(current, request.payload as CreateMobileBugInput),
+    );
   }
 
   if (request.operation === "deleteMobileBug") {
@@ -466,6 +475,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return listMobileVisibleProjects(
       requireDatabase(),
       request.payload as ListMobileVisibleProjectsInput,
+    );
+  }
+
+  if (request.operation === "getMobileProjectAccess") {
+    return getMobileProjectAccess(
+      requireDatabase(),
+      request.payload as GetMobileProjectAccessInput,
     );
   }
 
@@ -525,22 +541,15 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   }
 
   if (request.operation === "createMobileCapture") {
-    const current = requireDatabase();
-    current.exec("BEGIN IMMEDIATE");
-    try {
+    return inWriteTransaction((current) => {
       const payload = request.payload as CreateMobileCaptureInput;
-      const result = createMobileCapture(current, {
+      return createMobileCapture(current, {
         ...payload,
         ...(configuration.evidenceRoot === undefined
           ? {}
           : { evidenceRoot: configuration.evidenceRoot }),
       });
-      current.exec("COMMIT");
-      return result;
-    } catch (error) {
-      if (current.isTransaction) current.exec("ROLLBACK");
-      throw error;
-    }
+    });
   }
 
   if (request.operation === "getMobileCapture") {
@@ -725,9 +734,22 @@ async function execute(request: WorkerRequest): Promise<unknown> {
           readonly now: string;
           readonly leaseExpiresAt: string;
           readonly relayInstanceId?: string;
+          readonly accountId?: string;
+          readonly projectId?: string;
+          readonly componentVersion?: number;
+          readonly snapshotDigest?: string;
         },
       ),
     );
+  }
+
+  if (request.operation === "projectRelayQueue") {
+    const payload = request.payload as ProjectRelayQueueInput;
+    if (payload.operation === "resume" && isImportExecutionHeld(configuration.executionHoldFile))
+      throw Object.assign(new Error("Imported execution remains held"), {
+        code: "IMPORT_EXECUTION_HELD",
+      });
+    return inWriteTransaction((current) => projectRelayQueue(current, payload));
   }
 
   if (request.operation === "completeMobileRelayOutbox") {
@@ -821,10 +843,44 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 }
 
 let queue = Promise.resolve();
+async function executeAuthorized(request: WorkerRequest): Promise<unknown> {
+  const authorization = request.authorization;
+  if (!authorization) return execute(request);
+  const payload = request.payload as Record<string, unknown> | undefined;
+  // A capability is for one actor and project, never for adjacent worker messages.
+  if (
+    !payload ||
+    payload["accountId"] !== authorization.accountId ||
+    payload["projectId"] !== authorization.projectId ||
+    payload["actorId"] !== authorization.actorId
+  ) {
+    return execute(request);
+  }
+  const current = requireDatabase();
+  current.exec("BEGIN IMMEDIATE");
+  try {
+    current
+      .prepare(
+        "INSERT INTO storage_command_authorizations(account_id, project_id, actor_id) VALUES (?, ?, ?)",
+      )
+      .run(authorization.accountId, authorization.projectId, authorization.actorId);
+    const value = await execute(request);
+    current
+      .prepare(
+        "DELETE FROM storage_command_authorizations WHERE account_id = ? AND project_id = ? AND actor_id = ?",
+      )
+      .run(authorization.accountId, authorization.projectId, authorization.actorId);
+    current.exec("COMMIT");
+    return value;
+  } catch (error) {
+    if (current.isTransaction) current.exec("ROLLBACK");
+    throw error;
+  }
+}
 port.on("message", (request: WorkerRequest) => {
   queue = queue.then(async () => {
     try {
-      const value = await execute(request);
+      const value = await executeAuthorized(request);
       port.postMessage({ id: request.id, ok: true, value } satisfies WorkerResponse);
     } catch (error) {
       port.postMessage(errorResponse(request.id, error));

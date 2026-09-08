@@ -1,0 +1,14 @@
+Browser tab: 1, Title: "Relay QA Hub", URL: "http://127.0.0.1:4274/?projectId=b79a70c9-ef3e-4d85-b376-247c473789a9".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+~			88 text entry area (settable) Bug 内容 填写完整问题内容即可。, Value: 双窗口 A 草稿：撤销项目 A 成员资格后，必须保留这段内容和 JPEG 文件。
+~			99 pop up button (collapsed, settable) 修复人（可稍后分配）, Value: Web双窗1788889232622, Secondary Actions: Expand
+~					101 暂不指定
+~					103 (selected) Web双窗1788889232622
+~			110 button 截图 / 标注图 已添加 1 张图片；还可以继续选择或 Ctrl+V 粘贴
+~			111 text 已添加 1 张图片；还可以继续选择或 Ctrl+V 粘贴
++			114 container 待上传图片
++				115 container
++					116 image qa-preview-evidence.jpg
++					117 text qa-preview-evidence.jpg
++					118 button 移除图片 qa-preview-evidence.jpg
+The focused UI element is 110 button 截图 / 标注图 已添加 1 张图片；还可以继续选择或 Ctrl+V 粘贴

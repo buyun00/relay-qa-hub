@@ -23,6 +23,7 @@ const ALLOWED_RENDERER_HEADERS = new Set([
   "x-client-attachment-id",
   "x-chunk-sha256",
   "x-csrf-token",
+  "x-qa-project-id",
 ]);
 const FORWARDED_RESPONSE_HEADERS = [
   "content-type",
@@ -36,12 +37,15 @@ const FORWARDED_RESPONSE_HEADERS = [
   "x-upload-version",
 ] as const;
 
-function browserSessionTokenFromCookieHeader(value: string | null): string | null {
+function browserSessionTokenFromCookieHeader(
+  value: string | null,
+  cookieName: string,
+): string | null {
   if (value === null) return null;
   for (const item of value.split(";")) {
     const separator = item.indexOf("=");
     if (separator < 1) continue;
-    if (item.slice(0, separator).trim() !== BROWSER_SESSION_COOKIE_NAME) continue;
+    if (item.slice(0, separator).trim() !== cookieName) continue;
     const token = item.slice(separator + 1).trim();
     return BROWSER_SESSION_TOKEN_PATTERN.test(token) ? token : null;
   }
@@ -56,13 +60,92 @@ function browserSessionTokenFromCookieHeader(value: string | null): string | nul
 export class DesktopBrowserSessionCookieStore {
   private sessionToken: string | null = null;
   private loginName: string | null = null;
+  private projectId: string | null = null;
+  private userId: string | null = null;
+  private identity: string | null = null;
+  private projectRequestSequence = 0;
+  private authEpoch = 0;
+  private scopeVersion = 0;
+  private pendingAuthEpoch: number | null = null;
+  private requestedProjectId: string | null = null;
+  private authoritativeCookie = false;
+
+  constructor(private readonly cookieName = BROWSER_SESSION_COOKIE_NAME) {
+    if (!/^[a-zA-Z0-9_-]+$/u.test(cookieName)) throw new Error("BROWSER_COOKIE_NAME_INVALID");
+  }
+
+  rememberedProjectId(): string | null {
+    return this.projectId;
+  }
+  rememberedUserId(): string | null {
+    return this.userId;
+  }
+  rememberedIdentity(): string | null {
+    return this.identity;
+  }
+  authenticationEpoch(): number {
+    return this.authEpoch;
+  }
+  scopeEpoch(): number {
+    return this.scopeVersion;
+  }
+  isCurrentAuthentication(epoch: number): boolean {
+    return epoch === this.authEpoch;
+  }
+  canRecoverAuthentication(epoch: number): boolean {
+    return this.isCurrentAuthentication(epoch) && this.pendingAuthEpoch === null;
+  }
+  beginAuthenticationChange(): number {
+    this.authEpoch += 1;
+    this.scopeVersion += 1;
+    this.projectRequestSequence += 1;
+    this.pendingAuthEpoch = this.authEpoch;
+    return this.authEpoch;
+  }
+  finishAuthenticationChange(epoch: number): void {
+    if (this.isCurrentAuthentication(epoch)) this.pendingAuthEpoch = null;
+  }
+  rememberProjectId(value: unknown): void {
+    if (typeof value === "string" && /^[0-9a-f-]{36}$/iu.test(value)) {
+      if (this.projectId !== value) this.scopeVersion += 1;
+      this.projectId = value;
+      this.requestedProjectId = value;
+    }
+  }
+  rememberPrincipal(value: unknown): void {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) return;
+    const previous = this.snapshot();
+    const record = value as Record<string, unknown>;
+    if (typeof record["displayName"] === "string") this.rememberLoginName(record["displayName"]);
+    if (typeof record["userId"] === "string") this.userId = record["userId"];
+    if (typeof record["isGm"] === "boolean") this.identity = record["isGm"] ? "gm" : "employee";
+    else if (typeof record["identity"] === "string") this.identity = record["identity"];
+    this.rememberProjectId(record["projectId"]);
+    if (previous !== this.snapshot()) this.scopeVersion += 1;
+  }
+  snapshot(): string {
+    return JSON.stringify([this.loginName, this.projectId, this.userId, this.identity]);
+  }
+  beginProjectRequest(projectId: string | null): number {
+    if (projectId !== null && projectId !== this.requestedProjectId) {
+      this.requestedProjectId = projectId;
+      this.scopeVersion += 1;
+    }
+    return projectId === null ? 0 : ++this.projectRequestSequence;
+  }
+  completeProjectRequest(projectId: string | null, sequence: number): void {
+    if (sequence > 0 && sequence === this.projectRequestSequence) this.rememberProjectId(projectId);
+  }
 
   cookieHeader(rendererCookieHeader: string | null): string | null {
-    const rendererToken = browserSessionTokenFromCookieHeader(rendererCookieHeader);
-    if (rendererToken !== null) this.sessionToken = rendererToken;
-    return this.sessionToken === null
-      ? null
-      : `${BROWSER_SESSION_COOKIE_NAME}=${this.sessionToken}`;
+    const rendererToken = browserSessionTokenFromCookieHeader(
+      rendererCookieHeader,
+      this.cookieName,
+    );
+    // A renderer cookie jar can lag behind a main-process MCP login or logout.
+    // It may bootstrap a session, but cannot replace a server-observed result.
+    if (rendererToken !== null && !this.authoritativeCookie) this.sessionToken = rendererToken;
+    return this.sessionToken === null ? null : `${this.cookieName}=${this.sessionToken}`;
   }
 
   captureSetCookie(value: string | null): void {
@@ -70,9 +153,10 @@ export class DesktopBrowserSessionCookieStore {
     const firstSeparator = value.indexOf(";");
     const cookiePair = (firstSeparator < 0 ? value : value.slice(0, firstSeparator)).trim();
     const separator = cookiePair.indexOf("=");
-    if (separator < 1 || cookiePair.slice(0, separator).trim() !== BROWSER_SESSION_COOKIE_NAME) {
+    if (separator < 1 || cookiePair.slice(0, separator).trim() !== this.cookieName) {
       return;
     }
+    this.authoritativeCookie = true;
     const token = cookiePair.slice(separator + 1).trim();
     if (token.length === 0 || /(?:^|;)\s*Max-Age=0(?:;|$)/iu.test(value)) {
       this.sessionToken = null;
@@ -94,7 +178,17 @@ export class DesktopBrowserSessionCookieStore {
   }
 
   clearLoginName(): void {
+    this.authoritativeCookie = true;
+    this.authEpoch += 1;
+    this.scopeVersion += 1;
+    this.projectRequestSequence += 1;
+    this.pendingAuthEpoch = null;
+    this.requestedProjectId = null;
     this.loginName = null;
+    this.projectId = null;
+    this.userId = null;
+    this.identity = null;
+    this.sessionToken = null;
   }
 }
 
@@ -105,18 +199,6 @@ function normalizeLoginName(value: string | null): string | null {
     !/[\u0000-\u001f\u007f]/u.test(normalized)
     ? normalized
     : null;
-}
-
-function responseDisplayName(bytes: Uint8Array): string | null {
-  if (bytes.byteLength === 0) return null;
-  try {
-    const value = JSON.parse(Buffer.from(bytes).toString("utf8")) as unknown;
-    if (value === null || typeof value !== "object" || Array.isArray(value)) return null;
-    const displayName = (value as { readonly displayName?: unknown }).displayName;
-    return typeof displayName === "string" ? normalizeLoginName(displayName) : null;
-  } catch {
-    return null;
-  }
 }
 
 function responseByteLimit(pathname: string): number {
@@ -189,11 +271,13 @@ async function responseJson(response: Response, maxBytes: number): Promise<unkno
 export async function fetchDurableInbox(
   config: DesktopConfig,
   browserSessionCookie: string | null = null,
+  projectId: string | null = null,
 ): Promise<readonly DurableNotification[]> {
   if (config.accessToken === null && browserSessionCookie === null) {
     throw new Error("ACCESS_TOKEN_MISSING");
   }
   const endpoint = new URL(NOTIFICATIONS_PATH, config.apiBaseUrl);
+  if (projectId !== null) endpoint.searchParams.set("projectId", projectId);
   if (!isAllowedNetworkUrl(endpoint, config)) throw new Error("INBOX_ORIGIN_NOT_ALLOWED");
   let response: Response;
   try {
@@ -226,6 +310,32 @@ export async function proxyRendererApiRequest(
   browserSession: DesktopBrowserSessionCookieStore = new DesktopBrowserSessionCookieStore(),
   options: Readonly<{ fetchImpl?: typeof fetch; timeoutMs?: number }> = {},
 ): Promise<Response> {
+  const pathname = new URL(request.url).pathname;
+  const authenticationChange =
+    request.method === "POST" &&
+    ["/api/v1/auth/login", "/api/v1/auth/gm/login", "/api/v1/auth/logout"].includes(pathname);
+  const epoch = authenticationChange
+    ? browserSession.beginAuthenticationChange()
+    : browserSession.authenticationEpoch();
+  try {
+    return await proxyRendererApiRequestAtEpoch(request, config, browserSession, options, epoch);
+  } finally {
+    if (authenticationChange) browserSession.finishAuthenticationChange(epoch);
+  }
+}
+
+async function proxyRendererApiRequestAtEpoch(
+  request: Request,
+  config: DesktopConfig,
+  browserSession: DesktopBrowserSessionCookieStore,
+  options: Readonly<{ fetchImpl?: typeof fetch; timeoutMs?: number }>,
+  epoch: number,
+): Promise<Response> {
+  const sessionChanged = () =>
+    new Response(JSON.stringify({ code: "QA_HUB_SESSION_CHANGED" }), {
+      status: 409,
+      headers: { "content-type": "application/json" },
+    });
   const requestUrl = new URL(request.url);
   if (!requestUrl.pathname.startsWith(API_PATH)) {
     return new Response(JSON.stringify({ code: "API_PATH_NOT_ALLOWED" }), {
@@ -241,6 +351,8 @@ export async function proxyRendererApiRequest(
     });
   }
   const headers = copyRendererHeaders(request);
+  const requestProjectId = request.headers.get("x-qa-project-id");
+  const projectRequestSequence = browserSession.beginProjectRequest(requestProjectId);
   const browserSessionCookie = browserSession.cookieHeader(request.headers.get("cookie"));
   if (browserSessionCookie !== null) headers.set("cookie", browserSessionCookie);
   if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
@@ -274,6 +386,7 @@ export async function proxyRendererApiRequest(
     options.timeoutMs ?? proxyRequestTimeoutMs(requestUrl.pathname),
   );
   requestInit.signal = AbortSignal.any([request.signal, timeoutSignal]);
+  if (!browserSession.isCurrentAuthentication(epoch)) return sessionChanged();
   try {
     response = await (options.fetchImpl ?? fetch)(target, requestInit);
   } catch {
@@ -281,7 +394,7 @@ export async function proxyRendererApiRequest(
       ? proxyError("REQUEST_TIMEOUT", 504)
       : proxyError("NETWORK_ERROR", 503);
   }
-  browserSession.captureSetCookie(response.headers.get("set-cookie"));
+  if (!browserSession.isCurrentAuthentication(epoch)) return sessionChanged();
   if (response.status >= 300 && response.status < 400) {
     return new Response(JSON.stringify({ code: "API_REDIRECT_BLOCKED" }), {
       status: 502,
@@ -301,12 +414,21 @@ export async function proxyRendererApiRequest(
     }
     throw cause;
   }
-  if (response.ok && requestUrl.pathname === "/api/v1/auth/login") {
-    const displayName = responseDisplayName(responseBody);
-    if (displayName !== null) browserSession.rememberLoginName(displayName);
+  if (!browserSession.isCurrentAuthentication(epoch)) return sessionChanged();
+  browserSession.captureSetCookie(response.headers.get("set-cookie"));
+  if (
+    response.ok &&
+    ["/api/v1/auth/login", "/api/v1/auth/gm/login"].includes(requestUrl.pathname)
+  ) {
+    try {
+      browserSession.rememberPrincipal(JSON.parse(Buffer.from(responseBody).toString("utf8")));
+    } catch {
+      /* HTTP result remains visible. */
+    }
   } else if (response.ok && requestUrl.pathname === "/api/v1/auth/logout") {
     browserSession.clearLoginName();
   }
+  if (response.ok) browserSession.completeProjectRequest(requestProjectId, projectRequestSequence);
   const responseHeaders = new Headers();
   for (const header of FORWARDED_RESPONSE_HEADERS) {
     const value = response.headers.get(header);

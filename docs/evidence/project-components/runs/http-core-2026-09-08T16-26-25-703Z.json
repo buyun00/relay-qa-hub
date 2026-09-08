@@ -1,0 +1,8 @@
+{
+  "runId": "2026-09-08T16-26-25-703Z",
+  "instanceId": "qa-hub-preview-7c86",
+  "api": "http://127.0.0.1:4419",
+  "passed": false,
+  "note": "Real running API and isolated SQLite. This smoke is a subset, not full E2E acceptance.",
+  "checks": []
+}

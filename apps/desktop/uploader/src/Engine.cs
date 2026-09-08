@@ -152,15 +152,15 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
                     var path=await api.Get("/api/v1/developapi/oss/versionpath",Q(("vid",s.VersionId.ToString()),("file_name",Path.GetFileName(s.File.Path))),ct);
                     s.ObjectKey=Json.Text(path?["path"])+Json.Text(path?["file_name"]);Save();
                 }
-                if(!s.ObjectKey.StartsWith("test/pkg/")||!s.ObjectKey.EndsWith(".zip")||s.ObjectKey.Contains(".."))throw new UploadException("OBJECT_CONFLICT","平台分配了非预期的包路径。");
+                if(!s.ObjectKey.StartsWith(ProjectBinding.Prefix(c.TargetPrefix),StringComparison.Ordinal)||!s.ObjectKey.EndsWith(".zip")||s.ObjectKey.Contains(".."))throw new UploadException("OBJECT_CONFLICT","平台分配了非预期的项目包路径。");
                 Stage("UPLOADING");await uploader.Upload(c,s,api,log,ct);Files.CheckStable(s.File);
                 if(s.File.Size>50L*1024*1024)
                     await Step("REGISTER_OBJECT",async()=>{await api.Write("POST",O+"add_files_url",new JsonObject{["md5"]=s.File.Md5,["oss_provider"]="tencent",["url"]=s.PublicUrl,["distinction"]="version-package"},ct);},async()=>{
                         var h=await api.Get(O+"check_files_by_md5",Q(("md5",s.File.Md5),("oss_provider","tencent"),("distinction","version-package")),ct);return Json.Text(h?["url"])==s.PublicUrl;
                     });
             }
-            if(!s.ObjectKey.StartsWith("test/pkg/")||!s.ObjectKey.EndsWith(".zip"))throw new UploadException("OBJECT_CONFLICT","对象不在预期测试包目录，不能绑定。");
-            s.TestDir="test/dir/"+Path.GetFileNameWithoutExtension(s.ObjectKey)+"/";
+            if(!s.ObjectKey.StartsWith(ProjectBinding.Prefix(c.TargetPrefix),StringComparison.Ordinal)||!s.ObjectKey.EndsWith(".zip")||s.ObjectKey.Contains(".."))throw new UploadException("OBJECT_CONFLICT","对象不在项目测试包目录，不能绑定。");
+            s.TestDir=ProjectBinding.Prefix(c.TestDirectoryPrefix)+Path.GetFileNameWithoutExtension(s.ObjectKey)+"/";
             s.Done.Add("OBJECT_READY");Save();
         }
         await Update("BIND_PACKAGE",null,s.ObjectKey,[20],[20],ct);
@@ -211,7 +211,7 @@ public sealed class Engine(JobConfig c, JobState s, IPlatform api, IObjectUpload
             var x=data?[s.VersionId.ToString()];
             if(!string.IsNullOrEmpty(Json.Text(x?["err_msg"])))throw new UploadException("REMOTE_PROCESSING_FAILED","正式目录解压报告错误。");
             if(Json.Text(x?["status"])!="end")return false;
-            var expected="release/dir/"+Path.GetFileNameWithoutExtension(s.ObjectKey)+"/";
+            var expected=ProjectBinding.Prefix(c.ReleaseDirectoryPrefix)+Path.GetFileNameWithoutExtension(s.ObjectKey)+"/";
             if(Json.Text(x?["path"])!=expected)throw new UploadException("OBJECT_CONFLICT","正式目录不匹配本次上传对象。");
             s.ReleaseDir=expected;Save();return true;
         },ct);

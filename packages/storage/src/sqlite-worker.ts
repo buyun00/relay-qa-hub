@@ -1,4 +1,6 @@
 import { Worker } from "node:worker_threads";
+import { AsyncLocalStorage } from "node:async_hooks";
+import type { ProjectManagementInput } from "./project-management-store.js";
 
 import type {
   BindMobileAttachmentInput,
@@ -30,6 +32,8 @@ import type {
   MobileMetricsOverview,
 } from "./mobile-metrics-store.js";
 import type {
+  GetMobileProjectAccessInput,
+  MobileProjectAccess,
   ListMobileProjectMembersInput,
   ListMobileProjectModulesInput,
   ListMobileVisibleProjectsInput,
@@ -131,6 +135,7 @@ import type {
   ManagedUserMutationResult,
   UnlinkManagedUserInput,
 } from "./user-management-store.js";
+import type { ProjectRelayQueueInput } from "./project-relay-queue.js";
 
 export interface SqliteStorageWorkerOptions {
   readonly databaseFile: string;
@@ -138,6 +143,7 @@ export interface SqliteStorageWorkerOptions {
   readonly backupRoot?: string;
   readonly evidenceRoot?: string;
   readonly quarantineRoot?: string;
+  readonly executionHoldFile?: string;
   /** Real Relay identity is injected by the API process; no provider is chosen by storage. */
   readonly relayInstanceId?: string;
   readonly qaInstanceId?: string;
@@ -180,6 +186,17 @@ function workerEntryUrl(): URL {
 }
 
 export class SqliteStorageWorker {
+  private readonly requestAuthorization = new AsyncLocalStorage<{
+    gm?: Readonly<{ accountId: string; projectId: string; actorId: string }>;
+  }>();
+
+  /** Server-only request context. The worker snapshots its value for each message. */
+  runWithRequestAuthorization<T>(
+    context: { gm?: Readonly<{ accountId: string; projectId: string; actorId: string }> },
+    work: () => T,
+  ): T {
+    return this.requestAuthorization.run(context, work);
+  }
   readonly initialization: Promise<SqliteWorkerInitialization>;
 
   private readonly worker: Worker;
@@ -246,6 +263,11 @@ export class SqliteStorageWorker {
   async ensureMobileScope(scope: MobileScopeBootstrap): Promise<void> {
     await this.initialization;
     await this.request("ensureMobileScope", scope);
+  }
+
+  async projectManagement<T = unknown>(input: ProjectManagementInput): Promise<T> {
+    await this.initialization;
+    return this.request<T>("projectManagement", input);
   }
 
   async ensureBrowserAdmin(input: EnsureBrowserAdminInput): Promise<EnsureBrowserAdminResult> {
@@ -407,6 +429,13 @@ export class SqliteStorageWorker {
   ): Promise<MobileVisibleProjectList> {
     await this.initialization;
     return this.request<MobileVisibleProjectList>("listMobileVisibleProjects", input);
+  }
+
+  async getMobileProjectAccess(
+    input: GetMobileProjectAccessInput,
+  ): Promise<MobileProjectAccess | null> {
+    await this.initialization;
+    return this.request<MobileProjectAccess | null>("getMobileProjectAccess", input);
   }
 
   async listMobileProjectMembers(
@@ -655,6 +684,10 @@ export class SqliteStorageWorker {
     readonly now: string;
     readonly leaseExpiresAt: string;
     readonly relayInstanceId?: string;
+    readonly accountId?: string;
+    readonly projectId?: string;
+    readonly componentVersion?: number;
+    readonly snapshotDigest?: string;
   }): Promise<MobileRelayOutboxClaim | null> {
     await this.initialization;
     return this.request<MobileRelayOutboxClaim | null>("claimMobileRelayOutbox", {
@@ -663,6 +696,11 @@ export class SqliteStorageWorker {
         ? { relayInstanceId: this.relayRuntime.relayInstanceId }
         : {}),
     });
+  }
+
+  async projectRelayQueue(input: ProjectRelayQueueInput): Promise<unknown> {
+    await this.initialization;
+    return this.request("projectRelayQueue", input);
   }
 
   async completeMobileRelayOutbox(
@@ -735,7 +773,13 @@ export class SqliteStorageWorker {
         reject,
       });
       try {
-        this.worker.postMessage({ id, operation, payload });
+        const gm = this.requestAuthorization.getStore()?.gm;
+        this.worker.postMessage({
+          id,
+          operation,
+          payload,
+          ...(gm ? { authorization: { ...gm } } : {}),
+        });
       } catch (error) {
         this.pending.delete(id);
         reject(

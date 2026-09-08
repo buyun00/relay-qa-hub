@@ -1,8 +1,8 @@
 import AppIcon from "./AppIcon";
+import { saveMembership } from "./project-api";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  disableManagedProjectUser,
   linkManagedProjectUser,
   listManagedProjectUsers,
   QaHubApiError,
@@ -32,6 +32,7 @@ function shortId(userId: string): string {
 }
 
 function statusCopy(user: ManagedProjectUser): string {
+  if (user.membershipStatus !== "active") return "此项目已停用";
   if (user.status === "disabled") return "已停用";
   if (user.linkedToUserId !== null) return "已关联";
   return "使用中";
@@ -84,10 +85,13 @@ export default function UserManagementPage({
   }, [query, users]);
 
   const activeCount = users.filter(
-    (user) => user.status === "active" && user.linkedToUserId === null,
+    (user) =>
+      user.status === "active" &&
+      user.membershipStatus === "active" &&
+      user.linkedToUserId === null,
   ).length;
   const linkedCount = users.filter((user) => user.linkedToUserId !== null).length;
-  const disabledCount = users.filter((user) => user.status === "disabled").length;
+  const disabledCount = users.filter((user) => user.membershipStatus !== "active").length;
 
   const candidatesFor = (source: ManagedProjectUser) =>
     users.filter(
@@ -125,7 +129,7 @@ export default function UserManagementPage({
           <p className="eyebrow">账号与显示归一</p>
           <h1>用户管理</h1>
           <p>
-            手动把重复用户名关联到一个主用户。关联后，人员筛选和任务分配只显示主用户；停用会撤销登录与成员资格，但保留任务和审计历史。
+            手动把重复用户名关联到一个主用户。关联后，人员筛选和任务分配只显示主用户；停用只撤销当前项目资格，其他项目不受影响；可恢复资格，任务与审计历史保留。
           </p>
         </div>
         <div className="user-management-summary" aria-label="用户统计">
@@ -312,21 +316,27 @@ export default function UserManagementPage({
                       确认关联
                     </button>
                   ) : null}
-                  {user.status === "active" && user.linkedToUserId === null ? (
-                    protectedReason === null ? (
+                  {user.membershipStatus === "active" ? (
+                    !current ? (
                       <button
                         className="danger-text-button"
                         disabled={busy}
                         onClick={() => {
                           if (
                             !globalThis.confirm(
-                              `停用“${user.displayName}”？其会话和项目成员资格会被撤销，但 ${user.taskCount} 个历史任务引用会保留。`,
+                              `停用“${user.displayName}”？其当前项目资格会被停用，其他项目不受影响， ${user.taskCount} 个历史任务引用会保留。`,
                             )
                           )
                             return;
                           void mutate(
                             `disable:${user.userId}`,
-                            () => disableManagedProjectUser(projectId, user.userId),
+                            () =>
+                              saveMembership(
+                                projectId,
+                                user.userId,
+                                false,
+                                user.membershipVersion ?? 1,
+                              ),
                             `${user.displayName} 已停用并从人员选择器移除。`,
                           );
                         }}
@@ -337,8 +347,27 @@ export default function UserManagementPage({
                     ) : (
                       <span className="managed-user-muted">受保护</span>
                     )
-                  ) : user.status === "disabled" ? (
-                    <span className="managed-user-muted">历史已保留</span>
+                  ) : user.membershipStatus === "revoked" ? (
+                    <button
+                      className="secondary-button compact-button"
+                      disabled={busy}
+                      onClick={() =>
+                        void mutate(
+                          `restore:${user.userId}`,
+                          () =>
+                            saveMembership(
+                              projectId,
+                              user.userId,
+                              true,
+                              user.membershipVersion ?? 1,
+                            ),
+                          `${user.displayName} 的项目资格已恢复。`,
+                        )
+                      }
+                      type="button"
+                    >
+                      恢复资格
+                    </button>
                   ) : (
                     <span className="managed-user-muted">先取消关联再停用</span>
                   )}

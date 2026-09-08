@@ -5,6 +5,7 @@ import {
   continueMobileRelay,
   dispatchMobileRelay,
   insertBugNotificationOutbox,
+  MOBILE_FAKE_RELAY_INSTANCE_ID,
 } from "./mobile-relay-store.js";
 
 interface Delivery {
@@ -24,14 +25,50 @@ interface Delivery {
   bug_version: number;
   bug_updated_at: string;
 }
+export interface RelayLifecycleScope {
+  accountId?: string;
+  projectId?: string;
+  componentVersion?: number;
+  snapshotDigest?: string;
+  relayInstanceId?: string;
+}
+function scopeFilter(scope?: RelayLifecycleScope): {
+  sql: string;
+  values: (string | number | null)[];
+} {
+  if (!scope) return { sql: "", values: [] };
+  const scoped = scope.projectId !== undefined;
+  return {
+    sql: ` AND EXISTS (SELECT 1 FROM outbox AS source
+      WHERE source.account_id=attempt.account_id AND source.project_id=attempt.project_id
+        AND source.aggregate_id=attempt.id AND source.destination=?
+        AND json_extract(source.payload_json,'$.operation')='create'
+        AND COALESCE(source.last_error_code,'') <> 'COMPONENT_DISABLED_PAUSED'
+        AND ((?=0 AND json_extract(source.payload_json,'$.componentRoute') IS NULL)
+          OR (?=1 AND source.account_id=? AND source.project_id=?
+            AND json_extract(source.payload_json,'$.componentRoute.componentVersion')=?
+            AND json_extract(source.payload_json,'$.componentRoute.snapshotDigest')=?)))`,
+    values: [
+      scope.relayInstanceId ?? MOBILE_FAKE_RELAY_INSTANCE_ID,
+      scoped ? 1 : 0,
+      scoped ? 1 : 0,
+      scope.accountId ?? null,
+      scope.projectId ?? null,
+      scope.componentVersion ?? null,
+      scope.snapshotDigest ?? null,
+    ],
+  };
+}
 
 /** Only authenticated, applied, exact-task delivery evidence can advance an active round. */
 export function projectRelayDeliveries(
   database: DatabaseSync,
   now: string,
   attemptId: string | null = null,
+  scope?: RelayLifecycleScope,
 ): number {
   if (!database.isTransaction) throw new Error("Relay lifecycle requires a write transaction");
+  const filter = scopeFilter(scope);
   const deliveries = database
     .prepare(
       `
@@ -45,11 +82,12 @@ export function projectRelayDeliveries(
       AND bug.state = 'in_progress' AND (? IS NULL OR attempt.id = ?)
       AND EXISTS (SELECT 1 FROM service_principals WHERE id=delivery.principal_id AND status='active')
       AND NOT EXISTS (SELECT 1 FROM bug_deletions WHERE bug_id = bug.id)
+      ${filter.sql}
     GROUP BY attempt.id
     ORDER BY delivery.received_at LIMIT 20
   `,
     )
-    .all(attemptId, attemptId) as unknown as Delivery[];
+    .all(attemptId, attemptId, ...filter.values) as unknown as Delivery[];
   for (const delivery of deliveries) {
     let timestamp = Math.max(
       Date.parse(now),
@@ -233,8 +271,13 @@ export function queueRelayAcceptance(
   });
 }
 
-export function processRelayReworkRequests(database: DatabaseSync, now: string): void {
+export function processRelayReworkRequests(
+  database: DatabaseSync,
+  now: string,
+  scope?: RelayLifecycleScope,
+): void {
   if (!database.isTransaction) throw new Error("Relay rework requires a write transaction");
+  const filter = scopeFilter(scope);
   const requests = database
     .prepare(
       `SELECT rework.*, verification.failure_reason, attempt.assignee_id,
@@ -246,10 +289,11 @@ export function processRelayReworkRequests(database: DatabaseSync, now: string):
     JOIN repair_attempts AS attempt ON attempt.id=rework.previous_attempt_id
     JOIN relay_receipts AS receipt ON receipt.repair_attempt_id=attempt.id
     JOIN integration_links AS link ON link.id=receipt.integration_link_id
-    WHERE rework.status='pending' AND rework.next_attempt_at<=? ORDER BY rework.created_at LIMIT 5
+    WHERE rework.status='pending' AND rework.next_attempt_at<=? ${filter.sql}
+    ORDER BY rework.created_at LIMIT 5
   `,
     )
-    .all(now) as unknown as Rework[];
+    .all(now, ...filter.values) as unknown as Rework[];
   for (const request of requests) {
     database.exec("SAVEPOINT relay_rework");
     try {

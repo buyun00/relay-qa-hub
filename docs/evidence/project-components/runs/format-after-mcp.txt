@@ -1,0 +1,5 @@
+Checking formatting...
+[warn] apps/web/src/ComponentHistoryPage.tsx
+[warn] apps/web/src/relay-outbox-api.ts
+[warn] apps/web/src/RelayOutboxPanel.tsx
+[warn] Code style issues found in 3 files. Run Prettier with --write to fix.

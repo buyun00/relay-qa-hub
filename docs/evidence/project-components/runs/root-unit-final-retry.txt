@@ -1,0 +1,13 @@
+✔ Windows path boundaries reject equal, nested, and parent data roots (0.8759ms)
+✔ Windows path boundaries allow sibling and cross-drive data roots (0.2031ms)
+✔ portable packaging cannot overwrite the installer update manifest (1.4483ms)
+{"event":"preview-web.started","instanceId":"qa-hub-preview-test","address":"http://127.0.0.1:0","sourceRoot":"C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-hub-preview-download-boundary-PTJUV6","downloadsRoot":"C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-hub-preview-download-boundary-PTJUV6\\preview-downloads"}
+✔ preview downloads serve only the configured channel and never the legacy installer (3062.6153ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3240.7826

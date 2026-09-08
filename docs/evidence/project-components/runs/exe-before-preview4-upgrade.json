@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T17:56:07.3504630Z",
+  "dailyPid": 17160,
+  "dailyStarted": "2026-09-08T10:24:12.5269521Z",
+  "previewVersion": "0.2.0-preview.3",
+  "configSha256": "AA98507FD6DBE84C360E845859AF69C4F5ED1724975ECC10B7561015CF76AC83",
+  "remembered": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4419",
+    "loginName": "EXE实际验收0909",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "userId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "identity": "employee"
+  },
+  "draft": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。"
+}

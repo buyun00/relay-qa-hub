@@ -8,17 +8,23 @@ import {
   type ParsedBuildLog,
 } from "./jenkins-progress.js";
 
-// Fixed intranet installation, as requested. Credentials stay in the API process.
-const JENKINS_ORIGIN = "http://10.100.5.129:8080";
-const DOWNLOAD_ORIGIN = "http://10.100.5.129:8000";
-const JOB_PATH = `/job/${encodeURIComponent("01-【OZDQP】【Android】")}/`;
-const JENKINS_AUTH = `Basic ${Buffer.from("admin:admin").toString("base64")}`;
-const ZIP_PATH = "/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip";
 const TIMEOUT_MS = 8_000;
 const MAX_JSON_BYTES = 4 * 1024 * 1024;
 
 export const BUILD_PRESETS = ["internal-nosdk", "internal-sdk", "external"] as const;
-export type BuildPreset = (typeof BUILD_PRESETS)[number];
+export type BuildPreset = string;
+export interface JenkinsProjectConfiguration {
+  readonly projectId: string;
+  readonly version: number;
+  readonly origin: string;
+  readonly downloadOrigin: string;
+  readonly jobPath: string;
+  readonly authorization: string;
+  readonly zipPath: string;
+  readonly presets: Readonly<Record<string, Readonly<Record<string, string>>>>;
+  readonly apkPath?: string;
+  readonly ipaPath?: string;
+}
 export const JENKINS_BUILDS_PATH = "/api/v1/packaging";
 
 interface ParameterDefinition {
@@ -68,16 +74,12 @@ export function buildParameters(preset: BuildPreset): Record<string, string> {
   };
 }
 
-function presetForParameters(actions: JenkinsParameters[] = []): BuildPreset | null {
-  const values = Object.fromEntries(
-    actions.flatMap((action) => action.parameters ?? []).map((p) => [p.name, p.value]),
-  );
-  if (values["networkScope"] === "外网_保留原参数") return "external";
-  if (values["networkScope"] !== "内网_自动判断") return null;
-  return values["internalUseSdk"] === "接入SDK" ? "internal-sdk" : "internal-nosdk";
-}
-
-export function packageFiles(files: DirectoryFile[], kind: "apk" | "ipa"): PackageFile[] {
+export function packageFiles(
+  files: DirectoryFile[],
+  kind: "apk" | "ipa",
+  downloadOrigin = "",
+  directoryPath = `/${kind}/`,
+): PackageFile[] {
   return files
     .filter(
       (file) =>
@@ -94,7 +96,7 @@ export function packageFiles(files: DirectoryFile[], kind: "apk" | "ipa"): Packa
       name: file.name,
       size: file.size,
       modifiedAt: new Date(file.mtime).toISOString(),
-      url: `${DOWNLOAD_ORIGIN}/${kind}/${encodeURIComponent(file.name)}`,
+      url: `${downloadOrigin}${directoryPath}${encodeURIComponent(file.name)}`,
       kind,
       preset: /_intra_nosdk\./iu.test(file.name)
         ? "internal-nosdk"
@@ -123,7 +125,26 @@ export class JenkinsBuildService {
     }
   >();
 
-  constructor(private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(
+    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly configuration?: JenkinsProjectConfiguration,
+  ) {}
+  private get config(): JenkinsProjectConfiguration {
+    if (!this.configuration) throw new PackagingError("COMPONENT_NOT_CONFIGURED", 409);
+    return this.configuration;
+  }
+  private configuredPreset(actions: JenkinsParameters[] = []): BuildPreset | null {
+    const parameters = Object.fromEntries(
+      actions
+        .flatMap((action) => action.parameters ?? [])
+        .map((parameter) => [parameter.name, parameter.value]),
+    );
+    return (
+      Object.entries(this.config.presets).find(([, values]) =>
+        Object.entries(values).every(([key, value]) => String(parameters[key] ?? "") === value),
+      )?.[0] ?? null
+    );
+  }
 
   private async request(
     path: string,
@@ -132,18 +153,21 @@ export class JenkinsBuildService {
   ): Promise<Response> {
     const headers = new Headers(init.headers);
     if (authenticate) {
-      headers.set("authorization", JENKINS_AUTH);
+      headers.set("authorization", this.config.authorization);
       if (this.cookies.size > 0)
         headers.set("cookie", [...this.cookies].map(([k, v]) => `${k}=${v}`).join("; "));
     }
     let response: Response;
     try {
-      response = await this.fetchImpl(`${authenticate ? JENKINS_ORIGIN : DOWNLOAD_ORIGIN}${path}`, {
-        ...init,
-        headers,
-        redirect: "manual",
-        signal: init.signal ?? AbortSignal.timeout(TIMEOUT_MS),
-      });
+      response = await this.fetchImpl(
+        `${authenticate ? this.config.origin : this.config.downloadOrigin}${path}`,
+        {
+          ...init,
+          headers,
+          redirect: "manual",
+          signal: init.signal ?? AbortSignal.timeout(TIMEOUT_MS),
+        },
+      );
     } catch {
       throw new PackagingError("PACKAGING_UNAVAILABLE", 503);
     }
@@ -194,7 +218,7 @@ export class JenkinsBuildService {
       ? "buildable,builds[number,timestamp,duration,estimatedDuration,queueId,builtOn,building,result,actions[causes[userName],parameters[name,value]]]{0,24}"
       : "buildable,property[parameterDefinitions[name,choices]],builds[number,timestamp,building,result,actions[parameters[name,value]]]{0,10}";
     let response = await this.request(
-      `${JOB_PATH}api/json?tree=${encodeURIComponent(tree)}`,
+      `${this.config.jobPath}api/json?tree=${encodeURIComponent(tree)}`,
       signal ? { signal } : {},
     );
     if ([401, 403, 302].includes(response.status)) {
@@ -202,7 +226,7 @@ export class JenkinsBuildService {
       this.cookies.clear();
       this.crumb = null;
       response = await this.request(
-        `${JOB_PATH}api/json?tree=${encodeURIComponent(tree)}`,
+        `${this.config.jobPath}api/json?tree=${encodeURIComponent(tree)}`,
         signal ? { signal } : {},
       );
     }
@@ -236,10 +260,12 @@ export class JenkinsBuildService {
     const signal = AbortSignal.timeout(15_000);
     const job = await this.job(signal);
     if (!job.buildable) throw new PackagingError("JENKINS_JOB_DISABLED", 409);
-    const parameters = buildParameters(preset);
+    const parameters = this.config.presets[preset];
+    if (!parameters) throw new PackagingError("BUILD_PRESET_NOT_CONFIGURED", 400);
     const definitions = job.property?.flatMap((p) => p.parameterDefinitions ?? []) ?? [];
     for (const [name, value] of Object.entries(parameters)) {
-      if (!definitions.find((p) => p.name === name)?.choices?.includes(value)) {
+      const definition = definitions.find((p) => p.name === name);
+      if (!definition || (definition.choices && !definition.choices.includes(value))) {
         throw new PackagingError("JENKINS_PARAMETERS_CHANGED", 409);
       }
     }
@@ -248,7 +274,7 @@ export class JenkinsBuildService {
       const crumb = this.crumb!;
       let response: Response;
       try {
-        response = await this.request(`${JOB_PATH}buildWithParameters`, {
+        response = await this.request(`${this.config.jobPath}buildWithParameters`, {
           method: "POST",
           signal,
           headers: {
@@ -270,9 +296,9 @@ export class JenkinsBuildService {
         }
         throw new PackagingError("JENKINS_AUTH_FAILED");
       }
-      const queueUrl = location ? new URL(location, JENKINS_ORIGIN) : null;
+      const queueUrl = location ? new URL(location, this.config.origin) : null;
       const queue =
-        queueUrl?.origin === JENKINS_ORIGIN
+        queueUrl?.origin === this.config.origin
           ? /^\/queue\/item\/(\d+)\/?$/u.exec(queueUrl.pathname)
           : null;
       if (response.status !== 201 || !queue)
@@ -305,10 +331,19 @@ export class JenkinsBuildService {
 
   private async directory(kind: "apk" | "ipa"): Promise<PackageFile[]> {
     const listing = await this.readJson<{ files: DirectoryFile[] }>(
-      await this.request(`/${kind}/?json=true`, {}, false),
+      await this.request(
+        `${kind === "apk" ? (this.config.apkPath ?? "/apk/") : (this.config.ipaPath ?? "/ipa/")}?json=true`,
+        {},
+        false,
+      ),
     );
     if (!Array.isArray(listing.files)) throw new PackagingError("PACKAGING_INVALID_RESPONSE");
-    return packageFiles(listing.files, kind);
+    return packageFiles(
+      listing.files,
+      kind,
+      this.config.downloadOrigin,
+      kind === "apk" ? (this.config.apkPath ?? "/apk/") : (this.config.ipaPath ?? "/ipa/"),
+    );
   }
 
   private async readStatus() {
@@ -335,24 +370,25 @@ export class JenkinsBuildService {
             number: build.number,
             startedAt: new Date(build.timestamp).toISOString(),
             status: build.building ? "BUILDING" : (build.result ?? "UNKNOWN"),
-            preset: presetForParameters(build.actions),
+            preset: this.configuredPreset(build.actions),
           })),
           queue: queue.items
             .filter(
               (q) =>
-                q.task?.url === `${JENKINS_ORIGIN}${JOB_PATH}` ||
-                decodeURI(q.task?.url ?? "") === decodeURI(`${JENKINS_ORIGIN}${JOB_PATH}`),
+                q.task?.url === `${this.config.origin}${this.config.jobPath}` ||
+                decodeURI(q.task?.url ?? "") ===
+                  decodeURI(`${this.config.origin}${this.config.jobPath}`),
             )
-            .map((q) => ({ id: q.id, reason: q.why, preset: presetForParameters(q.actions) })),
+            .map((q) => ({ id: q.id, reason: q.why, preset: this.configuredPreset(q.actions) })),
         };
       })(),
       this.directory("apk"),
       this.directory("ipa"),
-      this.request(ZIP_PATH, { method: "HEAD" }, false).then((r) => {
+      this.request(this.config.zipPath, { method: "HEAD" }, false).then((r) => {
         if (!r.ok) throw new PackagingError("PACKAGING_UNAVAILABLE");
         return {
-          url: `${DOWNLOAD_ORIGIN}${ZIP_PATH}`,
-          name: "_pkg_cfg_2001_1002.zip",
+          url: `${this.config.downloadOrigin}${this.config.zipPath}`,
+          name: this.config.zipPath.split("/").at(-1) ?? "artifact.zip",
           size: Number(r.headers.get("content-length")),
           modifiedAt: r.headers.get("last-modified"),
         };
@@ -385,7 +421,7 @@ export class JenkinsBuildService {
     if (previous && previous.until > Date.now()) return previous.value;
     const value = (async () => {
       const response = await this.request(
-        `${JOB_PATH}${build.number}/timestamps/?elapsed=HH:mm:ss.SSS&appendLog`,
+        `${this.config.jobPath}${build.number}/timestamps/?elapsed=HH:mm:ss.SSS&appendLog`,
         { signal },
       );
       if (!response.ok) {
@@ -429,16 +465,23 @@ export class JenkinsBuildService {
   ): Promise<PackagingProgress> {
     const signal = AbortSignal.timeout(18_000);
     const job = await this.job(signal, true);
-    const builds = [...job.builds];
+    const builds = job.builds.filter(
+      (build) =>
+        buildNumbers.includes(build.number) ||
+        (build.queueId !== undefined && queueIds.includes(build.queueId)),
+    );
     const queues: PackagingProgress["queues"] = [];
     const buildTree =
       "number,timestamp,duration,estimatedDuration,queueId,builtOn,building,result,actions[causes[userName],parameters[name,value]]";
     const loadBuild = async (number: number) => {
       if (builds.some((b) => b.number === number)) return;
       const build = await this.readJson<JenkinsBuildRecord>(
-        await this.request(`${JOB_PATH}${number}/api/json?tree=${encodeURIComponent(buildTree)}`, {
-          signal,
-        }),
+        await this.request(
+          `${this.config.jobPath}${number}/api/json?tree=${encodeURIComponent(buildTree)}`,
+          {
+            signal,
+          },
+        ),
       );
       if (build.number !== number || !Number.isFinite(build.timestamp))
         throw new PackagingError("PACKAGING_INVALID_RESPONSE");
@@ -467,7 +510,8 @@ export class JenkinsBuildService {
           }>(response);
           if (
             item.id !== id ||
-            decodeURI(item.task?.url ?? "") !== decodeURI(`${JENKINS_ORIGIN}${JOB_PATH}`)
+            decodeURI(item.task?.url ?? "") !==
+              decodeURI(`${this.config.origin}${this.config.jobPath}`)
           )
             throw new Error("Unrelated queue item");
           if (item.cancelled)
@@ -497,18 +541,20 @@ export class JenkinsBuildService {
         while (index < builds.length) {
           const build = builds[index++]!;
           try {
-            descriptions.push(
-              describeBuild(
+            descriptions.push({
+              ...describeBuild(
                 build,
                 await this.buildLog(build, signal),
                 Date.now(),
                 this.observedStages,
               ),
-            );
+              preset: this.configuredPreset(build.actions),
+            });
           } catch {
-            descriptions.push(
-              describeBuild(build, parseBuildLog(""), Date.now(), this.observedStages, true),
-            );
+            descriptions.push({
+              ...describeBuild(build, parseBuildLog(""), Date.now(), this.observedStages, true),
+              preset: this.configuredPreset(build.actions),
+            });
           }
         }
       }),
@@ -600,7 +646,7 @@ export function registerPackagingRoutes(
         !body ||
         Object.keys(body).length !== 1 ||
         typeof preset !== "string" ||
-        !BUILD_PRESETS.includes(preset as BuildPreset) ||
+        !(BUILD_PRESETS as readonly string[]).includes(preset) ||
         typeof key !== "string" ||
         !/^[a-zA-Z0-9-]{16,80}$/u.test(key)
       ) {

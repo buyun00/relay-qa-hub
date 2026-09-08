@@ -1,3 +1,4 @@
+import { projectStorageKey } from "./project-context";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getPackagingProgress, type PackagingProgress } from "./packaging-api";
 import { readWatchedBuilds, reconcileBuilds, type WatchedBuild } from "./packaging-monitor";
@@ -10,7 +11,7 @@ export function usePackagingProgress(
   onCompleted: () => void,
   onOpen?: () => void,
 ) {
-  const storageKey = `qa-hub:packaging-watch:${userId}`;
+  const storageKey = projectStorageKey("packaging-watch", undefined, userId);
   const [initialWatched] = useState<WatchedBuild[]>(() => {
     try {
       return readWatchedBuilds(

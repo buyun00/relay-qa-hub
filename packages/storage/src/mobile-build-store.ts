@@ -1,10 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
-import {
-  MobileRelayStorageError,
-  type MobileRelayScope,
-} from "./mobile-relay-store.js";
+import { MobileRelayStorageError, type MobileRelayScope } from "./mobile-relay-store.js";
 
 const UUID_PATTERN =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
@@ -16,13 +13,7 @@ const URL_PATTERN = /^[a-z][a-z0-9+.-]*:\S+$/iu;
 export type BuildProvider = "manual" | "ozdqp" | "custom";
 export type BuildMode = "full" | "hot_update" | "cdn" | "debug" | "other";
 export type BuildStatus =
-  | "registered"
-  | "queued"
-  | "building"
-  | "validating"
-  | "publishing"
-  | "ready"
-  | "failed";
+  "registered" | "queued" | "building" | "validating" | "publishing" | "ready" | "failed";
 
 export interface MobileBuildRecord {
   readonly id: string;
@@ -214,7 +205,11 @@ function toBuild(row: BuildRow): MobileBuildRecord {
   });
 }
 
-function readBuild(database: DatabaseSync, input: MobileRelayScope, buildId: string): BuildRow | null {
+function readBuild(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  buildId: string,
+): BuildRow | null {
   return (
     (database
       .prepare(
@@ -237,10 +232,10 @@ function requireRole(database: DatabaseSync, input: MobileRelayScope, role: stri
          ON project.account_id = account.id AND project.id = ? AND project.status = 'active'
        JOIN users AS actor
          ON actor.account_id = account.id AND actor.id = ? AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id AND membership.project_id = project.id
         AND membership.user_id = actor.id AND membership.status = 'active'
-       JOIN membership_roles AS membership_role
+       JOIN command_project_roles AS membership_role
          ON membership_role.account_id = membership.account_id
         AND membership_role.project_id = membership.project_id
         AND membership_role.membership_id = membership.id
@@ -248,10 +243,12 @@ function requireRole(database: DatabaseSync, input: MobileRelayScope, role: stri
        WHERE account.id = ? AND account.status = 'active'`,
     )
     .get(input.projectId, input.actorId, role, input.accountId) as
-    | { readonly present: number }
-    | undefined;
+    { readonly present: number } | undefined;
   if (!row) {
-    throw new MobileRelayStorageError("FORBIDDEN", `actor lacks required ${role} project authority`);
+    throw new MobileRelayStorageError(
+      "FORBIDDEN",
+      `actor lacks required ${role} project authority`,
+    );
   }
 }
 
@@ -422,7 +419,10 @@ function beginIdempotency(
       );
     }
     if (existing.status !== "committed" || existing.response_json === null) {
-      throw new MobileRelayStorageError("VERSION_CONFLICT", "idempotent Build write is not committed");
+      throw new MobileRelayStorageError(
+        "VERSION_CONFLICT",
+        "idempotent Build write is not committed",
+      );
     }
     const response = JSON.parse(existing.response_json) as RegisterMobileBuildResult;
     return {
@@ -475,7 +475,10 @@ function commitIdempotency(
     )
     .run(200, JSON.stringify(response), eventId, context.id);
   if (result.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "idempotent Build write did not commit exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "idempotent Build write did not commit exactly once",
+    );
   }
 }
 
@@ -499,23 +502,38 @@ function validateBuildRegistration(input: RegisterMobileBuildInput): void {
     `build:register:project:${input.projectId}:provider:${input.provider}:external:${input.externalId}`,
   );
   if (input.provider !== "manual") {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "the mobile Build slice only registers manual Builds");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "the mobile Build slice only registers manual Builds",
+    );
   }
   if (input.mode !== "debug") {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "the mobile Build slice requires mode=debug");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "the mobile Build slice requires mode=debug",
+    );
   }
   if (input.status !== "ready") {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "the mobile Build slice requires status=ready");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "the mobile Build slice requires status=ready",
+    );
   }
   if (
     input.manifest.commitShas.length === 0 ||
     new Set(input.manifest.commitShas).size !== input.manifest.commitShas.length
   ) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "manifest.commitShas must be non-empty and unique");
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "manifest.commitShas must be non-empty and unique",
+    );
   }
   for (const commit of input.manifest.commitShas) requireCommit(commit, "manifest.commitShas");
   if (!input.manifest.commitShas.includes(input.sourceCommitSha)) {
-    throw new MobileRelayStorageError("BUILD_IDENTITY_MISMATCH", "Build manifest must contain sourceCommitSha");
+    throw new MobileRelayStorageError(
+      "BUILD_IDENTITY_MISMATCH",
+      "Build manifest must contain sourceCommitSha",
+    );
   }
   if (input.manifest.artifactSha256 !== undefined) {
     requireSha256(input.manifest.artifactSha256, "manifest.artifactSha256");
@@ -526,7 +544,11 @@ function validateBuildRegistration(input: RegisterMobileBuildInput): void {
   if (input.resourceVersion !== undefined && input.resourceVersion !== null) {
     requireNonEmpty(input.resourceVersion, "resourceVersion", 100);
   }
-  if (input.downloadUrl !== undefined && input.downloadUrl !== null && !URL_PATTERN.test(input.downloadUrl)) {
+  if (
+    input.downloadUrl !== undefined &&
+    input.downloadUrl !== null &&
+    !URL_PATTERN.test(input.downloadUrl)
+  ) {
     throw new MobileRelayStorageError("INVALID_REQUEST", "downloadUrl must be an absolute URI");
   }
 }
@@ -555,12 +577,7 @@ export function registerMobileBuild(
              AND mode = 'human' AND status = 'delivered'
              AND commit_sha = ?`,
         )
-        .get(
-          input.accountId,
-          input.projectId,
-          input.repairAttemptId,
-          input.sourceCommitSha,
-        )
+        .get(input.accountId, input.projectId, input.repairAttemptId, input.sourceCommitSha)
     : database
         .prepare(
           `SELECT 1 AS present
@@ -587,10 +604,12 @@ export function registerMobileBuild(
        WHERE account_id = ? AND project_id = ? AND provider = ? AND external_id = ?`,
     )
     .get(input.accountId, input.projectId, input.provider, input.externalId) as
-    | { readonly id: string }
-    | undefined;
+    { readonly id: string } | undefined;
   if (existing) {
-    throw new MobileRelayStorageError("BUILD_IDENTITY_MISMATCH", "provider/external Build identity already exists");
+    throw new MobileRelayStorageError(
+      "BUILD_IDENTITY_MISMATCH",
+      "provider/external Build identity already exists",
+    );
   }
 
   const artifactSha256 =
@@ -657,7 +676,10 @@ export function registerMobileBuild(
     )
     .run(readyAt, input.accountId, input.projectId, buildId);
   if (readyUpdate.changes !== 1) {
-    throw new MobileRelayStorageError("VERSION_CONFLICT", "Build did not become ready exactly once");
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Build did not become ready exactly once",
+    );
   }
 
   const eventId = randomUUID();

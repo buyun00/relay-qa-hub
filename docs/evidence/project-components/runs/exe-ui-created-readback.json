@@ -1,0 +1,29 @@
+{
+  "snapshotSequence": 137,
+  "items": [
+    {
+      "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "number": 13,
+      "key": "TA1788885078625-13",
+      "title": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。",
+      "description": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。",
+      "expectedBehavior": "问题修复后不再复现",
+      "moduleId": null,
+      "state": "in_progress",
+      "severity": "S2",
+      "priority": "P2",
+      "reporterId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "ownerId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "verificationOwnerId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "duplicateOfBugId": null,
+      "occurrenceCount": 1,
+      "reopenCount": 0,
+      "version": 3,
+      "createdAt": "2026-09-08T18:31:56.292Z",
+      "updatedAt": "2026-09-08T18:32:38.790Z",
+      "closedAt": null
+    }
+  ],
+  "nextCursor": null
+}

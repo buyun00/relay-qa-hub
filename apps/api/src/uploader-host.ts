@@ -2,7 +2,6 @@ import { createHash, randomUUID } from "node:crypto";
 import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { DEFAULT_UPLOAD_PARAMETERS, UPLOAD_TARGETS } from "./uploader-types.js";
 import { latestIosUploadSource } from "./upload-source.js";
 import type {
   UploadEvent,
@@ -13,11 +12,9 @@ import type {
   UploadSourceIdentity,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "6541ec8737a474acf2e66f7453ae33ccc665b6d2cbb8fa6d14ccca860f217e80";
-export const UPLOAD_SOURCE =
-  "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
-const API_BASE = "https://fq2ivi.ipwana.com";
-const LOGIN_BASE = "https://54cetx.jiaxiangxm.com";
+export const UPLOADER_SHA256 = "0d5e930bd6421550ac18d816a4f08ca444c3a8f078df26e2c051e960649fc907";
+/** Compatibility display value only; execution always needs explicit project configuration. */
+export const UPLOAD_SOURCE = "";
 const UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 type RecordValue = Record<string, unknown>;
 export function record(value: unknown): RecordValue {
@@ -78,13 +75,16 @@ export async function readJson(file: string): Promise<RecordValue | null> {
     throw new Error("LOCAL_STATE_INVALID");
   }
 }
-export function parseNewUploadInput(value: unknown): UploadInput {
+export function parseNewUploadInput(
+  value: unknown,
+  defaults: Partial<UploadInput> = {},
+): UploadInput {
   const raw = record(value);
   if (raw["mode"] !== "publish_workflow" && raw["mode"] !== "prepare_publish")
     throw new Error("INVALID_INPUT");
   const version = textInput(raw["version"] ?? "", 80);
   const input = parseUploadInput({
-    ...DEFAULT_UPLOAD_PARAMETERS,
+    ...defaults,
     ...raw,
     version,
     summary: version || "自动版本号",
@@ -167,10 +167,28 @@ export interface HostOptions {
   runner: string;
   nodeExecutable: string;
   fetch?: typeof fetch;
+  project?: UploadProjectConfiguration;
+}
+export interface UploadProjectConfiguration {
+  readonly projectId: string;
+  readonly componentVersion: number;
+  readonly apiBase: string;
+  readonly loginBase: string;
+  readonly sourceUrl: string;
+  readonly sourceKind?: "file" | "ios_directory";
+  readonly targetPrefix: string;
+  readonly testDirectoryPrefix?: string;
+  readonly releaseDirectoryPrefix?: string;
+  readonly defaults: Partial<UploadInput>;
+  readonly credentialRef: string;
 }
 export class UploaderHost {
   private mutating = false;
   constructor(private readonly options: HostOptions) {}
+  private get project(): UploadProjectConfiguration {
+    if (!this.options.project) throw new Error("COMPONENT_NOT_CONFIGURED");
+    return this.options.project;
+  }
   private async exclusive<T>(action: () => Promise<T>): Promise<T> {
     if (this.mutating) throw new Error("UPLOADER_BUSY");
     this.mutating = true;
@@ -200,6 +218,12 @@ export class UploaderHost {
     const meta = await readJson(path.join(directory, "desktop.json"));
     if (!meta) throw new Error("JOB_NOT_FOUND");
     const config = await readJson(path.join(directory, "job.json"));
+    if (
+      this.options.project &&
+      (config?.["projectId"] !== this.options.project.projectId ||
+        config?.["componentVersion"] !== this.options.project.componentVersion)
+    )
+      throw new Error("UPLOAD_PROJECT_SCOPE_MISMATCH");
     let input = parseUploadInput({ ...config, version: config?.["version"] ?? "" });
     const state = (await readJson(path.join(directory, "state.json"))) ?? {};
     if (config?.["useVersionText"] === true && state["version"])
@@ -238,10 +262,16 @@ export class UploaderHost {
         : stage === (input.mode === "upload_only" ? "TEST_ASSETS_READY" : "TEST_REQUESTED"));
     return {
       id,
+      ...(this.options.project
+        ? {
+            projectId: this.options.project.projectId,
+            componentVersion: this.options.project.componentVersion,
+          }
+        : {}),
       createdAt: str(meta["createdAt"]),
       input,
-      sourceUrl: str(config?.["downloadUrl"]) || UPLOAD_SOURCE,
-      sourceFileName: str(config?.["sourceFileName"], 240) || "_pkg_cfg_2001_1002.zip",
+      sourceUrl: str(config?.["downloadUrl"]) || this.options.project?.sourceUrl || "",
+      sourceFileName: str(config?.["sourceFileName"], 240),
       recordedWorkflow: config?.["recordedTestWorkflow"] === true,
       active,
       stage,
@@ -307,8 +337,8 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.4.3",
-      sourceUrl: UPLOAD_SOURCE,
+      toolVersion: "0.5.0",
+      sourceUrl: this.options.project?.sourceUrl ?? "",
       configured: !!auth,
       authError,
       account: str(auth?.["account"], 200),
@@ -380,7 +410,7 @@ export class UploaderHost {
         throw new Error("INVALID_INPUT");
       const kind: UploadLogin["kind"] = input["kind"];
       const data = await this.request(
-        LOGIN_BASE,
+        this.project.loginBase,
         `/api/v1/gwapi/login/${kind === "email" ? "unified" : "extension"}`,
         {
           account,
@@ -393,7 +423,8 @@ export class UploaderHost {
       if (!token && kind === "subaccount") {
         try {
           const url = new URL(str(data["new_skip_url"] || data["skip_url"], 30000));
-          if (![LOGIN_BASE, API_BASE].includes(url.origin)) throw new Error();
+          if (![this.project.loginBase, this.project.apiBase].includes(url.origin))
+            throw new Error();
           const values = [
             ...url.searchParams.getAll("access_token"),
             ...new URLSearchParams(url.hash.slice(1).replace(/^.*?\?/, "")).getAll("access_token"),
@@ -404,12 +435,17 @@ export class UploaderHost {
         }
       }
       if (!token || /REDACTED|[\r\n]/iu.test(token)) throw new Error("LOGIN_SCHEMA_CHANGED");
-      await this.request(API_BASE, "/api/v1/thirdpartyadminapi/oss_provider", null, token);
+      await this.request(
+        this.project.apiBase,
+        "/api/v1/thirdpartyadminapi/oss_provider",
+        null,
+        token,
+      );
       await writeJson(this.options.authFile, {
         accessToken: token,
         refreshToken: str(data["refresh_token"], 20000),
-        apiBase: API_BASE,
-        loginBase: LOGIN_BASE,
+        apiBase: this.project.apiBase,
+        loginBase: this.project.loginBase,
         account,
         password: input["password"],
         kind,
@@ -454,7 +490,7 @@ export class UploaderHost {
     const auth = await readJson(this.options.authFile);
     if (!auth || !auth["account"]) throw new Error("AUTH_REQUIRED");
     return createHash("sha256")
-      .update(JSON.stringify([API_BASE, auth["account"], auth["kind"]]))
+      .update(JSON.stringify([this.project.apiBase, auth["account"], auth["kind"]]))
       .digest("hex");
   }
   async hasBuildJob(id: string): Promise<boolean> {
@@ -463,6 +499,9 @@ export class UploaderHost {
   private workerEnvironment(): NodeJS.ProcessEnv {
     const env = { ...process.env, ...this.options.environment };
     delete env["OZDQP_AUTHORIZATION"];
+    env["OZDQP_AUTH_FILE"] = this.options.authFile;
+    env["QA_HUB_PROJECT_ID"] = this.project.projectId;
+    env["QA_HUB_COMPONENT_VERSION"] = String(this.project.componentVersion);
     return env;
   }
   private async launch(
@@ -511,8 +550,7 @@ export class UploaderHost {
     source: UploadSourceIdentity,
     accountIdentity: string,
   ): Promise<string> {
-    if (record(value)["channelId"] === UPLOAD_TARGETS.ios.channelId)
-      throw new Error("BUILD_PLATFORM_UNSUPPORTED");
+    if (this.project.sourceKind === "ios_directory") throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     if (
       !Number.isSafeInteger(source.size) ||
       source.size <= 0 ||
@@ -528,13 +566,23 @@ export class UploaderHost {
     accountIdentity?: string,
   ): Promise<string> {
     return this.exclusive(async () => {
-      const input = parseNewUploadInput(value);
+      const input = parseNewUploadInput(value, this.project.defaults);
+      if (
+        input.productId !== this.project.defaults.productId ||
+        input.channelId !== this.project.defaults.channelId
+      )
+        throw new Error("UPLOAD_TARGET_MISMATCH");
       const directory = this.folder(id);
       const existing = await readJson(path.join(directory, "job.json"));
       if (existing) {
         if (
+          existing["projectId"] !== this.project.projectId ||
+          existing["componentVersion"] !== this.project.componentVersion
+        )
+          throw new Error("PROJECT_SCOPE_MISMATCH");
+        if (
           (source && existing["buildChainId"] !== id) ||
-          ((source || input.channelId !== UPLOAD_TARGETS.ios.channelId) &&
+          ((source || this.project.sourceKind !== "ios_directory") &&
             JSON.stringify(existing["expectedSource"]) !== JSON.stringify(source)) ||
           JSON.stringify(
             parseNewUploadInput({ ...existing, version: existing["version"] ?? "" }),
@@ -558,14 +606,24 @@ export class UploaderHost {
           recordedTestWorkflow: true,
           version: input.version || null,
           existingVersionId: null,
-          apiBase: API_BASE,
+          apiBase: this.project.apiBase,
+          loginBase: this.project.loginBase,
+          projectId: this.project.projectId,
+          componentVersion: this.project.componentVersion,
+          targetPrefix: this.project.targetPrefix,
+          testDirectoryPrefix: this.project.testDirectoryPrefix,
+          releaseDirectoryPrefix: this.project.releaseDirectoryPrefix,
+          sourceRoot: new URL(".", this.project.sourceUrl).toString(),
+          downloadUrl: this.project.sourceUrl,
+          sourceFileName:
+            new URL(this.project.sourceUrl).pathname.split("/").at(-1) ?? "artifact.zip",
           workDirectory: directory,
           pollSeconds: 3,
           waitTimeoutSeconds: 1800,
           partSizeBytes: 5242880,
-          uploadConcurrency: 8,
-          ...(input.channelId === UPLOAD_TARGETS.ios.channelId
-            ? await latestIosUploadSource(this.options.fetch)
+          uploadConcurrency: 2,
+          ...(this.project.sourceKind === "ios_directory"
+            ? await latestIosUploadSource(this.options.fetch, this.project.sourceUrl)
             : {}),
           ...(source ? { buildChainId: id, expectedSource: source } : {}),
         });

@@ -241,10 +241,7 @@ function validatePoco(input: MobileCapturePocoInput): MobileCaptureEnrichmentSta
   if (!Number.isInteger(input.connectedPort) && input.connectedPort !== null) {
     captureInvalid("connectedPort is invalid");
   }
-  if (
-    input.connectedPort !== null &&
-    (input.connectedPort < 1 || input.connectedPort > 65535)
-  ) {
+  if (input.connectedPort !== null && (input.connectedPort < 1 || input.connectedPort > 65535)) {
     captureInvalid("connectedPort is invalid");
   }
   if (input.sdkVersion !== null && (input.sdkVersion.length < 1 || input.sdkVersion.length > 100)) {
@@ -276,7 +273,10 @@ function validatePoco(input: MobileCapturePocoInput): MobileCaptureEnrichmentSta
     return "unavailable";
   }
 
-  if ([...negotiated].some((method) => method !== "GetSDKVersion") && !succeeded.has("GetSDKVersion")) {
+  if (
+    [...negotiated].some((method) => method !== "GetSDKVersion") &&
+    !succeeded.has("GetSDKVersion")
+  ) {
     captureInvalid("negotiated Poco methods require a successful SDK method");
   }
   if (succeeded.size > 0 && !succeeded.has("GetSDKVersion")) {
@@ -308,7 +308,9 @@ function validatePoco(input: MobileCapturePocoInput): MobileCaptureEnrichmentSta
     captureInvalid("a fully succeeded Poco set cannot report a failure reason");
   }
   return sameMethods(input.negotiatedMethods, input.succeededMethods) &&
-    ["GetSDKVersion", "Screenshot", "Dump"].every((method) => succeeded.has(method as MobileCapturePocoMethod))
+    ["GetSDKVersion", "Screenshot", "Dump"].every((method) =>
+      succeeded.has(method as MobileCapturePocoMethod),
+    )
     ? "complete"
     : "partial";
 }
@@ -336,8 +338,7 @@ function readCapture(database: DatabaseSync, input: CreateMobileCaptureInput): C
          WHERE id = ? AND account_id = ? AND project_id = ? AND actor_id = ?`,
       )
       .get(input.captureId, input.accountId, input.projectId, input.actorId) as
-      | CaptureRow
-      | undefined) ?? null
+      CaptureRow | undefined) ?? null
   );
 }
 
@@ -357,8 +358,7 @@ function readCaptureBySubmission(
            AND client_submission_id = ?`,
       )
       .get(input.accountId, input.projectId, input.actorId, input.clientSubmissionId) as
-      | CaptureRow
-      | undefined) ?? null
+      CaptureRow | undefined) ?? null
   );
 }
 
@@ -429,7 +429,8 @@ function captureBundleRecord(database: DatabaseSync, row: CaptureRow): MobileCap
        WHERE account_id = ? AND project_id = ? AND capture_bundle_id = ?`,
     )
     .get(row.account_id, row.project_id, row.id) as PocoEnrichmentRow | undefined;
-  if (!enrichment) throw new SqliteStorageError("SQLITE_EFFECT_MISSING", "Poco enrichment is missing");
+  if (!enrichment)
+    throw new SqliteStorageError("SQLITE_EFFECT_MISSING", "Poco enrichment is missing");
   const methods = database
     .prepare(
       `SELECT method, negotiated, status
@@ -506,7 +507,8 @@ function requireArtifactIdentity(
   const succeededClientAttachmentIds = new Set<string>();
   let primaryFound = false;
   for (const artifact of input.artifacts) {
-    if (artifact.captureId !== input.captureId) captureInvalid("artifact captureId does not match captureId");
+    if (artifact.captureId !== input.captureId)
+      captureInvalid("artifact captureId does not match captureId");
     if (kinds.has(artifact.kind)) captureInvalid("capture artifact kinds must be unique");
     kinds.add(artifact.kind);
     const artifactStartedAt = requireDate(artifact.startedAt, "artifact.startedAt");
@@ -526,10 +528,17 @@ function requireArtifactIdentity(
       captureInvalid("capture artifact duration is too long");
     }
     if (artifact.status === "succeeded") {
-      if (artifact.attachmentId === null || artifact.clientAttachmentId === null || artifact.failureReason !== null) {
+      if (
+        artifact.attachmentId === null ||
+        artifact.clientAttachmentId === null ||
+        artifact.failureReason !== null
+      ) {
         captureInvalid("succeeded artifacts require exact attachment IDs");
       }
-      if (succeededAttachmentIds.has(artifact.attachmentId) || succeededClientAttachmentIds.has(artifact.clientAttachmentId)) {
+      if (
+        succeededAttachmentIds.has(artifact.attachmentId) ||
+        succeededClientAttachmentIds.has(artifact.clientAttachmentId)
+      ) {
         captureInvalid("succeeded artifact attachment identities must be unique");
       }
       succeededAttachmentIds.add(artifact.attachmentId);
@@ -538,7 +547,8 @@ function requireArtifactIdentity(
         artifact.attachmentId === input.primaryEvidenceAttachmentId &&
         artifact.clientAttachmentId === input.primaryEvidenceClientAttachmentId
       ) {
-        primaryFound = artifact.kind === "system_screenshot" || artifact.kind === "system_recording";
+        primaryFound =
+          artifact.kind === "system_screenshot" || artifact.kind === "system_recording";
       }
     } else if (
       artifact.attachmentId !== null ||
@@ -554,10 +564,7 @@ function requireArtifactIdentity(
   }
 }
 
-function insertPocoSnapshotFact(
-  database: DatabaseSync,
-  input: CreateMobileCaptureInput,
-): void {
+function insertPocoSnapshotFact(database: DatabaseSync, input: CreateMobileCaptureInput): void {
   if (!input.poco.succeededMethods.includes("qa.snapshot")) return;
   const artifact = input.artifacts.find(
     (candidate) => candidate.kind === "poco_snapshot" && candidate.status === "succeeded",
@@ -574,7 +581,8 @@ function insertPocoSnapshotFact(
        WHERE attachment.account_id = ? AND attachment.project_id = ? AND attachment.id = ?
          AND blob.state = 'ready'`,
     )
-    .get(input.accountId, input.projectId, artifact.attachmentId) as { readonly storage_key: string } | undefined;
+    .get(input.accountId, input.projectId, artifact.attachmentId) as
+    { readonly storage_key: string } | undefined;
   if (!blob) captureInvalid("qa.snapshot attachment backing blob is missing");
   let payload: Buffer;
   try {
@@ -625,13 +633,22 @@ export function createMobileCapture(
   const existing = readCapture(database, input);
   if (existing) {
     if (!sameCaptureIdentity(database, existing, input, startedAt, endedAt)) {
-      throw new SqliteStorageError("SQLITE_IDEMPOTENCY_MISMATCH", "capture identity conflicts with its replay");
+      throw new SqliteStorageError(
+        "SQLITE_IDEMPOTENCY_MISMATCH",
+        "capture identity conflicts with its replay",
+      );
     }
-    return Object.freeze({ captureBundle: captureBundleRecord(database, existing), replayed: true });
+    return Object.freeze({
+      captureBundle: captureBundleRecord(database, existing),
+      replayed: true,
+    });
   }
   const existingSubmissionCapture = readCaptureBySubmission(database, input);
   if (existingSubmissionCapture) {
-    throw new SqliteStorageError("SQLITE_IDEMPOTENCY_MISMATCH", "client submission already owns another capture");
+    throw new SqliteStorageError(
+      "SQLITE_IDEMPOTENCY_MISMATCH",
+      "client submission already owns another capture",
+    );
   }
   const existingSubmission = database
     .prepare(
@@ -640,10 +657,12 @@ export function createMobileCapture(
        WHERE account_id = ? AND project_id = ? AND actor_id = ? AND client_submission_id = ?`,
     )
     .get(input.accountId, input.projectId, input.actorId, input.clientSubmissionId) as
-    | { readonly present: number }
-    | undefined;
+    { readonly present: number } | undefined;
   if (existingSubmission) {
-    throw new SqliteStorageError("SQLITE_IDEMPOTENCY_MISMATCH", "client submission is already committed by another intent");
+    throw new SqliteStorageError(
+      "SQLITE_IDEMPOTENCY_MISMATCH",
+      "client submission is already committed by another intent",
+    );
   }
 
   const status = validatePoco(input.poco);
@@ -712,7 +731,8 @@ export function createMobileCapture(
   }>;
   for (const [index, artifact] of input.artifacts.entries()) {
     const row = artifactRows[index];
-    if (!row || row.artifact_type !== artifact.kind) captureInvalid("capture artifact effect is missing");
+    if (!row || row.artifact_type !== artifact.kind)
+      captureInvalid("capture artifact effect is missing");
     database
       .prepare(
         `UPDATE capture_artifacts
@@ -754,7 +774,9 @@ export function createMobileCapture(
         input.createdAt,
       );
   }
-  const nonceHash = sha256(`${input.accountId}:${input.projectId}:${input.captureId}:${input.clientSubmissionId}`);
+  const nonceHash = sha256(
+    `${input.accountId}:${input.projectId}:${input.captureId}:${input.clientSubmissionId}`,
+  );
   database
     .prepare(
       `INSERT INTO poco_enrichments(
@@ -807,7 +829,8 @@ export function createMobileCapture(
     )
     .run(status, updatedAt, input.accountId, input.projectId, input.actorId, input.captureId);
   const created = readCapture(database, input);
-  if (!created) throw new SqliteStorageError("SQLITE_EFFECT_MISSING", "capture bundle effect is missing");
+  if (!created)
+    throw new SqliteStorageError("SQLITE_EFFECT_MISSING", "capture bundle effect is missing");
   return Object.freeze({ captureBundle: captureBundleRecord(database, created), replayed: false });
 }
 

@@ -36,7 +36,7 @@ public static class SelfTest
         async Task Scenario(string name,Func<Fixture,JobConfig,JobState,Journal,Engine,Task> body)
         {
             await using var fixture=new Fixture(identity);using var api=new PlatformClient(fixture.Origin,"fixture-secret-not-for-logs",true);
-            var c=new JobConfig{ApiBase=fixture.Origin,FilePath=zipPath,Summary="fixture",Version="9.9.9",TesterId=7,TestResultReference="local-fixture-only",PollSeconds=1,WaitTimeoutSeconds=1,WorkDirectory=Path.Combine(root,name)};
+            var c=new JobConfig{ProjectId=Guid.NewGuid().ToString(),ComponentVersion=1,ProductId="2002",ChannelId="1002",BelongName="Fixture",TargetPrefix="test/pkg/",TestDirectoryPrefix="test/dir/",ReleaseDirectoryPrefix="release/dir/",ApiBase=fixture.Origin,FilePath=zipPath,Summary="fixture",Version="9.9.9",TesterId=7,TestResultReference="local-fixture-only",PollSeconds=1,WaitTimeoutSeconds=1,WorkDirectory=Path.Combine(root,name)};
             var s=new JobState{File=identity};using var journal=new Journal(c.WorkDirectory);
             var engine=new Engine(c,s,api,new FixtureUploader(fixture.Origin),journal);
             await body(fixture,c,s,journal,engine);
@@ -125,23 +125,24 @@ public static class SelfTest
         await AcquisitionTests.Run(root,Case,ct);
         await MultipartTransferTests.Run(root,Case,ct);
         await SourceDownloadTests.Run(root,Case,ct);
+        await ProjectBindingTests.Run(Case);
         await Case("server_auth_cache_is_explicit_and_separate_from_desktop",()=>{
             var prior=Environment.GetEnvironmentVariable("OZDQP_AUTH_FILE");
             try {
                 var first=Path.Combine(root,"server-owner-a","auth.json");
                 var second=Path.Combine(root,"server-owner-b","auth.json");
                 Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",first);
-                const string api="https://fq2ivi.ipwana.com";
-                TokenCache.Save(new LoginTokens("fixture-access","fixture-refresh",api,Authentication.LoginBase,"owner-a","fixture-password"));
-                Assert(TokenCache.CachePath(api)==first&&TokenCache.Load(api)?.Account=="owner-a","explicit server cache not used");
+                const string api="https://api.fixture.invalid";
+                TokenCache.Save(new LoginTokens("fixture-access","fixture-refresh",api,"https://login.fixture.invalid","owner-a","fixture-password"));
+                Assert(TokenCache.CachePath(api)==first&&TokenCache.Load(api,loginBase:"https://login.fixture.invalid")?.Account=="owner-a","explicit server cache not used");
                 Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",second);
-                Assert(TokenCache.Load(api)==null,"credentials crossed owner boundary");
+                Assert(TokenCache.Load(api,loginBase:"https://login.fixture.invalid")==null,"credentials crossed owner boundary");
                 Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",first);
-                Assert(TokenCache.Load(api)?.Account=="owner-a","original server cache replaced");
+                Assert(TokenCache.Load(api,loginBase:"https://login.fixture.invalid")?.Account=="owner-a","original server cache replaced");
             } finally { Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",prior); }
             return Task.CompletedTask;
         });
-        var report=new{version="0.4.2",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
+        var report=new{version="0.5.0",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
         string reportPath=Path.Combine(root,"report.json");await File.WriteAllTextAsync(reportPath,JsonSerializer.Serialize(report,Json.Options),ct);
         Console.WriteLine(JsonSerializer.Serialize(new{type="selfTestResult",passed=results.Count,failed=0,reportPath,realPlatformTested=false}));
     }

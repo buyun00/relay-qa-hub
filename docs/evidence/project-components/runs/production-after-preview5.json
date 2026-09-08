@@ -1,0 +1,70 @@
+{
+  "files": [
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\mvp-e2e-current.json",
+      "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Config\\qa-people.json",
+      "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Windows-x64-latest.json",
+      "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Setup-x64.exe",
+      "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+      "matchesBaseline": true
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+      "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a",
+      "matchesBaseline": true
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+      "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c",
+      "matchesBaseline": true
+    }
+  ],
+  "readiness": {
+    "status": "ready",
+    "schemaVersion": "12",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "recordedAt": "2026-09-08T18:38:31.0711769Z",
+  "processes": [
+    {
+      "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+      "pid": 17160,
+      "createdAt": "2026-09-08T10:24:12.5269520Z"
+    },
+    {
+      "executable": null,
+      "pid": 10844,
+      "createdAt": "2026-09-08T11:09:25.9817720Z"
+    },
+    {
+      "executable": null,
+      "pid": 7420,
+      "createdAt": "2026-09-07T09:37:15.3473300Z"
+    }
+  ]
+}

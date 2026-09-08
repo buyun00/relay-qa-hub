@@ -156,9 +156,7 @@ export function parseMobileRegisterBuildRequest(value: unknown): MobileRegisterB
   if (!Array.isArray(manifest["commitShas"]) || manifest["commitShas"].length < 1) {
     throw new TypeError("manifest.commitShas must not be empty");
   }
-  const commitShas = manifest["commitShas"].map((entry) =>
-    commitSha(entry, "manifest.commitSha"),
-  );
+  const commitShas = manifest["commitShas"].map((entry) => commitSha(entry, "manifest.commitSha"));
   if (new Set(commitShas).size !== commitShas.length) {
     throw new TypeError("manifest.commitShas must be unique");
   }
@@ -181,7 +179,9 @@ export function parseMobileRegisterBuildRequest(value: unknown): MobileRegisterB
       artifactSha256: sha256(manifest["artifactSha256"], "manifest.artifactSha256"),
       ...(providerPayloadDigest === undefined
         ? {}
-        : { providerPayloadDigest: sha256(providerPayloadDigest, "manifest.providerPayloadDigest") }),
+        : {
+            providerPayloadDigest: sha256(providerPayloadDigest, "manifest.providerPayloadDigest"),
+          }),
     },
     ...(body["repairAttemptId"] === undefined
       ? {}
@@ -224,8 +224,10 @@ export function parseMobileLinkBuildRepairRequest(value: unknown): MobileLinkBui
       : {
           expectedBugVersion: optionalVersion(body["expectedBugVersion"], "expectedBugVersion")!,
         }),
-    ...(optionalVersion(body["expectedBuildRequirementVersion"], "expectedBuildRequirementVersion") ===
-    undefined
+    ...(optionalVersion(
+      body["expectedBuildRequirementVersion"],
+      "expectedBuildRequirementVersion",
+    ) === undefined
       ? {}
       : {
           expectedBuildRequirementVersion: optionalVersion(

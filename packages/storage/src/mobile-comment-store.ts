@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
 import { MobileRelayStorageError, type MobileRelayScope } from "./mobile-relay-store.js";
@@ -151,7 +151,7 @@ function requireProjectMembership(database: DatabaseSync, input: MobileRelayScop
          ON actor.account_id = account.id
         AND actor.id = ?
         AND actor.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id

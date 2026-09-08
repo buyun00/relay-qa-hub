@@ -23,11 +23,12 @@ export function createSqliteMobileBuildStore(
   options: SqliteMobileBuildStoreOptions,
 ): MobileBuildStore {
   const now = options.now ?? (() => new Date());
-  const actorScope = (actorId: string) => ({
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId,
-  } as const);
+  const actorScope = (actorId: string) =>
+    ({
+      accountId: options.scope.accountId,
+      projectId: options.scope.projectId,
+      actorId,
+    }) as const;
 
   return {
     async registerBuild(command) {

@@ -108,3 +108,44 @@ test("MCP rejects browser origins that are not loopback", async (t) => {
   assert.equal(response.status, 403);
   assert.equal(((await response.json()) as { code: string }).code, "MCP_ORIGIN_NOT_ALLOWED");
 });
+
+test("MCP validates initialization and advertises only its implemented protocol", async (t) => {
+  const server = new QaHubMcpHttpServer({
+    port: 0,
+    serverVersion: "test",
+    tools: { definitions: [], call: async () => ({}) },
+  });
+  await server.start();
+  t.after(() => server.stop());
+  const port = server.status.port;
+  const invalid = await post(port, {
+    jsonrpc: "2.0",
+    id: 1,
+    method: "initialize",
+    params: { protocolVersion: "2025-06-18" },
+  });
+  assert.equal(((await invalid.json()) as { error: { code: number } }).error.code, -32602);
+  const negotiated = await post(port, {
+    jsonrpc: "2.0",
+    id: 2,
+    method: "initialize",
+    params: {
+      protocolVersion: "2025-03-26",
+      capabilities: {},
+      clientInfo: { name: "test", version: "1" },
+    },
+  });
+  assert.equal(
+    ((await negotiated.json()) as { result: { protocolVersion: string } }).result.protocolVersion,
+    "2025-06-18",
+  );
+  const unsupported = await post(
+    port,
+    { jsonrpc: "2.0", id: 3, method: "ping" },
+    { "MCP-Protocol-Version": "2025-03-26" },
+  );
+  assert.equal(unsupported.status, 400);
+  const fractional = await post(port, { jsonrpc: "2.0", id: 1.5, method: "ping" });
+  assert.equal(fractional.status, 400);
+  assert.equal(((await fractional.json()) as { error: { code: number } }).error.code, -32600);
+});

@@ -23,6 +23,8 @@ data class QaHubAccountSession(
     val displayName: String,
     val accessToken: String,
     val accessTokenExpiresAtEpochMs: Long,
+    val projectId: String,
+    val isGm: Boolean = false,
 )
 
 class AccountSessionFailure(val code: String) : RuntimeException(code)
@@ -34,10 +36,11 @@ class AccountSessionClient(
 ) {
     private val apiBaseUrl: HttpUrl = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp)
 
-    internal fun buildLoginRequest(name: String): Request {
+    internal fun buildLoginRequest(name: String, projectId: String): Request {
+        UUID.fromString(projectId)
         val url = apiBaseUrl.resolve("auth/login")
             ?: throw AccountSessionFailure("INVALID_LOGIN_PATH")
-        val body = "{\"name\":${name.toJsonString()},\"client\":\"android\"}"
+        val body = "{\"name\":${name.toJsonString()},\"client\":\"android\",\"projectId\":${projectId.toJsonString()}}"
             .toRequestBody(JSON_MEDIA_TYPE)
         return Request.Builder()
             .url(url)
@@ -46,9 +49,9 @@ class AccountSessionClient(
             .build()
     }
 
-    suspend fun login(name: String): QaHubAccountSession = withContext(Dispatchers.IO) {
+    suspend fun login(name: String, projectId: String): QaHubAccountSession = withContext(Dispatchers.IO) {
         val response = try {
-            httpClient.newCall(buildLoginRequest(name)).execute()
+            httpClient.newCall(buildLoginRequest(name, projectId)).execute()
         } catch (_: IOException) {
             throw AccountSessionFailure("NETWORK_IO")
         }
@@ -70,14 +73,14 @@ class AccountSessionClient(
             if (
                 runCatching { UUID.fromString(accountId) }.isFailure ||
                 runCatching { UUID.fromString(userId) }.isFailure ||
-                displayName.isBlank() ||
+                displayName.isBlank() || root.optString("projectId") != projectId ||
                 accessToken.length != 43 ||
                 expiresAtEpochMs == null ||
                 expiresAtEpochMs <= System.currentTimeMillis()
             ) {
                 throw AccountSessionFailure("INVALID_LOGIN_RESPONSE")
             }
-            QaHubAccountSession(accountId, userId, displayName, accessToken, expiresAtEpochMs)
+            QaHubAccountSession(accountId, userId, displayName, accessToken, expiresAtEpochMs, projectId, root.optBoolean("isGm"))
         }
     }
 
@@ -137,7 +140,7 @@ class AccountSessionClient(
                             }
                         }
                     }
-                    add(QaPerson(userId, displayName, roles, active = true))
+                    add(QaPerson(userId, displayName, setOf(QaPersonRole.FIXER, QaPersonRole.VERIFIER), active = true))
                 }
             }
             QaPeopleConfig(schemaVersion = 4, projectKey = projectKey, people = people)

@@ -1,0 +1,103 @@
+- banner "QA Hub 窗口栏":
+  - generic: Q
+  - img "QA Hub 已连接"
+  - strong: QA Hub
+  - generic: 项目
+  - combobox "切换项目":
+    - option "真实HTTP验收A 2026-09-08T16-31-18-569Z"
+    - option "真实HTTP验收B 2026-09-08T16-31-18-569Z" [selected]
+  - generic: 预览
+  - searchbox "搜索编号、内容或人员"
+  - generic: Ctrl K
+  - button "刷新":
+- complementary:
+  - navigation "主导航":
+    - paragraph: 工作区
+    - button "工作台 0":
+      - generic: 工作台
+      - generic: "0"
+    - button "总览 全部":
+      - generic: 总览
+      - generic: 全部
+  - generic "管理与设置":
+    - button "用户管理 4 位项目成员":
+      - strong: 用户管理
+      - generic: 4 位项目成员
+  - button "9 Web验收0909 点击退出登录":
+    - generic: "9"
+    - strong: Web验收0909
+    - generic: 点击退出登录
+- main:
+  - paragraph: 2026年9月9日
+  - heading "你好，Web验收0909" [level=1]
+  - paragraph: 先完成需要你动作的 Bug，其他进度会自动留在工作台里。
+  - button "新建 Bug":
+    - text: 新建 Bug
+  - region "工作统计":
+    - button "已选中 0 待处理 待分配、需补充或等待开始处理" [pressed]:
+      - text: 已选中
+      - generic: "0"
+      - generic: 待处理
+      - generic: 待分配、需补充或等待开始处理
+    - button "0 处理中 修复人正在处理":
+      - generic: "0"
+      - generic: 处理中
+      - generic: 修复人正在处理
+    - button "0 已完成待验收 修复已完成，等待人工验收":
+      - generic: "0"
+      - generic: 已完成待验收
+      - generic: 修复已完成，等待人工验收
+    - button "0 关闭 已验收并关闭":
+      - generic: "0"
+      - generic: 关闭
+      - generic: 已验收并关闭
+  - generic: 人员范围
+  - combobox "人员范围":
+    - option "我 · Web验收0909" [selected]
+    - option "整个团队"
+    - option "AndroidPreviewQA"
+    - option "Preview GM"
+    - option "双项目1788885078674"
+  - generic: 0 个事项
+  - button "刷新列表":
+  - table "Bug 列表":
+    - row "事项 当前动作人 进度 最后更新":
+      - columnheader "事项"
+      - columnheader "当前动作人"
+      - columnheader "进度"
+      - columnheader "最后更新"
+    - strong: 当前筛选下没有事项
+    - paragraph: 换一个人员或状态，或清空搜索关键词。
+- paragraph: QA HUB
+- heading "新建 Bug" [level=2]
+- button:
+- text: Bug 内容
+- textbox "Bug 内容 填写完整问题内容即可。" [active]:
+  - /placeholder: 描述你看到的问题、复现位置和需要修复的表现
+  - text: WEB-B-0909：B 项目独立草稿，切换时不得覆盖 A 的内容和附件。
+- generic: 填写完整问题内容即可。
+- text: 严重程度
+- combobox "严重程度":
+  - option "S0"
+  - option "S1"
+  - option "S2" [selected]
+  - option "S3"
+  - option "S4"
+- text: 修复人（可稍后分配）
+- combobox "修复人（可稍后分配）":
+  - option "暂不指定" [selected]
+  - option "AndroidPreviewQA"
+  - option "Preview GM"
+  - option "Web验收0909"
+  - option "双项目1788885078674"
+- text: 关闭人
+- combobox "关闭人":
+  - option "AndroidPreviewQA"
+  - option "Preview GM"
+  - option "Web验收0909" [selected]
+  - option "双项目1788885078674"
+- text: 截图 / 标注图
+- button "截图 / 标注图 可选择文件，或在弹窗内按 Ctrl+V 直接粘贴图片"
+- generic: 可选择文件，或在弹窗内按 Ctrl+V 直接粘贴图片
+- button "取消"
+- button "创建 Bug"

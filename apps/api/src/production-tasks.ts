@@ -73,6 +73,11 @@ export interface ProductionConfig {
   bearerToken: string;
   qaInstanceId: string;
   stateRoot: string;
+  projectId?: string;
+  externalProjectKey?: string;
+  gmUserId?: string;
+  componentVersion?: number;
+  canStart?: () => Promise<boolean>;
 }
 interface TaskItem extends RecordValue {
   id: string;
@@ -92,12 +97,13 @@ interface Step {
 }
 interface BatchItem {
   input: RecordValue;
-  status: "queued" | "running" | "accepted" | "existing" | "failed";
+  status: "queued" | "paused" | "running" | "accepted" | "existing" | "failed";
   steps: Record<string, Step>;
   result?: RecordValue;
   error?: { code: string; message: string };
 }
 interface Batch {
+  componentVersion?: number;
   id: string;
   actorId: string;
   projectId: string;
@@ -151,7 +157,19 @@ export class ProductionTasks {
       const batch = JSON.parse(
         await fs.readFile(join(this.config.stateRoot, "batches", file), "utf8"),
       ) as Batch;
+      if (this.config.projectId && batch.projectId !== this.config.projectId)
+        throw new Error("PRODUCTION_PROJECT_SCOPE_MISMATCH");
+      if (
+        this.config.componentVersion !== undefined &&
+        batch.componentVersion !== this.config.componentVersion
+      )
+        throw new Error("PRODUCTION_COMPONENT_VERSION_MISMATCH");
+      // Queued work requires an explicit resume after process recovery. Steps
+      // already running retain their original version and idempotency keys.
+      if (this.config.projectId)
+        for (const item of batch.items) if (item.status === "queued") item.status = "paused";
       this.batches.set(batch.id, batch);
+      await this.save(batch);
     }
   }
   async close(): Promise<void> {
@@ -166,19 +184,24 @@ export class ProductionTasks {
     await fs.rename(temporary, path);
   }
   private async scope(actorId: string, projectId: string, write = false, merge = false) {
-    const project = (await this.stores.projects.listProjects({ actorId, limit: 100 })).items.find(
-      (p) => p.id === projectId,
-    );
-    if (!project) return fail("PROJECT_FORBIDDEN", "无权访问此项目", 403);
+    if (this.config.projectId && this.config.projectId !== projectId)
+      return fail("PROJECT_FORBIDDEN", "项目归属不匹配", 403);
+    const access = await this.stores.projects.getProjectAccess?.({ actorId, projectId });
+    if (!access || access.projectId !== projectId || access.actorId !== actorId)
+      return fail("PROJECT_FORBIDDEN", "无权访问此项目", 403);
     const roles = merge
       ? ["developer", "release_manager", "project_admin"]
       : ["reporter", "developer", "triager", "project_admin", "release_manager"];
-    if (write && !project.roles.some((role) => roles.includes(role)))
+    if (write && !access.roles.some((role) => roles.includes(role)))
       return fail("PROJECT_FORBIDDEN", "当前身份无权执行此操作", 403);
-    const members = await this.stores.projects.listMembers({ actorId, projectId, limit: 100 });
-    const actor = members.items.find((member) => member.userId === actorId);
-    if (!actor) return fail("PROJECT_FORBIDDEN", "当前身份未加入此项目", 403);
-    return { key: project.key, actorName: actor.displayName };
+    return {
+      key: this.config.externalProjectKey ?? access.projectKey,
+      actorName: access.actorName,
+    };
+  }
+  private async requireEnabled(): Promise<void> {
+    if (this.config.canStart && !(await this.config.canStart()))
+      fail("COMPONENT_DISABLED", "该项目未启用制作组件", 409);
   }
   private async relay<T>(path: string, projectKey: string, body?: RecordValue): Promise<T> {
     const url = new URL(`/api/integrations/qa/v1/workbench${path}`, this.config.endpoint);
@@ -210,22 +233,27 @@ export class ProductionTasks {
     return value as T;
   }
   async project(actorId: string, projectId: string): Promise<ProductionProject> {
+    await this.requireEnabled();
     const scope = await this.scope(actorId, projectId);
     return this.relay("/project", scope.key);
   }
   async tasks(actorId: string, projectId: string): Promise<{ items: TaskItem[] }> {
+    await this.requireEnabled();
     const scope = await this.scope(actorId, projectId);
     return this.relay("/tasks", scope.key);
   }
   async task(actorId: string, projectId: string, taskId: string): Promise<unknown> {
+    await this.requireEnabled();
     const scope = await this.scope(actorId, projectId);
     return this.relay(`/tasks/${identifier(taskId)}`, scope.key);
   }
   async attachment(actorId: string, projectId: string, attachmentId: string): Promise<RecordValue> {
+    await this.requireEnabled();
     const scope = await this.scope(actorId, projectId);
     return this.relay(`/attachments/${identifier(attachmentId)}`, scope.key);
   }
   async upload(actorId: string, input: unknown): Promise<Upload> {
+    await this.requireEnabled();
     await this.ready;
     const body = record(input),
       projectId = identifier(body["projectId"]);
@@ -405,6 +433,7 @@ export class ProductionTasks {
     };
   }
   async submit(actorId: string, input: unknown): Promise<unknown> {
+    await this.requireEnabled();
     await this.ready;
     const normalized = this.normalize(input);
     await this.scope(
@@ -425,6 +454,9 @@ export class ProductionTasks {
         return this.view(previous);
       }
       const batch: Batch = {
+        ...(this.config.componentVersion === undefined
+          ? {}
+          : { componentVersion: this.config.componentVersion }),
         id,
         actorId,
         projectId: normalized.projectId,
@@ -448,12 +480,15 @@ export class ProductionTasks {
     return {
       id: batch.id,
       projectId: batch.projectId,
+      componentVersion: batch.componentVersion,
       kind: batch.kind,
       status: pending
         ? "running"
-        : batch.items.some((i) => i.status === "failed")
-          ? "partial_failure"
-          : "completed",
+        : batch.items.some((i) => i.status === "paused")
+          ? "paused"
+          : batch.items.some((i) => i.status === "failed")
+            ? "partial_failure"
+            : "completed",
       createdAt: batch.createdAt,
       updatedAt: batch.updatedAt,
       items: batch.items.map((item) => ({
@@ -506,7 +541,32 @@ export class ProductionTasks {
       ),
     };
   }
+  async history(actorId: string, projectId: string): Promise<unknown> {
+    await this.ready;
+    await this.scope(actorId, projectId);
+    return {
+      projectId,
+      items: [...this.batches.values()]
+        .filter((batch) => batch.projectId === projectId)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .map((batch) => this.view(batch)),
+    };
+  }
+  async pausePending(): Promise<void> {
+    await this.ready;
+    if (!this.config.canStart || (await this.config.canStart())) return;
+    for (const batch of this.batches.values()) {
+      let changed = false;
+      for (const item of batch.items)
+        if (item.status === "queued") {
+          item.status = "paused";
+          changed = true;
+        }
+      if (changed) await this.save(batch);
+    }
+  }
   async batch(actorId: string, projectId: string, id: string, retry = false): Promise<unknown> {
+    if (retry) await this.requireEnabled();
     await this.ready;
     await this.scope(actorId, projectId, retry);
     const batch = this.batches.get(identifier(id));
@@ -514,7 +574,7 @@ export class ProductionTasks {
       return fail("BATCH_NOT_FOUND", "批次不存在", 404);
     if (retry && !this.running.has(batch.id)) {
       for (const item of batch.items)
-        if (item.status === "failed") {
+        if (item.status === "failed" || item.status === "paused") {
           item.status = "queued";
           delete item.error;
         }
@@ -559,6 +619,11 @@ export class ProductionTasks {
     for (const item of batch.items) {
       if (this.stopped) return;
       if (item.status !== "queued" && item.status !== "running") continue;
+      if (item.status === "queued" && this.config.canStart && !(await this.config.canStart())) {
+        item.status = "paused";
+        await this.save(batch);
+        continue;
+      }
       item.status = "running";
       await this.save(batch);
       try {

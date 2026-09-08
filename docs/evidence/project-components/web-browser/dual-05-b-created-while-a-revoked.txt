@@ -1,0 +1,5 @@
+Browser tab: 2, Title: "Relay QA Hub", URL: "http://127.0.0.1:4274/?projectId=25e1d898-9e59-4dbb-998e-bfebf2abc0bf".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 103
++					136 text 这条 Bug 没有图片附件。
+The focused UI element is 0 AXWebArea Relay QA Hub, URL: 127.0.0.1:4274/?projectId=25e1d898-9e59-4dbb-998e-bfebf2abc0bf

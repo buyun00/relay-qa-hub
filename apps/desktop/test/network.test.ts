@@ -11,7 +11,11 @@ import {
 const TEST_BROWSER_SESSION_TOKEN = "A".repeat(43);
 
 test("desktop API proxy carries the browser session cookie in both directions", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   const browserSession = new DesktopBrowserSessionCookieStore();
   const originalFetch = globalThis.fetch;
   let forwardedCookie: string | null = null;
@@ -33,7 +37,7 @@ test("desktop API proxy carries the browser session cookie in both directions", 
 
   try {
     const response = await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/auth/logout", {
+      new Request("qa-hub-preview://app/api/v1/auth/logout", {
         method: "POST",
         headers: {
           cookie: `qa_hub_browser_session=${TEST_BROWSER_SESSION_TOKEN}`,
@@ -44,7 +48,7 @@ test("desktop API proxy carries the browser session cookie in both directions", 
       browserSession,
     );
     assert.equal(forwardedCookie, `qa_hub_browser_session=${TEST_BROWSER_SESSION_TOKEN}`);
-    assert.equal(forwardedOrigin, "http://127.0.0.1:4174");
+    assert.equal(forwardedOrigin, "http://127.0.0.1:4274");
     assert.equal(forwardedCsrf, "csrf-token");
     assert.equal(
       response.headers.get("set-cookie"),
@@ -56,7 +60,12 @@ test("desktop API proxy carries the browser session cookie in both directions", 
 });
 
 test("desktop API proxy retains the browser session when the custom protocol drops its cookie", async () => {
-  const config = parseDesktopConfig({ QA_HUB_DESKTOP_ACCESS_TOKEN: "stale-background-token" });
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+    QA_HUB_DESKTOP_ACCESS_TOKEN: "stale-background-token",
+  });
   const browserSession = new DesktopBrowserSessionCookieStore();
   const originalFetch = globalThis.fetch;
   const forwardedCookies: Array<string | null> = [];
@@ -83,7 +92,7 @@ test("desktop API proxy retains the browser session when the custom protocol dro
 
   try {
     await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/auth/login", {
+      new Request("qa-hub-preview://app/api/v1/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ name: "林步云", client: "web" }),
@@ -92,7 +101,7 @@ test("desktop API proxy retains the browser session when the custom protocol dro
       browserSession,
     );
     await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/projects?limit=50"),
+      new Request("qa-hub-preview://app/api/v1/projects?limit=50"),
       config,
       browserSession,
     );
@@ -109,7 +118,11 @@ test("desktop API proxy retains the browser session when the custom protocol dro
 });
 
 test("explicit desktop logout clears the remembered permanent identity", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   const browserSession = new DesktopBrowserSessionCookieStore();
   browserSession.restoreLoginName("林步云");
   browserSession.captureSetCookie(
@@ -127,7 +140,7 @@ test("explicit desktop logout clears the remembered permanent identity", async (
 
   try {
     const response = await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/auth/logout", { method: "POST" }),
+      new Request("qa-hub-preview://app/api/v1/auth/logout", { method: "POST" }),
       config,
       browserSession,
     );
@@ -141,8 +154,11 @@ test("explicit desktop logout clears the remembered permanent identity", async (
 
 test("tokenless portable LAN login targets the configured host without Authorization", async () => {
   const config = parseDesktopConfig({
-    QA_HUB_DESKTOP_API_BASE_URL: "http://10.100.5.157:4319",
-    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://10.100.5.157:4174",
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+    QA_HUB_DESKTOP_API_BASE_URL: "http://10.100.5.157:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://10.100.5.157:4274",
     QA_HUB_DESKTOP_ALLOW_PRIVATE_LAN_HTTP: "1",
   });
   const originalFetch = globalThis.fetch;
@@ -162,16 +178,16 @@ test("tokenless portable LAN login targets the configured host without Authoriza
 
   try {
     const response = await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/auth/login", {
+      new Request("qa-hub-preview://app/api/v1/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ name: "林步云", client: "web" }),
       }),
       config,
     );
-    assert.equal(target, "http://10.100.5.157:4319/api/v1/auth/login");
+    assert.equal(target, "http://10.100.5.157:4419/api/v1/auth/login");
     assert.equal(forwardedAuthorization, null);
-    assert.equal(forwardedOrigin, "http://10.100.5.157:4174");
+    assert.equal(forwardedOrigin, "http://10.100.5.157:4274");
     assert.equal(response.status, 401);
   } finally {
     globalThis.fetch = originalFetch;
@@ -179,7 +195,11 @@ test("tokenless portable LAN login targets the configured host without Authoriza
 });
 
 test("tokenless desktop Inbox uses the remembered browser session", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   const originalFetch = globalThis.fetch;
   let authorization: string | null = "not-observed";
   let cookie: string | null = null;
@@ -207,7 +227,11 @@ test("tokenless desktop Inbox uses the remembered browser session", async () => 
 });
 
 test("desktop API proxy preserves upload chunk integrity and version metadata", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   const originalFetch = globalThis.fetch;
   const bytes = new Uint8Array([1, 2, 3, 4]);
   const chunkSha256 = "a".repeat(64);
@@ -227,7 +251,7 @@ test("desktop API proxy preserves upload chunk integrity and version metadata", 
 
   try {
     const response = await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/uploads/session-1/chunks/0", {
+      new Request("qa-hub-preview://app/api/v1/uploads/session-1/chunks/0", {
         method: "PUT",
         headers: {
           "content-type": "application/octet-stream",
@@ -251,7 +275,11 @@ test("desktop API proxy preserves upload chunk integrity and version metadata", 
 });
 
 test("desktop API proxy preserves large attachment bytes and integrity headers", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   const originalFetch = globalThis.fetch;
   const image = new Uint8Array(4_471_962);
   image[0] = 137;
@@ -272,7 +300,7 @@ test("desktop API proxy preserves large attachment bytes and integrity headers",
 
   try {
     const response = await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/attachments/attachment-1"),
+      new Request("qa-hub-preview://app/api/v1/attachments/attachment-1"),
       config,
     );
     assert.equal(response.status, 200);
@@ -287,7 +315,11 @@ test("desktop API proxy preserves large attachment bytes and integrity headers",
 });
 
 test("desktop API proxy maps an oversized binary response to a bounded error", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => {
     const chunk = new Uint8Array(4 * 1024 * 1024);
@@ -304,7 +336,7 @@ test("desktop API proxy maps an oversized binary response to a bounded error", a
 
   try {
     const response = await proxyRendererApiRequest(
-      new Request("qa-hub://app/api/v1/attachments/attachment-2"),
+      new Request("qa-hub-preview://app/api/v1/attachments/attachment-2"),
       config,
     );
     assert.equal(response.status, 502);
@@ -315,11 +347,15 @@ test("desktop API proxy maps an oversized binary response to a bounded error", a
 });
 
 test("desktop API proxy bounds a request whose upstream never responds", async () => {
-  const config = parseDesktopConfig({});
+  const config = parseDesktopConfig({
+    QA_HUB_DESKTOP_API_BASE_URL: "http://127.0.0.1:4419",
+    QA_HUB_DESKTOP_CSRF_ORIGIN: "http://127.0.0.1:4274",
+    QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
+  });
   let forwardedSignal: AbortSignal | null | undefined;
 
   const response = await proxyRendererApiRequest(
-    new Request("qa-hub://app/api/v1/bugs?limit=1"),
+    new Request("qa-hub-preview://app/api/v1/bugs?limit=1"),
     config,
     new DesktopBrowserSessionCookieStore(),
     {

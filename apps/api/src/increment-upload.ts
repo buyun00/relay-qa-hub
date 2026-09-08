@@ -12,6 +12,7 @@ import {
   readJson,
   record,
   UPLOADER_SHA256,
+  type UploadProjectConfiguration,
 } from "./uploader-host.js";
 import type {
   BuildUploadChain,
@@ -52,6 +53,12 @@ interface Options {
   jenkins: JenkinsBuildService;
   fetch?: typeof fetch;
   hostFactory?: (owner: string) => WorkerHost;
+  project?: UploadProjectConfiguration;
+  buildPreset?: string;
+  canStart?: (kind: "upload" | "build") => Promise<boolean>;
+  /** Explicit shared-machine lock root; never split one physical workspace lock by project. */
+  sharedLockRoot?: string;
+  authFileForOwner?: (owner: string) => string;
 }
 type Kind = "upload" | "build" | "resume" | "confirm";
 interface Payload {
@@ -66,10 +73,12 @@ interface Command {
   jobId: string;
   kind: Kind;
   payload: string;
-  state: "queued" | "dispatching" | "started" | "failed" | "cancelled";
+  state: "queued" | "paused" | "dispatching" | "started" | "failed" | "cancelled";
   error: string;
   createdAt: string;
   updatedAt: string;
+  projectId: string;
+  componentVersion: number;
 }
 const lane = (p: Payload) => `${p.input.productId}/${p.input.channelId}`;
 
@@ -91,13 +100,10 @@ export class IncrementUploadService {
       options.executable ?? path.join(options.root, "bin", UPLOADER_SHA256, "ozdqp-uploader.exe");
     if (!options.executable && !options.hostFactory && !existsSync(this.executable)) {
       mkdirSync(path.dirname(this.executable), { recursive: true });
-      copyFileSync(
-        fileURLToPath(
-          new URL("../../desktop/vendor/ozdqp-uploader/ozdqp-uploader.exe", import.meta.url),
-        ),
-        this.executable,
-        fsConstants.COPYFILE_EXCL,
+      const bundled = fileURLToPath(
+        new URL("../../desktop/vendor/ozdqp-uploader/ozdqp-uploader.exe", import.meta.url),
       );
+      if (existsSync(bundled)) copyFileSync(bundled, this.executable, fsConstants.COPYFILE_EXCL);
     }
     this.db = new DatabaseSync(path.join(options.root, "queue.sqlite"));
     this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;
@@ -105,6 +111,23 @@ export class IncrementUploadService {
       CREATE INDEX IF NOT EXISTS upload_owner ON upload_commands(owner,jobId);
       CREATE TABLE IF NOT EXISTS upload_scheduler(id INTEGER PRIMARY KEY CHECK(id=1), holder TEXT NOT NULL, pid INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS upload_audit(id INTEGER PRIMARY KEY, actor TEXT NOT NULL, jobId TEXT NOT NULL, action TEXT NOT NULL, at TEXT NOT NULL);`);
+    const columns = this.db.prepare("PRAGMA table_info(upload_commands)").all();
+    if (!columns.some((column) => column["name"] === "projectId")) {
+      this.db.exec(
+        "ALTER TABLE upload_commands ADD COLUMN projectId TEXT NOT NULL DEFAULT ''; ALTER TABLE upload_commands ADD COLUMN componentVersion INTEGER NOT NULL DEFAULT 0;",
+      );
+      // Old unscoped queued work is retained for review, never replayed on import.
+      this.db.exec(
+        "UPDATE upload_commands SET state='paused', error='PROJECT_MIGRATION_REVIEW_REQUIRED' WHERE state IN ('queued','dispatching')",
+      );
+    }
+    if (
+      options.project &&
+      this.db
+        .prepare("SELECT 1 FROM upload_commands WHERE projectId <> '' AND projectId <> ? LIMIT 1")
+        .get(options.project.projectId)
+    )
+      throw new Error("UPLOAD_PROJECT_ROOT_MISMATCH");
   }
   private leader(): void {
     this.db.exec("BEGIN IMMEDIATE");
@@ -140,16 +163,28 @@ export class IncrementUploadService {
   }
   private rows(): Command[] {
     return this.db
-      .prepare("SELECT * FROM upload_commands ORDER BY createdAt,rowid")
-      .all() as unknown as Command[];
+      .prepare("SELECT * FROM upload_commands WHERE projectId = ? ORDER BY createdAt,rowid")
+      .all(this.options.project?.projectId ?? "") as unknown as Command[];
   }
   private save(c: Command): void {
     c.updatedAt = new Date().toISOString();
     this.db
       .prepare(
-        "INSERT INTO upload_commands VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,state=excluded.state,error=excluded.error,updatedAt=excluded.updatedAt",
+        "INSERT INTO upload_commands(id,owner,jobId,kind,payload,state,error,createdAt,updatedAt,projectId,componentVersion) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,state=excluded.state,error=excluded.error,updatedAt=excluded.updatedAt",
       )
-      .run(c.id, c.owner, c.jobId, c.kind, c.payload, c.state, c.error, c.createdAt, c.updatedAt);
+      .run(
+        c.id,
+        c.owner,
+        c.jobId,
+        c.kind,
+        c.payload,
+        c.state,
+        c.error,
+        c.createdAt,
+        c.updatedAt,
+        c.projectId,
+        c.componentVersion,
+      );
   }
   private audit(actor: string, jobId: string, action: string): void {
     this.db
@@ -165,15 +200,18 @@ export class IncrementUploadService {
       this.options.hostFactory?.(owner) ??
       new UploaderHost({
         root: path.join(ownerRoot, "jobs"),
-        authFile: path.join(ownerRoot, "auth.json"),
+        authFile: this.options.authFileForOwner?.(owner) ?? path.join(ownerRoot, "auth.json"),
         executable: this.executable,
         runner: fileURLToPath(new URL("./uploader-runner.js", import.meta.url)),
         nodeExecutable: process.execPath,
         environment: {
-          OZDQP_AUTH_FILE: path.join(ownerRoot, "auth.json"),
-          OZDQP_LOCK_ROOT: path.join(this.options.root, "channel-locks"),
+          OZDQP_AUTH_FILE:
+            this.options.authFileForOwner?.(owner) ?? path.join(ownerRoot, "auth.json"),
+          OZDQP_LOCK_ROOT:
+            this.options.sharedLockRoot ?? path.join(this.options.root, "channel-locks"),
         },
         ...(this.options.fetch ? { fetch: this.options.fetch } : {}),
+        ...(this.options.project ? { project: this.options.project } : {}),
       });
     this.hosts.set(owner, host);
     return host;
@@ -184,12 +222,21 @@ export class IncrementUploadService {
     const host = this.host(owner);
     chain = new BuildUploadHost({
       root: path.join(this.options.root, "owners", owner, "build-chains"),
+      ...(this.options.project
+        ? {
+            sourceUrl: this.options.project.sourceUrl,
+            projectId: this.options.project.projectId,
+            componentVersion: this.options.project.componentVersion,
+            defaults: this.options.project.defaults,
+          }
+        : {}),
+      ...(this.options.buildPreset ? { preset: this.options.buildPreset } : {}),
       api: {
         json: async (url, request) => {
           if (url === "/api/v1/auth/me") return { userId: owner };
           if (url === "/api/v1/packaging/builds" && request?.method === "POST")
             return this.options.jenkins.trigger(
-              "external",
+              this.options.buildPreset ?? "",
               `${owner}:${request.headers?.["idempotency-key"]}`,
             );
           if (url.startsWith("/api/v1/packaging/progress?")) {
@@ -241,6 +288,8 @@ export class IncrementUploadService {
       error: "",
       createdAt: now,
       updatedAt: now,
+      projectId: this.options.project?.projectId ?? "",
+      componentVersion: this.options.project?.componentVersion ?? 0,
     };
     this.db.exec("BEGIN IMMEDIATE");
     try {
@@ -262,10 +311,12 @@ export class IncrementUploadService {
     // Enqueue does not wait for Jenkins polling or a platform request. Only the
     // scheduler dispatches; the SQLite insertion itself is atomic and idempotent.
     this.leader();
+    if (this.options.canStart && !(await this.options.canStart(kind)))
+      throw new Error("COMPONENT_DISABLED");
     const key = uuid(id),
-      input = parseNewUploadInput(value),
+      input = parseNewUploadInput(value, this.options.project?.defaults),
       prior = this.rows().find((c) => c.id === key);
-    if (kind === "build" && input.channelId === "2004")
+    if (kind === "build" && this.options.project?.sourceKind === "ios_directory")
       throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     if (prior) {
       this.insert(owner, key, key, kind, { input, accountIdentity: "" });
@@ -335,6 +386,8 @@ export class IncrementUploadService {
     kind: "resume" | "confirm",
     value: unknown,
   ): Promise<string> {
+    if (this.options.canStart && !(await this.options.canStart("upload")))
+      throw new Error("COMPONENT_DISABLED");
     return this.exclusive(async () => {
       const jobId = uuid(id),
         requestId = uuid(key),
@@ -410,7 +463,7 @@ export class IncrementUploadService {
       if (build && latest.state === "started") {
         await this.chain(owner).cancel(jobId);
       } else {
-        if (latest.state !== "queued" && latest.state !== "cancelled")
+        if (latest.state !== "queued" && latest.state !== "paused" && latest.state !== "cancelled")
           throw new Error("UPLOAD_ALREADY_STARTED");
         latest.state = "cancelled";
         this.save(latest);
@@ -423,11 +476,20 @@ export class IncrementUploadService {
     const p = JSON.parse(c.payload) as Payload;
     return {
       id: c.jobId,
+      projectId: c.projectId,
+      componentVersion: c.componentVersion,
       createdAt: c.createdAt,
       input: p.input,
       active: false,
-      stage: "QUEUED",
-      status: c.state === "cancelled" ? "cancelled" : c.state === "failed" ? "failed" : "queued",
+      stage: c.state === "paused" ? "PAUSED" : "QUEUED",
+      status:
+        c.state === "paused"
+          ? "paused"
+          : c.state === "cancelled"
+            ? "cancelled"
+            : c.state === "failed"
+              ? "failed"
+              : "queued",
       errorCode: c.error,
       version: p.input.version,
       versionId: 0,
@@ -471,10 +533,20 @@ export class IncrementUploadService {
           rows
             .filter((r) => r.kind !== "build" && ["queued", "dispatching"].includes(r.state))
             .findIndex((r) => r.id === c.id) + 1;
+      } else if (c.state === "paused" && !job.active) {
+        job.status = "paused";
+        job.stage = "PAUSED";
+        job.errorCode = c.error;
       } else if (c.state === "failed" && !job.active) job.errorCode = c.error || job.errorCode;
     }
     return {
       ...snapshot,
+      ...(this.options.project
+        ? {
+            projectId: this.options.project.projectId,
+            componentVersion: this.options.project.componentVersion,
+          }
+        : {}),
       execution: "server",
       unreadableJobs,
       jobs: [...jobs.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
@@ -491,6 +563,8 @@ export class IncrementUploadService {
       const p = JSON.parse(c.payload) as Payload;
       chains.push({
         id: c.jobId,
+        projectId: c.projectId,
+        componentVersion: c.componentVersion,
         ownerId: c.owner,
         accountIdentity: p.accountIdentity,
         input: p.input,
@@ -498,7 +572,14 @@ export class IncrementUploadService {
         updatedAt: c.updatedAt,
         queueId: null,
         buildNumber: null,
-        status: c.state === "cancelled" ? "cancelled" : c.state === "failed" ? "failed" : "queued",
+        status:
+          c.state === "paused"
+            ? "paused"
+            : c.state === "cancelled"
+              ? "cancelled"
+              : c.state === "failed"
+                ? "failed"
+                : "queued",
         errorCode: c.error,
         uploadJobId: null,
         baseline: null,
@@ -526,6 +607,56 @@ export class IncrementUploadService {
         .all(job.id),
     };
   }
+  hasJob(id: string): boolean {
+    return this.rows().some((row) => row.jobId === id);
+  }
+  async hasActiveResources(): Promise<boolean> {
+    for (const owner of new Set(this.rows().map((row) => row.owner))) {
+      const snapshot = await this.host(owner).snapshot();
+      if (snapshot.unreadableJobs) return true;
+      if (snapshot.jobs.some((job) => job.active)) return true;
+      if (
+        (await this.chain(owner).list()).some(
+          (chain) => !["paused", "failed", "cancelled", "upload_started"].includes(chain.status),
+        )
+      )
+        return true;
+    }
+    return false;
+  }
+  async pausePending(): Promise<void> {
+    for (const command of this.rows().filter((row) => row.state === "queued")) {
+      if (command.kind === "upload" && Boolean((JSON.parse(command.payload) as Payload).source))
+        continue;
+      if (
+        this.options.canStart &&
+        (await this.options.canStart(command.kind === "build" ? "build" : "upload"))
+      )
+        continue;
+      command.state = "paused";
+      command.error = "COMPONENT_DISABLED";
+      this.save(command);
+      this.audit(command.owner, command.jobId, "paused_component_disabled");
+    }
+  }
+  async resumeQueued(owner: string, id: unknown): Promise<string> {
+    return this.exclusive(async () => {
+      const command = this.rows().find(
+        (row) => row.jobId === uuid(id) && row.owner === owner && row.state === "paused",
+      );
+      if (!command) throw new Error("JOB_NOT_FOUND");
+      if (
+        this.options.canStart &&
+        !(await this.options.canStart(command.kind === "build" ? "build" : "upload"))
+      )
+        throw new Error("COMPONENT_DISABLED");
+      command.state = "queued";
+      command.error = "";
+      this.save(command);
+      this.audit(owner, command.jobId, "resumed_explicitly");
+      return command.jobId;
+    });
+  }
   start(): void {
     if (!this.stopped) return;
     this.stopped = false;
@@ -549,7 +680,7 @@ export class IncrementUploadService {
     this.db.prepare("DELETE FROM upload_scheduler WHERE holder=?").run(this.holder);
     this.db.close();
   }
-  async tick(): Promise<void> {
+  async tick(allowLaunch = true): Promise<void> {
     if (this.busy) return;
     return this.exclusive(async () => {
       let rows = this.rows();
@@ -564,6 +695,23 @@ export class IncrementUploadService {
       // Poll submitted builds even while a different upload is running.
       for (const owner of owners) await this.chain(owner).tick();
       rows = this.rows();
+      if (this.options.canStart) {
+        for (const command of rows.filter((item) => item.state === "queued")) {
+          // A registered build-upload chain owns its follow-on upload already;
+          // disabling a component must allow that existing chain to finish.
+          const continuation =
+            command.kind === "upload" && Boolean((JSON.parse(command.payload) as Payload).source);
+          if (
+            !continuation &&
+            !(await this.options.canStart(command.kind === "build" ? "build" : "upload"))
+          ) {
+            command.state = "paused";
+            command.error = "COMPONENT_DISABLED";
+            this.save(command);
+            this.audit(command.owner, command.jobId, "paused_component_disabled");
+          }
+        }
+      }
       for (const c of rows.filter((c) => c.state === "dispatching")) {
         if (c.kind === "build") {
           if ((await this.chain(c.owner).list()).some((b) => b.id === c.jobId)) {
@@ -581,6 +729,7 @@ export class IncrementUploadService {
         }
       }
       if (active) return;
+      if (!allowLaunch) return;
       const held = new Set<string>();
       for (const c of rows.filter((c) => c.kind !== "build")) {
         const job = snapshots.get(c.owner)?.jobs.find((j) => j.id === c.jobId);

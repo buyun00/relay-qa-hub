@@ -1,0 +1,100 @@
+{
+  "createdAt": "2026-09-08T17:40:32.652Z",
+  "name": "Web双窗1788889232622",
+  "userId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+  "projects": [
+    {
+      "id": "b79a70c9-ef3e-4d85-b376-247c473789a9",
+      "key": "DWA1788889232622",
+      "name": "双窗草稿验收 A",
+      "active": true,
+      "version": 1
+    },
+    {
+      "id": "25e1d898-9e59-4dbb-998e-bfebf2abc0bf",
+      "key": "DWB1788889232622",
+      "name": "双窗草稿验收 B",
+      "active": true,
+      "version": 1
+    }
+  ],
+  "actions": [
+    {
+      "at": "2026-09-08T17:42:45.909Z",
+      "active": false,
+      "expectedVersion": 1,
+      "result": {
+        "projectId": "b79a70c9-ef3e-4d85-b376-247c473789a9",
+        "userId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+        "active": false,
+        "version": 2
+      }
+    },
+    {
+      "at": "2026-09-08T17:44:05.557Z",
+      "active": true,
+      "expectedVersion": 2,
+      "result": {
+        "projectId": "b79a70c9-ef3e-4d85-b376-247c473789a9",
+        "userId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+        "active": true,
+        "version": 3
+      }
+    }
+  ],
+  "readback": {
+    "at": "2026-09-08T17:45:29.999Z",
+    "projects": [
+      {
+        "projectId": "b79a70c9-ef3e-4d85-b376-247c473789a9",
+        "bugs": {
+          "snapshotSequence": 0,
+          "items": [],
+          "nextCursor": null
+        },
+        "attachments": []
+      },
+      {
+        "projectId": "25e1d898-9e59-4dbb-998e-bfebf2abc0bf",
+        "bugs": {
+          "snapshotSequence": 79,
+          "items": [
+            {
+              "id": "a45ae712-14ba-459d-91dc-cdc8cb67f221",
+              "projectId": "25e1d898-9e59-4dbb-998e-bfebf2abc0bf",
+              "number": 1,
+              "key": "DWB1788889232622-1",
+              "title": "双窗口 B 草稿：A 的内容和附件不得进入这里，A 撤权以后 B 仍可以创建。",
+              "description": "双窗口 B 草稿：A 的内容和附件不得进入这里，A 撤权以后 B 仍可以创建。",
+              "expectedBehavior": "问题修复后不再复现",
+              "moduleId": null,
+              "state": "reported",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+              "ownerId": null,
+              "verificationOwnerId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 1,
+              "createdAt": "2026-09-08T17:43:05.044Z",
+              "updatedAt": "2026-09-08T17:43:05.044Z",
+              "closedAt": null
+            }
+          ],
+          "nextCursor": null
+        },
+        "attachments": [
+          {
+            "bugId": "a45ae712-14ba-459d-91dc-cdc8cb67f221",
+            "projectId": "25e1d898-9e59-4dbb-998e-bfebf2abc0bf",
+            "snapshotSequence": 79,
+            "items": [],
+            "nextCursor": null
+          }
+        ]
+      }
+    ]
+  }
+}

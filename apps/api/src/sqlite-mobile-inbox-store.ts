@@ -17,11 +17,12 @@ export function createSqliteMobileInboxStore(
   options: SqliteMobileInboxStoreOptions,
 ): MobileNotificationStore {
   const now = options.now ?? (() => new Date());
-  const actorScope = (actorId: string) => ({
-    accountId: options.scope.accountId,
-    projectId: options.scope.projectId,
-    actorId,
-  } as const);
+  const actorScope = (actorId: string) =>
+    ({
+      accountId: options.scope.accountId,
+      projectId: options.scope.projectId,
+      actorId,
+    }) as const;
 
   return {
     async listNotifications(query): Promise<MobileNotificationList> {

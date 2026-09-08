@@ -1,0 +1,157 @@
+{
+  "recordedAt": "2026-09-08T17:47:27.078Z",
+  "kind": "real_browser_two_tabs_and_revocation",
+  "status": "passed",
+  "fixture": "dual-window-fixture.json",
+  "identity": {
+    "name": "Web双窗1788889232622",
+    "userId": "b32a6f48-2bb1-4eea-8354-a53361deb242"
+  },
+  "projects": [
+    {
+      "id": "b79a70c9-ef3e-4d85-b376-247c473789a9",
+      "key": "DWA1788889232622",
+      "name": "双窗草稿验收 A",
+      "active": true,
+      "version": 1
+    },
+    {
+      "id": "25e1d898-9e59-4dbb-998e-bfebf2abc0bf",
+      "key": "DWB1788889232622",
+      "name": "双窗草稿验收 B",
+      "active": true,
+      "version": 1
+    }
+  ],
+  "checks": [
+    {
+      "id": "parallel_tabs",
+      "status": "passed",
+      "actual": "同一浏览器会话的两个标签各自选定A/B；A保留文字、人员和JPEG，B保留不同文字且无A附件。"
+    },
+    {
+      "id": "revocation",
+      "status": "passed",
+      "actual": "A membership v1→revoked/v2，A轮询后自动移除业务页面并显示本地草稿恢复；B保持可操作。"
+    },
+    {
+      "id": "other_project_write",
+      "status": "passed",
+      "actual": "A撤权期间B实际创建DWB1788889232622-1；后端读回B正确project/reporter/文本，0附件；A仍0个Bug。"
+    },
+    {
+      "id": "local_export",
+      "status": "passed",
+      "actual": "真实点击文本与JPEG保存，Downloads生成701字节JSON和43311字节JPEG；导出projectId/A文本/人员/File元数据正确，JPEG哈希与原始完全相同。",
+      "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+      "matchesOriginal": true
+    },
+    {
+      "id": "restore",
+      "status": "passed",
+      "actual": "GM显式恢复A至membership v3；重新姓名登录自动恢复原A草稿、修复人、关闭人及JPEG。B页面保持自己的项目。"
+    }
+  ],
+  "limitations": [
+    "Two tabs in one actual browser were exercised; independent browser profiles and multi-device concurrency are not implied.",
+    "The A tab retained its previously loaded project-context build during this check; the B tab loaded the newest history-navigation build.",
+    "No deliberately injected network delay was tested; stale-response rejection still has unit regression only."
+  ],
+  "exportedDraft": {
+    "projectId": "b79a70c9-ef3e-4d85-b376-247c473789a9",
+    "draft": {
+      "newContent": "双窗口 A 草稿：撤销项目 A 成员资格后，必须保留这段内容和 JPEG 文件。",
+      "newOwnerId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+      "newVerifierId": "b32a6f48-2bb1-4eea-8354-a53361deb242",
+      "newSeverity": "S2",
+      "newFiles": [
+        {
+          "name": "qa-preview-evidence.jpg",
+          "size": 43311,
+          "type": "image/jpeg"
+        }
+      ],
+      "createOpen": true,
+      "selectedId": null,
+      "comment": "",
+      "detailDraft": null,
+      "detailNewFiles": [],
+      "detailAttachmentIds": [],
+      "editingDetail": false,
+      "assignmentDrafts": {},
+      "returnDrafts": {}
+    }
+  },
+  "artifacts": [
+    {
+      "name": "dual-01-a-draft.jpg",
+      "bytes": 45182,
+      "sha256": "d064027371d1490e20668a0250f44c04ce569423e1bce2bf8cada193e97d3198"
+    },
+    {
+      "name": "dual-01-a-draft.txt",
+      "bytes": 1151,
+      "sha256": "72a15b86dfe7d3971894c6dead87776ec2d0aceb0256d271059abfd9a61d78e2"
+    },
+    {
+      "name": "dual-02-b-draft.jpg",
+      "bytes": 43660,
+      "sha256": "e26b28e3488b1ebb2a7b71c6ef8d1b5bcc317a20b8112c97ba9cae1954b1b19e"
+    },
+    {
+      "name": "dual-02-b-draft.txt",
+      "bytes": 682,
+      "sha256": "06dc6074ca970a2b290745f288b24f10654daeac5428360a4f1d0372ec93f6c9"
+    },
+    {
+      "name": "dual-03-a-access-revoked.jpg",
+      "bytes": 36632,
+      "sha256": "d6d54ff7c507573eb348ebc640ec0d791b26de921199d7fd95ef0f4fb71430ef"
+    },
+    {
+      "name": "dual-03-a-access-revoked.txt",
+      "bytes": 892,
+      "sha256": "fccbc0a31339a28405c7e301ca8878329f68325c3ab82af03a4c2807bbeb6b6d"
+    },
+    {
+      "name": "dual-04-exported-draft.json",
+      "bytes": 701,
+      "sha256": "191b3d87ec2e75b13cf710fa2a3dc18fe1d39229904d07cca78e0afc1842026d"
+    },
+    {
+      "name": "dual-04-exported-evidence.jpg",
+      "bytes": 43311,
+      "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+    },
+    {
+      "name": "dual-05-b-created-while-a-revoked.txt",
+      "bytes": 483,
+      "sha256": "8b35ea0e307a313c07a02e351eb965835c1eab58994c7b6b7230f76fd8fd2206"
+    },
+    {
+      "name": "dual-05-b-created.jpg",
+      "bytes": 53029,
+      "sha256": "8ed2577fad377b40b34b4f70234cb9abcb28a45cfc5446953d3757761354d0cf"
+    },
+    {
+      "name": "dual-05-b-created.json",
+      "bytes": 1845,
+      "sha256": "dbddf2e6cf9e56684f89b27492a7ef337fc828428fffc1ffc1ee19bfc91800eb"
+    },
+    {
+      "name": "dual-06-a-restored.jpg",
+      "bytes": 47407,
+      "sha256": "6548c38595f55979d145c4dc157cf89adc85de2fa59ccbaf20e0dad2bcd65ef5"
+    },
+    {
+      "name": "dual-06-a-restored.json",
+      "bytes": 1814,
+      "sha256": "b184475e55f191ebc6b59d31dee74aefb0fe413486687877ad81c097977691c9"
+    },
+    {
+      "name": "dual-window-fixture.json",
+      "bytes": 3024,
+      "sha256": "91116ed9240b16187f5fcc4201a4761fa09d3ad000543056183e130556dc36d4"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "archiveDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec",
+  "redactedAt": "2026-09-08T18:59:20.183Z",
+  "rule": "Recursively parse valid JSON string values, then omit fields matching token|secret|password|cookie|authorization|private.?key|api.?key|credential (case insensitive); stringify sanitized JSON strings; preserve other evidence and outcomes. Depth >64 is replaced with REDACTED_NESTING_LIMIT.",
+  "items": [
+    {
+      "source": "docs/evidence/project-components/runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\desktop-mcp-core-2026-09-08T17-18-02-431Z.json",
+      "bytes": 141804,
+      "beforeSha256": "f5a86aac3f768a78ca5b5059e4773e6e4a2d66f61ab0543ca4d4525fe134a41b",
+      "afterSha256": "14ec6e8ea658579163c72e19fb68bc55534a3b9354f9cfc663e9a8880c91479d"
+    },
+    {
+      "source": "docs/evidence/project-components/runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+      "bytes": 473195,
+      "beforeSha256": "e2292c381a112d418dc81978c945d5dbfed07964b3f59a46e122cbd996ab20ef",
+      "afterSha256": "0a6e0c2c8bb75f9a31328dd4f022b6aae413e0313f097ac0ae0692a249189ad3"
+    },
+    {
+      "source": "docs/evidence/project-components/runs/mcp-core-2026-09-08T16-46-18-719Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\mcp-core-2026-09-08T16-46-18-719Z.json",
+      "bytes": 132373,
+      "beforeSha256": "f6b91aaa7106c03f61bff21ec00b9f31bec0ee8a5d853499068f95dda39f8952",
+      "afterSha256": "f12bf78a9897f6d0c7bef812e9eb1e862ea0bd5c897f06092325a984e9297018"
+    },
+    {
+      "source": "docs/evidence/project-components/runs/mcp-core-2026-09-08T17-05-10-894Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\mcp-core-2026-09-08T17-05-10-894Z.json",
+      "bytes": 133521,
+      "beforeSha256": "75ef60fece1f126e3094ae77ce95640bf0cf22696f9a61621c02928254fb8d04",
+      "afterSha256": "9747f4a2a6aa650e7523584a0e61da15d6e596804f1f6f0363089eb333f085c0"
+    },
+    {
+      "source": "docs/evidence/project-components/runs/mcp-core-2026-09-08T17-16-36-112Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\mcp-core-2026-09-08T17-16-36-112Z.json",
+      "bytes": 133521,
+      "beforeSha256": "82507f61ad2df1ba748f95036bdd28cdb4d8332d8a9976900d2c720277130a88",
+      "afterSha256": "9e9d1a9105361b6f3b465e6e6c655b41ce9180af7c8e2b776cb0ba7c801f27eb"
+    },
+    {
+      "source": "docs/evidence/project-components/runs/server-mcp-core-2026-09-08T17-52-56-155Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\server-mcp-core-2026-09-08T17-52-56-155Z.json",
+      "bytes": 464972,
+      "beforeSha256": "751fa694d2bfee624eb99de35ee2db73adae5830a5df050f750e14419e326d75",
+      "afterSha256": "2fce3aec611b2f6da45ddcbc42d9e9d54a8f2189a4f7972ee5d802c1d1ba9706"
+    },
+    {
+      "source": "docs/evidence/project-components/runs/server-mcp-core-2026-09-08T18-19-05-946Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\server-mcp-core-2026-09-08T18-19-05-946Z.json",
+      "bytes": 465016,
+      "beforeSha256": "b17bb35088ca5e135ed658ac2acea0d07103bd29dd76b5f260a0a45bee26f8a9",
+      "afterSha256": "0acf21b34d23ed596dccda3de3d43cdd9933a92d519495f6dad6641225974ed9"
+    },
+    {
+      "source": "docs/evidence/project-components/runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+      "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\server-mcp-core-2026-09-08T18-22-11-243Z.json",
+      "bytes": 465018,
+      "beforeSha256": "95fc5ffcc3df5cf92a5e4d3f49b18b9b8ba5744297077f56cb264595bb39e1d5",
+      "afterSha256": "54ac2396d2adb626274a3423d7e05103878a59877952bbf4a4b481d3f7af9fe7"
+    }
+  ]
+}

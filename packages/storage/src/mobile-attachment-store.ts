@@ -13,6 +13,7 @@ import type { DatabaseSync } from "node:sqlite";
 import type { MobileCaptureArtifactKind } from "./mobile-capture-store.js";
 import { SqliteStorageError } from "./sqlite.js";
 import { BUG_ATTACHMENT_LINKS_SQL } from "./bug-attachment-links.js";
+import { decodeScopedListCursor, encodeScopedListCursor } from "./scoped-list-cursor.js";
 
 const MOBILE_MIN_CHUNK_SIZE_BYTES = 256 * 1024;
 const MOBILE_MAX_CHUNK_SIZE_BYTES = 8 * 1024 * 1024;
@@ -142,6 +143,7 @@ export interface MobileAttachmentReservation {
 export interface ListMobileBugAttachmentsInput extends MobileAttachmentScope {
   readonly bugId: string;
   readonly limit: number;
+  readonly cursor?: string;
 }
 
 export interface GetMobileAttachmentInput extends MobileAttachmentScope {
@@ -175,7 +177,7 @@ export interface MobileBugAttachmentList {
   readonly projectId: string;
   readonly snapshotSequence: number;
   readonly items: readonly MobileAttachmentMetadata[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface MobileAttachmentDownload {
@@ -1001,7 +1003,7 @@ export function hasActiveAttachmentReadMembership(
            ON actor.account_id = account.id
           AND actor.id = ?
           AND actor.status = 'active'
-         JOIN memberships AS membership
+         JOIN command_project_memberships AS membership
            ON membership.account_id = account.id
           AND membership.project_id = project.id
           AND membership.user_id = actor.id
@@ -1065,7 +1067,13 @@ function selectClaimedAttachment(
           AND bug_attachment.binding_id = binding.id
          WHERE attachment.account_id = ? AND attachment.project_id = ?
            AND attachment.id = ? AND attachment.status = 'ready'
-           AND attachment.scan_state = 'clean'`,
+           AND attachment.scan_state = 'clean'
+           AND NOT EXISTS (
+             SELECT 1 FROM bug_deletions AS deletion
+             WHERE deletion.account_id = binding.account_id
+               AND deletion.project_id = binding.project_id
+               AND deletion.bug_id = binding.target_bug_id
+           )`,
       )
       .get(input.accountId, input.projectId, attachmentId) as ClaimedAttachmentRow | undefined) ??
     null
@@ -1084,10 +1092,23 @@ export function listMobileBugAttachments(
     .prepare(
       `SELECT id
        FROM bugs
-       WHERE account_id = ? AND project_id = ? AND id = ?`,
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bugs.account_id
+             AND deletion.project_id = bugs.project_id AND deletion.bug_id = bugs.id
+         )`,
     )
     .get(input.accountId, input.projectId, input.bugId);
   if (bug === undefined) return null;
+
+  const cursorScope = {
+    kind: "attachments" as const,
+    accountId: input.accountId,
+    projectId: input.projectId,
+    bugId: input.bugId,
+  };
+  const cursor = decodeScopedListCursor(input.cursor, cursorScope);
 
   const snapshot = database
     .prepare(
@@ -1105,7 +1126,7 @@ export function listMobileBugAttachments(
               attachment.client_attachment_id, attachment.capture_id,
               attachment.file_name, attachment.media_type, attachment.size_bytes,
               attachment.sha256, attachment.status, attachment.scan_state,
-              attachment.version, blob.storage_key
+              attachment.version, attachment.created_at, blob.storage_key
        FROM ${BUG_ATTACHMENT_LINKS_SQL} AS bug_attachment
        JOIN attachments AS attachment
          ON attachment.account_id = bug_attachment.account_id
@@ -1128,6 +1149,7 @@ export function listMobileBugAttachments(
         AND blob.state = 'ready'
        WHERE bug_attachment.account_id = ? AND bug_attachment.project_id = ?
          AND bug_attachment.bug_id = ?
+         AND (? IS NULL OR (attachment.created_at, attachment.id) > (?, ?))
          AND NOT EXISTS (
            SELECT 1 FROM bug_attachment_removals AS removal
            WHERE removal.account_id = bug_attachment.account_id
@@ -1142,15 +1164,24 @@ export function listMobileBugAttachments(
       input.accountId,
       input.projectId,
       input.bugId,
-      input.limit,
-    ) as unknown as ClaimedAttachmentRow[];
+      cursor?.createdAt ?? null,
+      cursor?.createdAt ?? null,
+      cursor?.id ?? null,
+      input.limit + 1,
+    ) as unknown as (ClaimedAttachmentRow & { created_at: string })[];
+
+  const items = rows.slice(0, input.limit);
+  const last = items.at(-1);
 
   return Object.freeze({
     bugId: input.bugId,
     projectId: input.projectId,
     snapshotSequence: snapshot.snapshot_sequence,
-    items: Object.freeze(rows.map(claimedAttachmentMetadata)),
-    nextCursor: null,
+    items: Object.freeze(items.map(claimedAttachmentMetadata)),
+    nextCursor:
+      rows.length > input.limit && last
+        ? encodeScopedListCursor(cursorScope, { createdAt: last.created_at, id: last.id })
+        : null,
   });
 }
 
@@ -1274,7 +1305,12 @@ function selectMobileCaptureArtifact(
           AND blob.state = 'ready'
          WHERE bug.account_id = ?
            AND bug.project_id = ?
-           AND bug.id = ?`,
+           AND bug.id = ?
+           AND NOT EXISTS (
+             SELECT 1 FROM bug_deletions AS deletion
+             WHERE deletion.account_id = bug.account_id
+               AND deletion.project_id = bug.project_id AND deletion.bug_id = bug.id
+           )`,
       )
       .get(
         input.captureId,

@@ -39,6 +39,8 @@ export interface UploadSourceIdentity {
   lastModified: string;
 }
 export interface BuildUploadChain {
+  projectId?: string;
+  componentVersion?: number;
   id: string;
   ownerId: string;
   canManage?: boolean;
@@ -50,6 +52,7 @@ export interface BuildUploadChain {
   buildNumber: number | null;
   status:
     | "queued"
+    | "paused"
     | "submitting"
     | "submission_unknown"
     | "building"
@@ -75,6 +78,8 @@ export interface UploadEvent {
   concurrency?: number;
 }
 export interface UploadJob {
+  projectId?: string;
+  componentVersion?: number;
   id: string;
   canManage?: boolean;
   createdAt: string;
@@ -87,6 +92,7 @@ export interface UploadJob {
   blockedBy?: string;
   status:
     | "queued"
+    | "paused"
     | "cancelled"
     | "running"
     | "succeeded"
@@ -109,6 +115,8 @@ export interface UploadJob {
   events: UploadEvent[];
 }
 export interface UploaderSnapshot {
+  projectId?: string;
+  componentVersion?: number;
   execution?: "server";
   available: boolean;
   toolVersion: string;

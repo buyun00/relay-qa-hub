@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-09-08T19:07:55.964Z",
+  "passed": true,
+  "result": {
+    "schemaVersion": 1,
+    "status": "installed",
+    "releaseId": "20260908T185123338Z",
+    "version": "0.2.0-preview.6",
+    "recordedAt": "2026-09-09T3:03:13.000Z"
+  },
+  "legacyTimestampNote": "This reinstall still used the helper from preview5; actual preview6 helper UTC is separately verified in native-updater-utc.json",
+  "backups": [
+    "RelayQaHubPreview.backup-20260908T185123338Z",
+    "RelayQaHubPreview.backup-20260908T185123338Z-1"
+  ],
+  "draftPreserved": true,
+  "nativeEvidence": [
+    "exe-preview6-repeat-restored-draft.jpg",
+    "exe-preview6-repeat-restored-draft.txt"
+  ]
+}

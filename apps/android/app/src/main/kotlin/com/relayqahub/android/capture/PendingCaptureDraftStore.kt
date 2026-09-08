@@ -30,6 +30,7 @@ data class PendingCaptureDraft(
     val qaAppVersion: String,
     val poco: CapturePocoSummary,
     val pocoArtifacts: List<CapturePocoArtifactRef>,
+    val scopeKey: String = "",
 )
 
 /** Durable completion marker shared by single-tap drafts and double-tap pending captures. */
@@ -54,6 +55,7 @@ class PendingCaptureDraftStore(context: Context) {
             val submissionId = existing?.clientSubmissionId ?: UUID.randomUUID().toString()
             val attachmentId = existing?.clientAttachmentId ?: UUID.randomUUID().toString()
             val draft = PendingCaptureDraft(
+                scopeKey = result.scopeKey,
                 captureId = result.captureId,
                 requestedAtEpochMs = result.requestedAtEpochMs,
                 width = result.width,
@@ -72,12 +74,13 @@ class PendingCaptureDraftStore(context: Context) {
             draft
         }
 
-    suspend fun latest(): PendingCaptureDraft? = withContext(Dispatchers.IO) {
+    suspend fun latest(scopeKey: String? = null): PendingCaptureDraft? = withContext(Dispatchers.IO) {
         root.listFiles()
             .orEmpty()
             .asSequence()
             .filter { it.isFile && it.name.endsWith(SIDECAR_SUFFIX) }
             .mapNotNull { file -> runCatching { readSidecar(file) }.getOrNull() }
+            .filter { scopeKey == null || it.scopeKey == scopeKey }
             .sortedWith(
                 compareByDescending<PendingCaptureDraft> { it.requestedAtEpochMs }
                     .thenByDescending { it.captureId },
@@ -172,6 +175,7 @@ class PendingCaptureDraftStore(context: Context) {
         }
         val pocoJson = json.getJSONObject("poco")
         return PendingCaptureDraft(
+            scopeKey = json.optString("scopeKey"),
             captureId = captureId,
             requestedAtEpochMs = json.getLong("requestedAtEpochMs").also { require(it > 0L) },
             width = json.getInt("width").also { require(it in 1..MAX_DIMENSION) },
@@ -240,6 +244,7 @@ class PendingCaptureDraftStore(context: Context) {
     }
 
     private fun PendingCaptureDraft.toJson(): JSONObject = JSONObject()
+        .put("scopeKey", scopeKey)
         .put("schemaVersion", SCHEMA_VERSION)
         .put("captureId", captureId)
         .put("requestedAtEpochMs", requestedAtEpochMs)

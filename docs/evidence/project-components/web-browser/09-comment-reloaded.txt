@@ -1,0 +1,153 @@
+- banner "QA Hub 窗口栏":
+  - generic: Q
+  - img "QA Hub 已连接"
+  - strong: QA Hub
+  - generic: 项目
+  - combobox "切换项目":
+    - option "真实HTTP验收A 2026-09-08T16-31-18-569Z"
+    - option "真实HTTP验收B 2026-09-08T16-31-18-569Z" [selected]
+  - generic: 预览
+  - searchbox "搜索编号、内容或人员"
+  - generic: Ctrl K
+  - button "刷新":
+- complementary:
+  - navigation "主导航":
+    - paragraph: 工作区
+    - button "工作台 1":
+      - generic: 工作台
+      - generic: "1"
+    - button "总览 全部":
+      - generic: 总览
+      - generic: 全部
+  - generic "管理与设置":
+    - button "用户管理 4 位项目成员":
+      - strong: 用户管理
+      - generic: 4 位项目成员
+  - button "9 Web验收0909 点击退出登录":
+    - generic: "9"
+    - strong: Web验收0909
+    - generic: 点击退出登录
+- main:
+  - paragraph: 2026年9月9日
+  - heading "你好，Web验收0909" [level=1]
+  - paragraph: 先完成需要你动作的 Bug，其他进度会自动留在工作台里。
+  - button "新建 Bug":
+    - text: 新建 Bug
+  - region "工作统计":
+    - button "已选中 1 待处理 待分配、需补充或等待开始处理" [pressed]:
+      - text: 已选中
+      - generic: "1"
+      - generic: 待处理
+      - generic: 待分配、需补充或等待开始处理
+    - button "0 处理中 修复人正在处理":
+      - generic: "0"
+      - generic: 处理中
+      - generic: 修复人正在处理
+    - button "0 已完成待验收 修复已完成，等待人工验收":
+      - generic: "0"
+      - generic: 已完成待验收
+      - generic: 修复已完成，等待人工验收
+    - button "0 关闭 已验收并关闭":
+      - generic: "0"
+      - generic: 关闭
+      - generic: 已验收并关闭
+  - generic: 人员范围
+  - combobox "人员范围":
+    - option "我 · Web验收0909" [selected]
+    - option "整个团队"
+    - option "AndroidPreviewQA"
+    - option "Preview GM"
+    - option "双项目1788885078674"
+  - generic: 1 个事项
+  - button "刷新列表":
+  - table "Bug 列表":
+    - row "事项 当前动作人 进度 最后更新":
+      - columnheader "事项"
+      - columnheader "当前动作人"
+      - columnheader "进度"
+      - columnheader "最后更新"
+    - row "P2 WEB-B-0909：B 项目独立草稿，切换时不得覆盖 A 的内容和附件。 TB1788885078632-1 · Web验收0909 修复 · Web验收0909 关闭 9 Web验收0909 修复人 待处理 9/9 01:05":
+      - cell "P2 WEB-B-0909：B 项目独立草稿，切换时不得覆盖 A 的内容和附件。 TB1788885078632-1 · Web验收0909 修复 · Web验收0909 关闭":
+        - generic: P2
+        - strong: WEB-B-0909：B 项目独立草稿，切换时不得覆盖 A 的内容和附件。
+        - generic: TB1788885078632-1
+        - generic: ·
+        - generic: Web验收0909 修复
+        - generic: ·
+        - generic: Web验收0909 关闭
+      - cell "9 Web验收0909 修复人":
+        - generic: "9"
+        - strong: Web验收0909
+        - generic: 修复人
+      - cell "待处理"
+      - cell "9/9 01:05"
+- button "关闭详情"
+- dialog "Bug 详情":
+  - banner:
+    - generic: TB1788885078632-1
+    - generic: P2
+    - generic: 待处理
+    - button "关闭详情":
+  - strong: Bug 内容
+  - generic: Web验收0909 · 9/9 01:05
+  - button "编辑详情"
+  - heading "WEB-B-0909：B 项目独立草稿，切换时不得覆盖 A 的内容和附件。" [level=2]
+  - paragraph: WEB-B-0909：B 项目独立草稿，切换时不得覆盖 A 的内容和附件。
+  - strong: 预期行为
+  - paragraph: 问题修复后不再复现
+  - generic "Bug 分类信息":
+    - generic: 严重程度 S2
+    - generic: 优先级 P2
+    - generic: 模块 未设置
+  - strong: 截图与标注
+  - generic: 1 张 · 点击查看大图
+  - button "查看图片 qa-preview-evidence.jpg":
+    - img "qa-preview-evidence.jpg"
+    - generic: qa-preview-evidence.jpg
+  - strong: 处理进度
+  - generic: 待处理
+  - generic: 待处理
+  - generic: 处理中
+  - generic: 已完成待验收
+  - generic: 关闭
+  - generic: 修复人
+  - combobox "修复人":
+    - option "AndroidPreviewQA"
+    - option "Preview GM"
+    - option "Web验收0909" [selected]
+    - option "双项目1788885078674"
+  - generic: 关闭人
+  - combobox "关闭人":
+    - option "AndroidPreviewQA"
+    - option "Preview GM"
+    - option "Web验收0909" [selected]
+    - option "双项目1788885078674"
+  - button "保存分配"
+  - generic "状态轨迹与处理记录 2 条" [active]:
+    - text: 状态轨迹与处理记录
+    - generic: 2 条
+  - paragraph:
+    - generic: "9"
+    - strong: Web验收0909
+    - text: 添加了评论
+    - generic: 9/9 01:06
+  - paragraph:
+    - generic: "9"
+    - strong: Web验收0909
+    - text: 记录了问题
+    - generic: 9/9 01:05
+  - paragraph:
+    - generic: "9"
+    - strong: Web验收0909
+    - text: WEB-B-评论正文-0909：JPEG 已上传并可读取，记录正文必须在刷新后仍显示。
+    - generic: 9/9 01:06
+  - textbox "补充评论或处理记录"
+  - button "记录" [disabled]
+  - generic "Poco 详情（截图时游戏上下文） 0 组":
+    - text: Poco 详情（截图时游戏上下文）
+    - generic: 0 组
+  - paragraph: 这张任务目前没有带 captureId 的 Poco 上下文；普通截图和任务处理不受影响。
+  - contentinfo:
+    - button "开始处理"
+    - button "人工标记完成"
+    - button "删除 Bug"

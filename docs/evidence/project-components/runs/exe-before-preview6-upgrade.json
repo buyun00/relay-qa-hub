@@ -1,0 +1,13 @@
+{
+  "configSha256": "AA98507FD6DBE84C360E845859AF69C4F5ED1724975ECC10B7561015CF76AC83",
+  "previousResultSha256": "AD07403B517582F8C1052AD674D6E780E18555D1282446DD9C82E2DE2D5D0AEE",
+  "observedAt": "2026-09-08T18:56:44.6416714Z",
+  "identity": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4419",
+    "loginName": "EXE实际验收0909",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "userId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "identity": "employee"
+  }
+}

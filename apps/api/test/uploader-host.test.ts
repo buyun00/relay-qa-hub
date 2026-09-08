@@ -10,6 +10,7 @@ import {
   parseUploadEvents,
   writeJson,
   readJson,
+  type UploadProjectConfiguration,
 } from "../src/uploader-host.js";
 import type { UploadInput } from "../src/uploader-types.js";
 
@@ -28,14 +29,24 @@ const executable = path.resolve("../desktop/vendor/ozdqp-uploader/ozdqp-uploader
 test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch retry and resume", async (t) => {
   const requests: string[] = [];
   const mtime = Date.parse("2026-09-08T09:16:23Z");
-  const { host, options } = await fixture(t, async (url, init) => {
-    requests.push(String(url));
-    if (init?.method === "HEAD")
-      return new Response(null, {
-        headers: { "content-length": "12345", "last-modified": new Date(mtime).toUTCString() },
+  const { host, options } = await fixture(
+    t,
+    async (url, init) => {
+      requests.push(String(url));
+      if (init?.method === "HEAD")
+        return new Response(null, {
+          headers: { "content-length": "12345", "last-modified": new Date(mtime).toUTCString() },
+        });
+      return Response.json({
+        files: [{ name: "ios_latest.zip", type: "file", size: 12345, mtime }],
       });
-    return Response.json({ files: [{ name: "ios_latest.zip", type: "file", size: 12345, mtime }] });
-  });
+    },
+    {
+      sourceKind: "ios_directory",
+      sourceUrl: "https://artifacts.fixture.invalid/ios/",
+      defaults: { ...input, channelId: "2004" },
+    },
+  );
   await writeJson(options.authFile, { account: "fixture" });
   await writeFile(
     options.runner,
@@ -56,9 +67,11 @@ test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch r
   const original = await readJson(configPath);
   assert.equal(
     original?.["downloadUrl"],
-    "http://10.100.5.129:8000/pkg_zip/ozdqp/ios/ios_latest.zip?download=true",
+    "https://artifacts.fixture.invalid/ios/ios_latest.zip?download=true",
   );
-  assert.equal(original?.["uploadConcurrency"], 8);
+  assert.equal(original?.["uploadConcurrency"], 2);
+  assert.equal(original?.["projectId"], options.project.projectId);
+  assert.equal(original?.["componentVersion"], options.project.componentVersion);
   assert.equal((await host.snapshot()).jobs[0]?.sourceFileName, "ios_latest.zip");
   await host.startWithId(ios, id);
   assert.equal(requests.length, 2);
@@ -79,7 +92,11 @@ test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch r
     /BUILD_PLATFORM_UNSUPPORTED/,
   );
 });
-async function fixture(t: Parameters<Parameters<typeof test>[1]>[0], fetcher?: typeof fetch) {
+async function fixture(
+  t: Parameters<Parameters<typeof test>[1]>[0],
+  fetcher?: typeof fetch,
+  projectOverrides: Partial<UploadProjectConfiguration> = {},
+) {
   const root = await mkdtemp(path.join(os.tmpdir(), "qahub-uploader-test-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const options = {
@@ -88,12 +105,24 @@ async function fixture(t: Parameters<Parameters<typeof test>[1]>[0], fetcher?: t
     executable,
     runner: path.join(root, "runner.mjs"),
     nodeExecutable: process.execPath,
+    project: {
+      projectId: randomUUID(),
+      componentVersion: 3,
+      apiBase: "https://upload.fixture.invalid",
+      loginBase: "https://login.fixture.invalid",
+      sourceUrl: "https://artifacts.fixture.invalid/test.zip",
+      sourceKind: "file" as const,
+      targetPrefix: "fixture-only",
+      defaults: input,
+      credentialRef: "fixture-only",
+      ...projectOverrides,
+    },
     ...(fetcher ? { fetch: fetcher } : {}),
   };
   return { root, options, host: new UploaderHost(options) };
 }
 async function seed(
-  options: { root: string },
+  options: { root: string; project: UploadProjectConfiguration },
   state: Record<string, unknown>,
   events = "",
   live = false,
@@ -101,7 +130,12 @@ async function seed(
   const id = randomUUID(),
     runId = randomUUID();
   const folder = path.join(options.root, id);
-  await writeJson(path.join(folder, "job.json"), { ...input, version: null });
+  await writeJson(path.join(folder, "job.json"), {
+    ...input,
+    version: null,
+    projectId: options.project.projectId,
+    componentVersion: options.project.componentVersion,
+  });
   await writeJson(path.join(folder, "desktop.json"), {
     createdAt: new Date().toISOString(),
     runStartedAt: "2020-01-01T00:00:00Z",
@@ -175,7 +209,7 @@ test("email login matches handover contract, validates access, saves compatible 
     password: "not-a-real-password",
     kind: "email",
   });
-  assert.equal(calls[0]?.url, "https://54cetx.jiaxiangxm.com/api/v1/gwapi/login/unified");
+  assert.equal(calls[0]?.url, "https://login.fixture.invalid/api/v1/gwapi/login/unified");
   assert.deepEqual(JSON.parse(String(calls[0]?.options?.body)), {
     account: "example@fixture.test",
     password: createHash("md5").update("not-a-real-password").digest("hex").toUpperCase(),
@@ -187,7 +221,7 @@ test("email login matches handover contract, validates access, saves compatible 
   assert.equal(new Headers(calls[1]?.options?.headers).get("Authorization"), "test-access");
   const cache = await readJson(options.authFile);
   assert.equal(cache?.["password"], "not-a-real-password");
-  assert.equal(cache?.["apiBase"], "https://fq2ivi.ipwana.com");
+  assert.equal(cache?.["apiBase"], "https://upload.fixture.invalid");
   const snapshot = await host.snapshot();
   assert.equal(snapshot.account, "example@fixture.test");
   for (const secret of ["not-a-real-password", "test-access", "test-refresh"])
@@ -208,7 +242,7 @@ test("failed access check preserves previous login and exposes no server text", 
   assert.equal((await readJson(options.authFile))?.["password"], "keep");
 });
 test("subaccount redirects accept only the recorded origins and one token", async (t) => {
-  let link = "https://fq2ivi.ipwana.com/#/main?access_token=sub-token";
+  let link = "https://upload.fixture.invalid/#/main?access_token=sub-token";
   const { host } = await fixture(t, async (url) =>
     Response.json({
       code: 0,
@@ -218,7 +252,7 @@ test("subaccount redirects accept only the recorded origins and one token", asyn
   assert.equal(await host.login({ account: "sub", password: "fixture", kind: "subaccount" }), true);
   for (const value of [
     "https://evil.test/?access_token=secret",
-    "https://fq2ivi.ipwana.com/?access_token=a&access_token=b",
+    "https://upload.fixture.invalid/?access_token=a&access_token=b",
   ]) {
     link = value;
     await assert.rejects(
@@ -429,6 +463,8 @@ test("final confirmation requires the persisted boundary and uses its own comman
   await assert.rejects(host.confirmPublish(id), /PUBLISH_NOT_READY/);
   await writeJson(path.join(folder, "job.json"), {
     ...input,
+    projectId: options.project.projectId,
+    componentVersion: options.project.componentVersion,
     mode: "prepare_publish",
     recordedTestWorkflow: true,
     useVersionText: true,
@@ -479,4 +515,18 @@ test("unreadable jobs remain present and are reported rather than silently disca
   await writeFile(path.join(folder, "desktop.json"), "malformed{");
   assert.equal((await host.snapshot()).unreadableJobs, 1);
   assert.equal(await readFile(path.join(folder, "desktop.json"), "utf8"), "malformed{");
+});
+
+test("a persisted job from another project is retained and cannot be resumed", async (t) => {
+  const { host, options } = await fixture(t);
+  const { id, folder } = await seed(options, { stage: "UPLOADING", runStatus: "FAILED" });
+  const configPath = path.join(folder, "job.json");
+  const original = { ...(await readJson(configPath)), projectId: randomUUID() };
+  await writeJson(configPath, original);
+  assert.equal((await host.snapshot()).unreadableJobs, 1);
+  await assert.rejects(
+    host.resume({ id, testerId: input.testerId, testResultReference: "" }),
+    /LOCAL_STATE_INVALID/,
+  );
+  assert.deepEqual(await readJson(configPath), original);
 });

@@ -82,7 +82,10 @@ export function registerAndroidUpdateRoutes(app: FastifyInstance, root: string |
         "content-type",
         metadata ? "application/json; charset=utf-8" : "application/vnd.android.package-archive",
       )
-      .header("content-disposition", `${metadata ? "inline" : "attachment"}; filename="${fileName}"`)
+      .header(
+        "content-disposition",
+        `${metadata ? "inline" : "attachment"}; filename="${fileName}"`,
+      )
       .header("etag", etag)
       .header("x-content-type-options", "nosniff");
     if (request.headers["if-none-match"] === etag) return reply.code(304).send();

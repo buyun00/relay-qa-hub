@@ -1,0 +1,24 @@
+✔ actual HTTP and SQLite authorize the 101st Relay member/project and recheck revocation, GM and disabled scope (1328.1084ms)
+✔ project component pauses queued work without reenable replay and retains local history (107.999ms)
+✔ eight bugs keep independent results, resume failed steps, and never resubmit successes (303.1352ms)
+✔ lost creation response replays the durable request after restart without duplicate task (41.5761ms)
+✔ existing linked task is reused and continuation follows its original QA receipt (27.2993ms)
+✔ project authorization and attachment integrity are checked before submission (9.9272ms)
+✔ HTTP routes require authentication and a merge confirmation before any mutation (138.7641ms)
+✔ project build queue pauses without replay; running task retains original version and verified artifact (601.661ms)
+✔ missing or escaping project configuration refuses execution before network (396.7884ms)
+✔ import execution hold prevents submission, retry and polling while local history remains readable (404.172ms)
+✔ Relay actions retain the task's original component endpoint after configuration changes (441.2657ms)
+✔ build-upload enqueue returns the persisted queued chain and performs no external execution (474.2692ms)
+✔ component HTTP routes preserve JSON string receipts and accept batch and outbox identifiers (132.8374ms)
+✔ iOS project source keeps its directory separator for scoped listing and ZIP resolution (357.567ms)
+✔ real HTTP project name login, protected GM identity, scoped membership and isolated cookie (611.9918ms)
+✔ actual API isolates concurrent users, explicit project headers and record-derived project context (1207.0585ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3273.1918

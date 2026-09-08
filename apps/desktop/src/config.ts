@@ -3,7 +3,7 @@ import path from "node:path";
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1"]);
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 
-export const APP_SCHEME = "qa-hub";
+export const APP_SCHEME = "qa-hub-preview";
 export const APP_HOST = "app";
 export const API_PATH = "/api/";
 export const NOTIFICATIONS_PATH = "/api/v1/notifications";
@@ -150,14 +150,11 @@ export function parseDesktopConfig(
   defaults: { readonly webAssetsDirectory?: string } = {},
 ): DesktopConfig {
   const configuredApiBaseUrl = envValue(env, "QA_HUB_DESKTOP_API_BASE_URL");
-  const usingLocalDebugDefault = configuredApiBaseUrl === null;
-  const allowLoopbackHttp = parseBoolean(
-    env,
-    "QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP",
-    usingLocalDebugDefault,
-  );
+  if (configuredApiBaseUrl === null)
+    throw new DesktopConfigError("QA_HUB_DESKTOP_API_BASE_URL must be explicitly configured");
+  const allowLoopbackHttp = parseBoolean(env, "QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP", false);
   const allowPrivateLanHttp = parseBoolean(env, "QA_HUB_DESKTOP_ALLOW_PRIVATE_LAN_HTTP", false);
-  const apiRaw = configuredApiBaseUrl ?? "http://127.0.0.1:4319";
+  const apiRaw = configuredApiBaseUrl;
   const apiBaseUrl = validateNetworkUrl(
     parseUrl(apiRaw, "QA_HUB_DESKTOP_API_BASE_URL"),
     "QA_HUB_DESKTOP_API_BASE_URL",
@@ -193,8 +190,7 @@ export function parseDesktopConfig(
     apiBaseUrl,
     wssUrl,
     csrfOrigin: parseCsrfOrigin(
-      envValue(env, "QA_HUB_DESKTOP_CSRF_ORIGIN") ??
-        (usingLocalDebugDefault ? "http://127.0.0.1:4174" : apiBaseUrl.origin),
+      envValue(env, "QA_HUB_DESKTOP_CSRF_ORIGIN") ?? apiBaseUrl.origin,
       allowLoopbackHttp,
       allowPrivateLanHttp,
     ),
@@ -216,7 +212,7 @@ export function parseDesktopConfig(
     allowPrivateLanHttp,
     startupHidden: parseBoolean(env, "QA_HUB_DESKTOP_START_HIDDEN", false),
     mcpEnabled: parseBoolean(env, "QA_HUB_DESKTOP_MCP_ENABLED", true),
-    mcpPort: parsePort(env, "QA_HUB_DESKTOP_MCP_PORT", 4_320),
+    mcpPort: parsePort(env, "QA_HUB_DESKTOP_MCP_PORT", 4_420),
   };
 }
 

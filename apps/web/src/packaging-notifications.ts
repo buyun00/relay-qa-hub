@@ -28,7 +28,7 @@ export async function notifyPackagingSystem(
     Notification.permission !== "granted"
   )
     return false;
-  const notification = new Notification(`OZDQP · ${notice.title}`, {
+  const notification = new Notification(`QA Hub · ${notice.title}`, {
     body: notice.body,
     tag: notice.id,
   });

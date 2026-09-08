@@ -1,0 +1,27 @@
+{
+  "recordedAt": "2026-09-08T18:19:06.8281847Z",
+  "httpCorePassed": true,
+  "productionReadiness": {
+    "status": "ready",
+    "schemaVersion": "12",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "previewExeStopped": true,
+  "dailyCreatedAt": "2026-09-08T10:24:12.5269520Z",
+  "serverMcpCorePassed": true,
+  "dailyPid": 17160,
+  "localMcpStopped": true
+}

@@ -1,3 +1,4 @@
+import { projectStorageKey } from "./project-context";
 import AppIcon from "./AppIcon";
 import { serverUploader, createUploadRequestId } from "./increment-upload-api";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -6,7 +7,7 @@ import type {
   UploadInput,
   UploaderSnapshot,
 } from "@relay-qa-hub/upload-contract";
-import { uploadDraftDefaults, UPLOAD_MODES, uploadPlatform } from "./upload-model";
+import { projectUploadDraft, UPLOAD_MODES, uploadPlatform } from "./upload-model";
 
 const messages: Record<string, string> = {
   BUILD_PLATFORM_UNSUPPORTED: "此按钮构建 Android。请在上传增量页选择 iOS，上传已有的 iOS ZIP。",
@@ -28,6 +29,7 @@ const messages: Record<string, string> = {
 };
 const labels: Record<BuildUploadChain["status"], string> = {
   queued: "服务端等待打包",
+  paused: "已暂停",
   submitting: "正在提交外网打包",
   submission_unknown: "待核对打包提交结果",
   building: "等待外网打包完成",
@@ -46,8 +48,12 @@ export default function BuildUploadControls({
   onBuildOnly,
   onSubmitted,
   onOpenUpload,
+  uploadDefaults,
+  label = "打包",
 }: {
   userId?: string;
+  uploadDefaults: Record<string, unknown>;
+  label?: string;
   disabled: boolean;
   onBuildOnly: () => void;
   onSubmitted: (queueId: number) => void;
@@ -59,7 +65,7 @@ export default function BuildUploadControls({
   const busyRef = useRef(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
-  const [input, setInput] = useState<UploadInput>(() => uploadDraftDefaults(null));
+  const [input, setInput] = useState<UploadInput>(() => projectUploadDraft(null, uploadDefaults));
   const [snapshot, setSnapshot] = useState<UploaderSnapshot | null>(null);
   const [chains, setChains] = useState<BuildUploadChain[]>([]);
   const [error, setError] = useState("");
@@ -104,12 +110,15 @@ export default function BuildUploadControls({
     setSnapshot(null);
     try {
       setInput(
-        uploadDraftDefaults(
-          JSON.parse(localStorage.getItem(`qa-hub:upload-draft:${userId}`) ?? "{}"),
+        projectUploadDraft(
+          JSON.parse(
+            localStorage.getItem(projectStorageKey("upload-draft", undefined, userId)) ?? "{}",
+          ),
+          uploadDefaults,
         ),
       );
     } catch {
-      setInput(uploadDraftDefaults(null));
+      setInput(projectUploadDraft(null, uploadDefaults));
     }
     setOpen(true);
     if (bridge) {
@@ -130,7 +139,7 @@ export default function BuildUploadControls({
     try {
       const result = await bridge.buildAndUpload({
         requestId: createUploadRequestId(),
-        upload: input,
+        upload: projectUploadDraft(input, uploadDefaults),
       });
       if (!result.ok) {
         setError(result.code);
@@ -177,7 +186,7 @@ export default function BuildUploadControls({
         aria-controls="external-build-options"
         onClick={() => void toggle()}
       >
-        打外网包 <AppIcon name={open ? "up" : "down"} />
+        {label} <AppIcon name={open ? "up" : "down"} />
       </button>
       {open ? (
         <div
@@ -195,7 +204,7 @@ export default function BuildUploadControls({
               onBuildOnly();
             }}
           >
-            仅打外网包
+            仅打包
           </button>
           <button
             className="package-combined-action"
@@ -251,7 +260,7 @@ export default function BuildUploadControls({
               ? `构建 #${latest.buildNumber}`
               : latest.queueId
                 ? `排队 #${latest.queueId}`
-                : "外网包"}{" "}
+                : "打包任务"}{" "}
             · {UPLOAD_MODES.find((m) => m.id === latest.input.mode)?.label}
           </span>
           {latest.errorCode ? <p>{buildUploadError(latest.errorCode)}</p> : null}

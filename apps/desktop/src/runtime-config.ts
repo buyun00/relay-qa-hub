@@ -153,7 +153,9 @@ export function resolveDesktopRuntimePaths(
   defaults: { readonly executablePath?: string } = {},
 ): DesktopRuntimePaths {
   const localAppData = envText(env, "LOCALAPPDATA");
-  const directory = localAppData === null ? null : path.join(localAppData, "Relay QA Hub");
+  const directory =
+    envText(env, "QA_HUB_DESKTOP_PROFILE_DIRECTORY") ??
+    (localAppData === null ? null : path.join(localAppData, "Relay QA Hub Preview"));
   const explicitConfig = envText(env, "QA_HUB_DESKTOP_CONFIG_FILE");
   const explicitPortableConfig = envText(env, "QA_HUB_DESKTOP_PORTABLE_CONFIG_FILE");
   const explicitToken = envText(env, "QA_HUB_DESKTOP_ACCESS_TOKEN_FILE");

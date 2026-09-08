@@ -32,11 +32,24 @@ export interface ListMobileProjectModulesInput extends MobileProjectDirectorySco
   readonly projectId: string;
 }
 
+export interface GetMobileProjectAccessInput extends MobileProjectDirectoryScope {
+  readonly projectId: string;
+}
+
+export interface MobileProjectAccess {
+  readonly projectId: string;
+  readonly projectKey: string;
+  readonly actorId: string;
+  readonly actorName: string;
+  readonly roles: readonly MobileProjectRole[];
+}
+
 export interface MobileVisibleProject {
   readonly id: string;
   readonly key: string;
   readonly name: string;
   readonly active: true;
+  readonly identity: "employee";
   readonly roles: readonly MobileProjectRole[];
 }
 
@@ -52,6 +65,7 @@ export interface MobileProjectMember {
   readonly displayName: string;
   readonly roles: readonly MobileProjectRole[];
   readonly active: true;
+  readonly identity: "employee";
 }
 
 export interface MobileProjectMemberList {
@@ -130,7 +144,7 @@ function requireActiveProjectMembership(
          ON project.account_id = account.id
         AND project.id = ?
         AND project.status = 'active'
-       JOIN memberships AS membership
+       JOIN command_project_memberships AS membership
          ON membership.account_id = account.id
         AND membership.project_id = project.id
         AND membership.user_id = actor.id
@@ -185,6 +199,45 @@ function readVisibleSnapshotSequence(
   return row.snapshot_sequence;
 }
 
+/** Resolve one current actor/project capability without relying on a directory page. */
+export function getMobileProjectAccess(
+  database: DatabaseSync,
+  input: GetMobileProjectAccessInput,
+): MobileProjectAccess | null {
+  requireDirectoryScope(input);
+  requireUuid(input.projectId, "projectId");
+  const rows = database
+    .prepare(
+      `SELECT DISTINCT project.project_key, actor.display_name, role.role
+       FROM accounts AS account
+       JOIN projects AS project ON project.account_id = account.id
+         AND project.id = ? AND project.status = 'active'
+       JOIN users AS actor ON actor.account_id = account.id
+         AND actor.id = ? AND actor.status = 'active'
+       JOIN command_project_memberships AS membership
+         ON membership.account_id = account.id AND membership.project_id = project.id
+         AND membership.user_id = actor.id AND membership.status = 'active'
+       JOIN command_project_roles AS role
+         ON role.account_id = membership.account_id AND role.project_id = membership.project_id
+         AND role.membership_id = membership.id
+       WHERE account.id = ? AND account.status = 'active'
+       ORDER BY role.role`,
+    )
+    .all(input.projectId, input.actorId, input.accountId) as unknown as {
+    readonly project_key: string;
+    readonly display_name: string;
+    readonly role: MobileProjectRole;
+  }[];
+  if (!rows.length) return null;
+  return Object.freeze({
+    projectId: input.projectId,
+    projectKey: rows[0]!.project_key,
+    actorId: input.actorId,
+    actorName: rows[0]!.display_name,
+    roles: Object.freeze(rows.map((row) => row.role)),
+  });
+}
+
 export function listMobileVisibleProjects(
   database: DatabaseSync,
   input: ListMobileVisibleProjectsInput,
@@ -228,6 +281,7 @@ export function listMobileVisibleProjects(
           key: row.project_key,
           name: row.name,
           active: true as const,
+          identity: "employee" as const,
           roles: listRoles(database, input.accountId, row.id, row.membership_id),
         }),
       ),
@@ -275,6 +329,7 @@ export function listMobileProjectMembers(
           displayName: row.display_name,
           roles: listRoles(database, input.accountId, input.projectId, row.membership_id),
           active: true as const,
+          identity: "employee" as const,
         }),
       ),
     ),

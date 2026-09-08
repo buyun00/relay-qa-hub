@@ -1,0 +1,11 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug typecheck
+npm notice run npm run typecheck --workspaces --if-present
+npm notice run @relay-qa-hub/api@0.1.0-debug typecheck
+npm notice run tsc -p tsconfig.json --noEmit
+npm notice run @relay-qa-hub/desktop@3.3.5 typecheck
+npm notice run @relay-qa-hub/web@3.3.5 typecheck
+npm notice run tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit
+npm notice run @relay-qa-hub/worker@0.1.0-debug typecheck
+npm notice run tsc --noEmit -p tsconfig.test.json
+npm notice run @relay-qa-hub/domain@0.1.0-debug typecheck
+npm notice run @relay-qa-hub/storage@0.1.0-debug typecheck

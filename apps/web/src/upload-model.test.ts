@@ -8,6 +8,7 @@ import {
   uploadStageLabel,
   uploadPlatform,
   selectUploadPlatform,
+  projectUploadDraft,
 } from "./upload-model";
 
 const job: UploadJob = {
@@ -52,6 +53,25 @@ const job: UploadJob = {
   ],
 };
 describe("upload progress and terminal states", () => {
+  it("takes upload targets exclusively from the active project without a production fallback", () => {
+    expect(projectUploadDraft(null, {})).toMatchObject({
+      productId: "",
+      channelId: "",
+      belongName: "",
+      testerId: 0,
+    });
+    const draft = projectUploadDraft(
+      { productId: "old", channelId: "old", belongName: "old", version: "1.2.3" },
+      { productId: "test-product", channelId: "test-channel", belongName: "Sandbox", testerId: 73 },
+    );
+    expect(draft).toMatchObject({
+      productId: "test-product",
+      channelId: "test-channel",
+      belongName: "Sandbox",
+      testerId: 73,
+      version: "1.2.3",
+    });
+  });
   it("switches Android and iOS targets while preserving product, tester, version and workflow", () => {
     const android = uploadDraftDefaults({
       testerId: 11562,

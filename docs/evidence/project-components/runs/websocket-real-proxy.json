@@ -1,0 +1,9 @@
+{
+  "at": "2026-09-08T17:58:49.619Z",
+  "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+  "url": "http://127.0.0.1:4274",
+  "passed": true,
+  "status": 101,
+  "anonymous": 401,
+  "note": "Real preview Web proxy preserves project cookie and API rejects unauthenticated upgrade."
+}

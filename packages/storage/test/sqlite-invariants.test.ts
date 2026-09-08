@@ -233,6 +233,9 @@ test("manual completion takes priority over every Relay status, preserves histor
         }),
       );
       assert.equal(verification.status, "requested");
+      const activeWorkflow = getMobileHumanWorkflowForBug(database, { ...human, bugId });
+      assert.equal(activeWorkflow.verification?.id, verification.id);
+      assert.equal(activeWorkflow.latestVerification?.id, verification.id);
       const started = transaction(database, () =>
         startMobileVerification(database, {
           ...scope,
@@ -261,6 +264,11 @@ test("manual completion takes priority over every Relay status, preserves histor
         }),
       );
       assert.equal(result.bug.state, "closed");
+      const closedWorkflow = getMobileHumanWorkflowForBug(database, { ...human, bugId });
+      assert.equal(closedWorkflow.verification, null);
+      assert.equal(closedWorkflow.latestVerification?.id, verification.id);
+      assert.equal(closedWorkflow.latestVerification?.status, "passed");
+      assert.equal(closedWorkflow.latestVerification?.resultSummary, "Human acceptance passed");
     }
     // A pending/unassigned Bug can also be completed by another active member.
     const pendingId = identifier(8_550);
