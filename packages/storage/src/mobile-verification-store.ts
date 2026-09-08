@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
 import { toBoundedAuditText } from "./audit-text.js";
+import { workflowReceipt } from "./workflow-idempotency.js";
 import type { MobileBugRecord } from "./mobile-bug-store.js";
 import {
   insertBugNotificationOutbox,
@@ -641,6 +642,11 @@ export function createMobileVerification(
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
   requireVerificationCreatorRole(database, input);
+  const receipt = workflowReceipt<MobileVerificationRecord>(database, input, "createVerification", {
+    type: "bug",
+    id: input.bugId,
+  });
+  if (receipt.replay) return receipt.replay;
   requireVerifierRole(database, input, input.verifierId);
   const workflow = readEligibleWorkflow(database, input);
   if (!workflow)
@@ -769,7 +775,7 @@ export function createMobileVerification(
   }
   const row = readVerification(database, input, verificationId);
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not created");
-  return toVerification(row);
+  return receipt.commit(toVerification(row), eventId);
 }
 
 export function getMobileVerification(
@@ -791,6 +797,11 @@ export function startMobileVerification(
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
   requireVerifierRole(database, input);
+  const receipt = workflowReceipt<MobileVerificationRecord>(database, input, "startVerification", {
+    type: "verification",
+    id: input.verificationId,
+  });
+  if (receipt.replay) return receipt.replay;
   const current = readVerification(database, input, input.verificationId);
   if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
   if (current.status !== "requested" || current.version !== input.expectedVersion) {
@@ -840,7 +851,7 @@ export function startMobileVerification(
   }
   const row = readVerification(database, input, current.id);
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "Verification disappeared after start");
-  return toVerification(row);
+  return receipt.commit(toVerification(row), eventId);
 }
 
 function claimVerificationAttachments(

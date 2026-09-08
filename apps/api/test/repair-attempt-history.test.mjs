@@ -160,6 +160,60 @@ async function fixture(t) {
   };
 }
 
+test("Bug creation replays one concurrent submission and reports changed payload as a public conflict", async (t) => {
+  const f = await fixture(t);
+  const clientSubmissionId = randomUUID();
+  const body = {
+    submissionContractVersion: "1.1.0",
+    clientSubmissionId,
+    projectId: f.projectId,
+    title: "Exactly one committed creation",
+    description: "Retrying an uncertain result must retain the business identity",
+    expectedBehavior: "One Bug and one occurrence event",
+    severity: "S3",
+    priority: "P3",
+    occurrence: {
+      observedAt: new Date().toISOString(),
+      platform: "web",
+      steps: ["Send the same request concurrently"],
+      actualBehavior: "First response might be lost",
+    },
+  };
+  const key = `submission:${clientSubmissionId}:commit`;
+  const [first, second] = await Promise.all([
+    f.call("bugs", { body, key, expected: 201 }),
+    f.call("bugs", { body, key, expected: 201 }),
+  ]);
+  assert.equal(first.bug.id, second.bug.id);
+  assert.equal(first.eventId, second.eventId);
+  assert.deepEqual([first.replayed, second.replayed].sort(), [false, true]);
+  const readEvents = () =>
+    f.worker.listMobileBugEvents({
+      accountId: f.accountId,
+      projectId: f.projectId,
+      actorId: f.actorId,
+      bugId: first.bug.id,
+      limit: 100,
+    });
+  const events = await readEvents();
+  assert.equal(events.items.length, 1);
+  const conflict = await f.call("bugs", {
+    body: { ...body, title: "A different payload with the already committed key" },
+    key,
+    expected: 409,
+  });
+  assert.deepEqual(conflict, { code: "IDEMPOTENCY_PAYLOAD_MISMATCH" });
+  assert.deepEqual(await f.call(`bugs/${first.bug.id}`), first.bug);
+  assert.deepEqual(await readEvents(), events);
+  const replay = await f.call("bugs", { body, key, expected: 201 });
+  assert.equal(replay.replayed, true);
+  assert.equal(replay.eventId, first.eventId);
+  assert.deepEqual(replay.bug, first.bug);
+  await f.call("bugs", { body, key, token: f.other.accessToken, expected: 403 });
+  assert.equal((await f.call(`bugs?projectId=${f.projectId}&limit=100`)).items.length, 1);
+  assert.deepEqual(await readEvents(), events);
+});
+
 test("SQLite human lifecycle preserves delivery/rejection facts while frozen responses and replay omit them", async (t) => {
   const f = await fixture(t);
   let bug = await f.bug();

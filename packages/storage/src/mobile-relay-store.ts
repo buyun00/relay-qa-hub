@@ -4,6 +4,7 @@ import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
 import { toBoundedAuditText } from "./audit-text.js";
+import { workflowReceipt } from "./workflow-idempotency.js";
 import type { MobileBugRecord, MobileScopeBootstrap } from "./mobile-bug-store.js";
 import type { MobileBuildRecord } from "./mobile-build-store.js";
 
@@ -1587,6 +1588,11 @@ export function transitionMobileBugReady(
   input: TransitionMobileBugInput,
 ): MobileBugRecord {
   requireTransaction(database);
+  const receipt = workflowReceipt<MobileBugRecord>(database, input, "transitionBugReady", {
+    type: "bug",
+    id: input.bugId,
+  });
+  if (receipt.replay) return receipt.replay;
   const bug = readBugRow(database, input, input.bugId);
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
   if (bug.version !== input.expectedVersion || bug.state !== "reported") {
@@ -1630,7 +1636,7 @@ export function transitionMobileBugReady(
     .run(at, input.accountId, input.projectId, bug.id, bug.version);
   const updated = readBugRow(database, input, bug.id);
   if (!updated) throw new MobileRelayStorageError("NOT_FOUND", "Bug disappeared after transition");
-  return toBug(updated);
+  return receipt.commit(toBug(updated), eventId);
 }
 
 function toAttempt(row: AttemptRow): MobileRepairAttemptRecord {
@@ -1829,6 +1835,16 @@ export function createMobileManualRepairAttempt(
   input: CreateMobileManualRepairAttemptInput,
 ): MobileManualRepairAttemptRecord {
   requireTransaction(database);
+  const receipt = workflowReceipt<MobileManualRepairAttemptRecord>(
+    database,
+    input,
+    "createManualRepairAttempt",
+    {
+      type: "bug",
+      id: input.bugId,
+    },
+  );
+  if (receipt.replay) return receipt.replay;
   const bug = readBugRow(database, input, input.bugId);
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
   if (bug.version !== input.expectedVersion || bug.state !== "ready") {
@@ -1915,7 +1931,7 @@ export function createMobileManualRepairAttempt(
     )
     .get(input.accountId, input.projectId, attemptId) as AttemptRow | undefined;
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not created");
-  return toManualAttempt(row);
+  return receipt.commit(toManualAttempt(row), eventId);
 }
 
 export function getMobileManualRepairAttempt(
@@ -2005,6 +2021,16 @@ export function startMobileRepairAttempt(
   input: StartMobileRepairAttemptInput,
 ): MobileManualRepairAttemptRecord {
   requireTransaction(database);
+  const receipt = workflowReceipt<MobileManualRepairAttemptRecord>(
+    database,
+    input,
+    "startRepairAttempt",
+    {
+      type: "repair_attempt",
+      id: input.attemptId,
+    },
+  );
+  if (receipt.replay) return receipt.replay;
   const attempt = readManualWorkflowAttempt(database, input, input.attemptId);
   if (!attempt) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt was not found");
   if (attempt.version !== input.expectedVersion || attempt.status !== "planned") {
@@ -2063,7 +2089,7 @@ export function startMobileRepairAttempt(
     )
     .get(input.accountId, input.projectId, attempt.id) as AttemptRow | undefined;
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt disappeared after start");
-  return toManualAttempt(row);
+  return receipt.commit(toManualAttempt(row), eventId);
 }
 
 export function deliverMobileRepairAttempt(
@@ -2071,6 +2097,16 @@ export function deliverMobileRepairAttempt(
   input: DeliverMobileRepairAttemptInput,
 ): MobileManualRepairAttemptRecord {
   requireTransaction(database);
+  const receipt = workflowReceipt<MobileManualRepairAttemptRecord>(
+    database,
+    input,
+    "deliverRepairAttempt",
+    {
+      type: "repair_attempt",
+      id: input.attemptId,
+    },
+  );
+  if (receipt.replay) return receipt.replay;
   requireWorkflowText(input.summary, "summary", 10_000);
   if (input.deliveryKind === "code") {
     requireWorkflowText(input.branch, "branch", 300);
@@ -2220,7 +2256,7 @@ export function deliverMobileRepairAttempt(
     .get(input.accountId, input.projectId, attempt.id) as AttemptRow | undefined;
   if (!row)
     throw new MobileRelayStorageError("NOT_FOUND", "RepairAttempt disappeared after delivery");
-  return toManualAttempt(row);
+  return receipt.commit(toManualAttempt(row), eventId);
 }
 
 /** One local transaction replaces executor authority with a recorded human decision. */

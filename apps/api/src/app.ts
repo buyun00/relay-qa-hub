@@ -1393,6 +1393,12 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(response);
     } catch (error: unknown) {
       const code = (error as { readonly code?: unknown })?.code;
+      if (code === "SQLITE_IDEMPOTENCY_MISMATCH") {
+        return reply
+          .code(409)
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code: "IDEMPOTENCY_PAYLOAD_MISMATCH" });
+      }
       if (!(error instanceof TypeError) && code !== "INVALID_REQUEST") throw error;
       return reply
         .code(400)

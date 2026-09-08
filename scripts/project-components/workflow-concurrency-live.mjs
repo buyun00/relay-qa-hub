@@ -410,6 +410,7 @@ try {
     createKey,
   );
   check("create changed payload denied", false, changedCreate.ok);
+  check("create changed payload HTTP status", 409, changedCreate.status);
   check("create changed payload code", "IDEMPOTENCY_PAYLOAD_MISMATCH", changedCreate.value.code);
   check("create rejection unchanged", initial, await bug(id));
 
