@@ -37,7 +37,14 @@ function clean(value, depth = 0) {
   if (depth > 64) return "[REDACTED_NESTING_LIMIT]";
   if (typeof value === "string") {
     try {
-      return JSON.stringify(clean(JSON.parse(value), depth + 1));
+      const decoded = JSON.parse(value);
+      if (decoded !== null && typeof decoded === "object")
+        return JSON.stringify(clean(decoded, depth + 1));
+      if (typeof decoded === "string") {
+        const cleaned = clean(decoded, depth + 1);
+        return cleaned === decoded ? value : JSON.stringify(cleaned);
+      }
+      return value;
     } catch {
       return value;
     }

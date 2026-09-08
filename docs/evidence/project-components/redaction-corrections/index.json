@@ -1,0 +1,220 @@
+{
+  "manifestVersion": 1,
+  "kind": "derived_redaction_correction",
+  "generatedAt": "2026-09-08T21:25:01.692Z",
+  "sourceHead": "3854aa8574ca0507e63b1b3b71ce634e263e21e9",
+  "sourceLedger": {
+    "path": "docs/evidence/project-components/commit-safety-redaction.json",
+    "sha256": "753a4baec680d2066152ac42e84899b8e69d8dfbf6d497e5c8fe2897620e966c"
+  },
+  "helpers": [
+    {
+      "path": "scripts/project-components/mcp-core.smoke.mjs",
+      "sha256": "8c6be5321eedad76c2b0840899bb2afbf1d256eca3b711f4bc60879bb6ad24d4"
+    },
+    {
+      "path": "scripts/project-components/frozen-workflow-live.mjs",
+      "sha256": "a16b86a0e5f252c8b38749fb37ae2731bef20210d61f75da346cdc281d7adaa1"
+    }
+  ],
+  "tests": {
+    "path": "scripts/project-components/redaction.test.mjs",
+    "sha256": "491ceb178b6f0d964fbf0d1c8bd8c6e9a1f093fad0d6fb54202797ce68a6f52b",
+    "passed": 18,
+    "failed": 0,
+    "command": "node --test scripts/project-components/redaction.test.mjs"
+  },
+  "rule": "Derive from verified private originals using the real corrected helpers. Preserve primitive string text; sanitize decoded objects/arrays and repeated string encoding. Omit sensitive named fields; depth >64 emits the fixed sentinel. Never infer original versions from an old redacted value.",
+  "businessRunsRepeated": false,
+  "clientsOrServicesOperated": false,
+  "oldPublicProofsOverwritten": false,
+  "privateOriginalsCopiedToGit": false,
+  "allPrivateHashesVerifiedBeforeDerivation": true,
+  "allPrivateHashesRecheckedBeforeWrite": true,
+  "correctionTotals": {
+    "jsonrpc": 104,
+    "eventSchemaVersion": 240
+  },
+  "securityScan": {
+    "privateSensitiveFieldOccurrences": 14,
+    "uniquePrivateSecretValuesInMemory": 14,
+    "secretValuesPersisted": false,
+    "publicTextFilesScanned": 13,
+    "knownSecretMatches": 0,
+    "jwtMatches": 0,
+    "pemMatches": 0,
+    "bearerLiteralMatches": 0,
+    "providerTokenMatches": 0,
+    "syntheticTestValuesAreNotProductionSecrets": true
+  },
+  "items": [
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\desktop-mcp-core-2026-09-08T17-18-02-431Z.json",
+      "originalPrivateSha256": "f5a86aac3f768a78ca5b5059e4773e6e4a2d66f61ab0543ca4d4525fe134a41b",
+      "originalPrivateBytes": 141804,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json",
+      "oldPublicSha256": "14ec6e8ea658579163c72e19fb68bc55534a3b9354f9cfc663e9a8880c91479d",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/desktop-mcp-core-2026-09-08T17-18-02-431Z.json",
+      "correctedPublicSha256": "35113076205f2bc71f6aa3fb02260910a1a48640bb37e5b8d7fbcdb201a7b760",
+      "correctedPublicBytes": 132336,
+      "runId": "2026-09-08T17-18-02-431Z",
+      "passed": true,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    },
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+      "originalPrivateSha256": "e2292c381a112d418dc81978c945d5dbfed07964b3f59a46e122cbd996ab20ef",
+      "originalPrivateBytes": 473195,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+      "oldPublicSha256": "0a6e0c2c8bb75f9a31328dd4f022b6aae413e0313f097ac0ae0692a249189ad3",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+      "correctedPublicSha256": "9d783066a33bc578f29d6a69a933ea1b985d8cefad1ea4bfeb9b285fb2cad2ac",
+      "correctedPublicBytes": 460829,
+      "runId": "2026-09-08T17-52-57-495Z",
+      "passed": true,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    },
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\mcp-core-2026-09-08T16-46-18-719Z.json",
+      "originalPrivateSha256": "f6b91aaa7106c03f61bff21ec00b9f31bec0ee8a5d853499068f95dda39f8952",
+      "originalPrivateBytes": 132373,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/mcp-core-2026-09-08T16-46-18-719Z.json",
+      "oldPublicSha256": "f12bf78a9897f6d0c7bef812e9eb1e862ea0bd5c897f06092325a984e9297018",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/mcp-core-2026-09-08T16-46-18-719Z.json",
+      "correctedPublicSha256": "cfdcc1ad6b3f133feb828eea6b485f6c50fcf6facc32f19d153823a22515d165",
+      "correctedPublicBytes": 131074,
+      "runId": "2026-09-08T16-46-18-719Z",
+      "passed": false,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    },
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\mcp-core-2026-09-08T17-05-10-894Z.json",
+      "originalPrivateSha256": "75ef60fece1f126e3094ae77ce95640bf0cf22696f9a61621c02928254fb8d04",
+      "originalPrivateBytes": 133521,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/mcp-core-2026-09-08T17-05-10-894Z.json",
+      "oldPublicSha256": "9747f4a2a6aa650e7523584a0e61da15d6e596804f1f6f0363089eb333f085c0",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/mcp-core-2026-09-08T17-05-10-894Z.json",
+      "correctedPublicSha256": "b486d060b09f6cbecfbf9326611a19e3692e6b8b0baa21c0e1b96a287735cac1",
+      "correctedPublicBytes": 132222,
+      "runId": "2026-09-08T17-05-10-894Z",
+      "passed": true,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    },
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\mcp-core-2026-09-08T17-16-36-112Z.json",
+      "originalPrivateSha256": "82507f61ad2df1ba748f95036bdd28cdb4d8332d8a9976900d2c720277130a88",
+      "originalPrivateBytes": 133521,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/mcp-core-2026-09-08T17-16-36-112Z.json",
+      "oldPublicSha256": "9e9d1a9105361b6f3b465e6e6c655b41ce9180af7c8e2b776cb0ba7c801f27eb",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/mcp-core-2026-09-08T17-16-36-112Z.json",
+      "correctedPublicSha256": "5bb09250ebd00fddc0a1054f8c2a0da74dcb435e38d23a0a8ca2fb2e0495a8f2",
+      "correctedPublicBytes": 132222,
+      "runId": "2026-09-08T17-16-36-112Z",
+      "passed": true,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    },
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\server-mcp-core-2026-09-08T17-52-56-155Z.json",
+      "originalPrivateSha256": "751fa694d2bfee624eb99de35ee2db73adae5830a5df050f750e14419e326d75",
+      "originalPrivateBytes": 464972,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/server-mcp-core-2026-09-08T17-52-56-155Z.json",
+      "oldPublicSha256": "2fce3aec611b2f6da45ddcbc42d9e9d54a8f2189a4f7972ee5d802c1d1ba9706",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/server-mcp-core-2026-09-08T17-52-56-155Z.json",
+      "correctedPublicSha256": "19221e1dcefa05c588cf03abe584d5a5f82b93d3b00533ca507fdb2ffb682bfe",
+      "correctedPublicBytes": 460775,
+      "runId": "2026-09-08T17-52-56-155Z",
+      "passed": true,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    },
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\server-mcp-core-2026-09-08T18-19-05-946Z.json",
+      "originalPrivateSha256": "b17bb35088ca5e135ed658ac2acea0d07103bd29dd76b5f260a0a45bee26f8a9",
+      "originalPrivateBytes": 465016,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/server-mcp-core-2026-09-08T18-19-05-946Z.json",
+      "oldPublicSha256": "0acf21b34d23ed596dccda3de3d43cdd9933a92d519495f6dad6641225974ed9",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/server-mcp-core-2026-09-08T18-19-05-946Z.json",
+      "correctedPublicSha256": "6781abcab01b8a5dee46df382bd5cea3e5663b82b01616892f10d98b6a2b9c10",
+      "correctedPublicBytes": 460819,
+      "runId": "2026-09-08T18-19-05-946Z",
+      "passed": true,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    },
+    {
+      "originalPrivatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\private-evidence-originals\\2026-09-08T18-57-48-618Z-be0bc5bd-a16b-45cb-a335-ba4d98fe7cec\\server-mcp-core-2026-09-08T18-22-11-243Z.json",
+      "originalPrivateSha256": "95fc5ffcc3df5cf92a5e4d3f49b18b9b8ba5744297077f56cb264595bb39e1d5",
+      "originalPrivateBytes": 465018,
+      "originalPrivateShaVerified": true,
+      "oldPublicPath": "docs/evidence/project-components/runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+      "oldPublicSha256": "54ac2396d2adb626274a3423d7e05103878a59877952bbf4a4b481d3f7af9fe7",
+      "oldPublicPreserved": true,
+      "correctedPublicPath": "docs/evidence/project-components/redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+      "correctedPublicSha256": "57dc9eef5db29627c82e139c937eb06cfdf34058a8ae4f360c576ae5f2a98546",
+      "correctedPublicBytes": 460821,
+      "runId": "2026-09-08T18-22-11-243Z",
+      "passed": true,
+      "checks": 13,
+      "outcomeAndCheckCountPreserved": true,
+      "correctedPrimitiveFields": {
+        "jsonrpc": 13,
+        "eventSchemaVersion": 30,
+        "unexpected": 0
+      }
+    }
+  ]
+}

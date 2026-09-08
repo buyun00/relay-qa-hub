@@ -18,9 +18,16 @@ function redact(value, depth = 0) {
   if (depth > 64) return "[REDACTED_NESTING_LIMIT]";
   if (typeof value === "string") {
     try {
-      // MCP mirrors structured results inside content[].text. These strings
-      // can themselves contain JSON strings, so sanitize every decoded layer.
-      return JSON.stringify(redact(JSON.parse(value), depth + 1));
+      // MCP mirrors structured results inside content[].text. Decode containers
+      // and repeated string encoding without normalizing primitive text such as "2.0".
+      const decoded = JSON.parse(value);
+      if (decoded !== null && typeof decoded === "object")
+        return JSON.stringify(redact(decoded, depth + 1));
+      if (typeof decoded === "string") {
+        const cleaned = redact(decoded, depth + 1);
+        return cleaned === decoded ? value : JSON.stringify(cleaned);
+      }
+      return value;
     } catch {
       return value;
     }
