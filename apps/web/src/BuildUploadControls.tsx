@@ -6,9 +6,10 @@ import type {
   UploadInput,
   UploaderSnapshot,
 } from "@relay-qa-hub/upload-contract";
-import { uploadDraftDefaults, UPLOAD_MODES } from "./upload-model";
+import { uploadDraftDefaults, UPLOAD_MODES, uploadPlatform } from "./upload-model";
 
 const messages: Record<string, string> = {
+  BUILD_PLATFORM_UNSUPPORTED: "此按钮构建 Android。请在上传增量页选择 iOS，上传已有的 iOS ZIP。",
   AUTH_REQUIRED: "请先到上传增量页登录平台账号。",
   UPLOAD_ACCOUNT_CHANGED: "上传平台账号已切换，自动上传已暂停；切回原账号后继续。",
   BUILD_UPLOAD_ALREADY_STARTED: "上传任务已经启动，请到上传增量页查看。",
@@ -204,7 +205,8 @@ export default function BuildUploadControls({
               disabled ||
               !bridge?.buildAndUpload ||
               !snapshot?.configured ||
-              !snapshot.available
+              !snapshot.available ||
+              uploadPlatform(input) === "ios"
             }
             onClick={() => void combined()}
           >
@@ -213,6 +215,7 @@ export default function BuildUploadControls({
           <p>
             产品 {input.productId} · 渠道 {input.channelId} · 测试人 {input.testerId}
           </p>
+          {uploadPlatform(input) === "ios" ? <p>{messages.BUILD_PLATFORM_UNSUPPORTED}</p> : null}
           <p>
             版本 {input.version || "自动生成"} ·{" "}
             {UPLOAD_MODES.find((m) => m.id === input.mode)?.label}

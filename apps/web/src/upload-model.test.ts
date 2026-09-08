@@ -6,6 +6,8 @@ import {
   uploadJobLabel,
   uploadProgress,
   uploadStageLabel,
+  uploadPlatform,
+  selectUploadPlatform,
 } from "./upload-model";
 
 const job: UploadJob = {
@@ -50,6 +52,18 @@ const job: UploadJob = {
   ],
 };
 describe("upload progress and terminal states", () => {
+  it("switches Android and iOS targets while preserving product, tester, version and workflow", () => {
+    const android = uploadDraftDefaults({
+      testerId: 11562,
+      version: "2.4.32",
+      mode: "prepare_publish",
+    });
+    const ios = selectUploadPlatform(android, "ios");
+    expect(ios).toEqual({ ...android, channelId: "2004", belongName: "[2002]Baloot Go|[2004]iOS" });
+    expect(uploadPlatform(ios)).toBe("ios");
+    expect(uploadDraftDefaults(ios)).toEqual(ios);
+    expect(selectUploadPlatform(ios, "android")).toEqual(android);
+  });
   it("uses the recorded target and tester and keeps only two new-job endpoints", () => {
     expect(uploadDraftDefaults(null)).toMatchObject({
       productId: "2002",

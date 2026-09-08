@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile, mkdir } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile, mkdir, unlink } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -25,6 +25,60 @@ const input: UploadInput = {
   testResultReference: "",
 };
 const executable = path.resolve("../desktop/vendor/ozdqp-uploader/ozdqp-uploader.exe");
+test("iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch retry and resume", async (t) => {
+  const requests: string[] = [];
+  const mtime = Date.parse("2026-09-08T09:16:23Z");
+  const { host, options } = await fixture(t, async (url, init) => {
+    requests.push(String(url));
+    if (init?.method === "HEAD")
+      return new Response(null, {
+        headers: { "content-length": "12345", "last-modified": new Date(mtime).toUTCString() },
+      });
+    return Response.json({ files: [{ name: "ios_latest.zip", type: "file", size: 12345, mtime }] });
+  });
+  await writeJson(options.authFile, { account: "fixture" });
+  await writeFile(
+    options.runner,
+    `import fs from 'node:fs/promises';import path from 'node:path';const [,dir,runId]=process.argv.slice(2);await fs.writeFile(path.join(dir,'run-'+runId+'.json'),JSON.stringify({finished:true}));`,
+  );
+  const id = randomUUID();
+  const ios = { ...input, channelId: "2004", belongName: "iOS fixture" };
+  await host.startWithId({ ...ios, downloadUrl: "https://untrusted.invalid/file.zip" }, id);
+  const wait = async () => {
+    for (let i = 0; i < 100; i++) {
+      if (!(await host.snapshot()).jobs[0]?.active) return;
+      await new Promise((r) => setTimeout(r, 30));
+    }
+    throw new Error("fixture runner timeout");
+  };
+  await wait();
+  const configPath = path.join(host.folder(id), "job.json");
+  const original = await readJson(configPath);
+  assert.equal(
+    original?.["downloadUrl"],
+    "http://10.100.5.129:8000/pkg_zip/ozdqp/ios/ios_latest.zip?download=true",
+  );
+  assert.equal(original?.["uploadConcurrency"], 8);
+  assert.equal((await host.snapshot()).jobs[0]?.sourceFileName, "ios_latest.zip");
+  await host.startWithId(ios, id);
+  assert.equal(requests.length, 2);
+  await unlink(path.join(host.folder(id), "desktop.json")); // Simulate persisted intent before launch.
+  await host.startWithId(ios, id);
+  await wait();
+  await host.resume({ id, testerId: ios.testerId, testResultReference: "" });
+  await wait();
+  assert.equal(requests.length, 2, "Original directory selection is never repeated");
+  assert.deepEqual(await readJson(configPath), original);
+  await assert.rejects(
+    host.startForBuild(
+      ios,
+      randomUUID(),
+      { size: 10, lastModified: new Date(mtime).toUTCString() },
+      "fixture",
+    ),
+    /BUILD_PLATFORM_UNSUPPORTED/,
+  );
+});
 async function fixture(t: Parameters<Parameters<typeof test>[1]>[0], fetcher?: typeof fetch) {
   const root = await mkdtemp(path.join(os.tmpdir(), "qahub-uploader-test-"));
   t.after(() => rm(root, { recursive: true, force: true }));

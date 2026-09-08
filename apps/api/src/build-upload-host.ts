@@ -141,6 +141,7 @@ export class BuildUploadHost {
       this.file(id);
       const input = parseNewUploadInput(raw["upload"]),
         ownerId = await this.owner();
+      if (input.channelId === "2004") throw new Error("BUILD_PLATFORM_UNSUPPORTED");
       const chains = await this.all(),
         prior = chains.find((c) => c.id === id);
       if (prior) {

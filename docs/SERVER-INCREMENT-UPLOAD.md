@@ -1,4 +1,4 @@
-# Server incremental upload (3.2.0)
+# Server incremental upload (3.3.4)
 
 The API server owns uploads and the external-build/upload workflow. Web and EXE
 submit authenticated requests and display persistent server snapshots. Closing the
@@ -8,10 +8,24 @@ upload IPC fails with `UPLOAD_MOVED_TO_SERVER`; there is no local execution fall
 
 ## Defaults and final confirmation
 
-The unchanged handover recording supplies product **2002**, channel **1002**, tester
+The Android handover recording supplies product **2002**, channel **1002**, tester
 **11562**, and `[2002]Baloot Go|[1002]谷歌-国际正式`. Historical version and record IDs
 are never reused. Summary and description contain only the resolved version number.
 Legacy tester-1 drafts still migrate once, preserving later deliberate choices.
+
+The page offers **Android / iOS**. Selecting iOS changes the channel to **2004**;
+product, tester, version and final-confirmation mode retain their current values.
+The server reads `http://10.100.5.129:8000/pkg_zip/ozdqp/ios/?json=true` when a new
+iOS task is dispatched, selects the ZIP with the newest file modification time,
+and verifies its size and Last-Modified using HEAD. Directories, checksum files,
+partial files and unsafe names are excluded. Android retains its original fixed ZIP.
+
+The selected iOS URL, filename, size and modification time are persisted before
+launch. Conditional download and a final HEAD reject a changing artifact; retry
+before launch, lost acknowledgements and resume retain that same selection.
+Completed local ZIPs and old Android configuration digests remain compatible.
+The client cannot supply a download URL. Both platforms use the same eight-part
+upload and recorded test/publication workflow.
 
 New server jobs explicitly use **8 concurrent COS parts**, each **5 MiB**. This
 applies to both manual uploads and automatic build handoffs. Existing job configs
@@ -52,7 +66,7 @@ identity and reads the original worker result instead of repeating launches. A
 machine restart leaves interrupted work recoverable with the original ZIP. Unknown
 writes are reconciled only on explicit recovery, never blindly replayed.
 
-Worker 0.4.2 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
+Worker 0.4.3 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
 The API does not accept client-selected paths, executables, origins or historical
 version IDs. Eight 5 MiB COS parts run concurrently, with serialized STS renewal and
 checkpoint writes; recovery sends only missing verified parts. The SDK's synchronous
@@ -77,6 +91,9 @@ The worker checks conditional-download metadata and HEAD again before accepting 
 new ZIP. A changed or ambiguous shared artifact stops handoff. A finished local
 download remains the original job snapshot on resume. Cancelling automatic handoff
 preserves the Jenkins build; unknown submission results are not automatically resent.
+This existing build button produces Android artifacts. An iOS draft disables its
+combined upload option, and the API independently rejects that combination before
+Jenkins submission. Existing iOS ZIPs are submitted from the incremental upload page.
 
 ## API and diagnostics
 

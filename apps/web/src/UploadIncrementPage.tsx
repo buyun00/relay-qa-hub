@@ -1,5 +1,6 @@
 import AppIcon from "./AppIcon";
 import { serverUploader } from "./increment-upload-api";
+import { UPLOAD_TARGETS } from "@relay-qa-hub/upload-contract";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type {
   UploadInput,
@@ -15,6 +16,8 @@ import {
   uploadJobLabel,
   uploadProgress,
   uploadStageLabel,
+  uploadPlatform,
+  selectUploadPlatform,
 } from "./upload-model";
 import "./upload-increment.css";
 
@@ -132,7 +135,11 @@ function JobProgress({ job }: { job: UploadJob | undefined }) {
           <summary>文件与版本结果</summary>
           <dl>
             <dt>文件</dt>
-            <dd>_pkg_cfg_2001_1002.zip · {size(job.size)}</dd>
+            <dd>
+              {job.sourceFileName ||
+                (uploadPlatform(job.input) === "ios" ? "iOS ZIP" : "_pkg_cfg_2001_1002.zip")}{" "}
+              · {size(job.size)}
+            </dd>
             <dt>SHA-256</dt>
             <dd className="upload-hash">{job.sha256}</dd>
             <dt>平台版本 ID</dt>
@@ -434,14 +441,19 @@ export default function UploadIncrementPage({
               <div className="upload-source">
                 <span>ZIP</span>
                 <div>
-                  <strong>_pkg_cfg_2001_1002.zip</strong>
-                  <small>从内网构建服务自动下载并校验</small>
+                  <strong>
+                    {uploadPlatform(form) === "ios"
+                      ? "iOS · 最新 ZIP"
+                      : "Android · _pkg_cfg_2001_1002.zip"}
+                  </strong>
+                  <small>
+                    {uploadPlatform(form) === "ios"
+                      ? "按目录中文件修改时间取最新 ZIP，恢复时继续使用原包"
+                      : "从内网构建服务自动下载并校验"}
+                  </small>
                   <details>
-                    <summary>查看固定下载地址</summary>
-                    <code>
-                      {snapshot?.sourceUrl ??
-                        "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true"}
-                    </code>
+                    <summary>查看取包地址</summary>
+                    <code>{UPLOAD_TARGETS[uploadPlatform(form)].sourceUrl}</code>
                   </details>
                 </div>
               </div>
@@ -452,6 +464,25 @@ export default function UploadIncrementPage({
                   setReview(true);
                 }}
               >
+                <label>
+                  包类型
+                  <select
+                    aria-label="包类型"
+                    value={uploadPlatform(form)}
+                    onChange={(event) => {
+                      setForm((current) =>
+                        selectUploadPlatform(
+                          current,
+                          event.target.value === "ios" ? "ios" : "android",
+                        ),
+                      );
+                      setReview(false);
+                    }}
+                  >
+                    <option value="android">Android</option>
+                    <option value="ios">iOS</option>
+                  </select>
+                </label>
                 <div className="upload-field-pair">
                   <label>
                     产品 ID
@@ -474,7 +505,18 @@ export default function UploadIncrementPage({
                       maxLength={20}
                       value={form.channelId}
                       placeholder="例如 1002"
-                      onChange={(event) => setField("channelId", event.target.value)}
+                      onChange={(event) => {
+                        const channelId = event.target.value;
+                        setForm((current) =>
+                          ["1002", "2004"].includes(channelId)
+                            ? selectUploadPlatform(
+                                current,
+                                channelId === "2004" ? "ios" : "android",
+                              )
+                            : { ...current, channelId },
+                        );
+                        setReview(false);
+                      }}
                     />
                   </label>
                 </div>
@@ -541,8 +583,8 @@ export default function UploadIncrementPage({
                     <p>
                       {form.belongName}
                       <br />
-                      产品 {form.productId} · 渠道 {form.channelId} · 版本{" "}
-                      {form.version || "自动生成"} · 测试人 {form.testerId}
+                      {UPLOAD_TARGETS[uploadPlatform(form)].label} · 产品 {form.productId} · 渠道{" "}
+                      {form.channelId} · 版本 {form.version || "自动生成"} · 测试人 {form.testerId}
                     </p>
                     <p>
                       {form.mode === "publish_workflow"

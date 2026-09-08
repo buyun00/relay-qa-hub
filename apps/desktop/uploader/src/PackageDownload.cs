@@ -5,10 +5,23 @@ namespace Ozdqp;
 public static class PackageDownload
 {
     public const string SourceUrl="http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
-    public static string LocalPath(string work)=>Path.Combine(Path.GetFullPath(work),"input","_pkg_cfg_2001_1002.zip");
-    public static async Task<FileIdentity> Get(string work,CancellationToken ct,Action<long,long?>? progress=null,HttpMessageHandler? testHandler=null,SourceIdentity? expectedSource=null)
+    public static string ValidateSource(string? sourceUrl)
     {
-        string target=LocalPath(work);Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+        if(sourceUrl==null||sourceUrl==SourceUrl)return SourceUrl;
+        if(!Uri.TryCreate(sourceUrl,UriKind.Absolute,out var uri)||uri.Scheme!="http"||uri.Host!="10.100.5.129"||uri.Port!=8000||uri.UserInfo!=""||uri.Fragment!=""||uri.Query!="?download=true")
+            throw new UploadException("INVALID_INPUT","下载地址不属于固定构建目录。");
+        const string prefix="/pkg_zip/ozdqp/ios/";
+        string decoded=Uri.UnescapeDataString(uri.AbsolutePath);
+        string name=decoded.StartsWith(prefix,StringComparison.Ordinal)?decoded[prefix.Length..]:"";
+        if(name.Length is <5 or >240||!name.EndsWith(".zip",StringComparison.OrdinalIgnoreCase)||name.IndexOfAny(Path.GetInvalidFileNameChars())>=0||name.Contains('/')||name.Contains('\\'))
+            throw new UploadException("INVALID_INPUT","iOS 下载文件名无效。");
+        return uri.AbsoluteUri;
+    }
+    public static string LocalPath(string work,string? sourceUrl=null)=>Path.Combine(Path.GetFullPath(work),"input",Uri.UnescapeDataString(new Uri(ValidateSource(sourceUrl)).Segments[^1]));
+    public static async Task<FileIdentity> Get(string work,CancellationToken ct,Action<long,long?>? progress=null,HttpMessageHandler? testHandler=null,SourceIdentity? expectedSource=null,string? sourceUrl=null)
+    {
+        string resolved=ValidateSource(sourceUrl);
+        string target=LocalPath(work,resolved);Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         // Complete files are immutable snapshots belonging to this task.
         if(File.Exists(target))return await Files.Inspect(target,ct);
         string partial=target+".partial";
@@ -17,7 +30,7 @@ public static class PackageDownload
         try
         {
             // This client never receives business Authorization or browser cookies.
-            using var request=new HttpRequestMessage(HttpMethod.Get,SourceUrl);
+            using var request=new HttpRequestMessage(HttpMethod.Get,resolved);
             if(expectedSource!=null)request.Headers.IfUnmodifiedSince=DateTimeOffset.Parse(expectedSource.LastModified);
             using var response=await client.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,idle.Token);
             if(expectedSource!=null)CheckSource(response,expectedSource);
@@ -44,7 +57,7 @@ public static class PackageDownload
             if(expectedSource!=null)
             {
                 idle.CancelAfter(TimeSpan.FromSeconds(60));
-                using var head=await client.SendAsync(new HttpRequestMessage(HttpMethod.Head,SourceUrl),HttpCompletionOption.ResponseHeadersRead,idle.Token);
+                using var head=await client.SendAsync(new HttpRequestMessage(HttpMethod.Head,resolved),HttpCompletionOption.ResponseHeadersRead,idle.Token);
                 CheckSource(head,expectedSource);
             }
             File.Move(partial,target,false);progress?.Invoke(received,expected);

@@ -16,7 +16,7 @@ public static class Program
             string ApiArg()=>args.Contains("--api-base")?Arg("--api-base"):new JobConfig().ApiBase;
             if(args.Length==0||args[0] is "help" or "--help")
             {
-                Console.WriteLine("OZDQP Uploader 0.4.2 / 固定地址下载 + 账号密码登录\n\n  login [--kind email|subaccount]   登录并保存账号密码，默认邮箱\n  auth-check                       只读检查已保存的登录状态\n  logout                           清除本工具本地登录缓存\n  download --work <目录>            仅从固定地址下载并校验 ZIP\n  preflight --file <ZIP>            本地检查\n  self-test                        本地测试，不访问业务平台\n  run --config <job.json>           登录、下载、执行完整流程\n  resume --config <job.json>        恢复本任务的相同 ZIP\n  confirm-publish --config <job.json> 最终确认发布（prepare_publish 等待后）\n  status --work <任务目录>          读取当前结果\n\nZIP 固定来源："+PackageDownload.SourceUrl+"\n账号密码保存在本地 JSON；后续自动登录。兼容 OZDQP_AUTHORIZATION。\nCtrl+C 保留断点；下载中断后从头下载，已完成下载的旧任务不会取新包。");return 0;
+                Console.WriteLine("OZDQP Uploader 0.4.3 / 固定地址下载 + 账号密码登录\n\n  login [--kind email|subaccount]   登录并保存账号密码，默认邮箱\n  auth-check                       只读检查已保存的登录状态\n  logout                           清除本工具本地登录缓存\n  download --work <目录>            仅从固定地址下载并校验 ZIP\n  preflight --file <ZIP>            本地检查\n  self-test                        本地测试，不访问业务平台\n  run --config <job.json>           登录、下载、执行完整流程\n  resume --config <job.json>        恢复本任务的相同 ZIP\n  confirm-publish --config <job.json> 最终确认发布（prepare_publish 等待后）\n  status --work <任务目录>          读取当前结果\n\nZIP 固定来源："+PackageDownload.SourceUrl+"\n账号密码保存在本地 JSON；后续自动登录。兼容 OZDQP_AUTHORIZATION。\nCtrl+C 保留断点；下载中断后从头下载，已完成下载的旧任务不会取新包。");return 0;
             }
             if(args[0]=="login")
             {
@@ -72,8 +72,11 @@ public static class Program
             if(config.ExpectedSource is {} expectedSource && (expectedSource.Size<=0 || !DateTimeOffset.TryParse(expectedSource.LastModified,out _)))throw new UploadException("INVALID_INPUT","构建产物身份无效。");
             if(string.IsNullOrWhiteSpace(config.Summary)||string.IsNullOrWhiteSpace(config.ProductId)||string.IsNullOrWhiteSpace(config.ChannelId))throw new UploadException("INVALID_INPUT","产品、渠道、版本概述不能为空。");
             config.WorkDirectory=Path.GetFullPath(config.WorkDirectory,Path.GetDirectoryName(configPath)!);
-            config.FilePath=PackageDownload.LocalPath(config.WorkDirectory);
-            var digest=Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new{config.ApiBase,source=PackageDownload.SourceUrl,config.FilePath,config.ProductId,config.ChannelId,config.Version,config.Summary,config.Description,config.BelongName,config.ExistingVersionId,config.PartSizeBytes,config.Mode})));
+            string downloadUrl=PackageDownload.ValidateSource(config.DownloadUrl);
+            if(config.DownloadUrl!=null && (downloadUrl!=PackageDownload.SourceUrl)!=(config.ChannelId=="2004"))throw new UploadException("INVALID_INPUT","增量包来源与渠道不一致。");
+            if(downloadUrl!=PackageDownload.SourceUrl&&config.ExpectedSource==null)throw new UploadException("INVALID_INPUT","iOS 任务缺少固定文件身份。");
+            config.FilePath=PackageDownload.LocalPath(config.WorkDirectory,downloadUrl);
+            var digest=Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new{config.ApiBase,source=downloadUrl,config.FilePath,config.ProductId,config.ChannelId,config.Version,config.Summary,config.Description,config.BelongName,config.ExistingVersionId,config.PartSizeBytes,config.Mode})));
             // Keep the exact 0.2.0 digest for existing jobs; new behavior is immutable.
             if(config.UseVersionText||config.RecordedTestWorkflow)
                 digest=Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new{digest,config.UseVersionText,config.RecordedTestWorkflow})));
@@ -85,12 +88,12 @@ public static class Program
             if(loaded!=null&&loaded.ConfigDigest!=digest)throw new UploadException("VERSION_CONFLICT","任务身份配置已改变；不能把旧断点用于新文件或新目标。");
             state=loaded??new JobState{ConfigDigest=digest};
             if(args[0]=="confirm-publish")Engine.ConfirmPublication(config,state,journal);
-            state.DownloadUrl=PackageDownload.SourceUrl;
+            state.DownloadUrl=downloadUrl;
             state.Stage="AUTHENTICATING";journal.Save(state);journal.Emit(state,"authenticating");
             using var api=await LoggedInClient(config.ApiBase);
             state.Stage="DOWNLOADING";journal.Save(state);journal.Emit(state,"downloading");
             if(state.File!=null&&!File.Exists(config.FilePath))throw new UploadException("FILE_CHANGED","本任务的下载文件已丢失，不能用固定地址上的新包替换旧断点。");
-            var identity=state.File==null?await PackageDownload.Get(config.WorkDirectory,cancel.Token,(received,total)=>journal.Emit(state,"downloadProgress",new{received,total}),expectedSource:config.ExpectedSource):await Files.Inspect(config.FilePath,cancel.Token);
+            var identity=state.File==null?await PackageDownload.Get(config.WorkDirectory,cancel.Token,(received,total)=>journal.Emit(state,"downloadProgress",new{received,total}),expectedSource:config.ExpectedSource,sourceUrl:downloadUrl):await Files.Inspect(config.FilePath,cancel.Token);
             if(state.File!=null&&(state.File.Sha256!=identity.Sha256||state.File.Size!=identity.Size))throw new UploadException("FILE_CHANGED","文件内容与断点不一致。");
             state.File=identity;journal.Save(state);
             // Prevent file replacement and writes throughout the run.

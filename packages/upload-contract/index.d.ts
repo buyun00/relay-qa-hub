@@ -1,5 +1,17 @@
 // Legacy modes remain readable for existing jobs; new jobs expose only the last two.
 export type UploadMode = "upload_only" | "prepare_test" | "publish_workflow" | "prepare_publish";
+export type UploadPlatform = "android" | "ios";
+export declare const UPLOAD_TARGETS: Readonly<
+  Record<
+    UploadPlatform,
+    Readonly<{
+      label: string;
+      channelId: string;
+      channelName: string;
+      sourceUrl: string;
+    }>
+  >
+>;
 export declare const DEFAULT_UPLOAD_PARAMETERS: {
   readonly productId: "2002";
   readonly channelId: "1002";
@@ -65,6 +77,8 @@ export interface UploadJob {
   id: string;
   createdAt: string;
   input: UploadInput;
+  sourceUrl?: string;
+  sourceFileName?: string;
   active: boolean;
   stage: string;
   queuePosition?: number;

@@ -1,5 +1,23 @@
 import type { UploadJob, UploadMode } from "@relay-qa-hub/upload-contract";
-import { DEFAULT_UPLOAD_PARAMETERS, type UploadInput } from "@relay-qa-hub/upload-contract";
+import {
+  DEFAULT_UPLOAD_PARAMETERS,
+  UPLOAD_TARGETS,
+  type UploadInput,
+  type UploadPlatform,
+} from "@relay-qa-hub/upload-contract";
+
+export const uploadPlatform = (input: Pick<UploadInput, "channelId">): UploadPlatform =>
+  input.channelId === UPLOAD_TARGETS.ios.channelId ? "ios" : "android";
+
+export function selectUploadPlatform(input: UploadInput, platform: UploadPlatform): UploadInput {
+  const target = UPLOAD_TARGETS[platform];
+  const productName = input.belongName.split("|")[0] || `[${input.productId}]Baloot Go`;
+  return {
+    ...input,
+    channelId: target.channelId,
+    belongName: `${productName}|[${target.channelId}]${target.channelName}`,
+  };
+}
 
 export function uploadDraftDefaults(value: unknown): UploadInput {
   const draft =
@@ -103,6 +121,10 @@ const STAGES: Record<string, string> = {
   AWAITING_PUBLISH_CONFIRMATION: "等待最终确认发布",
 };
 const ERRORS: Record<string, string> = {
+  UPLOAD_SOURCE_NO_ZIP: "iOS 目录中还没有可上传的 ZIP，请等待构建完成后重试。",
+  UPLOAD_SOURCE_UNAVAILABLE: "暂时无法读取 iOS 构建目录，请稍后恢复任务。",
+  BUILD_ZIP_CHANGED: "增量包大小或修改时间已变化，本次已停止上传，请核对构建结果。",
+  BUILD_PLATFORM_UNSUPPORTED: "打外网包按钮构建 Android，请在上传增量页选择 iOS 并上传已有 ZIP。",
   UPLOAD_CHANNEL_HELD: "同产品和渠道有未完成任务，正在等待前一任务完成或确认发布。",
   UPLOAD_QUEUE_BUSY: "服务端正在核对任务，稍后重试即可；提交标识已保留。",
   UPLOAD_SERVICE_UNAVAILABLE: "暂时无法连接上传服务，已有任务仍保存在服务端。",

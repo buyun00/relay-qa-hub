@@ -265,6 +265,8 @@ export class IncrementUploadService {
     const key = uuid(id),
       input = parseNewUploadInput(value),
       prior = this.rows().find((c) => c.id === key);
+    if (kind === "build" && input.channelId === "2004")
+      throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     if (prior) {
       this.insert(owner, key, key, kind, { input, accountIdentity: "" });
       return key;

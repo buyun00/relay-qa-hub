@@ -150,6 +150,20 @@ test("submission is durable, idempotent, actor-bound and does not launch in the 
   assert.equal(f.launches.length, 1);
   assert.equal((await f.service.snapshot(f.owner)).execution, "server");
 });
+test("iOS persists channel 2004 through queue restart and cannot use the Android build button", async (t) => {
+  const f = await fixture(t),
+    id = randomUUID();
+  const ios = { ...input, channelId: "2004", belongName: "iOS fixture" };
+  await f.service.enqueue(f.owner, id, ios);
+  await f.restart();
+  await f.service.tick();
+  assert.equal(f.launches[0].input.channelId, "2004");
+  assert.equal(f.launches[0].input.testerId, 11562);
+  await assert.rejects(
+    f.service.enqueue(f.owner, randomUUID(), ios, "build"),
+    /BUILD_PLATFORM_UNSUPPORTED/,
+  );
+});
 test("global queue serializes workers across users; confirmation reserves the channel", async (t) => {
   const f = await fixture(t),
     a = randomUUID(),

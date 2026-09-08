@@ -2,7 +2,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { DEFAULT_UPLOAD_PARAMETERS } from "./uploader-types.js";
+import { DEFAULT_UPLOAD_PARAMETERS, UPLOAD_TARGETS } from "./uploader-types.js";
+import { latestIosUploadSource } from "./upload-source.js";
 import type {
   UploadEvent,
   UploadInput,
@@ -12,7 +13,7 @@ import type {
   UploadSourceIdentity,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "04d6d264c4ee814f5f271e743d4c314f19d204cdf78c96e5cda34d94bd530f88";
+export const UPLOADER_SHA256 = "6541ec8737a474acf2e66f7453ae33ccc665b6d2cbb8fa6d14ccca860f217e80";
 export const UPLOAD_SOURCE =
   "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
 const API_BASE = "https://fq2ivi.ipwana.com";
@@ -239,6 +240,8 @@ export class UploaderHost {
       id,
       createdAt: str(meta["createdAt"]),
       input,
+      sourceUrl: str(config?.["downloadUrl"]) || UPLOAD_SOURCE,
+      sourceFileName: str(config?.["sourceFileName"], 240) || "_pkg_cfg_2001_1002.zip",
       recordedWorkflow: config?.["recordedTestWorkflow"] === true,
       active,
       stage,
@@ -304,7 +307,7 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.4.2",
+      toolVersion: "0.4.3",
       sourceUrl: UPLOAD_SOURCE,
       configured: !!auth,
       authError,
@@ -314,10 +317,18 @@ export class UploaderHost {
       unreadableJobs,
     };
   }
-  private async idle(): Promise<void> {
+  private async idle(prelaunchId?: string): Promise<void> {
     const snapshot = await this.snapshot();
     if (snapshot.jobs.some((job) => job.active)) throw new Error("UPLOADER_BUSY");
-    if (snapshot.unreadableJobs) throw new Error("LOCAL_STATE_INVALID");
+    if (
+      snapshot.unreadableJobs &&
+      !(
+        snapshot.unreadableJobs === 1 &&
+        prelaunchId &&
+        !(await readJson(path.join(this.folder(prelaunchId), "desktop.json")))
+      )
+    )
+      throw new Error("LOCAL_STATE_INVALID");
   }
   private async request(
     origin: string,
@@ -500,6 +511,8 @@ export class UploaderHost {
     source: UploadSourceIdentity,
     accountIdentity: string,
   ): Promise<string> {
+    if (record(value)["channelId"] === UPLOAD_TARGETS.ios.channelId)
+      throw new Error("BUILD_PLATFORM_UNSUPPORTED");
     if (
       !Number.isSafeInteger(source.size) ||
       source.size <= 0 ||
@@ -521,7 +534,8 @@ export class UploaderHost {
       if (existing) {
         if (
           (source && existing["buildChainId"] !== id) ||
-          JSON.stringify(existing["expectedSource"]) !== JSON.stringify(source) ||
+          ((source || input.channelId !== UPLOAD_TARGETS.ios.channelId) &&
+            JSON.stringify(existing["expectedSource"]) !== JSON.stringify(source)) ||
           JSON.stringify(
             parseNewUploadInput({ ...existing, version: existing["version"] ?? "" }),
           ) !== JSON.stringify(input)
@@ -530,25 +544,31 @@ export class UploaderHost {
         // The launch intent is written before spawn. Never create a second job on a lost acknowledgement.
         if (await readJson(path.join(directory, "desktop.json"))) return id;
       }
-      await this.idle();
+      await this.idle(existing ? id : undefined);
       if (source && (!accountIdentity || (await this.accountIdentity()) !== accountIdentity))
         throw new Error("UPLOAD_ACCOUNT_CHANGED");
       if (!(await readJson(this.options.authFile))) throw new Error("AUTH_REQUIRED");
       await this.verifiedExecutable();
-      await writeJson(path.join(directory, "job.json"), {
-        ...input,
-        useVersionText: true,
-        recordedTestWorkflow: true,
-        version: input.version || null,
-        existingVersionId: null,
-        apiBase: API_BASE,
-        workDirectory: directory,
-        pollSeconds: 3,
-        waitTimeoutSeconds: 1800,
-        partSizeBytes: 5242880,
-        uploadConcurrency: 8,
-        ...(source ? { buildChainId: id, expectedSource: source } : {}),
-      });
+      // Keep an already resolved source if dispatch was interrupted before spawn.
+      // Resume and lost acknowledgements must never select a newer iOS ZIP.
+      if (!existing)
+        await writeJson(path.join(directory, "job.json"), {
+          ...input,
+          useVersionText: true,
+          recordedTestWorkflow: true,
+          version: input.version || null,
+          existingVersionId: null,
+          apiBase: API_BASE,
+          workDirectory: directory,
+          pollSeconds: 3,
+          waitTimeoutSeconds: 1800,
+          partSizeBytes: 5242880,
+          uploadConcurrency: 8,
+          ...(input.channelId === UPLOAD_TARGETS.ios.channelId
+            ? await latestIosUploadSource(this.options.fetch)
+            : {}),
+          ...(source ? { buildChainId: id, expectedSource: source } : {}),
+        });
       return this.launch(id, "run", new Date().toISOString());
     });
   }
