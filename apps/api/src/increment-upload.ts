@@ -446,13 +446,21 @@ export class IncrementUploadService {
   async snapshot(owner: string): Promise<UploaderSnapshot> {
     const snapshot = await this.host(owner).snapshot(),
       rows = this.rows(),
-      own = rows.filter((c) => c.owner === owner && c.kind !== "build");
-    const jobs = new Map(
-      snapshot.jobs.filter((j) => own.some((c) => c.jobId === j.id)).map((j) => [j.id, j]),
-    );
-    const latest = new Map(own.map((c) => [c.jobId, c]));
+      uploads = rows.filter((c) => c.kind !== "build");
+    const jobs = new Map<string, UploadJob>();
+    let unreadableJobs = snapshot.unreadableJobs;
+    for (const uploader of new Set(uploads.map((c) => c.owner))) {
+      const current = uploader === owner ? snapshot : await this.host(uploader).snapshot();
+      if (uploader !== owner) unreadableJobs += current.unreadableJobs;
+      const ids = new Set(uploads.filter((c) => c.owner === uploader).map((c) => c.jobId));
+      for (const job of current.jobs) {
+        if (ids.has(job.id)) jobs.set(job.id, { ...job, canManage: uploader === owner });
+      }
+    }
+    const latest = new Map(uploads.map((c) => [c.jobId, c]));
     for (const c of latest.values()) {
-      if (!jobs.has(c.jobId)) jobs.set(c.jobId, this.queuedJob(c));
+      if (!jobs.has(c.jobId))
+        jobs.set(c.jobId, { ...this.queuedJob(c), canManage: c.owner === owner });
       const job = jobs.get(c.jobId)!;
       if (["queued", "dispatching"].includes(c.state)) {
         job.status = "queued";
@@ -468,18 +476,22 @@ export class IncrementUploadService {
     return {
       ...snapshot,
       execution: "server",
+      unreadableJobs,
       jobs: [...jobs.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
     };
   }
   async buildChains(owner: string): Promise<BuildUploadChain[]> {
-    const chains = await this.chain(owner).list();
-    for (const c of this.rows().filter(
-      (c) => c.owner === owner && c.kind === "build" && !chains.some((b) => b.id === c.jobId),
-    )) {
+    const commands = this.rows().filter((c) => c.kind === "build");
+    const chains = (
+      await Promise.all(
+        [...new Set(commands.map((c) => c.owner))].map((id) => this.chain(id).list()),
+      )
+    ).flat();
+    for (const c of commands.filter((c) => !chains.some((b) => b.id === c.jobId))) {
       const p = JSON.parse(c.payload) as Payload;
       chains.push({
         id: c.jobId,
-        ownerId: owner,
+        ownerId: c.owner,
         accountIdentity: p.accountIdentity,
         input: p.input,
         createdAt: c.createdAt,
@@ -493,7 +505,15 @@ export class IncrementUploadService {
         source: null,
       });
     }
-    return chains.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 20);
+    return chains
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, 20)
+      .map((chain) => ({
+        ...chain,
+        canManage: chain.ownerId === owner,
+        // Account binding stays in persisted execution records, not shared diagnostics.
+        accountIdentity: "",
+      }));
   }
   async logs(owner: string, id: unknown): Promise<unknown> {
     const job = (await this.snapshot(owner)).jobs.find((j) => j.id === uuid(id));
@@ -502,10 +522,8 @@ export class IncrementUploadService {
       execution: "server",
       job,
       audit: this.db
-        .prepare(
-          "SELECT actor,jobId,action,at FROM upload_audit WHERE jobId=? AND actor=? ORDER BY id",
-        )
-        .all(job.id, owner),
+        .prepare("SELECT actor,jobId,action,at FROM upload_audit WHERE jobId=? ORDER BY id")
+        .all(job.id),
     };
   }
   start(): void {

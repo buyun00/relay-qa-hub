@@ -259,7 +259,7 @@ export default function BuildUploadControls({
             <button type="button" onClick={() => onOpenUpload(latest.uploadJobId ?? undefined)}>
               查看上传进度
             </button>
-          ) : !["failed", "cancelled"].includes(latest.status) ? (
+          ) : latest.canManage !== false && !["failed", "cancelled"].includes(latest.status) ? (
             <button type="button" disabled={busy} onClick={() => void cancel(latest.id)}>
               取消自动上传（保留打包）
             </button>

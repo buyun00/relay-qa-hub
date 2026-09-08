@@ -41,6 +41,7 @@ export interface UploadSourceIdentity {
 export interface BuildUploadChain {
   id: string;
   ownerId: string;
+  canManage?: boolean;
   accountIdentity: string;
   createdAt: string;
   updatedAt: string;
@@ -75,6 +76,7 @@ export interface UploadEvent {
 }
 export interface UploadJob {
   id: string;
+  canManage?: boolean;
   createdAt: string;
   input: UploadInput;
   sourceUrl?: string;

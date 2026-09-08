@@ -143,8 +143,8 @@ test("submission is durable, idempotent, actor-bound and does not launch in the 
     f.service.enqueue(f.owner, id, { ...input, version: "different" }),
     /UPLOAD_REQUEST_CONFLICT/,
   );
-  assert.equal((await f.service.snapshot(f.other)).jobs.length, 0);
-  await assert.rejects(f.service.logs(f.other, id), /JOB_NOT_FOUND/);
+  assert.equal((await f.service.snapshot(f.other)).jobs[0].id, id);
+  assert.equal((await f.service.logs(f.other, id)).job.canManage, false);
   await f.restart();
   await f.service.tick();
   assert.equal(f.launches.length, 1);
@@ -164,6 +164,68 @@ test("iOS persists channel 2004 through queue restart and cannot use the Android
     /BUILD_PLATFORM_UNSUPPORTED/,
   );
 });
+
+test("all users see existing upload progress and diagnostics without sharing account configuration", async (t) => {
+  const f = await fixture(t),
+    id = randomUUID();
+  await f.service.enqueue(f.owner, id, input);
+  await f.restart();
+  let shared = await f.service.snapshot(f.other);
+  assert.equal(shared.jobs[0].id, id);
+  assert.equal(shared.jobs[0].status, "queued");
+  assert.equal(shared.jobs[0].queuePosition, 1);
+  assert.equal(shared.jobs[0].canManage, false);
+  assert.equal(shared.account, `account-${f.other}`);
+  assert.ok(!JSON.stringify(shared).includes(`account-${f.owner}`));
+  await f.service.tick();
+  for (const status of ["running", "failed", "awaiting_publish", "succeeded"]) {
+    Object.assign(f.hosts.get(f.owner).jobs[0], {
+      status,
+      active: status === "running",
+      published: status === "succeeded",
+      stage: status === "succeeded" ? "PUBLISHED" : status.toUpperCase(),
+      events: [{ stage: "UPLOADING", completedParts: 8, totalParts: 10 }],
+    });
+    shared = await f.service.snapshot(f.other);
+    assert.equal(shared.jobs[0].status, status);
+    assert.equal(shared.jobs[0].events[0].completedParts, 8);
+    const log = await f.service.logs(f.other, id);
+    assert.equal(log.job.status, status);
+    assert.equal(log.audit[0].actor, f.owner);
+    assert.equal(log.audit[0].action, "enqueue_upload");
+    assert.equal((await f.service.snapshot(f.owner)).jobs[0].canManage, true);
+  }
+  await assert.rejects(
+    f.service.continue(f.other, id, randomUUID(), "resume", {}),
+    /JOB_NOT_FOUND/,
+  );
+  await assert.rejects(
+    f.service.continue(f.other, id, randomUUID(), "confirm", {}),
+    /JOB_NOT_FOUND/,
+  );
+  await assert.rejects(f.service.cancel(f.other, id), /JOB_NOT_FOUND/);
+});
+
+test("shared build records retain creator, queue and handoff across restart without exposing account binding", async (t) => {
+  const f = await fixture(t),
+    id = randomUUID();
+  await f.service.enqueue(f.owner, id, input, "build");
+  let chains = await f.service.buildChains(f.other);
+  assert.equal(chains[0].id, id);
+  assert.equal(chains[0].status, "queued");
+  assert.equal(chains[0].ownerId, f.owner);
+  assert.equal(chains[0].canManage, false);
+  assert.equal(chains[0].accountIdentity, "");
+  await f.service.tick();
+  await f.restart();
+  chains = await f.service.buildChains(f.other);
+  assert.equal(chains[0].queueId, 760);
+  assert.equal(chains[0].status, "building");
+  assert.equal(chains[0].accountIdentity, "");
+  assert.equal((await f.service.buildChains(f.owner))[0].canManage, true);
+  await assert.rejects(f.service.cancel(f.other, id, true), /JOB_NOT_FOUND/);
+  assert.equal(f.builds.length, 1);
+});
 test("global queue serializes workers across users; confirmation reserves the channel", async (t) => {
   const f = await fixture(t),
     a = randomUUID(),
@@ -180,7 +242,10 @@ test("global queue serializes workers across users; confirmation reserves the ch
   });
   await f.service.tick();
   assert.equal(f.launches.length, 1);
-  assert.equal((await f.service.snapshot(f.other)).jobs[0].errorCode, "UPLOAD_CHANNEL_HELD");
+  assert.equal(
+    (await f.service.snapshot(f.other)).jobs.find((j) => j.id === b).errorCode,
+    "UPLOAD_CHANNEL_HELD",
+  );
   await assert.rejects(
     f.service.continue(f.owner, a, randomUUID(), "resume", {}),
     /PUBLISH_NOT_READY/,
@@ -355,6 +420,21 @@ test("authenticated API exposes queue and diagnostics without local bridge or cr
   assert.equal(result.json().job.status, "queued");
   assert.ok(!result.body.includes("accountIdentity"));
   assert.ok(!result.body.includes("password"));
+  const otherHeaders = { ...headers, "x-qa-actor-id": f.other };
+  const shared = await app.inject({ url: "/api/v1/increment-upload", headers: otherHeaders });
+  assert.equal(shared.statusCode, 200);
+  assert.equal(shared.json().jobs[0].id, id);
+  assert.equal(shared.json().jobs[0].canManage, false);
+  const sharedLogs = await app.inject({
+    url: `/api/v1/increment-upload/jobs/${id}/logs`,
+    headers: otherHeaders,
+  });
+  assert.equal(sharedLogs.statusCode, 200);
+  assert.equal(sharedLogs.json().audit[0].actor, f.owner);
+  assert.equal(
+    (await app.inject({ url: `/api/v1/increment-upload/jobs/${id}/logs` })).statusCode,
+    401,
+  );
   // This fixture owns closing the service; avoid closing it twice through the app hook.
   const close = f.service.close.bind(f.service);
   f.service.close = async () => {};
@@ -412,7 +492,10 @@ test("completed build hands off to upload before the next queued build can overw
   assert.equal(f.launches.length, 1);
   assert.equal(f.launches[0].id, first);
   assert.equal(f.builds.length, 1);
-  assert.equal((await f.service.buildChains(f.owner))[0].uploadJobId, first);
+  assert.equal(
+    (await f.service.buildChains(f.owner)).find((c) => c.id === first).uploadJobId,
+    first,
+  );
 });
 
 test("new submissions are accepted while server build polling is waiting on Jenkins", async (t) => {
@@ -452,7 +535,7 @@ test("cancelling a queued recovery preserves the original failed task and its ch
   await f.service.enqueue(f.other, randomUUID(), input);
   await f.service.continue(f.owner, id, randomUUID(), "resume", {});
   await f.service.cancel(f.owner, id);
-  assert.equal((await f.service.snapshot(f.owner)).jobs[0].status, "failed");
+  assert.equal((await f.service.snapshot(f.owner)).jobs.find((j) => j.id === id).status, "failed");
   await f.service.tick();
   assert.equal(f.launches.length, 1);
   await f.service.account(f.owner, "login", {

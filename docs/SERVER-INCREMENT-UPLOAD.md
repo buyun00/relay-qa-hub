@@ -1,4 +1,4 @@
-# Server incremental upload (3.3.4)
+# Server incremental upload (3.3.5)
 
 The API server owns uploads and the external-build/upload workflow. Web and EXE
 submit authenticated requests and display persistent server snapshots. Closing the
@@ -97,12 +97,16 @@ Jenkins submission. Existing iOS ZIPs are submitted from the incremental upload 
 
 ## API and diagnostics
 
-Prefix: `/api/v1/increment-upload`. All routes use existing QA Hub authentication,
-browser CSRF and per-actor authorization, including reads and final confirmation.
+Prefix: `/api/v1/increment-upload`. All routes require existing QA Hub authentication
+and browser CSRF for writes. Upload history, progress, sanitized diagnostics and
+build/upload handoffs are shared with every signed-in user, including records
+created before this change. Account configuration remains the current user's;
+shared responses do not contain another user's platform account binding. Task
+mutations retain creator authorization, exposed through `canManage` for the UI.
 
 | Method | Suffix | Behavior |
 | --- | --- | --- |
-| GET | prefix | Per-user account availability and task snapshots |
+| GET | prefix | Current-user account availability and shared task snapshots |
 | POST | `/login`, `/logout`, `/check-auth` | Per-user server platform account |
 | POST | `/jobs` | Enqueue; `Idempotency-Key` required |
 | POST | `/jobs/:id/resume` | Original-job recovery; idempotency key required |
@@ -120,7 +124,7 @@ resumed/re-uploaded. Old clients do not participate in the server lock: update
 submitting clients and reconcile unfinished old jobs before starting another release
 for that target. Deployment never forcibly closes an active daily client.
 
-Tests cover persistence, actor isolation, concurrent requests, queue ownership,
+Tests cover persistence, shared records, account and write isolation, concurrent requests, queue ownership,
 restart, lost acknowledgements, account binding, cancellation and build handoff.
 A real supervisor/worker test closes the API and verifies its result after restart
 using a deliberately invalid local cache before any platform request. Worker self-test

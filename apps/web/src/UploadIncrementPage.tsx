@@ -287,7 +287,7 @@ export default function UploadIncrementPage({
     });
   };
   const resume = () => {
-    if (!bridge || !job) return;
+    if (!bridge || !job || job.canManage === false) return;
     void action("resume", async () => {
       unwrap(
         await bridge.resume({
@@ -300,7 +300,7 @@ export default function UploadIncrementPage({
     });
   };
   const confirmPublish = () => {
-    if (!bridge || !job) return;
+    if (!bridge || !job || job.canManage === false) return;
     void action("confirm-publish", async () => {
       unwrap(await bridge.confirmPublish(job.id));
       setNotice("已确认发布，正在执行最后一步并核验发布结果。");
@@ -622,35 +622,40 @@ export default function UploadIncrementPage({
                   <p>
                     <strong>{job.version}</strong> · {job.input.belongName}
                   </p>
-                  <button
-                    type="button"
-                    className="upload-primary"
-                    disabled={!!busy || !snapshot?.configured}
-                    onClick={confirmPublish}
-                  >
-                    {busy === "confirm-publish" ? "正在确认…" : "确认发布"}
-                  </button>
+                  {job.canManage !== false ? (
+                    <button
+                      type="button"
+                      className="upload-primary"
+                      disabled={!!busy || !snapshot?.configured}
+                      onClick={confirmPublish}
+                    >
+                      {busy === "confirm-publish" ? "正在确认…" : "确认发布"}
+                    </button>
+                  ) : null}
                 </section>
               ) : null}
               {job?.status === "queued" ? (
                 <section className="upload-card upload-resume">
                   <h2>排队信息</h2>
                   <p>队列位置 {job.queuePosition ?? "—"}。同产品和渠道的前一任务完成后继续。</p>
-                  <button
-                    type="button"
-                    disabled={!!busy}
-                    onClick={() =>
-                      void action("cancel", async () => {
-                        if (bridge.cancel) unwrap(await bridge.cancel(job.id));
-                      })
-                    }
-                  >
-                    取消排队
-                  </button>
+                  {job.canManage !== false ? (
+                    <button
+                      type="button"
+                      disabled={!!busy}
+                      onClick={() =>
+                        void action("cancel", async () => {
+                          if (bridge.cancel) unwrap(await bridge.cancel(job.id));
+                        })
+                      }
+                    >
+                      取消排队
+                    </button>
+                  ) : null}
                 </section>
               ) : null}
               <JobProgress job={job} />
               {job &&
+              job.canManage !== false &&
               !job.active &&
               job.status !== "succeeded" &&
               job.status !== "awaiting_publish" &&
@@ -715,9 +720,7 @@ export default function UploadIncrementPage({
           <section className="upload-card upload-history">
             <div className="upload-card-heading">
               <h2>服务端上传记录</h2>
-              <span className="upload-muted">
-                {snapshot?.jobs.length ?? 0} 个任务 · 服务端持续执行
-              </span>
+              <span className="upload-muted">{snapshot?.jobs.length ?? 0} 个任务 · 所有人可见</span>
             </div>
             {snapshot?.jobs.length ? (
               <div className="upload-history-list">
