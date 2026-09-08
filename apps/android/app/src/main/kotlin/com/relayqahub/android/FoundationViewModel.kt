@@ -114,6 +114,8 @@ data class CaptureDraftUiState(
     val height: Int = 0,
     val requestedAtEpochMs: Long = 0L,
     val pocoStatus: String? = null,
+    val isDeleting: Boolean = false,
+    val isSubmitting: Boolean = false,
 )
 
 data class PendingCaptureUiState(
@@ -697,6 +699,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun restoreLatestCaptureDraft() {
         viewModelScope.launch {
+            val previous = captureDraft.value
+            if (previous.isDeleting || previous.isSubmitting) return@launch
             val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }.getOrNull()
                 ?: return@launch
             val queued = appContainer.scopedRepository.findOperationByIdempotencyKey(
@@ -707,7 +711,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 refreshPendingCaptureState()
                 return@launch
             }
-            if (draft.captureId != captureDraft.value.captureId) {
+            if (captureDraft.value !== previous) return@launch
+            if (draft.captureId != previous.captureId) {
                 onCaptureReady(
                     captureId = draft.captureId,
                     privatePath = draft.primaryPath,
@@ -727,6 +732,38 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             appContainer.pendingCaptureDraftStore.latest()
                 ?.takeIf { it.captureId == captureId }
                 ?.let { runCatching { appContainer.pendingCaptureDraftStore.delete(it) } }
+        }
+    }
+
+    fun deleteCaptureDraft() {
+        val current = captureDraft.value
+        val captureId = current.captureId ?: return
+        if (current.isDeleting || current.isSubmitting) return
+        captureDraft.value = current.copy(isDeleting = true)
+        viewModelScope.launch {
+            runCatching {
+                val draft = appContainer.pendingCaptureDraftStore.find(captureId)
+                    ?: error("截图草稿读取失败，请重试。")
+                val operation = appContainer.scopedRepository.findOperationByIdempotencyKey(
+                    scope = scope,
+                    idempotencyKey = "submission:${draft.clientSubmissionId}:commit",
+                )
+                check(operation == null || operation.state == QueueState.FAILED_PERMANENT) {
+                    "这张图片已随单子提交，请在单子详情中修改。"
+                }
+                appContainer.pendingCaptureDraftStore.delete(draft)
+            }.onSuccess {
+                if (captureDraft.value.captureId == captureId) {
+                    captureDraft.value = CaptureDraftUiState()
+                }
+                lastAction.value = "图片已删除，可以重新截图或直接提交文字 Bug。"
+            }.onFailure { failure ->
+                if (captureDraft.value.captureId == captureId) {
+                    captureDraft.value = current
+                }
+                lastAction.value = "删除图片失败：${failure.message ?: "请重试"}"
+            }
+            refreshPendingCaptureState()
         }
     }
 
@@ -1712,6 +1749,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         fixerId: String,
         verifierId: String,
     ) {
+        val draftState = captureDraft.value
+        if (draftState.isDeleting || draftState.isSubmitting) return
         val cleanContent = content.trim()
         if (cleanContent.isBlank()) {
             lastAction.value = "请填写 Bug 内容。"
@@ -1721,14 +1760,22 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             lastAction.value = "请选择验收人。"
             return
         }
+        captureDraft.value = draftState.copy(isSubmitting = true)
         viewModelScope.launch {
-            val draftState = captureDraft.value
-            val draft = runCatching { appContainer.pendingCaptureDraftStore.latest() }
-                .getOrNull()
-                ?.takeIf { it.captureId == draftState.captureId }
-            val originalPng = draft?.let {
-                runCatching { appContainer.pendingCaptureDraftStore.readPrimary(it) }.getOrNull()
+            val media = runCatching {
+                val draft = draftState.captureId?.let { captureId ->
+                    appContainer.pendingCaptureDraftStore.find(captureId)
+                        ?: error("截图草稿读取失败，请重试或删除图片。")
+                }
+                draft to draft?.let { appContainer.pendingCaptureDraftStore.readPrimary(it) }
+            }.getOrElse { failure ->
+                if (captureDraft.value.captureId == draftState.captureId) {
+                    captureDraft.value = draftState
+                }
+                lastAction.value = "提交失败：${failure.message ?: "截图读取失败"}"
+                return@launch
             }
+            val (draft, originalPng) = media
             val submissionId = draft?.clientSubmissionId ?: UUID.randomUUID().toString()
             val originalAttachmentId = draft?.clientAttachmentId ?: UUID.randomUUID().toString()
             queueDurableBugDraft(
@@ -1748,6 +1795,11 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 ownerId = fixerId.takeIf(String::isNotBlank),
                 verificationOwnerId = verifierId,
                 navigateAfterQueue = true,
+                onCompleted = {
+                    if (captureDraft.value.captureId == draftState.captureId) {
+                        captureDraft.value = captureDraft.value.copy(isSubmitting = false)
+                    }
+                },
             )
         }
     }

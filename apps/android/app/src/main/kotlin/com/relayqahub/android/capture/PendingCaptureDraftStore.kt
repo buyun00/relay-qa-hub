@@ -102,16 +102,8 @@ class PendingCaptureDraftStore(context: Context) {
     }
 
     suspend fun delete(draft: PendingCaptureDraft) = withContext(Dispatchers.IO) {
-        val primary = resolvePrimary(draft.captureId, draft.primaryPath)
-        draft.pocoArtifacts.forEach { ref ->
-            validateArtifact(ref, draft.captureId)
-            File(ref.privatePath).canonicalFile.delete()
-        }
-        File(root, draft.captureId).canonicalFile
-            .takeIf { it.parentFile == root && it.isDirectory && it.list()?.isEmpty() == true }
-            ?.delete()
-        primary.delete()
-        sidecar(draft.captureId).delete()
+        requireCaptureId(draft.captureId)
+        deletePendingCaptureFiles(root, draft)
     }
 
     private fun writeSidecar(draft: PendingCaptureDraft) {
@@ -335,5 +327,26 @@ class PendingCaptureDraftStore(context: Context) {
                 "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
         )
         val SHA256_PATTERN = Regex("^[0-9a-f]{64}$")
+    }
+}
+
+/** Validate every target before deleting only this capture's app-private files. */
+internal fun deletePendingCaptureFiles(directory: File, draft: PendingCaptureDraft) {
+    val root = directory.canonicalFile
+    val artifactRoot = File(root, draft.captureId).canonicalFile
+    require(artifactRoot.parentFile == root)
+    val primary = File(draft.primaryPath).canonicalFile
+    require(primary.parentFile == root && primary.name == "${draft.captureId}.png")
+    val marker = File(root, "${draft.captureId}.pending.json").canonicalFile
+    require(marker.parentFile == root)
+    val artifacts = draft.pocoArtifacts.map { ref ->
+        File(ref.privatePath).canonicalFile.also { require(it.parentFile == artifactRoot) }
+    }
+    val targets = (artifacts + primary + marker).distinct()
+    require(targets.all { !it.exists() || it.isFile })
+    // Unlike File.delete(), this reports failed removal instead of hiding it from the UI.
+    targets.forEach { Files.deleteIfExists(it.toPath()) }
+    if (artifactRoot.isDirectory && artifactRoot.list()?.isEmpty() == true) {
+        Files.deleteIfExists(artifactRoot.toPath())
     }
 }

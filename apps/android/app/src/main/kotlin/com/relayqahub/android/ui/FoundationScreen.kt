@@ -192,6 +192,7 @@ fun FoundationScreen(
             QaHubPage.NEW_BUG -> NewBugPage(
                 state = state,
                 onCaptureNow = onCaptureNow,
+                onDeleteImage = viewModel::deleteCaptureDraft,
                 onSubmit = viewModel::submitNewBug,
                 modifier = Modifier.padding(innerPadding),
             )
@@ -1826,6 +1827,7 @@ private fun DetailFact(label: String, value: String) {
 private fun NewBugPage(
     state: FoundationUiState,
     onCaptureNow: () -> Unit,
+    onDeleteImage: () -> Unit,
     onSubmit: (ByteArray?, String, String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -1887,9 +1889,22 @@ private fun NewBugPage(
                     "点击图片才进入标注；当前页面上下滑动不会误画"
                 },
             ) {
+                if (draft.available) {
+                    TextButton(
+                        onClick = onDeleteImage,
+                        enabled = !draft.isDeleting && !draft.isSubmitting,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                        modifier = Modifier.align(Alignment.End).testTag("new-bug-delete-image"),
+                    ) {
+                        Text(if (draft.isDeleting) "正在删除…" else "删除图片")
+                    }
+                }
                 if (image != null) {
                     Card(
                         onClick = { editorOpen = true },
+                        enabled = !draft.isDeleting && !draft.isSubmitting,
                         modifier = Modifier.fillMaxWidth().testTag("capture-preview"),
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
@@ -1943,7 +1958,11 @@ private fun NewBugPage(
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.ExtraBold,
                             )
-                            OutlinedButton(onClick = onCaptureNow, modifier = Modifier.testTag("new-bug-capture-now")) {
+                            OutlinedButton(
+                                onClick = onCaptureNow,
+                                enabled = !draft.isDeleting && !draft.isSubmitting,
+                                modifier = Modifier.testTag("new-bug-capture-now"),
+                            ) {
                                 Text("立即截图")
                             }
                         }
@@ -1993,7 +2012,8 @@ private fun NewBugPage(
                     }
                     onSubmit(bytes, content, fixerId, verifierId)
                 },
-                enabled = content.isNotBlank() && verifierId.isNotBlank(),
+                enabled = content.isNotBlank() && verifierId.isNotBlank() &&
+                    !draft.isDeleting && !draft.isSubmitting,
                 modifier = Modifier.fillMaxWidth().height(56.dp).testTag("submit-bug"),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
