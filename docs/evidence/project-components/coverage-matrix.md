@@ -1,6 +1,6 @@
 # QA Hub 项目制与组件化真实验收矩阵
 
-生成时点：2026-09-08T20:15:38.228Z；设计 v2.1；源码 HEAD：`3f66932e11c42f60aa660028b490a3ac0dea310d`。
+生成时点：2026-09-08T20:57:15.400Z；设计 v2.1；源码 HEAD：`81e70d43638f3cb2f3dbd3994acd46f413e5364e`。
 
 本文件是代码和需求的验收清单，初始全部为 `not_run`。代码存在、静态推导、mock、编译成功、端口监听或排队成功均不算通过。逐入口真实操作并读回项目、操作人、状态、版本、事件、附件及最终产物后，才登记结果。
 
@@ -35,7 +35,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | 21 旧数据副本迁移 | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | 一致性离线副本迁移前后 ID、Bug、人员、附件、历史和未完成任务可核对。 |
 | 22 APK 共存与升级 | A · not_run | — | — | — | — | — | 新旧独立 applicationId 同设备共存；专用测试升级保留草稿和证据。 |
 | 23 EXE 共存与升级 | — | A · passed | — | — | — | — | 新旧真实 EXE 同开；专用升级重启保留配置、草稿、历史及更新隔离。 |
-| 24 回退演练 | A · not_run | A · passed | A · not_run | A · not_run | A · not_run | A · not_run | 按人工说明停止/恢复新版；保留回退前新增数据和任务证据；生产继续健康。 |
+| 24 回退演练 | — | — | — | A · passed | — | — | 能按文档恢复服务并保留回退前新增数据和任务证据；按设计10.3隔离保留新版数据，旧程序不读取已迁移的新库。 |
 
 ## 盘点规模
 
@@ -68,6 +68,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 - **external-qingyu** (unverified): Dedicated third-party test identity/project/order; no genuine work order mutation.
 - **physical-android** (unverified): Physical device for appropriate capture/file/upgrade acceptance plus separate preview applicationId and test upgrade environment.
 - **historical-copy** (partially_verified): The pinned main SQLite and 878 attachments have been restored, migrated and read through a held API. Still required: explicit unfinished-task inventory and recovery evidence for legacy increment-upload queue/owner/workspace/job files, Relay batch/state directories and third-party state outside that recovery set.
+- **frozen-workflow-runtime-coverage** (partially_verified): The six registered mutation response schemas and strict static gates are repaired. Inherited 1.0 result requests/blocked writes and unregistered fail/supersede POST plus /bugs/:bugId/workflow GET remain gaps; rich existing GET history is a separate read model, not those missing operations.
 
 ## 静态盘点边界与运行补全
 
@@ -99,7 +100,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 
 | 测试 ID | 功能/入口 | 适用客户端 | 来源 | 状态 |
 | --- | --- | --- | --- | --- |
-| android_control-344d465741210b | Button(enabled = mayAct, onClick = { perform { it.beginFix(bug, projectScope.actorId, note) } }, modifier = Modifier.testTag("bug-begin-fix")) { Text("开始修复") } OutlinedButton(enabled = mayAct, onClick = { perform { it.manualComplete(bug, no | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:86 | not_run |
+| android_control-344d465741210b | Button(enabled = mayAct, onClick = { perform { it.beginFix(bug, projectScope.actorId, note) } }, modifier = Modifier.testTag("bug-begin-fix")) { Text("开始修复") } OutlinedButton(enabled = mayAct, onClick = { perform { it.manualComplete(bug, no | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:86 | passed |
 | android_control-f245715f5bce13 | OutlinedButton(enabled = mayAct, onClick = { perform { it.manualComplete(bug, note) } }, modifier = Modifier.testTag("bug-manual-complete")) { Text("人工完成") } } } | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:87 | passed |
 | android_control-e2c3c6bc8d9527 | Button(enabled = mayAct && (!codeDelivery \|\| branch.isNotBlank() && commit.matches(Regex("[0-9a-f]{40}"))), onClick = { perform { it.submitFix(bug, note, branch.takeIf { codeDelivery }, commit.takeIf { codeDelivery }) } }, modifier = Modifi | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:96 | not_run |
 | android_control-1cd07b980530f5 | Button(enabled = mayAct, onClick = { perform { it.verify(bug, projectScope.actorId, true, note) } }, modifier = Modifier.testTag("bug-verify-pass")) { Text("验收通过并关闭") } OutlinedButton(enabled = mayAct, onClick = { perform { it.verify(bug, p | apk | apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt:102 | passed |
@@ -495,67 +496,67 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | http_route-d65bf262601bf6 | GET /api/v1/projects/:projectId/bugs/:id/integrations/qingyu | http | apps/api/src/project-components-runtime.ts:1596 | not_run · revalidation required |
 | http_route-def90a2a37e735 | POST /api/v1/bugs/:id/integrations/qingyu/resolve | http | apps/api/src/project-components-runtime.ts:1599 | not_run · revalidation required |
 | http_route-fb184b4887747c | POST /api/v1/projects/:projectId/bugs/:id/integrations/qingyu/resolve | http | apps/api/src/project-components-runtime.ts:1599 | not_run · revalidation required |
-| http_route-ba74efbe6c4a29 | GET /api/v1/projects/:projectId/bugs/:bugId/comments | http | apps/api/src/app.ts:638 | not_run · revalidation required |
-| http_route-9b7f74dec2b2b9 | GET /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:638 | passed · revalidation required |
-| http_route-e20df3cb12ff98 | GET /api/v1/integrations/qingyu/session | http | apps/api/src/app.ts:850 | not_run · revalidation required |
-| http_route-4d0d6a9945299e | POST /api/v1/integrations/qingyu/login/start | http | apps/api/src/app.ts:853 | not_run · revalidation required |
-| http_route-b16fff4e38476e | GET /api/v1/integrations/qingyu/login/status | http | apps/api/src/app.ts:856 | not_run · revalidation required |
-| http_route-0b9a05d3353c00 | POST /api/v1/integrations/qingyu/logout | http | apps/api/src/app.ts:859 | not_run · revalidation required |
-| http_route-fb4df5d6788e96 | GET /api/v1/integrations/qingyu/projects | http | apps/api/src/app.ts:862 | not_run · revalidation required |
-| http_route-734ef90385c2b4 | GET /api/v1/integrations/qingyu/defects | http | apps/api/src/app.ts:865 | not_run · revalidation required |
-| http_route-05c527f410d563 | POST /api/v1/integrations/qingyu/import | http | apps/api/src/app.ts:877 | not_run · revalidation required |
-| http_route-46019be68cb07c | GET /api/v1/bugs/:bugId/integrations/qingyu | http | apps/api/src/app.ts:900 | not_run · revalidation required |
-| http_route-488ec5565e8dbb | POST /api/v1/bugs/:bugId/integrations/qingyu/resolve | http | apps/api/src/app.ts:907 | not_run · revalidation required |
-| http_route-ce0b3ab5de0378 | GET /api/v1/health/live | http | apps/api/src/app.ts:932 | not_run · revalidation required |
-| http_route-26df99fae8d3cb | GET /api/v1/health/ready | http | apps/api/src/app.ts:944 | passed · revalidation required |
-| http_route-188681ac0da08e | GET /api/v1/health/deps | http | apps/api/src/app.ts:956 | not_run · revalidation required |
-| http_route-15d30cfca91ddc | GET /api/v1/projects | http | apps/api/src/app.ts:979 | passed · revalidation required |
-| http_route-86a5dccd36f9b9 | GET /api/v1/projects/:projectId/members | http | apps/api/src/app.ts:1010 | not_run · revalidation required |
-| http_route-070fd3ccaaef52 | GET /api/v1/projects/:projectId/users | http | apps/api/src/app.ts:1047 | passed · revalidation required |
-| http_route-59983f06154358 | POST /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1078 | passed · revalidation required |
-| http_route-9ffe2403f950fe | DELETE /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1117 | passed · revalidation required |
-| http_route-a08902abfe6362 | DELETE /api/v1/projects/:projectId/users/:userId | http | apps/api/src/app.ts:1153 | not_run · revalidation required |
-| http_route-3941a7c4bf1de3 | GET /api/v1/projects/:projectId/modules | http | apps/api/src/app.ts:1189 | not_run · revalidation required |
-| http_route-28fa750120b0f6 | GET /api/v1/projects/:projectId/metrics/overview | http | apps/api/src/app.ts:1221 | not_run · revalidation required |
-| http_route-b1edbd66a463bf | POST /api/v1/integrations/relay/webhooks | http | apps/api/src/app.ts:1257 | not_run · revalidation required |
-| http_route-869c95e9cb22b6 | POST /api/v1/bugs | http | apps/api/src/app.ts:1370 | passed · revalidation required |
-| http_route-fc68d4ec88b267 | GET /api/v1/bugs | http | apps/api/src/app.ts:1397 | passed · revalidation required |
-| http_route-c5244a2b94ee13 | GET /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1433 | passed · revalidation required |
-| http_route-662ac1e4f068be | GET /api/v1/bugs/:bugId/attachments | http | apps/api/src/app.ts:1448 | passed · revalidation required |
-| http_route-f2b76a8f2d3bd2 | GET /api/v1/attachments/:attachmentId | http | apps/api/src/app.ts:1486 | passed · revalidation required |
-| http_route-a04ed67480846a | GET /api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind | http | apps/api/src/app.ts:1523 | not_run · revalidation required |
-| http_route-7cbbf0261f199e | PATCH /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1561 | passed · revalidation required |
-| http_route-3f8b6d79c3ec5a | DELETE /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1602 | not_run · revalidation required |
-| http_route-ece15477c6d8f2 | GET /api/v1/bugs/:bugId/duplicate-candidates | http | apps/api/src/app.ts:1653 | not_run · revalidation required |
-| http_route-fa0ad66b7c6d55 | POST /api/v1/bugs/:bugId/mark-duplicate | http | apps/api/src/app.ts:1685 | not_run · revalidation required |
-| http_route-280fa057c65980 | POST /api/v1/bugs/:bugId/transitions | http | apps/api/src/app.ts:1766 | not_run · revalidation required |
-| http_route-1c63e6c6d88251 | POST /api/v1/bugs/:bugId/complete | http | apps/api/src/app.ts:1791 | not_run · revalidation required |
-| http_route-91587d5ccb9fcd | POST /api/v1/bugs/:bugId/manual-complete | http | apps/api/src/app.ts:1816 | not_run · revalidation required |
-| http_route-133e8410ae7ef7 | POST /api/v1/bugs/:bugId/repair-attempts | http | apps/api/src/app.ts:1844 | not_run · revalidation required |
-| http_route-45735bc8af628d | POST /api/v1/repair-attempts/:attemptId/start | http | apps/api/src/app.ts:1882 | not_run · revalidation required |
-| http_route-41e2d865a8623c | GET /api/v1/repair-attempts/:attemptId | http | apps/api/src/app.ts:1913 | not_run · revalidation required |
-| http_route-144efd0c9334b8 | POST /api/v1/repair-attempts/:attemptId/deliver | http | apps/api/src/app.ts:1933 | not_run · revalidation required |
-| http_route-db5ad310cd3847 | POST /api/v1/repair-attempts/:attemptId/dispatch/relay | http | apps/api/src/app.ts:1964 | not_run · revalidation required |
-| http_route-5e57e964b1adfd | POST /api/v1/repair-attempts/:attemptId/dispatch/relay/continue | http | apps/api/src/app.ts:1992 | not_run · revalidation required |
-| http_route-76ef6845b5667f | GET /api/v1/repair-attempts/:attemptId/relay-receipt | http | apps/api/src/app.ts:2020 | not_run · revalidation required |
-| http_route-458b653f20c1e7 | GET /api/v1/projects/:projectId/human-workflows/latest | http | apps/api/src/app.ts:2084 | not_run · revalidation required |
-| http_route-58b6388e1f18b2 | GET /api/v1/bugs/:bugId/human-workflow | http | apps/api/src/app.ts:2109 | passed · revalidation required |
-| http_route-9b794c870fa8c4 | POST /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:2125 | passed · revalidation required |
-| http_route-c72542c420f961 | GET /api/v1/bugs/:bugId/events | http | apps/api/src/app.ts:2168 | not_run · revalidation required |
-| http_route-845f3dd811fe15 | POST /api/v1/projects/:projectId/builds | http | apps/api/src/app.ts:2188 | not_run · revalidation required |
-| http_route-0b655a74e571ea | GET /api/v1/builds/:buildId | http | apps/api/src/app.ts:2219 | not_run · revalidation required |
-| http_route-9294236825da5b | POST /api/v1/builds/:buildId/link-repair | http | apps/api/src/app.ts:2236 | not_run · revalidation required |
-| http_route-8d683a24515c8d | POST /api/v1/bugs/:bugId/verifications | http | apps/api/src/app.ts:2267 | not_run · revalidation required |
-| http_route-36af4a3289727c | GET /api/v1/verifications/:verificationId | http | apps/api/src/app.ts:2296 | not_run · revalidation required |
-| http_route-d250196281a746 | POST /api/v1/verifications/:verificationId/start | http | apps/api/src/app.ts:2319 | not_run · revalidation required |
-| http_route-71b69634fdaab2 | POST /api/v1/verifications/:verificationId/result | http | apps/api/src/app.ts:2351 | not_run · revalidation required |
-| http_route-b83c2fe59f4e18 | GET /api/v1/notifications | http | apps/api/src/app.ts:2406 | not_run · revalidation required |
-| http_route-ac6d99044543fe | POST /api/v1/capture-bundles | http | apps/api/src/app.ts:2450 | not_run · revalidation required |
-| http_route-b549a49f407c27 | GET /api/v1/capture-bundles/:captureId | http | apps/api/src/app.ts:2492 | not_run · revalidation required |
-| http_route-52f4781153b6ba | POST /api/v1/uploads/init | http | apps/api/src/app.ts:2507 | not_run · revalidation required |
-| http_route-1aed7cd39c68f5 | PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber | http | apps/api/src/app.ts:2541 | not_run · revalidation required |
-| http_route-fa84a8b7df5b30 | POST /api/v1/uploads/:sessionId/finalize | http | apps/api/src/app.ts:2595 | not_run · revalidation required |
-| http_route-45b4878978d031 | POST /api/v1/attachments/:attachmentId/bind | http | apps/api/src/app.ts:2639 | not_run · revalidation required |
+| http_route-ba74efbe6c4a29 | GET /api/v1/projects/:projectId/bugs/:bugId/comments | http | apps/api/src/app.ts:645 | not_run · revalidation required |
+| http_route-9b7f74dec2b2b9 | GET /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:645 | passed · revalidation required |
+| http_route-e20df3cb12ff98 | GET /api/v1/integrations/qingyu/session | http | apps/api/src/app.ts:857 | not_run · revalidation required |
+| http_route-4d0d6a9945299e | POST /api/v1/integrations/qingyu/login/start | http | apps/api/src/app.ts:860 | not_run · revalidation required |
+| http_route-b16fff4e38476e | GET /api/v1/integrations/qingyu/login/status | http | apps/api/src/app.ts:863 | not_run · revalidation required |
+| http_route-0b9a05d3353c00 | POST /api/v1/integrations/qingyu/logout | http | apps/api/src/app.ts:866 | not_run · revalidation required |
+| http_route-fb4df5d6788e96 | GET /api/v1/integrations/qingyu/projects | http | apps/api/src/app.ts:869 | not_run · revalidation required |
+| http_route-734ef90385c2b4 | GET /api/v1/integrations/qingyu/defects | http | apps/api/src/app.ts:872 | not_run · revalidation required |
+| http_route-05c527f410d563 | POST /api/v1/integrations/qingyu/import | http | apps/api/src/app.ts:884 | not_run · revalidation required |
+| http_route-46019be68cb07c | GET /api/v1/bugs/:bugId/integrations/qingyu | http | apps/api/src/app.ts:907 | not_run · revalidation required |
+| http_route-488ec5565e8dbb | POST /api/v1/bugs/:bugId/integrations/qingyu/resolve | http | apps/api/src/app.ts:914 | not_run · revalidation required |
+| http_route-ce0b3ab5de0378 | GET /api/v1/health/live | http | apps/api/src/app.ts:939 | not_run · revalidation required |
+| http_route-26df99fae8d3cb | GET /api/v1/health/ready | http | apps/api/src/app.ts:951 | passed · revalidation required |
+| http_route-188681ac0da08e | GET /api/v1/health/deps | http | apps/api/src/app.ts:963 | not_run · revalidation required |
+| http_route-15d30cfca91ddc | GET /api/v1/projects | http | apps/api/src/app.ts:986 | passed · revalidation required |
+| http_route-86a5dccd36f9b9 | GET /api/v1/projects/:projectId/members | http | apps/api/src/app.ts:1017 | not_run · revalidation required |
+| http_route-070fd3ccaaef52 | GET /api/v1/projects/:projectId/users | http | apps/api/src/app.ts:1054 | passed · revalidation required |
+| http_route-59983f06154358 | POST /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1085 | passed · revalidation required |
+| http_route-9ffe2403f950fe | DELETE /api/v1/projects/:projectId/users/:userId/identity-link | http | apps/api/src/app.ts:1124 | passed · revalidation required |
+| http_route-a08902abfe6362 | DELETE /api/v1/projects/:projectId/users/:userId | http | apps/api/src/app.ts:1160 | not_run · revalidation required |
+| http_route-3941a7c4bf1de3 | GET /api/v1/projects/:projectId/modules | http | apps/api/src/app.ts:1196 | not_run · revalidation required |
+| http_route-28fa750120b0f6 | GET /api/v1/projects/:projectId/metrics/overview | http | apps/api/src/app.ts:1228 | not_run · revalidation required |
+| http_route-b1edbd66a463bf | POST /api/v1/integrations/relay/webhooks | http | apps/api/src/app.ts:1264 | not_run · revalidation required |
+| http_route-869c95e9cb22b6 | POST /api/v1/bugs | http | apps/api/src/app.ts:1377 | passed · revalidation required |
+| http_route-fc68d4ec88b267 | GET /api/v1/bugs | http | apps/api/src/app.ts:1404 | passed · revalidation required |
+| http_route-c5244a2b94ee13 | GET /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1440 | passed · revalidation required |
+| http_route-662ac1e4f068be | GET /api/v1/bugs/:bugId/attachments | http | apps/api/src/app.ts:1455 | passed · revalidation required |
+| http_route-f2b76a8f2d3bd2 | GET /api/v1/attachments/:attachmentId | http | apps/api/src/app.ts:1493 | passed · revalidation required |
+| http_route-a04ed67480846a | GET /api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind | http | apps/api/src/app.ts:1530 | not_run · revalidation required |
+| http_route-7cbbf0261f199e | PATCH /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1568 | passed · revalidation required |
+| http_route-3f8b6d79c3ec5a | DELETE /api/v1/bugs/:bugId | http | apps/api/src/app.ts:1609 | not_run · revalidation required |
+| http_route-ece15477c6d8f2 | GET /api/v1/bugs/:bugId/duplicate-candidates | http | apps/api/src/app.ts:1660 | not_run · revalidation required |
+| http_route-fa0ad66b7c6d55 | POST /api/v1/bugs/:bugId/mark-duplicate | http | apps/api/src/app.ts:1692 | not_run · revalidation required |
+| http_route-280fa057c65980 | POST /api/v1/bugs/:bugId/transitions | http | apps/api/src/app.ts:1773 | passed · revalidation required |
+| http_route-1c63e6c6d88251 | POST /api/v1/bugs/:bugId/complete | http | apps/api/src/app.ts:1798 | not_run · revalidation required |
+| http_route-91587d5ccb9fcd | POST /api/v1/bugs/:bugId/manual-complete | http | apps/api/src/app.ts:1823 | not_run · revalidation required |
+| http_route-133e8410ae7ef7 | POST /api/v1/bugs/:bugId/repair-attempts | http | apps/api/src/app.ts:1851 | passed · revalidation required |
+| http_route-45735bc8af628d | POST /api/v1/repair-attempts/:attemptId/start | http | apps/api/src/app.ts:1892 | passed · revalidation required |
+| http_route-41e2d865a8623c | GET /api/v1/repair-attempts/:attemptId | http | apps/api/src/app.ts:1925 | passed · revalidation required |
+| http_route-144efd0c9334b8 | POST /api/v1/repair-attempts/:attemptId/deliver | http | apps/api/src/app.ts:1945 | passed · revalidation required |
+| http_route-db5ad310cd3847 | POST /api/v1/repair-attempts/:attemptId/dispatch/relay | http | apps/api/src/app.ts:1978 | not_run · revalidation required |
+| http_route-5e57e964b1adfd | POST /api/v1/repair-attempts/:attemptId/dispatch/relay/continue | http | apps/api/src/app.ts:2006 | not_run · revalidation required |
+| http_route-76ef6845b5667f | GET /api/v1/repair-attempts/:attemptId/relay-receipt | http | apps/api/src/app.ts:2034 | not_run · revalidation required |
+| http_route-458b653f20c1e7 | GET /api/v1/projects/:projectId/human-workflows/latest | http | apps/api/src/app.ts:2098 | not_run · revalidation required |
+| http_route-58b6388e1f18b2 | GET /api/v1/bugs/:bugId/human-workflow | http | apps/api/src/app.ts:2123 | passed · revalidation required |
+| http_route-9b794c870fa8c4 | POST /api/v1/bugs/:bugId/comments | http | apps/api/src/app.ts:2139 | passed · revalidation required |
+| http_route-c72542c420f961 | GET /api/v1/bugs/:bugId/events | http | apps/api/src/app.ts:2182 | not_run · revalidation required |
+| http_route-845f3dd811fe15 | POST /api/v1/projects/:projectId/builds | http | apps/api/src/app.ts:2202 | not_run · revalidation required |
+| http_route-0b655a74e571ea | GET /api/v1/builds/:buildId | http | apps/api/src/app.ts:2233 | not_run · revalidation required |
+| http_route-9294236825da5b | POST /api/v1/builds/:buildId/link-repair | http | apps/api/src/app.ts:2250 | not_run · revalidation required |
+| http_route-8d683a24515c8d | POST /api/v1/bugs/:bugId/verifications | http | apps/api/src/app.ts:2281 | passed · revalidation required |
+| http_route-36af4a3289727c | GET /api/v1/verifications/:verificationId | http | apps/api/src/app.ts:2313 | passed · revalidation required |
+| http_route-d250196281a746 | POST /api/v1/verifications/:verificationId/start | http | apps/api/src/app.ts:2336 | passed · revalidation required |
+| http_route-71b69634fdaab2 | POST /api/v1/verifications/:verificationId/result | http | apps/api/src/app.ts:2370 | passed · revalidation required |
+| http_route-b83c2fe59f4e18 | GET /api/v1/notifications | http | apps/api/src/app.ts:2426 | not_run · revalidation required |
+| http_route-ac6d99044543fe | POST /api/v1/capture-bundles | http | apps/api/src/app.ts:2470 | not_run · revalidation required |
+| http_route-b549a49f407c27 | GET /api/v1/capture-bundles/:captureId | http | apps/api/src/app.ts:2512 | not_run · revalidation required |
+| http_route-52f4781153b6ba | POST /api/v1/uploads/init | http | apps/api/src/app.ts:2527 | not_run · revalidation required |
+| http_route-1aed7cd39c68f5 | PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber | http | apps/api/src/app.ts:2561 | not_run · revalidation required |
+| http_route-fa84a8b7df5b30 | POST /api/v1/uploads/:sessionId/finalize | http | apps/api/src/app.ts:2615 | not_run · revalidation required |
+| http_route-45b4878978d031 | POST /api/v1/attachments/:attachmentId/bind | http | apps/api/src/app.ts:2659 | not_run · revalidation required |
 
 ## mcp_tool
 

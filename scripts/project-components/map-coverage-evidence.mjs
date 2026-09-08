@@ -985,7 +985,7 @@ if (
       "runs/exe-preview6-after-uninstall-reinstall.json",
       "runs/exe-preview6-reinstall-restored-draft.txt",
     ],
-    "EXE入口实际.6→.5手工回退、重复升级.6、卸载后精确同包重装并原生恢复员工/项目/配置/文字+1图；102个profile文件663514299字节在卸载前后hash完全一致。旧backup与-1新backup、回退/卸载保留目录仍在；原closed/v14、评论与184872字节附件hash读回，生产边界核对正常。仅客户端恢复范围passed；完整数据服务与APK回退仍未测，24整项not_run。",
+    "EXE入口实际.6→.5手工回退、重复升级.6、卸载后精确同包重装并原生恢复员工/项目/配置/文字+1图；102个profile文件663514299字节在卸载前后hash完全一致。旧backup与-1新backup、回退/卸载保留目录仍在；原closed/v14、评论与184872字节附件hash读回，生产边界核对正常。仅客户端恢复范围passed；基线24的服务恢复由独立HTTP证据判定，其它客户端恢复功能不因此通过。",
   );
 }
 // The installed preview uses sharedApi=true and the server's 90-tool catalog.
@@ -1005,6 +1005,15 @@ for (const item of matrix.items.filter(
   );
 }
 const validationEvidence = [
+  ["runs/contracts-remediation-api-final.txt", "响应修复最终API MJS205/205", "pass 205"],
+  ["runs/contracts-remediation-api-final.txt", "响应修复最终API TS33/33（合计238/238）", "pass 33"],
+  ["runs/contracts-remediation-storage.txt", "响应修复Storage109/109", "pass 109"],
+  ["runs/contracts-remediation-web-configured.txt", "响应修复相关Web19/19", "19 passed"],
+  [
+    "runs/contracts-remediation-strict.txt",
+    "严格合同五步恢复通过（原baseline/checker保留）",
+    "13 versioned files match contract 1.1.0",
+  ],
   ["runs/desktop-final-pagination-protocol.txt", "Desktop 104/104", "pass 104"],
   ["runs/storage-final.txt", "Storage 109/109", "pass 109"],
   ["runs/storage-final-complete-source.txt", "冻结源码最终Storage109/109", "pass 109"],
@@ -1138,6 +1147,13 @@ for (const item of matrix.items) {
         [].concat(entry.remaining ?? []),
       );
 }
+for (const [file, expected] of Object.entries(
+  matrix.evidenceMapping?.finalSourceSupplement?.proofHashes ?? {},
+)) {
+  proofText(file);
+  if (proofHashes[file] !== expected)
+    throw new Error(`Final supplement evidence changed; re-review required: ${file}`);
+}
 matrix.evidenceMapping = {
   ...matrix.evidenceMapping,
   at: new Date().toISOString(),
@@ -1177,7 +1193,7 @@ const review = [
         `| ${item.title} | ${surfaces.map((surface) => (!item.results[surface].applicable ? "—" : item.results[surface].status + (item.manual.surfaceProgress?.[surface] ? "（部分实测）" : ""))).join(" | ")} |`,
     ),
   "",
-  "09按六个实际入口分别闭环；15严格按设计列出的HTTP下载、远端MCP资源、本地MCP落盘三个入口判定，三者有同一PNG归属和hash证据。其它APK/EXE/Web控件仍各自验收，不因该基线通过而通过。23已有实际EXE升级恢复proof。22仍缺物理Android及适用的设备取证、文件和升级验证。",
+  "09按六个实际入口分别闭环；15严格按设计列出的HTTP下载、远端MCP资源、本地MCP落盘三个入口判定，三者有同一PNG归属和hash证据。23已有实际EXE升级恢复proof。24按设计13/24与10.3的服务恢复要求，由独立HTTP回退/保留/恢复证据判定；先前要求六入口各自降级超出该基线原文。EXE既有客户端恢复证据独立保留，其它APK/EXE/Web/MCP功能控件仍各自验收。22仍缺物理Android及适用的设备取证、文件和升级验证。",
   "",
   "## 部分实测及剩余缺口",
   "",
@@ -1204,13 +1220,13 @@ const review = [
       `- ${entry.summary}：${entry.matched ? "已有成功输出" : "输出需复核"}，见[${entry.file}](${entry.file})。${entry.scope}。`,
   ),
   "",
-  "严格旧合同冻结基线失败与三项独立合同成功分别保留；后续修复须独立证据。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。",
+  "严格旧合同冻结失败保留为历史，后续六条响应边界修复已有独立五步门禁成功日志与实际HTTP读回。旧1.0请求/blocked写入、未注册的fail/supersede POST和workflow GET仍缺，静态合同通过不代表全部运行能力。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。",
   "",
   "依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。",
   "",
   "映射器对 JSON proof 读取记录 SHA-256（UTF-8 文本原文），见 coverage-matrix.json 的 evidenceMapping.proofHashes；正文、原生 UI tree 和截图从证据字段追溯。缺少 optional proof 时不新增通过。所有凭据均不参与读取和输出。",
   "",
-  `当前细目计数：${matrix.items.length}。全部入口均满足而整行 passed 的基线：${
+  `当前细目计数：${matrix.items.length}。设计明确的必要入口均满足而整行 passed 的基线：${
     matrix.items
       .filter((item) => item.kind === "baseline" && item.status === "passed")
       .map((item) => item.title)

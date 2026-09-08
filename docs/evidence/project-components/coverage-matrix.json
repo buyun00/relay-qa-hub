@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-08T20:15:38.228Z",
+  "generatedAt": "2026-09-08T20:57:15.400Z",
   "evidenceMapping": {
-    "at": "2026-09-08T20:15:36.289Z",
+    "at": "2026-09-08T20:57:13.490Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json",
@@ -50,6 +50,10 @@
       "runs/exe-preview6-repeat-upgrade.json",
       "runs/exe-preview6-uninstall-readback.json",
       "runs/exe-preview6-after-uninstall-reinstall.json",
+      "runs/contracts-remediation-api-final.txt",
+      "runs/contracts-remediation-storage.txt",
+      "runs/contracts-remediation-web-configured.txt",
+      "runs/contracts-remediation-strict.txt",
       "runs/desktop-final-pagination-protocol.txt",
       "runs/storage-final.txt",
       "runs/storage-final-complete-source.txt",
@@ -71,18 +75,26 @@
       "runs/exe-preview4-restored-draft.txt",
       "runs/exe-preview4-after-fault-draft.txt",
       "runs/exe-after-preview7-upgrade.json",
+      "android-code22-no-code.json",
       "runs/mcp-delete-live-preview6.json",
       "runs/exe-preview7-live-protocol.json",
+      "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+      "runs/frozen-workflow-live-readback.json",
       "migration-rehearsal.md",
       "migration-service-readback.md",
       "migration-service-readback.json",
       "runs/exe-preview5-restored-draft.txt",
       "runs/exe-preview6-restored-draft.txt",
       "runs/production-after-preview7.json",
+      "baseline24-service-rollback.json",
+      "baseline24-service-rollback.md",
       "runs/exe-preview7-close-restore.json",
       "runs/exe-preview7-update-ready.txt",
       "runs/exe-preview7-restored-draft.txt",
-      "runs/exe-preview7-tray-restored.txt"
+      "runs/exe-preview7-tray-restored.txt",
+      "runs/production-after-api-fix-code22.json",
+      "contracts-remediation-implementation.json",
+      "runs/android-code22-download-publication.json"
     ],
     "proofHashes": {
       "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json": "14ec6e8ea658579163c72e19fb68bc55534a3b9354f9cfc663e9a8880c91479d",
@@ -130,6 +142,10 @@
       "runs/exe-preview6-repeat-upgrade.json": "50ba858b158b28227ad8cbd0a9433e0b331d8a295b10554388bf66af7b240b6d",
       "runs/exe-preview6-uninstall-readback.json": "e5a6b6fe57c2995c6758d8e4968f61cc9da86b09fd92c980e31a5d78455ec2f5",
       "runs/exe-preview6-after-uninstall-reinstall.json": "afe262232dff8918bba58223fc64afa564c07c095d4f024f811e6470d3258ddd",
+      "runs/contracts-remediation-api-final.txt": "093d66168c6d077482da4e35be7c8d9a002a075fddc7b0bda8d7a0c7ef8e4909",
+      "runs/contracts-remediation-storage.txt": "804134a825e0c19cf8fb720e9dff50774653b1c97da73eb00d713f8dfa0ffa11",
+      "runs/contracts-remediation-web-configured.txt": "e4b2cba480a55d84d9ea479a9ff6c6688f4bb73616b74693a76f25c236cc4c24",
+      "runs/contracts-remediation-strict.txt": "69f352f09c0cedef451604f7557e4362b4a0e25868604a197bd2d770e64dffca",
       "runs/desktop-final-pagination-protocol.txt": "eb37a5d419a325df7cf142e3d5233cca6ddcde04f55a79e1f60d2a376e27a2eb",
       "runs/storage-final.txt": "322c3b1978f5ec315e1f36fbf827d678e6e178acf38ccce64b58516b4d56a298",
       "runs/storage-final-complete-source.txt": "8ba0431ced318dd3cd2905d4e89238cebecd01aeece2adfff201faad8c9e0976",
@@ -151,20 +167,58 @@
       "runs/exe-preview4-restored-draft.txt": "2e6f3d81a3d4fb8471fdd8bbeec49ba732906a486c069c898968d54370816abc",
       "runs/exe-preview4-after-fault-draft.txt": "bd6da80a889397688b4c504b9c1eee56a0998c35019c4b06d1e93d8a216af50d",
       "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
+      "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2",
       "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95",
       "runs/exe-preview7-live-protocol.json": "cd3bdf38c53ded87e8bcb170daca28ec8fc4096dd4dcc80b7297abd31ceceeee",
+      "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+      "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a",
       "migration-rehearsal.md": "d77d7953269ccea07f53c6b13c8b63145c5a437a8e3519280975913bae627878",
       "migration-service-readback.md": "78f276b7ac286bd9e2cd418872a9908e37a89af5dd2a1dd5af494f5a1cff60a6",
       "migration-service-readback.json": "43763e22c79cbdfb78d9ffb072b75334438540a4926107936123fffde00d93b0",
       "runs/exe-preview5-restored-draft.txt": "f4d925946a4140736733c0d82603c378d66fb0f4d9211b10c0e6a4815a1bbd3b",
       "runs/exe-preview6-restored-draft.txt": "071a9789cd88c9a3db54a95d48971aba24ae0fce15dfd698c90c7b0c38e2bcc1",
       "runs/production-after-preview7.json": "a9ab607a81bed5817336aa75ce0172dd47c0a8000e5b716664441f0c34701658",
+      "baseline24-service-rollback.json": "e26ad7b970f2348c4759bb94929212cb04e9becce1a2e74239e9a7bbc7032d17",
+      "baseline24-service-rollback.md": "d2ee0770dd78d9d63088e3e173dab01e20dd81b07cc4f5d41790486c9d78f679",
       "runs/exe-preview7-close-restore.json": "c761ed95be90df650254fa8811733ddc38edcd960ff9d4768ece0b12420e93a9",
       "runs/exe-preview7-update-ready.txt": "f16ca439cae5a845d734e19c6065f093a286cbd158dd5122efce3456f8550420",
       "runs/exe-preview7-restored-draft.txt": "af5191709506db0df820a143dc41ed69a0f46c065c1d82ca271ae8d178f323ef",
-      "runs/exe-preview7-tray-restored.txt": "58ad53337958a6f7b867fb98d9e86243b87a99fbf9d66101ac48866a3a166ecf"
+      "runs/exe-preview7-tray-restored.txt": "58ad53337958a6f7b867fb98d9e86243b87a99fbf9d66101ac48866a3a166ecf",
+      "runs/production-after-api-fix-code22.json": "15c8b540442ef1267bc9b43f2b8078a4d2875e1e5b388515697dfc2d5618ad18",
+      "contracts-remediation-implementation.json": "91a1e28322348ea2435583d53a5ccb4407b712c40ccc2752900dd33ef2189101",
+      "runs/android-code22-download-publication.json": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
     },
     "validationEvidence": [
+      {
+        "file": "runs/contracts-remediation-api-final.txt",
+        "summary": "响应修复最终API MJS205/205",
+        "matched": true,
+        "scope": "local verification; does not mark unexecuted native UI/external baseline passed"
+      },
+      {
+        "file": "runs/contracts-remediation-api-final.txt",
+        "summary": "响应修复最终API TS33/33（合计238/238）",
+        "matched": true,
+        "scope": "local verification; does not mark unexecuted native UI/external baseline passed"
+      },
+      {
+        "file": "runs/contracts-remediation-storage.txt",
+        "summary": "响应修复Storage109/109",
+        "matched": true,
+        "scope": "local verification; does not mark unexecuted native UI/external baseline passed"
+      },
+      {
+        "file": "runs/contracts-remediation-web-configured.txt",
+        "summary": "响应修复相关Web19/19",
+        "matched": true,
+        "scope": "local verification; does not mark unexecuted native UI/external baseline passed"
+      },
+      {
+        "file": "runs/contracts-remediation-strict.txt",
+        "summary": "严格合同五步恢复通过（原baseline/checker保留）",
+        "matched": true,
+        "scope": "local verification; does not mark unexecuted native UI/external baseline passed"
+      },
       {
         "file": "runs/desktop-final-pagination-protocol.txt",
         "summary": "Desktop 104/104",
@@ -343,12 +397,121 @@
       }
     },
     "reviewedSupplementSections": [
-      "## 首次提交前证据补充\n\n新增预览.6真实双入口删除：服务端4421和已安装EXE的本地4420各创建独立Bug并调用默认删除；相同请求重放均replayed:true、删除时点相同，context返回NOT_FOUND，原Bug及删除actor/version审计保留。[双MCP删除实测](runs/mcp-delete-live-preview6.json)。仅映射对应qa_delete_bug入口，不把一个删除用例推定为全部HTTP/MCP动作对等或全量幂等通过。\n\n新增.6实际身份边界：原生退出后磁盘身份清除，本地MCP返回QA_HUB_LOGIN_REQUIRED；local MCP登录成功返回时身份已经落盘；原生重新登录同员工/项目后原文字+1张PNG草稿恢复。[退出读回](runs/exe-preview6-logout-readback.json)、[同步持久登录](runs/exe-preview6-login-durable-readback.json)、[原生重登草稿](runs/exe-preview6-relogin-draft.json)。登录后立即强停的组合命令被自动审批拒绝、未执行且未重试；这组证据明确processRestartNotTested，不能据此声称该强停场景通过。\n\n此前提交前只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。\n\n最新.7升级后生产只读核对为2026-09-08T19:55:31.6095789Z：六文件hash、三个原PID及精确启动时点不变，4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。日常EXE可读路径相同；两个Node的路径仍为null，不能视为新增可执行路径验证。本轮未重新查询Android，APK状态仍引用19:30快照；未读配置正文/凭据或修改生产。[.7后生产快照](runs/production-after-preview7.json)。\n\n最新API完整回归为MJS151+TS33=184/184，旧175轮次保留。生命周期9项覆盖真实监听、SQLite与inflight清理，修复的是绑定前调度/异常清理，旧runtime已有onReady/onClose；不得据此通过外部完整链路。[184原始日志](runs/api-final-lifecycle-source.txt)、[生命周期证据](component-runtime-lifecycle.md)。\n\n本次仅将源码qa_delete_bug行 mcp_tool-65cae97a9470db 的server_mcp/local_mcp记通过；required_mcp_parity同名需求行仍not_run，不重复算全部对等。基线01/07的EXE与13/14的两MCP只补部分实测，经基线15判据校准后，09/15/23是当前wholepass。\n\nmapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual保留机制，审计元数据位于evidenceMapping.postFreezeSupplement，各行manual.postFreezeEvidence亦保留必要proof hash。只运行既有generate-coverage-matrix.mjs重生JSON/Markdown，不重写mapper代码。未来重跑旧mapper会刷新其自动审查段，需保留本补充段；人工行结果由既有matching-ID机制保留。\n\n## 实施提交后的发布与迁移补充\n\n**Windows 0.2.0-preview.7 已完成独立发布和实际6→7原生升级验收。** releaseId为20260908T194425490Z，108378668字节，SHA-256 fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a。公开回执sourceCommit为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789、sourceDirty:false；文档更新只读核对receipt及主代理实际原生升级proof；未额外操作安装或验签。回执位置：C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260908T194425490Z\\receipt.json。此包已含首装guard及提交内源码，升级passed依据下述实际proof。\n\n.6→.7已通过原生“检查更新→安装并重启”实际完成，proof观测时点2026-09-08T19:54:02.443Z；当前已安装nativeVersion0.2.0.7、主PID11368。原员工/项目A、文字+1张PNG草稿和配置SHA保持，原Bug13 closed/v14、评论及184872字节原附件materialize/hash读回通过；旧更新结果及7份backup目录保留。新helper的成功result时间19:52:36Z位于真实原生点击区间，UTC已在本次成功更新中核对。[.7升级proof](runs/exe-after-preview7-upgrade.json)、[原生恢复](runs/exe-preview7-restored-draft.txt)。19:54:30Z本地4420与服务4421实际目录均为相同90工具、协议2025-06-18，不支持的协议头均400；此项只证明目录/协议，不能称90个业务工具全部通过。[双入口协议](runs/exe-preview7-live-protocol.json)。\n\n新增保持冻结状态的迁移副本的真实API服务读回26项通过：固定schema12归档在新的service-readback-8b94d602中恢复并迁移至14，127.0.0.1:51708仅启动该副本API；稳定旧姓名ID登录后读出100 Bug、真实2评论及1附件（3487861字节、SHA-256 73470971577ea3ceb30edf4e8cb713d449a3b6e66c566cac5e897e136566e2ce），匿名401、跨项目404、外部读取hold409均实测。五组件关闭、出站和执行器子进程尝试均0；hold字节和核心业务/outbox指纹保持，原身份记录全部保留。新增的仅是官方独立GM和会话记录；不能称整个数据库字节无变化。进程8532正常exit0且监听关闭，旧migrated/rollback未启动且hash不变。[26项读回](migration-service-readback.md)、[脱敏JSON](migration-service-readback.json)。\n\n该服务使用19:24:26Z冻结的独立编译样本，其已有onReady/onClose并由paused gate阻止调度；它不代替后续监听生命周期9项测试。此结果证明held schema14 API恢复读取，**未证明schema12程序启动、迁移后新增数据的完整回退、生产切换、客户端迁移或独立组件队列/workspace恢复**。归档2021条outbox原本全sent，也不单独证明pending任务冻结。前两次错误测试路由导致的harness失败已保留，不计成功。\n\n矩阵仍保留985条，仅基线21的HTTP progress补入实际服务读回，不将其它客户端/MCP入口传递通过；21和24整项保持not_run。仅09/15/23整项通过，严格旧合同失败、外部完整链路及物理Android缺口均保留。公开receipt摘要与hash记录于evidenceMapping.releaseAndMigrationSupplement，原始receipt仍位于独立runtime。该段发布证据形成时mapper源码保持冻结；本轮仅追加proof保留与基线判据校正。",
+      "## 首次提交前证据补充\n\n新增预览.6真实双入口删除：服务端4421和已安装EXE的本地4420各创建独立Bug并调用默认删除；相同请求重放均replayed:true、删除时点相同，context返回NOT_FOUND，原Bug及删除actor/version审计保留。[双MCP删除实测](runs/mcp-delete-live-preview6.json)。仅映射对应qa_delete_bug入口，不把一个删除用例推定为全部HTTP/MCP动作对等或全量幂等通过。\n\n新增.6实际身份边界：原生退出后磁盘身份清除，本地MCP返回QA_HUB_LOGIN_REQUIRED；local MCP登录成功返回时身份已经落盘；原生重新登录同员工/项目后原文字+1张PNG草稿恢复。[退出读回](runs/exe-preview6-logout-readback.json)、[同步持久登录](runs/exe-preview6-login-durable-readback.json)、[原生重登草稿](runs/exe-preview6-relogin-draft.json)。登录后立即强停的组合命令被自动审批拒绝、未执行且未重试；这组证据明确processRestartNotTested，不能据此声称该强停场景通过。\n\n此前提交前只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。\n\n此前.7升级后生产只读核对为2026-09-08T19:55:31.6095789Z：六文件hash、三个原PID及精确启动时点不变，4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。日常EXE可读路径相同；两个Node的路径仍为null，不能视为新增可执行路径验证。本轮未重新查询Android，APK状态仍引用19:30快照；未读配置正文/凭据或修改生产。[.7后生产快照](runs/production-after-preview7.json)。\n\n该阶段API完整回归为MJS151+TS33=184/184，旧175轮次保留；后续238最终回归见末节。生命周期9项覆盖真实监听、SQLite与inflight清理，修复的是绑定前调度/异常清理，旧runtime已有onReady/onClose；不得据此通过外部完整链路。[184原始日志](runs/api-final-lifecycle-source.txt)、[生命周期证据](component-runtime-lifecycle.md)。\n\n本次仅将源码qa_delete_bug行 mcp_tool-65cae97a9470db 的server_mcp/local_mcp记通过；required_mcp_parity同名需求行仍not_run，不重复算全部对等。基线01/07的EXE与13/14的两MCP只补部分实测，该次补充后的wholepass为09/15/23；随后基线24服务证据及判据校正见专节。\n\nmapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual保留机制，审计元数据位于evidenceMapping.postFreezeSupplement，各行manual.postFreezeEvidence亦保留必要proof hash。只运行既有generate-coverage-matrix.mjs重生JSON/Markdown，不重写mapper代码。未来重跑旧mapper会刷新其自动审查段，需保留本补充段；人工行结果由既有matching-ID机制保留。\n\n## 实施提交后的发布与迁移补充\n\n**Windows 0.2.0-preview.7 已完成独立发布和实际6→7原生升级验收。** releaseId为20260908T194425490Z，108378668字节，SHA-256 fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a。公开回执sourceCommit为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789、sourceDirty:false；文档更新只读核对receipt及主代理实际原生升级proof；未额外操作安装或验签。回执位置：C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260908T194425490Z\\receipt.json。此包已含首装guard及提交内源码，升级passed依据下述实际proof。\n\n.6→.7已通过原生“检查更新→安装并重启”实际完成，proof观测时点2026-09-08T19:54:02.443Z；当前已安装nativeVersion0.2.0.7、主PID11368。原员工/项目A、文字+1张PNG草稿和配置SHA保持，原Bug13 closed/v14、评论及184872字节原附件materialize/hash读回通过；旧更新结果及7份backup目录保留。新helper的成功result时间19:52:36Z位于真实原生点击区间，UTC已在本次成功更新中核对。[.7升级proof](runs/exe-after-preview7-upgrade.json)、[原生恢复](runs/exe-preview7-restored-draft.txt)。19:54:30Z本地4420与服务4421实际目录均为相同90工具、协议2025-06-18，不支持的协议头均400；此项只证明目录/协议，不能称90个业务工具全部通过。[双入口协议](runs/exe-preview7-live-protocol.json)。\n\n新增保持冻结状态的迁移副本的真实API服务读回26项通过：固定schema12归档在新的service-readback-8b94d602中恢复并迁移至14，127.0.0.1:51708仅启动该副本API；稳定旧姓名ID登录后读出100 Bug、真实2评论及1附件（3487861字节、SHA-256 73470971577ea3ceb30edf4e8cb713d449a3b6e66c566cac5e897e136566e2ce），匿名401、跨项目404、外部读取hold409均实测。五组件关闭、出站和执行器子进程尝试均0；hold字节和核心业务/outbox指纹保持，原身份记录全部保留。新增的仅是官方独立GM和会话记录；不能称整个数据库字节无变化。进程8532正常exit0且监听关闭，旧migrated/rollback未启动且hash不变。[26项读回](migration-service-readback.md)、[脱敏JSON](migration-service-readback.json)。\n\n该服务使用19:24:26Z冻结的独立编译样本，其已有onReady/onClose并由paused gate阻止调度；它不代替后续监听生命周期9项测试。此结果证明held schema14 API恢复读取，**未证明schema12程序启动、迁移后新增数据的完整回退、生产切换、客户端迁移或独立组件队列/workspace恢复**。归档2021条outbox原本全sent，也不单独证明pending任务冻结。前两次错误测试路由导致的harness失败已保留，不计成功。\n\n该次迁移补充保留985条，仅补21的HTTP progress，不传递其它客户端/MCP通过；当时21/24仍not_run。后续24服务演练及判据校正另记，21外部任务清单与物理Android缺口仍保留。公开receipt摘要与hash记录于evidenceMapping.releaseAndMigrationSupplement，原始receipt仍位于独立runtime。该段发布证据形成时mapper源码保持冻结；本轮仅追加proof保留与基线判据校正。",
       "## 基线判据及窄分支校正\n\n设计13原文：“相同输入得到相同状态、版本、操作人和错误结果”。设计15原文：“HTTP 下载、远端 MCP 资源、本地 MCP 落盘均归属正确且可用”。15现在只按这三读取入口汇总，APK/EXE/Web其它功能控件保持各自状态，未增加not_applicable状态或豁免17.3物理设备要求。\n\n重新核对同一项目fb914b3b-4169-47f8-8dec-76f3a3cc780d、Bug b817a6cc-f096-415d-bdb8-faa9b6005c36、附件31c9b4be-d0f6-4c9a-864e-032cc9130562：184872字节PNG，三种读取SHA-256同为e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b；HTTP跨项目404。三份主要入口proof是[HTTP](../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json)、[远端MCP](runs/server-mcp-real-resource-20260909.json)、[本地落盘](runs/desktop-mcp-resource-preview4.json)，绑定ID来自原[采集读回](../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json)。\n\n21仅移除无关的schema12程序启动/新增数据回退条件；26项held服务读回同时写入HTTP actual/evidence和manual。主库与878附件恢复集已经可用，historical-copy改为partially_verified；仍缺legacy上传独立queue.sqlite/owner/workspace/job、Relay批次/state和轻语状态的未完成任务完整清单及迁移核对。故21整项仍not_run，不能从58表指纹或2021sent主outbox推出这些目录已迁移。\n\n.7真实close和更新按钮仅EXE入口passed；window-action(close)、check-update成功、install-update成功和second-instance无深链恢复记录为manual.branchResults中的passed，复合handler整行仍not_run。tray.click/double-click及托盘菜单没有此证据，仍not_run。\n\n可重放纠正由manual.reviewedEvidence保存结果、progress和实际proof SHA；mapper在重放前逐一核对hash，变化即拒绝并要求重审。它不是新的业务通过来源，也不会取消needsRevalidation。",
-      "## 本轮重放验证与合同边界\n\n生成器→mapper→生成器重放后985细目不变，wholepass为09、15、23；401个既有needsRevalidation以及sourceHash/人工复验字段的规范化SHA保持相同。实际运行mapper的内存文件系统替身用错误proof SHA验证拒绝且零写入；另一个用例证明后来的failed结果、负向note、partial note、item/manual复验标记和sourceHash均保留。原始磁盘证据未改。[实际重放验证](runs/coverage-criteria-replay.json)。\n\n严格合同评估已补充：五个继承字段使冻结canonical漂移；仅删除schema定义会让当前真实DTO违反additionalProperties:false，不能靠重写baseline或豁免解决。尚未确认可运行的严格旧响应投影入口，兼容修复没有实施，严格门禁仍failed。[修复边界评估](contracts-remediation-assessment.md)。"
-    ]
+      "## 本轮重放验证与合同边界\n\n前轮生成器→mapper→生成器重放后985细目不变，当时wholepass为09、15、23；401个既有needsRevalidation以及sourceHash/人工复验字段的规范化SHA保持相同。实际运行mapper的内存文件系统替身用错误proof SHA验证拒绝且零写入；另一个用例证明后来的failed结果、负向note、partial note、item/manual复验标记和sourceHash均保留。原始磁盘证据未改。[实际重放验证](runs/coverage-criteria-replay.json)。\n\n严格合同的历史失败已在提交09f7150fc1c671d867bbdbc257cab0e61c78d20f修复：五步test:contract全部通过，原1.0/1.1 baseline与checker未重写。六条已注册POST使用冻结响应投影，丰富事实仍可从原三条GET读取。完整API238/238（205mjs+33ts）、Storage109/109、相关Web19/19通过；其中52条响应fixture覆盖八种Accept，不能当作运行实例E2E。[实现与边界](contracts-remediation-implementation.md)、[严格五步](runs/contracts-remediation-strict.txt)、[最终API](runs/contracts-remediation-api-final.txt)。旧1.0 result请求、blocked写入和未注册fail/supersede POST及/bugs/:bugId/workflow GET仍缺，不能据静态门禁宣称完整运行合同。",
+      "## 基线24服务回退判据校正\n\n设计13/24原文：“能按文档恢复服务并保留回退前新增数据和任务证据”。10.3同时要求旧服务不能读取已迁移的新库，新版停止或回退时保留新增操作和产物。因此24以服务/HTTP为必要入口；此前要求APK、EXE、Web、HTTP、两MCP各自降级是过度约束。已有EXE客户端回退/重装证据独立保留，APK/Web/MCP及所有功能控件不由服务演练自动通过。\n\n[47项服务回退](baseline24-service-rollback.md)及[脱敏JSON](baseline24-service-rollback.json)记录59条真实HTTP状态/大小/hash：modern3b1371c/schema14新增两Bug、评论、68字节PNG及两人工RepairAttempt/两Verification，其中一项仍in_progress；正常停止后910文件753461759字节整根保留，old62b4495/schema12实际读取独立旧归档，再以M14原session恢复所有新增ID/版本/操作者/状态/hash。三进程均正常exit0，端口关闭，retained全文件hash仍一致。写入外层是HTTP /api/v1/mcp/call，另有标准domain GET；本证据没有建立独立JSON-RPC或客户端UI会话。\n\n该证明的protectedBefore/After仅为固定archive/migrated/rollback副本，不是新一轮生产六文件快照；生产状态继续按各自带时点proof引用。它不证明旧外部queue.sqlite/workspace、Relay批次/state、轻语目录的完整迁移，也不承诺schema14新业务降级到12。18/19外部任务、21旧文件系统任务清单、22和17.3物理设备缺口保留。当前整项通过09、15、23、24，全部任务仍未完成。",
+      "## 最终API、Android与生产读回\n\n严格合同的历史失败已在提交09f7150fc1c671d867bbdbc257cab0e61c78d20f修复：五步test:contract全部通过，原1.0/1.1 baseline与checker未重写。六条已注册POST使用冻结响应投影，丰富事实仍可从原三条GET读取。完整API238/238（205mjs+33ts）、Storage109/109、相关Web19/19通过；其中52条响应fixture覆盖八种Accept，不能当作运行实例E2E。[实现与边界](contracts-remediation-implementation.md)、[严格五步](runs/contracts-remediation-strict.txt)、[最终API](runs/contracts-remediation-api-final.txt)。旧1.0 result请求、blocked写入和未注册fail/supersede POST及/bugs/:bugId/workflow GET仍缺，不能据静态门禁宣称完整运行合同。\n\n最终dist已在独立API PID18644加载，启动时点2026-09-08T20:39:13.7225210Z，4419 ready/schema14。root实际31个HTTP调用通过：六条冻结POST的vendor/JSON输出、同幂等请求切换媒体重放、丰富历史读取及跨项目404；另核对14个媒体头与原EXE Bug closed/v14、评论及184872字节附件hash。[31次实际请求](runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json)、[媒体/旧业务读回](runs/frozen-workflow-live-readback.json)。请求均使用1.1；没有以此补齐旧1.0请求、未注册路由或全部HTTP/MCP对等。\n\nAndroid最新实际安装为com.relayqahub.android.preview.debug，code22 / 0.2.0-preview.8，MuMu中21→22覆盖升级与原生开始→无需代码提交→验收通过关闭完成。Bug386cdd2f-44c9-4a79-992a-891d595766fd closed/v6；49条对应HTTP均2xx，deliver1次、complete0次，87单测通过，lint0errors/29warnings。原有草稿/PNG/sidecar三hash、日常code14/PID5051/安装时间及四配置hash保留。Bug由API准备，后续状态写入来自原生按钮。修复文件BugLifecycleClient.kt由本目标3b1371c新增，62b起点不存在，不能描述为旧基线故障。[code22原生记录](android-code22-no-code.md)、[机器证据](android-code22-no-code.json)。真实物理设备、真实代码分支交付及外部组件仍not_run。\n\n最新生产只读核对为2026-09-08T20:49:45.0734634Z：相对19:55快照，六文件hash、三个原PID精确启动时点及可见日常EXE路径保持，4319 ready/schema12，4174 Windows3.3.5 manifest原字节hash不变。两个Node的可执行路径仍null，没有新增路径证明；未重新验签/下载生产安装包。Android引用code22证据20:46:37.419Z的daily14/PID5051/配置保留，root未重复ADB查询。[最新生产只读证据](runs/production-after-api-fix-code22.json)。\n\n14条HTTP路由仅映射该实际调用子集。Android开始按钮记实测通过，submitFix的no_code分支记录passed但真实代码分支未测，复合按钮整行仍not_run。基线09保留原APK原生创建证据并追加本轮状态链，22仅追加模拟器升级progress；09、15、23、24为整项通过，18/19/21/22及17.3缺口继续保留。\n\ncode22同一已验收APK已发布为不可变预览下载：[下载Android code22 / preview.8](http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk)。完整HTTP下载35,471,405字节、SHA-256 733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777，实例响应头/类型匹配，Windows manifest未变。Android源内容与提交1be772469671d75cbb5e31240bf345dcc7c4a267一致，APK构建发生在提交之前；本次发布没有重新构建或安装。回执不是签名更新manifest，不能记为应用内自升级或物理设备通过。[下载发布证据](runs/android-code22-download-publication.json)。",
+      "## 最终源码及映射冻结\n\n本轮冻结盘点锚点为81e70d43638f3cb2f3dbd3994acd46f413e5364e，其中API兼容源码提交09f7150、Android源码提交1be7724；188个源码文件hash逐一匹配，985条细目、21条退役历史保留。连续生成器→mapper→生成器重放的语义hash一致；错误proof hash在任何写入前拒绝（0写入），人工负向结果和item/manual复验、sourceHash标记均保留，既有needsRevalidation零丢失。审计结果见coverage-matrix.json的evidenceMapping.finalReplayVerification。\n\n[运行HTTP回归说明](frozen-workflow-live.md)保留六注册路由的31请求和14媒体头边界。此次新增API/Android/下载证据没有补齐旧请求、blocked写入、未注册状态路由、外部队列迁移或物理设备验收。"
+    ],
+    "baseline24CriterionReview": {
+      "design": "docs/design/project-components-transformation-2026-09-08.md:458 / :384",
+      "quote": "能按文档恢复服务并保留回退前新增数据和任务证据",
+      "requiredSurfaces": [
+        "http"
+      ],
+      "reason": "This design baseline requires service restoration and retained new operations/task evidence, not a separate downgrade through all six clients. Section17 feature and physical-device acceptance remain independent.",
+      "modernCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+      "oldCommit": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+      "proofHashes": {
+        "baseline24-service-rollback.json": "e26ad7b970f2348c4759bb94929212cb04e9becce1a2e74239e9a7bbc7032d17",
+        "baseline24-service-rollback.md": "d2ee0770dd78d9d63088e3e173dab01e20dd81b07cc4f5d41790486c9d78f679"
+      },
+      "notProven": [
+        "legacy external queue/workspace migration or recovery",
+        "schema14-to12 business downgrade or merge",
+        "APK/Web/MCP client rollback execution",
+        "fresh production six-file snapshot"
+      ],
+      "mappingState": "Final frozen application sources rescanned; reviewed proof mappings prepared for replay."
+    },
+    "finalSourceSupplement": {
+      "sourceCommit": "09f7150fc1c671d867bbdbc257cab0e61c78d20f",
+      "proofHashes": {
+        "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+        "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a",
+        "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2",
+        "runs/production-after-api-fix-code22.json": "15c8b540442ef1267bc9b43f2b8078a4d2875e1e5b388515697dfc2d5618ad18",
+        "contracts-remediation-implementation.json": "91a1e28322348ea2435583d53a5ccb4407b712c40ccc2752900dd33ef2189101",
+        "runs/contracts-remediation-strict.txt": "69f352f09c0cedef451604f7557e4362b4a0e25868604a197bd2d770e64dffca",
+        "runs/contracts-remediation-api-final.txt": "093d66168c6d077482da4e35be7c8d9a002a075fddc7b0bda8d7a0c7ef8e4909",
+        "runs/contracts-remediation-storage.txt": "804134a825e0c19cf8fb720e9dff50774653b1c97da73eb00d713f8dfa0ffa11",
+        "runs/contracts-remediation-web-configured.txt": "e4b2cba480a55d84d9ea479a9ff6c6688f4bb73616b74693a76f25c236cc4c24",
+        "runs/android-code22-download-publication.json": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+      },
+      "api": {
+        "pid": 18644,
+        "createdAt": "2026-09-08T20:39:13.7225210Z",
+        "instanceId": "qa-hub-preview-7c86",
+        "ready": {
+          "status": "ready",
+          "schemaVersion": "14",
+          "checks": [
+            {
+              "name": "database",
+              "status": "ok"
+            },
+            {
+              "name": "evidence",
+              "status": "ok"
+            },
+            {
+              "name": "worker",
+              "status": "ok"
+            }
+          ]
+        }
+      },
+      "strictContract": "historical failure repaired; five steps passed; inherited request/unregistered route limitations remain",
+      "android": {
+        "versionCode": 22,
+        "versionName": "0.2.0-preview.8",
+        "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+        "observedAt": "2026-09-08T20:46:37.419Z",
+        "sourceCommit": "1be772469671d75cbb5e31240bf345dcc7c4a267",
+        "buildPredatesCommit": true,
+        "downloadUrl": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk"
+      },
+      "production": {
+        "proof": "runs/production-after-api-fix-code22.json",
+        "at": "2026-09-08T20:49:45.0734634Z",
+        "androidRequeriedByRoot": false
+      },
+      "counts": {
+        "api": 238,
+        "storage": 109,
+        "webRelated": 19,
+        "androidUnit": 87,
+        "liveHttp": 31,
+        "liveMedia": 14,
+        "androidHttp": 49
+      },
+      "applicationSourceHead": "1be772469671d75cbb5e31240bf345dcc7c4a267"
+    },
+    "finalReplayVerification": {
+      "at": "2026-09-08T20:56:37.333Z",
+      "applicationSourceHead": "1be772469671d75cbb5e31240bf345dcc7c4a267",
+      "inventoryHead": "81e70d43638f3cb2f3dbd3994acd46f413e5364e",
+      "itemCount": 985,
+      "fileCount": 188,
+      "wholePassedBaselines": [
+        9,
+        15,
+        23,
+        24
+      ],
+      "semanticSha256": "7bd93e0910d568dd122df6e848ad7b046b02a015a798af3ac4534b08ba90c9f1",
+      "repeatStable": true,
+      "changedSupplementProofRejected": true,
+      "changedProofWriteCount": 0,
+      "manualSourceAndNegativeFlagsRetained": true,
+      "priorRevalidationFlagsLost": 0,
+      "mapperSha256": "dd9af7e08a17a0e661c2a526f6300dd738434be85644e0654e246335161f8ba2",
+      "generatorSha256": "30015a35127b8ebda0d2b8ddae3862c0b52bec2ebf02e524e342b483d05d4bdf",
+      "scope": "Executed real generator/mapper replay; fail-closed and preservation cases used in-memory filesystem substitution without changing raw evidence."
+    }
   },
-  "sourceHead": "3f66932e11c42f60aa660028b490a3ac0dea310d",
+  "sourceHead": "81e70d43638f3cb2f3dbd3994acd46f413e5364e",
   "sourceRoots": [
     "apps/api/src",
     "apps/web/src",
@@ -382,7 +545,7 @@
     "apps/android/app/src/main/kotlin/com/relayqahub/android/network/ApkDistributionClient.kt": "044c1076a64847cbcf84b657aabf02b0ed1807da4c92b5844505dc57248a83cf",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/network/AttachmentUploadClient.kt": "616665ba7281cd0d91c7617fabd7fa88baad4b73e00cf86932bdd2ec68b9a490",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/network/BugAssignmentClient.kt": "68b19665d3455f8928771e6a600cc0f7ecd9d5387829db00db4b61b8a6dc5e6e",
-    "apps/android/app/src/main/kotlin/com/relayqahub/android/network/BugLifecycleClient.kt": "522699ef03e2ff9ca3ad90f5313d717f8fa2f74e86de36ebddbc141fb04962e0",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/network/BugLifecycleClient.kt": "d8a7b083245e41132234c0301e0510352e0c2a9945192517940266f552105eaa",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/network/BugWorkbenchClient.kt": "270521d78e7ae34b8687e212f595a4a8397d628c60f3d589eb32f1a9d42cd4d3",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/network/BuildProjectionClient.kt": "0c6128cd4e9192abd2cd9a30b0a7ceb7c9b5d6070a63c43897ebe70e28313c0a",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/network/CommentTimelineClient.kt": "aa9f5992ab39cc31a2c2450848ac324cc16a10d69286f583877677016895dc70",
@@ -421,7 +584,7 @@
     "apps/android/app/src/main/kotlin/com/relayqahub/android/work/OfflineSyncWorker.kt": "8a21d7135249a4ff7a5c5128f2f993c1654347e34d8b8803de4950d11da0dde9",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/work/SyncScheduler.kt": "73fe9a7903c711dc1222009527fa1056847a3cfdeeeda5d865658e7e23e6a236",
     "apps/api/src/android-updates.ts": "04eaa759eed6f92c3f32b9cc620973ae2ca73b1d0006ece64565c0842e1a3121",
-    "apps/api/src/app.ts": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+    "apps/api/src/app.ts": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
     "apps/api/src/automation-routes.ts": "3f9b81b7c10c3f09e5edf121e1f9ad7d35ca30ac1a0093573721da5816478761",
     "apps/api/src/automation.ts": "a48de5d4da277c6f2ba883f7b92dc5b5814a5be710fc66896433e6cd880e936e",
     "apps/api/src/backup-archive-worker-client.ts": "e022fa9180870c845012ac927d0b822159f408c748bbbf189c8366627ab0902d",
@@ -432,6 +595,7 @@
     "apps/api/src/bug-actions.ts": "9d1ee1c96e1850ab291d48270588c4ccbd044654836b2cf5bb9371dc2b3cf30f",
     "apps/api/src/build-upload-host.ts": "0e81ef8625f3a61f962358c55370c02b48c4d71e332862b73f0e71bb712b1ab7",
     "apps/api/src/config.ts": "97d321c746f6a2e5590eaf8a7311cd3af59f66f3617a2bf65505843a2f751428",
+    "apps/api/src/frozen-workflow-response.ts": "4be4ac365b958bde9263d7a9fb201328f5a606721c2834685aa15bf920d2b44f",
     "apps/api/src/health.ts": "406ff4f0c169d3afccead5cfc8535027af8c81760ca768bfe446ed53c8bd7f79",
     "apps/api/src/import-execution-hold.ts": "7770ae7614e1d46398f889da9423106386cb8fc5daebda64e5157e89a98b5d49",
     "apps/api/src/increment-upload.ts": "bf21ecbaeb2e2a3bb43a522814da86bdb238fa65a55ffe29e0800e88aa4fd140",
@@ -452,7 +616,7 @@
     "apps/api/src/mobile-project-directory.ts": "e2d77b9863494f940d7ac7ea47d24e31d217aa0b2110f57ad64fadd21352dd74",
     "apps/api/src/mobile-relay-outbox.ts": "827c9f04ff4f1425319c9ee2b5db3984b8fd8c6c09fc58ae63339516722c0d90",
     "apps/api/src/mobile-relay-webhook.ts": "bc45dee3b21ec5d0cf4ad6a307862f94dde562a154f1e2ca68a044fb9c648767",
-    "apps/api/src/mobile-relay.ts": "022eb5a21f14ea269d4d45d72030f2f87cc905e7bf230b3e1964cf3e6dbad209",
+    "apps/api/src/mobile-relay.ts": "faaaf924eb3e819d62235fcf0c4b86c7eb4cc65dadc633b40e904507032aaf70",
     "apps/api/src/mobile-user-management.ts": "f87119d0244e773154efd3ff0720933cbfebc2ae2f884ac2168f0bb092a5ecf8",
     "apps/api/src/mobile-verification.ts": "f77069f2e45e4690c50f16a42f64418cec7125f20620861799c0405fccf0d022",
     "apps/api/src/parallel-instance.ts": "00feaf310eb138f925810f88c5b91cffab503fbdccd5b3dae58de3ac87800ba4",
@@ -474,7 +638,7 @@
     "apps/api/src/sqlite-mobile-inbox-store.ts": "05efb58f60daf49e493be786757bc28c2f9c33784231fa17823718f91bb241da",
     "apps/api/src/sqlite-mobile-metrics-store.ts": "349c16d78cba162df0e1bdc47ed41ee77bb760edc26c20f9b5d91fea760edb86",
     "apps/api/src/sqlite-mobile-project-directory-store.ts": "78eae3e7d187a09c49a8be7359dc2372a2dd1144b247ef6131715fe5ad16622b",
-    "apps/api/src/sqlite-mobile-relay-store.ts": "dc2873e26e06148a129352b2445efc700532a3432fd9656fa7c0d471473554be",
+    "apps/api/src/sqlite-mobile-relay-store.ts": "b509e25ab5b89585025d1d5a59f33ee741b086b0fab2d6c64f51eaca8edd226d",
     "apps/api/src/sqlite-mobile-relay-webhook-store.ts": "65d554525f467eabb9e32f1f3b598b51bec468925f57a19c8df4435917cffd3c",
     "apps/api/src/sqlite-mobile-user-management-store.ts": "9475e9ed73c4aaa8a052170e580fc54747a10ea45768243e78d95ae6be954695",
     "apps/api/src/sqlite-mobile-verification-store.ts": "55352855178da7b5ccab4d5e192f9484234a9e82b9d9097fdd53e39a9f10bbb7",
@@ -629,6 +793,19 @@
         "migration-rehearsal.md",
         "migration-service-readback.json"
       ]
+    },
+    {
+      "id": "frozen-workflow-runtime-coverage",
+      "affects": [
+        "http",
+        "workflow"
+      ],
+      "status": "partially_verified",
+      "required": "The six registered mutation response schemas and strict static gates are repaired. Inherited 1.0 result requests/blocked writes and unregistered fail/supersede POST plus /bugs/:bugId/workflow GET remain gaps; rich existing GET history is a separate read model, not those missing operations.",
+      "evidence": [
+        "contracts-remediation-implementation.md",
+        "runs/frozen-workflow-live-readback.json"
+      ]
     }
   ],
   "summary": {
@@ -654,30 +831,30 @@
       "web_page_component": 34
     },
     "baselineCount": 24,
-    "fileCount": 187,
+    "fileCount": 188,
     "resultsBySurface": {
       "apk": {
-        "not_run": 270,
-        "passed": 21
+        "not_run": 268,
+        "passed": 22
       },
       "exe": {
         "not_run": 458,
-        "passed": 17
+        "passed": 16
       },
       "web": {
         "passed": 27,
-        "not_run": 406
+        "not_run": 405
       },
       "http": {
-        "passed": 33,
-        "not_run": 318
+        "passed": 43,
+        "not_run": 308
       },
       "server_mcp": {
-        "not_run": 244,
+        "not_run": 243,
         "passed": 20
       },
       "local_mcp": {
-        "not_run": 253,
+        "not_run": 252,
         "passed": 12
       }
     }
@@ -765,7 +942,7 @@
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-08T20:15:36.285Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.478Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -981,7 +1158,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.277Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.469Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -1093,7 +1270,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.253Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.445Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1169,7 +1346,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -1356,9 +1533,10 @@
             "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
             "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
             "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
-            "../../../apps/android/app/build/evidence/project-components/preview-code16-return-a-draft-confirmed-ui.xml"
+            "../../../apps/android/app/build/evidence/project-components/preview-code16-return-a-draft-confirmed-ui.xml",
+            "android-code22-no-code.json"
           ],
-          "actual": "已实测：A/B文字与图片草稿实际分离；20→21升级恢复原项目/身份/文字/未提交PNG且三个本地hash一致。仍缺：未刻意制造迟到网络响应；未覆盖全部编辑/组件/文件草稿与人员选择。",
+          "actual": "已实测：A/B文字与图片草稿实际分离；20→21升级恢复原项目/身份/文字/未提交PNG且三个本地hash一致；code21→22覆盖升级及原生闭环后，旧草稿/PNG/sidecar三个hash和原文继续保留。仍缺：未刻意制造迟到网络响应；未覆盖全部编辑/组件/文件草稿与人员选择；物理设备和完整迟到响应/草稿类别仍未完成。",
           "note": "Real execution and read-back required."
         },
         "exe": {
@@ -1410,23 +1588,26 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.286Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.479Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
               "A/B文字与图片草稿实际分离",
-              "20→21升级恢复原项目/身份/文字/未提交PNG且三个本地hash一致"
+              "20→21升级恢复原项目/身份/文字/未提交PNG且三个本地hash一致",
+              "code21→22覆盖升级及原生闭环后，旧草稿/PNG/sidecar三个hash和原文继续保留"
             ],
             "remaining": [
               "未刻意制造迟到网络响应",
-              "未覆盖全部编辑/组件/文件草稿与人员选择"
+              "未覆盖全部编辑/组件/文件草稿与人员选择",
+              "物理设备和完整迟到响应/草稿类别仍未完成"
             ],
             "evidence": [
               "android-implementation.md",
               "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
               "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
               "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
-              "../../../apps/android/app/build/evidence/project-components/preview-code16-return-a-draft-confirmed-ui.xml"
+              "../../../apps/android/app/build/evidence/project-components/preview-code16-return-a-draft-confirmed-ui.xml",
+              "android-code22-no-code.json"
             ],
             "status": "partial"
           },
@@ -1467,7 +1648,8 @@
             "runs/exe-fault-independent-api-mcp.json": "e1727e6cb86714713ca8020c3341eacbc3fe2eef32da8c0ed5208a87dccf608e",
             "runs/exe-preview4-after-fault-draft.txt": "bd6da80a889397688b4c504b9c1eee56a0998c35019c4b06d1e93d8a216af50d",
             "runs/exe-preview6-relogin-draft.json": "3d3868bfad34a8a01d9c9cd8c3ac4de79676489c95f093aba29252c4ebb6383b",
-            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3"
+            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
+            "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
           },
           "results": {
             "exe": {
@@ -1500,6 +1682,26 @@
                 "runs/exe-after-preview7-upgrade.json"
               ],
               "status": "partial"
+            },
+            "apk": {
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
+                "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
+                "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
+                "../../../apps/android/app/build/evidence/project-components/preview-code16-return-a-draft-confirmed-ui.xml",
+                "android-code22-no-code.json"
+              ],
+              "completed": [
+                "A/B文字与图片草稿实际分离",
+                "20→21升级恢复原项目/身份/文字/未提交PNG且三个本地hash一致",
+                "code21→22覆盖升级及原生闭环后，旧草稿/PNG/sidecar三个hash和原文继续保留"
+              ],
+              "remaining": [
+                "未刻意制造迟到网络响应",
+                "未覆盖全部编辑/组件/文件草稿与人员选择",
+                "物理设备和完整迟到响应/草稿类别仍未完成"
+              ]
             }
           }
         },
@@ -1608,7 +1810,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1639,9 +1841,10 @@
           "status": "passed",
           "evidence": [
             "android-implementation.md",
-            "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json"
+            "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json",
+            "android-code22-no-code.json"
           ],
-          "actual": "真实 MuMu 原生界面提交、评论、人工完成、验收失败退回、再次人工完成、验收关闭；Bug e81a7e88-0f51-45ec-bdcb-187b6989aebc closed/v11，16事件、2轮人工修复、1评论，五组件全关。仅此基础流程；物理设备及其余操作另列未测。",
+          "actual": "真实 MuMu 原生界面提交、评论、人工完成、验收失败退回、再次人工完成、验收关闭；Bug e81a7e88-0f51-45ec-bdcb-187b6989aebc closed/v11，16事件、2轮人工修复、1评论，五组件全关。仅此基础流程；物理设备及其余操作另列未测。 另有code22原生开始→无需代码提交→验收通过关闭，Bug386cdd2f-44c9-4a79-992a-891d595766fd closed/v6；49对应HTTP均2xx，deliver1次、complete0次。该新增Bug由API准备，不替代前次APK原生创建闭环证据。",
           "note": "Real execution and read-back required."
         },
         "exe": {
@@ -1695,7 +1898,36 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.479Z",
+        "reviewedEvidence": {
+          "proofHashes": {
+            "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
+          },
+          "results": {
+            "apk": {
+              "status": "passed",
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json",
+                "android-code22-no-code.json"
+              ],
+              "actual": "真实 MuMu 原生界面提交、评论、人工完成、验收失败退回、再次人工完成、验收关闭；Bug e81a7e88-0f51-45ec-bdcb-187b6989aebc closed/v11，16事件、2轮人工修复、1评论，五组件全关。仅此基础流程；物理设备及其余操作另列未测。 另有code22原生开始→无需代码提交→验收通过关闭，Bug386cdd2f-44c9-4a79-992a-891d595766fd closed/v6；49对应HTTP均2xx，deliver1次、complete0次。该新增Bug由API准备，不替代前次APK原生创建闭环证据。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "apk",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "真实 MuMu 原生界面提交、评论、人工完成、验收失败退回、再次人工完成、验收关闭；Bug e81a7e88-0f51-45ec-bdcb-187b6989aebc closed/v11，16事件、2轮人工修复、1评论，五组件全关。仅此基础流程；物理设备及其余操作另列未测。",
+            "evidence": [
+              "android-implementation.md",
+              "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -1771,7 +2003,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1844,7 +2076,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.278Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.470Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -1932,7 +2164,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.278Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.470Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -1998,9 +2230,11 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/api-pagination-final.txt"
+            "runs/api-pagination-final.txt",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
           ],
-          "actual": "已实测：真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过。仍缺：全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。",
+          "actual": "已实测：真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过；真实预览六已注册POST的vendor/JSON冻结响应、两格式同请求重放与丰富历史读取；仅HTTP，没有独立MCP对照。仍缺：全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明；完整HTTP/MCP对等输入矩阵仍未逐项执行。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -2026,17 +2260,21 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.286Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.480Z",
         "surfaceProgress": {
           "http": {
             "completed": [
-              "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过"
+              "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过",
+              "真实预览六已注册POST的vendor/JSON冻结响应、两格式同请求重放与丰富历史读取；仅HTTP，没有独立MCP对照"
             ],
             "remaining": [
-              "全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明"
+              "全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明",
+              "完整HTTP/MCP对等输入矩阵仍未逐项执行"
             ],
             "evidence": [
-              "runs/api-pagination-final.txt"
+              "runs/api-pagination-final.txt",
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
             ],
             "status": "partial"
           },
@@ -2080,7 +2318,9 @@
           "proofHashes": {
             "runs/api-pagination-final.txt": "fbf77b168fc4a7181bd8bb7aa35c12cbb751dae03189e7676240ca4fe285355c",
             "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95",
-            "runs/exe-preview7-live-protocol.json": "cd3bdf38c53ded87e8bcb170daca28ec8fc4096dd4dcc80b7297abd31ceceeee"
+            "runs/exe-preview7-live-protocol.json": "cd3bdf38c53ded87e8bcb170daca28ec8fc4096dd4dcc80b7297abd31ceceeee",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
           },
           "results": {
             "server_mcp": {
@@ -2117,6 +2357,21 @@
                 "runs/exe-preview7-live-protocol.json"
               ],
               "status": "partial"
+            },
+            "http": {
+              "evidence": [
+                "runs/api-pagination-final.txt",
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "completed": [
+                "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过",
+                "真实预览六已注册POST的vendor/JSON冻结响应、两格式同请求重放与丰富历史读取；仅HTTP，没有独立MCP对照"
+              ],
+              "remaining": [
+                "全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明",
+                "完整HTTP/MCP对等输入矩阵仍未逐项执行"
+              ]
             }
           }
         },
@@ -2231,8 +2486,11 @@
         "http": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "已实测：真实同验收请求切换JSON/vendor重放，保留相同事件和Bug版本。仍缺：全部动作/错误/并发组合的幂等验证仍不完整。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -2279,6 +2537,19 @@
               "runs/mcp-delete-live-preview6.json"
             ],
             "status": "partial"
+          },
+          "http": {
+            "completed": [
+              "真实同验收请求切换JSON/vendor重放，保留相同事件和Bug版本"
+            ],
+            "remaining": [
+              "全部动作/错误/并发组合的幂等验证仍不完整"
+            ],
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "status": "partial"
           }
         },
         "postFreezeEvidence": {
@@ -2291,7 +2562,9 @@
           "at": "2026-09-08T20:09:46.367Z",
           "reason": "Retain previously reviewed precise installed-client/MCP evidence; no new broad baseline pass.",
           "proofHashes": {
-            "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95"
+            "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
           },
           "results": {
             "server_mcp": {
@@ -2321,6 +2594,18 @@
                 "runs/mcp-delete-live-preview6.json"
               ],
               "status": "partial"
+            },
+            "http": {
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "completed": [
+                "真实同验收请求切换JSON/vendor重放，保留相同事件和Bug版本"
+              ],
+              "remaining": [
+                "全部动作/错误/并发组合的幂等验证仍不完整"
+              ]
             }
           }
         },
@@ -2398,7 +2683,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.286Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.480Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -2489,7 +2774,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.287Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.481Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2686,7 +2971,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.277Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.469Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -2774,7 +3059,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.277Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.469Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -2868,7 +3153,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.284Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.478Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2976,7 +3261,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3083,7 +3368,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.280Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3247,7 +3532,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.287Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.481Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3649,9 +3934,10 @@
             "android-implementation.md",
             "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
             "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
-            "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml"
+            "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
+            "android-code22-no-code.json"
           ],
-          "actual": "已实测：MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留。仍缺：物理Android设备必测仍缺；应用内更新源/自安装链路未测。",
+          "actual": "已实测：MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留；code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留。仍缺：物理Android设备必测仍缺；应用内更新源/自安装链路未测；物理Android及应用内更新完整链路仍未验收。",
           "note": "Real execution and read-back required."
         },
         "exe": {
@@ -3691,24 +3977,53 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.481Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
               "MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同",
-              "日常code14/PID5051/安装时点/dataDir保留"
+              "日常code14/PID5051/安装时点/dataDir保留",
+              "code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留"
             ],
             "remaining": [
               "物理Android设备必测仍缺",
-              "应用内更新源/自安装链路未测"
+              "应用内更新源/自安装链路未测",
+              "物理Android及应用内更新完整链路仍未验收"
             ],
             "evidence": [
               "android-implementation.md",
               "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
               "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
-              "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml"
+              "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
+              "android-code22-no-code.json"
             ],
             "status": "partial"
+          }
+        },
+        "reviewedEvidence": {
+          "proofHashes": {
+            "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
+          },
+          "surfaceProgress": {
+            "apk": {
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
+                "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
+                "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
+                "android-code22-no-code.json"
+              ],
+              "completed": [
+                "MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同",
+                "日常code14/PID5051/安装时点/dataDir保留",
+                "code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留"
+              ],
+              "remaining": [
+                "物理Android设备必测仍缺",
+                "应用内更新源/自安装链路未测",
+                "物理Android及应用内更新完整链路仍未验收"
+              ]
+            }
           }
         }
       },
@@ -3793,7 +4108,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.288Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.483Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -3884,18 +4199,18 @@
         "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
-      "expected": "按人工说明停止/恢复新版；保留回退前新增数据和任务证据；生产继续健康。",
-      "status": "not_run",
+      "expected": "能按文档恢复服务并保留回退前新增数据和任务证据；按设计10.3隔离保留新版数据，旧程序不读取已迁移的新库。",
+      "status": "passed",
       "results": {
         "apk": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "exe": {
-          "applicable": true,
+          "applicable": false,
           "status": "passed",
           "evidence": [
             "runs/exe-preview6-to5-rollback.json",
@@ -3908,41 +4223,183 @@
             "runs/exe-preview6-after-uninstall-reinstall.json",
             "runs/exe-preview6-reinstall-restored-draft.txt"
           ],
-          "actual": "EXE入口实际.6→.5手工回退、重复升级.6、卸载后精确同包重装并原生恢复员工/项目/配置/文字+1图；102个profile文件663514299字节在卸载前后hash完全一致。旧backup与-1新backup、回退/卸载保留目录仍在；原closed/v14、评论与184872字节附件hash读回，生产边界核对正常。仅客户端恢复范围passed；完整数据服务与APK回退仍未测，24整项not_run。",
-          "note": "Real execution and read-back required."
+          "actual": "EXE入口实际.6→.5手工回退、重复升级.6、卸载后精确同包重装并原生恢复员工/项目/配置/文字+1图；102个profile文件663514299字节在卸载前后hash完全一致。旧backup与-1新backup、回退/卸载保留目录仍在；原closed/v14、评论与184872字节附件hash读回，生产边界核对正常。仅客户端恢复范围passed；基线24服务恢复由独立HTTP证据判定，其它客户端恢复功能不因此通过。",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "web": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "baseline24-service-rollback.json",
+            "baseline24-service-rollback.md"
+          ],
+          "actual": "47项真实服务回退/保留/恢复检查通过，59条HTTP状态/大小/hash记录。modern源码3b1371c/schema14正常停止后910文件753461759字节整根保留；old62b4495/schema12真实API读取独立旧归档；随后M14原session恢复，两新Bug、评论、68字节PNG及两人工RepairAttempt/两Verification（含in_progress未完成任务）ID、版本、操作者、状态/hash一致，3进程正常exit0且端口关闭。外层写入为HTTP /api/v1/mcp/call、标准domain GET读回；未单独执行JSON-RPC或客户端UI。protected前后比较仅固定archive/migrated/rollback，不是新的生产六文件快照。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "local_mcp": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
-        "surfaceProgress": {}
+        "evidenceMappedAt": "2026-09-08T20:57:13.483Z",
+        "surfaceProgress": {},
+        "priorCriterionSnapshot": {
+          "reason": "Historical six-surface baseline24 interpretation retained; superseded by reviewed design section13/24 and10.3 service criterion.",
+          "status": "not_run",
+          "expected": "按人工说明停止/恢复新版；保留回退前新增数据和任务证据；生产继续健康。",
+          "results": {
+            "apk": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            },
+            "exe": {
+              "applicable": true,
+              "status": "passed",
+              "evidence": [
+                "runs/exe-preview6-to5-rollback.json",
+                "runs/exe-rollback5-restored-draft.txt",
+                "runs/exe-rollback5-business-readback.json",
+                "runs/production-after-preview6-rollback.json",
+                "runs/exe-preview6-repeat-upgrade.json",
+                "runs/exe-preview6-repeat-restored-draft.txt",
+                "runs/exe-preview6-uninstall-readback.json",
+                "runs/exe-preview6-after-uninstall-reinstall.json",
+                "runs/exe-preview6-reinstall-restored-draft.txt"
+              ],
+              "actual": "EXE入口实际.6→.5手工回退、重复升级.6、卸载后精确同包重装并原生恢复员工/项目/配置/文字+1图；102个profile文件663514299字节在卸载前后hash完全一致。旧backup与-1新backup、回退/卸载保留目录仍在；原closed/v14、评论与184872字节附件hash读回，生产边界核对正常。仅客户端恢复范围passed；完整数据服务与APK回退仍未测，24整项not_run。",
+              "note": "Real execution and read-back required."
+            },
+            "web": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            },
+            "http": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            },
+            "server_mcp": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            },
+            "local_mcp": {
+              "applicable": true,
+              "status": "not_run",
+              "evidence": [],
+              "actual": "",
+              "note": "Real execution and read-back required."
+            }
+          }
+        },
+        "supplementaryEvidence": {
+          "exeRecovery": {
+            "applicable": true,
+            "status": "passed",
+            "evidence": [
+              "runs/exe-preview6-to5-rollback.json",
+              "runs/exe-rollback5-restored-draft.txt",
+              "runs/exe-rollback5-business-readback.json",
+              "runs/production-after-preview6-rollback.json",
+              "runs/exe-preview6-repeat-upgrade.json",
+              "runs/exe-preview6-repeat-restored-draft.txt",
+              "runs/exe-preview6-uninstall-readback.json",
+              "runs/exe-preview6-after-uninstall-reinstall.json",
+              "runs/exe-preview6-reinstall-restored-draft.txt"
+            ],
+            "actual": "EXE入口实际.6→.5手工回退、重复升级.6、卸载后精确同包重装并原生恢复员工/项目/配置/文字+1图；102个profile文件663514299字节在卸载前后hash完全一致。旧backup与-1新backup、回退/卸载保留目录仍在；原closed/v14、评论与184872字节附件hash读回，生产边界核对正常。仅客户端恢复范围passed；基线24服务恢复由独立HTTP证据判定，其它客户端恢复功能不因此通过。",
+            "note": "Real execution and read-back required.",
+            "scope": "Historical EXE client recovery only; independent of the required service/HTTP baseline24 criterion."
+          }
+        },
+        "reviewedEvidence": {
+          "proofHashes": {
+            "baseline24-service-rollback.json": "e26ad7b970f2348c4759bb94929212cb04e9becce1a2e74239e9a7bbc7032d17",
+            "baseline24-service-rollback.md": "d2ee0770dd78d9d63088e3e173dab01e20dd81b07cc4f5d41790486c9d78f679"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "baseline24-service-rollback.json",
+                "baseline24-service-rollback.md"
+              ],
+              "actual": "47项真实服务回退/保留/恢复检查通过，59条HTTP状态/大小/hash记录。modern源码3b1371c/schema14正常停止后910文件753461759字节整根保留；old62b4495/schema12真实API读取独立旧归档；随后M14原session恢复，两新Bug、评论、68字节PNG及两人工RepairAttempt/两Verification（含in_progress未完成任务）ID、版本、操作者、状态/hash一致，3进程正常exit0且端口关闭。外层写入为HTTP /api/v1/mcp/call、标准domain GET读回；未单独执行JSON-RPC或客户端UI。protected前后比较仅固定archive/migrated/rollback，不是新的生产六文件快照。"
+            }
+          }
+        },
+        "serviceCriterionReview": {
+          "design": "docs/design/project-components-transformation-2026-09-08.md:458 / :384",
+          "quote": "能按文档恢复服务并保留回退前新增数据和任务证据",
+          "requiredSurfaces": [
+            "http"
+          ],
+          "reason": "This design baseline requires service restoration and retained new operations/task evidence, not a separate downgrade through all six clients. Section17 feature and physical-device acceptance remain independent.",
+          "modernCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+          "oldCommit": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+          "proofHashes": {
+            "baseline24-service-rollback.json": "e26ad7b970f2348c4759bb94929212cb04e9becce1a2e74239e9a7bbc7032d17",
+            "baseline24-service-rollback.md": "d2ee0770dd78d9d63088e3e173dab01e20dd81b07cc4f5d41790486c9d78f679"
+          },
+          "notProven": [
+            "legacy external queue/workspace migration or recovery",
+            "schema14-to12 business downgrade or merge",
+            "APK/Web/MCP client rollback execution",
+            "fresh production six-file snapshot"
+          ]
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Passed only for the exact service restoration criterion; independent client and external task requirements remain required.",
+            "actual": "47项真实服务回退/保留/恢复检查通过，59条HTTP状态/大小/hash记录。modern源码3b1371c/schema14正常停止后910文件753461759字节整根保留；old62b4495/schema12真实API读取独立旧归档；随后M14原session恢复，两新Bug、评论、68字节PNG及两人工RepairAttempt/两Verification（含in_progress未完成任务）ID、版本、操作者、状态/hash一致，3进程正常exit0且端口关闭。外层写入为HTTP /api/v1/mcp/call、标准domain GET读回；未单独执行JSON-RPC或客户端UI。protected前后比较仅固定archive/migrated/rollback，不是新的生产六文件快照。",
+            "evidence": [
+              "baseline24-service-rollback.json",
+              "baseline24-service-rollback.md"
+            ],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "47项真实服务回退/保留/恢复检查通过，59条HTTP状态/大小/hash记录。modern源码3b1371c/schema14正常停止后910文件753461759字节整根保留；old62b4495/schema12真实API读取独立旧归档；随后M14原session恢复，两新Bug、评论、68字节PNG及两人工RepairAttempt/两Verification（含in_progress未完成任务）ID、版本、操作者、状态/hash一致，3进程正常exit0且端口关闭。外层写入为HTTP /api/v1/mcp/call、标准domain GET读回；未单独执行JSON-RPC或客户端UI。protected前后比较仅固定archive/migrated/rollback，不是新的生产六文件快照。",
+            "evidence": [
+              "baseline24-service-rollback.json",
+              "baseline24-service-rollback.md"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -4475,9 +4932,11 @@
             "runs/management-2026-09-08T17-53-20-441Z.json#checks[52]",
             "runs/management-2026-09-08T17-53-20-441Z.json#checks[55]",
             "runs/management-2026-09-08T17-53-20-441Z.json#checks[56]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[59]"
+            "runs/management-2026-09-08T17-53-20-441Z.json#checks[59]",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
           ],
-          "actual": "A first name login: HTTP 200 (expected 200); shared user joins A: HTTP 200 (expected 200); shared user joins B: HTTP 200 (expected 200); ordinary operator joins A: HTTP 200 (expected 200); shared employee joins A: HTTP 200 (expected 200); shared employee joins B: HTTP 200 (expected 200); alias joins A: HTTP 200 (expected 200); alias joins B: HTTP 200 (expected 200); ordinary name gm logs in without privilege: HTTP 200 (expected 200); same-name login cannot restore revoked A membership: HTTP 403 (expected 403); same-name employee still enters B: HTTP 200 (expected 200); restored employee can enter A with original ID: HTTP 200 (expected 200); A linked name resolves canonical user: HTTP 200 (expected 200); B same alias remains independent: HTTP 200 (expected 200); unlinked name returns original user: HTTP 200 (expected 200)",
+          "actual": "真实独立API31调用中的本路由子集：separate test employee login: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -4496,7 +4955,64 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.243Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.483Z",
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[4]",
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[11]",
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[12]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[7]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[8]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[9]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[10]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[11]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[13]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[44]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[45]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[52]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[55]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[56]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[59]",
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：separate test employee login: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "A first name login: HTTP 200 (expected 200); shared user joins A: HTTP 200 (expected 200); shared user joins B: HTTP 200 (expected 200); ordinary operator joins A: HTTP 200 (expected 200); shared employee joins A: HTTP 200 (expected 200); shared employee joins B: HTTP 200 (expected 200); alias joins A: HTTP 200 (expected 200); alias joins B: HTTP 200 (expected 200); ordinary name gm logs in without privilege: HTTP 200 (expected 200); same-name login cannot restore revoked A membership: HTTP 403 (expected 403); same-name employee still enters B: HTTP 200 (expected 200); restored employee can enter A with original ID: HTTP 200 (expected 200); A linked name resolves canonical user: HTTP 200 (expected 200); B same alias remains independent: HTTP 200 (expected 200); unlinked name returns original user: HTTP 200 (expected 200)",
+            "evidence": [
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[4]",
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[11]",
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[12]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[7]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[8]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[9]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[10]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[11]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[13]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[44]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[45]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[52]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[55]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[56]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[59]"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": true,
       "generated": true
@@ -4584,7 +5100,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5210,7 +5726,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5296,7 +5812,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5385,7 +5901,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5474,7 +5990,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5546,9 +6062,11 @@
             "runs/management-2026-09-08T17-53-20-441Z.json#checks[32]",
             "runs/management-2026-09-08T17-53-20-441Z.json#checks[34]",
             "runs/management-2026-09-08T17-53-20-441Z.json#checks[37]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[63]"
+            "runs/management-2026-09-08T17-53-20-441Z.json#checks[63]",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
           ],
-          "actual": "all optional components disabled: HTTP 200 (expected 200); new project has five disabled components: HTTP 200 (expected 200); missing configuration remains visible: HTTP 200 (expected 200); employee receives public configuration only: HTTP 200 (expected 200); GM can edit existing private connection configuration: HTTP 200 (expected 200); project B component configuration remains off: HTTP 200 (expected 200); dependency disable closes combined entry: HTTP 200 (expected 200); GM without A membership still reads components: HTTP 200 (expected 200)",
+          "actual": "真实独立API31调用中的本路由子集：components remain off: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -5567,7 +6085,50 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.484Z",
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[6]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[20]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[25]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[30]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[32]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[34]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[37]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[63]",
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：components remain off: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "all optional components disabled: HTTP 200 (expected 200); new project has five disabled components: HTTP 200 (expected 200); missing configuration remains visible: HTTP 200 (expected 200); employee receives public configuration only: HTTP 200 (expected 200); GM can edit existing private connection configuration: HTTP 200 (expected 200); project B component configuration remains off: HTTP 200 (expected 200); dependency disable closes combined entry: HTTP 200 (expected 200); GM without A membership still reads components: HTTP 200 (expected 200)",
+            "evidence": [
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[6]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[20]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[25]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[30]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[32]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[34]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[37]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[63]"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": true,
       "generated": true
@@ -5658,7 +6219,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5745,7 +6306,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5833,7 +6394,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5919,7 +6480,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.436Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6088,7 +6649,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -8100,7 +8661,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -8184,7 +8745,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -8668,7 +9229,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -8750,7 +9311,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -9792,7 +10353,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -10108,7 +10669,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -10735,7 +11296,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -11753,7 +12314,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -11844,7 +12405,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12016,7 +12577,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12104,7 +12665,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12315,7 +12876,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.288Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.484Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12424,7 +12985,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12512,7 +13073,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12600,7 +13161,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.437Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12989,7 +13550,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -13472,7 +14033,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -23545,9 +24106,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 638
+        "line": 645
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/bugs/:bugId/comments",
       "registration": "direct",
@@ -23624,9 +24185,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 638
+        "line": 645
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/comments",
       "registration": "direct",
@@ -23688,7 +24249,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -23705,9 +24266,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 850
+        "line": 857
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/session",
       "registration": "direct",
@@ -23781,9 +24342,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 853
+        "line": 860
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/login/start",
       "registration": "direct",
@@ -23857,9 +24418,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 856
+        "line": 863
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/login/status",
       "registration": "direct",
@@ -23933,9 +24494,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 859
+        "line": 866
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/logout",
       "registration": "direct",
@@ -24009,9 +24570,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 862
+        "line": 869
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/projects",
       "registration": "direct",
@@ -24085,9 +24646,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 865
+        "line": 872
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/defects",
       "registration": "direct",
@@ -24161,9 +24722,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 877
+        "line": 884
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/import",
       "registration": "direct",
@@ -24237,9 +24798,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 900
+        "line": 907
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/integrations/qingyu",
       "registration": "direct",
@@ -24313,9 +24874,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 907
+        "line": 914
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/integrations/qingyu/resolve",
       "registration": "direct",
@@ -24392,9 +24953,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 932
+        "line": 939
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/health/live",
       "registration": "direct",
@@ -24471,9 +25032,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 944
+        "line": 951
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/health/ready",
       "registration": "direct",
@@ -24514,9 +25075,11 @@
           "status": "passed",
           "evidence": [
             "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[0]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[0]"
+            "runs/management-2026-09-08T17-53-20-441Z.json#checks[0]",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
           ],
-          "actual": "new API ready: HTTP 200 (expected 200); independent API readiness: HTTP 200 (expected 200)",
+          "actual": "真实独立API31调用中的本路由子集：ready: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -24535,7 +25098,38 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.484Z",
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[0]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[0]",
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：ready: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "new API ready: HTTP 200 (expected 200); independent API readiness: HTTP 200 (expected 200)",
+            "evidence": [
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[0]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[0]"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": true,
       "generated": true
@@ -24555,9 +25149,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 956
+        "line": 963
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/health/deps",
       "registration": "direct",
@@ -24637,9 +25231,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 979
+        "line": 986
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/projects",
       "registration": "direct",
@@ -24701,7 +25295,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.440Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24724,9 +25318,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1010
+        "line": 1017
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/members",
       "registration": "direct",
@@ -24806,9 +25400,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1047
+        "line": 1054
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/users",
       "registration": "direct",
@@ -24871,7 +25465,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.440Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24894,9 +25488,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1078
+        "line": 1085
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/projects/:projectId/users/:userId/identity-link",
       "registration": "direct",
@@ -24957,7 +25551,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.440Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24980,9 +25574,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1117
+        "line": 1124
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "DELETE",
       "path": "/api/v1/projects/:projectId/users/:userId/identity-link",
       "registration": "direct",
@@ -25043,7 +25637,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.440Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25066,9 +25660,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1153
+        "line": 1160
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "DELETE",
       "path": "/api/v1/projects/:projectId/users/:userId",
       "registration": "direct",
@@ -25148,9 +25742,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1189
+        "line": 1196
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/modules",
       "registration": "direct",
@@ -25230,9 +25824,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1221
+        "line": 1228
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/metrics/overview",
       "registration": "direct",
@@ -25307,9 +25901,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1257
+        "line": 1264
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/integrations/relay/webhooks",
       "registration": "direct",
@@ -25386,9 +25980,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1370
+        "line": 1377
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs",
       "registration": "direct",
@@ -25429,9 +26023,11 @@
           "status": "passed",
           "evidence": [
             "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[8]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[66]"
+            "runs/management-2026-09-08T17-53-20-441Z.json#checks[66]",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
           ],
-          "actual": "create real Bug with components off: HTTP 201 (expected 201); non-member GM creates assigned Bug: HTTP 201 (expected 201)",
+          "actual": "真实独立API31调用中的本路由子集：vendor create Bug: 201；legacy-response create Bug: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -25450,7 +26046,38 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.484Z",
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[8]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[66]",
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor create Bug: 201；legacy-response create Bug: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "create real Bug with components off: HTTP 201 (expected 201); non-member GM creates assigned Bug: HTTP 201 (expected 201)",
+            "evidence": [
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[8]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[66]"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": true,
       "generated": true
@@ -25470,9 +26097,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1397
+        "line": 1404
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs",
       "registration": "direct",
@@ -25541,7 +26168,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.441Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25561,9 +26188,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1433
+        "line": 1440
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -25605,9 +26232,11 @@
           "evidence": [
             "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[9]",
             "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[10]",
-            "runs/management-2026-09-08T17-53-20-441Z.json#checks[80]"
+            "runs/management-2026-09-08T17-53-20-441Z.json#checks[80]",
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
           ],
-          "actual": "read back stable Bug: HTTP 200 (expected 200); conflicting project header refused: HTTP 404 (expected 404); closed GM Bug final readback: HTTP 200 (expected 200)",
+          "actual": "真实独立API31调用中的本路由子集：vendor delivery state: 200；legacy-response delivery state: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -25626,7 +26255,40 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.485Z",
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[9]",
+                "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[10]",
+                "runs/management-2026-09-08T17-53-20-441Z.json#checks[80]",
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor delivery state: 200；legacy-response delivery state: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "read back stable Bug: HTTP 200 (expected 200); conflicting project header refused: HTTP 404 (expected 404); closed GM Bug final readback: HTTP 200 (expected 200)",
+            "evidence": [
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[9]",
+              "runs/http-core-2026-09-08T18-19-04-805Z.json#checks[10]",
+              "runs/management-2026-09-08T17-53-20-441Z.json#checks[80]"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": true,
       "generated": true
@@ -25646,9 +26308,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1448
+        "line": 1455
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/attachments",
       "registration": "direct",
@@ -25712,7 +26374,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25732,9 +26394,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1486
+        "line": 1493
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/attachments/:attachmentId",
       "registration": "direct",
@@ -25798,7 +26460,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25818,9 +26480,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1523
+        "line": 1530
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind",
       "registration": "direct",
@@ -25897,9 +26559,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1561
+        "line": 1568
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "PATCH",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -25960,7 +26622,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.249Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.441Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25980,9 +26642,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1602
+        "line": 1609
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "DELETE",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -26059,9 +26721,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1653
+        "line": 1660
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/duplicate-candidates",
       "registration": "direct",
@@ -26138,9 +26800,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1685
+        "line": 1692
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/mark-duplicate",
       "registration": "direct",
@@ -26217,9 +26879,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1766
+        "line": 1773
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/transitions",
       "registration": "direct",
@@ -26232,7 +26894,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -26257,9 +26919,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor ready: 200；legacy-response ready: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -26277,7 +26942,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor ready: 200；legacy-response ready: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor ready: 200；legacy-response ready: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.485Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -26296,9 +27000,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1791
+        "line": 1798
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/complete",
       "registration": "direct",
@@ -26375,9 +27079,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1816
+        "line": 1823
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/manual-complete",
       "registration": "direct",
@@ -26454,9 +27158,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1844
+        "line": 1851
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/repair-attempts",
       "registration": "direct",
@@ -26469,7 +27173,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -26494,9 +27198,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor create repair: 201；legacy-response create repair: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -26514,7 +27221,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor create repair: 201；legacy-response create repair: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor create repair: 201；legacy-response create repair: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.485Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -26533,9 +27279,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1882
+        "line": 1892
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/start",
       "registration": "direct",
@@ -26548,7 +27294,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -26573,9 +27319,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor start repair: 200；legacy-response start repair: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -26593,7 +27342,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor start repair: 200；legacy-response start repair: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor start repair: 200；legacy-response start repair: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.486Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -26612,9 +27400,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1913
+        "line": 1925
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/repair-attempts/:attemptId",
       "registration": "direct",
@@ -26627,7 +27415,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -26652,9 +27440,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor rich repair: 200；vendor historical repair readback: 200；vendor wrong project history refused: 404；legacy-response rich repair: 200；legacy-response historical repair readback: 200；legacy-response wrong project history refused: 404。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -26672,7 +27463,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor rich repair: 200；vendor historical repair readback: 200；vendor wrong project history refused: 404；legacy-response rich repair: 200；legacy-response historical repair readback: 200；legacy-response wrong project history refused: 404。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor rich repair: 200；vendor historical repair readback: 200；vendor wrong project history refused: 404；legacy-response rich repair: 200；legacy-response historical repair readback: 200；legacy-response wrong project history refused: 404。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.486Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -26691,9 +27521,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1933
+        "line": 1945
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/deliver",
       "registration": "direct",
@@ -26706,7 +27536,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -26731,9 +27561,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor no-code delivery: 200；legacy-response no-code delivery: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -26751,7 +27584,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor no-code delivery: 200；legacy-response no-code delivery: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor no-code delivery: 200；legacy-response no-code delivery: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.486Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -26768,9 +27640,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1964
+        "line": 1978
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/dispatch/relay",
       "registration": "direct",
@@ -26845,9 +27717,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1992
+        "line": 2006
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/dispatch/relay/continue",
       "registration": "direct",
@@ -26922,9 +27794,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2020
+        "line": 2034
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/repair-attempts/:attemptId/relay-receipt",
       "registration": "direct",
@@ -27004,9 +27876,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2084
+        "line": 2098
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/human-workflows/latest",
       "registration": "direct",
@@ -27083,9 +27955,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2109
+        "line": 2123
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/human-workflow",
       "registration": "direct",
@@ -27147,7 +28019,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.249Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.441Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27167,9 +28039,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2125
+        "line": 2139
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/comments",
       "registration": "direct",
@@ -27230,7 +28102,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.249Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.441Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27250,9 +28122,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2168
+        "line": 2182
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/events",
       "registration": "direct",
@@ -27332,9 +28204,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2188
+        "line": 2202
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/projects/:projectId/builds",
       "registration": "direct",
@@ -27411,9 +28283,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2219
+        "line": 2233
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/builds/:buildId",
       "registration": "direct",
@@ -27490,9 +28362,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2236
+        "line": 2250
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/builds/:buildId/link-repair",
       "registration": "direct",
@@ -27569,9 +28441,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2267
+        "line": 2281
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/verifications",
       "registration": "direct",
@@ -27584,7 +28456,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -27609,9 +28481,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor create verification: 201；legacy-response create verification: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -27629,7 +28504,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor create verification: 201；legacy-response create verification: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor create verification: 201；legacy-response create verification: 201。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.487Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -27648,9 +28562,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2296
+        "line": 2313
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/verifications/:verificationId",
       "registration": "direct",
@@ -27663,7 +28577,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -27688,9 +28602,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor verification detail: 200；legacy-response verification detail: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -27708,7 +28625,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor verification detail: 200；legacy-response verification detail: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor verification detail: 200；legacy-response verification detail: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.487Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -27727,9 +28683,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2319
+        "line": 2336
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/verifications/:verificationId/start",
       "registration": "direct",
@@ -27742,7 +28698,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -27767,9 +28723,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor start verification: 200；legacy-response start verification: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -27787,7 +28746,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor start verification: 200；legacy-response start verification: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor start verification: 200；legacy-response start verification: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.487Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -27806,9 +28804,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2351
+        "line": 2370
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/verifications/:verificationId/result",
       "registration": "direct",
@@ -27821,7 +28819,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -27846,9 +28844,12 @@
         },
         "http": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+            "runs/frozen-workflow-live-readback.json"
+          ],
+          "actual": "真实独立API31调用中的本路由子集：vendor result: 200；vendor same request other response media: 200；legacy-response result: 200；legacy-response same request other response media: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -27866,7 +28867,46 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
+            "runs/frozen-workflow-live-readback.json": "86f19ca0f0e279f12994a70702dac8a4bdc1769d67e7e79b547d27c7a8a4c95a"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "evidence": [
+                "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+                "runs/frozen-workflow-live-readback.json"
+              ],
+              "actual": "真实独立API31调用中的本路由子集：vendor result: 200；vendor same request other response media: 200；legacy-response result: 200；legacy-response same request other response media: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "真实独立API31调用中的本路由子集：vendor result: 200；vendor same request other response media: 200；legacy-response result: 200；legacy-response same request other response media: 200。14个响应媒体头另行核对；请求为1.1，不宣称完整旧1.0请求、blocked写入或本路由全部负向组合。",
+            "evidence": [
+              "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json",
+              "runs/frozen-workflow-live-readback.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.488Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -27885,9 +28925,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2406
+        "line": 2426
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/notifications",
       "registration": "direct",
@@ -27964,9 +29004,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2450
+        "line": 2470
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/capture-bundles",
       "registration": "direct",
@@ -28043,9 +29083,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2492
+        "line": 2512
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "GET",
       "path": "/api/v1/capture-bundles/:captureId",
       "registration": "direct",
@@ -28122,9 +29162,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2507
+        "line": 2527
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/uploads/init",
       "registration": "direct",
@@ -28201,9 +29241,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2541
+        "line": 2561
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "PUT",
       "path": "/api/v1/uploads/:sessionId/chunks/:chunkNumber",
       "registration": "direct",
@@ -28280,9 +29320,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2595
+        "line": 2615
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/uploads/:sessionId/finalize",
       "registration": "direct",
@@ -28359,9 +29399,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2639
+        "line": 2659
       },
-      "sourceHash": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+      "sourceHash": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
       "method": "POST",
       "path": "/api/v1/attachments/:attachmentId/bind",
       "registration": "direct",
@@ -29621,7 +30661,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.473Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -29797,7 +30837,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.474Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -29898,7 +30938,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.474Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -30074,7 +31114,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.474Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -31528,7 +32568,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.488Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -32380,7 +33420,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.488Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -32555,7 +33595,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.488Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -33027,7 +34067,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.488Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -33339,7 +34379,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -34525,7 +35565,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.471Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35561,7 +36601,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35645,7 +36685,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35808,7 +36848,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36755,7 +37795,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36839,7 +37879,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36921,7 +37961,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37322,7 +38362,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.471Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37721,7 +38761,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.471Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37884,7 +38924,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.472Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -38971,7 +40011,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.471Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -39134,7 +40174,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.471Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -42782,7 +43822,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.488Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -43358,7 +44398,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.489Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -43821,7 +44861,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -43901,7 +44941,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -52646,7 +53686,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52733,7 +53773,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52820,7 +53860,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52907,7 +53947,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52992,7 +54032,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53157,7 +54197,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53244,7 +54284,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53331,7 +54371,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53418,7 +54458,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53503,7 +54543,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53590,7 +54630,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53841,7 +54881,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53928,7 +54968,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -54015,7 +55055,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -54100,7 +55140,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -54187,7 +55227,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.443Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -58466,13 +59506,15 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "android-code22-no-code.json"
+          ],
+          "actual": "code22已安装原生开始修复按钮实际调用：Bug in_progress/v3、human RepairAttempt running/v2，官方HTTP回读与事件保留。",
           "note": "Real execution and read-back required."
         },
         "exe": {
@@ -58511,7 +59553,43 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "proofHashes": {
+            "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
+          },
+          "results": {
+            "apk": {
+              "status": "passed",
+              "evidence": [
+                "android-code22-no-code.json"
+              ],
+              "actual": "code22已安装原生开始修复按钮实际调用：Bug in_progress/v3、human RepairAttempt running/v2，官方HTTP回读与事件保留。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "apk",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": null
+          },
+          {
+            "surface": "apk",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "code22已安装原生开始修复按钮实际调用：Bug in_progress/v3、human RepairAttempt running/v2，官方HTTP回读与事件保留。",
+            "evidence": [
+              "android-code22-no-code.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:57:13.489Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -58588,7 +59666,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -58622,84 +59700,10 @@
         "apk": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "Real execution and read-back required."
-        },
-        "exe": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "web": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "http": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "server_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "local_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        }
-      },
-      "manual": {},
-      "needsRevalidation": false,
-      "generated": true
-    },
-    {
-      "id": "android_control-1cd07b980530f5",
-      "kind": "android_control",
-      "title": "Button(enabled = mayAct, onClick = { perform { it.verify(bug, projectScope.actorId, true, note) } }, modifier = Modifier.testTag(\"bug-verify-pass\")) { Text(\"验收通过并关闭\") } OutlinedButton(enabled = mayAct, onClick = { perform { it.verify(bug, p",
-      "group": "relay.production",
-      "baselineIds": [
-        16,
-        18,
-        19,
-        20
-      ],
-      "source": {
-        "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
-        "line": 102
-      },
-      "sourceHash": "4b9e9a4eafa96ed75d1ee93046df9355557c120935b0bfaa8610854fb9830794",
-      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
-      "steps": [
-        "Prepare a fresh project-scoped test record and record its version.",
-        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
-        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
-        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
-      ],
-      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "passed",
-      "results": {
-        "apk": {
-          "applicable": true,
-          "status": "passed",
           "evidence": [
-            "android-implementation.md",
-            "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json"
+            "android-code22-no-code.json"
           ],
-          "actual": "此原生控件在实际模拟器姓名登录/新建内容与提交/Bug详情/评论/人工完成/验收退回或关闭过程中操作；HTTP读回 closed/v11 与事件。未把旁边未操作的开始修复、代码交付、编辑、删除或其它入口记通过。",
+          "actual": "已实测：code22原生无需代码分支提交成功，Bug ready_for_verification/v4，RepairAttempt delivered/v3，not_required/no_code_delivery，deliver1且complete0。仍缺：同一按钮的真实代码分支/commit交付仍未执行，整行保持not_run。",
           "note": "Real execution and read-back required."
         },
         "exe": {
@@ -58739,7 +59743,156 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "reviewedEvidence": {
+          "proofHashes": {
+            "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
+          },
+          "surfaceProgress": {
+            "apk": {
+              "evidence": [
+                "android-code22-no-code.json"
+              ],
+              "completed": [
+                "code22原生无需代码分支提交成功，Bug ready_for_verification/v4，RepairAttempt delivered/v3，not_required/no_code_delivery，deliver1且complete0"
+              ],
+              "remaining": [
+                "同一按钮的真实代码分支/commit交付仍未执行，整行保持not_run"
+              ]
+            }
+          }
+        },
+        "branchResults": {
+          "no_code": {
+            "status": "passed",
+            "evidence": [
+              "android-code22-no-code.json"
+            ],
+            "actual": "Actual native no-code submit and durable task readback; real code branch remains not_run."
+          }
+        },
+        "evidenceMappedAt": "2026-09-08T20:57:13.489Z",
+        "surfaceProgress": {
+          "apk": {
+            "completed": [
+              "code22原生无需代码分支提交成功，Bug ready_for_verification/v4，RepairAttempt delivered/v3，not_required/no_code_delivery，deliver1且complete0"
+            ],
+            "remaining": [
+              "同一按钮的真实代码分支/commit交付仍未执行，整行保持not_run"
+            ],
+            "evidence": [
+              "android-code22-no-code.json"
+            ],
+            "status": "partial"
+          }
+        }
+      },
+      "needsRevalidation": false,
+      "generated": true
+    },
+    {
+      "id": "android_control-1cd07b980530f5",
+      "kind": "android_control",
+      "title": "Button(enabled = mayAct, onClick = { perform { it.verify(bug, projectScope.actorId, true, note) } }, modifier = Modifier.testTag(\"bug-verify-pass\")) { Text(\"验收通过并关闭\") } OutlinedButton(enabled = mayAct, onClick = { perform { it.verify(bug, p",
+      "group": "relay.production",
+      "baselineIds": [
+        16,
+        18,
+        19,
+        20
+      ],
+      "source": {
+        "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
+        "line": 102
+      },
+      "sourceHash": "4b9e9a4eafa96ed75d1ee93046df9355557c120935b0bfaa8610854fb9830794",
+      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
+      "steps": [
+        "Prepare a fresh project-scoped test record and record its version.",
+        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
+        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
+        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
+      ],
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
+      "status": "passed",
+      "results": {
+        "apk": {
+          "applicable": true,
+          "status": "passed",
+          "evidence": [
+            "android-implementation.md",
+            "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json",
+            "android-code22-no-code.json"
+          ],
+          "actual": "此原生控件在实际模拟器姓名登录/新建内容与提交/Bug详情/评论/人工完成/验收退回或关闭过程中操作；HTTP读回 closed/v11 与事件。未把旁边未操作的开始修复、代码交付、编辑、删除或其它入口记通过。 code22实际原生验收通过并关闭：Bug closed/v6、Verification passed/v3，官方HTTP及事件读回。",
+          "note": "Real execution and read-back required."
+        },
+        "exe": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "web": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "http": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "server_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "local_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        }
+      },
+      "manual": {
+        "evidenceMappedAt": "2026-09-08T20:57:13.489Z",
+        "reviewedEvidence": {
+          "proofHashes": {
+            "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
+          },
+          "results": {
+            "apk": {
+              "status": "passed",
+              "evidence": [
+                "android-implementation.md",
+                "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json",
+                "android-code22-no-code.json"
+              ],
+              "actual": "此原生控件在实际模拟器姓名登录/新建内容与提交/Bug详情/评论/人工完成/验收退回或关闭过程中操作；HTTP读回 closed/v11 与事件。未把旁边未操作的开始修复、代码交付、编辑、删除或其它入口记通过。 code22实际原生验收通过并关闭：Bug closed/v6、Verification passed/v3，官方HTTP及事件读回。"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "apk",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "此原生控件在实际模拟器姓名登录/新建内容与提交/Bug详情/评论/人工完成/验收退回或关闭过程中操作；HTTP读回 closed/v11 与事件。未把旁边未操作的开始修复、代码交付、编辑、删除或其它入口记通过。",
+            "evidence": [
+              "android-implementation.md",
+              "../../../apps/android/app/build/evidence/project-components/bug-closed-readback.json"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -58817,7 +59970,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -58895,7 +60048,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -61377,7 +62530,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -62915,7 +64068,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -63577,7 +64730,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65188,7 +66341,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65266,7 +66419,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65344,7 +66497,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -66591,7 +67744,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -66670,7 +67823,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -66749,7 +67902,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -66974,7 +68127,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -67053,7 +68206,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -67277,7 +68430,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -67428,7 +68581,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -67507,7 +68660,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -67658,7 +68811,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -68534,7 +69687,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.448Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -69433,7 +70586,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.468Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -69609,7 +70762,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.468Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -69713,7 +70866,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.468Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -70033,7 +71186,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.468Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -70137,7 +71290,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.468Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -70391,7 +71544,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
+        "evidenceMappedAt": "2026-09-08T20:57:13.449Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -71679,7 +72832,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.255Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -73119,7 +74272,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -73210,7 +74363,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -74082,7 +75235,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -75309,7 +76462,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -75613,7 +76766,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
+        "evidenceMappedAt": "2026-09-08T20:57:13.447Z",
         "surfaceProgress": {
           "apk": {
             "completed": [

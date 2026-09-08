@@ -298,7 +298,10 @@ const baseline = [
   ["旧数据副本迁移", "一致性离线副本迁移前后 ID、Bug、人员、附件、历史和未完成任务可核对。"],
   ["APK 共存与升级", "新旧独立 applicationId 同设备共存；专用测试升级保留草稿和证据。"],
   ["EXE 共存与升级", "新旧真实 EXE 同开；专用升级重启保留配置、草稿、历史及更新隔离。"],
-  ["回退演练", "按人工说明停止/恢复新版；保留回退前新增数据和任务证据；生产继续健康。"],
+  [
+    "回退演练",
+    "能按文档恢复服务并保留回退前新增数据和任务证据；按设计10.3隔离保留新版数据，旧程序不读取已迁移的新库。",
+  ],
 ];
 for (const [index, [title, expected]] of baseline.entries()) {
   const number = index + 1;
@@ -311,6 +314,9 @@ for (const [index, [title, expected]] of baseline.entries()) {
       15: ["http", "server_mcp", "local_mcp"],
       22: ["apk"],
       23: ["exe"],
+      // Design 13/24 is service restoration, observed through HTTP. Client rollback
+      // controls remain independent inventory entries under sections 16 and 17.
+      24: ["http"],
     }[number] ?? surfaces;
   add({
     kind: "baseline",
@@ -845,6 +851,17 @@ const data = {
       required:
         "The pinned main SQLite and 878 attachments have been restored, migrated and read through a held API. Still required: explicit unfinished-task inventory and recovery evidence for legacy increment-upload queue/owner/workspace/job files, Relay batch/state directories and third-party state outside that recovery set.",
       evidence: ["migration-rehearsal.md", "migration-service-readback.json"],
+    },
+    {
+      id: "frozen-workflow-runtime-coverage",
+      affects: ["http", "workflow"],
+      status: "partially_verified",
+      required:
+        "The six registered mutation response schemas and strict static gates are repaired. Inherited 1.0 result requests/blocked writes and unregistered fail/supersede POST plus /bugs/:bugId/workflow GET remain gaps; rich existing GET history is a separate read model, not those missing operations.",
+      evidence: [
+        "contracts-remediation-implementation.md",
+        "runs/frozen-workflow-live-readback.json",
+      ],
     },
   ],
   summary: {

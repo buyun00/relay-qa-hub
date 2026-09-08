@@ -5,7 +5,7 @@
 ## 工作树和边界
 
 - 工作树：C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub。
-- 分支：codex/project-components-v2-1；起点 62b4495c9b28dc3aea1d5633e870be4e1fdf841f。首个实施提交为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789；当前补充仅修改文档。
+- 分支：codex/project-components-v2-1；起点 62b4495c9b28dc3aea1d5633e870be4e1fdf841f。首个实施提交为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789；本轮补充包含证据映射/判据校正，合同修复已提交09f7150，Android源已提交1be7724；本轮源码清单按最终内容冻结。
 - 依据：完整读取 docs/design/project-components-transformation-2026-09-08.md v2.1，包含第 16、17 节；适用 C:\Users\lin0\.codex\AGENTS.md 和本任务生产隔离约束。
 - 不合并 main、不推送生产分支、不发布或重启生产，不覆盖日常 EXE/APK，不清理已有草稿、附件、备份或任务。旧运维脚本中的生产路径和默认回退不能直接用于预览。
 - 本工作树独立 npm 依赖已在前期安装；源码、运行目录、客户端身份、Cookie 和更新通道与日常实例分开。
@@ -21,11 +21,11 @@
 
 独立配置为 C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\instance.json。API 4419、Web/下载 4274、服务端 MCP 4421、本地 EXE MCP 4420。操作方法见 [preview-operations.md](preview-operations.md)。
 
-已有真实管理和GM项目读回确认 API ready / schema **14**，database、evidence、worker均正常。最新公开进程回执为 API PID17912（2026-09-08T19:37:04.0646720Z）、Web PID20284、MCP转发PID15736；主代理报告本次API重启后ready。本次仅核对预览进程回执，没有重新探测预览API；回执不能替代每次操作前的身份与就绪检查。提交前已只读重新核对生产，结果见下一段。[GM就绪读回](runs/server-mcp-gm-project-live.json)、[生产盘点](production-inventory.md)、[生产留存读回](runs/production-after-preview5.json)。
+已有真实管理和GM项目读回确认 API ready / schema **14**，database、evidence、worker均正常。最新API为PID18644（2026-09-08T20:39:13.7225210Z），实际HTTP读回ready/schema14；Web PID20284、MCP转发PID15736为此前回执。实际验证见最新frozen-workflow-live-readback；这些历史PID仍不能替代操作前身份核对。提交前已只读重新核对生产，结果见下一段。[GM就绪读回](runs/server-mcp-gm-project-live.json)、[生产盘点](production-inventory.md)、[生产留存读回](runs/production-after-preview5.json)。
 
 此前提交前只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。
 
-最新.7升级后生产只读核对为2026-09-08T19:55:31.6095789Z：六文件hash、三个原PID及精确启动时点不变，4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。日常EXE可读路径相同；两个Node的路径仍为null，不能视为新增可执行路径验证。本轮未重新查询Android，APK状态仍引用19:30快照；未读配置正文/凭据或修改生产。[.7后生产快照](runs/production-after-preview7.json)。
+此前.7升级后生产只读核对为2026-09-08T19:55:31.6095789Z：六文件hash、三个原PID及精确启动时点不变，4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。日常EXE可读路径相同；两个Node的路径仍为null，不能视为新增可执行路径验证。本轮未重新查询Android，APK状态仍引用19:30快照；未读配置正文/凭据或修改生产。[.7后生产快照](runs/production-after-preview7.json)。
 
 | 范围 | 已落实行为 | 证据和边界 |
 | --- | --- | --- |
@@ -52,9 +52,9 @@
 
 后续19:01:28Z已实际手工回退.6→.5：旧backup继续保留，整个.6目录另存为.rollback-retained-20260908T1901Z，profile未改；原生同员工/项目/文字+图恢复，Bug13仍closed/v14且原评论/附件hash保留。19:02:22Z生产六文件hash、三个原进程/启动时点及ready/schema12不变。[手工回退](runs/exe-preview6-to5-rollback.json)、[业务保留](runs/exe-rollback5-business-readback.json)、[生产核对](runs/production-after-preview6-rollback.json)。
 
-随后重复升级.6成功，原.backup-release与新增-1备份同时存在，原生草稿恢复。实际卸载.6时整个安装转存.uninstalled-release，profile的102文件/663514299字节逐一hash完全不变；之后使用精确相同.6包重装成功，原员工A/配置/文字+1图恢复，原closed/v14、1评论和附件hash读回。[重复升级](runs/exe-preview6-repeat-upgrade.json)、[卸载保留](runs/exe-preview6-uninstall-readback.json)、[同包重装](runs/exe-preview6-after-uninstall-reinstall.json)。**24仅EXE客户端范围passed，完整服务数据与APK回退仍not_run，24整项未通过。** 当前最新成功安装和原生恢复proof为.7；.6回退/卸载重装只证明当时的客户端范围。
+随后重复升级.6成功，原.backup-release与新增-1备份同时存在，原生草稿恢复。实际卸载.6时整个安装转存.uninstalled-release，profile的102文件/663514299字节逐一hash完全不变；之后使用精确相同.6包重装成功，原员工A/配置/文字+1图恢复，原closed/v14、1评论和附件hash读回。[重复升级](runs/exe-preview6-repeat-upgrade.json)、[卸载保留](runs/exe-preview6-uninstall-readback.json)、[同包重装](runs/exe-preview6-after-uninstall-reinstall.json)。**这里仅记录EXE客户端回退/恢复通过；基线24随后由独立47项服务/HTTP演练满足，其他客户端功能不传递通过。** 当前最新成功安装和原生恢复proof为.7；.6回退/卸载重装只证明当时的客户端范围。
 
-**Android 当前为 com.relayqahub.android.preview.debug，0.2.0-preview.7 / versionCode 21。** 与日常包分离；15→21 预览升级、手工闭环、截图/附件和人员管理有 MuMu Android 15 模拟器证据。20→21实际恢复原项目/身份/文字和未提交PNG，drafts/sidecar/PNG三份hash不变；code21本地批次/交接/禁用远端三个tab实际可达，前两者为空列表，未操作有数据的恢复或merge。日常code14/PID5051/安装时点/dataDir不变。**没有物理Android设备证据**；基线22保持not_run，ADB更新不是签名更新源和应用内自升级通过。[Android完整记录](android-implementation.md)。
+**Android 当前为 com.relayqahub.android.preview.debug，0.2.0-preview.8 / versionCode 22；新增原生验证见下方code22专节。** 此前code21证据继续保留。 与日常包分离；15→21 预览升级、手工闭环、截图/附件和人员管理有 MuMu Android 15 模拟器证据。20→21实际恢复原项目/身份/文字和未提交PNG，drafts/sidecar/PNG三份hash不变；code21本地批次/交接/禁用远端三个tab实际可达，前两者为空列表，未操作有数据的恢复或merge。日常code14/PID5051/安装时点/dataDir不变。**没有物理Android设备证据**；基线22保持not_run，ADB更新不是签名更新源和应用内自升级通过。[Android完整记录](android-implementation.md)。
 
 EXE 异常退出独立性已取得真实子集证据：仅停止预览 EXE 后，预览进程及本地 4420 消失，独立 HTTP 核心 15 项与服务端 MCP 核心 13 项继续通过；恢复预览后原员工、文字及 1 张图片草稿保留。日常 EXE PID 17160/启动时间不变，生产仍 ready/schema 12。这不代表全部 HTTP 动作通过。[异常退出读回](runs/exe-fault-independent-api-mcp.json)、[HTTP 15 项](runs/http-core-2026-09-08T18-19-04-805Z.json)、[MCP 13 项](runs/server-mcp-core-2026-09-08T18-19-05-946Z.json)、[草稿界面](runs/exe-preview4-after-fault-draft.txt)。
 
@@ -73,13 +73,13 @@ EXE 异常退出独立性已取得真实子集证据：仅停止预览 EXE 后�
 | 真实API分页/协议/附件 | 15/15，fail0；实际HTTP/SQLite分页501评论、101绑定附件且保持内容/归属 | [完整原始日志](runs/api-pagination-final.txt)；独立临时实例，含采集包附属资源、MCP协议与权限；不是生产大数据或外部执行器验收 |
 | 后续精确授权/删除保护 | scope16/16；最终删除/协议/附件组合17/17 | [scope](runs/api-production-scope-final.txt)、[删除保护](runs/api-delete-guard-final.txt)：第101项目/成员与GM无普通membership精确授权；已删Bug附件metadata/raw/capture/materialize/resources拒绝且存储保留；套件重叠，不相加 |
 | Native安装守卫/时间 | NSIS原始.onInit隔离fixture6/6；.6helper实际UTC验证通过 | [安装guard](runs/native-installer-guards.json)只含首建Programs/marker/junction/越界判断，未执行干净用户完整首装；[UTC](runs/native-updater-utc.json)故意无效空配置得到failed、未调用installer，不能计更新成功 |
-| 冻结源码完整Storage/API/执行器 | Storage109/109；最新API MJS151+TS33=184/184；C#40/40 | [Storage](runs/storage-final-complete-source.txt)、[生命周期修复后最新API](runs/api-final-lifecycle-source.txt)、[后端证据](backend-components.md)；先前[API175/175](runs/api-final-complete-source.txt)保留历史，上表15/16/17与175均为重叠轮次，不相加 |
-| 组件运行生命周期 | 9项真实listener/runtime/SQLite/inflight验证；纳入最新184 | [生命周期说明](component-runtime-lifecycle.md)、[结构化证据](runs/component-runtime-lifecycle.json)：旧实现已有onReady/onClose，修复绑定成功前调度、构造失败清理及并发关闭/drain；不是外部执行器E2E |
+| 冻结源码完整Storage/API/执行器 | 最新Storage109/109、API205mjs+33ts=238/238；C#40/40 | [最新Storage](runs/contracts-remediation-storage.txt)、[最新API238](runs/contracts-remediation-api-final.txt)、[历史API184](runs/api-final-lifecycle-source.txt)、[后端证据](backend-components.md)；先前[API175/175](runs/api-final-complete-source.txt)保留历史，上表15/16/17与175均为重叠轮次，不相加 |
+| 组件运行生命周期 | 9项真实listener/runtime/SQLite/inflight验证；184历史轮次已有且最新238继续覆盖 | [生命周期说明](component-runtime-lifecycle.md)、[结构化证据](runs/component-runtime-lifecycle.json)：旧实现已有onReady/onClose，修复绑定成功前调度、构造失败清理及并发关闭/drain；不是外部执行器E2E |
 | MCP | 服务端/本地核心场景、90 工具目录、Android 真截图资源读回，.4 本地文件/hash 匹配 | [服务端核心](runs/server-mcp-core-2026-09-08T17-52-56-155Z.json)、[本地核心（当时 .3）](runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json)、[.4 资源](runs/desktop-mcp-resource-preview4.json) |
-| root 常规门禁 | unit4/4、skeleton1/1、workspace typecheck/lint通过 | [unit](runs/root-unit-final-retry.txt)、[skeleton](runs/skeleton-e2e-final-retry.txt)、[最新typecheck](runs/typecheck-final-all-source.txt)、[最新lint](runs/lint-final-all-source.txt)；早期失败日志保留 |
-| root 严格合同基线 | check:contracts通过，check:contract-breaking仍failed，组合test:contract未通过 | [失败日志](runs/contracts-final-retry.txt)、[只读审查](contracts-baseline-audit.md)：起点HEAD已有workflow冻结漂移；未重写baseline，不能豁免为成功 |
-| 独立合同检查 | app-first、additive、app-first breaking三项各自通过 | [app-first](runs/contracts-app-first.txt)、[additive](runs/contracts-additive.txt)、[breaking app-first](runs/contracts-breaking-app-first.txt)；这是另行执行，不代表前述组合门禁通过 |
-| Android | code21 assembleDebug/testDebugUnitTest/lintDebug通过；80测试无失败；模拟器安装与交互 | [Android 证据](android-implementation.md)，物理设备/有数据恢复merge/完整组件/更新源未覆盖 |
+| root 常规门禁 | unit4/4、skeleton1/1、workspace typecheck/lint通过 | [unit](runs/root-unit-final-retry.txt)、[skeleton](runs/skeleton-e2e-final-retry.txt)、[该轮typecheck](runs/typecheck-final-all-source.txt)、[该轮lint](runs/lint-final-all-source.txt)；早期失败日志保留 |
+| root 严格合同基线 | 历史失败已修复；最新test:contract五步全过，原1.0/1.1 baseline/checker保持 | [失败日志](runs/contracts-final-retry.txt)、[只读审查](contracts-baseline-audit.md)：起点HEAD已有workflow冻结漂移；现以[真实响应修复](contracts-remediation-implementation.md)和[五步成功](runs/contracts-remediation-strict.txt)解决，历史失败不覆盖 |
+| 独立合同检查 | app-first、additive、app-first breaking三项各自通过 | [app-first](runs/contracts-app-first.txt)、[additive](runs/contracts-additive.txt)、[breaking app-first](runs/contracts-breaking-app-first.txt)；这是修复前另行执行的历史记录；当前组合五步已另有成功证据 |
+| Android | code22 build、87单测、lint0errors；MuMu21→22升级和原生no_code闭环 | [最新code22](android-code22-no-code.md)，旧[code21](android-implementation.md)保留；物理设备/真实代码交付/外部组件/更新源未覆盖 |
 | 离线迁移/回退 | schema 12→14；完整性正常、外键 0；878 附件匹配；58 原业务表指纹不变；另存 schema 12 回退副本 | [迁移演练](migration-rehearsal.md)；原两副本仍paused且未启动，新的第三副本服务读回见下行，不覆盖独立组件目录 |
 | held迁移副本服务读回 | 26/26，schema14 ready、100 Bug、2评论、1真实附件hash、401/404/hold409；出站0、正常退出0 | [新副本实际HTTP](migration-service-readback.md)、[JSON](migration-service-readback.json)；只补21的HTTP部分实测，不能代表schema12程序或迁移后新增数据回退 |
 
@@ -89,7 +89,7 @@ EXE 异常退出独立性已取得真实子集证据：仅停止预览 EXE 后�
 
 ## 矩阵和未完成事项
 
-[coverage-matrix.json](coverage-matrix.json) / [Markdown](coverage-matrix.md) 已更新到 **985 条、24基线、193 HTTP路由、109 MCP源码注册行、269 Web控件、106 Android控件**。980是添加Web outbox前的旧计数。运行目录去重90工具，源码保留18工具fallback分别记未测；同名调用不会重复通过。**整项通过的基线为09、15、23**；22物理Android仍缺。15按设计列出的HTTP/服务MCP/本地MCP三读取入口及同一PNG归属/hash证据整项通过；其它客户端控件未因此通过。HTTP15和服务MCP13核心脚本不等于全部动作，11/12仍为部分实测。精确入口结果、证明文件hash和剩余缺口见[映射审查](coverage-mapping-review.md)；旧失败、退役项与源码复验标记保留。
+[coverage-matrix.json](coverage-matrix.json) / [Markdown](coverage-matrix.md) 已更新到 **985 条、24基线、193 HTTP路由、109 MCP源码注册行、269 Web控件、106 Android控件**。980是添加Web outbox前的旧计数。运行目录去重90工具，源码保留18工具fallback分别记未测；同名调用不会重复通过。**整项通过的基线为09、15、23、24**；22物理Android仍缺。15按设计列出的HTTP/服务MCP/本地MCP三读取入口及同一PNG归属/hash证据整项通过；其它客户端控件未因此通过。HTTP15和服务MCP13核心脚本不等于全部动作，11/12仍为部分实测。精确入口结果、证明文件hash和剩余缺口见[映射审查](coverage-mapping-review.md)；旧失败、退役项与源码复验标记保留。
 
 仍缺：
 
@@ -103,11 +103,11 @@ EXE 异常退出独立性已取得真实子集证据：仅停止预览 EXE 后�
 
 五组件真实外部完整链路仍为 **not_run**，24 基线未全过。没有借生产目标测试，没有把 queued/uncertain/mock 写成成功。
 
-基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、15、23整项通过，其余功能仍按实际入口分别验收。21的缺口是主库归档以外的旧上传queue.sqlite/owner/workspace/job、Relay批次/state及轻语状态的未完成任务完整清单和迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
+基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、15、23、24整项通过，其余功能仍按实际入口分别验收。21的缺口是主库归档以外的旧上传queue.sqlite/owner/workspace/job、Relay批次/state及轻语状态的未完成任务完整清单和迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
 
 .7仅两个实际按钮新增EXE passed：关闭窗口、状态面板检查更新/安装并重启。window-action(close)、check-update成功、install-update成功、second-instance无深链恢复记为分支passed，复合handler仍not_run；托盘图标点击仍未测。生成/映射脚本本轮仅为持久重放这些证据作有界修改，不改应用源码；保留401个既有复验标记，proof SHA不一致时拒绝且不写矩阵。[映射审查](coverage-mapping-review.md)、[实际重放验证](runs/coverage-criteria-replay.json)。
 
-严格合同评估已补充：五个继承字段使冻结canonical漂移；仅删除schema定义会让当前真实DTO违反additionalProperties:false，不能靠重写baseline或豁免解决。尚未确认可运行的严格旧响应投影入口，兼容修复没有实施，严格门禁仍failed。[修复边界评估](contracts-remediation-assessment.md)。
+严格合同的历史失败已在提交09f7150fc1c671d867bbdbc257cab0e61c78d20f修复：五步test:contract全部通过，原1.0/1.1 baseline与checker未重写。六条已注册POST使用冻结响应投影，丰富事实仍可从原三条GET读取。完整API238/238（205mjs+33ts）、Storage109/109、相关Web19/19通过；其中52条响应fixture覆盖八种Accept，不能当作运行实例E2E。[实现与边界](contracts-remediation-implementation.md)、[严格五步](runs/contracts-remediation-strict.txt)、[最终API](runs/contracts-remediation-api-final.txt)。旧1.0 result请求、blocked写入和未注册fail/supersede POST及/bugs/:bugId/workflow GET仍缺，不能据静态门禁宣称完整运行合同。
 
 ## 保留的问题和修复历史
 
@@ -122,3 +122,25 @@ Web 首次附件失败是 JPEG 字节误命名/声明 PNG，服务端正确拒�
 安装guard fixture初次将两个测试junction条目留在预览runtime内，触发正式启动器的路径校验拒绝；已按主代理授权仅将链接条目移到runtime外的专用fixture目录，目标/sentinel hash保留，manager只读Status恢复exit0。native6/6结果不变；布局修正和映射保存在[native guard证据](runs/native-installer-guards.json)，矩阵采用修正后的证据hash。
 
 8份MCP证据的嵌套JSON凭据已完成脱敏，原件经hash校验保留于独立runtime私有目录；本轮矩阵读取并重算的是脱敏后的工作树文件，没有读取私有原件。对应新旧hash与规则见[脱敏清单](commit-safety-redaction.json)。提交和归档应保留公开证明与受限私有原件的边界。
+
+## 服务回退47项与基线24校准
+
+新增三阶段真实服务回退演练47/47通过，记录59条HTTP状态/大小/hash。modern3b1371c/schema14新增两Bug、评论、68字节PNG及两人工RepairAttempt/两Verification（含in_progress未完成任务）；正常停止后910文件/753461759字节整根保留，old62b4495/schema12实际读取独立旧归档，随后M14以原session恢复新增ID、版本、操作者、状态和hash。三进程正常exit0，端口关闭，retained全文件hash仍一致。[47项服务回退](baseline24-service-rollback.md)、[JSON](baseline24-service-rollback.json)。外层写入为HTTP /api/v1/mcp/call，标准domain GET读回；本次没有独立JSON-RPC或客户端UI操作。protectedBefore/After只核对固定archive/migrated/rollback，不是新一轮生产六文件快照。
+
+基线24按设计13/24“能按文档恢复服务并保留回退前新增数据和任务证据”和10.3的隔离回退边界校准：服务/HTTP是必要入口，旧程序不需要读取或合并新版数据。先前要求六入口各自降级、或让APK回退阻止该服务基线通过，属于过度约束，现已纠正。既有EXE客户端恢复证据单独保留；APK/Web/MCP及其它功能控件保持各自实测状态。24整项通过不补齐18/19外部组件、21旧queue/workspace完整清单、22及17.3物理设备缺口，整个任务仍未完成。
+
+本轮按最终冻结源码重新盘点：188个源码文件、985细目，保留既有人工结果、负向备注与needsRevalidation；09、15、23、24整项通过，其余基线和独立功能仍按实际缺口验收。
+
+## 最终API、Android与生产读回
+
+最终dist已在独立API PID18644加载，启动时点2026-09-08T20:39:13.7225210Z，4419 ready/schema14。root实际31个HTTP调用通过：六条冻结POST的vendor/JSON输出、同幂等请求切换媒体重放、丰富历史读取及跨项目404；另核对14个媒体头与原EXE Bug closed/v14、评论及184872字节附件hash。[31次实际请求](runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json)、[媒体/旧业务读回](runs/frozen-workflow-live-readback.json)。请求均使用1.1；没有以此补齐旧1.0请求、未注册路由或全部HTTP/MCP对等。
+
+Android最新实际安装为com.relayqahub.android.preview.debug，code22 / 0.2.0-preview.8，MuMu中21→22覆盖升级与原生开始→无需代码提交→验收通过关闭完成。Bug386cdd2f-44c9-4a79-992a-891d595766fd closed/v6；49条对应HTTP均2xx，deliver1次、complete0次，87单测通过，lint0errors/29warnings。原有草稿/PNG/sidecar三hash、日常code14/PID5051/安装时间及四配置hash保留。Bug由API准备，后续状态写入来自原生按钮。修复文件BugLifecycleClient.kt由本目标3b1371c新增，62b起点不存在，不能描述为旧基线故障。[code22原生记录](android-code22-no-code.md)、[机器证据](android-code22-no-code.json)。真实物理设备、真实代码分支交付及外部组件仍not_run。
+
+当前固定APK为C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code22-acceptance/qa-hub-preview-code22.apk，35,471,405 bytes，SHA-256 733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777。code21原包保留为同目录retained-code21.apk，SHA-256 d783e9908e7dacdd660565cf15e1624c567a820e973d01190a38a0981afe7255。本次使用相同debug签名的adb install-r，不声称应用内签名更新源/自升级通过。EXE最新成功包仍为.7，不能把Android .8版本当作EXE新包。
+
+最新生产只读核对为2026-09-08T20:49:45.0734634Z：相对19:55快照，六文件hash、三个原PID精确启动时点及可见日常EXE路径保持，4319 ready/schema12，4174 Windows3.3.5 manifest原字节hash不变。两个Node的可执行路径仍null，没有新增路径证明；未重新验签/下载生产安装包。Android引用code22证据20:46:37.419Z的daily14/PID5051/配置保留，root未重复ADB查询。[最新生产只读证据](runs/production-after-api-fix-code22.json)。
+
+code22同一已验收APK已发布为不可变预览下载：[下载Android code22 / preview.8](http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk)。完整HTTP下载35,471,405字节、SHA-256 733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777，实例响应头/类型匹配，Windows manifest未变。Android源内容与提交1be772469671d75cbb5e31240bf345dcc7c4a267一致，APK构建发生在提交之前；本次发布没有重新构建或安装。回执不是签名更新manifest，不能记为应用内自升级或物理设备通过。[下载发布证据](runs/android-code22-download-publication.json)。
+
+本轮冻结盘点锚点为81e70d43638f3cb2f3dbd3994acd46f413e5364e，其中API兼容源码提交09f7150、Android源码提交1be7724；188个源码文件hash逐一匹配，985条细目、21条退役历史保留。连续生成器→mapper→生成器重放的语义hash一致；错误proof hash在任何写入前拒绝（0写入），人工负向结果和item/manual复验、sourceHash标记均保留，既有needsRevalidation零丢失。审计结果见coverage-matrix.json的evidenceMapping.finalReplayVerification。
