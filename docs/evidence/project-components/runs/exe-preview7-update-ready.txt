@@ -1,0 +1,56 @@
+Window: "Relay QA Hub", App: RelayQaHubPreview.exe.
+	0 窗口 Relay QA Hub Secondary Actions: Raise
+		1 窗格 (disabled)
+		2 区域 Relay QA Hub
+			3 区域
+				4 区域
+					5 区域
+						6 区域
+							7 区域
+								8 区域
+									9 文档 Relay QA Hub ID: RootWebArea
+										194 对话框 当前状态 Secondary Actions: Raise
+											195 文本 QA HUB
+											196 标题 当前状态 ID: desktop-tools-title
+											197 按钮 关闭设置
+											198 文本 Q
+											199 文本 Relay QA Hub
+											200 文本 当前版本 v0.2.0-preview.6
+											201 列表
+												202 字词 服务连接
+													203 文本 服务连接
+												204 文本 已连接
+												205 字词 通知连接
+													206 文本 通知连接
+												207 文本 已连接
+												208 字词 MCP 服务
+													209 文本 MCP 服务
+												210 文本 运行中
+											211 状态
+												212 文本 新版本 0.2.0-preview.7 已就绪
+											213 按钮 安装并重启
+											214 组 窗口控制
+												215 按钮 最小化 Description: 最小化
+												216 切换按钮 最大化 Description: 最大化
+												217 按钮 关闭窗口 Description: 关闭窗口，继续在托盘运行
+								72 区域
+
+Document text: ```
+QA HUB
+当前状态
+关闭设置
+Q
+Relay QA Hub
+当前版本 v0.2.0-preview.6
+服务连接
+已连接
+通知连接
+已连接
+MCP 服务
+运行中
+新版本 0.2.0-preview.7 已就绪
+安装并重启
+最小化
+最大化
+关闭窗口
+```

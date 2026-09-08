@@ -1,0 +1,38 @@
+{
+  "recordedAt": "2026-09-08T19:56:56.606Z",
+  "version": "0.2.0-preview.7",
+  "actions": [
+    "Native close-window button with open draft",
+    "Read-only local MCP context while hidden",
+    "Launch exact installed preview EXE a second time",
+    "Activate observed titled main window and inspect restored draft"
+  ],
+  "whileHidden": {
+    "nativeWindows": [],
+    "localMcpReadable": true,
+    "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+    "bugState": "closed"
+  },
+  "beforeAfterMainProcess": {
+    "pid": 11368,
+    "createdAt": "2026-09-08T19:52:36.0963040Z",
+    "same": true
+  },
+  "restored": {
+    "windowId": 2165104,
+    "employee": "EXE实际验收0909",
+    "draftText": "EXE第6版升级与回退保留草稿 2026-09-09：同一员工、项目A、PNG附件与未提交正文必须保留。",
+    "imageCount": 1,
+    "imageName": "exe-test-input.png"
+  },
+  "nativeEvidence": [
+    "exe-preview7-tray-restored.jpg",
+    "exe-preview7-tray-restored.txt"
+  ],
+  "limitations": [
+    "Restore invoked by second exact executable launch, not a Windows system tray icon click.",
+    "A transient untitled window could not be activated; after selecting the observed titled main window activation succeeded.",
+    "No process restart or force-stop was performed in this sequence."
+  ],
+  "passed": true
+}

@@ -33,7 +33,7 @@
 | 23 EXE 共存与升级 | — | passed | — | — | — | — |
 | 24 回退演练 | not_run | passed | not_run | not_run | not_run | not_run |
 
-09 已按六个各自真实入口分别闭环；23 已按原生EXE .4/.5/.6升级和恢复proof判通过。22保持未测：MuMu共存、ADB升级与code21三个保留hash只是部分实测，物理Android与应用内更新链路缺失。15的HTTP、服务MCP和本地MCP分别有同一PNG字节/hash证据，不将资源读取传递为所有客户端整项通过。
+09 已按六个各自真实入口分别闭环；23 已按原生EXE .4/.5/.6/.7升级和恢复proof判通过。22保持未测：MuMu共存、ADB升级与code21三个保留hash只是部分实测，物理Android与应用内更新链路缺失。15的HTTP、服务MCP和本地MCP分别有同一PNG字节/hash证据，不将资源读取传递为所有客户端整项通过。
 
 ## 部分实测及剩余缺口
 
@@ -65,7 +65,7 @@
 - 21 旧数据副本迁移 / APK：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
 - 21 旧数据副本迁移 / EXE：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
 - 21 旧数据副本迁移 / Web：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
-- 21 旧数据副本迁移 / HTTP API：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
+- 21 旧数据副本迁移 / HTTP API：已测 离线schema12→14及独立schema12回退副本；新增held第三副本真实API26项，100 Bug/2评论/1附件3487861字节hash匹配、匿名401/跨项目404/hold409、出站0、正常退出0。仍缺 迁移后的写入/完整数据回退与客户端组合；schema12程序未启动，独立组件目录/未完成外部任务不在该恢复集。
 - 21 旧数据副本迁移 / server MCP：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
 - 21 旧数据副本迁移 / local MCP：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
 - 22 APK 共存与升级 / APK：已测 MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留。仍缺 物理Android设备必测仍缺；应用内更新源/自安装链路未测。
@@ -79,13 +79,27 @@
 
 新增.6实际身份边界：原生退出后磁盘身份清除，本地MCP返回QA_HUB_LOGIN_REQUIRED；local MCP登录成功返回时身份已经落盘；原生重新登录同员工/项目后原文字+1张PNG草稿恢复。[退出读回](runs/exe-preview6-logout-readback.json)、[同步持久登录](runs/exe-preview6-login-durable-readback.json)、[原生重登草稿](runs/exe-preview6-relogin-draft.json)。登录后立即强停的组合命令被自动审批拒绝、未执行且未重试；这组证据明确processRestartNotTested，不能据此声称该强停场景通过。
 
-最新只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。
+此前提交前只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。
+
+最新.7升级后生产只读核对为2026-09-08T19:55:31.6095789Z：六文件hash、三个原PID及精确启动时点不变，4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。日常EXE可读路径相同；两个Node的路径仍为null，不能视为新增可执行路径验证。本轮未重新查询Android，APK状态仍引用19:30快照；未读配置正文/凭据或修改生产。[.7后生产快照](runs/production-after-preview7.json)。
 
 最新API完整回归为MJS151+TS33=184/184，旧175轮次保留。生命周期9项覆盖真实监听、SQLite与inflight清理，修复的是绑定前调度/异常清理，旧runtime已有onReady/onClose；不得据此通过外部完整链路。[184原始日志](runs/api-final-lifecycle-source.txt)、[生命周期证据](component-runtime-lifecycle.md)。
 
 本次仅将源码qa_delete_bug行 mcp_tool-65cae97a9470db 的server_mcp/local_mcp记通过；required_mcp_parity同名需求行仍not_run，不重复算全部对等。基线01/07的EXE与13/14的两MCP只补部分实测，09/23仍是仅有wholepass。
 
 mapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual保留机制，审计元数据位于evidenceMapping.postFreezeSupplement，各行manual.postFreezeEvidence亦保留必要proof hash。只运行既有generate-coverage-matrix.mjs重生JSON/Markdown，不重写mapper代码。未来重跑旧mapper会刷新其自动审查段，需保留本补充段；人工行结果由既有matching-ID机制保留。
+
+## 实施提交后的发布与迁移补充
+
+**Windows 0.2.0-preview.7 已完成独立发布和实际6→7原生升级验收。** releaseId为20260908T194425490Z，108378668字节，SHA-256 fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a。公开回执sourceCommit为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789、sourceDirty:false；文档更新只读核对receipt及主代理实际原生升级proof；未额外操作安装或验签。回执位置：C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\packages\20260908T194425490Z\receipt.json。此包已含首装guard及提交内源码，升级passed依据下述实际proof。
+
+.6→.7已通过原生“检查更新→安装并重启”实际完成，proof观测时点2026-09-08T19:54:02.443Z；当前已安装nativeVersion0.2.0.7、主PID11368。原员工/项目A、文字+1张PNG草稿和配置SHA保持，原Bug13 closed/v14、评论及184872字节原附件materialize/hash读回通过；旧更新结果及7份backup目录保留。新helper的成功result时间19:52:36Z位于真实原生点击区间，UTC已在本次成功更新中核对。[.7升级proof](runs/exe-after-preview7-upgrade.json)、[原生恢复](runs/exe-preview7-restored-draft.txt)。19:54:30Z本地4420与服务4421实际目录均为相同90工具、协议2025-06-18，不支持的协议头均400；此项只证明目录/协议，不能称90个业务工具全部通过。[双入口协议](runs/exe-preview7-live-protocol.json)。
+
+新增保持冻结状态的迁移副本的真实API服务读回26项通过：固定schema12归档在新的service-readback-8b94d602中恢复并迁移至14，127.0.0.1:51708仅启动该副本API；稳定旧姓名ID登录后读出100 Bug、真实2评论及1附件（3487861字节、SHA-256 73470971577ea3ceb30edf4e8cb713d449a3b6e66c566cac5e897e136566e2ce），匿名401、跨项目404、外部读取hold409均实测。五组件关闭、出站和执行器子进程尝试均0；hold字节和核心业务/outbox指纹保持，原身份记录全部保留。新增的仅是官方独立GM和会话记录；不能称整个数据库字节无变化。进程8532正常exit0且监听关闭，旧migrated/rollback未启动且hash不变。[26项读回](migration-service-readback.md)、[脱敏JSON](migration-service-readback.json)。
+
+该服务使用19:24:26Z冻结的独立编译样本，其已有onReady/onClose并由paused gate阻止调度；它不代替后续监听生命周期9项测试。此结果证明held schema14 API恢复读取，**未证明schema12程序启动、迁移后新增数据的完整回退、生产切换、客户端迁移或独立组件队列/workspace恢复**。归档2021条outbox原本全sent，也不单独证明pending任务冻结。前两次错误测试路由导致的harness失败已保留，不计成功。
+
+矩阵仍保留985条，仅基线21的HTTP progress补入实际服务读回，不将其它客户端/MCP入口传递通过；21和24整项保持not_run。仅09/23整项通过，严格旧合同失败、外部完整链路及物理Android缺口均保留。公开receipt摘要与hash记录于evidenceMapping.releaseAndMigrationSupplement，原始receipt仍位于独立runtime。mapper源码保持冻结。
 
 ## 可重放与审计
 
@@ -106,7 +120,7 @@ mapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual�
 - .6 native helper以故意无效空配置实际返回failed并验证UTC序列化：已有成功输出，见[runs/native-updater-utc.json](runs/native-updater-utc.json)。预期失败仅验证UTC；没有调用installer，不计更新成功。
 - Web61/61+typecheck/lint/build；outbox真实临时API/SQLite、外部请求0：已有成功输出，见[runs/web-outbox-verification.json](runs/web-outbox-verification.json)。React静态渲染及隔离API实测；浏览器暂停条目点击未测。
 
-严格旧合同冻结基线仍failed（workflow canonical drift在起点HEAD已存在）；三项独立合同成功不抵消该失败。EXE.6升级/回退/重复升级/卸载后精确包重装已有真实proof，24仅EXE入口passed，完整数据服务/APK仍缺，不标wholepassed。.5原生Bug闭环/编辑/评论/删除按发生版本记录，不推定.6全部操作已测。NSIS6项仅guard，UTC用例故意failed且未调用installer，均不推定干净用户完整首装或额外更新成功。.7仅计划，不提前映射。
+严格旧合同冻结基线仍failed（workflow canonical drift在起点HEAD已存在）；三项独立合同成功不抵消该失败。EXE.6升级/回退/重复升级/卸载后精确包重装已有真实proof，24仅EXE入口passed，完整数据服务/APK仍缺，不标wholepassed。.5原生Bug闭环/编辑/评论/删除按发生版本记录，不推定.6全部操作已测。NSIS6项仅guard，UTC用例故意failed且未调用installer，均不推定干净用户完整首装或额外更新成功。.7已从干净实施提交3b1371c完成发包，实际6→7原生升级和恢复proof通过；它补入23的EXE证据，不扩大24服务/APK回退范围。
 
 依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。
 

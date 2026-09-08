@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-08T19:41:49.848Z",
+  "generatedAt": "2026-09-08T19:56:26.341Z",
   "evidenceMapping": {
     "at": "2026-09-08T19:18:16.465Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
@@ -249,9 +249,65 @@
         "priorHistorical": "runs/api-final-complete-source.txt"
       },
       "processRestartNotTestedInLogoutSequence": true
+    },
+    "releaseAndMigrationSupplement": {
+      "at": "2026-09-08T19:53:10.292Z",
+      "implementationCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+      "release": {
+        "releaseId": "20260908T194425490Z",
+        "version": "0.2.0-preview.7",
+        "sourceCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+        "sourceDirty": false,
+        "installer": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.7-20260908T194425490Z.exe",
+        "packageDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260908T194425490Z\\portable\\RelayQaHubPreview-win32-x64",
+        "manifestPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+        "sha256": "fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a",
+        "bytes": 108378668,
+        "receiptPath": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/packages/20260908T194425490Z/receipt.json",
+        "receiptSha256": "13ec0873a47fd8be2048754a3cb0d404b3618fdb8651c57f88eee8215ba693cc",
+        "actualUpgradeStatus": "passed",
+        "note": "Actual native6 to7 installed and restored; protocol catalog is not all tool execution.",
+        "proof": "runs/exe-after-preview7-upgrade.json",
+        "proofSha256": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
+        "nativeVersion": "0.2.0.7",
+        "mainProcessId": 11368,
+        "observedAt": "2026-09-08T19:54:02.443Z"
+      },
+      "migration": {
+        "file": "migration-service-readback.json",
+        "sha256": "43763e22c79cbdfb78d9ffb072b75334438540a4926107936123fffde00d93b0",
+        "assertions": 26,
+        "status": "passed",
+        "matrixMapping": "baseline21.http partial progress only",
+        "limitations": [
+          "No schema12 executable rollback",
+          "No postmigration new-data complete rollback",
+          "No external execution or other client entrance passed"
+        ]
+      },
+      "protocol": {
+        "file": "runs/exe-preview7-live-protocol.json",
+        "sha256": "cd3bdf38c53ded87e8bcb170daca28ec8fc4096dd4dcc80b7297abd31ceceeee",
+        "ports": [
+          4420,
+          4421
+        ],
+        "toolCount": 90,
+        "protocol": "2025-06-18",
+        "unsupportedHeaderStatus": 400,
+        "scope": "catalog and protocol only"
+      },
+      "productionAfterUpgrade": {
+        "file": "runs/production-after-preview7.json",
+        "sha256": "a9ab607a81bed5817336aa75ce0172dd47c0a8000e5b716664441f0c34701658",
+        "recordedAt": "2026-09-08T19:55:31.6095789Z",
+        "passed": true,
+        "androidRequeried": false,
+        "androidPriorEvidence": "runs/production-pre-commit.json"
+      }
     }
   },
-  "sourceHead": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+  "sourceHead": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
   "sourceRoots": [
     "apps/api/src",
     "apps/web/src",
@@ -1248,7 +1304,7 @@
             "status": "partial"
           },
           "exe": {
-            "completed": ".4升级及异常退出后的项目/姓名/文字/图片草稿恢复 .6原生退出重登后同一项目/员工原文字+1图草稿恢复；本序列不含强停。",
+            "completed": ".4升级及异常退出后的项目/姓名/文字/图片草稿恢复 .6原生退出重登后同一项目/员工原文字+1图草稿恢复；本序列不含强停。 .7原生更新后同员工/项目/文字+PNG草稿恢复。",
             "remaining": [
               "EXE内A/B快速切换和刻意延迟响应未完成"
             ],
@@ -1259,7 +1315,8 @@
               "runs/desktop-mcp-resource-preview4.json",
               "runs/exe-fault-independent-api-mcp.json",
               "runs/exe-preview4-after-fault-draft.txt",
-              "runs/exe-preview6-relogin-draft.json"
+              "runs/exe-preview6-relogin-draft.json",
+              "runs/exe-after-preview7-upgrade.json"
             ],
             "status": "partial"
           }
@@ -1770,21 +1827,23 @@
             "status": "partial"
           },
           "server_mcp": {
-            "completed": "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
+            "completed": "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具",
             "remaining": [
               "全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明"
             ],
             "evidence": [
               "runs/api-pagination-final.txt",
-              "runs/mcp-delete-live-preview6.json"
+              "runs/mcp-delete-live-preview6.json",
+              "runs/exe-preview7-live-protocol.json"
             ],
             "status": "partial"
           },
           "local_mcp": {
-            "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
+            "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具",
             "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
             "evidence": [
-              "runs/mcp-delete-live-preview6.json"
+              "runs/mcp-delete-live-preview6.json",
+              "runs/exe-preview7-live-protocol.json"
             ],
             "status": "partial"
           }
@@ -1970,9 +2029,10 @@
             "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
             "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json",
             "runs/server-mcp-real-resource-20260909.json",
-            "runs/desktop-mcp-resource-preview4.json"
+            "runs/desktop-mcp-resource-preview4.json",
+            "runs/exe-after-preview7-upgrade.json"
           ],
-          "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。",
+          "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。 Installed preview7 qa_materialize_attachment read-back confirms original184872-byte PNG and verified local SHA unchanged.",
           "note": "Real execution and read-back required."
         }
       },
@@ -2669,14 +2729,18 @@
           },
           "http": {
             "completed": [
-              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，原两副本paused",
+              "新第三副本held schema14实际API26项：旧姓名稳定ID登录，100 Bug/2真实评论/1附件3487861字节hash匹配，匿名401/跨项目404/hold409；五组件off、出站0、正常exit0；原身份/核心业务/outbox指纹保留"
             ],
             "remaining": [
-              "本入口未在迁移副本执行完整业务读回",
-              "独立组件目录/未完成外部任务迁移不在该恢复集"
+              "迁移后写入和新增数据的完整回退未测；schema12程序未启动",
+              "其它客户端/MCP入口未在迁移副本完成业务组合",
+              "独立组件队列/workspace和未完成外部任务不在该恢复集；归档outbox全sent不能证明pending任务冻结"
             ],
             "evidence": [
-              "migration-rehearsal.md"
+              "migration-rehearsal.md",
+              "migration-service-readback.md",
+              "migration-service-readback.json"
             ],
             "status": "partial"
           },
@@ -2705,6 +2769,12 @@
               "migration-rehearsal.md"
             ],
             "status": "partial"
+          }
+        },
+        "releaseAndMigrationEvidence": {
+          "at": "2026-09-08T19:53:10.291Z",
+          "proofHashes": {
+            "migration-service-readback.json": "43763e22c79cbdfb78d9ffb072b75334438540a4926107936123fffde00d93b0"
           }
         }
       },
@@ -2846,9 +2916,11 @@
             "runs/exe-after-preview5-upgrade.json",
             "runs/exe-preview5-restored-draft.txt",
             "runs/exe-after-preview6-upgrade.json",
-            "runs/exe-preview6-restored-draft.txt"
+            "runs/exe-preview6-restored-draft.txt",
+            "runs/exe-after-preview7-upgrade.json",
+            "runs/production-after-preview7.json"
           ],
-          "actual": "真实独立EXE .4/.5/.6升级成功；.6原生恢复同一项目/人员/配置hash及文字+1图，五份旧安装backup保留，.5更新回执按原hash归档。此前历史截图本地读取和日常共存已实测。旧helper时间字段仍误将本地标为Z，使用proof.observedAt；.6新helper后续调用尚未据此证明。手工回退另列24部分实测及剩余缺口。",
+          "actual": "真实独立EXE .4/.5/.6升级成功；.6原生恢复同一项目/人员/配置hash及文字+1图，五份旧安装backup保留，.5更新回执按原hash归档。此前历史截图本地读取和日常共存已实测。旧helper时间字段仍误将本地标为Z，使用proof.observedAt；.6新helper后续调用尚未据此证明。手工回退另列24部分实测及剩余缺口。 Actual native6→7 upgrade from clean sourceCommit3b1371c: installed0.2.0.7 PID11368, same identity/project/config/draft+PNG, original closed/v14/comment/attachment hash, retained prior update results and7 backups; successful helper UTC falls within observed upgrade interval.",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -2881,7 +2953,15 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z"
+        "evidenceMappedAt": "2026-09-08T19:18:16.459Z",
+        "preview7Upgrade": {
+          "at": "2026-09-08T19:54:02.443Z",
+          "proof": "runs/exe-after-preview7-upgrade.json",
+          "sha256": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
+          "releaseId": "20260908T194425490Z",
+          "sourceCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+          "sourceDirty": false
+        }
       },
       "needsRevalidation": false,
       "generated": true

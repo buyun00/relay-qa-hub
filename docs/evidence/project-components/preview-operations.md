@@ -1,6 +1,6 @@
 # 独立项目预览运行与回退说明
 
-适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新真实升级/原生恢复为.6，Bug闭环/编辑/评论/软删除证据来自.5；Android当前code21/preview.7。24基线仅09、23整项通过，物理Android和真实外部完整链路仍缺。**
+适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7、PID11368），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code21/preview.7。24基线仅09、23整项通过，物理Android和真实外部完整链路仍缺。**
 
 ## 目录、端口和身份
 
@@ -94,7 +94,9 @@ Start 不编译源码：API 使用 apps/api/dist/main.js，Web 使用 apps/web/d
 
 新增预览.6真实双入口删除：服务端4421和已安装EXE的本地4420各创建独立Bug并调用默认删除；相同请求重放均replayed:true、删除时点相同，context返回NOT_FOUND，原Bug及删除actor/version审计保留。[双MCP删除实测](runs/mcp-delete-live-preview6.json)。仅映射对应qa_delete_bug入口，不把一个删除用例推定为全部HTTP/MCP动作对等或全量幂等通过。
 
-最新只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。
+此前提交前只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。
+
+最新.7升级后生产只读核对为2026-09-08T19:55:31.6095789Z：六文件hash、三个原PID及精确启动时点不变，4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。日常EXE可读路径相同；两个Node的路径仍为null，不能视为新增可执行路径验证。本轮未重新查询Android，APK状态仍引用19:30快照；未读配置正文/凭据或修改生产。[.7后生产快照](runs/production-after-preview7.json)。
 
 ## 日志和失败处理
 
@@ -126,7 +128,17 @@ Windows 独立清单：
 
 http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-latest.json
 
-已验证升级/恢复的固定.6包（latest清单可能随后续发布变化，应先核对版本）：
+**Windows 0.2.0-preview.7 已完成独立发布和实际6→7原生升级验收。** releaseId为20260908T194425490Z，108378668字节，SHA-256 fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a。公开回执sourceCommit为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789、sourceDirty:false；文档更新只读核对receipt及主代理实际原生升级proof；未额外操作安装或验签。回执位置：C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\packages\20260908T194425490Z\receipt.json。此包已含首装guard及提交内源码，升级passed依据下述实际proof。
+
+.6→.7已通过原生“检查更新→安装并重启”实际完成，proof观测时点2026-09-08T19:54:02.443Z；当前已安装nativeVersion0.2.0.7、主PID11368。原员工/项目A、文字+1张PNG草稿和配置SHA保持，原Bug13 closed/v14、评论及184872字节原附件materialize/hash读回通过；旧更新结果及7份backup目录保留。新helper的成功result时间19:52:36Z位于真实原生点击区间，UTC已在本次成功更新中核对。[.7升级proof](runs/exe-after-preview7-upgrade.json)、[原生恢复](runs/exe-preview7-restored-draft.txt)。19:54:30Z本地4420与服务4421实际目录均为相同90工具、协议2025-06-18，不支持的协议头均400；此项只证明目录/协议，不能称90个业务工具全部通过。[双入口协议](runs/exe-preview7-live-protocol.json)。
+
+.7新增原生窗口子集验收（2026-09-08T19:56:56.606Z）：打开草稿时点击窗口关闭按钮后无可见窗口，本地MCP仍能读取原closed Bug；第二次启动精确已安装预览EXE后，原主进程PID11368及启动时点19:52:36.0963040Z不变，恢复窗口2165104中的同员工、原文字+1张PNG草稿。恢复通过第二次EXE启动并激活已观察的主窗口完成；短暂无标题窗口曾无法激活，后续选择标题主窗口成功。**这里只证明关闭到后台和单实例第二次启动恢复，不包含Windows系统托盘图标点击、进程重启或强停。** [窄范围proof](runs/exe-preview7-close-restore.json)、[原生恢复界面](runs/exe-preview7-tray-restored.txt)。
+
+新发.7固定包：
+
+http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-0.2.0-preview.7-20260908T194425490Z.exe
+
+已验证升级/恢复的旧固定.6包（latest清单已更新为.7，不能当作固定回退引用）：
 
 http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-0.2.0-preview.6-20260908T185123338Z.exe
 
@@ -142,7 +154,7 @@ Android当前文件为apps/android/app/build/outputs/apk/debug/app-debug.apk：c
 
 ## 证据保留
 
-索引：[IMPLEMENTATION.md](IMPLEMENTATION.md)、[矩阵](coverage-matrix.md)、[生产盘点](production-inventory.md)、[GM](gm-authorization.md)、[Web](web-browser/results.md)、[双标签](web-browser/dual-window-results.md)、[GM UI](web-browser/gm-results.md)、[组件](backend-components.md)、[Android](android-implementation.md)、[迁移](migration-rehearsal.md)。
+索引：[IMPLEMENTATION.md](IMPLEMENTATION.md)、[矩阵](coverage-matrix.md)、[生产盘点](production-inventory.md)、[GM](gm-authorization.md)、[Web](web-browser/results.md)、[双标签](web-browser/dual-window-results.md)、[GM UI](web-browser/gm-results.md)、[组件](backend-components.md)、[Android](android-implementation.md)、[离线迁移](migration-rehearsal.md)、[held副本API读回](migration-service-readback.md)。
 
 Git 忽略目录也须保留：
 
@@ -162,14 +174,18 @@ Git 忽略目录也须保留：
 
 19:01:28Z已有一次真实预览.6→.5手工回退：源backup保持原样，.6整个安装另存%LOCALAPPDATA%\Programs\RelayQaHubPreview.rollback-retained-20260908T1901Z；恢复.5后同员工/项目/文字+PNG草稿以及closed/v14、原评论/附件hash读回。生产六文件hash、三个原进程与ready/schema12不变。[回退proof](runs/exe-preview6-to5-rollback.json)、[保留读回](runs/exe-rollback5-business-readback.json)、[生产边界](runs/production-after-preview6-rollback.json)。
 
-之后实际重复升级.6成功：同release的原backup继续保留，新backup追加-1后缀。卸载.6将安装目录保留为RelayQaHubPreview.uninstalled-20260908T185123338Z，profile全部102文件/663514299字节在卸载前后逐一hash一致；精确同一.6包重装后原生恢复同员工/项目/配置/文字+1图，原closed/v14、评论/附件hash读回。[重复安装](runs/exe-preview6-repeat-upgrade.json)、[卸载保留](runs/exe-preview6-uninstall-readback.json)、[同包重装](runs/exe-preview6-after-uninstall-reinstall.json)。最新已恢复安装版为.6。这里只完成EXE客户端回退/恢复范围，24的服务数据/APK部分仍not_run，不能整项passed。
+之后实际重复升级.6成功：同release的原backup继续保留，新backup追加-1后缀。卸载.6将安装目录保留为RelayQaHubPreview.uninstalled-20260908T185123338Z，profile全部102文件/663514299字节在卸载前后逐一hash一致；精确同一.6包重装后原生恢复同员工/项目/配置/文字+1图，原closed/v14、评论/附件hash读回。[重复安装](runs/exe-preview6-repeat-upgrade.json)、[卸载保留](runs/exe-preview6-uninstall-readback.json)、[同包重装](runs/exe-preview6-after-uninstall-reinstall.json)。最新已安装并有成功原生恢复proof的版本为.7；上面回退/卸载重装仍按实际发生的.6版本记录。这里只完成EXE客户端回退/恢复范围，24的服务数据/APK部分仍not_run，不能整项passed。
 
-后续首装guard修正在源中完成，原始.onInit经隔离native NSIS编译的6项检查通过，涵盖不存在Programs目录、合法/错误marker、Programs/install junction和越界INSTDIR；所有目录位于runtime fixture根，未执行真实用户Programs/注册表/安装卸载主体。这不是干净Windows用户完整首装通过。[guard范围](runs/native-installer-guards.json)。.7计划纳入该修正，当前未声称已发布或原生安装。.6helper的UTC序列化已用无AppPath的故意失败配置实际验证，installerInvoked:false，不计另一次升级成功。[时间证据](runs/native-updater-utc.json)。
+后续首装guard修正在源中完成，原始.onInit经隔离native NSIS编译的6项检查通过，涵盖不存在Programs目录、合法/错误marker、Programs/install junction和越界INSTDIR；所有目录位于runtime fixture根，未执行真实用户Programs/注册表/安装卸载主体。这不是干净Windows用户完整首装通过。[guard范围](runs/native-installer-guards.json)。.7已从实施提交3b1371c打包纳入该修正，sourceDirty:false；实际6→7原生升级及同身份/草稿/配置/历史保留已通过；干净Windows用户完整首装仍未测。.6helper的UTC序列化已用无AppPath的故意失败配置实际验证，installerInvoked:false，不计另一次升级成功。[时间证据](runs/native-updater-utc.json)。
 
 **Android**：code19/code20和旧证据保留，不声称执行降级。先保留预览数据库、草稿和截图，在专门可恢复测试安装中验证兼容性；不以卸载、清数据或覆盖日常包作为恢复步骤。
 
-**数据**：已完成的是离线恢复集演练。固定输入 runtime\migration-rehearsal-81deb464\source\rpo；migrated 是 schema 14，rollback 是独立 schema 12 副本。两者仍 paused，未启动 API/worker/连接器。878 附件和 58 原业务表指纹一致，回退库哈希等于固定 schema 12 源。迁移前备份/原归档/报告保留；滚动原归档后来到期，不再以活动生产库替代。[实际结果](migration-rehearsal.md)。
+**数据**：离线恢复集演练及新第三副本的held API读回分别保留。固定输入 runtime\migration-rehearsal-81deb464\source\rpo；migrated 是 schema 14，rollback 是独立 schema 12 副本。原两者仍paused且未启动API/worker/连接器；后续服务只在新service-readback-8b94d602副本启动并已正常退出。878 附件和 58 原业务表指纹一致，回退库哈希等于固定 schema 12 源。迁移前备份/原归档/报告保留；滚动原归档后来到期，不再以活动生产库替代。[实际结果](migration-rehearsal.md)。
+
+新增保持冻结状态的迁移副本的真实API服务读回26项通过：固定schema12归档在新的service-readback-8b94d602中恢复并迁移至14，127.0.0.1:51708仅启动该副本API；稳定旧姓名ID登录后读出100 Bug、真实2评论及1附件（3487861字节、SHA-256 73470971577ea3ceb30edf4e8cb713d449a3b6e66c566cac5e897e136566e2ce），匿名401、跨项目404、外部读取hold409均实测。五组件关闭、出站和执行器子进程尝试均0；hold字节和核心业务/outbox指纹保持，原身份记录全部保留。新增的仅是官方独立GM和会话记录；不能称整个数据库字节无变化。进程8532正常exit0且监听关闭，旧migrated/rollback未启动且hash不变。[26项读回](migration-service-readback.md)、[脱敏JSON](migration-service-readback.json)。
+
+该服务使用19:24:26Z冻结的独立编译样本，其已有onReady/onClose并由paused gate阻止调度；它不代替后续监听生命周期9项测试。此结果证明held schema14 API恢复读取，**未证明schema12程序启动、迁移后新增数据的完整回退、生产切换、客户端迁移或独立组件队列/workspace恢复**。归档2021条outbox原本全sent，也不单独证明pending任务冻结。前两次错误测试路由导致的harness失败已保留，不计成功。
 
 offline-import.mjs 要求显式 archive、expected-sha256、allowed-root、data-root 和 mode，使用官方恢复/校验。恢复到新的独立目录并核对报告，不能覆盖当前库。独立上传队列/workspace、Relay 批次和轻语状态不在该主库附件归档内，不能宣称一并回退成功。
 
-导入 .qa-hub-import-hold.json 在资源/队列复核和明确释放记录前保持 paused；损坏或不完整 released 声明仍被拒绝。组件启用不解除 hold。本文没有释放 hold、启动副本或重放外部任务。
+导入 .qa-hub-import-hold.json 在资源/队列复核和明确释放记录前保持 paused；损坏或不完整 released 声明仍被拒绝。组件启用不解除 hold。本记录所列新副本API已完成hold保持的读取并正常退出；没有释放hold或重放外部任务。

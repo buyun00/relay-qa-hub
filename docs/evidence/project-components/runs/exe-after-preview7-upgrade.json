@@ -1,0 +1,113 @@
+{
+  "observedAt": "2026-09-08T19:54:02.443Z",
+  "upgradeStartedAt": "2026-09-08T19:52:20.634Z",
+  "upgradeInvokedBy": "Native EXE current-status panel: check updates, install and restart",
+  "releaseId": "20260908T194425490Z",
+  "version": "0.2.0-preview.7",
+  "sourceCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+  "sourceDirty": false,
+  "installer": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.7-20260908T194425490Z.exe",
+  "packageDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260908T194425490Z\\portable\\RelayQaHubPreview-win32-x64",
+  "manifestPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+  "sha256": "fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a",
+  "bytes": 108378668,
+  "nativeVersion": "0.2.0.7",
+  "mainProcessId": 11368,
+  "result": {
+    "schemaVersion": 1,
+    "status": "installed",
+    "releaseId": "20260908T194425490Z",
+    "version": "0.2.0-preview.7",
+    "recordedAt": "2026-09-08T19:52:36.000Z"
+  },
+  "resultUtcWithinObservedUpgrade": true,
+  "configSha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+  "identity": {
+    "schemaVersion": 2,
+    "serviceOrigin": "http://127.0.0.1:4419",
+    "loginName": "EXE实际验收0909",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "userId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "identity": "employee"
+  },
+  "retained": [
+    {
+      "name": "retained-update-result-88f1d364-7903-445b-86f9-ade583768eb6.json",
+      "sha256": "f4b3a56199b1ba754411724fbc8c60ac443fbbf9bb92bcbef53d009fe8ad40b5"
+    },
+    {
+      "name": "retained-update-result-8ec5010d-c688-4b88-a25a-673a966872f6.json",
+      "sha256": "ad07403b517582f8c1052ad674d6e780e18555d1282446dd9c82e2de2d5d0aee"
+    },
+    {
+      "name": "retained-update-result-b537f8ed-1c1d-48e7-a346-c7b0fc590a7b.json",
+      "sha256": "81213d0918a78a5ef6c1ad59676395856a6fde30f699753b71933a89156b94b7"
+    }
+  ],
+  "backups": [
+    "RelayQaHubPreview.backup-20260908T172125402Z",
+    "RelayQaHubPreview.backup-20260908T174125783Z",
+    "RelayQaHubPreview.backup-20260908T175032165Z",
+    "RelayQaHubPreview.backup-20260908T182326239Z",
+    "RelayQaHubPreview.backup-20260908T185123338Z",
+    "RelayQaHubPreview.backup-20260908T185123338Z-1",
+    "RelayQaHubPreview.backup-20260908T194425490Z"
+  ],
+  "draft": {
+    "text": "EXE第6版升级与回退保留草稿 2026-09-09：同一员工、项目A、PNG附件与未提交正文必须保留。",
+    "imageCount": 1,
+    "imageName": "exe-test-input.png",
+    "nativeScreenshot": "exe-preview7-restored-draft.jpg",
+    "nativeTree": "exe-preview7-restored-draft.txt"
+  },
+  "business": {
+    "bug": {
+      "id": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "number": 13,
+      "key": "TA1788885078625-13",
+      "title": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。",
+      "description": "EXE升级保留草稿 2026-09-09：A项目、当前员工、未提交内容必须原样恢复。已通过原生客户端编辑补充，保留原截图和关闭状态。",
+      "expectedBehavior": "问题修复后不再复现",
+      "moduleId": null,
+      "state": "closed",
+      "severity": "S2",
+      "priority": "P2",
+      "reporterId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "ownerId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "verificationOwnerId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+      "duplicateOfBugId": null,
+      "occurrenceCount": 1,
+      "reopenCount": 0,
+      "version": 14,
+      "createdAt": "2026-09-08T18:31:56.292Z",
+      "updatedAt": "2026-09-08T18:38:54.214Z",
+      "closedAt": "2026-09-08T18:36:33.458Z"
+    },
+    "comments": {
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "items": [
+        {
+          "id": "d7a5ee19-1145-4162-a9ff-44d89fa34f7c",
+          "body": "EXE 实际评论验收：升级、异常重启和验收退回后，原截图与操作历史仍然保留。",
+          "authorId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+          "createdAt": "2026-09-08T18:43:11.468Z"
+        }
+      ],
+      "nextCursor": null
+    },
+    "attachment": {
+      "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+      "attachmentId": "bbeaafee-effa-4265-873e-881111e40ae8",
+      "filename": "31C9B4~1.PNG",
+      "mediaType": "image/png",
+      "size": 184872,
+      "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+      "localPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\mcp-attachments\\27d123dcb8ae089507d07de071e5b7b4d75b02090617cdec91d2ac374b3a54ee\\a32d175b-137c-47bd-bbd9-b952d4860b1e\\bbeaafee-effa-4265-873e-881111e40ae8-e0ed7b4b9693-31C9B4_1.PNG",
+      "cached": false,
+      "verifiedLocalSha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+    }
+  },
+  "passed": true
+}
