@@ -189,10 +189,6 @@ internal object OfflineAttachmentDraftContract {
         require(staged.attachments.map { it.clientAttachmentId }.distinct().size == staged.attachments.size)
         require(staged.attachments.count { it.role == ROLE_ORIGINAL } <= 1)
         require(staged.attachments.count { it.role == ROLE_ANNOTATED } <= 1)
-        require(
-            staged.attachments.none { it.role == ROLE_ANNOTATED } ||
-                staged.attachments.any { it.role == ROLE_ORIGINAL },
-        )
         staged.attachments.forEach { attachment ->
             requireUuid(attachment.clientAttachmentId, "clientAttachmentId")
             require(attachment.filename.isNotBlank() && attachment.filename.length <= 255)
@@ -467,9 +463,11 @@ class OfflineAttachmentDraftProcessor(
         val capturedAtEpochMs = staged.capturedAtEpochMs ?: return null
         val pendingStore = pendingCaptureDraftStore ?: return null
         val artifactStore = captureArtifactStore ?: return null
-        val primaryIndex = staged.attachments.indexOfFirst {
+        val originalIndex = staged.attachments.indexOfFirst {
             it.role == OfflineAttachmentDraftContract.ROLE_ORIGINAL
         }
+        val primaryIndex = originalIndex.takeIf { it >= 0 }
+            ?: staged.attachments.indexOfFirst { it.role == OfflineAttachmentDraftContract.ROLE_ANNOTATED }
         if (primaryIndex < 0) return null
         val primary = uploadReceipts.getOrNull(primaryIndex) ?: return null
         return try {

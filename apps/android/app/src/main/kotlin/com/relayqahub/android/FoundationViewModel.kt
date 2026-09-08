@@ -854,7 +854,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         navigateAfterQueue: Boolean,
         onCompleted: () -> Unit = {},
     ) {
-        val immutableOriginal = originalPng?.copyOf()
+        val immutableOriginal = originalPng?.takeIf { annotatedPng == null }?.copyOf()
         val immutableAnnotated = annotatedPng?.copyOf()
         viewModelScope.launch {
             val accessToken = currentAccessToken()
@@ -1937,28 +1937,13 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     scope = scope,
                     clientSubmissionId = submissionId,
                     clientAttachmentId = clientAttachmentId,
-                    filename = filename,
-                    pngBytes = pngBytes,
+                    filename = if (annotatedPngBytes == null) filename
+                        else filename.substringBeforeLast('.', filename) + "-annotated.png",
+                    pngBytes = annotatedPngBytes ?: pngBytes,
                     accessToken = accessToken,
                     captureId = captureId,
                 )
                 appContainer.scopedRepository.recordAttachmentReservation(scope, uploadReceipt)
-                val annotatedReceipt = annotatedPngBytes?.let { markedBytes ->
-                    val markedAttachmentId = UUID.nameUUIDFromBytes(
-                        "$submissionId:annotated".toByteArray(Charsets.UTF_8),
-                    ).toString()
-                    appContainer.attachmentUploadClient.uploadAndReserveBugCreate(
-                        scope = scope,
-                        clientSubmissionId = submissionId,
-                        clientAttachmentId = markedAttachmentId,
-                        filename = filename.substringBeforeLast('.', filename) + "-annotated.png",
-                        pngBytes = markedBytes,
-                        accessToken = accessToken,
-                        captureId = captureId,
-                    ).also { receipt ->
-                        appContainer.scopedRepository.recordAttachmentReservation(scope, receipt)
-                    }
-                }
 
                 var captureBundleId: String? = null
                 var captureEvidenceSummary = ""
@@ -2040,10 +2025,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         submissionId = submissionId,
                         observedAt = Instant.now().toString(),
                         qaAppVersion = BuildConfig.VERSION_NAME,
-                        attachmentIds = listOfNotNull(
-                            uploadReceipt.attachmentId,
-                            annotatedReceipt?.attachmentId,
-                        ),
+                        attachmentIds = listOf(uploadReceipt.attachmentId),
                         captureBundleId = captureBundleId,
                         title = title,
                         description = description,
@@ -2053,7 +2035,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 val syncResult = appContainer.syncEngine.run(scope)
                 val receipt = appContainer.scopedRepository.findReceipt(scope, operationId)
                 if (receipt != null) {
-                    val claimed = listOfNotNull(uploadReceipt, annotatedReceipt).map { uploaded ->
+                    val claimed = listOf(uploadReceipt).map { uploaded ->
                         appContainer.scopedRepository.recordAttachmentClaimed(
                             scope = scope,
                             clientSubmissionId = submissionId,
