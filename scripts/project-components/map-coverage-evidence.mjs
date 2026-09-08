@@ -6,6 +6,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const evidenceRoot = path.join(root, "docs/evidence/project-components");
 const matrixPath = path.join(evidenceRoot, "coverage-matrix.json");
 const matrix = JSON.parse(fs.readFileSync(matrixPath, "utf8"));
+const incomingResults = new Map(
+  matrix.items.map((item) => [item.id, structuredClone(item.results)]),
+);
 const proofHashes = {};
 const proofBytes = (relative) => {
   const body = fs.readFileSync(path.resolve(evidenceRoot, relative));
@@ -98,25 +101,57 @@ for (const name of fs
       });
   }
 }
+const automaticResultNote =
+  "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.";
+function retainReviewNote(item, surface) {
+  const prior = item.results[surface];
+  // Do not archive this mapper's own intermediate output again on every replay.
+  // Existing history remains intact; human/legacy notes are retained before replacement.
+  if (!prior?.note || prior.note === automaticResultNote) return;
+  const retained = structuredClone({
+    surface,
+    status: prior.status,
+    note: prior.note,
+    actual: prior.actual,
+    evidence: prior.evidence,
+    progress: item.manual.surfaceProgress?.[surface] ?? null,
+  });
+  item.manual.retainedReviewNotes ??= [];
+  if (
+    !item.manual.retainedReviewNotes.some(
+      (entry) => JSON.stringify(entry) === JSON.stringify(retained),
+    )
+  )
+    item.manual.retainedReviewNotes.push(retained);
+}
 function record(item, surface, status, evidence, actual) {
-  if (!item?.results[surface]?.applicable) return;
+  if (!item?.results[surface]?.applicable || item.results[surface].status === "failed") return;
+  const mappedEvidence = [
+    ...new Set(
+      evidence.flatMap((reference) => {
+        const [file, fragment] = reference.split("#", 2);
+        const corrected = correctedEvidence.get(file);
+        return corrected
+          ? [reference, corrected + (fragment === undefined ? "" : "#" + fragment)]
+          : [reference];
+      }),
+    ),
+  ];
+  const prior = item.results[surface];
+  if (
+    prior.status === status &&
+    prior.actual === actual &&
+    JSON.stringify(prior.evidence) === JSON.stringify(mappedEvidence)
+  )
+    return;
+  retainReviewNote(item, surface);
   if (status === "passed" && item.manual.surfaceProgress)
     delete item.manual.surfaceProgress[surface];
   Object.assign(item.results[surface], {
     status,
-    evidence: [
-      ...new Set(
-        evidence.flatMap((reference) => {
-          const [file, fragment] = reference.split("#", 2);
-          const corrected = correctedEvidence.get(file);
-          return corrected
-            ? [reference, corrected + (fragment === undefined ? "" : "#" + fragment)]
-            : [reference];
-        }),
-      ),
-    ],
+    evidence: mappedEvidence,
     actual,
-    note: "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+    note: automaticResultNote,
   });
   const statuses = Object.values(item.results)
     .filter((result) => result.applicable)
@@ -129,7 +164,7 @@ function record(item, surface, status, evidence, actual) {
   item.manual.evidenceMappedAt = new Date().toISOString();
 }
 function progress(item, surface, evidence, completed, remaining) {
-  if (!item?.results[surface]?.applicable) return;
+  if (!item?.results[surface]?.applicable || item.results[surface].status === "failed") return;
   record(
     item,
     surface,
@@ -1049,6 +1084,17 @@ for (const item of matrix.items.filter(
   );
 }
 const validationEvidence = [
+  ["workflow-concurrency-live/api-regression.txt", "人工流程幂等修复API MJS206/206", "pass 206"],
+  [
+    "workflow-concurrency-live/api-regression.txt",
+    "人工流程幂等修复API TS33/33（合计239/239）",
+    "pass 33",
+  ],
+  [
+    "workflow-concurrency-live/storage-regression.txt",
+    "人工流程幂等修复Storage117/117",
+    "pass 117",
+  ],
   ["runs/contracts-remediation-api-final.txt", "响应修复最终API MJS205/205", "pass 205"],
   ["runs/contracts-remediation-api-final.txt", "响应修复最终API TS33/33（合计238/238）", "pass 33"],
   ["runs/contracts-remediation-storage.txt", "响应修复Storage109/109", "pass 109"],
@@ -1092,6 +1138,60 @@ const validationEvidence = [
     scope: "local verification; does not mark unexecuted native UI/external baseline passed",
   }));
 const webVerification = optionalRead("runs/web-outbox-verification.json");
+verifyPinnedProofs(
+  {
+    "web-pending-submission-source.json":
+      "8b92d024d2622ceb0142a903482fea726d746c1adcf7fc3f42535c09e9b0e6a4",
+    "runs/web-pending-submission-source.txt":
+      "57c2b61bb942575e36df9b3de038fb62c616588e6a484763df9477689b6154c1",
+    "runs/web-pending-submission-build.txt":
+      "69cffe48d4425c7c601c1c0593dc5c273ca830b301c1a233fc8d986823b78f64",
+    "runs/web-pending-submission-publication.json":
+      "cd0118ed85b9fffd8ca4eaa4067bfa48050e25ec3fe8b79b479c29a811a31c08",
+  },
+  "Web pending submission source/publication",
+);
+const pendingSource = read("web-pending-submission-source.json");
+const pendingPublication = read("runs/web-pending-submission-publication.json");
+if (
+  pendingSource.passed !== true ||
+  pendingSource.web?.passed !== 99 ||
+  pendingSource.web?.failed !== 0 ||
+  !pendingSource.checks.every((check) => check.exitCode === 0) ||
+  pendingPublication.passed !== true ||
+  pendingPublication.sourceCommit !== "7904e2c2d7285003884a5788a83300fbf521dbf1" ||
+  pendingPublication.serviceRestarted !== false ||
+  pendingPublication.installedExeUpdated !== false ||
+  pendingPublication.oldAssetBytesPreserved !== true ||
+  pendingPublication.oldIndexRetained !== true ||
+  pendingPublication.httpReadback.length !== 3 ||
+  pendingPublication.httpReadback.some(
+    (entry) => entry.status !== 200 || entry.instance !== "qa-hub-preview-7c86",
+  ) ||
+  pendingSource.sourceFiles.length !== 6 ||
+  !pendingSource.sourceFiles.every((file) =>
+    pendingPublication.webSourceFiles.some(
+      (other) => other.path === file.path && other.sha256 === file.sha256,
+    ),
+  )
+)
+  throw new Error("Web pending submission validation differs from the reviewed source/publication");
+validationEvidence.push(
+  {
+    file: "web-pending-submission-source.json",
+    summary: "冻结共享Web源码99/99、双noEmit/lint/format；严格持久提交与明确拒绝恢复的本地回归",
+    matched: true,
+    scope:
+      "fetch替身、受控IndexedDB事件与串行存储适配器；不证明真实浏览器/EXE重启或基线14客户端恢复",
+  },
+  {
+    file: "runs/web-pending-submission-publication.json",
+    summary: "7904e2c Web独立构建发布、3个实际HTTP下载SHA匹配、旧dist及全部旧assets保留",
+    matched: true,
+    scope:
+      "仅构建/发布和静态下载读回，无服务重启/安装版EXE更新；浏览器故障注入尚未执行，不修改客户端通过项",
+  },
+);
 const nativeGuards = optionalRead("runs/native-installer-guards.json");
 if (
   nativeGuards?.summary?.passed === 6 &&
@@ -1162,23 +1262,7 @@ for (const item of matrix.items) {
   for (const [surface, result] of Object.entries(reviewed.results ?? {})) {
     const prior = item.results[surface];
     if (prior?.status === "failed" && result.status !== "failed") continue;
-    if (prior?.note || item.manual.surfaceProgress?.[surface]) {
-      const retained = {
-        surface,
-        status: prior?.status,
-        note: prior?.note,
-        actual: prior?.actual,
-        evidence: prior?.evidence,
-        progress: item.manual.surfaceProgress?.[surface] ?? null,
-      };
-      item.manual.retainedReviewNotes ??= [];
-      if (
-        !item.manual.retainedReviewNotes.some(
-          (entry) => JSON.stringify(entry) === JSON.stringify(retained),
-        )
-      )
-        item.manual.retainedReviewNotes.push(retained);
-    }
+    retainReviewNote(item, surface);
     record(item, surface, result.status, result.evidence, result.actual);
   }
   for (const [surface, entry] of Object.entries(reviewed.surfaceProgress ?? {}))
@@ -1197,6 +1281,525 @@ for (const [file, expected] of Object.entries(
   proofBytes(file);
   if (proofHashes[file] !== expected)
     throw new Error(`Final supplement evidence changed; re-review required: ${file}`);
+}
+
+// These runs are immutable observations, not a route-discovery heuristic. Only
+// the enumerated HTTP/server-MCP capabilities below receive this evidence.
+const isolationFirst = "project-isolation-live/789bd648-e5df-43d7-b5b1-283327f83b07";
+const isolationFinal = "project-isolation-live/006a3b46-258e-4be8-a184-b605b26293e9";
+const isolationProofHashes = {
+  [`${isolationFirst}/summary.json`]:
+    "2a02f9293d354ba5358d6328a77fb9863b9f1b05da779a576fbea2414d76120a",
+  [`${isolationFirst}/requests.jsonl`]:
+    "a8a98862776062149ac7698f823caa3bf0b4ea12013974a824f97bbec733667f",
+  [`${isolationFirst}/assertions.jsonl`]:
+    "6128110fe4f1f4869f381724a2e8681b7f4baec0c88db1530157ddb4924f3cb0",
+  "project-isolation-live/first-run.raw.log":
+    "2f61c5c10a83a1ba3a9f1f9cadc37c805e8fe4e9b27d2de1fc03d55011677af3",
+  [`${isolationFinal}/summary.json`]:
+    "d90f329c16461792e4f56bb10340c9d44cd6f86c617c25b8bee4953a2d9be53b",
+  [`${isolationFinal}/requests.jsonl`]:
+    "bc936b7c142a089db4827a526a69e95b517318c466806dd724cd1ff83be7b90f",
+  [`${isolationFinal}/assertions.jsonl`]:
+    "4b5c39a46172a8c1c9716db7cc0cf022a2a650a149aa86e0ee5b89993ed5aab4",
+  "project-isolation-live/second-run.raw.log":
+    "e1e431ceb4019391790774ec8bc0832ace755233a2ca085bc4673b210436826a",
+  "project-isolation-live/post-run-audit.json":
+    "87df7e62e51a6e52789d0e7e60ef775828a21fb4d2450e77d304dd88c976451c",
+};
+function verifyPinnedProofs(hashes, label) {
+  for (const [file, expected] of Object.entries(hashes)) {
+    proofBytes(file);
+    if (proofHashes[file] !== expected)
+      throw new Error(`${label} proof changed; re-review required: ${file}`);
+  }
+}
+verifyPinnedProofs(isolationProofHashes, "Project isolation");
+const isolationFailedRun = read(`${isolationFirst}/summary.json`);
+const isolationPassedRun = read(`${isolationFinal}/summary.json`);
+const isolationRequests = proofText(`${isolationFinal}/requests.jsonl`)
+  .trim()
+  .split("\n")
+  .map(JSON.parse);
+const isolationAssertions = proofText(`${isolationFinal}/assertions.jsonl`)
+  .trim()
+  .split("\n")
+  .map(JSON.parse);
+const isolationDenials = isolationAssertions.filter((entry) =>
+  entry.label.endsWith("authorization rejection"),
+);
+const isolationUnchanged = isolationAssertions.filter((entry) =>
+  entry.label.endsWith("statistics unchanged"),
+);
+if (
+  isolationFailedRun.passed !== false ||
+  isolationFailedRun.failure?.name !== "ReferenceError" ||
+  isolationFailedRun.requestCount !== 363 ||
+  isolationFailedRun.assertionCount !== 45 ||
+  isolationPassedRun.passed !== true ||
+  isolationPassedRun.requestCount !== 1997 ||
+  isolationRequests.length !== 1997 ||
+  isolationAssertions.length !== 262 ||
+  isolationAssertions.some((entry) => entry.passed !== true) ||
+  JSON.stringify(isolationAssertions) !== JSON.stringify(isolationPassedRun.assertions) ||
+  isolationDenials.length !== 100 ||
+  isolationDenials.filter((entry) => entry.label.endsWith("write authorization rejection"))
+    .length !== 40 ||
+  isolationUnchanged.length !== 100 ||
+  isolationUnchanged.some((entry) => entry.beforeSha256 !== entry.afterSha256) ||
+  isolationPassedRun.boundaries?.componentsOff !== true ||
+  isolationPassedRun.fixtures.length !== 4 ||
+  isolationPassedRun.fixtures.some(
+    (entry) => !entry.deletedAt || entry.reservation?.status !== "reserved",
+  ) ||
+  isolationRequests.some(
+    (entry, index) =>
+      entry.index !== index ||
+      entry.failure ||
+      !["http://127.0.0.1:4419", "http://127.0.0.1:4421"].includes(entry.origin) ||
+      /production|increment-upload|packaging|qingyu/u.test(entry.path),
+  )
+)
+  throw new Error("Project isolation evidence does not match the reviewed scope");
+const isolationEvidence = Object.keys(isolationProofHashes);
+const isolationRunHistory = [
+  {
+    runId: isolationFailedRun.runId,
+    status: "failed",
+    category: "harness",
+    evidence: `${isolationFirst}/summary.json`,
+    actual:
+      "363 requests/45 completed assertions; 17 authorization denials and unchanged snapshots passed before ReferenceError in the reservation replay check. All first-run fixtures retained; no product failure inferred.",
+  },
+  {
+    runId: isolationPassedRun.runId,
+    status: "passed",
+    category: "selected_live_cases",
+    evidence: `${isolationFinal}/summary.json`,
+    actual:
+      "1997 requests/262 assertions; 60 read and 40 write denials with 100 unchanged owner snapshots. Fresh C/D fixtures; initial PNGs claimed, extra attachments reserved, four Bugs soft-deleted after valid human completion. Component logs not exercised.",
+  },
+];
+function appendIsolationObservation(item, surface, references, actual) {
+  if (!item?.results[surface]?.applicable) return;
+  const prior = item.results[surface];
+  const marker = "项目隔离006a3b46";
+  const previousText = prior.actual.split(marker)[0].trim();
+  record(
+    item,
+    surface,
+    prior.status === "failed" ? "failed" : "passed",
+    [...new Set([...prior.evidence, ...references])],
+    `${previousText}${previousText ? " " : ""}${marker}：${actual}`,
+  );
+  item.manual.projectIsolationRuns = isolationRunHistory;
+}
+for (const surface of ["http", "server_mcp"]) {
+  const note =
+    "HTTP4419及服务JSON-RPC4421各自双向C/D测试：非成员403、双成员显式错记录项目404；每次拒绝后Bug/列表/评论/事件/附件字节/统计/分类相同，合法读取及写入对照成功。";
+  if (baselineItem(5).results[surface].status !== "failed")
+    partialBaseline(
+      5,
+      surface,
+      isolationEvidence,
+      [note, "实际PNG下载和MCP资源字节一致；仅当前HTTP/server MCP入口"],
+      [
+        "组件任务日志未执行，Bug事件/附件不替代日志",
+        "其它客户端、本地MCP和§17完整异常组合独立验收",
+      ],
+    );
+  const writeNote =
+    "设计13/06列出的修改、评论、上传绑定、状态四类均有真实项目隔离拒绝及合法成功对照，额外测试软删除；两项目双向、无成员和shared错scope共40次写拒绝。绑定负向为bug_create预留，成功后同键读取同bindingId/replayed:true；初始PNG已由Bug创建事务认领。仅该入口最低基线，不扩展verification-result跨Bug意图或全部状态动作。";
+  if (baselineItem(6).results[surface].status !== "failed")
+    baseline(6, surface, "passed", isolationEvidence, writeNote);
+  for (const number of [5, 6])
+    baselineItem(number).manual.projectIsolationRuns = isolationRunHistory;
+}
+const isolationHttpRoutes = [
+  ["GET", "/api/v1/bugs"],
+  ["GET", "/api/v1/bugs/:bugId"],
+  ["GET", "/api/v1/bugs/:bugId/comments"],
+  ["GET", "/api/v1/bugs/:bugId/events"],
+  ["GET", "/api/v1/bugs/:bugId/attachments"],
+  ["GET", "/api/v1/attachments/:attachmentId"],
+  ["GET", "/api/v1/projects/:projectId/metrics/overview"],
+  ["GET", "/api/v1/projects/:projectId/modules"],
+  ["PATCH", "/api/v1/bugs/:bugId"],
+  ["POST", "/api/v1/bugs/:bugId/comments"],
+  ["POST", "/api/v1/attachments/:attachmentId/bind"],
+  ["POST", "/api/v1/bugs/:bugId/manual-complete"],
+  ["DELETE", "/api/v1/bugs/:bugId"],
+];
+for (const [method, route] of isolationHttpRoutes) {
+  const expression = new RegExp(
+    "^" +
+      route
+        .split("/")
+        .map((part) => (part.startsWith(":") ? "[^/]+" : escape(part)))
+        .join("/") +
+      "$",
+  );
+  const observed = isolationRequests.filter(
+    (entry) =>
+      entry.origin === "http://127.0.0.1:4419" &&
+      entry.method === method &&
+      expression.test(entry.path.split("?")[0]),
+  );
+  if (
+    !observed.some((entry) => entry.status >= 200 && entry.status < 300) ||
+    !observed.some((entry) => entry.status === 403 || entry.status === 404)
+  )
+    throw new Error(
+      `Reviewed isolation HTTP route lacks a real positive/negative pair: ${method} ${route}`,
+    );
+  const references = [
+    ...isolationEvidence.slice(0, 3),
+    `${isolationFinal}/summary.json`,
+    `${isolationFinal}/assertions.jsonl`,
+    ...observed.map((entry) => `${isolationFinal}/requests.jsonl#line=${entry.index + 1}`),
+  ];
+  for (const item of matrix.items.filter(
+    (entry) => entry.kind === "http_route" && entry.method === method && entry.path === route,
+  ))
+    appendIsolationObservation(
+      item,
+      "http",
+      references,
+      "此准确路由有C/D授权成功及错项目拒绝与原项目不变读回；不推导该路由的全部请求分支、附件意图或状态动作通过。",
+    );
+}
+const isolationTools = [
+  "qa_list_bugs",
+  "qa_get_bug_context",
+  "qa_list_comments",
+  "qa_list_events",
+  "qa_list_attachments",
+  "qa_read_attachment",
+  "qa_get_metrics",
+  "qa_list_modules",
+  "qa_materialize_attachment",
+  "qa_update_bug",
+  "qa_add_comment",
+  "qa_bind_attachment",
+  "qa_bug_action",
+  "qa_delete_bug",
+];
+for (const toolName of isolationTools) {
+  const observed = isolationRequests.filter(
+    (entry) =>
+      entry.origin === "http://127.0.0.1:4421" &&
+      entry.request?.method === "tools/call" &&
+      entry.request.params.name === toolName,
+  );
+  if (
+    !observed.some((entry) => entry.response?.result?.isError === false) ||
+    !observed.some((entry) => entry.response?.result?.isError === true)
+  )
+    throw new Error(`Reviewed isolation MCP tool lacks a real positive/negative pair: ${toolName}`);
+  const references = [
+    ...isolationEvidence.slice(0, 3),
+    `${isolationFinal}/summary.json`,
+    `${isolationFinal}/assertions.jsonl`,
+    ...observed.map((entry) => `${isolationFinal}/requests.jsonl#line=${entry.index + 1}`),
+  ];
+  for (const item of matrix.items.filter(
+    (entry) =>
+      entry.kind === "mcp_tool" &&
+      entry.toolName === toolName &&
+      ["apps/api/src/automation.ts", "apps/api/src/automation-routes.ts"].includes(
+        entry.source?.file,
+      ),
+  ))
+    appendIsolationObservation(
+      item,
+      "server_mcp",
+      references,
+      "此服务端工具经实际JSON-RPC有合法成功及项目拒绝、HTTP持久读回；qa_bug_action仅manual_complete，qa_bind_attachment额外部分为预留。没有运行本地MCP或旧fallback工具。",
+    );
+}
+matrix.evidenceMapping.projectIsolationLive = {
+  proofHashes: isolationProofHashes,
+  runs: isolationRunHistory,
+  surfaces: ["http", "server_mcp"],
+  baseline05: "partial; task logs unexecuted",
+  baseline06: "criterion passed per tested surface; other surfaces remain independent",
+};
+
+// First concurrency run is a real product failure, unlike the isolation harness
+// exception. Retain it separately; a later corrected runtime proof must explicitly
+// compare the same cases before this history can be described as resolved.
+const concurrencyFirstFile = "workflow-concurrency-live/e94223b3-82c5-469d-b7ca-eea306ba0aab.json";
+verifyPinnedProofs(
+  { [concurrencyFirstFile]: "999efd88f54db67331b68c7d5aad9031f9f2048e94d625c23a5864433cc6370f" },
+  "Workflow concurrency first failure",
+);
+const concurrencyFirst = read(concurrencyFirstFile);
+if (
+  concurrencyFirst.passed !== false ||
+  concurrencyFirst.exchanges.length !== 98 ||
+  concurrencyFirst.checks.length !== 86 ||
+  concurrencyFirst.checks.filter((entry) => entry.passed === false).length !== 19
+)
+  throw new Error("Workflow concurrency first failure no longer matches its reviewed history");
+matrix.evidenceMapping.workflowConcurrencyFirstFailure = {
+  evidence: concurrencyFirstFile,
+  status: "failed",
+  category: "product",
+  requests: 98,
+  passedChecks: 67,
+  failedChecks: 19,
+  actual:
+    "Six same-key workflow receipt replay gaps (18 checks) plus reused-create payload mismatch HTTP500 instead of frozen409. Twelve real HTTP/server-MCP races; first fixtures and source hashes retained. Resolution requires the later deployed-runtime proof.",
+};
+
+const concurrencyFinalFile = "workflow-concurrency-live/badce916-8b25-463b-9ee2-ddad3727350f.json";
+const concurrencyProofHashes = {
+  [concurrencyFirstFile]: "999efd88f54db67331b68c7d5aad9031f9f2048e94d625c23a5864433cc6370f",
+  [concurrencyFinalFile]: "88d332019f95d11bdd1d294749016cc431b2f7995cb053640c58c3c2fa478579",
+  "workflow-concurrency-live/before-restart-33c28537-73ad-4037-b1c4-bff011da9a53.json":
+    "625a031685b61785c22fb0409e404dd7adf713ce687ffd33ce6f3d2f8eb74aff",
+  "workflow-concurrency-live/after-restart-33c28537-73ad-4037-b1c4-bff011da9a53.json":
+    "61f7670da33b0b274017f0d3e7ff7b03f537d39deb0f7cf24f3d943e9445ff0d",
+  "workflow-concurrency-live/api-regression.txt":
+    "469b7eef387328c4495c539188762b311cd6c308b8e629ab9e930ff787db05be",
+  "workflow-concurrency-live/storage-regression.txt":
+    "89f61434e7873f97e2e75b9e09827b9cd4bfddd5e58e0bdb9dac0dd3eed7f7d8",
+  "workflow-concurrency-live/contracts-regression.txt":
+    "69f352f09c0cedef451604f7557e4362b4a0e25868604a197bd2d770e64dffca",
+};
+verifyPinnedProofs(concurrencyProofHashes, "Workflow concurrency repair");
+const concurrencyFinal = read(concurrencyFinalFile);
+const repairedChecks = new Map(concurrencyFinal.checks.map((entry) => [entry.label, entry]));
+if (
+  concurrencyFinal.passed !== true ||
+  concurrencyFinal.exchanges.length !== 98 ||
+  concurrencyFinal.checks.length !== 105 ||
+  concurrencyFinal.checks.some((entry) => entry.passed !== true) ||
+  concurrencyFinal.races.length !== 12 ||
+  JSON.stringify(concurrencyFirst.races.map((entry) => entry.label)) !==
+    JSON.stringify(concurrencyFinal.races.map((entry) => entry.label)) ||
+  concurrencyFirst.checks.some((entry) => repairedChecks.get(entry.label)?.passed !== true) ||
+  repairedChecks.get("create changed payload HTTP status")?.actual !== 409 ||
+  repairedChecks.get("create changed payload code")?.actual !== "IDEMPOTENCY_PAYLOAD_MISMATCH" ||
+  concurrencyFinal.exchanges.some(
+    (entry) => !["http://127.0.0.1:4419", "http://127.0.0.1:4421"].includes(entry.origin),
+  )
+)
+  throw new Error("Workflow repair must preserve and re-run every first-run check and race");
+const concurrencyRunHistory = [
+  {
+    runId: concurrencyFirst.runId,
+    evidence: concurrencyFirstFile,
+    status: "failed",
+    category: "product",
+    requests: 98,
+    checks: 86,
+    failedChecks: 19,
+    resolvedBy: concurrencyFinal.runId,
+  },
+  {
+    runId: concurrencyFinal.runId,
+    evidence: concurrencyFinalFile,
+    status: "passed",
+    category: "same_cases_after_deployed_repair",
+    requests: 98,
+    checks: 105,
+    failedChecks: 0,
+    additionalChecks:
+      "18 resource comparisons reached after successful replay, plus HTTP409 status",
+  },
+];
+matrix.evidenceMapping.workflowConcurrencyFirstFailure.resolvedBy = concurrencyFinal.runId;
+matrix.evidenceMapping.workflowConcurrencyLive = {
+  proofHashes: concurrencyProofHashes,
+  runs: concurrencyRunHistory,
+  fixCommit: "8f7330a559fc9611e93f2ef62df0e63639f07afc",
+  recordedRuntimeHashes: concurrencyFinal.sourceHashes,
+  baseline14: "partial HTTP/server MCP; all client timeout recovery and other actions independent",
+  sourceChange:
+    "packages/storage/src/workflow-idempotency.ts adds durable transaction receipts for six human workflow operations; app.ts maps reused-create payload mismatch to frozen409. Storage source is outside the UI/API discovery roots; the fix commit, local regression logs and live dist hashes are recorded separately.",
+};
+for (const surface of ["http", "server_mcp"]) {
+  const previousProgress = baselineItem(14).manual.surfaceProgress?.[surface];
+  if (baselineItem(14).results[surface].status !== "failed")
+    partialBaseline(
+      14,
+      surface,
+      [
+        ...new Set([
+          ...baselineItem(14).results[surface].evidence,
+          ...Object.keys(concurrencyProofHashes),
+        ]),
+      ],
+      [
+        ...new Set([
+          ...[].concat(previousProgress?.completed ?? []),
+          "真实两客户端12并发组、98请求/105检查通过；六人工流程动作同键并发及后续重放返回同一已提交资源，事件/操作者和重放后Bug不变，旧版本不同编辑键一胜一VERSION_CONFLICT。",
+          "创建同键不同payload实际HTTP409/IDEMPOTENCY_PAYLOAD_MISMATCH；创建、编辑、评论、验收通过和软删除同键无重复效果。首次19项产品失败原样留存并由同场景新proof对照修复。",
+        ]),
+      ],
+      [
+        ...new Set([
+          ...[].concat(previousProgress?.remaining ?? []),
+          "APK/EXE/Web真实超时恢复及local MCP未由本轮测试",
+          "更多状态动作、全部附件阶段、组件外部任务及§17完整异常组合尚未测试",
+        ]),
+      ],
+    );
+  baselineItem(14).manual.workflowConcurrencyRuns = concurrencyRunHistory;
+}
+const repairedWorkflowRoutes = [
+  ["ready", "ready", "/api/v1/bugs/:bugId/transitions"],
+  ["plan human fix", "plan_fix", "/api/v1/bugs/:bugId/repair-attempts"],
+  ["begin human fix", "begin_fix", "/api/v1/repair-attempts/:attemptId/start"],
+  ["submit no-code fix", "submit_fix", "/api/v1/repair-attempts/:attemptId/deliver"],
+  ["create verification", "create_verification", "/api/v1/bugs/:bugId/verifications"],
+  ["start verification", "start_verification", "/api/v1/verifications/:verificationId/start"],
+];
+function appendConcurrencyObservation(item, surface, references, actual) {
+  if (!item?.results[surface]?.applicable) return;
+  const prior = item.results[surface];
+  const marker = "并发修复badce916";
+  const previousText = prior.actual.split(marker)[0].trim();
+  record(
+    item,
+    surface,
+    prior.status === "failed" ? "failed" : "passed",
+    [...new Set([...prior.evidence, concurrencyFirstFile, concurrencyFinalFile, ...references])],
+    `${previousText}${previousText ? " " : ""}${marker}：${actual}`,
+  );
+  item.manual.workflowConcurrencyRuns = concurrencyRunHistory;
+}
+for (const [label, action, route] of repairedWorkflowRoutes) {
+  const race = concurrencyFinal.races.find((entry) => entry.label === label);
+  const exchanges = race.exchangeIds.map((id) =>
+    concurrencyFinal.exchanges.find((entry) => entry.id === id),
+  );
+  if (
+    exchanges.length !== 2 ||
+    !exchanges.some(
+      (entry) => entry.origin.endsWith(":4419") && entry.status >= 200 && entry.status < 300,
+    ) ||
+    !exchanges.some(
+      (entry) =>
+        entry.request?.params?.arguments?.action === action &&
+        entry.response?.result?.isError === false,
+    )
+  )
+    throw new Error(`Workflow repair lacks real paired success: ${label}`);
+  const references = race.exchangeIds.map((id) => `${concurrencyFinalFile}#exchangeId=${id}`);
+  for (const item of matrix.items.filter(
+    (entry) => entry.kind === "http_route" && entry.method === "POST" && entry.path === route,
+  ))
+    appendConcurrencyObservation(
+      item,
+      "http",
+      references,
+      `${label}经实际HTTP和server MCP同键并发/后续重放成功，原始失败留存；仅human/no_code及当前输入，未验证该路由所有分支。`,
+    );
+}
+for (const item of matrix.items.filter(
+  (entry) =>
+    entry.kind === "mcp_tool" &&
+    entry.toolName === "qa_bug_action" &&
+    entry.source?.file === "apps/api/src/automation.ts",
+))
+  appendConcurrencyObservation(
+    item,
+    "server_mcp",
+    [],
+    "ready/plan_fix/begin_fix/submit_fix(no_code)/create_verification/start_verification六动作真实并发及回执重放修复；只比较共同资源DTO，MCP envelope的fresh Bug读取不声称整包字节相同。未扩展local MCP或其它动作。",
+  );
+for (const item of matrix.items.filter(
+  (entry) =>
+    entry.kind === "http_route" && entry.method === "POST" && entry.path === "/api/v1/bugs",
+))
+  appendConcurrencyObservation(
+    item,
+    "http",
+    [],
+    "同键创建一次，同clientSubmissionId变更payload实际409/IDEMPOTENCY_PAYLOAD_MISMATCH且原Bug/事件不变；首次错误500保留。",
+  );
+
+const verdictProofFile =
+  "workflow-verdict-concurrency-live/f8e2c6da-65c0-4cf6-9631-886bb777df2e.json";
+verifyPinnedProofs(
+  { [verdictProofFile]: "9c0ccfd292e8ff2f679b0e36961ad83fdf1979b58012127eec3b2e5e29fb1478" },
+  "Opposite verification verdict concurrency",
+);
+const verdictProof = read(verdictProofFile);
+if (
+  verdictProof.passed !== true ||
+  verdictProof.exchanges.length !== 66 ||
+  verdictProof.checks.length !== 56 ||
+  verdictProof.checks.some((entry) => entry.passed !== true) ||
+  verdictProof.races.length !== 4 ||
+  verdictProof.fixtures.length !== 2 ||
+  verdictProof.fixtures.some((entry) => entry.winner.lane !== "HTTP") ||
+  verdictProof.exchanges.some(
+    (entry) =>
+      entry.failure || !["http://127.0.0.1:4419", "http://127.0.0.1:4421"].includes(entry.origin),
+  )
+)
+  throw new Error("Opposite verdict proof differs from the reviewed cases");
+for (const race of verdictProof.races) {
+  const pair = race.exchangeIds.map((id) =>
+    verdictProof.exchanges.find((entry) => entry.id === id),
+  );
+  if (
+    pair.length !== 2 ||
+    pair.some((entry) => !entry) ||
+    Math.max(...pair.map((entry) => Date.parse(entry.startedAt))) >
+      Math.min(...pair.map((entry) => Date.parse(entry.finishedAt)))
+  )
+    throw new Error("Opposite verdict proof lacks bounded overlapping dispatch");
+}
+matrix.evidenceMapping.workflowVerdictConcurrencyLive = {
+  evidence: verdictProofFile,
+  runId: verdictProof.runId,
+  requests: 66,
+  checks: 56,
+  races: 4,
+  scope:
+    "HTTP/server MCP only: same manual completion intent and two opposite verdict races; pass won both. All fresh fixtures retained, five components disabled. Successful failure-side effects, UI and other entries remain untested here.",
+};
+for (const surface of ["http", "server_mcp"]) {
+  const item = baselineItem(14);
+  const prior = item.manual.surfaceProgress?.[surface];
+  if (item.results[surface].status === "failed") continue;
+  partialBaseline(
+    14,
+    surface,
+    [...new Set([...item.results[surface].evidence, verdictProofFile])],
+    [
+      ...new Set([
+        ...[].concat(prior?.completed ?? []),
+        "f8e2c6da：66真实请求/56检查，两组同manual_complete意图和verify_pass/verify_fail、close/reject相反结论竞争；验收结果各仅一个版本和事件效果。胜方跨HTTP/server MCP重放同回执，败方旧版本及胜方变更payload均拒绝，原记录保留。",
+      ]),
+    ],
+    [
+      ...new Set([
+        ...[].concat(prior?.remaining ?? []),
+        "f8e2c6da中两次均由HTTP通过方胜出，不据此声称退回成功效果、客户端恢复或所有动作组合通过",
+      ]),
+    ],
+  );
+}
+
+// Several reviewed passes may temporarily revisit the same result. If its
+// actual observation is unchanged, retain the incoming note rather than an
+// incidental automatic note from one of those intermediate passes.
+for (const item of matrix.items) {
+  for (const [surface, result] of Object.entries(item.results)) {
+    const incoming = incomingResults.get(item.id)?.[surface];
+    if (
+      incoming &&
+      incoming.status === result.status &&
+      incoming.actual === result.actual &&
+      JSON.stringify(incoming.evidence) === JSON.stringify(result.evidence)
+    )
+      result.note = incoming.note;
+  }
 }
 matrix.evidenceMapping = {
   ...matrix.evidenceMapping,
@@ -1256,6 +1859,12 @@ const review = [
   "已安装EXE的90工具共享目录与源码保留的18工具fallback目录分别统计；同名工具调用只通过共享目录对应行，fallback行保留未测，避免重复计数。",
   "",
   ...(matrix.evidenceMapping.reviewedSupplementSections ?? []),
+  "",
+  "## C/D HTTP与服务端MCP项目隔离",
+  "",
+  "[两轮完整证据](project-isolation-live/README.md)：首次363请求/45已完成断言因harness变量初始化顺序失败，项目/人员/4Bug/额外预留原样保留；修正后新fixture第二轮1997请求/262断言通过，100授权拒绝各有原项目快照不变。05仅部分实测，组件任务日志仍未执行；事件/附件不替代日志。06的修改、评论、上传绑定、状态最低类别在HTTP/serverMCP两个实际入口criterion passed，绑定额外测试是bug_create预留及持久重放，不声称已claim到既有Bug或全部意图通过。其它客户端不迁移状态，06整行仍未完成。映射仅13条明确HTTP路由和14个服务端工具，不向本地MCP/fallback/所有状态组合传播。",
+  "",
+  "[首次并发实际失败](workflow-concurrency-live/e94223b3-82c5-469d-b7ca-eea306ba0aab.json)为98请求/86检查、19失败：六动作同键回执重放及创建payload不匹配错误边界。部署修复8f7330a后，[相同12并发组新proof](workflow-concurrency-live/badce916-8b25-463b-9ee2-ddad3727350f.json)98请求/105检查全过，原86检查逐label均重新通过，增加18个成功后才能执行的资源比较和1个HTTP409断言；首次失败及fixture原样留存。映射精确六条人工流程HTTP路由、POST Bugs错误码和server qa_bug_action六动作，保留needsRevalidation；其它状态与local MCP不传播。14仅HTTP/server MCP partial，客户端timeout恢复、更多动作/附件阶段与外部任务去重仍未测试。",
   "",
   "## 可重放与审计",
   "",

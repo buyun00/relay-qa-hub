@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T23:37:53.939Z",
+  "passed": true,
+  "method": "Entire frozen mapper executed with new Function after removing four imports and replacing import.meta.url; fs.readFileSync substitutes only matrixPath; every fs.writeFileSync intercepted; other evidence reads remain real and read-only; fixed Date normalizes generated timestamps.",
+  "command": "node scripts/project-components/map-coverage-evidence.audit.mjs",
+  "input": {
+    "mapperSha256": "19acf90afb515919b13258733578dd9a8bb4328d84e9b80b2b9e8d5d9527fca5",
+    "matrixSha256": "aa09c534edb6d28454357ce90c0364ce7d2f7499f544320d8ca9a7002bd87bc7",
+    "actualReviewSha256": "1a75f83c7ea5662115110a596cd680b438e6a2d83e1497c3bdd4245542cd1201",
+    "inputMatrixPath": "docs\\evidence\\project-components\\coverage-matrix.json",
+    "matrixLastCommittedAt": "cb9454b195071e78b006dab5cdac1b8a900a1b9c",
+    "items": 985
+  },
+  "historicalBeforeFix": {
+    "observedInPriorReadOnlyAudit": true,
+    "firstRetainedNotes": 159,
+    "secondRetainedNotes": 198,
+    "changedPaths": 36,
+    "syntheticFailedDowngrades": 68,
+    "note": "Historical observation was captured before the fix. The current audit also reproduces the 68-status protection regression by disabling exactly the two central failed guards; that control is not a byte-identical reconstruction of the former source."
+  },
+  "results": {
+    "semanticReplayDiffs": 0,
+    "noteCounts": [159, 218, 218],
+    "originalNotesMissing": 0,
+    "syntheticFailedSurfaces": 612,
+    "failedResultDiffs": 0,
+    "failedProgressDiffs": 0,
+    "guardDisabledControlDowngrades": 68,
+    "fourUnmeasuredSurfaceDiffs": 0,
+    "revalidationFlags": 401,
+    "flagDiffs": 0,
+    "mismatchedProofVirtualWrites": 0,
+    "mismatchedProofError": "Reviewed evidence changed; re-review required: baseline-950546b51f2cb2 / runs/exe-preview6-logout-readback.json",
+    "virtualWriteTargets": [
+      "docs\\evidence\\project-components\\coverage-matrix.json",
+      "docs\\evidence\\project-components\\coverage-mapping-review.md"
+    ],
+    "differencePaths": []
+  },
+  "checks": {
+    "semanticReplayStable": true,
+    "twoExpectedVirtualWrites": true,
+    "retainsAll159OriginalNotes": true,
+    "noteCountsStable": true,
+    "syntheticFailedResultsPreserved": true,
+    "syntheticFailedProgressPreserved": true,
+    "regressionControlDetects68Downgrades": true,
+    "fourUnmeasuredSurfacesUnchanged": true,
+    "all401RevalidationFlagsPreserved": true,
+    "explicitManualAnnotationRetained": true,
+    "mismatchedProofRejectedBeforeWrite": true,
+    "protectedActualFilesUnchanged": true,
+    "rootVerdictPreservedAndClarified": true
+  },
+  "protectedFilesBefore": {
+    "scripts\\project-components\\map-coverage-evidence.mjs": "19acf90afb515919b13258733578dd9a8bb4328d84e9b80b2b9e8d5d9527fca5",
+    "docs\\evidence\\project-components\\coverage-matrix.json": "aa09c534edb6d28454357ce90c0364ce7d2f7499f544320d8ca9a7002bd87bc7",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "1a75f83c7ea5662115110a596cd680b438e6a2d83e1497c3bdd4245542cd1201"
+  },
+  "protectedFilesAfter": {
+    "scripts\\project-components\\map-coverage-evidence.mjs": "19acf90afb515919b13258733578dd9a8bb4328d84e9b80b2b9e8d5d9527fca5",
+    "docs\\evidence\\project-components\\coverage-matrix.json": "aa09c534edb6d28454357ce90c0364ce7d2f7499f544320d8ca9a7002bd87bc7",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "1a75f83c7ea5662115110a596cd680b438e6a2d83e1497c3bdd4245542cd1201"
+  },
+  "limits": [
+    "Pure memory audit only: no actual generate/map output was written and no baseline result was published.",
+    "No UI, business API, service control or production probes.",
+    "Virtual timestamp is fixed only to compare mapping semantics.",
+    "For a later changed worktree, supply exact reviewed source/input snapshots with --mapper and --input-matrix; hash mismatch intentionally fails closed."
+  ],
+  "verification": {
+    "auditExecutionExitCode": 0,
+    "nodeCheckExitCode": 0,
+    "eslintExitCode": 0,
+    "prettierExitCode": 0,
+    "diffCheckExitCode": 0
+  },
+  "auditScript": {
+    "path": "scripts/project-components/map-coverage-evidence.audit.mjs",
+    "sha256": "115c105a356b61fe354ac3aeebf941c9845bc088a4a3059f07b06b5c5e1b6474",
+    "writesFiles": false
+  }
+}
