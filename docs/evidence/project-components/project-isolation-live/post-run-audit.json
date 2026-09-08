@@ -1,0 +1,58 @@
+{
+  "auditedAt": "2026-09-08T22:14:18.445Z",
+  "audit": "Read-only audit of recorded evidence, no further live requests",
+  "sensitiveFieldScan": "passed, including JSON containers embedded in strings",
+  "jwtShapeScan": "passed",
+  "allowedOriginsAndRouteExclusions": "passed",
+  "firstFailure": "harness reference-before-initialization; original files retained",
+  "runs": [
+    {
+      "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
+      "passed": false,
+      "requests": 363,
+      "assertions": 45,
+      "completedRejections": 17,
+      "completedWriteRejections": 4,
+      "unchangedSnapshots": 17,
+      "jsonRpcPrimitiveFieldsPreserved": 31,
+      "files": {
+        "summary.json": {
+          "bytes": 13971,
+          "sha256": "2a02f9293d354ba5358d6328a77fb9863b9f1b05da779a576fbea2414d76120a"
+        },
+        "requests.jsonl": {
+          "bytes": 548760,
+          "sha256": "a8a98862776062149ac7698f823caa3bf0b4ea12013974a824f97bbec733667f"
+        },
+        "assertions.jsonl": {
+          "bytes": 10156,
+          "sha256": "6128110fe4f1f4869f381724a2e8681b7f4baec0c88db1530157ddb4924f3cb0"
+        }
+      }
+    },
+    {
+      "runId": "006a3b46-258e-4be8-a184-b605b26293e9",
+      "passed": true,
+      "requests": 1997,
+      "assertions": 262,
+      "completedRejections": 100,
+      "completedWriteRejections": 40,
+      "unchangedSnapshots": 100,
+      "jsonRpcPrimitiveFieldsPreserved": 231,
+      "files": {
+        "summary.json": {
+          "bytes": 67487,
+          "sha256": "d90f329c16461792e4f56bb10340c9d44cd6f86c617c25b8bee4953a2d9be53b"
+        },
+        "requests.jsonl": {
+          "bytes": 2401615,
+          "sha256": "bc936b7c142a089db4827a526a69e95b517318c466806dd724cd1ff83be7b90f"
+        },
+        "assertions.jsonl": {
+          "bytes": 61366,
+          "sha256": "4b5c39a46172a8c1c9716db7cc0cf022a2a650a149aa86e0ee5b89993ed5aab4"
+        }
+      }
+    }
+  ]
+}

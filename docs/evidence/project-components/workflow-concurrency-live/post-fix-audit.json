@@ -1,0 +1,100 @@
+{
+  "auditedAt": "2026-09-08T22:32:44.418Z",
+  "readOnly": true,
+  "newRequests": 0,
+  "firstFailedAssertions": 19,
+  "oldAssertionLabelsAllPass": true,
+  "newPassedAssertions": 105,
+  "overlappingPairs": 12,
+  "exactConfiguredCredentialMatches": 0,
+  "files": {
+    "docs/evidence/project-components/workflow-concurrency-live/after-restart-33c28537-73ad-4037-b1c4-bff011da9a53.json": {
+      "bytes": 3578,
+      "sha256": "61f7670da33b0b274017f0d3e7ff7b03f537d39deb0f7cf24f3d943e9445ff0d"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/api-regression.txt": {
+      "bytes": 26970,
+      "sha256": "469b7eef387328c4495c539188762b311cd6c308b8e629ab9e930ff787db05be"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/badce916-8b25-463b-9ee2-ddad3727350f.json": {
+      "bytes": 500988,
+      "sha256": "88d332019f95d11bdd1d294749016cc431b2f7995cb053640c58c3c2fa478579"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/before-restart-33c28537-73ad-4037-b1c4-bff011da9a53.json": {
+      "bytes": 3409,
+      "sha256": "625a031685b61785c22fb0409e404dd7adf713ce687ffd33ce6f3d2f8eb74aff"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/contracts-regression.txt": {
+      "bytes": 1757,
+      "sha256": "69f352f09c0cedef451604f7557e4362b4a0e25868604a197bd2d770e64dffca"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/e94223b3-82c5-469d-b7ca-eea306ba0aab.json": {
+      "bytes": 446189,
+      "sha256": "999efd88f54db67331b68c7d5aad9031f9f2048e94d625c23a5864433cc6370f"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/processes-after-restart.json": {
+      "bytes": 1412,
+      "sha256": "b4514d8e6802993ca3a7b61d842fda8927822899e3d77746a63902f0d84fbcef"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/processes-before-restart.json": {
+      "bytes": 1412,
+      "sha256": "7e0d65442e41edcfaf4284de94396727e6e192d2f95ccf57d8f8e1318a228596"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/production-after-workflow-fix.json": {
+      "bytes": 4222,
+      "sha256": "7db4b637425685ca8d1e2ab9746bb225d995961aa0ef5f75cbf0df69672ee810"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/readiness-after-restart.json": {
+      "bytes": 263,
+      "sha256": "7a18e4ef35c91b7f45628c26a145b57c08f12f3858878ba6210fc7bcb181bc28"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/README.md": {
+      "bytes": 7143,
+      "sha256": "41433ae5f81050ef1e0f2ca627c939c16cf4d2a6836e1ca7bb345aaba28f3260"
+    },
+    "docs/evidence/project-components/workflow-concurrency-live/storage-regression.txt": {
+      "bytes": 12217,
+      "sha256": "89f61434e7873f97e2e75b9e09827b9cd4bfddd5e58e0bdb9dac0dd3eed7f7d8"
+    },
+    "docs/evidence/project-components/project-isolation-live/first-run.raw.log": {
+      "bytes": 952,
+      "sha256": "2f61c5c10a83a1ba3a9f1f9cadc37c805e8fe4e9b27d2de1fc03d55011677af3"
+    },
+    "docs/evidence/project-components/project-isolation-live/post-run-audit.json": {
+      "bytes": 1920,
+      "sha256": "87df7e62e51a6e52789d0e7e60ef775828a21fb4d2450e77d304dd88c976451c"
+    },
+    "docs/evidence/project-components/project-isolation-live/README.md": {
+      "bytes": 8516,
+      "sha256": "c735e39178fc12f5e412bf80500254cc1741599f35d3a58a9ab99355cb768bec"
+    },
+    "docs/evidence/project-components/project-isolation-live/second-run.raw.log": {
+      "bytes": 1061,
+      "sha256": "e1e431ceb4019391790774ec8bc0832ace755233a2ca085bc4673b210436826a"
+    },
+    "docs/evidence/project-components/project-isolation-live/789bd648-e5df-43d7-b5b1-283327f83b07/assertions.jsonl": {
+      "bytes": 10156,
+      "sha256": "6128110fe4f1f4869f381724a2e8681b7f4baec0c88db1530157ddb4924f3cb0"
+    },
+    "docs/evidence/project-components/project-isolation-live/789bd648-e5df-43d7-b5b1-283327f83b07/requests.jsonl": {
+      "bytes": 548760,
+      "sha256": "a8a98862776062149ac7698f823caa3bf0b4ea12013974a824f97bbec733667f"
+    },
+    "docs/evidence/project-components/project-isolation-live/789bd648-e5df-43d7-b5b1-283327f83b07/summary.json": {
+      "bytes": 13971,
+      "sha256": "2a02f9293d354ba5358d6328a77fb9863b9f1b05da779a576fbea2414d76120a"
+    },
+    "docs/evidence/project-components/project-isolation-live/006a3b46-258e-4be8-a184-b605b26293e9/assertions.jsonl": {
+      "bytes": 61366,
+      "sha256": "4b5c39a46172a8c1c9716db7cc0cf022a2a650a149aa86e0ee5b89993ed5aab4"
+    },
+    "docs/evidence/project-components/project-isolation-live/006a3b46-258e-4be8-a184-b605b26293e9/requests.jsonl": {
+      "bytes": 2401615,
+      "sha256": "bc936b7c142a089db4827a526a69e95b517318c466806dd724cd1ff83be7b90f"
+    },
+    "docs/evidence/project-components/project-isolation-live/006a3b46-258e-4be8-a184-b605b26293e9/summary.json": {
+      "bytes": 67487,
+      "sha256": "d90f329c16461792e4f56bb10340c9d44cd6f86c617c25b8bee4953a2d9be53b"
+    }
+  }
+}

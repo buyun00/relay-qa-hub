@@ -1,0 +1,6 @@
+{"phase":"fixtures_ready","runId":"006a3b46-258e-4be8-a184-b605b26293e9","projects":[{"id":"388be255-c610-432b-9f35-b87627e696fe","label":"C"},{"id":"ba45b31d-2eb2-4c27-8f9f-7e406d9b9442","label":"D"}],"fixtures":4}
+{"phase":"fixture_complete","lane":"HTTP","projectId":"388be255-c610-432b-9f35-b87627e696fe","bugId":"62c2c30b-3805-4a26-931e-1f6a1287a8f6","requests":488}
+{"phase":"fixture_complete","lane":"HTTP","projectId":"ba45b31d-2eb2-4c27-8f9f-7e406d9b9442","bugId":"649d8621-9701-4369-b39e-2e12c9155a49","requests":939}
+{"phase":"fixture_complete","lane":"MCP","projectId":"388be255-c610-432b-9f35-b87627e696fe","bugId":"24b06c92-17dc-4b31-8090-b165441e651f","requests":1468}
+{"phase":"fixture_complete","lane":"MCP","projectId":"ba45b31d-2eb2-4c27-8f9f-7e406d9b9442","bugId":"404106ab-bd2f-4ef9-8d7a-ac1dfe6e3551","requests":1997}
+{"passed":true,"requests":1997,"assertions":262,"evidence":"C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\project-isolation-live\\006a3b46-258e-4be8-a184-b605b26293e9"}

@@ -1,0 +1,47 @@
+{
+  "observedAt": "2026-09-08T22:25:25.6472639Z",
+  "processes": [
+    {
+      "port": 4174,
+      "pid": 7420,
+      "createdAt": "2026-09-07T09:37:15.3473300Z",
+      "path": null
+    },
+    {
+      "port": 4274,
+      "pid": 20284,
+      "createdAt": "2026-09-08T17:52:36.5080910Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+    },
+    {
+      "port": 4319,
+      "pid": 10844,
+      "createdAt": "2026-09-08T11:09:25.9817720Z",
+      "path": null
+    },
+    {
+      "port": 4320,
+      "pid": 17160,
+      "createdAt": "2026-09-08T10:24:12.5269520Z",
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+    },
+    {
+      "port": 4419,
+      "pid": 18644,
+      "createdAt": "2026-09-08T20:39:13.7225210Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+    },
+    {
+      "port": 4420,
+      "pid": 23924,
+      "createdAt": "2026-09-08T21:18:26.3376550Z",
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+    },
+    {
+      "port": 4421,
+      "pid": 15736,
+      "createdAt": "2026-09-08T16:46:02.4598690Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+    }
+  ]
+}

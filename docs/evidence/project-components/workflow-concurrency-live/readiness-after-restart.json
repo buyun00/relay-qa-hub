@@ -1,0 +1,18 @@
+{
+  "status": "ready",
+  "schemaVersion": "14",
+  "checks": [
+    {
+      "name": "database",
+      "status": "ok"
+    },
+    {
+      "name": "evidence",
+      "status": "ok"
+    },
+    {
+      "name": "worker",
+      "status": "ok"
+    }
+  ]
+}

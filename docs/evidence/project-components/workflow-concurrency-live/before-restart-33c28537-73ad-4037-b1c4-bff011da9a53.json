@@ -1,0 +1,107 @@
+{
+  "runId": "33c28537-73ad-4037-b1c4-bff011da9a53",
+  "observedAt": "2026-09-08T22:25:19.985Z",
+  "instanceId": "qa-hub-preview-7c86",
+  "phase": "--before",
+  "backupRelativePath": "backups/api-workflow-33c28537-73ad-4037-b1c4-bff011da9a53/qa-hub.sqlite",
+  "backup": {
+    "manifestVersion": 1,
+    "schemaVersion": 14,
+    "createdAt": "2026-09-08T22:25:19.895Z",
+    "sourceDatabase": {
+      "applicationId": 1363232834,
+      "schemaVersion": 14
+    },
+    "backup": {
+      "sizeBytes": 3530752,
+      "sha256": "a4bad9f7d3ae9c10f3cdf629b596549ed6abd6ea168909f659e5e25cf357bdf5"
+    },
+    "integrity": {
+      "ok": true,
+      "integrityMessages": [
+        "ok"
+      ],
+      "foreignKeyViolations": []
+    }
+  },
+  "domain": {
+    "projects": {
+      "count": 21,
+      "sha256": "cb77c701232f41367aca1ecf0125bd6c22241468e0ce0fe0c491e4c019292a0e"
+    },
+    "users": {
+      "count": 43,
+      "sha256": "483525fa8fa0959b961dfcb1d1fa69211f017bc11262edfcf1dd0c14b0811781"
+    },
+    "memberships": {
+      "count": 80,
+      "sha256": "bf0e03bbef84bf98b130fa3f0409c939da362ff5813bab3736ecea2e39b0aec1"
+    },
+    "membership_roles": {
+      "count": 560,
+      "sha256": "a77fa3de2d07da3e27c8f3d3466a930e1e14a94250ea720b3c2326032a34e671"
+    },
+    "modules": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "bugs": {
+      "count": 36,
+      "sha256": "17cdc3a47dd53045c56de201aaf270f6deb7d5dbc9d85dbac00451ed0633bbe5"
+    },
+    "repair_attempts": {
+      "count": 30,
+      "sha256": "195f742349e9f42a4702895d40289facce0f9af2f27bca8be8a6fd6bfe3aff5a"
+    },
+    "verifications": {
+      "count": 24,
+      "sha256": "f24dd8821961af606b55dd2421f630a99888bc291436e79c64306b5f6eb8f4ec"
+    },
+    "events": {
+      "count": 267,
+      "sha256": "ea8315aaa3cffe03a23015f082b1ba9d10032f37a11421dc44d78a60e8b091ac"
+    },
+    "comments": {
+      "count": 28,
+      "sha256": "7706c551f5c578c1517db946adcd8eed30292f6a5a0903200ccdfd7125ae99ed"
+    },
+    "attachments": {
+      "count": 17,
+      "sha256": "b31af1012206441d9825db956501595c65cc296f10f5550760f4969ee998137a"
+    },
+    "bug_attachments": {
+      "count": 12,
+      "sha256": "5f08b2a2b2a6241cd826d27d3a525c6e64452fb3bf2c82dd925a7f4f9edf33d5"
+    },
+    "bug_deletions": {
+      "count": 10,
+      "sha256": "a5e8e02c21bf79a1afec2f09bf991fd3ade0cffb51bd00983ae6bb2959b3a190"
+    },
+    "submissions": {
+      "count": 88,
+      "sha256": "b7c63a0cbd0e5789e764de94f2adabf9ac1c449403dda151e5dfa3b66e680066"
+    },
+    "idempotency_records": {
+      "count": 11,
+      "sha256": "bf1d2684f87cf5a748646b3c540ae51b9ce3462528e37847ee06744868df9ae5"
+    },
+    "manual_completion_requests": {
+      "count": 24,
+      "sha256": "8f6d835fbdc902db5968c1e05f148ac5eac39d4cce029b56aec8d22b5e14a925"
+    },
+    "user_identity_links": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "evidence": {
+    "count": 3,
+    "bytes": 228251,
+    "sha256": "492b43e25436375c63143aaeb3f2b1aa6cb05dd0214c77633d53a0132986a2bf"
+  },
+  "configurationHashes": {
+    "instance.json": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b",
+    "people.json": "10fc26c3630f252c53009dc4debe20fd6a14a76192ec57daf060e482dfafcad2",
+    "secrets.json": "a22cfae14e96f164adc617b2a195bdc097a2a8cbc80d450a651badd35416ff69"
+  }
+}
