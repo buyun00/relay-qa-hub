@@ -13,6 +13,10 @@ The unchanged handover recording supplies product **2002**, channel **1002**, te
 are never reused. Summary and description contain only the resolved version number.
 Legacy tester-1 drafts still migrate once, preserving later deliberate choices.
 
+New server jobs explicitly use **8 concurrent COS parts**, each **5 MiB**. This
+applies to both manual uploads and automatic build handoffs. Existing job configs
+and checkpoints are retained; changing this default does not alter active jobs.
+
 There are exactly two new-job modes: `publish_workflow` publishes and verifies
 status 100; `prepare_publish` performs the same preceding upload/test-status/resource
 steps and stops at status 60 for a separate **确认发布** action. Normal resume cannot

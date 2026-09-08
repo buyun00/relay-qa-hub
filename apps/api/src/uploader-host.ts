@@ -546,6 +546,7 @@ export class UploaderHost {
         pollSeconds: 3,
         waitTimeoutSeconds: 1800,
         partSizeBytes: 5242880,
+        uploadConcurrency: 8,
         ...(source ? { buildChainId: id, expectedSource: source } : {}),
       });
       return this.launch(id, "run", new Date().toISOString());
