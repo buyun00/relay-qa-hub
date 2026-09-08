@@ -394,7 +394,24 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
       manifestPath: recoveryPoint.manifestPath,
       evidenceRoot: config.evidenceRoot,
       archiveRoot: config.archiveRoot,
+    }).catch((error: unknown) => {
+      const code = (error as { code?: unknown })?.code;
+      if (typeof code !== "string" || !code.startsWith("SQLITE_ARCHIVE_")) throw error;
+      // The local online backup has already been committed. An unavailable or
+      // full archive volume must not tear down the live API and its job queue.
+      options.logger.error(
+        {
+          errorCode: code,
+          errorMessage: error instanceof Error ? error.message : "Archive operation failed",
+          backupPath: recoveryPoint.backupPath,
+          archiveRoot: config.archiveRoot,
+          retryIntervalMs: config.intervalMs,
+        },
+        "Relay QA Hub archive failed; local recovery point retained and cadence continues",
+      );
+      return undefined;
     });
+    if (archived === undefined) return;
     options.logger.info(
       {
         disposition: archived.disposition,

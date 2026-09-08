@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -8,6 +8,62 @@ import test from "node:test";
 import { SqliteStorageWorker } from "@relay-qa-hub/storage";
 
 import { archiveRecoveryPointOffThread } from "../dist/backup-archive-worker-client.js";
+import { createApiBackupRunner } from "../dist/backup-runner.js";
+
+test("archive failure preserves local backups, startup and the next backup attempt", async () => {
+  const root = await mkdtemp(join(tmpdir(), "qa-hub-archive-unavailable-"));
+  const evidenceRoot = join(root, "evidence");
+  const quarantineRoot = join(root, "quarantine");
+  const backupRoot = join(root, "backups");
+  const archiveRoot = join(root, "blocked-archive");
+  const failures = [];
+  let worker, runner;
+  try {
+    await Promise.all(
+      [evidenceRoot, quarantineRoot, backupRoot].map((p) => mkdir(p, { recursive: true })),
+    );
+    await writeFile(archiveRoot, "retained fixture obstruction");
+    worker = new SqliteStorageWorker({
+      databaseFile: join(root, "db", "qa.sqlite"),
+      busyTimeoutMs: 5000,
+      backupRoot: join(root, "migration"),
+      evidenceRoot,
+      quarantineRoot,
+    });
+    await worker.initialization;
+    runner = createApiBackupRunner({
+      config: {
+        enabled: true,
+        onStart: true,
+        intervalMs: 50,
+        backupRoot,
+        evidenceRoot,
+        archiveRoot,
+      },
+      worker,
+      logger: {
+        info() {},
+        error(details) {
+          failures.push(details);
+        },
+      },
+    });
+    const backup = await runner.start();
+    assert.equal(existsSync(backup.backupPath), true);
+    assert.equal(existsSync(backup.manifestPath), true);
+    const deadline = Date.now() + 5000;
+    while (failures.length < 2 && Date.now() < deadline)
+      await new Promise((r) => setTimeout(r, 20));
+    assert.ok(failures.length >= 2, "archive failure must not disable scheduled backups");
+    assert.match(failures[0].errorCode, /^SQLITE_ARCHIVE_/);
+    assert.notEqual(failures[0].backupPath, failures[1].backupPath);
+    assert.equal(existsSync(failures[1].backupPath), true);
+  } finally {
+    await runner?.stop();
+    await worker?.close();
+    await rm(root, { recursive: true, force: true });
+  }
+});
 
 test("blocking archive work runs outside the API event loop", async () => {
   let ticks = 0;
