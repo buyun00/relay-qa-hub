@@ -1,0 +1,645 @@
+{
+  "observedAt": "2026-09-08T20:46:37.419Z",
+  "status": "passed",
+  "scope": "Independent preview Android emulator 21 to 22 upgrade and native no-code human workflow",
+  "source": {
+    "introducedIn": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+    "absentFromBaseline": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+    "clientSha256": "d8a7b083245e41132234c0301e0510352e0c2a9945192517940266f552105eaa"
+  },
+  "runtimeRoot": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code22-acceptance",
+  "apk": {
+    "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code22-acceptance/qa-hub-preview-code22.apk",
+    "bytes": 35471405,
+    "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+    "package": "com.relayqahub.android.preview.debug",
+    "versionCode": 22,
+    "versionName": "0.2.0-preview.8",
+    "signatureCertificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83",
+    "oldPackagePath": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code22-acceptance/retained-code21.apk",
+    "oldPackageSha256": "d783e9908e7dacdd660565cf15e1624c567a820e973d01190a38a0981afe7255"
+  },
+  "validation": {
+    "unitTests": 87,
+    "newRequestSequenceTests": 7,
+    "failures": 0,
+    "lintErrors": 0,
+    "lintWarnings": 29,
+    "unitLintLog": "runs/android-code22-unit-lint-retry.txt",
+    "buildLog": "runs/android-code22-build.txt",
+    "failedInvocationLog": "runs/android-code22-unit-lint.txt"
+  },
+  "device": {
+    "serial": "127.0.0.1:16384",
+    "upgrade": "install -r",
+    "dailyBefore": [
+      "    versionCode=14 minSdk=29 targetSdk=37\r",
+      "    versionName=0.1.13-debug\r",
+      "    lastUpdateTime=2026-09-08 16:57:11\r",
+      "      dataDir=/data/user/0/com.relayqahub.android.debug\r"
+    ],
+    "dailyPid": "5051",
+    "dailySettingsHashes": [
+      "b021f5e4a3bcde60266ddf3a1e2518bdb0af4da3fd26be070707aee9ef49226f  shared_prefs/qa-hub-account-sessions-v1.xml\r",
+      "31996d447738cd0924c93e0ba643bdeba9becbbde246fb82c4edb924f48dc1a0  shared_prefs/qa_hub_credentials_v2.xml\r",
+      "5fe91f1c686ef179f120569bf1f47279ccd054f0d8490ff931384de128033fa9  shared_prefs/qa-hub-private-identity.xml\r",
+      "f034664f85fdd56cbd75445f29d5e03bb3fd0eb1fcb6c34e6448e8c12323c58b  shared_prefs/qa-hub-bug-draft-defaults-v1.xml"
+    ],
+    "dailyAfter": [
+      "    versionCode=14 minSdk=29 targetSdk=37\r",
+      "    versionName=0.1.13-debug\r",
+      "    lastUpdateTime=2026-09-08 16:57:11\r",
+      "      dataDir=/data/user/0/com.relayqahub.android.debug\r"
+    ],
+    "dailyUnchanged": true,
+    "retainedFiles": [
+      "e93f7d49eaeaa22bfe3b43fe51d7cd6954b1162dcc59799182c14f3a985729c1  shared_prefs/qa-hub-preview-drafts-v2.xml\r",
+      "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf  files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json\r",
+      "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc  files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png"
+    ],
+    "retainedUnchanged": true,
+    "privateCode21Backup": {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code22-acceptance/private-preview-code21-data.tar",
+      "sha256": "a6eb69fd50ba1ad33c4e355d2abbed044ab719024e10c1247b5afaec4ec6d597",
+      "bytes": 730112
+    }
+  },
+  "workflow": {
+    "createdAt": "2026-09-08T20:40:31.690Z",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "actorId": "69730f4d-53d5-44bc-873d-7337a01e8365",
+    "bugId": "386cdd2f-44c9-4a79-992a-891d595766fd",
+    "key": "TA1788885078625-17",
+    "initialVersion": 1,
+    "initialState": "reported",
+    "components": [
+      {
+        "key": "build",
+        "enabled": false,
+        "version": 0
+      },
+      {
+        "key": "build_upload.single",
+        "enabled": false,
+        "version": 0
+      },
+      {
+        "key": "upload.incremental",
+        "enabled": false,
+        "version": 0
+      },
+      {
+        "key": "relay.production",
+        "enabled": false,
+        "version": 0
+      },
+      {
+        "key": "qingyu.sync",
+        "enabled": false,
+        "version": 0
+      }
+    ],
+    "clientSubmissionId": "a54a1728-4f5d-4cd2-b3f3-31526c70a20a",
+    "stages": [
+      {
+        "nativeAction": "Start repair",
+        "state": "in_progress",
+        "bugVersion": 3
+      },
+      {
+        "nativeAction": "Submit no-code handling",
+        "state": "ready_for_verification",
+        "bugVersion": 4
+      },
+      {
+        "nativeAction": "Verify passed and close",
+        "state": "closed",
+        "bugVersion": 6
+      }
+    ],
+    "repairAttempt": {
+      "id": "841d3463-a86a-4c30-b246-4c8c97db1d7d",
+      "status": "delivered",
+      "version": 3,
+      "mode": "human",
+      "actorId": "69730f4d-53d5-44bc-873d-7337a01e8365",
+      "deliveryKind": "no_code"
+    },
+    "verification": {
+      "id": "5d527027-62ca-4a78-a75c-cd598eab8e54",
+      "status": "passed",
+      "version": 3,
+      "actorId": "69730f4d-53d5-44bc-873d-7337a01e8365"
+    },
+    "buildRequirement": {
+      "id": "daf34f81-2129-4b00-995c-4a7836b6757b",
+      "requirement": "not_required",
+      "decisionBasis": "no_code_delivery"
+    },
+    "nativeDeliveryRequests": 1,
+    "redundantCompleteRequests": 0,
+    "allSelectedRequestsSuccessful": true,
+    "httpRequests": [
+      {
+        "time": "2026-09-08T20:41:51.227Z",
+        "pid": 18644,
+        "requestId": "req-3z",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 2.801500000001397
+      },
+      {
+        "time": "2026-09-08T20:41:51.237Z",
+        "pid": 18644,
+        "requestId": "req-40",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/attachments?limit=20",
+        "status": 200,
+        "responseTimeMs": 3.985500000009779
+      },
+      {
+        "time": "2026-09-08T20:42:00.307Z",
+        "pid": 18644,
+        "requestId": "req-48",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 3.466500000009546
+      },
+      {
+        "time": "2026-09-08T20:42:00.335Z",
+        "pid": 18644,
+        "requestId": "req-49",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.951900000014575
+      },
+      {
+        "time": "2026-09-08T20:42:00.345Z",
+        "pid": 18644,
+        "requestId": "req-4a",
+        "method": "GET",
+        "path": "/api/v1/projects/fb914b3b-4169-47f8-8dec-76f3a3cc780d/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/comments?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.817300000024261
+      },
+      {
+        "time": "2026-09-08T20:42:24.522Z",
+        "pid": 18644,
+        "requestId": "req-4r",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 1.5023000000219326
+      },
+      {
+        "time": "2026-09-08T20:42:24.528Z",
+        "pid": 18644,
+        "requestId": "req-4s",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 1.7354000000050291
+      },
+      {
+        "time": "2026-09-08T20:42:24.552Z",
+        "pid": 18644,
+        "requestId": "req-4t",
+        "method": "POST",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/transitions",
+        "status": 200,
+        "responseTimeMs": 27.585399999981746
+      },
+      {
+        "time": "2026-09-08T20:42:24.588Z",
+        "pid": 18644,
+        "requestId": "req-4u",
+        "method": "POST",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/repair-attempts",
+        "status": 201,
+        "responseTimeMs": 29.347299999993993
+      },
+      {
+        "time": "2026-09-08T20:42:24.624Z",
+        "pid": 18644,
+        "requestId": "req-4v",
+        "method": "POST",
+        "path": "/api/v1/repair-attempts/841d3463-a86a-4c30-b246-4c8c97db1d7d/start",
+        "status": 200,
+        "responseTimeMs": 10.06260000000475
+      },
+      {
+        "time": "2026-09-08T20:42:24.640Z",
+        "pid": 18644,
+        "requestId": "req-4w",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 2.958600000012666
+      },
+      {
+        "time": "2026-09-08T20:42:24.649Z",
+        "pid": 18644,
+        "requestId": "req-4x",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.0204999999841675
+      },
+      {
+        "time": "2026-09-08T20:42:24.675Z",
+        "pid": 18644,
+        "requestId": "req-4y",
+        "method": "GET",
+        "path": "/api/v1/projects/fb914b3b-4169-47f8-8dec-76f3a3cc780d/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/comments?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.0291999999899417
+      },
+      {
+        "time": "2026-09-08T20:42:24.700Z",
+        "pid": 18644,
+        "requestId": "req-51",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 2.673500000004424
+      },
+      {
+        "time": "2026-09-08T20:42:24.710Z",
+        "pid": 18644,
+        "requestId": "req-52",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/attachments?limit=20",
+        "status": 200,
+        "responseTimeMs": 2.384200000000419
+      },
+      {
+        "time": "2026-09-08T20:42:27.179Z",
+        "pid": 18644,
+        "requestId": "req-5a",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 2.2277999999932945
+      },
+      {
+        "time": "2026-09-08T20:42:27.189Z",
+        "pid": 18644,
+        "requestId": "req-5b",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 1.904899999994086
+      },
+      {
+        "time": "2026-09-08T20:42:27.194Z",
+        "pid": 18644,
+        "requestId": "req-5c",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.367599999997765
+      },
+      {
+        "time": "2026-09-08T20:42:35.593Z",
+        "pid": 18644,
+        "requestId": "req-5g",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 2.04670000000624
+      },
+      {
+        "time": "2026-09-08T20:42:35.602Z",
+        "pid": 18644,
+        "requestId": "req-5h",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 1.7899000000033993
+      },
+      {
+        "time": "2026-09-08T20:42:35.623Z",
+        "pid": 18644,
+        "requestId": "req-5i",
+        "method": "GET",
+        "path": "/api/v1/projects/fb914b3b-4169-47f8-8dec-76f3a3cc780d/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/comments?limit=100",
+        "status": 200,
+        "responseTimeMs": 1.8166999999957625
+      },
+      {
+        "time": "2026-09-08T20:42:58.179Z",
+        "pid": 18644,
+        "requestId": "req-6b",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 1.8390000000072177
+      },
+      {
+        "time": "2026-09-08T20:42:58.200Z",
+        "pid": 18644,
+        "requestId": "req-6c",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 2.020600000018021
+      },
+      {
+        "time": "2026-09-08T20:42:58.208Z",
+        "pid": 18644,
+        "requestId": "req-6d",
+        "method": "POST",
+        "path": "/api/v1/repair-attempts/841d3463-a86a-4c30-b246-4c8c97db1d7d/deliver",
+        "status": 200,
+        "responseTimeMs": 35.31659999999101
+      },
+      {
+        "time": "2026-09-08T20:42:58.248Z",
+        "pid": 18644,
+        "requestId": "req-6e",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 2.146199999988312
+      },
+      {
+        "time": "2026-09-08T20:42:58.255Z",
+        "pid": 18644,
+        "requestId": "req-6f",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 2.520699999993667
+      },
+      {
+        "time": "2026-09-08T20:42:58.264Z",
+        "pid": 18644,
+        "requestId": "req-6g",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 3.2054000000061933
+      },
+      {
+        "time": "2026-09-08T20:42:58.281Z",
+        "pid": 18644,
+        "requestId": "req-6h",
+        "method": "GET",
+        "path": "/api/v1/projects/fb914b3b-4169-47f8-8dec-76f3a3cc780d/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/comments?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.6598999999987427
+      },
+      {
+        "time": "2026-09-08T20:42:58.310Z",
+        "pid": 18644,
+        "requestId": "req-6k",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 2.2792999999946915
+      },
+      {
+        "time": "2026-09-08T20:42:58.317Z",
+        "pid": 18644,
+        "requestId": "req-6l",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/attachments?limit=20",
+        "status": 200,
+        "responseTimeMs": 2.294399999984307
+      },
+      {
+        "time": "2026-09-08T20:43:00.794Z",
+        "pid": 18644,
+        "requestId": "req-6n",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 1.6055000000051223
+      },
+      {
+        "time": "2026-09-08T20:43:00.803Z",
+        "pid": 18644,
+        "requestId": "req-6o",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 1.7398000000102911
+      },
+      {
+        "time": "2026-09-08T20:43:00.808Z",
+        "pid": 18644,
+        "requestId": "req-6p",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.9121999999915715
+      },
+      {
+        "time": "2026-09-08T20:43:10.006Z",
+        "pid": 18644,
+        "requestId": "req-6w",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 2.739800000010291
+      },
+      {
+        "time": "2026-09-08T20:43:10.030Z",
+        "pid": 18644,
+        "requestId": "req-6x",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.122299999988172
+      },
+      {
+        "time": "2026-09-08T20:43:10.041Z",
+        "pid": 18644,
+        "requestId": "req-6y",
+        "method": "GET",
+        "path": "/api/v1/projects/fb914b3b-4169-47f8-8dec-76f3a3cc780d/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/comments?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.6226000000024214
+      },
+      {
+        "time": "2026-09-08T20:43:31.236Z",
+        "pid": 18644,
+        "requestId": "req-7c",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 1.4698999999964144
+      },
+      {
+        "time": "2026-09-08T20:43:31.251Z",
+        "pid": 18644,
+        "requestId": "req-7d",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 2.0599999999976717
+      },
+      {
+        "time": "2026-09-08T20:43:31.258Z",
+        "pid": 18644,
+        "requestId": "req-7e",
+        "method": "POST",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/verifications",
+        "status": 201,
+        "responseTimeMs": 28.224499999982072
+      },
+      {
+        "time": "2026-09-08T20:43:31.292Z",
+        "pid": 18644,
+        "requestId": "req-7f",
+        "method": "POST",
+        "path": "/api/v1/verifications/5d527027-62ca-4a78-a75c-cd598eab8e54/start",
+        "status": 200,
+        "responseTimeMs": 6.368500000011409
+      },
+      {
+        "time": "2026-09-08T20:43:31.304Z",
+        "pid": 18644,
+        "requestId": "req-7g",
+        "method": "POST",
+        "path": "/api/v1/verifications/5d527027-62ca-4a78-a75c-cd598eab8e54/result",
+        "status": 200,
+        "responseTimeMs": 41.538000000000466
+      },
+      {
+        "time": "2026-09-08T20:43:31.355Z",
+        "pid": 18644,
+        "requestId": "req-7h",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 1.9997999999905005
+      },
+      {
+        "time": "2026-09-08T20:43:31.363Z",
+        "pid": 18644,
+        "requestId": "req-7i",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 3.0587999999988824
+      },
+      {
+        "time": "2026-09-08T20:43:31.377Z",
+        "pid": 18644,
+        "requestId": "req-7j",
+        "method": "GET",
+        "path": "/api/v1/projects/fb914b3b-4169-47f8-8dec-76f3a3cc780d/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/comments?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.255200000014156
+      },
+      {
+        "time": "2026-09-08T20:43:31.410Z",
+        "pid": 18644,
+        "requestId": "req-7l",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 3.007400000002235
+      },
+      {
+        "time": "2026-09-08T20:43:31.418Z",
+        "pid": 18644,
+        "requestId": "req-7n",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/attachments?limit=20",
+        "status": 200,
+        "responseTimeMs": 2.3599000000103842
+      },
+      {
+        "time": "2026-09-08T20:43:33.833Z",
+        "pid": 18644,
+        "requestId": "req-7s",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd",
+        "status": 200,
+        "responseTimeMs": 1.4716999999945983
+      },
+      {
+        "time": "2026-09-08T20:43:33.842Z",
+        "pid": 18644,
+        "requestId": "req-7t",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/human-workflow",
+        "status": 200,
+        "responseTimeMs": 1.706000000005588
+      },
+      {
+        "time": "2026-09-08T20:43:33.849Z",
+        "pid": 18644,
+        "requestId": "req-7u",
+        "method": "GET",
+        "path": "/api/v1/bugs/386cdd2f-44c9-4a79-992a-891d595766fd/events?limit=100",
+        "status": 200,
+        "responseTimeMs": 2.745100000000093
+      }
+    ],
+    "eventTypes": [
+      "verification.result_recorded",
+      "verification.started",
+      "verification.created",
+      "repair_attempt.delivered",
+      "repair_attempt.started",
+      "repair_attempt.created",
+      "bug.triage.ready",
+      "occurrence.appended"
+    ]
+  },
+  "screenshots": [
+    {
+      "path": "android-code22/after-start.png",
+      "sha256": "84b8300142e98b294f248cb9534006f24ff9c40157636898d832e31837f4c761",
+      "xmlSha256": "a59b3d51202e630f69614e2ffd703bc47892060eae67bdd5db37095b9443dfec"
+    },
+    {
+      "path": "android-code22/submit-ready.png",
+      "sha256": "1eef519ae8e1b6cda55652ae4e8cf854e2c9136fcafffbe764a9e4311288ff5e",
+      "xmlSha256": "b8966f967a271e6b454e3fa02acda27c39c0fa7e086f79dd72f5903adbf04905"
+    },
+    {
+      "path": "android-code22/after-submit.png",
+      "sha256": "14c733baf308c1bd49ee315e262453db8a709ed24c2afe45d97e1dc99386be78",
+      "xmlSha256": "66073c140e1938a0e664e0fc521c7d794dd1d8a9acbbc0d0b627d7c6b83e227e"
+    },
+    {
+      "path": "android-code22/verify-actions.png",
+      "sha256": "9f229b06e1430a6ba0e60b20bd847508b0b7788a087018dc0e07b8023a1386c3",
+      "xmlSha256": "3c22d5056e12f9de867ce859cafbe735ca8543091acb4e38547b450eb55942f0"
+    },
+    {
+      "path": "android-code22/verify-ready.png",
+      "sha256": "4d3b50a0aa855cc22bccdde208b8f51bb758e868dd336ceca4730c9d487488b4",
+      "xmlSha256": "f5d5f3a4d03ab7128610358c75f5fd22557839440c291b5e630f5491292f25c7"
+    },
+    {
+      "path": "android-code22/closed.png",
+      "sha256": "db9bbbb2b78a64990d11d4716f18b9fe8a1dfed8129c66b964dbda772799d0a8",
+      "xmlSha256": "2721f743e85142ba952f7145ca1a77b190ffde11d864806a2a43a523bb3b363d"
+    },
+    {
+      "path": "android-code22/retained-draft-three.png",
+      "sha256": "880f22b15cdc33666c9fa5536cfd53e01f831dedefa30b993a847e9ae721bcb2",
+      "xmlSha256": "74c14aca10b1449293799ba7ed964a262ffae15c72516b8265a1b2c0d7f0079d"
+    }
+  ],
+  "boundaries": {
+    "physicalDevice": "not_run",
+    "codeDeliveryRealBranch": "not_run; request/CAS/409 behavior covered by client tests",
+    "externalTasks": "not_run; five project components remained disabled",
+    "productionMutation": false,
+    "dailyAppClearUninstallOrForceStop": false,
+    "sourceCommittedByAgent": false
+  },
+  "harnessNotes": [
+    "Initial Gradle invocation failed before tests because PowerShell split an unquoted -D argument; original output retained; quoted retry passed.",
+    "MuMu uiautomator dump returned 139 (one other nonzero status) after reporting successful XML write. The independent screencap and actual fresh state/readback were verified; later dumps used unique paths. Android app process remained alive and logcat AndroidRuntime had no crash."
+  ]
+}

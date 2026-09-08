@@ -11,8 +11,10 @@ class BugLifecycleClient(private val api: ProjectOperationsClient, private val p
     }
     suspend fun events(bugId: String): JSONObject = api.request("bugs/$bugId/events?limit=100", token)
     suspend fun comments(bugId: String): JSONObject = api.request("projects/$projectId/bugs/$bugId/comments?limit=100", token)
-    private suspend fun current(bug: WorkbenchBug): JSONObject = api.request("bugs/${bug.id}", token).also {
-        check(it.getString("projectId") == projectId) { "BUG_SCOPE_MISMATCH" }
+    private suspend fun readBug(bug: WorkbenchBug): JSONObject = api.request("bugs/${bug.id}", token).also {
+        check(bug.projectId == projectId && it.getString("id") == bug.id && it.getString("projectId") == projectId) { "BUG_SCOPE_MISMATCH" }
+    }
+    private suspend fun current(bug: WorkbenchBug): JSONObject = readBug(bug).also {
         check(it.getInt("version") == bug.version) { "VERSION_CONFLICT" }
     }
     suspend fun manualComplete(bug: WorkbenchBug, note: String) {
@@ -53,7 +55,9 @@ class BugLifecycleClient(private val api: ProjectOperationsClient, private val p
         else body.put("deliveryKind", "no_code").put("noCodeReason", note)
         if (attempt.getString("status") != "delivered") api.request("repair-attempts/$id/deliver", token, "POST", body,
             "workflow:deliverRepairAttempt:attempt:$id:v$version")
-        val fresh = api.request("bugs/${bug.id}", token)
+        val fresh = readBug(bug)
+        // A no-code delivery can finish this transition itself. Trust scoped server readback.
+        if (fresh.getString("state") == "ready_for_verification") return
         val bugVersion = fresh.getInt("version")
         api.request("bugs/${bug.id}/complete", token, "POST", JSONObject().put("expectedVersion", bugVersion)
             .put("repairAttemptId", id).put("reason", note), "workflow:completeBug:bug:${bug.id}:v$bugVersion")

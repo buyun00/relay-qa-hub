@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.relayqahub.android.network.BugLifecycleClientTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-08T20:37:11.350Z" hostname="WIN11-LIN-MAIN" time="0.181">
+  <properties/>
+  <testcase name="stale bug version prevents delivery" classname="com.relayqahub.android.network.BugLifecycleClientTest" time="0.101"/>
+  <testcase name="code delivery still completes with freshly read version and original attempt" classname="com.relayqahub.android.network.BugLifecycleClientTest" time="0.013"/>
+  <testcase name="no code delivery succeeds from fresh server state without redundant completion" classname="com.relayqahub.android.network.BugLifecycleClientTest" time="0.006"/>
+  <testcase name="another bug or project in fresh ready response cannot be mistaken for success" classname="com.relayqahub.android.network.BugLifecycleClientTest" time="0.009"/>
+  <testcase name="another bug or project in initial response prevents delivery" classname="com.relayqahub.android.network.BugLifecycleClientTest" time="0.004"/>
+  <testcase name="already delivered no code attempt is read back without replaying either mutation" classname="com.relayqahub.android.network.BugLifecycleClientTest" time="0.004"/>
+  <testcase name="other fresh states keep server completion guards and propagate conflict" classname="com.relayqahub.android.network.BugLifecycleClientTest" time="0.043"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
