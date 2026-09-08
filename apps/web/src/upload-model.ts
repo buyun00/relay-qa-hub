@@ -1,13 +1,51 @@
 import type { UploadJob, UploadMode } from "../../desktop/src/uploader-types";
+import { DEFAULT_UPLOAD_PARAMETERS, type UploadInput } from "../../desktop/src/uploader-types";
+
+export function uploadDraftDefaults(value: unknown): UploadInput {
+  const draft =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Partial<UploadInput>)
+      : {};
+  const version = typeof draft.version === "string" ? draft.version : "";
+  return {
+    ...DEFAULT_UPLOAD_PARAMETERS,
+    productId:
+      (typeof draft.productId === "string" && draft.productId.trim()) ||
+      DEFAULT_UPLOAD_PARAMETERS.productId,
+    channelId:
+      (typeof draft.channelId === "string" && draft.channelId.trim()) ||
+      DEFAULT_UPLOAD_PARAMETERS.channelId,
+    belongName:
+      (typeof draft.belongName === "string" && draft.belongName.trim()) ||
+      DEFAULT_UPLOAD_PARAMETERS.belongName,
+    testerId:
+      Number.isSafeInteger(draft.testerId) && Number(draft.testerId) > 0
+        ? Number(draft.testerId)
+        : DEFAULT_UPLOAD_PARAMETERS.testerId,
+    version,
+    summary: version,
+    description: version,
+    testResultReference: "",
+    mode:
+      draft.mode === "prepare_publish" ||
+      draft.mode === "upload_only" ||
+      draft.mode === "prepare_test"
+        ? "prepare_publish"
+        : "publish_workflow",
+  };
+}
 
 export const UPLOAD_MODES: { id: UploadMode; label: string; description: string }[] = [
   {
     id: "publish_workflow",
-    label: "完整发布",
-    description: "上传、提测，按已有测试结论继续正式发布",
+    label: "完成发布",
+    description: "完成上传、提测及发布准备，自动确认正式发布",
   },
-  { id: "prepare_test", label: "上传并提测", description: "测试包就绪后提测，等待人工测试" },
-  { id: "upload_only", label: "仅上传", description: "上传并等待测试目录解压完成" },
+  {
+    id: "prepare_publish",
+    label: "等待最终确认",
+    description: "完成上传、提测及发布准备，只留下最后一步确认",
+  },
 ];
 export const UPLOAD_STEPS = [
   { label: "登录与下载", stages: ["NEW", "AUTHENTICATING", "DOWNLOADING"], done: "CREATE_VERSION" },
@@ -23,20 +61,18 @@ export const UPLOAD_STEPS = [
     done: "WAIT_TEST_ASSETS",
   },
   {
-    label: "提测与测试结论",
+    label: "完成提测流程",
     stages: ["REQUEST_TEST", "TEST_REQUESTED", "START_TEST", "PASS_TEST"],
     done: "PASS_TEST",
   },
   {
-    label: "复制与正式发布",
-    stages: [
-      "WAIT_RELEASE_COPY",
-      "WAIT_RELEASE_ASSETS",
-      "PREPARE_PUBLISH",
-      "REQUEST_PUBLISH",
-      "WAIT_PUBLISHED",
-      "PUBLISHED",
-    ],
+    label: "准备正式资源",
+    stages: ["WAIT_RELEASE_COPY", "WAIT_RELEASE_ASSETS", "PREPARE_PUBLISH"],
+    done: "PREPARE_PUBLISH",
+  },
+  {
+    label: "确认正式发布",
+    stages: ["AWAITING_PUBLISH_CONFIRMATION", "REQUEST_PUBLISH", "WAIT_PUBLISHED", "PUBLISHED"],
     done: "WAIT_PUBLISHED",
   },
 ];
@@ -55,18 +91,19 @@ const STAGES: Record<string, string> = {
   REQUEST_TEST: "提交测试",
   TEST_REQUESTED: "已提测 · 等待人工测试",
   START_TEST: "登记测试状态",
-  PASS_TEST: "提交已有测试结论",
+  PASS_TEST: "完成平台测试状态登记",
   WAIT_RELEASE_ASSETS: "等待复制正式资源",
   WAIT_RELEASE_COPY: "等待正式资源复制",
   PREPARE_PUBLISH: "准备正式发布",
   REQUEST_PUBLISH: "提交正式发布",
   WAIT_PUBLISHED: "核验最终发布状态",
   PUBLISHED: "正式发布完成",
+  AWAITING_PUBLISH_CONFIRMATION: "等待最终确认发布",
 };
 const ERRORS: Record<string, string> = {
   AUTH_REQUIRED: "登录已失效或尚未配置，请登录后恢复任务。",
   FORBIDDEN: "当前账号没有操作权限，请核对平台账号。",
-  INVALID_INPUT: "请检查产品、渠道、版本概述、说明和测试人 ID。",
+  INVALID_INPUT: "请检查产品、渠道、版本号和测试人 ID。",
   TEST_RESULT_REQUIRED: "增量包已提测。请填写本次测试人 ID 和实际测试结论引用，然后继续发布。",
   TEST_RESULT_LOCKED: "本任务已开始登记测试状态，测试人和测试结论不能再替换。",
   REMOTE_RESULT_UNKNOWN: "上次操作结果尚不明确。恢复时工具会先核对远端状态，无法确认时会继续停留。",
@@ -86,6 +123,7 @@ const ERRORS: Record<string, string> = {
   NETWORK_TIMEOUT: "平台请求超时，任务断点已保留。",
   JOB_COMPLETED: "该任务已完成，获取最新增量包请新建任务。",
   JOB_NOT_FOUND: "未找到本机任务记录。",
+  PUBLISH_NOT_READY: "任务尚未到达最终确认发布步骤，请先完成前序处理。",
   REMOTE_PROCESSING_FAILED: "平台解压或复制失败，请查看平台处理结果后恢复。",
 };
 export const uploadStageLabel = (stage: string): string => STAGES[stage] ?? "正在处理";
@@ -96,6 +134,7 @@ export function uploadJobLabel(job: UploadJob): string {
   if (job.published) return "正式发布完成";
   if (job.status === "succeeded") return uploadStageLabel(job.stage);
   if (job.status === "awaiting_test") return "等待测试结论";
+  if (job.status === "awaiting_publish") return "等待最终确认发布";
   return job.status === "interrupted" ? "已中断 · 可恢复" : "待处理 · 可恢复";
 }
 export function uploadProgress(job: UploadJob) {

@@ -2,17 +2,35 @@
 
 The Windows sidebar includes 上传增量 after 打包下载. The page configures the
 platform account, reviews a new job, shows download/upload and processing stages,
-and resumes local jobs with their original ZIP and target. Three endpoints are
-available: upload only, upload and request testing, and the complete publication
-workflow. Complete publication without a tester ID and actual test-result reference
-stops after requesting testing; these fields can be supplied when resuming.
-Recording the platform's test status does not execute a game test.
+and resumes local jobs with their original ZIP and target. New jobs have two endpoints:
+完成发布 (`publish_workflow`) and 等待最终确认 (`prepare_publish`). Both finish
+uploading, the recorded test-status workflow, release copy and release preparation.
+The latter stops at remote status 60 with `AWAITING_PUBLISH_CONFIRMATION / WAITING`.
+Only the explicit 确认发布 action launches `confirm-publish` to submit status 99 and
+wait for verified publication at status 100. Normal resume and page reload never
+grant this confirmation. Remote identity, status and release URL are checked again
+before publication. The confirmation timestamp is saved before continuing.
+
+The latest original recording supplies product **2002**, channel **1002**, tester
+**11562**, and `[2002]Baloot Go|[1002]谷歌-国际正式`. Evidence: events 3708, 7609,
+8537 and 8796 in `原始操作记录/ozdqp-upload-f76457e4-7c1b-4503-b5ed-8511330d3a78.json`
+(SHA-256 `7db1b6bf0c7c44824d954f76b57c9a83361cef4633435a4a02b6a58e776af2d3`).
+Historical version/record IDs are never reused. Both summary and description are
+the resolved version number, including an automatically generated next version.
+Existing custom drafts retain their target; empty fields receive recorded defaults.
+
+New jobs use the user's requested recorded workflow without a manual test-report
+field. The worker audits `testStatusSource=user_selected_recorded_workflow` and
+`executesGameTests=false`; it does not invent a test report or execute game tests.
+Existing jobs retain their original configuration, digest, mode and test-result
+requirements, and remain recoverable with their original ZIP.
 
 ## Integration boundary
 
-- `apps/desktop/vendor/ozdqp-uploader` contains the **unchanged** 0.2.0 executable
-  supplied in `D:\OZDQP-自动上传完整交接包-20260908`, its original README and licenses.
-  SHA-256: `9ffa226d0c6dc6e971963e7d1fc838dd2e1110f3120c716e548d33e80934dc23`.
+- `apps/desktop/vendor/ozdqp-uploader` contains the **0.3.0** executable built from
+  `apps/desktop/uploader`, adapted from the original 0.2.0 handover source in
+  `D:\OZDQP-自动上传完整交接包-20260908`. The original handover remains untouched.
+  SHA-256: `ac98a271deb77ddb6733e93703f0ba044df205c4c0a8a80804a9e3facbc524fb`.
   Packaging and execution verify that hash. The binary is placed outside ASAR in
   `resources/uploader`; no .NET installation is required on client machines.
 - The original executable does not implement `serve --stdio` or redirected
@@ -23,8 +41,8 @@ Recording the platform's test status does not execute a game test.
   origins; redirects are not followed. Failed login does not replace saved access.
 - Preload exposes bounded operations to the trusted main renderer. There is no
   arbitrary shell, executable path, API URL, job directory or historical version
-  ID in the renderer contract. Unknown target product/channel IDs are not inferred
-  from the ZIP name; the user enters them explicitly. Version defaults to the next
+  ID in the renderer contract. Target product/channel defaults come from the original
+  recording, not the ZIP name, and remain editable. Version defaults to the next
   platform version. The fixed ZIP is downloaded by the worker without platform auth.
 - Credentials use the tool's existing local JSON format in
   `%LOCALAPPDATA%\OZDQP-Uploader\auth\fq2ivi.ipwana.com-443.json` as required by the
@@ -60,11 +78,23 @@ continuing; the host does not clear pending writes or resend them itself.
 
 Host tests use disposable directories and mocked authentication. Browser fixtures
 cover account submission, navigation/draft retention, review before start,
-duplicate clicks, transfer progress, test-result recovery, reload and final-state
-labels. The supplied executable's local self-test is run separately. Production
+duplicate clicks, transfer progress, explicit final confirmation, reload and final-state
+labels. The built executable's local self-test is run separately. Production
 platform credentials and historical version IDs are not test fixtures.
 
 Real account login, cross-origin token permissions/expiry, COS multipart recovery,
 server unzip/copy terminal conditions and final publication on a designated **new**
 version still require business acceptance. The handover explicitly marks these
 as unverified. Integration/package checks do not claim that acceptance.
+
+## Build the standalone worker
+
+Use .NET 10 SDK, then update the vendor EXE and both hash pins if the binary changes:
+
+```powershell
+dotnet publish apps/desktop/uploader/Ozdqp.Uploader.csproj -c Release -r win-x64 --self-contained true -o work/uploader-0.3.0
+& work/uploader-0.3.0/ozdqp-uploader.exe self-test
+```
+
+The 0.3.0 worker retains all 23 original local tests and adds four tests for the
+confirmation boundary, resumed waiting, remote changes and version-only text.

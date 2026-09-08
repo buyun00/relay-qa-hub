@@ -1,0 +1,122 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Security.Cryptography;
+using System.IO.Compression;
+
+namespace Ozdqp;
+public static class Json
+{
+    public static readonly JsonSerializerOptions Options = new() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true };
+    public static string Text(JsonNode? n) => n is JsonValue v && v.TryGetValue<string>(out var s) ? s : n?.ToJsonString() ?? "";
+    public static int Int(JsonNode? n) => int.TryParse(Text(n), out var i) ? i : 0;
+    public static bool Bool(JsonNode? n) => Text(n) == "true";
+    public static JsonObject Clone(JsonObject obj) => (JsonObject)obj.DeepClone();
+}
+public sealed class JobConfig
+{
+    public string ApiBase { get; set; } = "https://fq2ivi.ipwana.com";
+    public string FilePath { get; set; } = "";
+    public string ProductId { get; set; } = "2002";
+    public string ChannelId { get; set; } = "1002";
+    public string? Version { get; set; }
+    public string Summary { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string BelongName { get; set; } = "[2002]Baloot Go|[1002]谷歌-国际正式";
+    public int? ExistingVersionId { get; set; }
+    public int TesterId { get; set; }
+    public string Mode { get; set; } = "publish_workflow";
+    public string TestResultReference { get; set; } = "";
+    public bool UseVersionText { get; set; }
+    public bool RecordedTestWorkflow { get; set; }
+    public int PollSeconds { get; set; } = 3;
+    public int WaitTimeoutSeconds { get; set; } = 1800;
+    public long PartSizeBytes { get; set; } = 5 * 1024 * 1024;
+    public int? ConfirmedTestUnzipStatus { get; set; }
+    public string WorkDirectory { get; set; } = "";
+}
+public sealed class JobState
+{
+    public string JobId { get; set; } = Guid.NewGuid().ToString();
+    public string ConfigDigest { get; set; } = "";
+    public bool PublishConfirmed { get; set; }
+    public string PublishConfirmedAt { get; set; } = "";
+    public string TestStatusSource { get; set; } = "";
+    public string DownloadUrl { get; set; } = "";
+    public string Stage { get; set; } = "NEW";
+    public string RunStatus { get; set; } = "NEW";
+    public string Version { get; set; } = "";
+    public int VersionId { get; set; }
+    public FileIdentity? File { get; set; }
+    public HashSet<string> Done { get; set; } = [];
+    public string? PendingAction { get; set; }
+    public string ObjectKey { get; set; } = "";
+    public string PublicUrl { get; set; } = "";
+    public string TestDir { get; set; } = "";
+    public string ReleaseDir { get; set; } = "";
+    public string Bucket { get; set; } = "";
+    public string Region { get; set; } = "";
+    public string UploadId { get; set; } = "";
+    public Dictionary<int, string> Parts { get; set; } = [];
+    public bool Reused { get; set; }
+    public int FinalRemoteStatus { get; set; }
+    public string PublishTime { get; set; } = "";
+    public int TesterId { get; set; }
+    public string TestResultReference { get; set; } = "";
+    public string StartTime { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+    public string EndTime { get; set; } = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss");
+    public DateTimeOffset StartedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+public sealed record FileIdentity(string Path, long Size, DateTime LastWriteUtc, string Md5, string Sha256, int ZipEntries);
+public sealed class UploadException(string code, string message) : Exception(message) { public string Code { get; } = code; }
+public static class Files
+{
+    public static async Task<FileIdentity> Inspect(string path, CancellationToken ct)
+    {
+        path = System.IO.Path.GetFullPath(path);
+        await using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 1024 * 1024, FileOptions.SequentialScan);
+        if (file.Length == 0) throw new UploadException("INVALID_INPUT", "ZIP 文件为空。");
+        using var md5 = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
+        using var sha = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        byte[] buffer = new byte[1024 * 1024]; int read;
+        while ((read = await file.ReadAsync(buffer, ct)) > 0) { md5.AppendData(buffer.AsSpan(0, read)); sha.AppendData(buffer.AsSpan(0, read)); }
+        file.Position = 0;
+        using var zip = new ZipArchive(file, ZipArchiveMode.Read, true);
+        int entries = zip.Entries.Count;
+        if (entries == 0) throw new UploadException("INVALID_INPUT", "ZIP 没有文件条目。");
+        foreach (var e in zip.Entries)
+            if (e.FullName.Replace('\\', '/').Split('/').Contains("..") || e.FullName.StartsWith('/') || e.FullName.Contains(':'))
+                throw new UploadException("INVALID_INPUT", "ZIP 含不安全路径条目。");
+        return new(path, file.Length, File.GetLastWriteTimeUtc(path), Convert.ToHexString(md5.GetHashAndReset()).ToLowerInvariant(), Convert.ToHexString(sha.GetHashAndReset()).ToLowerInvariant(), entries);
+    }
+    public static void CheckStable(FileIdentity id)
+    {
+        var f = new FileInfo(id.Path);
+        if (f.Length != id.Size || f.LastWriteTimeUtc != id.LastWriteUtc) throw new UploadException("FILE_CHANGED", "上传文件已改变，不能继续原任务。");
+    }
+}
+public sealed class Journal : IDisposable
+{
+    readonly FileStream exclusive;
+    public string Root { get; }
+    public string StatePath => Path.Combine(Root, "state.json");
+    public Journal(string root)
+    {
+        Root = Path.GetFullPath(root); Directory.CreateDirectory(Root);
+        try { exclusive = new FileStream(Path.Combine(Root, "job.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
+        catch (IOException) { throw new UploadException("JOB_LOCKED", "该任务正在另一个进程中运行。"); }
+    }
+    public JobState? Read() => File.Exists(StatePath) ? JsonSerializer.Deserialize<JobState>(File.ReadAllText(StatePath), Json.Options) : null;
+    public void Save(JobState s)
+    {
+        string tmp = StatePath + ".tmp";
+        using (var f = new FileStream(tmp, FileMode.Create, FileAccess.Write, FileShare.None)) { var bytes = JsonSerializer.SerializeToUtf8Bytes(s, Json.Options); f.Write(bytes); f.Flush(true); }
+        File.Move(tmp, StatePath, true);
+    }
+    public void Emit(JobState s, string kind, object? data = null)
+    {
+        string line = JsonSerializer.Serialize(new { protocolVersion = 1, type = "event", @event = kind, jobId = s.JobId, at = DateTimeOffset.UtcNow, stage = s.Stage, data });
+        File.AppendAllText(Path.Combine(Root, "events.jsonl"), line + "\n");
+        Console.WriteLine(line);
+    }
+    public void Dispose() => exclusive.Dispose();
+}

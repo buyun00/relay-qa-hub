@@ -476,6 +476,18 @@
   margin-top: 7px;
   font-size: 11px;
 }
+.upload-version-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #f7f9f3;
+  font-size: 12px;
+}
+.upload-version-text span {
+  color: var(--muted);
+}
 .upload-history-row > button:last-child {
   flex-shrink: 0;
 }

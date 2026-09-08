@@ -217,6 +217,7 @@ const bridge: QaHubDesktopBridge = {
         testResultReference: input.testResultReference,
       }),
     openFolder: (id) => ipcRenderer.invoke("desktop:uploader:open-folder", id),
+    confirmPublish: (id) => ipcRenderer.invoke("desktop:uploader:confirm-publish", id),
   },
   windowControlsOverlay: true,
   getWindowState: async () =>

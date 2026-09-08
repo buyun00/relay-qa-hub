@@ -12,7 +12,7 @@ if (
   !directory ||
   !runId ||
   !/^[a-f0-9-]{36}$/.test(runId) ||
-  !["run", "resume"].includes(command ?? "")
+  !["run", "resume", "confirm-publish"].includes(command ?? "")
 )
   process.exit(2);
 const receipt = path.join(directory, `run-${runId}.json`);

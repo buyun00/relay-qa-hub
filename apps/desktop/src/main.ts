@@ -612,6 +612,7 @@ function installIpcHandlers(): void {
     logout: () => getUploader().logout(),
     start: (value) => getUploader().start(value),
     resume: (value) => getUploader().resume(value),
+    "confirm-publish": (value) => getUploader().confirmPublish(value),
     "open-folder": async (value) => {
       const directory = getUploader().folder(value);
       await fs.access(path.join(directory, "desktop.json"));

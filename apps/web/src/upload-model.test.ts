@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { UploadJob } from "../../desktop/src/uploader-types";
-import { uploadJobLabel, uploadProgress, uploadStageLabel } from "./upload-model";
+import {
+  UPLOAD_MODES,
+  uploadDraftDefaults,
+  uploadJobLabel,
+  uploadProgress,
+  uploadStageLabel,
+} from "./upload-model";
 
 const job: UploadJob = {
   id: "fixture",
@@ -44,6 +50,52 @@ const job: UploadJob = {
   ],
 };
 describe("upload progress and terminal states", () => {
+  it("uses the recorded target and tester and keeps only two new-job endpoints", () => {
+    expect(uploadDraftDefaults(null)).toMatchObject({
+      productId: "2002",
+      channelId: "1002",
+      testerId: 11562,
+      belongName: "[2002]Baloot Go|[1002]谷歌-国际正式",
+      mode: "publish_workflow",
+    });
+    expect(UPLOAD_MODES.map((mode) => mode.id)).toEqual(["publish_workflow", "prepare_publish"]);
+    expect(uploadDraftDefaults({ productId: 12, channelId: "", testerId: 0 })).toMatchObject({
+      productId: "2002",
+      channelId: "1002",
+      testerId: 11562,
+    });
+  });
+  it("retains custom targets, derives both text fields from version, migrates legacy drafts", () => {
+    expect(
+      uploadDraftDefaults({
+        productId: "77",
+        channelId: "88",
+        testerId: 99,
+        version: "2.4.28",
+        summary: "old",
+        description: "old",
+        mode: "prepare_test",
+        testResultReference: "old",
+      }),
+    ).toMatchObject({
+      productId: "77",
+      channelId: "88",
+      testerId: 99,
+      version: "2.4.28",
+      summary: "2.4.28",
+      description: "2.4.28",
+      mode: "prepare_publish",
+      testResultReference: "",
+    });
+    expect(
+      uploadJobLabel({
+        ...job,
+        active: false,
+        status: "awaiting_publish",
+        stage: "AWAITING_PUBLISH_CONFIRMATION",
+      }),
+    ).toBe("等待最终确认发布");
+  });
   it("100 percent uploaded does not mean published", () => {
     expect(uploadProgress(job)?.percent).toBe(100);
     expect(uploadJobLabel(job)).toBe("上传增量包");

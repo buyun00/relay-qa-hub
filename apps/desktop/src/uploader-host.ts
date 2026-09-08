@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { DEFAULT_UPLOAD_PARAMETERS } from "./uploader-types.js";
 import type {
   UploadEvent,
   UploadInput,
@@ -10,7 +11,7 @@ import type {
   UploaderSnapshot,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "9ffa226d0c6dc6e971963e7d1fc838dd2e1110f3120c716e548d33e80934dc23";
+export const UPLOADER_SHA256 = "ac98a271deb77ddb6733e93703f0ba044df205c4c0a8a80804a9e3facbc524fb";
 export const UPLOAD_SOURCE =
   "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
 const API_BASE = "https://fq2ivi.ipwana.com";
@@ -41,7 +42,11 @@ function tester(value: unknown): number {
 }
 export function parseUploadInput(value: unknown): UploadInput {
   const v = record(value);
-  if (!["upload_only", "prepare_test", "publish_workflow"].includes(String(v["mode"])))
+  if (
+    !["upload_only", "prepare_test", "publish_workflow", "prepare_publish"].includes(
+      String(v["mode"]),
+    )
+  )
     throw new Error("INVALID_INPUT");
   const productId = textInput(v["productId"], 20, true);
   const channelId = textInput(v["channelId"], 20, true);
@@ -171,8 +176,14 @@ export class UploaderHost {
     const meta = await readJson(path.join(directory, "desktop.json"));
     if (!meta) throw new Error("JOB_NOT_FOUND");
     const config = await readJson(path.join(directory, "job.json"));
-    const input = parseUploadInput({ ...config, version: config?.["version"] ?? "" });
+    let input = parseUploadInput({ ...config, version: config?.["version"] ?? "" });
     const state = (await readJson(path.join(directory, "state.json"))) ?? {};
+    if (config?.["useVersionText"] === true && state["version"])
+      input = {
+        ...input,
+        summary: str(state["version"], 80),
+        description: str(state["version"], 80),
+      };
     const runId = str(meta["runId"]);
     if (!UUID.test(runId)) throw new Error("LOCAL_STATE_INVALID");
     const receipt = await readJson(path.join(directory, `run-${runId}.json`));
@@ -198,24 +209,34 @@ export class UploaderHost {
       Boolean(state["publishTime"]);
     const succeeded =
       state["runStatus"] === "SUCCEEDED" &&
-      (input.mode === "publish_workflow"
+      (input.mode === "publish_workflow" || input.mode === "prepare_publish"
         ? published
         : stage === (input.mode === "upload_only" ? "TEST_ASSETS_READY" : "TEST_REQUESTED"));
     return {
       id,
       createdAt: str(meta["createdAt"]),
       input,
+      recordedWorkflow: config?.["recordedTestWorkflow"] === true,
       active,
       stage,
       status: active
         ? "running"
         : succeeded
           ? "succeeded"
-          : errorCode === "TEST_RESULT_REQUIRED"
-            ? "awaiting_test"
-            : errorCode || state["runStatus"] === "FAILED" || state["runStatus"] === "AUTH_REQUIRED"
-              ? "failed"
-              : "interrupted",
+          : input.mode === "prepare_publish" &&
+              stage === "AWAITING_PUBLISH_CONFIRMATION" &&
+              state["runStatus"] === "WAITING" &&
+              state["finalRemoteStatus"] === 60 &&
+              done.includes("PREPARE_PUBLISH") &&
+              !state["pendingAction"]
+            ? "awaiting_publish"
+            : errorCode === "TEST_RESULT_REQUIRED"
+              ? "awaiting_test"
+              : errorCode ||
+                  state["runStatus"] === "FAILED" ||
+                  state["runStatus"] === "AUTH_REQUIRED"
+                ? "failed"
+                : "interrupted",
       errorCode,
       version: str(state["version"], 80) || input.version,
       versionId: num(state["versionId"]),
@@ -260,7 +281,7 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.2.0",
+      toolVersion: "0.3.0",
       sourceUrl: UPLOAD_SOURCE,
       configured: !!auth,
       authError,
@@ -400,7 +421,11 @@ export class UploaderHost {
     delete env["OZDQP_AUTHORIZATION"];
     return env;
   }
-  private async launch(id: string, command: "run" | "resume", createdAt: string): Promise<string> {
+  private async launch(
+    id: string,
+    command: "run" | "resume" | "confirm-publish",
+    createdAt: string,
+  ): Promise<string> {
     const directory = this.folder(id);
     const runId = randomUUID();
     const meta = { createdAt, runId, runStartedAt: new Date().toISOString() };
@@ -431,7 +456,19 @@ export class UploaderHost {
   }
   async start(value: unknown): Promise<string> {
     return this.exclusive(async () => {
-      const input = parseUploadInput(value);
+      const raw = record(value);
+      if (raw["mode"] !== "publish_workflow" && raw["mode"] !== "prepare_publish")
+        throw new Error("INVALID_INPUT");
+      const version = textInput(raw["version"] ?? "", 80);
+      const input = parseUploadInput({
+        ...DEFAULT_UPLOAD_PARAMETERS,
+        ...raw,
+        version,
+        summary: version || "自动版本号",
+        description: version || "自动版本号",
+        testResultReference: "",
+      });
+      if (input.testerId <= 0) throw new Error("INVALID_INPUT");
       await this.idle();
       if (!(await readJson(this.options.authFile))) throw new Error("AUTH_REQUIRED");
       await this.verifiedExecutable();
@@ -439,6 +476,8 @@ export class UploaderHost {
       const directory = this.folder(id);
       await writeJson(path.join(directory, "job.json"), {
         ...input,
+        useVersionText: true,
+        recordedTestWorkflow: true,
         version: input.version || null,
         existingVersionId: null,
         apiBase: API_BASE,
@@ -474,6 +513,18 @@ export class UploaderHost {
       });
       const state = await readJson(path.join(directory, "state.json"));
       return this.launch(job.id, state ? "resume" : "run", job.createdAt);
+    });
+  }
+  async confirmPublish(id: unknown): Promise<string> {
+    return this.exclusive(async () => {
+      this.folder(id);
+      await this.idle();
+      const job = await this.job(String(id));
+      if (job.input.mode !== "prepare_publish" || job.status !== "awaiting_publish")
+        throw new Error("PUBLISH_NOT_READY");
+      if (!(await readJson(this.options.authFile))) throw new Error("AUTH_REQUIRED");
+      await this.verifiedExecutable();
+      return this.launch(job.id, "confirm-publish", job.createdAt);
     });
   }
 }

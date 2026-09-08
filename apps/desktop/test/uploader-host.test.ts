@@ -21,7 +21,7 @@ const input: UploadInput = {
   summary: "Fixture update",
   description: "Local verification only",
   mode: "publish_workflow",
-  testerId: 0,
+  testerId: 11562,
   testResultReference: "",
 };
 const executable = path.resolve("vendor/ozdqp-uploader/ozdqp-uploader.exe");
@@ -294,6 +294,91 @@ test("tampered executable is rejected before creating a task", async (t) => {
   const host = new UploaderHost({ ...options, executable: file });
   await assert.rejects(host.start(input), /UPLOADER_INTEGRITY_FAILED/);
   assert.equal((await host.snapshot()).jobs.length, 0);
+});
+test("new jobs default to recorded parameters and persist version-only text behavior", async (t) => {
+  const { host, options } = await fixture(t);
+  await writeJson(options.authFile, { account: "fixture" });
+  await writeFile(
+    options.runner,
+    `import fs from 'node:fs/promises';import path from 'node:path';const [,dir,runId]=process.argv.slice(2);await fs.writeFile(path.join(dir,'run-'+runId+'.json'),JSON.stringify({finished:true}));`,
+  );
+  for (const mode of ["upload_only", "prepare_test"])
+    await assert.rejects(host.start({ ...input, mode }), /INVALID_INPUT/);
+  const id = await host.start({
+    mode: "prepare_publish",
+    version: "2.4.28",
+    summary: "ignore",
+    description: "ignore",
+  });
+  for (let i = 0; i < 100 && (await host.snapshot()).jobs[0]?.active; i++)
+    await new Promise((resolve) => setTimeout(resolve, 30));
+  const config = await readJson(path.join(host.folder(id), "job.json"));
+  assert.equal(config?.["productId"], "2002");
+  assert.equal(config?.["channelId"], "1002");
+  assert.equal(config?.["testerId"], 11562);
+  assert.equal(config?.["summary"], "2.4.28");
+  assert.equal(config?.["description"], "2.4.28");
+  assert.equal(config?.["useVersionText"], true);
+  assert.equal(config?.["recordedTestWorkflow"], true);
+  assert.equal(config?.["testResultReference"], "");
+  await writeJson(path.join(host.folder(id), "state.json"), { version: "2.4.29" });
+  assert.equal((await host.snapshot()).jobs[0]?.input.summary, "2.4.29");
+});
+test("final confirmation requires the persisted boundary and uses its own command exactly once", async (t) => {
+  const { host, options } = await fixture(t);
+  const state = {
+    stage: "AWAITING_PUBLISH_CONFIRMATION",
+    runStatus: "WAITING",
+    finalRemoteStatus: 60,
+    version: "2.4.28",
+    done: ["START_TEST", "PASS_TEST", "PREPARE_PUBLISH"],
+  };
+  const { id, folder } = await seed(options, state);
+  await assert.rejects(host.confirmPublish(id), /PUBLISH_NOT_READY/);
+  await writeJson(path.join(folder, "job.json"), {
+    ...input,
+    mode: "prepare_publish",
+    recordedTestWorkflow: true,
+    useVersionText: true,
+  });
+  assert.equal((await host.snapshot()).jobs[0]?.status, "awaiting_publish");
+  await assert.rejects(host.confirmPublish(id), /AUTH_REQUIRED/);
+  await writeJson(options.authFile, { account: "fixture" });
+  await writeFile(
+    options.runner,
+    `import fs from 'node:fs/promises';import path from 'node:path';const [,dir,runId,command]=process.argv.slice(2);await fs.appendFile(path.join(dir,'commands.txt'),command+'\\n');await fs.writeFile(path.join(dir,'run-'+runId+'.json'),JSON.stringify({finished:true}));`,
+  );
+  const wait = async () => {
+    for (let i = 0; i < 100; i++) {
+      if (!(await host.snapshot()).jobs[0]?.active) return;
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    }
+    throw new Error("runner timeout");
+  };
+  const config = await readFile(path.join(folder, "job.json"), "utf8");
+  await host.resume({ id, testerId: input.testerId, testResultReference: "" });
+  await wait();
+  assert.equal((await host.snapshot()).jobs[0]?.status, "awaiting_publish");
+  assert.equal(await readFile(path.join(folder, "job.json"), "utf8"), config);
+  const replies = await Promise.allSettled([host.confirmPublish(id), host.confirmPublish(id)]);
+  await wait();
+  assert.deepEqual(
+    replies.map((reply) => reply.status),
+    ["fulfilled", "rejected"],
+  );
+  assert.equal(
+    await readFile(path.join(folder, "commands.txt"), "utf8"),
+    "resume\nconfirm-publish\n",
+  );
+  for (const change of [
+    { finalRemoteStatus: 99 },
+    { pendingAction: "REQUEST_PUBLISH" },
+    { done: [] },
+    { runStatus: "FAILED" },
+  ]) {
+    await writeJson(path.join(folder, "state.json"), { ...state, ...change });
+    await assert.rejects(host.confirmPublish(id), /PUBLISH_NOT_READY/);
+  }
 });
 test("unreadable jobs remain present and are reported rather than silently discarded", async (t) => {
   const { host, options } = await fixture(t);

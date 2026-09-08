@@ -6,6 +6,8 @@ dist/
 **/dist/
 apps/desktop/release/
 apps/desktop/.packaging-stage-*/
+apps/desktop/uploader/bin/
+apps/desktop/uploader/obj/
 coverage/
 playwright-report/
 test-results/

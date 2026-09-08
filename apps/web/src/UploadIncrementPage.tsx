@@ -8,6 +8,7 @@ import type {
 import {
   UPLOAD_MODES,
   UPLOAD_STEPS,
+  uploadDraftDefaults,
   uploadErrorLabel,
   uploadJobLabel,
   uploadProgress,
@@ -15,17 +16,7 @@ import {
 } from "./upload-model";
 import "./upload-increment.css";
 
-const EMPTY: UploadInput = {
-  productId: "",
-  channelId: "",
-  belongName: "",
-  version: "",
-  summary: "",
-  description: "",
-  mode: "publish_workflow",
-  testerId: 0,
-  testResultReference: "",
-};
+const EMPTY = uploadDraftDefaults(null);
 const size = (value: number) =>
   value >= 1024 ** 3
     ? `${(value / 1024 ** 3).toFixed(2)} GB`
@@ -43,7 +34,7 @@ function JobProgress({ job }: { job: UploadJob | undefined }) {
   const progress = job ? uploadProgress(job) : null;
   const steps = UPLOAD_STEPS.slice(
     0,
-    job?.input.mode === "upload_only" ? 4 : job?.input.mode === "prepare_test" ? 5 : 6,
+    job?.input.mode === "upload_only" ? 4 : job?.input.mode === "prepare_test" ? 5 : 7,
   );
   return (
     <section className="upload-card upload-progress" aria-label="任务进度">
@@ -55,14 +46,16 @@ function JobProgress({ job }: { job: UploadJob | undefined }) {
               ? "进行中"
               : job.status === "succeeded"
                 ? "已完成"
-                : "待继续"
+                : job.status === "awaiting_publish"
+                  ? "待确认"
+                  : "待继续"
             : "待开始"}
         </span>
       </div>
       <h3 aria-live="polite">{job ? uploadJobLabel(job) : "准备好后，开始上传"}</h3>
       <p className="upload-muted">
         {job
-          ? `${job.input.summary} · ${job.version || "自动版本号"}`
+          ? `${job.version || "自动版本号"} · ${job.input.belongName}`
           : "下载、上传、解压与发布的进度会显示在这里。"}
       </p>
       {progress ? (
@@ -98,7 +91,9 @@ function JobProgress({ job }: { job: UploadJob | undefined }) {
                     : current
                       ? job?.active
                         ? "正在处理"
-                        : "等待继续"
+                        : job?.status === "awaiting_publish"
+                          ? "等待确认"
+                          : "等待继续"
                       : "等待前序步骤"}
                 </small>
               </div>
@@ -169,7 +164,7 @@ export default function UploadIncrementPage({
   const draftKey = `qa-hub:upload-draft:${userId}`;
   const [form, setForm] = useState<UploadInput>(() => {
     try {
-      return { ...EMPTY, ...JSON.parse(localStorage.getItem(draftKey) ?? "{}") } as UploadInput;
+      return uploadDraftDefaults(JSON.parse(localStorage.getItem(draftKey) ?? "{}"));
     } catch {
       return { ...EMPTY };
     }
@@ -232,7 +227,11 @@ export default function UploadIncrementPage({
     }
   };
   const setField = <K extends keyof UploadInput>(key: K, value: UploadInput[K]) => {
-    setForm((current) => ({ ...current, [key]: value }));
+    setForm((current) => ({
+      ...current,
+      [key]: value,
+      ...(key === "version" ? { summary: String(value), description: String(value) } : {}),
+    }));
     setReview(false);
   };
   const login = (event: FormEvent) => {
@@ -265,6 +264,13 @@ export default function UploadIncrementPage({
         }),
       );
       setNotice("正在恢复原任务，继续使用原增量包和版本。");
+    });
+  };
+  const confirmPublish = () => {
+    if (!bridge || !job) return;
+    void action("confirm-publish", async () => {
+      unwrap(await bridge.confirmPublish(job.id));
+      setNotice("已确认发布，正在执行最后一步并核验发布结果。");
     });
   };
 
@@ -464,25 +470,20 @@ export default function UploadIncrementPage({
                     onChange={(event) => setField("version", event.target.value)}
                   />
                 </label>
+                <div className="upload-version-text">
+                  <span>版本概述 / 更新说明</span>
+                  <strong>{form.version || "自动使用本次版本号"}</strong>
+                </div>
                 <label>
-                  版本概述
+                  平台测试人 ID
                   <input
+                    type="number"
+                    min={1}
+                    max={2147483647}
+                    step={1}
                     required
-                    maxLength={300}
-                    value={form.summary}
-                    placeholder="本次更新的简短概述"
-                    onChange={(event) => setField("summary", event.target.value)}
-                  />
-                </label>
-                <label>
-                  更新说明
-                  <textarea
-                    required
-                    rows={3}
-                    maxLength={10000}
-                    value={form.description}
-                    placeholder="填写本次变更内容"
-                    onChange={(event) => setField("description", event.target.value)}
+                    value={form.testerId || ""}
+                    onChange={(event) => setField("testerId", Number(event.target.value))}
                   />
                 </label>
                 <fieldset className="upload-mode-picker">
@@ -503,35 +504,7 @@ export default function UploadIncrementPage({
                     </label>
                   ))}
                 </fieldset>
-                {form.mode === "publish_workflow" ? (
-                  <details className="upload-test-input">
-                    <summary>
-                      测试结论 <span>可在提测后补充</span>
-                    </summary>
-                    <p>这里登记已有测试结果，不执行游戏测试。未填写时，任务会在提测后等待。</p>
-                    <label>
-                      平台测试人 ID
-                      <input
-                        type="number"
-                        min={1}
-                        max={2147483647}
-                        step={1}
-                        value={form.testerId || ""}
-                        onChange={(event) => setField("testerId", Number(event.target.value))}
-                      />
-                    </label>
-                    <label>
-                      实际测试结论引用
-                      <textarea
-                        rows={2}
-                        maxLength={2000}
-                        value={form.testResultReference}
-                        placeholder="本次测试报告链接或结论记录编号"
-                        onChange={(event) => setField("testResultReference", event.target.value)}
-                      />
-                    </label>
-                  </details>
-                ) : null}
+                <p className="upload-muted">沿用上次上传的提测流程，自动登记平台测试状态。</p>
                 {review ? (
                   <div className="upload-review" role="region" aria-label="确认上传任务">
                     <strong>
@@ -541,14 +514,12 @@ export default function UploadIncrementPage({
                       {form.belongName}
                       <br />
                       产品 {form.productId} · 渠道 {form.channelId} · 版本{" "}
-                      {form.version || "自动生成"}
+                      {form.version || "自动生成"} · 测试人 {form.testerId}
                     </p>
                     <p>
                       {form.mode === "publish_workflow"
-                        ? form.testerId && form.testResultReference.trim()
-                          ? "将使用已填写的测试结论继续正式发布。"
-                          : "将先上传并提测，等待补齐测试结论后再继续发布。"
-                        : "按所选流程终点完成本次任务。"}
+                        ? "将完成上传、提测及发布准备，自动确认正式发布。"
+                        : "将完成上传、提测及发布准备，等待你最后确认发布。"}
                     </p>
                     <button
                       className="upload-primary"
@@ -574,12 +545,32 @@ export default function UploadIncrementPage({
               </form>
             </section>
             <div className="upload-right">
+              {job && !job.active && job.status === "awaiting_publish" ? (
+                <section className="upload-card upload-resume">
+                  <h2>只剩最后一步确认</h2>
+                  <p>上传、提测和正式资源准备已完成。确认后将正式发布此版本。</p>
+                  <p>
+                    <strong>{job.version}</strong> · {job.input.belongName}
+                  </p>
+                  <button
+                    type="button"
+                    className="upload-primary"
+                    disabled={!!busy || hasActive || !snapshot?.configured}
+                    onClick={confirmPublish}
+                  >
+                    {busy === "confirm-publish" ? "正在确认…" : "确认发布"}
+                  </button>
+                </section>
+              ) : null}
               <JobProgress job={job} />
-              {job && !job.active && job.status !== "succeeded" ? (
+              {job &&
+              !job.active &&
+              job.status !== "succeeded" &&
+              job.status !== "awaiting_publish" ? (
                 <section className="upload-card upload-resume">
                   <h2>继续此任务</h2>
                   <p>继续使用原版本和原增量包，已完成的步骤会保留。</p>
-                  {job.input.mode === "publish_workflow" ? (
+                  {job.input.mode === "publish_workflow" && !job.recordedWorkflow ? (
                     <>
                       <label>
                         平台测试人 ID

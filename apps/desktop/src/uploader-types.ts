@@ -1,4 +1,11 @@
-export type UploadMode = "upload_only" | "prepare_test" | "publish_workflow";
+// Legacy modes remain readable for existing jobs; new jobs expose only the last two.
+export type UploadMode = "upload_only" | "prepare_test" | "publish_workflow" | "prepare_publish";
+export const DEFAULT_UPLOAD_PARAMETERS = {
+  productId: "2002",
+  channelId: "1002",
+  belongName: "[2002]Baloot Go|[1002]谷歌-国际正式",
+  testerId: 11562,
+} as const;
 export interface UploadInput {
   productId: string;
   channelId: string;
@@ -31,7 +38,8 @@ export interface UploadJob {
   input: UploadInput;
   active: boolean;
   stage: string;
-  status: "running" | "succeeded" | "failed" | "interrupted" | "awaiting_test";
+  status: "running" | "succeeded" | "failed" | "interrupted" | "awaiting_test" | "awaiting_publish";
+  recordedWorkflow?: boolean;
   errorCode: string;
   version: string;
   versionId: number;
@@ -69,4 +77,5 @@ export interface UploaderBridge {
     testResultReference: string;
   }) => Promise<UploadReply<string>>;
   openFolder: (id: string) => Promise<UploadReply<boolean>>;
+  confirmPublish: (id: string) => Promise<UploadReply<string>>;
 }
