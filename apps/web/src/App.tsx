@@ -1591,7 +1591,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
       setNewContent("");
       setNewFiles([]);
       setNewOwnerId("");
-      setScopeId("team");
       setCategory("pending");
       openDetail(created.bug.id);
     });
