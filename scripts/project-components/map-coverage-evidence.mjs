@@ -12,9 +12,42 @@ const proofText = (relative) => {
   proofHashes[relative] = createHash("sha256").update(body).digest("hex");
   return body;
 };
-const read = (relative) => JSON.parse(proofText(relative).replace(/^\uFEFF/u, ""));
+const correctedEvidence = new Map();
+const read = (relative) =>
+  JSON.parse(proofText(correctedEvidence.get(relative) ?? relative).replace(/^\uFEFF/u, ""));
 const optionalRead = (relative) =>
   fs.existsSync(path.resolve(evidenceRoot, relative)) ? read(relative) : null;
+// The reviewed public index binds old proofs to derivatives of verified originals.
+// Never access its private-original paths or infer a version from old redacted text.
+const correctionIndexPath = "redaction-corrections/index.json";
+const correctionIndex = optionalRead(correctionIndexPath);
+if (correctionIndex) {
+  if (
+    proofHashes[correctionIndexPath] !==
+      "b7f7c147da5a718ef9a9312293b81b6acb716e16a0ba823127823a9969f15491" ||
+    correctionIndex.businessRunsRepeated !== false ||
+    correctionIndex.oldPublicProofsOverwritten !== false
+  )
+    throw new Error("Corrected evidence index changed; re-review required");
+  const publicPrefix = "docs/evidence/project-components/";
+  for (const entry of correctionIndex.items) {
+    const relative = (file) => {
+      if (!file.startsWith(publicPrefix) || file.includes(".."))
+        throw new Error("Correction path must remain in public evidence");
+      return file.slice(publicPrefix.length);
+    };
+    const old = relative(entry.oldPublicPath);
+    const corrected = relative(entry.correctedPublicPath);
+    proofText(old);
+    proofText(corrected);
+    if (
+      proofHashes[old] !== entry.oldPublicSha256 ||
+      proofHashes[corrected] !== entry.correctedPublicSha256
+    )
+      throw new Error(`Corrected evidence changed; re-review required: ${old}`);
+    correctedEvidence.set(old, corrected);
+  }
+}
 function mcpBody(check) {
   const envelope = check.result?.jsonrpc ? check.result.result : check.result;
   if (check.result?.error || envelope?.isError === true) return null;
@@ -70,7 +103,17 @@ function record(item, surface, status, evidence, actual) {
     delete item.manual.surfaceProgress[surface];
   Object.assign(item.results[surface], {
     status,
-    evidence: [...new Set(evidence)],
+    evidence: [
+      ...new Set(
+        evidence.flatMap((reference) => {
+          const [file, fragment] = reference.split("#", 2);
+          const corrected = correctedEvidence.get(file);
+          return corrected
+            ? [reference, corrected + (fragment === undefined ? "" : "#" + fragment)]
+            : [reference];
+        }),
+      ),
+    ],
     actual,
     note: "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
   });
@@ -716,7 +759,7 @@ if (
     "http",
     ["runs/exe-fault-independent-api-mcp.json", "runs/http-core-2026-09-08T18-19-04-805Z.json"],
     ["预览EXE和4420退出时，独立HTTP实际15项含登录/创建/查询/跨项目拒绝继续成功"],
-    ["停EXE窗口内没有通过HTTP独立完成评论及全部主要状态动作，不能用MCP调用替代HTTP入口"],
+    ["该早期HTTP窗口未包含评论和状态变更；后续独立性证据另行校准，不能用MCP调用替代HTTP入口"],
   );
   partialBaseline(
     12,
@@ -726,7 +769,7 @@ if (
       "runs/server-mcp-core-2026-09-08T18-19-05-946Z.json",
     ],
     ["预览EXE/本地MCP退出时服务MCP13项仍完成真实创建、评论、人工完成和验收关闭"],
-    ["编辑、删除、退回/重开等其余主要Bug动作及完整负向场景未在该独立窗口逐一覆盖"],
+    ["该早期proof的逐请求进程边界较弱；后续独立性证据另行校准，§17完整功能与负向场景仍独立验收"],
   );
 }
 const beforeUpgrade = optionalRead("runs/exe-before-preview4-upgrade.json");
@@ -1193,7 +1236,7 @@ const review = [
         `| ${item.title} | ${surfaces.map((surface) => (!item.results[surface].applicable ? "—" : item.results[surface].status + (item.manual.surfaceProgress?.[surface] ? "（部分实测）" : ""))).join(" | ")} |`,
     ),
   "",
-  "09按六个实际入口分别闭环；15严格按设计列出的HTTP下载、远端MCP资源、本地MCP落盘三个入口判定，三者有同一PNG归属和hash证据。23已有实际EXE升级恢复proof。24按设计13/24与10.3的服务恢复要求，由独立HTTP回退/保留/恢复证据判定；先前要求六入口各自降级超出该基线原文。EXE既有客户端恢复证据独立保留，其它APK/EXE/Web/MCP功能控件仍各自验收。22仍缺物理Android及适用的设备取证、文件和升级验证。",
+  "09按六个实际入口分别闭环；11/12按设计原文独立性判据，由EXE停止窗口内的实际HTTP及服务端JSON-RPC分别登录、查询、评论和改状态判断；先前把全部动作/负向场景加入这两个基线超出原文，§17全功能及13/14对等/并发要求继续独立保留。15严格按HTTP下载、远端MCP资源、本地MCP落盘三个入口及同一PNG归属/hash判定。23有实际EXE升级恢复proof。24按设计13/24与10.3的服务恢复要求，由独立HTTP回退/保留/恢复证据判定；六入口各自降级超出该基线原文。EXE既有客户端恢复证据独立保留，其它APK/EXE/Web/MCP功能控件仍各自验收。22仍缺物理Android及适用的设备取证、文件和升级验证。",
   "",
   "## 部分实测及剩余缺口",
   "",

@@ -285,8 +285,8 @@ const baseline = [
   ["多窗口和多客户端", "同一人员并行打开不同项目；每个请求保持明确归属。"],
   ["关闭所有组件的基础全流程", "APK/EXE/Web 均可创建、处理、人工完成、验收并关闭 Bug。"],
   ["项目人员管理一致", "各端实际查看、关联、解除、停用和恢复当前项目人员。"],
-  ["HTTP API 独立使用", "停止专用测试 EXE 后，HTTP 仍可登录、查询、评论和执行全部动作。"],
-  ["服务端 MCP 独立使用", "不依赖 EXE；远端真实连接并完成主要 Bug 全部动作。"],
+  ["HTTP API 独立使用", "关闭 EXE 后，外部程序仍可登录、查询、评论和改状态。"],
+  ["服务端 MCP 独立使用", "服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作。"],
   ["HTTP/MCP 对等", "等价输入得到一致状态、版本、操作人、幂等结果和错误。"],
   ["并发和重复提交", "旧 expectedVersion 被拒；同幂等键不重复创建轮次或外部任务。"],
   ["附件三种读取", "HTTP 字节下载、服务 MCP 资源、EXE 本地落盘均正确归属且哈希一致。"],
@@ -849,8 +849,12 @@ const data = {
       affects: ["migration", "rollback"],
       status: "partially_verified",
       required:
-        "The pinned main SQLite and 878 attachments have been restored, migrated and read through a held API. Still required: explicit unfinished-task inventory and recovery evidence for legacy increment-upload queue/owner/workspace/job files, Relay batch/state directories and third-party state outside that recovery set.",
-      evidence: ["migration-rehearsal.md", "migration-service-readback.json"],
+        "The pinned main SQLite and 878 attachments have been restored, migrated and read through a held API. Read-only external-state inventory now locates 3 upload jobs, 2 chains, 9 Relay batches and the active queue/WAL. Live queue counts, cross-file consistent export, explicit project/version mapping and actual recovery of those external states remain unverified.",
+      evidence: [
+        "migration-rehearsal.md",
+        "migration-service-readback.json",
+        "baseline21-external-state-inventory.json",
+      ],
     },
     {
       id: "frozen-workflow-runtime-coverage",

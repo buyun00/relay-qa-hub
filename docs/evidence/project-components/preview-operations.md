@@ -1,31 +1,31 @@
 # 独立项目预览运行与回退说明
 
-适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7、PID11368），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code22/preview.8。24基线仅09、15、23、24整项通过，物理Android和真实外部完整链路仍缺。**
+适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7，最新恢复PID23924），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code22/preview.8。24基线仅09、11、12、15、23、24整项通过，物理Android和真实外部完整链路仍缺。**
 
 ## 目录、端口和身份
 
-| 用途 | 显式配置 |
-| --- | --- |
-| 源码 | C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub |
-| 实例配置 | C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\instance.json |
-| runtime | C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86 |
-| 业务数据 / 备份 | runtime\data / runtime\backups；独立启动配置关闭自动备份 runner |
-| 日志 / 发布 / 打包工作区 | runtime\logs / runtime\downloads / runtime\packages\<releaseId> |
-| EXE profile | runtime\desktop\profile；含项目身份、草稿、MCP 文件缓存、升级回执 |
-| 组件 / 凭据引用 | runtime\components\projects\<projectId>\components\<key>\versions\<version> / runtime\credentials |
-| 秘密文件 | instance.json 指定 runtime\secrets.json；专用启动器仅在进程内读取，不能进入命令参数、日志、文档或提交 |
-| Cookie / 更新通道 | qa-hub-preview-7c86-session / qa-hub-preview-7c86 |
-| Windows | %LOCALAPPDATA%\Programs\RelayQaHubPreview\RelayQaHubPreview.exe；scheme qa-hub-preview |
-| Android | com.relayqahub.android.preview.debug；名称 QA Hub 项目预览；scheme qahub-preview |
+| 用途                     | 显式配置                                                                                              |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| 源码                     | C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub                                                      |
+| 实例配置                 | C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\instance.json                              |
+| runtime                  | C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86                                            |
+| 业务数据 / 备份          | runtime\data / runtime\backups；独立启动配置关闭自动备份 runner                                       |
+| 日志 / 发布 / 打包工作区 | runtime\logs / runtime\downloads / runtime\packages\<releaseId>                                       |
+| EXE profile              | runtime\desktop\profile；含项目身份、草稿、MCP 文件缓存、升级回执                                     |
+| 组件 / 凭据引用          | runtime\components\projects\<projectId>\components\<key>\versions\<version> / runtime\credentials     |
+| 秘密文件                 | instance.json 指定 runtime\secrets.json；专用启动器仅在进程内读取，不能进入命令参数、日志、文档或提交 |
+| Cookie / 更新通道        | qa-hub-preview-7c86-session / qa-hub-preview-7c86                                                     |
+| Windows                  | %LOCALAPPDATA%\Programs\RelayQaHubPreview\RelayQaHubPreview.exe；scheme qa-hub-preview                |
+| Android                  | com.relayqahub.android.preview.debug；名称 QA Hub 项目预览；scheme qahub-preview                      |
 
 以下 runtime\... 相对于表内绝对目录，不是生产目录。
 
-| 服务 | 地址 | 已保存证据 |
-| --- | --- | --- |
-| API | http://127.0.0.1:4419；就绪 /api/v1/health/ready | 2026-09-08T20:39:13.7225210Z启动PID18644；最终dist已加载，实际HTTP读回ready/schema14；操作前仍核对身份 |
-| Web/下载 | http://127.0.0.1:4274/；/downloads/<filename> | 17:52:36Z 回执 PID 20284；GM 浏览和 WebSocket 实际通过 |
-| 服务端 MCP | http://127.0.0.1:4421/mcp；就绪 /health | 16:46:02Z 转发进程回执 PID 15736；后续核心/资源烟测通过 |
-| EXE 本地 MCP | http://127.0.0.1:4420/mcp | 随独立 EXE 启动；.4 资源读回 90 工具和文件/hash |
+| 服务         | 地址                                             | 已保存证据                                                                                             |
+| ------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| API          | http://127.0.0.1:4419；就绪 /api/v1/health/ready | 2026-09-08T20:39:13.7225210Z启动PID18644；最终dist已加载，实际HTTP读回ready/schema14；操作前仍核对身份 |
+| Web/下载     | http://127.0.0.1:4274/；/downloads/<filename>    | 17:52:36Z 回执 PID 20284；GM 浏览和 WebSocket 实际通过                                                 |
+| 服务端 MCP   | http://127.0.0.1:4421/mcp；就绪 /health          | 16:46:02Z 转发进程回执 PID 15736；后续核心/资源烟测通过                                                |
+| EXE 本地 MCP | http://127.0.0.1:4420/mcp                        | 随独立 EXE 启动；.4 资源读回 90 工具和文件/hash                                                        |
 
 PID 是历史回执，不能手写用于停止。生产 4319、4174、日常 MCP 4320 和日常应用不在这些命令范围内。预览端口当前已分配，不能再当空闲端口。
 
@@ -37,50 +37,50 @@ Web 由 scripts/project-components/preview-web.mjs 服务 apps/web/dist，将 /a
 
 PowerShell 操作变量：
 
-~~~powershell
+```powershell
 $qaPreviewSource = 'C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub'
 $qaPreviewConfig = 'C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\instance.json'
 $qaPreviewManager = Join-Path $qaPreviewSource 'scripts\project-components\Manage-QAHubPreview.ps1'
-~~~
+```
 
 只读身份状态：
 
-~~~powershell
+```powershell
 & $qaPreviewManager -Action Status -ConfigFile $qaPreviewConfig -Services @('api', 'web', 'mcp')
-~~~
+```
 
 Status 核对 PID、CreationDate、可执行路径和完整命令行，**不等于 HTTP ready**。实际就绪需分别读取：
 
-~~~powershell
+```powershell
 Invoke-RestMethod -Uri 'http://127.0.0.1:4419/api/v1/health/ready'
 Invoke-RestMethod -Uri 'http://127.0.0.1:4421/health'
-~~~
+```
 
 要求 status:ready，并检查 database/evidence/worker；当前证据到 schema 14。上面是后续操作方法，本次文档更新没有调用。
 
 启动时明确服务名；API 先启动，Web/MCP 依赖 API：
 
-~~~powershell
+```powershell
 & $qaPreviewManager -Action Start -ConfigFile $qaPreviewConfig -Services api
-~~~
+```
 
-~~~powershell
+```powershell
 & $qaPreviewManager -Action Start -ConfigFile $qaPreviewConfig -Services web
-~~~
+```
 
-~~~powershell
+```powershell
 & $qaPreviewManager -Action Start -ConfigFile $qaPreviewConfig -Services mcp
-~~~
+```
 
 只重启 Web 时，停止与启动是两个独立操作：
 
-~~~powershell
+```powershell
 & $qaPreviewManager -Action Stop -ConfigFile $qaPreviewConfig -Services web
-~~~
+```
 
-~~~powershell
+```powershell
 & $qaPreviewManager -Action Start -ConfigFile $qaPreviewConfig -Services web
-~~~
+```
 
 API 重启会打断浏览、Android/MCP 请求和本进程工作；先与当前验收者到达操作边界，再单独 Stop -Services api、确认结果、Start -Services api。MCP 同理。**不要省略 -Services，其默认值是三个服务。** 不按进程名批量终止，不使用上述历史 PID。脚本不管理 EXE MCP 4420，不关闭日常 EXE。
 
@@ -130,7 +130,7 @@ http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-latest.json
 
 **Windows 0.2.0-preview.7 已完成独立发布和实际6→7原生升级验收。** releaseId为20260908T194425490Z，108378668字节，SHA-256 fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a。公开回执sourceCommit为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789、sourceDirty:false；文档更新只读核对receipt及主代理实际原生升级proof；未额外操作安装或验签。回执位置：C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\packages\20260908T194425490Z\receipt.json。此包已含首装guard及提交内源码，升级passed依据下述实际proof。
 
-.6→.7已通过原生“检查更新→安装并重启”实际完成，proof观测时点2026-09-08T19:54:02.443Z；当前已安装nativeVersion0.2.0.7、主PID11368。原员工/项目A、文字+1张PNG草稿和配置SHA保持，原Bug13 closed/v14、评论及184872字节原附件materialize/hash读回通过；旧更新结果及7份backup目录保留。新helper的成功result时间19:52:36Z位于真实原生点击区间，UTC已在本次成功更新中核对。[.7升级proof](runs/exe-after-preview7-upgrade.json)、[原生恢复](runs/exe-preview7-restored-draft.txt)。19:54:30Z本地4420与服务4421实际目录均为相同90工具、协议2025-06-18，不支持的协议头均400；此项只证明目录/协议，不能称90个业务工具全部通过。[双入口协议](runs/exe-preview7-live-protocol.json)。
+.6→.7已通过原生“检查更新→安装并重启”实际完成，proof观测时点2026-09-08T19:54:02.443Z；该次观测已安装nativeVersion0.2.0.7、主PID11368；最新受控停止恢复后为PID23924（21:18:26.3376550Z）。原员工/项目A、文字+1张PNG草稿和配置SHA保持，原Bug13 closed/v14、评论及184872字节原附件materialize/hash读回通过；旧更新结果及7份backup目录保留。新helper的成功result时间19:52:36Z位于真实原生点击区间，UTC已在本次成功更新中核对。[.7升级proof](runs/exe-after-preview7-upgrade.json)、[原生恢复](runs/exe-preview7-restored-draft.txt)。19:54:30Z本地4420与服务4421实际目录均为相同90工具、协议2025-06-18，不支持的协议头均400；此项只证明目录/协议，不能称90个业务工具全部通过。[双入口协议](runs/exe-preview7-live-protocol.json)。
 
 .7新增原生窗口子集验收（2026-09-08T19:56:56.606Z）：打开草稿时点击窗口关闭按钮后无可见窗口，本地MCP仍能读取原closed Bug；第二次启动精确已安装预览EXE后，原主进程PID11368及启动时点19:52:36.0963040Z不变，恢复窗口2165104中的同员工、原文字+1张PNG草稿。恢复通过第二次EXE启动并激活已观察的主窗口完成；短暂无标题窗口曾无法激活，后续选择标题主窗口成功。**这里只证明关闭到后台和单实例第二次启动恢复，不包含Windows系统托盘图标点击、进程重启或强停。** [窄范围proof](runs/exe-preview7-close-restore.json)、[原生恢复界面](runs/exe-preview7-tray-restored.txt)。
 
@@ -164,9 +164,9 @@ Git 忽略目录也须保留：
 - apps/android/app/build/evidence/project-components 的截图、UI XML、脱敏读回和保留 APK；build 目录不是 Git 持久证据。
 - runtime\migration-rehearsal-81deb464 的固定归档、校验报告、migrated/rollback 副本和 hold。
 
-矩阵重生保留结果、人工备注和retiredItems，源码变化标记复验。当前985细目不是985项通过；24基线只有09、15、23、24整项通过，22保留物理Android必测缺口，15仅按设计列出的三种实际读取入口判定整项通过，APK/EXE/Web其它控件和17.3物理设备要求不受影响。源目录重复MCP注册行不重复计数。[映射规则与progress](coverage-mapping-review.md)。真实外部Jenkins、上传、Relay、轻语以及物理Android仍缺资源。
+矩阵重生保留结果、人工备注和retiredItems，源码变化标记复验。当前985细目不是985项通过；24基线只有09、11、12、15、23、24整项通过，22保留物理Android必测缺口，15仅按设计列出的三种实际读取入口判定整项通过，APK/EXE/Web其它控件和17.3物理设备要求不受影响。源目录重复MCP注册行不重复计数。[映射规则与progress](coverage-mapping-review.md)。真实外部Jenkins、上传、Relay、轻语以及物理Android仍缺资源。
 
-基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、15、23、24整项通过，其余功能仍按实际入口分别验收。21的缺口是主库归档以外的旧上传queue.sqlite/owner/workspace/job、Relay批次/state及轻语状态的未完成任务完整清单和迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
+基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、11、12、15、23、24整项通过，其余功能仍按实际入口分别验收。21已只读定位旧上传queue.sqlite/owner/job/chain、Relay批次及轻语状态；仍缺活queue数量/状态、跨文件一致恢复集、明确项目/版本映射及实际迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
 
 .7仅两个实际按钮新增EXE passed：关闭窗口、状态面板检查更新/安装并重启。window-action(close)、check-update成功、install-update成功、second-instance无深链恢复记为分支passed，复合handler仍not_run；托盘图标点击仍未测。生成/映射脚本本轮仅为持久重放这些证据作有界修改，不改应用源码；保留401个既有复验标记，proof SHA不一致时拒绝且不写矩阵。[映射审查](coverage-mapping-review.md)、[实际重放验证](runs/coverage-criteria-replay.json)。
 
@@ -202,7 +202,7 @@ offline-import.mjs 要求显式 archive、expected-sha256、allowed-root、data-
 
 基线24按设计13/24“能按文档恢复服务并保留回退前新增数据和任务证据”和10.3的隔离回退边界校准：服务/HTTP是必要入口，旧程序不需要读取或合并新版数据。先前要求六入口各自降级、或让APK回退阻止该服务基线通过，属于过度约束，现已纠正。既有EXE客户端恢复证据单独保留；APK/Web/MCP及其它功能控件保持各自实测状态。24整项通过不补齐18/19外部组件、21旧queue/workspace完整清单、22及17.3物理设备缺口，整个任务仍未完成。
 
-本轮按最终冻结源码重新盘点：188个源码文件、985细目，保留既有人工结果、负向备注与needsRevalidation；09、15、23、24整项通过，其余基线和独立功能仍按实际缺口验收。
+本轮按最终冻结源码重新盘点：188个源码文件、985细目，保留既有人工结果、负向备注与needsRevalidation；09、11、12、15、23、24整项通过，其余基线和独立功能仍按实际缺口验收。
 
 ## 最终API、Android与生产读回
 
@@ -212,8 +212,28 @@ Android最新实际安装为com.relayqahub.android.preview.debug，code22 / 0.2.
 
 当前固定APK为C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code22-acceptance/qa-hub-preview-code22.apk，35,471,405 bytes，SHA-256 733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777。code21原包保留为同目录retained-code21.apk，SHA-256 d783e9908e7dacdd660565cf15e1624c567a820e973d01190a38a0981afe7255。本次使用相同debug签名的adb install-r，不声称应用内签名更新源/自升级通过。EXE最新成功包仍为.7，不能把Android .8版本当作EXE新包。
 
-最新生产只读核对为2026-09-08T20:49:45.0734634Z：相对19:55快照，六文件hash、三个原PID精确启动时点及可见日常EXE路径保持，4319 ready/schema12，4174 Windows3.3.5 manifest原字节hash不变。两个Node的可执行路径仍null，没有新增路径证明；未重新验签/下载生产安装包。Android引用code22证据20:46:37.419Z的daily14/PID5051/配置保留，root未重复ADB查询。[最新生产只读证据](runs/production-after-api-fix-code22.json)。
+前轮生产只读核对为2026-09-08T20:49:45.0734634Z：相对19:55快照，六文件hash、三个原PID精确启动时点及可见日常EXE路径保持，4319 ready/schema12，4174 Windows3.3.5 manifest原字节hash不变。两个Node的可执行路径仍null，没有新增路径证明；未重新验签/下载生产安装包。Android引用code22证据20:46:37.419Z的daily14/PID5051/配置保留，root未重复ADB查询。[前轮生产只读证据](runs/production-after-api-fix-code22.json)。
 
 code22同一已验收APK已发布为不可变预览下载：[下载Android code22 / preview.8](http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk)。完整HTTP下载35,471,405字节、SHA-256 733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777，实例响应头/类型匹配，Windows manifest未变。Android源内容与提交1be772469671d75cbb5e31240bf345dcc7c4a267一致，APK构建发生在提交之前；本次发布没有重新构建或安装。回执不是签名更新manifest，不能记为应用内自升级或物理设备通过。[下载发布证据](runs/android-code22-download-publication.json)。
 
-本轮冻结盘点锚点为81e70d43638f3cb2f3dbd3994acd46f413e5364e，其中API兼容源码提交09f7150、Android源码提交1be7724；188个源码文件hash逐一匹配，985条细目、21条退役历史保留。连续生成器→mapper→生成器重放的语义hash一致；错误proof hash在任何写入前拒绝（0写入），人工负向结果和item/manual复验、sourceHash标记均保留，既有needsRevalidation零丢失。审计结果见coverage-matrix.json的evidenceMapping.finalReplayVerification。
+前轮冻结盘点锚点为81e70d43638f3cb2f3dbd3994acd46f413e5364e，其中API兼容源码提交09f7150、Android源码提交1be7724；188个源码文件hash逐一匹配，985条细目、21条退役历史保留。连续生成器→mapper→生成器重放的语义hash一致；错误proof hash在任何写入前拒绝（0写入），人工负向结果和item/manual复验、sourceHash标记均保留，既有needsRevalidation零丢失。审计结果见coverage-matrix.json的evidenceMapping.finalReplayVerification。
+
+## EXE 停止期间的 HTTP / 服务端 MCP 独立性
+
+设计基线11原文为“关闭 EXE 后，外部程序仍可登录、查询、评论和改状态”；12为“服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作”。此前生成器把“全部动作/完整负向场景”加入这两个基线，超出原文；这些要求继续由§17全功能矩阵及13/14对等、并发项目验收。此次只按独立性纠正11/12，当前整项通过为09、11、12、15、23、24。
+
+2026-09-08T21:13:39.2199432Z，主代理对已核对精确路径/启动时点的预览EXE主进程11368执行 controlled_fault_stop；没有登录后立即强停的组合，也没有操作日常EXE。独立性脚本在21:14:14.415Z–21:17:11.392Z一次运行通过：33次直接HTTP请求、36次服务端4421请求（业务为真实JSON-RPC）、140次逐请求前后及首尾边界，预览目录/同名进程和4420监听始终不存在。两个独立员工和Bug各完成登录、查询、编辑、评论重放、人工完成、验收失败退回、再次完成和通过关闭v12，随后软删除并读回拒绝/列表消失；各17条事件actor、验收人及旧版本/错项目负例均核对。[可读全过程](exe-independent-services.md)、[69请求和140边界](runs/exe-closed-api-mcp.json)、[精确停止](runs/exe-independence-controlled-stop.json)。
+
+停止期间，109个预览profile文件共772540633字节冷保留，全部hash相同。21:18:26.3376550Z恢复同一已安装.7，主PID23924、4420恢复；原员工/项目/文字+1PNG/配置SHA，以及原Bug closed/v14、1评论和184872字节原附件hash读回不变；API18644、服务MCP15736、Web20284继续运行。[冷保留](runs/exe-independence-profile-retained.json)、[原生恢复和业务读回](runs/exe-independence-restored.json)、[恢复界面](runs/exe-independence-restored-draft.txt)。该实测不证明正常托盘退出、Windows托盘图标点击或任意崩溃组合。
+
+最新生产只读快照为2026-09-08T21:22:09.4439761Z：六文件hash、三个原PID精确启动时点和可见日常EXE路径保持；4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。两个Node路径仍null；本次没有重新ADB查询，Android仍引用20:46:37.419Z的code22证据。[独立性恢复后生产快照](runs/production-after-independence.json)。
+
+21的旧外部状态现已找到并只读盘点：53文件，3上传job/2chain/9Relay batch共17items，以及活queue/WAL位置。活SQLite未打开，队列行数/状态未知；未建立跨文件一致导出或迁移，项目/组件版本绑定及Qingyu密文/密钥恢复仍缺，因此21保持not_run。[盘点及限制](baseline21-external-state-inventory.md)、[脱敏元数据](baseline21-external-state-inventory.json)。本轮只把实际17条HTTP路由和12个服务MCP源码工具行追加对应证据，没有转移到本地MCP、APK/Web控件或全部状态组合。
+
+## 独立性证据与脱敏保真最终检查点
+
+本轮源码盘点锚点为538c78f03e74aef8d02d13ad3e166ab3ece4a06f（脱敏修正提交）；业务API源码仍09f7150，Android源码仍1be7724。8份新的corrected派生由已核对原始SHA的私有原件生成，旧公开proof保留；它们修复104个JSON-RPC版本和240个事件schemaVersion的证据文本，业务结果、失败历史、检查数量未变，绝不计作新增业务运行。mapper只读取公开文件，核对index及old/corrected两侧SHA后解析派生内容，在当前结果保留old引用并追加corrected引用。[更正说明](redaction-corrections/README.md)、[公开哈希索引](redaction-corrections/index.json)。两份实际脱敏helper共有18/18纯函数测试通过；原1.0请求/blocked及未注册路由的业务能力缺口不因本证据修正改变。
+
+本轮仅11/12及所对应实际入口新增通过；当前整项基线为09、11、12、15、23、24。985项/188源码文件/21退役历史、401复验标记继续保留；完整HTTP/MCP对等与并发、§17全功能、18/19外部执行、21一致迁移和22物理Android仍未完成。预览EXE当前已恢复PID23924；最新生产观测为21:22:09.4439761Z，均以本轮独立性proof为准，前轮时点保留为历史。
+
+本轮最终重放已完成（2026-09-08T21:38:02.173Z）：985项、188源码hash逐一相符、21退役历史和401复验标记保留。两次generate→map→generate的语义SHA-256同为cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48；实际mapper的内存FS故障测试证实manual/source-change标记及reviewed失败结果保留，独立性proof或corrected proof错hash均在任何写入前拒绝（0写入）。本轮只有8个入口状态由not_run变passed：11/12两基线、HTTP的DELETE/manual-complete/events三路、server MCP的list_bugs/update_bug/list_events三工具；派生脱敏本身没有新增业务通过。审计字段见coverage-matrix.json的evidenceMapping.finalReplayVerification，前轮检查点保留在finalReplayVerificationHistory。
