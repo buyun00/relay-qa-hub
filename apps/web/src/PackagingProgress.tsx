@@ -149,7 +149,13 @@ function BuildHeading({ build }: { build: BuildProgress }) {
             : build.mode === "App"
               ? "资源和包体"
               : "正在判断流程"}{" "}
-        · {duration(build.elapsedMs)}
+        · 执行{" "}
+        {duration(
+          build.executionElapsedMs === undefined ? build.elapsedMs : build.executionElapsedMs,
+        )}
+        {build.queueWait
+          ? ` · 排队 ${build.queueWait.timing === "observed" ? "≥ " : ""}${duration(build.queueWait.elapsedMs)}`
+          : ""}
       </span>
     </>
   );
@@ -164,7 +170,12 @@ export default function PackagingProgressPanel({
   error: boolean;
   pendingQueues?: { id: number; reason: string }[];
 }) {
-  const current = progress?.builds.filter((build) => build.status === "BUILDING") ?? [];
+  const current =
+    progress?.builds.filter((build) => build.status === "BUILDING" && !build.queueWait?.active) ??
+    [];
+  const waiting =
+    progress?.builds.filter((build) => build.status === "BUILDING" && build.queueWait?.active) ??
+    [];
   const history = progress?.builds.filter((build) => build.status !== "BUILDING") ?? [];
   const queues = [
     ...(progress?.queues ?? []),
@@ -177,7 +188,7 @@ export default function PackagingProgressPanel({
       )
       .map((q) => ({ ...q, status: "QUEUED" as const })),
   ].filter((queue) => queue.status !== "CANCELLED");
-  const hasActiveBuild = current.length > 0 || queues.length > 0;
+  const hasActiveBuild = current.length > 0 || waiting.length > 0 || queues.length > 0;
   if (!hasActiveBuild && !history.length && !error) return null;
   return (
     <section
@@ -202,11 +213,31 @@ export default function PackagingProgressPanel({
       {queues.map((queue) => (
         <div className="package-queued-progress" key={queue.id}>
           <strong>
-            排队 #{queue.id} ·{" "}
-            {queue.status === "UNKNOWN" ? "状态待确认" : "等待执行"}
+            排队 #{queue.id} · {queue.status === "UNKNOWN" ? "状态待确认" : "等待执行"}
           </strong>
           <ProgressMeter label={`排队 ${queue.id}`} value={null} active />
           <p>{queue.reason}</p>
+        </div>
+      ))}
+      {waiting.map((build) => (
+        <div className="package-queued-progress" key={`build-${build.number}`} role="status">
+          <strong>构建 #{build.number} · 正在排队</strong>
+          <ProgressMeter
+            label={`构建 ${build.number} 正在排队`}
+            value={null}
+            active
+            tone="paused"
+          />
+          <p>
+            {build.queueWait?.blockingBuild
+              ? `正在等待 ${build.queueWait.blockingBuild} 完成并释放构建环境。`
+              : "已有构建占用环境，正在等待可用环境。"}
+          </p>
+          <p>
+            已排队 {build.queueWait?.timing === "observed" ? "≥ " : ""}
+            {duration(build.queueWait?.elapsedMs ?? null)} · 等待期间不计入准备环境耗时
+          </p>
+          {build.logError ? <p>日志暂时无法读取，显示上次排队状态，正在重试。</p> : null}
         </div>
       ))}
       {current.map((build) => (

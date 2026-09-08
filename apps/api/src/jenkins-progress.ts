@@ -20,7 +20,7 @@ export const BUILD_STAGES = [
   {
     id: "prepare",
     label: "准备环境",
-    work: "获取构建锁、分配版本、同步代码并判断构建方式",
+    work: "分配版本、同步代码并判断构建方式",
     limit: 5 * MINUTE,
   },
   {
@@ -72,6 +72,13 @@ export interface BuildProgress {
   status: string;
   startedAt: string;
   elapsedMs: number;
+  executionElapsedMs?: number | null;
+  queueWait?: {
+    active: boolean;
+    blockingBuild: string | null;
+    elapsedMs: number | null;
+    timing: "recorded" | "observed" | "unavailable";
+  };
   expectedMs: number | null;
   triggeredBy: string;
   executor: string;
@@ -91,6 +98,12 @@ export interface ParsedBuildLog {
   mode: BuildProgress["mode"];
   zip: boolean | null;
   gradleMs: number | null;
+  lockWait?: {
+    start: number | null;
+    end: number | null;
+    acquired: boolean;
+    blockingBuild: string | null;
+  };
 }
 
 /** Only known stage markers are exported. Console output can contain credentials. */
@@ -103,6 +116,20 @@ export function parseBuildLog(log: string): ParsedBuildLog {
         Number(timed[4])
       : null;
     const line = (timed ? timed[5]! : raw).trim();
+    // Actual script output only: an echoed command is not proof it has executed.
+    if (/^\[lock\] 等待构建锁(?:\.{3}|…)?$/u.test(line) && !parsed.lockWait)
+      parsed.lockWait = { start: elapsed, end: null, acquired: false, blockingBuild: null };
+    if (parsed.lockWait && !parsed.lockWait.acquired) {
+      const blocker =
+        /^\[lock\] 另一个构建正在运行: (iOS_Build|Android_Build)_#(\d{1,10})，等待释放(?:\.{3}|…)?$/u.exec(
+          line,
+        );
+      if (blocker) parsed.lockWait.blockingBuild = `${blocker[1]} #${blocker[2]}`;
+      if (line === "[lock] 已获取构建锁") {
+        parsed.lockWait.acquired = true;
+        parsed.lockWait.end = elapsed;
+      }
+    }
     const policy = /^\[JenkinsPlayerPolicy\].*\beffective=(App|Res|Script)\b/u.exec(line);
     if (policy) parsed.mode = policy[1] as ParsedBuildLog["mode"];
     const zip = /^\[init\] MAKE_PKG_ZIP_VAL=(true|false)$/u.exec(line);
@@ -158,6 +185,22 @@ export function describeBuild(
   const seen = BUILD_STAGES.filter((s) => s.id in parsed.markers);
   const current = seen.at(-1)!.id;
   const currentIndex = BUILD_STAGES.findIndex((s) => s.id === current);
+  const lock = parsed.lockWait;
+  const pendingLock = !!lock && !lock.acquired && current === "prepare";
+  const waiting = pendingLock && build.building;
+  let waitMs: number | null = null;
+  let waitTiming: "recorded" | "observed" | "unavailable" = "unavailable";
+  const waitEnd = lock?.acquired ? lock.end : pendingLock ? elapsedMs : null;
+  if (lock && lock.start !== null && waitEnd !== null && waitEnd >= lock.start && !logError) {
+    waitMs = waitEnd - lock.start;
+    waitTiming = "recorded";
+  } else if (waiting && !logError) {
+    const key = `${build.number}:queue`;
+    if (!observed.has(key)) observed.set(key, now);
+    waitMs = Math.max(0, now - observed.get(key)!);
+    waitTiming = "observed";
+  }
+  if (pendingLock) observed.delete(`${build.number}:prepare`);
   const stages = BUILD_STAGES.map((definition, index): BuildStageProgress => {
     const start = parsed.markers[definition.id];
     const next = seen[seen.findIndex((s) => s.id === definition.id) + 1];
@@ -169,28 +212,32 @@ export function describeBuild(
         (!build.building && build.result === "SUCCESS") ||
         (definition.id === "apk" && parsed.mode === "Res") ||
         (definition.id === "zip" && parsed.zip === false));
-    const state = skipped
-      ? "skipped"
-      : !seenStage
-        ? "waiting"
-        : definition.id !== current
-          ? "complete"
-          : build.building
-            ? "running"
-            : build.result === "SUCCESS"
-              ? "complete"
-              : "failed";
+    const state = pendingLock
+      ? "waiting"
+      : skipped
+        ? "skipped"
+        : !seenStage
+          ? "waiting"
+          : definition.id !== current
+            ? "complete"
+            : build.building
+              ? "running"
+              : build.result === "SUCCESS"
+                ? "complete"
+                : "failed";
     let timing: BuildStageProgress["timing"] = "unavailable";
     let duration: number | null = null;
     // Preparation has a known start, but its end still needs a timestamp.
     if (
       seenStage &&
+      !pendingLock &&
       start !== null &&
       end != null &&
       end >= start &&
-      !(logError && build.building)
+      !(logError && build.building) &&
+      (definition.id !== "prepare" || !lock || waitTiming === "recorded")
     ) {
-      duration = end - start;
+      duration = Math.max(0, end - start - (definition.id === "prepare" ? (waitMs ?? 0) : 0));
       timing = "recorded";
     } else if (state === "running" && !logError) {
       const key = `${build.number}:${definition.id}`;
@@ -221,6 +268,21 @@ export function describeBuild(
     status: build.building ? "BUILDING" : (build.result ?? "UNKNOWN"),
     startedAt: new Date(build.timestamp).toISOString(),
     elapsedMs,
+    executionElapsedMs: lock
+      ? waitTiming === "recorded"
+        ? Math.max(0, elapsedMs - (waitMs ?? 0))
+        : null
+      : elapsedMs,
+    ...(lock
+      ? {
+          queueWait: {
+            active: waiting,
+            blockingBuild: lock.blockingBuild,
+            elapsedMs: waitMs,
+            timing: waitTiming,
+          },
+        }
+      : {}),
     expectedMs: null,
     triggeredBy:
       (build.actions ?? [])
@@ -308,6 +370,16 @@ export function applyBuildHistory(builds: BuildProgress[]): BuildProgress[] {
                 100,
             ),
           );
-    return { ...build, stages, percent, expectedMs: median(peers.map((p) => p.elapsedMs)) };
+    return {
+      ...build,
+      stages,
+      percent,
+      expectedMs: median(
+        peers.flatMap((p) => {
+          const elapsed = p.executionElapsedMs === undefined ? p.elapsedMs : p.executionElapsedMs;
+          return elapsed === null ? [] : [elapsed];
+        }),
+      ),
+    };
   });
 }

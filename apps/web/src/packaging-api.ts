@@ -28,6 +28,13 @@ export interface BuildProgress {
   status: string;
   startedAt: string;
   elapsedMs: number;
+  executionElapsedMs?: number | null;
+  queueWait?: {
+    active: boolean;
+    blockingBuild: string | null;
+    elapsedMs: number | null;
+    timing: "recorded" | "observed" | "unavailable";
+  };
   expectedMs: number | null;
   triggeredBy: string;
   executor: string;

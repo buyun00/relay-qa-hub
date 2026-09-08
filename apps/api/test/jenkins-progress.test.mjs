@@ -29,6 +29,101 @@ const meta = (number = 1, overrides = {}) => ({
 const describe = (metadata, log = timed, now = 2_000_000, observed = new Map()) =>
   describeBuild(metadata, parseBuildLog(log), now, observed);
 
+const waitingLog = `00:00:05.928 [lock] 等待构建锁...
+00:00:05.931 [lock] 另一个构建正在运行: iOS_Build_#30，等待释放...`;
+test("a started Jenkins run blocked by the shared build lock is queued without preparation alarms", () => {
+  const result = applyBuildHistory([
+    describe(meta(10159, { building: true, result: null }), waitingLog, 1_600_000),
+  ])[0];
+  assert.equal(
+    result.status,
+    "BUILDING",
+    "Jenkins state stays compatible with the upload coordinator",
+  );
+  assert.deepEqual(result.queueWait, {
+    active: true,
+    blockingBuild: "iOS_Build #30",
+    elapsedMs: 594072,
+    timing: "recorded",
+  });
+  assert.equal(result.percent, 0);
+  assert.ok(result.stages.every((s) => s.state === "waiting" && s.elapsedMs === null && !s.alert));
+});
+test("recorded lock wait is subtracted from preparation and execution history, not raw build time", () => {
+  const withWait =
+    waitingLog + "\n00:08:38.273 [lock] 已获取构建锁\n00:08:43.000 + notify_stage 'Unity 导出中'";
+  const live = describe(meta(10159, { building: true, result: null }), withWait, 1_550_000);
+  assert.equal(live.queueWait.active, false);
+  assert.equal(live.queueWait.elapsedMs, 512345);
+  assert.equal(live.stages[0].elapsedMs, 10655);
+  assert.equal(live.stages[1].elapsedMs, 27000);
+  assert.equal(live.elapsedMs, 550000);
+  assert.equal(live.executionElapsedMs, 37655);
+  const shift = timed.replace(
+    /^(\d+):(\d{2}):(\d{2})\.(\d{3})/gmu,
+    (_, h, m, s, ms) => `${h}:${String(Number(m) + 10).padStart(2, "0")}:${s}.${ms}`,
+  );
+  const history = describe(
+    meta(2, { duration: 1110000 }),
+    "00:00:05.000 [lock] 等待构建锁...\n00:10:05.000 [lock] 已获取构建锁\n" + shift,
+  );
+  assert.equal(history.stages[0].elapsedMs, 10000);
+  assert.equal(history.executionElapsedMs, 510000);
+  assert.equal(applyBuildHistory([history, describe(meta(3))])[1].expectedMs, 510000);
+});
+test("untimed lock wait has a lower bound and preparation timing starts after acquisition", () => {
+  const log = waitingLog.replace(/^\d+:\d+:\d+\.\d+ /gmu, "");
+  const observations = new Map();
+  const metadata = meta(4, { building: true, result: null });
+  assert.equal(describe(metadata, log, 1_010_000, observations).queueWait.elapsedMs, 0);
+  const waiting = describe(metadata, log, 1_500_000, observations);
+  assert.equal(waiting.queueWait.elapsedMs, 490000);
+  assert.equal(waiting.queueWait.timing, "observed");
+  assert.equal(waiting.stages[0].elapsedMs, null);
+  const acquired = log + "\n[lock] 已获取构建锁";
+  const first = describe(metadata, acquired, 1_510_000, observations);
+  assert.equal(first.queueWait.active, false);
+  assert.equal(first.queueWait.elapsedMs, null);
+  assert.equal(first.executionElapsedMs, null);
+  assert.equal(first.stages[0].elapsedMs, 0);
+  assert.equal(describe(metadata, acquired, 1_515_000, observations).stages[0].elapsedMs, 5000);
+  const finished = describe(
+    meta(4),
+    acquired + "\n+ notify_stage 'Unity 导出中'",
+    1_515_000,
+    observations,
+  );
+  assert.equal(finished.stages[0].elapsedMs, null);
+});
+test("cancellation while waiting and non-whitelisted log content do not pretend to execute preparation", () => {
+  const cancelled = describe(meta(5, { result: "ABORTED", duration: 650000 }), waitingLog);
+  assert.equal(cancelled.queueWait.active, false);
+  assert.equal(cancelled.stages[0].state, "waiting");
+  assert.equal(cancelled.stages[0].elapsedMs, null);
+  const echo = describe(
+    meta(6, { building: true, result: null }),
+    "00:00:00.000 + echo '[lock] 等待构建锁...'",
+  );
+  assert.equal(echo.queueWait, undefined);
+  const secret = describe(
+    meta(7, { building: true, result: null }),
+    waitingLog.split("\n")[0] + "\n[lock] 另一个构建正在运行: PASSWORD_SECRET，等待释放...",
+  );
+  assert.equal(secret.queueWait.blockingBuild, null);
+  assert.ok(!JSON.stringify(secret).includes("PASSWORD_SECRET"));
+});
+test("positive stage evidence ends the queue display even when the acquisition marker is absent", () => {
+  const value = describe(
+    meta(8, { building: true, result: null }),
+    waitingLog + "\n00:10:00.000 + notify_stage 'Unity 导出中'",
+    1_610_000,
+  );
+  assert.equal(value.queueWait.active, false);
+  assert.equal(value.queueWait.elapsedMs, null);
+  assert.equal(value.stages[0].elapsedMs, null);
+  assert.equal(value.stages[1].state, "running");
+});
+
 test("timestamped stages carry actual boundaries, worker work and a separate Gradle timer", () => {
   const result = describe(meta());
   assert.deepEqual(

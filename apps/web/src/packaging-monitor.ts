@@ -76,7 +76,7 @@ export function reconcileBuilds(watched: WatchedBuild[], progress: PackagingProg
               : "打包未成功",
         body: `构建 #${build.number}${build.status === "SUCCESS" ? (build.mode === "Res" ? " 资源更新完成；此流程不生成新 APK。下载列表正在刷新。" : " 已完成，下载列表正在刷新。") : ` 已结束（${build.status}），请查看构建阶段。`}`,
       });
-    } else if (!build.logError) {
+    } else if (!build.logError && !build.queueWait?.active) {
       for (const stage of build.stages) {
         if (!stage.alert || updated.alerts.includes(stage.id)) continue;
         updated.alerts.push(stage.id);

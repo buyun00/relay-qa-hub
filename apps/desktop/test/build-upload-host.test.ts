@@ -183,6 +183,26 @@ test("lost upload acknowledgement recovers the same stable job ID", async (t) =>
   assert.equal(f.state.starts.length, 1);
   assert.equal((await f.host.list())[0]?.status, "upload_started");
 });
+test("a Jenkins run waiting on the shared lock keeps its automatic upload pending", async (t) => {
+  const f = await fixture(t);
+  await f.host.start(f.request);
+  f.finish();
+  f.state.build.status = "BUILDING";
+  Object.assign(f.state.build, {
+    queueWait: {
+      active: true,
+      blockingBuild: "iOS_Build #30",
+      elapsedMs: 600000,
+      timing: "recorded",
+    },
+  });
+  await f.host.tick();
+  assert.equal((await f.host.list())[0]?.status, "building");
+  assert.equal(f.state.starts.length, 0);
+  f.state.build.status = "SUCCESS";
+  await f.host.tick();
+  assert.equal(f.state.starts.length, 1);
+});
 for (const scenario of [
   "failed",
   "cancelled",
