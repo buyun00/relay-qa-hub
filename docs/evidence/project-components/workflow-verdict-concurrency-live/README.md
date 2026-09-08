@@ -1,0 +1,13 @@
+# Opposite verification verdicts — live preview evidence
+
+Run `f8e2c6da-65c0-4cf6-9631-886bb777df2e` completed from **2026-09-08T23:02:53.031Z to 23:02:53.800Z** with **56/56 checks**, **66 requests** (51 direct HTTP on 4419; 15 real server-MCP JSON-RPC requests on 4421), and four bounded two-request races. The runner is inert without its explicit `--run` argument and accepts only the named preview configuration.
+
+Two fresh Bugs each exercised concurrent same-intent manual completion, then competing verification verdicts: `verify_pass` versus `verify_fail`, and `close` versus `reject`. Both requests in each race were dispatched before either response finished. In both verdict races the HTTP pass side won. The verification and Bug each advanced one version, with one `verification.result_recorded` event attributed to the authenticated actor. The competing failed verdict was refused with `VERSION_CONFLICT`.
+
+The winner replayed through both HTTP and server MCP with the same event, submission, verification and result identity. The losing submission remained refused through both paths; changing the winning payload was refused with `IDEMPOTENCY_PAYLOAD_MISMATCH`. Bug, verification and event snapshots remained unchanged after these retries. Same-intent manual completion returned the same Bug and caused no additional effect on sequential retries.
+
+All fixtures and histories remain in fresh project `5b5abda8-e11e-408d-85fa-1b16055d039a`, under actor `094623ba-dd7a-43c1-83ae-0a96c151be44`. The two Bug IDs are `cd547467-ff6f-4067-838a-737a5c373901` and `e3d8a981-ad87-498a-9503-f80b23fd1f85`; both ended closed. All five project components remained disabled. No external execution, service restart, original acceptance record, client UI, daily client, or production mutation was involved.
+
+The [raw proof](f8e2c6da-65c0-4cf6-9631-886bb777df2e.json) is 294563 bytes, SHA-256 `9c0ccfd292e8ff2f679b0e36961ad83fdf1979b58012127eec3b2e5e29fb1478`. Its runner SHA is `9519a9c9a93cee8e6c7d06e4201fc51d23fedc453b96c8b7f6a3fc3d0b8ba17e`; hashes of the loaded API/storage distribution files are included. The API used the already deployed `8f7330a559fc9611e93f2ef62df0e63639f07afc` service fix; this run made no deployment.
+
+This proves the listed HTTP/server-MCP cases only. The failed-result side did not win a race, so successful failure recording is not established by this proof. Client response-loss recovery, the other four entries, the complete action, every state/action combination, external execution, and full baseline 14 remain outside this run. Earlier failed or untested evidence is not replaced.

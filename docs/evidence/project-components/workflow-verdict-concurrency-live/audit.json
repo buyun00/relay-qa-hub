@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-08T23:09:45.319Z",
+  "scope": "Read-only independent review of the runner and retained raw proof; no network, service, source or business mutation. This JSON is the only new file.",
+  "raw": {
+    "path": "docs/evidence/project-components/workflow-verdict-concurrency-live/f8e2c6da-65c0-4cf6-9631-886bb777df2e.json",
+    "sizeBytes": 294563,
+    "sha256": "9c0ccfd292e8ff2f679b0e36961ad83fdf1979b58012127eec3b2e5e29fb1478"
+  },
+  "runner": {
+    "path": "scripts/project-components/workflow-verdict-concurrency-live.mjs",
+    "sha256": "9519a9c9a93cee8e6c7d06e4201fc51d23fedc453b96c8b7f6a3fc3d0b8ba17e",
+    "matchesRecordedHash": true
+  },
+  "passed": true,
+  "counts": {
+    "requests": 66,
+    "originalChecksRecomputed": 56,
+    "races": 4,
+    "fixtures": 2,
+    "byOrigin": {
+      "http://127.0.0.1:4419": 51,
+      "http://127.0.0.1:4421": 15
+    },
+    "protocolEnvelopes": 13,
+    "matchingStructuredAndTextMirrors": 6,
+    "jsonrpcLiteralStrings": 27,
+    "schemaVersionStrings": 120
+  },
+  "races": [
+    {
+      "label": "verify_pass versus verify_fail same manual completion intent",
+      "exchangeIds": [
+        10,
+        11
+      ],
+      "overlapMs": 80,
+      "starts": [
+        "2026-09-08T23:02:53.154Z",
+        "2026-09-08T23:02:53.154Z"
+      ],
+      "finishes": [
+        "2026-09-08T23:02:53.234Z",
+        "2026-09-08T23:02:53.235Z"
+      ]
+    },
+    {
+      "label": "verify_pass versus verify_fail",
+      "exchangeIds": [
+        23,
+        24
+      ],
+      "overlapMs": 32,
+      "starts": [
+        "2026-09-08T23:02:53.331Z",
+        "2026-09-08T23:02:53.331Z"
+      ],
+      "finishes": [
+        "2026-09-08T23:02:53.363Z",
+        "2026-09-08T23:02:53.364Z"
+      ]
+    },
+    {
+      "label": "close versus reject same manual completion intent",
+      "exchangeIds": [
+        38,
+        39
+      ],
+      "overlapMs": 78,
+      "starts": [
+        "2026-09-08T23:02:53.469Z",
+        "2026-09-08T23:02:53.470Z"
+      ],
+      "finishes": [
+        "2026-09-08T23:02:53.548Z",
+        "2026-09-08T23:02:53.550Z"
+      ]
+    },
+    {
+      "label": "close versus reject",
+      "exchangeIds": [
+        51,
+        52
+      ],
+      "overlapMs": 34,
+      "starts": [
+        "2026-09-08T23:02:53.682Z",
+        "2026-09-08T23:02:53.683Z"
+      ],
+      "finishes": [
+        "2026-09-08T23:02:53.717Z",
+        "2026-09-08T23:02:53.717Z"
+      ]
+    }
+  ],
+  "fixtures": [
+    {
+      "bugId": "cd547467-ff6f-4067-838a-737a5c373901",
+      "attemptId": "b114b620-aebc-4a38-9e9a-22228107f3e5",
+      "verificationId": "c96cd36e-2b8a-4631-92a9-b7bd5233736e",
+      "actorId": "094623ba-dd7a-43c1-83ae-0a96c151be44",
+      "manual": {
+        "initialVersion": 1,
+        "committedVersion": 4,
+        "oneEventPerType": true,
+        "eventTypes": [
+          "bug.manual_completion_started",
+          "repair_attempt.created",
+          "repair_attempt.started",
+          "repair_attempt.delivered"
+        ],
+        "receiptReplayedBothLanes": true
+      },
+      "verdict": {
+        "winnerLane": "HTTP",
+        "winnerAction": "verify_pass",
+        "loserLane": "server_mcp",
+        "loserCode": "VERSION_CONFLICT",
+        "beforeBugVersion": 5,
+        "afterBugVersion": 6,
+        "verificationVersion": 3,
+        "state": "closed",
+        "status": "passed",
+        "newEventId": "9013e667-6a3e-4006-9c28-5c5f2d08b0c4",
+        "newEventCount": 1,
+        "allRetryReadbacksUnchanged": true
+      }
+    },
+    {
+      "bugId": "e3d8a981-ad87-498a-9503-f80b23fd1f85",
+      "attemptId": "9c299de8-3048-4bd1-b958-4bab61d61b99",
+      "verificationId": "bd87b310-f12a-45e3-b59f-e70f5029f929",
+      "actorId": "094623ba-dd7a-43c1-83ae-0a96c151be44",
+      "manual": {
+        "initialVersion": 1,
+        "committedVersion": 4,
+        "oneEventPerType": true,
+        "eventTypes": [
+          "bug.manual_completion_started",
+          "repair_attempt.created",
+          "repair_attempt.started",
+          "repair_attempt.delivered"
+        ],
+        "receiptReplayedBothLanes": true
+      },
+      "verdict": {
+        "winnerLane": "HTTP",
+        "winnerAction": "close",
+        "loserLane": "server_mcp",
+        "loserCode": "VERSION_CONFLICT",
+        "beforeBugVersion": 5,
+        "afterBugVersion": 6,
+        "verificationVersion": 3,
+        "state": "closed",
+        "status": "passed",
+        "newEventId": "c958afe0-b029-4742-a14b-cf114a994b4f",
+        "newEventCount": 1,
+        "allRetryReadbacksUnchanged": true
+      }
+    }
+  ],
+  "checks": {
+    "allOriginalChecksMatchRawValues": true,
+    "clientRequestIntervalsStrictlyOverlap": true,
+    "oneWinnerPerOppositeVerdict": true,
+    "oneResultEventAndVersionIncrement": true,
+    "winnerReplayBothLanes": true,
+    "loserStaleRejectedBothLanes": true,
+    "changedWinnerPayloadRejectedBothLanes": true,
+    "postRetryBugVerificationEventsUnchanged": true,
+    "fiveComponentsOffAtStartAndEnd": true,
+    "onlyFreshProjectAndFixtures": true,
+    "recursiveSensitiveKeyAndJwtScanPassed": true,
+    "protocolPrimitiveStringsRetained": true,
+    "rawUnchanged": true
+  },
+  "limitations": [
+    "Overlap measures client request intervals, not parallel SQLite execution or precise server scheduling.",
+    "HTTP pass/close won both opposite-verdict races; no failed/reject winner observed.",
+    "Manual completion is a single intent with four workflow events and Bug version 1 to 4, not one event or a one-step version increment.",
+    "No UI, APK/EXE/local MCP, timeout recovery, external execution, all-state matrix or production-boundary claim is inferred."
+  ]
+}
