@@ -110,6 +110,11 @@ interface BugDetailDraft {
   readonly priority: BugPriority;
 }
 
+interface AssignmentDraft {
+  readonly ownerId?: string;
+  readonly verifierId?: string;
+}
+
 interface ClipboardImageItem {
   readonly kind: string;
   readonly type: string;
@@ -459,8 +464,19 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
   const [detailEditVersionConflict, setDetailEditVersionConflict] = useState(false);
   const [detailAttachmentIds, setDetailAttachmentIds] = useState<readonly string[]>([]);
   const [detailNewFiles, setDetailNewFiles] = useState<readonly File[]>([]);
-  const [ownerId, setOwnerId] = useState("");
-  const [verifierId, setVerifierId] = useState("");
+  const [assignmentDrafts, setAssignmentDrafts] = useState<
+    Readonly<Record<string, AssignmentDraft>>
+  >({});
+  const assignmentDraft = detail === null ? undefined : assignmentDrafts[detail.id];
+  const ownerId =
+    canonicalProjectMemberId(members, assignmentDraft?.ownerId ?? detail?.ownerId ?? null) ?? "";
+  const verifierId =
+    canonicalProjectMemberId(
+      members,
+      assignmentDraft?.verifierId ?? detail?.verificationOwnerId ?? detail?.reporterId ?? null,
+    ) ??
+    detail?.reporterId ??
+    "";
   const [comment, setComment] = useState("");
   const [returnDrafts, setReturnDrafts] = useState<Readonly<Record<string, ReturnDraft>>>({});
   const returnUploads = useRef(
@@ -864,13 +880,6 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         setQingyuLink(nextQingyuLink);
         setModules(moduleResponse.items.filter((item) => item.active));
         setDetailAttachmentIds(attachmentResponse.items.map((item) => item.attachmentId));
-        setOwnerId(canonicalProjectMemberId(members, nextDetail.ownerId) ?? "");
-        setVerifierId(
-          canonicalProjectMemberId(
-            members,
-            nextDetail.verificationOwnerId ?? nextDetail.reporterId,
-          ) ?? nextDetail.reporterId,
-        );
 
         const imageResults = await Promise.allSettled(
           attachmentResponse.items
@@ -951,7 +960,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         if (requestId === detailRequestRef.current) setDetailLoading(false);
       }
     },
-    [clearEvidence, members],
+    [clearEvidence],
   );
 
   useEffect(() => {
@@ -1136,10 +1145,27 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
     [runMutation],
   );
 
+  const updateAssignmentDraft = (patch: AssignmentDraft) => {
+    if (detail === null) return;
+    const bugId = detail.id;
+    setAssignmentDrafts((current) => ({
+      ...current,
+      [bugId]: { ...current[bugId], ...patch },
+    }));
+  };
+
   const saveAssignments = async () => {
     if (detail === null || ownerId.length === 0 || verifierId.length === 0) return;
     await runCurrentBugMutation("分配已更新", async () => {
-      await updateBugAssignments(detail.id, detail.version, ownerId, verifierId);
+      const updated = await updateBugAssignments(detail.id, detail.version, ownerId, verifierId);
+      if (selectedIdRef.current === updated.id) {
+        detailRequestRef.current += 1;
+        setDetail(updated);
+      }
+      setAssignmentDrafts((current) => {
+        if (current[updated.id] !== assignmentDraft) return current;
+        return Object.fromEntries(Object.entries(current).filter(([id]) => id !== updated.id));
+      });
     });
   };
 
@@ -2326,7 +2352,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <span>修复人</span>
                         <select
                           disabled={!canManageDetail}
-                          onChange={(event) => setOwnerId(event.target.value)}
+                          onChange={(event) =>
+                            updateAssignmentDraft({ ownerId: event.target.value })
+                          }
                           value={ownerId}
                         >
                           {owners.map((member) => (
@@ -2340,7 +2368,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         <span>关闭人</span>
                         <select
                           disabled={!canManageDetail}
-                          onChange={(event) => setVerifierId(event.target.value)}
+                          onChange={(event) =>
+                            updateAssignmentDraft({ verifierId: event.target.value })
+                          }
                           value={verifierId}
                         >
                           {verifiers.map((member) => (

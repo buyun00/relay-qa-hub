@@ -213,6 +213,10 @@ export default function OverviewPage({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [mutatingId, setMutatingId] = useState<string | null>(null);
+  const [pendingVerifierIds, setPendingVerifierIds] = useState<Readonly<Record<string, string>>>(
+    {},
+  );
+  const loadRequestRef = useRef(0);
   const [columnWidths, setColumnWidths] = useState<OverviewColumnWidths>(loadOverviewColumnWidths);
   const [resizingColumn, setResizingColumn] = useState<OverviewColumnKey | null>(null);
   const columnWidthsRef = useRef(columnWidths);
@@ -250,6 +254,7 @@ export default function OverviewPage({
 
   const load = useCallback(
     async (quiet = false) => {
+      const requestId = ++loadRequestRef.current;
       if (quiet) setRefreshing(true);
       else setLoading(true);
       setError(null);
@@ -269,12 +274,21 @@ export default function OverviewPage({
           undefined,
           500,
         );
-        setItems(response.items);
+        if (requestId !== loadRequestRef.current) return;
+        setItems((current) => {
+          const currentById = new Map(current.map((item) => [item.id, item]));
+          return response.items.map((item) => {
+            const existing = currentById.get(item.id);
+            return existing && existing.version > item.version ? existing : item;
+          });
+        });
       } catch (cause) {
-        setError(errorMessage(cause));
+        if (requestId === loadRequestRef.current) setError(errorMessage(cause));
       } finally {
-        setLoading(false);
-        setRefreshing(false);
+        if (requestId === loadRequestRef.current) {
+          setLoading(false);
+          setRefreshing(false);
+        }
       }
     },
     [ownerFilter, projectId, query, severity],
@@ -282,7 +296,10 @@ export default function OverviewPage({
 
   useEffect(() => {
     const timeout = window.setTimeout(() => void load(), 150);
-    return () => window.clearTimeout(timeout);
+    return () => {
+      window.clearTimeout(timeout);
+      loadRequestRef.current += 1;
+    };
   }, [load, refreshToken]);
 
   useEffect(() => {
@@ -344,6 +361,8 @@ export default function OverviewPage({
   };
 
   const assignVerificationOwner = async (bug: BugListItem, nextVerifierId: string) => {
+    if (memberId(bug.verificationOwnerId ?? bug.reporterId) === nextVerifierId) return;
+    setPendingVerifierIds((current) => ({ ...current, [bug.id]: nextVerifierId }));
     setMutatingId(bug.id);
     setError(null);
     setNotice(null);
@@ -356,6 +375,9 @@ export default function OverviewPage({
       setError(errorMessage(cause));
       await load(true);
     } finally {
+      setPendingVerifierIds((current) =>
+        Object.fromEntries(Object.entries(current).filter(([id]) => id !== bug.id)),
+      );
       setMutatingId(null);
     }
   };
@@ -609,9 +631,12 @@ export default function OverviewPage({
           </div>
         ) : null}
         {visibleItems.map((bug) => {
+          const rowMutating = mutatingId === bug.id || pendingVerifierIds[bug.id] !== undefined;
           const effectiveOwnerId = memberId(bug.ownerId);
           const effectiveVerifierId =
-            memberId(bug.verificationOwnerId ?? bug.reporterId) ?? bug.reporterId;
+            pendingVerifierIds[bug.id] ??
+            memberId(bug.verificationOwnerId ?? bug.reporterId) ??
+            bug.reporterId;
           return (
             <div
               className={`overview-grid${bug.ownerId === null ? " is-unassigned" : ""}`}
@@ -626,7 +651,7 @@ export default function OverviewPage({
                 <select
                   aria-label={`设置 ${bug.key} 优先级`}
                   className="overview-key-priority-select"
-                  disabled={mutatingId === bug.id}
+                  disabled={rowMutating}
                   onChange={(event) => void setPriority(bug, event.target.value as BugPriority)}
                   title="点击编号设置 P0-P3 优先级"
                   value={bug.priority}
@@ -646,7 +671,7 @@ export default function OverviewPage({
                 {bug.ownerId === null ? (
                   <button
                     className="claim-button"
-                    disabled={mutatingId === bug.id}
+                    disabled={rowMutating}
                     onClick={() => void assignOwner(bug, principal.userId)}
                     type="button"
                   >
@@ -655,7 +680,7 @@ export default function OverviewPage({
                 ) : null}
                 <select
                   aria-label={`设置 ${bug.key} 负责人`}
-                  disabled={mutatingId === bug.id}
+                  disabled={rowMutating}
                   onChange={(event) => void assignOwner(bug, event.target.value || null)}
                   value={effectiveOwnerId ?? ""}
                 >
@@ -671,7 +696,7 @@ export default function OverviewPage({
                 {effectiveVerifierId === principal.userId ? null : (
                   <button
                     className="claim-button"
-                    disabled={mutatingId === bug.id}
+                    disabled={rowMutating}
                     onClick={() => void assignVerificationOwner(bug, principal.userId)}
                     type="button"
                   >
@@ -680,7 +705,7 @@ export default function OverviewPage({
                 )}
                 <select
                   aria-label={`设置 ${bug.key} 关闭人`}
-                  disabled={mutatingId === bug.id}
+                  disabled={rowMutating}
                   onChange={(event) => void assignVerificationOwner(bug, event.target.value)}
                   value={effectiveVerifierId}
                 >
