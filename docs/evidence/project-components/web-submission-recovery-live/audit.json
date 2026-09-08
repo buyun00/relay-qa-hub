@@ -1,0 +1,432 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent-read-only-artifact-audit",
+  "recordedAt": "2026-09-08T23:45:21.833Z",
+  "status": "passed_with_preserved_first_run_harness_failure",
+  "method": "Recompute all parsed expected/actual; hash original buffers/screenshots; compare immutable requests/receipts/actor/version/artifact bytes; inspect three screenshots and the exact runner-only diff; scan nested JSON and private configured secrets without values or service/device calls.",
+  "runs": [
+    {
+      "runId": "4f6387f6-244b-4115-916b-6fffe3db1efd",
+      "status": "failed",
+      "startedAt": "2026-09-08T23:34:34.184Z",
+      "finishedAt": "2026-09-08T23:34:58.870Z",
+      "rawSha256": "e895f1114d9b86ac2272783e101a360617c1e28fc16537104a116a880446eef7",
+      "runnerFile": "docs\\evidence\\project-components\\web-submission-recovery-live\\4f6387f6-244b-4115-916b-6fffe3db1efd\\runner.mjs",
+      "runnerSha256": "dec415ebabbb59f272644945722dfad97d183c05297521a0cc2907747854fa1d",
+      "recordedChecks": 38,
+      "recomputedEqualAndPassed": 38,
+      "failure": "Error: Timed out: post comment once",
+      "ledgerEntries": 107,
+      "ledgerCounts": {
+        "readiness": 1,
+        "setup_gm_login": 1,
+        "setup_project": 1,
+        "page_request": 87,
+        "read_only_api": 13,
+        "page_upload_response": 2,
+        "page_commit_response": 2
+      },
+      "ledgerIsNotTotalHttpCount": true,
+      "pageMethodCounts": {
+        "GET": 80,
+        "POST": 6,
+        "PUT": 1
+      },
+      "componentExecutionRequests": 0,
+      "fiveComponentsOff": true,
+      "processes": [
+        {
+          "pid": 18004,
+          "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+          "startedAt": "2026-09-08T23:34:34.2659410Z",
+          "closedAt": "2026-09-08T23:34:37.047Z",
+          "exited": true
+        },
+        {
+          "pid": 23316,
+          "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+          "startedAt": "2026-09-08T23:34:37.0507420Z",
+          "closedAt": "2026-09-08T23:34:58.869Z",
+          "exited": true
+        }
+      ],
+      "sameProfileRestarts": 1,
+      "bundleLoads": 2,
+      "bundle": {
+        "url": "http://127.0.0.1:4274/assets/index-Ce9wROrH.js",
+        "sizeBytes": 477454,
+        "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+      },
+      "fixture": {
+        "projectId": "b4317f99-3807-4a6f-b300-7d08d40c4072",
+        "actorId": "cdcbb3ab-f840-4657-8530-2a7ff28d835e",
+        "bugId": "c30eeb38-aa61-45f7-9d6a-1046a5b5aedf",
+        "bugVersion": 1,
+        "clientSubmissionId": "351e6d12-bf91-473d-86b6-447b9abf6ab8",
+        "occurrenceId": "656820cc-f5c3-4cc5-9460-9d332f3cffd9",
+        "eventId": "73da7de5-6b21-456d-a68b-1ecf8d03800d",
+        "attachmentId": "5cfca4fc-e85c-42d8-a93a-2547e470256a",
+        "commentId": null,
+        "commentSubmissionId": null
+      },
+      "png": {
+        "bytes": 68,
+        "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+        "readbackCount": 2,
+        "allBytesEqual": true
+      },
+      "replayPairs": [
+        {
+          "kind": "bug",
+          "path": "/api/v1/bugs",
+          "requestCount": 2,
+          "statuses": [201, 201],
+          "sameParsedJsonBody": true,
+          "sameWhitelistedHeaders": true,
+          "key": "submission:351e6d12-bf91-473d-86b6-447b9abf6ab8:commit",
+          "bodySha256": "bc160dc42f6e3a31d25a48fa9cf65c5d40082e92a7df0a43c54688d60c24128e",
+          "observed201Sha256": "5a077c31a62979a1016c5ce431954cc0876876d5f0adf1696c1c2170b3c352e6",
+          "sameReceipt": true,
+          "replayedFlag": [false, true]
+        }
+      ],
+      "durableCheckpoints": [
+        {
+          "at": "2026-09-08T23:34:35.760Z",
+          "label": "edited Bug durable before restart"
+        },
+        {
+          "at": "2026-09-08T23:34:38.002Z",
+          "label": "original Bug receipt acknowledged"
+        }
+      ],
+      "finalTwoDraftsAndTwoAcknowledgements": false,
+      "screenshots": [
+        {
+          "at": "2026-09-08T23:34:35.563Z",
+          "kind": "screenshot",
+          "label": "01-original-with-png",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-4f6387f6-244b-4115-916b-6fffe3db1efd\\01-original-with-png.png",
+          "sizeBytes": 180210,
+          "sha256": "44cd6361078d5f049c8adbcc39d479fbd9890c3c8e161d379f75027b3287d7ec"
+        },
+        {
+          "at": "2026-09-08T23:34:35.943Z",
+          "kind": "screenshot",
+          "label": "02-unknown-create-edited",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-4f6387f6-244b-4115-916b-6fffe3db1efd\\02-unknown-create-edited.png",
+          "sizeBytes": 188472,
+          "sha256": "36c6bacfc37b6505ae24f48904252ecffebc73a85ec22d8a81986c94b761382c"
+        },
+        {
+          "at": "2026-09-08T23:34:38.172Z",
+          "kind": "screenshot",
+          "label": "03-confirmed-create-new-draft-retained",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-4f6387f6-244b-4115-916b-6fffe3db1efd\\03-confirmed-create-new-draft-retained.png",
+          "sizeBytes": 113280,
+          "sha256": "9289161e2bb8b0f36d6d0f07d5002062862b845fd7ba7fef5aa15c90021277e0"
+        }
+      ],
+      "artifacts": [
+        {
+          "file": "4f6387f6-244b-4115-916b-6fffe3db1efd/bug-observed-201.json",
+          "bytes": 2420,
+          "sha256": "206e19933890716dbee9ccf6595737415a2f2cc9dc6b14b04116a9e8c4b38b0f"
+        },
+        {
+          "file": "4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json",
+          "bytes": 221772,
+          "sha256": "e895f1114d9b86ac2272783e101a360617c1e28fc16537104a116a880446eef7"
+        },
+        {
+          "file": "4f6387f6-244b-4115-916b-6fffe3db1efd/runner.mjs",
+          "bytes": 37768,
+          "sha256": "dec415ebabbb59f272644945722dfad97d183c05297521a0cc2907747854fa1d"
+        }
+      ],
+      "runtime": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-4f6387f6-244b-4115-916b-6fffe3db1efd",
+      "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-4f6387f6-244b-4115-916b-6fffe3db1efd\\edge-profile"
+    },
+    {
+      "runId": "bf3a4621-6c48-459e-b776-5c9011d7d327",
+      "status": "passed",
+      "startedAt": "2026-09-08T23:36:51.104Z",
+      "finishedAt": "2026-09-08T23:36:58.777Z",
+      "rawSha256": "3bd91b313315c54c457307facaaff52d900848dfc6da4fc8c096c8e70d1c4c84",
+      "runnerFile": "scripts/project-components/web-submission-recovery-live.mjs",
+      "runnerSha256": "c68945dc9c2fcaaa1d338c3707266a205f5a4943f521485490a5738be1b4ded8",
+      "recordedChecks": 101,
+      "recomputedEqualAndPassed": 101,
+      "failure": null,
+      "ledgerEntries": 154,
+      "ledgerCounts": {
+        "readiness": 1,
+        "setup_gm_login": 1,
+        "setup_project": 1,
+        "page_request": 114,
+        "read_only_api": 31,
+        "page_upload_response": 2,
+        "page_commit_response": 4
+      },
+      "ledgerIsNotTotalHttpCount": true,
+      "pageMethodCounts": {
+        "GET": 105,
+        "POST": 8,
+        "PUT": 1
+      },
+      "componentExecutionRequests": 0,
+      "fiveComponentsOff": true,
+      "processes": [
+        {
+          "pid": 1096,
+          "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+          "startedAt": "2026-09-08T23:36:51.1955240Z",
+          "closedAt": "2026-09-08T23:36:53.301Z",
+          "exited": true
+        },
+        {
+          "pid": 17920,
+          "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+          "startedAt": "2026-09-08T23:36:53.3036160Z",
+          "closedAt": "2026-09-08T23:36:55.395Z",
+          "exited": true
+        },
+        {
+          "pid": 14624,
+          "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+          "startedAt": "2026-09-08T23:36:55.3980530Z",
+          "closedAt": "2026-09-08T23:36:57.212Z",
+          "exited": true
+        },
+        {
+          "pid": 21748,
+          "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+          "startedAt": "2026-09-08T23:36:57.2149940Z",
+          "closedAt": "2026-09-08T23:36:58.776Z",
+          "exited": true
+        }
+      ],
+      "sameProfileRestarts": 3,
+      "bundleLoads": 4,
+      "bundle": {
+        "url": "http://127.0.0.1:4274/assets/index-Ce9wROrH.js",
+        "sizeBytes": 477454,
+        "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+      },
+      "fixture": {
+        "projectId": "ea83c107-7687-4b38-8d80-096f0868001a",
+        "actorId": "968df48a-2b12-45fa-8bc5-4346ef9a57b9",
+        "bugId": "f64b024c-71b5-4f50-b767-957b0b9e2eab",
+        "bugVersion": 1,
+        "clientSubmissionId": "e3a683e0-7813-44c5-91d0-cc80496408ef",
+        "occurrenceId": "e0cbe496-86fd-4f08-9a90-40fd39a09639",
+        "eventId": "7d06be93-002e-40d1-85fe-8acd37f65895",
+        "attachmentId": "7b01c8c7-5963-4522-a79d-e9db82677472",
+        "commentId": "4f0fbf5c-3d4f-41c6-8ebd-489209c50757",
+        "commentSubmissionId": "549b6189-ec76-408a-b299-2edf6049c3da"
+      },
+      "png": {
+        "bytes": 68,
+        "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+        "readbackCount": 5,
+        "allBytesEqual": true
+      },
+      "replayPairs": [
+        {
+          "kind": "bug",
+          "path": "/api/v1/bugs",
+          "requestCount": 2,
+          "statuses": [201, 201],
+          "sameParsedJsonBody": true,
+          "sameWhitelistedHeaders": true,
+          "key": "submission:e3a683e0-7813-44c5-91d0-cc80496408ef:commit",
+          "bodySha256": "f10af954bc36b96c0d0c512d5ec30d634a3fb3fce3cde47b05e4f5572be8d8f3",
+          "observed201Sha256": "90585ff7d926b1bf2d2a0255939b8f8b08e91f248e50bdf37d7a4f959e6e3efe",
+          "sameReceipt": true,
+          "replayedFlag": [false, true]
+        },
+        {
+          "kind": "comment",
+          "path": "/api/v1/bugs/f64b024c-71b5-4f50-b767-957b0b9e2eab/comments",
+          "requestCount": 2,
+          "statuses": [201, 201],
+          "sameParsedJsonBody": true,
+          "sameWhitelistedHeaders": true,
+          "key": "comment:f64b024c-71b5-4f50-b767-957b0b9e2eab:549b6189-ec76-408a-b299-2edf6049c3da",
+          "bodySha256": "72897066e01ae06d603919edfaa7d235a300c8e4a0dd5da8d8c33999819eb3bb",
+          "observed201Sha256": "0a830882cb1f96b1b20d5878310a1a964b26e804bc4f4391e576707fbf3bed73",
+          "sameReceipt": true,
+          "replayedFlag": "not_in_comment_contract"
+        }
+      ],
+      "durableCheckpoints": [
+        {
+          "at": "2026-09-08T23:36:52.541Z",
+          "label": "edited Bug durable before restart"
+        },
+        {
+          "at": "2026-09-08T23:36:54.252Z",
+          "label": "original Bug receipt acknowledged"
+        },
+        {
+          "at": "2026-09-08T23:36:54.667Z",
+          "label": "edited comment durable before restart"
+        },
+        {
+          "at": "2026-09-08T23:36:56.410Z",
+          "label": "comment receipt acknowledged without erasing edit"
+        },
+        {
+          "at": "2026-09-08T23:36:58.052Z",
+          "label": "both confirmed receipts and both new drafts survive"
+        }
+      ],
+      "finalTwoDraftsAndTwoAcknowledgements": true,
+      "screenshots": [
+        {
+          "at": "2026-09-08T23:36:52.346Z",
+          "kind": "screenshot",
+          "label": "01-original-with-png",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327\\01-original-with-png.png",
+          "sizeBytes": 181881,
+          "sha256": "c835b140e91237949dbf9212cd239b31ce9581c25859b8a0963fc82dc4e9a0e4"
+        },
+        {
+          "at": "2026-09-08T23:36:52.721Z",
+          "kind": "screenshot",
+          "label": "02-unknown-create-edited",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327\\02-unknown-create-edited.png",
+          "sizeBytes": 190123,
+          "sha256": "326b89e6a1dd2b9d7c3b6da62a2bc794a77740980a5e54f03985ddf3dd02f75e"
+        },
+        {
+          "at": "2026-09-08T23:36:54.422Z",
+          "kind": "screenshot",
+          "label": "03-confirmed-create-new-draft-retained",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327\\03-confirmed-create-new-draft-retained.png",
+          "sizeBytes": 114207,
+          "sha256": "59082d18775929c5af5ffd4d1fa0d5fd478c15304e6d8435f98f28599b3d1692"
+        },
+        {
+          "at": "2026-09-08T23:36:54.803Z",
+          "kind": "screenshot",
+          "label": "04-unknown-comment-edited",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327\\04-unknown-comment-edited.png",
+          "sizeBytes": 120304,
+          "sha256": "cbd70cb570a016a1cba9c495e3d76199e83893ce3a3aed1ccdaadd1dd127f391"
+        },
+        {
+          "at": "2026-09-08T23:36:56.582Z",
+          "kind": "screenshot",
+          "label": "05-confirmed-comment-new-draft-retained",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327\\05-confirmed-comment-new-draft-retained.png",
+          "sizeBytes": 129429,
+          "sha256": "fb336b3b846622a0f4164e6c7bd94411d9e3ddfc7610985a9c130e0239e4028c"
+        },
+        {
+          "at": "2026-09-08T23:36:58.174Z",
+          "kind": "screenshot",
+          "label": "06-final-restored-profile",
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327\\06-final-restored-profile.png",
+          "sizeBytes": 121775,
+          "sha256": "468c61efb3450113a6c6c306c136e473e36d0f3a1dea4be08bdd2de2c2227421"
+        }
+      ],
+      "artifacts": [
+        {
+          "file": "bf3a4621-6c48-459e-b776-5c9011d7d327/bug-observed-201.json",
+          "bytes": 2420,
+          "sha256": "e9be0f582ad3e5f51b2a9e6e4662c2db9c7d28c49dbe0360c01f819c92ac185c"
+        },
+        {
+          "file": "bf3a4621-6c48-459e-b776-5c9011d7d327/comment-observed-201.json",
+          "bytes": 632,
+          "sha256": "0cb8e71fafb0e9266b4b8b805ba7e6a0a2f2ae42ee1d4f7c12265854597b940b"
+        },
+        {
+          "file": "bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json",
+          "bytes": 414063,
+          "sha256": "3bd91b313315c54c457307facaaff52d900848dfc6da4fc8c096c8e70d1c4c84"
+        }
+      ],
+      "runtime": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327",
+      "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-submission-recovery-bf3a4621-6c48-459e-b776-5c9011d7d327\\edge-profile"
+    }
+  ],
+  "sharedWebSource": {
+    "commit": "7904e2c2d7285003884a5788a83300fbf521dbf1",
+    "sourceHashes": {
+      "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
+      "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
+      "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
+      "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
+    },
+    "unchangedAcrossBothRunsAndCurrentSourceAndPublication": true
+  },
+  "secretScan": {
+    "jsonArtifactsOnly": true,
+    "nestedObjectAndArrayJsonStringsRecursed": true,
+    "primitiveStringsUnchanged": true,
+    "submissionVersionStrings": 14,
+    "configuredSecretValueCount": 3,
+    "configuredExactSecretHits": 0,
+    "nonRedactedSensitiveValueKeys": 0,
+    "jwtLikeStrings": 0,
+    "credentialValuesNotWritten": true,
+    "scope": "Exact configured secrets plus field/JWT checks; no browser cookies or access tokens extracted from retained profiles."
+  },
+  "visualInspection": {
+    "firstRun": ["03-confirmed-create-new-draft-retained"],
+    "secondRun": ["05-confirmed-comment-new-draft-retained", "06-final-restored-profile"],
+    "finding": "Foreground Bug detail covers retained create form. Old observer included controls under closed details; no comment POST was emitted in the first run. Second run operates on foreground detail; create form remains retained underneath."
+  },
+  "firstRunDiagnosis": {
+    "classification": "harness_dom_visibility_and_hit_target_error",
+    "evidence": "38 checks passed including Bug replay/readback; timeout at post comment once; zero comment POST; old selector uses getClientRects without closed-details filtering and tries to click covered Cancel. Screenshot03 and observed DOM corroborate layering/hidden control inclusion.",
+    "productSourceChanged": false,
+    "runnerOnlyChanges": [
+      "checkVisibility and closed-details exclusion",
+      "elementFromPoint hit test before click",
+      "do not click create Cancel behind foreground Bug detail"
+    ]
+  },
+  "auditPreparationCorrection": {
+    "effect": "No raw/proof/product mutation",
+    "detail": "An initial in-memory audit assertion used comment.added; actual raw and mobile-comment-store.ts:345 use comment.created. The audit term was corrected after source inspection; all original 101 expected/actual values remain untouched."
+  },
+  "coverage": {
+    "baseline": "14",
+    "designText": "旧版本被拒绝，同一幂等请求不重复执行",
+    "surface": "Web",
+    "status": "partial",
+    "observed": "Create Bug with PNG and comment actual-201 response loss; original-key confirmation; one effect and preserved edited drafts through same-profile normal restarts.",
+    "notEstablished": [
+      "stale-version rejection by these UI runs",
+      "concurrent windows",
+      "project switch late response isolation",
+      "all mutation routes",
+      "attachment intermediate-stage response loss",
+      "process crash or power loss",
+      "APK",
+      "EXE",
+      "standalone HTTP surface",
+      "server MCP",
+      "local MCP",
+      "physical device",
+      "external component execution"
+    ],
+    "otherFiveSurfacesPromoted": false
+  },
+  "originalPlan": {
+    "file": "plan.md",
+    "sha256": "37e5ba2eab3f0147f786787a879783652e453282cc35f3601e870bb938539d69",
+    "retainedAsNotRunPreparationHistory": true
+  },
+  "mutationsByAuditor": {
+    "business": 0,
+    "services": 0,
+    "browsers": 0,
+    "rawOrRunnerEdits": 0,
+    "newFiles": ["audit.json", "README.md"]
+  }
+}

@@ -2,7 +2,17 @@
 
 适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7，最新恢复PID23924），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code22/preview.8。24基线仅09、10、11、12、15、23、24整项通过，物理Android和真实外部完整链路仍缺。**
 
+## 项目隔离与API修复补充
+
+2026-09-08T22:26Z已在预览完成一次API-only部署，加载人工流程幂等修复提交 `8f7330a559fc9611e93f2ef62df0e63639f07afc`；当时API PID10036 ready/schema14。部署前正常保留一致SQLite（3530752字节、SHA `a4bad9f7d3ae9c10f3cdf629b596549ed6abd6ea168909f659e5e25cf357bdf5`），17表、3附件文件/228251字节及3配置hash在重启前后相同。实际并发新run98请求/105检查通过，与原98请求/86检查的19项产品失败逐项对照；原失败和fixture不覆盖。[完整过程](workflow-concurrency-live/README.md)。这里仅API发生部署，EXE/本地MCP、Web和APK不因服务修复视为更新；操作前仍需核对真实进程身份。
+
+新 C/D 项目隔离验收只使用显式 `instance.json` 和直接4419 HTTP、4421 JSON-RPC，不修改服务或EXE会话。脚本默认不执行；`--selftest` 只验证递归脱敏及协议字符串保真。在已授权的独立预览验收范围内，先核对实例配置和服务身份，再使用 `node scripts/project-components/project-isolation-live.mjs --run C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\instance.json`；每次都会创建新的独立项目和员工，不能当作只读健康检查。[完整脚本与两轮留存](project-isolation-live/README.md)。
+
+既有第二轮1997请求/262断言通过，100次错误项目拒绝后的原项目快照不变；首次363请求因harness变量初始化顺序失败，所有原始记录与fixture保留。05的组件任务日志仍未执行；06仅HTTP/server MCP的最低四类写入归属判据通过，额外绑定属于 `bug_create` 预留，所有客户端或附件意图不随之通过。并发修复绑定上段独立实际部署proof，不把该隔离证据用作并发成功依据；14仍仅部分实测。
+
 ## 目录、端口和身份
+
+2026-09-08T23:22Z共享Web已更新为`assets/index-Ce9wROrH.js`，对应已核对的提交`7904e2c`六个Web源码文件。99/99源码测试与独立构建通过；旧dist完整保存在runtime的`web-backups/140143dd-d18b-4616-a34a-4a2e02aa3fa1`，现服务目录继续保留全部旧assets。新index、新旧JS真实HTTP字节/hash匹配；无服务重启，不强制刷新既有页面。EXE仍为.7、APK仍code22。[发布证明](runs/web-pending-submission-publication.json)。真实浏览器响应丢失恢复尚待独立验收，单元测试不补齐该项。
 
 | 用途                     | 显式配置                                                                                              |
 | ------------------------ | ----------------------------------------------------------------------------------------------------- |
@@ -86,7 +96,7 @@ API 重启会打断浏览、Android/MCP 请求和本进程工作；先与当前�
 
 Start 不编译源码：API 使用 apps/api/dist/main.js，Web 使用 apps/web/dist。先完成相应构建和回归。仅 Web 静态 bundle 变化时，新开/刷新页面加载磁盘 dist；旧页面可能持有旧 bundle。EXE 使用安装包内 Web，独立 Web 更新不等于 EXE 升级。
 
-最新独立Web构建index-CUjaBP8S.js包含Relay交接历史与暂停恢复入口。Web61/61、Desktop104/104、Storage109/109、最新完整API238/238（MJS205+TS33；旧184/175及分页/删除/协议17项保留为重叠历史子集），另有最新相关Web19/19、root unit4/skeleton1以及typecheck/lint已有日志；严格旧合同历史失败已修复，最新五步全部通过，详见[实施验证表](IMPLEMENTATION.md)。Vite dev/test需要显式QA_HUB_API_BASE_URL；本轮测试设置为4419，但outbox测试请求被限定到其随机本地fixture端口，并未调用预览4419。[Web验证范围](runs/web-outbox-verification.json)。新增生命周期9项的实际范围为成功监听后调度、绑定失败/构造失败清理、并发stop与HTTP/inflight drain；旧runtime已有onReady/onClose，不应描述为从未调度。[历史184日志](runs/api-final-lifecycle-source.txt)、[生命周期证据](component-runtime-lifecycle.md)。
+最新独立Web构建index-CUjaBP8S.js包含Relay交接历史与暂停恢复入口。Web61/61、Desktop104/104；并发修复后的Storage117/117、完整API239/239（MJS206+TS33；旧238/184/175及分页/删除/协议17项保留为重叠历史子集），另有最新相关Web19/19、root unit4/skeleton1以及typecheck/lint已有日志；严格旧合同历史失败已修复，最新五步全部通过，详见[实施验证表](IMPLEMENTATION.md)。Vite dev/test需要显式QA_HUB_API_BASE_URL；本轮测试设置为4419，但outbox测试请求被限定到其随机本地fixture端口，并未调用预览4419。[Web验证范围](runs/web-outbox-verification.json)。新增生命周期9项的实际范围为成功监听后调度、绑定失败/构造失败清理、并发stop与HTTP/inflight drain；旧runtime已有onReady/onClose，不应描述为从未调度。[历史184日志](runs/api-final-lifecycle-source.txt)、[生命周期证据](component-runtime-lifecycle.md)。
 
 已实际验证 EXE 异常退出边界：独立预览 EXE 及 4420 停止后，HTTP 核心 15 项、服务端 MCP 核心 13 项仍通过；重启预览后员工/文字/1 图片草稿恢复，日常 EXE 与生产 ready 不变。它证明这些已列子集的独立性，不是全部 API 动作或任意崩溃场景通过。[故障证据](runs/exe-fault-independent-api-mcp.json)、[恢复界面](runs/exe-preview4-after-fault-draft.txt)。
 
@@ -206,7 +216,7 @@ offline-import.mjs 要求显式 archive、expected-sha256、allowed-root、data-
 
 ## 最终API、Android与生产读回
 
-最终dist已在独立API PID18644加载，启动时点2026-09-08T20:39:13.7225210Z，4419 ready/schema14。root实际31个HTTP调用通过：六条冻结POST的vendor/JSON输出、同幂等请求切换媒体重放、丰富历史读取及跨项目404；另核对14个媒体头与原EXE Bug closed/v14、评论及184872字节附件hash。[31次实际请求](runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json)、[媒体/旧业务读回](runs/frozen-workflow-live-readback.json)。请求均使用1.1；没有以此补齐旧1.0请求、未注册路由或全部HTTP/MCP对等。
+响应合同修复时的dist已在独立API PID18644加载，启动时点2026-09-08T20:39:13.7225210Z，4419 ready/schema14。root实际31个HTTP调用通过：六条冻结POST的vendor/JSON输出、同幂等请求切换媒体重放、丰富历史读取及跨项目404；另核对14个媒体头与原EXE Bug closed/v14、评论及184872字节附件hash。[31次实际请求](runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json)、[媒体/旧业务读回](runs/frozen-workflow-live-readback.json)。请求均使用1.1；没有以此补齐旧1.0请求、未注册路由或全部HTTP/MCP对等。
 
 Android最新实际安装为com.relayqahub.android.preview.debug，code22 / 0.2.0-preview.8，MuMu中21→22覆盖升级与原生开始→无需代码提交→验收通过关闭完成。Bug386cdd2f-44c9-4a79-992a-891d595766fd closed/v6；49条对应HTTP均2xx，deliver1次、complete0次，87单测通过，lint0errors/29warnings。原有草稿/PNG/sidecar三hash、日常code14/PID5051/安装时间及四配置hash保留。Bug由API准备，后续状态写入来自原生按钮。修复文件BugLifecycleClient.kt由本目标3b1371c新增，62b起点不存在，不能描述为旧基线故障。[code22原生记录](android-code22-no-code.md)、[机器证据](android-code22-no-code.json)。真实物理设备、真实代码分支交付及外部组件仍not_run。
 
@@ -247,3 +257,11 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 新增通过限于4.EXE、10.EXE与确认关联/取消关联/停用/恢复四按钮；搜索、主用户选择及整页只记录部分实测。当前wholepass为09、10、11、12、15、23、24，4整体仍not_run。生产最新仍21:22:09.4439761Z快照；本轮没有再次探测生产，也没有启停服务。
 
 本轮重放以dc98892为锚点，985项/188源码hash/21退役项/401复验标记保持；相对该提交仅6个EXE入口状态新增通过，10的必要入口改为APK/EXE并保留旧HTTP证据。稳定重放语义SHA为c23f07f22c0195b2dc59eab39c7cb4f84d32c79ea770cd0a884147ea33902b9f。proof统一按原始字节求SHA；首次JPG文本hash不匹配被拒绝后修正，旧JSON及14份人员proof的字节hash均核对不变。
+
+## 本轮提交恢复检查点（2026-09-09）
+
+共享 Web 修复已在提交 `7904e2c` 冻结并仅发布到4274：实际新包 `assets/index-Ce9wROrH.js` 的下载哈希已核对，旧完整目录和旧资源保留，Web服务未重启。实际浏览器的第二轮 `bf3a4621-6c48-459e-b776-5c9011d7d327` 完成101/101检查：Bug和评论各丢失一次服务端真实201回执、三次正常浏览器重启后，原键确认仅产生一份记录，PNG与两份后改稿、两份确认回执保留。首轮38项后控件识别超时及完整profile仍留存；修正仅在验收脚本。[两轮真实过程与独立审计](web-submission-recovery-live/README.md)。这只补充14.Web的部分能力，其他入口及旧版本拒绝、跨窗并发、其他动作仍须分别验收。
+
+Android恢复源码已提交 `fb2eca7`：原提交身份、请求和图片持久保留，旧code22队列先确认，协议异常只由专用按钮按原请求重试。115/115单测和lint0错误/33警告；一处CRLF提交规范化在proof中保留前后哈希，没有声称重复运行测试。[源码与限制](android-offline-create-recovery.md)、[code23实际验收计划](android-code23-recovery-plan.md)。code23/.9已完成隔离构建，但本检查点设备仍为code22，EXE仍为preview.7；源码测试和构建不计作安装或原生恢复通过。
+
+矩阵映射保护修复已提交 `6b28723`：13项纯内存审计证明失败结果、401个复验标记、159条原说明均保留，说明归档稳定为218条；关闭两个保护分支的对照复现68条失败降级，现修复为0。[纯内存审计](mapper-memory-audit.json)。该审计没有写实际矩阵，后续实际重放另记，不能把静态映射审核计作业务验收。

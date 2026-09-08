@@ -1,0 +1,206 @@
+{
+  "recordedAt": "2026-09-08T23:22:03.396Z",
+  "runId": "140143dd-d18b-4616-a34a-4a2e02aa3fa1",
+  "sourceCommit": "7904e2c2d7285003884a5788a83300fbf521dbf1",
+  "webSourceFiles": [
+    {
+      "path": "apps/web/src/App.tsx",
+      "sha256": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
+      "bytes": 137001
+    },
+    {
+      "path": "apps/web/src/api.ts",
+      "sha256": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
+      "bytes": 70382
+    },
+    {
+      "path": "apps/web/src/project-drafts.ts",
+      "sha256": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
+      "bytes": 2556
+    },
+    {
+      "path": "apps/web/src/pending-submission.ts",
+      "sha256": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
+      "bytes": 17168
+    },
+    {
+      "path": "apps/web/src/pending-submission.test.ts",
+      "sha256": "f8e0958a67accd31fdab2a9d83b630c137e26a3bc420d940c46c2e68b2a89171",
+      "bytes": 27342
+    },
+    {
+      "path": "apps/web/src/project-drafts.test.ts",
+      "sha256": "e8e1f28b428ff71693f50fceb9d0a76fdf5063fd7bdbab968307a41471c5f915",
+      "bytes": 4080
+    }
+  ],
+  "otherWorktreeChangesPresent": true,
+  "buildDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-builds\\140143dd-d18b-4616-a34a-4a2e02aa3fa1",
+  "servedDirectory": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\web\\dist",
+  "retainedPreviousDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-backups\\140143dd-d18b-4616-a34a-4a2e02aa3fa1",
+  "before": [
+    {
+      "path": "assets/index-CgNw0fhl.css",
+      "bytes": 91623,
+      "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+    },
+    {
+      "path": "assets/index-CUjaBP8S.js",
+      "bytes": 467013,
+      "sha256": "a001eacfd1aae18facd6ad0e4ffd34e24e2abaf9b98c9612eac69678f0c30962"
+    },
+    {
+      "path": "assets/index-CUjaBP8S.js.map",
+      "bytes": 1782565,
+      "sha256": "9b75066ba577ec1b466b41d8b2fed82f1b67e257844f7db9c5000e46b16f552a"
+    },
+    {
+      "path": "icon-licenses.txt",
+      "bytes": 4308,
+      "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+    },
+    {
+      "path": "icons/qa-hub-192.svg",
+      "bytes": 506,
+      "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+    },
+    {
+      "path": "icons/qa-hub-512.svg",
+      "bytes": 506,
+      "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+    },
+    {
+      "path": "icons/qa-hub-maskable-512.svg",
+      "bytes": 495,
+      "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+    },
+    {
+      "path": "index.html",
+      "bytes": 709,
+      "sha256": "4e256943ddb93039341b652b18e14632d81b9601229d034203932a5bcd629dcb"
+    }
+  ],
+  "built": [
+    {
+      "path": "assets/index-Ce9wROrH.js",
+      "bytes": 477454,
+      "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+    },
+    {
+      "path": "assets/index-Ce9wROrH.js.map",
+      "bytes": 1829460,
+      "sha256": "ce6a8263f152a2a349db4d19b42e5cc60fce3e2a9b32d90db23abc32003fafcd"
+    },
+    {
+      "path": "assets/index-CgNw0fhl.css",
+      "bytes": 91623,
+      "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+    },
+    {
+      "path": "icon-licenses.txt",
+      "bytes": 4308,
+      "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+    },
+    {
+      "path": "icons/qa-hub-192.svg",
+      "bytes": 506,
+      "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+    },
+    {
+      "path": "icons/qa-hub-512.svg",
+      "bytes": 506,
+      "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+    },
+    {
+      "path": "icons/qa-hub-maskable-512.svg",
+      "bytes": 495,
+      "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+    },
+    {
+      "path": "index.html",
+      "bytes": 709,
+      "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+    }
+  ],
+  "after": [
+    {
+      "path": "assets/index-Ce9wROrH.js",
+      "bytes": 477454,
+      "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+    },
+    {
+      "path": "assets/index-Ce9wROrH.js.map",
+      "bytes": 1829460,
+      "sha256": "ce6a8263f152a2a349db4d19b42e5cc60fce3e2a9b32d90db23abc32003fafcd"
+    },
+    {
+      "path": "assets/index-CgNw0fhl.css",
+      "bytes": 91623,
+      "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+    },
+    {
+      "path": "assets/index-CUjaBP8S.js",
+      "bytes": 467013,
+      "sha256": "a001eacfd1aae18facd6ad0e4ffd34e24e2abaf9b98c9612eac69678f0c30962"
+    },
+    {
+      "path": "assets/index-CUjaBP8S.js.map",
+      "bytes": 1782565,
+      "sha256": "9b75066ba577ec1b466b41d8b2fed82f1b67e257844f7db9c5000e46b16f552a"
+    },
+    {
+      "path": "icon-licenses.txt",
+      "bytes": 4308,
+      "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+    },
+    {
+      "path": "icons/qa-hub-192.svg",
+      "bytes": 506,
+      "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+    },
+    {
+      "path": "icons/qa-hub-512.svg",
+      "bytes": 506,
+      "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+    },
+    {
+      "path": "icons/qa-hub-maskable-512.svg",
+      "bytes": 495,
+      "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+    },
+    {
+      "path": "index.html",
+      "bytes": 709,
+      "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+    }
+  ],
+  "httpReadback": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "instance": "qa-hub-preview-7c86",
+      "bytes": 709,
+      "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+    },
+    {
+      "path": "assets/index-Ce9wROrH.js",
+      "status": 200,
+      "instance": "qa-hub-preview-7c86",
+      "bytes": 477454,
+      "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+    },
+    {
+      "path": "assets/index-CUjaBP8S.js",
+      "status": 200,
+      "instance": "qa-hub-preview-7c86",
+      "bytes": 467013,
+      "sha256": "a001eacfd1aae18facd6ad0e4ffd34e24e2abaf9b98c9612eac69678f0c30962"
+    }
+  ],
+  "oldAssetBytesPreserved": true,
+  "oldIndexRetained": true,
+  "serviceRestarted": false,
+  "installedExeUpdated": false,
+  "androidUpdated": false,
+  "passed": true
+}

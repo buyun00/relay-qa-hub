@@ -1,0 +1,67 @@
+{
+  "request": {
+    "submissionContractVersion": "1.1.0",
+    "projectId": "ea83c107-7687-4b38-8d80-096f0868001a",
+    "clientSubmissionId": "e3a683e0-7813-44c5-91d0-cc80496408ef",
+    "title": "Recovery original bf3a4621-6c48-459e-b776-5c9011d7d327",
+    "description": "Recovery original bf3a4621-6c48-459e-b776-5c9011d7d327",
+    "expectedBehavior": "问题修复后不再复现",
+    "severity": "S2",
+    "priority": "P2",
+    "ownerId": null,
+    "verificationOwnerId": "968df48a-2b12-45fa-8bc5-4346ef9a57b9",
+    "attachmentIds": [
+      "7b01c8c7-5963-4522-a79d-e9db82677472"
+    ],
+    "occurrence": {
+      "observedAt": "2026-09-08T23:36:52.379Z",
+      "platform": "web",
+      "deviceModel": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
+      "osVersion": "Win32",
+      "steps": [
+        "从 Relay QA Hub Web 管理台提交"
+      ],
+      "actualBehavior": "Recovery original bf3a4621-6c48-459e-b776-5c9011d7d327"
+    },
+    "captureBundleId": null
+  },
+  "response": {
+    "clientSubmissionId": "e3a683e0-7813-44c5-91d0-cc80496408ef",
+    "qaItem": {
+      "type": "bug",
+      "id": "f64b024c-71b5-4f50-b767-957b0b9e2eab",
+      "key": "WRBF3A46216C4845-1"
+    },
+    "disposition": "created",
+    "bug": {
+      "id": "f64b024c-71b5-4f50-b767-957b0b9e2eab",
+      "projectId": "ea83c107-7687-4b38-8d80-096f0868001a",
+      "number": 1,
+      "key": "WRBF3A46216C4845-1",
+      "title": "Recovery original bf3a4621-6c48-459e-b776-5c9011d7d327",
+      "description": "Recovery original bf3a4621-6c48-459e-b776-5c9011d7d327",
+      "expectedBehavior": "问题修复后不再复现",
+      "moduleId": null,
+      "state": "reported",
+      "severity": "S2",
+      "priority": "P2",
+      "reporterId": "968df48a-2b12-45fa-8bc5-4346ef9a57b9",
+      "ownerId": null,
+      "verificationOwnerId": "968df48a-2b12-45fa-8bc5-4346ef9a57b9",
+      "duplicateOfBugId": null,
+      "occurrenceCount": 1,
+      "reopenCount": 0,
+      "version": 1,
+      "createdAt": "2026-09-08T23:36:52.464Z",
+      "updatedAt": "2026-09-08T23:36:52.464Z",
+      "closedAt": null
+    },
+    "occurrenceId": "e0cbe496-86fd-4f08-9a90-40fd39a09639",
+    "attachmentIds": [
+      "7b01c8c7-5963-4522-a79d-e9db82677472"
+    ],
+    "captureBundleId": null,
+    "eventId": "7d06be93-002e-40d1-85fe-8acd37f65895",
+    "replayed": false
+  }
+}

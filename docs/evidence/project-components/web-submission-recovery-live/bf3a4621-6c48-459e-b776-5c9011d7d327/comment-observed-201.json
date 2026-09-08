@@ -1,0 +1,18 @@
+{
+  "request": {
+    "clientSubmissionId": "549b6189-ec76-408a-b299-2edf6049c3da",
+    "body": "Recovery comment bf3a4621-6c48-459e-b776-5c9011d7d327"
+  },
+  "response": {
+    "comment": {
+      "id": "4f0fbf5c-3d4f-41c6-8ebd-489209c50757",
+      "bugId": "f64b024c-71b5-4f50-b767-957b0b9e2eab",
+      "authorId": "968df48a-2b12-45fa-8bc5-4346ef9a57b9",
+      "body": "Recovery comment bf3a4621-6c48-459e-b776-5c9011d7d327",
+      "clientSubmissionId": "549b6189-ec76-408a-b299-2edf6049c3da",
+      "createdAt": "2026-09-08T23:36:54.484Z",
+      "version": 1
+    },
+    "correlationId": "549b6189-ec76-408a-b299-2edf6049c3da"
+  }
+}

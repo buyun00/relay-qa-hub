@@ -2,6 +2,28 @@
 
 更新日期：2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。**24 项最低基线尚未全部通过，持续目标不能标记 complete。** 编译、mock、目录存在、排队与真实外部完成分别记录。
 
+## C/D 项目隔离实测补充
+
+2026-09-08T22:12:32.958Z–22:12:44.758Z，直接 HTTP 4419 与服务端 JSON-RPC MCP 4421 在全新 C/D 项目完成 1,997 次请求、262 条断言。100 次授权拒绝（60 读取、40 写入）均有原项目 Bug、版本、事件、评论、附件字节、统计及分类前后不变读回；两项目无成员请求为403，双成员显式错记录项目为404，并有合法成功对照。仅配置读取确认五组件全关，没有调用组件任务或日志路由、UI、本地MCP或服务控制。[两轮证据和范围](project-isolation-live/README.md)。
+
+基线06原文的修改、评论、上传绑定和状态四类在 HTTP/server MCP 两入口满足最低判据，另验证软删除；其它入口及整项未完成。额外绑定是 `bug_create` 预留和同键持久重放，不是把新附件认领到既有Bug；最初四份PNG已由真实创建事务认领。基线05仍是部分实测：组件任务日志未执行，事件和附件不替代日志。首次363请求/45已完成断言因脚本变量初始化顺序错误中止；原始失败、两个项目、员工、四Bug和预留全部保留，新fixture第二轮没有覆盖它。精确映射只覆盖13条HTTP路由及14个服务端工具，不推导所有分支或完整HTTP/MCP对等通过。
+
+## 同键并发回执修复
+
+人工流程并发实际失败与修复分别保留：[首次](workflow-concurrency-live/e94223b3-82c5-469d-b7ca-eea306ba0aab.json)98请求/86检查中19项失败，六动作同键重放被旧版本拒绝，以及创建同键不同payload返回错误500。修复提交 `8f7330a559fc9611e93f2ef62df0e63639f07afc` 新增事务内持久回执并统一创建409错误；API239/239、Storage117/117及原严格合同门禁通过。API-only部署后，2026-09-08T22:26:42.653Z–22:26:43.549Z [相同12并发组](workflow-concurrency-live/badce916-8b25-463b-9ee2-ddad3727350f.json)98请求/105检查全过，原86项逐label重测；新增18个成功资源比较和1个HTTP409断言。首次失败原样保留，不能把105与86的差异说成增加19个业务场景。
+
+这证明 ready、人工修复计划/开始/无代码交付、验收创建/开始的同键并发与后续重放均返回已提交资源，且相同事件/操作者无重复；不同编辑键同旧版本一胜一冲突。基线14的HTTP/server MCP仍为部分实测，客户端真实timeout恢复、local MCP、更多动作、所有附件阶段和外部任务去重仍缺。仅升级前后17表指纹、3附件文件/228251字节、3配置hash相同及一致备份保留得到[重启前后证据](workflow-concurrency-live/after-restart-33c28537-73ad-4037-b1c4-bff011da9a53.json)支持，不推导外部队列恢复。
+
+相反验收结论另有[独立真实竞争证据](workflow-verdict-concurrency-live/README.md)：66请求/56检查、四个双请求竞争，其中两组同manual_complete，两组verify_pass/verify_fail及close/reject。两组相反结论均由HTTP通过方胜出，Bug/Verification只前进一版本、审计只新增一事件；跨HTTP/server MCP的胜方原回执重放、败方旧版本拒绝、胜方改payload拒绝均有不变读回。所有新fixture保留且五组件关闭；不推导退回成功效果、客户端恢复、其它入口或完整基线14。
+
+## 共享 Web 提交恢复源码与独立发布
+
+提交 `7904e2c2d7285003884a5788a83300fbf521dbf1` 保存创建/评论的原业务ID、冻结请求、File及上传阶段回执；未知结果重试使用原意图，确认后保留后来修改或留空的草稿。明确无核心业务效果的拒绝经持久记录后提供显式纠稿入口，未知历史和权限/归属异常不能释放提交身份。Web99/99、App/Node类型检查、相关lint/format通过；[源码证明](web-pending-submission-source.md)明确测试使用本地替身，不作为实际浏览器/EXE恢复通过。
+
+2026-09-08T23:22:03.396Z已把同一冻结Web源码构建至新runtime目录，再保留完整旧dist和全部旧assets、原子更新独立4274的index。新bundle为`assets/index-Ce9wROrH.js`；新index、新JS及旧JS均真实HTTP下载核对hash，未重启任何服务。[构建日志](runs/web-pending-submission-build.txt)、[发布及保留读回](runs/web-pending-submission-publication.json)。其他工作树修改尚在进行，发布proof仅绑定已核对的六个Web文件和上述提交；EXE/APK未因本次Web发布更新，浏览器故障注入验收尚未运行。
+
+2026-09-08T23:13:03.140Z的[生产只读复核](runs/production-after-verdict.json)确认六文件hash、三个原PID启动身份、ready/schema12和3.3.5公开manifest仍与22:28证据相同；两个生产Node可执行路径不可读取，没有把null相等当作路径验证，也没有重新查询Android或验签。
+
 ## 工作树和边界
 
 - 工作树：C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub。
@@ -21,7 +43,7 @@
 
 独立配置为 C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\instance.json。API 4419、Web/下载 4274、服务端 MCP 4421、本地 EXE MCP 4420。操作方法见 [preview-operations.md](preview-operations.md)。
 
-已有真实管理和GM项目读回确认 API ready / schema **14**，database、evidence、worker均正常。最新API为PID18644（2026-09-08T20:39:13.7225210Z），实际HTTP读回ready/schema14；Web PID20284、MCP转发PID15736为此前回执。实际验证见最新frozen-workflow-live-readback；这些历史PID仍不能替代操作前身份核对。提交前已只读重新核对生产，结果见下一段。[GM就绪读回](runs/server-mcp-gm-project-live.json)、[生产盘点](production-inventory.md)、[生产留存读回](runs/production-after-preview5.json)。
+已有真实管理和GM项目读回确认 API ready / schema **14**，database、evidence、worker均正常。最新并发修复观测为API PID10036（2026-09-08T22:26:05.0349230Z），[实际ready](workflow-concurrency-live/readiness-after-restart.json)为schema14；[22:27进程边界](workflow-concurrency-live/processes-after-restart.json)中Web20284、MCP转发15736和预览EXE23924未随API-only部署改变。此前响应合同修复使用PID18644的记录继续保留；这些历史PID不能替代下一次操作前身份核对。[GM就绪读回](runs/server-mcp-gm-project-live.json)、[生产盘点](production-inventory.md)、[本次生产只读留存](workflow-concurrency-live/production-after-workflow-fix.json)。
 
 此前提交前只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。
 
@@ -73,7 +95,7 @@ EXE 异常退出独立性已取得真实子集证据：仅停止预览 EXE 后�
 | 真实API分页/协议/附件          | 15/15，fail0；实际HTTP/SQLite分页501评论、101绑定附件且保持内容/归属                         | [完整原始日志](runs/api-pagination-final.txt)；独立临时实例，含采集包附属资源、MCP协议与权限；不是生产大数据或外部执行器验收                                                                                                                                                                             |
 | 后续精确授权/删除保护          | scope16/16；最终删除/协议/附件组合17/17                                                      | [scope](runs/api-production-scope-final.txt)、[删除保护](runs/api-delete-guard-final.txt)：第101项目/成员与GM无普通membership精确授权；已删Bug附件metadata/raw/capture/materialize/resources拒绝且存储保留；套件重叠，不相加                                                                             |
 | Native安装守卫/时间            | NSIS原始.onInit隔离fixture6/6；.6helper实际UTC验证通过                                       | [安装guard](runs/native-installer-guards.json)只含首建Programs/marker/junction/越界判断，未执行干净用户完整首装；[UTC](runs/native-updater-utc.json)故意无效空配置得到failed、未调用installer，不能计更新成功                                                                                            |
-| 冻结源码完整Storage/API/执行器 | 最新Storage109/109、API205mjs+33ts=238/238；C#40/40                                          | [最新Storage](runs/contracts-remediation-storage.txt)、[最新API238](runs/contracts-remediation-api-final.txt)、[历史API184](runs/api-final-lifecycle-source.txt)、[后端证据](backend-components.md)；先前[API175/175](runs/api-final-complete-source.txt)保留历史，上表15/16/17与175均为重叠轮次，不相加 |
+| 冻结源码完整Storage/API/执行器 | 并发修复Storage117/117、API206mjs+33ts=239/239；C#40/40 | [最新Storage117](workflow-concurrency-live/storage-regression.txt)、[最新API239](workflow-concurrency-live/api-regression.txt)、[历史API238](runs/contracts-remediation-api-final.txt)、[历史API184](runs/api-final-lifecycle-source.txt)、[后端证据](backend-components.md)；先前[API175/175](runs/api-final-complete-source.txt)保留历史，重叠轮次不相加 |
 | 组件运行生命周期               | 9项真实listener/runtime/SQLite/inflight验证；184历史轮次已有且最新238继续覆盖                | [生命周期说明](component-runtime-lifecycle.md)、[结构化证据](runs/component-runtime-lifecycle.json)：旧实现已有onReady/onClose，修复绑定成功前调度、构造失败清理及并发关闭/drain；不是外部执行器E2E                                                                                                      |
 | MCP                            | 服务端/本地核心场景、90 工具目录、Android 真截图资源读回，.4 本地文件/hash 匹配              | [服务端核心](runs/server-mcp-core-2026-09-08T17-52-56-155Z.json)、[本地核心（当时 .3）](runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json)、[.4 资源](runs/desktop-mcp-resource-preview4.json)                                                                                                         |
 | root 常规门禁                  | unit4/4、skeleton1/1、workspace typecheck/lint通过                                           | [unit](runs/root-unit-final-retry.txt)、[skeleton](runs/skeleton-e2e-final-retry.txt)、[该轮typecheck](runs/typecheck-final-all-source.txt)、[该轮lint](runs/lint-final-all-source.txt)；早期失败日志保留                                                                                                |
@@ -133,7 +155,7 @@ Web 首次附件失败是 JPEG 字节误命名/声明 PNG，服务端正确拒�
 
 ## 最终API、Android与生产读回
 
-最终dist已在独立API PID18644加载，启动时点2026-09-08T20:39:13.7225210Z，4419 ready/schema14。root实际31个HTTP调用通过：六条冻结POST的vendor/JSON输出、同幂等请求切换媒体重放、丰富历史读取及跨项目404；另核对14个媒体头与原EXE Bug closed/v14、评论及184872字节附件hash。[31次实际请求](runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json)、[媒体/旧业务读回](runs/frozen-workflow-live-readback.json)。请求均使用1.1；没有以此补齐旧1.0请求、未注册路由或全部HTTP/MCP对等。
+响应合同修复时的dist已在独立API PID18644加载，启动时点2026-09-08T20:39:13.7225210Z，4419 ready/schema14。root实际31个HTTP调用通过：六条冻结POST的vendor/JSON输出、同幂等请求切换媒体重放、丰富历史读取及跨项目404；另核对14个媒体头与原EXE Bug closed/v14、评论及184872字节附件hash。[31次实际请求](runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json)、[媒体/旧业务读回](runs/frozen-workflow-live-readback.json)。请求均使用1.1；没有以此补齐旧1.0请求、未注册路由或全部HTTP/MCP对等。
 
 Android最新实际安装为com.relayqahub.android.preview.debug，code22 / 0.2.0-preview.8，MuMu中21→22覆盖升级与原生开始→无需代码提交→验收通过关闭完成。Bug386cdd2f-44c9-4a79-992a-891d595766fd closed/v6；49条对应HTTP均2xx，deliver1次、complete0次，87单测通过，lint0errors/29warnings。原有草稿/PNG/sidecar三hash、日常code14/PID5051/安装时间及四配置hash保留。Bug由API准备，后续状态写入来自原生按钮。修复文件BugLifecycleClient.kt由本目标3b1371c新增，62b起点不存在，不能描述为旧基线故障。[code22原生记录](android-code22-no-code.md)、[机器证据](android-code22-no-code.json)。真实物理设备、真实代码分支交付及外部组件仍not_run。
 
@@ -174,3 +196,11 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 新增通过限于4.EXE、10.EXE与确认关联/取消关联/停用/恢复四按钮；搜索、主用户选择及整页只记录部分实测。当前wholepass为09、10、11、12、15、23、24，4整体仍not_run。生产最新仍21:22:09.4439761Z快照；本轮没有再次探测生产，也没有启停服务。
 
 本轮重放以dc98892为锚点，985项/188源码hash/21退役项/401复验标记保持；相对该提交仅6个EXE入口状态新增通过，10的必要入口改为APK/EXE并保留旧HTTP证据。稳定重放语义SHA为c23f07f22c0195b2dc59eab39c7cb4f84d32c79ea770cd0a884147ea33902b9f。proof统一按原始字节求SHA；首次JPG文本hash不匹配被拒绝后修正，旧JSON及14份人员proof的字节hash均核对不变。
+
+## 本轮提交恢复检查点（2026-09-09）
+
+共享 Web 修复已在提交 `7904e2c` 冻结并仅发布到4274：实际新包 `assets/index-Ce9wROrH.js` 的下载哈希已核对，旧完整目录和旧资源保留，Web服务未重启。实际浏览器的第二轮 `bf3a4621-6c48-459e-b776-5c9011d7d327` 完成101/101检查：Bug和评论各丢失一次服务端真实201回执、三次正常浏览器重启后，原键确认仅产生一份记录，PNG与两份后改稿、两份确认回执保留。首轮38项后控件识别超时及完整profile仍留存；修正仅在验收脚本。[两轮真实过程与独立审计](web-submission-recovery-live/README.md)。这只补充14.Web的部分能力，其他入口及旧版本拒绝、跨窗并发、其他动作仍须分别验收。
+
+Android恢复源码已提交 `fb2eca7`：原提交身份、请求和图片持久保留，旧code22队列先确认，协议异常只由专用按钮按原请求重试。115/115单测和lint0错误/33警告；一处CRLF提交规范化在proof中保留前后哈希，没有声称重复运行测试。[源码与限制](android-offline-create-recovery.md)、[code23实际验收计划](android-code23-recovery-plan.md)。code23/.9已完成隔离构建，但本检查点设备仍为code22，EXE仍为preview.7；源码测试和构建不计作安装或原生恢复通过。
+
+矩阵映射保护修复已提交 `6b28723`：13项纯内存审计证明失败结果、401个复验标记、159条原说明均保留，说明归档稳定为218条；关闭两个保护分支的对照复现68条失败降级，现修复为0。[纯内存审计](mapper-memory-audit.json)。该审计没有写实际矩阵，后续实际重放另记，不能把静态映射审核计作业务验收。

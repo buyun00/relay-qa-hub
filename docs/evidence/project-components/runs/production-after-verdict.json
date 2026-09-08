@@ -1,0 +1,150 @@
+{
+  "recordedAt": "2026-09-08T23:13:03.140Z",
+  "readOnly": true,
+  "baseline": "docs/evidence/project-components/workflow-concurrency-live/production-after-workflow-fix.json",
+  "baselineRecordedAt": "2026-09-08T22:28:41.8279814Z",
+  "files": [
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\mvp-e2e-current.json",
+      "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e",
+      "baselineSha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Config\\qa-people.json",
+      "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374",
+      "baselineSha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Windows-x64-latest.json",
+      "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+      "baselineSha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+      "matchesBaseline": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Setup-x64.exe",
+      "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+      "baselineSha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+      "matchesBaseline": true
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+      "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a",
+      "baselineSha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a",
+      "matchesBaseline": true
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+      "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c",
+      "baselineSha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c",
+      "matchesBaseline": true
+    }
+  ],
+  "processes": [
+    {
+      "pid": 17160,
+      "exists": true,
+      "createdAt": "2026-09-08T10:24:12.5269520Z",
+      "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+      "baselineCreatedAt": "2026-09-08T10:24:12.5269520Z",
+      "sameStart": true,
+      "pathAvailable": true,
+      "executableMatch": true
+    },
+    {
+      "pid": 10844,
+      "exists": true,
+      "createdAt": "2026-09-08T11:09:25.9817720Z",
+      "executable": null,
+      "baselineCreatedAt": "2026-09-08T11:09:25.9817720Z",
+      "sameStart": true,
+      "pathAvailable": false,
+      "executableMatch": null
+    },
+    {
+      "pid": 7420,
+      "exists": true,
+      "createdAt": "2026-09-07T09:37:15.3473300Z",
+      "executable": null,
+      "baselineCreatedAt": "2026-09-07T09:37:15.3473300Z",
+      "sameStart": true,
+      "pathAvailable": false,
+      "executableMatch": null
+    }
+  ],
+  "previewProcesses": [
+    {
+      "pid": 10036,
+      "exists": true,
+      "createdAt": "2026-09-08T22:26:05.0349230Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+    },
+    {
+      "pid": 20284,
+      "exists": true,
+      "createdAt": "2026-09-08T17:52:36.5080910Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+    },
+    {
+      "pid": 15736,
+      "exists": true,
+      "createdAt": "2026-09-08T16:46:02.4598690Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+    },
+    {
+      "pid": 23924,
+      "exists": true,
+      "createdAt": "2026-09-08T21:18:26.3376550Z",
+      "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+    }
+  ],
+  "readiness": {
+    "status": "ready",
+    "schemaVersion": "12",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "previewReadiness": {
+    "status": "ready",
+    "schemaVersion": "14",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "windowsManifest": {
+    "bytes": 413,
+    "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+    "version": "3.3.5",
+    "matchesBaseline": true
+  },
+  "androidRequeried": false,
+  "limitations": [
+    "Two production Node executable paths are unavailable; no path-match inference.",
+    "No Android query, signature revalidation or installer download."
+  ],
+  "passed": true
+}
