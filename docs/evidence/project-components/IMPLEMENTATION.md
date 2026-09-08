@@ -89,7 +89,7 @@ EXE 异常退出独立性已取得真实子集证据：仅停止预览 EXE 后�
 
 ## 矩阵和未完成事项
 
-[coverage-matrix.json](coverage-matrix.json) / [Markdown](coverage-matrix.md) 已更新到 **985 条、24基线、193 HTTP路由、109 MCP源码注册行、269 Web控件、106 Android控件**。980是添加Web outbox前的旧计数。运行目录去重90工具，源码保留18工具fallback分别记未测；同名调用不会重复通过。**整项通过的基线只有09与23**；22物理Android仍缺。15仅HTTP/服务MCP/本地MCP三读取入口有同一PNG hash证据。HTTP15和服务MCP13核心脚本不等于全部动作，11/12仍为部分实测。精确入口结果、证明文件hash和剩余缺口见[映射审查](coverage-mapping-review.md)；旧失败、退役项与源码复验标记保留。
+[coverage-matrix.json](coverage-matrix.json) / [Markdown](coverage-matrix.md) 已更新到 **985 条、24基线、193 HTTP路由、109 MCP源码注册行、269 Web控件、106 Android控件**。980是添加Web outbox前的旧计数。运行目录去重90工具，源码保留18工具fallback分别记未测；同名调用不会重复通过。**整项通过的基线为09、15、23**；22物理Android仍缺。15按设计列出的HTTP/服务MCP/本地MCP三读取入口及同一PNG归属/hash证据整项通过；其它客户端控件未因此通过。HTTP15和服务MCP13核心脚本不等于全部动作，11/12仍为部分实测。精确入口结果、证明文件hash和剩余缺口见[映射审查](coverage-mapping-review.md)；旧失败、退役项与源码复验标记保留。
 
 仍缺：
 
@@ -102,6 +102,12 @@ EXE 异常退出独立性已取得真实子集证据：仅停止预览 EXE 后�
 7. 独立组件目录和未完成任务迁移/恢复。归档 2,021 条 outbox 原本全为 sent，不能用于证明 pending 导入任务被 hold 阻止，该门禁另有本机 fixture。
 
 五组件真实外部完整链路仍为 **not_run**，24 基线未全过。没有借生产目标测试，没有把 queued/uncertain/mock 写成成功。
+
+基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、15、23整项通过，其余功能仍按实际入口分别验收。21的缺口是主库归档以外的旧上传queue.sqlite/owner/workspace/job、Relay批次/state及轻语状态的未完成任务完整清单和迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
+
+.7仅两个实际按钮新增EXE passed：关闭窗口、状态面板检查更新/安装并重启。window-action(close)、check-update成功、install-update成功、second-instance无深链恢复记为分支passed，复合handler仍not_run；托盘图标点击仍未测。生成/映射脚本本轮仅为持久重放这些证据作有界修改，不改应用源码；保留401个既有复验标记，proof SHA不一致时拒绝且不写矩阵。[映射审查](coverage-mapping-review.md)、[实际重放验证](runs/coverage-criteria-replay.json)。
+
+严格合同评估已补充：五个继承字段使冻结canonical漂移；仅删除schema定义会让当前真实DTO违反additionalProperties:false，不能靠重写baseline或豁免解决。尚未确认可运行的严格旧响应投影入口，兼容修复没有实施，严格门禁仍failed。[修复边界评估](contracts-remediation-assessment.md)。
 
 ## 保留的问题和修复历史
 

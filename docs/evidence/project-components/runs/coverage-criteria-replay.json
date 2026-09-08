@@ -1,0 +1,31 @@
+{
+  "recordedAt": "2026-09-08T20:15:13.885Z",
+  "scope": "Evidence generator/mapper only; no app source or runtime API mutation",
+  "entryCount": 985,
+  "wholePassed": [
+    "09 关闭所有组件的基础全流程",
+    "15 附件三种读取",
+    "23 EXE 共存与升级"
+  ],
+  "semanticReplayStable": true,
+  "beforeSemanticSha256": "01f9ea42d8a52ea16a1f0bae498760457870b26643300b373a5edb9656dd34db",
+  "afterSemanticSha256": "01f9ea42d8a52ea16a1f0bae498760457870b26643300b373a5edb9656dd34db",
+  "revalidationFlagsUnchanged": true,
+  "revalidationFlagCount": 401,
+  "flagsSha256": "7e70b4cb0dac05c45e6b971215114ea702dc685615044e6c022c555c16d2ec23",
+  "proofHashMismatches": [],
+  "missingLinks": [],
+  "inMemoryMapperChecks": {
+    "mismatchedProofRejected": true,
+    "mismatchedProofWriteCalls": 0,
+    "negativeStatusAndNotePreserved": true,
+    "partialNotePreserved": true,
+    "itemAndManualRevalidationPreserved": true,
+    "sourceHashPreserved": true,
+    "realDiskWrites": 0
+  },
+  "scripts": {
+    "generatorSha256": "b1b7ac41c634f87d6d1ada2d14604d2b73e4d26ffdff087ab747647522ae48f8",
+    "mapperSha256": "e78f0c9da02b21d37f2db1496e1d74e64f24b838e6a84d23c3323ce71a4aaba6"
+  }
+}

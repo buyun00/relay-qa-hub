@@ -308,6 +308,7 @@ for (const [index, [title, expected]] of baseline.entries()) {
       11: ["http"],
       12: ["server_mcp"],
       13: ["http", "server_mcp", "local_mcp"],
+      15: ["http", "server_mcp", "local_mcp"],
       22: ["apk"],
       23: ["exe"],
     }[number] ?? surfaces;
@@ -840,9 +841,10 @@ const data = {
     {
       id: "historical-copy",
       affects: ["migration", "rollback"],
-      status: "unverified",
+      status: "partially_verified",
       required:
-        "Pinned, fully validated consistent SQLite+attachment recovery set restored only into isolated data roots; imported queues/outbox paused.",
+        "The pinned main SQLite and 878 attachments have been restored, migrated and read through a held API. Still required: explicit unfinished-task inventory and recovery evidence for legacy increment-upload queue/owner/workspace/job files, Relay batch/state directories and third-party state outside that recovery set.",
+      evidence: ["migration-rehearsal.md", "migration-service-readback.json"],
     },
   ],
   summary: {

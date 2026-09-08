@@ -1,6 +1,6 @@
 # 独立项目预览运行与回退说明
 
-适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7、PID11368），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code21/preview.7。24基线仅09、23整项通过，物理Android和真实外部完整链路仍缺。**
+适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7、PID11368），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code21/preview.7。24基线仅09、15、23整项通过，物理Android和真实外部完整链路仍缺。**
 
 ## 目录、端口和身份
 
@@ -164,7 +164,13 @@ Git 忽略目录也须保留：
 - apps/android/app/build/evidence/project-components 的截图、UI XML、脱敏读回和保留 APK；build 目录不是 Git 持久证据。
 - runtime\migration-rehearsal-81deb464 的固定归档、校验报告、migrated/rollback 副本和 hold。
 
-矩阵重生保留结果、人工备注和retiredItems，源码变化标记复验。当前985细目不是985项通过；24基线只有09和23整项通过，22保留物理Android必测缺口，15只将已实际调用的三种读取入口标通过。源目录重复MCP注册行不重复计数。[映射规则与progress](coverage-mapping-review.md)。真实外部Jenkins、上传、Relay、轻语以及物理Android仍缺资源。
+矩阵重生保留结果、人工备注和retiredItems，源码变化标记复验。当前985细目不是985项通过；24基线只有09、15、23整项通过，22保留物理Android必测缺口，15仅按设计列出的三种实际读取入口判定整项通过，APK/EXE/Web其它控件和17.3物理设备要求不受影响。源目录重复MCP注册行不重复计数。[映射规则与progress](coverage-mapping-review.md)。真实外部Jenkins、上传、Relay、轻语以及物理Android仍缺资源。
+
+基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、15、23整项通过，其余功能仍按实际入口分别验收。21的缺口是主库归档以外的旧上传queue.sqlite/owner/workspace/job、Relay批次/state及轻语状态的未完成任务完整清单和迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
+
+.7仅两个实际按钮新增EXE passed：关闭窗口、状态面板检查更新/安装并重启。window-action(close)、check-update成功、install-update成功、second-instance无深链恢复记为分支passed，复合handler仍not_run；托盘图标点击仍未测。生成/映射脚本本轮仅为持久重放这些证据作有界修改，不改应用源码；保留401个既有复验标记，proof SHA不一致时拒绝且不写矩阵。[映射审查](coverage-mapping-review.md)、[实际重放验证](runs/coverage-criteria-replay.json)。
+
+严格合同评估已补充：五个继承字段使冻结canonical漂移；仅删除schema定义会让当前真实DTO违反additionalProperties:false，不能靠重写baseline或豁免解决。尚未确认可运行的严格旧响应投影入口，兼容修复没有实施，严格门禁仍failed。[修复边界评估](contracts-remediation-assessment.md)。
 
 ## 回退和恢复
 

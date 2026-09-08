@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-08T19:56:26.341Z",
+  "generatedAt": "2026-09-08T20:15:38.228Z",
   "evidenceMapping": {
-    "at": "2026-09-08T19:18:16.465Z",
+    "at": "2026-09-08T20:15:36.289Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json",
@@ -64,7 +64,25 @@
       "runs/contracts-breaking-app-first.txt",
       "runs/web-outbox-verification.json",
       "runs/native-installer-guards.json",
-      "runs/native-updater-utc.json"
+      "runs/native-updater-utc.json",
+      "runs/exe-preview6-logout-readback.json",
+      "runs/exe-preview6-login-durable-readback.json",
+      "runs/exe-preview6-relogin-draft.json",
+      "runs/exe-preview4-restored-draft.txt",
+      "runs/exe-preview4-after-fault-draft.txt",
+      "runs/exe-after-preview7-upgrade.json",
+      "runs/mcp-delete-live-preview6.json",
+      "runs/exe-preview7-live-protocol.json",
+      "migration-rehearsal.md",
+      "migration-service-readback.md",
+      "migration-service-readback.json",
+      "runs/exe-preview5-restored-draft.txt",
+      "runs/exe-preview6-restored-draft.txt",
+      "runs/production-after-preview7.json",
+      "runs/exe-preview7-close-restore.json",
+      "runs/exe-preview7-update-ready.txt",
+      "runs/exe-preview7-restored-draft.txt",
+      "runs/exe-preview7-tray-restored.txt"
     ],
     "proofHashes": {
       "runs/desktop-mcp-core-2026-09-08T17-18-02-431Z.json": "14ec6e8ea658579163c72e19fb68bc55534a3b9354f9cfc663e9a8880c91479d",
@@ -126,7 +144,25 @@
       "runs/contracts-breaking-app-first.txt": "af34ce69997c047d2ed2a28c394c5d70d34877620a54613df3b16e092d1d2df6",
       "runs/web-outbox-verification.json": "efd64ea9d35782cc650d144b59bb27f5cbd5203367a5f8eeb5ad96aa9f761d12",
       "runs/native-installer-guards.json": "554953787a701ff0df4c6d9c0c44f4fb5ad34ea485bb4fca86a4f2a25c359093",
-      "runs/native-updater-utc.json": "aa04ab6e60819f5b0a83868bad228d876a8a794646302ae38ee94b43d90e5365"
+      "runs/native-updater-utc.json": "aa04ab6e60819f5b0a83868bad228d876a8a794646302ae38ee94b43d90e5365",
+      "runs/exe-preview6-logout-readback.json": "d07be384982ae36d835be0e36e445d49b8363ca450387c9719b8382d21d4104c",
+      "runs/exe-preview6-login-durable-readback.json": "ae11302feeed5aa7df9f53d029091ee662ee374f0ce96d35f9755d926d0d7de2",
+      "runs/exe-preview6-relogin-draft.json": "3d3868bfad34a8a01d9c9cd8c3ac4de79676489c95f093aba29252c4ebb6383b",
+      "runs/exe-preview4-restored-draft.txt": "2e6f3d81a3d4fb8471fdd8bbeec49ba732906a486c069c898968d54370816abc",
+      "runs/exe-preview4-after-fault-draft.txt": "bd6da80a889397688b4c504b9c1eee56a0998c35019c4b06d1e93d8a216af50d",
+      "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
+      "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95",
+      "runs/exe-preview7-live-protocol.json": "cd3bdf38c53ded87e8bcb170daca28ec8fc4096dd4dcc80b7297abd31ceceeee",
+      "migration-rehearsal.md": "d77d7953269ccea07f53c6b13c8b63145c5a437a8e3519280975913bae627878",
+      "migration-service-readback.md": "78f276b7ac286bd9e2cd418872a9908e37a89af5dd2a1dd5af494f5a1cff60a6",
+      "migration-service-readback.json": "43763e22c79cbdfb78d9ffb072b75334438540a4926107936123fffde00d93b0",
+      "runs/exe-preview5-restored-draft.txt": "f4d925946a4140736733c0d82603c378d66fb0f4d9211b10c0e6a4815a1bbd3b",
+      "runs/exe-preview6-restored-draft.txt": "071a9789cd88c9a3db54a95d48971aba24ae0fce15dfd698c90c7b0c38e2bcc1",
+      "runs/production-after-preview7.json": "a9ab607a81bed5817336aa75ce0172dd47c0a8000e5b716664441f0c34701658",
+      "runs/exe-preview7-close-restore.json": "c761ed95be90df650254fa8811733ddc38edcd960ff9d4768ece0b12420e93a9",
+      "runs/exe-preview7-update-ready.txt": "f16ca439cae5a845d734e19c6065f093a286cbd158dd5122efce3456f8550420",
+      "runs/exe-preview7-restored-draft.txt": "af5191709506db0df820a143dc41ed69a0f46c065c1d82ca271ae8d178f323ef",
+      "runs/exe-preview7-tray-restored.txt": "58ad53337958a6f7b867fb98d9e86243b87a99fbf9d66101ac48866a3a166ecf"
     },
     "validationEvidence": [
       {
@@ -305,9 +341,14 @@
         "androidRequeried": false,
         "androidPriorEvidence": "runs/production-pre-commit.json"
       }
-    }
+    },
+    "reviewedSupplementSections": [
+      "## 首次提交前证据补充\n\n新增预览.6真实双入口删除：服务端4421和已安装EXE的本地4420各创建独立Bug并调用默认删除；相同请求重放均replayed:true、删除时点相同，context返回NOT_FOUND，原Bug及删除actor/version审计保留。[双MCP删除实测](runs/mcp-delete-live-preview6.json)。仅映射对应qa_delete_bug入口，不把一个删除用例推定为全部HTTP/MCP动作对等或全量幂等通过。\n\n新增.6实际身份边界：原生退出后磁盘身份清除，本地MCP返回QA_HUB_LOGIN_REQUIRED；local MCP登录成功返回时身份已经落盘；原生重新登录同员工/项目后原文字+1张PNG草稿恢复。[退出读回](runs/exe-preview6-logout-readback.json)、[同步持久登录](runs/exe-preview6-login-durable-readback.json)、[原生重登草稿](runs/exe-preview6-relogin-draft.json)。登录后立即强停的组合命令被自动审批拒绝、未执行且未重试；这组证据明确processRestartNotTested，不能据此声称该强停场景通过。\n\n此前提交前只读生产快照为2026-09-08T19:30:39Z：六个文件hash、三个原PID/启动时点均与19:02:22Z一致，4319 ready/schema12，4174的Windows 3.3.5公开manifest原字节hash一致；日常APK code14/PID5051/安装时点保留，预览APK code21仍在。未读取配置正文或凭据，未启停任何应用，未重新验签。日期比较曾因PowerShell隐式转换丢失小数精度误报，已按原始UTC字符串100ns精度更正并保留说明。[提交前生产快照](runs/production-pre-commit.json)。\n\n最新.7升级后生产只读核对为2026-09-08T19:55:31.6095789Z：六文件hash、三个原PID及精确启动时点不变，4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。日常EXE可读路径相同；两个Node的路径仍为null，不能视为新增可执行路径验证。本轮未重新查询Android，APK状态仍引用19:30快照；未读配置正文/凭据或修改生产。[.7后生产快照](runs/production-after-preview7.json)。\n\n最新API完整回归为MJS151+TS33=184/184，旧175轮次保留。生命周期9项覆盖真实监听、SQLite与inflight清理，修复的是绑定前调度/异常清理，旧runtime已有onReady/onClose；不得据此通过外部完整链路。[184原始日志](runs/api-final-lifecycle-source.txt)、[生命周期证据](component-runtime-lifecycle.md)。\n\n本次仅将源码qa_delete_bug行 mcp_tool-65cae97a9470db 的server_mcp/local_mcp记通过；required_mcp_parity同名需求行仍not_run，不重复算全部对等。基线01/07的EXE与13/14的两MCP只补部分实测，经基线15判据校准后，09/15/23是当前wholepass。\n\nmapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual保留机制，审计元数据位于evidenceMapping.postFreezeSupplement，各行manual.postFreezeEvidence亦保留必要proof hash。只运行既有generate-coverage-matrix.mjs重生JSON/Markdown，不重写mapper代码。未来重跑旧mapper会刷新其自动审查段，需保留本补充段；人工行结果由既有matching-ID机制保留。\n\n## 实施提交后的发布与迁移补充\n\n**Windows 0.2.0-preview.7 已完成独立发布和实际6→7原生升级验收。** releaseId为20260908T194425490Z，108378668字节，SHA-256 fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a。公开回执sourceCommit为3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789、sourceDirty:false；文档更新只读核对receipt及主代理实际原生升级proof；未额外操作安装或验签。回执位置：C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260908T194425490Z\\receipt.json。此包已含首装guard及提交内源码，升级passed依据下述实际proof。\n\n.6→.7已通过原生“检查更新→安装并重启”实际完成，proof观测时点2026-09-08T19:54:02.443Z；当前已安装nativeVersion0.2.0.7、主PID11368。原员工/项目A、文字+1张PNG草稿和配置SHA保持，原Bug13 closed/v14、评论及184872字节原附件materialize/hash读回通过；旧更新结果及7份backup目录保留。新helper的成功result时间19:52:36Z位于真实原生点击区间，UTC已在本次成功更新中核对。[.7升级proof](runs/exe-after-preview7-upgrade.json)、[原生恢复](runs/exe-preview7-restored-draft.txt)。19:54:30Z本地4420与服务4421实际目录均为相同90工具、协议2025-06-18，不支持的协议头均400；此项只证明目录/协议，不能称90个业务工具全部通过。[双入口协议](runs/exe-preview7-live-protocol.json)。\n\n新增保持冻结状态的迁移副本的真实API服务读回26项通过：固定schema12归档在新的service-readback-8b94d602中恢复并迁移至14，127.0.0.1:51708仅启动该副本API；稳定旧姓名ID登录后读出100 Bug、真实2评论及1附件（3487861字节、SHA-256 73470971577ea3ceb30edf4e8cb713d449a3b6e66c566cac5e897e136566e2ce），匿名401、跨项目404、外部读取hold409均实测。五组件关闭、出站和执行器子进程尝试均0；hold字节和核心业务/outbox指纹保持，原身份记录全部保留。新增的仅是官方独立GM和会话记录；不能称整个数据库字节无变化。进程8532正常exit0且监听关闭，旧migrated/rollback未启动且hash不变。[26项读回](migration-service-readback.md)、[脱敏JSON](migration-service-readback.json)。\n\n该服务使用19:24:26Z冻结的独立编译样本，其已有onReady/onClose并由paused gate阻止调度；它不代替后续监听生命周期9项测试。此结果证明held schema14 API恢复读取，**未证明schema12程序启动、迁移后新增数据的完整回退、生产切换、客户端迁移或独立组件队列/workspace恢复**。归档2021条outbox原本全sent，也不单独证明pending任务冻结。前两次错误测试路由导致的harness失败已保留，不计成功。\n\n矩阵仍保留985条，仅基线21的HTTP progress补入实际服务读回，不将其它客户端/MCP入口传递通过；21和24整项保持not_run。仅09/15/23整项通过，严格旧合同失败、外部完整链路及物理Android缺口均保留。公开receipt摘要与hash记录于evidenceMapping.releaseAndMigrationSupplement，原始receipt仍位于独立runtime。该段发布证据形成时mapper源码保持冻结；本轮仅追加proof保留与基线判据校正。",
+      "## 基线判据及窄分支校正\n\n设计13原文：“相同输入得到相同状态、版本、操作人和错误结果”。设计15原文：“HTTP 下载、远端 MCP 资源、本地 MCP 落盘均归属正确且可用”。15现在只按这三读取入口汇总，APK/EXE/Web其它功能控件保持各自状态，未增加not_applicable状态或豁免17.3物理设备要求。\n\n重新核对同一项目fb914b3b-4169-47f8-8dec-76f3a3cc780d、Bug b817a6cc-f096-415d-bdb8-faa9b6005c36、附件31c9b4be-d0f6-4c9a-864e-032cc9130562：184872字节PNG，三种读取SHA-256同为e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b；HTTP跨项目404。三份主要入口proof是[HTTP](../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json)、[远端MCP](runs/server-mcp-real-resource-20260909.json)、[本地落盘](runs/desktop-mcp-resource-preview4.json)，绑定ID来自原[采集读回](../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json)。\n\n21仅移除无关的schema12程序启动/新增数据回退条件；26项held服务读回同时写入HTTP actual/evidence和manual。主库与878附件恢复集已经可用，historical-copy改为partially_verified；仍缺legacy上传独立queue.sqlite/owner/workspace/job、Relay批次/state和轻语状态的未完成任务完整清单及迁移核对。故21整项仍not_run，不能从58表指纹或2021sent主outbox推出这些目录已迁移。\n\n.7真实close和更新按钮仅EXE入口passed；window-action(close)、check-update成功、install-update成功和second-instance无深链恢复记录为manual.branchResults中的passed，复合handler整行仍not_run。tray.click/double-click及托盘菜单没有此证据，仍not_run。\n\n可重放纠正由manual.reviewedEvidence保存结果、progress和实际proof SHA；mapper在重放前逐一核对hash，变化即拒绝并要求重审。它不是新的业务通过来源，也不会取消needsRevalidation。",
+      "## 本轮重放验证与合同边界\n\n生成器→mapper→生成器重放后985细目不变，wholepass为09、15、23；401个既有needsRevalidation以及sourceHash/人工复验字段的规范化SHA保持相同。实际运行mapper的内存文件系统替身用错误proof SHA验证拒绝且零写入；另一个用例证明后来的failed结果、负向note、partial note、item/manual复验标记和sourceHash均保留。原始磁盘证据未改。[实际重放验证](runs/coverage-criteria-replay.json)。\n\n严格合同评估已补充：五个继承字段使冻结canonical漂移；仅删除schema定义会让当前真实DTO违反additionalProperties:false，不能靠重写baseline或豁免解决。尚未确认可运行的严格旧响应投影入口，兼容修复没有实施，严格门禁仍failed。[修复边界评估](contracts-remediation-assessment.md)。"
+    ]
   },
-  "sourceHead": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+  "sourceHead": "3f66932e11c42f60aa660028b490a3ac0dea310d",
   "sourceRoots": [
     "apps/api/src",
     "apps/web/src",
@@ -582,8 +623,12 @@
         "migration",
         "rollback"
       ],
-      "status": "unverified",
-      "required": "Pinned, fully validated consistent SQLite+attachment recovery set restored only into isolated data roots; imported queues/outbox paused."
+      "status": "partially_verified",
+      "required": "The pinned main SQLite and 878 attachments have been restored, migrated and read through a held API. Still required: explicit unfinished-task inventory and recovery evidence for legacy increment-upload queue/owner/workspace/job files, Relay batch/state directories and third-party state outside that recovery set.",
+      "evidence": [
+        "migration-rehearsal.md",
+        "migration-service-readback.json"
+      ]
     }
   ],
   "summary": {
@@ -612,16 +657,16 @@
     "fileCount": 187,
     "resultsBySurface": {
       "apk": {
-        "not_run": 271,
+        "not_run": 270,
         "passed": 21
       },
       "exe": {
-        "not_run": 461,
-        "passed": 15
+        "not_run": 458,
+        "passed": 17
       },
       "web": {
         "passed": 27,
-        "not_run": 407
+        "not_run": 406
       },
       "http": {
         "passed": 33,
@@ -672,8 +717,12 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/exe-preview6-logout-readback.json",
+            "runs/exe-preview6-login-durable-readback.json",
+            "runs/exe-preview6-relogin-draft.json"
+          ],
+          "actual": "已实测：.6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。。仍缺：完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -716,7 +765,7 @@
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-08T19:18:16.457Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.285Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -757,8 +806,12 @@
             "status": "partial"
           },
           "exe": {
-            "completed": ".6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。",
-            "remaining": "完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。",
+            "completed": [
+              ".6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。"
+            ],
+            "remaining": [
+              "完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。"
+            ],
             "evidence": [
               "runs/exe-preview6-logout-readback.json",
               "runs/exe-preview6-login-durable-readback.json",
@@ -774,7 +827,79 @@
             "runs/exe-preview6-login-durable-readback.json": "ae11302feeed5aa7df9f53d029091ee662ee374f0ce96d35f9755d926d0d7de2",
             "runs/exe-preview6-relogin-draft.json": "3d3868bfad34a8a01d9c9cd8c3ac4de79676489c95f093aba29252c4ebb6383b"
           }
-        }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Retain previously reviewed precise installed-client/MCP evidence; no new broad baseline pass.",
+          "proofHashes": {
+            "runs/exe-preview6-logout-readback.json": "d07be384982ae36d835be0e36e445d49b8363ca450387c9719b8382d21d4104c",
+            "runs/exe-preview6-login-durable-readback.json": "ae11302feeed5aa7df9f53d029091ee662ee374f0ce96d35f9755d926d0d7de2",
+            "runs/exe-preview6-relogin-draft.json": "3d3868bfad34a8a01d9c9cd8c3ac4de79676489c95f093aba29252c4ebb6383b"
+          },
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "",
+              "evidence": []
+            }
+          },
+          "surfaceProgress": {
+            "exe": {
+              "completed": ".6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。",
+              "remaining": "完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。",
+              "evidence": [
+                "runs/exe-preview6-logout-readback.json",
+                "runs/exe-preview6-login-durable-readback.json",
+                "runs/exe-preview6-relogin-draft.json"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": {
+              "completed": ".6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。",
+              "remaining": "完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。",
+              "evidence": [
+                "runs/exe-preview6-logout-readback.json",
+                "runs/exe-preview6-login-durable-readback.json",
+                "runs/exe-preview6-relogin-draft.json"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：.6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。。仍缺：完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。。",
+            "evidence": [
+              "runs/exe-preview6-logout-readback.json",
+              "runs/exe-preview6-login-durable-readback.json",
+              "runs/exe-preview6-relogin-draft.json"
+            ],
+            "progress": {
+              "completed": [
+                ".6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。"
+              ],
+              "remaining": [
+                "完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。"
+              ],
+              "evidence": [
+                "runs/exe-preview6-logout-readback.json",
+                "runs/exe-preview6-login-durable-readback.json",
+                "runs/exe-preview6-relogin-draft.json"
+              ],
+              "status": "partial"
+            }
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -856,7 +981,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.457Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.277Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -968,7 +1093,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.432Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.253Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1044,7 +1169,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -1245,9 +1370,11 @@
             "runs/exe-preview4-restored-draft.txt",
             "runs/desktop-mcp-resource-preview4.json",
             "runs/exe-fault-independent-api-mcp.json",
-            "runs/exe-preview4-after-fault-draft.txt"
+            "runs/exe-preview4-after-fault-draft.txt",
+            "runs/exe-preview6-relogin-draft.json",
+            "runs/exe-after-preview7-upgrade.json"
           ],
-          "actual": "已实测：.4升级及异常退出后的项目/姓名/文字/图片草稿恢复。仍缺：EXE内A/B快速切换和刻意延迟响应未完成。",
+          "actual": "已实测：.4升级及异常退出后的项目/姓名/文字/图片草稿恢复 .6原生退出重登后同一项目/员工原文字+1图草稿恢复；本序列不含强停。 .7原生更新后同员工/项目/文字+PNG草稿恢复。。仍缺：EXE内A/B快速切换和刻意延迟响应未完成。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -1283,7 +1410,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.458Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.286Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -1304,7 +1431,9 @@
             "status": "partial"
           },
           "exe": {
-            "completed": ".4升级及异常退出后的项目/姓名/文字/图片草稿恢复 .6原生退出重登后同一项目/员工原文字+1图草稿恢复；本序列不含强停。 .7原生更新后同员工/项目/文字+PNG草稿恢复。",
+            "completed": [
+              ".4升级及异常退出后的项目/姓名/文字/图片草稿恢复 .6原生退出重登后同一项目/员工原文字+1图草稿恢复；本序列不含强停。 .7原生更新后同员工/项目/文字+PNG草稿恢复。"
+            ],
             "remaining": [
               "EXE内A/B快速切换和刻意延迟响应未完成"
             ],
@@ -1326,7 +1455,87 @@
           "proofHashes": {
             "runs/exe-preview6-relogin-draft.json": "3d3868bfad34a8a01d9c9cd8c3ac4de79676489c95f093aba29252c4ebb6383b"
           }
-        }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Retain previously reviewed precise installed-client/MCP evidence; no new broad baseline pass.",
+          "proofHashes": {
+            "runs/exe-before-preview4-upgrade.json": "6744fed784105aeaeee7fad598471f5f437049180c77c09b975c4067efd78b0e",
+            "runs/exe-after-preview4-upgrade.json": "765aba31b1966f5b61d6db8e469af7e5c6e1c36c9ca38256901487c8941140f6",
+            "runs/exe-preview4-restored-draft.txt": "2e6f3d81a3d4fb8471fdd8bbeec49ba732906a486c069c898968d54370816abc",
+            "runs/desktop-mcp-resource-preview4.json": "d66e27c1c16c20fa87fc8d41fbe8dd2ee813fcfc635fdc2a89512bf2fc92c224",
+            "runs/exe-fault-independent-api-mcp.json": "e1727e6cb86714713ca8020c3341eacbc3fe2eef32da8c0ed5208a87dccf608e",
+            "runs/exe-preview4-after-fault-draft.txt": "bd6da80a889397688b4c504b9c1eee56a0998c35019c4b06d1e93d8a216af50d",
+            "runs/exe-preview6-relogin-draft.json": "3d3868bfad34a8a01d9c9cd8c3ac4de79676489c95f093aba29252c4ebb6383b",
+            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3"
+          },
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "已实测：.4升级及异常退出后的项目/姓名/文字/图片草稿恢复。仍缺：EXE内A/B快速切换和刻意延迟响应未完成。",
+              "evidence": [
+                "runs/exe-before-preview4-upgrade.json",
+                "runs/exe-after-preview4-upgrade.json",
+                "runs/exe-preview4-restored-draft.txt",
+                "runs/desktop-mcp-resource-preview4.json",
+                "runs/exe-fault-independent-api-mcp.json",
+                "runs/exe-preview4-after-fault-draft.txt"
+              ]
+            }
+          },
+          "surfaceProgress": {
+            "exe": {
+              "completed": ".4升级及异常退出后的项目/姓名/文字/图片草稿恢复 .6原生退出重登后同一项目/员工原文字+1图草稿恢复；本序列不含强停。 .7原生更新后同员工/项目/文字+PNG草稿恢复。",
+              "remaining": [
+                "EXE内A/B快速切换和刻意延迟响应未完成"
+              ],
+              "evidence": [
+                "runs/exe-before-preview4-upgrade.json",
+                "runs/exe-after-preview4-upgrade.json",
+                "runs/exe-preview4-restored-draft.txt",
+                "runs/desktop-mcp-resource-preview4.json",
+                "runs/exe-fault-independent-api-mcp.json",
+                "runs/exe-preview4-after-fault-draft.txt",
+                "runs/exe-preview6-relogin-draft.json",
+                "runs/exe-after-preview7-upgrade.json"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：.4升级及异常退出后的项目/姓名/文字/图片草稿恢复。仍缺：EXE内A/B快速切换和刻意延迟响应未完成。",
+            "evidence": [
+              "runs/exe-before-preview4-upgrade.json",
+              "runs/exe-after-preview4-upgrade.json",
+              "runs/exe-preview4-restored-draft.txt",
+              "runs/desktop-mcp-resource-preview4.json",
+              "runs/exe-fault-independent-api-mcp.json",
+              "runs/exe-preview4-after-fault-draft.txt"
+            ],
+            "progress": {
+              "completed": [
+                ".4升级及异常退出后的项目/姓名/文字/图片草稿恢复"
+              ],
+              "remaining": [
+                "EXE内A/B快速切换和刻意延迟响应未完成"
+              ],
+              "evidence": [
+                "runs/exe-before-preview4-upgrade.json",
+                "runs/exe-after-preview4-upgrade.json",
+                "runs/exe-preview4-restored-draft.txt",
+                "runs/desktop-mcp-resource-preview4.json",
+                "runs/exe-fault-independent-api-mcp.json",
+                "runs/exe-preview4-after-fault-draft.txt"
+              ],
+              "status": "partial"
+            }
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -1399,7 +1608,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1486,7 +1695,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1562,7 +1771,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1635,7 +1844,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.458Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.278Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -1723,7 +1932,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.458Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.278Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -1798,21 +2007,26 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/api-pagination-final.txt"
+            "runs/api-pagination-final.txt",
+            "runs/mcp-delete-live-preview6.json",
+            "runs/exe-preview7-live-protocol.json"
           ],
-          "actual": "已实测：真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过。仍缺：全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。",
+          "actual": "已实测：真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具。仍缺：全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。",
           "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/mcp-delete-live-preview6.json",
+            "runs/exe-preview7-live-protocol.json"
+          ],
+          "actual": "已实测：实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具。仍缺：全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。",
           "note": "Real execution and read-back required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.465Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.286Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -1827,7 +2041,9 @@
             "status": "partial"
           },
           "server_mcp": {
-            "completed": "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具",
+            "completed": [
+              "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具"
+            ],
             "remaining": [
               "全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明"
             ],
@@ -1839,8 +2055,12 @@
             "status": "partial"
           },
           "local_mcp": {
-            "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具",
-            "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+            "completed": [
+              "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具"
+            ],
+            "remaining": [
+              "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。"
+            ],
             "evidence": [
               "runs/mcp-delete-live-preview6.json",
               "runs/exe-preview7-live-protocol.json"
@@ -1853,7 +2073,115 @@
           "proofHashes": {
             "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95"
           }
-        }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Retain previously reviewed precise installed-client/MCP evidence; no new broad baseline pass.",
+          "proofHashes": {
+            "runs/api-pagination-final.txt": "fbf77b168fc4a7181bd8bb7aa35c12cbb751dae03189e7676240ca4fe285355c",
+            "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95",
+            "runs/exe-preview7-live-protocol.json": "cd3bdf38c53ded87e8bcb170daca28ec8fc4096dd4dcc80b7297abd31ceceeee"
+          },
+          "results": {
+            "server_mcp": {
+              "status": "not_run",
+              "actual": "已实测：真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过。仍缺：全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。",
+              "evidence": [
+                "runs/api-pagination-final.txt"
+              ]
+            },
+            "local_mcp": {
+              "status": "not_run",
+              "actual": "",
+              "evidence": []
+            }
+          },
+          "surfaceProgress": {
+            "server_mcp": {
+              "completed": "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具",
+              "remaining": [
+                "全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明"
+              ],
+              "evidence": [
+                "runs/api-pagination-final.txt",
+                "runs/mcp-delete-live-preview6.json",
+                "runs/exe-preview7-live-protocol.json"
+              ],
+              "status": "partial"
+            },
+            "local_mcp": {
+              "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具",
+              "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json",
+                "runs/exe-preview7-live-protocol.json"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "server_mcp",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过。仍缺：全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。",
+            "evidence": [
+              "runs/api-pagination-final.txt"
+            ],
+            "progress": {
+              "completed": [
+                "真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过"
+              ],
+              "remaining": [
+                "全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明"
+              ],
+              "evidence": [
+                "runs/api-pagination-final.txt"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "local_mcp",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": {
+              "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具",
+              "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json",
+                "runs/exe-preview7-live-protocol.json"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "local_mcp",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具。仍缺：全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。",
+            "evidence": [
+              "runs/mcp-delete-live-preview6.json",
+              "runs/exe-preview7-live-protocol.json"
+            ],
+            "progress": {
+              "completed": [
+                "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具"
+              ],
+              "remaining": [
+                "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。"
+              ],
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json",
+                "runs/exe-preview7-live-protocol.json"
+              ],
+              "status": "partial"
+            }
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -1910,31 +2238,43 @@
         "server_mcp": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/mcp-delete-live-preview6.json"
+          ],
+          "actual": "已实测：实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。。仍缺：全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。",
           "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/mcp-delete-live-preview6.json"
+          ],
+          "actual": "已实测：实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。。仍缺：全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。",
           "note": "Real execution and read-back required."
         }
       },
       "manual": {
         "surfaceProgress": {
           "server_mcp": {
-            "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
-            "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+            "completed": [
+              "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。"
+            ],
+            "remaining": [
+              "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。"
+            ],
             "evidence": [
               "runs/mcp-delete-live-preview6.json"
             ],
             "status": "partial"
           },
           "local_mcp": {
-            "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
-            "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+            "completed": [
+              "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。"
+            ],
+            "remaining": [
+              "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。"
+            ],
             "evidence": [
               "runs/mcp-delete-live-preview6.json"
             ],
@@ -1946,7 +2286,119 @@
           "proofHashes": {
             "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95"
           }
-        }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Retain previously reviewed precise installed-client/MCP evidence; no new broad baseline pass.",
+          "proofHashes": {
+            "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95"
+          },
+          "results": {
+            "server_mcp": {
+              "status": "not_run",
+              "actual": "",
+              "evidence": []
+            },
+            "local_mcp": {
+              "status": "not_run",
+              "actual": "",
+              "evidence": []
+            }
+          },
+          "surfaceProgress": {
+            "server_mcp": {
+              "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
+              "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ],
+              "status": "partial"
+            },
+            "local_mcp": {
+              "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
+              "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "server_mcp",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": {
+              "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
+              "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "local_mcp",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "",
+            "evidence": [],
+            "progress": {
+              "completed": "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。",
+              "remaining": "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "server_mcp",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。。仍缺：全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。",
+            "evidence": [
+              "runs/mcp-delete-live-preview6.json"
+            ],
+            "progress": {
+              "completed": [
+                "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。"
+              ],
+              "remaining": [
+                "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。"
+              ],
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "local_mcp",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。。仍缺：全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。",
+            "evidence": [
+              "runs/mcp-delete-live-preview6.json"
+            ],
+            "progress": {
+              "completed": [
+                "实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。"
+              ],
+              "remaining": [
+                "全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。"
+              ],
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.286Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1970,10 +2422,10 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "HTTP 字节下载、服务 MCP 资源、EXE 本地落盘均正确归属且哈希一致。",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [
             "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
@@ -1982,21 +2434,21 @@
             "runs/desktop-mcp-resource-preview4.json"
           ],
           "actual": "已实测：真实MediaProjection PNG在APK提交绑定；同一图片三个读取入口hash一致。仍缺：APK物理设备和更多文件/游戏截图场景未测；MCP调用属于各自MCP入口，未记作APK调用。",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "exe": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "web": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "http": {
           "applicable": true,
@@ -2037,7 +2489,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.287Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2055,7 +2507,114 @@
             ],
             "status": "partial"
           }
-        }
+        },
+        "baselineCriterionReview": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "designText": "HTTP 下载、远端 MCP 资源、本地 MCP 落盘均归属正确且可用",
+          "requiredSurfaces": [
+            "http",
+            "server_mcp",
+            "local_mcp"
+          ],
+          "previousAdditionalSurfaces": [
+            "apk",
+            "exe",
+            "web"
+          ],
+          "reason": "Baseline15 names three read entrances. Additional APK/EXE/Web feature/control rows and section17.3 physical-device acceptance stay independently required; no not_applicable status or feature waiver introduced.",
+          "proofHashes": {
+            "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json": "9555c07a8eb27aa21a487855ae409d8bb96a73f2f9d72c853d63d7f3d8a37266",
+            "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json": "6347f5c46f7fdaa9179712a4b26760c65f70ecf97539ab45a0ae3bfb98a40531",
+            "runs/server-mcp-real-resource-20260909.json": "183e1d27d536eb37c9c0ac28a8a11935a9971a610aa3073c305a9b1cb25eb858",
+            "runs/desktop-mcp-resource-preview4.json": "d66e27c1c16c20fa87fc8d41fbe8dd2ee813fcfc635fdc2a89512bf2fc92c224"
+          }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Verified identical original PNG through the three entrances named by design baseline15; includes prior preview7 local readback.",
+          "proofHashes": {
+            "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json": "9555c07a8eb27aa21a487855ae409d8bb96a73f2f9d72c853d63d7f3d8a37266",
+            "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json": "6347f5c46f7fdaa9179712a4b26760c65f70ecf97539ab45a0ae3bfb98a40531",
+            "runs/server-mcp-real-resource-20260909.json": "183e1d27d536eb37c9c0ac28a8a11935a9971a610aa3073c305a9b1cb25eb858",
+            "runs/desktop-mcp-resource-preview4.json": "d66e27c1c16c20fa87fc8d41fbe8dd2ee813fcfc635fdc2a89512bf2fc92c224",
+            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3"
+          },
+          "results": {
+            "http": {
+              "status": "passed",
+              "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。",
+              "evidence": [
+                "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
+                "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json",
+                "runs/server-mcp-real-resource-20260909.json",
+                "runs/desktop-mcp-resource-preview4.json"
+              ]
+            },
+            "server_mcp": {
+              "status": "passed",
+              "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。",
+              "evidence": [
+                "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
+                "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json",
+                "runs/server-mcp-real-resource-20260909.json",
+                "runs/desktop-mcp-resource-preview4.json"
+              ]
+            },
+            "local_mcp": {
+              "status": "passed",
+              "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。 Installed preview7 qa_materialize_attachment read-back confirms original184872-byte PNG and verified local SHA unchanged.",
+              "evidence": [
+                "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
+                "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json",
+                "runs/server-mcp-real-resource-20260909.json",
+                "runs/desktop-mcp-resource-preview4.json",
+                "runs/exe-after-preview7-upgrade.json"
+              ]
+            }
+          },
+          "surfaceProgress": {}
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "http",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。",
+            "evidence": [
+              "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
+              "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json",
+              "runs/server-mcp-real-resource-20260909.json",
+              "runs/desktop-mcp-resource-preview4.json"
+            ],
+            "progress": null
+          },
+          {
+            "surface": "server_mcp",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。",
+            "evidence": [
+              "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
+              "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json",
+              "runs/server-mcp-real-resource-20260909.json",
+              "runs/desktop-mcp-resource-preview4.json"
+            ],
+            "progress": null
+          },
+          {
+            "surface": "local_mcp",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "同一原生PNG：project fb914b3b-4169-47f8-8dec-76f3a3cc780d / Bug b817a6cc-f096-415d-bdb8-faa9b6005c36 / attachment 31c9b4be-d0f6-4c9a-864e-032cc9130562，184872字节，HTTP下载、服务端resources/read与EXE本地materialize/resources/read SHA-256均为 e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b。HTTP错误项目404；不推定其它MCP负向场景已过。",
+            "evidence": [
+              "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json",
+              "../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json",
+              "runs/server-mcp-real-resource-20260909.json",
+              "runs/desktop-mcp-resource-preview4.json"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -2127,7 +2686,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.457Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.277Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -2215,7 +2774,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.457Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.277Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -2309,7 +2868,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.464Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.284Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2417,7 +2976,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2524,7 +3083,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.280Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2636,7 +3195,7 @@
           "evidence": [
             "migration-rehearsal.md"
           ],
-          "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+          "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
           "note": "Real execution and read-back required."
         },
         "exe": {
@@ -2645,7 +3204,7 @@
           "evidence": [
             "migration-rehearsal.md"
           ],
-          "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+          "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -2654,16 +3213,18 @@
           "evidence": [
             "migration-rehearsal.md"
           ],
-          "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+          "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
           "note": "Real execution and read-back required."
         },
         "http": {
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "migration-rehearsal.md"
+            "migration-rehearsal.md",
+            "migration-service-readback.md",
+            "migration-service-readback.json"
           ],
-          "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+          "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；新的held schema14 API真实26项：旧姓名稳定ID、100 Bug/2评论/1附件3487861字节hash，匿名401/跨项目404/hold409；五组件off、出站0、原身份和核心表保留，正常exit0。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
           "note": "Real execution and read-back required."
         },
         "server_mcp": {
@@ -2672,7 +3233,7 @@
           "evidence": [
             "migration-rehearsal.md"
           ],
-          "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+          "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
           "note": "Real execution and read-back required."
         },
         "local_mcp": {
@@ -2681,20 +3242,20 @@
           "evidence": [
             "migration-rehearsal.md"
           ],
-          "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+          "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
           "note": "Real execution and read-back required."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.287Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
-              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+              "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
             ],
             "remaining": [
-              "本入口未在迁移副本执行完整业务读回",
-              "独立组件目录/未完成外部任务迁移不在该恢复集"
+              "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
             ],
             "evidence": [
               "migration-rehearsal.md"
@@ -2703,11 +3264,11 @@
           },
           "exe": {
             "completed": [
-              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+              "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
             ],
             "remaining": [
-              "本入口未在迁移副本执行完整业务读回",
-              "独立组件目录/未完成外部任务迁移不在该恢复集"
+              "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
             ],
             "evidence": [
               "migration-rehearsal.md"
@@ -2716,11 +3277,11 @@
           },
           "web": {
             "completed": [
-              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+              "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
             ],
             "remaining": [
-              "本入口未在迁移副本执行完整业务读回",
-              "独立组件目录/未完成外部任务迁移不在该恢复集"
+              "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
             ],
             "evidence": [
               "migration-rehearsal.md"
@@ -2729,13 +3290,11 @@
           },
           "http": {
             "completed": [
-              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，原两副本paused",
-              "新第三副本held schema14实际API26项：旧姓名稳定ID登录，100 Bug/2真实评论/1附件3487861字节hash匹配，匿名401/跨项目404/hold409；五组件off、出站0、正常exit0；原身份/核心业务/outbox指纹保留"
+              "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+              "新的held schema14 API真实26项：旧姓名稳定ID、100 Bug/2评论/1附件3487861字节hash，匿名401/跨项目404/hold409；五组件off、出站0、原身份和核心表保留，正常exit0"
             ],
             "remaining": [
-              "迁移后写入和新增数据的完整回退未测；schema12程序未启动",
-              "其它客户端/MCP入口未在迁移副本完成业务组合",
-              "独立组件队列/workspace和未完成外部任务不在该恢复集；归档outbox全sent不能证明pending任务冻结"
+              "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
             ],
             "evidence": [
               "migration-rehearsal.md",
@@ -2746,11 +3305,11 @@
           },
           "server_mcp": {
             "completed": [
-              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+              "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
             ],
             "remaining": [
-              "本入口未在迁移副本执行完整业务读回",
-              "独立组件目录/未完成外部任务迁移不在该恢复集"
+              "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
             ],
             "evidence": [
               "migration-rehearsal.md"
@@ -2759,11 +3318,11 @@
           },
           "local_mcp": {
             "completed": [
-              "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+              "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
             ],
             "remaining": [
-              "本入口未在迁移副本执行完整业务读回",
-              "独立组件目录/未完成外部任务迁移不在该恢复集"
+              "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
             ],
             "evidence": [
               "migration-rehearsal.md"
@@ -2776,7 +3335,288 @@
           "proofHashes": {
             "migration-service-readback.json": "43763e22c79cbdfb78d9ffb072b75334438540a4926107936123fffde00d93b0"
           }
-        }
+        },
+        "baselineCriterionReview": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "designText": "原 Bug、人员 ID、附件、操作历史和未完成任务数量可核对",
+          "removedUnrelatedConditions": [
+            "schema12程序启动",
+            "迁移后新增数据回退"
+          ],
+          "remainingScope": "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对",
+          "scopeNote": "Client readback evidence remains separately scoped. Baseline21 still not_run because unfinished legacy filesystem tasks are not accounted for; fingerprints alone cannot establish their counts."
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Correct baseline21 to its migration/count requirement and actual26 HTTP reads; legacy filesystem task inventory remains missing.",
+          "proofHashes": {
+            "migration-rehearsal.md": "d77d7953269ccea07f53c6b13c8b63145c5a437a8e3519280975913bae627878",
+            "migration-service-readback.md": "78f276b7ac286bd9e2cd418872a9908e37a89af5dd2a1dd5af494f5a1cff60a6",
+            "migration-service-readback.json": "43763e22c79cbdfb78d9ffb072b75334438540a4926107936123fffde00d93b0"
+          },
+          "results": {
+            "apk": {
+              "status": "not_run",
+              "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
+              "evidence": [
+                "migration-rehearsal.md"
+              ]
+            },
+            "exe": {
+              "status": "not_run",
+              "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
+              "evidence": [
+                "migration-rehearsal.md"
+              ]
+            },
+            "web": {
+              "status": "not_run",
+              "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
+              "evidence": [
+                "migration-rehearsal.md"
+              ]
+            },
+            "http": {
+              "status": "not_run",
+              "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；新的held schema14 API真实26项：旧姓名稳定ID、100 Bug/2评论/1附件3487861字节hash，匿名401/跨项目404/hold409；五组件off、出站0、原身份和核心表保留，正常exit0。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
+              "evidence": [
+                "migration-rehearsal.md",
+                "migration-service-readback.md",
+                "migration-service-readback.json"
+              ]
+            },
+            "server_mcp": {
+              "status": "not_run",
+              "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
+              "evidence": [
+                "migration-rehearsal.md"
+              ]
+            },
+            "local_mcp": {
+              "status": "not_run",
+              "actual": "已实测：主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺：legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。",
+              "evidence": [
+                "migration-rehearsal.md"
+              ]
+            }
+          },
+          "surfaceProgress": {
+            "apk": {
+              "completed": [
+                "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+                "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
+              ],
+              "remaining": [
+                "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            },
+            "exe": {
+              "completed": [
+                "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+                "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
+              ],
+              "remaining": [
+                "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            },
+            "web": {
+              "completed": [
+                "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+                "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
+              ],
+              "remaining": [
+                "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            },
+            "http": {
+              "completed": [
+                "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+                "新的held schema14 API真实26项：旧姓名稳定ID、100 Bug/2评论/1附件3487861字节hash，匿名401/跨项目404/hold409；五组件off、出站0、原身份和核心表保留，正常exit0"
+              ],
+              "remaining": [
+                "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
+              ],
+              "evidence": [
+                "migration-rehearsal.md",
+                "migration-service-readback.md",
+                "migration-service-readback.json"
+              ],
+              "status": "partial"
+            },
+            "server_mcp": {
+              "completed": [
+                "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+                "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
+              ],
+              "remaining": [
+                "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            },
+            "local_mcp": {
+              "completed": [
+                "主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变",
+                "上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称"
+              ],
+              "remaining": [
+                "legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "apk",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+            "evidence": [
+              "migration-rehearsal.md"
+            ],
+            "progress": {
+              "completed": [
+                "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              ],
+              "remaining": [
+                "本入口未在迁移副本执行完整业务读回",
+                "独立组件目录/未完成外部任务迁移不在该恢复集"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+            "evidence": [
+              "migration-rehearsal.md"
+            ],
+            "progress": {
+              "completed": [
+                "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              ],
+              "remaining": [
+                "本入口未在迁移副本执行完整业务读回",
+                "独立组件目录/未完成外部任务迁移不在该恢复集"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "web",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+            "evidence": [
+              "migration-rehearsal.md"
+            ],
+            "progress": {
+              "completed": [
+                "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              ],
+              "remaining": [
+                "本入口未在迁移副本执行完整业务读回",
+                "独立组件目录/未完成外部任务迁移不在该恢复集"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "http",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+            "evidence": [
+              "migration-rehearsal.md"
+            ],
+            "progress": {
+              "completed": [
+                "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              ],
+              "remaining": [
+                "本入口未在迁移副本执行完整业务读回",
+                "独立组件目录/未完成外部任务迁移不在该恢复集"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "server_mcp",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+            "evidence": [
+              "migration-rehearsal.md"
+            ],
+            "progress": {
+              "completed": [
+                "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              ],
+              "remaining": [
+                "本入口未在迁移副本执行完整业务读回",
+                "独立组件目录/未完成外部任务迁移不在该恢复集"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            }
+          },
+          {
+            "surface": "local_mcp",
+            "status": "not_run",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "已实测：离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺：本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。",
+            "evidence": [
+              "migration-rehearsal.md"
+            ],
+            "progress": {
+              "completed": [
+                "离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused"
+              ],
+              "remaining": [
+                "本入口未在迁移副本执行完整业务读回",
+                "独立组件目录/未完成外部任务迁移不在该恢复集"
+              ],
+              "evidence": [
+                "migration-rehearsal.md"
+              ],
+              "status": "partial"
+            }
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -2851,7 +3691,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2953,7 +3793,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.288Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -2961,7 +3801,67 @@
           "releaseId": "20260908T194425490Z",
           "sourceCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
           "sourceDirty": false
-        }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Retain previously reviewed precise installed-client/MCP evidence; no new broad baseline pass.",
+          "proofHashes": {
+            "runs/exe-before-preview4-upgrade.json": "6744fed784105aeaeee7fad598471f5f437049180c77c09b975c4067efd78b0e",
+            "runs/exe-after-preview4-upgrade.json": "765aba31b1966f5b61d6db8e469af7e5c6e1c36c9ca38256901487c8941140f6",
+            "runs/exe-preview4-restored-draft.txt": "2e6f3d81a3d4fb8471fdd8bbeec49ba732906a486c069c898968d54370816abc",
+            "runs/desktop-mcp-resource-preview4.json": "d66e27c1c16c20fa87fc8d41fbe8dd2ee813fcfc635fdc2a89512bf2fc92c224",
+            "runs/exe-fault-independent-api-mcp.json": "e1727e6cb86714713ca8020c3341eacbc3fe2eef32da8c0ed5208a87dccf608e",
+            "runs/exe-preview4-after-fault-draft.txt": "bd6da80a889397688b4c504b9c1eee56a0998c35019c4b06d1e93d8a216af50d",
+            "runs/exe-after-preview5-upgrade.json": "2d2559b638163ce2fd6f29143ee0a755a956f1b100cd385ac001f9552ad17b35",
+            "runs/exe-preview5-restored-draft.txt": "f4d925946a4140736733c0d82603c378d66fb0f4d9211b10c0e6a4815a1bbd3b",
+            "runs/exe-after-preview6-upgrade.json": "228c0ce86e23673348734abfb38d1ad03f59620a473422f5f5fa9708d7891c7e",
+            "runs/exe-preview6-restored-draft.txt": "071a9789cd88c9a3db54a95d48971aba24ae0fce15dfd698c90c7b0c38e2bcc1",
+            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
+            "runs/production-after-preview7.json": "a9ab607a81bed5817336aa75ce0172dd47c0a8000e5b716664441f0c34701658"
+          },
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "真实独立EXE .4/.5/.6升级成功；.6原生恢复同一项目/人员/配置hash及文字+1图，五份旧安装backup保留，.5更新回执按原hash归档。此前历史截图本地读取和日常共存已实测。旧helper时间字段仍误将本地标为Z，使用proof.observedAt；.6新helper后续调用尚未据此证明。手工回退另列24部分实测及剩余缺口。 Actual native6→7 upgrade from clean sourceCommit3b1371c: installed0.2.0.7 PID11368, same identity/project/config/draft+PNG, original closed/v14/comment/attachment hash, retained prior update results and7 backups; successful helper UTC falls within observed upgrade interval.",
+              "evidence": [
+                "runs/exe-before-preview4-upgrade.json",
+                "runs/exe-after-preview4-upgrade.json",
+                "runs/exe-preview4-restored-draft.txt",
+                "runs/desktop-mcp-resource-preview4.json",
+                "runs/exe-fault-independent-api-mcp.json",
+                "runs/exe-preview4-after-fault-draft.txt",
+                "runs/exe-after-preview5-upgrade.json",
+                "runs/exe-preview5-restored-draft.txt",
+                "runs/exe-after-preview6-upgrade.json",
+                "runs/exe-preview6-restored-draft.txt",
+                "runs/exe-after-preview7-upgrade.json",
+                "runs/production-after-preview7.json"
+              ]
+            }
+          },
+          "surfaceProgress": {}
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required.",
+            "actual": "真实独立EXE .4/.5/.6升级成功；.6原生恢复同一项目/人员/配置hash及文字+1图，五份旧安装backup保留，.5更新回执按原hash归档。此前历史截图本地读取和日常共存已实测。旧helper时间字段仍误将本地标为Z，使用proof.observedAt；.6新helper后续调用尚未据此证明。手工回退另列24部分实测及剩余缺口。",
+            "evidence": [
+              "runs/exe-before-preview4-upgrade.json",
+              "runs/exe-after-preview4-upgrade.json",
+              "runs/exe-preview4-restored-draft.txt",
+              "runs/desktop-mcp-resource-preview4.json",
+              "runs/exe-fault-independent-api-mcp.json",
+              "runs/exe-preview4-after-fault-draft.txt",
+              "runs/exe-after-preview5-upgrade.json",
+              "runs/exe-preview5-restored-draft.txt",
+              "runs/exe-after-preview6-upgrade.json",
+              "runs/exe-preview6-restored-draft.txt"
+            ],
+            "progress": null
+          }
+        ]
       },
       "needsRevalidation": false,
       "generated": true
@@ -3041,7 +3941,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.461Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
         "surfaceProgress": {}
       },
       "needsRevalidation": false,
@@ -3596,7 +4496,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.243Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -3684,7 +4584,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4310,7 +5210,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4396,7 +5296,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4485,7 +5385,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4574,7 +5474,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4667,7 +5567,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4758,7 +5658,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4845,7 +5745,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -4933,7 +5833,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.423Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5019,7 +5919,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -5188,7 +6088,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.244Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -7200,7 +8100,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -7284,7 +8184,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -7768,7 +8668,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -7850,7 +8750,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -8892,7 +9792,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -9208,7 +10108,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -9835,7 +10735,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -10853,7 +11753,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -10944,7 +11844,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -11116,7 +12016,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -11204,7 +12104,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -11312,7 +12212,7 @@
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
       "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": false,
@@ -11368,7 +12268,54 @@
           "proofHashes": {
             "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95"
           }
-        }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Actual independent server/local MCP delete and same-request replay proof retained.",
+          "proofHashes": {
+            "runs/mcp-delete-live-preview6.json": "4f091ff8d609550cd73d986f2b0014bf876164056480b64816b331a449c3bb95"
+          },
+          "results": {
+            "server_mcp": {
+              "status": "passed",
+              "actual": "Actual server MCP 4421 default qa_delete_bug on its independent Bug; same request replays with identical deletedAt, context NOT_FOUND, original record and actor/version audit retained.",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ]
+            },
+            "local_mcp": {
+              "status": "passed",
+              "actual": "Actual installed EXE preview.6 local MCP 4420 default qa_delete_bug on its independent Bug; same request replays with identical deletedAt, context NOT_FOUND, original record and actor/version audit retained.",
+              "evidence": [
+                "runs/mcp-delete-live-preview6.json"
+              ]
+            }
+          },
+          "surfaceProgress": {}
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "server_mcp",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "Actual server MCP 4421 default qa_delete_bug on its independent Bug; same request replays with identical deletedAt, context NOT_FOUND, original record and actor/version audit retained.",
+            "evidence": [
+              "runs/mcp-delete-live-preview6.json"
+            ],
+            "progress": null
+          },
+          {
+            "surface": "local_mcp",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "Actual installed EXE preview.6 local MCP 4420 default qa_delete_bug on its independent Bug; same request replays with identical deletedAt, context NOT_FOUND, original record and actor/version audit retained.",
+            "evidence": [
+              "runs/mcp-delete-live-preview6.json"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.288Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -11477,7 +12424,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -11565,7 +12512,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -11653,7 +12600,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.424Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.245Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12042,7 +12989,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12525,7 +13472,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -22741,7 +23688,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -23588,7 +24535,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.427Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -23754,7 +24701,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.427Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -23924,7 +24871,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.427Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24010,7 +24957,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.427Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24096,7 +25043,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.427Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24503,7 +25450,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.428Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24594,7 +25541,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.428Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24679,7 +25626,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.428Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.248Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24765,7 +25712,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24851,7 +25798,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25013,7 +25960,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.428Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.249Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -26200,7 +27147,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.428Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.249Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -26283,7 +27230,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.428Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.249Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -28674,7 +29621,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.461Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -28850,7 +29797,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.461Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -28951,7 +29898,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.461Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -29127,7 +30074,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.461Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.281Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -30448,8 +31395,10 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/exe-preview7-close-restore.json"
+          ],
+          "actual": "已实测：实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -30481,7 +31430,106 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "branchResults": {
+          "trusted-renderer-close": {
+            "status": "passed",
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "actual": "实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。"
+          }
+        },
+        "surfaceProgress": {
+          "exe": {
+            "completed": [
+              "实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。"
+            ],
+            "remaining": [
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+            ],
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "status": "partial"
+          }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Native preview7 actual button or exact handler branch; no tray icon, restart or force-stop inferred.",
+          "proofHashes": {
+            "runs/exe-preview7-close-restore.json": "c761ed95be90df650254fa8811733ddc38edcd960ff9d4768ece0b12420e93a9"
+          },
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。",
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ]
+            }
+          },
+          "surfaceProgress": {
+            "exe": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ],
+              "completed": [
+                "实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。",
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "progress": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ],
+              "completed": [
+                "实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "progress": {
+              "completed": [
+                "实际可信原生渲染器window-action(close)隐藏窗口且同进程MCP仍可读；其它window action和不可信sender拒绝分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ],
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -31199,8 +32247,10 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/exe-after-preview7-upgrade.json"
+          ],
+          "actual": "已实测：实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -31232,7 +32282,106 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "branchResults": {
+          "trusted-renderer-check-success": {
+            "status": "passed",
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "actual": "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。"
+          }
+        },
+        "surfaceProgress": {
+          "exe": {
+            "completed": [
+              "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。"
+            ],
+            "remaining": [
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+            ],
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "status": "partial"
+          }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Native preview7 actual button or exact handler branch; no tray icon, restart or force-stop inferred.",
+          "proofHashes": {
+            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3"
+          },
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。",
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ]
+            }
+          },
+          "surfaceProgress": {
+            "exe": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ],
+              "completed": [
+                "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。",
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "progress": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ],
+              "completed": [
+                "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "progress": {
+              "completed": [
+                "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ],
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -31273,8 +32422,10 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/exe-after-preview7-upgrade.json"
+          ],
+          "actual": "已实测：实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -31306,7 +32457,106 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "branchResults": {
+          "trusted-renderer-install-success": {
+            "status": "passed",
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "actual": "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。"
+          }
+        },
+        "surfaceProgress": {
+          "exe": {
+            "completed": [
+              "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。"
+            ],
+            "remaining": [
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+            ],
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "status": "partial"
+          }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Native preview7 actual button or exact handler branch; no tray icon, restart or force-stop inferred.",
+          "proofHashes": {
+            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3"
+          },
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。",
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ]
+            }
+          },
+          "surfaceProgress": {
+            "exe": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ],
+              "completed": [
+                "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。",
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "progress": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ],
+              "completed": [
+                "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json"
+            ],
+            "progress": {
+              "completed": [
+                "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ],
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -31644,8 +32894,10 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "runs/exe-preview7-close-restore.json"
+          ],
+          "actual": "已实测：第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -31677,7 +32929,106 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "branchResults": {
+          "second-instance-no-deeplink": {
+            "status": "passed",
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "actual": "第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。"
+          }
+        },
+        "surfaceProgress": {
+          "exe": {
+            "completed": [
+              "第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。"
+            ],
+            "remaining": [
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+            ],
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "status": "partial"
+          }
+        },
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Native preview7 actual button or exact handler branch; no tray icon, restart or force-stop inferred.",
+          "proofHashes": {
+            "runs/exe-preview7-close-restore.json": "c761ed95be90df650254fa8811733ddc38edcd960ff9d4768ece0b12420e93a9"
+          },
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。",
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ]
+            }
+          },
+          "surfaceProgress": {
+            "exe": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ],
+              "completed": [
+                "第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。",
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "progress": {
+              "status": "partial",
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ],
+              "completed": [
+                "第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ]
+            }
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+            "evidence": [
+              "runs/exe-preview7-close-restore.json"
+            ],
+            "progress": {
+              "completed": [
+                "第二次启动精确已安装EXE后恢复同PID11368/同启动时点/window2165104/同员工草稿+PNG；未携带深链参数，系统托盘图标未点击。"
+              ],
+              "remaining": [
+                "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
+              ],
+              "evidence": [
+                "runs/exe-preview7-close-restore.json"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+      },
       "needsRevalidation": true,
       "generated": true
     },
@@ -31988,7 +33339,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -33174,7 +34525,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -34210,7 +35561,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -34294,7 +35645,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -34457,7 +35808,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35404,7 +36755,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35488,7 +36839,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35570,7 +36921,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35971,7 +37322,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36370,7 +37721,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36533,7 +37884,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.460Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.280Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37620,7 +38971,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37783,7 +39134,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.459Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.279Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -41357,9 +42708,13 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/exe-after-preview7-upgrade.json",
+            "runs/exe-preview7-update-ready.txt",
+            "runs/exe-preview7-restored-draft.txt"
+          ],
+          "actual": "实际当前状态面板点击检查更新和ready状态安装并重启，.6→.7 installed且恢复身份/草稿/配置/原附件hash；不推定错误状态或托盘菜单按钮。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -41391,7 +42746,44 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Native preview7 actual button or exact handler branch; no tray icon, restart or force-stop inferred.",
+          "proofHashes": {
+            "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
+            "runs/exe-preview7-update-ready.txt": "f16ca439cae5a845d734e19c6065f093a286cbd158dd5122efce3456f8550420",
+            "runs/exe-preview7-restored-draft.txt": "af5191709506db0df820a143dc41ed69a0f46c065c1d82ca271ae8d178f323ef"
+          },
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "实际当前状态面板点击检查更新和ready状态安装并重启，.6→.7 installed且恢复身份/草稿/配置/原附件hash；不推定错误状态或托盘菜单按钮。",
+              "evidence": [
+                "runs/exe-after-preview7-upgrade.json",
+                "runs/exe-preview7-update-ready.txt",
+                "runs/exe-preview7-restored-draft.txt"
+              ]
+            }
+          },
+          "surfaceProgress": {}
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "实际当前状态面板点击检查更新和ready状态安装并重启，.6→.7 installed且恢复身份/草稿/配置/原附件hash；不推定错误状态或托盘菜单按钮。",
+            "evidence": [
+              "runs/exe-after-preview7-upgrade.json",
+              "runs/exe-preview7-update-ready.txt",
+              "runs/exe-preview7-restored-draft.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -41896,9 +43288,12 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "runs/exe-preview7-close-restore.json",
+            "runs/exe-preview7-tray-restored.txt"
+          ],
+          "actual": "安装版.7实际点击关闭窗口按钮；窗口隐藏，本地MCP仍读原closed Bug。仅close按钮，不包含系统tray icon、进程restart或force-stop。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -41930,7 +43325,41 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "reviewedEvidence": {
+          "at": "2026-09-08T20:09:46.367Z",
+          "reason": "Native preview7 actual button or exact handler branch; no tray icon, restart or force-stop inferred.",
+          "proofHashes": {
+            "runs/exe-preview7-close-restore.json": "c761ed95be90df650254fa8811733ddc38edcd960ff9d4768ece0b12420e93a9",
+            "runs/exe-preview7-tray-restored.txt": "58ad53337958a6f7b867fb98d9e86243b87a99fbf9d66101ac48866a3a166ecf"
+          },
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "安装版.7实际点击关闭窗口按钮；窗口隐藏，本地MCP仍读原closed Bug。仅close按钮，不包含系统tray icon、进程restart或force-stop。",
+              "evidence": [
+                "runs/exe-preview7-close-restore.json",
+                "runs/exe-preview7-tray-restored.txt"
+              ]
+            }
+          },
+          "surfaceProgress": {}
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "安装版.7实际点击关闭窗口按钮；窗口隐藏，本地MCP仍读原closed Bug。仅close按钮，不包含系统tray icon、进程restart或force-stop。",
+            "evidence": [
+              "runs/exe-preview7-close-restore.json",
+              "runs/exe-preview7-tray-restored.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "evidenceMappedAt": "2026-09-08T20:15:36.289Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -42392,7 +43821,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -42472,7 +43901,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -51217,7 +52646,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51304,7 +52733,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51391,7 +52820,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51478,7 +52907,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51563,7 +52992,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51728,7 +53157,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51815,7 +53244,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51902,7 +53331,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51989,7 +53418,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52074,7 +53503,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52161,7 +53590,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52412,7 +53841,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52499,7 +53928,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52586,7 +54015,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52671,7 +54100,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52758,7 +54187,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.430Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.251Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -57159,7 +58588,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -57310,7 +58739,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -57388,7 +58817,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -57466,7 +58895,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -59948,7 +61377,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -61486,7 +62915,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -62148,7 +63577,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -63759,7 +65188,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -63837,7 +65266,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -63915,7 +65344,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65162,7 +66591,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65241,7 +66670,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65320,7 +66749,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65545,7 +66974,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65624,7 +67053,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65848,7 +67277,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65999,7 +67428,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -66078,7 +67507,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -66229,7 +67658,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.434Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -67105,7 +68534,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -68004,7 +69433,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.456Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -68180,7 +69609,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.456Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -68284,7 +69713,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.456Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -68604,7 +70033,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.456Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -68708,7 +70137,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.456Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.276Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": [
@@ -68962,7 +70391,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.436Z"
+        "evidenceMappedAt": "2026-09-08T20:15:36.257Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -70250,7 +71679,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.255Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -71690,7 +73119,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -71781,7 +73210,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -72653,7 +74082,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -73880,7 +75309,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -74184,7 +75613,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T19:18:16.435Z",
+        "evidenceMappedAt": "2026-09-08T20:15:36.256Z",
         "surfaceProgress": {
           "apk": {
             "completed": [

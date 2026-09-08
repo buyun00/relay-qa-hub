@@ -1,6 +1,6 @@
 # QA Hub 项目制与组件化真实验收矩阵
 
-生成时点：2026-09-08T19:56:26.341Z；设计 v2.1；源码 HEAD：`3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789`。
+生成时点：2026-09-08T20:15:38.228Z；设计 v2.1；源码 HEAD：`3f66932e11c42f60aa660028b490a3ac0dea310d`。
 
 本文件是代码和需求的验收清单，初始全部为 `not_run`。代码存在、静态推导、mock、编译成功、端口监听或排队成功均不算通过。逐入口真实操作并读回项目、操作人、状态、版本、事件、附件及最终产物后，才登记结果。
 
@@ -26,7 +26,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | 12 服务端 MCP 独立使用 | — | — | — | — | A · not_run | — | 不依赖 EXE；远端真实连接并完成主要 Bug 全部动作。 |
 | 13 HTTP/MCP 对等 | — | — | — | A · not_run | A · not_run | A · not_run | 等价输入得到一致状态、版本、操作人、幂等结果和错误。 |
 | 14 并发和重复提交 | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | 旧 expectedVersion 被拒；同幂等键不重复创建轮次或外部任务。 |
-| 15 附件三种读取 | A · not_run | A · not_run | A · not_run | A · passed | A · passed | A · passed | HTTP 字节下载、服务 MCP 资源、EXE 本地落盘均正确归属且哈希一致。 |
+| 15 附件三种读取 | — | — | — | A · passed | A · passed | A · passed | HTTP 字节下载、服务 MCP 资源、EXE 本地落盘均正确归属且哈希一致。 |
 | 16 项目组件开关 | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A 开启不影响 B；关闭后旧 HTTP/MCP/后台请求不能创建新任务。 |
 | 17 组件依赖和缺配置 | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | 单次打包上传依赖清楚；缺连接显示待配置，不拖累 Bug 页面。 |
 | 18 运行中停用组件 | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | 排队任务暂停、运行任务按规则收尾；历史产物保留；重启用不自动重放。 |
@@ -67,7 +67,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 - **external-relay** (unverified): Dedicated Relay project/workspace/test task, callback mapping and available independent executor.
 - **external-qingyu** (unverified): Dedicated third-party test identity/project/order; no genuine work order mutation.
 - **physical-android** (unverified): Physical device for appropriate capture/file/upgrade acceptance plus separate preview applicationId and test upgrade environment.
-- **historical-copy** (unverified): Pinned, fully validated consistent SQLite+attachment recovery set restored only into isolated data roots; imported queues/outbox paused.
+- **historical-copy** (partially_verified): The pinned main SQLite and 878 attachments have been restored, migrated and read through a held API. Still required: explicit unfinished-task inventory and recovery evidence for legacy increment-upload queue/owner/workspace/job files, Relay batch/state directories and third-party state outside that recovery set.
 
 ## 静态盘点边界与运行补全
 
@@ -637,7 +637,7 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | mcp_tool-e115fd03bfb2f6 | qa_get_bug_context | server_mcp, local_mcp | apps/api/src/automation.ts:105 | passed · revalidation required |
 | mcp_tool-74ebfb8a36a39b | qa_create_bug | server_mcp, local_mcp | apps/api/src/automation.ts:106 | passed · revalidation required |
 | mcp_tool-6a5abbcebe63f8 | qa_update_bug | server_mcp, local_mcp | apps/api/src/automation.ts:107 | not_run · revalidation required |
-| mcp_tool-65cae97a9470db | qa_delete_bug | server_mcp, local_mcp | apps/api/src/automation.ts:113 | not_run · revalidation required |
+| mcp_tool-65cae97a9470db | qa_delete_bug | server_mcp, local_mcp | apps/api/src/automation.ts:113 | passed · revalidation required |
 | mcp_tool-5f4e4082b53976 | qa_bug_action | server_mcp, local_mcp | apps/api/src/automation.ts:114 | passed · revalidation required |
 | mcp_tool-a483a7b73025b9 | qa_add_comment | server_mcp, local_mcp | apps/api/src/automation.ts:120 | passed · revalidation required |
 | mcp_tool-c55b38696c3ed8 | qa_list_comments | server_mcp, local_mcp | apps/api/src/automation.ts:121 | passed · revalidation required |

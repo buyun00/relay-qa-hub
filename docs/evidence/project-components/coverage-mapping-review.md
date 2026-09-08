@@ -1,6 +1,6 @@
 # 实测证据映射审查
 
-生成时点：2026-09-08T19:18:16.465Z。只读已有证据，没有操作 UI、API 或生产。
+生成时点：2026-09-08T20:15:36.289Z。只读已有证据，没有操作 UI、API 或生产。
 
 `passed` 只代表该行明确注明的实际入口与输入。细目控件/路由通过不代表全部负向分支或上层基线通过；HTTP 15项、MCP 13项不称全部动作。未使用源码存在、共享实现、编译、单元或外部合同 fixture 代替真实外部执行。
 
@@ -22,7 +22,7 @@
 | 12 服务端 MCP 独立使用 | — | — | — | — | not_run（部分实测） | — |
 | 13 HTTP/MCP 对等 | — | — | — | not_run（部分实测） | not_run（部分实测） | not_run（部分实测） |
 | 14 并发和重复提交 | not_run | not_run | not_run | not_run | not_run（部分实测） | not_run（部分实测） |
-| 15 附件三种读取 | not_run（部分实测） | not_run | not_run | passed | passed | passed |
+| 15 附件三种读取 | — | — | — | passed | passed | passed |
 | 16 项目组件开关 | not_run | not_run | not_run | not_run（部分实测） | not_run | not_run |
 | 17 组件依赖和缺配置 | not_run | not_run | not_run | not_run（部分实测） | not_run | not_run |
 | 18 运行中停用组件 | not_run（部分实测） | not_run | not_run（部分实测） | not_run | not_run | not_run |
@@ -33,11 +33,12 @@
 | 23 EXE 共存与升级 | — | passed | — | — | — | — |
 | 24 回退演练 | not_run | passed | not_run | not_run | not_run | not_run |
 
-09 已按六个各自真实入口分别闭环；23 已按原生EXE .4/.5/.6/.7升级和恢复proof判通过。22保持未测：MuMu共存、ADB升级与code21三个保留hash只是部分实测，物理Android与应用内更新链路缺失。15的HTTP、服务MCP和本地MCP分别有同一PNG字节/hash证据，不将资源读取传递为所有客户端整项通过。
+09按六个实际入口分别闭环；15严格按设计列出的HTTP下载、远端MCP资源、本地MCP落盘三个入口判定，三者有同一PNG归属和hash证据。其它APK/EXE/Web控件仍各自验收，不因该基线通过而通过。23已有实际EXE升级恢复proof。22仍缺物理Android及适用的设备取证、文件和升级验证。
 
 ## 部分实测及剩余缺口
 
 - 01 项目入口姓名登录 / APK：已测 实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表。仍缺 尚未逐一核对该基线完整首登/原历史姓名/有效成员目录组合；物理Android设备未测。
+- 01 项目入口姓名登录 / EXE：已测 .6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。。仍缺 完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。。
 - 01 项目入口姓名登录 / server MCP：已测 实际项目姓名登录与项目目录、后续操作人读回。仍缺 完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖。
 - 01 项目入口姓名登录 / local MCP：已测 实际项目姓名登录与项目目录、后续操作人读回。仍缺 完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖。
 - 02 单项目和多项目人员 / APK：已测 实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表。仍缺 尚未逐一核对该基线完整首登/原历史姓名/有效成员目录组合；物理Android设备未测。
@@ -45,11 +46,14 @@
 - 02 单项目和多项目人员 / local MCP：已测 实际列出当前员工所属项目。仍缺 单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。
 - 04 项目人员停用 / APK：已测 A 内原生停用/恢复及HTTP同名登录403/200已核对。仍缺 未在这次原生人员操作中验证同一人的 B 项目继续可用；物理设备未测。
 - 07 项目快速切换 / APK：已测 A/B文字与图片草稿实际分离；20→21升级恢复原项目/身份/文字/未提交PNG且三个本地hash一致。仍缺 未刻意制造迟到网络响应；未覆盖全部编辑/组件/文件草稿与人员选择。
-- 07 项目快速切换 / EXE：已测 .4升级及异常退出后的项目/姓名/文字/图片草稿恢复。仍缺 EXE内A/B快速切换和刻意延迟响应未完成。
+- 07 项目快速切换 / EXE：已测 .4升级及异常退出后的项目/姓名/文字/图片草稿恢复 .6原生退出重登后同一项目/员工原文字+1图草稿恢复；本序列不含强停。 .7原生更新后同员工/项目/文字+PNG草稿恢复。。仍缺 EXE内A/B快速切换和刻意延迟响应未完成。
 - 11 HTTP API 独立使用 / HTTP API：已测 预览EXE和4420退出时，独立HTTP实际15项含登录/创建/查询/跨项目拒绝继续成功。仍缺 停EXE窗口内没有通过HTTP独立完成评论及全部主要状态动作，不能用MCP调用替代HTTP入口。
 - 12 服务端 MCP 独立使用 / server MCP：已测 预览EXE/本地MCP退出时服务MCP13项仍完成真实创建、评论、人工完成和验收关闭。仍缺 编辑、删除、退回/重开等其余主要Bug动作及完整负向场景未在该独立窗口逐一覆盖。
 - 13 HTTP/MCP 对等 / HTTP API：已测 真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过。仍缺 全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。
-- 13 HTTP/MCP 对等 / server MCP：已测 真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过。仍缺 全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。
+- 13 HTTP/MCP 对等 / server MCP：已测 真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具。仍缺 全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。
+- 13 HTTP/MCP 对等 / local MCP：已测 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具。仍缺 全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。
+- 14 并发和重复提交 / server MCP：已测 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。。仍缺 全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。
+- 14 并发和重复提交 / local MCP：已测 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。。仍缺 全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。
 - 15 附件三种读取 / APK：已测 真实MediaProjection PNG在APK提交绑定；同一图片三个读取入口hash一致。仍缺 APK物理设备和更多文件/游戏截图场景未测；MCP调用属于各自MCP入口，未记作APK调用。
 - 16 项目组件开关 / HTTP API：已测 A配置开关不影响B；依赖级联关闭；普通员工禁止组件配置。仍缺 旧HTTP/MCP和后台创建任务的全组合禁止仍只部分fixture覆盖，没有真实外部任务验证。
 - 17 组件依赖和缺配置 / HTTP API：已测 缺配置为needs_configuration；single依赖检查和级联关闭；基础人工闭环可用。仍缺 所有客户端可见配置引导及实际独立外部资源尚未全面验证。
@@ -62,12 +66,12 @@
 - 20 外部失败与人工处理 / HTTP API：已测 本地合同fixture已验证实现的部分失败处理，作为背景证据；不算本入口外部失败实测。仍缺 真实独立Jenkins/上传/Relay/轻语失败时的完整客户端人工处理未执行。
 - 20 外部失败与人工处理 / server MCP：已测 本地合同fixture已验证实现的部分失败处理，作为背景证据；不算本入口外部失败实测。仍缺 真实独立Jenkins/上传/Relay/轻语失败时的完整客户端人工处理未执行。
 - 20 外部失败与人工处理 / local MCP：已测 本地合同fixture已验证实现的部分失败处理，作为背景证据；不算本入口外部失败实测。仍缺 真实独立Jenkins/上传/Relay/轻语失败时的完整客户端人工处理未执行。
-- 21 旧数据副本迁移 / APK：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
-- 21 旧数据副本迁移 / EXE：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
-- 21 旧数据副本迁移 / Web：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
-- 21 旧数据副本迁移 / HTTP API：已测 离线schema12→14及独立schema12回退副本；新增held第三副本真实API26项，100 Bug/2评论/1附件3487861字节hash匹配、匿名401/跨项目404/hold409、出站0、正常退出0。仍缺 迁移后的写入/完整数据回退与客户端组合；schema12程序未启动，独立组件目录/未完成外部任务不在该恢复集。
-- 21 旧数据副本迁移 / server MCP：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
-- 21 旧数据副本迁移 / local MCP：已测 离线schema12→14及独立schema12回退副本，878附件/58业务表指纹匹配，两副本paused。仍缺 本入口未在迁移副本执行完整业务读回；独立组件目录/未完成外部任务迁移不在该恢复集。
+- 21 旧数据副本迁移 / APK：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺 legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。
+- 21 旧数据副本迁移 / EXE：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺 legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。
+- 21 旧数据副本迁移 / Web：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺 legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。
+- 21 旧数据副本迁移 / HTTP API：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；新的held schema14 API真实26项：旧姓名稳定ID、100 Bug/2评论/1附件3487861字节hash，匿名401/跨项目404/hold409；五组件off、出站0、原身份和核心表保留，正常exit0。仍缺 legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。
+- 21 旧数据副本迁移 / server MCP：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺 legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。
+- 21 旧数据副本迁移 / local MCP：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称。仍缺 legacy increment-upload独立queue.sqlite及owner/workspace/job文件、Relay批次/state目录、轻语状态均未纳入RPO，缺少这些文件系统未完成任务的完整数量/状态/项目映射清单及迁移前后核对。
 - 22 APK 共存与升级 / APK：已测 MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留。仍缺 物理Android设备必测仍缺；应用内更新源/自安装链路未测。
 
 独立 Jenkins、上传平台/对象存储、Relay 目的实例和轻语测试租户/凭据仍缺；所有 `external_full_chain` 保持 not_run。离线迁移的数据库/附件指纹证明没有替代各入口执行。异常停止预览 EXE 证明进程独立和草稿恢复，不能自动记为完整版本回退。
@@ -85,7 +89,7 @@
 
 最新API完整回归为MJS151+TS33=184/184，旧175轮次保留。生命周期9项覆盖真实监听、SQLite与inflight清理，修复的是绑定前调度/异常清理，旧runtime已有onReady/onClose；不得据此通过外部完整链路。[184原始日志](runs/api-final-lifecycle-source.txt)、[生命周期证据](component-runtime-lifecycle.md)。
 
-本次仅将源码qa_delete_bug行 mcp_tool-65cae97a9470db 的server_mcp/local_mcp记通过；required_mcp_parity同名需求行仍not_run，不重复算全部对等。基线01/07的EXE与13/14的两MCP只补部分实测，09/23仍是仅有wholepass。
+本次仅将源码qa_delete_bug行 mcp_tool-65cae97a9470db 的server_mcp/local_mcp记通过；required_mcp_parity同名需求行仍not_run，不重复算全部对等。基线01/07的EXE与13/14的两MCP只补部分实测，经基线15判据校准后，09/15/23是当前wholepass。
 
 mapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual保留机制，审计元数据位于evidenceMapping.postFreezeSupplement，各行manual.postFreezeEvidence亦保留必要proof hash。只运行既有generate-coverage-matrix.mjs重生JSON/Markdown，不重写mapper代码。未来重跑旧mapper会刷新其自动审查段，需保留本补充段；人工行结果由既有matching-ID机制保留。
 
@@ -99,15 +103,31 @@ mapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual�
 
 该服务使用19:24:26Z冻结的独立编译样本，其已有onReady/onClose并由paused gate阻止调度；它不代替后续监听生命周期9项测试。此结果证明held schema14 API恢复读取，**未证明schema12程序启动、迁移后新增数据的完整回退、生产切换、客户端迁移或独立组件队列/workspace恢复**。归档2021条outbox原本全sent，也不单独证明pending任务冻结。前两次错误测试路由导致的harness失败已保留，不计成功。
 
-矩阵仍保留985条，仅基线21的HTTP progress补入实际服务读回，不将其它客户端/MCP入口传递通过；21和24整项保持not_run。仅09/23整项通过，严格旧合同失败、外部完整链路及物理Android缺口均保留。公开receipt摘要与hash记录于evidenceMapping.releaseAndMigrationSupplement，原始receipt仍位于独立runtime。mapper源码保持冻结。
+矩阵仍保留985条，仅基线21的HTTP progress补入实际服务读回，不将其它客户端/MCP入口传递通过；21和24整项保持not_run。仅09/15/23整项通过，严格旧合同失败、外部完整链路及物理Android缺口均保留。公开receipt摘要与hash记录于evidenceMapping.releaseAndMigrationSupplement，原始receipt仍位于独立runtime。该段发布证据形成时mapper源码保持冻结；本轮仅追加proof保留与基线判据校正。
+## 基线判据及窄分支校正
+
+设计13原文：“相同输入得到相同状态、版本、操作人和错误结果”。设计15原文：“HTTP 下载、远端 MCP 资源、本地 MCP 落盘均归属正确且可用”。15现在只按这三读取入口汇总，APK/EXE/Web其它功能控件保持各自状态，未增加not_applicable状态或豁免17.3物理设备要求。
+
+重新核对同一项目fb914b3b-4169-47f8-8dec-76f3a3cc780d、Bug b817a6cc-f096-415d-bdb8-faa9b6005c36、附件31c9b4be-d0f6-4c9a-864e-032cc9130562：184872字节PNG，三种读取SHA-256同为e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b；HTTP跨项目404。三份主要入口proof是[HTTP](../../../apps/android/app/build/evidence/project-components/preview-code17-capture-isolation-readback.json)、[远端MCP](runs/server-mcp-real-resource-20260909.json)、[本地落盘](runs/desktop-mcp-resource-preview4.json)，绑定ID来自原[采集读回](../../../apps/android/app/build/evidence/project-components/preview-code17-capture-bug-readback.json)。
+
+21仅移除无关的schema12程序启动/新增数据回退条件；26项held服务读回同时写入HTTP actual/evidence和manual。主库与878附件恢复集已经可用，historical-copy改为partially_verified；仍缺legacy上传独立queue.sqlite/owner/workspace/job、Relay批次/state和轻语状态的未完成任务完整清单及迁移核对。故21整项仍not_run，不能从58表指纹或2021sent主outbox推出这些目录已迁移。
+
+.7真实close和更新按钮仅EXE入口passed；window-action(close)、check-update成功、install-update成功和second-instance无深链恢复记录为manual.branchResults中的passed，复合handler整行仍not_run。tray.click/double-click及托盘菜单没有此证据，仍not_run。
+
+可重放纠正由manual.reviewedEvidence保存结果、progress和实际proof SHA；mapper在重放前逐一核对hash，变化即拒绝并要求重审。它不是新的业务通过来源，也不会取消needsRevalidation。
+## 本轮重放验证与合同边界
+
+生成器→mapper→生成器重放后985细目不变，wholepass为09、15、23；401个既有needsRevalidation以及sourceHash/人工复验字段的规范化SHA保持相同。实际运行mapper的内存文件系统替身用错误proof SHA验证拒绝且零写入；另一个用例证明后来的failed结果、负向note、partial note、item/manual复验标记和sourceHash均保留。原始磁盘证据未改。[实际重放验证](runs/coverage-criteria-replay.json)。
+
+严格合同评估已补充：五个继承字段使冻结canonical漂移；仅删除schema定义会让当前真实DTO违反additionalProperties:false，不能靠重写baseline或豁免解决。尚未确认可运行的严格旧响应投影入口，兼容修复没有实施，严格门禁仍failed。[修复边界评估](contracts-remediation-assessment.md)。
 
 ## 可重放与审计
 
 - Desktop 104/104：已有成功输出，见[runs/desktop-final-pagination-protocol.txt](runs/desktop-final-pagination-protocol.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - Storage 109/109：已有成功输出，见[runs/storage-final.txt](runs/storage-final.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - 冻结源码最终Storage109/109：已有成功输出，见[runs/storage-final-complete-source.txt](runs/storage-final-complete-source.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
-- 先前冻结源码API MJS142/142（历史）：已有成功输出，见[runs/api-final-complete-source.txt](runs/api-final-complete-source.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
-- 先前冻结源码API TS33/33（两组共175/175，历史）：已有成功输出，见[runs/api-final-complete-source.txt](runs/api-final-complete-source.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
+- 冻结源码最终API MJS142/142：已有成功输出，见[runs/api-final-complete-source.txt](runs/api-final-complete-source.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
+- 冻结源码最终API TS33/33（两组共175/175）：已有成功输出，见[runs/api-final-complete-source.txt](runs/api-final-complete-source.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - 真实临时HTTP/SQLite与MCP分页/协议15/15，501评论/101附件：已有成功输出，见[runs/api-pagination-final.txt](runs/api-pagination-final.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - root unit 4/4：已有成功输出，见[runs/root-unit-final-retry.txt](runs/root-unit-final-retry.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
 - skeleton 1/1：已有成功输出，见[runs/skeleton-e2e-final-retry.txt](runs/skeleton-e2e-final-retry.txt)。local verification; does not mark unexecuted native UI/external baseline passed。
@@ -120,10 +140,10 @@ mapper源保持冻结。本次新增结果及SHA使用既有JSON results/manual�
 - .6 native helper以故意无效空配置实际返回failed并验证UTC序列化：已有成功输出，见[runs/native-updater-utc.json](runs/native-updater-utc.json)。预期失败仅验证UTC；没有调用installer，不计更新成功。
 - Web61/61+typecheck/lint/build；outbox真实临时API/SQLite、外部请求0：已有成功输出，见[runs/web-outbox-verification.json](runs/web-outbox-verification.json)。React静态渲染及隔离API实测；浏览器暂停条目点击未测。
 
-严格旧合同冻结基线仍failed（workflow canonical drift在起点HEAD已存在）；三项独立合同成功不抵消该失败。EXE.6升级/回退/重复升级/卸载后精确包重装已有真实proof，24仅EXE入口passed，完整数据服务/APK仍缺，不标wholepassed。.5原生Bug闭环/编辑/评论/删除按发生版本记录，不推定.6全部操作已测。NSIS6项仅guard，UTC用例故意failed且未调用installer，均不推定干净用户完整首装或额外更新成功。.7已从干净实施提交3b1371c完成发包，实际6→7原生升级和恢复proof通过；它补入23的EXE证据，不扩大24服务/APK回退范围。
+严格旧合同冻结基线失败与三项独立合同成功分别保留；后续修复须独立证据。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。
 
 依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。
 
 映射器对 JSON proof 读取记录 SHA-256（UTF-8 文本原文），见 coverage-matrix.json 的 evidenceMapping.proofHashes；正文、原生 UI tree 和截图从证据字段追溯。缺少 optional proof 时不新增通过。所有凭据均不参与读取和输出。
 
-当前细目计数：985。全部入口均满足而整行 passed 的基线：09 关闭所有组件的基础全流程、23 EXE 共存与升级。其余基线不能称整体完成。
+当前细目计数：985。全部入口均满足而整行 passed 的基线：09 关闭所有组件的基础全流程、15 附件三种读取、23 EXE 共存与升级。其余基线不能称整体完成。

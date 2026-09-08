@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T20:05:42.931Z",
+  "head": "3f66932e11c42f60aa660028b490a3ac0dea310d",
+  "taskStart": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+  "scope": "Read-only source/Git analysis and in-memory schema/DTO validation. Only these new assessment evidence documents are written; no source/checker/baseline/service changes.",
+  "inheritance": {
+    "contractsDiffBytesSinceTaskStart": 0,
+    "factories": [
+      {
+        "name": "toAttempt",
+        "unchangedSinceTaskStart": true
+      },
+      {
+        "name": "toVerification",
+        "unchangedSinceTaskStart": true
+      }
+    ],
+    "originalDriftCommit": "abd3a861e9ab52839f4dc45e3e5db6a2dad6459e",
+    "priorEvidence": "docs/evidence/project-components/contracts-baseline-audit.json"
+  },
+  "currentFrozenAudit": {
+    "filesChecked": 24,
+    "drifts": [
+      {
+        "file": "schemas/workflow.schema.json",
+        "expected": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+        "actual": "38330d9691930409d4ac12c5384a51379748fb99c63df98e51c1ccbc02032b3c"
+      }
+    ]
+  },
+  "canonicalWhatIf": {
+    "removedProperties": [
+      {
+        "definition": "repairAttempt",
+        "property": "patchUrl"
+      },
+      {
+        "definition": "repairAttempt",
+        "property": "noCodeReason"
+      },
+      {
+        "definition": "repairAttempt",
+        "property": "failureReason"
+      },
+      {
+        "definition": "verification",
+        "property": "failureReason"
+      },
+      {
+        "definition": "verification",
+        "property": "blockedReason"
+      }
+    ],
+    "currentWorkflowCanonicalSha256": "38330d9691930409d4ac12c5384a51379748fb99c63df98e51c1ccbc02032b3c",
+    "restoredInMemoryCanonicalSha256": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+    "untouchedFrozenExpectedSha256": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+    "matchesFrozen": true,
+    "filesChanged": false
+  },
+  "appFirstValidatorWhatIf": {
+    "originalScript": "packages/contracts/versions/1.1.0/scripts/validate-contracts.mjs",
+    "virtualWorkflowReads": 3,
+    "exitCode": 0,
+    "observedOutput": [
+      "App-first contract check passed: 9 frozen base schemas + 1 versioned schema, 51 payload scenarios, 12 inherited + 133 new behavior scenarios, 35 base + 19 new OpenAPI operations, 26 error codes."
+    ],
+    "readOnly": true,
+    "httpResolverDisabledInOriginalScript": true
+  },
+  "actualDtoValidation": [
+    {
+      "definition": "repairAttempt",
+      "factory": "toAttempt",
+      "constructedFromActualTranspiledStorageFunction": true,
+      "inputWasSynthetic": true,
+      "currentSchemaAccepted": true,
+      "restoredFrozenSchemaAccepted": false,
+      "errors": [
+        {
+          "keyword": "additionalProperties",
+          "property": "patchUrl"
+        },
+        {
+          "keyword": "additionalProperties",
+          "property": "noCodeReason"
+        },
+        {
+          "keyword": "additionalProperties",
+          "property": "failureReason"
+        }
+      ]
+    },
+    {
+      "definition": "verification",
+      "factory": "toVerification",
+      "constructedFromActualTranspiledStorageFunction": true,
+      "inputWasSynthetic": true,
+      "currentSchemaAccepted": true,
+      "restoredFrozenSchemaAccepted": false,
+      "errors": [
+        {
+          "keyword": "additionalProperties",
+          "property": "failureReason"
+        },
+        {
+          "keyword": "additionalProperties",
+          "property": "blockedReason"
+        }
+      ]
+    }
+  ],
+  "declaredRepresentations": [
+    {
+      "operationId": "createRepairAttempt",
+      "method": "POST",
+      "contractPath": "/bugs/{bugId}/repair-attempts",
+      "status": "201",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      }
+    },
+    {
+      "operationId": "startRepairAttempt",
+      "method": "POST",
+      "contractPath": "/repair-attempts/{attemptId}/start",
+      "status": "200",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      }
+    },
+    {
+      "operationId": "deliverRepairAttempt",
+      "method": "POST",
+      "contractPath": "/repair-attempts/{attemptId}/deliver",
+      "status": "200",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      }
+    },
+    {
+      "operationId": "failRepairAttempt",
+      "method": "POST",
+      "contractPath": "/repair-attempts/{attemptId}/fail",
+      "status": "200",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      }
+    },
+    {
+      "operationId": "supersedeRepairAttempt",
+      "method": "POST",
+      "contractPath": "/repair-attempts/{attemptId}/supersede",
+      "status": "200",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/repairAttempt"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/repairAttempt"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../schemas/app-first.schema.json#/$defs/supersedeRepairAttemptResponse"
+        }
+      }
+    },
+    {
+      "operationId": "createVerification",
+      "method": "POST",
+      "contractPath": "/bugs/{bugId}/verifications",
+      "status": "201",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/verification"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/verification"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/verification"
+        }
+      }
+    },
+    {
+      "operationId": "startVerification",
+      "method": "POST",
+      "contractPath": "/verifications/{verificationId}/start",
+      "status": "200",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/verification"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/verification"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/verification"
+        }
+      }
+    },
+    {
+      "operationId": "recordVerificationResult",
+      "method": "POST",
+      "contractPath": "/verifications/{verificationId}/result",
+      "status": "200",
+      "baseContent": {
+        "application/json": {
+          "schemaRef": "../schemas/workflow.schema.json#/$defs/verificationResultResponse"
+        }
+      },
+      "appFirstContent": {
+        "application/json": {
+          "schemaRef": "../../../schemas/workflow.schema.json#/$defs/verificationResultResponse"
+        },
+        "application/vnd.relay-qa-hub.v1.1+json": {
+          "schemaRef": "../schemas/app-first.schema.json#/$defs/recordVerificationResultResponse"
+        }
+      }
+    }
+  ],
+  "representationAssessment": {
+    "baseServers": [
+      {
+        "url": "/api/v1",
+        "description": "Same-origin QA Hub API"
+      }
+    ],
+    "contractPromise": "Frozen OpenAPI declares application/json for these existing operations; the 1.1 OpenAPI retains it and adds vendor media.",
+    "observedImplementation": "Reviewed Verification create/start/result handlers set MOBILE_API_CONTENT_TYPE (v1.1 vendor media) directly and send storage result; no Accept-dependent legacy projection was found in those handlers.",
+    "implementedFrozenLegacyProjection": "not identified in reviewed handlers; not claimed to exist",
+    "richFieldsFutureRepresentation": "unresolved; no new endpoint or version is invented or approved by this assessment",
+    "wireCompatibleFixClaimed": false
+  },
+  "sourceRefs": [
+    {
+      "file": "packages/contracts/schemas/workflow.schema.json",
+      "line": 160,
+      "sha256": "2d98abb912c745ae34f85ddc7252bcffe480e9905a58595840507990789716f3"
+    },
+    {
+      "file": "packages/contracts/schemas/workflow.schema.json",
+      "line": 181,
+      "sha256": "2d98abb912c745ae34f85ddc7252bcffe480e9905a58595840507990789716f3"
+    },
+    {
+      "file": "packages/contracts/schemas/workflow.schema.json",
+      "line": 193,
+      "sha256": "2d98abb912c745ae34f85ddc7252bcffe480e9905a58595840507990789716f3"
+    },
+    {
+      "file": "packages/contracts/scripts/check-breaking.mjs",
+      "line": 85,
+      "sha256": "30140c4d540a0ddc915593cbba2c283355c3f06029db577faa570b67e813e9bc"
+    },
+    {
+      "file": "packages/contracts/versions/1.1.0/README.md",
+      "line": 11,
+      "sha256": "b9d29477f1240797efa5a36d0da794865c44a4c35220d21ab4dda4237cb297cc"
+    },
+    {
+      "file": "packages/contracts/versions/1.1.0/schemas/app-first.schema.json",
+      "line": 858,
+      "sha256": "86c8737d9a73fda8e819da142554e3103889e35cd3226cd88b868f91c1287f08"
+    },
+    {
+      "file": "packages/storage/src/mobile-verification-store.ts",
+      "line": 297,
+      "sha256": "44b0c9da2f4bf11adb518b3b37d0cbcc21c1394ca69719bac34db5ea551a9c25"
+    },
+    {
+      "file": "packages/storage/src/mobile-verification-store.ts",
+      "line": 313,
+      "sha256": "44b0c9da2f4bf11adb518b3b37d0cbcc21c1394ca69719bac34db5ea551a9c25"
+    },
+    {
+      "file": "apps/api/src/app.ts",
+      "line": 2283,
+      "sha256": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6"
+    },
+    {
+      "file": "apps/api/src/app.ts",
+      "line": 2338,
+      "sha256": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6"
+    },
+    {
+      "file": "apps/api/src/app.ts",
+      "line": 2371,
+      "sha256": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6"
+    },
+    {
+      "file": "apps/api/src/mobile-bugs.ts",
+      "line": 1,
+      "sha256": "3491ce7023e64f7dba4629e51679a52bd7f3ee362beaba58b44a8c389e0cc020"
+    }
+  ],
+  "sourceHashes": {
+    "packages/contracts/schemas/workflow.schema.json": "2d98abb912c745ae34f85ddc7252bcffe480e9905a58595840507990789716f3",
+    "packages/contracts/baselines/contract-baseline.json": "05ac95cc39e349b4ab92481858df132ab6ce9b6a5a474485663e68ac040fc8f9",
+    "packages/contracts/scripts/check-breaking.mjs": "30140c4d540a0ddc915593cbba2c283355c3f06029db577faa570b67e813e9bc",
+    "packages/contracts/src/api-manifest.json": "5bf4c40873d7e27365bb4f65b0bf4f9b0f977b8ac6a0128c70708db3125908c2",
+    "packages/contracts/openapi/openapi.json": "1f5e3ba1e782d9ac4b95157c1dabcb5b54583241b2d40f6f936490fc95af2d94",
+    "packages/contracts/versions/1.1.0/baselines/contract-baseline-1.1.0.json": "b439a9acc4b608cf32a1daf116caad78641a5af33d703703975185208db20f88",
+    "packages/contracts/versions/1.1.0/README.md": "b9d29477f1240797efa5a36d0da794865c44a4c35220d21ab4dda4237cb297cc",
+    "packages/contracts/versions/1.1.0/src/api-manifest.json": "240ac2ab4b0b7880d10c9e9ce8d62d22867a331bf74314e9f7a78c67f4fe20f6",
+    "packages/contracts/versions/1.1.0/schemas/app-first.schema.json": "86c8737d9a73fda8e819da142554e3103889e35cd3226cd88b868f91c1287f08",
+    "packages/contracts/versions/1.1.0/scripts/validate-contracts.mjs": "4559cfee2ef5b1284f27361d914098676c03220aeaf6f59eb84ca70acf4b03b4",
+    "packages/contracts/versions/1.1.0/scripts/check-breaking.mjs": "57199ca81ae28c0f1eda175ce78ef9a6ad76215bb3b06180ae7e42f293e9113a",
+    "packages/storage/src/mobile-verification-store.ts": "44b0c9da2f4bf11adb518b3b37d0cbcc21c1394ca69719bac34db5ea551a9c25",
+    "apps/api/src/app.ts": "f9de4db8af9a480b32bb3520c2bd4bdaa329bc2038d43db8d0a99339add07ee6",
+    "apps/api/src/mobile-bugs.ts": "3491ce7023e64f7dba4629e51679a52bd7f3ee362beaba58b44a8c389e0cc020",
+    "apps/api/src/mobile-verification.ts": "f77069f2e45e4690c50f16a42f64418cec7125f20620861799c0405fccf0d022",
+    "packages/contracts/versions/1.1.0/openapi/openapi.json": "75a2d7c91ba26b67cad9a3b17a08bd3b0568a27a5e8a7aa1b854825832461714"
+  },
+  "sourceUnchangedDuringAssessment": true,
+  "recommendation": {
+    "boundedArtifactRepair": "Restore only the five drifted response-property definitions to frozen 1.0 content; keep baseline/checker unchanged. This alone repairs the frozen artifact, not actual response compatibility.",
+    "completeCompatibilityWork": "Decide the rich-field representation boundary, retain internal records, apply strict projection to frozen response representations, and test actual route responses against the original frozen schemas. Any richer public representation needs an explicit contract decision without altering frozen baselines."
+  }
+}

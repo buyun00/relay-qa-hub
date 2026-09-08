@@ -1094,7 +1094,52 @@ for (const surface of ["http", "server_mcp"]) {
       ["全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明"],
     );
 }
+// Reviewed, proof-bound corrections survive reruns of older automatic mappings.
+// These are public evidence records, never authority to skip an untested feature.
+for (const item of matrix.items) {
+  const reviewed = item.manual.reviewedEvidence;
+  if (!reviewed) continue;
+  const hashes = Object.entries(reviewed.proofHashes ?? {});
+  if (!hashes.length) throw new Error(`Reviewed evidence has no proof hashes: ${item.id}`);
+  for (const [file, expected] of hashes) {
+    proofText(file);
+    if (proofHashes[file] !== expected)
+      throw new Error(`Reviewed evidence changed; re-review required: ${item.id} / ${file}`);
+  }
+  for (const [surface, result] of Object.entries(reviewed.results ?? {})) {
+    const prior = item.results[surface];
+    if (prior?.status === "failed" && result.status !== "failed") continue;
+    if (prior?.note || item.manual.surfaceProgress?.[surface]) {
+      const retained = {
+        surface,
+        status: prior?.status,
+        note: prior?.note,
+        actual: prior?.actual,
+        evidence: prior?.evidence,
+        progress: item.manual.surfaceProgress?.[surface] ?? null,
+      };
+      item.manual.retainedReviewNotes ??= [];
+      if (
+        !item.manual.retainedReviewNotes.some(
+          (entry) => JSON.stringify(entry) === JSON.stringify(retained),
+        )
+      )
+        item.manual.retainedReviewNotes.push(retained);
+    }
+    record(item, surface, result.status, result.evidence, result.actual);
+  }
+  for (const [surface, entry] of Object.entries(reviewed.surfaceProgress ?? {}))
+    if (item.results[surface]?.status !== "failed")
+      progress(
+        item,
+        surface,
+        entry.evidence,
+        [].concat(entry.completed ?? []),
+        [].concat(entry.remaining ?? []),
+      );
+}
 matrix.evidenceMapping = {
+  ...matrix.evidenceMapping,
   at: new Date().toISOString(),
   scope:
     "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
@@ -1132,7 +1177,7 @@ const review = [
         `| ${item.title} | ${surfaces.map((surface) => (!item.results[surface].applicable ? "—" : item.results[surface].status + (item.manual.surfaceProgress?.[surface] ? "（部分实测）" : ""))).join(" | ")} |`,
     ),
   "",
-  "09 已按六个各自真实入口分别闭环；23 已按原生EXE .4/.5/.6升级和恢复proof判通过。22保持未测：MuMu共存、ADB升级与code21三个保留hash只是部分实测，物理Android与应用内更新链路缺失。15的HTTP、服务MCP和本地MCP分别有同一PNG字节/hash证据，不将资源读取传递为所有客户端整项通过。",
+  "09按六个实际入口分别闭环；15严格按设计列出的HTTP下载、远端MCP资源、本地MCP落盘三个入口判定，三者有同一PNG归属和hash证据。其它APK/EXE/Web控件仍各自验收，不因该基线通过而通过。23已有实际EXE升级恢复proof。22仍缺物理Android及适用的设备取证、文件和升级验证。",
   "",
   "## 部分实测及剩余缺口",
   "",
@@ -1143,12 +1188,14 @@ const review = [
         .filter((surface) => item.manual.surfaceProgress?.[surface])
         .map((surface) => {
           const entry = item.manual.surfaceProgress[surface];
-          return `- ${item.title} / ${matrix.surfaces[surface]}：已测 ${entry.completed.join("；")}。仍缺 ${entry.remaining.join("；")}。`;
+          return `- ${item.title} / ${matrix.surfaces[surface]}：已测 ${[].concat(entry.completed ?? []).join("；")}。仍缺 ${[].concat(entry.remaining ?? []).join("；")}。`;
         }),
     ),
   "",
   "独立 Jenkins、上传平台/对象存储、Relay 目的实例和轻语测试租户/凭据仍缺；所有 `external_full_chain` 保持 not_run。离线迁移的数据库/附件指纹证明没有替代各入口执行。异常停止预览 EXE 证明进程独立和草稿恢复，不能自动记为完整版本回退。",
   "已安装EXE的90工具共享目录与源码保留的18工具fallback目录分别统计；同名工具调用只通过共享目录对应行，fallback行保留未测，避免重复计数。",
+  "",
+  ...(matrix.evidenceMapping.reviewedSupplementSections ?? []),
   "",
   "## 可重放与审计",
   "",
@@ -1157,7 +1204,7 @@ const review = [
       `- ${entry.summary}：${entry.matched ? "已有成功输出" : "输出需复核"}，见[${entry.file}](${entry.file})。${entry.scope}。`,
   ),
   "",
-  "严格旧合同冻结基线仍failed（workflow canonical drift在起点HEAD已存在）；三项独立合同成功不抵消该失败。EXE.6升级/回退/重复升级/卸载后精确包重装已有真实proof，24仅EXE入口passed，完整数据服务/APK仍缺，不标wholepassed。.5原生Bug闭环/编辑/评论/删除按发生版本记录，不推定.6全部操作已测。NSIS6项仅guard，UTC用例故意failed且未调用installer，均不推定干净用户完整首装或额外更新成功。.7仅计划，不提前映射。",
+  "严格旧合同冻结基线失败与三项独立合同成功分别保留；后续修复须独立证据。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。",
   "",
   "依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。",
   "",
