@@ -36,6 +36,7 @@ test("archive failure preserves local backups, startup and the next backup attem
         enabled: true,
         onStart: true,
         intervalMs: 50,
+        retentionEnabled: true,
         backupRoot,
         evidenceRoot,
         archiveRoot,

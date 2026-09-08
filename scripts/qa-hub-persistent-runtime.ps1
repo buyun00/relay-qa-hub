@@ -102,12 +102,14 @@ function Initialize-QAHubPersistentRuntime {
   $env:QA_HUB_BACKUP_INTERVAL_MINUTES = [string]$script:QAHubBackupIntervalMinutes
   $env:QA_HUB_BACKUP_ARCHIVE_ENABLED = "true"
   $env:QA_HUB_BACKUP_ARCHIVE_ROOT = $canonicalArchiveRoot
+  $env:QA_HUB_BACKUP_RETENTION_ENABLED = "true"
 
   foreach ($entry in @{
     persistentDataRoot = $canonicalDataRoot
     backupRoot = $canonicalBackupRoot
     backupArchiveRoot = $canonicalArchiveRoot
     backupIntervalMinutes = $script:QAHubBackupIntervalMinutes
+    backupRetentionPolicy = "latest-two-and-09-shanghai"
     peopleConfigFile = $peopleConfigFile
     peopleConfigSha256 = $peopleConfigSha256
     peopleConfigArchiveFile = $peopleConfigArchiveFile

@@ -9,6 +9,7 @@ import {
 } from "@relay-qa-hub/storage";
 
 import { archiveRecoveryPointOffThread } from "./backup-archive-worker-client.js";
+import { nextBackupDelay } from "./backup-retention.js";
 
 const MINIMUM_BACKUP_INTERVAL_MINUTES = 15;
 const MAXIMUM_BACKUP_INTERVAL_MINUTES = 7 * 24 * 60;
@@ -34,6 +35,7 @@ export type ApiBackupRunnerConfig =
       archiveRoot?: string;
       onStart: boolean;
       intervalMs?: number;
+      retentionEnabled?: boolean;
     }>;
 
 export interface ApiBackupEnvironmentOptions {
@@ -275,6 +277,13 @@ export function parseApiBackupEnvironment(
     environment["QA_HUB_BACKUP_ARCHIVE_ENABLED"],
     "QA_HUB_BACKUP_ARCHIVE_ENABLED",
   );
+  const retentionEnabled = parseBoolean(
+    environment["QA_HUB_BACKUP_RETENTION_ENABLED"],
+    "QA_HUB_BACKUP_RETENTION_ENABLED",
+  );
+  if (retentionEnabled && (!archiveEnabled || intervalMs === undefined)) {
+    throw new ApiBackupConfigurationError("Backup retention requires off-disk archive and cadence");
+  }
   if (!onStart && intervalMs === undefined) {
     if (archiveEnabled) {
       throw new ApiBackupConfigurationError(
@@ -351,6 +360,7 @@ export function parseApiBackupEnvironment(
     ...(archiveRoot === undefined ? {} : { archiveRoot }),
     onStart,
     ...(intervalMs === undefined ? {} : { intervalMs }),
+    ...(retentionEnabled ? { retentionEnabled } : {}),
   });
 }
 
@@ -383,6 +393,7 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
   let activeBackup: Promise<SqliteOnlineBackupResult> | undefined;
   let started = false;
   let stopped = false;
+  let latestCreatedAtMs = 0;
 
   const archiveRecoveryPoint = async (recoveryPoint: {
     readonly backupPath: string;
@@ -394,6 +405,7 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
       manifestPath: recoveryPoint.manifestPath,
       evidenceRoot: config.evidenceRoot,
       archiveRoot: config.archiveRoot,
+      ...(config.retentionEnabled ? { retentionBackupRoot: config.backupRoot } : {}),
     }).catch((error: unknown) => {
       const code = (error as { code?: unknown })?.code;
       if (typeof code !== "string" || !code.startsWith("SQLITE_ARCHIVE_")) throw error;
@@ -412,6 +424,15 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
       return undefined;
     });
     if (archived === undefined) return;
+    if (archived.retention !== undefined) {
+      options.logger.info({ ...archived.retention }, "Relay QA Hub backup retention completed");
+    }
+    if (archived.retentionError !== undefined) {
+      options.logger.error(
+        { errorMessage: archived.retentionError },
+        "Relay QA Hub backup retention failed; backups retained",
+      );
+    }
     options.logger.info(
       {
         disposition: archived.disposition,
@@ -436,9 +457,13 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
     const rpoRoot = ensureSafeRpoRoot(config.backupRoot);
     if (stopped) return undefined;
     const targetPath = backupTargetPath(rpoRoot, createdAt, operationId());
+    // A failed attempt still advances the retry clock; a failure at the daily
+    // boundary must not create a one-millisecond retry loop.
+    latestCreatedAtMs = Date.parse(createdAt);
     const current = options.worker
       .createOnlineBackup({ targetPath, createdAt })
       .then(async (result) => {
+        latestCreatedAtMs = Date.parse(result.manifest.createdAt);
         await archiveRecoveryPoint(result);
         return result;
       });
@@ -464,6 +489,8 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
 
   const scheduleNextBackup = (delayMs: number): void => {
     if (stopped || config.intervalMs === undefined) return;
+    if (config.retentionEnabled)
+      delayMs = nextBackupDelay(delayMs, now().getTime(), latestCreatedAtMs);
     timer = setTimeout(() => {
       timer = undefined;
       if (stopped) return;
@@ -472,6 +499,7 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
           if (result !== undefined) recordSuccess(result);
         })
         .catch((error: unknown) => {
+          latestCreatedAtMs = now().getTime();
           options.logger.error({ error }, "Relay QA Hub scheduled online backup failed");
         })
         .finally(() => {
@@ -501,6 +529,7 @@ export function createApiBackupRunner(options: CreateApiBackupRunnerOptions): Ap
           throw new ApiBackupConfigurationError("backup runner clock returned an invalid time");
         }
         const latest = findLatestRecoveryPoint(ensureSafeRpoRoot(config.backupRoot), currentTimeMs);
+        latestCreatedAtMs = latest?.createdAtMs ?? 0;
         const ageMs =
           latest === undefined
             ? config.intervalMs

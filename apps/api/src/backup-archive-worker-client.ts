@@ -4,8 +4,15 @@ import type {
   ArchiveSqliteRecoveryPointWithAttachmentsOptions,
   SqliteRecoveryPointWithAttachmentsResult,
 } from "@relay-qa-hub/storage";
+import type { BackupRetentionResult } from "./backup-retention.js";
 
-export type BackupArchiveWorkerData = ArchiveSqliteRecoveryPointWithAttachmentsOptions;
+export type BackupArchiveWorkerData = ArchiveSqliteRecoveryPointWithAttachmentsOptions & {
+  readonly retentionBackupRoot?: string;
+};
+export type BackupArchiveWorkerResult = SqliteRecoveryPointWithAttachmentsResult & {
+  readonly retention?: BackupRetentionResult;
+  readonly retentionError?: string;
+};
 
 interface SerializedWorkerError {
   readonly name: string;
@@ -15,7 +22,7 @@ interface SerializedWorkerError {
 }
 
 export type BackupArchiveWorkerMessage =
-  | Readonly<{ ok: true; result: SqliteRecoveryPointWithAttachmentsResult }>
+  | Readonly<{ ok: true; result: BackupArchiveWorkerResult }>
   | Readonly<{ ok: false; error: SerializedWorkerError }>;
 
 interface BackupArchiveWorkerLaunchOptions {
@@ -59,7 +66,7 @@ function deserializeWorkerError(serialized: SerializedWorkerError): Error {
 export function archiveRecoveryPointOffThread(
   input: BackupArchiveWorkerData,
   launchOptions: BackupArchiveWorkerLaunchOptions = {},
-): Promise<SqliteRecoveryPointWithAttachmentsResult> {
+): Promise<BackupArchiveWorkerResult> {
   const worker = new Worker(launchOptions.workerUrl ?? defaultWorkerUrl(), { workerData: input });
 
   return new Promise((resolve, reject) => {
