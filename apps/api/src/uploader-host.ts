@@ -12,7 +12,7 @@ import type {
   UploadSourceIdentity,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "095352393e09e526b23b255398737798e93381879f9163ffbc6a2ed2b992d0fe";
+export const UPLOADER_SHA256 = "370bd5e8a81ff6d99886c8cbb40edb274b5e5359cd1c67535eaf3d6e1c3e828f";
 export const UPLOAD_SOURCE =
   "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
 const API_BASE = "https://fq2ivi.ipwana.com";
@@ -304,7 +304,7 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.4.0",
+      toolVersion: "0.4.1",
       sourceUrl: UPLOAD_SOURCE,
       configured: !!auth,
       authError,

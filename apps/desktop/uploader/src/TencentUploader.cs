@@ -2,6 +2,7 @@ using COSXML;
 using COSXML.Auth;
 using COSXML.Model.Object;
 using System.Text.Json.Nodes;
+using System.Diagnostics;
 
 namespace Ozdqp;
 public sealed class TencentUploader : IObjectUploader
@@ -11,6 +12,7 @@ public sealed class TencentUploader : IObjectUploader
         if(s.Done.Contains("COS_UPLOAD"))return;
         CosXmlServer? server=null;DateTimeOffset refreshAt=DateTimeOffset.MinValue;
         using var credentialGate=new SemaphoreSlim(1,1);var stateGate=new object();
+        void Diagnostic(string kind,object data) { lock(stateGate)journal.Emit(s,kind,data); }
         async Task Refresh()
         {
             var sts=await api.Get("/api/v1/thirdpartyadminapi/oss_sts",null,ct) as JsonObject??throw new UploadException("SCHEMA_CHANGED","STS 配置为空。");
@@ -73,7 +75,10 @@ public sealed class TencentUploader : IObjectUploader
             do
             {
                 var request=new ListPartsRequest(s.Bucket,s.ObjectKey,s.UploadId);request.SetMaxParts(1000);if(marker>0)request.SetPartNumberMarker(marker);
-                var result=await Task.Run(()=>server!.ListParts(request),ct);
+                Diagnostic("reconcileParts",new{marker});
+                COSXML.Model.Object.ListPartsResult result;
+                try { result=await Task.Run(()=>server!.ListParts(request),ct); }
+                catch(Exception error) { Diagnostic("cosRequestFailed",new{operation="ListParts",error=CosDiagnostics.Describe(error)});throw; }
                 foreach(var part in result.listParts.parts??[])
                 {
                     int number=int.Parse(part.partNumber);long expected=Math.Min(c.PartSizeBytes,s.File!.Size-(number-1)*c.PartSizeBytes);
@@ -89,6 +94,7 @@ public sealed class TencentUploader : IObjectUploader
                 int next=int.Parse(result.listParts.nextPartNumberMarker);if(next<=marker)throw new UploadException("SCHEMA_CHANGED","COS 分片分页标记未前进。");marker=next;
             }while(true);
             s.Parts=confirmed;journal.Save(s);
+            Diagnostic("reconciledParts",new{completedParts=confirmed.Count});
         }
         int total=checked((int)((s.File!.Size+c.PartSizeBytes-1)/c.PartSizeBytes));
         if(total>10000)throw new UploadException("INVALID_INPUT","分片数量超过 10000，请调整 partSizeBytes 后创建新任务。");
@@ -101,6 +107,7 @@ public sealed class TencentUploader : IObjectUploader
             for(int attempt=0;;attempt++)
             {
                 CosXmlServer? currentServer=null;
+                var watch=Stopwatch.StartNew();
                 try
                 {
                     currentServer=await CurrentServer(failed,token);
@@ -110,8 +117,12 @@ public sealed class TencentUploader : IObjectUploader
                 }
                 catch(OperationCanceledException){throw;}
                 catch(UploadException){throw;}
-                catch when(attempt<2){failed=currentServer;await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2,attempt)),token);}
-                catch {throw new UploadException("UPLOAD_FAILED",$"COS 分片 {current} 上传失败，断点已保存。恢复会先核对服务端分片。");}
+                catch(Exception error)
+                {
+                    Diagnostic("cosRequestFailed",new{operation="UploadPart",part=current,attempt=attempt+1,elapsedMs=watch.ElapsedMilliseconds,error=CosDiagnostics.Describe(error)});
+                    if(attempt>=2)throw new UploadException("UPLOAD_FAILED",$"COS 分片 {current} 上传失败，断点已保存。恢复会先核对服务端分片。");
+                    failed=currentServer;await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2,attempt)),token);
+                }
             }
         },(current,etag)=>{
             lock(stateGate)

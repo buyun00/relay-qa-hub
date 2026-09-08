@@ -141,7 +141,7 @@ public static class SelfTest
             } finally { Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",prior); }
             return Task.CompletedTask;
         });
-        var report=new{version="0.4.0",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
+        var report=new{version="0.4.1",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
         string reportPath=Path.Combine(root,"report.json");await File.WriteAllTextAsync(reportPath,JsonSerializer.Serialize(report,Json.Options),ct);
         Console.WriteLine(JsonSerializer.Serialize(new{type="selfTestResult",passed=results.Count,failed=0,reportPath,realPlatformTested=false}));
     }

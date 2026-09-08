@@ -14,6 +14,17 @@ public static class MultipartTransferTests
     static void Check(bool value,string message){if(!value)throw new Exception("Multipart test: "+message);}
     public static async Task Run(string root,Func<string,Func<Task>,Task> test,CancellationToken ct)
     {
+        await test("cos_diagnostics_preserve_status_without_credentials",()=>{
+            var server=new COSXML.CosException.CosServerException(403,"Authorization=secret") { errorCode="ExpiredToken",requestId="fixture-request",errorMessage="signed-url-secret",resource="secret-path" };
+            string text=JsonSerializer.Serialize(CosDiagnostics.Describe(server));
+            Check(text.Contains("ExpiredToken")&&text.Contains("403")&&text.Contains("fixture-request")&&!text.Contains("secret"),"server diagnostic redaction");
+            var client=new COSXML.CosException.CosClientException(100,"https://signed.invalid?token=secret",new WebException("Authorization=secret",WebExceptionStatus.Timeout));
+            text=JsonSerializer.Serialize(CosDiagnostics.Describe(client));
+            Check(text.Contains("Timeout")&&!text.Contains("secret")&&!text.Contains("signed.invalid"),"transport diagnostic redaction");
+            server.requestId="secret?token=value";
+            Check(!JsonSerializer.Serialize(CosDiagnostics.Describe(server)).Contains("secret"),"identifier allowlist");
+            return Task.CompletedTask;
+        });
         await test("sdk_parallel_parts_have_correct_bytes_and_bounded_concurrency",async()=>{
             const int count=8,size=256*1024;var payload=new byte[count*size];new Random(123).NextBytes(payload);
             string file=Path.Combine(root,"parallel-payload.bin");await File.WriteAllBytesAsync(file,payload,ct);
