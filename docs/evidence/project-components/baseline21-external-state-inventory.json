@@ -1,0 +1,2180 @@
+{
+  "schemaVersion": 1,
+  "kind": "baseline21_external_state_read_only_inventory",
+  "startedAt": "2026-09-08T20:57:04.171Z",
+  "scope": {
+    "productionContentsModified": false,
+    "sqliteOpened": false,
+    "processOrNetworkOperations": false,
+    "credentialsRead": false,
+    "archivesCopied": false,
+    "attachmentTreesEnumerated": false
+  },
+  "roots": {
+    "integrations": "D:\\Relay-QA-Hub-Data\\production\\integrations",
+    "backups": "D:\\Relay-QA-Hub-Backups\\production",
+    "archives": "E:\\Relay-QA-Hub-Archives\\production"
+  },
+  "trees": {
+    "integrations": {
+      "root": "D:\\Relay-QA-Hub-Data\\production\\integrations",
+      "ancestors": [
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T06:58:57.172Z",
+          "realPathEqualsLexical": true
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-08-28T11:50:31.991Z",
+          "realPathEqualsLexical": true
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T11:09:27.359Z",
+          "realPathEqualsLexical": true
+        },
+        {
+          "path": "D:\\",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T03:20:51.989Z",
+          "realPathEqualsLexical": true
+        }
+      ],
+      "entries": [
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:14:51.113Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-04T11:35:24.562Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\qingyu-state.enc.json",
+          "kind": "file",
+          "bytes": 1011,
+          "mtimeUtc": "2026-09-07T09:16:04.483Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T12:10:49.434Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\uploads",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-04T11:35:24.562Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\20a9cb2dd5e18b17b9ab01b0f412195d8288a54f32676ff36c4dd469c53df9f9.json",
+          "kind": "file",
+          "bytes": 2356,
+          "mtimeUtc": "2026-09-08T04:43:03.568Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\65ead7f214389d0e4b7392ef7051c39a7339d807c2e8976635c72ebf46cb6aa0.json",
+          "kind": "file",
+          "bytes": 1034,
+          "mtimeUtc": "2026-09-05T01:35:16.274Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\75f8b8eee187b19b044b9f6779dc1672663028efccc3215ba779e72a5b155cb7.json",
+          "kind": "file",
+          "bytes": 9392,
+          "mtimeUtc": "2026-09-08T04:41:41.514Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\9442449211cdf778b9ab2be1a24d5a05171b31ed0bcabb5c308433175b248b2d.json",
+          "kind": "file",
+          "bytes": 3390,
+          "mtimeUtc": "2026-09-08T11:08:55.954Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\953037ec9e1d9508be55bb288bc8a4cda18d2e76db7f4322f7c92436573617ca.json",
+          "kind": "file",
+          "bytes": 11413,
+          "mtimeUtc": "2026-09-07T07:28:46.239Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\9b3b37bc6d0f2d55c663e049643149dbed2ee0ef69b0109af053c28aac513737.json",
+          "kind": "file",
+          "bytes": 2750,
+          "mtimeUtc": "2026-09-08T10:38:26.796Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\d0de0df4ff5b70c15d467f2e4b31b4b072e12359275cee656dbd774b1ed3bea5.json",
+          "kind": "file",
+          "bytes": 1134,
+          "mtimeUtc": "2026-09-05T12:09:06.244Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\d468c47f67e3fe827eb879b1b5b8eb327bf97c946b02a4c5e714ab659927b7a0.json",
+          "kind": "file",
+          "bytes": 1030,
+          "mtimeUtc": "2026-09-08T12:10:49.434Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\f354e60deba94fc777eac67bf260d4610e7ed3790023c30985c40d97bba7aa56.json",
+          "kind": "file",
+          "bytes": 5309,
+          "mtimeUtc": "2026-09-05T12:09:05.210Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T09:53:43.290Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\channel-locks",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T07:55:31.421Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T10:18:59.228Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite",
+          "kind": "file",
+          "bytes": 24576,
+          "mtimeUtc": "2026-09-08T20:30:58.597Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-shm",
+          "kind": "file",
+          "bytes": 32768,
+          "mtimeUtc": "2026-09-08T11:09:26.622Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-wal",
+          "kind": "file",
+          "bytes": 4120032,
+          "mtimeUtc": "2026-09-08T20:57:03.913Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T07:41:05.005Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\10000000-0000-4000-8000-000000000003",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T06:59:14.568Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\85a49b10-c467-4800-8dd8-e33818544904",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T11:00:10.219Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\85a49b10-c467-4800-8dd8-e33818544904\\auth.json",
+          "kind": "file",
+          "bytes": 1187,
+          "mtimeUtc": "2026-09-08T11:00:10.219Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\85a49b10-c467-4800-8dd8-e33818544904\\jobs",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T10:18:59.228Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\10000000-0000-4000-8000-000000000003\\jobs",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T06:59:14.568Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\auth.json",
+          "kind": "file",
+          "bytes": 1196,
+          "mtimeUtc": "2026-09-08T07:40:58.452Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\build-chains",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T09:56:10.047Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T10:45:58.614Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T10:00:01.606Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:26:00.784Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T10:51:01.940Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\desktop.json",
+          "kind": "file",
+          "bytes": 158,
+          "mtimeUtc": "2026-09-08T10:45:58.626Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\events.jsonl",
+          "kind": "file",
+          "bytes": 43044,
+          "mtimeUtc": "2026-09-08T10:51:01.924Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\input",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T10:46:08.180Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\job.json",
+          "kind": "file",
+          "bytes": 687,
+          "mtimeUtc": "2026-09-08T10:45:58.615Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\job.lock",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-08T10:45:58.883Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\result.json",
+          "kind": "file",
+          "bytes": 10598,
+          "mtimeUtc": "2026-09-08T10:51:01.925Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\run-332d28cc-6f4b-4e5e-b9ad-ea3247cc9466.json",
+          "kind": "file",
+          "bytes": 99,
+          "mtimeUtc": "2026-09-08T10:51:01.940Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\run-332d28cc-6f4b-4e5e-b9ad-ea3247cc9466.jsonl",
+          "kind": "file",
+          "bytes": 43216,
+          "mtimeUtc": "2026-09-08T10:51:01.924Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\state.json",
+          "kind": "file",
+          "bytes": 10598,
+          "mtimeUtc": "2026-09-08T10:51:01.921Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\input\\_pkg_cfg_2001_1002.zip",
+          "kind": "file",
+          "bytes": 752457582,
+          "mtimeUtc": "2026-09-08T10:46:05.989Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\desktop.json",
+          "kind": "file",
+          "bytes": 157,
+          "mtimeUtc": "2026-09-08T08:24:23.460Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\events.jsonl",
+          "kind": "file",
+          "bytes": 48166,
+          "mtimeUtc": "2026-09-08T08:26:00.770Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\input",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T07:55:31.399Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\job.json",
+          "kind": "file",
+          "bytes": 847,
+          "mtimeUtc": "2026-09-08T08:24:23.450Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\job.lock",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-08T07:55:21.899Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\result.json",
+          "kind": "file",
+          "bytes": 10538,
+          "mtimeUtc": "2026-09-08T08:26:00.771Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-2ec72ec0-27f6-403f-aa8b-ad08b3d5fb80.json",
+          "kind": "file",
+          "bytes": 99,
+          "mtimeUtc": "2026-09-08T08:17:30.172Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-2ec72ec0-27f6-403f-aa8b-ad08b3d5fb80.jsonl",
+          "kind": "file",
+          "bytes": 27687,
+          "mtimeUtc": "2026-09-08T08:17:30.153Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-4a6ef8b8-7395-4c21-afed-fad06017f880.json",
+          "kind": "file",
+          "bytes": 98,
+          "mtimeUtc": "2026-09-08T08:26:00.784Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-4a6ef8b8-7395-4c21-afed-fad06017f880.jsonl",
+          "kind": "file",
+          "bytes": 4182,
+          "mtimeUtc": "2026-09-08T08:26:00.770Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-d506e63f-dd30-44dd-8988-b3ac87139444.json",
+          "kind": "file",
+          "bytes": 98,
+          "mtimeUtc": "2026-09-08T07:58:07.655Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-d506e63f-dd30-44dd-8988-b3ac87139444.jsonl",
+          "kind": "file",
+          "bytes": 16489,
+          "mtimeUtc": "2026-09-08T07:58:07.640Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\state.json",
+          "kind": "file",
+          "bytes": 10538,
+          "mtimeUtc": "2026-09-08T08:26:00.767Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\input\\_pkg_cfg_2001_1002.zip",
+          "kind": "file",
+          "bytes": 745669560,
+          "mtimeUtc": "2026-09-08T07:55:29.296Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\desktop.json",
+          "kind": "file",
+          "bytes": 158,
+          "mtimeUtc": "2026-09-08T09:56:10.164Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\events.jsonl",
+          "kind": "file",
+          "bytes": 43041,
+          "mtimeUtc": "2026-09-08T10:00:01.589Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\input",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T09:56:20.008Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\job.json",
+          "kind": "file",
+          "bytes": 847,
+          "mtimeUtc": "2026-09-08T09:56:10.153Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\job.lock",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-08T09:56:10.522Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\result.json",
+          "kind": "file",
+          "bytes": 10598,
+          "mtimeUtc": "2026-09-08T10:00:01.590Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\run-23adeefb-88e9-494d-99d3-4a8e3447b1c6.json",
+          "kind": "file",
+          "bytes": 99,
+          "mtimeUtc": "2026-09-08T10:00:01.605Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\run-23adeefb-88e9-494d-99d3-4a8e3447b1c6.jsonl",
+          "kind": "file",
+          "bytes": 43213,
+          "mtimeUtc": "2026-09-08T10:00:01.589Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\state.json",
+          "kind": "file",
+          "bytes": 10598,
+          "mtimeUtc": "2026-09-08T10:00:01.585Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\input\\_pkg_cfg_2001_1002.zip",
+          "kind": "file",
+          "bytes": 751176913,
+          "mtimeUtc": "2026-09-08T09:56:17.748Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\build-chains\\97fb789d-6ce4-4c39-8da4-5c21cd62f344.json",
+          "kind": "file",
+          "bytes": 923,
+          "mtimeUtc": "2026-09-08T09:56:10.047Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\build-chains\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06.json",
+          "kind": "file",
+          "bytes": 923,
+          "mtimeUtc": "2026-09-08T07:55:21.489Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\channel-locks\\E2E3CB21E8625F381D138965AD27BC973AA26E8FA540A60A68BE1FE0031CD941.lock",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-08T07:55:31.421Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\04d6d264c4ee814f5f271e743d4c314f19d204cdf78c96e5cda34d94bd530f88",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:24:15.230Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\095352393e09e526b23b255398737798e93381879f9163ffbc6a2ed2b992d0fe",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T06:58:57.172Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\370bd5e8a81ff6d99886c8cbb40edb274b5e5359cd1c67535eaf3d6e1c3e828f",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:11:10.852Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\6541ec8737a474acf2e66f7453ae33ccc665b6d2cbb8fa6d14ccca860f217e80",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T09:53:43.291Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\6541ec8737a474acf2e66f7453ae33ccc665b6d2cbb8fa6d14ccca860f217e80\\ozdqp-uploader.exe",
+          "kind": "file",
+          "bytes": 73999943,
+          "mtimeUtc": "2026-09-08T09:43:03.574Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\370bd5e8a81ff6d99886c8cbb40edb274b5e5359cd1c67535eaf3d6e1c3e828f\\ozdqp-uploader.exe",
+          "kind": "file",
+          "bytes": 73995847,
+          "mtimeUtc": "2026-09-08T08:09:37.330Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\095352393e09e526b23b255398737798e93381879f9163ffbc6a2ed2b992d0fe\\ozdqp-uploader.exe",
+          "kind": "file",
+          "bytes": 73987655,
+          "mtimeUtc": "2026-09-08T06:35:49.205Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\bin\\04d6d264c4ee814f5f271e743d4c314f19d204cdf78c96e5cda34d94bd530f88\\ozdqp-uploader.exe",
+          "kind": "file",
+          "bytes": 73995847,
+          "mtimeUtc": "2026-09-08T08:21:46.060Z"
+        }
+      ],
+      "skipped": [],
+      "errors": [],
+      "complete": true
+    },
+    "backups": {
+      "root": "D:\\Relay-QA-Hub-Backups\\production",
+      "ancestors": [
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T20:55:07.789Z",
+          "realPathEqualsLexical": true
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-04T09:34:48.191Z",
+          "realPathEqualsLexical": true
+        },
+        {
+          "path": "D:\\",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T03:20:51.989Z",
+          "realPathEqualsLexical": true
+        }
+      ],
+      "entries": [
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\guardian-validation-2026-09-04T02-37-51.506Z.sqlite",
+          "kind": "file",
+          "bytes": 20135936,
+          "mtimeUtc": "2026-09-04T02:37:51.569Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\guardian-validation-2026-09-04T02-37-51.506Z.sqlite-shm",
+          "kind": "file",
+          "bytes": 32768,
+          "mtimeUtc": "2026-09-04T02:37:51.583Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\guardian-validation-2026-09-04T02-37-51.506Z.sqlite-wal",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-04T02:37:51.582Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-07T09:36:48.576Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T20:55:00.463Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T20:55:00.710Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite",
+          "kind": "file",
+          "bytes": 2347008,
+          "mtimeUtc": "2026-08-27T05:33:26.760Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite-shm",
+          "kind": "file",
+          "bytes": 32768,
+          "mtimeUtc": "2026-08-27T05:33:26.799Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite-wal",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-08-27T05:33:26.766Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 415,
+          "mtimeUtc": "2026-08-27T05:33:26.783Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite",
+          "kind": "file",
+          "bytes": 2347008,
+          "mtimeUtc": "2026-08-27T05:38:05.589Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite-shm",
+          "kind": "file",
+          "bytes": 32768,
+          "mtimeUtc": "2026-08-27T05:38:05.830Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite-wal",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-08-27T05:38:05.799Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 415,
+          "mtimeUtc": "2026-08-27T05:38:05.815Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite",
+          "kind": "file",
+          "bytes": 26419200,
+          "mtimeUtc": "2026-09-08T01:10:20.958Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T01:10:21.121Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite",
+          "kind": "file",
+          "bytes": 29790208,
+          "mtimeUtc": "2026-09-08T20:39:14.369Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T20:39:14.645Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite",
+          "kind": "file",
+          "bytes": 29790208,
+          "mtimeUtc": "2026-09-08T20:54:42.175Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T20:54:42.393Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T09-12-39.506Z.23a2c12f-a1f6-4012-ac4e-2e60fd8053c0.jsonl",
+          "kind": "file",
+          "bytes": 1554745,
+          "mtimeUtc": "2026-09-08T09:54:54.017Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T09-57-04.022Z.e88ada33-336e-4415-8f6a-5aa0ebfe6948.jsonl",
+          "kind": "file",
+          "bytes": 12170,
+          "mtimeUtc": "2026-09-08T09:57:28.004Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T10-12-37.448Z.0e0aa493-982a-4dd6-8c3b-6b7354b7b569.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T10:12:47.530Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T10-27-57.692Z.5e925734-fd7f-49b6-850e-7c3758bf3cbe.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T10:28:07.676Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T10-43-17.545Z.11d28e0a-899a-4d69-9991-7ea975ce3ba5.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T10:43:27.346Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T10-58-36.625Z.ba16e936-2e57-4e0b-8f2a-a1d783a37b2e.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T10:58:46.468Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T11-09-37.673Z.13a32827-0096-46d3-bf6a-59ab3b4f1d00.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T11:09:49.455Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T11-24-59.425Z.22bee0ab-250f-48f0-874f-dac2529dfc4e.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T11:25:09.496Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T11-40-18.691Z.8b07aca4-2a49-4bf2-8705-72a5444e32bc.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T11:40:28.593Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T11-55-44.909Z.8a0da2bd-de35-4475-8571-2362ca773d91.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T11:56:02.315Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T12-11-21.738Z.607e1d9d-b6e5-4495-af09-fab71438af04.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T12:11:41.907Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T12-26-52.215Z.7cdcc8b6-344c-4b21-ba0b-e006b4d27638.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T12:27:03.861Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T12-42-14.002Z.54211b32-aa4f-44ed-987c-ba243549faad.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T12:42:25.442Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T12-57-35.663Z.92dddacb-7638-4171-b3d8-3f3bbff4e773.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T12:57:47.369Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T13-12-57.762Z.c7822109-33ca-4ad3-bd1e-de4174969aef.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T13:13:09.158Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T13-28-19.152Z.51be6700-f16e-423a-8822-312d7067f08a.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T13:28:30.649Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T13-43-40.503Z.c1be1edd-2402-4612-990c-dac4e42ea128.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T13:43:51.732Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T13-59-01.817Z.90906661-99a3-4d15-9e17-b765b4f0e0b6.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T13:59:13.374Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T14-14-22.553Z.bd2b939d-c0a6-4b73-9916-1ac74222de80.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T14:14:32.376Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T14-29-41.373Z.d032c46f-13f4-4532-8ddb-e13fc378cba1.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T14:29:51.294Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T14-45-00.326Z.25e635ff-09d6-413e-861a-7dde706263db.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T14:45:10.231Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T15-00-19.552Z.1770c43c-7fa3-4f9f-a6bd-80a0a06b740a.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T15:00:29.528Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T15-15-38.632Z.b8d267f6-d972-4562-b1a3-d1299520d7ff.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T15:15:48.532Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T15-30-57.533Z.41effa0d-dba9-45a6-9f0c-dc080f628392.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T15:31:07.466Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T15-46-16.477Z.6c346349-3332-4ae9-88e0-c3aaa43b68b3.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T15:46:26.300Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T16-01-35.305Z.4dd0fe47-8f7f-428d-9217-82708db2db5c.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T16:01:45.084Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T16-16-54.572Z.5a36494b-bcb8-4eb0-9a1c-32784ca6d175.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T16:17:04.411Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T16-32-13.897Z.23864087-3d2b-4c1d-99ac-de056a6e3da6.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T16:32:24.273Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T16-47-33.353Z.984ee589-4c65-4587-86a4-47e6dfc34ed8.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T16:47:43.335Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T17-02-58.632Z.818ad123-7622-48a4-8438-df2456f813f3.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T17:03:18.471Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T17-18-34.432Z.26b4f9ec-b55b-446f-bf90-e52a07408b62.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T17:18:50.300Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T17-34-02.819Z.9cdd3936-8e84-4c6d-9cc2-e40dc795ae10.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T17:34:16.619Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T17-49-29.723Z.77f7c9d7-d01e-4fca-be8c-03650c7656bd.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T17:49:44.465Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T18-04-56.930Z.bef9a883-1658-42ed-afa5-d0d839588881.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T18:05:10.630Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T18-20-23.000Z.26930f4d-5425-46ab-b29e-ba32291c24a9.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T18:20:36.734Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T18-35-49.021Z.9a54b946-0ff3-4085-90a0-2e6214df32a6.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T18:36:03.549Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T18-51-16.215Z.f99bf232-9e06-4538-a79a-3347d5477523.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T18:51:32.369Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T19-06-44.497Z.804f0147-0175-419a-8766-71b10ea16d5d.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T19:06:58.537Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T19-22-11.378Z.2373e70c-d74e-40d9-9cb0-5cf7dbc7deda.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T19:22:24.928Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T19-37-36.886Z.483b8d25-fcd1-4fe6-b37e-84fa3cd79196.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T19:37:50.204Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T19-53-02.587Z.398888b0-8db3-420b-a68c-ae4ae5e8c301.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T19:53:17.017Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T20-08-31.190Z.9254e0c0-a0dc-42ba-8166-e10d6dc75671.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T20:08:47.773Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T20-24-00.031Z.5715ce80-8477-4945-b7dd-6a2ebe5f0969.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T20:24:14.033Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T20-39-27.878Z.73c41414-bb34-4217-8dab-10c3fe2943e7.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T20:39:41.888Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\retention-audit\\2026-09-08T20-54-53.932Z.f9bdd6af-9eed-4372-884b-9c8da9961ebd.jsonl",
+          "kind": "file",
+          "bytes": 6799,
+          "mtimeUtc": "2026-09-08T20:55:07.788Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration\\qa-hub.sqlite.v10-to-v11.9647eef3-219d-4129-b0bd-8e110fe620d7.sqlite",
+          "kind": "file",
+          "bytes": 22839296,
+          "mtimeUtc": "2026-09-05T14:20:38.564Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration\\qa-hub.sqlite.v11-to-v12.f8871869-4ed5-4fc1-b42c-1533081eec31.sqlite",
+          "kind": "file",
+          "bytes": 24956928,
+          "mtimeUtc": "2026-09-07T09:36:48.548Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration\\qa-hub.sqlite.v5-to-v6.48d7dfe7-f1ef-4289-a487-c329755b3b46.sqlite",
+          "kind": "file",
+          "bytes": 4460544,
+          "mtimeUtc": "2026-08-28T11:49:01.293Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration\\qa-hub.sqlite.v6-to-v7.e2c4deb0-7325-4b82-b395-a63f7082e752.sqlite",
+          "kind": "file",
+          "bytes": 4984832,
+          "mtimeUtc": "2026-08-28T12:55:03.926Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration\\qa-hub.sqlite.v7-to-v8.0d198c5a-a226-4a7e-aadd-90e366bb2b0d.sqlite",
+          "kind": "file",
+          "bytes": 5861376,
+          "mtimeUtc": "2026-08-31T03:20:54.777Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration\\qa-hub.sqlite.v8-to-v9.38ccab39-89be-41c4-8ad3-1f0f98f890df.sqlite",
+          "kind": "file",
+          "bytes": 8732672,
+          "mtimeUtc": "2026-08-31T09:37:17.661Z"
+        },
+        {
+          "path": "D:\\Relay-QA-Hub-Backups\\production\\migration\\qa-hub.sqlite.v9-to-v10.89bd81a9-ce4d-4488-9860-bf7b58f40242.sqlite",
+          "kind": "file",
+          "bytes": 18153472,
+          "mtimeUtc": "2026-09-03T05:49:13.466Z"
+        }
+      ],
+      "skipped": [],
+      "errors": [],
+      "complete": true
+    },
+    "archives": {
+      "root": "E:\\Relay-QA-Hub-Archives\\production",
+      "ancestors": [
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T20:54:52.435Z",
+          "realPathEqualsLexical": true
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:15:39.581Z",
+          "realPathEqualsLexical": true
+        },
+        {
+          "path": "E:\\",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:14:40.943Z",
+          "realPathEqualsLexical": true
+        }
+      ],
+      "entries": [
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-08-28T07-57-09.484Z.fb98f8da-a005-46be-a9c7-3f7129710c8a.sqlite.attachments.6be44f1b-e1b4-44a3-add9-c7bd60903143.staging",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-08-28T07:57:09.650Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-09-04T06-30-11.095Z.6d2a3a20-d054-4f9b-adfb-17af0cf7f314.sqlite.attachments.47945d13-991e-4905-911b-e7033091aa44.staging",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-04T06:30:16.513Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-09-08T08-11-10.905Z.c15843a0-b0f9-4644-ba51-ef7a81e883cc.sqlite.attachments.f7f1ed98-c741-4a9c-89df-f79b0e297346.staging",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:11:11.833Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-09-08T08-14-51.144Z.8f1564f2-f23d-45d3-970b-4af18b7d5f1e.sqlite.attachments.ff26de7e-d74a-4f80-b772-30892a443020.staging",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T08:15:21.083Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\configuration",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-08-27T11:26:05.110Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-08-27T05:53:14.049Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T20:55:02.631Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-08-31T06-12-59.266Z.23fee5bf-f012-478b-a4b2-d749b75b77f7.sqlite-shm",
+          "kind": "file",
+          "bytes": 32768,
+          "mtimeUtc": "2026-08-31T06:13:37.638Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-08-31T06-12-59.266Z.23fee5bf-f012-478b-a4b2-d749b75b77f7.sqlite-wal",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-08-31T06:13:37.598Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-04T06-30-11.095Z.6d2a3a20-d054-4f9b-adfb-17af0cf7f314.sqlite",
+          "kind": "file",
+          "bytes": 21827584,
+          "mtimeUtc": "2026-09-04T06:30:11.713Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-04T06-30-11.095Z.6d2a3a20-d054-4f9b-adfb-17af0cf7f314.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-04T06:30:11.735Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-04T06-45-16.519Z.709e2551-bed8-4cf3-91f7-8e53264fa8f3.sqlite",
+          "kind": "file",
+          "bytes": 2097152,
+          "mtimeUtc": "2026-09-04T06:45:17.036Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-04T07-00-17.045Z.9e9a3ef9-a9a1-4134-933b-2f00462bef4b.sqlite",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-04T07:00:17.570Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-04T07-15-17.578Z.4b23afa1-e201-4074-9c1f-75afd9476e51.sqlite",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-04T07:15:18.109Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite",
+          "kind": "file",
+          "bytes": 26419200,
+          "mtimeUtc": "2026-09-08T01:10:21.367Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite.attachments",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T01:10:28.116Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T01:10:21.391Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-11-10.905Z.c15843a0-b0f9-4644-ba51-ef7a81e883cc.sqlite",
+          "kind": "file",
+          "bytes": 28532736,
+          "mtimeUtc": "2026-09-08T08:11:11.596Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-11-10.905Z.c15843a0-b0f9-4644-ba51-ef7a81e883cc.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T08:11:11.623Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-11-39.000Z.2c0effb8-170e-4d30-a32e-6cd37e71779f.sqlite",
+          "kind": "file",
+          "bytes": 0,
+          "mtimeUtc": "2026-09-08T08:11:39.730Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-13-09.961Z.4ef6531c-2bf8-44da-b49d-e47297228740.sqlite",
+          "kind": "file",
+          "bytes": 2097152,
+          "mtimeUtc": "2026-09-08T08:13:10.675Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-13-47.839Z.da789686-760a-4269-b4af-9baa67a1ea03.sqlite",
+          "kind": "file",
+          "bytes": 2097152,
+          "mtimeUtc": "2026-09-08T08:13:48.523Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-14-51.144Z.8f1564f2-f23d-45d3-970b-4af18b7d5f1e.sqlite",
+          "kind": "file",
+          "bytes": 28532736,
+          "mtimeUtc": "2026-09-08T08:15:11.864Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-14-51.144Z.8f1564f2-f23d-45d3-970b-4af18b7d5f1e.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T08:15:11.894Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite",
+          "kind": "file",
+          "bytes": 29790208,
+          "mtimeUtc": "2026-09-08T20:39:15.048Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite.attachments",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T20:39:26.190Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T20:39:15.079Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite",
+          "kind": "file",
+          "bytes": 29790208,
+          "mtimeUtc": "2026-09-08T20:54:42.737Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite.attachments",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-09-08T20:54:52.434Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 418,
+          "mtimeUtc": "2026-09-08T20:54:42.766Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts\\db-only-before-refs-copy-fix",
+          "kind": "directory",
+          "bytes": null,
+          "mtimeUtc": "2026-08-27T05:53:14.071Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts\\db-only-before-refs-copy-fix\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite",
+          "kind": "file",
+          "bytes": 2347008,
+          "mtimeUtc": "2026-08-27T05:33:26.760Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts\\db-only-before-refs-copy-fix\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 415,
+          "mtimeUtc": "2026-08-27T05:33:26.818Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts\\db-only-before-refs-copy-fix\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite",
+          "kind": "file",
+          "bytes": 2347008,
+          "mtimeUtc": "2026-08-27T05:38:05.589Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts\\db-only-before-refs-copy-fix\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite.manifest.json",
+          "kind": "file",
+          "bytes": 415,
+          "mtimeUtc": "2026-08-27T05:38:05.848Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\configuration\\qa-people.10fc26c3630f252c53009dc4debe20fd6a14a76192ec57daf060e482dfafcad2.json",
+          "kind": "file",
+          "bytes": 66,
+          "mtimeUtc": "2026-08-27T11:01:39.816Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\configuration\\qa-people.13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374.json",
+          "kind": "file",
+          "bytes": 2268,
+          "mtimeUtc": "2026-08-27T11:26:05.115Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\configuration\\qa-people.2576b23d43ecf1add437919127088f5fb7bbc257f7782f092e7715f67b31f010.json",
+          "kind": "file",
+          "bytes": 2584,
+          "mtimeUtc": "2026-08-27T10:29:34.316Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\configuration\\qa-people.5f0a4433905d94157905396e65b9078af1a79c186c35dac2042608a42d774d83.json",
+          "kind": "file",
+          "bytes": 3052,
+          "mtimeUtc": "2026-08-27T07:13:45.256Z"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\configuration\\qa-people.d3153836f78e2381a8347d7d7764fd3086bbbdd197bb1569f016e130c49f257a.json",
+          "kind": "file",
+          "bytes": 2863,
+          "mtimeUtc": "2026-08-27T05:48:27.081Z"
+        }
+      ],
+      "skipped": [
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-08-28T07-57-09.484Z.fb98f8da-a005-46be-a9c7-3f7129710c8a.sqlite.attachments.6be44f1b-e1b4-44a3-add9-c7bd60903143.staging",
+          "reason": "main_database_attachment_tree_not_external_state"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-09-04T06-30-11.095Z.6d2a3a20-d054-4f9b-adfb-17af0cf7f314.sqlite.attachments.47945d13-991e-4905-911b-e7033091aa44.staging",
+          "reason": "main_database_attachment_tree_not_external_state"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-09-08T08-11-10.905Z.c15843a0-b0f9-4644-ba51-ef7a81e883cc.sqlite.attachments.f7f1ed98-c741-4a9c-89df-f79b0e297346.staging",
+          "reason": "main_database_attachment_tree_not_external_state"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\.2026-09-08T08-14-51.144Z.8f1564f2-f23d-45d3-970b-4af18b7d5f1e.sqlite.attachments.ff26de7e-d74a-4f80-b772-30892a443020.staging",
+          "reason": "main_database_attachment_tree_not_external_state"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite.attachments",
+          "reason": "main_database_attachment_tree_not_external_state"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite.attachments",
+          "reason": "main_database_attachment_tree_not_external_state"
+        },
+        {
+          "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite.attachments",
+          "reason": "main_database_attachment_tree_not_external_state"
+        }
+      ],
+      "errors": [],
+      "complete": true
+    }
+  },
+  "selectedStateReads": {
+    "readAt": "2026-09-08T20:59:39.713Z",
+    "summaries": [
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\20a9cb2dd5e18b17b9ab01b0f412195d8288a54f32676ff36c4dd469c53df9f9.json",
+        "bytes": 2356,
+        "sha256": "fc2d59fe1286cdd68077e8974bcfa2bfeddee7b044e86fc542ee3deb04cf873f",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "action",
+        "itemCount": 3,
+        "itemStatusCounts": {
+          "accepted": 3
+        },
+        "stepStatusCounts": {
+          "absent": 3
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\65ead7f214389d0e4b7392ef7051c39a7339d807c2e8976635c72ebf46cb6aa0.json",
+        "bytes": 1034,
+        "sha256": "8e224b6d4b78b6de0a6de6cdca7e9219a3dfd6ff87dff68a0da3fcaa90ee94e7",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "action",
+        "itemCount": 1,
+        "itemStatusCounts": {
+          "accepted": 1
+        },
+        "stepStatusCounts": {
+          "absent": 1
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\75f8b8eee187b19b044b9f6779dc1672663028efccc3215ba779e72a5b155cb7.json",
+        "bytes": 9392,
+        "sha256": "5cf789f2dfe7510b081f6c4632c9323833db69a877706fdf247c34d0d3a711e7",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "bugs",
+        "itemCount": 3,
+        "itemStatusCounts": {
+          "accepted": 3
+        },
+        "stepStatusCounts": {
+          "absent": 12
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\9442449211cdf778b9ab2be1a24d5a05171b31ed0bcabb5c308433175b248b2d.json",
+        "bytes": 3390,
+        "sha256": "875f242c832dd4fbfe6b5bb763e6d73fd3c1047a84916410c456d4b01f6f6405",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "bugs",
+        "itemCount": 1,
+        "itemStatusCounts": {
+          "accepted": 1
+        },
+        "stepStatusCounts": {
+          "absent": 4
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\953037ec9e1d9508be55bb288bc8a4cda18d2e76db7f4322f7c92436573617ca.json",
+        "bytes": 11413,
+        "sha256": "acc30775c5a299670e69018b6b6e9cc2a5c286d43096d14a98032bc22ae87273",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "bugs",
+        "itemCount": 4,
+        "itemStatusCounts": {
+          "accepted": 4
+        },
+        "stepStatusCounts": {
+          "absent": 16
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\9b3b37bc6d0f2d55c663e049643149dbed2ee0ef69b0109af053c28aac513737.json",
+        "bytes": 2750,
+        "sha256": "15ff8eb5cd813f541663b8006663409a9a1e665c8aad640d57d634eba0c7c950",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "action",
+        "itemCount": 1,
+        "itemStatusCounts": {
+          "accepted": 1
+        },
+        "stepStatusCounts": {
+          "absent": 1
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\d0de0df4ff5b70c15d467f2e4b31b4b072e12359275cee656dbd774b1ed3bea5.json",
+        "bytes": 1134,
+        "sha256": "c3fd28f12fb8227f42de9220478a67528052d57da05e62d0a56c5a3aae8993d9",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "bugs",
+        "itemCount": 1,
+        "itemStatusCounts": {
+          "existing": 1
+        },
+        "stepStatusCounts": {
+          "absent": 2
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\d468c47f67e3fe827eb879b1b5b8eb327bf97c946b02a4c5e714ab659927b7a0.json",
+        "bytes": 1030,
+        "sha256": "f09073e256ccb61a73be3025c82a3f08bcc141e394257e1d6ee848634c4363ca",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "action",
+        "itemCount": 1,
+        "itemStatusCounts": {
+          "accepted": 1
+        },
+        "stepStatusCounts": {
+          "absent": 1
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\production\\batches\\f354e60deba94fc777eac67bf260d4610e7ed3790023c30985c40d97bba7aa56.json",
+        "bytes": 5309,
+        "sha256": "9c925206d9ad411f6b79a0ab6138a9408dbfdcd0b206ec0ba4050cfa2b760cc5",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": true,
+        "componentVersionPresent": false,
+        "kind": "relay_batch",
+        "batchKind": "bugs",
+        "itemCount": 2,
+        "itemStatusCounts": {
+          "accepted": 2
+        },
+        "stepStatusCounts": {
+          "absent": 7
+        }
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\desktop.json",
+        "bytes": 158,
+        "sha256": "7364fc942f30beeb492a5b3f341e3616563ac23fa55e35dbdd61345238609bdb",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_launch_receipt"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\job.json",
+        "bytes": 687,
+        "sha256": "95f1ec697e694ff05eab0430fec6a6138b454a75c60083f82b74c681ed1f9ff9",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "upload_job",
+        "workDirectoryMatchesContainingJob": true,
+        "expectedSourcePresent": false
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\run-332d28cc-6f4b-4e5e-b9ad-ea3247cc9466.json",
+        "bytes": 99,
+        "sha256": "2d0017de28cdd236db95041894a505b353b1f1800f8ee5e70f0b2bba80edbce9",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_run_receipt",
+        "finished": true,
+        "errorCode": "absent"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\ed51cbe6-26ac-4e02-bdfc-473d54b4a5df\\state.json",
+        "bytes": 10598,
+        "sha256": "aa9ee04f9293e5c443f52da09335ac4d54f51c84106fff6b5dfd273dd9b0448b",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "upload_state",
+        "stage": "PUBLISHED",
+        "runStatus": "SUCCEEDED",
+        "finalRemoteStatus": 100,
+        "publishConfirmed": false
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\desktop.json",
+        "bytes": 157,
+        "sha256": "5dbe6a365cffb8ccbe205861849df8c6f226a89cf3a604c83e728cc7a2f33860",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_launch_receipt"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\job.json",
+        "bytes": 847,
+        "sha256": "ce32af00a5f525414a117357267076ce54869d6364fb55b9c62a67a4715ef940",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "upload_job",
+        "workDirectoryMatchesContainingJob": true,
+        "expectedSourcePresent": true
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-2ec72ec0-27f6-403f-aa8b-ad08b3d5fb80.json",
+        "bytes": 99,
+        "sha256": "fdf8c8fc70675b1798c1cef6e9d0ac885e940fc233f8c0d69003c1d85b3de675",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_run_receipt",
+        "finished": true,
+        "errorCode": "absent"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-4a6ef8b8-7395-4c21-afed-fad06017f880.json",
+        "bytes": 98,
+        "sha256": "b106f81c5ca094c5d38d6b9aa78f0198eb57b9fe2ac0a81a8ef8eb4f701c5f01",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_run_receipt",
+        "finished": true,
+        "errorCode": "absent"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\run-d506e63f-dd30-44dd-8988-b3ac87139444.json",
+        "bytes": 98,
+        "sha256": "7e47292f6f57121c4f99aa430fc679523567e9bf14ad42ea8555148fc522c178",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_run_receipt",
+        "finished": true,
+        "errorCode": "absent"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06\\state.json",
+        "bytes": 10538,
+        "sha256": "848959523e2d778644d834da7c28e299c468646c47423270c5d5786fee31275f",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "upload_state",
+        "stage": "PUBLISHED",
+        "runStatus": "SUCCEEDED",
+        "finalRemoteStatus": 100,
+        "publishConfirmed": false
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\desktop.json",
+        "bytes": 158,
+        "sha256": "d9f70afe18db6d4dae3e600961552d4313bc7f18b8611ebca9cf01f48f1bad1f",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_launch_receipt"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\job.json",
+        "bytes": 847,
+        "sha256": "e32ee7029fb4a72125967464b5f491e3f52dd55353b380c9543630d1ddda5861",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "upload_job",
+        "workDirectoryMatchesContainingJob": true,
+        "expectedSourcePresent": true
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\run-23adeefb-88e9-494d-99d3-4a8e3447b1c6.json",
+        "bytes": 99,
+        "sha256": "352f8d5eb3e84e0b973e9e6a702901ba8ed80aa020ddc0671f44d04f086efc8f",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "uploader_run_receipt",
+        "finished": true,
+        "errorCode": "absent"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\jobs\\97fb789d-6ce4-4c39-8da4-5c21cd62f344\\state.json",
+        "bytes": 10598,
+        "sha256": "42cfbee61b1ee377230bfd136fea92735a91219bc24f4e76f27de8242bbac457",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "upload_state",
+        "stage": "PUBLISHED",
+        "runStatus": "SUCCEEDED",
+        "finalRemoteStatus": 100,
+        "publishConfirmed": false
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\build-chains\\97fb789d-6ce4-4c39-8da4-5c21cd62f344.json",
+        "bytes": 923,
+        "sha256": "93f70fefadf63ce57fe5c41f95f8ad40dba8fb23ecf4c679f434a7a4032e2920",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "build_chain",
+        "status": "upload_started",
+        "uploadJobIdPresent": true,
+        "sameHashOnSecondRead": true
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\build-chains\\aeba3bc8-dbb6-4c79-bd4a-3582aeda6c06.json",
+        "bytes": 923,
+        "sha256": "db121daa241323779ead458aba285de39489399fe71547140cfcc9f112f0a56a",
+        "sameSizeAndMtimeAcrossRead": true,
+        "projectIdPresent": false,
+        "componentVersionPresent": false,
+        "kind": "build_chain",
+        "status": "upload_started",
+        "uploadJobIdPresent": true,
+        "sameHashOnSecondRead": true
+      }
+    ],
+    "credentialBodiesExcluded": true,
+    "otherJsonOrLogBodiesRead": false,
+    "contentPolicy": "Exact job/state/desktop/run/build-chain/batch files only; free-text, URLs, actor identities, accounts, tokens and credential fields never recorded."
+  },
+  "backupManifestReads": [
+    {
+      "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite.manifest.json",
+      "bytes": 415,
+      "sha256": "9db48dbd972ad086fae36d6ecf29b510a83bfad1af4405b5bfeb4556a02b0c6a",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 5,
+      "createdAt": "2026-08-27T05:33:26.737Z",
+      "databaseSha256": "07b5e854b84f08cbaf1ebf5ae1634dcf73f29ceb2f4b17c6333db2856a825b5c",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 2347008,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite.manifest.json",
+      "bytes": 415,
+      "sha256": "5fa8d0f0a49019439643bb348d0f4b6dadf1200cd59b2237e1dcd97ab53537e1",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 5,
+      "createdAt": "2026-08-27T05:38:05.007Z",
+      "databaseSha256": "07b5e854b84f08cbaf1ebf5ae1634dcf73f29ceb2f4b17c6333db2856a825b5c",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 2347008,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "8b98fc6ad5065f3562aff543985fcb12eb6ebaff4792912d7ec4bbd536664380",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T01:10:20.746Z",
+      "databaseSha256": "d1c935ef4d9f6c5dd7c897383c92edddfdfa4c93c47906634c6b2e045610ea6d",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 26419200,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "7de41ca0bb3dc050cf762ba13a6e9ab25348a8505a1044eafaf4c0457eef2377",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T20:39:14.035Z",
+      "databaseSha256": "4f4023a122fbcd37bd8225909d540d778fa9d6024ab75846893e1326a6c58a65",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 29790208,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Backups\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "135739b1d1d2b1cfde641145167fec77d69fd47294b7ca0a096626a89b0df82a",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T20:54:41.891Z",
+      "databaseSha256": "4f4023a122fbcd37bd8225909d540d778fa9d6024ab75846893e1326a6c58a65",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 29790208,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-04T06-30-11.095Z.6d2a3a20-d054-4f9b-adfb-17af0cf7f314.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "caea414a5427b1d7a0349d52fcd8c516eeb53f2bf05ad4438b33dd41f8494d8c",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 10,
+      "createdAt": "2026-09-04T06:30:11.095Z",
+      "databaseSha256": "3afd2818df4f3b233be4012ccede5091a1f442f930020f819234d88d51d9e65c",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 21827584,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T01-10-20.746Z.4387d4f7-5206-4b7b-a1d4-a5972036c033.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "8b98fc6ad5065f3562aff543985fcb12eb6ebaff4792912d7ec4bbd536664380",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T01:10:20.746Z",
+      "databaseSha256": "d1c935ef4d9f6c5dd7c897383c92edddfdfa4c93c47906634c6b2e045610ea6d",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": true,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 26419200,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-11-10.905Z.c15843a0-b0f9-4644-ba51-ef7a81e883cc.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "32cc2509961879662885fc2640d483fb4450448a9a0c059037b2803c82d94765",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T08:11:10.905Z",
+      "databaseSha256": "4cc3450c7807468c81abf9a2bd963ae279f38ac96efe71d17a4b2457414908ad",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 28532736,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T08-14-51.144Z.8f1564f2-f23d-45d3-970b-4af18b7d5f1e.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "a515a9da7e24bb358e7ffb9cba4a7f0a5f40e594b3c5942530e8e6ebe396539d",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T08:14:51.144Z",
+      "databaseSha256": "4cc3450c7807468c81abf9a2bd963ae279f38ac96efe71d17a4b2457414908ad",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": false,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 28532736,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-39-14.035Z.09d5f4d8-67c7-4e07-9e5a-40d1cc1a40db.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "7de41ca0bb3dc050cf762ba13a6e9ab25348a8505a1044eafaf4c0457eef2377",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T20:39:14.035Z",
+      "databaseSha256": "4f4023a122fbcd37bd8225909d540d778fa9d6024ab75846893e1326a6c58a65",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": true,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 29790208,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\rpo\\2026-09-08T20-54-41.891Z.5e33a43a-3a21-4374-ad60-280dd613d5ff.sqlite.manifest.json",
+      "bytes": 418,
+      "sha256": "135739b1d1d2b1cfde641145167fec77d69fd47294b7ca0a096626a89b0df82a",
+      "sameSizeAndMtimeAcrossRead": true,
+      "fields": [
+        "backup",
+        "createdAt",
+        "integrity",
+        "manifestVersion",
+        "schemaVersion",
+        "sourceDatabase"
+      ],
+      "schemaVersion": 12,
+      "createdAt": "2026-09-08T20:54:41.891Z",
+      "databaseSha256": "4f4023a122fbcd37bd8225909d540d778fa9d6024ab75846893e1326a6c58a65",
+      "integrityCheck": "ok",
+      "sqliteExists": true,
+      "attachmentDirectoryExists": true,
+      "sqliteOpened": false,
+      "declaredDatabaseBytes": 29790208,
+      "sourceDatabaseApplicationId": 1363232834,
+      "declaredForeignKeyViolationCount": 0,
+      "sameManifestHashOnSecondRead": true
+    }
+  ],
+  "readErrors": [
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts\\db-only-before-refs-copy-fix\\2026-08-27T05-33-26.737Z.81d4afcf-a0a5-41f8-b88c-3f3403ab1062.sqlite.manifest.json",
+      "code": "JSON_PARSE_FAILED_CONTENT_SUPPRESSED",
+      "bytes": 415,
+      "sha256": "666c36b33fea21cedd139cd489729de9e1bdde1d20f4cf07b9ca22cd64b39f79",
+      "allBytesZero": true
+    },
+    {
+      "path": "E:\\Relay-QA-Hub-Archives\\production\\failed-attempts\\db-only-before-refs-copy-fix\\2026-08-27T05-38-05.007Z.1579964b-27a1-4942-b002-265fcc65944d.sqlite.manifest.json",
+      "code": "JSON_PARSE_FAILED_CONTENT_SUPPRESSED",
+      "bytes": 415,
+      "sha256": "666c36b33fea21cedd139cd489729de9e1bdde1d20f4cf07b9ca22cd64b39f79",
+      "allBytesZero": true
+    }
+  ],
+  "credentialMetadataOnly": [
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\qingyu-state.enc.json",
+      "kind": "file",
+      "bytes": 1011,
+      "mtimeUtc": "2026-09-07T09:16:04.483Z"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\85a49b10-c467-4800-8dd8-e33818544904\\auth.json",
+      "kind": "file",
+      "bytes": 1187,
+      "mtimeUtc": "2026-09-08T11:00:10.219Z"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\owners\\07b48903-5331-4b4c-8993-bf162db319bc\\auth.json",
+      "kind": "file",
+      "bytes": 1196,
+      "mtimeUtc": "2026-09-08T07:40:58.452Z"
+    }
+  ],
+  "externalStateArchiveCandidates": [],
+  "summary": {
+    "owners": 3,
+    "jobDirectories": 3,
+    "inputZipCount": 3,
+    "inputZipBytes": 2249304055,
+    "executables": 4,
+    "executableBytes": 295979292,
+    "relayUploadFiles": 0,
+    "authFilesMetadataOnly": 2,
+    "workDirectoriesMatch": true,
+    "runReceiptsFinished": 5
+  },
+  "sqliteInspection": {
+    "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite",
+    "opened": false,
+    "reason": "Live WAL exists and changes; read-only SQLite can still require or update shared-memory coordination. No independent component queue archive was found in the enumerated backup/archive roots.",
+    "tableNamesObserved": null,
+    "rowCountsObserved": null,
+    "statusCountsObserved": null,
+    "sourceOnlyExpectedTables": ["upload_commands", "upload_scheduler", "upload_audit"],
+    "recheckAt": "2026-09-08T21:01:20.669Z",
+    "metadataAfter": [
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite",
+        "bytes": 24576,
+        "mtimeUtc": "2026-09-08T20:30:58.597Z"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-wal",
+        "bytes": 4120032,
+        "mtimeUtc": "2026-09-08T21:01:19.038Z"
+      },
+      {
+        "path": "D:\\Relay-QA-Hub-Data\\production\\integrations\\increment-upload\\queue.sqlite-shm",
+        "bytes": 32768,
+        "mtimeUtc": "2026-09-08T11:09:26.622Z"
+      }
+    ]
+  },
+  "sourceReview": {
+    "head": "8447cdfee60b52c01df76b179d18d19c48155d06",
+    "legacyHead": "62b4495c9b28dc3aea1d5633e870be4e1fdf841f",
+    "current": [
+      {
+        "path": "apps/api/src/main.ts",
+        "sha256": "22a2f014fc18c6113dd473c57a2e8588de1d515e403a9acd353ae5a97cce4eba",
+        "lineRanges": [
+          [339, 344],
+          [439, 466]
+        ]
+      },
+      {
+        "path": "apps/api/src/app.ts",
+        "sha256": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66",
+        "lineRanges": [[2697, 2734]]
+      },
+      {
+        "path": "apps/api/src/increment-upload.ts",
+        "sha256": "bf21ecbaeb2e2a3bb43a522814da86bdb238fa65a55ffe29e0800e88aa4fd140",
+        "lineRanges": [
+          [108, 123],
+          [163, 168],
+          [198, 224]
+        ]
+      },
+      {
+        "path": "apps/api/src/uploader-host.ts",
+        "sha256": "a076e955249e1c5ffcfe330a379677ee066220de426de26defbd18d244cfa959",
+        "lineRanges": [
+          [218, 245],
+          [603, 621]
+        ]
+      },
+      {
+        "path": "apps/api/src/build-upload-host.ts",
+        "sha256": "0e81ef8625f3a61f962358c55370c02b48c4d71e332862b73f0e71bb712b1ab7",
+        "lineRanges": [[75, 125]]
+      },
+      {
+        "path": "apps/api/src/production-tasks.ts",
+        "sha256": "b1d4311bd4c39325ab92901e1bc5dc0b35d9299a8037aa3ac40c4c408cd2d6d2",
+        "lineRanges": [
+          [137, 183],
+          [295, 326]
+        ]
+      },
+      {
+        "path": "apps/api/src/qingyu-integration.ts",
+        "sha256": "3725c3d2e0a063e0b6b08e5d14fa1bc9f0f4dec5bae02afcb753968bc85e7597",
+        "lineRanges": [[160, 231]]
+      },
+      {
+        "path": "apps/api/src/project-components-runtime.ts",
+        "sha256": "cc626cdbf0da7e2761efcc5495c2b7ada38322a01697bb3108fccb6fc499376f",
+        "lineRanges": [
+          [183, 190],
+          [210, 260],
+          [275, 279],
+          [686, 709],
+          [848, 860],
+          [872, 879],
+          [1000, 1003],
+          [1078, 1082],
+          [1305, 1312],
+          [1367, 1371]
+        ]
+      },
+      {
+        "path": "packages/storage/src/sqlite-worker-entry.ts",
+        "sha256": "2c9eaa7fa643e3e3617beb7c401ae2b939eca2d3ad9050d186717f65e83e9c0d",
+        "lineRanges": [[323, 333]]
+      },
+      {
+        "path": "packages/storage/src/import-execution-hold.ts",
+        "sha256": "c600fd0b8ef2a7e8bfb86084097f3f232a7b1e96d918d8b3a5360a5c93c106c1",
+        "lineRanges": [[4, 24]]
+      },
+      {
+        "path": "packages/storage/src/project-management-store.ts",
+        "sha256": "94cbdd04ba49405f226516852013498372165f13e0d8690826f187817c98990f",
+        "lineRanges": [[298, 307]]
+      },
+      {
+        "path": "packages/storage/src/sqlite-archive.ts",
+        "sha256": "091ba1e4e53bb4ec5be6c50f3fb49e0723aaa846577f7244ce53ccc49602d099",
+        "lineRanges": [[975, 1018]]
+      },
+      {
+        "path": "packages/storage/src/attachment-restore.ts",
+        "sha256": "fc7e53c7d40604585483d57ff07956b40589917d5996590494d061ce96c4fde7",
+        "lineRanges": [[230, 280]]
+      },
+      {
+        "path": "scripts/project-components/offline-import.mjs",
+        "sha256": "6443f305ee121593afcd6a10d78aaa9c6a992c0134d3eb6cc00da38b9126ffda",
+        "lineRanges": [
+          [73, 100],
+          [184, 189]
+        ]
+      }
+    ],
+    "legacy": [
+      {
+        "path": "apps/api/src/main.ts",
+        "gitBlobId": "0443d3027ea2b21c7ddb237a5647889767ab2315",
+        "lineRanges": [
+          [221, 224],
+          [396, 397],
+          [408, 415]
+        ]
+      },
+      {
+        "path": "apps/api/src/increment-upload.ts",
+        "gitBlobId": "34e93c8c3925df0e5527a5957e623a8b7e8c1190",
+        "lineRanges": [
+          [102, 108],
+          [163, 186]
+        ]
+      },
+      {
+        "path": "apps/api/src/uploader-host.ts",
+        "gitBlobId": "4bcf8d085b67fe39c3358535650143f026b5d140",
+        "lineRanges": [
+          [200, 221],
+          [555, 562]
+        ]
+      },
+      {
+        "path": "apps/api/src/production-tasks.ts",
+        "gitBlobId": "db40c0cd498ab87edad136018a7a528423797483",
+        "lineRanges": [
+          [139, 163],
+          [268, 298]
+        ]
+      }
+    ]
+  },
+  "priorEvidenceReferences": [
+    {
+      "path": "docs\\evidence\\project-components\\production-inventory.md",
+      "sha256": "df3e49577304878d477d4d30071e2e30b7f4975ac717b5e0b212bee5b150eb03"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\production-inventory.json",
+      "sha256": "d1d27fc27f507f89c9e4914b3c3cfc47c4f8f7541ce7d3fa5e3dbc46bf79e2ce"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\migration-rehearsal.md",
+      "sha256": "d77d7953269ccea07f53c6b13c8b63145c5a437a8e3519280975913bae627878"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\baseline24-service-rollback.md",
+      "sha256": "d2ee0770dd78d9d63088e3e173dab01e20dd81b07cc4f5d41790486c9d78f679"
+    }
+  ],
+  "recoveryCoverage": {
+    "mainRpo": {
+      "covers": [
+        "main business SQLite including business outbox",
+        "attachments referenced by the main database"
+      ],
+      "currentPass": "Manifest claims and attachment-directory presence only; no database or recovery-set integrity revalidation.",
+      "priorPinnedValidation": "migration-rehearsal.md describes the separately pinned and validated source set."
+    },
+    "externalState": {
+      "consistentArchiveFoundInEnumeratedRoots": false,
+      "liveFilesReadAsAtomicSet": false,
+      "credentialsDecrypted": false,
+      "queueSchemaOrRowsInspected": false,
+      "uploadInputZipBytesRead": false,
+      "restored": false,
+      "migrated": false,
+      "replayed": false
+    },
+    "legacyImportedIdentity": {
+      "uploadJobsMissingProjectOrComponentVersion": 3,
+      "buildChainsMissingProjectOrComponentVersion": 2,
+      "relayBatchesMissingComponentVersion": 9
+    },
+    "hold": {
+      "currentRuntimeAndWorker": "A present marker is held unless it has markerVersion=1, state=released, a nonblank release.actorId/reason and a parseable release.releasedAt. Malformed/unreadable markers fail closed; a missing marker does not hold.",
+      "directoryMigration": "Hold and offline-import do not assign project/version or load legacy directories as version snapshots.",
+      "legacyRuntime": "62b has no import-hold support and constructors/schedulers can auto-resume; future isolated rehearsal needs process-level external I/O and child-process denial."
+    }
+  },
+  "limitations": [
+    "No live SQLite opened; queue schema/table counts and command state distribution are unknown.",
+    "No external-state snapshot found in the two enumerated backup/archive roots; this is not a global disk/archive search.",
+    "Main DB attachment/staging trees pruned; binary payloads, auth.json, Qingyu ciphertext, people configuration and log bodies not read.",
+    "Stable per-file reads are not a cross-file or cross-database consistency point.",
+    "Published/accepted history does not prove that pending imported work will remain paused.",
+    "Qingyu sessions/links/pendingImports counts and encryption-key recoverability were not inspected.",
+    "No process, listener, executor, external API, client or production file changed."
+  ],
+  "nextIsolatedSteps": [
+    "Obtain an application-consistent external-state export within the existing isolated-rehearsal scope: queue SQLite snapshot and matching jobs/chains/batches/reference inventory. The missing prerequisites are a provable cross-file consistency point and explicit mappings; this read-only inventory performed no backup or copy. Any production pause/configuration mutation is outside this read-only inventory. Never copy only a live SQLite main file or infer consistency from mtime.",
+    "Keep pinned input outside the worktree; record manifests and non-secret hashes. Do not copy production credentials into test roots; use explicit independent test connections. Encrypted-state recovery needs a defined key/cipher recovery procedure within the existing scope; neither credential material nor ciphertext was read in this inventory.",
+    "Create a new isolated root; write paused import hold before constructing anything, keep five components off, deny outbound and child-process execution, especially for legacy code.",
+    "Specify original-to-target project/owner/component-version and path mappings; preserve unknown scope, never guess a project or reuse old PIDs/locks/production workDirectory.",
+    "Use a purpose-built importer or read-only legacy history adapter for counts, hashes, job-chain and main DB/outbox joins; current offline-import only restores main DB and referenced attachments.",
+    "Exercise synthetic pending/running/paused/resume-denied fixtures with hold and zero outbound calls. Explicit resume with independent external test targets remains a separate unperformed verification."
+  ],
+  "completedAt": "2026-09-08T21:03:50.114Z",
+  "metadataEnumerationFinishedAt": "2026-09-08T20:57:04.206Z"
+}
