@@ -26,8 +26,10 @@ archive, the archive worker applies retention to both the local backup and archi
 - Create an immutable plan and append validation/deletion/error/reconciliation
   records under `D:\Relay-QA-Hub-Backups\production\retention-audit`. Errors are
   reported separately from successful backups and do not disable the cadence.
+- A process-owned lock prevents overlap with another cleanup or a backend
+  restart. A dead process's lock is recovered on the next attempt.
 
-Validation: API TypeScript build and ESLint passed; 10 backup/retention tests and
+Validation: API TypeScript build and ESLint passed; 11 backup/retention tests and
 26 API/production-task regression tests passed. Tests cover day rollover,
 deduplicated anchors, timer alignment, complete-group deletion on both roots,
 idempotency, corruption, junction refusal, and isolated cleanup errors.

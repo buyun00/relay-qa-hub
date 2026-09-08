@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -148,6 +149,19 @@ test("corrupt retained archive prevents every deletion, including local backups"
   );
   await assert.rejects(pruneRecoveryPoints(f.options));
   for (const backup of f.backups) assert.ok(existsSync(backup.backupPath));
+});
+
+test("a live cleanup lock refuses overlap and a dead owner's lock is recovered", async (t) => {
+  const f = await fixture(t);
+  const lockPath = join(f.backupRoot, "retention.lock.json");
+  await writeFile(lockPath, JSON.stringify({ pids: [process.pid] }));
+  await assert.rejects(pruneRecoveryPoints(f.options), /already running/);
+  assert.ok(existsSync(f.backups[0].backupPath));
+  const exited = spawnSync(process.execPath, ["-e", "process.exit(0)"]);
+  assert.equal(exited.status, 0);
+  await writeFile(lockPath, JSON.stringify({ pids: [exited.pid] }));
+  assert.equal((await pruneRecoveryPoints(f.options)).deletedGroups, 4);
+  assert.equal(existsSync(lockPath), false);
 });
 
 test("a junction inside an obsolete attachment group is preserved and never traversed for deletion", async (t) => {

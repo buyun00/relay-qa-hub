@@ -125,7 +125,7 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-export async function pruneRecoveryPoints(options: {
+async function executeRetention(options: {
   readonly backupRoot: string;
   readonly archiveRoot: string;
   readonly successfulBackupName: string;
@@ -260,4 +260,49 @@ export async function pruneRecoveryPoints(options: {
   const result = { policy, auditPath, kept, deletedGroups, deletedBytes, skipped };
   appendFileSync(auditPath, `${JSON.stringify({ event: "complete", ...result })}\n`);
   return result;
+}
+
+/** A process-owned lock also covers restarts and operator-initiated cleanup. */
+export async function pruneRecoveryPoints(
+  options: Parameters<typeof executeRetention>[0],
+): Promise<BackupRetentionResult> {
+  const root = ordinaryPath(options.backupRoot, true);
+  const lockPath = join(root, "retention.lock.json");
+  if (existsSync(lockPath)) {
+    directChild(lockPath, root, false);
+    const content = readFileSync(lockPath, "utf8");
+    const lock = JSON.parse(content) as { pids: unknown };
+    if (
+      !Array.isArray(lock.pids) ||
+      lock.pids.length === 0 ||
+      lock.pids.some(
+        (pid: unknown) => typeof pid !== "number" || !Number.isSafeInteger(pid) || pid <= 0,
+      )
+    ) {
+      throw new Error("Invalid backup retention lock; operator inspection required");
+    }
+    for (const pid of lock.pids as number[]) {
+      try {
+        process.kill(pid, 0);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ESRCH") continue;
+      }
+      throw new Error("Backup retention is already running; retry on the next backup");
+    }
+    directChild(lockPath, root, false);
+    if (readFileSync(lockPath, "utf8") !== content)
+      throw new Error("Backup retention lock changed");
+    rmSync(lockPath);
+  }
+  const token = randomUUID();
+  const content = JSON.stringify({ token, pids: [process.pid] });
+  writeFileSync(lockPath, content, { flag: "wx" });
+  try {
+    return await executeRetention(options);
+  } finally {
+    directChild(lockPath, root, false);
+    if (readFileSync(lockPath, "utf8") !== content)
+      throw new Error("Backup retention lock ownership changed");
+    rmSync(lockPath);
+  }
 }
