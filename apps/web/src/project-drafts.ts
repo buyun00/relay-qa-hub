@@ -27,13 +27,44 @@ export async function readProjectDraft<T>(key: string): Promise<T | undefined> {
   });
 }
 export async function writeProjectDraft<T>(key: string, draft: T): Promise<void> {
-  memory.set(key, draft);
   const db = await database();
   await new Promise<void>((resolve, reject) => {
-    const transaction = db.transaction("drafts", "readwrite");
+    const transaction = db.transaction("drafts", "readwrite", { durability: "strict" });
     transaction.objectStore("drafts").put(draft, key);
-    transaction.oncomplete = () => resolve();
+    transaction.oncomplete = () => {
+      memory.set(key, draft);
+      resolve();
+    };
     transaction.onerror = () => reject(transaction.error);
     transaction.onabort = () => reject(transaction.error);
+  });
+}
+
+/** Fresh, serialized read/modify/write. A caller may send a request only after commit. */
+export async function updateProjectDraft<T>(
+  key: string,
+  update: (current: T | undefined) => T,
+): Promise<T> {
+  const db = await database();
+  return await new Promise<T>((resolve, reject) => {
+    const transaction = db.transaction("drafts", "readwrite", { durability: "strict" });
+    const store = transaction.objectStore("drafts");
+    let result: T;
+    let failure: unknown;
+    const request = store.get(key);
+    request.onsuccess = () => {
+      try {
+        result = update(request.result as T | undefined);
+        store.put(result, key);
+      } catch (cause) {
+        failure = cause;
+        transaction.abort();
+      }
+    };
+    transaction.oncomplete = () => {
+      memory.set(key, result);
+      resolve(result);
+    };
+    transaction.onerror = transaction.onabort = () => reject(failure ?? transaction.error);
   });
 }

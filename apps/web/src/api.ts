@@ -586,6 +586,14 @@ export interface CreateBugInput {
   readonly ownerId: string | null;
   readonly verificationOwnerId: string;
   readonly attachmentIds: readonly string[];
+  readonly occurrence?: {
+    readonly observedAt: string;
+    readonly platform: "web";
+    readonly deviceModel: string;
+    readonly osVersion: string;
+    readonly steps: readonly string[];
+    readonly actualBehavior: string;
+  };
 }
 
 export interface CreateBugResponse {
@@ -1364,46 +1372,74 @@ export async function deleteBug(
   };
 }
 
-export async function createBug(input: CreateBugInput): Promise<CreateBugResponse> {
-  const body = await requestJson("/api/v1/bugs", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
-      "Idempotency-Key": `submission:${input.clientSubmissionId}:commit`,
-    },
-    body: JSON.stringify({
-      submissionContractVersion: "1.1.0",
-      projectId: input.projectId,
-      clientSubmissionId: input.clientSubmissionId,
-      title: input.title,
-      description: input.description,
-      expectedBehavior: input.expectedBehavior,
-      severity: input.severity,
-      priority: input.priority,
-      ownerId: input.ownerId,
-      verificationOwnerId: input.verificationOwnerId,
-      occurrence: {
-        observedAt: new Date().toISOString(),
-        platform: "web",
-        deviceModel: navigator.userAgent.slice(0, 200),
-        osVersion: navigator.platform.slice(0, 100),
-        steps: ["从 Relay QA Hub Web 管理台提交"],
-        actualBehavior: input.description,
+function submissionRequest(
+  init: RequestInit,
+  scope?: RequestInit,
+  projectId?: string,
+): RequestInit {
+  if (scope) assertProjectRequest(scope);
+  const headers = new Headers(scope?.headers);
+  new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+  return projectRequestSnapshot(
+    { ...init, ...(scope?.signal ? { signal: scope.signal } : {}), headers },
+    projectId,
+  );
+}
+
+export async function createBug(
+  input: CreateBugInput,
+  scope?: RequestInit,
+  frozenBody?: string,
+): Promise<CreateBugResponse> {
+  const body = await requestJson(
+    "/api/v1/bugs",
+    submissionRequest(
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+          "Idempotency-Key": `submission:${input.clientSubmissionId}:commit`,
+        },
+        body:
+          frozenBody ??
+          JSON.stringify({
+            submissionContractVersion: "1.1.0",
+            projectId: input.projectId,
+            clientSubmissionId: input.clientSubmissionId,
+            title: input.title,
+            description: input.description,
+            expectedBehavior: input.expectedBehavior,
+            severity: input.severity,
+            priority: input.priority,
+            ownerId: input.ownerId,
+            verificationOwnerId: input.verificationOwnerId,
+            occurrence: input.occurrence ?? {
+              observedAt: new Date().toISOString(),
+              platform: "web",
+              deviceModel: navigator.userAgent.slice(0, 200),
+              osVersion: navigator.platform.slice(0, 100),
+              steps: ["从 Relay QA Hub Web 管理台提交"],
+              actualBehavior: input.description,
+            },
+            attachmentIds: input.attachmentIds,
+            captureBundleId: null,
+          }),
       },
-      attachmentIds: input.attachmentIds,
-      captureBundleId: null,
-    }),
-  });
+      scope,
+      input.projectId,
+    ),
+    scope === undefined,
+  );
   return requireRecord(body, "BUG_CREATION") as unknown as CreateBugResponse;
 }
 
-interface UploadInitResponse {
+export interface UploadInitResponse {
   readonly sessionId: string;
   readonly chunkSize: number;
   readonly version: number;
 }
 
-interface UploadFinalizeResponse {
+export interface UploadFinalizeResponse {
   readonly attachmentId: string;
   readonly readyToBind: boolean;
   readonly version: number;
@@ -1413,16 +1449,33 @@ function csrfHeadersForMutation(): Record<string, string> {
   return browserCsrfToken === null ? {} : { "X-CSRF-Token": browserCsrfToken };
 }
 
-async function sha256Hex(blob: Blob): Promise<string> {
+export async function sha256Hex(blob: Blob): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", await blob.arrayBuffer());
   return [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, "0")).join("");
 }
 
-export async function uploadBugCreateAttachment(input: {
-  readonly projectId: string;
-  readonly clientSubmissionId: string;
-  readonly file: File;
-}): Promise<string> {
+export interface UploadCheckpoint {
+  readonly clientAttachmentId: string;
+  readonly sha256: string;
+  readonly init?: UploadInitResponse | undefined;
+  readonly nextChunk: number;
+  readonly version?: number | undefined;
+  readonly finalized?: UploadFinalizeResponse | undefined;
+  readonly bound?: boolean | undefined;
+}
+interface DurableUploadOptions {
+  readonly checkpoint?: UploadCheckpoint;
+  readonly saveCheckpoint?: (checkpoint: UploadCheckpoint) => Promise<void>;
+  readonly scope?: RequestInit;
+}
+
+export async function uploadBugCreateAttachment(
+  input: {
+    readonly projectId: string;
+    readonly clientSubmissionId: string;
+    readonly file: File;
+  } & DurableUploadOptions,
+): Promise<string> {
   return uploadSubmissionAttachment({ ...input, intent: "bug_create" });
 }
 
@@ -1439,60 +1492,99 @@ export async function uploadVerificationAttachment(input: {
   });
 }
 
-async function uploadSubmissionAttachment(input: {
-  readonly projectId: string;
-  readonly clientSubmissionId: string;
-  readonly file: File;
-  readonly intent: "bug_create" | "verification_result";
-  readonly targetQaItemId?: string;
-}): Promise<string> {
-  const scope = projectRequestSnapshot({}, input.projectId);
-  const clientAttachmentId = crypto.randomUUID();
+async function uploadSubmissionAttachment(
+  input: {
+    readonly projectId: string;
+    readonly clientSubmissionId: string;
+    readonly file: File;
+    readonly intent: "bug_create" | "verification_result";
+    readonly targetQaItemId?: string;
+  } & DurableUploadOptions,
+): Promise<string> {
+  const scope = input.scope ?? projectRequestSnapshot({}, input.projectId);
+  let checkpoint: UploadCheckpoint = input.checkpoint ?? {
+    clientAttachmentId: crypto.randomUUID(),
+    sha256: await sha256Hex(input.file),
+    nextChunk: 0,
+  };
+  const save = async (patch: Partial<UploadCheckpoint>) => {
+    checkpoint = { ...checkpoint, ...patch };
+    await input.saveCheckpoint?.(checkpoint);
+    assertProjectRequest(scope);
+  };
+  const clientAttachmentId = checkpoint.clientAttachmentId;
   const uploadAttempt = 1;
-  const sha256 = await sha256Hex(input.file);
+  const sha256 = checkpoint.sha256;
   assertProjectRequest(scope);
-  const initBody = (await requestJson("/api/v1/uploads/init", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
-      "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:init`,
-    },
-    body: JSON.stringify({
-      submissionContractVersion: "1.1.0",
-      projectId: input.projectId,
-      clientSubmissionId: input.clientSubmissionId,
-      clientAttachmentId,
-      uploadAttempt,
-      filename: input.file.name,
-      mediaType: input.file.type || "application/octet-stream",
-      expectedSize: input.file.size,
-      sha256,
-    }),
-  })) as UploadInitResponse;
+  const initBody =
+    checkpoint.init ??
+    ((await requestJson(
+      "/api/v1/uploads/init",
+      submissionRequest(
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+            "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:init`,
+          },
+          body: JSON.stringify({
+            submissionContractVersion: "1.1.0",
+            projectId: input.projectId,
+            clientSubmissionId: input.clientSubmissionId,
+            clientAttachmentId,
+            uploadAttempt,
+            filename: input.file.name,
+            mediaType: input.file.type || "application/octet-stream",
+            expectedSize: input.file.size,
+            sha256,
+          }),
+        },
+        scope,
+        input.projectId,
+      ),
+      input.scope === undefined,
+    )) as UploadInitResponse);
+  if (
+    !initBody.sessionId ||
+    !Number.isSafeInteger(initBody.chunkSize) ||
+    initBody.chunkSize <= 0 ||
+    !Number.isSafeInteger(initBody.version) ||
+    initBody.version < 1
+  )
+    throw new QaHubApiError(200, "INVALID_UPLOAD_INIT");
+  if (!checkpoint.init) await save({ init: initBody, version: initBody.version });
 
-  let version = initBody.version;
-  let chunkNumber = 0;
-  for (let offset = 0; offset < input.file.size; offset += initBody.chunkSize) {
+  let version = checkpoint.version ?? initBody.version;
+  let chunkNumber = checkpoint.nextChunk;
+  for (
+    let offset = chunkNumber * initBody.chunkSize;
+    offset < input.file.size;
+    offset += initBody.chunkSize
+  ) {
     const chunk = input.file.slice(offset, Math.min(input.file.size, offset + initBody.chunkSize));
     const chunkSha256 = await sha256Hex(chunk);
     assertProjectRequest(scope);
     const response = await fetchWithTimeout(
       `/api/v1/uploads/${encodeURIComponent(initBody.sessionId)}/chunks/${chunkNumber}`,
-      {
-        method: "PUT",
-        credentials: "same-origin",
-        headers: {
-          Accept: "application/vnd.relay-qa-hub.v1.1+json",
-          "Content-Type": "application/octet-stream",
-          "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:chunk:${chunkNumber}`,
-          "If-Match": `"${version}"`,
-          "X-Chunk-SHA256": chunkSha256,
-          "X-Client-Submission-Id": input.clientSubmissionId,
-          "X-Client-Attachment-Id": clientAttachmentId,
-          ...csrfHeadersForMutation(),
+      submissionRequest(
+        {
+          method: "PUT",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/vnd.relay-qa-hub.v1.1+json",
+            "Content-Type": "application/octet-stream",
+            "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:chunk:${chunkNumber}`,
+            "If-Match": `"${version}"`,
+            "X-Chunk-SHA256": chunkSha256,
+            "X-Client-Submission-Id": input.clientSubmissionId,
+            "X-Client-Attachment-Id": clientAttachmentId,
+            ...csrfHeadersForMutation(),
+          },
+          body: chunk,
         },
-        body: chunk,
-      },
+        scope,
+        input.projectId,
+      ),
       API_TRANSFER_TIMEOUT_MS,
     );
     if (!response.ok) {
@@ -1500,51 +1592,75 @@ async function uploadSubmissionAttachment(input: {
       throw new QaHubApiError(response.status, readErrorCode(errorBody));
     }
     const nextVersion = Number(response.headers.get("x-upload-version"));
-    if (!Number.isSafeInteger(nextVersion) || nextVersion <= version) {
+    // A duplicate chunk returns the session's current version, which may already
+    // include other chunks from a second window. Equal is a valid replay; older is not.
+    if (!Number.isSafeInteger(nextVersion) || nextVersion < version) {
       throw new QaHubApiError(200, "INVALID_UPLOAD_VERSION");
     }
     version = nextVersion;
     chunkNumber += 1;
+    await save({ nextChunk: chunkNumber, version });
   }
 
-  const finalized = (await requestJson(
-    `/api/v1/uploads/${encodeURIComponent(initBody.sessionId)}/finalize`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
-        "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:finalize`,
-      },
-      body: JSON.stringify({
-        submissionContractVersion: "1.1.0",
-        expectedVersion: version,
-        clientSubmissionId: input.clientSubmissionId,
-        clientAttachmentId,
-        uploadAttempt,
-        sha256,
-        expectedSize: input.file.size,
-      }),
-    },
-  )) as UploadFinalizeResponse;
+  const finalized =
+    checkpoint.finalized ??
+    ((await requestJson(
+      `/api/v1/uploads/${encodeURIComponent(initBody.sessionId)}/finalize`,
+      submissionRequest(
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+            "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:upload:${uploadAttempt}:finalize`,
+          },
+          body: JSON.stringify({
+            submissionContractVersion: "1.1.0",
+            expectedVersion: version,
+            clientSubmissionId: input.clientSubmissionId,
+            clientAttachmentId,
+            uploadAttempt,
+            sha256,
+            expectedSize: input.file.size,
+          }),
+        },
+        scope,
+        input.projectId,
+      ),
+      input.scope === undefined,
+    )) as UploadFinalizeResponse);
   if (!finalized.readyToBind) throw new QaHubApiError(409, "ATTACHMENT_NOT_READY");
+  if (!finalized.attachmentId || !Number.isSafeInteger(finalized.version) || finalized.version < 1)
+    throw new QaHubApiError(200, "INVALID_UPLOAD_FINALIZE");
+  if (!checkpoint.finalized) await save({ finalized });
 
-  await requestJson(`/api/v1/attachments/${encodeURIComponent(finalized.attachmentId)}/bind`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
-      "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:bind:1`,
-    },
-    body: JSON.stringify({
-      submissionContractVersion: "1.1.0",
-      expectedVersion: finalized.version,
-      projectId: input.projectId,
-      clientSubmissionId: input.clientSubmissionId,
-      clientAttachmentId,
-      leaseGeneration: 1,
-      intent: input.intent,
-      ...(input.targetQaItemId ? { targetQaItemId: input.targetQaItemId } : {}),
-    }),
-  });
+  if (!checkpoint.bound) {
+    await requestJson(
+      `/api/v1/attachments/${encodeURIComponent(finalized.attachmentId)}/bind`,
+      submissionRequest(
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+            "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${clientAttachmentId}:bind:1`,
+          },
+          body: JSON.stringify({
+            submissionContractVersion: "1.1.0",
+            expectedVersion: finalized.version,
+            projectId: input.projectId,
+            clientSubmissionId: input.clientSubmissionId,
+            clientAttachmentId,
+            leaseGeneration: 1,
+            intent: input.intent,
+            ...(input.targetQaItemId ? { targetQaItemId: input.targetQaItemId } : {}),
+          }),
+        },
+        scope,
+        input.projectId,
+      ),
+      input.scope === undefined,
+    );
+    await save({ bound: true });
+  }
   return finalized.attachmentId;
 }
 
@@ -1627,16 +1743,25 @@ export async function addBugComment(
   bugId: string,
   body: string,
   clientSubmissionId: string,
+  scope?: RequestInit,
+  frozenBody?: string,
 ): Promise<CommentCreationResponse> {
-  const response = await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/comments`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
-      "Idempotency-Key": `comment:${bugId}:${clientSubmissionId}`,
-      "X-Correlation-ID": clientSubmissionId,
-    },
-    body: JSON.stringify({ clientSubmissionId, body }),
-  });
+  const response = await requestJson(
+    `/api/v1/bugs/${encodeURIComponent(bugId)}/comments`,
+    submissionRequest(
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
+          "Idempotency-Key": `comment:${bugId}:${clientSubmissionId}`,
+          "X-Correlation-ID": clientSubmissionId,
+        },
+        body: frozenBody ?? JSON.stringify({ clientSubmissionId, body }),
+      },
+      scope,
+    ),
+    scope === undefined,
+  );
   const record = requireRecord(response, "COMMENT");
   if (typeof record.comment !== "object" || record.comment === null) {
     throw new QaHubApiError(201, "INVALID_COMMENT");

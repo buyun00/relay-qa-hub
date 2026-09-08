@@ -1,0 +1,43 @@
+check: web
+startedAt: 2026-09-08 23:17:05 UTC
+completedObservationAt: 2026-09-08 23:17:15 UTC
+command: $env:QA_HUB_API_BASE_URL='http://127.0.0.1:9'; node ../../node_modules/vitest/vitest.mjs run
+workingDirectory: C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\web
+exitCode: 0
+stdout:
+
+ RUN  v4.1.11 C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/web
+
+
+ Test Files  16 passed (16)
+      Tests  99 passed (99)
+   Start at  07:17:06
+   Duration  4.05s (transform 6.10s, setup 0ms, import 10.02s, tests 1.73s, environment 2ms)
+
+
+check: typecheck
+startedAt: 2026-09-08 23:17:05 UTC
+completedObservationAt: 2026-09-08 23:17:25 UTC
+command: node node_modules/typescript/bin/tsc -p apps/web/tsconfig.app.json --noEmit; if ($LASTEXITCODE -eq 0) { node node_modules/typescript/bin/tsc -p apps/web/tsconfig.node.json --noEmit }
+workingDirectory: C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub
+exitCode: 0
+stdout:
+
+check: lint
+startedAt: 2026-09-08 23:17:05 UTC
+completedObservationAt: 2026-09-08 23:17:15 UTC
+command: node ../../node_modules/eslint/bin/eslint.js src/App.tsx src/api.ts src/project-drafts.ts src/pending-submission.ts src/pending-submission.test.ts src/project-drafts.test.ts --max-warnings=0
+workingDirectory: C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\web
+exitCode: 0
+stdout:
+
+check: format
+startedAt: 2026-09-08 23:17:05 UTC
+completedObservationAt: 2026-09-08 23:17:15 UTC
+command: node node_modules/prettier/bin/prettier.cjs --check apps/web/src/App.tsx apps/web/src/api.ts apps/web/src/project-drafts.ts apps/web/src/pending-submission.ts apps/web/src/pending-submission.test.ts apps/web/src/project-drafts.test.ts
+workingDirectory: C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub
+exitCode: 0
+stdout:
+Checking formatting...
+All matched files use Prettier code style!
+

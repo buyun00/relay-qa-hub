@@ -6,6 +6,7 @@ import {
   type FormEvent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -13,9 +14,7 @@ import {
 import { QRCodeSVG } from "qrcode.react";
 
 import {
-  addBugComment,
   completeBugForVerification,
-  createBug,
   createHumanRepairAttempt,
   createRelayAttempt,
   createVerification,
@@ -79,6 +78,7 @@ import DesktopTools, { ConnectionLight, useDesktopStatus } from "./DesktopTools"
 import ProjectManagementPage from "./ProjectManagementPage";
 import { listProjectComponents, type ProjectComponent, type ComponentKey } from "./project-api";
 import { getActiveProjectId, projectStorageKey } from "./project-context";
+import { durableSubmissions, type SubmissionRejection } from "./pending-submission";
 import {
   TASK_STATUS_ORDER,
   taskStatusCopy,
@@ -142,6 +142,8 @@ interface ReturnDraft {
   readonly clientSubmissionId: string;
 }
 export interface AppDraft {
+  createReceiptId?: string | undefined;
+  commentReceiptIds?: Readonly<Record<string, string>>;
   newContent: string;
   newOwnerId: string;
   newVerifierId: string;
@@ -566,6 +568,106 @@ export default function App({
   );
   const [newSeverity, setNewSeverity] = useState<BugSeverity>(initialDraft?.newSeverity ?? "S2");
   const [newFiles, setNewFiles] = useState<readonly File[]>(initialDraft?.newFiles ?? []);
+  const [createReceiptId, setCreateReceiptId] = useState(initialDraft?.createReceiptId);
+  const [hasPendingBug, setHasPendingBug] = useState(false);
+  const [pendingCommentBugId, setPendingCommentBugId] = useState<string | null>(null);
+  const [bugRejection, setBugRejection] = useState<SubmissionRejection | undefined>();
+  const [commentRejection, setCommentRejection] = useState<SubmissionRejection | undefined>();
+  const [commentReceiptIds, setCommentReceiptIds] = useState<Readonly<Record<string, string>>>(
+    initialDraft?.commentReceiptIds ?? {},
+  );
+  const submissionScope = useMemo(
+    () => ({ accountId: principal.accountId, projectId, actorId: principal.userId }),
+    [principal.accountId, projectId, principal.userId],
+  );
+  const createDraftSnapshot = useMemo(
+    () => ({
+      content: newContent,
+      title: internalBugSummary(newContent.trim()),
+      expectedBehavior: DEFAULT_EXPECTED_BEHAVIOR,
+      severity: newSeverity,
+      ownerId: newOwnerId,
+      verificationOwnerId: newVerifierId,
+      files: newFiles,
+    }),
+    [newContent, newSeverity, newOwnerId, newVerifierId, newFiles],
+  );
+  const currentCreateDraft = useRef(createDraftSnapshot);
+  const commentSnapshot = useMemo(
+    () => ({ bugId: selectedId, body: comment }),
+    [selectedId, comment],
+  );
+  const currentCommentDraft = useRef(commentSnapshot);
+  const createEditRevision = useRef(0);
+  const commentEditRevision = useRef(0);
+  const editCreate = (change: () => void) => {
+    createEditRevision.current += 1;
+    change();
+  };
+  useLayoutEffect(() => {
+    currentCreateDraft.current = createDraftSnapshot;
+  }, [createDraftSnapshot]);
+  useLayoutEffect(() => {
+    currentCommentDraft.current = commentSnapshot;
+  }, [commentSnapshot]);
+  useEffect(() => {
+    let active = true;
+    const original = currentCreateDraft.current;
+    void durableSubmissions
+      .recoverBug(submissionScope, createReceiptId)
+      .then(async (pending) => {
+        const rejection = await durableSubmissions.rejection(submissionScope);
+        if (!active) return;
+        setBugRejection(rejection);
+        setHasPendingBug(pending !== undefined);
+        if (
+          !pending ||
+          initialDraft !== undefined ||
+          currentCreateDraft.current !== original ||
+          original.content ||
+          original.files.length
+        )
+          return;
+        setNewContent(pending.content);
+        setNewOwnerId(pending.ownerId);
+        setNewVerifierId(pending.verificationOwnerId);
+        setNewSeverity(pending.severity);
+        setNewFiles(pending.files);
+        setCreateOpen(true);
+      })
+      .catch(() => {
+        if (active) setError("本地提交记录暂不可读；请保留草稿，恢复存储后再提交。");
+      });
+    return () => {
+      active = false;
+    };
+  }, [submissionScope, initialDraft, createReceiptId]);
+  useEffect(() => {
+    if (!selectedId) return;
+    let active = true;
+    const original = currentCommentDraft.current;
+    void durableSubmissions
+      .recoverComment(submissionScope, selectedId, commentReceiptIds[selectedId])
+      .then(async (pending) => {
+        const rejection = await durableSubmissions.rejection(submissionScope, selectedId);
+        if (!active) return;
+        setCommentRejection(rejection);
+        setPendingCommentBugId(pending === undefined ? null : selectedId);
+        if (
+          initialDraft === undefined &&
+          pending &&
+          currentCommentDraft.current === original &&
+          !original.body
+        )
+          setComment(pending);
+      })
+      .catch(() => {
+        if (active) setError("本地处理记录暂不可读；请保留输入，恢复存储后再提交。");
+      });
+    return () => {
+      active = false;
+    };
+  }, [submissionScope, selectedId, initialDraft, commentReceiptIds]);
   const [qingyuLink, setQingyuLink] = useState<QingyuBugLink | null>(null);
   const [qingyuOpen, setQingyuOpen] = useState(false);
   const [qingyuSession, setQingyuSession] = useState<QingyuSession | null>(null);
@@ -726,6 +828,8 @@ export default function App({
   }, [enabled, view]);
   useEffect(() => {
     onDraftChange?.({
+      createReceiptId,
+      commentReceiptIds,
       newContent,
       newOwnerId,
       newVerifierId,
@@ -743,6 +847,8 @@ export default function App({
     });
   }, [
     onDraftChange,
+    createReceiptId,
+    commentReceiptIds,
     newContent,
     newOwnerId,
     newVerifierId,
@@ -1229,7 +1335,7 @@ export default function App({
     async (
       scope: string,
       label: string,
-      action: () => Promise<void>,
+      action: () => Promise<void> | Promise<string | undefined>,
       options: { readonly closeDetailOnSuccess?: boolean } = {},
     ) => {
       const token = beginMutation(scope, label);
@@ -1237,8 +1343,8 @@ export default function App({
       setError(null);
       setNotice(null);
       try {
-        await action();
-        setNotice(label);
+        const resultNotice = await action();
+        setNotice(resultNotice ?? label);
         setOverviewRevision((value) => value + 1);
         if (
           options.closeDetailOnSuccess === true &&
@@ -1270,7 +1376,7 @@ export default function App({
   const runCurrentBugMutation = useCallback(
     async (
       label: string,
-      action: () => Promise<void>,
+      action: () => Promise<void> | Promise<string | undefined>,
       options: { readonly closeDetailOnSuccess?: boolean } = {},
     ) => {
       const bugId = selectedIdRef.current;
@@ -1684,52 +1790,95 @@ export default function App({
     });
   };
 
-  const submitComment = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (selectedId === null || comment.trim().length === 0) return;
-    const body = comment.trim();
+  const submitComment = async (
+    event?: FormEvent<HTMLFormElement>,
+    resumeOnly = false,
+    replaceRejectedId?: string,
+  ) => {
+    event?.preventDefault();
+    if (selectedId === null || (!resumeOnly && comment.trim().length === 0)) return;
+    const submitted = commentSnapshot;
+    const submittedRevision = commentEditRevision.current;
     await runCurrentBugMutation("处理记录已添加", async () => {
-      await addBugComment(selectedId, body, crypto.randomUUID());
-      if (selectedIdRef.current === selectedId) setComment("");
+      const result = await durableSubmissions
+        .comment(
+          submissionScope,
+          selectedId,
+          submitted.body,
+          commentReceiptIds[selectedId],
+          resumeOnly,
+          replaceRejectedId,
+        )
+        .catch(async (cause: unknown) => {
+          const pending = await durableSubmissions
+            .recoverComment(submissionScope, selectedId, commentReceiptIds[selectedId])
+            .catch(() => undefined);
+          setPendingCommentBugId(pending === undefined ? null : selectedId);
+          setCommentRejection(
+            await durableSubmissions.rejection(submissionScope, selectedId).catch(() => undefined),
+          );
+          throw cause;
+        });
+      setPendingCommentBugId(null);
+      setCommentRejection(undefined);
+      setCommentReceiptIds((current) => ({ ...current, [selectedId]: result.receiptId }));
+      const unchanged =
+        result.matchesDraft &&
+        commentEditRevision.current === submittedRevision &&
+        selectedIdRef.current === selectedId &&
+        currentCommentDraft.current === submitted;
+      if (unchanged) setComment("");
+      return unchanged ? undefined : "上次处理记录已确认，当前新内容尚未提交。";
     });
   };
 
-  const submitBug = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitBug = async (
+    event?: FormEvent<HTMLFormElement>,
+    resumeOnly = false,
+    replaceRejectedId?: string,
+  ) => {
+    event?.preventDefault();
     const content = newContent.trim();
-    if (content.length === 0) return;
+    if (!resumeOnly && content.length === 0) return;
+    const submitted = createDraftSnapshot;
+    const submittedRevision = createEditRevision.current;
     await runMutation(CREATE_BUG_MUTATION_SCOPE, "Bug 已创建并同步到统一后端", async () => {
-      const clientSubmissionId = crypto.randomUUID();
-      const attachmentIds: string[] = [];
-      for (const file of newFiles) {
-        attachmentIds.push(
-          await uploadBugCreateAttachment({ projectId, clientSubmissionId, file }),
-        );
-      }
-      const created = await createBug({
-        projectId,
-        clientSubmissionId,
-        title: internalBugSummary(content),
-        description: content,
-        expectedBehavior: DEFAULT_EXPECTED_BEHAVIOR,
-        severity: newSeverity,
-        priority: `P${newSeverity.slice(1)}` as "P0" | "P1" | "P2" | "P3" | "P4",
-        ownerId: newOwnerId || null,
-        verificationOwnerId: newVerifierId,
-        attachmentIds,
-      });
+      const result = await durableSubmissions
+        .bug(submissionScope, submitted, createReceiptId, resumeOnly, replaceRejectedId)
+        .catch(async (cause: unknown) => {
+          setHasPendingBug(
+            (await durableSubmissions
+              .recoverBug(submissionScope, createReceiptId)
+              .catch(() => undefined)) !== undefined,
+          );
+          setBugRejection(
+            await durableSubmissions.rejection(submissionScope).catch(() => undefined),
+          );
+          throw cause;
+        });
+      setHasPendingBug(false);
+      setBugRejection(undefined);
+      const created = result.response;
+      setCreateReceiptId(result.receiptId);
       setOverviewRevision((value) => value + 1);
-      setCreateOpen(false);
-      setNewContent("");
-      setNewFiles([]);
-      setNewOwnerId("");
+      const unchanged =
+        result.matchesDraft &&
+        createEditRevision.current === submittedRevision &&
+        currentCreateDraft.current === submitted;
+      if (unchanged) {
+        setCreateOpen(false);
+        setNewContent("");
+        setNewFiles([]);
+        setNewOwnerId("");
+      }
       setCategory("pending");
       openDetail(created.bug.id);
+      return unchanged ? undefined : "上次提交已确认，当前新稿尚未提交。";
     });
   };
 
   const appendNewFiles = (files: readonly File[]) => {
-    setNewFiles((current) => mergeCreateBugImages(current, files));
+    editCreate(() => setNewFiles((current) => mergeCreateBugImages(current, files)));
   };
 
   const pasteNewBugImages = (event: ClipboardEvent<HTMLFormElement>) => {
@@ -2647,7 +2796,10 @@ export default function App({
                         onSubmit={(event) => void submitComment(event)}
                       >
                         <input
-                          onChange={(event) => setComment(event.target.value)}
+                          onChange={(event) => {
+                            commentEditRevision.current += 1;
+                            setComment(event.target.value);
+                          }}
                           placeholder="补充评论或处理记录"
                           value={comment}
                         />
@@ -2657,6 +2809,26 @@ export default function App({
                         >
                           记录
                         </button>
+                        {pendingCommentBugId === selectedId && !commentRejection && (
+                          <button
+                            type="button"
+                            disabled={mutation !== null}
+                            onClick={() => void submitComment(undefined, true)}
+                          >
+                            确认上次记录
+                          </button>
+                        )}
+                        {commentRejection && pendingCommentBugId === selectedId && (
+                          <button
+                            type="button"
+                            disabled={mutation !== null || !comment.trim()}
+                            onClick={() =>
+                              void submitComment(undefined, false, commentRejection.id)
+                            }
+                          >
+                            保留失败记录并提交修改稿
+                          </button>
+                        )}
                       </form>
                     </div>
                   </details>
@@ -3139,19 +3311,21 @@ export default function App({
               <textarea
                 autoFocus
                 maxLength={20000}
-                onChange={(event) => setNewContent(event.target.value)}
+                onChange={(event) => editCreate(() => setNewContent(event.target.value))}
                 placeholder="描述你看到的问题、复现位置和需要修复的表现"
                 required
                 rows={7}
                 value={newContent}
               />
-              <small>填写完整问题内容即可。</small>
+              <small>填写完整问题内容即可。重试会先确认上次提交，期间新改的内容会保留。</small>
             </label>
             <div className="form-grid">
               <label>
                 严重程度
                 <select
-                  onChange={(event) => setNewSeverity(event.target.value as typeof newSeverity)}
+                  onChange={(event) =>
+                    editCreate(() => setNewSeverity(event.target.value as typeof newSeverity))
+                  }
                   value={newSeverity}
                 >
                   {["S0", "S1", "S2", "S3", "S4"].map((value) => (
@@ -3161,7 +3335,10 @@ export default function App({
               </label>
               <label>
                 修复人（可稍后分配）
-                <select onChange={(event) => setNewOwnerId(event.target.value)} value={newOwnerId}>
+                <select
+                  onChange={(event) => editCreate(() => setNewOwnerId(event.target.value))}
+                  value={newOwnerId}
+                >
                   <option value="">暂不指定</option>
                   {owners.map((member) => (
                     <option key={member.userId} value={member.userId}>
@@ -3173,7 +3350,7 @@ export default function App({
               <label>
                 关闭人
                 <select
-                  onChange={(event) => setNewVerifierId(event.target.value)}
+                  onChange={(event) => editCreate(() => setNewVerifierId(event.target.value))}
                   value={newVerifierId}
                 >
                   {verifiers.map((member) => (
@@ -3210,7 +3387,9 @@ export default function App({
                     <button
                       aria-label={`移除图片 ${preview.file.name}`}
                       onClick={() =>
-                        setNewFiles((current) => current.filter((file) => file !== preview.file))
+                        editCreate(() =>
+                          setNewFiles((current) => current.filter((file) => file !== preview.file)),
+                        )
                       }
                       type="button"
                     >
@@ -3221,6 +3400,24 @@ export default function App({
               </div>
             )}
             <div className="modal-actions">
+              {hasPendingBug && !bugRejection && (
+                <button
+                  type="button"
+                  disabled={createMutation !== null}
+                  onClick={() => void submitBug(undefined, true)}
+                >
+                  确认上次提交
+                </button>
+              )}
+              {bugRejection && (
+                <button
+                  type="button"
+                  disabled={createMutation !== null || !newContent.trim() || !newVerifierId}
+                  onClick={() => void submitBug(undefined, false, bugRejection.id)}
+                >
+                  保留失败记录并提交修改稿
+                </button>
+              )}
               <button
                 className="secondary-button"
                 onClick={() => setCreateOpen(false)}

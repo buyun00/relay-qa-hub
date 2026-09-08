@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-08 23:17:25 UTC",
+  "scope": "Frozen shared Web/EXE source only; no application build, deployment, live server or client acceptance.",
+  "passed": true,
+  "checks": [
+    {
+      "name": "web",
+      "command": "$env:QA_HUB_API_BASE_URL='http://127.0.0.1:9'; node ../../node_modules/vitest/vitest.mjs run",
+      "workingDirectory": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\web",
+      "startedAt": "2026-09-08 23:17:05 UTC",
+      "completedObservationAt": "2026-09-08 23:17:15 UTC",
+      "exitCode": 0,
+      "log": "runs/web-pending-submission-source.txt"
+    },
+    {
+      "name": "typecheck",
+      "command": "node node_modules/typescript/bin/tsc -p apps/web/tsconfig.app.json --noEmit; if ($LASTEXITCODE -eq 0) { node node_modules/typescript/bin/tsc -p apps/web/tsconfig.node.json --noEmit }",
+      "workingDirectory": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+      "startedAt": "2026-09-08 23:17:05 UTC",
+      "completedObservationAt": "2026-09-08 23:17:25 UTC",
+      "exitCode": 0,
+      "log": "runs/web-pending-submission-source.txt"
+    },
+    {
+      "name": "lint",
+      "command": "node ../../node_modules/eslint/bin/eslint.js src/App.tsx src/api.ts src/project-drafts.ts src/pending-submission.ts src/pending-submission.test.ts src/project-drafts.test.ts --max-warnings=0",
+      "workingDirectory": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\web",
+      "startedAt": "2026-09-08 23:17:05 UTC",
+      "completedObservationAt": "2026-09-08 23:17:15 UTC",
+      "exitCode": 0,
+      "log": "runs/web-pending-submission-source.txt"
+    },
+    {
+      "name": "format",
+      "command": "node node_modules/prettier/bin/prettier.cjs --check apps/web/src/App.tsx apps/web/src/api.ts apps/web/src/project-drafts.ts apps/web/src/pending-submission.ts apps/web/src/pending-submission.test.ts apps/web/src/project-drafts.test.ts",
+      "workingDirectory": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+      "startedAt": "2026-09-08 23:17:05 UTC",
+      "completedObservationAt": "2026-09-08 23:17:15 UTC",
+      "exitCode": 0,
+      "log": "runs/web-pending-submission-source.txt"
+    }
+  ],
+  "web": {
+    "testFiles": 16,
+    "passed": 99,
+    "failed": 0,
+    "existingTests": 61,
+    "newTests": 38
+  },
+  "sourceFiles": [
+    {
+      "path": "apps/web/src/App.tsx",
+      "sha256": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
+      "bytes": 137001
+    },
+    {
+      "path": "apps/web/src/api.ts",
+      "sha256": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
+      "bytes": 70382
+    },
+    {
+      "path": "apps/web/src/project-drafts.ts",
+      "sha256": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
+      "bytes": 2556
+    },
+    {
+      "path": "apps/web/src/pending-submission.ts",
+      "sha256": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
+      "bytes": 17168
+    },
+    {
+      "path": "apps/web/src/pending-submission.test.ts",
+      "sha256": "f8e0958a67accd31fdab2a9d83b630c137e26a3bc420d940c46c2e68b2a89171",
+      "bytes": 27342
+    },
+    {
+      "path": "apps/web/src/project-drafts.test.ts",
+      "sha256": "e8e1f28b428ff71693f50fceb9d0a76fdf5063fd7bdbab968307a41471c5f915",
+      "bytes": 4080
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/evidence/project-components/runs/web-pending-submission-source.txt",
+      "sha256": "57c2b61bb942575e36df9b3de038fb62c616588e6a484763df9477689b6154c1",
+      "bytes": 1807
+    }
+  ],
+  "implemented": [
+    "Frozen Bug/comment business identity and complete core JSON before request; same scope and original intent on unknown outcome",
+    "Durable attachment File/hash/identity and init/chunk/finalize/bind checkpoints; equal current chunk version replay accepted",
+    "Strict IndexedDB write commit before subsequent effect; uncommitted writes excluded from in-memory cache",
+    "Unacknowledged successful receipts remain explicitly confirmable, including beside deliberately blank newer drafts; edited text/files retained",
+    "Definite rejection evidence retained before explicit atomic replacement; prior unknown/concurrent core attempts and 401/403/409/5xx never release an intent"
+  ],
+  "definiteRejectionPolicy": {
+    "upload": "HTTP400 UPLOAD_CONTENT_INVALID/INVALID_REQUEST only while durable core commitAttempts=0",
+    "core": "HTTP400 INVALID_REQUEST only first uncontended attempt=1 and durable current count still1; server parsing/adapter ordering reviewed",
+    "release": "Explicit user action rechecks the same rejection ID; retains original files, request, checkpoints and rejection"
+  },
+  "limitations": [
+    "Fetch responses and response-loss conditions are local test doubles, not a real HTTP service or installed client.",
+    "IndexedDB commit/abort tests use a controlled event boundary and pending-journal tests use a serialized storage adapter. They do not prove physical browser storage durability or a native browser/EXE process restart.",
+    "No real Web/EXE failure injection, upgrade or end-to-end acceptance was performed here.",
+    "No schema/queue cleanup, automatic unknown-intent abandonment or blanket 4xx retry reset was introduced."
+  ]
+}
