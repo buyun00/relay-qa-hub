@@ -59,6 +59,8 @@ describe("upload progress and terminal states", () => {
       mode: "publish_workflow",
     });
     expect(UPLOAD_MODES.map((mode) => mode.id)).toEqual(["publish_workflow", "prepare_publish"]);
+    expect(uploadDraftDefaults({ testerId: 1 }).testerId).toBe(11562);
+    expect(uploadDraftDefaults({ testerId: 1, defaultsVersion: 2 }).testerId).toBe(1);
     expect(uploadDraftDefaults({ productId: 12, channelId: "", testerId: 0 })).toMatchObject({
       productId: "2002",
       channelId: "1002",

@@ -4,7 +4,7 @@ import { DEFAULT_UPLOAD_PARAMETERS, type UploadInput } from "../../desktop/src/u
 export function uploadDraftDefaults(value: unknown): UploadInput {
   const draft =
     value && typeof value === "object" && !Array.isArray(value)
-      ? (value as Partial<UploadInput>)
+      ? (value as Partial<UploadInput> & { defaultsVersion?: number })
       : {};
   const version = typeof draft.version === "string" ? draft.version : "";
   return {
@@ -19,7 +19,9 @@ export function uploadDraftDefaults(value: unknown): UploadInput {
       (typeof draft.belongName === "string" && draft.belongName.trim()) ||
       DEFAULT_UPLOAD_PARAMETERS.belongName,
     testerId:
-      Number.isSafeInteger(draft.testerId) && Number(draft.testerId) > 0
+      Number.isSafeInteger(draft.testerId) &&
+      Number(draft.testerId) > 0 &&
+      (draft.testerId !== 1 || draft.defaultsVersion === 2)
         ? Number(draft.testerId)
         : DEFAULT_UPLOAD_PARAMETERS.testerId,
     version,

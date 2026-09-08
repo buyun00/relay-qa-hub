@@ -209,7 +209,7 @@ export default function UploadIncrementPage({
   }, [active, refreshRevision, refresh]);
   useEffect(() => {
     try {
-      localStorage.setItem(draftKey, JSON.stringify(form));
+      localStorage.setItem(draftKey, JSON.stringify({ ...form, defaultsVersion: 2 }));
     } catch {
       /* Keep the in-memory draft if local storage is full. */
     }
