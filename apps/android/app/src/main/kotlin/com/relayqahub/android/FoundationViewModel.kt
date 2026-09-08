@@ -11,6 +11,9 @@ import com.relayqahub.android.capture.PendingCaptureDraft
 import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
 import com.relayqahub.android.data.QueueState
+import com.relayqahub.android.data.commitDurableBugDraft
+import com.relayqahub.android.data.noBugPostRejectionFingerprint
+import com.relayqahub.android.data.isReconfirmableCreateProtocolFailure
 import com.relayqahub.android.capture.CapturePocoSummary
 import com.relayqahub.android.network.AttachmentUploadFailure
 import com.relayqahub.android.network.AndroidUpdateRelease
@@ -91,6 +94,8 @@ data class FoundationUiState(
     val selfUpdate: SelfUpdateUiState = SelfUpdateUiState(),
     val gameApkCatalog: GameApkCatalogUiState = GameApkCatalogUiState(),
     val apkDownload: ApkDownloadUiState = ApkDownloadUiState(),
+    val replaceableRejectedCreationId: String? = null,
+    val reconfirmableCreationId: String? = null,
 )
 
 enum class QaHubPage {
@@ -392,6 +397,8 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     private val preferredFixerId = MutableStateFlow<String?>(null)
     private val bugDetail = MutableStateFlow(BugDetailUiState())
     private val newBugFormRevision = MutableStateFlow(0L)
+    private val replaceableRejectedCreationId = MutableStateFlow<String?>(null)
+    private val reconfirmableCreationId = MutableStateFlow<String?>(null)
     private val selfUpdate = MutableStateFlow(SelfUpdateUiState())
     private val gameApkCatalog = MutableStateFlow(GameApkCatalogUiState())
     private val apkDownload = MutableStateFlow(ApkDownloadUiState())
@@ -506,6 +513,12 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         .combine(newBugFormRevision) { state, revision ->
             state.copy(newBugFormRevision = revision)
         }
+        .combine(replaceableRejectedCreationId) { state, operationId ->
+            state.copy(replaceableRejectedCreationId = operationId)
+        }
+        .combine(reconfirmableCreationId) { state, operationId ->
+            state.copy(reconfirmableCreationId = operationId)
+        }
         .combine(selfUpdate) { state, update -> state.copy(selfUpdate = update) }
         .combine(gameApkCatalog) { state, catalog -> state.copy(gameApkCatalog = catalog) }
         .combine(apkDownload) { state, download -> state.copy(apkDownload = download) }
@@ -540,6 +553,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         checkForSelfUpdate()
         viewModelScope.launch {
             appContainer.scopedRepository.observeLatestSubmission(scope).collect { latestSubmission ->
+                runCatching { reconcilePendingBugSubmission() }.onFailure {
+                    lastAction.value = "提交确认记录暂时无法保存；草稿和原提交身份仍保留，请重试。"
+                }
                 refreshPendingCaptureState()
                 if (latestSubmission.receipt != null && page.value != QaHubPage.NEW_BUG) {
                     refreshBugWorkbench()
@@ -742,13 +758,16 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         captureDraft.value = current.copy(isDeleting = true)
         viewModelScope.launch {
             runCatching {
+                check(appContainer.bugDraftPreferences.pending(draftKey)?.captureId != captureId) {
+                    "这张图片的原提交仍待确认；确认后再删除，当前修改会保留。"
+                }
                 val draft = appContainer.pendingCaptureDraftStore.find(captureId)
                     ?: error("截图草稿读取失败，请重试。")
                 val operation = appContainer.scopedRepository.findOperationByIdempotencyKey(
                     scope = scope,
                     idempotencyKey = "submission:${draft.clientSubmissionId}:commit",
                 )
-                check(operation == null || operation.state == QueueState.FAILED_PERMANENT) {
+                check(operation == null || appContainer.bugDraftPreferences.isReleasedRejection(draftKey, operation)) {
                     "这张图片已随单子提交，请在单子详情中修改。"
                 }
                 appContainer.pendingCaptureDraftStore.delete(draft)
@@ -852,6 +871,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         ownerId: String?,
         verificationOwnerId: String?,
         navigateAfterQueue: Boolean,
+        originalFormDraft: SavedBugDraft? = null,
         onCompleted: () -> Unit = {},
     ) {
         val immutableOriginal = originalPng?.takeIf { annotatedPng == null }?.copyOf()
@@ -864,86 +884,105 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
 
-            val preferredKey = "submission:$submissionId:commit"
-            val previous = appContainer.scopedRepository.findOperationByIdempotencyKey(
-                scope = scope,
-                idempotencyKey = preferredKey,
-            )
-            if (previous != null && previous.state != QueueState.FAILED_PERMANENT) {
-                lastAction.value = "$actionLabel 已在持久队列中，无需重复提交。"
-                if (navigateAfterQueue) finishNewBugForm()
+            if (reuseDurableBugDraft(submissionId, navigateAfterQueue)) {
                 onCompleted()
                 return@launch
             }
-            val effectiveSubmissionId = if (previous == null) submissionId else UUID.randomUUID().toString()
-            val effectiveOriginalAttachmentId = if (previous == null) {
-                originalAttachmentId
-            } else {
-                UUID.randomUUID().toString()
-            }
+            val effectiveSubmissionId = submissionId
+            val effectiveOriginalAttachmentId = originalAttachmentId
             val persistedAttachmentIds = mutableListOf<String>()
+            var retainStagedAttachments = false
             lastAction.value = "正在持久保存 Bug 字段和图片，尚未发起网络请求…"
             val result = runCatching {
-                appContainer.scopedRepository.seedFoundationScope(scope)
-                val stagedAttachments = buildList {
-                    immutableOriginal?.let { bytes ->
-                        val metadata = appContainer.offlineAttachmentDraftStore.persist(
-                            submissionId = effectiveSubmissionId,
-                            clientAttachmentId = effectiveOriginalAttachmentId,
-                            pngBytes = bytes,
-                        )
-                        persistedAttachmentIds += effectiveOriginalAttachmentId
-                        add(
-                            StagedOfflineAttachment(
-                                clientAttachmentId = effectiveOriginalAttachmentId,
-                                filename = originalFilename,
-                                expectedSize = metadata.expectedSize,
-                                sha256 = metadata.sha256,
-                                role = OfflineAttachmentDraftContract.ROLE_ORIGINAL,
+                commitDurableBugDraft(
+                    prepare = {
+                        appContainer.scopedRepository.seedFoundationScope(scope)
+                        val stagedAttachments = buildList {
+                            immutableOriginal?.let { bytes ->
+                                val metadata = appContainer.offlineAttachmentDraftStore.persist(
+                                    submissionId = effectiveSubmissionId,
+                                    clientAttachmentId = effectiveOriginalAttachmentId,
+                                    pngBytes = bytes,
+                                )
+                                persistedAttachmentIds += effectiveOriginalAttachmentId
+                                add(
+                                    StagedOfflineAttachment(
+                                        clientAttachmentId = effectiveOriginalAttachmentId,
+                                        filename = originalFilename,
+                                        expectedSize = metadata.expectedSize,
+                                        sha256 = metadata.sha256,
+                                        role = OfflineAttachmentDraftContract.ROLE_ORIGINAL,
+                                    ),
+                                )
+                            }
+                            immutableAnnotated?.let { bytes ->
+                                val annotatedAttachmentId = UUID.nameUUIDFromBytes(
+                                    "$effectiveSubmissionId:annotated".toByteArray(Charsets.UTF_8),
+                                ).toString()
+                                val metadata = appContainer.offlineAttachmentDraftStore.persist(
+                                    submissionId = effectiveSubmissionId,
+                                    clientAttachmentId = annotatedAttachmentId,
+                                    pngBytes = bytes,
+                                )
+                                persistedAttachmentIds += annotatedAttachmentId
+                                add(
+                                    StagedOfflineAttachment(
+                                        clientAttachmentId = annotatedAttachmentId,
+                                        filename = originalFilename.substringBeforeLast('.', originalFilename) +
+                                            "-annotated.png",
+                                        expectedSize = metadata.expectedSize,
+                                        sha256 = metadata.sha256,
+                                        role = OfflineAttachmentDraftContract.ROLE_ANNOTATED,
+                                    ),
+                                )
+                            }
+                        }
+                        OfflineAttachmentDraftContract.buildOperation(
+                            projectId = scope.projectId,
+                            staged = StagedOfflineBugDraft(
+                                submissionId = effectiveSubmissionId,
+                                observedAt = observedAt,
+                                qaAppVersion = qaAppVersion,
+                                title = title,
+                                description = description,
+                                expectedBehavior = expectedBehavior,
+                                ownerId = ownerId,
+                                verificationOwnerId = verificationOwnerId,
+                                captureId = captureId,
+                                capturedAtEpochMs = capturedAtEpochMs,
+                                attachments = stagedAttachments,
                             ),
                         )
-                    }
-                    immutableAnnotated?.let { bytes ->
-                        val annotatedAttachmentId = UUID.nameUUIDFromBytes(
-                            "$effectiveSubmissionId:annotated".toByteArray(Charsets.UTF_8),
-                        ).toString()
-                        val metadata = appContainer.offlineAttachmentDraftStore.persist(
-                            submissionId = effectiveSubmissionId,
-                            clientAttachmentId = annotatedAttachmentId,
-                            pngBytes = bytes,
-                        )
-                        persistedAttachmentIds += annotatedAttachmentId
-                        add(
-                            StagedOfflineAttachment(
-                                clientAttachmentId = annotatedAttachmentId,
-                                filename = originalFilename.substringBeforeLast('.', originalFilename) +
-                                    "-annotated.png",
-                                expectedSize = metadata.expectedSize,
-                                sha256 = metadata.sha256,
-                                role = OfflineAttachmentDraftContract.ROLE_ANNOTATED,
+                    },
+                    saveIntent = if (navigateAfterQueue) { request ->
+                        // Save the complete immutable intent before Room can dispatch it. Even a failed
+                        // preference commit can have uncertain durability, so retain its media as well.
+                        retainStagedAttachments = true
+                        appContainer.bugDraftPreferences.savePending(
+                            draftKey,
+                            PendingBugSubmission(
+                                effectiveSubmissionId, effectiveOriginalAttachmentId,
+                                originalFormDraft, captureId, scope, request,
                             ),
                         )
-                    }
-                }
-                val request = OfflineAttachmentDraftContract.buildOperation(
-                    projectId = scope.projectId,
-                    staged = StagedOfflineBugDraft(
-                        submissionId = effectiveSubmissionId,
-                        observedAt = observedAt,
-                        qaAppVersion = qaAppVersion,
-                        title = title,
-                        description = description,
-                        expectedBehavior = expectedBehavior,
-                        ownerId = ownerId,
-                        verificationOwnerId = verificationOwnerId,
-                        captureId = captureId,
-                        capturedAtEpochMs = capturedAtEpochMs,
-                        attachments = stagedAttachments,
-                    ),
+                    } else null,
+                    enqueue = { request -> appContainer.scopedRepository.enqueue(scope, request).also {
+                        retainStagedAttachments = true
+                    } },
+                    markQueued = { operationId ->
+                        if (navigateAfterQueue) appContainer.bugDraftPreferences.markQueued(
+                            draftKey, effectiveSubmissionId, operationId,
+                        )
+                    },
+                    schedule = { appContainer.syncScheduler.enqueue(scope) },
+                    discardStaged = {
+                        persistedAttachmentIds.forEach { attachmentId ->
+                            runCatching {
+                                appContainer.offlineAttachmentDraftStore.delete(effectiveSubmissionId, attachmentId)
+                            }
+                        }
+                    },
                 )
-                val operationId = appContainer.scopedRepository.enqueue(scope, request)
-                appContainer.syncScheduler.enqueue(scope)
-                operationId
             }
             result.onSuccess { operationId ->
                 lastAction.value =
@@ -951,27 +990,158 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                         if (captureId == null) "" else " Poco 上下文将在线尽力附加，失败不阻断 Bug。"
                 if (navigateAfterQueue) finishNewBugForm()
             }.onFailure { failure ->
-                persistedAttachmentIds.forEach { attachmentId ->
-                    runCatching {
-                        appContainer.offlineAttachmentDraftStore.delete(
-                            effectiveSubmissionId,
-                            attachmentId,
-                        )
-                    }
-                }
                 val code = (failure as? LiveSmokeFailure)?.code
                     ?: "OFFLINE_DRAFT_PERSIST_FAILED"
-                lastAction.value = "$actionLabel failed: $code."
+                lastAction.value = if (retainStagedAttachments) {
+                    "提交或调度暂时无法完成，原内容和图片已保留；再次提交将确认原记录，不会替换它。"
+                } else "$actionLabel failed: $code."
             }
             onCompleted()
         }
     }
 
     private fun finishNewBugForm() {
-        appContainer.bugDraftPreferences.clear(draftKey)
-        captureDraft.value = CaptureDraftUiState()
-        newBugFormRevision.value += 1
+        // The visible form can close once durable; its identity and text remain until confirmation.
         page.value = QaHubPage.BUG_LIST
+    }
+
+    private suspend fun reuseDurableBugDraft(submissionId: String, navigate: Boolean): Boolean {
+        return try {
+            val pending = appContainer.bugDraftPreferences.pending(draftKey)?.takeIf {
+                it.submissionId == submissionId
+            }
+            pending?.requireScope(scope)
+            val previous = appContainer.scopedRepository.resumeUnconfirmedCreate(
+                scope, "submission:$submissionId:commit",
+            ) ?: run {
+                if (pending == null) return false
+                // A crash before Room insertion can resume only the saved request, never the open form.
+                val request = pending.preparedRequest(scope)
+                appContainer.scopedRepository.seedFoundationScope(scope)
+                val operationId = appContainer.scopedRepository.enqueue(scope, request)
+                appContainer.bugDraftPreferences.markQueued(draftKey, submissionId, operationId)
+                checkNotNull(appContainer.scopedRepository.findOperationByIdempotencyKey(scope, request.idempotencyKey))
+            }
+            check(pending?.operationId == null || pending.operationId == previous.operationId) {
+                "原提交记录身份不一致，请恢复本地队列。"
+            }
+            if (pending != null && pending.operationId == null) {
+                appContainer.bugDraftPreferences.markQueued(draftKey, submissionId, previous.operationId)
+            }
+            if (previous.state == QueueState.FAILED_PERMANENT) {
+                reconfirmableCreationId.value = previous.operationId.takeIf { previous.isReconfirmableCreateProtocolFailure() }
+                replaceableRejectedCreationId.value = previous.operationId.takeIf {
+                    previous.noBugPostRejectionFingerprint() != null
+                }
+                lastAction.value = if (replaceableRejectedCreationId.value != null) {
+                    "附件阶段已明确拒绝，尚未发送 Bug 创建。可使用下方按钮保留原失败记录和图片，再修改草稿。"
+                } else if (reconfirmableCreationId.value != null) {
+                    "原提交收到异常成功回执，尚未确认。可点击下方“使用原请求重新确认”，沿用原内容和身份。"
+                } else "原提交结果仍无法确认 (${previous.lastErrorCode ?: "UNKNOWN"})；" +
+                    "已保留原内容和身份，请先核对原记录，不能自动换身份新建 Bug。"
+                return true
+            }
+            if (previous.state == QueueState.SUCCEEDED) {
+                lastAction.value = if (reconcilePendingBugSubmission()) {
+                    "原提交已收到服务端确认，无需重复创建 Bug；保留的修改可另行提交。"
+                } else "原提交成功回执暂时无法核对，原身份和当前草稿已保留，不能重复创建。"
+            } else {
+                appContainer.syncScheduler.enqueue(scope)
+                lastAction.value = "正在确认原提交；将沿用已保存的内容和图片。当前修改另行保留，确认后可再提交。"
+            }
+            // Keep the open form, including unsaved annotation-editor strokes, while confirming.
+            if (navigate && page.value != QaHubPage.NEW_BUG) finishNewBugForm()
+            true
+        } catch (failure: Exception) {
+            if (failure is kotlinx.coroutines.CancellationException) throw failure
+            lastAction.value = "原提交暂时无法确认；当前内容已保留，请稍后重试，避免重复创建。"
+            true // Failure to inspect/rearm an original operation never authorizes a replacement.
+        }
+    }
+
+    private suspend fun reconcilePendingBugSubmission(): Boolean {
+        val pending = appContainer.bugDraftPreferences.pending(draftKey) ?: return false
+        pending.requireScope(scope)
+        val operation = appContainer.scopedRepository.findOperationByIdempotencyKey(
+            scope, "submission:${pending.submissionId}:commit",
+        ) ?: return false
+        if (pending.operationId != null && pending.operationId != operation.operationId) return false
+        if (operation.state != QueueState.SUCCEEDED) return false
+        val receipt = appContainer.scopedRepository.findReceipt(scope, operation.operationId) ?: return false
+        if (receipt.clientSubmissionId != pending.submissionId || receipt.qaItemId != receipt.bugId) return false
+        val cleared = appContainer.bugDraftPreferences.confirmPending(
+            draftKey, pending.submissionId,
+            preserveDraft = page.value == QaHubPage.NEW_BUG || captureDraft.value.captureId != pending.captureId,
+        )
+        if (cleared) {
+            if (captureDraft.value.captureId == pending.captureId) captureDraft.value = CaptureDraftUiState()
+            newBugFormRevision.value += 1
+        }
+        lastAction.value = if (cleared) "${receipt.qaItemKey} 已确认提交。"
+        else "${receipt.qaItemKey} 已确认提交；当前文字、截图和批注保留。再次提交会新建 Bug，请先确认内容。"
+        return true
+    }
+
+    private suspend fun recoverLegacyCreation(draft: PendingCaptureDraft?): Boolean {
+        val candidates = appContainer.scopedRepository.findLegacyUnconfirmedCreates(scope, draft?.clientSubmissionId)
+            .filterNot { appContainer.bugDraftPreferences.isReleasedRejection(draftKey, it) }
+        val original = candidates.firstOrNull() ?: return false
+        val sameCapture = draft?.takeIf { original.idempotencyKey == "submission:${it.clientSubmissionId}:commit" }
+        appContainer.bugDraftPreferences.savePending(draftKey, PendingBugSubmission.fromQueuedCreate(
+            scope, original, sameCapture?.captureId, sameCapture?.clientAttachmentId,
+        ))
+        replaceableRejectedCreationId.value = original.operationId.takeIf {
+            original.noBugPostRejectionFingerprint() != null
+        }
+        reconfirmableCreationId.value = original.operationId.takeIf { original.isReconfirmableCreateProtocolFailure() }
+        // A legacy text row cannot be proven to belong to the current form. Offer its original
+        // queue intent explicitly, without submitting either it or the newly edited form here.
+        lastAction.value = "找到 ${candidates.size} 条旧版本未确认创建记录；" +
+            "先保留原记录 ${original.operationId.take(8)}，当前文字和图片不变。" +
+            "再次点击提交只会确认这条旧记录，不会提交当前修改。"
+        return true
+    }
+
+    fun preserveRejectedCreationAndEdit() {
+        val candidateId = replaceableRejectedCreationId.value ?: return
+        replaceableRejectedCreationId.value = null
+        viewModelScope.launch {
+            runCatching {
+                val pending = checkNotNull(appContainer.bugDraftPreferences.pending(draftKey))
+                check(pending.operationId == candidateId)
+                val operation = checkNotNull(appContainer.scopedRepository.findOperationByIdempotencyKey(
+                    scope, "submission:${pending.submissionId}:commit",
+                ))
+                appContainer.bugDraftPreferences.releaseRejectedBeforeBugPost(draftKey, scope, operation)
+            }.onSuccess {
+                replaceableRejectedCreationId.value = null
+                lastAction.value = "旧请求在附件阶段已拒绝，尚未发送 Bug 创建；失败记录和原图片仍保留。" +
+                    "请修改当前草稿或更换图片，再点击提交创建新 Bug。"
+            }.onFailure {
+                replaceableRejectedCreationId.value = null
+                lastAction.value = "无法证明原请求尚未创建 Bug，已保留原身份；请先核对原记录。"
+            }
+        }
+    }
+
+    fun reconfirmOriginalCreation() {
+        val candidateId = reconfirmableCreationId.value ?: return
+        reconfirmableCreationId.value = null
+        viewModelScope.launch {
+            runCatching {
+                val pending = checkNotNull(appContainer.bugDraftPreferences.pending(draftKey))
+                pending.requireScope(scope)
+                check(pending.operationId == candidateId)
+                appContainer.scopedRepository.reconfirmCreateProtocolFailure(
+                    scope, candidateId, "submission:${pending.submissionId}:commit",
+                )
+                appContainer.syncScheduler.enqueue(scope)
+            }.onSuccess {
+                lastAction.value = "正在使用原请求重新确认；原 ID、内容和图片不变，仍须收到归属一致的有效回执。"
+            }.onFailure {
+                lastAction.value = "原请求暂时无法重新确认；原记录和当前草稿仍保留，没有新建替代请求。"
+            }
+        }
     }
 
     /**
@@ -1761,8 +1931,39 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             lastAction.value = "请选择验收人。"
             return
         }
+        if (runCatching { saveNewBugDraft(SavedBugDraft(content, fixerId, verifierId)) }.isFailure) {
+            lastAction.value = "草稿暂时无法保存，请重试；尚未发送新的提交。"
+            return
+        }
         captureDraft.value = draftState.copy(isSubmitting = true)
+        replaceableRejectedCreationId.value = null
+        reconfirmableCreationId.value = null
         viewModelScope.launch {
+            val pending = runCatching { appContainer.bugDraftPreferences.pending(draftKey) }
+                .getOrElse {
+                    captureDraft.value = draftState
+                    lastAction.value = "上次提交记录无法读取，草稿已保留；请先恢复提交记录。"
+                    return@launch
+                }
+            if (pending != null && reuseDurableBugDraft(pending.submissionId, true)) {
+                captureDraft.value = captureDraft.value.copy(isSubmitting = false)
+                return@launch
+            }
+            if (pending == null) {
+                val recovered = runCatching {
+                    val originalCapture = draftState.captureId?.let {
+                        appContainer.pendingCaptureDraftStore.find(it) ?: error("原截图草稿无法读取")
+                    }
+                    recoverLegacyCreation(originalCapture)
+                }.getOrElse {
+                    lastAction.value = "旧版本提交记录暂时无法安全核对；当前草稿已保留，尚未新建 Bug。"
+                    true
+                }
+                if (recovered) {
+                    captureDraft.value = captureDraft.value.copy(isSubmitting = false)
+                    return@launch
+                }
+            }
             val media = runCatching {
                 val draft = draftState.captureId?.let { captureId ->
                     appContainer.pendingCaptureDraftStore.find(captureId)
@@ -1777,8 +1978,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
             val (draft, originalPng) = media
-            val submissionId = draft?.clientSubmissionId ?: UUID.randomUUID().toString()
-            val originalAttachmentId = draft?.clientAttachmentId ?: UUID.randomUUID().toString()
+            // A confirmed, conservatively retained screenshot is a draft asset, not a creation ID.
+            val submissionId = pending?.submissionId ?: UUID.randomUUID().toString()
+            val originalAttachmentId = pending?.attachmentId ?: UUID.randomUUID().toString()
             queueDurableBugDraft(
                 originalPng = originalPng,
                 annotatedPng = annotatedPng,
@@ -1796,6 +1998,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 ownerId = fixerId.takeIf(String::isNotBlank),
                 verificationOwnerId = verifierId,
                 navigateAfterQueue = true,
+                originalFormDraft = SavedBugDraft(content, fixerId, verifierId),
                 onCompleted = {
                     if (captureDraft.value.captureId == draftState.captureId) {
                         captureDraft.value = captureDraft.value.copy(isSubmitting = false)
@@ -1897,6 +2100,11 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             operation?.state == QueueState.SUCCEEDED &&
             appContainer.scopedRepository.findReceipt(scope, operation.operationId) != null
         ) {
+            // A receipt for this capture's earlier use cannot delete the current unsent draft.
+            if (captureDraft.value.captureId == draft.captureId || readNewBugDraft() != SavedBugDraft()) {
+                pendingCapture.value = draft.toUiState("SAVED")
+                return
+            }
             runCatching { appContainer.pendingCaptureDraftStore.delete(draft) }
             pendingCapture.value = PendingCaptureUiState()
             return

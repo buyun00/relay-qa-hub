@@ -6,6 +6,7 @@ import com.relayqahub.android.data.OfflineOperationDao
 import com.relayqahub.android.data.OfflineOperationEntity
 import com.relayqahub.android.data.OfflineOperationReceiptEntity
 import com.relayqahub.android.data.QueueState
+import com.relayqahub.android.data.UNCERTAIN_CREATE_ERROR_PREFIX
 import com.relayqahub.android.network.ApiOutcome
 import com.relayqahub.android.network.CreateBugReceipt
 import com.relayqahub.android.network.QaHubApiClient
@@ -151,7 +152,7 @@ class OfflineSyncEngine(
                                 scope,
                                 operation,
                                 QueueState.FAILED_PERMANENT,
-                                "RETRY_EXHAUSTED_${stage.errorCode}",
+                                "$UNCERTAIN_CREATE_ERROR_PREFIX${stage.errorCode}",
                                 now,
                             )
                         } else {
@@ -240,7 +241,9 @@ class OfflineSyncEngine(
                             scope,
                             executableOperation,
                             QueueState.FAILED_PERMANENT,
-                            "RETRY_EXHAUSTED_${outcome.errorCode}",
+                            // No response is not proof of rejection. Keep this exact operation
+                            // available for explicit confirmation through the same idempotency key.
+                            "$UNCERTAIN_CREATE_ERROR_PREFIX${outcome.errorCode}",
                             now,
                         )
                     } else {

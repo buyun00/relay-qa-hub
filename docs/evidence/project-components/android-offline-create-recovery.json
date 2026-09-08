@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T23:32:16.030Z",
+  "kind": "android-source-and-isolated-fixture-verification",
+  "sourceBaseHead": "7904e2c2d7285003884a5788a83300fbf521dbf1",
+  "sourceFrozen": true,
+  "sourceFiles": [
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/BugDraftPreferences.kt",
+      "sha256": "710a77ed0afa5ec680bac1de4f689c264783a2dc5aaee2e873b88c19f7164bf5"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/FoundationViewModel.kt",
+      "sha256": "91529b32553ebcf41628851e76f756272a141eac580192ac141645162ddebdad"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/Daos.kt",
+      "sha256": "7aa6fa6b7826492fc1c01e0dbd923c0e0319a82a73dcd1e8ec8f6965ff18e7c9"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/ScopedRepository.kt",
+      "sha256": "69d6794b7b7c784d7f30f3551901cad77c265d58576cdecc9cd036e350bcf193"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/UnconfirmedCreateSubmission.kt",
+      "sha256": "eb9590c65a69223ff3ddff39b5e9655ad7243b105c817ca1ef9ef62bc80bb86e"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/DurableBugDraftCommit.kt",
+      "sha256": "d36e190d927dbbb24108834f18680dabf6ba0291497dadd35a8aa049a542b7db"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/work/OfflineSyncEngine.kt",
+      "sha256": "c253c457fad29d377abdd0774d5443d0e71264aaa9cfe7682d15d08796a22da6"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
+      "sha256": "592ec742249e32c87f274029795c6ada50e2cf96be51fb135fae3df0ff093e3e"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/work/OfflineSyncEngineTest.kt",
+      "sha256": "95ce6a53c23f22c3e83180a22c8d45c6503db7c403734028a500fee749df9580"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/BugDraftPreferencesTest.kt",
+      "sha256": "5a969d26a5d642e8ce7cbfbb69972f50d8b9fcef81bee2083bfc5d766406ea63"
+    }
+  ],
+  "unit": {
+    "tests": 115,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "newTests": 28,
+    "reports": [
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.ApkInstallFlowTest.xml",
+        "sha256": "28b2e5cc6197ba999804bf94f01a76552a99df00ad687990487028924c96812a",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.BugDraftPreferencesTest.xml",
+        "sha256": "33488a9c7dadd1fe443b30e945fdfaaeb74909cab98d7fd500529c5b62170eac",
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.capture.CaptureDisplayGeometryTest.xml",
+        "sha256": "4d191925ac6f1e028b2edad562466988c481f4585210c9250a3f0721a563f1cd",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.capture.PendingCaptureDeletionTest.xml",
+        "sha256": "3ec5f2cc227093b84307e3b67361b9e395a29d2c74566b97b6de8f017b9acba5",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.FoundationViewModelContractTest.xml",
+        "sha256": "8849755f97f034936af78a808aa1def6df454d938a0b047d0e40b82e122ad8dc",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.network.AccountSessionClientTest.xml",
+        "sha256": "9074cde55b21f76e86f5103e6acea215fb4c369ca8e0f92113983bf84ffc0cf8",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.network.ApkDistributionClientTest.xml",
+        "sha256": "b88741f6db4d73d4591be002b09ef0cc0b04bf1a7cdbcc076d3f4dab069dbd04",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.network.BugLifecycleClientTest.xml",
+        "sha256": "4f878a56a06bcef95a0ec35a2646bcfc7e0c6a33914e81e92919e3096e418550",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.network.BugWorkbenchClientTest.xml",
+        "sha256": "02eb1dc6452c4dfbeb1ece8fcb5a97d026b1a23f3fa99bbae06094c761cdb56b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.network.QaHubApiClientTest.xml",
+        "sha256": "54d8529b45d8ac4e6c8d34934d588e7052ea993cc501f0de4b316550f96dc770",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.network.RelayOperationsTest.xml",
+        "sha256": "89940d4b8bd19305bd3c0e702cb57c95f21c211080c8e61c7f9dcacce7703c14",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.overlay.OverlayGestureStateMachineTest.xml",
+        "sha256": "3c6b094ed9b0c516ecd1fb641124c087cc5b2ac1660edf48a5dbac885c24e02a",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.poco.PocoSimpleRpcClientTest.xml",
+        "sha256": "d8028d09fb8cec5611e387d39b30813d30fc03082b9a4e40b2ca56ff708a38cc",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.ProjectScopeIsolationTest.xml",
+        "sha256": "a9fa663dc902db8e93142590f3c91dd89f488c3731eaa64bfa6522eb15a2290f",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.QaRuntimeConfigTest.xml",
+        "sha256": "3d416b5bcc40ac61b2b54f5c986f3218fa3a558ec727c380f15bcec11de21443",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.security.CredentialVaultTest.xml",
+        "sha256": "8818641a14762fc138fd900a0a57f31b7171485c407afc29daba77163098945b",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.security.SessionLifecycleCoordinatorTest.xml",
+        "sha256": "7dae80b2489d046121ccfa8f28248717ed1629b88c731824b202513ed9525995",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.ui.BugListFiltersTest.xml",
+        "sha256": "804929eb797a240e92a211ecc49faf734ec6391c8d4c1fb45aebf20c2cf6ef8a",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.work.DeviceSecurityResumeCoordinatorTest.xml",
+        "sha256": "46a4c81aa8c05ff83eb3768a1624dcccc41deea0203a54b8e8150fcf1d3e8b3c",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.work.OfflineSyncEngineTest.xml",
+        "sha256": "5dae7163f73fca28b64872517755ee56e9bfa777c2a38b87b1635d14e5f7c4ee",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "apps/android/app/build/test-results/testDebugUnitTest/TEST-com.relayqahub.android.work.SyncSchedulerTest.xml",
+        "sha256": "3cba90a7ef849ad04a0c6231841f1c48a1cf626deb2c4cb22d7f9afc37cf4d05",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 33,
+    "report": "apps/android/app/build/reports/lint-results-debug.txt",
+    "sha256": "32f102f64030a74d3c6d5977386c3d28199f558ab7b8ed4c619fd914445d9b14",
+    "additionalWarnings": "Four UseKtx suggestions on explicit checked SharedPreferences.commit calls; their Boolean durability result is intentionally inspected."
+  },
+  "verificationLog": {
+    "path": "docs/evidence/project-components/runs/android-offline-create-protocol-source-retry.txt",
+    "scope": "Final complete unit and lint verification after synchronizing fixture clocks; 36 seconds, BUILD SUCCESSFUL",
+    "sha256": "53a7683f1399cbf873d6b39ae6f1db97954c5d9d13ea8125a661172274df126a"
+  },
+  "actualHttpFaultFixture": {
+    "transport": "Real hardened OkHttp client and ephemeral IPv4-loopback HttpServer; fake scoped DAO boundary",
+    "committedResponseLosses": 4,
+    "explicitRetryRequests": 1,
+    "serverEffects": 1,
+    "distinctIdempotencyKeys": 1,
+    "distinctPayloads": 1,
+    "queueRows": 1,
+    "receipts": 1,
+    "realQaHubApi": false
+  },
+  "daoSql": {
+    "source": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/Daos.kt",
+    "extraction": "Actual @Query immediately preceding resumeUnconfirmedCreate; executed in Node DatabaseSync :memory:",
+    "querySha256": "52c3e16e3f4ffa7ca2fe8aab26ea1eaea019745e68494aca9f7d30ea93a3f07a",
+    "wrongScopeCases": 6,
+    "eligibleFirstCASChanges": 1,
+    "repeatedCASChanges": 0,
+    "immutableFields": 6,
+    "ineligibleCases": 6,
+    "passed": true
+  },
+  "mediaFixture": "Actual commitDurableBugDraft helper, SharedPreferences boundary fake, temporary file bytes/hash; scheduler failure leaves original intent, queue identity and bytes. Not PNG protocol validation.",
+  "preservation": {
+    "newQueueState": false,
+    "roomSchemaChange": false,
+    "fullScopeInPending": true,
+    "immutablePreparedRequest": true,
+    "knownMissingQueueRow": "fail_closed",
+    "sameCapture": "conservatively retain draft; no image-revision equality claim",
+    "openForm": "receipt does not clear the form or increment revision; retry does not navigate away",
+    "confirmedRetainedDraft": "UI says next explicit submit creates a new Bug; new IDs allocated only after original pending confirmation",
+    "pendingCaptureDelete": "Refused while unresolved; a precisely archived no-Bug-POST rejection can be released explicitly without deleting its original media."
+  },
+  "limits": {
+    "apkPackaged": false,
+    "apkInstalled": false,
+    "deviceTouched": false,
+    "productionOrPreviewServiceTouched": false,
+    "physicalDeviceFaultInjection": false,
+    "composeUiFaultInjection": false,
+    "roomInstrumentedDatabase": false,
+    "persistingUnsavedAnnotationStrokesAcrossNavigationOrProcessDeath": false,
+    "editComponentLifecycleRetryFixes": false,
+    "baseline14ClientPassClaim": false,
+    "genericPermanentRecovery": "Unknown or unaudited classifications remain held with no general retry/release path; only the explicit protocol whitelist and proven STAGE rejection paths are added."
+  },
+  "excludedBuildArtifacts": [
+    "apps/android/.kotlin/",
+    "apps/android/.gradle/",
+    "apps/android/app/build/"
+  ],
+  "verificationHistory": [
+    {
+      "path": "docs/evidence/project-components/runs/android-offline-create-source.txt",
+      "sha256": "ebbac67922f757b771cefc06adaedd3254e60e0b8c67af8a92823095e571a70d"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/android-offline-create-legacy-source.txt",
+      "sha256": "776e9352dab2bb56e369d6bd0e50863bcde8c5a8e26041a167a9bc78f0cc414e"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/android-offline-create-rejection-source.txt",
+      "sha256": "133419a247a7895597bfb031a5df16a99d755c158e20ce516d883b005e1472e8"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/android-offline-create-protocol-source.txt",
+      "sha256": "6f40bd82c90066c73beb3ec38f100c9062921cc8e53d6a1f5299dc35405204d5"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/android-offline-create-protocol-source-retry.txt",
+      "sha256": "53a7683f1399cbf873d6b39ae6f1db97954c5d9d13ea8125a661172274df126a"
+    }
+  ],
+  "preservedFailedVerification": {
+    "path": "docs/evidence/project-components/runs/android-offline-create-protocol-source.txt",
+    "tests": 115,
+    "failures": 2,
+    "cause": "Fixture reconfirmation clocks scheduled at 1/10ms but the engine remained at 0ms, so listReady correctly excluded future work.",
+    "assertions": [
+      {
+        "test": "queue cannot become succeeded without exact scoped 201 receipt",
+        "expected": "SUCCEEDED",
+        "actual": "RETRY"
+      },
+      {
+        "test": "real client permanent success violations preserve original intent and block fresh creation",
+        "expected": "FAILED_PERMANENT",
+        "actual": "RETRY"
+      }
+    ],
+    "correction": "Advance the fixture engine clock to the explicit reconfirmation time. Retain successful/failed receipt expectations; add exact unchanged-row assertions before the explicit action. No product logic weakened."
+  },
+  "additionalDaoSql": [
+    {
+      "method": "hasForeignOperationForIdempotencyKey",
+      "querySha256": "d35d7618d5cd3be7183d842364724a6d6dfc65353fb7157378cf7175b3c5d6a3",
+      "engine": "Node DatabaseSync :memory:",
+      "wrongScopeCases": 5,
+      "sameScopeAndMissingKeyAllowed": true,
+      "differentKeyIgnored": true,
+      "passed": true
+    },
+    {
+      "method": "reconfirmCreateProtocolFailure",
+      "querySha256": "6274bdf715f90929457ee0f3a594da206363fb493507d4078e6e2b949e921d3f",
+      "engine": "Node DatabaseSync :memory:",
+      "wrongScopeOrIdentityCases": 7,
+      "allowedProtocolCodes": 101,
+      "eligibleFirstCASChanges": 1,
+      "repeatedCASChanges": 0,
+      "immutableFields": 7,
+      "deniedCodes": 8,
+      "deniedStateOrRequestCases": 4,
+      "passed": true
+    }
+  ],
+  "legacyRecovery": {
+    "captureSidecar": "Before generating an ID, discover original full-scope queue records, prioritizing the exact capture submission key; foreign-scope matches fail closed.",
+    "text": "Discover all unresolved create rows in the full scope, not only latest. First click adopts one exact immutable request and prompts; it does not send current form contents.",
+    "confirmed": "Only SUCCEEDED with exact scoped receipt and matching submission/QA Bug identity is treated as resolved.",
+    "genericPermanent": "All unknown CREATE_BUG permanent failures preserve the original intent; no automatic replacement identity."
+  },
+  "explicitStageRejectionRecovery": {
+    "ui": "保留附件失败记录，允许修改后新建",
+    "eligible": "Only permanently rejected STAGE_CREATE_BUG_ATTACHMENT with exact local size/hash mismatch or INIT/CHUNK/FINALIZE/BIND HTTP 400/413/415/422.",
+    "proof": "The stage is durably promoted before Bug POST and never converted back. This proves no Bug POST, not absence of partial upload effects.",
+    "durability": "Checked preference commit archives original pending request and the complete failed row, with full-row SHA-256 fingerprint, before releasing the pending slot.",
+    "preserved": [
+      "original Room row",
+      "original request/key/payload",
+      "original attachments and files",
+      "full failure snapshot"
+    ],
+    "denied": "Every CREATE_BUG state, generic/unreviewed errors, auth errors, exhausted unknown outcomes and success-receipt violations.",
+    "failure": "Failed commit is not treated as release even when fake SharedPreferences memory updates before returning false."
+  },
+  "explicitProtocolReconfirmation": {
+    "ui": "使用原请求重新确认",
+    "eligible": [
+      "UNEXPECTED_CREATE_BUG_SUCCESS_STATUS_2xx except 201",
+      "SUCCESS_RESPONSE_SCOPE_MISMATCH",
+      "SUCCESS_RECEIPT_SCOPE_MISMATCH"
+    ],
+    "gate": "Full account/project/actor/installation/session + operationId + original key, CREATE_BUG POST /bugs, exact FAILED_PERMANENT whitelist; CAS changes one original row.",
+    "automaticRetry": false,
+    "replacementIdentity": false,
+    "payloadMutation": false,
+    "validatorRelaxed": false,
+    "recoveryFixture": "Real hardened OkHttp and synthetic interceptor responses (200/202/204 and 201 wrong project): generic resume/automatic run do not replay; explicit retry while still bad remains failed; after service response is restored only another explicit retry confirms the same key/body and one simulated effect. Engine-level malformed receipt tests cover the second scope validator.",
+    "denied": [
+      "generic HTTP 4xx",
+      "INVALID_QUEUED_REQUEST",
+      "unknown classifications",
+      "wrong full scope or operation/key",
+      "wrong method/path/kind/state"
+    ]
+  },
+  "preCommitLineEndingNormalization": {
+    "recordedAt": "2026-09-08T23:40:28.051Z",
+    "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/BugDraftPreferences.kt",
+    "testedRawSha256": "0d13a3724d2866368d381338728179c4ba3e51308aaf9cedd2a7a45e1b694ca8",
+    "committedCanonicalSha256": "710a77ed0afa5ec680bac1de4f689c264783a2dc5aaee2e873b88c19f7164bf5",
+    "removedCarriageReturns": 1,
+    "onlyCRLFToLF": true,
+    "testsRerun": false,
+    "note": "Repository eol=lf normalization only. Test evidence above was produced before this one-byte normalization; no Kotlin token or behavior changed."
+  }
+}

@@ -254,6 +254,63 @@ interface OfflineOperationDao {
     ): OfflineOperationEntity?
 
     @Query(
+        "SELECT EXISTS(SELECT 1 FROM offline_operations WHERE idempotencyKey = :idempotencyKey " +
+            "AND NOT(accountId = :accountId AND projectId = :projectId AND actorId = :actorId " +
+            "AND installationId = :installationId AND sessionId = :sessionId))",
+    )
+    suspend fun hasForeignOperationForIdempotencyKey(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        idempotencyKey: String,
+    ): Boolean
+
+    /** Retry an uncertain create without replacing its immutable intent or attachment identity. */
+    @Query(
+        "UPDATE offline_operations SET state = 'RETRY', attemptCount = 0, " +
+            "nextAttemptAtEpochMs = :nowEpochMs, updatedAtEpochMs = :nowEpochMs " +
+            "WHERE operationId = :operationId AND accountId = :accountId AND projectId = :projectId " +
+            "AND actorId = :actorId AND installationId = :installationId AND sessionId = :sessionId " +
+            "AND operationKind IN ('CREATE_BUG', 'STAGE_CREATE_BUG_ATTACHMENT') " +
+            "AND httpMethod = 'POST' AND relativePath = '/bugs' " +
+            "AND state = 'FAILED_PERMANENT' AND lastErrorCode GLOB 'RETRY_EXHAUSTED_*'",
+    )
+    suspend fun resumeUnconfirmedCreate(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        operationId: String,
+        nowEpochMs: Long,
+    ): Int
+
+    @Query(
+        "UPDATE offline_operations SET state = 'RETRY', attemptCount = 0, " +
+            "nextAttemptAtEpochMs = :nowEpochMs, updatedAtEpochMs = :nowEpochMs " +
+            "WHERE operationId = :operationId AND idempotencyKey = :idempotencyKey " +
+            "AND accountId = :accountId AND projectId = :projectId AND actorId = :actorId " +
+            "AND installationId = :installationId AND sessionId = :sessionId " +
+            "AND operationKind = 'CREATE_BUG' AND httpMethod = 'POST' AND relativePath = '/bugs' " +
+            "AND state = 'FAILED_PERMANENT' AND (lastErrorCode IN " +
+            "('SUCCESS_RESPONSE_SCOPE_MISMATCH','SUCCESS_RECEIPT_SCOPE_MISMATCH') OR " +
+            "(lastErrorCode GLOB 'UNEXPECTED_CREATE_BUG_SUCCESS_STATUS_2[0-9][0-9]' " +
+            "AND lastErrorCode != 'UNEXPECTED_CREATE_BUG_SUCCESS_STATUS_201'))",
+    )
+    suspend fun reconfirmCreateProtocolFailure(
+        accountId: String,
+        projectId: String,
+        actorId: String,
+        installationId: String,
+        sessionId: String,
+        operationId: String,
+        idempotencyKey: String,
+        nowEpochMs: Long,
+    ): Int
+
+    @Query(
         "SELECT DISTINCT accountId, projectId, actorId, installationId, sessionId " +
             "FROM offline_operations WHERE state = 'BLOCKED_DEVICE' " +
             "ORDER BY accountId, projectId, actorId, installationId, sessionId",

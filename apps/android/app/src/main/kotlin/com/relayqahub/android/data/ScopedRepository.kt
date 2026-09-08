@@ -171,6 +171,25 @@ class ScopedRepository(
         )
     }
 
+    suspend fun resumeUnconfirmedCreate(
+        scope: AccountProjectScope,
+        idempotencyKey: String,
+    ): OfflineOperationEntity? = UnconfirmedCreateSubmission(offlineOperationDao, clock)
+        .resume(scope, idempotencyKey)
+
+    suspend fun findLegacyUnconfirmedCreates(
+        scope: AccountProjectScope,
+        captureSubmissionId: String?,
+    ): List<OfflineOperationEntity> = UnconfirmedCreateSubmission(offlineOperationDao, clock)
+        .legacyCandidates(scope, captureSubmissionId)
+
+    suspend fun reconfirmCreateProtocolFailure(
+        scope: AccountProjectScope,
+        operationId: String,
+        idempotencyKey: String,
+    ): OfflineOperationEntity = UnconfirmedCreateSubmission(offlineOperationDao, clock)
+        .reconfirmProtocolFailure(scope, operationId, idempotencyKey)
+
     suspend fun recordAttachmentReservation(
         scope: AccountProjectScope,
         receipt: AttachmentUploadReceipt,

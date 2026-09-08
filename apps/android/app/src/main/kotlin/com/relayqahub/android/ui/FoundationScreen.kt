@@ -200,6 +200,8 @@ fun FoundationScreen(
                 },
                 onDeleteImage = viewModel::deleteCaptureDraft,
                 onSubmit = viewModel::submitNewBug,
+                onPreserveRejectedAndEdit = viewModel::preserveRejectedCreationAndEdit,
+                onReconfirmOriginalCreation = viewModel::reconfirmOriginalCreation,
                 modifier = Modifier.padding(innerPadding),
             )
             QaHubPage.BUG_LIST -> BugListPage(
@@ -1843,6 +1845,8 @@ private fun NewBugPage(
     onCaptureNow: () -> Unit,
     onDeleteImage: () -> Unit,
     onSubmit: (ByteArray?, String, String, String) -> Unit,
+    onPreserveRejectedAndEdit: () -> Unit,
+    onReconfirmOriginalCreation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var content by remember(draftKey, state.newBugFormRevision) {
@@ -1986,7 +1990,10 @@ private fun NewBugPage(
             SectionCard(title = "Bug 内容", subtitle = "不需要标题，直接描述看到的问题") {
                 OutlinedTextField(
                     value = content,
-                    onValueChange = { content = it },
+                    onValueChange = {
+                        content = it
+                        onDraftChange(com.relayqahub.android.SavedBugDraft(it, fixerId, verifierId))
+                    },
                     label = { Text("问题内容") },
                     placeholder = { Text("例如：结算页面点击返回后一直停留在加载状态") },
                     minLines = 5,
@@ -2005,7 +2012,10 @@ private fun NewBugPage(
                         people = fixers,
                         role = QaPersonRole.FIXER,
                         selectedId = fixerId,
-                        onSelected = { fixerId = it },
+                        onSelected = {
+                            fixerId = it
+                            onDraftChange(com.relayqahub.android.SavedBugDraft(content, it, verifierId))
+                        },
                         allowUnassigned = true,
                         modifier = Modifier.weight(1f),
                     )
@@ -2014,7 +2024,10 @@ private fun NewBugPage(
                         people = verifiers,
                         role = QaPersonRole.VERIFIER,
                         selectedId = verifierId,
-                        onSelected = { verifierId = it },
+                        onSelected = {
+                            verifierId = it
+                            onDraftChange(com.relayqahub.android.SavedBugDraft(content, fixerId, it))
+                        },
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -2038,6 +2051,24 @@ private fun NewBugPage(
                 ),
             ) {
                 Text("提交 Bug", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold)
+            }
+            if (state.replaceableRejectedCreationId != null) {
+                OutlinedButton(
+                    onClick = onPreserveRejectedAndEdit,
+                    enabled = !draft.isDeleting && !draft.isSubmitting,
+                    modifier = Modifier.fillMaxWidth().testTag("preserve-rejected-and-edit"),
+                ) {
+                    Text("保留附件失败记录，允许修改后新建")
+                }
+            }
+            if (state.reconfirmableCreationId != null) {
+                OutlinedButton(
+                    onClick = onReconfirmOriginalCreation,
+                    enabled = !draft.isDeleting && !draft.isSubmitting,
+                    modifier = Modifier.fillMaxWidth().testTag("reconfirm-original-creation"),
+                ) {
+                    Text("使用原请求重新确认")
+                }
             }
             if (state.lastAction.isNotBlank()) {
                 Surface(
