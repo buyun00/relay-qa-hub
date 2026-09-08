@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import {
   useCallback,
   useEffect,
@@ -504,12 +505,16 @@ export default function OverviewPage({
           </p>
         </div>
         <button className="primary-button" onClick={onCreateBug} type="button">
-          <span>＋</span> 新建 Bug
+          <AppIcon name="plus" /> 新建 Bug
         </button>
       </section>
 
       {error === null ? null : <div className="banner error-banner">{error}</div>}
-      {notice === null ? null : <div className="banner success-banner">✓ {notice}</div>}
+      {notice === null ? null : (
+        <div className="banner success-banner">
+          <AppIcon name="success" /> {notice}
+        </div>
+      )}
 
       <section className="overview-toolbar" aria-label="总览筛选">
         <label className="overview-search">
@@ -576,6 +581,7 @@ export default function OverviewPage({
           </select>
         </label>
         <button
+          aria-pressed={ownerFilter === "unassigned"}
           className={`unassigned-filter-button${ownerFilter === "unassigned" ? " is-active" : ""}`}
           onClick={() => setOwnerFilter(ownerFilter === "unassigned" ? "all" : "unassigned")}
           type="button"
@@ -589,7 +595,7 @@ export default function OverviewPage({
           onClick={() => void load(true)}
           type="button"
         >
-          ↻
+          <AppIcon name="refresh" busy={refreshing} />
         </button>
       </section>
 

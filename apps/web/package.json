@@ -1,6 +1,6 @@
 {
   "name": "@relay-qa-hub/web",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "private": true,
   "description": "Desktop-first management platform for the independent Relay QA Hub source of truth.",
   "license": "UNLICENSED",
@@ -18,10 +18,12 @@
     "preview": "vite preview --host 127.0.0.1 --strictPort"
   },
   "dependencies": {
+    "@relay-qa-hub/upload-contract": "0.1.0",
+    "lucide": "1.42.0",
+    "morphicons": "1.7.1",
     "qrcode.react": "4.2.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "@relay-qa-hub/upload-contract": "0.1.0"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

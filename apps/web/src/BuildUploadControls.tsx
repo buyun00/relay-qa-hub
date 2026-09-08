@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import { serverUploader, createUploadRequestId } from "./increment-upload-api";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
@@ -175,7 +176,7 @@ export default function BuildUploadControls({
         aria-controls="external-build-options"
         onClick={() => void toggle()}
       >
-        打外网包 <span aria-hidden="true">▾</span>
+        打外网包 <AppIcon name={open ? "up" : "down"} />
       </button>
       {open ? (
         <div

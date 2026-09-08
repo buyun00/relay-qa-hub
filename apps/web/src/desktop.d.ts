@@ -47,6 +47,7 @@ type QaHubDesktopUpdateState =
 interface QaHubDesktopBridge {
   readonly uploader?: UploaderBridge;
   readonly windowControlsOverlay?: boolean;
+  readonly windowAction?: (action: "minimize" | "toggle-maximize" | "close") => Promise<boolean>;
   readonly getWindowState?: () => Promise<{ maximized: boolean; fullScreen: boolean }>;
   readonly onWindowState?: (
     listener: (state: { maximized: boolean; fullScreen: boolean }) => void,

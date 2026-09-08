@@ -223,6 +223,8 @@ const bridge: QaHubDesktopBridge = {
     cancelBuildUpload: (id) => ipcRenderer.invoke("desktop:uploader:cancel-build-upload", id),
   },
   windowControlsOverlay: true,
+  windowAction: async (action) =>
+    (await ipcRenderer.invoke("desktop:window-action", action)) === true,
   getWindowState: async () =>
     parseWindowState(await ipcRenderer.invoke("desktop:get-window-state")),
   onWindowState: (listener) => {

@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import PackagingProgressPanel from "./PackagingProgress";
@@ -106,7 +107,7 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        ↓ 快速下载
+                        <AppIcon name="download" /> 快速下载
                       </a>
                     </>
                   ) : (
@@ -163,7 +164,7 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  ↓ 下载增量 ZIP
+                  <AppIcon name="download" /> 下载增量 ZIP
                 </a>
               </>
             ) : (
@@ -188,7 +189,7 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
             target="_blank"
             rel="noreferrer"
           >
-            打开 IPA 下载目录 ↗
+            打开 IPA 下载目录 <AppIcon name="external" />
           </a>
           {status.ipaError ? (
             <small>IPA 目录暂时无法读取</small>
@@ -200,7 +201,7 @@ export function PackageDownloads({ status }: { status: PackagingStatus }) {
                 target="_blank"
                 rel="noreferrer"
               >
-                ↓ {status.ipas[0].name}
+                <AppIcon name="download" /> {status.ipas[0].name}
               </a>
               <small>
                 {formatSize(status.ipas[0].size)} · {formatTime(status.ipas[0].modifiedAt)}

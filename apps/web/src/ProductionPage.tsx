@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   listBugs,
@@ -502,7 +503,7 @@ export default function ProductionPage({
             刷新
           </button>
           <button type="button" className="primary-button" onClick={() => setCreating(true)}>
-            ＋ 新建 / 批量制作
+            <AppIcon name="plus" /> 新建 / 批量制作
           </button>
         </div>
       </header>
@@ -515,7 +516,7 @@ export default function ProductionPage({
         <div className="banner" role="status">
           {notice}
           <button type="button" aria-label="关闭提示" onClick={() => setNotice("")}>
-            ×
+            <AppIcon name="close" />
           </button>
         </div>
       )}
@@ -677,7 +678,7 @@ export default function ProductionPage({
                 setDetail(null);
               }}
             >
-              关闭详情 ×
+              关闭详情 <AppIcon name="close" />
             </button>
             {detail ? (
               <>
@@ -819,7 +820,7 @@ export default function ProductionPage({
                             )
                           }
                         >
-                          ↓ {file.filename}
+                          <AppIcon name="download" /> {file.filename}
                         </button>
                       ))}
                     </div>
@@ -945,7 +946,7 @@ export default function ProductionPage({
                 <h2 id="production-create-heading">新建制作</h2>
               </div>
               <button type="button" onClick={() => setCreating(false)}>
-                收起 · 保留草稿 ×
+                收起 · 保留草稿 <AppIcon name="close" />
               </button>
             </div>
             <form

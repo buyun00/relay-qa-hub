@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -141,7 +142,11 @@ export default function UserManagementPage({
       </section>
 
       {error === null ? null : <div className="banner error-banner">{error}</div>}
-      {notice === null ? null : <div className="banner success-banner">✓ {notice}</div>}
+      {notice === null ? null : (
+        <div className="banner success-banner">
+          <AppIcon name="success" /> {notice}
+        </div>
+      )}
 
       <section className="user-management-panel">
         <div className="user-management-toolbar">
@@ -150,7 +155,7 @@ export default function UserManagementPage({
             <span>不会根据名字相似度自动合并，所有关联都由你明确选择。</span>
           </div>
           <label className="user-search">
-            <span aria-hidden="true">⌕</span>
+            <AppIcon name="search" />
             <input
               onChange={(event) => setQuery(event.target.value)}
               placeholder="搜索用户名或用户 ID"

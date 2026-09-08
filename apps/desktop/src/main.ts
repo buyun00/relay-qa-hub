@@ -1,4 +1,5 @@
 import { promises as fs } from "node:fs";
+import { applyWindowAction } from "./window-actions.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -548,7 +549,7 @@ function createWindow(): BrowserWindow {
     backgroundColor: "#192f25",
     title: "Relay QA Hub",
     titleBarStyle: "hidden",
-    titleBarOverlay: { color: "#192f25", symbolColor: "#e8f0e8", height: 60 },
+    titleBarOverlay: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(currentDirectory, "preload.cjs"),
@@ -606,6 +607,14 @@ function installIpcHandlers(): void {
       code: "UPLOAD_MOVED_TO_SERVER",
     }));
   }
+  ipcMain.handle("desktop:window-action", (event, action: unknown) => {
+    if (
+      event.senderFrame !== event.sender.mainFrame ||
+      !isTrustedRendererUrl(event.senderFrame?.url ?? "")
+    )
+      return false;
+    return applyWindowAction(BrowserWindow.fromWebContents(event.sender), action);
+  });
   ipcMain.handle("desktop:get-window-state", (event) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return null;
     const window = BrowserWindow.fromWebContents(event.sender);

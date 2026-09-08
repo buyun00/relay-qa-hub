@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import { useEffect, useRef, useState } from "react";
 
 type Bridge = NonNullable<Window["qaHubDesktop"]>;
@@ -184,47 +185,24 @@ export default function DesktopTools({
           onClick={onOpenUsers}
           type="button"
         >
-          <svg
-            className="utility-icon"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            aria-hidden="true"
-          >
-            <circle cx="9" cy="8" r="3" />
-            <path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2" />
-          </svg>
+          <AppIcon name="users" active={usersActive} className="utility-icon" size={24} />
           <span>
             <strong>用户管理</strong>
             <small>{memberCount} 位项目成员</small>
           </span>
-          <span className="utility-chevron" aria-hidden="true">
-            ›
-          </span>
+          <AppIcon name="right" className="utility-chevron" />
         </button>
         {bridge ? (
           <>
             <button
-              className="utility-card compact-card"
+              className={`utility-card compact-card${panel === "mcp" ? " is-active" : ""}`}
+              aria-expanded={panel === "mcp"}
               onClick={() => openPanel("mcp")}
               type="button"
               aria-haspopup="dialog"
             >
               <span className="utility-card-heading">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  aria-hidden="true"
-                >
-                  <path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-14-2 22" />
-                </svg>
+                <AppIcon name="code" active={panel === "mcp"} />
                 <span
                   className={`mini-light${!unavailable && mcp?.state === "listening" ? " is-online" : ""}`}
                 />
@@ -236,24 +214,14 @@ export default function DesktopTools({
               </small>
             </button>
             <button
-              className="utility-card compact-card"
+              className={`utility-card compact-card${panel === "status" ? " is-active" : ""}`}
+              aria-expanded={panel === "status"}
               onClick={() => openPanel("status")}
               type="button"
               aria-haspopup="dialog"
             >
               <span className="utility-card-heading">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 7v5l3 2" />
-                </svg>
+                <AppIcon name="clock" active={panel === "status"} />
                 {update?.status === "ready" ? <span className="update-badge">新</span> : null}
               </span>
               <strong>当前状态</strong>
@@ -279,7 +247,7 @@ export default function DesktopTools({
                 <h2 id="desktop-tools-title">{panel === "mcp" ? "MCP 设置" : "当前状态"}</h2>
               </div>
               <button aria-label="关闭设置" onClick={() => setPanel(null)} type="button">
-                ×
+                <AppIcon name="close" />
               </button>
             </div>
             {panel === "mcp" ? (

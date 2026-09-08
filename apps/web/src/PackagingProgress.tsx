@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import { BUILD_PRESETS, type BuildProgress, type PackagingProgress } from "./packaging-api";
 
 export function duration(ms: number | null): string {
@@ -70,7 +71,15 @@ export function BuildStages({ build }: { build: BuildProgress }) {
             key={stage.id}
           >
             <span className="package-stage-dot" aria-hidden="true">
-              {stage.state === "complete" ? "✓" : stage.state === "skipped" ? "—" : index + 1}
+              {stage.state === "complete" ? (
+                <AppIcon name="check" size={15} />
+              ) : stage.state === "skipped" ? (
+                <AppIcon name="minus" size={15} />
+              ) : stage.state === "running" ? (
+                <AppIcon name="loader" busy size={15} />
+              ) : (
+                index + 1
+              )}
             </span>
             <div className="package-stage-work">
               <strong>

@@ -5,6 +5,7 @@ import AuthGate from "./AuthGate";
 import DesktopWindow from "./DesktopWindow";
 import "./app.css";
 import "./desktop-shell.css";
+import "./icon-theme.css";
 
 const rootElement = document.querySelector<HTMLElement>("#root");
 

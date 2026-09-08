@@ -1,0 +1,303 @@
+:root {
+  --accent: #236847;
+  --scrollbar-thumb: #9aa99e;
+  --scrollbar-thumb-hover: #627d6a;
+}
+.app-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  line-height: 1;
+  transition:
+    color 160ms ease,
+    transform 180ms ease;
+}
+.app-icon svg {
+  display: block;
+  overflow: visible;
+}
+button .app-icon,
+a .app-icon {
+  pointer-events: none;
+}
+button:hover:not(:disabled) > .app-icon,
+a:hover > .app-icon {
+  transform: translateY(-1px);
+}
+.app-icon.is-spinning svg {
+  animation: icon-spin 1100ms linear infinite;
+}
+@keyframes icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+:is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--accent);
+}
+.nav-item {
+  margin-bottom: 5px;
+  transition:
+    background 180ms,
+    color 180ms,
+    box-shadow 180ms;
+}
+.nav-item .nav-icon {
+  color: #78857b;
+}
+.nav-item.is-active,
+.nav-item.is-active:hover {
+  color: #195435;
+  background: transparent;
+  border-radius: 6px;
+  box-shadow: inset 3px 0 var(--accent);
+  font-weight: 850;
+}
+.nav-item.is-active .nav-icon {
+  color: #174f2d;
+}
+.nav-count,
+.nav-item.is-active .nav-count {
+  background: transparent;
+  color: inherit;
+}
+.utility-card {
+  background: transparent;
+  border-color: #e3e8e3;
+  border-radius: 10px;
+}
+.utility-card.is-active,
+.utility-card.is-active:hover {
+  border-color: var(--accent);
+  background: transparent;
+  box-shadow: inset 2px 0 var(--accent);
+  color: #16472d;
+}
+.utility-icon,
+.utility-card-heading > .app-icon,
+.compact-card:last-child .utility-card-heading > .app-icon {
+  color: #65786a;
+}
+.utility-card.is-active small {
+  color: #285c37;
+}
+.connection-light.is-connected,
+.mini-light.is-online {
+  background: #6da075;
+}
+.connection-light.is-offline {
+  background: #cf5e53;
+}
+.primary-button {
+  background: #265c3e;
+  color: #fff;
+  border-color: #265c3e;
+}
+.primary-button:hover:not(:disabled) {
+  background: #194d31;
+}
+.primary-button .app-icon {
+  color: inherit;
+}
+.summary-card {
+  position: relative;
+  --status-color: #236847;
+  --status-ink: #195435;
+  box-shadow: none;
+}
+.summary-card .summary-icon {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  color: #7b897f;
+  justify-items: start;
+}
+.summary-card.is-selected,
+.summary-card.is-selected:hover {
+  border-color: var(--status-color);
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--status-color);
+}
+.summary-card.is-selected .summary-icon {
+  background: transparent;
+  color: var(--status-color);
+}
+.summary-card.is-selected .summary-value,
+.summary-card.is-selected .summary-label {
+  color: var(--status-ink);
+}
+.summary-selection {
+  position: absolute;
+  top: 18px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 0;
+  color: var(--status-color);
+  font-size: 10px;
+  font-weight: 700;
+  visibility: hidden;
+}
+.summary-card.is-selected .summary-selection {
+  visibility: visible;
+}
+.summary-card.is-selected small {
+  color: #46584e;
+}
+.overview-date-page.is-active,
+.overview-date-page.is-active:hover,
+.unassigned-filter-button.is-active,
+.unassigned-filter-button.is-active:hover,
+.production-mode button[aria-pressed="true"] {
+  background: transparent;
+  border-color: var(--accent);
+  color: #195435;
+  box-shadow: inset 2px 0 var(--accent);
+  font-weight: 800;
+}
+.overview-date-page.is-active b {
+  color: inherit;
+  background: transparent;
+}
+.upload-mode-picker label.is-selected,
+.upload-history-row.is-selected,
+.qingyu-defect-list article.is-selected {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.upload-mode-picker label.is-selected strong {
+  color: #086547;
+}
+.production-list tr.is-selected td {
+  background: #f6f8f6;
+}
+.production-list tr.is-selected td:first-child {
+  box-shadow: inset 3px 0 var(--accent);
+}
+.status-badge[class*="state-"] {
+  color: #4c6456;
+  background: transparent;
+  border: 1px solid #dce4de;
+}
+.priority:is(.p0, .p1, .p2, .p3) {
+  color: #627168;
+  background: transparent;
+  border: 1px solid #dce4de;
+  border-radius: 6px;
+}
+.priority:is(.p0, .p1) {
+  color: #a45142;
+  border-color: #caa69e;
+}
+.person-mini {
+  background: transparent;
+  color: #738177;
+}
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #62786a;
+}
+.icon-button:hover:not(:disabled) {
+  background: #f1f4f1;
+  color: var(--accent);
+}
+.detail-close .app-icon,
+.modal-head button .app-icon {
+  color: #6a776d;
+}
+.open-arrow {
+  color: #7e8d82;
+}
+.success-banner > .app-icon {
+  color: var(--accent);
+  margin-right: 5px;
+}
+.desktop-window.has-custom-controls .topbar {
+  padding-right: 174px;
+}
+.window-controls {
+  position: fixed;
+  top: 0;
+  right: 12px;
+  height: var(--window-bar-height);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 160;
+  -webkit-app-region: no-drag;
+}
+.window-control {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #d7e0d8;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  transition:
+    background 150ms,
+    box-shadow 150ms,
+    transform 150ms;
+}
+.window-control:hover {
+  background: #ffffff14;
+  color: #fff;
+}
+.window-close:hover {
+  background: #bb4145;
+  color: #fff;
+}
+.window-maximize.is-maximized {
+  border-color: #80958a;
+  color: #fff;
+}
+.window-control:active {
+  transform: scale(0.93);
+}
+.window-control:focus-visible {
+  outline-color: #fff;
+}
+.window-control-error {
+  position: absolute;
+  top: 54px;
+  right: 0;
+  width: 190px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff0f2;
+  color: #9e1730;
+}
+/* Modal backdrop covers the window buttons just as it covers the app underneath. */
+.desktop-window:has(.detail-overlay, dialog[open]) .window-controls {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-icon,
+  .window-control,
+  .nav-item,
+  .summary-card {
+    transition: none;
+  }
+  .app-icon.is-spinning svg {
+    animation: none;
+  }
+  button:hover:not(:disabled) > .app-icon,
+  a:hover > .app-icon {
+    transform: none;
+  }
+}

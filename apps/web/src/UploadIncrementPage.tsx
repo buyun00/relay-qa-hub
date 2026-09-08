@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import { serverUploader } from "./increment-upload-api";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type {
@@ -89,7 +90,15 @@ function JobProgress({ job }: { job: UploadJob | undefined }) {
           const current = !!job && step.stages.includes(job.stage) && !complete;
           return (
             <li key={step.label} className={complete ? "is-complete" : current ? "is-current" : ""}>
-              <span>{complete ? "✓" : index + 1}</span>
+              <span>
+                {complete ? (
+                  <AppIcon name="check" size={16} />
+                ) : current ? (
+                  <AppIcon name="loader" busy={!!job?.active} size={16} />
+                ) : (
+                  index + 1
+                )}
+              </span>
               <div>
                 <strong>{step.label}</strong>
                 <small>

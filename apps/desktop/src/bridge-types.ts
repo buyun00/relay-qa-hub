@@ -50,6 +50,7 @@ export type DesktopUpdateState =
 export interface QaHubDesktopBridge {
   readonly uploader: UploaderBridge;
   readonly windowControlsOverlay: boolean;
+  readonly windowAction: (action: "minimize" | "toggle-maximize" | "close") => Promise<boolean>;
   readonly getWindowState: () => Promise<DesktopWindowState>;
   readonly onWindowState: (listener: (state: DesktopWindowState) => void) => () => void;
   readonly notifyPackaging: (notice: DesktopPackagingNotice) => Promise<boolean>;

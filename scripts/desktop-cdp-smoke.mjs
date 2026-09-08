@@ -523,6 +523,8 @@ try {
           && rectangles[1].right < rectangles[2].left;
         const overlay = navigator.windowControlsOverlay;
         const titlebar = overlay?.getTitlebarAreaRect();
+        const customControls = document.querySelector('.window-controls');
+        const customRect = customControls?.getBoundingClientRect();
         const search = document.querySelector('.global-search');
         const header = document.querySelector('.topbar');
         const headerRect = header.getBoundingClientRect();
@@ -531,8 +533,8 @@ try {
         const searchRect = search?.getBoundingClientRect();
         const chrome = {
           enabled: window.qaHubDesktop.windowControlsOverlay === true,
-          visible: overlay?.visible === true,
-          height: titlebar?.height ?? 0,
+          visible: customControls ? getComputedStyle(customControls).visibility === 'visible' : overlay?.visible === true,
+          height: customRect?.height ?? titlebar?.height ?? 0,
           draggable: getComputedStyle(document.querySelector('.topbar')).getPropertyValue('-webkit-app-region') === 'drag',
           searchClickable: !search || getComputedStyle(search).getPropertyValue('-webkit-app-region') === 'no-drag',
           toolbarHeight: headerRect.height,
@@ -544,7 +546,7 @@ try {
           darkBackground: getComputedStyle(header).backgroundColor === 'rgb(25, 47, 37)',
           aligned: [identity, refresh, ...(searchRect ? [searchRect] : [])].every(rect =>
             Math.abs(rect.top + rect.height / 2 - (headerRect.top + headerRect.height / 2)) <= 1),
-          controlsReserved: refresh.right + 8 <= (titlebar?.x ?? 0) + (titlebar?.width ?? 0),
+          controlsReserved: refresh.right + 8 <= (customRect?.left ?? ((titlebar?.x ?? 0) + (titlebar?.width ?? 0))),
           contentBelowHeader: Math.abs(document.querySelector('.page').getBoundingClientRect().top - headerRect.bottom) < 1 &&
             Math.abs(document.querySelector('.sidebar').getBoundingClientRect().top - headerRect.bottom) < 1
         };

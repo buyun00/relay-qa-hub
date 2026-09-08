@@ -1,3 +1,4 @@
+import AppIcon from "./AppIcon";
 import {
   type ClipboardEvent,
   type FormEvent,
@@ -1660,19 +1661,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
         </div>
         {view === "workbench" ? (
           <label className="global-search">
-            <svg
-              className="search-icon"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              aria-hidden="true"
-            >
-              <circle cx="10.5" cy="10.5" r="6.5" />
-              <path d="m16 16 4 4" strokeLinecap="round" />
-            </svg>
+            <AppIcon name="search" className="search-icon" />
             <input
               aria-label="搜索编号、内容或人员"
               onChange={(event) => setQuery(event.target.value)}
@@ -1708,21 +1697,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           }}
           type="button"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            aria-hidden="true"
-          >
-            <path
-              d="M19.3 8A8 8 0 1 0 20 14M20 4v5h-5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <AppIcon name="refresh" busy={refreshing} />
         </button>
       </header>
       <aside className="sidebar">
@@ -1734,7 +1709,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             onClick={() => setView("workbench")}
             type="button"
           >
-            <span className="nav-icon">▦</span>
+            <AppIcon
+              name="dashboard"
+              active={view === "workbench"}
+              className="nav-icon"
+              size={21}
+            />
             <span>工作台</span>
             <span className="nav-count">{counts.pending}</span>
           </button>
@@ -1744,7 +1724,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             onClick={() => setView("overview")}
             type="button"
           >
-            <span className="nav-icon">▤</span>
+            <AppIcon name="overview" active={view === "overview"} className="nav-icon" size={21} />
             <span>总览</span>
             <span className="nav-count">全部</span>
           </button>
@@ -1795,7 +1775,12 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             onClick={() => setView("production")}
             type="button"
           >
-            <span className="nav-icon">▷</span>
+            <AppIcon
+              name="production"
+              active={view === "production"}
+              className="nav-icon"
+              size={21}
+            />
             <span>制作任务</span>
           </button>
           <button
@@ -1804,7 +1789,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             onClick={() => setView("packaging")}
             type="button"
           >
-            <span className="nav-icon">↓</span>
+            <AppIcon name="package" active={view === "packaging"} className="nav-icon" size={21} />
             <span>打包下载</span>
           </button>
           <button
@@ -1813,9 +1798,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             onClick={() => setView("upload")}
             type="button"
           >
-            <span className="nav-icon" aria-hidden="true">
-              ↑
-            </span>
+            <AppIcon name="upload" active={view === "upload"} className="nav-icon" size={21} />
             <span>上传增量</span>
           </button>
         </nav>
@@ -1832,7 +1815,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             <strong>{principal.displayName}</strong>
             <small>点击退出登录</small>
           </span>
-          <span className="profile-arrow">›</span>
+          <AppIcon name="logout" className="profile-arrow" />
         </button>
       </aside>
 
@@ -1856,13 +1839,17 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                   从轻语导入
                 </button>
                 <button className="primary-button" onClick={openCreateBug} type="button">
-                  <span>＋</span> 新建 Bug
+                  <AppIcon name="plus" /> 新建 Bug
                 </button>
               </div>
             </section>
 
             {error === null ? null : <div className="banner error-banner">{error}</div>}
-            {notice === null ? null : <div className="banner success-banner">✓ {notice}</div>}
+            {notice === null ? null : (
+              <div className="banner success-banner">
+                <AppIcon name="success" /> {notice}
+              </div>
+            )}
             {pendingMutationLabels.size === 0 ? null : (
               <div className="banner pending-banner" role="status">
                 后台正在处理 {pendingMutationLabels.size} 项请求，你可以继续使用其他功能。
@@ -1873,11 +1860,18 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
               {TASK_STATUS_ORDER.map((value) => (
                 <button
                   className={`summary-card${category === value ? " is-selected" : ""}`}
+                  aria-pressed={category === value}
+                  data-status={value}
                   key={value}
                   onClick={() => setCategory(value)}
                   type="button"
                 >
-                  <span className={`summary-icon icon-${value}`}>{taskStatusCopy[value].icon}</span>
+                  <span className={`summary-icon icon-${value}`}>
+                    <AppIcon name={value} active={category === value} size={22} />
+                  </span>
+                  <span className="summary-selection">
+                    <AppIcon name="check" size={13} /> 已选中
+                  </span>
                   <span className="summary-value">{counts[value]}</span>
                   <span className="summary-label">{taskStatusCopy[value].label}</span>
                   <small>{taskStatusCopy[value].hint}</small>
@@ -1910,7 +1904,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                     onClick={() => void loadWorkbench(true)}
                     type="button"
                   >
-                    ↻
+                    <AppIcon name="refresh" busy={refreshing} />
                   </button>
                 </div>
               </div>
@@ -1925,7 +1919,9 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 {loading ? <div className="loading-row">正在读取统一后端…</div> : null}
                 {!loading && visibleBugs.length === 0 ? (
                   <div className="empty-state">
-                    <span>✓</span>
+                    <span>
+                      <AppIcon name="success" size={28} />
+                    </span>
                     <strong>当前筛选下没有事项</strong>
                     <p>换一个人员或状态，或清空搜索关键词。</p>
                   </div>
@@ -1970,9 +1966,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       <span className="updated-cell" role="cell">
                         {formatTime(bug.updatedAt)}
                       </span>
-                      <span className="open-arrow" aria-hidden="true">
-                        ›
-                      </span>
+                      <AppIcon name="right" className="open-arrow" />
                     </button>
                   );
                 })}
@@ -2057,7 +2051,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                   onClick={closeDetail}
                   type="button"
                 >
-                  ×
+                  <AppIcon name="close" />
                 </button>
                 {detailLoading ? (
                   <span>正在读取 Bug 详情…</span>
@@ -2091,7 +2085,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                     onClick={closeDetail}
                     type="button"
                   >
-                    ×
+                    <AppIcon name="close" />
                   </button>
                 </header>
                 <div className="detail-modal-scroll">
@@ -2119,7 +2113,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                         </span>
                       </div>
                       <a href={qingyuLink.defectUrl} rel="noreferrer" target="_blank">
-                        打开轻语原单 ↗
+                        打开轻语原单 <AppIcon name="external" />
                       </a>
                       {qingyuLink.lastSyncErrorMessage === null ? null : (
                         <small>{qingyuLink.lastSyncErrorMessage}</small>
@@ -2294,7 +2288,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                                   }
                                   type="button"
                                 >
-                                  ×
+                                  <AppIcon name="close" />
                                 </button>
                               </figure>
                             ))}
@@ -2608,7 +2602,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                                         setReturnImageError(null);
                                       }}
                                     >
-                                      ×
+                                      <AppIcon name="close" />
                                     </button>
                                   </figure>
                                 ))}
@@ -2690,7 +2684,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
           />
           <figure aria-label={previewImage.filename} aria-modal="true" role="dialog">
             <button aria-label="关闭图片预览" onClick={() => setPreviewImage(null)} type="button">
-              ×
+              <AppIcon name="close" />
             </button>
             <img alt={previewImage.filename} src={previewImage.url} />
             <figcaption>{previewImage.filename}</figcaption>
@@ -2718,7 +2712,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 }}
                 type="button"
               >
-                ×
+                <AppIcon name="close" />
               </button>
             </div>
             {qingyuError === null ? null : <div className="banner error-banner">{qingyuError}</div>}
@@ -2927,7 +2921,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                 <h2>新建 Bug</h2>
               </div>
               <button onClick={() => setCreateOpen(false)} type="button">
-                ×
+                <AppIcon name="close" />
               </button>
             </div>
             <label>
@@ -3010,7 +3004,7 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
                       }
                       type="button"
                     >
-                      ×
+                      <AppIcon name="close" />
                     </button>
                   </figure>
                 ))}
