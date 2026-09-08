@@ -1,0 +1,27 @@
+{
+  "recordedAt": "2026-09-08T21:07:58.594Z",
+  "instanceId": "qa-hub-preview-7c86",
+  "sourceCheckpoint": "8447cdfee60b52c01df76b179d18d19c48155d06",
+  "installedVersion": "0.2.0-preview.7",
+  "previewExecutable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+  "configuration": {
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\preview-instance.json",
+    "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+  },
+  "originalBusiness": {
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+    "state": "closed",
+    "version": 14,
+    "commentCount": 1
+  },
+  "nativeDraft": {
+    "text": "EXE第6版升级与回退保留草稿 2026-09-09：同一员工、项目A、PNG附件与未提交正文必须保留。",
+    "attachmentName": "exe-test-input.png",
+    "attachmentCount": 1,
+    "tree": "runs/exe-independence-before-draft.txt",
+    "screenshot": "runs/exe-independence-before-draft.jpg"
+  },
+  "status": "before_only",
+  "scope": "Read-only business/config and native draft inspection. No login or stop was performed in this preparation."
+}

@@ -1,0 +1,14 @@
+{
+  "recordedAt": "2026-09-08T21:15:06.168Z",
+  "scope": "Whole stopped-preview profile copied and all file hashes compared before/after; private credential/data files are retained outside Git.",
+  "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile",
+  "retainedProfile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-closed-profile-e4fb9c4e-4b06-429c-bdff-bc378c796531\\profile",
+  "privateManifest": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-closed-profile-e4fb9c4e-4b06-429c-bdff-bc378c796531\\private-profile-manifest.json",
+  "privateManifestSha256": "54e36401a13bef264ac8b49d4c97a7e84f2e70ea21434bfb8a8be13279705960",
+  "fileCount": 109,
+  "totalBytes": 772540633,
+  "allFileHashesMatch": true,
+  "sourceUnchangedDuringCopy": true,
+  "boundaryEvidence": "runs/exe-independence-controlled-stop.json",
+  "passed": true
+}

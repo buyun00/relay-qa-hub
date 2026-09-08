@@ -1,0 +1,61 @@
+{
+  "recordedAt": "2026-09-08T21:20:37.507Z",
+  "passed": true,
+  "mode": "restore same installed EXE after completed controlled fault-stop independence window",
+  "preview": {
+    "pid": 23924,
+    "createdAt": "2026-09-08T21:18:26.3376550Z",
+    "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+    "version": "0.2.0-preview.7",
+    "windowId": 2820330,
+    "localMcpPort": 4420,
+    "configSha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+  },
+  "services": {
+    "api": {
+      "pid": 18644,
+      "port": 4419
+    },
+    "web": {
+      "pid": 20284,
+      "port": 4274
+    },
+    "serverMcp": {
+      "pid": 15736,
+      "port": 4421
+    }
+  },
+  "native": {
+    "employee": "EXE实际验收0909",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "originalDraftTextPreserved": true,
+    "originalPngVisible": true,
+    "screenshot": "runs/exe-independence-restored-draft.jpg",
+    "tree": "runs/exe-independence-restored-draft.txt"
+  },
+  "originalBusiness": {
+    "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+    "state": "closed",
+    "version": 14,
+    "commentCount": 1,
+    "attachmentId": "bbeaafee-effa-4265-873e-881111e40ae8",
+    "attachmentBytes": 184872,
+    "attachmentSha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+  },
+  "dailyWindows": {
+    "pid": 17160,
+    "createdAt": "2026-09-08T10:24:12.5269520Z",
+    "exactIdentityUnchanged": true
+  },
+  "relatedEvidence": [
+    "runs/exe-independence-before.json",
+    "runs/exe-independence-controlled-stop.json",
+    "runs/exe-independence-profile-retained.json",
+    "runs/exe-closed-api-mcp.json"
+  ],
+  "notClaimed": [
+    "Native tray quit",
+    "Immediate post-login force-stop sequence",
+    "Complete HTTP/MCP parity or all product controls"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "recordedAt": "2026-09-08T21:13:39.2199432Z",
+  "mode": "controlled_fault_stop",
+  "startedAt": "2026-09-08T21:13:37.0054361Z",
+  "scope": "Stop only the exact already-running preview primary process to test HTTP/server MCP independence. No login was performed in the preparation or stop command. Native tray quit was not exercised.",
+  "beforeEvidence": "runs/exe-independence-before.json",
+  "target": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+  "mainPid": 11368,
+  "expectedCreatedAt": "2026-09-08T19:52:36.0963040Z",
+  "configSha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+  "observedTreeBefore": [
+    {
+      "ProcessId": 11368,
+      "ParentProcessId": 12636,
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+      "createdAt": "2026-09-08T19:52:36.0963040Z"
+    },
+    {
+      "ProcessId": 22576,
+      "ParentProcessId": 11368,
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+      "createdAt": "2026-09-08T19:52:36.3079730Z"
+    },
+    {
+      "ProcessId": 4916,
+      "ParentProcessId": 11368,
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+      "createdAt": "2026-09-08T19:52:36.3264020Z"
+    },
+    {
+      "ProcessId": 20260,
+      "ParentProcessId": 11368,
+      "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+      "createdAt": "2026-09-08T19:52:36.4465740Z"
+    }
+  ],
+  "remainingPreviewProcesses": [],
+  "remaining4420Listeners": [],
+  "dailyPid": 17160,
+  "dailyExactIdentityUnchanged": true,
+  "apiReadiness": {
+    "status": "ready",
+    "schemaVersion": "14",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "serverMcpReadiness": {
+    "status": "ready",
+    "schemaVersion": "14",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "passed": true
+}
