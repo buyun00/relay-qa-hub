@@ -1,6 +1,6 @@
 # 实测证据映射审查
 
-生成时点：2026-09-08T21:38:03.128Z。只读已有证据，没有操作 UI、API 或生产。
+生成时点：2026-09-08T21:54:12.490Z。只读已有证据，没有操作 UI、API 或生产。
 
 `passed` 只代表该行明确注明的实际入口与输入。细目控件/路由通过不代表全部负向分支或上层基线通过；HTTP 15项、MCP 13项不称全部动作。未使用源码存在、共享实现、编译、单元或外部合同 fixture 代替真实外部执行。
 
@@ -11,13 +11,13 @@
 | 01 项目入口姓名登录         | not_run（部分实测） | not_run（部分实测） | passed              | passed              | not_run（部分实测） | not_run（部分实测） |
 | 02 单项目和多项目人员       | not_run（部分实测） | not_run             | passed              | passed              | not_run（部分实测） | not_run（部分实测） |
 | 03 唯一 GM                  | not_run             | not_run             | not_run             | passed              | not_run             | not_run             |
-| 04 项目人员停用             | not_run（部分实测） | not_run             | not_run             | passed              | not_run             | not_run             |
+| 04 项目人员停用             | not_run（部分实测） | passed              | not_run             | passed              | not_run             | not_run             |
 | 05 非所属项目读取           | not_run             | not_run             | not_run             | not_run             | not_run             | not_run             |
 | 06 写入归属                 | not_run             | not_run             | not_run             | not_run             | not_run             | not_run             |
 | 07 项目快速切换             | not_run（部分实测） | not_run（部分实测） | not_run             | —                   | —                   | —                   |
 | 08 多窗口和多客户端         | not_run             | not_run             | passed              | not_run             | not_run             | not_run             |
 | 09 关闭所有组件的基础全流程 | passed              | passed              | passed              | passed              | passed              | passed              |
-| 10 项目人员管理一致         | passed              | not_run             | not_run             | passed              | not_run             | not_run             |
+| 10 项目人员管理一致         | passed              | passed              | —                   | —                   | —                   | —                   |
 | 11 HTTP API 独立使用        | —                   | —                   | —                   | passed              | —                   | —                   |
 | 12 服务端 MCP 独立使用      | —                   | —                   | —                   | —                   | passed              | —                   |
 | 13 HTTP/MCP 对等            | —                   | —                   | —                   | not_run（部分实测） | not_run（部分实测） | not_run（部分实测） |
@@ -33,7 +33,7 @@
 | 23 EXE 共存与升级           | —                   | passed              | —                   | —                   | —                   | —                   |
 | 24 回退演练                 | —                   | —                   | —                   | passed              | —                   | —                   |
 
-09按六个实际入口分别闭环；11/12按设计原文独立性判据，由EXE停止窗口内的实际HTTP及服务端JSON-RPC分别登录、查询、评论和改状态判断；先前把全部动作/负向场景加入这两个基线超出原文，§17全功能及13/14对等/并发要求继续独立保留。15严格按HTTP下载、远端MCP资源、本地MCP落盘三个入口及同一PNG归属/hash判定。23有实际EXE升级恢复proof。24按设计13/24与10.3的服务恢复要求，由独立HTTP回退/保留/恢复证据判定；六入口各自降级超出该基线原文。EXE既有客户端恢复证据独立保留，其它APK/EXE/Web/MCP功能控件仍各自验收。22仍缺物理Android及适用的设备取证、文件和升级验证。
+09按六个实际入口分别闭环；10原文的两端指APK与EXE，分别有原生人员查看、关联和停用证据，既有HTTP证据保留但不把六入口附加为此基线条件。11/12按设计独立性判据，由EXE停止窗口内的实际HTTP及服务端JSON-RPC分别登录、查询、评论和改状态判断；全部动作/负向场景继续由§17及13/14验收。15按HTTP下载、远端MCP资源、本地MCP落盘及同一PNG归属/hash判定。23有实际EXE升级恢复proof。24按设计13/24与10.3服务恢复要求，由独立HTTP回退/保留/恢复证据判定。其它客户端/HTTP/MCP功能控件独立保留，22和§17.3物理Android未豁免。
 
 ## 部分实测及剩余缺口
 
@@ -152,7 +152,7 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 
 ## EXE 停止期间的 HTTP / 服务端 MCP 独立性
 
-设计基线11原文为“关闭 EXE 后，外部程序仍可登录、查询、评论和改状态”；12为“服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作”。此前生成器把“全部动作/完整负向场景”加入这两个基线，超出原文；这些要求继续由§17全功能矩阵及13/14对等、并发项目验收。此次只按独立性纠正11/12，当前整项通过为09、11、12、15、23、24。
+设计基线11原文为“关闭 EXE 后，外部程序仍可登录、查询、评论和改状态”；12为“服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作”。此前生成器把“全部动作/完整负向场景”加入这两个基线，超出原文；这些要求继续由§17全功能矩阵及13/14对等、并发项目验收。该轮按独立性纠正11/12，当时整项通过为09、11、12、15、23、24。
 
 2026-09-08T21:13:39.2199432Z，主代理对已核对精确路径/启动时点的预览EXE主进程11368执行 controlled_fault_stop；没有登录后立即强停的组合，也没有操作日常EXE。独立性脚本在21:14:14.415Z–21:17:11.392Z一次运行通过：33次直接HTTP请求、36次服务端4421请求（业务为真实JSON-RPC）、140次逐请求前后及首尾边界，预览目录/同名进程和4420监听始终不存在。两个独立员工和Bug各完成登录、查询、编辑、评论重放、人工完成、验收失败退回、再次完成和通过关闭v12，随后软删除并读回拒绝/列表消失；各17条事件actor、验收人及旧版本/错项目负例均核对。[可读全过程](exe-independent-services.md)、[69请求和140边界](runs/exe-closed-api-mcp.json)、[精确停止](runs/exe-independence-controlled-stop.json)。
 
@@ -164,11 +164,21 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 
 ## 独立性证据与脱敏保真最终检查点
 
-本轮源码盘点锚点为538c78f03e74aef8d02d13ad3e166ab3ece4a06f（脱敏修正提交）；业务API源码仍09f7150，Android源码仍1be7724。8份新的corrected派生由已核对原始SHA的私有原件生成，旧公开proof保留；它们修复104个JSON-RPC版本和240个事件schemaVersion的证据文本，业务结果、失败历史、检查数量未变，绝不计作新增业务运行。mapper只读取公开文件，核对index及old/corrected两侧SHA后解析派生内容，在当前结果保留old引用并追加corrected引用。[更正说明](redaction-corrections/README.md)、[公开哈希索引](redaction-corrections/index.json)。两份实际脱敏helper共有18/18纯函数测试通过；原1.0请求/blocked及未注册路由的业务能力缺口不因本证据修正改变。
+前轮源码盘点锚点为538c78f03e74aef8d02d13ad3e166ab3ece4a06f（脱敏修正提交）；业务API源码仍09f7150，Android源码仍1be7724。8份新的corrected派生由已核对原始SHA的私有原件生成，旧公开proof保留；它们修复104个JSON-RPC版本和240个事件schemaVersion的证据文本，业务结果、失败历史、检查数量未变，绝不计作新增业务运行。mapper只读取公开文件，核对index及old/corrected两侧SHA后解析派生内容，在当前结果保留old引用并追加corrected引用。[更正说明](redaction-corrections/README.md)、[公开哈希索引](redaction-corrections/index.json)。两份实际脱敏helper共有18/18纯函数测试通过；原1.0请求/blocked及未注册路由的业务能力缺口不因本证据修正改变。
 
-本轮仅11/12及所对应实际入口新增通过；当前整项基线为09、11、12、15、23、24。985项/188源码文件/21退役历史、401复验标记继续保留；完整HTTP/MCP对等与并发、§17全功能、18/19外部执行、21一致迁移和22物理Android仍未完成。预览EXE当前已恢复PID23924；最新生产观测为21:22:09.4439761Z，均以本轮独立性proof为准，前轮时点保留为历史。
+前轮仅11/12及所对应实际入口新增通过；当时整项基线为09、11、12、15、23、24。985项/188源码文件/21退役历史、401复验标记继续保留；完整HTTP/MCP对等与并发、§17全功能、18/19外部执行、21一致迁移和22物理Android仍未完成。预览EXE当前已恢复PID23924；最新生产观测为21:22:09.4439761Z，均以本轮独立性proof为准，前轮时点保留为历史。
 
-本轮最终重放已完成（2026-09-08T21:38:02.173Z）：985项、188源码hash逐一相符、21退役历史和401复验标记保留。两次generate→map→generate的语义SHA-256同为cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48；实际mapper的内存FS故障测试证实manual/source-change标记及reviewed失败结果保留，独立性proof或corrected proof错hash均在任何写入前拒绝（0写入）。本轮只有8个入口状态由not_run变passed：11/12两基线、HTTP的DELETE/manual-complete/events三路、server MCP的list_bugs/update_bug/list_events三工具；派生脱敏本身没有新增业务通过。审计字段见coverage-matrix.json的evidenceMapping.finalReplayVerification，前轮检查点保留在finalReplayVerificationHistory。
+前轮最终重放已完成（2026-09-08T21:38:02.173Z）：985项、188源码hash逐一相符、21退役历史和401复验标记保留。两次generate→map→generate的语义SHA-256同为cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48；实际mapper的内存FS故障测试证实manual/source-change标记及reviewed失败结果保留，独立性proof或corrected proof错hash均在任何写入前拒绝（0写入）。该轮只有8个入口状态由not_run变passed：11/12两基线、HTTP的DELETE/manual-complete/events三路、server MCP的list_bugs/update_bug/list_events三工具；派生脱敏本身没有新增业务通过。审计字段见coverage-matrix.json的evidenceMapping.finalReplayVerification，前轮检查点保留在finalReplayVerificationHistory。
+
+## EXE人员管理补充与基线10判据
+
+以dc9889263cbe2b7d499ec0efbff33b512a490ef9为本轮证据锚点。设计444“两端均按现有方式完成项目人员查看、关联与停用”承接443的APK、EXE；10现在仅用这两个必要入口汇总。已有MuMu code19原生人员查看/关联/解除/停用/恢复和稳定ID读回，加上此次已安装EXE .7的独立实际操作，满足10整项；其它入口人员功能及§17.3物理Android继续独立验收，既有HTTP结果保留。
+
+本次4个EXE业务动作、24辅助HTTP、6组截图/树、7项断言通过：A内关联/解除有2条唯一身份事件；停用/恢复有2条原actor成员事件，A主资格v1→2→3，B两人active/v1且无link；A同名登录及旧session403，B仍200。原Bug完整DTO、员工及文字+PNG草稿保持。5条UI/REPL诊断保留，未重做业务变更；新员工任务数0，不证明非零引用保全。[原生验收](exe-native-personnel/README.md)、[结果](exe-native-personnel/result.json)。
+
+新增通过限于4.EXE、10.EXE与确认关联/取消关联/停用/恢复四按钮；搜索、主用户选择及整页只记录部分实测。当前wholepass为09、10、11、12、15、23、24，4整体仍not_run。生产最新仍21:22:09.4439761Z快照；本轮没有再次探测生产，也没有启停服务。
+
+本轮重放以dc98892为锚点，985项/188源码hash/21退役项/401复验标记保持；相对该提交仅6个EXE入口状态新增通过，10的必要入口改为APK/EXE并保留旧HTTP证据。稳定重放语义SHA为c23f07f22c0195b2dc59eab39c7cb4f84d32c79ea770cd0a884147ea33902b9f。proof统一按原始字节求SHA；首次JPG文本hash不匹配被拒绝后修正，旧JSON及14份人员proof的字节hash均核对不变。
 
 ## 可重放与审计
 
@@ -198,6 +208,6 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 
 依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。
 
-映射器对 JSON proof 读取记录 SHA-256（UTF-8 文本原文），见 coverage-matrix.json 的 evidenceMapping.proofHashes；正文、原生 UI tree 和截图从证据字段追溯。缺少 optional proof 时不新增通过。所有凭据均不参与读取和输出。
+所有proof的SHA-256均按原始文件字节计算，见coverage-matrix.json的evidenceMapping.proofHashes。仅JSON解析或日志/正文文本断言使用UTF-8解码；JPG等二进制hash检查不解码。旧/修正公开proof与原生tree/截图均保留各自hash；缺少optional proof时不新增通过。所有凭据均不参与读取和输出。
 
-当前细目计数：985。设计明确的必要入口均满足而整行 passed 的基线：09 关闭所有组件的基础全流程、11 HTTP API 独立使用、12 服务端 MCP 独立使用、15 附件三种读取、23 EXE 共存与升级、24 回退演练。其余基线不能称整体完成。
+当前细目计数：985。设计明确的必要入口均满足而整行 passed 的基线：09 关闭所有组件的基础全流程、10 项目人员管理一致、11 HTTP API 独立使用、12 服务端 MCP 独立使用、15 附件三种读取、23 EXE 共存与升级、24 回退演练。其余基线不能称整体完成。

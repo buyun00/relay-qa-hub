@@ -7,11 +7,12 @@ const evidenceRoot = path.join(root, "docs/evidence/project-components");
 const matrixPath = path.join(evidenceRoot, "coverage-matrix.json");
 const matrix = JSON.parse(fs.readFileSync(matrixPath, "utf8"));
 const proofHashes = {};
-const proofText = (relative) => {
-  const body = fs.readFileSync(path.resolve(evidenceRoot, relative), "utf8");
+const proofBytes = (relative) => {
+  const body = fs.readFileSync(path.resolve(evidenceRoot, relative));
   proofHashes[relative] = createHash("sha256").update(body).digest("hex");
   return body;
 };
+const proofText = (relative) => proofBytes(relative).toString("utf8");
 const correctedEvidence = new Map();
 const read = (relative) =>
   JSON.parse(proofText(correctedEvidence.get(relative) ?? relative).replace(/^\uFEFF/u, ""));
@@ -38,8 +39,8 @@ if (correctionIndex) {
     };
     const old = relative(entry.oldPublicPath);
     const corrected = relative(entry.correctedPublicPath);
-    proofText(old);
-    proofText(corrected);
+    proofBytes(old);
+    proofBytes(corrected);
     if (
       proofHashes[old] !== entry.oldPublicSha256 ||
       proofHashes[corrected] !== entry.correctedPublicSha256
@@ -1154,7 +1155,7 @@ for (const item of matrix.items) {
   const hashes = Object.entries(reviewed.proofHashes ?? {});
   if (!hashes.length) throw new Error(`Reviewed evidence has no proof hashes: ${item.id}`);
   for (const [file, expected] of hashes) {
-    proofText(file);
+    proofBytes(file);
     if (proofHashes[file] !== expected)
       throw new Error(`Reviewed evidence changed; re-review required: ${item.id} / ${file}`);
   }
@@ -1193,7 +1194,7 @@ for (const item of matrix.items) {
 for (const [file, expected] of Object.entries(
   matrix.evidenceMapping?.finalSourceSupplement?.proofHashes ?? {},
 )) {
-  proofText(file);
+  proofBytes(file);
   if (proofHashes[file] !== expected)
     throw new Error(`Final supplement evidence changed; re-review required: ${file}`);
 }
@@ -1236,7 +1237,7 @@ const review = [
         `| ${item.title} | ${surfaces.map((surface) => (!item.results[surface].applicable ? "—" : item.results[surface].status + (item.manual.surfaceProgress?.[surface] ? "（部分实测）" : ""))).join(" | ")} |`,
     ),
   "",
-  "09按六个实际入口分别闭环；11/12按设计原文独立性判据，由EXE停止窗口内的实际HTTP及服务端JSON-RPC分别登录、查询、评论和改状态判断；先前把全部动作/负向场景加入这两个基线超出原文，§17全功能及13/14对等/并发要求继续独立保留。15严格按HTTP下载、远端MCP资源、本地MCP落盘三个入口及同一PNG归属/hash判定。23有实际EXE升级恢复proof。24按设计13/24与10.3的服务恢复要求，由独立HTTP回退/保留/恢复证据判定；六入口各自降级超出该基线原文。EXE既有客户端恢复证据独立保留，其它APK/EXE/Web/MCP功能控件仍各自验收。22仍缺物理Android及适用的设备取证、文件和升级验证。",
+  "09按六个实际入口分别闭环；10原文的两端指APK与EXE，分别有原生人员查看、关联和停用证据，既有HTTP证据保留但不把六入口附加为此基线条件。11/12按设计独立性判据，由EXE停止窗口内的实际HTTP及服务端JSON-RPC分别登录、查询、评论和改状态判断；全部动作/负向场景继续由§17及13/14验收。15按HTTP下载、远端MCP资源、本地MCP落盘及同一PNG归属/hash判定。23有实际EXE升级恢复proof。24按设计13/24与10.3服务恢复要求，由独立HTTP回退/保留/恢复证据判定。其它客户端/HTTP/MCP功能控件独立保留，22和§17.3物理Android未豁免。",
   "",
   "## 部分实测及剩余缺口",
   "",
@@ -1267,7 +1268,7 @@ const review = [
   "",
   "依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。",
   "",
-  "映射器对 JSON proof 读取记录 SHA-256（UTF-8 文本原文），见 coverage-matrix.json 的 evidenceMapping.proofHashes；正文、原生 UI tree 和截图从证据字段追溯。缺少 optional proof 时不新增通过。所有凭据均不参与读取和输出。",
+  "所有proof的SHA-256均按原始文件字节计算，见coverage-matrix.json的evidenceMapping.proofHashes。仅JSON解析或日志/正文文本断言使用UTF-8解码；JPG等二进制hash检查不解码。旧/修正公开proof与原生tree/截图均保留各自hash；缺少optional proof时不新增通过。所有凭据均不参与读取和输出。",
   "",
   `当前细目计数：${matrix.items.length}。设计明确的必要入口均满足而整行 passed 的基线：${
     matrix.items

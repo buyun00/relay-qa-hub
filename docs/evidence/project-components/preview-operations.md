@@ -1,6 +1,6 @@
 # 独立项目预览运行与回退说明
 
-适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7，最新恢复PID23924），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code22/preview.8。24基线仅09、11、12、15、23、24整项通过，物理Android和真实外部完整链路仍缺。**
+适用实例qa-hub-preview-7c86；更新日期2026-09-09。本记录汇总独立预览实现、实际客户端验收和只读生产快照。业务写入、服务启停和安装均限独立预览或隔离fixture；生产边界按证据核对。运行参数来自公开instance配置、启动器与发布回执，不含secrets内容。**Windows最新发包和真实升级/原生恢复为.7（native0.2.0.7，最新恢复PID23924），Bug闭环/编辑/评论/软删除证据来自.5；Android当前code22/preview.8。24基线仅09、10、11、12、15、23、24整项通过，物理Android和真实外部完整链路仍缺。**
 
 ## 目录、端口和身份
 
@@ -164,9 +164,9 @@ Git 忽略目录也须保留：
 - apps/android/app/build/evidence/project-components 的截图、UI XML、脱敏读回和保留 APK；build 目录不是 Git 持久证据。
 - runtime\migration-rehearsal-81deb464 的固定归档、校验报告、migrated/rollback 副本和 hold。
 
-矩阵重生保留结果、人工备注和retiredItems，源码变化标记复验。当前985细目不是985项通过；24基线只有09、11、12、15、23、24整项通过，22保留物理Android必测缺口，15仅按设计列出的三种实际读取入口判定整项通过，APK/EXE/Web其它控件和17.3物理设备要求不受影响。源目录重复MCP注册行不重复计数。[映射规则与progress](coverage-mapping-review.md)。真实外部Jenkins、上传、Relay、轻语以及物理Android仍缺资源。
+矩阵重生保留结果、人工备注和retiredItems，源码变化标记复验。当前985细目不是985项通过；24基线只有09、10、11、12、15、23、24整项通过，22保留物理Android必测缺口，15仅按设计列出的三种实际读取入口判定整项通过，APK/EXE/Web其它控件和17.3物理设备要求不受影响。源目录重复MCP注册行不重复计数。[映射规则与progress](coverage-mapping-review.md)。真实外部Jenkins、上传、Relay、轻语以及物理Android仍缺资源。
 
-基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、11、12、15、23、24整项通过，其余功能仍按实际入口分别验收。21已只读定位旧上传queue.sqlite/owner/job/chain、Relay批次及轻语状态；仍缺活queue数量/状态、跨文件一致恢复集、明确项目/版本映射及实际迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
+基线15已按设计原文重新核对三种读取并校准适用入口，没有增加not_applicable状态。当前09、10、11、12、15、23、24整项通过，其余功能仍按实际入口分别验收。21已只读定位旧上传queue.sqlite/owner/job/chain、Relay批次及轻语状态；仍缺活queue数量/状态、跨文件一致恢复集、明确项目/版本映射及实际迁移核对；schema12程序启动与新增数据回退不再作为21条件。主库及878附件已固定并通过迁移/held服务26项读回，historical-copy资源状态为partially_verified。
 
 .7仅两个实际按钮新增EXE passed：关闭窗口、状态面板检查更新/安装并重启。window-action(close)、check-update成功、install-update成功、second-instance无深链恢复记为分支passed，复合handler仍not_run；托盘图标点击仍未测。生成/映射脚本本轮仅为持久重放这些证据作有界修改，不改应用源码；保留401个既有复验标记，proof SHA不一致时拒绝且不写矩阵。[映射审查](coverage-mapping-review.md)、[实际重放验证](runs/coverage-criteria-replay.json)。
 
@@ -202,7 +202,7 @@ offline-import.mjs 要求显式 archive、expected-sha256、allowed-root、data-
 
 基线24按设计13/24“能按文档恢复服务并保留回退前新增数据和任务证据”和10.3的隔离回退边界校准：服务/HTTP是必要入口，旧程序不需要读取或合并新版数据。先前要求六入口各自降级、或让APK回退阻止该服务基线通过，属于过度约束，现已纠正。既有EXE客户端恢复证据单独保留；APK/Web/MCP及其它功能控件保持各自实测状态。24整项通过不补齐18/19外部组件、21旧queue/workspace完整清单、22及17.3物理设备缺口，整个任务仍未完成。
 
-本轮按最终冻结源码重新盘点：188个源码文件、985细目，保留既有人工结果、负向备注与needsRevalidation；09、11、12、15、23、24整项通过，其余基线和独立功能仍按实际缺口验收。
+前轮按冻结源码盘点：188个源码文件、985细目，保留既有人工结果、负向备注与needsRevalidation；当时09、11、12、15、23、24整项通过，其余基线和独立功能仍按实际缺口验收。
 
 ## 最终API、Android与生产读回
 
@@ -220,7 +220,7 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 
 ## EXE 停止期间的 HTTP / 服务端 MCP 独立性
 
-设计基线11原文为“关闭 EXE 后，外部程序仍可登录、查询、评论和改状态”；12为“服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作”。此前生成器把“全部动作/完整负向场景”加入这两个基线，超出原文；这些要求继续由§17全功能矩阵及13/14对等、并发项目验收。此次只按独立性纠正11/12，当前整项通过为09、11、12、15、23、24。
+设计基线11原文为“关闭 EXE 后，外部程序仍可登录、查询、评论和改状态”；12为“服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作”。此前生成器把“全部动作/完整负向场景”加入这两个基线，超出原文；这些要求继续由§17全功能矩阵及13/14对等、并发项目验收。该轮按独立性纠正11/12，当时整项通过为09、11、12、15、23、24。
 
 2026-09-08T21:13:39.2199432Z，主代理对已核对精确路径/启动时点的预览EXE主进程11368执行 controlled_fault_stop；没有登录后立即强停的组合，也没有操作日常EXE。独立性脚本在21:14:14.415Z–21:17:11.392Z一次运行通过：33次直接HTTP请求、36次服务端4421请求（业务为真实JSON-RPC）、140次逐请求前后及首尾边界，预览目录/同名进程和4420监听始终不存在。两个独立员工和Bug各完成登录、查询、编辑、评论重放、人工完成、验收失败退回、再次完成和通过关闭v12，随后软删除并读回拒绝/列表消失；各17条事件actor、验收人及旧版本/错项目负例均核对。[可读全过程](exe-independent-services.md)、[69请求和140边界](runs/exe-closed-api-mcp.json)、[精确停止](runs/exe-independence-controlled-stop.json)。
 
@@ -232,8 +232,18 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 
 ## 独立性证据与脱敏保真最终检查点
 
-本轮源码盘点锚点为538c78f03e74aef8d02d13ad3e166ab3ece4a06f（脱敏修正提交）；业务API源码仍09f7150，Android源码仍1be7724。8份新的corrected派生由已核对原始SHA的私有原件生成，旧公开proof保留；它们修复104个JSON-RPC版本和240个事件schemaVersion的证据文本，业务结果、失败历史、检查数量未变，绝不计作新增业务运行。mapper只读取公开文件，核对index及old/corrected两侧SHA后解析派生内容，在当前结果保留old引用并追加corrected引用。[更正说明](redaction-corrections/README.md)、[公开哈希索引](redaction-corrections/index.json)。两份实际脱敏helper共有18/18纯函数测试通过；原1.0请求/blocked及未注册路由的业务能力缺口不因本证据修正改变。
+前轮源码盘点锚点为538c78f03e74aef8d02d13ad3e166ab3ece4a06f（脱敏修正提交）；业务API源码仍09f7150，Android源码仍1be7724。8份新的corrected派生由已核对原始SHA的私有原件生成，旧公开proof保留；它们修复104个JSON-RPC版本和240个事件schemaVersion的证据文本，业务结果、失败历史、检查数量未变，绝不计作新增业务运行。mapper只读取公开文件，核对index及old/corrected两侧SHA后解析派生内容，在当前结果保留old引用并追加corrected引用。[更正说明](redaction-corrections/README.md)、[公开哈希索引](redaction-corrections/index.json)。两份实际脱敏helper共有18/18纯函数测试通过；原1.0请求/blocked及未注册路由的业务能力缺口不因本证据修正改变。
 
-本轮仅11/12及所对应实际入口新增通过；当前整项基线为09、11、12、15、23、24。985项/188源码文件/21退役历史、401复验标记继续保留；完整HTTP/MCP对等与并发、§17全功能、18/19外部执行、21一致迁移和22物理Android仍未完成。预览EXE当前已恢复PID23924；最新生产观测为21:22:09.4439761Z，均以本轮独立性proof为准，前轮时点保留为历史。
+前轮仅11/12及所对应实际入口新增通过；当时整项基线为09、11、12、15、23、24。985项/188源码文件/21退役历史、401复验标记继续保留；完整HTTP/MCP对等与并发、§17全功能、18/19外部执行、21一致迁移和22物理Android仍未完成。预览EXE当前已恢复PID23924；最新生产观测为21:22:09.4439761Z，均以本轮独立性proof为准，前轮时点保留为历史。
 
-本轮最终重放已完成（2026-09-08T21:38:02.173Z）：985项、188源码hash逐一相符、21退役历史和401复验标记保留。两次generate→map→generate的语义SHA-256同为cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48；实际mapper的内存FS故障测试证实manual/source-change标记及reviewed失败结果保留，独立性proof或corrected proof错hash均在任何写入前拒绝（0写入）。本轮只有8个入口状态由not_run变passed：11/12两基线、HTTP的DELETE/manual-complete/events三路、server MCP的list_bugs/update_bug/list_events三工具；派生脱敏本身没有新增业务通过。审计字段见coverage-matrix.json的evidenceMapping.finalReplayVerification，前轮检查点保留在finalReplayVerificationHistory。
+前轮最终重放已完成（2026-09-08T21:38:02.173Z）：985项、188源码hash逐一相符、21退役历史和401复验标记保留。两次generate→map→generate的语义SHA-256同为cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48；实际mapper的内存FS故障测试证实manual/source-change标记及reviewed失败结果保留，独立性proof或corrected proof错hash均在任何写入前拒绝（0写入）。该轮只有8个入口状态由not_run变passed：11/12两基线、HTTP的DELETE/manual-complete/events三路、server MCP的list_bugs/update_bug/list_events三工具；派生脱敏本身没有新增业务通过。审计字段见coverage-matrix.json的evidenceMapping.finalReplayVerification，前轮检查点保留在finalReplayVerificationHistory。
+
+## EXE人员管理补充与基线10判据
+
+以dc9889263cbe2b7d499ec0efbff33b512a490ef9为本轮证据锚点。设计444“两端均按现有方式完成项目人员查看、关联与停用”承接443的APK、EXE；10现在仅用这两个必要入口汇总。已有MuMu code19原生人员查看/关联/解除/停用/恢复和稳定ID读回，加上此次已安装EXE .7的独立实际操作，满足10整项；其它入口人员功能及§17.3物理Android继续独立验收，既有HTTP结果保留。
+
+本次4个EXE业务动作、24辅助HTTP、6组截图/树、7项断言通过：A内关联/解除有2条唯一身份事件；停用/恢复有2条原actor成员事件，A主资格v1→2→3，B两人active/v1且无link；A同名登录及旧session403，B仍200。原Bug完整DTO、员工及文字+PNG草稿保持。5条UI/REPL诊断保留，未重做业务变更；新员工任务数0，不证明非零引用保全。[原生验收](exe-native-personnel/README.md)、[结果](exe-native-personnel/result.json)。
+
+新增通过限于4.EXE、10.EXE与确认关联/取消关联/停用/恢复四按钮；搜索、主用户选择及整页只记录部分实测。当前wholepass为09、10、11、12、15、23、24，4整体仍not_run。生产最新仍21:22:09.4439761Z快照；本轮没有再次探测生产，也没有启停服务。
+
+本轮重放以dc98892为锚点，985项/188源码hash/21退役项/401复验标记保持；相对该提交仅6个EXE入口状态新增通过，10的必要入口改为APK/EXE并保留旧HTTP证据。稳定重放语义SHA为c23f07f22c0195b2dc59eab39c7cb4f84d32c79ea770cd0a884147ea33902b9f。proof统一按原始字节求SHA；首次JPG文本hash不匹配被拒绝后修正，旧JSON及14份人员proof的字节hash均核对不变。

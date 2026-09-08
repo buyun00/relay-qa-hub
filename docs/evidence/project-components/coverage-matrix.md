@@ -1,6 +1,6 @@
 # QA Hub 项目制与组件化真实验收矩阵
 
-生成时点：2026-09-08T21:38:05.631Z；设计 v2.1；源码 HEAD：`538c78f03e74aef8d02d13ad3e166ab3ece4a06f`。
+生成时点：2026-09-08T21:54:14.917Z；设计 v2.1；源码 HEAD：`dc9889263cbe2b7d499ec0efbff33b512a490ef9`。
 
 本文件是代码和需求的验收清单，初始全部为 `not_run`。代码存在、静态推导、mock、编译成功、端口监听或排队成功均不算通过。逐入口真实操作并读回项目、操作人、状态、版本、事件、附件及最终产物后，才登记结果。
 
@@ -15,13 +15,13 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | 01 项目入口姓名登录         | A · not_run | A · not_run | A · passed  | A · passed  | A · not_run | A · not_run | 首次登录只登记入口项目；原姓名仍解析为稳定原人员。                                                     |
 | 02 单项目和多项目人员       | A · not_run | A · not_run | A · passed  | A · passed  | A · not_run | A · not_run | 单项目直接进入；多项目只列出有效所属项目。                                                             |
 | 03 唯一 GM                  | A · not_run | A · not_run | A · not_run | A · passed  | A · not_run | A · not_run | GM 管理全部项目；普通姓名 gm 不获得 GM 身份。                                                          |
-| 04 项目人员停用             | A · not_run | A · not_run | A · not_run | A · passed  | A · not_run | A · not_run | A 停用不影响 B；再次姓名登录不恢复显式停用关系。                                                       |
+| 04 项目人员停用             | A · not_run | A · passed  | A · not_run | A · passed  | A · not_run | A · not_run | A 停用不影响 B；再次姓名登录不恢复显式停用关系。                                                       |
 | 05 非所属项目读取           | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | 列表、详情、附件、日志和统计均不泄露其他项目。                                                         |
 | 06 写入归属                 | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | 编辑、评论、附件绑定和状态动作不能写到错误项目。                                                       |
 | 07 项目快速切换             | A · not_run | A · not_run | A · not_run | —           | —           | —           | A 迟到请求、草稿及人员选择不能覆盖 B。                                                                 |
 | 08 多窗口和多客户端         | A · not_run | A · not_run | A · passed  | A · not_run | A · not_run | A · not_run | 同一人员并行打开不同项目；每个请求保持明确归属。                                                       |
 | 09 关闭所有组件的基础全流程 | A · passed  | A · passed  | A · passed  | A · passed  | A · passed  | A · passed  | APK/EXE/Web 均可创建、处理、人工完成、验收并关闭 Bug。                                                 |
-| 10 项目人员管理一致         | A · passed  | A · not_run | A · not_run | A · passed  | A · not_run | A · not_run | 各端实际查看、关联、解除、停用和恢复当前项目人员。                                                     |
+| 10 项目人员管理一致         | A · passed  | A · passed  | —           | —           | —           | —           | 两端均按现有方式完成项目人员查看、关联与停用。                                                         |
 | 11 HTTP API 独立使用        | —           | —           | —           | A · passed  | —           | —           | 关闭 EXE 后，外部程序仍可登录、查询、评论和改状态。                                                    |
 | 12 服务端 MCP 独立使用      | —           | —           | —           | —           | A · passed  | —           | 服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作。                                                       |
 | 13 HTTP/MCP 对等            | —           | —           | —           | A · not_run | A · not_run | A · not_run | 等价输入得到一致状态、版本、操作人、幂等结果和错误。                                                   |

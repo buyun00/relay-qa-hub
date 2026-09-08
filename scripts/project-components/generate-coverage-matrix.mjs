@@ -284,7 +284,7 @@ const baseline = [
   ["项目快速切换", "A 迟到请求、草稿及人员选择不能覆盖 B。"],
   ["多窗口和多客户端", "同一人员并行打开不同项目；每个请求保持明确归属。"],
   ["关闭所有组件的基础全流程", "APK/EXE/Web 均可创建、处理、人工完成、验收并关闭 Bug。"],
-  ["项目人员管理一致", "各端实际查看、关联、解除、停用和恢复当前项目人员。"],
+  ["项目人员管理一致", "两端均按现有方式完成项目人员查看、关联与停用。"],
   ["HTTP API 独立使用", "关闭 EXE 后，外部程序仍可登录、查询、评论和改状态。"],
   ["服务端 MCP 独立使用", "服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作。"],
   ["HTTP/MCP 对等", "等价输入得到一致状态、版本、操作人、幂等结果和错误。"],
@@ -308,6 +308,9 @@ for (const [index, [title, expected]] of baseline.entries()) {
   const applicability =
     {
       7: ["apk", "exe", "web"],
+      // Design 13/10 follows the APK and EXE pair named in 13/09.
+      // Other personnel controls and section 17 device coverage remain independent.
+      10: ["apk", "exe"],
       11: ["http"],
       12: ["server_mcp"],
       13: ["http", "server_mcp", "local_mcp"],

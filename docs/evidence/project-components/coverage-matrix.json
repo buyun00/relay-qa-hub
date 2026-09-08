@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-08T21:38:05.631Z",
+  "generatedAt": "2026-09-08T21:54:14.917Z",
   "evidenceMapping": {
-    "at": "2026-09-08T21:38:03.128Z",
+    "at": "2026-09-08T21:54:12.490Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "redaction-corrections/index.json",
@@ -81,6 +81,20 @@
       "runs/exe-preview6-logout-readback.json",
       "runs/exe-preview6-login-durable-readback.json",
       "runs/exe-preview6-relogin-draft.json",
+      "exe-native-personnel/result.json",
+      "exe-native-personnel/README.md",
+      "exe-native-personnel/01-two-new-personnel.jpg",
+      "exe-native-personnel/01-two-new-personnel.txt",
+      "exe-native-personnel/02-linked-only-a.jpg",
+      "exe-native-personnel/02-linked-only-a.txt",
+      "exe-native-personnel/03-unlinked-original-id.jpg",
+      "exe-native-personnel/03-unlinked-original-id.txt",
+      "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+      "exe-native-personnel/04-disabled-a-b-still-active.txt",
+      "exe-native-personnel/05-restored-stable-identities.jpg",
+      "exe-native-personnel/05-restored-stable-identities.txt",
+      "exe-native-personnel/06-original-draft-preserved.jpg",
+      "exe-native-personnel/06-original-draft-preserved.txt",
       "runs/exe-preview4-restored-draft.txt",
       "runs/exe-preview4-after-fault-draft.txt",
       "runs/exe-after-preview7-upgrade.json",
@@ -193,6 +207,20 @@
       "runs/exe-preview6-logout-readback.json": "d07be384982ae36d835be0e36e445d49b8363ca450387c9719b8382d21d4104c",
       "runs/exe-preview6-login-durable-readback.json": "ae11302feeed5aa7df9f53d029091ee662ee374f0ce96d35f9755d926d0d7de2",
       "runs/exe-preview6-relogin-draft.json": "3d3868bfad34a8a01d9c9cd8c3ac4de79676489c95f093aba29252c4ebb6383b",
+      "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+      "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+      "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+      "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+      "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+      "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+      "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+      "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+      "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+      "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+      "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+      "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+      "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+      "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30",
       "runs/exe-preview4-restored-draft.txt": "2e6f3d81a3d4fb8471fdd8bbeec49ba732906a486c069c898968d54370816abc",
       "runs/exe-preview4-after-fault-draft.txt": "bd6da80a889397688b4c504b9c1eee56a0998c35019c4b06d1e93d8a216af50d",
       "runs/exe-after-preview7-upgrade.json": "a5163d71cfe22edb57d7ea04c35e6768c7e6a09ec81adeaf1c15a3d182f4a3b3",
@@ -440,9 +468,11 @@
       "## 基线24服务回退判据校正\n\n设计13/24原文：“能按文档恢复服务并保留回退前新增数据和任务证据”。10.3同时要求旧服务不能读取已迁移的新库，新版停止或回退时保留新增操作和产物。因此24以服务/HTTP为必要入口；此前要求APK、EXE、Web、HTTP、两MCP各自降级是过度约束。已有EXE客户端回退/重装证据独立保留，APK/Web/MCP及所有功能控件不由服务演练自动通过。\n\n[47项服务回退](baseline24-service-rollback.md)及[脱敏JSON](baseline24-service-rollback.json)记录59条真实HTTP状态/大小/hash：modern3b1371c/schema14新增两Bug、评论、68字节PNG及两人工RepairAttempt/两Verification，其中一项仍in_progress；正常停止后910文件753461759字节整根保留，old62b4495/schema12实际读取独立旧归档，再以M14原session恢复所有新增ID/版本/操作者/状态/hash。三进程均正常exit0，端口关闭，retained全文件hash仍一致。写入外层是HTTP /api/v1/mcp/call，另有标准domain GET；本证据没有建立独立JSON-RPC或客户端UI会话。\n\n该证明的protectedBefore/After仅为固定archive/migrated/rollback副本，不是新一轮生产六文件快照；生产状态继续按各自带时点proof引用。它不证明旧外部queue.sqlite/workspace、Relay批次/state、轻语目录的完整迁移，也不承诺schema14新业务降级到12。18/19外部任务、21旧文件系统任务清单、22和17.3物理设备缺口保留。该轮整项通过09、15、23、24，全部任务仍未完成。",
       "## 最终API、Android与生产读回\n\n严格合同的历史失败已在提交09f7150fc1c671d867bbdbc257cab0e61c78d20f修复：五步test:contract全部通过，原1.0/1.1 baseline与checker未重写。六条已注册POST使用冻结响应投影，丰富事实仍可从原三条GET读取。完整API238/238（205mjs+33ts）、Storage109/109、相关Web19/19通过；其中52条响应fixture覆盖八种Accept，不能当作运行实例E2E。[实现与边界](contracts-remediation-implementation.md)、[严格五步](runs/contracts-remediation-strict.txt)、[最终API](runs/contracts-remediation-api-final.txt)。旧1.0 result请求、blocked写入和未注册fail/supersede POST及/bugs/:bugId/workflow GET仍缺，不能据静态门禁宣称完整运行合同。\n\n最终dist已在独立API PID18644加载，启动时点2026-09-08T20:39:13.7225210Z，4419 ready/schema14。root实际31个HTTP调用通过：六条冻结POST的vendor/JSON输出、同幂等请求切换媒体重放、丰富历史读取及跨项目404；另核对14个媒体头与原EXE Bug closed/v14、评论及184872字节附件hash。[31次实际请求](runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json)、[媒体/旧业务读回](runs/frozen-workflow-live-readback.json)。请求均使用1.1；没有以此补齐旧1.0请求、未注册路由或全部HTTP/MCP对等。\n\nAndroid最新实际安装为com.relayqahub.android.preview.debug，code22 / 0.2.0-preview.8，MuMu中21→22覆盖升级与原生开始→无需代码提交→验收通过关闭完成。Bug386cdd2f-44c9-4a79-992a-891d595766fd closed/v6；49条对应HTTP均2xx，deliver1次、complete0次，87单测通过，lint0errors/29warnings。原有草稿/PNG/sidecar三hash、日常code14/PID5051/安装时间及四配置hash保留。Bug由API准备，后续状态写入来自原生按钮。修复文件BugLifecycleClient.kt由本目标3b1371c新增，62b起点不存在，不能描述为旧基线故障。[code22原生记录](android-code22-no-code.md)、[机器证据](android-code22-no-code.json)。真实物理设备、真实代码分支交付及外部组件仍not_run。\n\n前轮生产只读核对为2026-09-08T20:49:45.0734634Z：相对19:55快照，六文件hash、三个原PID精确启动时点及可见日常EXE路径保持，4319 ready/schema12，4174 Windows3.3.5 manifest原字节hash不变。两个Node的可执行路径仍null，没有新增路径证明；未重新验签/下载生产安装包。Android引用code22证据20:46:37.419Z的daily14/PID5051/配置保留，root未重复ADB查询。[前轮生产只读证据](runs/production-after-api-fix-code22.json)。\n\n14条HTTP路由仅映射该实际调用子集。Android开始按钮记实测通过，submitFix的no_code分支记录passed但真实代码分支未测，复合按钮整行仍not_run。基线09保留原APK原生创建证据并追加本轮状态链，22仅追加模拟器升级progress；09、15、23、24为整项通过，18/19/21/22及17.3缺口继续保留。\n\ncode22同一已验收APK已发布为不可变预览下载：[下载Android code22 / preview.8](http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk)。完整HTTP下载35,471,405字节、SHA-256 733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777，实例响应头/类型匹配，Windows manifest未变。Android源内容与提交1be772469671d75cbb5e31240bf345dcc7c4a267一致，APK构建发生在提交之前；本次发布没有重新构建或安装。回执不是签名更新manifest，不能记为应用内自升级或物理设备通过。[下载发布证据](runs/android-code22-download-publication.json)。",
       "## 前轮源码及映射冻结\n\n前轮冻结盘点锚点为81e70d43638f3cb2f3dbd3994acd46f413e5364e，其中API兼容源码提交09f7150、Android源码提交1be7724；188个源码文件hash逐一匹配，985条细目、21条退役历史保留。连续生成器→mapper→生成器重放的语义hash一致；错误proof hash在任何写入前拒绝（0写入），人工负向结果和item/manual复验、sourceHash标记均保留，既有needsRevalidation零丢失。审计结果见coverage-matrix.json的evidenceMapping.finalReplayVerification。\n\n[运行HTTP回归说明](frozen-workflow-live.md)保留六注册路由的31请求和14媒体头边界。此次新增API/Android/下载证据没有补齐旧请求、blocked写入、未注册状态路由、外部队列迁移或物理设备验收。",
-      "## EXE 停止期间的 HTTP / 服务端 MCP 独立性\n\n设计基线11原文为“关闭 EXE 后，外部程序仍可登录、查询、评论和改状态”；12为“服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作”。此前生成器把“全部动作/完整负向场景”加入这两个基线，超出原文；这些要求继续由§17全功能矩阵及13/14对等、并发项目验收。此次只按独立性纠正11/12，当前整项通过为09、11、12、15、23、24。\n\n2026-09-08T21:13:39.2199432Z，主代理对已核对精确路径/启动时点的预览EXE主进程11368执行 controlled_fault_stop；没有登录后立即强停的组合，也没有操作日常EXE。独立性脚本在21:14:14.415Z–21:17:11.392Z一次运行通过：33次直接HTTP请求、36次服务端4421请求（业务为真实JSON-RPC）、140次逐请求前后及首尾边界，预览目录/同名进程和4420监听始终不存在。两个独立员工和Bug各完成登录、查询、编辑、评论重放、人工完成、验收失败退回、再次完成和通过关闭v12，随后软删除并读回拒绝/列表消失；各17条事件actor、验收人及旧版本/错项目负例均核对。[可读全过程](exe-independent-services.md)、[69请求和140边界](runs/exe-closed-api-mcp.json)、[精确停止](runs/exe-independence-controlled-stop.json)。\n\n停止期间，109个预览profile文件共772540633字节冷保留，全部hash相同。21:18:26.3376550Z恢复同一已安装.7，主PID23924、4420恢复；原员工/项目/文字+1PNG/配置SHA，以及原Bug closed/v14、1评论和184872字节原附件hash读回不变；API18644、服务MCP15736、Web20284继续运行。[冷保留](runs/exe-independence-profile-retained.json)、[原生恢复和业务读回](runs/exe-independence-restored.json)、[恢复界面](runs/exe-independence-restored-draft.txt)。该实测不证明正常托盘退出、Windows托盘图标点击或任意崩溃组合。\n\n最新生产只读快照为2026-09-08T21:22:09.4439761Z：六文件hash、三个原PID精确启动时点和可见日常EXE路径保持；4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。两个Node路径仍null；本次没有重新ADB查询，Android仍引用20:46:37.419Z的code22证据。[独立性恢复后生产快照](runs/production-after-independence.json)。\n\n21的旧外部状态现已找到并只读盘点：53文件，3上传job/2chain/9Relay batch共17items，以及活queue/WAL位置。活SQLite未打开，队列行数/状态未知；未建立跨文件一致导出或迁移，项目/组件版本绑定及Qingyu密文/密钥恢复仍缺，因此21保持not_run。[盘点及限制](baseline21-external-state-inventory.md)、[脱敏元数据](baseline21-external-state-inventory.json)。本轮只把实际17条HTTP路由和12个服务MCP源码工具行追加对应证据，没有转移到本地MCP、APK/Web控件或全部状态组合。\n",
-      "## 独立性证据与脱敏保真最终检查点\n\n本轮源码盘点锚点为538c78f03e74aef8d02d13ad3e166ab3ece4a06f（脱敏修正提交）；业务API源码仍09f7150，Android源码仍1be7724。8份新的corrected派生由已核对原始SHA的私有原件生成，旧公开proof保留；它们修复104个JSON-RPC版本和240个事件schemaVersion的证据文本，业务结果、失败历史、检查数量未变，绝不计作新增业务运行。mapper只读取公开文件，核对index及old/corrected两侧SHA后解析派生内容，在当前结果保留old引用并追加corrected引用。[更正说明](redaction-corrections/README.md)、[公开哈希索引](redaction-corrections/index.json)。两份实际脱敏helper共有18/18纯函数测试通过；原1.0请求/blocked及未注册路由的业务能力缺口不因本证据修正改变。\n\n本轮仅11/12及所对应实际入口新增通过；当前整项基线为09、11、12、15、23、24。985项/188源码文件/21退役历史、401复验标记继续保留；完整HTTP/MCP对等与并发、§17全功能、18/19外部执行、21一致迁移和22物理Android仍未完成。预览EXE当前已恢复PID23924；最新生产观测为21:22:09.4439761Z，均以本轮独立性proof为准，前轮时点保留为历史。\n",
-      "本轮最终重放已完成（2026-09-08T21:38:02.173Z）：985项、188源码hash逐一相符、21退役历史和401复验标记保留。两次generate→map→generate的语义SHA-256同为cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48；实际mapper的内存FS故障测试证实manual/source-change标记及reviewed失败结果保留，独立性proof或corrected proof错hash均在任何写入前拒绝（0写入）。本轮只有8个入口状态由not_run变passed：11/12两基线、HTTP的DELETE/manual-complete/events三路、server MCP的list_bugs/update_bug/list_events三工具；派生脱敏本身没有新增业务通过。审计字段见coverage-matrix.json的evidenceMapping.finalReplayVerification，前轮检查点保留在finalReplayVerificationHistory。"
+      "## EXE 停止期间的 HTTP / 服务端 MCP 独立性\n\n设计基线11原文为“关闭 EXE 后，外部程序仍可登录、查询、评论和改状态”；12为“服务端 MCP 不依赖 EXE，并覆盖同样主要 Bug 动作”。此前生成器把“全部动作/完整负向场景”加入这两个基线，超出原文；这些要求继续由§17全功能矩阵及13/14对等、并发项目验收。该轮按独立性纠正11/12，当时整项通过为09、11、12、15、23、24。\n\n2026-09-08T21:13:39.2199432Z，主代理对已核对精确路径/启动时点的预览EXE主进程11368执行 controlled_fault_stop；没有登录后立即强停的组合，也没有操作日常EXE。独立性脚本在21:14:14.415Z–21:17:11.392Z一次运行通过：33次直接HTTP请求、36次服务端4421请求（业务为真实JSON-RPC）、140次逐请求前后及首尾边界，预览目录/同名进程和4420监听始终不存在。两个独立员工和Bug各完成登录、查询、编辑、评论重放、人工完成、验收失败退回、再次完成和通过关闭v12，随后软删除并读回拒绝/列表消失；各17条事件actor、验收人及旧版本/错项目负例均核对。[可读全过程](exe-independent-services.md)、[69请求和140边界](runs/exe-closed-api-mcp.json)、[精确停止](runs/exe-independence-controlled-stop.json)。\n\n停止期间，109个预览profile文件共772540633字节冷保留，全部hash相同。21:18:26.3376550Z恢复同一已安装.7，主PID23924、4420恢复；原员工/项目/文字+1PNG/配置SHA，以及原Bug closed/v14、1评论和184872字节原附件hash读回不变；API18644、服务MCP15736、Web20284继续运行。[冷保留](runs/exe-independence-profile-retained.json)、[原生恢复和业务读回](runs/exe-independence-restored.json)、[恢复界面](runs/exe-independence-restored-draft.txt)。该实测不证明正常托盘退出、Windows托盘图标点击或任意崩溃组合。\n\n最新生产只读快照为2026-09-08T21:22:09.4439761Z：六文件hash、三个原PID精确启动时点和可见日常EXE路径保持；4319 ready/schema12，4174 Windows3.3.5 manifest原字节SHA不变。两个Node路径仍null；本次没有重新ADB查询，Android仍引用20:46:37.419Z的code22证据。[独立性恢复后生产快照](runs/production-after-independence.json)。\n\n21的旧外部状态现已找到并只读盘点：53文件，3上传job/2chain/9Relay batch共17items，以及活queue/WAL位置。活SQLite未打开，队列行数/状态未知；未建立跨文件一致导出或迁移，项目/组件版本绑定及Qingyu密文/密钥恢复仍缺，因此21保持not_run。[盘点及限制](baseline21-external-state-inventory.md)、[脱敏元数据](baseline21-external-state-inventory.json)。本轮只把实际17条HTTP路由和12个服务MCP源码工具行追加对应证据，没有转移到本地MCP、APK/Web控件或全部状态组合。\n",
+      "## 独立性证据与脱敏保真最终检查点\n\n前轮源码盘点锚点为538c78f03e74aef8d02d13ad3e166ab3ece4a06f（脱敏修正提交）；业务API源码仍09f7150，Android源码仍1be7724。8份新的corrected派生由已核对原始SHA的私有原件生成，旧公开proof保留；它们修复104个JSON-RPC版本和240个事件schemaVersion的证据文本，业务结果、失败历史、检查数量未变，绝不计作新增业务运行。mapper只读取公开文件，核对index及old/corrected两侧SHA后解析派生内容，在当前结果保留old引用并追加corrected引用。[更正说明](redaction-corrections/README.md)、[公开哈希索引](redaction-corrections/index.json)。两份实际脱敏helper共有18/18纯函数测试通过；原1.0请求/blocked及未注册路由的业务能力缺口不因本证据修正改变。\n\n前轮仅11/12及所对应实际入口新增通过；当时整项基线为09、11、12、15、23、24。985项/188源码文件/21退役历史、401复验标记继续保留；完整HTTP/MCP对等与并发、§17全功能、18/19外部执行、21一致迁移和22物理Android仍未完成。预览EXE当前已恢复PID23924；最新生产观测为21:22:09.4439761Z，均以本轮独立性proof为准，前轮时点保留为历史。\n",
+      "前轮最终重放已完成（2026-09-08T21:38:02.173Z）：985项、188源码hash逐一相符、21退役历史和401复验标记保留。两次generate→map→generate的语义SHA-256同为cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48；实际mapper的内存FS故障测试证实manual/source-change标记及reviewed失败结果保留，独立性proof或corrected proof错hash均在任何写入前拒绝（0写入）。该轮只有8个入口状态由not_run变passed：11/12两基线、HTTP的DELETE/manual-complete/events三路、server MCP的list_bugs/update_bug/list_events三工具；派生脱敏本身没有新增业务通过。审计字段见coverage-matrix.json的evidenceMapping.finalReplayVerification，前轮检查点保留在finalReplayVerificationHistory。",
+      "## EXE人员管理补充与基线10判据\n\n以dc9889263cbe2b7d499ec0efbff33b512a490ef9为本轮证据锚点。设计444“两端均按现有方式完成项目人员查看、关联与停用”承接443的APK、EXE；10现在仅用这两个必要入口汇总。已有MuMu code19原生人员查看/关联/解除/停用/恢复和稳定ID读回，加上此次已安装EXE .7的独立实际操作，满足10整项；其它入口人员功能及§17.3物理Android继续独立验收，既有HTTP结果保留。\n\n本次4个EXE业务动作、24辅助HTTP、6组截图/树、7项断言通过：A内关联/解除有2条唯一身份事件；停用/恢复有2条原actor成员事件，A主资格v1→2→3，B两人active/v1且无link；A同名登录及旧session403，B仍200。原Bug完整DTO、员工及文字+PNG草稿保持。5条UI/REPL诊断保留，未重做业务变更；新员工任务数0，不证明非零引用保全。[原生验收](exe-native-personnel/README.md)、[结果](exe-native-personnel/result.json)。\n\n新增通过限于4.EXE、10.EXE与确认关联/取消关联/停用/恢复四按钮；搜索、主用户选择及整页只记录部分实测。当前wholepass为09、10、11、12、15、23、24，4整体仍not_run。生产最新仍21:22:09.4439761Z快照；本轮没有再次探测生产，也没有启停服务。\n",
+      "本轮重放以dc98892为锚点，985项/188源码hash/21退役项/401复验标记保持；相对该提交仅6个EXE入口状态新增通过，10的必要入口改为APK/EXE并保留旧HTTP证据。稳定重放语义SHA为c23f07f22c0195b2dc59eab39c7cb4f84d32c79ea770cd0a884147ea33902b9f。proof统一按原始字节求SHA；首次JPG文本hash不匹配被拒绝后修正，旧JSON及14份人员proof的字节hash均核对不变。"
     ],
     "baseline24CriterionReview": {
       "design": "docs/design/project-components-transformation-2026-09-08.md:458 / :384",
@@ -495,7 +525,21 @@
         "redaction-corrections/mcp-core-2026-09-08T17-16-36-112Z.json": "5bb09250ebd00fddc0a1054f8c2a0da74dcb435e38d23a0a8ca2fb2e0495a8f2",
         "redaction-corrections/server-mcp-core-2026-09-08T17-52-56-155Z.json": "19221e1dcefa05c588cf03abe584d5a5f82b93d3b00533ca507fdb2ffb682bfe",
         "redaction-corrections/server-mcp-core-2026-09-08T18-19-05-946Z.json": "6781abcab01b8a5dee46df382bd5cea3e5663b82b01616892f10d98b6a2b9c10",
-        "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json": "57dc9eef5db29627c82e139c937eb06cfdf34058a8ae4f360c576ae5f2a98546"
+        "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json": "57dc9eef5db29627c82e139c937eb06cfdf34058a8ae4f360c576ae5f2a98546",
+        "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+        "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+        "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+        "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+        "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+        "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+        "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+        "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+        "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+        "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+        "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+        "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+        "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+        "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
       },
       "api": {
         "pid": 18644,
@@ -547,90 +591,71 @@
       "applicationSourceHead": "1be772469671d75cbb5e31240bf345dcc7c4a267"
     },
     "finalReplayVerification": {
-      "at": "2026-09-08T21:38:02.173Z",
-      "inventorySourceHead": "538c78f03e74aef8d02d13ad3e166ab3ece4a06f",
+      "at": "2026-09-08T21:54:11.768Z",
+      "inventorySourceHead": "dc9889263cbe2b7d499ec0efbff33b512a490ef9",
       "applicationSourceHead": "1be772469671d75cbb5e31240bf345dcc7c4a267",
-      "sourceFileCount": 188,
       "itemCount": 985,
+      "sourceFileCount": 188,
       "retiredItemCount": 21,
-      "allSourceHashesMatch": true,
       "retainedNeedsRevalidation": 401,
       "lostNeedsRevalidation": 0,
-      "semanticReplayHash": "cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48",
-      "semanticReplayScope": "sourceHead, sourceHashes, summary, resourceGaps, all items/manual/results except evidenceMappedAt, and retiredItems",
+      "allSourceHashesMatch": true,
+      "allPriorPublicProofHashesUnchanged": true,
+      "semanticReplayHash": "c23f07f22c0195b2dc59eab39c7cb4f84d32c79ea770cd0a884147ea33902b9f",
+      "semanticReplayScope": "sourceHead/sourceHashes/summary/resourceGaps/items including manual except evidenceMappedAt/retiredItems",
       "repeatGenerateMapGenerateMatched": true,
-      "mapperHash": "e916bb80c6feb05664354d439143295d27e3d76646104ede57d6b8051b7ae0a7",
-      "generatorHash": "a3e4bd00e9e440039028a133122abd58c2d3f02c218afafa5a95edf8e38f2af6",
-      "proofHashCount": 110,
-      "manualReviewedProofCount": 44,
-      "inMemoryActualMapperAudit": {
-        "manualNeedsRevalidationPreserved": true,
-        "sourceChangeFieldsPreserved": true,
-        "reviewedFailedResultPreserved": true,
-        "independenceProofMismatchRejectedBeforeWrite": true,
-        "correctedProofMismatchRejectedBeforeWrite": true,
-        "mismatchDiskWrites": 0,
-        "liveServicesCalled": false
-      },
-      "changedStatusesSince538c78f": [
+      "mapperHash": "aeab73e80b751d658cda8d5da9df164b13063efb329f4e4ba608086a72ef9642",
+      "generatorHash": "9f9417a93619a2c624359bdd2a9cb046bba15afc9adbb641f308286d6763150f",
+      "proofHashCount": 124,
+      "changedStatusesSinceDc98892": [
         {
-          "id": "baseline-9fff5a0bd4e750",
-          "title": "11 HTTP API 独立使用",
-          "surface": "http",
+          "id": "baseline-725921666b2c57",
+          "title": "04 项目人员停用",
+          "surface": "exe",
           "before": "not_run",
           "after": "passed"
         },
         {
-          "id": "baseline-be45d11bf5f799",
-          "title": "12 服务端 MCP 独立使用",
-          "surface": "server_mcp",
+          "id": "baseline-163e4ace685493",
+          "title": "10 项目人员管理一致",
+          "surface": "exe",
           "before": "not_run",
           "after": "passed"
         },
         {
-          "id": "mcp_tool-491b4d01a7ad0b",
-          "title": "qa_list_bugs",
-          "surface": "server_mcp",
+          "id": "web_control-8bbad9f431a583",
+          "title": "button | 取消关联 | title={protectedReason ?? undefined} | type=\"button\" | onClick={() => void mutate( `unlink:${user.userId}`, () => unlinkManagedProjectUser(projectId, user.userId), `${user.displayName} 的关联已取消。`, ) }",
+          "surface": "exe",
           "before": "not_run",
           "after": "passed"
         },
         {
-          "id": "mcp_tool-6a5abbcebe63f8",
-          "title": "qa_update_bug",
-          "surface": "server_mcp",
+          "id": "web_control-7a2ede0c1969d9",
+          "title": "button | 确认关联 | title={protectedReason ?? undefined} | type=\"button\" | onClick={() => { const target = users.find((item) => item.userId === selectedTarget); if (target === undefined) return; if ( !globalThis.confirm( `将“${user.disp",
+          "surface": "exe",
           "before": "not_run",
           "after": "passed"
         },
         {
-          "id": "mcp_tool-f280c088ac3cdf",
-          "title": "qa_list_events",
-          "surface": "server_mcp",
+          "id": "web_control-09dc23bb07f270",
+          "title": "button | type=\"button\" | onClick={() => { if ( !globalThis.confirm( `停用“${user.displayName}”？其当前项目资格会被停用，其他项目不受影响， ${user.taskCount} 个历史任务引用会保留。`, ) ) return; void mutate( `disable:${us",
+          "surface": "exe",
           "before": "not_run",
           "after": "passed"
         },
         {
-          "id": "http_route-3f8b6d79c3ec5a",
-          "title": "DELETE /api/v1/bugs/:bugId",
-          "surface": "http",
-          "before": "not_run",
-          "after": "passed"
-        },
-        {
-          "id": "http_route-91587d5ccb9fcd",
-          "title": "POST /api/v1/bugs/:bugId/manual-complete",
-          "surface": "http",
-          "before": "not_run",
-          "after": "passed"
-        },
-        {
-          "id": "http_route-c72542c420f961",
-          "title": "GET /api/v1/bugs/:bugId/events",
-          "surface": "http",
+          "id": "web_control-44096fd8d5a180",
+          "title": "button | 恢复资格 | type=\"button\" | onClick={() => void mutate( `restore:${user.userId}`, () => saveMembership( projectId, user.userId, true, user.membershipVersion ?? 1, ), `${user.displayName} 的",
+          "surface": "exe",
           "before": "not_run",
           "after": "passed"
         }
       ],
-      "wholePassed": [9, 11, 12, 15, 23, 24]
+      "baseline10RequiredSurfaces": ["apk", "exe"],
+      "otherSurfaceProofRetained": true,
+      "wholePassed": [9, 10, 11, 12, 15, 23, 24],
+      "mappingDiagnostic": "Initial JPG raw-byte SHA comparison rejected because old helper decoded all files before hashing; helper now hashes raw Buffer, and all existing JSON plus 14 personnel proof hashes match. No original evidence changed.",
+      "priorIntegrityAudit": "finalReplayVerificationHistory preserves earlier in-memory fail-closed/manual-flag checks"
     },
     "independenceSupplement": {
       "at": "2026-09-08T21:26:59.617Z",
@@ -824,10 +849,125 @@
         "mapperSha256": "dd9af7e08a17a0e661c2a526f6300dd738434be85644e0654e246335161f8ba2",
         "generatorSha256": "30015a35127b8ebda0d2b8ddae3862c0b52bec2ebf02e524e342b483d05d4bdf",
         "scope": "Executed real generator/mapper replay; fail-closed and preservation cases used in-memory filesystem substitution without changing raw evidence."
+      },
+      {
+        "at": "2026-09-08T21:38:02.173Z",
+        "inventorySourceHead": "538c78f03e74aef8d02d13ad3e166ab3ece4a06f",
+        "applicationSourceHead": "1be772469671d75cbb5e31240bf345dcc7c4a267",
+        "sourceFileCount": 188,
+        "itemCount": 985,
+        "retiredItemCount": 21,
+        "allSourceHashesMatch": true,
+        "retainedNeedsRevalidation": 401,
+        "lostNeedsRevalidation": 0,
+        "semanticReplayHash": "cc470e52d6f9537a9790a75a5e9fe1a6d96957e62174dfc38b58a6d695639f48",
+        "semanticReplayScope": "sourceHead, sourceHashes, summary, resourceGaps, all items/manual/results except evidenceMappedAt, and retiredItems",
+        "repeatGenerateMapGenerateMatched": true,
+        "mapperHash": "e916bb80c6feb05664354d439143295d27e3d76646104ede57d6b8051b7ae0a7",
+        "generatorHash": "a3e4bd00e9e440039028a133122abd58c2d3f02c218afafa5a95edf8e38f2af6",
+        "proofHashCount": 110,
+        "manualReviewedProofCount": 44,
+        "inMemoryActualMapperAudit": {
+          "manualNeedsRevalidationPreserved": true,
+          "sourceChangeFieldsPreserved": true,
+          "reviewedFailedResultPreserved": true,
+          "independenceProofMismatchRejectedBeforeWrite": true,
+          "correctedProofMismatchRejectedBeforeWrite": true,
+          "mismatchDiskWrites": 0,
+          "liveServicesCalled": false
+        },
+        "changedStatusesSince538c78f": [
+          {
+            "id": "baseline-9fff5a0bd4e750",
+            "title": "11 HTTP API 独立使用",
+            "surface": "http",
+            "before": "not_run",
+            "after": "passed"
+          },
+          {
+            "id": "baseline-be45d11bf5f799",
+            "title": "12 服务端 MCP 独立使用",
+            "surface": "server_mcp",
+            "before": "not_run",
+            "after": "passed"
+          },
+          {
+            "id": "mcp_tool-491b4d01a7ad0b",
+            "title": "qa_list_bugs",
+            "surface": "server_mcp",
+            "before": "not_run",
+            "after": "passed"
+          },
+          {
+            "id": "mcp_tool-6a5abbcebe63f8",
+            "title": "qa_update_bug",
+            "surface": "server_mcp",
+            "before": "not_run",
+            "after": "passed"
+          },
+          {
+            "id": "mcp_tool-f280c088ac3cdf",
+            "title": "qa_list_events",
+            "surface": "server_mcp",
+            "before": "not_run",
+            "after": "passed"
+          },
+          {
+            "id": "http_route-3f8b6d79c3ec5a",
+            "title": "DELETE /api/v1/bugs/:bugId",
+            "surface": "http",
+            "before": "not_run",
+            "after": "passed"
+          },
+          {
+            "id": "http_route-91587d5ccb9fcd",
+            "title": "POST /api/v1/bugs/:bugId/manual-complete",
+            "surface": "http",
+            "before": "not_run",
+            "after": "passed"
+          },
+          {
+            "id": "http_route-c72542c420f961",
+            "title": "GET /api/v1/bugs/:bugId/events",
+            "surface": "http",
+            "before": "not_run",
+            "after": "passed"
+          }
+        ],
+        "wholePassed": [9, 11, 12, 15, 23, 24]
       }
-    ]
+    ],
+    "personnelSupplement": {
+      "at": "2026-09-08T21:51:01.209Z",
+      "proof": "exe-native-personnel/result.json",
+      "proofSha256": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+      "proofHashes": {
+        "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+        "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+        "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+        "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+        "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+        "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+        "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+        "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+        "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+        "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+        "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+        "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+        "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+        "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+      },
+      "sourceCommit": "dc9889263cbe2b7d499ec0efbff33b512a490ef9",
+      "nativeActions": 4,
+      "auxiliaryHttpRequests": 24,
+      "screens": 6,
+      "assertions": 7,
+      "harnessDiagnosticsRetained": 5,
+      "wholePassed": [9, 10, 11, 12, 15, 23, 24],
+      "latestProductionProof": "runs/production-after-independence.json"
+    }
   },
-  "sourceHead": "538c78f03e74aef8d02d13ad3e166ab3ece4a06f",
+  "sourceHead": "dc9889263cbe2b7d499ec0efbff33b512a490ef9",
   "sourceRoots": [
     "apps/api/src",
     "apps/web/src",
@@ -1131,23 +1271,23 @@
         "passed": 22
       },
       "exe": {
-        "not_run": 458,
-        "passed": 16
+        "not_run": 452,
+        "passed": 22
       },
       "web": {
         "passed": 27,
-        "not_run": 405
+        "not_run": 404
       },
       "http": {
-        "passed": 47,
+        "passed": 46,
         "not_run": 304
       },
       "server_mcp": {
-        "not_run": 239,
+        "not_run": 238,
         "passed": 24
       },
       "local_mcp": {
-        "not_run": 252,
+        "not_run": 251,
         "passed": 12
       }
     }
@@ -1230,7 +1370,7 @@
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-08T21:38:02.932Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.400Z",
         "surfaceProgress": {
           "apk": {
             "completed": ["实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表"],
@@ -1427,7 +1567,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.921Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.390Z",
         "surfaceProgress": {
           "apk": {
             "completed": ["实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表"],
@@ -1521,7 +1661,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.894Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.371Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -1558,9 +1698,24 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -1593,7 +1748,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.402Z",
         "surfaceProgress": {
           "apk": {
             "completed": ["A 内原生停用/恢复及HTTP同名登录403/200已核对"],
@@ -1605,6 +1760,82 @@
             ],
             "status": "partial"
           }
+        },
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
         }
       },
       "needsRevalidation": false,
@@ -1823,7 +2054,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.938Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.405Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2090,7 +2321,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -2173,7 +2404,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.938Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.405Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -2223,8 +2454,8 @@
         "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
-      "expected": "各端实际查看、关联、解除、停用和恢复当前项目人员。",
-      "status": "not_run",
+      "expected": "两端均按现有方式完成项目人员查看、关联与停用。",
+      "status": "passed",
       "results": {
         "apk": {
           "applicable": true,
@@ -2239,42 +2470,155 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
           "note": "Real execution and read-back required."
         },
         "web": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "http": {
-          "applicable": true,
+          "applicable": false,
           "status": "passed",
           "evidence": ["runs/management-2026-09-08T17-53-20-441Z.json"],
           "actual": "HTTP 实际列出项目人员、关联与解除身份、成员停用恢复；GM 非成员目录由最新完整管理运行独立核对。",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "server_mcp": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         },
         "local_mcp": {
-          "applicable": true,
+          "applicable": false,
           "status": "not_run",
           "evidence": [],
           "actual": "",
-          "note": "Real execution and read-back required."
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.407Z",
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
+        },
+        "baselineCriterionReview": {
+          "at": "2026-09-08T21:51:01.209Z",
+          "designText": "两端均按现有方式完成项目人员查看、关联与停用",
+          "designLines": [443, 444],
+          "requiredSurfaces": ["apk", "exe"],
+          "previousRequiredSurfaces": ["apk", "exe", "web", "http", "server_mcp", "local_mcp"],
+          "reason": "Two clients are APK and EXE, explicitly named by the adjacent baseline and product scope. Section17 full feature/device coverage remains separate.",
+          "retainedOtherSurfaceResults": {
+            "http": {
+              "applicable": true,
+              "status": "passed",
+              "evidence": ["runs/management-2026-09-08T17-53-20-441Z.json"],
+              "actual": "HTTP 实际列出项目人员、关联与解除身份、成员停用恢复；GM 非成员目录由最新完整管理运行独立核对。",
+              "note": "Real execution and read-back required."
+            }
+          },
+          "notWaived": [
+            "Web/HTTP/serverMCP/localMCP personnel feature rows",
+            "Section17.3 physical Android",
+            "Nonzero fixture task-reference retention"
+          ]
+        }
       },
       "needsRevalidation": false,
       "generated": true
@@ -2347,7 +2691,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.942Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.409Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -2508,7 +2852,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.948Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.410Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -2703,7 +3047,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.953Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.413Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -3347,7 +3691,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:02.958Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.415Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -3436,7 +3780,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.959Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.415Z",
         "surfaceProgress": {
           "apk": {
             "completed": ["真实MediaProjection PNG在APK提交绑定", "同一图片三个读取入口hash一致"],
@@ -3618,7 +3962,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.921Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.390Z",
         "surfaceProgress": {
           "http": {
             "completed": ["A配置开关不影响B", "依赖级联关闭", "普通员工禁止组件配置"],
@@ -3696,7 +4040,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.921Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.390Z",
         "surfaceProgress": {
           "http": {
             "completed": [
@@ -3782,7 +4126,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.931Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.399Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3886,7 +4230,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3973,7 +4317,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -4117,7 +4461,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.960Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.416Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -4705,7 +5049,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.960Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.416Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -4834,7 +5178,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.961Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.417Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -4980,7 +5324,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.961Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.418Z",
         "surfaceProgress": {},
         "priorCriterionSnapshot": {
           "reason": "Historical six-surface baseline24 interpretation retained; superseded by reviewed design section13/24 and10.3 service criterion.",
@@ -5618,7 +5962,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.966Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.419Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -5792,7 +6136,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.361Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6365,7 +6709,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.361Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6439,7 +6783,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6518,7 +6862,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6597,7 +6941,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6683,7 +7027,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.971Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.421Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -6839,7 +7183,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6916,7 +7260,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -6994,7 +7338,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.883Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -7068,7 +7412,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.884Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -7220,7 +7564,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.884Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.362Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -9047,7 +9391,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -9122,7 +9466,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -9562,7 +9906,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -9637,7 +9981,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -10588,7 +10932,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -10882,7 +11226,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -11468,7 +11812,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.898Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -12424,7 +12768,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.976Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.423Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -12592,7 +12936,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.981Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.424Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -12799,7 +13143,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-08T21:38:02.986Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.426Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -12909,7 +13253,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.990Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.427Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -13109,7 +13453,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.994Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.429Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -13310,7 +13654,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-08T21:38:02.999Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.430Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -13462,7 +13806,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.004Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.432Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -13601,7 +13945,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.009Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.433Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -13853,7 +14197,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.014Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.435Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -14022,7 +14366,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.019Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.436Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -14214,7 +14558,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-08T21:38:03.024Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.438Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -14499,7 +14843,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.029Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.439Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -14975,7 +15319,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.898Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -24573,7 +24917,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.033Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.441Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -25418,7 +25762,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.038Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.443Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -25625,7 +25969,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.043Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.444Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -25826,7 +26170,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.888Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.366Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25900,7 +26244,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.888Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.366Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -25974,7 +26318,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.888Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.366Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -26342,7 +26686,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.051Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.446Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -26487,7 +26831,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.055Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.448Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -26647,7 +26991,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.060Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.449Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -26790,7 +27134,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.898Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.377Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -26869,7 +27213,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.898Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.377Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27019,7 +27363,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.065Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.451Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -27179,7 +27523,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-08T21:38:03.070Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.453Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27437,7 +27781,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.070Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.453Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27636,7 +27980,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-08T21:38:03.075Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.454Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27750,7 +28094,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.076Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.455Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27864,7 +28208,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.076Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.455Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -27978,7 +28322,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.076Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.455Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -28092,7 +28436,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.077Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.455Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -28460,7 +28804,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.081Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.457Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -28591,7 +28935,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.085Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.458Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -28751,7 +29095,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-08T21:38:03.091Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.460Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -29121,7 +29465,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.096Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.462Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -29235,7 +29579,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.097Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.462Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -29389,7 +29733,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.102Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.464Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -29543,7 +29887,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.107Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.465Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -31164,7 +31508,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.926Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.395Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -31332,7 +31676,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.926Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.395Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -31430,7 +31774,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.926Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.395Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -31594,7 +31938,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.926Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.395Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -32916,7 +33260,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.108Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.466Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -33678,7 +34022,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.108Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.466Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -33822,7 +34166,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.108Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.466Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -34237,7 +34581,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.108Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.466Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -34513,7 +34857,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -35568,7 +35912,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.923Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.392Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36480,7 +36824,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36552,7 +36896,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -36694,7 +37038,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37536,7 +37880,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37608,7 +37952,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -37680,7 +38024,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -38035,7 +38379,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.923Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.392Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -38390,7 +38734,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.923Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.392Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -38537,7 +38881,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.924Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.393Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -39522,7 +39866,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.923Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.392Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -39667,7 +40011,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.923Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.392Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -42912,7 +43256,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.108Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.466Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -43435,7 +43779,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.109Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.467Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -43856,7 +44200,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -43931,7 +44275,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -51881,7 +52225,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -51953,7 +52297,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52025,7 +52369,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52097,7 +52441,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52169,7 +52513,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52309,7 +52653,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52381,7 +52725,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52453,7 +52797,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52525,7 +52869,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52597,7 +52941,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52669,7 +53013,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52881,7 +53225,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -52953,7 +53297,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53025,7 +53369,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53097,7 +53441,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -53169,7 +53513,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.891Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.369Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -55229,8 +55573,23 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "已实测：实际进入人员管理页并完成本次四个业务动作，随后原员工草稿仍在。仍缺：整页全部分支、非零历史引用及所有错误/并发场景未全部测试。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -55262,7 +55621,151 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：实际进入人员管理页并完成本次四个业务动作，随后原员工草稿仍在。仍缺：整页全部分支、非零历史引用及所有错误/并发场景未全部测试。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": {
+              "completed": ["实际进入人员管理页并完成本次四个业务动作，随后原员工草稿仍在"],
+              "remaining": ["整页全部分支、非零历史引用及所有错误/并发场景未全部测试"],
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "已实测：实际进入人员管理页并完成本次四个业务动作，随后原员工草稿仍在。仍缺：整页全部分支、非零历史引用及所有错误/并发场景未全部测试。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients.",
+          "surfaceProgress": {
+            "exe": {
+              "completed": ["实际进入人员管理页并完成本次四个业务动作，随后原员工草稿仍在"],
+              "remaining": ["整页全部分支、非零历史引用及所有错误/并发场景未全部测试"],
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "surfaceProgress": {
+          "exe": {
+            "completed": ["实际进入人员管理页并完成本次四个业务动作，随后原员工草稿仍在"],
+            "remaining": ["整页全部分支、非零历史引用及所有错误/并发场景未全部测试"],
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "status": "partial"
+          }
+        },
+        "evidenceMappedAt": "2026-09-08T21:54:12.469Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -55299,8 +55802,23 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "已实测：原生键盘输入本次测试员工名称过滤，列表显示两名fixture；初次UIA set_value诊断保留。仍缺：其它搜索词/清空/空结果及迟到请求未逐项测试。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -55332,7 +55850,157 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：原生键盘输入本次测试员工名称过滤，列表显示两名fixture；初次UIA set_value诊断保留。仍缺：其它搜索词/清空/空结果及迟到请求未逐项测试。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": {
+              "completed": [
+                "原生键盘输入本次测试员工名称过滤，列表显示两名fixture；初次UIA set_value诊断保留"
+              ],
+              "remaining": ["其它搜索词/清空/空结果及迟到请求未逐项测试"],
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "已实测：原生键盘输入本次测试员工名称过滤，列表显示两名fixture；初次UIA set_value诊断保留。仍缺：其它搜索词/清空/空结果及迟到请求未逐项测试。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients.",
+          "surfaceProgress": {
+            "exe": {
+              "completed": [
+                "原生键盘输入本次测试员工名称过滤，列表显示两名fixture；初次UIA set_value诊断保留"
+              ],
+              "remaining": ["其它搜索词/清空/空结果及迟到请求未逐项测试"],
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "surfaceProgress": {
+          "exe": {
+            "completed": [
+              "原生键盘输入本次测试员工名称过滤，列表显示两名fixture；初次UIA set_value诊断保留"
+            ],
+            "remaining": ["其它搜索词/清空/空结果及迟到请求未逐项测试"],
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "status": "partial"
+          }
+        },
+        "evidenceMappedAt": "2026-09-08T21:54:12.471Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -55369,8 +56037,23 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "已实测：原生瞬态下拉选择本次主用户并完成一次关联；工具窗口诊断保留。仍缺：其他候选/取消、保护用户、无效及过期目标未测。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -55402,7 +56085,151 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "not_run",
+            "note": "Real execution and read-back required.",
+            "actual": "已实测：原生瞬态下拉选择本次主用户并完成一次关联；工具窗口诊断保留。仍缺：其他候选/取消、保护用户、无效及过期目标未测。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": {
+              "completed": ["原生瞬态下拉选择本次主用户并完成一次关联；工具窗口诊断保留"],
+              "remaining": ["其他候选/取消、保护用户、无效及过期目标未测"],
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ],
+              "status": "partial"
+            }
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "not_run",
+              "actual": "已实测：原生瞬态下拉选择本次主用户并完成一次关联；工具窗口诊断保留。仍缺：其他候选/取消、保护用户、无效及过期目标未测。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients.",
+          "surfaceProgress": {
+            "exe": {
+              "completed": ["原生瞬态下拉选择本次主用户并完成一次关联；工具窗口诊断保留"],
+              "remaining": ["其他候选/取消、保护用户、无效及过期目标未测"],
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ],
+              "status": "partial"
+            }
+          }
+        },
+        "surfaceProgress": {
+          "exe": {
+            "completed": ["原生瞬态下拉选择本次主用户并完成一次关联；工具窗口诊断保留"],
+            "remaining": ["其他候选/取消、保护用户、无效及过期目标未测"],
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "status": "partial"
+          }
+        },
+        "evidenceMappedAt": "2026-09-08T21:54:12.473Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -55438,9 +56265,24 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "EXE原生实际操作取消关联，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -55472,7 +56314,85 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "EXE原生实际操作取消关联，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "EXE原生实际操作取消关联，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
+        },
+        "evidenceMappedAt": "2026-09-08T21:54:12.475Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -55508,9 +56428,24 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "EXE原生实际操作确认关联，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -55542,7 +56477,85 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "EXE原生实际操作确认关联，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "EXE原生实际操作确认关联，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
+        },
+        "evidenceMappedAt": "2026-09-08T21:54:12.477Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -55578,9 +56591,24 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "EXE原生实际操作停用当前项目资格，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -55612,7 +56640,85 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "EXE原生实际操作停用当前项目资格，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "EXE原生实际操作停用当前项目资格，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
+        },
+        "evidenceMappedAt": "2026-09-08T21:54:12.479Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -55648,9 +56754,24 @@
         },
         "exe": {
           "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
+          "status": "passed",
+          "evidence": [
+            "exe-native-personnel/result.json",
+            "exe-native-personnel/README.md",
+            "exe-native-personnel/01-two-new-personnel.jpg",
+            "exe-native-personnel/01-two-new-personnel.txt",
+            "exe-native-personnel/02-linked-only-a.jpg",
+            "exe-native-personnel/02-linked-only-a.txt",
+            "exe-native-personnel/03-unlinked-original-id.jpg",
+            "exe-native-personnel/03-unlinked-original-id.txt",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt",
+            "exe-native-personnel/05-restored-stable-identities.jpg",
+            "exe-native-personnel/05-restored-stable-identities.txt",
+            "exe-native-personnel/06-original-draft-preserved.jpg",
+            "exe-native-personnel/06-original-draft-preserved.txt"
+          ],
+          "actual": "EXE原生实际操作恢复资格，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
           "note": "Real execution and read-back required."
         },
         "web": {
@@ -55682,7 +56803,85 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {},
+      "manual": {
+        "retainedReviewNotes": [
+          {
+            "surface": "exe",
+            "applicable": true,
+            "status": "not_run",
+            "evidence": [],
+            "actual": "",
+            "note": "Real execution and read-back required.",
+            "progress": null
+          },
+          {
+            "surface": "exe",
+            "status": "passed",
+            "note": "Real execution and read-back required.",
+            "actual": "EXE原生实际操作恢复资格，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+            "evidence": [
+              "exe-native-personnel/result.json",
+              "exe-native-personnel/README.md",
+              "exe-native-personnel/01-two-new-personnel.jpg",
+              "exe-native-personnel/01-two-new-personnel.txt",
+              "exe-native-personnel/02-linked-only-a.jpg",
+              "exe-native-personnel/02-linked-only-a.txt",
+              "exe-native-personnel/03-unlinked-original-id.jpg",
+              "exe-native-personnel/03-unlinked-original-id.txt",
+              "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+              "exe-native-personnel/04-disabled-a-b-still-active.txt",
+              "exe-native-personnel/05-restored-stable-identities.jpg",
+              "exe-native-personnel/05-restored-stable-identities.txt",
+              "exe-native-personnel/06-original-draft-preserved.jpg",
+              "exe-native-personnel/06-original-draft-preserved.txt"
+            ],
+            "progress": null
+          }
+        ],
+        "reviewedEvidence": {
+          "results": {
+            "exe": {
+              "status": "passed",
+              "actual": "EXE原生实际操作恢复资格，对应唯一业务审计、项目和版本读回；只通过本次新fixture分支，未测保护用户、错误目标、过期版本或非零历史任务引用。",
+              "evidence": [
+                "exe-native-personnel/result.json",
+                "exe-native-personnel/README.md",
+                "exe-native-personnel/01-two-new-personnel.jpg",
+                "exe-native-personnel/01-two-new-personnel.txt",
+                "exe-native-personnel/02-linked-only-a.jpg",
+                "exe-native-personnel/02-linked-only-a.txt",
+                "exe-native-personnel/03-unlinked-original-id.jpg",
+                "exe-native-personnel/03-unlinked-original-id.txt",
+                "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+                "exe-native-personnel/04-disabled-a-b-still-active.txt",
+                "exe-native-personnel/05-restored-stable-identities.jpg",
+                "exe-native-personnel/05-restored-stable-identities.txt",
+                "exe-native-personnel/06-original-draft-preserved.jpg",
+                "exe-native-personnel/06-original-draft-preserved.txt"
+              ]
+            }
+          },
+          "proofHashes": {
+            "exe-native-personnel/result.json": "d91a88b3a9dd2bf6f0fcc3492b76450bfe6d367a4cf7961fa558b46cacd367f6",
+            "exe-native-personnel/README.md": "20f5593b0e9a20fa3745f8abfa8b093bba5a97f33eff3669b4cbf72b79027428",
+            "exe-native-personnel/01-two-new-personnel.jpg": "a0cedfbc4365bdbd02e0985e86988fced17e780d9c6ac6eba4e6a341a8d1d8bf",
+            "exe-native-personnel/01-two-new-personnel.txt": "d8ceb59ca5e0c911e0a2413bfc766a50a8784de7358ffdf6faab59c2c596e396",
+            "exe-native-personnel/02-linked-only-a.jpg": "e1f1ef58f6593f245af5c7bbae9209e3759c26aa8c42d88a901b4964ad1ea81a",
+            "exe-native-personnel/02-linked-only-a.txt": "7e0b2684cad49793f989d7d5bedfcafedec143ae1eac5d1a740550fa2b06bde8",
+            "exe-native-personnel/03-unlinked-original-id.jpg": "b77f1700ca292665a0d31230af709dc976e36cea08b30703365890b8aae8aa49",
+            "exe-native-personnel/03-unlinked-original-id.txt": "7a606c46b62644fc853f6f7392dbc60c8104e656cb12662a3d01e8d143d9db49",
+            "exe-native-personnel/04-disabled-a-b-still-active.jpg": "a65802793336b57c508e5c3dbb6e8f15a051f7c78bc8c1b9eb9630d0dec7d8af",
+            "exe-native-personnel/04-disabled-a-b-still-active.txt": "85570e36566e6391eee321fdf28d68fcfc3ec1fca162019d0f4523d38bb9e0f1",
+            "exe-native-personnel/05-restored-stable-identities.jpg": "a3a3bafe09d8b8078e1318ddd25a7238a50ac84105cbf65343557f4489f2a7eb",
+            "exe-native-personnel/05-restored-stable-identities.txt": "335e8e26b436af749518ffdcb0a5e1b3decfd46782b9092b58d0af22876dc93e",
+            "exe-native-personnel/06-original-draft-preserved.jpg": "d65b8b61a9cef1274b1c7625df7e4b17abcfb633786dc65bb1047caf4785e84c",
+            "exe-native-personnel/06-original-draft-preserved.txt": "826c772c595de3f80b77d1d63f9f88879ce06c65e4b7339797a3c9fe08f9ab30"
+          },
+          "at": "2026-09-08T21:51:01.209Z",
+          "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
+        },
+        "evidenceMappedAt": "2026-09-08T21:54:12.481Z"
+      },
       "needsRevalidation": false,
       "generated": true
     },
@@ -57153,7 +58352,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-08T21:38:03.109Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.481Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -57226,7 +58425,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.895Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.374Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -57317,7 +58516,7 @@
             "actual": "Actual native no-code submit and durable task readback; real code branch remains not_run."
           }
         },
-        "evidenceMappedAt": "2026-09-08T21:38:03.109Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.481Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -57401,7 +58600,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:03.109Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.482Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -57503,7 +58702,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.374Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -57576,7 +58775,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.374Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -59893,7 +61092,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.374Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -61326,7 +62525,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -61943,7 +63142,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -63444,7 +64643,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.898Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.377Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -63517,7 +64716,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.374Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -63590,7 +64789,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.374Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -64752,7 +65951,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -64826,7 +66025,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -64900,7 +66099,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65110,7 +66309,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65184,7 +66383,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65393,7 +66592,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65534,7 +66733,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65608,7 +66807,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -65749,7 +66948,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -66573,7 +67772,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.897Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": ["三个tab真实切换并读到禁用状态下本地空列表"],
@@ -67409,7 +68608,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.920Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": ["该实际MCP工具已有调用与项目/人员/状态读回"],
@@ -67563,7 +68762,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.920Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": ["该实际MCP工具已有调用与项目/人员/状态读回"],
@@ -67651,7 +68850,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.920Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": ["该实际MCP工具已有调用与项目/人员/状态读回"],
@@ -67937,7 +69136,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.920Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": ["该实际MCP工具已有调用与项目/人员/状态读回"],
@@ -68025,7 +69224,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.920Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.389Z",
         "surfaceProgress": {
           "server_mcp": {
             "completed": ["该实际MCP工具已有调用与项目/人员/状态读回"],
@@ -68249,7 +69448,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.898Z"
+        "evidenceMappedAt": "2026-09-08T21:54:12.376Z"
       },
       "needsRevalidation": false,
       "generated": true
@@ -69432,7 +70631,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -70770,7 +71969,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -70854,7 +72053,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -71664,7 +72863,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -72804,7 +74003,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -73086,7 +74285,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-08T21:38:02.896Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.375Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
