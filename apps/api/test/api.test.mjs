@@ -607,7 +607,11 @@ test("human workflow routes preserve no-code and failed Verification contracts",
       },
       async recordResult(command) {
         calls.push(["result", command]);
-        return { verificationId, status: command.request.status };
+        return {
+          verification: { id: verificationId, status: command.request.status },
+          repairAttempt: { id: attemptId },
+          bug: { id: bugId, state: "ready" },
+        };
       },
     },
   });

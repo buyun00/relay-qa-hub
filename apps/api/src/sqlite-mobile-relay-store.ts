@@ -118,6 +118,12 @@ export function createSqliteMobileRelayStore(
         attemptId: query.attemptId,
       });
     },
+    async getRepairAttempt(query) {
+      return options.worker.getRepairAttemptDetail({
+        ...actorScope(query.actorId),
+        attemptId: query.attemptId,
+      });
+    },
     async startManualAttempt(command) {
       return options.worker.startMobileRepairAttempt({
         ...actorScope(command.actorId),

@@ -1,4 +1,8 @@
 import { Worker } from "node:worker_threads";
+import type {
+  GetRepairAttemptDetailInput,
+  RepairAttemptDetail,
+} from "./repair-attempt-detail-store.js";
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { ProjectManagementInput } from "./project-management-store.js";
 
@@ -595,6 +599,13 @@ export class SqliteStorageWorker {
       "getMobileManualRepairAttempt",
       input,
     );
+  }
+
+  async getRepairAttemptDetail(
+    input: GetRepairAttemptDetailInput,
+  ): Promise<RepairAttemptDetail | null> {
+    await this.initialization;
+    return this.request<RepairAttemptDetail | null>("getRepairAttemptDetail", input);
   }
 
   async startMobileRepairAttempt(

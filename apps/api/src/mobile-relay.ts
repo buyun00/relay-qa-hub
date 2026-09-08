@@ -5,6 +5,7 @@ import type {
   MobileRelayReceipt,
   MobileManualRepairAttemptRecord,
   MobileRepairAttemptRecord,
+  RepairAttemptDetail,
 } from "@relay-qa-hub/storage";
 
 export const MOBILE_BUG_TRANSITION_PATH = "/api/v1/bugs/:bugId/transitions" as const;
@@ -126,6 +127,10 @@ export interface MobileRelayStore {
     readonly actorId: string;
     readonly attemptId: string;
   }) => MobileManualRepairAttemptRecord | null | Promise<MobileManualRepairAttemptRecord | null>;
+  readonly getRepairAttempt: (query: {
+    readonly actorId: string;
+    readonly attemptId: string;
+  }) => RepairAttemptDetail | null | Promise<RepairAttemptDetail | null>;
   readonly startManualAttempt: (command: {
     readonly actorId: string;
     readonly attemptId: string;

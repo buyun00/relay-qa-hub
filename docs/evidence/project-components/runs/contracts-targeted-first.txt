@@ -1,0 +1,71 @@
+✔ Bug update accepts a complete attachment set and rejects ambiguous image edits (2.3476ms)
+✔ backend account-name normalization is stable and preserves the display spelling (0.4751ms)
+✔ unique Chinese pinyin login preserves an existing exact account identity (19.3079ms)
+✔ project people directory preserves distinct stable IDs until explicitly linked (15.5839ms)
+✔ explicit identity links override spelling and expose old IDs for historical labels (0.5552ms)
+✔ user management routes preserve the explicit source and canonical IDs (166.552ms)
+✔ backend people seed accepts only schema 4 without client-side aliases (27.4436ms)
+✔ checked-in backend people seed contains the default QA team (1.0777ms)
+✔ new Web and Android name login creates backend accounts and rejects the legacy pinyin body field (26.4837ms)
+✔ Bug overview query supports unassigned ownership and a 500-row window (0.5655ms)
+✔ capture metadata records positive Android API values without an admission floor (2.0716ms)
+✔ GET /api/v1/health/live returns the frozen liveness shape (18.0032ms)
+✔ android update feed serves uncached metadata and immutable APK ranges (22.5537ms)
+✔ human workflow routes preserve no-code and failed Verification contracts (18.78ms)
+✔ Verification routes hide raw SQLite failures behind a retryable storage error (10.8528ms)
+✔ Android createBug persists an exact receipt, supports GET, and rejects a wrong token (12.7699ms)
+✔ Android attachment upload follows the frozen init, chunk, finalize, bind wire (14.6379ms)
+✔ server defaults to loopback and supports graceful stop plus restart (79.8543ms)
+✔ rejects ambiguous build provenance (0.3222ms)
+✔ normalizes an explicit set of exact browser origins (0.4706ms)
+✔ manual completion route binds the authenticated human, exact version and idempotency key (15.1575ms)
+✖ SQLite human lifecycle preserves delivery/rejection facts while frozen responses and replay omit them (597.0836ms)
+✖ historical GET reads all persisted modes without widening action permissions and hides forbidden/deleted Bugs (422.2115ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 21
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1390.765
+
+✖ failing tests:
+
+test at test\repair-attempt-history.test.mjs:71:1
+✖ SQLite human lifecycle preserves delivery/rejection facts while frozen responses and replay omit them (597.0836ms)
+  AssertionError [ERR_ASSERTION]: {"code":"VERSION_CONFLICT"}
+  
+  409 !== 200
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/repair-attempt-history.test.mjs:52:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/repair-attempt-history.test.mjs:82:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 409,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test\repair-attempt-history.test.mjs:106:1
+✖ historical GET reads all persisted modes without widening action permissions and hides forbidden/deleted Bugs (422.2115ms)
+  AssertionError [ERR_ASSERTION]: {"code":"NOT_FOUND"}
+  
+  404 !== 412
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/repair-attempt-history.test.mjs:52:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/repair-attempt-history.test.mjs:134:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 412,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -187,6 +187,12 @@ import {
 } from "./project-management.js";
 import type { ProjectRequestContext } from "./project-request-context.js";
 import { registerBugActionRoutes } from "./bug-actions.js";
+import {
+  frozenRepairAttempt,
+  frozenVerification,
+  frozenVerificationResult,
+  workflowResponseMedia,
+} from "./frozen-workflow-response.js";
 import { registerAutomationRoutes } from "./automation.js";
 import {
   registerProjectComponentRoutes,
@@ -392,6 +398,7 @@ const unconfiguredMobileRelayStore: MobileRelayStore = {
     throw new Error("MobileRelayStore is not configured");
   },
   getManualAttempt: () => null,
+  getRepairAttempt: () => null,
   startManualAttempt: () => {
     throw new Error("MobileRelayStore is not configured");
   },
@@ -1872,7 +1879,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
                 idempotencyKey,
                 request: body,
               });
-        return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+        return reply
+          .code(201)
+          .header("content-type", workflowResponseMedia(readHeader(request.headers.accept)))
+          .send(frozenRepairAttempt(result));
       } catch (error: unknown) {
         return relayErrorReply(error, reply);
       }
@@ -1903,7 +1913,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           idempotencyKey,
           request: body,
         });
-        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+        return reply
+          .header("content-type", workflowResponseMedia(readHeader(request.headers.accept)))
+          .send(frozenRepairAttempt(result));
       } catch (error: unknown) {
         return relayErrorReply(error, reply);
       }
@@ -1918,7 +1930,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       try {
         const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
-        const result = await mobileRelayStore.getManualAttempt({
+        const result = await mobileRelayStore.getRepairAttempt({
           actorId: authenticatedActorId(request, debugActorId),
           attemptId,
         });
@@ -1954,7 +1966,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           idempotencyKey,
           request: body,
         });
-        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+        return reply
+          .header("content-type", workflowResponseMedia(readHeader(request.headers.accept)))
+          .send(frozenRepairAttempt(result));
       } catch (error: unknown) {
         return relayErrorReply(error, reply);
       }
@@ -2286,7 +2300,10 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           idempotencyKey,
           request: body,
         });
-        return reply.code(201).header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+        return reply
+          .code(201)
+          .header("content-type", workflowResponseMedia(readHeader(request.headers.accept)))
+          .send(frozenVerification(result));
       } catch (error: unknown) {
         return buildErrorReply(error, reply);
       }
@@ -2341,7 +2358,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           idempotencyKey,
           request: body,
         });
-        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+        return reply
+          .header("content-type", workflowResponseMedia(readHeader(request.headers.accept)))
+          .send(frozenVerification(result));
       } catch (error: unknown) {
         return buildErrorReply(error, reply);
       }
@@ -2396,7 +2415,8 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
             );
           }
         }
-        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+        const media = workflowResponseMedia(readHeader(request.headers.accept));
+        return reply.header("content-type", media).send(frozenVerificationResult(result, media));
       } catch (error: unknown) {
         return buildErrorReply(error, reply);
       }

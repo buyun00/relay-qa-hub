@@ -1,5 +1,7 @@
 # 严格契约漂移的修复边界评估
 
+> 本文及配套 JSON 是修复前的只读观测，以下“当前”和 failed 均指所记录的 `3f66932` 状态，原观测不回写。随后获授权实施的六路响应修复、通过的门禁与仍未覆盖的请求/路由边界，另见 [contracts-remediation-implementation.md](contracts-remediation-implementation.md)。
+
 复核 HEAD：`3f66932e11c42f60aa660028b490a3ac0dea310d`。本次只读源码/Git，并在内存中验证假设；仅新增本 Markdown 和配套 JSON，没有修改源码、schema、checker、baseline 或任何运行服务。**没有实施或声称已完成 wire 兼容修复，严格基线门禁仍为 failed。**
 
 完整观测、源文件物理 SHA-256、行号和声明的媒体类型见 [contracts-remediation-assessment.json](contracts-remediation-assessment.json)。此前首次漂移提交的追溯见 [contracts-baseline-audit.json](contracts-baseline-audit.json)。

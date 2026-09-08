@@ -1,4 +1,8 @@
 import { parentPort, workerData } from "node:worker_threads";
+import {
+  getRepairAttemptDetail,
+  type GetRepairAttemptDetailInput,
+} from "./repair-attempt-detail-store.js";
 import { isImportExecutionHeld } from "./import-execution-hold.js";
 import { projectRelayQueue, type ProjectRelayQueueInput } from "./project-relay-queue.js";
 import type { DatabaseSync } from "node:sqlite";
@@ -230,6 +234,7 @@ interface WorkerRequest {
     | "createMobileRelayAttempt"
     | "createMobileManualRepairAttempt"
     | "getMobileManualRepairAttempt"
+    | "getRepairAttemptDetail"
     | "startMobileRepairAttempt"
     | "deliverMobileRepairAttempt"
     | "completeMobileBugForVerification"
@@ -661,6 +666,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return getMobileManualRepairAttempt(
       requireDatabase(),
       request.payload as GetMobileManualRepairAttemptInput,
+    );
+  }
+
+  if (request.operation === "getRepairAttemptDetail") {
+    return getRepairAttemptDetail(
+      requireDatabase(),
+      request.payload as GetRepairAttemptDetailInput,
     );
   }
 

@@ -1,0 +1,11 @@
+npm notice run @relay-qa-hub/web@3.3.5 test
+npm notice run vitest run src/App.test.tsx src/api.test.ts
+
+ RUN  v4.1.11 C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/web
+
+
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+   Start at  04:30:06
+   Duration  2.63s (transform 1.18s, setup 0ms, import 2.34s, tests 145ms, environment 0ms)
+

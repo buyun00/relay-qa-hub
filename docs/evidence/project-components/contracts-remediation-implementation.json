@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T20:35:25.059Z",
+  "phase": "implemented_in_worktree_not_deployed",
+  "baseHead": "ef296a49f1e22da43f3a264541ef8384d617d6d5",
+  "scope": "Six existing frozen mutation response representations plus an independent authorized historical read method on the existing unfrozen GET attempt; no client source, production, running preview, install or release operations.",
+  "priorReadOnlyAssessment": "contracts-remediation-assessment.json",
+  "checks": {
+    "api": {
+      "mjs": 205,
+      "ts": 33,
+      "passed": 238,
+      "failed": 0
+    },
+    "storage": {
+      "passed": 109,
+      "failed": 0
+    },
+    "webRelevant": {
+      "files": ["App.test.tsx", "api.test.ts"],
+      "passed": 19,
+      "failed": 0,
+      "explicitUnusedApiOrigin": "http://127.0.0.1:1"
+    },
+    "responseFixture": {
+      "passed": 52,
+      "kind": "actual createApiApp inject with immutable rich store DTOs and original OpenAPI/Ajv refs",
+      "mediaCases": 8
+    },
+    "sqliteFixture": {
+      "passed": 2,
+      "historicalModes": ["human", "relay", "external"],
+      "historicalStates": ["failed", "verification_failed", "superseded", "cancelled"],
+      "snapshotRows": 12,
+      "historySetup": "Synthetic snapshot transaction restores and verifies original table triggers before API reads; not an implementation of missing mutations",
+      "guards": [
+        "wrong project",
+        "nonmember",
+        "disabled member",
+        "deleted Bug",
+        "historical start refused"
+      ],
+      "otherFacts": [
+        "non-null patchUrl/noCodeReason/failureReason historical attempt",
+        "non-null blockedReason historical verification",
+        "official no_code -> failed verification with reason",
+        "vendor/legacy/vendor idempotent result preserves event and Bug version"
+      ]
+    },
+    "strictContracts": {
+      "steps": 5,
+      "passed": true,
+      "frozenBaseFiles": 24,
+      "frozenVersionedFiles": 13,
+      "restoredCanonicalWorkflowSha256": "da878252ce2da8b93b61cd4f9a937841b37230b87feaae589d7894ea123f6ea8",
+      "baselineOrCheckerModified": false
+    },
+    "typecheck": ["api", "storage"],
+    "lint": "passed for changed sources/tests",
+    "format": "passed for changed sources/tests",
+    "diffCheck": "passed"
+  },
+  "limitations": [
+    "No live preview network, deployment or client upgrade in this proof",
+    "Limited JSON/vendor response selection, not complete HTTP negotiation",
+    "Legacy 1.0 result request and blocked writes remain unsupported",
+    "Frozen fail/supersede POST and v1.1 bugs/:bugId/workflow GET remain unregistered; no all-nine compatibility claim"
+  ],
+  "retainedFailures": [
+    {
+      "log": "runs/contracts-remediation-api.txt",
+      "cause": "Existing Qingyu test DTO had null repairAttempt, unlike storage contract; fixture corrected only"
+    },
+    {
+      "log": "runs/contracts-remediation-web.txt",
+      "cause": "Explicit preview API env absent; failed closed before tests"
+    },
+    {
+      "log": "runs/contracts-targeted-first.txt",
+      "cause": "Fixture repeated complete after no_code delivery had already reached ready_for_verification; historical start denial expected status corrected to existing 404"
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "2bee52cdb4654f4f3be1b63cfa4e18e6eca1b39b0c3052af20d08d8954b0da66"
+    },
+    {
+      "path": "apps/api/src/frozen-workflow-response.ts",
+      "sha256": "4be4ac365b958bde9263d7a9fb201328f5a606721c2834685aa15bf920d2b44f"
+    },
+    {
+      "path": "apps/api/src/mobile-relay.ts",
+      "sha256": "faaaf924eb3e819d62235fcf0c4b86c7eb4cc65dadc633b40e904507032aaf70"
+    },
+    {
+      "path": "apps/api/src/sqlite-mobile-relay-store.ts",
+      "sha256": "b509e25ab5b89585025d1d5a59f33ee741b086b0fab2d6c64f51eaca8edd226d"
+    },
+    {
+      "path": "packages/storage/src/repair-attempt-detail-store.ts",
+      "sha256": "fe1172acc4b5b7b143c1a7b381d06a14b4750230429da07f5e7e73c04e4d7617"
+    },
+    {
+      "path": "packages/storage/src/index.ts",
+      "sha256": "8bbf748b7d84f6017277220ec4a2489e0c35ecafd42c0e55e8c468d668ada1d9"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker.ts",
+      "sha256": "06af1f8a1388aae3ddf786afe2345f085fe03efe50b956536f6163c8b3f05e26"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker-entry.ts",
+      "sha256": "2c9eaa7fa643e3e3617beb7c401ae2b939eca2d3ad9050d186717f65e83e9c0d"
+    },
+    {
+      "path": "packages/contracts/schemas/workflow.schema.json",
+      "sha256": "f62bec868db74155fdc741a161f42805162aa3dc4cc6c6af557ade0522eecbe3"
+    },
+    {
+      "path": "apps/api/test/api.test.mjs",
+      "sha256": "36eef18d5024bef2ca76c7147d1c210e4565a133f8b14847fe8b62c428cdc7f4"
+    },
+    {
+      "path": "apps/api/test/qingyu-integration.test.mjs",
+      "sha256": "367e742416760fb6275ecf8710af3ef9cba5d6e6ec18ac6246d012440ef55dc7"
+    },
+    {
+      "path": "apps/api/test/frozen-workflow-response.test.mjs",
+      "sha256": "347ed681304bb53b08c46e7b0ea51da380f7450c6292304e518811605c8f0f97"
+    },
+    {
+      "path": "apps/api/test/repair-attempt-history.test.mjs",
+      "sha256": "569a5891bf5c8ed0648a6f2838a93d3fb28d97c3a644ea3f372e1dd646ff842c"
+    }
+  ],
+  "baselines": [
+    {
+      "path": "packages/contracts/baselines/contract-baseline.json",
+      "sha256": "05ac95cc39e349b4ab92481858df132ab6ce9b6a5a474485663e68ac040fc8f9"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/baselines/contract-baseline-1.1.0.json",
+      "sha256": "b439a9acc4b608cf32a1daf116caad78641a5af33d703703975185208db20f88"
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-api-final.txt",
+      "sha256": "093d66168c6d077482da4e35be7c8d9a002a075fddc7b0bda8d7a0c7ef8e4909",
+      "bytes": 26895
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-api.txt",
+      "sha256": "48bf6e9dadf49d23cdd222c7d53124e1bff669afa53558695c2b3abb1999dd98",
+      "bytes": 32991
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-storage.txt",
+      "sha256": "804134a825e0c19cf8fb720e9dff50774653b1c97da73eb00d713f8dfa0ffa11",
+      "bytes": 11179
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-strict.txt",
+      "sha256": "69f352f09c0cedef451604f7557e4362b4a0e25868604a197bd2d770e64dffca",
+      "bytes": 1757
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-type.txt",
+      "sha256": "b654032d009cdd631ff197456b7703063c35bf5252ed9ebfafbab4fe435870b7",
+      "bytes": 111
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-api-type.txt",
+      "sha256": "65486eabe2a8942afe8004d6b7d9f0944e328f09d238d317b56e5a34c70ecfa3",
+      "bytes": 102
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-web-configured.txt",
+      "sha256": "e4b2cba480a55d84d9ea479a9ff6c6688f4bb73616b74693a76f25c236cc4c24",
+      "bytes": 358
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-web.txt",
+      "sha256": "8b411ec69b41db68fb9b653c8d12188d8e86e282220abf433db17001877746ac",
+      "bytes": 1810
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-format.txt",
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "bytes": 68
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-remediation-lint.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/evidence/project-components/runs/contracts-targeted-first.txt",
+      "sha256": "b68c04930c784e2fb0ba36cb005ce86157b8bf5cca98f76392c6bfdcea8bf540",
+      "bytes": 4122
+    }
+  ]
+}

@@ -548,3 +548,8 @@ export type {
   MobileCaptureScreenSize,
 } from "./mobile-capture-store.js";
 export { isImportExecutionHeld } from "./import-execution-hold.js";
+export { getRepairAttemptDetail } from "./repair-attempt-detail-store.js";
+export type {
+  GetRepairAttemptDetailInput,
+  RepairAttemptDetail,
+} from "./repair-attempt-detail-store.js";

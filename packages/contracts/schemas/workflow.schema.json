@@ -178,9 +178,6 @@
         "branch": { "type": ["string", "null"], "maxLength": 300 },
         "commitSha": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
         "mergeRequestUrl": { "type": ["string", "null"], "format": "uri" },
-        "patchUrl": { "type": ["string", "null"], "format": "uri" },
-        "noCodeReason": { "type": ["string", "null"], "maxLength": 5000 },
-        "failureReason": { "type": ["string", "null"], "maxLength": 5000 },
         "targetBuildId": {
           "oneOf": [
             { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
@@ -220,8 +217,6 @@
         "verifierId": { "$ref": "https://qa-hub.local/contracts/common.schema.json#/$defs/uuid" },
         "criteriaSnapshot": { "type": "string", "minLength": 1, "maxLength": 10000 },
         "resultSummary": { "type": ["string", "null"], "maxLength": 10000 },
-        "failureReason": { "type": ["string", "null"], "maxLength": 5000 },
-        "blockedReason": { "type": ["string", "null"], "maxLength": 5000 },
         "version": { "type": "integer", "minimum": 1 }
       }
     },
