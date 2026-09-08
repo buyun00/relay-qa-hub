@@ -74,7 +74,9 @@ public static class Authentication
 }
 public static class TokenCache
 {
-    public static string CachePath(string api)=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"OZDQP-Uploader","auth",new Uri(api).Host+"-"+new Uri(api).Port+".json");
+    public static string CachePath(string api)=>Environment.GetEnvironmentVariable("OZDQP_AUTH_FILE") is { Length: > 0 } configured
+        ? Path.GetFullPath(configured)
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"OZDQP-Uploader","auth",new Uri(api).Host+"-"+new Uri(api).Port+".json");
     public static void Save(LoginTokens tokens,string? testPath=null)
     {
         var path=testPath??CachePath(tokens.ApiBase);Directory.CreateDirectory(Path.GetDirectoryName(path)!);

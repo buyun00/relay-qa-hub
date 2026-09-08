@@ -405,6 +405,7 @@ async function run(): Promise<void> {
     server = createApiServer({
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
+      incrementUploadRoot: join(storage.dataRoot, "integrations", "increment-upload"),
       ...(relayRuntime.endpoint && relayRuntime.bearerToken && relayRuntime.qaInstanceId
         ? {
             productionConfig: {

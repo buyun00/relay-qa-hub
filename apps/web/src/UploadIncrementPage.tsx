@@ -1,10 +1,11 @@
+import { serverUploader } from "./increment-upload-api";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import type {
   UploadInput,
   UploadJob,
   UploadReply,
   UploaderSnapshot,
-} from "../../desktop/src/uploader-types";
+} from "@relay-qa-hub/upload-contract";
 import {
   UPLOAD_MODES,
   UPLOAD_STEPS,
@@ -47,11 +48,13 @@ function JobProgress({ job }: { job: UploadJob | undefined }) {
           {job
             ? job.active
               ? "进行中"
-              : job.status === "succeeded"
-                ? "已完成"
-                : job.status === "awaiting_publish"
-                  ? "待确认"
-                  : "待继续"
+              : job.status === "queued"
+                ? "排队中"
+                : job.status === "succeeded"
+                  ? "已完成"
+                  : job.status === "awaiting_publish"
+                    ? "待确认"
+                    : "待继续"
             : "待开始"}
         </span>
       </div>
@@ -164,7 +167,7 @@ export default function UploadIncrementPage({
   refreshRevision: number;
   userId: string;
 }) {
-  const bridge = typeof window === "undefined" ? undefined : window.qaHubDesktop?.uploader;
+  const bridge = serverUploader;
   const draftKey = `qa-hub:upload-draft:${userId}`;
   const [form, setForm] = useState<UploadInput>(() => {
     try {
@@ -264,7 +267,7 @@ export default function UploadIncrementPage({
       const id = unwrap(await bridge.start(form));
       setSelectedId(id);
       setReview(false);
-      setNotice("任务已启动，切换页面或关闭窗口后仍会继续运行。");
+      setNotice("任务已提交服务端排队，退出客户端或关闭电脑不影响执行。");
     });
   };
   const resume = () => {
@@ -294,14 +297,14 @@ export default function UploadIncrementPage({
         <div>
           <span className="upload-eyebrow">OZDQP · 版本交付</span>
           <h1>上传增量</h1>
-          <p>自动获取增量包，一次完成上传、提测与发布。</p>
+          <p>服务端统一排队，自动完成上传、提测与发布。关闭客户端后继续执行。</p>
         </div>
-        <span className="upload-badge">本机任务</span>
+        <span className="upload-badge">服务端任务</span>
       </header>
       {!bridge ? (
         <section className="upload-card">
-          <h2>请在桌面 EXE 中使用</h2>
-          <p>上传工具需要在本机运行。安装最新桌面版本后，可在这里配置账号并启动任务。</p>
+          <h2>暂时无法连接服务端</h2>
+          <p>请检查 QA Hub 服务连接后重试。</p>
         </section>
       ) : (
         <>
@@ -320,11 +323,13 @@ export default function UploadIncrementPage({
           ) : null}
           {snapshot?.unreadableJobs ? (
             <p className="upload-callout">
-              有 {snapshot.unreadableJobs} 条本机记录暂时无法读取，原文件已保留。
+              有 {snapshot.unreadableJobs} 条服务端记录暂时无法读取，原文件已保留。
             </p>
           ) : null}
           {snapshot?.authError ? (
-            <p className="upload-callout">本机登录配置无法读取，请重新登录保存。任务记录已保留。</p>
+            <p className="upload-callout">
+              服务端登录配置无法读取，请重新登录保存。任务记录已保留。
+            </p>
           ) : null}
           <details
             className="upload-card upload-account"
@@ -382,11 +387,11 @@ export default function UploadIncrementPage({
               </button>
             </form>
             <div className="upload-account-footer">
-              <small>账号密码按工具约定保存在本机，后续自动登录。</small>
+              <small>账号配置保存在服务端，绑定当前 QA Hub 用户，后续自动登录。</small>
               <div>
                 <button
                   type="button"
-                  disabled={!!busy || hasActive || !snapshot?.configured}
+                  disabled={!!busy || !snapshot?.configured}
                   onClick={() =>
                     void action("check", async () => {
                       unwrap(await bridge.checkAuth());
@@ -398,11 +403,11 @@ export default function UploadIncrementPage({
                 </button>
                 <button
                   type="button"
-                  disabled={!!busy || hasActive || !snapshot?.configured}
+                  disabled={!!busy || !snapshot?.configured}
                   onClick={() =>
                     void action("logout", async () => {
                       unwrap(await bridge.logout());
-                      setNotice("已清除本工具的本地登录配置。");
+                      setNotice("已清除当前用户的服务端平台登录配置。");
                     })
                   }
                 >
@@ -415,7 +420,7 @@ export default function UploadIncrementPage({
             <section className="upload-card">
               <div className="upload-card-heading">
                 <h2>新建上传任务</h2>
-                <span className="upload-muted">每次新任务获取最新包</span>
+                <span className="upload-muted">任务执行时获取增量包</span>
               </div>
               <div className="upload-source">
                 <span>ZIP</span>
@@ -539,7 +544,7 @@ export default function UploadIncrementPage({
                       className="upload-primary"
                       type="button"
                       onClick={start}
-                      disabled={!!busy || hasActive || !snapshot?.configured || !snapshot.available}
+                      disabled={!!busy || !snapshot?.configured || !snapshot.available}
                     >
                       {busy === "start" ? "正在启动…" : "确认并开始"}
                     </button>
@@ -551,9 +556,9 @@ export default function UploadIncrementPage({
                   <button
                     type="submit"
                     className="upload-primary upload-start"
-                    disabled={!!busy || hasActive || !snapshot?.configured || !snapshot.available}
+                    disabled={!!busy || !snapshot?.configured || !snapshot.available}
                   >
-                    {hasActive ? "当前任务正在运行" : "检查并开始上传"}
+                    检查并提交上传
                   </button>
                 )}
               </form>
@@ -569,10 +574,27 @@ export default function UploadIncrementPage({
                   <button
                     type="button"
                     className="upload-primary"
-                    disabled={!!busy || hasActive || !snapshot?.configured}
+                    disabled={!!busy || !snapshot?.configured}
                     onClick={confirmPublish}
                   >
                     {busy === "confirm-publish" ? "正在确认…" : "确认发布"}
+                  </button>
+                </section>
+              ) : null}
+              {job?.status === "queued" ? (
+                <section className="upload-card upload-resume">
+                  <h2>排队信息</h2>
+                  <p>队列位置 {job.queuePosition ?? "—"}。同产品和渠道的前一任务完成后继续。</p>
+                  <button
+                    type="button"
+                    disabled={!!busy}
+                    onClick={() =>
+                      void action("cancel", async () => {
+                        if (bridge.cancel) unwrap(await bridge.cancel(job.id));
+                      })
+                    }
+                  >
+                    取消排队
                   </button>
                 </section>
               ) : null}
@@ -580,7 +602,9 @@ export default function UploadIncrementPage({
               {job &&
               !job.active &&
               job.status !== "succeeded" &&
-              job.status !== "awaiting_publish" ? (
+              job.status !== "awaiting_publish" &&
+              job.status !== "queued" &&
+              job.status !== "cancelled" ? (
                 <section className="upload-card upload-resume">
                   <h2>继续此任务</h2>
                   <p>继续使用原版本和原增量包，已完成的步骤会保留。</p>
@@ -628,7 +652,7 @@ export default function UploadIncrementPage({
                   <button
                     type="button"
                     className="upload-primary"
-                    disabled={!!busy || hasActive}
+                    disabled={!!busy}
                     onClick={resume}
                   >
                     {busy === "resume" ? "正在恢复…" : "恢复任务"}
@@ -639,9 +663,9 @@ export default function UploadIncrementPage({
           </div>
           <section className="upload-card upload-history">
             <div className="upload-card-heading">
-              <h2>本机上传记录</h2>
+              <h2>服务端上传记录</h2>
               <span className="upload-muted">
-                {snapshot?.jobs.length ?? 0} 个任务 · 切换页面持续执行
+                {snapshot?.jobs.length ?? 0} 个任务 · 服务端持续执行
               </span>
             </div>
             {snapshot?.jobs.length ? (
@@ -677,14 +701,14 @@ export default function UploadIncrementPage({
                         })
                       }
                     >
-                      打开记录目录
+                      下载服务端记录
                     </button>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="upload-empty">
-                还没有上传任务。开始后，断点、处理记录和最终结果会自动保存在本机。
+                还没有服务端上传任务。提交后，断点、处理记录和最终结果会保存在服务端。旧版本的本机记录仍保留在原电脑，不会被自动重传。
               </p>
             )}
           </section>

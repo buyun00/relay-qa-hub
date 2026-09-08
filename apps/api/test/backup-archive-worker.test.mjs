@@ -73,7 +73,7 @@ test("the production archive worker preserves the complete recovery-point contra
 
     assert.equal(archived.disposition, "created");
     assert.equal(archived.entryCount, 0);
-    assert.equal(archived.manifest.schemaVersion, 10);
+    assert.equal(archived.manifest.schemaVersion, backup.manifest.schemaVersion);
     assert.equal(existsSync(archived.backupPath), true);
     assert.equal(existsSync(archived.manifestPath), true);
     assert.equal(existsSync(archived.attachmentRoot), true);

@@ -125,7 +125,23 @@ public static class SelfTest
         await AcquisitionTests.Run(root,Case,ct);
         await MultipartTransferTests.Run(root,Case,ct);
         await SourceDownloadTests.Run(root,Case,ct);
-        var report=new{version="0.3.2",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
+        await Case("server_auth_cache_is_explicit_and_separate_from_desktop",()=>{
+            var prior=Environment.GetEnvironmentVariable("OZDQP_AUTH_FILE");
+            try {
+                var first=Path.Combine(root,"server-owner-a","auth.json");
+                var second=Path.Combine(root,"server-owner-b","auth.json");
+                Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",first);
+                const string api="https://fq2ivi.ipwana.com";
+                TokenCache.Save(new LoginTokens("fixture-access","fixture-refresh",api,Authentication.LoginBase,"owner-a","fixture-password"));
+                Assert(TokenCache.CachePath(api)==first&&TokenCache.Load(api)?.Account=="owner-a","explicit server cache not used");
+                Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",second);
+                Assert(TokenCache.Load(api)==null,"credentials crossed owner boundary");
+                Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",first);
+                Assert(TokenCache.Load(api)?.Account=="owner-a","original server cache replaced");
+            } finally { Environment.SetEnvironmentVariable("OZDQP_AUTH_FILE",prior); }
+            return Task.CompletedTask;
+        });
+        var report=new{version="0.4.0",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
         string reportPath=Path.Combine(root,"report.json");await File.WriteAllTextAsync(reportPath,JsonSerializer.Serialize(report,Json.Options),ct);
         Console.WriteLine(JsonSerializer.Serialize(new{type="selfTestResult",passed=results.Count,failed=0,reportPath,realPlatformTested=false}));
     }

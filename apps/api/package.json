@@ -20,13 +20,14 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsc -p tsconfig.json && node --test test/api.test.mjs test/backup-archive-worker.test.mjs test/qingyu-integration.test.mjs test/jenkins-builds.test.mjs test/jenkins-progress.test.mjs test/production-tasks.test.mjs test/relay-lifecycle-outbox.test.mjs",
+    "test": "tsc -p tsconfig.json && node --test test/api.test.mjs test/backup-archive-worker.test.mjs test/qingyu-integration.test.mjs test/jenkins-builds.test.mjs test/jenkins-progress.test.mjs test/production-tasks.test.mjs test/relay-lifecycle-outbox.test.mjs test/increment-upload.test.mjs test/server-uploader-process.test.mjs && node --import tsx --test test/uploader-host.test.ts test/build-upload-host.test.ts",
     "start": "node dist/main.js"
   },
   "dependencies": {
     "@relay-qa-hub/storage": "0.1.0-debug",
     "fastify": "5.12.1",
-    "pinyin-pro": "3.29.3"
+    "pinyin-pro": "3.29.3",
+    "@relay-qa-hub/upload-contract": "0.1.0"
   },
   "devDependencies": {
     "@types/node": "24.10.4",

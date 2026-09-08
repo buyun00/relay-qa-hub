@@ -1,4 +1,9 @@
-# Desktop incremental upload
+# Legacy desktop incremental upload (through 3.1.4)
+
+This document preserves the pre-migration integration contract. Since 3.2.0,
+execution, accounts, queues and diagnostics belong to the server; the current
+contract is [Server incremental upload](SERVER-INCREMENT-UPLOAD.md). The Windows
+package no longer contains the uploader or starts local upload/build workers.
 
 The Windows sidebar includes 上传增量 after 打包下载. The page configures the
 platform account, reviews a new job, shows download/upload and processing stages,

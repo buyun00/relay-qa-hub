@@ -181,6 +181,7 @@ import {
 } from "./qingyu-integration.js";
 import { QingyuError } from "./qingyu-client.js";
 import { JenkinsBuildService, registerPackagingRoutes } from "./jenkins-builds.js";
+import { IncrementUploadService, registerIncrementUploadRoutes } from "./increment-upload.js";
 import {
   ProductionTasks,
   registerProductionRoutes,
@@ -259,6 +260,8 @@ export interface CreateApiAppOptions {
   readonly browserAuth?: BrowserAuthOptions;
   readonly androidUpdateRoot?: string;
   readonly jenkinsBuildService?: JenkinsBuildService;
+  readonly incrementUploadRoot?: string;
+  readonly incrementUploadService?: IncrementUploadService;
   readonly productionConfig?: ProductionConfig;
 }
 
@@ -2537,13 +2540,25 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         : null,
   );
 
-  registerPackagingRoutes(
+  const jenkinsBuildService = options.jenkinsBuildService ?? new JenkinsBuildService();
+  registerIncrementUploadRoutes(
     app,
-    options.jenkinsBuildService ?? new JenkinsBuildService(),
+    options.incrementUploadService ??
+      (options.incrementUploadRoot
+        ? new IncrementUploadService({
+            root: options.incrementUploadRoot,
+            jenkins: jenkinsBuildService,
+          })
+        : undefined),
     (request) =>
       readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
         ? authenticatedActorId(request, debugActorId)
         : null,
+  );
+  registerPackagingRoutes(app, jenkinsBuildService, (request) =>
+    readHeader(request.headers.authorization) === `Bearer ${debugBearerToken}`
+      ? authenticatedActorId(request, debugActorId)
+      : null,
   );
   registerAndroidUpdateRoutes(app, options.androidUpdateRoot);
   return app;

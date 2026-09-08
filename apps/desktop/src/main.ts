@@ -18,8 +18,6 @@ import {
 import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
 import { isPackageDownloadUrl } from "./package-downloads.js";
 import { parsePackagingNotice } from "./packaging-notifications.js";
-import { UploaderHost } from "./uploader-host.js";
-import { BuildUploadHost } from "./build-upload-host.js";
 import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
 import { NotificationHistory } from "./notification-history.js";
 import {
@@ -68,24 +66,6 @@ let mcpServer: QaHubMcpHttpServer | null = null;
 let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
-let uploader: UploaderHost | null = null;
-let buildUploads: BuildUploadHost;
-
-function getUploader(): UploaderHost {
-  const local = process.env["LOCALAPPDATA"];
-  if (!local) throw new Error("LOCAL_STORAGE_FAILED");
-  uploader ??= new UploaderHost({
-    root: path.join(local, "OZDQP-Uploader", "qa-hub-jobs"),
-    authFile: path.join(local, "OZDQP-Uploader", "auth", "fq2ivi.ipwana.com-443.json"),
-    executable: app.isPackaged
-      ? path.join(process.resourcesPath, "uploader", "ozdqp-uploader.exe")
-      : path.join(app.getAppPath(), "vendor", "ozdqp-uploader", "ozdqp-uploader.exe"),
-    runner: path.join(currentDirectory, "uploader-runner.js"),
-    nodeExecutable: process.execPath,
-  });
-  return uploader;
-}
-
 async function loadRememberedLoginName(): Promise<void> {
   if (rememberedLoginNameFile === null) return;
   try {
@@ -607,42 +587,24 @@ function createWindow(): BrowserWindow {
 }
 
 function installIpcHandlers(): void {
-  const uploadActions: Record<string, (value: unknown) => Promise<unknown>> = {
-    snapshot: () => getUploader().snapshot(),
-    login: (value) => getUploader().login(value),
-    "check-auth": () => getUploader().checkAuth(),
-    logout: () => getUploader().logout(),
-    start: (value) => getUploader().start(value),
-    resume: (value) => getUploader().resume(value),
-    "confirm-publish": (value) => getUploader().confirmPublish(value),
-    "build-chains": () => buildUploads.list(),
-    "build-and-upload": (value) => buildUploads.start(value),
-    "cancel-build-upload": (value) => buildUploads.cancel(value),
-    "open-folder": async (value) => {
-      const directory = getUploader().folder(value);
-      await fs.access(path.join(directory, "desktop.json"));
-      if (await shell.openPath(directory)) throw new Error("OPEN_FOLDER_FAILED");
-      return true;
-    },
-  };
-  for (const [action, handler] of Object.entries(uploadActions)) {
-    ipcMain.handle(`desktop:uploader:${action}`, async (event, value: unknown) => {
-      if (
-        !isTrustedRendererUrl(event.senderFrame?.url ?? "") ||
-        event.senderFrame !== event.sender.mainFrame
-      )
-        return { ok: false, code: "UNTRUSTED_SENDER" };
-      try {
-        return { ok: true, value: await handler(value) };
-      } catch (error) {
-        // Never transport exception details, credentials or remote responses to the renderer/logs.
-        const code =
-          error instanceof Error && /^[A-Z_]{3,80}$/.test(error.message)
-            ? error.message
-            : "UPLOADER_FAILED";
-        return { ok: false, code };
-      }
-    });
+  // Older rendered assets fail closed; no local execution fallback.
+  for (const action of [
+    "snapshot",
+    "login",
+    "check-auth",
+    "logout",
+    "start",
+    "resume",
+    "confirm-publish",
+    "build-chains",
+    "build-and-upload",
+    "cancel-build-upload",
+    "open-folder",
+  ]) {
+    ipcMain.handle(`desktop:uploader:${action}`, () => ({
+      ok: false,
+      code: "UPLOAD_MOVED_TO_SERVER",
+    }));
   }
   ipcMain.handle("desktop:get-window-state", (event) => {
     if (!isTrustedRendererUrl(event.senderFrame?.url ?? "")) return null;
@@ -812,21 +774,6 @@ async function startApplication(): Promise<void> {
     void persistRememberedLoginNameSafely();
     syncNotificationCredential();
   });
-  buildUploads = new BuildUploadHost({
-    root: path.join(
-      process.env["LOCALAPPDATA"] ?? app.getPath("userData"),
-      "OZDQP-Uploader",
-      "qa-hub-build-chains",
-    ),
-    api: apiClient,
-    uploader: {
-      checkAuth: () => getUploader().checkAuth(),
-      accountIdentity: () => getUploader().accountIdentity(),
-      hasBuildJob: (id) => getUploader().hasBuildJob(id),
-      startForBuild: (input, id, source, accountIdentity) =>
-        getUploader().startForBuild(input, id, source, accountIdentity),
-    },
-  });
   if (config.mcpEnabled) {
     const mcpTools = new QaHubMcpTools(
       apiClient,
@@ -872,7 +819,6 @@ async function startApplication(): Promise<void> {
   await mainWindow.loadURL(target);
   if (!(config.startupHidden || process.argv.includes("--hidden"))) openMainWindow();
   transport.start();
-  buildUploads.startPolling();
   const initialUpdateTimer = setTimeout(() => void updater?.check(), 5_000);
   initialUpdateTimer.unref();
   const recurringUpdateTimer = setInterval(() => void updater?.check(), 30 * 60 * 1_000);
@@ -903,7 +849,6 @@ if (!hasLock) {
     if (!quitting) {
       quitting = true;
       transport?.stop();
-      buildUploads?.stop();
       void mcpServer?.stop();
     }
   });

@@ -15,12 +15,6 @@ $portableClientScript = Join-Path $PSScriptRoot "Configure-QAHubPortableClient.p
 $signUpdateScript = Join-Path $PSScriptRoot "sign-update.mjs"
 $generateIconScript = Join-Path $PSScriptRoot "generate-windows-icon.mjs"
 $buildUpdaterScript = Join-Path $PSScriptRoot "build-updater.ps1"
-$uploaderDirectory = Join-Path $desktopRoot "vendor\ozdqp-uploader"
-$uploaderExecutable = Join-Path $uploaderDirectory "ozdqp-uploader.exe"
-if (-not (Test-Path -LiteralPath $uploaderExecutable -PathType Leaf) -or
-    (Get-FileHash -LiteralPath $uploaderExecutable -Algorithm SHA256).Hash.ToLowerInvariant() -ne "43a3ba2d30f4b1792e0406aa92ead1a61624c7aa491bfa9ae7e5be2b559b7a3d") {
-  throw "Pinned OZDQP uploader 0.3.2 is missing or has changed."
-}
 $assertReleaseSource = Join-Path $repoRoot "scripts\Assert-QAHubReleaseSource.ps1"
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
 $manifestFile = Join-Path $outputRoot "RelayQaHub-win32-x64-portable-latest.json"
@@ -93,6 +87,9 @@ try {
   New-Item -ItemType Directory -Path $stageRoot -Force | Out-Null
   Copy-Item -LiteralPath (Join-Path $desktopRoot "package.json") -Destination $stageRoot
   Copy-Item -LiteralPath $desktopDist -Destination (Join-Path $stageRoot "dist") -Recurse
+  foreach ($legacyName in @("uploader-host", "uploader-runner", "build-upload-host")) {
+    Get-ChildItem -LiteralPath (Join-Path $stageRoot "dist") -File | Where-Object { $_.Name -like "$legacyName.*" } | Remove-Item -Force
+  }
   Copy-Item -LiteralPath $webDist -Destination (Join-Path $stageRoot "web") -Recurse
   $encoding = [Text.UTF8Encoding]::new($false)
   $releaseDescriptor = [ordered]@{
@@ -119,7 +116,6 @@ try {
   if (-not (Test-Path -LiteralPath $packageDirectory -PathType Container)) {
     throw "Packaged desktop directory is missing."
   }
-  Copy-Item -LiteralPath $uploaderDirectory -Destination (Join-Path $packageDirectory "resources\uploader") -Recurse
   Copy-Item `
     -LiteralPath ([string]$nativeUpdater.updater) `
     -Destination (Join-Path $packageDirectory "RelayQaHubUpdater.exe") `

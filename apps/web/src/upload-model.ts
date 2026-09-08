@@ -1,5 +1,5 @@
-import type { UploadJob, UploadMode } from "../../desktop/src/uploader-types";
-import { DEFAULT_UPLOAD_PARAMETERS, type UploadInput } from "../../desktop/src/uploader-types";
+import type { UploadJob, UploadMode } from "@relay-qa-hub/upload-contract";
+import { DEFAULT_UPLOAD_PARAMETERS, type UploadInput } from "@relay-qa-hub/upload-contract";
 
 export function uploadDraftDefaults(value: unknown): UploadInput {
   const draft =
@@ -103,6 +103,12 @@ const STAGES: Record<string, string> = {
   AWAITING_PUBLISH_CONFIRMATION: "等待最终确认发布",
 };
 const ERRORS: Record<string, string> = {
+  UPLOAD_CHANNEL_HELD: "同产品和渠道有未完成任务，正在等待前一任务完成或确认发布。",
+  UPLOAD_QUEUE_BUSY: "服务端正在核对任务，稍后重试即可；提交标识已保留。",
+  UPLOAD_SERVICE_UNAVAILABLE: "暂时无法连接上传服务，已有任务仍保存在服务端。",
+  UPLOAD_ACCOUNT_IN_USE: "账号有未完成任务，暂不能切换或移除；可使用原账号重新登录。",
+  UPLOAD_SERVER_STANDBY: "服务正在切换，请稍后刷新。",
+  UPLOAD_REQUEST_CONFLICT: "提交标识与已有任务不一致，请刷新后核对。",
   AUTH_REQUIRED: "登录已失效或尚未配置，请登录后恢复任务。",
   FORBIDDEN: "当前账号没有操作权限，请核对平台账号。",
   INVALID_INPUT: "请检查产品、渠道、版本号和测试人 ID。",
@@ -114,17 +120,17 @@ const ERRORS: Record<string, string> = {
   FILE_CHANGED: "原任务的增量文件已改变或丢失。请保留现场并恢复原文件。",
   JOB_LOCKED: "这个任务已在另一个上传进程中运行。",
   UPLOADER_BUSY: "当前有操作或上传任务正在运行，请等待完成。",
-  UPLOADER_MISSING: "上传工具文件缺失，请重新安装完整的桌面版本。",
-  UPLOADER_INTEGRITY_FAILED: "上传工具文件校验不一致，请重新安装完整的桌面版本。",
+  UPLOADER_MISSING: "服务端上传程序未就绪，任务记录已保留，请联系维护人员。",
+  UPLOADER_INTEGRITY_FAILED: "服务端上传程序校验失败，任务记录已保留，请联系维护人员。",
   UPLOADER_START_FAILED: "上传进程未能启动。任务记录已保留，可重试启动。",
   LOGIN_SCHEMA_CHANGED: "平台登录响应与当前接口不一致，请到平台检查是否需要网页登录验证。",
   NETWORK_FAILED: "暂时无法连接平台，请检查网络后重试。",
   PLATFORM_FAILED: "平台暂时无法处理请求，请稍后重试。",
-  LOCAL_STATE_INVALID: "本机账号或任务记录无法读取，请保留记录并检查本地文件。",
+  LOCAL_STATE_INVALID: "服务端账号或任务记录无法读取，请保留记录并检查服务端记录。",
   PROCESSING_TIMEOUT: "等待平台处理超时，恢复任务可继续查询进度。",
   NETWORK_TIMEOUT: "平台请求超时，任务断点已保留。",
   JOB_COMPLETED: "该任务已完成，获取最新增量包请新建任务。",
-  JOB_NOT_FOUND: "未找到本机任务记录。",
+  JOB_NOT_FOUND: "未找到当前用户的服务端任务记录。",
   PUBLISH_NOT_READY: "任务尚未到达最终确认发布步骤，请先完成前序处理。",
   REMOTE_PROCESSING_FAILED: "平台解压或复制失败，请查看平台处理结果后恢复。",
 };
@@ -132,6 +138,8 @@ export const uploadStageLabel = (stage: string): string => STAGES[stage] ?? "正
 export const uploadErrorLabel = (code: string): string =>
   ERRORS[code] ?? `操作暂未完成，记录已保留（${code || "UNKNOWN"}）。`;
 export function uploadJobLabel(job: UploadJob): string {
+  if (job.status === "queued") return "服务端排队中";
+  if (job.status === "cancelled") return "已取消排队";
   if (job.active) return uploadStageLabel(job.stage);
   if (job.published) return "正式发布完成";
   if (job.status === "succeeded") return uploadStageLabel(job.stage);

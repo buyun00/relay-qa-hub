@@ -1,9 +1,10 @@
+import { serverUploader, createUploadRequestId } from "./increment-upload-api";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   BuildUploadChain,
   UploadInput,
   UploaderSnapshot,
-} from "../../desktop/src/uploader-types";
+} from "@relay-qa-hub/upload-contract";
 import { uploadDraftDefaults, UPLOAD_MODES } from "./upload-model";
 
 const messages: Record<string, string> = {
@@ -24,6 +25,7 @@ const messages: Record<string, string> = {
   BUILD_LOG_UNAVAILABLE: "正在等待构建日志恢复，以核对 ZIP 生成结果。",
 };
 const labels: Record<BuildUploadChain["status"], string> = {
+  queued: "服务端等待打包",
   submitting: "正在提交外网打包",
   submission_unknown: "待核对打包提交结果",
   building: "等待外网打包完成",
@@ -49,7 +51,7 @@ export default function BuildUploadControls({
   onSubmitted: (queueId: number) => void;
   onOpenUpload?: ((jobId?: string) => void) | undefined;
 }) {
-  const bridge = typeof window === "undefined" ? undefined : window.qaHubDesktop?.uploader;
+  const bridge = serverUploader;
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
@@ -65,7 +67,7 @@ export default function BuildUploadControls({
       const result = await bridge.buildChains();
       if (result.ok) setChains(result.value);
     } catch {
-      /* Main-process monitor continues while disconnected. */
+      /* Server monitor continues while disconnected. */
     }
   }, [bridge]);
   useEffect(() => {
@@ -124,7 +126,10 @@ export default function BuildUploadControls({
     setBusy(true);
     setError("");
     try {
-      const result = await bridge.buildAndUpload({ requestId: crypto.randomUUID(), upload: input });
+      const result = await bridge.buildAndUpload({
+        requestId: createUploadRequestId(),
+        upload: input,
+      });
       if (!result.ok) {
         setError(result.code);
         return;
@@ -198,9 +203,7 @@ export default function BuildUploadControls({
               disabled ||
               !bridge?.buildAndUpload ||
               !snapshot?.configured ||
-              !snapshot.available ||
-              !!activeChain ||
-              snapshot.jobs.some((j) => j.active)
+              !snapshot.available
             }
             onClick={() => void combined()}
           >
@@ -214,10 +217,10 @@ export default function BuildUploadControls({
             {UPLOAD_MODES.find((m) => m.id === input.mode)?.label}
           </p>
           <small>
-            更新说明只写版本号。打包成功后自动上传；关闭窗口后继续等待，完全退出后下次启动继续。
+            更新说明只写版本号。服务端在打包成功后自动上传，退出客户端或关闭电脑不影响执行。
           </small>
           {!bridge?.buildAndUpload ? (
-            <p>请在最新版 Windows 客户端使用自动上传。</p>
+            <p>服务端上传暂时不可用。</p>
           ) : !snapshot?.configured ? (
             <p>请先登录上传平台账号。</p>
           ) : null}
