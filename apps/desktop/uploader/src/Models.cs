@@ -28,6 +28,7 @@ public sealed class JobConfig
     public string TestResultReference { get; set; } = "";
     public bool UseVersionText { get; set; }
     public bool RecordedTestWorkflow { get; set; }
+    public int UploadConcurrency { get; set; } = 4;
     public int PollSeconds { get; set; } = 3;
     public int WaitTimeoutSeconds { get; set; } = 1800;
     public long PartSizeBytes { get; set; } = 5 * 1024 * 1024;

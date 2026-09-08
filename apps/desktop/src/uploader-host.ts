@@ -11,7 +11,7 @@ import type {
   UploaderSnapshot,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "ac98a271deb77ddb6733e93703f0ba044df205c4c0a8a80804a9e3facbc524fb";
+export const UPLOADER_SHA256 = "1291cb0cc397cc53ca4f9af3fde42f95f49bba9a9b3f6f2b0e4bbb0dde42e663";
 export const UPLOAD_SOURCE =
   "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
 const API_BASE = "https://fq2ivi.ipwana.com";
@@ -107,6 +107,11 @@ export function parseUploadEvents(lines: string): UploadEvent[] {
         totalBytes: num(data["totalBytes"] ?? data["total"]),
         completedParts: num(data["completedParts"]),
         totalParts: num(data["totalParts"]),
+        ...(Number.isSafeInteger(data["concurrency"]) &&
+        Number(data["concurrency"]) >= 1 &&
+        Number(data["concurrency"]) <= 8
+          ? { concurrency: Number(data["concurrency"]) }
+          : {}),
       });
     } catch {
       /* A writer may still be appending the last line. */
@@ -281,7 +286,7 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.3.0",
+      toolVersion: "0.3.1",
       sourceUrl: UPLOAD_SOURCE,
       configured: !!auth,
       authError,

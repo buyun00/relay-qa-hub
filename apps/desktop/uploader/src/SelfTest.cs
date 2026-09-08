@@ -123,7 +123,8 @@ public static class SelfTest
             return Expect("JOB_LOCKED",()=>{using var second=new Journal(first.Root);return Task.CompletedTask;});
         });
         await AcquisitionTests.Run(root,Case,ct);
-        var report=new{version="0.3.0",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
+        await MultipartTransferTests.Run(root,Case,ct);
+        var report=new{version="0.3.1",verification="local-loopback-and-handler-fixtures",passed=results.Count,failed=0,realPlatformTested=false,realAccountLoginTested=false,tencentSdkTransferTested=false,fixture=identity,tests=results,at=DateTimeOffset.UtcNow};
         string reportPath=Path.Combine(root,"report.json");await File.WriteAllTextAsync(reportPath,JsonSerializer.Serialize(report,Json.Options),ct);
         Console.WriteLine(JsonSerializer.Serialize(new{type="selfTestResult",passed=results.Count,failed=0,reportPath,realPlatformTested=false}));
     }

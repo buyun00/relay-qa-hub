@@ -93,6 +93,16 @@ test("event projection tolerates partial JSONL and never returns tokens or raw e
   assert.equal(events[0]?.completedBytes, 50);
   assert.ok(!JSON.stringify(events).includes("secret"));
   assert.ok(!JSON.stringify(events).includes("sensitive"));
+  assert.equal(
+    parseUploadEvents('{"type":"event","event":"uploadParallelism","data":{"concurrency":4}}')[0]
+      ?.concurrency,
+    4,
+  );
+  assert.equal(
+    parseUploadEvents('{"type":"event","event":"uploadParallelism","data":{"concurrency":999}}')[0]
+      ?.concurrency,
+    undefined,
+  );
 });
 test("email login matches handover contract, validates access, saves compatible cache, keeps secrets out of snapshot", async (t) => {
   const calls: { url: string; options?: RequestInit }[] = [];

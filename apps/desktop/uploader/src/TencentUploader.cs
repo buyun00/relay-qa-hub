@@ -10,6 +10,7 @@ public sealed class TencentUploader : IObjectUploader
     {
         if(s.Done.Contains("COS_UPLOAD"))return;
         CosXmlServer? server=null;DateTimeOffset refreshAt=DateTimeOffset.MinValue;
+        using var credentialGate=new SemaphoreSlim(1,1);var stateGate=new object();
         async Task Refresh()
         {
             var sts=await api.Get("/api/v1/thirdpartyadminapi/oss_sts",null,ct) as JsonObject??throw new UploadException("SCHEMA_CHANGED","STS 配置为空。");
@@ -28,10 +29,20 @@ public sealed class TencentUploader : IObjectUploader
                 if(long.TryParse(value,out long n)&&n>now)expiry=Math.Min(expiry,n>100000000000?n/1000:n);
                 else if(DateTimeOffset.TryParse(value,out var date)&&date.ToUnixTimeSeconds()>now)expiry=Math.Min(expiry,date.ToUnixTimeSeconds());
             }
-            var config=new CosXmlConfig.Builder().SetRegion(region).IsHttps(true).SetDebugLog(false).SetConnectionTimeoutMs(30000).SetReadWriteTimeoutMs(90000).Build();
+            var config=new CosXmlConfig.Builder().SetRegion(region).IsHttps(true).SetDebugLog(false).SetConnectionLimit(Math.Max(8,c.UploadConcurrency)).SetConnectionTimeoutMs(30000).SetReadWriteTimeoutMs(90000).Build();
             server=new CosXmlServer(config,new DefaultSessionQCloudCredentialProvider(id,key,now-30,expiry,token));
             refreshAt=DateTimeOffset.FromUnixTimeSeconds(Math.Max(now+5,expiry-60));
-            s.Bucket=bucket;s.Region=region;s.PublicUrl=domain.TrimEnd('/')+"/"+s.ObjectKey;journal.Save(s);
+            lock(stateGate){s.Bucket=bucket;s.Region=region;s.PublicUrl=domain.TrimEnd('/')+"/"+s.ObjectKey;journal.Save(s);}
+        }
+        async Task<CosXmlServer> CurrentServer(CosXmlServer? failed,CancellationToken token)
+        {
+            await credentialGate.WaitAsync(token);
+            try
+            {
+                if(server==null||DateTimeOffset.UtcNow>=refreshAt||(failed!=null&&ReferenceEquals(server,failed)))await Refresh();
+                return server!;
+            }
+            finally{credentialGate.Release();}
         }
         await Refresh();
         if(s.PendingAction=="COS_COMPLETE")
@@ -81,28 +92,34 @@ public sealed class TencentUploader : IObjectUploader
         }
         int total=checked((int)((s.File!.Size+c.PartSizeBytes-1)/c.PartSizeBytes));
         if(total>10000)throw new UploadException("INVALID_INPUT","分片数量超过 10000，请调整 partSizeBytes 后创建新任务。");
-        for(int number=1;number<=total;number++)
-        {
-            ct.ThrowIfCancellationRequested();Files.CheckStable(s.File);
-            if(s.Parts.ContainsKey(number))continue;
-            int current=number;long offset=(current-1)*c.PartSizeBytes,length=Math.Min(c.PartSizeBytes,s.File.Size-offset);
+        var pending=Enumerable.Range(1,total).Where(number=>!s.Parts.ContainsKey(number)).ToArray();
+        journal.Emit(s,"uploadParallelism",new{concurrency=c.UploadConcurrency,totalParts=total,pendingParts=pending.Length});
+        await MultipartTransfers.Run(pending,c.UploadConcurrency,async(current,token)=>{
+            token.ThrowIfCancellationRequested();Files.CheckStable(s.File);
+            long offset=(current-1)*c.PartSizeBytes,length=Math.Min(c.PartSizeBytes,s.File.Size-offset);
+            CosXmlServer? failed=null;
             for(int attempt=0;;attempt++)
             {
+                CosXmlServer? currentServer=null;
                 try
                 {
-                    if(DateTimeOffset.UtcNow>=refreshAt)await Refresh();
+                    currentServer=await CurrentServer(failed,token);
                     var request=new UploadPartRequest(s.Bucket,s.ObjectKey,current,s.UploadId,s.File.Path,offset,length);
-                    var result=await Task.Run(()=>server!.UploadPart(request),ct);
-                    if(string.IsNullOrWhiteSpace(result.eTag))throw new UploadException("UPLOAD_FAILED","COS 未返回分片 ETag。");
-                    s.Parts[current]=result.eTag;journal.Save(s);
-                    journal.Emit(s,"progress",new{completedParts=s.Parts.Count,totalParts=total,completedBytes=s.Parts.Keys.Sum(n=>Math.Min(c.PartSizeBytes,s.File.Size-(n-1)*c.PartSizeBytes)),totalBytes=s.File.Size});break;
+                    var result=await Task.Run(()=>currentServer.UploadPart(request),token);
+                    return result.eTag;
                 }
                 catch(OperationCanceledException){throw;}
                 catch(UploadException){throw;}
-                catch when(attempt<2){await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2,attempt)),ct);await Refresh();}
+                catch when(attempt<2){failed=currentServer;await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2,attempt)),token);}
                 catch {throw new UploadException("UPLOAD_FAILED",$"COS 分片 {current} 上传失败，断点已保存。恢复会先核对服务端分片。");}
             }
-        }
+        },(current,etag)=>{
+            lock(stateGate)
+            {
+                s.Parts[current]=etag;journal.Save(s);
+                journal.Emit(s,"progress",new{completedParts=s.Parts.Count,totalParts=total,completedBytes=s.Parts.Keys.Sum(n=>Math.Min(c.PartSizeBytes,s.File.Size-(n-1)*c.PartSizeBytes)),totalBytes=s.File.Size});
+            }
+        },ct);
         Files.CheckStable(s.File);ct.ThrowIfCancellationRequested();
         s.PendingAction="COS_COMPLETE";journal.Save(s);
         var complete=new CompleteMultipartUploadRequest(s.Bucket,s.ObjectKey,s.UploadId);complete.SetPartNumberAndETag(s.Parts);

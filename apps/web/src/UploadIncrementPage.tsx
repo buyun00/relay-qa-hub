@@ -32,6 +32,9 @@ function unwrap<T>(reply: UploadReply<T>): T {
 
 function JobProgress({ job }: { job: UploadJob | undefined }) {
   const progress = job ? uploadProgress(job) : null;
+  const concurrency = job?.events.findLast(
+    (event) => event.kind === "uploadParallelism",
+  )?.concurrency;
   const steps = UPLOAD_STEPS.slice(
     0,
     job?.input.mode === "upload_only" ? 4 : job?.input.mode === "prepare_test" ? 5 : 7,
@@ -73,6 +76,7 @@ function JobProgress({ job }: { job: UploadJob | undefined }) {
             {size(progress.completedBytes)}
             {progress.totalBytes ? ` / ${size(progress.totalBytes)}` : ""}
             {progress.totalParts ? ` · 分片 ${progress.completedParts}/${progress.totalParts}` : ""}
+            {job?.stage === "UPLOADING" && concurrency ? ` · ${concurrency} 片并行` : ""}
           </small>
         </div>
       ) : null}

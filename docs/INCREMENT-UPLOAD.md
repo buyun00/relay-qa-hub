@@ -27,10 +27,10 @@ requirements, and remain recoverable with their original ZIP.
 
 ## Integration boundary
 
-- `apps/desktop/vendor/ozdqp-uploader` contains the **0.3.0** executable built from
+- `apps/desktop/vendor/ozdqp-uploader` contains the **0.3.1** executable built from
   `apps/desktop/uploader`, adapted from the original 0.2.0 handover source in
   `D:\OZDQP-自动上传完整交接包-20260908`. The original handover remains untouched.
-  SHA-256: `ac98a271deb77ddb6733e93703f0ba044df205c4c0a8a80804a9e3facbc524fb`.
+  SHA-256: `1291cb0cc397cc53ca4f9af3fde42f95f49bba9a9b3f6f2b0e4bbb0dde42e663`.
   Packaging and execution verify that hash. The binary is placed outside ASAR in
   `resources/uploader`; no .NET installation is required on client machines.
 - The original executable does not implement `serve --stdio` or redirected
@@ -87,14 +87,27 @@ server unzip/copy terminal conditions and final publication on a designated **ne
 version still require business acceptance. The handover explicitly marks these
 as unverified. Integration/package checks do not claim that acceptance.
 
+## Parallel multipart transfer
+
+Worker 0.3.1 sends four 5 MB parts concurrently by default (bounded to 1–8 for CLI
+configuration). HTTP connection capacity is at least eight. STS renewal and journal
+writes are serialized; completed parts are checkpointed as their acknowledgments
+arrive. On error/cancellation, in-flight calls finish before the journal closes.
+Multipart completion only runs after all parts succeed. Resume retains the original
+upload ID, validates remote parts/MD5 and sends only missing parts. Concurrency is
+not part of task identity because it does not alter bytes or multipart layout.
+The page's parallel count comes from the actual worker event, not an assumed setting.
+
 ## Build the standalone worker
 
 Use .NET 10 SDK, then update the vendor EXE and both hash pins if the binary changes:
 
 ```powershell
-dotnet publish apps/desktop/uploader/Ozdqp.Uploader.csproj -c Release -r win-x64 --self-contained true -o work/uploader-0.3.0
-& work/uploader-0.3.0/ozdqp-uploader.exe self-test
+dotnet publish apps/desktop/uploader/Ozdqp.Uploader.csproj -c Release -r win-x64 --self-contained true -o work/uploader-0.3.1
+& work/uploader-0.3.1/ozdqp-uploader.exe self-test
 ```
 
-The 0.3.0 worker retains all 23 original local tests and adds four tests for the
-confirmation boundary, resumed waiting, remote changes and version-only text.
+The 0.3.1 worker passes 30 tests: the original 23, four confirmation/version tests,
+and three multipart tests. The latter exercise the real Tencent SDK against a
+loopback fixture, verify four concurrent requests and exact part bytes, and check
+checkpoint recovery and cancellation. Loopback timing is not a real COS benchmark.

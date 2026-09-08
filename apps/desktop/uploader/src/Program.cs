@@ -16,7 +16,7 @@ public static class Program
             string ApiArg()=>args.Contains("--api-base")?Arg("--api-base"):new JobConfig().ApiBase;
             if(args.Length==0||args[0] is "help" or "--help")
             {
-                Console.WriteLine("OZDQP Uploader 0.3.0 / 固定地址下载 + 账号密码登录\n\n  login [--kind email|subaccount]   登录并保存账号密码，默认邮箱\n  auth-check                       只读检查已保存的登录状态\n  logout                           清除本工具本地登录缓存\n  download --work <目录>            仅从固定地址下载并校验 ZIP\n  preflight --file <ZIP>            本地检查\n  self-test                        本地测试，不访问业务平台\n  run --config <job.json>           登录、下载、执行完整流程\n  resume --config <job.json>        恢复本任务的相同 ZIP\n  confirm-publish --config <job.json> 最终确认发布（prepare_publish 等待后）\n  status --work <任务目录>          读取当前结果\n\nZIP 固定来源："+PackageDownload.SourceUrl+"\n账号密码保存在本地 JSON；后续自动登录。兼容 OZDQP_AUTHORIZATION。\nCtrl+C 保留断点；下载中断后从头下载，已完成下载的旧任务不会取新包。");return 0;
+                Console.WriteLine("OZDQP Uploader 0.3.1 / 固定地址下载 + 账号密码登录\n\n  login [--kind email|subaccount]   登录并保存账号密码，默认邮箱\n  auth-check                       只读检查已保存的登录状态\n  logout                           清除本工具本地登录缓存\n  download --work <目录>            仅从固定地址下载并校验 ZIP\n  preflight --file <ZIP>            本地检查\n  self-test                        本地测试，不访问业务平台\n  run --config <job.json>           登录、下载、执行完整流程\n  resume --config <job.json>        恢复本任务的相同 ZIP\n  confirm-publish --config <job.json> 最终确认发布（prepare_publish 等待后）\n  status --work <任务目录>          读取当前结果\n\nZIP 固定来源："+PackageDownload.SourceUrl+"\n账号密码保存在本地 JSON；后续自动登录。兼容 OZDQP_AUTHORIZATION。\nCtrl+C 保留断点；下载中断后从头下载，已完成下载的旧任务不会取新包。");return 0;
             }
             if(args[0]=="login")
             {
@@ -68,6 +68,7 @@ public static class Program
             if(string.IsNullOrWhiteSpace(config.WorkDirectory))throw new UploadException("INVALID_INPUT","必须设置唯一 workDirectory，以保存断点。");
             if(config.Mode is not ("upload_only" or "prepare_test" or "publish_workflow" or "prepare_publish"))throw new UploadException("INVALID_INPUT","mode 无效。");
             if(config.PollSeconds<1||config.WaitTimeoutSeconds<1||config.PartSizeBytes<1024*1024||config.PartSizeBytes>128L*1024*1024)throw new UploadException("INVALID_INPUT","超时或分片设置超出支持范围。");
+            if(config.UploadConcurrency is <1 or >8)throw new UploadException("INVALID_INPUT","上传并发数必须为 1 到 8。");
             if(string.IsNullOrWhiteSpace(config.Summary)||string.IsNullOrWhiteSpace(config.ProductId)||string.IsNullOrWhiteSpace(config.ChannelId))throw new UploadException("INVALID_INPUT","产品、渠道、版本概述不能为空。");
             config.WorkDirectory=Path.GetFullPath(config.WorkDirectory,Path.GetDirectoryName(configPath)!);
             config.FilePath=PackageDownload.LocalPath(config.WorkDirectory);

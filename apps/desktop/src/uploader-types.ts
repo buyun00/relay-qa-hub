@@ -31,6 +31,7 @@ export interface UploadEvent {
   totalBytes: number;
   completedParts: number;
   totalParts: number;
+  concurrency?: number;
 }
 export interface UploadJob {
   id: string;
