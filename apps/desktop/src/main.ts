@@ -19,6 +19,7 @@ import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./co
 import { isPackageDownloadUrl } from "./package-downloads.js";
 import { parsePackagingNotice } from "./packaging-notifications.js";
 import { UploaderHost } from "./uploader-host.js";
+import { BuildUploadHost } from "./build-upload-host.js";
 import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
 import { NotificationHistory } from "./notification-history.js";
 import {
@@ -68,6 +69,7 @@ let quitting = false;
 let pendingBugId: string | null = null;
 let assetsDirectory = config.webAssetsDirectory;
 let uploader: UploaderHost | null = null;
+let buildUploads: BuildUploadHost;
 
 function getUploader(): UploaderHost {
   const local = process.env["LOCALAPPDATA"];
@@ -613,6 +615,9 @@ function installIpcHandlers(): void {
     start: (value) => getUploader().start(value),
     resume: (value) => getUploader().resume(value),
     "confirm-publish": (value) => getUploader().confirmPublish(value),
+    "build-chains": () => buildUploads.list(),
+    "build-and-upload": (value) => buildUploads.start(value),
+    "cancel-build-upload": (value) => buildUploads.cancel(value),
     "open-folder": async (value) => {
       const directory = getUploader().folder(value);
       await fs.access(path.join(directory, "desktop.json"));
@@ -803,12 +808,28 @@ async function startApplication(): Promise<void> {
   await registerAppProtocol();
   transport = createTransport();
   updater = await createUpdater();
+  const apiClient = new DesktopQaHubApiClient(config, browserSession, fetch, () => {
+    void persistRememberedLoginNameSafely();
+    syncNotificationCredential();
+  });
+  buildUploads = new BuildUploadHost({
+    root: path.join(
+      process.env["LOCALAPPDATA"] ?? app.getPath("userData"),
+      "OZDQP-Uploader",
+      "qa-hub-build-chains",
+    ),
+    api: apiClient,
+    uploader: {
+      checkAuth: () => getUploader().checkAuth(),
+      accountIdentity: () => getUploader().accountIdentity(),
+      hasBuildJob: (id) => getUploader().hasBuildJob(id),
+      startForBuild: (input, id, source, accountIdentity) =>
+        getUploader().startForBuild(input, id, source, accountIdentity),
+    },
+  });
   if (config.mcpEnabled) {
     const mcpTools = new QaHubMcpTools(
-      new DesktopQaHubApiClient(config, browserSession, fetch, () => {
-        void persistRememberedLoginNameSafely();
-        syncNotificationCredential();
-      }),
+      apiClient,
       path.join(app.getPath("userData"), "mcp-attachments"),
     );
     mcpServer = new QaHubMcpHttpServer({
@@ -851,6 +872,7 @@ async function startApplication(): Promise<void> {
   await mainWindow.loadURL(target);
   if (!(config.startupHidden || process.argv.includes("--hidden"))) openMainWindow();
   transport.start();
+  buildUploads.startPolling();
   const initialUpdateTimer = setTimeout(() => void updater?.check(), 5_000);
   initialUpdateTimer.unref();
   const recurringUpdateTimer = setInterval(() => void updater?.check(), 30 * 60 * 1_000);
@@ -881,6 +903,7 @@ if (!hasLock) {
     if (!quitting) {
       quitting = true;
       transport?.stop();
+      buildUploads?.stop();
       void mcpServer?.stop();
     }
   });

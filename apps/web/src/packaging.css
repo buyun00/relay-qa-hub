@@ -2,6 +2,76 @@
   display: grid;
   gap: 28px;
 }
+.package-external-control {
+  position: relative;
+  min-width: 0;
+}
+.package-external-control > .package-build-button {
+  width: 100%;
+  min-height: 58px;
+}
+.package-build-options {
+  position: absolute;
+  z-index: 20;
+  top: 66px;
+  right: 0;
+  width: 360px;
+  max-width: calc(100vw - 64px);
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 16px 40px #18372b24;
+}
+.package-build-options button,
+.package-upload-chain button {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  text-align: left;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.package-build-options .package-combined-action {
+  background: var(--forest);
+  color: white;
+}
+.package-build-options button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.package-build-options p,
+.package-upload-chain p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.package-build-options small {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.package-build-options .package-settings-link {
+  border: 0;
+  padding: 4px 0;
+  color: var(--forest);
+  font-size: 12px;
+}
+.package-upload-chain {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  background: #f0f7f4;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 12px;
+}
+.package-upload-chain > span {
+  color: var(--muted);
+}
 .package-progress-panel {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -317,6 +387,7 @@
 }
 .package-build-buttons {
   display: grid;
+  align-items: start;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
@@ -334,12 +405,12 @@
 .package-build-button:hover:enabled {
   background: #294b39;
 }
-.package-build-button:last-child {
+.package-external-control > .package-build-button {
   color: var(--forest);
   background: var(--lime);
   border-color: var(--lime);
 }
-.package-build-button:last-child:hover:enabled {
+.package-external-control > .package-build-button:hover:enabled {
   background: #a7e331;
 }
 .package-hint {

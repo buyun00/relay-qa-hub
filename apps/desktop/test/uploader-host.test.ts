@@ -305,6 +305,34 @@ test("tampered executable is rejected before creating a task", async (t) => {
   await assert.rejects(host.start(input), /UPLOADER_INTEGRITY_FAILED/);
   assert.equal((await host.snapshot()).jobs.length, 0);
 });
+test("build handoff persists source identity and returns one existing job after a lost acknowledgement", async (t) => {
+  const { host, options } = await fixture(t);
+  await writeJson(options.authFile, { account: "fixture", kind: "email" });
+  await writeFile(
+    options.runner,
+    `import fs from 'node:fs/promises';import path from 'node:path';const [,dir,runId]=process.argv.slice(2);await fs.writeFile(path.join(dir,'run-'+runId+'.json'),JSON.stringify({finished:true}));`,
+  );
+  const id = randomUUID(),
+    source = { size: 1000, lastModified: "Tue, 08 Sep 2026 05:00:00 GMT" };
+  assert.equal(await host.hasBuildJob(id), false);
+  await host.startForBuild(input, id, source, await host.accountIdentity());
+  const meta = await readJson(path.join(host.folder(id), "desktop.json"));
+  assert.equal(await host.startForBuild(input, id, source, await host.accountIdentity()), id);
+  assert.deepEqual(await readJson(path.join(host.folder(id), "desktop.json")), meta);
+  const config = await readJson(path.join(host.folder(id), "job.json"));
+  assert.deepEqual(config?.["expectedSource"], source);
+  assert.equal(config?.["buildChainId"], id);
+  await assert.rejects(
+    host.startForBuild(input, id, { ...source, size: 2000 }, await host.accountIdentity()),
+    /LOCAL_STATE_INVALID/,
+  );
+  await assert.rejects(
+    host.startForBuild({ ...input, testerId: 1 }, id, source, await host.accountIdentity()),
+    /LOCAL_STATE_INVALID/,
+  );
+  for (let i = 0; i < 100 && (await host.snapshot()).jobs[0]?.active; i++)
+    await new Promise((r) => setTimeout(r, 30));
+});
 test("new jobs default to recorded parameters and persist version-only text behavior", async (t) => {
   const { host, options } = await fixture(t);
   await writeJson(options.authFile, { account: "fixture" });

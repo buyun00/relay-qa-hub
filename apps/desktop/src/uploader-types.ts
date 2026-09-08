@@ -22,6 +22,33 @@ export interface UploadLogin {
   password: string;
   kind: "email" | "subaccount";
 }
+export interface UploadSourceIdentity {
+  size: number;
+  lastModified: string;
+}
+export interface BuildUploadChain {
+  id: string;
+  ownerId: string;
+  accountIdentity: string;
+  createdAt: string;
+  updatedAt: string;
+  input: UploadInput;
+  queueId: number | null;
+  buildNumber: number | null;
+  status:
+    | "submitting"
+    | "submission_unknown"
+    | "building"
+    | "waiting_zip"
+    | "starting_upload"
+    | "upload_started"
+    | "failed"
+    | "cancelled";
+  errorCode: string;
+  uploadJobId: string | null;
+  baseline: UploadSourceIdentity | null;
+  source: UploadSourceIdentity | null;
+}
 export interface UploadEvent {
   at: string;
   stage: string;
@@ -79,4 +106,10 @@ export interface UploaderBridge {
   }) => Promise<UploadReply<string>>;
   openFolder: (id: string) => Promise<UploadReply<boolean>>;
   confirmPublish: (id: string) => Promise<UploadReply<string>>;
+  buildChains: () => Promise<UploadReply<BuildUploadChain[]>>;
+  buildAndUpload: (input: {
+    requestId: string;
+    upload: UploadInput;
+  }) => Promise<UploadReply<BuildUploadChain>>;
+  cancelBuildUpload: (id: string) => Promise<UploadReply<boolean>>;
 }

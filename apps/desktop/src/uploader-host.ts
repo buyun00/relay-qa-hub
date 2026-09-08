@@ -9,9 +9,10 @@ import type {
   UploadJob,
   UploadLogin,
   UploaderSnapshot,
+  UploadSourceIdentity,
 } from "./uploader-types.js";
 
-export const UPLOADER_SHA256 = "1291cb0cc397cc53ca4f9af3fde42f95f49bba9a9b3f6f2b0e4bbb0dde42e663";
+export const UPLOADER_SHA256 = "43a3ba2d30f4b1792e0406aa92ead1a61624c7aa491bfa9ae7e5be2b559b7a3d";
 export const UPLOAD_SOURCE =
   "http://10.100.5.129:8000/pkg_zip/ozdqp/_pkg_cfg_2001_1002.zip?download=true";
 const API_BASE = "https://fq2ivi.ipwana.com";
@@ -75,6 +76,22 @@ export async function readJson(file: string): Promise<RecordValue | null> {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw new Error("LOCAL_STATE_INVALID");
   }
+}
+export function parseNewUploadInput(value: unknown): UploadInput {
+  const raw = record(value);
+  if (raw["mode"] !== "publish_workflow" && raw["mode"] !== "prepare_publish")
+    throw new Error("INVALID_INPUT");
+  const version = textInput(raw["version"] ?? "", 80);
+  const input = parseUploadInput({
+    ...DEFAULT_UPLOAD_PARAMETERS,
+    ...raw,
+    version,
+    summary: version || "自动版本号",
+    description: version || "自动版本号",
+    testResultReference: "",
+  });
+  if (input.testerId <= 0) throw new Error("INVALID_INPUT");
+  return input;
 }
 export async function writeJson(file: string, value: unknown): Promise<void> {
   const temporary = `${file}.${randomUUID()}.tmp`;
@@ -286,7 +303,7 @@ export class UploaderHost {
     jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       available,
-      toolVersion: "0.3.1",
+      toolVersion: "0.3.2",
       sourceUrl: UPLOAD_SOURCE,
       configured: !!auth,
       authError,
@@ -421,6 +438,16 @@ export class UploaderHost {
       });
     });
   }
+  async accountIdentity(): Promise<string> {
+    const auth = await readJson(this.options.authFile);
+    if (!auth || !auth["account"]) throw new Error("AUTH_REQUIRED");
+    return createHash("sha256")
+      .update(JSON.stringify([API_BASE, auth["account"], auth["kind"]]))
+      .digest("hex");
+  }
+  async hasBuildJob(id: string): Promise<boolean> {
+    return (await readJson(path.join(this.folder(id), "desktop.json"))) !== null;
+  }
   private workerEnvironment(): NodeJS.ProcessEnv {
     const env = { ...process.env };
     delete env["OZDQP_AUTHORIZATION"];
@@ -460,25 +487,51 @@ export class UploaderHost {
     return id;
   }
   async start(value: unknown): Promise<string> {
+    return this.startJob(value, randomUUID());
+  }
+  // Only the main-process build coordinator supplies an identity and a pinned source.
+  async startForBuild(
+    value: unknown,
+    id: string,
+    source: UploadSourceIdentity,
+    accountIdentity: string,
+  ): Promise<string> {
+    if (
+      !Number.isSafeInteger(source.size) ||
+      source.size <= 0 ||
+      !Number.isFinite(Date.parse(source.lastModified))
+    )
+      throw new Error("INVALID_INPUT");
+    return this.startJob(value, id, source, accountIdentity);
+  }
+  private async startJob(
+    value: unknown,
+    id: string,
+    source?: UploadSourceIdentity,
+    accountIdentity?: string,
+  ): Promise<string> {
     return this.exclusive(async () => {
-      const raw = record(value);
-      if (raw["mode"] !== "publish_workflow" && raw["mode"] !== "prepare_publish")
-        throw new Error("INVALID_INPUT");
-      const version = textInput(raw["version"] ?? "", 80);
-      const input = parseUploadInput({
-        ...DEFAULT_UPLOAD_PARAMETERS,
-        ...raw,
-        version,
-        summary: version || "自动版本号",
-        description: version || "自动版本号",
-        testResultReference: "",
-      });
-      if (input.testerId <= 0) throw new Error("INVALID_INPUT");
+      const input = parseNewUploadInput(value);
+      const directory = this.folder(id);
+      const existing = await readJson(path.join(directory, "job.json"));
+      if (existing) {
+        if (
+          !source ||
+          existing["buildChainId"] !== id ||
+          JSON.stringify(existing["expectedSource"]) !== JSON.stringify(source) ||
+          JSON.stringify(
+            parseNewUploadInput({ ...existing, version: existing["version"] ?? "" }),
+          ) !== JSON.stringify(input)
+        )
+          throw new Error("LOCAL_STATE_INVALID");
+        // The launch intent is written before spawn. Never create a second job on a lost acknowledgement.
+        if (await readJson(path.join(directory, "desktop.json"))) return id;
+      }
       await this.idle();
+      if (source && (!accountIdentity || (await this.accountIdentity()) !== accountIdentity))
+        throw new Error("UPLOAD_ACCOUNT_CHANGED");
       if (!(await readJson(this.options.authFile))) throw new Error("AUTH_REQUIRED");
       await this.verifiedExecutable();
-      const id = randomUUID();
-      const directory = this.folder(id);
       await writeJson(path.join(directory, "job.json"), {
         ...input,
         useVersionText: true,
@@ -490,6 +543,7 @@ export class UploaderHost {
         pollSeconds: 3,
         waitTimeoutSeconds: 1800,
         partSizeBytes: 5242880,
+        ...(source ? { buildChainId: id, expectedSource: source } : {}),
       });
       return this.launch(id, "run", new Date().toISOString());
     });

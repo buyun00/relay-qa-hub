@@ -175,6 +175,16 @@ export default function UploadIncrementPage({
   });
   const [snapshot, setSnapshot] = useState<UploaderSnapshot | null>(null);
   const [selectedId, setSelectedId] = useState("");
+  useEffect(() => {
+    const select = (event: Event) =>
+      setSelectedId(
+        typeof (event as CustomEvent<unknown>).detail === "string"
+          ? (event as CustomEvent<string>).detail
+          : "",
+      );
+    window.addEventListener("qa-hub:select-upload", select);
+    return () => window.removeEventListener("qa-hub:select-upload", select);
+  }, []);
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
   const [kind, setKind] = useState<"email" | "subaccount">("email");

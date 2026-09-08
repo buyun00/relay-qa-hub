@@ -2021,6 +2021,13 @@ export default function App({ principal, signingOut, onSignOut }: AppProps) {
             active={view === "packaging"}
             refreshRevision={packagingRevision}
             onOpen={() => setView("packaging")}
+            onOpenUpload={(jobId) => {
+              setView("upload");
+              setUploadRevision((value) => value + 1);
+              window.dispatchEvent(
+                new CustomEvent("qa-hub:select-upload", { detail: jobId ?? "" }),
+              );
+            }}
           />
         </div>
         <div hidden={view !== "upload"}>

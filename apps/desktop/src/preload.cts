@@ -218,6 +218,9 @@ const bridge: QaHubDesktopBridge = {
       }),
     openFolder: (id) => ipcRenderer.invoke("desktop:uploader:open-folder", id),
     confirmPublish: (id) => ipcRenderer.invoke("desktop:uploader:confirm-publish", id),
+    buildChains: () => ipcRenderer.invoke("desktop:uploader:build-chains"),
+    buildAndUpload: (input) => ipcRenderer.invoke("desktop:uploader:build-and-upload", input),
+    cancelBuildUpload: (id) => ipcRenderer.invoke("desktop:uploader:cancel-build-upload", id),
   },
   windowControlsOverlay: true,
   getWindowState: async () =>

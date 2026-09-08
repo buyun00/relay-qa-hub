@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import PackagingProgressPanel from "./PackagingProgress";
+import BuildUploadControls from "./BuildUploadControls";
 import { usePackagingProgress } from "./usePackagingProgress";
 import { requestPackagingNotificationPermission } from "./packaging-notifications";
 import { QaHubApiError } from "./api";
@@ -219,11 +220,13 @@ export default function PackagingPage({
   refreshRevision,
   userId = "current",
   onOpen,
+  onOpenUpload,
 }: {
   active: boolean;
   refreshRevision: number;
   userId?: string;
   onOpen?: () => void;
+  onOpenUpload?: (jobId?: string) => void;
 }) {
   const [status, setStatus] = useState<PackagingStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -305,17 +308,31 @@ export default function PackagingPage({
             </span>
           </div>
           <div className="package-build-buttons">
-            {BUILD_PRESETS.map(({ id, label }) => (
-              <button
-                className="package-build-button"
-                type="button"
-                key={id}
-                disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
-                onClick={() => void build(id)}
-              >
-                {pending === id ? "正在提交…" : label}
-              </button>
-            ))}
+            {BUILD_PRESETS.map(({ id, label }) =>
+              id === "external" ? (
+                <BuildUploadControls
+                  key={id}
+                  userId={userId}
+                  disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
+                  onBuildOnly={() => void build(id)}
+                  onSubmitted={(queueId) => {
+                    monitor.watch(queueId);
+                    void refresh();
+                  }}
+                  onOpenUpload={onOpenUpload}
+                />
+              ) : (
+                <button
+                  className="package-build-button"
+                  type="button"
+                  key={id}
+                  disabled={pending !== null || !status?.jenkins?.buildable || error !== null}
+                  onClick={() => void build(id)}
+                >
+                  {pending === id ? "正在提交…" : label}
+                </button>
+              ),
+            )}
           </div>
           <p className="package-hint">
             使用 Jenkins 当前默认参数。内网会自动判断资源更新或整包；下载区展示已生成的文件。
