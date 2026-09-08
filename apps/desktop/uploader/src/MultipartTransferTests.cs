@@ -14,6 +14,16 @@ public static class MultipartTransferTests
     static void Check(bool value,string message){if(!value)throw new Exception("Multipart test: "+message);}
     public static async Task Run(string root,Func<string,Func<Task>,Task> test,CancellationToken ct)
     {
+        await test("cos_completion_serializes_parts_in_numeric_order_after_parallel_acks",()=>{
+            var parts=new Dictionary<int,string>{{3,"etag3"},{1,"etag1"},{12,"etag12"},{2,"etag2"}};
+            var request=TencentUploader.CreateCompletion("fixture-1250000000","fixture.bin","fixture-upload",parts);
+            using var bytes=new MemoryStream();request.GetRequestBody().OnWrite(bytes);
+            var xml=System.Xml.Linq.XDocument.Parse(System.Text.Encoding.UTF8.GetString(bytes.ToArray()));
+            var numbers=xml.Descendants().Where(e=>e.Name.LocalName=="PartNumber").Select(e=>int.Parse(e.Value)).ToArray();
+            Check(numbers.SequenceEqual(new[]{1,2,3,12}),"multipart completion must follow byte order, not acknowledgment order");
+            Check(parts.Keys.SequenceEqual(new[]{3,1,12,2}),"building completion must not mutate checkpoints");
+            return Task.CompletedTask;
+        });
         await test("cos_diagnostics_preserve_status_without_credentials",()=>{
             var server=new COSXML.CosException.CosServerException(403,"Authorization=secret") { errorCode="ExpiredToken",requestId="fixture-request",errorMessage="signed-url-secret",resource="secret-path" };
             string text=JsonSerializer.Serialize(CosDiagnostics.Describe(server));

@@ -31,7 +31,10 @@ public sealed class TencentUploader : IObjectUploader
                 if(long.TryParse(value,out long n)&&n>now)expiry=Math.Min(expiry,n>100000000000?n/1000:n);
                 else if(DateTimeOffset.TryParse(value,out var date)&&date.ToUnixTimeSeconds()>now)expiry=Math.Min(expiry,date.ToUnixTimeSeconds());
             }
-            var config=new CosXmlConfig.Builder().SetRegion(region).IsHttps(true).SetDebugLog(false).SetConnectionLimit(Math.Max(8,c.UploadConcurrency)).SetConnectionTimeoutMs(30000).SetReadWriteTimeoutMs(90000).Build();
+            // The SDK maps ConnectionTimeoutMs to HttpWebRequest.Timeout: this
+            // bounds the whole synchronous part request, not just connecting.
+            // A 5 MiB part must survive temporary slow uplink periods.
+            var config=new CosXmlConfig.Builder().SetRegion(region).IsHttps(true).SetDebugLog(false).SetConnectionLimit(Math.Max(8,c.UploadConcurrency)).SetConnectionTimeoutMs(180000).SetReadWriteTimeoutMs(90000).Build();
             server=new CosXmlServer(config,new DefaultSessionQCloudCredentialProvider(id,key,now-30,expiry,token));
             refreshAt=DateTimeOffset.FromUnixTimeSeconds(Math.Max(now+5,expiry-60));
             lock(stateGate){s.Bucket=bucket;s.Region=region;s.PublicUrl=domain.TrimEnd('/')+"/"+s.ObjectKey;journal.Save(s);}
@@ -47,7 +50,8 @@ public sealed class TencentUploader : IObjectUploader
             finally{credentialGate.Release();}
         }
         await Refresh();
-        if(s.PendingAction=="COS_COMPLETE")
+        bool reconcilingCompletion=s.PendingAction=="COS_COMPLETE";
+        if(reconcilingCompletion)
         {
             // Unique server-allocated key plus task-specific ETag is required;
             // a matching object size alone cannot prove this multipart completed.
@@ -56,12 +60,16 @@ public sealed class TencentUploader : IObjectUploader
                 var head=await Task.Run(()=>server!.HeadObject(new HeadObjectRequest(s.Bucket,s.ObjectKey)),ct);
                 if(head.size==s.File!.Size&&head.eTag.Trim('"')==ExpectedMultipartEtag(s.Parts))
                 {s.PendingAction=null;s.Done.Add("COS_UPLOAD");journal.Save(s);return;}
+                throw new UploadException("OBJECT_CONFLICT","COS 成品文件与本任务的大小或分片摘要不一致，已停止合并恢复。");
             }
             catch(UploadException){throw;}
-            catch { }
-            throw new UploadException("REMOTE_RESULT_UNKNOWN","COS 合并结果不确定，已保留 uploadId 和分片；不能自动重新合并。");
+            catch(Exception error) { Diagnostic("cosRequestFailed",new{operation="HeadObject",error=CosDiagnostics.Describe(error)}); }
+            // Upload-scoped STS may not permit HeadObject. A still-active upload
+            // can instead be reconciled with ListParts and every part's byte MD5.
+            // Never initialize a replacement upload when completion is pending.
+            if(string.IsNullOrEmpty(s.UploadId))throw new UploadException("REMOTE_RESULT_UNKNOWN","COS 合并结果不确定且缺少原 uploadId，已保留断点。");
         }
-        if(s.PendingAction!=null)throw new UploadException("REMOTE_RESULT_UNKNOWN","存在其他未决操作："+s.PendingAction);
+        if(s.PendingAction!=null&&!reconcilingCompletion)throw new UploadException("REMOTE_RESULT_UNKNOWN","存在其他未决操作："+s.PendingAction);
         if(string.IsNullOrEmpty(s.UploadId))
         {
             var result=await Task.Run(()=>server!.InitMultipartUpload(new InitMultipartUploadRequest(s.Bucket,s.ObjectKey)),ct);
@@ -78,7 +86,11 @@ public sealed class TencentUploader : IObjectUploader
                 Diagnostic("reconcileParts",new{marker});
                 COSXML.Model.Object.ListPartsResult result;
                 try { result=await Task.Run(()=>server!.ListParts(request),ct); }
-                catch(Exception error) { Diagnostic("cosRequestFailed",new{operation="ListParts",error=CosDiagnostics.Describe(error)});throw; }
+                catch(Exception error) {
+                    Diagnostic("cosRequestFailed",new{operation="ListParts",error=CosDiagnostics.Describe(error)});
+                    if(reconcilingCompletion)throw new UploadException("REMOTE_RESULT_UNKNOWN","不能确认原 COS 合并结果或活动分片，已保留原任务，请核对云端状态。");
+                    throw;
+                }
                 foreach(var part in result.listParts.parts??[])
                 {
                     int number=int.Parse(part.partNumber);long expected=Math.Min(c.PartSizeBytes,s.File!.Size-(number-1)*c.PartSizeBytes);
@@ -93,6 +105,8 @@ public sealed class TencentUploader : IObjectUploader
                 if(!result.listParts.isTruncated)break;
                 int next=int.Parse(result.listParts.nextPartNumberMarker);if(next<=marker)throw new UploadException("SCHEMA_CHANGED","COS 分片分页标记未前进。");marker=next;
             }while(true);
+            if(reconcilingCompletion&&confirmed.Count!=(s.File!.Size+c.PartSizeBytes-1)/c.PartSizeBytes)
+                throw new UploadException("REMOTE_RESULT_UNKNOWN","合并恢复时原上传的分片不完整，不能重新合并，已保留断点。");
             s.Parts=confirmed;journal.Save(s);
             Diagnostic("reconciledParts",new{completedParts=confirmed.Count});
         }
@@ -133,9 +147,16 @@ public sealed class TencentUploader : IObjectUploader
         },ct);
         Files.CheckStable(s.File);ct.ThrowIfCancellationRequested();
         s.PendingAction="COS_COMPLETE";journal.Save(s);
-        var complete=new CompleteMultipartUploadRequest(s.Bucket,s.ObjectKey,s.UploadId);complete.SetPartNumberAndETag(s.Parts);
-        await Task.Run(()=>server!.CompleteMultiUpload(complete),ct);
+        var complete=CreateCompletion(s.Bucket,s.ObjectKey,s.UploadId,s.Parts);
+        try { await Task.Run(()=>server!.CompleteMultiUpload(complete),ct); }
+        catch(Exception error) { Diagnostic("cosRequestFailed",new{operation="CompleteMultipartUpload",error=CosDiagnostics.Describe(error)});throw; }
         s.PendingAction=null;s.Done.Add("COS_UPLOAD");journal.Save(s);
+    }
+    public static CompleteMultipartUploadRequest CreateCompletion(string bucket,string key,string uploadId,IReadOnlyDictionary<int,string> parts)
+    {
+        var request=new CompleteMultipartUploadRequest(bucket,key,uploadId);
+        foreach(var part in parts.OrderBy(x=>x.Key))request.SetPartNumberAndETag(part.Key,part.Value);
+        return request;
     }
     static string ExpectedMultipartEtag(Dictionary<int,string> parts)
     {
