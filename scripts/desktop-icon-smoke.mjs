@@ -122,6 +122,30 @@ try {
     navigation[1].path,
     "Workbench and overview must have distinct shapes",
   );
+  const navigationSelection = [];
+  for (const name of ["overview", "dashboard"]) {
+    await click(`.nav-item:has([data-icon="${name}"])`);
+    await delay(700);
+    navigationSelection.push(
+      await evaluate(`(() => {
+      const buttons = [...document.querySelectorAll('.nav-item')];
+      const selected = buttons.filter(button => button.getAttribute('aria-current') === 'page');
+      const button = selected[0];
+      const style = getComputedStyle(button);
+      return {name:button.querySelector('.nav-icon').dataset.icon,count:selected.length,background:style.backgroundColor,color:style.color,inactiveBackground:getComputedStyle(buttons.find(item => item !== button)).backgroundColor};
+    })()`),
+    );
+  }
+  assert.ok(
+    navigationSelection.every(
+      (item) =>
+        item.count === 1 &&
+        item.background === "rgb(23, 43, 33)" &&
+        item.color === "rgb(255, 255, 255)" &&
+        item.inactiveBackground === "rgba(0, 0, 0, 0)",
+    ),
+    JSON.stringify(navigationSelection),
+  );
   const minimizeHover = await evaluate(
     `(() => {const r=document.querySelector('[aria-label="最小化"]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`,
   );
@@ -136,17 +160,15 @@ try {
   );
   await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 5, y: 80 });
   console.error("Testing morph geometry");
-  const sample = evaluate(`new Promise(resolve => {
+  const frames = await evaluate(`new Promise(resolve => {
     const values = [];
+    const button = document.querySelector('.topbar [aria-label="刷新"]');
     const frame = () => { values.push(document.querySelector('.topbar [data-icon="refresh"] path').getAttribute('d')); if (values.length < 40) setTimeout(frame, 20); else resolve([...new Set(values)]); };
     frame();
+    button.focus();
   })`);
-  const hover = await evaluate(
-    `(() => {const r = document.querySelector('.topbar [aria-label="刷新"]').getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2};})()`,
-  );
-  await send("Input.dispatchMouseEvent", { type: "mouseMoved", ...hover });
-  const frames = await sample;
-  assert.ok(frames.length > 3, "Hover must morph geometry over multiple frames");
+  assert.ok(frames.length > 3, "Keyboard focus must morph geometry over multiple frames");
+  await evaluate(`document.querySelector('.topbar [aria-label="刷新"]').blur()`);
   await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 5, y: 80 });
   const selection = [];
   for (const status of ["pending", "inProgress", "verification", "closed"]) {
@@ -156,15 +178,24 @@ try {
       const cards = [...document.querySelectorAll('.summary-card')];
       const selected = cards.filter(card => card.getAttribute('aria-pressed') === 'true');
       const card = selected[0];
-      return {status:card.dataset.status, count:selected.length, badge:getComputedStyle(card.querySelector('.summary-selection')).visibility, background:getComputedStyle(card).backgroundColor, border:getComputedStyle(card).borderColor, inactiveBackground:getComputedStyle(cards.find(c=>c!==card)).backgroundColor};
+      return {status:card.dataset.status, count:selected.length, badge:getComputedStyle(card.querySelector('.summary-selection')).visibility, background:getComputedStyle(card).backgroundColor, border:getComputedStyle(card).borderColor, icon:getComputedStyle(card.querySelector('.summary-icon')).color, iconBackground:getComputedStyle(card.querySelector('.summary-icon')).backgroundColor, allIcons:cards.map(item=>getComputedStyle(item.querySelector('.summary-icon')).color), inactiveBackground:getComputedStyle(cards.find(c=>c!==card)).backgroundColor};
     })()`),
     );
   }
   assert.ok(
     selection.every(
-      (item) => item.count === 1 && item.badge === "visible" && item.border === "rgb(35, 104, 71)",
+      (item) =>
+        item.count === 1 &&
+        item.badge === "visible" &&
+        item.border === item.icon &&
+        item.background === "rgb(255, 255, 255)" &&
+        item.inactiveBackground === "rgb(255, 255, 255)" &&
+        item.iconBackground === "rgba(0, 0, 0, 0)" &&
+        new Set(item.allIcons).size === 4,
     ),
+    JSON.stringify(selection),
   );
+  assert.equal(new Set(selection.map((item) => item.border)).size, 4);
   await click('.summary-card[data-status="pending"]');
   const list = await evaluate(
     `([...document.querySelectorAll('.bug-row')].map(row => ({priority:row.querySelector('.priority').textContent,color:getComputedStyle(row.querySelector('.priority')).backgroundColor,fixer:row.querySelector('.bug-fixer').textContent,person:row.querySelector('.person-cell').innerText})))`,
@@ -248,6 +279,7 @@ try {
   const proof = {
     shell,
     navigation,
+    navigationSelection,
     minimizeLineMaxHeight: Math.max(...minimizeHeights),
     list,
     morphFrames: frames.length,

@@ -69,14 +69,14 @@ input[type="radio"] {
 }
 .nav-item.is-active,
 .nav-item.is-active:hover {
-  color: #195435;
-  background: transparent;
-  border-radius: 6px;
-  box-shadow: inset 3px 0 var(--accent);
+  color: #fff;
+  background: var(--forest);
+  border-radius: 14px;
+  box-shadow: none;
   font-weight: 850;
 }
 .nav-item.is-active .nav-icon {
-  color: var(--nav-icon-color, #174f2d);
+  color: color-mix(in srgb, var(--nav-icon-color, #23875c) 45%, white);
 }
 .nav-count,
 .nav-item.is-active .nav-count {
@@ -90,18 +90,19 @@ input[type="radio"] {
 }
 .utility-card.is-active,
 .utility-card.is-active:hover {
-  border-color: var(--accent);
-  background: transparent;
-  box-shadow: inset 2px 0 var(--accent);
-  color: #16472d;
+  border-color: var(--forest);
+  background: var(--forest);
+  box-shadow: none;
+  color: #fff;
 }
 .utility-icon,
 .utility-card-heading > .app-icon,
 .compact-card:last-child .utility-card-heading > .app-icon {
   color: #65786a;
 }
-.utility-card.is-active small {
-  color: #285c37;
+.utility-card.is-active small,
+.utility-card.is-active .utility-icon {
+  color: #c5dccd;
 }
 .connection-light.is-connected,
 .mini-light.is-online {
@@ -125,13 +126,30 @@ input[type="radio"] {
   position: relative;
   --status-color: #236847;
   --status-ink: #195435;
+  background: #fff;
   box-shadow: none;
+}
+.summary-card[data-status="pending"] {
+  --status-color: #cd741f;
+  --status-ink: #a65a16;
+}
+.summary-card[data-status="inProgress"] {
+  --status-color: #4478df;
+  --status-ink: #2f61b9;
+}
+.summary-card[data-status="verification"] {
+  --status-color: #8753ce;
+  --status-ink: #69409f;
+}
+.summary-card[data-status="closed"] {
+  --status-color: #23875c;
+  --status-ink: #196a47;
 }
 .summary-card .summary-icon {
   width: 36px;
   height: 36px;
   background: transparent;
-  color: #7b897f;
+  color: var(--status-color);
   justify-items: start;
 }
 .summary-card.is-selected,
