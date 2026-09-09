@@ -1,0 +1,101 @@
+[
+  {
+    "name": "mapper-nodecheck",
+    "command": [
+      "node",
+      "--check",
+      "scripts/project-components/map-coverage-evidence.mjs"
+    ],
+    "startedAt": "2026-09-09T02:22:07.693Z",
+    "completedAt": "2026-09-09T02:22:07.759Z",
+    "exitCode": 0,
+    "stdout": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/mapper-nodecheck.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/mapper-nodecheck.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "audit-nodecheck",
+    "command": [
+      "node",
+      "--check",
+      "scripts/project-components/map-coverage-evidence.recent-evidence.audit.mjs"
+    ],
+    "startedAt": "2026-09-09T02:22:07.759Z",
+    "completedAt": "2026-09-09T02:22:07.820Z",
+    "exitCode": 0,
+    "stdout": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-nodecheck.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-nodecheck.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "lint",
+    "command": [
+      "node",
+      "node_modules/eslint/bin/eslint.js",
+      "scripts/project-components/map-coverage-evidence.mjs",
+      "scripts/project-components/map-coverage-evidence.recent-evidence.audit.mjs"
+    ],
+    "startedAt": "2026-09-09T02:22:07.820Z",
+    "completedAt": "2026-09-09T02:22:08.730Z",
+    "exitCode": 0,
+    "stdout": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/lint.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/lint.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "format",
+    "command": [
+      "node",
+      "node_modules/prettier/bin/prettier.cjs",
+      "--check",
+      "scripts/project-components/map-coverage-evidence.mjs",
+      "scripts/project-components/map-coverage-evidence.recent-evidence.audit.mjs"
+    ],
+    "startedAt": "2026-09-09T02:22:08.730Z",
+    "completedAt": "2026-09-09T02:22:09.083Z",
+    "exitCode": 0,
+    "stdout": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/format.txt",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "stderr": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/format.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "name": "audit",
+    "command": [
+      "node",
+      "scripts/project-components/map-coverage-evidence.recent-evidence.audit.mjs",
+      "--expected-mapper",
+      "c0de8ebdc985eeecbda449977b0380d1eedef4de33cda2b9d6f524e3c81da02b"
+    ],
+    "startedAt": "2026-09-09T02:22:09.084Z",
+    "completedAt": "2026-09-09T02:22:13.083Z",
+    "exitCode": 0,
+    "stdout": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-final.json",
+      "sha256": "95ab05c2f5061b1b776516bdf3b6087e0d1645a6bc099b3ac8445e5aa48fa419"
+    },
+    "stderr": {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+]

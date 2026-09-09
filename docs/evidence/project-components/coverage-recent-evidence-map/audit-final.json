@@ -1,0 +1,451 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T02:22:13.020Z",
+  "passed": true,
+  "method": "Entire mapper in new Function after import removal and import.meta.url replacement; substitute only matrix reads and capture every writeFileSync in memory. Fixed Date for semantic comparison; six proof tamper/absence cases only alter virtual reads. No generate/map writes, business calls or runtime probes.",
+  "input": {
+    "mapperSha256": "c0de8ebdc985eeecbda449977b0380d1eedef4de33cda2b9d6f524e3c81da02b",
+    "matrixSha256": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "referenceCommit": "3baff66d84dd6ad2f9b5f48230ff4375510269ec",
+    "referenceMapperSha256": "a6ce0ab3e9dda7b910682e4b6584d32dca2eb88dca06f5734dd89b9c35744ee5",
+    "items": 991,
+    "retiredItems": 28,
+    "historicalSourceFiles": 191
+  },
+  "results": {
+    "whole": [
+      9,
+      10,
+      11,
+      12,
+      15,
+      23,
+      24
+    ],
+    "statusDiffs": [],
+    "resultDiffCount": 29,
+    "unexpectedResultDiffs": [],
+    "replayDiffs": [],
+    "replayDiffCount": 0,
+    "semanticSha256": [
+      "aec861ee57ceb1c2d7d39a1e275d96d7236c4bfad34e715920c8b06dd6c4105b",
+      "aec861ee57ceb1c2d7d39a1e275d96d7236c4bfad34e715920c8b06dd6c4105b"
+    ],
+    "retainedNoteCounts": [
+      159,
+      159,
+      159
+    ],
+    "missingRetained": [],
+    "lostCurrentNotes": [],
+    "revalidationFlags": 484,
+    "flagDiffs": [],
+    "syntheticFailedSurfaces": 2080,
+    "syntheticNegativeDiffCount": 0,
+    "syntheticNegativeDiffs": [],
+    "proofTamper": [
+      {
+        "file": "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
+        "rejected": true,
+        "virtualWrites": 0
+      },
+      {
+        "file": "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+        "rejected": true,
+        "virtualWrites": 0
+      },
+      {
+        "file": "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
+        "rejected": true,
+        "virtualWrites": 0
+      },
+      {
+        "file": "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
+        "rejected": true,
+        "virtualWrites": 0
+      },
+      {
+        "file": "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json",
+        "rejected": true,
+        "virtualWrites": 0
+      },
+      {
+        "file": "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
+        "rejected": true,
+        "virtualWrites": 0
+      }
+    ],
+    "optionalAbsence": [
+      {
+        "file": "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
+        "skipped": true,
+        "absentProofMapped": false,
+        "whole": [
+          9,
+          10,
+          11,
+          12,
+          15,
+          23,
+          24
+        ]
+      },
+      {
+        "file": "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+        "skipped": true,
+        "absentProofMapped": false,
+        "whole": [
+          9,
+          10,
+          11,
+          12,
+          15,
+          23,
+          24
+        ]
+      },
+      {
+        "file": "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
+        "skipped": true,
+        "absentProofMapped": false,
+        "whole": [
+          9,
+          10,
+          11,
+          12,
+          15,
+          23,
+          24
+        ]
+      },
+      {
+        "file": "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
+        "skipped": true,
+        "absentProofMapped": false,
+        "whole": [
+          9,
+          10,
+          11,
+          12,
+          15,
+          23,
+          24
+        ]
+      },
+      {
+        "file": "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json",
+        "skipped": true,
+        "absentProofMapped": false,
+        "whole": [
+          9,
+          10,
+          11,
+          12,
+          15,
+          23,
+          24
+        ]
+      },
+      {
+        "file": "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
+        "skipped": true,
+        "absentProofMapped": false,
+        "whole": [
+          9,
+          10,
+          11,
+          12,
+          15,
+          23,
+          24
+        ]
+      }
+    ],
+    "existingReviewedHashVirtualWrites": 0,
+    "recentObservations": [
+      {
+        "id": "web-7904e2c-rejected-media-81",
+        "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
+        "evidence": [
+          "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
+        ]
+      },
+      {
+        "id": "apk-code23-legacy-text-recovery",
+        "version": {
+          "code": 23,
+          "name": "0.2.0-preview.9",
+          "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+        },
+        "evidence": [
+          "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+          "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
+          "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
+        ]
+      },
+      {
+        "id": "android-code23-feed-http13",
+        "version": "code23/0.2.0-preview.9 publication; Windows manifest was .8 at this observation",
+        "evidence": [
+          "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json"
+        ]
+      },
+      {
+        "id": "exe-native-upgrade-7-to-8",
+        "version": {
+          "releaseId": "20260909T000712593Z",
+          "version": "0.2.0-preview.8",
+          "nativeVersion": "0.2.0.8",
+          "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+          "installerBytes": 108333764,
+          "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+        },
+        "evidence": [
+          "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
+        ]
+      },
+      {
+        "id": "exe-native-upgrade-8-to-9",
+        "version": {
+          "releaseId": "20260909T011704801Z",
+          "version": "0.2.0-preview.9",
+          "nativeVersion": "0.2.0.9",
+          "installerBytes": 108334255,
+          "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
+          "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
+          "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+          "sourceDirty": true
+        },
+        "evidence": [
+          "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+        ]
+      }
+    ],
+    "matches": [
+      {
+        "observation": "web-7904e2c-rejected-media-81",
+        "itemId": "baseline-4e70e4b8aea144",
+        "surface": "web",
+        "source": null,
+        "title": "14 并发和重复提交",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "web-7904e2c-rejected-media-81",
+        "itemId": "web_control-f59fc9cda1c3d9",
+        "surface": "web",
+        "source": {
+          "file": "apps/web/src/App.tsx",
+          "line": 3413
+        },
+        "title": "button | 保留失败记录并提交修改稿 | type=\"button\" | onClick={() => void submitBug(undefined, false, bugRejection.id)}",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/init",
+        "itemId": "http_route-52f4781153b6ba",
+        "surface": "http",
+        "source": {
+          "file": "apps/api/src/app.ts",
+          "line": 2533
+        },
+        "title": "POST /api/v1/uploads/init",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "web-7904e2c-rejected-media-81:PUT:/api/v1/uploads/:sessionId/chunks/:chunkNumber",
+        "itemId": "http_route-1aed7cd39c68f5",
+        "surface": "http",
+        "source": {
+          "file": "apps/api/src/app.ts",
+          "line": 2567
+        },
+        "title": "PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/:sessionId/finalize",
+        "itemId": "http_route-fa84a8b7df5b30",
+        "surface": "http",
+        "source": {
+          "file": "apps/api/src/app.ts",
+          "line": 2621
+        },
+        "title": "POST /api/v1/uploads/:sessionId/finalize",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/bugs",
+        "itemId": "http_route-869c95e9cb22b6",
+        "surface": "http",
+        "source": {
+          "file": "apps/api/src/app.ts",
+          "line": 1377
+        },
+        "title": "POST /api/v1/bugs",
+        "preservedStatus": "passed"
+      },
+      {
+        "observation": "apk-code23-legacy-text-recovery",
+        "itemId": "baseline-4e70e4b8aea144",
+        "surface": "apk",
+        "source": null,
+        "title": "14 并发和重复提交",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "apk-code23-legacy-text-recovery",
+        "itemId": "android_control-44808d673345f3",
+        "surface": "apk",
+        "source": {
+          "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
+          "line": 2036
+        },
+        "title": "onClick = { val bytes = image?.takeIf { savedStrokes.isNotEmpty() }?.let { renderAnnotatedPng(draft = draft, strokes = savedStrokes)",
+        "preservedStatus": "passed"
+      },
+      {
+        "observation": "apk-code22-to23-adb-upgrade",
+        "itemId": "baseline-31809d764ba2e7",
+        "surface": "apk",
+        "source": null,
+        "title": "22 APK 共存与升级",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "exe-native-upgrade-7-to-8",
+        "itemId": "baseline-ee6de045b248f3",
+        "surface": "exe",
+        "source": null,
+        "title": "23 EXE 共存与升级",
+        "preservedStatus": "passed"
+      },
+      {
+        "observation": "exe-native-upgrade-7-to-8",
+        "itemId": "desktop_ipc_action-1b2936d4f2c6aa",
+        "surface": "exe",
+        "source": {
+          "file": "apps/desktop/src/main.ts",
+          "line": 690
+        },
+        "title": "handle desktop:get-update-state",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "exe-native-upgrade-7-to-8",
+        "itemId": "desktop_ipc_action-a5c0718eb53782",
+        "surface": "exe",
+        "source": {
+          "file": "apps/desktop/src/main.ts",
+          "line": 696
+        },
+        "title": "handle desktop:check-update",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "exe-native-upgrade-7-to-8",
+        "itemId": "desktop_ipc_action-e1a9ae39f347bc",
+        "surface": "exe",
+        "source": {
+          "file": "apps/desktop/src/main.ts",
+          "line": 701
+        },
+        "title": "handle desktop:install-update",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "exe-native-upgrade-8-to-9",
+        "itemId": "baseline-ee6de045b248f3",
+        "surface": "exe",
+        "source": null,
+        "title": "23 EXE 共存与升级",
+        "preservedStatus": "passed"
+      },
+      {
+        "observation": "exe-native-upgrade-8-to-9",
+        "itemId": "desktop_ipc_action-1b2936d4f2c6aa",
+        "surface": "exe",
+        "source": {
+          "file": "apps/desktop/src/main.ts",
+          "line": 690
+        },
+        "title": "handle desktop:get-update-state",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "exe-native-upgrade-8-to-9",
+        "itemId": "desktop_ipc_action-a5c0718eb53782",
+        "surface": "exe",
+        "source": {
+          "file": "apps/desktop/src/main.ts",
+          "line": 696
+        },
+        "title": "handle desktop:check-update",
+        "preservedStatus": "not_run"
+      },
+      {
+        "observation": "exe-native-upgrade-8-to-9",
+        "itemId": "desktop_ipc_action-e1a9ae39f347bc",
+        "surface": "exe",
+        "source": {
+          "file": "apps/desktop/src/main.ts",
+          "line": 701
+        },
+        "title": "handle desktop:install-update",
+        "preservedStatus": "not_run"
+      }
+    ],
+    "unmatched": [
+      {
+        "observation": "android-code23-feed-http13",
+        "kind": "http_route",
+        "sourceFile": "apps/api/src/android-updates.ts",
+        "selector": "GET /api/v1/android-updates/preview/:fileName"
+      },
+      {
+        "observation": "android-code23-feed-http13",
+        "kind": "http_route",
+        "sourceFile": "apps/api/src/android-updates.ts",
+        "selector": "HEAD /api/v1/android-updates/preview/:fileName"
+      }
+    ]
+  },
+  "checks": {
+    "wholeBaselinesRemainSeven": true,
+    "noEntryOrSurfaceStatusPromotion": true,
+    "exactAllowedResultTargetsOnly": true,
+    "semanticReplayZeroDiff": true,
+    "virtualReviewReplayStable": true,
+    "allOriginalRetainedNotesPreserved": true,
+    "allNonDefaultCurrentNotesPreserved": true,
+    "retainedNotesStable": true,
+    "allRevalidationFlagsUnchanged": true,
+    "allSyntheticFailedResultsAndProgressUntouched": true,
+    "allNewProofHashFailuresBeforeWrite": true,
+    "existingReviewedHashFailsBeforeWrite": true,
+    "absentOptionalProofsDoNotMap": true,
+    "differentNodeGetsNoInheritedObservationOrPass": true,
+    "oldWebHarnessFailureRetained": true,
+    "oldExe8FailureHistoryRetained": true,
+    "noUnrunClientTransfer": true,
+    "noSourceSnapshotRefresh": true,
+    "publicationOnlyValidation": true,
+    "onlyVirtualMatrixAndReviewWrites": true,
+    "actualThreeOutputsByteUnchanged": true
+  },
+  "protectedBefore": {
+    "docs\\evidence\\project-components\\coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+    "docs\\evidence\\project-components\\coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+  },
+  "protectedAfter": {
+    "docs\\evidence\\project-components\\coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+    "docs\\evidence\\project-components\\coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+  },
+  "limits": [
+    "Pure memory mapping only; actual matrix/source inventory not regenerated or published.",
+    "Input 191-source snapshot is historical. Other agents may change API sources without invalidating these historical version-bound proofs; Git dirty is not used as a test verdict.",
+    "Whole baseline14/22 and physical Android remain incomplete; static Web publication is not browser loading acceptance."
+  ]
+}

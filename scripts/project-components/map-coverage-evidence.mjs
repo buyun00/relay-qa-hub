@@ -1964,6 +1964,309 @@ if (webRecoveryItem.results.web.status !== "failed") {
   );
 }
 
+// Recent version-bound observations only add evidence. They never turn a
+// partial control/route into a pass, revalidate current source, or erase a failure.
+const recentEvidence = { observations: [], matches: [], unmatched: [], absent: [] };
+function recentProof(file, sha256) {
+  if (!fs.existsSync(path.join(evidenceRoot, file))) {
+    recentEvidence.absent.push(file);
+    return null;
+  }
+  verifyPinnedProofs({ [file]: sha256 }, "Recent version-bound evidence");
+  return read(file);
+}
+function addRecentObservation(item, surface, observation) {
+  if (!item?.results[surface]?.applicable) return;
+  recentEvidence.matches.push({
+    observation: observation.id,
+    itemId: item.id,
+    surface,
+    source: item.source,
+    title: item.title,
+    preservedStatus: item.results[surface].status,
+  });
+  if (item.results[surface].status === "failed") return;
+  item.manual.recentEvidenceObservations ??= [];
+  if (!item.manual.recentEvidenceObservations.some((entry) => entry.id === observation.id))
+    item.manual.recentEvidenceObservations.push(structuredClone(observation));
+  if (item.results[surface].status === "not_run") {
+    const prior = item.manual.surfaceProgress?.[surface];
+    progress(
+      item,
+      surface,
+      [...new Set([...item.results[surface].evidence, ...observation.evidence])],
+      [...new Set([...[].concat(prior?.completed ?? []), observation.completed])],
+      [...new Set([...[].concat(prior?.remaining ?? []), observation.remaining])],
+    );
+  }
+  // A pre-existing pass remains historical. Keep its receipt and status intact;
+  // the additional scoped branch is visible in recentEvidenceObservations.
+}
+function recentMatch(kind, sourceFile, predicate, surface, observation, selector) {
+  const items = matrix.items.filter(
+    (item) => item.kind === kind && item.source?.file === sourceFile && predicate(item),
+  );
+  if (!items.length)
+    recentEvidence.unmatched.push({ observation: observation.id, kind, sourceFile, selector });
+  for (const item of items) addRecentObservation(item, surface, observation);
+}
+function rememberRecent(observation) {
+  recentEvidence.observations.push(observation);
+  return observation;
+}
+
+const rejectedMediaFile =
+  "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json";
+const rejectedMedia = recentProof(
+  rejectedMediaFile,
+  "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb",
+);
+if (rejectedMedia) {
+  if (
+    rejectedMedia.status !== "passed" ||
+    rejectedMedia.checks.length !== 81 ||
+    rejectedMedia.checks.some((check) => check.passed !== true) ||
+    rejectedMedia.rejections.length !== 1 ||
+    rejectedMedia.rejections[0].status !== 400 ||
+    rejectedMedia.rejections[0].response.code !== "UPLOAD_CONTENT_INVALID" ||
+    rejectedMedia.boundaries.syntheticResponse !== false ||
+    rejectedMedia.boundaries.existingBrowserOrExeAttached !== false ||
+    rejectedMedia.publishedSourceCommit !== pendingPublication.sourceCommit
+  )
+    throw new Error("Recent Web rejected-media evidence differs from reviewed 81 cases");
+  const observation = rememberRecent({
+    id: "web-7904e2c-rejected-media-81",
+    evidence: [rejectedMediaFile],
+    version: rejectedMedia.publishedSourceCommit,
+    sourceHashesAtExecution: rejectedMedia.sourceHashes,
+    completed:
+      "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
+    remaining:
+      "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。",
+  });
+  addRecentObservation(baselineItem(14), "web", observation);
+  recentMatch(
+    "web_control",
+    "apps/web/src/App.tsx",
+    (item) =>
+      item.id === "web_control-f59fc9cda1c3d9" &&
+      item.title.includes("submitBug(undefined, false, bugRejection.id)"),
+    "web",
+    observation,
+    "Bug rejection recovery button; exclude comment button with the same visible label",
+  );
+  for (const [method, route] of [
+    ["POST", "/api/v1/uploads/init"],
+    ["PUT", "/api/v1/uploads/:sessionId/chunks/:chunkNumber"],
+    ["POST", "/api/v1/uploads/:sessionId/finalize"],
+    ["POST", "/api/v1/bugs"],
+  ])
+    recentMatch(
+      "http_route",
+      "apps/api/src/app.ts",
+      (item) => item.method === method && item.path === route,
+      "http",
+      { ...observation, id: observation.id + ":" + method + ":" + route },
+      method + " " + route,
+    );
+}
+
+const android23File =
+  "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json";
+const android23 = recentProof(
+  android23File,
+  "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56",
+);
+if (android23) {
+  if (
+    android23.status !== "passed_scoped_legacy_text_recovery" ||
+    android23.artifact.versionCode !== 23 ||
+    android23.componentsDisabled !== true ||
+    android23.proxy.dropped !== 4 ||
+    android23.proxy.forwardedCreates !== 5 ||
+    android23.proxy.proxyRetries !== 0 ||
+    android23.room.receiptCount !== 1 ||
+    android23.room.originalIntentUnchanged !== true ||
+    android23.room.editedDraftRetained !== true ||
+    android23.legacy.firstAdoptionSentNoRequest !== true ||
+    android23.upgrade.installExitCode !== 0 ||
+    android23.finalDevice.dailyPidAndSettingsUnchanged !== true
+  )
+    throw new Error("Recent Android code23 recovery evidence differs from reviewed scope");
+  const publicPrefix = "docs/evidence/project-components/";
+  for (const proof of android23.independentEvidence) {
+    if (!proof.path.startsWith(publicPrefix) || proof.path.includes(".."))
+      throw new Error("Android independent proof must remain public");
+    verifyPinnedProofs({ [proof.path.slice(publicPrefix.length)]: proof.sha256 }, "Android code23");
+  }
+  const observation = rememberRecent({
+    id: "apk-code23-legacy-text-recovery",
+    evidence: [
+      android23File,
+      ...android23.independentEvidence.map((p) => p.path.slice(publicPrefix.length)),
+    ],
+    version: {
+      code: 23,
+      name: android23.artifact.versionName,
+      apkSha256: android23.artifact.sha256,
+    },
+    preservedFailures: android23.failuresRetained,
+    completed:
+      "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。",
+    remaining:
+      "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。",
+  });
+  addRecentObservation(baselineItem(14), "apk", observation);
+  recentMatch(
+    "android_control",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
+    (item) =>
+      item.id === "android_control-44808d673345f3" &&
+      item.title.startsWith("onClick = { val bytes = image?"),
+    "apk",
+    observation,
+    "NewBugPage ordinary submit used to confirm adopted legacy text intent; not reconfirm-original-creation button",
+  );
+  addRecentObservation(baselineItem(22), "apk", {
+    ...observation,
+    id: "apk-code22-to23-adb-upgrade",
+    completed:
+      "MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。",
+    remaining:
+      "物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。",
+  });
+}
+
+const androidFeedFile =
+  "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json";
+const androidFeed = recentProof(
+  androidFeedFile,
+  "ab97c596e0cd33811fe4311d7956ddd04d091f5feb9de4533bdeb3324bc56c7d",
+);
+if (androidFeed) {
+  if (
+    androidFeed.status !== "published_and_http_readback_verified" ||
+    androidFeed.requests.length !== 13 ||
+    androidFeed.componentGate.enabledRows !== 0 ||
+    androidFeed.boundaries.nativeUpdateVerified !== false ||
+    JSON.stringify(androidFeed.apiBefore) !== JSON.stringify(androidFeed.apiAfter)
+  )
+    throw new Error("Android feed publication differs from the reviewed 13 reads");
+  validationEvidence.push({
+    file: androidFeedFile,
+    matched: true,
+    summary:
+      "code23同包preview feed发布13个真实HTTP：GET/HEAD/206 range及完整APK SHA核对；旧code22与发布时Windows.8保留",
+    scope:
+      "仅发布/下载与API身份记录；stable未选channel的401保留。不是APK原生自更新，后来的Windows.9更新不是本次失败。",
+  });
+  const observation = rememberRecent({
+    id: "android-code23-feed-http13",
+    evidence: [androidFeedFile],
+    version: "code23/0.2.0-preview.9 publication; Windows manifest was .8 at this observation",
+    completed:
+      "已选择preview的匿名manifest/APK GET、HEAD及range均按原始13条ledger实测，原code22下载仍可用。",
+    remaining: "仅固定preview下载输入；客户端更新UI、所有错误组合及物理设备未测。",
+  });
+  for (const [method, route] of [
+    ["GET", "/api/v1/android-updates/preview/:fileName"],
+    ["HEAD", "/api/v1/android-updates/preview/:fileName"],
+  ])
+    recentMatch(
+      "http_route",
+      "apps/api/src/android-updates.ts",
+      (item) => item.method === method && item.path === route,
+      "http",
+      observation,
+      method + " " + route,
+    );
+}
+
+for (const [version, file, sha256] of [
+  [
+    8,
+    "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
+    "02522989982733987c86ee90132f3251e50a70f0a257a6c6b9723bf6cc6d867a",
+  ],
+  [
+    9,
+    "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json",
+    "9a5184a94eee7493ac3020b052e9ae7775988c50fd993d04c745cd26eccfe789",
+  ],
+]) {
+  const proof = recentProof(file, sha256);
+  if (!proof) continue;
+  if (
+    proof.actualUpdate.updater.status !== "installed" ||
+    proof.release.nativeVersion !== `0.2.0.${version}` ||
+    proof.actualUpdate.previousPid === proof.actualUpdate.newPid ||
+    proof.coldRetention.fileCount !== 67
+  )
+    throw new Error("Recent EXE upgrade proof differs from reviewed version");
+  const observation = rememberRecent({
+    id: `exe-native-upgrade-${version - 1}-to-${version}`,
+    evidence: [file],
+    version: proof.release,
+    preservedFinding:
+      version === 8
+        ? proof.openFinding
+        : "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
+    completed: `EXE实际原生${version - 1}→${version}检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。`,
+    remaining:
+      version === 8
+        ? ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
+        : ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。",
+  });
+  addRecentObservation(baselineItem(23), "exe", observation);
+  for (const title of [
+    "handle desktop:get-update-state",
+    "handle desktop:check-update",
+    "handle desktop:install-update",
+  ])
+    recentMatch(
+      "desktop_ipc_action",
+      "apps/desktop/src/main.ts",
+      (item) => item.title === title,
+      "exe",
+      observation,
+      title + " successful native status/update branch only",
+    );
+}
+
+const recentWebDeployFile =
+  "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json";
+const recentWebDeploy = recentProof(
+  recentWebDeployFile,
+  "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63",
+);
+if (recentWebDeploy) {
+  if (
+    recentWebDeploy.status !== "published_verified" ||
+    recentWebDeploy.requests.length !== 18 ||
+    recentWebDeploy.requests.some((entry) => entry.status !== 200) ||
+    recentWebDeploy.servedAfter.count !== 12 ||
+    recentWebDeploy.boundaries.uiValidation !== "not_run" ||
+    JSON.stringify(recentWebDeploy.webBefore) !== JSON.stringify(recentWebDeploy.webAfter)
+  )
+    throw new Error("Recent Web publication differs from reviewed 18 reads");
+  validationEvidence.push({
+    file: recentWebDeployFile,
+    matched: true,
+    summary:
+      "bc2b347对应.9包中共享Web部署：18 GET/HEAD全部200、8候选SHA、12 served文件及Web进程身份保持",
+    scope:
+      "仅静态下载和发布时进程证据；无新服务启停，不代表真实Web loading页面验收，不将.9原生EXE UI传递到Web。",
+  });
+}
+matrix.evidenceMapping.recentVersionedEvidence = {
+  ...recentEvidence,
+  inputSourceFileCount: Object.keys(matrix.sourceHashes).length,
+  sourceSnapshotScope:
+    "Input matrix sourceHashes/sourceHead describe its previous generation, not current source. This append neither refreshes that inventory nor clears revalidation flags.",
+  statusPolicy:
+    "No status promotion. Historical passes/failures remain; current-source/new-node verification and whole baselines are independent.",
+};
+
 // Several reviewed passes may temporarily revisit the same result. If its
 // actual observation is unchanged, retain the incoming note rather than an
 // incidental automatic note from one of those intermediate passes.
@@ -2049,6 +2352,19 @@ const review = [
   ...validationEvidence.map(
     (entry) =>
       `- ${entry.summary}：${entry.matched ? "已有成功输出" : "输出需复核"}，见[${entry.file}](${entry.file})。${entry.scope}。`,
+  ),
+  "",
+  "## 近期指定版本的部分实测",
+  "",
+  "以下只补充原始版本的证据与精确入口，不提升任何行的状态，不清除旧失败或源码复验标记。EXE已通过的升级基线保留原结果，新版本事实另列；共享Web静态部署不代替浏览器loading验收。",
+  "",
+  ...recentEvidence.observations.map(
+    (entry) =>
+      `- ${entry.id}：[原始证据](${entry.evidence[0]})。${entry.completed} ${entry.remaining}`,
+  ),
+  ...recentEvidence.unmatched.map(
+    (entry) =>
+      `- 清单缺项：${entry.selector}（${entry.sourceFile}）；仅保存原始观察，等待后续生成器盘点，不虚建当前条目或计通过。`,
   ),
   "",
   "严格旧合同冻结失败保留为历史，后续六条响应边界修复已有独立五步门禁成功日志与实际HTTP读回。旧1.0请求/blocked写入、未注册的fail/supersede POST和workflow GET仍缺，静态合同通过不代表全部运行能力。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。",

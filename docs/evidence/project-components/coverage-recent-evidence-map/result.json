@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "status": "source_frozen_pure_memory_audit_passed_actual_matrix_not_written",
+  "observedAt": "2026-09-09T02:23:25.549Z",
+  "sourceFiles": [
+    {
+      "path": "scripts/project-components/map-coverage-evidence.mjs",
+      "bytes": 105423,
+      "sha256": "c0de8ebdc985eeecbda449977b0380d1eedef4de33cda2b9d6f524e3c81da02b"
+    },
+    {
+      "path": "scripts/project-components/map-coverage-evidence.recent-evidence.audit.mjs",
+      "bytes": 14686,
+      "sha256": "d04f85fdd625a2bceee9aa36e843d64aa44341abce0b19a434e1fc13a1145ab7"
+    }
+  ],
+  "proofs": [
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
+      "bytes": 237342,
+      "sha256": "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+      "bytes": 13294,
+      "sha256": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
+      "bytes": 12970,
+      "sha256": "ab97c596e0cd33811fe4311d7956ddd04d091f5feb9de4533bdeb3324bc56c7d"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
+      "bytes": 13722,
+      "sha256": "02522989982733987c86ee90132f3251e50a70f0a257a6c6b9723bf6cc6d867a"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json",
+      "bytes": 30300,
+      "sha256": "9a5184a94eee7493ac3020b052e9ae7775988c50fd993d04c745cd26eccfe789"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
+      "bytes": 40539,
+      "sha256": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-final.json",
+      "bytes": 15089,
+      "sha256": "95ab05c2f5061b1b776516bdf3b6087e0d1645a6bc099b3ac8445e5aa48fa419"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-first.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-first.stdout.txt",
+      "bytes": 15050,
+      "sha256": "9d37d2b3de45f3932de22be3adf6e26a21799f1b91c0797740aaeb6d662602f8"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-nodecheck.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit-nodecheck.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/audit.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/format.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/format.txt",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/gates.json",
+      "bytes": 3708,
+      "sha256": "61843881b17b4fe2b0dd829a6764087eafb82fda07f88564c82de8c1920ef077"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/lint.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/lint.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/mapper-nodecheck.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-recent-evidence-map/mapper-nodecheck.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "checks": {
+    "passed": 21,
+    "total": 21
+  },
+  "summary": {
+    "wholePassed": [
+      9,
+      10,
+      11,
+      12,
+      15,
+      23,
+      24
+    ],
+    "wholeCount": 7,
+    "totalBaselines": 24,
+    "statusChanges": 0,
+    "matchedObservations": 17,
+    "uniqueItems": 12,
+    "uniqueItemSurfaces": 13,
+    "unmatched": [
+      {
+        "observation": "android-code23-feed-http13",
+        "kind": "http_route",
+        "sourceFile": "apps/api/src/android-updates.ts",
+        "selector": "GET /api/v1/android-updates/preview/:fileName"
+      },
+      {
+        "observation": "android-code23-feed-http13",
+        "kind": "http_route",
+        "sourceFile": "apps/api/src/android-updates.ts",
+        "selector": "HEAD /api/v1/android-updates/preview/:fileName"
+      }
+    ],
+    "semanticSha256": [
+      "aec861ee57ceb1c2d7d39a1e275d96d7236c4bfad34e715920c8b06dd6c4105b",
+      "aec861ee57ceb1c2d7d39a1e275d96d7236c4bfad34e715920c8b06dd6c4105b"
+    ],
+    "semanticDiffs": 0,
+    "retainedNoteCounts": [
+      159,
+      159,
+      159
+    ],
+    "revalidationFlags": 484,
+    "allExistingFlagsPreserved": true,
+    "syntheticFailedSurfaces": 2080,
+    "syntheticFailedOrProgressChanges": 0,
+    "newProofTamperCases": 6,
+    "oldReviewedProofTamperCases": 1,
+    "allHashFailuresBeforeVirtualWrite": true,
+    "existingInputItems": 991,
+    "existingRetiredItems": 28,
+    "historicalInputSourceFiles": 191,
+    "inputSourceSnapshotRefreshed": false,
+    "actualOutputsChanged": 0
+  },
+  "scope": {
+    "implemented": "Only mapper + one replayable audit script; new evidence folder only.",
+    "run": "Full mapper current/reference/second replay, synthetic failures, changed-node and virtual proof absence/hash-tamper cases. All writes intercepted.",
+    "noActualGenerateOrMap": true,
+    "noBusinessOrNetworkCalls": true,
+    "noRuntimeOrProductionReads": true,
+    "noAppOrGeneratorChanges": true,
+    "noGitCommit": true
+  },
+  "preservedHistory": [
+    "Initial successful pure-memory 20-check audit kept as audit-first.stdout.txt; final version adds readable generated-review section and its stability assertion (21 checks).",
+    "Web first38-check harness failure remains in original mapper history; new81 bad-media success does not erase it.",
+    "Android code23 initial upgrade precheck/signature environment failures and three optional unauthenticated update denials preserved as historical facts.",
+    "EXE.8 false-failure observation remains open for installed.8; .9 sampled loading-to-loaded is limited to those native observations."
+  ],
+  "limits": [
+    "17 matched observation links are not 17 new passes. All statuses are unchanged.",
+    "14 Web/APK and22 APK remain partial/not_run; physical Android and application self-update are not waived.",
+    "The historical matrix has no generated Android preview GET/HEAD route entries; their observations remain explicitly unmatched. Generator inventory awaits a separately authorized run.",
+    "Web static deployment is validationEvidence only, not a browser loading test.",
+    "Existing191-file source snapshot is historical. Concurrent unrelated API source work is not tested by this audit and Git dirty is not a verdict.",
+    "Public generic-pattern scan is bounded to these new source/audit files; no private secret values were accessed."
+  ],
+  "secretScan": {
+    "files": 15,
+    "patternHits": 0,
+    "exactSecretValueComparison": false
+  }
+}
