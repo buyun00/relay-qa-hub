@@ -1,0 +1,50 @@
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (296.45ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (86.2213ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (36.2398ms)
+✔ actual MCP HTTP reports protocol errors separately and retains 90 tools plus the frozen result tool (82.0686ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (93.6097ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (13.5995ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (406.9654ms)
+✔ actual worker MCP passed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (1109.6103ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-6VcD7b; 18 real HTTP requests; schema 17
+✔ actual worker MCP failed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (765.9001ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-anN5Rj; 18 real HTTP requests; schema 17
+✔ actual worker MCP blocked: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (963.2069ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-yVVYry; 23 real HTTP requests; schema 17
+✔ MCP result catalog is additive, explicit and vendor-only; invalid scope/key/body never writes (880.7964ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-UC0bcv; 29 real HTTP requests; schema 17
+✔ MCP result enforces current assigned verifier, Cookie CSRF, revocation and deletion on first write and replay (1419.5955ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-mBSUvu; 21 real HTTP requests; schema 17
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-X3FjGt; 13 real HTTP requests; schema 17
+✖ ordinary MCP human closure retains employee permissions and does not reinterpret blocked as an old action (570.2781ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-vHw10b; 14 real HTTP requests; schema 17
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6224.8875
+
+✖ failing tests:
+
+test at apps\api\test\automation-verification-result.test.mjs:595:1
+✖ ordinary MCP human closure retains employee permissions and does not reinterpret blocked as an old action (570.2781ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'db941592-c861-412f-873b-af9a820e02d4'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:646:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'db941592-c861-412f-873b-af9a820e02d4',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

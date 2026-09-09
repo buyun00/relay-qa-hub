@@ -1,0 +1,131 @@
+▶ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation
+  ✔ secondary artifact fallback preserves exact bytes for another reader of the bound Bug (89.363ms)
+  ✔ wrong Bug, project, membership, resource URI and nested capture project cannot expose evidence (74.9734ms)
+  ✔ only validated clean content is exposed; disk and transport checksum failures are rejected (156.4851ms)
+  ✔ soft deletion denies capture metadata and raw artifacts while preserving stored evidence (76.0322ms)
+✔ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation (1579.692ms)
+✔ actual MCP HTTP and SQLite: attachment upload, resource read, project isolation and API parity (1168.1041ms)
+✔ actual HTTP and SQLite paginate 501 comments and 101 bound attachments without scope or content loss (10457.343ms)
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (377.5267ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (145.6434ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (51.0645ms)
+✔ actual MCP HTTP reports protocol errors separately and retains 90 tools plus the frozen result tool (106.5667ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (109.8397ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (21.4841ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (586.2095ms)
+✔ actual worker MCP passed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (1610.8489ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-AHOueL; 18 real HTTP requests; schema 17
+✔ actual worker MCP failed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (1022.6461ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-pfYNAY; 18 real HTTP requests; schema 17
+✔ actual worker MCP blocked: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (1231.3119ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-GzwGrg; 23 real HTTP requests; schema 17
+✔ MCP result catalog is additive, explicit and vendor-only; invalid scope/key/body never writes (869.3409ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-BW3rKC; 29 real HTTP requests; schema 17
+✔ MCP result enforces current assigned verifier, Cookie CSRF, revocation and deletion on first write and replay (1465.1693ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-Huibnk; 21 real HTTP requests; schema 17
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-E5qOK9; 13 real HTTP requests; schema 17
+✔ ordinary MCP human closure retains employee permissions and does not reinterpret blocked as an old action (774.6704ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-yJx4ZW; 15 real HTTP requests; schema 17
+✔ frozen response schemas reject every nonempty rich DTO extension (105.2592ms)
+✔ createRepairAttempt: default returns its frozen wire response without modifying history (218.935ms)
+✔ createRepairAttempt: wildcard keeps current default returns its frozen wire response without modifying history (54.9303ms)
+✔ createRepairAttempt: explicit vendor returns its frozen wire response without modifying history (50.2065ms)
+✔ createRepairAttempt: legacy JSON returns its frozen wire response without modifying history (40.9557ms)
+✔ createRepairAttempt: vendor preferred over JSON returns its frozen wire response without modifying history (34.5616ms)
+✔ createRepairAttempt: JSON has higher quality returns its frozen wire response without modifying history (27.8262ms)
+✔ createRepairAttempt: equal quality puts JSON first returns its frozen wire response without modifying history (32.0782ms)
+✔ createRepairAttempt: equal quality puts vendor first returns its frozen wire response without modifying history (27.992ms)
+✔ startRepairAttempt: default returns its frozen wire response without modifying history (36.0158ms)
+✔ startRepairAttempt: wildcard keeps current default returns its frozen wire response without modifying history (32.7469ms)
+✔ startRepairAttempt: explicit vendor returns its frozen wire response without modifying history (30.8817ms)
+✔ startRepairAttempt: legacy JSON returns its frozen wire response without modifying history (23.2781ms)
+✔ startRepairAttempt: vendor preferred over JSON returns its frozen wire response without modifying history (21.1196ms)
+✔ startRepairAttempt: JSON has higher quality returns its frozen wire response without modifying history (28.1127ms)
+✔ startRepairAttempt: equal quality puts JSON first returns its frozen wire response without modifying history (28.0986ms)
+✔ startRepairAttempt: equal quality puts vendor first returns its frozen wire response without modifying history (26.9177ms)
+✔ deliverRepairAttempt: default returns its frozen wire response without modifying history (27.7392ms)
+✔ deliverRepairAttempt: wildcard keeps current default returns its frozen wire response without modifying history (30.8843ms)
+✔ deliverRepairAttempt: explicit vendor returns its frozen wire response without modifying history (33.0824ms)
+✔ deliverRepairAttempt: legacy JSON returns its frozen wire response without modifying history (34.1246ms)
+✔ deliverRepairAttempt: vendor preferred over JSON returns its frozen wire response without modifying history (36.7669ms)
+✔ deliverRepairAttempt: JSON has higher quality returns its frozen wire response without modifying history (26.8418ms)
+✔ deliverRepairAttempt: equal quality puts JSON first returns its frozen wire response without modifying history (26.8789ms)
+✔ deliverRepairAttempt: equal quality puts vendor first returns its frozen wire response without modifying history (21.8514ms)
+✔ createVerification: default returns its frozen wire response without modifying history (21.9193ms)
+✔ createVerification: wildcard keeps current default returns its frozen wire response without modifying history (28.1583ms)
+✔ createVerification: explicit vendor returns its frozen wire response without modifying history (27.812ms)
+✔ createVerification: legacy JSON returns its frozen wire response without modifying history (24.5378ms)
+✔ createVerification: vendor preferred over JSON returns its frozen wire response without modifying history (29.4976ms)
+✔ createVerification: JSON has higher quality returns its frozen wire response without modifying history (28.3274ms)
+✔ createVerification: equal quality puts JSON first returns its frozen wire response without modifying history (19.349ms)
+✔ createVerification: equal quality puts vendor first returns its frozen wire response without modifying history (23.302ms)
+✔ startVerification: default returns its frozen wire response without modifying history (23.267ms)
+✔ startVerification: wildcard keeps current default returns its frozen wire response without modifying history (24.2511ms)
+✔ startVerification: explicit vendor returns its frozen wire response without modifying history (33.7737ms)
+✔ startVerification: legacy JSON returns its frozen wire response without modifying history (30.1263ms)
+✔ startVerification: vendor preferred over JSON returns its frozen wire response without modifying history (36.7719ms)
+✔ startVerification: JSON has higher quality returns its frozen wire response without modifying history (27.0769ms)
+✔ startVerification: equal quality puts JSON first returns its frozen wire response without modifying history (25.3686ms)
+✔ startVerification: equal quality puts vendor first returns its frozen wire response without modifying history (21.1354ms)
+✔ recordVerificationResult: default returns its frozen wire response without modifying history (45.1658ms)
+✔ recordVerificationResult: wildcard keeps current default returns its frozen wire response without modifying history (15.1889ms)
+✔ recordVerificationResult: explicit vendor returns its frozen wire response without modifying history (17.3855ms)
+✔ recordVerificationResult: legacy JSON returns its frozen wire response without modifying history (32.4894ms)
+✔ recordVerificationResult: vendor preferred over JSON returns its frozen wire response without modifying history (30.6061ms)
+✔ recordVerificationResult: JSON has higher quality returns its frozen wire response without modifying history (16.9338ms)
+✔ recordVerificationResult: equal quality puts JSON first returns its frozen wire response without modifying history (18.5254ms)
+✔ recordVerificationResult: equal quality puts vendor first returns its frozen wire response without modifying history (19.4962ms)
+✔ RepairAttempt detail keeps complete rich facts on its unfrozen GET (11.0541ms)
+✔ Verification detail keeps complete rich facts on its unfrozen GET (12.1272ms)
+✔ Bug human-workflow history keeps complete rich facts on its unfrozen GET (12.3444ms)
+✔ real HTTP vendor passed preserves the exact original receipt after later Bug edits (1574.3602ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-1fFuzW; 16 real HTTP requests
+✔ real HTTP vendor failed preserves the exact original receipt after later Bug edits (1033.1241ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-6iuwmj; 16 real HTTP requests
+✔ real HTTP legacy passed preserves the exact original receipt after later Bug edits (980.4937ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-qG7Nmj; 15 real HTTP requests
+✔ real HTTP legacy failed preserves the exact original receipt after later Bug edits (762.6554ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-1O50r9; 15 real HTTP requests
+✔ legacy Accept q-values and malformed bodies reject before any domain write (795.0515ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-lAD1BJ; 25 real HTTP requests
+✔ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (703.7185ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-uToioC; 22 real HTTP requests
+✔ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (754.9229ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-UHln6M; 17 real HTTP requests
+✔ legal long Unicode/control text exceeds generic 64KiB while exact immutable replay and recovery remain valid (964.4017ms)
+ℹ immutable result bytes=106665; online backup restored without re-execution
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-w6ZLSz; 12 real HTTP requests
+✔ manual takeover preserves actual non-null parentAttemptId in frozen result and original replay (676.5256ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-qox8P6; 14 real HTTP requests
+(node:20020) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ fixed pre-Phase-A writer leaves IDs-only history intact; new replay refuses to reconstruct it (863.9859ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-TiSyur; 13 real HTTP requests
+✔ snapshot/pointer exact shape, types, scope and digest cannot be replaced; rejected transactions leave all facts intact (1151.3553ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-9kACMd; 10 real HTTP requests
+✔ vendor result final receipt failure rolls back domain, event, notification, snapshot and submission atomically (775.8866ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-TK0QcH; 12 real HTTP requests
+✔ legacy result final receipt failure rolls back domain, event, notification, snapshot and submission atomically (681.6288ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-ZRCnUB; 12 real HTTP requests
+✔ ordinary multi-employee closure remains allowed while the frozen result requires its assigned verifier, including replay (638.3782ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-zmPhMJ; 16 real HTTP requests
+✔ blocked vendor retains the delivered Attempt and original receipt across another complete Verification (1709.6481ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-1n1KXM; 20 real HTTP requests
+✔ blocked vendor reason guards and current authorization leave all transaction facts unchanged (1164.4298ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-qNP26C; 25 real HTTP requests
+✔ blocked legacy retains the delivered Attempt and original receipt across another complete Verification (1033.2968ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-FNlIQE; 20 real HTTP requests
+✔ blocked legacy reason guards and current authorization leave all transaction facts unchanged (811.6446ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-36HEa6; 25 real HTTP requests
+✔ blocked result full UTF-16 limits preserve original text while escaping audit payload safely (651.3063ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-qQpPhK; 12 real HTTP requests
+✔ blocked receipt failure rolls back Verification, Bug pointers, Event, outbox and snapshot atomically (764.1204ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-SrRnZr; 12 real HTTP requests
+ℹ tests 92
+ℹ suites 0
+ℹ pass 92
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13175.453

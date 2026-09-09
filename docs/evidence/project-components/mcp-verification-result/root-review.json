@@ -1,0 +1,45 @@
+{
+  "at": "2026-09-09T03:50:52.146Z",
+  "kind": "root independent code and evidence review",
+  "sourceHead": "758ddf5f29234c66b0b91551be4b4f320ee3061d",
+  "sources": [
+    {
+      "path": "apps/api/src/automation.ts",
+      "bytes": 30961,
+      "sha256": "eb2c5683f65207282753d32b01880fef0468590d2f0fb15ae32c7e8d060427ba",
+      "modifiedAt": "2026-09-09T03:33:07.730Z"
+    },
+    {
+      "path": "apps/api/src/automation-verification-result.ts",
+      "bytes": 4044,
+      "sha256": "adf2b08b2e731f85c5bb1b21ce47494318d190bc72d80a6621cf7c61f6fb4d61",
+      "modifiedAt": "2026-09-09T03:33:07.729Z"
+    },
+    {
+      "path": "apps/api/test/automation-protocol.test.mjs",
+      "bytes": 16057,
+      "sha256": "3a22ad45986f63eddbc24bc2e7c1c323ba4626dd3dca829669f3505a786dbac5",
+      "modifiedAt": "2026-09-09T03:33:07.731Z"
+    },
+    {
+      "path": "apps/api/test/automation-verification-result.test.mjs",
+      "bytes": 23780,
+      "sha256": "621b9a0ca393b82386073f1d25881ae3b79d91636921334efec270409d427539",
+      "modifiedAt": "2026-09-09T03:43:18.671Z"
+    }
+  ],
+  "checks": {
+    "fixedToolPathAndCallerSubmissionId": true,
+    "existingAuthenticationAndProjectForwardingRetained": true,
+    "vendorParserAndCanonicalKeyReused": true,
+    "ordinaryHumanActionUnchanged": true,
+    "original90CatalogCountRetained": true,
+    "sourceAndAllRecordedRawHashesMatch": true,
+    "retainedFailuresReviewed": true
+  },
+  "limits": [
+    "Independent review, not another live run.",
+    "Current common dist may be rebuilt by the D integrator; the result records exact earlier execution bytes.",
+    "New tool nonempty attachments/capture and installed clients remain untested."
+  ]
+}

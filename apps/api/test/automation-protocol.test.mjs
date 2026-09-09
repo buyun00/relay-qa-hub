@@ -185,7 +185,7 @@ test("actual MCP HTTP accepts notifications and responses without executing tool
   assert.equal(f.calls.length, 0);
 });
 
-test("actual MCP HTTP reports protocol errors separately and retains the 90 business tools", async (t) => {
+test("actual MCP HTTP reports protocol errors separately and retains 90 tools plus the frozen result tool", async (t) => {
   const f = await fixture(t);
   assert.equal((await f.rpc("unknown/method", {})).error.code, -32601);
   assert.equal((await f.rpc("notifications/initialized", {})).error.code, -32601);
@@ -205,7 +205,9 @@ test("actual MCP HTTP reports protocol errors separately and retains the 90 busi
     assert.equal((await f.rpc(method, params)).error.code, -32602);
   assert.equal(f.calls.length, 0);
   const catalog = (await f.rpc("tools/list")).result.tools;
-  assert.equal(catalog.length, 90);
+  assert.equal(catalog.length, 91);
+  assert.equal(catalog.filter((tool) => tool.name !== "qa_record_verification_result").length, 90);
+  assert.equal(catalog.filter((tool) => tool.name === "qa_record_verification_result").length, 1);
   assert.deepEqual(catalog, AUTOMATION_TOOLS);
   assert.deepEqual((await f.rpc("resources/list")).result, { resources: [] });
   assert.equal((await f.rpc("resources/templates/list")).result.resourceTemplates.length, 1);

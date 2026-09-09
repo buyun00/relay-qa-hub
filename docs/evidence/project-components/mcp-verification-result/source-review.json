@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-09-09T03:49:22.911Z",
+  "kind": "independent bounded source review",
+  "verdict": "no high-confidence blocking issue found",
+  "sources": [
+    {
+      "path": "apps/api/src/automation-verification-result.ts",
+      "sha256": "adf2b08b2e731f85c5bb1b21ce47494318d190bc72d80a6621cf7c61f6fb4d61"
+    },
+    {
+      "path": "apps/api/src/automation.ts",
+      "sha256": "eb2c5683f65207282753d32b01880fef0468590d2f0fb15ae32c7e8d060427ba"
+    }
+  ],
+  "checks": [
+    {
+      "name": "fixed command shape",
+      "result": "passed",
+      "detail": "Allowed top-level arguments are projectId, verificationId, request and idempotencyKey; UUID scope is checked before constructing the one fixed local HTTP path."
+    },
+    {
+      "name": "frozen parser and command identity",
+      "result": "passed",
+      "detail": "Uses the actual 1.1 verification-result parser. Canonical key binds verification/version, a supplied different key is rejected; no random new submission identity is invented."
+    },
+    {
+      "name": "request-bound authentication",
+      "result": "passed",
+      "detail": "Original authorization/cookie/origin/CSRF headers are captured per request in a WeakMap and forwarded into app.inject; explicit project scope is a header. The existing business route revalidates actor and assigned-verifier rights for first write and replay."
+    },
+    {
+      "name": "DTO and effect boundary",
+      "result": "passed",
+      "detail": "Returns original authenticated business response; the tool does not project a new result or execute an external task."
+    }
+  ],
+  "limitations": [
+    "Read-only repository review; no API/UI/device or service operation performed for this review.",
+    "Author test and live facts remain in their separately hashed evidence; this review adds no business acceptance result."
+  ]
+}

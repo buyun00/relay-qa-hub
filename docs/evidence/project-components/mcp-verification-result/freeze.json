@@ -1,0 +1,100 @@
+{
+  "recordedAt": "2026-09-09T03:50:52.203Z",
+  "files": [
+    {
+      "path": "apps/api/src/automation.ts",
+      "bytes": 30961,
+      "sha256": "eb2c5683f65207282753d32b01880fef0468590d2f0fb15ae32c7e8d060427ba"
+    },
+    {
+      "path": "apps/api/src/automation-verification-result.ts",
+      "bytes": 4044,
+      "sha256": "adf2b08b2e731f85c5bb1b21ce47494318d190bc72d80a6621cf7c61f6fb4d61"
+    },
+    {
+      "path": "apps/api/test/automation-protocol.test.mjs",
+      "bytes": 16057,
+      "sha256": "3a22ad45986f63eddbc24bc2e7c1c323ba4626dd3dca829669f3505a786dbac5"
+    },
+    {
+      "path": "apps/api/test/automation-verification-result.test.mjs",
+      "bytes": 23780,
+      "sha256": "621b9a0ca393b82386073f1d25881ae3b79d91636921334efec270409d427539"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/README.md",
+      "bytes": 6245,
+      "sha256": "5cb00d7c5c0fa53e83c1695ff28bd4e5b79f1e2e8242958a2c67258259e7f56b"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/result.json",
+      "bytes": 6961,
+      "sha256": "c832b7afa92013a0dc002c4091374caa5de957bab93568af07ae21ece51fcfd8"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/retained-fixture-audit.json",
+      "bytes": 38272,
+      "sha256": "6441a020105143e40c43a10f1447c85bf1994fa832fd8d96379a181abab6cfd8"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/root-review.json",
+      "bytes": 1688,
+      "sha256": "0f00269fd84370a4829bc4d3c06e6a22890f483600f2d32335e8bd79d8d36575"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/final-actual-http.txt",
+      "bytes": 3435,
+      "sha256": "5ad1469b038ac97aa1ae854baddc50ae13ac90ebbf33d8092a8344ee57ee09ad"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/final-related-regression.txt",
+      "bytes": 14066,
+      "sha256": "e77ea6ce2fa76876b19654c8dc243114ab039ffd4c29b17711a4e1982356b675"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/first-actual-http.txt",
+      "bytes": 7820,
+      "sha256": "5236f40a9942649156d79688ffeccf5c842ac98df1ec74ab34b403fdb2220a20"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/first-fixture.mjs.txt",
+      "bytes": 21557,
+      "sha256": "59c995f3afb39d41897af989096bb09da3806203f3c7a2cc444d0e39827410dd"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/format.txt",
+      "bytes": 80,
+      "sha256": "d6d678ecd2af7d2aec1f2e67be49274ea14bd99c1e975dc734cd84170667f676"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/human-comparison-fixture.mjs.txt",
+      "bytes": 23775,
+      "sha256": "e217fdab3b5f42c8d0e7f2a4d871bfd23822a92634c98ff5d47fd0f5c7dbe2bc"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/lint.txt",
+      "bytes": 12,
+      "sha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/nodecheck.txt",
+      "bytes": 12,
+      "sha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/second-actual-http.txt",
+      "bytes": 2225,
+      "sha256": "814aced712b42687b0faa34b5f575a15cfa2b65137b2487b0230788dc1d65a4a"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/runs/typecheck.txt",
+      "bytes": 12,
+      "sha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-verification-result/source-review.json",
+      "bytes": 1852,
+      "sha256": "74ddd6ce6f86fecb50a981591314016675956b7b0924c9cf939b200d57efed7d"
+    }
+  ]
+}

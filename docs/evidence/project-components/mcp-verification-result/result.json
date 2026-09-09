@@ -1,0 +1,224 @@
+{
+  "createdAt": "2026-09-09T03:47:57.720Z",
+  "status": "passed_related_regression_source_frozen",
+  "tool": "qa_record_verification_result",
+  "catalog": {
+    "old": 90,
+    "added": 1,
+    "total": 91,
+    "runningInstancesChanged": false
+  },
+  "sources": [
+    {
+      "path": "apps/api/src/automation.ts",
+      "bytes": 30961,
+      "sha256": "eb2c5683f65207282753d32b01880fef0468590d2f0fb15ae32c7e8d060427ba",
+      "modifiedAt": "2026-09-09T03:33:07.730Z"
+    },
+    {
+      "path": "apps/api/src/automation-verification-result.ts",
+      "bytes": 4044,
+      "sha256": "adf2b08b2e731f85c5bb1b21ce47494318d190bc72d80a6621cf7c61f6fb4d61",
+      "modifiedAt": "2026-09-09T03:33:07.729Z"
+    },
+    {
+      "path": "apps/api/test/automation-protocol.test.mjs",
+      "bytes": 16057,
+      "sha256": "3a22ad45986f63eddbc24bc2e7c1c323ba4626dd3dca829669f3505a786dbac5",
+      "modifiedAt": "2026-09-09T03:33:07.731Z"
+    },
+    {
+      "path": "apps/api/test/automation-verification-result.test.mjs",
+      "bytes": 23780,
+      "sha256": "621b9a0ca393b82386073f1d25881ae3b79d91636921334efec270409d427539",
+      "modifiedAt": "2026-09-09T03:43:18.671Z"
+    }
+  ],
+  "dist": [
+    {
+      "path": "apps/api/dist/automation.js",
+      "bytes": 32827,
+      "sha256": "da3c0a6bdea56ba204e838d2deab29f57a1a626d8da9834cbe3d2ca6796b61b9",
+      "modifiedAt": "2026-09-09T03:40:21.480Z"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.js",
+      "bytes": 4433,
+      "sha256": "18de9f1cbe96656f8aec5d5d097a69401570b243f434444979bb6e5fa6b91fa3",
+      "modifiedAt": "2026-09-09T03:40:21.455Z"
+    },
+    {
+      "path": "apps/api/dist/app.js",
+      "bytes": 108578,
+      "sha256": "afc0f0b9e83612c9c2b6ac9d156a6c0f520f8e3ba0072dc7ea23281e1174ae1d",
+      "modifiedAt": "2026-09-09T03:40:21.711Z"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.js",
+      "bytes": 6392,
+      "sha256": "27a1ba6b8503b23fc5e1bce00648418e2f81e9cc117ee69bba66084e3a1667a9",
+      "modifiedAt": "2026-09-09T03:40:21.214Z"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.js",
+      "bytes": 3553,
+      "sha256": "31cb5de1b94feab674e722d36df671e5f88c889d96b71e5f093b9130600cb3ed",
+      "modifiedAt": "2026-09-09T03:40:21.811Z"
+    },
+    {
+      "path": "packages/storage/dist/sqlite-worker-entry.js",
+      "bytes": 19947,
+      "sha256": "6e3e6dea3568331baae42abbe2b0399c97fdf46b66a6f1efbd5558ced2f5a048",
+      "modifiedAt": "2026-09-09T03:39:41.712Z"
+    },
+    {
+      "path": "packages/storage/dist/mobile-verification-store.js",
+      "bytes": 39125,
+      "sha256": "d8eff4c7d0be33a46566a3120207474aa0fadc6516b9bea6468a64e8f2572c0f",
+      "modifiedAt": "2026-09-09T03:39:41.614Z"
+    },
+    {
+      "path": "packages/storage/dist/verification-result-snapshot-migration.js",
+      "bytes": 9599,
+      "sha256": "fa78d16e5ce2736d90dea3d61d18134e9cb26577b2530539121922e66c06f826",
+      "modifiedAt": "2026-09-09T03:39:41.401Z"
+    },
+    {
+      "path": "packages/storage/dist/verification-blocked-result-migration.js",
+      "bytes": 1051,
+      "sha256": "8233aca60cc2cae7a60a14256b3dcd8332c1df4b3dc7bf5025513c8f072b0c4f",
+      "modifiedAt": "2026-09-09T03:39:41.403Z"
+    },
+    {
+      "path": "packages/storage/dist/sqlite-migrations.js",
+      "bytes": 326564,
+      "sha256": "ef3f608c9729c3948d7cea0b07ccbe3b2f5778b01c3266d2b70f73020eca24ec",
+      "modifiedAt": "2026-09-09T03:39:41.421Z"
+    }
+  ],
+  "newTests": {
+    "groups": 6,
+    "temporaryWorkers": 7,
+    "schemaVersion": 17,
+    "actualNetworkRequests": 137
+  },
+  "relatedTests": {
+    "files": 8,
+    "passed": 92,
+    "failed": 0
+  },
+  "staticGates": {
+    "apiNoEmit": 0,
+    "eslint": 0,
+    "prettier": 0,
+    "nodeCheck": 0
+  },
+  "history": [
+    {
+      "log": "first-actual-http.txt",
+      "tests": 12,
+      "passed": 7,
+      "failed": 5,
+      "class": "fixture_missing_automation_route_option",
+      "retainedWorkers": 5,
+      "actualNetworkRequests": 58
+    },
+    {
+      "log": "second-actual-http.txt",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "retainedWorkers": 6,
+      "actualNetworkRequests": 122
+    },
+    {
+      "log": "final-actual-http.txt",
+      "tests": 13,
+      "passed": 12,
+      "failed": 1,
+      "class": "fixture_read_incorrect_event_actor_column_after_successful_close",
+      "retainedWorkers": 7,
+      "actualNetworkRequests": 136
+    },
+    {
+      "log": "final-related-regression.txt",
+      "tests": 92,
+      "passed": 92,
+      "failed": 0,
+      "newTestWorkers": 7,
+      "newTestNetworkRequests": 137
+    }
+  ],
+  "raw": [
+    {
+      "path": "runs/first-actual-http.txt",
+      "bytes": 7820,
+      "sha256": "5236f40a9942649156d79688ffeccf5c842ac98df1ec74ab34b403fdb2220a20"
+    },
+    {
+      "path": "runs/first-fixture.mjs.txt",
+      "bytes": 21557,
+      "sha256": "59c995f3afb39d41897af989096bb09da3806203f3c7a2cc444d0e39827410dd"
+    },
+    {
+      "path": "runs/second-actual-http.txt",
+      "bytes": 2225,
+      "sha256": "814aced712b42687b0faa34b5f575a15cfa2b65137b2487b0230788dc1d65a4a"
+    },
+    {
+      "path": "runs/final-actual-http.txt",
+      "bytes": 3435,
+      "sha256": "5ad1469b038ac97aa1ae854baddc50ae13ac90ebbf33d8092a8344ee57ee09ad"
+    },
+    {
+      "path": "runs/human-comparison-fixture.mjs.txt",
+      "bytes": 23775,
+      "sha256": "e217fdab3b5f42c8d0e7f2a4d871bfd23822a92634c98ff5d47fd0f5c7dbe2bc"
+    },
+    {
+      "path": "runs/final-related-regression.txt",
+      "bytes": 14066,
+      "sha256": "e77ea6ce2fa76876b19654c8dc243114ab039ffd4c29b17711a4e1982356b675"
+    },
+    {
+      "path": "runs/typecheck.txt",
+      "bytes": 12,
+      "sha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b"
+    },
+    {
+      "path": "runs/lint.txt",
+      "bytes": 12,
+      "sha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b"
+    },
+    {
+      "path": "runs/format.txt",
+      "bytes": 80,
+      "sha256": "d6d678ecd2af7d2aec1f2e67be49274ea14bd99c1e975dc734cd84170667f676"
+    },
+    {
+      "path": "runs/nodecheck.txt",
+      "bytes": 12,
+      "sha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b"
+    }
+  ],
+  "proof": [
+    {
+      "path": "README.md",
+      "bytes": 6245,
+      "sha256": "5cb00d7c5c0fa53e83c1695ff28bd4e5b79f1e2e8242958a2c67258259e7f56b"
+    },
+    {
+      "path": "retained-fixture-audit.json",
+      "bytes": 38272,
+      "sha256": "6441a020105143e40c43a10f1447c85bf1994fa832fd8d96379a181abab6cfd8"
+    }
+  ],
+  "remaining": {
+    "fullApiAndStorage": "parallel owner production_inventory executes and preserves separate raw gates",
+    "fullMain91": "not_run; separate fresh-runtime preparation authorized",
+    "installedClients91": "not_run",
+    "externalComponents": "not_run",
+    "newToolNonemptyAttachmentsOrCapture": "not_run"
+  },
+  "scope": "No existing runtime, production, clients, frozen contracts, or matrix changes."
+}

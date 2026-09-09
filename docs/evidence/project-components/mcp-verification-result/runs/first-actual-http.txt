@@ -1,0 +1,128 @@
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (1431.7901ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (78.2338ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (26.9668ms)
+✔ actual MCP HTTP reports protocol errors separately and retains 90 tools plus the frozen result tool (186.3064ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (64.2323ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (6.7629ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (266.2662ms)
+✖ actual worker MCP passed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (1631.8734ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-DVzg8U; 11 real HTTP requests; schema 17
+✖ actual worker MCP failed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (405.5973ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-HKNweJ; 11 real HTTP requests; schema 17
+✖ actual worker MCP blocked: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (447.7951ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-mJbU2I; 12 real HTTP requests; schema 17
+✖ MCP result catalog is additive, explicit and vendor-only; invalid scope/key/body never writes (402.6458ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-oZU2cw; 11 real HTTP requests; schema 17
+✖ MCP result enforces current assigned verifier, Cookie CSRF, revocation and deletion on first write and replay (432.1544ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-ftYo1M; 13 real HTTP requests; schema 17
+ℹ tests 12
+ℹ suites 0
+ℹ pass 7
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4397.8447
+
+✖ failing tests:
+
+test at apps\api\test\automation-verification-result.test.mjs:319:3
+✖ actual worker MCP passed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (1631.8734ms)
+  AssertionError [ERR_ASSERTION]: POST /mcp: code=response
+  
+  404 !== 200
+  
+      at Object.request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:130:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async rpc (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:285:18)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:324:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\automation-verification-result.test.mjs:319:3
+✖ actual worker MCP failed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (405.5973ms)
+  AssertionError [ERR_ASSERTION]: POST /mcp: code=response
+  
+  404 !== 200
+  
+      at Object.request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:130:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async rpc (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:285:18)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:324:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\automation-verification-result.test.mjs:319:3
+✖ actual worker MCP blocked: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (447.7951ms)
+  AssertionError [ERR_ASSERTION]: POST /mcp: code=response
+  
+  404 !== 200
+  
+      at Object.request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:130:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async rpc (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:285:18)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:324:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\automation-verification-result.test.mjs:437:1
+✖ MCP result catalog is additive, explicit and vendor-only; invalid scope/key/body never writes (402.6458ms)
+  AssertionError [ERR_ASSERTION]: POST /mcp: code=response
+  
+  404 !== 200
+  
+      at Object.request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:130:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async rpc (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:285:18)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:443:20)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\automation-verification-result.test.mjs:503:1
+✖ MCP result enforces current assigned verifier, Cookie CSRF, revocation and deletion on first write and replay (432.1544ms)
+  AssertionError [ERR_ASSERTION]: POST /mcp: code=response
+  
+  404 !== 200
+  
+      at Object.request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:130:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async rpc (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:285:18)
+      at async resultTool (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:297:18)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/automation-verification-result.test.mjs:515:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

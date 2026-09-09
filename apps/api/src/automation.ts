@@ -2,6 +2,10 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { createHash } from "node:crypto";
 import { AUTOMATION_HTTP_ROUTES } from "./automation-routes.js";
 import { BUG_ACTIONS } from "./bug-actions.js";
+import {
+  VERIFICATION_RESULT_AUTOMATION_TOOL,
+  verificationResultAutomationRequest,
+} from "./automation-verification-result.js";
 
 type Values = Record<string, unknown>;
 interface ToolDefinition {
@@ -60,6 +64,7 @@ function definition(
   };
 }
 export const AUTOMATION_TOOLS: readonly ToolDefinition[] = [
+  VERIFICATION_RESULT_AUTOMATION_TOOL,
   ...AUTOMATION_HTTP_ROUTES.map(([name, title, method, path]) =>
     definition(
       name,
@@ -285,6 +290,16 @@ export function registerAutomationRoutes(
       return query.size ? `${path}?${query}` : path;
     };
     switch (name) {
+      case "qa_record_verification_result": {
+        let command: ReturnType<typeof verificationResultAutomationRequest>;
+        try {
+          command = verificationResultAutomationRequest(input);
+        } catch (error) {
+          if (error instanceof TypeError) throw new AutomationError("INVALID_REQUEST", 400);
+          throw error;
+        }
+        return send("POST", command.path, command.body, command.idempotencyKey);
+      }
       case "qa_put_upload_chunk": {
         const base64 = field(input, "bytesBase64");
         if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u.test(base64))

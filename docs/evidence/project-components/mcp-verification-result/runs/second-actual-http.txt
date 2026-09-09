@@ -1,0 +1,26 @@
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (205.9867ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (60.2397ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (26.1155ms)
+✔ actual MCP HTTP reports protocol errors separately and retains 90 tools plus the frozen result tool (58.8763ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (67.2523ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (7.0839ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (380.8244ms)
+✔ actual worker MCP passed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (965.9583ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-VckL2s; 18 real HTTP requests; schema 17
+✔ actual worker MCP failed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (550.737ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-OmqV41; 18 real HTTP requests; schema 17
+✔ actual worker MCP blocked: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (676.3625ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-YrZidT; 23 real HTTP requests; schema 17
+✔ MCP result catalog is additive, explicit and vendor-only; invalid scope/key/body never writes (608.0441ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-kPvTpp; 29 real HTTP requests; schema 17
+✔ MCP result enforces current assigned verifier, Cookie CSRF, revocation and deletion on first write and replay (1005.8233ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-9FfpSO; 21 real HTTP requests; schema 17
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-PAj8nB; 13 real HTTP requests; schema 17
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4191.3358

@@ -1,0 +1,946 @@
+{
+  "createdAt": "2026-09-09T03:46:10.134Z",
+  "kind": "author-readonly-retained-fixture-audit",
+  "sourceBaseCommit": "3b57719deed8d907fa84bba232e2939d18288351",
+  "sourcePins": [
+    {
+      "path": "apps/api/src/automation.ts",
+      "bytes": 30961,
+      "sha256": "eb2c5683f65207282753d32b01880fef0468590d2f0fb15ae32c7e8d060427ba",
+      "modifiedAt": "2026-09-09T03:33:07.730Z"
+    },
+    {
+      "path": "apps/api/src/automation-verification-result.ts",
+      "bytes": 4044,
+      "sha256": "adf2b08b2e731f85c5bb1b21ce47494318d190bc72d80a6621cf7c61f6fb4d61",
+      "modifiedAt": "2026-09-09T03:33:07.729Z"
+    },
+    {
+      "path": "apps/api/test/automation-protocol.test.mjs",
+      "bytes": 16057,
+      "sha256": "3a22ad45986f63eddbc24bc2e7c1c323ba4626dd3dca829669f3505a786dbac5",
+      "modifiedAt": "2026-09-09T03:33:07.731Z"
+    },
+    {
+      "path": "apps/api/test/automation-verification-result.test.mjs",
+      "bytes": 23780,
+      "sha256": "621b9a0ca393b82386073f1d25881ae3b79d91636921334efec270409d427539",
+      "modifiedAt": "2026-09-09T03:43:18.671Z"
+    }
+  ],
+  "distPins": [
+    {
+      "path": "apps/api/dist/automation.js",
+      "bytes": 32827,
+      "sha256": "da3c0a6bdea56ba204e838d2deab29f57a1a626d8da9834cbe3d2ca6796b61b9",
+      "modifiedAt": "2026-09-09T03:40:21.480Z"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.js",
+      "bytes": 4433,
+      "sha256": "18de9f1cbe96656f8aec5d5d097a69401570b243f434444979bb6e5fa6b91fa3",
+      "modifiedAt": "2026-09-09T03:40:21.455Z"
+    },
+    {
+      "path": "apps/api/dist/app.js",
+      "bytes": 108578,
+      "sha256": "afc0f0b9e83612c9c2b6ac9d156a6c0f520f8e3ba0072dc7ea23281e1174ae1d",
+      "modifiedAt": "2026-09-09T03:40:21.711Z"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.js",
+      "bytes": 6392,
+      "sha256": "27a1ba6b8503b23fc5e1bce00648418e2f81e9cc117ee69bba66084e3a1667a9",
+      "modifiedAt": "2026-09-09T03:40:21.214Z"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.js",
+      "bytes": 3553,
+      "sha256": "31cb5de1b94feab674e722d36df671e5f88c889d96b71e5f093b9130600cb3ed",
+      "modifiedAt": "2026-09-09T03:40:21.811Z"
+    },
+    {
+      "path": "packages/storage/dist/sqlite-worker-entry.js",
+      "bytes": 19947,
+      "sha256": "6e3e6dea3568331baae42abbe2b0399c97fdf46b66a6f1efbd5558ced2f5a048",
+      "modifiedAt": "2026-09-09T03:39:41.712Z"
+    },
+    {
+      "path": "packages/storage/dist/mobile-verification-store.js",
+      "bytes": 39125,
+      "sha256": "d8eff4c7d0be33a46566a3120207474aa0fadc6516b9bea6468a64e8f2572c0f",
+      "modifiedAt": "2026-09-09T03:39:41.614Z"
+    },
+    {
+      "path": "packages/storage/dist/verification-result-snapshot-migration.js",
+      "bytes": 9599,
+      "sha256": "fa78d16e5ce2736d90dea3d61d18134e9cb26577b2530539121922e66c06f826",
+      "modifiedAt": "2026-09-09T03:39:41.401Z"
+    },
+    {
+      "path": "packages/storage/dist/verification-blocked-result-migration.js",
+      "bytes": 1051,
+      "sha256": "8233aca60cc2cae7a60a14256b3dcd8332c1df4b3dc7bf5025513c8f072b0c4f",
+      "modifiedAt": "2026-09-09T03:39:41.403Z"
+    },
+    {
+      "path": "packages/storage/dist/sqlite-migrations.js",
+      "bytes": 326564,
+      "sha256": "ef3f608c9729c3948d7cea0b07ccbe3b2f5778b01c3266d2b70f73020eca24ec",
+      "modifiedAt": "2026-09-09T03:39:41.421Z"
+    }
+  ],
+  "checks": [
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-DVzg8U",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-HKNweJ",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-mJbU2I",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-oZU2cw",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-ftYo1M",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-VckL2s",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-OmqV41",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-YrZidT",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-kPvTpp",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-9FfpSO",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-PAj8nB",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-6VcD7b",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-anN5Rj",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-yVVYry",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-UC0bcv",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-mBSUvu",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-X3FjGt",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-vHw10b",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-AHOueL",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-pfYNAY",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-GzwGrg",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-BW3rKC",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-Huibnk",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-E5qOK9",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    },
+    {
+      "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-yJx4ZW",
+      "passed": true,
+      "checks": [
+        "schema17",
+        "requestCount agrees with raw log",
+        "integrity_check ok",
+        "foreign_key_check empty"
+      ]
+    }
+  ],
+  "fixtures": [
+    {
+      "log": "first-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-DVzg8U",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-DVzg8U\\fixture.sqlite",
+      "requestCount": 11,
+      "schemaVersion": 17,
+      "port": "52678",
+      "databaseSha256": "03c70d83d9a33561c214c985db18dac8b1a1bfe302869ffb7ab81eb071d50e45",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "first-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-HKNweJ",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-HKNweJ\\fixture.sqlite",
+      "requestCount": 11,
+      "schemaVersion": 17,
+      "port": "52719",
+      "databaseSha256": "523588b0aeaff015224c70eb4a90846d53da282318d59ab8466ce00a2cc641d0",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "first-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-mJbU2I",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-mJbU2I\\fixture.sqlite",
+      "requestCount": 12,
+      "schemaVersion": 17,
+      "port": "52726",
+      "databaseSha256": "48612a432edc2127fa26b65884776270e9e3f91721dd76a41f547afac1b351de",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "first-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-oZU2cw",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-oZU2cw\\fixture.sqlite",
+      "requestCount": 11,
+      "schemaVersion": 17,
+      "port": "52729",
+      "databaseSha256": "66099c55b111d4631d949aa0bbebd6e3aa8cc1f5eb693c7da20a5efcc62c8513",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "first-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-ftYo1M",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-ftYo1M\\fixture.sqlite",
+      "requestCount": 13,
+      "schemaVersion": 17,
+      "port": "52733",
+      "databaseSha256": "4b9a452a2eaa5d50f518cb96a4f02b24750edc05384a3b9f7d74ba2c1829215a",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "second-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-VckL2s",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-VckL2s\\fixture.sqlite",
+      "requestCount": 18,
+      "schemaVersion": 17,
+      "port": "52823",
+      "databaseSha256": "5d61645a6db3a17692bda99f94deb1c7c3cbe5987dcea04e807ae574b3446433",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "5c510595-9bab-4c0c-bfa4-9ba10f81b17a",
+          "accountId": "9c706c97-7803-4d14-a244-2c66f509cdf6",
+          "projectId": "d4f6f516-affa-4697-a907-61313cb309b1",
+          "actorId": "903a47df-7fec-4924-851b-b792391c6eb9",
+          "verificationId": "24ce64b7-0967-4b9e-a75d-5efc68a8e56c",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:24ce64b7-0967-4b9e-a75d-5efc68a8e56c:v2",
+          "status": "passed",
+          "responseSha256": "b533a0d29c9edc27604d074c9013ae1fd13a28cfc29d47578a856ea7771b2f3d",
+          "responseBytes": 1744,
+          "bugId": "8e737b19-6553-497a-bf9d-0a075b2613ca",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "second-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-OmqV41",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-OmqV41\\fixture.sqlite",
+      "requestCount": 18,
+      "schemaVersion": 17,
+      "port": "52830",
+      "databaseSha256": "e45b8731ba518a86ed64b3ad5faa0c1e0bd6a9520b1ab1439bea9c6a622819fc",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "a2ad5fe5-382d-4ba5-90df-3e80b94d725a",
+          "accountId": "978b39dc-7e57-4eed-a908-a965faa7fff1",
+          "projectId": "30c6b587-5cd0-424b-9fc1-46f710939650",
+          "actorId": "c80f5ff3-1dde-47bc-8536-751ce47cbe8e",
+          "verificationId": "1f710c60-827a-460a-9e5d-55a7fa54be28",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:1f710c60-827a-460a-9e5d-55a7fa54be28:v2",
+          "status": "failed",
+          "responseSha256": "7cd3169e2f432dcd37be39061daa55ac15d320de6676446aca087a4e8fd1aa53",
+          "responseBytes": 1754,
+          "bugId": "9ed06d23-249d-4336-a895-0decd7212b48",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "second-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-YrZidT",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-YrZidT\\fixture.sqlite",
+      "requestCount": 23,
+      "schemaVersion": 17,
+      "port": "52833",
+      "databaseSha256": "cd77731362e84de714d092fd95aace83da998099c9aa8b40ac40fc32925eae4d",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "16647737-337e-4685-a92d-cc7979c13d27",
+          "accountId": "9b3957f3-349e-4544-b393-1997b869f3bb",
+          "projectId": "94ffa4f0-9669-4389-b372-ba06ff0f36bd",
+          "actorId": "7a16ad10-1fb8-4de2-8173-8ada04082494",
+          "verificationId": "8ce1876c-c5dc-45df-afa4-b521a36f6dad",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:8ce1876c-c5dc-45df-afa4-b521a36f6dad:v2",
+          "status": "passed",
+          "responseSha256": "46bdb9c8f1771304f179ff505248b00a3ca186682d72893b6cd0fd53fa50a215",
+          "responseBytes": 1905,
+          "bugId": "0f9feb14-949c-4b0d-9db3-8d4c27df5461",
+          "bugVersion": 11,
+          "verificationVersion": 3
+        },
+        {
+          "id": "60b2874a-a774-486b-ba51-280206a50858",
+          "accountId": "9b3957f3-349e-4544-b393-1997b869f3bb",
+          "projectId": "94ffa4f0-9669-4389-b372-ba06ff0f36bd",
+          "actorId": "7a16ad10-1fb8-4de2-8173-8ada04082494",
+          "verificationId": "4a7d1505-1cf4-48d3-9a06-7491f4aa12c5",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:4a7d1505-1cf4-48d3-9a06-7491f4aa12c5:v2",
+          "status": "blocked",
+          "responseSha256": "f845edc02126364de37c5a6761edd717b5972d0b6f9d995ac14e2f1eb741b0ae",
+          "responseBytes": 1913,
+          "bugId": "0f9feb14-949c-4b0d-9db3-8d4c27df5461",
+          "bugVersion": 8,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "second-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-kPvTpp",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-kPvTpp\\fixture.sqlite",
+      "requestCount": 29,
+      "schemaVersion": 17,
+      "port": "52839",
+      "databaseSha256": "6d41715733c46775e96b011e230e1b5f5b82152a3faf4d4bc85a3afad83cebe9",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "second-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-9FfpSO",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-9FfpSO\\fixture.sqlite",
+      "requestCount": 21,
+      "schemaVersion": 17,
+      "port": "52843",
+      "databaseSha256": "732baf5b9e119968d7117025abf5e5cc73ebbfa39d53b5b407eb54f367cd79ef",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "e905d547-75a4-4435-8698-4b3e5fa164f1",
+          "accountId": "84eefba1-e92c-4157-88fd-a946c3d89292",
+          "projectId": "3ab9f5b3-8ec1-4156-993b-37657ece20a8",
+          "actorId": "52f3dc69-d6f1-4980-88c0-d51114dfc73a",
+          "verificationId": "b170f1ab-a444-45b4-9f4c-d3b9f014bfde",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:b170f1ab-a444-45b4-9f4c-d3b9f014bfde:v2",
+          "status": "blocked",
+          "responseSha256": "5e07a94e3da49df806069bca1bd79319ad599dade461723e78133cf9fd46846d",
+          "responseBytes": 1777,
+          "bugId": "2aedfd32-a322-4fc8-9b5b-b67f1f1481ee",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "second-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-PAj8nB",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-PAj8nB\\fixture.sqlite",
+      "requestCount": 13,
+      "schemaVersion": 17,
+      "port": "52847",
+      "databaseSha256": "a8e70d3d610100e79086062307a77db1e118d2b1c10dc051bdcd21021f7d2413",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "77b3a37c-d580-4c63-a7a8-51bebdfbeeb9",
+          "accountId": "d96901c8-d147-4655-85b9-1150935341ae",
+          "projectId": "6def6e3f-85ce-485c-8bf8-5fea6839b04a",
+          "actorId": "89e5c4ea-bf08-4f89-8f2a-ad608e6d46c3",
+          "verificationId": "cb893d3e-4ec5-4d92-af37-8cc09dfcfe05",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:cb893d3e-4ec5-4d92-af37-8cc09dfcfe05:v2",
+          "status": "passed",
+          "responseSha256": "1065f06fb889a5031b1246e097c3bf643ecf3a7f7ad7ebe9961ac2283b982ffe",
+          "responseBytes": 1744,
+          "bugId": "e6a7e8a1-71d6-4a03-81a4-86c65b14c6fa",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-6VcD7b",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-6VcD7b\\fixture.sqlite",
+      "requestCount": 18,
+      "schemaVersion": 17,
+      "port": "53015",
+      "databaseSha256": "5c7c3805767eab550c26a4d137291a95ca8e2e7315e2a5eeff2b3a8f5e3e1f48",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "298cf684-de33-4ae4-947e-5bc07ed27818",
+          "accountId": "d77e2725-70ba-4ef3-85aa-b6f00261b06f",
+          "projectId": "243ad38b-ec7d-4b6a-b2c0-e99be80ee46f",
+          "actorId": "c01de692-5449-4102-885b-aeaa94a21de8",
+          "verificationId": "97f5700c-1e9d-4328-8445-82c9050e74aa",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:97f5700c-1e9d-4328-8445-82c9050e74aa:v2",
+          "status": "passed",
+          "responseSha256": "1831e15980ecb97ecfa0aaef35e00c196b6488ea2a00c1919f1bc3cd97d1af5a",
+          "responseBytes": 1744,
+          "bugId": "be5c2d7f-3885-44c0-aa26-1ddcbd128aeb",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-anN5Rj",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-anN5Rj\\fixture.sqlite",
+      "requestCount": 18,
+      "schemaVersion": 17,
+      "port": "53025",
+      "databaseSha256": "cf22d1c7a36940dd793b2cb34649bf74120137cb1feba9a10a5db32628a6c18e",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "18205aa5-6cf2-4a3a-be7e-ea84321228a7",
+          "accountId": "262d746a-c2b0-45c5-be76-e47d3464bdb8",
+          "projectId": "306f955a-0814-4e72-8e16-ca6afce20961",
+          "actorId": "b8e68389-519f-496d-8f51-b5f85709d34f",
+          "verificationId": "eb9f3245-aeeb-4405-9c66-fb72c29f7aa7",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:eb9f3245-aeeb-4405-9c66-fb72c29f7aa7:v2",
+          "status": "failed",
+          "responseSha256": "9a0747ce44e4d1e4bda32bde31f5d73106a745717a903305891810db19bd0fd7",
+          "responseBytes": 1754,
+          "bugId": "33eccb28-f4a8-4eaa-a678-1c3f0bbbd0bd",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-yVVYry",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-yVVYry\\fixture.sqlite",
+      "requestCount": 23,
+      "schemaVersion": 17,
+      "port": "53028",
+      "databaseSha256": "ecf7e12ad80e897dd7baacf6385b1a81fdf57d0083a61bfd13bbfdf7726095c3",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "c04f7d0d-50d3-47bc-a33c-a18b91231b6b",
+          "accountId": "cbacd6a0-7d87-46d9-a7e1-238c48cdc8ee",
+          "projectId": "69042b4d-047c-4ab2-9e7d-932ce3fa2b7a",
+          "actorId": "fdb3a945-5dc5-4e43-8b4c-6cc1ba8537b9",
+          "verificationId": "155e5817-ff01-4ed0-8290-2c450b261e97",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:155e5817-ff01-4ed0-8290-2c450b261e97:v2",
+          "status": "blocked",
+          "responseSha256": "9642bc687e780f2b2ca8672d7bca930f00af4d528aa07a1b17fcd03964cf87e5",
+          "responseBytes": 1913,
+          "bugId": "4511b7ff-c049-433e-b14d-e40bb3c85fe7",
+          "bugVersion": 8,
+          "verificationVersion": 3
+        },
+        {
+          "id": "fb79b0ab-c4ae-47de-9bb9-0b208fa427ca",
+          "accountId": "cbacd6a0-7d87-46d9-a7e1-238c48cdc8ee",
+          "projectId": "69042b4d-047c-4ab2-9e7d-932ce3fa2b7a",
+          "actorId": "fdb3a945-5dc5-4e43-8b4c-6cc1ba8537b9",
+          "verificationId": "fa7c7ca1-e5f9-4232-b0e3-6245e981db63",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:fa7c7ca1-e5f9-4232-b0e3-6245e981db63:v2",
+          "status": "passed",
+          "responseSha256": "b64d088faa2c1d61ca343d5829266229189a01d63c7e3f2b122a74a5c85d6396",
+          "responseBytes": 1905,
+          "bugId": "4511b7ff-c049-433e-b14d-e40bb3c85fe7",
+          "bugVersion": 11,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-UC0bcv",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-UC0bcv\\fixture.sqlite",
+      "requestCount": 29,
+      "schemaVersion": 17,
+      "port": "53031",
+      "databaseSha256": "5ef2b19ad2cb2c7ce82b44119a8aa7bdbe9d18664d2c09096f62bd6d63d3951a",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "final-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-mBSUvu",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-mBSUvu\\fixture.sqlite",
+      "requestCount": 21,
+      "schemaVersion": 17,
+      "port": "53034",
+      "databaseSha256": "4840710bfd1a3934ea14df87c3d3717bbd6f84c493a1d41cb509f7d59ab1c008",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "99b389cb-7364-4d98-8eaa-0ffa9d9fe96c",
+          "accountId": "706ee492-1115-4dbf-b07e-0645ba438a73",
+          "projectId": "108be493-f672-4d94-8d3a-7a818344a69d",
+          "actorId": "9fe37112-b8df-4e76-8338-306bfc4967d6",
+          "verificationId": "467aca14-55b6-448e-891c-42d2b0247773",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:467aca14-55b6-448e-891c-42d2b0247773:v2",
+          "status": "blocked",
+          "responseSha256": "9ead4630e3bfb8f89273f67f099c83c7222467b0f411effcd7b216129ec27dad",
+          "responseBytes": 1777,
+          "bugId": "78ef205c-5049-4456-890b-128e1a0ca84a",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-X3FjGt",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-X3FjGt\\fixture.sqlite",
+      "requestCount": 13,
+      "schemaVersion": 17,
+      "port": "53038",
+      "databaseSha256": "b0c447e1e83e3a4b2e3dd6c6874c8cf6d00ddb4182f806ed11a300a209c4bbb4",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "4e697ecd-ede2-4f32-b83e-b94e358ff4e9",
+          "accountId": "06f35f6d-6191-4422-aec2-1cfcf89b34cc",
+          "projectId": "415a9d47-fb2e-44a7-8061-dc8a9bc9772b",
+          "actorId": "ccf31a3f-4748-4746-8ec7-f8b5a3daae2e",
+          "verificationId": "c19315e7-4b7b-49ee-bd1c-02532362286d",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:c19315e7-4b7b-49ee-bd1c-02532362286d:v2",
+          "status": "passed",
+          "responseSha256": "5b7c9d502aab3ef62788605137c4bda93b8c0fe66cd33140f318648555c6d3cd",
+          "responseBytes": 1744,
+          "bugId": "1ee361a5-b3e6-4160-9b8e-4862da4f3707",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-actual-http.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-vHw10b",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-vHw10b\\fixture.sqlite",
+      "requestCount": 14,
+      "schemaVersion": 17,
+      "port": "53041",
+      "databaseSha256": "354b9115e533b129d74482aee371c523d86a04b02b06142a458f17ca06b12133",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "fb20db12-b89a-4bc7-8326-08131d878389",
+          "accountId": "f98bb5db-dcc2-4a46-8082-c6cd7f99dce6",
+          "projectId": "37343ea1-6c1f-4b0a-973e-8d997b9d2178",
+          "actorId": "db941592-c861-412f-873b-af9a820e02d4",
+          "verificationId": "f539e037-14b0-41be-8884-6d85ad3bd4e0",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:f539e037-14b0-41be-8884-6d85ad3bd4e0:v2",
+          "status": "passed",
+          "responseSha256": "0dd10b4a26ba664be2176df2c9954a47e08eb3a30d4113cf360d7f1d0c7869d8",
+          "responseBytes": 1744,
+          "bugId": "fa00fd20-c8b0-4722-af77-ec0baf1d620f",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-related-regression.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-AHOueL",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-AHOueL\\fixture.sqlite",
+      "requestCount": 18,
+      "schemaVersion": 17,
+      "port": "53133",
+      "databaseSha256": "b8f583b527a586062424fa331f5f0f3ccbaffad827e26bd5c1379c6a15ee42b4",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "07812ba9-8ee7-463b-a1f6-1e80233de328",
+          "accountId": "b21b5f10-333a-44d1-aada-e99fecea7f81",
+          "projectId": "4334a655-ae98-4cf2-9e11-20b72d023af7",
+          "actorId": "08b2a641-da15-4b62-8553-53d9bbeb2697",
+          "verificationId": "3b78272f-c2a1-4569-80e4-65c1f860a177",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:3b78272f-c2a1-4569-80e4-65c1f860a177:v2",
+          "status": "passed",
+          "responseSha256": "b097160a436e9a5204ba1ef9c3ae7a0339fcd3c2f6c640e44b7f6a037aabd040",
+          "responseBytes": 1744,
+          "bugId": "69954494-463c-4cee-9b14-aca6651aed63",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-related-regression.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-pfYNAY",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-pfYNAY\\fixture.sqlite",
+      "requestCount": 18,
+      "schemaVersion": 17,
+      "port": "53152",
+      "databaseSha256": "e03d0585e3085a6755b9d8932ee98b39cae0eb7b35446d47e4047beb6cbe4b74",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "06e7dd32-94d5-4f45-87c2-f42c6b8332c2",
+          "accountId": "6fcea39d-1d26-4e01-b3b1-388844687b37",
+          "projectId": "ce92eec8-f010-47a5-a230-f980fe129198",
+          "actorId": "d2aadbae-27f1-4164-8c0f-94286d68d007",
+          "verificationId": "7b5e1729-6bcf-49a9-b01c-cf4acc42606c",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:7b5e1729-6bcf-49a9-b01c-cf4acc42606c:v2",
+          "status": "failed",
+          "responseSha256": "f0316eaa91fd7f8c6a057ff2373a3c2720cb09d79e13c31ba2a23c282fc0758e",
+          "responseBytes": 1754,
+          "bugId": "4bf63def-c2e1-44d0-8a95-111632b53b3b",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-related-regression.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-GzwGrg",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-GzwGrg\\fixture.sqlite",
+      "requestCount": 23,
+      "schemaVersion": 17,
+      "port": "53161",
+      "databaseSha256": "b818f5189480f3d1cd5d8f2d9d123aca78b153769646bd9f50a915a86390251a",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "01a1920c-8709-496e-9ded-ab0e09431344",
+          "accountId": "488b262a-3903-434d-a9a7-d67614260a9b",
+          "projectId": "0bd25133-e904-4266-862e-0f4f6ec07fb9",
+          "actorId": "68b75349-bea9-40f2-8ae3-85c31e35e9f7",
+          "verificationId": "8af0b368-68b4-4ce0-9b2b-b5024d03951d",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:8af0b368-68b4-4ce0-9b2b-b5024d03951d:v2",
+          "status": "passed",
+          "responseSha256": "a285451d9f08b1a96d1f8cd4450498e1e6004d117e186107d9355c76ebbe5b48",
+          "responseBytes": 1905,
+          "bugId": "858af907-648c-4417-92e3-e0811e6eb51f",
+          "bugVersion": 11,
+          "verificationVersion": 3
+        },
+        {
+          "id": "5c5137b8-2fcc-483a-aa82-29e85494105b",
+          "accountId": "488b262a-3903-434d-a9a7-d67614260a9b",
+          "projectId": "0bd25133-e904-4266-862e-0f4f6ec07fb9",
+          "actorId": "68b75349-bea9-40f2-8ae3-85c31e35e9f7",
+          "verificationId": "e0c5ed1f-c841-4010-92ef-4e4a4513b469",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:e0c5ed1f-c841-4010-92ef-4e4a4513b469:v2",
+          "status": "blocked",
+          "responseSha256": "cf1eb18dc364a5c33c78ef6354487df2c6cb82f6c82141534ad13e06bcb37c5f",
+          "responseBytes": 1913,
+          "bugId": "858af907-648c-4417-92e3-e0811e6eb51f",
+          "bugVersion": 8,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-related-regression.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-BW3rKC",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-BW3rKC\\fixture.sqlite",
+      "requestCount": 29,
+      "schemaVersion": 17,
+      "port": "53175",
+      "databaseSha256": "e46ce376420d8a34a0a90a32731001de16a2bcefd63ab6e8763a6671435722bd",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": []
+    },
+    {
+      "log": "final-related-regression.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-Huibnk",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-Huibnk\\fixture.sqlite",
+      "requestCount": 21,
+      "schemaVersion": 17,
+      "port": "53188",
+      "databaseSha256": "8ad7c74b75ff8b23aba3af22b6b8cae9dddf7643a64910e845f8646f12e11b8d",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "e54e5283-038a-403d-9072-2c4397b0dedb",
+          "accountId": "0475f56a-d7a7-41cc-96e6-e02df917fe2a",
+          "projectId": "a0f5e69d-b2eb-437a-91c6-8e8a5a3374f4",
+          "actorId": "70893ff9-4f37-4f95-8f8f-3c3143f294aa",
+          "verificationId": "c38ef09e-b7be-4091-804e-c861a06f8210",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:c38ef09e-b7be-4091-804e-c861a06f8210:v2",
+          "status": "blocked",
+          "responseSha256": "b8f2bc9e58e1cb6f6c6bcb29b414f5ecdaf21fb8a47aad9c82eb2d3758ac62a1",
+          "responseBytes": 1777,
+          "bugId": "b645a57e-4b03-44e4-8b5b-2be7441a4dd6",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-related-regression.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-E5qOK9",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-E5qOK9\\fixture.sqlite",
+      "requestCount": 13,
+      "schemaVersion": 17,
+      "port": "53200",
+      "databaseSha256": "7942c7be5597f0cfb910d9d9944fb65a5aa19a03ade7858299e44104455c8777",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "305812cd-2395-428c-ba4c-7302acd8eb94",
+          "accountId": "d87f9be7-e1d9-4016-89eb-5267e9027b3e",
+          "projectId": "b8db6048-87e1-4e3e-95fc-0538d1b1e1d9",
+          "actorId": "4c81820d-5d0c-4b78-88b3-a17b26295c18",
+          "verificationId": "289707ff-cf81-4aeb-93be-c45dc975d3b6",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:289707ff-cf81-4aeb-93be-c45dc975d3b6:v2",
+          "status": "passed",
+          "responseSha256": "13ee285367d31fb1949c56a60f0f74f1589f38263784199d927715019e280469",
+          "responseBytes": 1744,
+          "bugId": "ad461ff7-f08b-4393-b241-15b0b7bab007",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    },
+    {
+      "log": "final-related-regression.txt",
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-yJx4ZW",
+      "databaseFile": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-automation-result-yJx4ZW\\fixture.sqlite",
+      "requestCount": 15,
+      "schemaVersion": 17,
+      "port": "53207",
+      "databaseSha256": "28b8b1d3d0e765fc607160036cd42847183a4be23a2cbd8bca55301d206ad9d9",
+      "integrity": "ok",
+      "foreignKeyErrors": 0,
+      "resultSnapshots": [
+        {
+          "id": "e9c74886-3476-4046-b3b6-e37eb29204a8",
+          "accountId": "9b514a5e-9260-4a92-889f-1d205a3a2e71",
+          "projectId": "8e131aab-3ff6-46fe-894a-71376a8fceab",
+          "actorId": "ef3b4274-0ee1-4d6a-8935-6f4ffc1e23a2",
+          "verificationId": "76aa7f4c-4d8f-4b42-8e7a-f932222c25e2",
+          "idempotencyKey": "workflow:recordVerificationResult:verification:76aa7f4c-4d8f-4b42-8e7a-f932222c25e2:v2",
+          "status": "passed",
+          "responseSha256": "95c5845b23fb57b66aab31d6419fdeed524c43470dcd12e78b5cf0a7feef469c",
+          "responseBytes": 1744,
+          "bugId": "c1c88cbc-f4df-4f36-bf86-5ea1e6aaf6ec",
+          "bugVersion": 6,
+          "verificationVersion": 3
+        }
+      ]
+    }
+  ],
+  "passed": true,
+  "scope": "Retained temporary SQLite files only; no runtime or external service reads. Hashes are post-test closed-worker files; source tests use real Fastify plus worker, not full main."
+}
