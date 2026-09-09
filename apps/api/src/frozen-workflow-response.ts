@@ -90,6 +90,8 @@ export function workflowResponseMedia(accept: string | undefined): string {
 export function frozenVerificationResult(value: MobileVerificationResultResponse, media: string) {
   const verification = frozenVerification(value.verification);
   if (media.startsWith("application/json")) return { verification, bug: legacyBug(value.bug) };
+  if (value.clientSubmissionId === null)
+    throw new TypeError("Legacy result has no client submission identity");
   return {
     clientSubmissionId: value.clientSubmissionId,
     qaItem: value.qaItem,
@@ -101,4 +103,28 @@ export function frozenVerificationResult(value: MobileVerificationResultResponse
     eventId: value.eventId,
     replayed: value.replayed,
   };
+}
+
+/** Legacy requests have no client submission identity, so only the JSON DTO is representable. */
+export function legacyVerificationResultMedia(accept: string | undefined): string {
+  if (!accept?.trim()) return "application/json; charset=utf-8";
+  const matches = accept
+    .split(",")
+    .flatMap((entry) => {
+      const [media, ...parameters] = entry.trim().toLowerCase().split(";");
+      const specificity =
+        media === "application/json" ? 2 : media === "application/*" ? 1 : media === "*/*" ? 0 : -1;
+      if (specificity < 0) return [];
+      const quality = parameters.find((part) => part.trim().startsWith("q="));
+      const q = quality === undefined ? 1 : Number(quality.trim().slice(2));
+      return [{ specificity, q: Number.isFinite(q) && q >= 0 && q <= 1 ? q : 0 }];
+    })
+    .sort((a, b) => b.specificity - a.specificity || b.q - a.q);
+  if (!matches[0] || matches[0].q <= 0) {
+    throw Object.assign(
+      new Error("Legacy Verification result requires an acceptable application/json response"),
+      { code: "NOT_ACCEPTABLE" },
+    );
+  }
+  return "application/json; charset=utf-8";
 }

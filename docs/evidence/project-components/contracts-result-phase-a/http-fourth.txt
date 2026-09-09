@@ -1,0 +1,22 @@
+✔ real HTTP vendor passed preserves the exact original receipt after later Bug edits (681.9185ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-zLInn3; 16 real HTTP requests
+✔ real HTTP vendor failed preserves the exact original receipt after later Bug edits (539.2918ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-BjfVaO; 16 real HTTP requests
+✔ real HTTP legacy passed preserves the exact original receipt after later Bug edits (515.1817ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-L8afkl; 15 real HTTP requests
+✔ real HTTP legacy failed preserves the exact original receipt after later Bug edits (513.5709ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-uV3195; 15 real HTTP requests
+✔ legacy Accept q-values and malformed bodies reject before any domain write (535.2805ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-nQIl0l; 24 real HTTP requests
+✔ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (511.6381ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-StoH7q; 22 real HTTP requests
+✔ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (452.1832ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-ARLTag; 17 real HTTP requests
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4023.5096

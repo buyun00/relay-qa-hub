@@ -1,0 +1,101 @@
+✖ real HTTP vendor passed preserves the exact original receipt after later Bug edits (240.3514ms)
+✖ real HTTP vendor failed preserves the exact original receipt after later Bug edits (205.1014ms)
+✖ real HTTP legacy passed preserves the exact original receipt after later Bug edits (200.6526ms)
+✖ real HTTP legacy failed preserves the exact original receipt after later Bug edits (201.8079ms)
+✖ legacy Accept q-values and malformed bodies reject before any domain write (202.5991ms)
+✖ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (211.0254ms)
+✖ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (205.1596ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1739.4162
+
+✖ failing tests:
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP vendor passed preserves the exact original receipt after later Bug edits (240.3514ms)
+  Error [SqliteStorageWorkerError]: foreign key mismatch - "verification_result_snapshots" referencing "events"
+      at SqliteStorageWorker.onMessage (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:440:28)
+      at Worker.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:44:53)
+      at Worker.emit (node:events:509:28)
+      at MessagePort.<anonymous> (node:internal/worker:350:14)
+      at [nodejs.internal.kHybridDispatch] (node:internal/event_target:856:20)
+      at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {
+    code: 'ERR_SQLITE_ERROR'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP vendor failed preserves the exact original receipt after later Bug edits (205.1014ms)
+  Error [SqliteStorageWorkerError]: foreign key mismatch - "verification_result_snapshots" referencing "events"
+      at SqliteStorageWorker.onMessage (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:440:28)
+      at Worker.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:44:53)
+      at Worker.emit (node:events:509:28)
+      at MessagePort.<anonymous> (node:internal/worker:350:14)
+      at [nodejs.internal.kHybridDispatch] (node:internal/event_target:856:20)
+      at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {
+    code: 'ERR_SQLITE_ERROR'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP legacy passed preserves the exact original receipt after later Bug edits (200.6526ms)
+  Error [SqliteStorageWorkerError]: foreign key mismatch - "verification_result_snapshots" referencing "events"
+      at SqliteStorageWorker.onMessage (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:440:28)
+      at Worker.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:44:53)
+      at Worker.emit (node:events:509:28)
+      at MessagePort.<anonymous> (node:internal/worker:350:14)
+      at [nodejs.internal.kHybridDispatch] (node:internal/event_target:856:20)
+      at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {
+    code: 'ERR_SQLITE_ERROR'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP legacy failed preserves the exact original receipt after later Bug edits (201.8079ms)
+  Error [SqliteStorageWorkerError]: foreign key mismatch - "verification_result_snapshots" referencing "events"
+      at SqliteStorageWorker.onMessage (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:440:28)
+      at Worker.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:44:53)
+      at Worker.emit (node:events:509:28)
+      at MessagePort.<anonymous> (node:internal/worker:350:14)
+      at [nodejs.internal.kHybridDispatch] (node:internal/event_target:856:20)
+      at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {
+    code: 'ERR_SQLITE_ERROR'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:241:1
+✖ legacy Accept q-values and malformed bodies reject before any domain write (202.5991ms)
+  Error [SqliteStorageWorkerError]: foreign key mismatch - "verification_result_snapshots" referencing "events"
+      at SqliteStorageWorker.onMessage (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:440:28)
+      at Worker.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:44:53)
+      at Worker.emit (node:events:509:28)
+      at MessagePort.<anonymous> (node:internal/worker:350:14)
+      at [nodejs.internal.kHybridDispatch] (node:internal/event_target:856:20)
+      at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {
+    code: 'ERR_SQLITE_ERROR'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:257:1
+✖ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (211.0254ms)
+  Error [SqliteStorageWorkerError]: foreign key mismatch - "verification_result_snapshots" referencing "events"
+      at SqliteStorageWorker.onMessage (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:440:28)
+      at Worker.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:44:53)
+      at Worker.emit (node:events:509:28)
+      at MessagePort.<anonymous> (node:internal/worker:350:14)
+      at [nodejs.internal.kHybridDispatch] (node:internal/event_target:856:20)
+      at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {
+    code: 'ERR_SQLITE_ERROR'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:282:1
+✖ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (205.1596ms)
+  Error [SqliteStorageWorkerError]: foreign key mismatch - "verification_result_snapshots" referencing "events"
+      at SqliteStorageWorker.onMessage (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:440:28)
+      at Worker.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/dist/sqlite-worker.js:44:53)
+      at Worker.emit (node:events:509:28)
+      at MessagePort.<anonymous> (node:internal/worker:350:14)
+      at [nodejs.internal.kHybridDispatch] (node:internal/event_target:856:20)
+      at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {
+    code: 'ERR_SQLITE_ERROR'
+  }

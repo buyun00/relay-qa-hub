@@ -1,0 +1,129 @@
+✖ real HTTP vendor passed preserves the exact original receipt after later Bug edits (536.1964ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-ar9Mex; 10 real HTTP requests
+✖ real HTTP vendor failed preserves the exact original receipt after later Bug edits (389.7754ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-1j1P2V; 10 real HTTP requests
+✖ real HTTP legacy passed preserves the exact original receipt after later Bug edits (385.5435ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-Bi1OI4; 10 real HTTP requests
+✖ real HTTP legacy failed preserves the exact original receipt after later Bug edits (406.2851ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-txPef9; 10 real HTTP requests
+✖ legacy Accept q-values and malformed bodies reject before any domain write (404.7434ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-58nw6S; 10 real HTTP requests
+✖ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (410.5099ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-ZWwpSu; 12 real HTTP requests
+✖ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (401.0988ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-bktWCS; 12 real HTTP requests
+ℹ tests 7
+ℹ suites 0
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3214.8932
+
+✖ failing tests:
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP vendor passed preserves the exact original receipt after later Bug edits (536.1964ms)
+  Error: no such table: notification_outbox
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:188
+      at Array.map (<anonymous>)
+      at snapshot (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:164)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:203:20)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP vendor failed preserves the exact original receipt after later Bug edits (389.7754ms)
+  Error: no such table: notification_outbox
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:188
+      at Array.map (<anonymous>)
+      at snapshot (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:164)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:203:20)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP legacy passed preserves the exact original receipt after later Bug edits (385.5435ms)
+  Error: no such table: notification_outbox
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:188
+      at Array.map (<anonymous>)
+      at snapshot (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:164)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:203:20)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP legacy failed preserves the exact original receipt after later Bug edits (406.2851ms)
+  Error: no such table: notification_outbox
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:188
+      at Array.map (<anonymous>)
+      at snapshot (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:164)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:203:20)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:241:1
+✖ legacy Accept q-values and malformed bodies reject before any domain write (404.7434ms)
+  Error: no such table: notification_outbox
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:188
+      at Array.map (<anonymous>)
+      at snapshot (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:164)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:242:95)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:257:1
+✖ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (410.5099ms)
+  Error: no such table: notification_outbox
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:188
+      at Array.map (<anonymous>)
+      at snapshot (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:164)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:262:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:282:1
+✖ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (401.0988ms)
+  Error: no such table: notification_outbox
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:188
+      at Array.map (<anonymous>)
+      at snapshot (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:195:164)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:288:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }

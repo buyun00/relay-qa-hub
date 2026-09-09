@@ -192,6 +192,7 @@ import {
   frozenVerification,
   frozenVerificationResult,
   workflowResponseMedia,
+  legacyVerificationResultMedia,
 } from "./frozen-workflow-response.js";
 import { registerAutomationRoutes } from "./automation.js";
 import {
@@ -2057,6 +2058,9 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   const buildErrorReply = (error: unknown, reply: FastifyReply) => {
     const code = (error as { code?: unknown })?.code;
+    if (code === "NOT_ACCEPTABLE" || code === "UNSUPPORTED_MEDIA_TYPE") {
+      return reply.code(code === "NOT_ACCEPTABLE" ? 406 : 415).send({ code });
+    }
     if (
       code === "ERR_SQLITE_ERROR" ||
       code === "SQLITE_BUSY" ||
@@ -2074,6 +2078,19 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       return reply.code(404).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
     if (code === "VERSION_CONFLICT") {
+      if (
+        error instanceof Error &&
+        /^(Historical Verification submission|Original Verification result snapshot)/u.test(
+          error.message,
+        )
+      ) {
+        return reply.code(412).header("content-type", MOBILE_API_CONTENT_TYPE).send({
+          code,
+          message:
+            "The original verification result receipt is unavailable. Inspect the preserved Verification and Bug history; this request was not executed again.",
+          requestId: randomUUID(),
+        });
+      }
       return reply.code(412).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
     if (
@@ -2385,12 +2402,20 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           request.params.verificationId,
           "verificationId",
         );
-        const body = parseMobileRecordVerificationResultRequest(request.body);
+        const body = parseMobileRecordVerificationResultRequest(request.body, {
+          allowLegacy: true,
+          contentType: readHeader(request.headers["content-type"]),
+        });
+        const isVendor = "submissionContractVersion" in body;
+        // Negotiate before the transaction: a legacy request cannot invent a client submission ID.
+        const media = isVendor
+          ? workflowResponseMedia(readHeader(request.headers.accept))
+          : legacyVerificationResultMedia(readHeader(request.headers.accept));
         const idempotencyKey = requireVerificationIdempotencyKey(
           readHeader(request.headers["idempotency-key"]),
         );
         const expectedKey = `workflow:recordVerificationResult:verification:${verificationId}:v${body.expectedVersion}`;
-        if (idempotencyKey !== expectedKey) {
+        if (idempotencyKey.length > 200 || (isVendor && idempotencyKey !== expectedKey)) {
           throw new TypeError("Idempotency-Key does not match Verification result");
         }
         const actorId = authenticatedActorId(request, debugActorId);
@@ -2398,6 +2423,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           actorId,
           verificationId,
           idempotencyKey,
+          requireAssignedVerifier: true,
           request: body,
         });
         if (
@@ -2422,7 +2448,6 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
             );
           }
         }
-        const media = workflowResponseMedia(readHeader(request.headers.accept));
         return reply.header("content-type", media).send(frozenVerificationResult(result, media));
       } catch (error: unknown) {
         return buildErrorReply(error, reply);

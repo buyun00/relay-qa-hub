@@ -80,13 +80,14 @@ export function createSqliteMobileVerificationStore(
     async recordResult(command) {
       const request: MobileRecordVerificationResultRequest = command.request;
       const common = {
+        requireAssignedVerifier: command.requireAssignedVerifier ?? false,
         ...actorScope(command.actorId),
         verificationId: command.verificationId,
         expectedVersion: request.expectedVersion,
         resultSummary: request.resultSummary,
-        clientSubmissionId: request.clientSubmissionId,
-        attachmentIds: request.attachmentIds,
-        captureBundleId: request.captureBundleId ?? null,
+        clientSubmissionId: "clientSubmissionId" in request ? request.clientSubmissionId : null,
+        attachmentIds: "attachmentIds" in request ? request.attachmentIds : [],
+        captureBundleId: "captureBundleId" in request ? (request.captureBundleId ?? null) : null,
         idempotencyKey: command.idempotencyKey,
         requestDigest: digest(request),
         createdAt: now().toISOString(),

@@ -1,0 +1,39 @@
+✔ real HTTP vendor passed preserves the exact original receipt after later Bug edits (666.1157ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-jUh1Ke; 16 real HTTP requests
+✔ real HTTP vendor failed preserves the exact original receipt after later Bug edits (527.6764ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-azFX0B; 16 real HTTP requests
+✔ real HTTP legacy passed preserves the exact original receipt after later Bug edits (513.4179ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-75r9Uq; 15 real HTTP requests
+✔ real HTTP legacy failed preserves the exact original receipt after later Bug edits (497.2049ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-KDZOd0; 15 real HTTP requests
+✔ legacy Accept q-values and malformed bodies reject before any domain write (557.3689ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-yW1K18; 25 real HTTP requests
+✔ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (489.6484ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-qRrFj2; 22 real HTTP requests
+✔ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (460.169ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-PkTHIG; 17 real HTTP requests
+✔ legal long Unicode/control text exceeds generic 64KiB while exact immutable replay and recovery remain valid (578.3613ms)
+ℹ immutable result bytes=106665; online backup restored without re-execution
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-3XlTNe; 12 real HTTP requests
+✔ manual takeover preserves actual non-null parentAttemptId in frozen result and original replay (441.7603ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-Ojqc5r; 14 real HTTP requests
+(node:20184) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ fixed pre-Phase-A writer leaves IDs-only history intact; new replay refuses to reconstruct it (524.9768ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-dwnUWn; 13 real HTTP requests
+✔ snapshot/pointer exact shape, types, scope and digest cannot be replaced; rejected transactions leave all facts intact (706.2385ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-Bqiy4R; 10 real HTTP requests
+✔ vendor result final receipt failure rolls back domain, event, notification, snapshot and submission atomically (508.9018ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-tP3rOp; 12 real HTTP requests
+✔ legacy result final receipt failure rolls back domain, event, notification, snapshot and submission atomically (496.0822ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-kwTX4g; 12 real HTTP requests
+✔ ordinary multi-employee closure remains allowed while the frozen result requires its assigned verifier, including replay (447.6688ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-HR5eYJ; 16 real HTTP requests
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7714.7836

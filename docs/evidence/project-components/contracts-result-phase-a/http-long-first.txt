@@ -1,0 +1,57 @@
+✔ real HTTP vendor passed preserves the exact original receipt after later Bug edits (683.1833ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-EuWnmH; 16 real HTTP requests
+✔ real HTTP vendor failed preserves the exact original receipt after later Bug edits (544.1832ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-yTKMd6; 16 real HTTP requests
+✔ real HTTP legacy passed preserves the exact original receipt after later Bug edits (527.306ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-dc84iq; 15 real HTTP requests
+✔ real HTTP legacy failed preserves the exact original receipt after later Bug edits (498.9029ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-yBZFu4; 15 real HTTP requests
+✔ legacy Accept q-values and malformed bodies reject before any domain write (518.7196ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-CRSlZn; 24 real HTTP requests
+✔ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (489.657ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-Npc0jz; 22 real HTTP requests
+✔ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (457.8057ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-ibxQaI; 17 real HTTP requests
+✖ legal long Unicode/control text exceeds generic 64KiB while exact immutable replay and recovery remain valid (381.682ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-IVdJzW; 11 real HTTP requests
+✔ manual takeover preserves actual non-null parentAttemptId in frozen result and original replay (460.3416ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-1ebI8K; 14 real HTTP requests
+✖ fixed pre-Phase-A writer leaves IDs-only history intact; new replay refuses to reconstruct it (422.2071ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-XjyzRZ; 10 real HTTP requests
+ℹ tests 10
+ℹ suites 0
+ℹ pass 8
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5271.2133
+
+✖ failing tests:
+
+test at apps\api\test\verification-result-phase-a.test.mjs:312:1
+✖ legal long Unicode/control text exceeds generic 64KiB while exact immutable replay and recovery remain valid (381.682ms)
+  AssertionError [ERR_ASSERTION]: POST verifications/5cd26eee-b60a-47fd-af6d-36d7278a8083/result: code=STORAGE_WRITE_TEMPORARILY_UNAVAILABLE
+  
+  503 !== 200
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:126:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:317:17)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:351:1
+✖ fixed pre-Phase-A writer leaves IDs-only history intact; new replay refuses to reconstruct it (422.2071ms)
+  TypeError: Cannot read properties of undefined (reading 'ESNext')
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:355:86)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

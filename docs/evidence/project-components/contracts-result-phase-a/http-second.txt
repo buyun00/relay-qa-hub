@@ -1,0 +1,159 @@
+✖ real HTTP vendor passed preserves the exact original receipt after later Bug edits (675.226ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-4B4sPd; 16 real HTTP requests
+✖ real HTTP vendor failed preserves the exact original receipt after later Bug edits (521.2816ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-NFe9FS; 16 real HTTP requests
+✖ real HTTP legacy passed preserves the exact original receipt after later Bug edits (400.5908ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-JLWk1x; 11 real HTTP requests
+✖ real HTTP legacy failed preserves the exact original receipt after later Bug edits (391.932ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-qQYcZK; 11 real HTTP requests
+✖ legacy Accept q-values and malformed bodies reject before any domain write (524.3172ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-QeiEng; 21 real HTTP requests
+✖ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (437.0559ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-hvKn0H; 17 real HTTP requests
+✖ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (458.2452ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-FoRfKu; 17 real HTTP requests
+ℹ tests 7
+ℹ suites 0
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3695.3061
+
+✖ failing tests:
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP vendor passed preserves the exact original receipt after later Bug edits (675.226ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '0778fe2a-1e66-49ac-811b-59648c03114b'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:237:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '0778fe2a-1e66-49ac-811b-59648c03114b',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP vendor failed preserves the exact original receipt after later Bug edits (521.2816ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'af736d1f-f4dc-48f0-8345-e53645454a72'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:237:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'af736d1f-f4dc-48f0-8345-e53645454a72',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP legacy passed preserves the exact original receipt after later Bug edits (400.5908ms)
+  AssertionError [ERR_ASSERTION]: POST verifications/95d98bff-a036-4752-93df-438a952df3b2/result: code=NOT_ACCEPTABLE
+  
+  406 !== 200
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:121:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:204:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 406,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:199:3
+✖ real HTTP legacy failed preserves the exact original receipt after later Bug edits (391.932ms)
+  AssertionError [ERR_ASSERTION]: POST verifications/d9be0b7a-b8cc-464a-9e0b-0eb32f7d17f9/result: code=NOT_ACCEPTABLE
+  
+  406 !== 200
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:121:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:204:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 406,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:241:1
+✖ legacy Accept q-values and malformed bodies reject before any domain write (524.3172ms)
+  AssertionError [ERR_ASSERTION]: POST verifications/9517147f-daf8-4842-b45b-f11310ec8e89/result: code=NOT_ACCEPTABLE
+  
+  406 !== 200
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:121:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:254:112)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 406,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:257:1
+✖ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (437.0559ms)
+  AssertionError [ERR_ASSERTION]: POST verifications/1e74898d-ec05-461f-ac58-4d2d5d4b7050/result: code=NOT_FOUND
+  
+  404 !== 403
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:121:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:267:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\verification-result-phase-a.test.mjs:282:1
+✖ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (458.2452ms)
+  AssertionError [ERR_ASSERTION]: GET verifications/f91bdc88-44a1-49d0-b914-c86d77bb8789: code=response
+  
+  200 !== 404
+  
+      at request (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:121:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/verification-result-phase-a.test.mjs:295:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 404,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

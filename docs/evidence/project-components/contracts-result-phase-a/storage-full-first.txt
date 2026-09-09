@@ -1,0 +1,45 @@
+npm notice run @relay-qa-hub/storage@0.1.0-debug test
+npm notice run npm run build && tsx --test test/storage.test.ts test/sqlite-migrations.test.ts test/sqlite-invariants.test.ts test/sqlite-backup.test.ts test/sqlite-restore.test.ts test/attachment-restore.test.ts test/sqlite-archive.test.ts test/qingyu-link-store.test.ts test/user-management-store.test.ts test/mobile-scope-branding.test.ts test/project-management-store.test.ts test/workflow-idempotency.test.ts
+node:internal/modules/cjs/loader:1520
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\.tools\npm-12.0.2\package\bin\node_modules\npm\bin\npm-prefix.js'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)
+    at Module._load (node:internal/modules/cjs/loader:1294:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v24.19.0
+node:internal/modules/cjs/loader:1520
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\.tools\npm-12.0.2\package\bin\node_modules\npm\bin\npm-cli.js'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)
+    at Module._load (node:internal/modules/cjs/loader:1294:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v24.19.0
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage
+npm error workspace @relay-qa-hub/storage@0.1.0-debug
+npm error location C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c npm run build && tsx --test test/storage.test.ts test/sqlite-migrations.test.ts test/sqlite-invariants.test.ts test/sqlite-backup.test.ts test/sqlite-restore.test.ts test/attachment-restore.test.ts test/sqlite-archive.test.ts test/qingyu-link-store.test.ts test/user-management-store.test.ts test/mobile-scope-branding.test.ts test/project-management-store.test.ts test/workflow-idempotency.test.ts

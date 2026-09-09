@@ -199,7 +199,7 @@ export interface MobileManualRepairAttemptRecord {
   readonly mode: "human" | "relay";
   readonly status: "planned" | "running" | "delivered" | "verification_failed";
   readonly assigneeId: string;
-  readonly parentAttemptId: null;
+  readonly parentAttemptId: string | null;
   readonly summary: string | null;
   readonly branch: string | null;
   readonly commitSha: string | null;
@@ -207,7 +207,7 @@ export interface MobileManualRepairAttemptRecord {
   readonly patchUrl: string | null;
   readonly noCodeReason: string | null;
   readonly failureReason: string | null;
-  readonly targetBuildId: null;
+  readonly targetBuildId: string | null;
   readonly version: number;
 }
 
@@ -1683,7 +1683,7 @@ function toManualAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     mode: "human",
     status: row.status,
     assigneeId: row.assignee_id,
-    parentAttemptId: null,
+    parentAttemptId: row.parent_attempt_id,
     summary: row.summary,
     branch: row.branch,
     commitSha: row.commit_sha,
@@ -1691,7 +1691,7 @@ function toManualAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     patchUrl: row.patch_url ?? null,
     noCodeReason: row.no_code_reason ?? null,
     failureReason: row.failure_reason ?? null,
-    targetBuildId: null,
+    targetBuildId: row.target_build_id,
     version: row.version,
   });
 }

@@ -38,8 +38,16 @@ interface MobileRecordVerificationResultBase {
   readonly captureBundleId?: string | null;
 }
 
-export type MobileRecordVerificationResultRequest = MobileRecordVerificationResultBase &
+export type MobileVendorVerificationResultRequest = MobileRecordVerificationResultBase &
   ({ readonly status: "passed" } | { readonly status: "failed"; readonly failureReason: string });
+
+export type MobileLegacyVerificationResultRequest = {
+  readonly expectedVersion: number;
+  readonly resultSummary: string;
+} & ({ readonly status: "passed" } | { readonly status: "failed"; readonly failureReason: string });
+
+export type MobileRecordVerificationResultRequest =
+  MobileVendorVerificationResultRequest | MobileLegacyVerificationResultRequest;
 
 export interface MobileVerificationStore {
   readonly createVerification: (command: {
@@ -62,6 +70,8 @@ export interface MobileVerificationStore {
     readonly actorId: string;
     readonly verificationId: string;
     readonly idempotencyKey: string;
+    /** Frozen result endpoint policy; never populated from the caller's request body. */
+    readonly requireAssignedVerifier?: boolean;
     readonly request: MobileRecordVerificationResultRequest;
   }) => MobileVerificationResultResponse | Promise<MobileVerificationResultResponse>;
 }
@@ -144,8 +154,52 @@ export function parseMobileStartVerificationRequest(
 
 export function parseMobileRecordVerificationResultRequest(
   value: unknown,
+): MobileVendorVerificationResultRequest;
+export function parseMobileRecordVerificationResultRequest(
+  value: unknown,
+  options: { readonly allowLegacy: true; readonly contentType: string | undefined },
+): MobileRecordVerificationResultRequest;
+export function parseMobileRecordVerificationResultRequest(
+  value: unknown,
+  options?: { readonly allowLegacy: true; readonly contentType: string | undefined },
 ): MobileRecordVerificationResultRequest {
+  const media = options?.contentType?.split(";")[0]?.trim().toLowerCase();
+  if (
+    options &&
+    media !== "application/json" &&
+    media !== "application/vnd.relay-qa-hub.v1.1+json"
+  ) {
+    throw Object.assign(new Error("Unsupported Verification result request media"), {
+      code: "UNSUPPORTED_MEDIA_TYPE",
+    });
+  }
   const body = record(value);
+  const vendorFields = [
+    "submissionContractVersion",
+    "clientSubmissionId",
+    "attachmentIds",
+    "captureBundleId",
+  ];
+  const isVendor = vendorFields.some((key) => Object.hasOwn(body, key));
+  if (options?.allowLegacy && !isVendor && media === "application/json") {
+    onlyKeys(body, new Set(["expectedVersion", "status", "resultSummary", "failureReason"]));
+    const common = {
+      expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
+      resultSummary: boundedString(body["resultSummary"], "resultSummary", 1, 10_000),
+    };
+    if (body["status"] === "failed")
+      return {
+        ...common,
+        status: "failed",
+        failureReason: boundedString(body["failureReason"], "failureReason", 1, 5_000),
+      };
+    if (body["status"] !== "passed" || body["failureReason"] !== undefined) {
+      throw new TypeError(
+        "Legacy result must be passed or failed with the applicable failureReason",
+      );
+    }
+    return { ...common, status: "passed" };
+  }
   onlyKeys(
     body,
     new Set([

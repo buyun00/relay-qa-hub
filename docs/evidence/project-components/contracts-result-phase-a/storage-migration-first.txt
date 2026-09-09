@@ -1,0 +1,31 @@
+✖ schema14 to15 preserves every old table and retains a restorable pre-migration backup (154.6231ms)
+ℹ retained migration fixture C:\Users\lin0\AppData\Local\Temp\qa-result-migration15-1pewPL
+✔ transitionMobileBugReady: two workers replay one effect, reject changed payload and persist the original DTO (845.7925ms)
+✔ createMobileManualRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (778.1911ms)
+✔ startMobileRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (751.0587ms)
+✔ deliverMobileRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (765.1955ms)
+✔ createMobileVerification: two workers replay one effect, reject changed payload and persist the original DTO (790.1032ms)
+✔ startMobileVerification: two workers replay one effect, reject changed payload and persist the original DTO (746.1022ms)
+✔ receipt replay rechecks actor/project visibility, membership revocation, GM scope and soft deletion (484.7838ms)
+✔ a failure after effect writes rolls back domain, audit, notification and reserved receipt together (368.1649ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5963.4697
+
+✖ failing tests:
+
+test at packages\storage\test\workflow-idempotency.test.ts:1:864
+✖ schema14 to15 preserves every old table and retains a restorable pre-migration backup (154.6231ms)
+  TypeError: Provided value cannot be bound to SQLite parameter 3.
+      at readBug (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\src\mobile-bug-store.ts:171:6)
+      at getMobileBug (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\src\mobile-bug-store.ts:775:10)
+      at TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-idempotency.test.ts:43:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    code: 'ERR_INVALID_ARG_TYPE'
+  }

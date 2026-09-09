@@ -15,7 +15,9 @@ type WorkflowOperation =
   | "startRepairAttempt"
   | "deliverRepairAttempt"
   | "createVerification"
-  | "startVerification";
+  | "startVerification"
+  | "recordVerificationResult"
+  | "recordLegacyVerificationResult";
 
 type WorkflowTarget = Readonly<{ type: "bug" | "repair_attempt" | "verification"; id: string }>;
 

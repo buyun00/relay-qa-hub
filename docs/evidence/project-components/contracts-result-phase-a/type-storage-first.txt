@@ -1,0 +1,11 @@
+npm notice run @relay-qa-hub/storage@0.1.0-debug typecheck
+npm notice run tsc --noEmit -p tsconfig.test.json
+test/workflow-idempotency.test.ts(43,18): error TS2554: Expected 3 arguments, but got 2.
+test/workflow-idempotency.test.ts(58,20): error TS2554: Expected 3 arguments, but got 2.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 1
+npm error path C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage
+npm error workspace @relay-qa-hub/storage@0.1.0-debug
+npm error location C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c tsc --noEmit -p tsconfig.test.json

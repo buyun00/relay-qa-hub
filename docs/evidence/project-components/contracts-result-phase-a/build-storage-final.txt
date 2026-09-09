@@ -1,0 +1,2 @@
+npm notice run @relay-qa-hub/storage@0.1.0-debug build
+npm notice run tsc -p tsconfig.json

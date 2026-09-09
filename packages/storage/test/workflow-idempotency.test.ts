@@ -3,15 +3,113 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DatabaseSync } from "node:sqlite";
+import { DatabaseSync, backup } from "node:sqlite";
 import test from "node:test";
 import { Worker } from "node:worker_threads";
 import { projectManagement } from "../src/project-management-store.ts";
-import { deleteMobileBug } from "../src/mobile-bug-store.ts";
+import {
+  deleteMobileBug,
+  ensureMobileScope,
+  createMobileBug,
+  getMobileBug,
+} from "../src/mobile-bug-store.ts";
+import {
+  migrateSqliteDatabase,
+  openSqliteDatabaseForWorker,
+  currentSqliteSchemaVersion,
+  verifySqliteIntegrity,
+} from "../src/sqlite.ts";
 
 type RecordValue = Record<string, unknown>;
 const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const now = () => new Date().toISOString();
+
+test("schema14 to15 preserves every old table and retains a restorable pre-migration backup", async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), "qa-result-migration15-"));
+  t.diagnostic(`retained migration fixture ${directory}`);
+  const databaseFile = join(directory, "schema14.sqlite");
+  const database = openSqliteDatabaseForWorker({ databaseFile, busyTimeoutMs: 1000 });
+  try {
+    await migrateSqliteDatabase(database, databaseFile, { targetVersion: 14 });
+    const scope = { accountId: randomUUID(), projectId: randomUUID(), actorId: randomUUID() };
+    database.exec("BEGIN IMMEDIATE");
+    ensureMobileScope(database, {
+      ...scope,
+      membershipId: randomUUID(),
+      projectKey: "MIG15",
+      createdAt: now(),
+    });
+    const created = createMobileBug(database, {
+      ...scope,
+      clientSubmissionId: randomUUID(),
+      payloadDigest: digest("migration fixture"),
+      title: "A real schema14 Bug",
+      description: "Preserve this immutable pre-migration history",
+      expectedBehavior: "Add result snapshots without changing old facts",
+      severity: "S2",
+      priority: "P2",
+      ownerId: scope.actorId,
+      verificationOwnerId: scope.actorId,
+      occurrence: {
+        observedAt: now(),
+        platform: "web",
+        steps: ["Read after migration"],
+        actualBehavior: "Recorded",
+      },
+      attachmentIds: [],
+      captureBundleId: null,
+      createdAt: now(),
+    });
+    database.exec("COMMIT");
+    const tables = database
+      .prepare(
+        "SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name <> 'schema_migrations' ORDER BY name",
+      )
+      .all()
+      .map((row) => String(row.name));
+    const contents = (connection: DatabaseSync) =>
+      Object.fromEntries(
+        tables.map((table) => [
+          table,
+          connection.prepare(`SELECT * FROM "${table.replaceAll('"', '""')}"`).all(),
+        ]),
+      );
+    const before = contents(database);
+    const migration = await migrateSqliteDatabase(database, databaseFile, {
+      backupRoot: join(directory, "before-backup"),
+    });
+    assert.deepEqual(migration.appliedVersions, [15]);
+    assert.equal(currentSqliteSchemaVersion(database), 15);
+    assert.deepEqual(contents(database), before);
+    assert.equal(getMobileBug(database, scope, created.bug.id)?.id, created.bug.id);
+    assert.equal(verifySqliteIntegrity(database).ok, true);
+    assert.ok(migration.backupPath);
+    const old = new DatabaseSync(migration.backupPath, { readOnly: true });
+    try {
+      assert.equal(currentSqliteSchemaVersion(old), 14);
+      assert.deepEqual(contents(old), before);
+      assert.equal(verifySqliteIntegrity(old).ok, true);
+    } finally {
+      old.close();
+    }
+    const recoveredFile = join(directory, "recovered-schema15.sqlite");
+    await backup(database, recoveredFile);
+    const recovered = new DatabaseSync(recoveredFile, { readOnly: true });
+    try {
+      assert.equal(currentSqliteSchemaVersion(recovered), 15);
+      assert.deepEqual(contents(recovered), before);
+      assert.equal(getMobileBug(recovered, scope, created.bug.id)?.id, created.bug.id);
+      assert.equal(verifySqliteIntegrity(recovered).ok, true);
+    } finally {
+      recovered.close();
+    }
+    t.diagnostic(
+      `${tables.length} old tables identical; SHA256 ${digest(before)}; original Bug ${created.bug.id}`,
+    );
+  } finally {
+    database.close();
+  }
+});
 
 /** Real worker entry from source. SqliteStorageWorker itself intentionally selects dist in TS tests. */
 class SourceWorker {

@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-09-09T02:48:35.489Z",
+  "sourceFrozen": true,
+  "files": [
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/README.md",
+      "sha256": "b43781444df6ccf765fd012bb2deef7802a3f183e91c0829444d05de58abbfbf"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/result.json",
+      "sha256": "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/format-final-check.txt",
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/diff-final-check.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

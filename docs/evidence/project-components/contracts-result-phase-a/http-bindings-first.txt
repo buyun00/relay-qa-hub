@@ -1,0 +1,33 @@
+✔ real HTTP vendor passed preserves the exact original receipt after later Bug edits (671.4064ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-gU6GqK; 16 real HTTP requests
+✔ real HTTP vendor failed preserves the exact original receipt after later Bug edits (533.3444ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-bb1rmv; 16 real HTTP requests
+✔ real HTTP legacy passed preserves the exact original receipt after later Bug edits (515.1716ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-tfjfQc; 15 real HTTP requests
+✔ real HTTP legacy failed preserves the exact original receipt after later Bug edits (534.1771ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-cCSqVl; 15 real HTTP requests
+✔ legacy Accept q-values and malformed bodies reject before any domain write (543.039ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-ePzbPK; 24 real HTTP requests
+✔ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (515.7541ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-g5gh6P; 22 real HTTP requests
+✔ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (462.2723ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-VPyhGj; 17 real HTTP requests
+✔ legal long Unicode/control text exceeds generic 64KiB while exact immutable replay and recovery remain valid (657.122ms)
+ℹ immutable result bytes=106665; online backup restored without re-execution
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-hohwiU; 12 real HTTP requests
+✔ manual takeover preserves actual non-null parentAttemptId in frozen result and original replay (465.5918ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-HBGPi2; 14 real HTTP requests
+(node:3008) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ fixed pre-Phase-A writer leaves IDs-only history intact; new replay refuses to reconstruct it (536.9786ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-2Io9o1; 13 real HTTP requests
+✔ snapshot/pointer exact shape, types, scope and digest cannot be replaced; rejected transactions leave all facts intact (846.2169ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-KdbOSV; 10 real HTTP requests
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6559.9081

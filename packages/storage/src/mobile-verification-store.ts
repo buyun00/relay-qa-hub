@@ -59,10 +59,11 @@ export interface StartMobileVerificationInput extends MobileRelayScope {
 }
 
 interface RecordMobileVerificationResultBase extends MobileRelayScope {
+  readonly requireAssignedVerifier?: boolean;
   readonly verificationId: string;
   readonly expectedVersion: number;
   readonly resultSummary: string;
-  readonly clientSubmissionId: string;
+  readonly clientSubmissionId: string | null;
   readonly attachmentIds: readonly string[];
   readonly captureBundleId: string | null;
   readonly idempotencyKey: string;
@@ -77,7 +78,7 @@ export type RecordMobileVerificationResultInput = RecordMobileVerificationResult
   );
 
 export interface MobileVerificationResultResponse {
-  readonly clientSubmissionId: string;
+  readonly clientSubmissionId: string | null;
   readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
   readonly verification: MobileVerificationRecord;
   readonly repairAttempt: MobileManualRepairAttemptRecord;
@@ -328,7 +329,7 @@ function toAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     mode: row.mode,
     status: row.status,
     assigneeId: row.assignee_id,
-    parentAttemptId: null,
+    parentAttemptId: row.parent_attempt_id,
     summary: row.summary,
     branch: row.branch,
     commitSha: row.commit_sha,
@@ -336,7 +337,7 @@ function toAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     patchUrl: row.patch_url,
     noCodeReason: row.no_code_reason,
     failureReason: row.failure_reason,
-    targetBuildId: null,
+    targetBuildId: row.target_build_id,
     version: row.version,
   });
 }
@@ -783,7 +784,15 @@ export function getMobileVerification(
   input: GetMobileVerificationInput,
 ): MobileVerificationRecord | null {
   requireUuid(input.verificationId, "verificationId");
+  if (!hasProjectMembership(database, input, input.actorId)) return null;
   const row = readVerification(database, input, input.verificationId);
+  if (
+    row &&
+    database
+      .prepare(`SELECT 1 FROM bug_deletions WHERE account_id=? AND project_id=? AND bug_id=?`)
+      .get(input.accountId, input.projectId, row.bug_id)
+  )
+    return null;
   return row ? toVerification(row) : null;
 }
 
@@ -920,13 +929,25 @@ function claimVerificationAttachments(
   }
 }
 
+function resultAuditText(value: string, maximumBytes: number): string {
+  const redacted = toBoundedAuditText(value, maximumBytes);
+  if (Buffer.byteLength(JSON.stringify(redacted), "utf8") <= maximumBytes) return redacted;
+  let prefix = "";
+  for (const character of redacted) {
+    if (Buffer.byteLength(JSON.stringify(`${prefix}${character}…`), "utf8") > maximumBytes) break;
+    prefix += character;
+  }
+  return `${prefix}…`;
+}
+
 export function recordMobileVerificationResult(
   database: DatabaseSync,
   input: RecordMobileVerificationResultInput,
 ): MobileVerificationResultResponse {
   requireTransaction(database);
   requireUuid(input.verificationId, "verificationId");
-  requireUuid(input.clientSubmissionId, "clientSubmissionId");
+  if (input.clientSubmissionId !== null)
+    requireUuid(input.clientSubmissionId, "clientSubmissionId");
   requireVerificationIdentity(input, input.actorId);
   requireText(input.resultSummary, "resultSummary", 10_000);
   if (input.status === "failed") {
@@ -937,7 +958,8 @@ export function recordMobileVerificationResult(
   if (
     input.attachmentIds.length > 8 ||
     new Set(input.attachmentIds).size !== input.attachmentIds.length ||
-    input.captureBundleId !== null
+    input.captureBundleId !== null ||
+    (input.clientSubmissionId === null && input.attachmentIds.length > 0)
   ) {
     throw new MobileRelayStorageError(
       "INVALID_REQUEST",
@@ -945,6 +967,71 @@ export function recordMobileVerificationResult(
     );
   }
   for (const attachmentId of input.attachmentIds) requireUuid(attachmentId, "attachmentId");
+  const operation =
+    input.clientSubmissionId === null
+      ? "recordLegacyVerificationResult"
+      : "recordVerificationResult";
+  const receipt = workflowReceipt<{ readonly snapshotId: string }>(database, input, operation, {
+    type: "verification",
+    id: input.verificationId,
+  });
+  const current = readVerification(database, input, input.verificationId);
+  if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
+  if (input.requireAssignedVerifier && current.verifier_id !== input.actorId) {
+    throw new MobileRelayStorageError(
+      "FORBIDDEN",
+      "Only the assigned verifier may record or replay this result",
+    );
+  }
+  // The internal legacy operation has no submissions row; it still shares the public key boundary.
+  const otherFamily = database
+    .prepare(
+      `SELECT 1 FROM idempotency_records
+    WHERE account_id = ? AND project_id = ? AND actor_id = ? AND idempotency_key = ?
+      AND operation_id = ? AND json_extract(scope_json, '$.targetId') = ?`,
+    )
+    .get(
+      input.accountId,
+      input.projectId,
+      input.actorId,
+      input.idempotencyKey,
+      operation === "recordVerificationResult"
+        ? "recordLegacyVerificationResult"
+        : "recordVerificationResult",
+      input.verificationId,
+    );
+  if (otherFamily)
+    throw new MobileRelayStorageError(
+      "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      "Result key was already used with another request contract",
+    );
+  if (receipt.replay) {
+    const snapshot = database
+      .prepare(
+        `SELECT response_json FROM verification_result_snapshots
+      WHERE id=? AND account_id=? AND project_id=? AND actor_id=? AND verification_id=?
+        AND operation_id=? AND idempotency_key=? AND request_digest=?`,
+      )
+      .get(
+        receipt.replay.snapshotId,
+        input.accountId,
+        input.projectId,
+        input.actorId,
+        input.verificationId,
+        operation,
+        input.idempotencyKey,
+        input.requestDigest,
+      );
+    if (!snapshot || typeof snapshot.response_json !== "string")
+      throw new MobileRelayStorageError(
+        "VERSION_CONFLICT",
+        "Original Verification result snapshot is unavailable; inspect preserved history",
+      );
+    return Object.freeze({
+      ...(JSON.parse(snapshot.response_json) as MobileVerificationResultResponse),
+      replayed: true,
+    });
+  }
   const prior = readVerificationSubmission(database, input);
   if (prior) {
     if (prior.intent !== "verification_result" || prior.payload_digest !== input.requestDigest) {
@@ -953,10 +1040,11 @@ export function recordMobileVerificationResult(
         "client submission was already used with another Verification result",
       );
     }
-    return loadResultResponse(database, input, true);
+    throw new MobileRelayStorageError(
+      "VERSION_CONFLICT",
+      "Historical Verification submission has no original durable result receipt; inspect the preserved Verification and Bug history",
+    );
   }
-  const current = readVerification(database, input, input.verificationId);
-  if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
   const bug = readBug(database, input, current.bug_id);
   if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Verification Bug was not found");
   if (!hasProjectMembership(database, input, input.actorId))
@@ -997,10 +1085,8 @@ export function recordMobileVerificationResult(
     toState: nextBugState,
     payload: {
       status: input.status,
-      summary: toBoundedAuditText(input.resultSummary, input.status === "failed" ? 1_500 : 2_000),
-      ...(input.status === "failed"
-        ? { reason: toBoundedAuditText(input.failureReason, 1_500) }
-        : {}),
+      summary: resultAuditText(input.resultSummary, input.status === "failed" ? 1_500 : 2_000),
+      ...(input.status === "failed" ? { reason: resultAuditText(input.failureReason, 1_500) } : {}),
       verificationId: current.id,
       repairAttemptId: current.repair_attempt_id,
       ...(current.build_id === null ? {} : { buildId: current.build_id }),
@@ -1095,34 +1181,61 @@ export function recordMobileVerificationResult(
       `Bug did not enter ${nextBugState} exactly once`,
     );
   }
+  const result = loadResultResponse(database, input, false);
+  const snapshotId = randomUUID();
   database
     .prepare(
-      `INSERT INTO submissions(
+      `INSERT INTO verification_result_snapshots (
+    id,account_id,project_id,actor_id,bug_id,verification_id,client_submission_id,
+    operation_id,idempotency_key,request_digest,event_id,response_json,created_at
+  ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    )
+    .run(
+      snapshotId,
+      input.accountId,
+      input.projectId,
+      input.actorId,
+      bug.id,
+      current.id,
+      input.clientSubmissionId,
+      operation,
+      input.idempotencyKey,
+      input.requestDigest,
+      eventId,
+      JSON.stringify(result),
+      at,
+    );
+  const snapshot = {
+    clientSubmissionId: input.clientSubmissionId,
+    projectId: input.projectId,
+    bugId: bug.id,
+    occurrenceId: null,
+    commentId: null,
+    verificationId: current.id,
+    captureBundleId: null,
+    snapshotId,
+  };
+  if (input.clientSubmissionId !== null)
+    database
+      .prepare(
+        `INSERT INTO submissions(
         id, account_id, project_id, actor_id, client_submission_id, intent,
         payload_digest, bug_id, occurrence_id, comment_id, verification_id,
         capture_bundle_id, response_json, committed_at, version
       ) VALUES (?, ?, ?, ?, ?, 'verification_result', ?, ?, NULL, NULL, ?, NULL, ?, ?, 1)`,
-    )
-    .run(
-      randomUUID(),
-      input.accountId,
-      input.projectId,
-      input.actorId,
-      input.clientSubmissionId,
-      input.requestDigest,
-      bug.id,
-      current.id,
-      JSON.stringify({
-        clientSubmissionId: input.clientSubmissionId,
-        projectId: input.projectId,
-        bugId: bug.id,
-        occurrenceId: null,
-        commentId: null,
-        verificationId: current.id,
-        captureBundleId: null,
-      }),
-      at,
-    );
+      )
+      .run(
+        randomUUID(),
+        input.accountId,
+        input.projectId,
+        input.actorId,
+        input.clientSubmissionId,
+        input.requestDigest,
+        bug.id,
+        current.id,
+        JSON.stringify(snapshot),
+        at,
+      );
   if (input.status === "failed" && attempt.mode === "relay") {
     queueRelayRework(database, {
       accountId: input.accountId,
@@ -1142,5 +1255,6 @@ export function recordMobileVerificationResult(
       createdAt: at,
     });
   }
-  return loadResultResponse(database, input, false);
+  receipt.commit(snapshot, eventId);
+  return result;
 }

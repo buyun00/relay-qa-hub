@@ -1,0 +1,2 @@
+npm notice run @relay-qa-hub/storage@0.1.0-debug typecheck
+npm notice run tsc --noEmit -p tsconfig.test.json

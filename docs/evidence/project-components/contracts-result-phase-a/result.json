@@ -1,0 +1,806 @@
+{
+  "kind": "phase_a_local_implementation_and_real_fixture_regression",
+  "createdAt": "2026-09-09T02:46:37.729Z",
+  "status": "passed",
+  "head": "e7ee04f01a976fa196ee97afcafec2deaa38f70b",
+  "baselineOldWriter": {
+    "commit": "3baff66d84dd6ad2f9b5f48230ff4375510269ec",
+    "path": "packages/storage/src/mobile-verification-store.ts",
+    "sha256": "b6e77504faeb146078d01e17d6d96a2546ebdf51380f097645198f1c3dad7458"
+  },
+  "boundaries": {
+    "deployed": false,
+    "preview4419Touched": false,
+    "productionTouched": false,
+    "clientsChanged": false,
+    "externalExecutorsRun": false,
+    "contractsChanged": false,
+    "phase": "A",
+    "oldRecordsBackfilled": false
+  },
+  "results": {
+    "api": {
+      "tests": 260,
+      "pass": 260,
+      "fail": 0
+    },
+    "storage": {
+      "tests": 118,
+      "pass": 118,
+      "fail": 0
+    },
+    "phaseAHttp": {
+      "tests": 14,
+      "requests": 215,
+      "randomLoopbackOnly": true
+    },
+    "types": "passed",
+    "lint": "passed",
+    "contracts": [
+      {
+        "log": "contracts10.txt",
+        "status": "passed"
+      },
+      {
+        "log": "freeze10.txt",
+        "status": "passed"
+      },
+      {
+        "log": "contracts11.txt",
+        "status": "passed"
+      },
+      {
+        "log": "additive.txt",
+        "status": "passed"
+      },
+      {
+        "log": "freeze11.txt",
+        "status": "passed"
+      }
+    ]
+  },
+  "schema": {
+    "from": 14,
+    "to": 15,
+    "additiveOnly": true,
+    "table": "verification_result_snapshots",
+    "genericReceiptMaxBytes": 65536,
+    "resultSnapshotMaxBytes": 1048576,
+    "longResultMeasuredBytes": 106665,
+    "textBound": {
+      "variableCodeUnits": 83640,
+      "maxJsonBytesPerCodeUnit": 6,
+      "variableBytes": 501840,
+      "conservativeFixedAllowance": 16384,
+      "totalBound": 518224
+    },
+    "existingTablesPreserved": 69
+  },
+  "source": [
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 107855,
+      "sha256": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f"
+    },
+    {
+      "path": "apps/api/src/frozen-workflow-response.ts",
+      "bytes": 4331,
+      "sha256": "599762c9402571919ed6a8a501995c816d55fe962b44db95b6070f01bc301258"
+    },
+    {
+      "path": "apps/api/src/mobile-verification.ts",
+      "bytes": 10014,
+      "sha256": "e19335e3e5dbe8bfd268cdfe3c2b3391219787444f9e0c941483439e8a9bbc84"
+    },
+    {
+      "path": "apps/api/src/sqlite-mobile-verification-store.ts",
+      "bytes": 3735,
+      "sha256": "4d96cc184251e0bd15dc7136a2b1e531277a1d8505a230e9777940b46743a691"
+    },
+    {
+      "path": "packages/storage/src/mobile-relay-store.ts",
+      "bytes": 163772,
+      "sha256": "7f50938a6342d1abe9a28c12c9a499d7fa0264461185e9e31b54bcfbf6e56e36"
+    },
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "bytes": 46266,
+      "sha256": "e23d13c46286516ee19b4a04d3a381f2fb2a3dd2b4a629095006b0fefd582a5a"
+    },
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 327115,
+      "sha256": "90221613c779477900915a137561eba8587769117e1bd11843a9cc38b045bd12"
+    },
+    {
+      "path": "packages/storage/src/workflow-idempotency.ts",
+      "bytes": 5943,
+      "sha256": "d748ab0cb1133c4e2e0b963992f37d5169a3b78e92b086d097bbf60c1cedd5e0"
+    },
+    {
+      "path": "packages/storage/src/verification-result-snapshot-migration.ts",
+      "bytes": 9547,
+      "sha256": "593d3c42e2e4ddd454fd77ccc114589e71bab9d743cc3253826f85bd3f10912a"
+    },
+    {
+      "path": "packages/storage/test/sqlite-migrations.test.ts",
+      "bytes": 35637,
+      "sha256": "5a387b42f84713f71a7745f85a82936d41a6303f93df40c55e1e4d8866376028"
+    },
+    {
+      "path": "packages/storage/test/workflow-idempotency.test.ts",
+      "bytes": 17971,
+      "sha256": "975b9b6ccb9189f9b8832ecb600f14ecc7e9e9cb30b061442583786d4d2c5c6b"
+    },
+    {
+      "path": "apps/api/test/verification-result-phase-a.test.mjs",
+      "bytes": 32805,
+      "sha256": "20ef301abb986a53d4786e1d12f0ffa0e9f81b114460af3845d5ea5ed760b697"
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/additive.txt",
+      "bytes": 172,
+      "sha256": "d62aeb60249d18ca294501dc9043ee281939d9a8183144f25af6af1039cf663c"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/api-full-first.txt",
+      "bytes": 30832,
+      "sha256": "6baeba2bbbe4d85007a7739a54691a844e0c343d97544f66fd33be7dda8668b4"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/api-full-policy.txt",
+      "bytes": 31100,
+      "sha256": "23118c1724e3637f2770e636de35735ce909941c4c7a8880a377c12782546fa9"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-api-final.txt",
+      "bytes": 89,
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-api-first.txt",
+      "bytes": 89,
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-api-parent.txt",
+      "bytes": 89,
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-api-policy.txt",
+      "bytes": 89,
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-api-schema15.txt",
+      "bytes": 89,
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-storage-control.txt",
+      "bytes": 93,
+      "sha256": "d8e58a4a46f437dba79909c846cc2193be6463bc74fa22337c795bd86d9c4ae8"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-storage-final.txt",
+      "bytes": 93,
+      "sha256": "d8e58a4a46f437dba79909c846cc2193be6463bc74fa22337c795bd86d9c4ae8"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-storage-parent.txt",
+      "bytes": 93,
+      "sha256": "d8e58a4a46f437dba79909c846cc2193be6463bc74fa22337c795bd86d9c4ae8"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-storage-policy.txt",
+      "bytes": 93,
+      "sha256": "d8e58a4a46f437dba79909c846cc2193be6463bc74fa22337c795bd86d9c4ae8"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-storage-schema15-corrected.txt",
+      "bytes": 93,
+      "sha256": "d8e58a4a46f437dba79909c846cc2193be6463bc74fa22337c795bd86d9c4ae8"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/build-storage-schema15.txt",
+      "bytes": 93,
+      "sha256": "d8e58a4a46f437dba79909c846cc2193be6463bc74fa22337c795bd86d9c4ae8"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/contracts10.txt",
+      "bytes": 198,
+      "sha256": "502ae498523053f240cdb129e2eae8fbd8c23029200ddd91a36ec6140bf73d4a"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/contracts11.txt",
+      "bytes": 196,
+      "sha256": "5f762cd137746ead43e653b371e7edb6eb64a41d2c65d49768d3ecfd834b364e"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/format-policy.txt",
+      "bytes": 365,
+      "sha256": "b31b8a0a0ed640516dadfe55ff8c5e5fa7da219215a4d47fc6da25efa2b89db2"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/format-write.txt",
+      "bytes": 670,
+      "sha256": "09e43341bfaf3fcf7761a67c93c6d57133626fb336d7c4eb9f240296caf7080b"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/freeze10.txt",
+      "bytes": 90,
+      "sha256": "94a696cc79b17d632983aed2fafe753733d3f4dd9786cdcd04ba49f8c3525d88"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/freeze11.txt",
+      "bytes": 101,
+      "sha256": "b20ac1820d9c193b62e921ff9aad4d2615a0e684671604f9e0a82ed07f5008bc"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-bindings-first.txt",
+      "bytes": 2711,
+      "sha256": "0557004a706e1010c0a53d6cf10780628a75ad6a22db42c0d9f9b4f17bae02d4"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-final-first.txt",
+      "bytes": 3176,
+      "sha256": "60a0acf4a8e6d8775c3a5b49201278b5ee96b6d8a83d4c50173dd44179080831"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-first.txt",
+      "bytes": 8440,
+      "sha256": "15ae5476f3fb821872d2ea5a0aa2c2fd482982cb208dbb279fa15b450b0b6bb5"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-fourth.txt",
+      "bytes": 1546,
+      "sha256": "4b98eb20f7a6e178dfeab882b386c97a99a2b84f9e877904a95ffc69080a1a44"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-long-first.txt",
+      "bytes": 3899,
+      "sha256": "e67e37cdf751c5172890b90de09e9c320cf23a976febea39ccd7725659096c06"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-long-second.txt",
+      "bytes": 2474,
+      "sha256": "5bc08c805d73a403d2467086524a6504c8e7ff55ee99f3b6fa711701dcffcc2a"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-policy-first.txt",
+      "bytes": 3419,
+      "sha256": "a0f66847baca4b9c10cd6034c28c6187b678316a94650224d396af08b7cc775e"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-second.txt",
+      "bytes": 8312,
+      "sha256": "7f364ecffc2fde0f1b50f8a96e04f45c3cb2abbd547680d8f5455a2e5b8fc161"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/http-third.txt",
+      "bytes": 6891,
+      "sha256": "4a2363d88ac2cb4f2a2ed8b97132f5f5757fee565a062029c195d5a2ea7cf3fc"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/lint-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/lint-policy.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/storage-full-first.txt",
+      "bytes": 2935,
+      "sha256": "d5b453a914cede164c5d3f4f9e4dda95bb2ff4631dabeed583c0aa0366ff11ec"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/storage-full-policy.txt",
+      "bytes": 12017,
+      "sha256": "a055868a0cc4bebebd35550422fce039a0b346b7d9bd439af98d10e517420a45"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/storage-full-second.txt",
+      "bytes": 15679,
+      "sha256": "2329d3e504654599c843a5697c7c6f6aa73ddb0a287c8b8ce8c50c90cf3f5ae1"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/storage-migration-first.txt",
+      "bytes": 2158,
+      "sha256": "046f9672e3a375b50f469241a9cd301ea7d8b3a449f7a51005886a2d2746bbe7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/storage-migration-second.txt",
+      "bytes": 1478,
+      "sha256": "2213b3ff9dae65cdcbd6f2b289a0f43db9e4b92402f3fdd63e7202a7d3d7cbaa"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/type-api-final.txt",
+      "bytes": 102,
+      "sha256": "65486eabe2a8942afe8004d6b7d9f0944e328f09d238d317b56e5a34c70ecfa3"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/type-api-policy.txt",
+      "bytes": 102,
+      "sha256": "65486eabe2a8942afe8004d6b7d9f0944e328f09d238d317b56e5a34c70ecfa3"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/type-storage-final.txt",
+      "bytes": 111,
+      "sha256": "b654032d009cdd631ff197456b7703063c35bf5252ed9ebfafbab4fe435870b7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/type-storage-first.txt",
+      "bytes": 708,
+      "sha256": "65ebe6e07dcb14c85a4c6395baa0bc8be5ca4b43d2073ba3fa4be3de07303357"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-a/type-storage-policy.txt",
+      "bytes": 111,
+      "sha256": "b654032d009cdd631ff197456b7703063c35bf5252ed9ebfafbab4fe435870b7"
+    }
+  ],
+  "fixtures": [
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-vTm0TL",
+      "httpRequests": 16,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-vTm0TL\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "136ae55c4743dc13235be88d3d480b3b46be4cdb1ddb8ea8a609cbb8eb609b8e"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "f248c61b-ce84-4b0b-955a-852c8749e8ad",
+          "account_id": "c358ce09-6861-4af6-8e93-eec6c7a32592",
+          "project_id": "4730ca75-20db-4729-80ca-5b133f5d30cb",
+          "actor_id": "c9edbb2d-f7fc-4e87-8917-de8c994502c5",
+          "bug_id": "276fe523-10c5-4170-8a14-54db54ba6840",
+          "verification_id": "ef4d57fc-f8c9-4711-8135-4dde4e1e8ab2",
+          "operation_id": "recordVerificationResult",
+          "event_id": "633797c9-31e6-4429-a67c-36a0fb63c1be",
+          "response_bytes": 1744
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 9,
+        "submissions": 2,
+        "idempotency_records": 8,
+        "verification_result_snapshots": 1,
+        "outbox": 6
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-Dad6MX",
+      "httpRequests": 16,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-Dad6MX\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "b702c5f4abb93ad0c528d29522716c0e9f02a9371b4d1a7ad36901d730a233eb"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "f75a22f2-b1e6-48c6-af22-ab92ae629b14",
+          "account_id": "3c20254a-4595-4c99-ba5f-045fb3800364",
+          "project_id": "1f1f7397-d144-4542-924a-5248f2eb2103",
+          "actor_id": "6c1d32f2-88c2-4142-86b1-a6a3a4e647f3",
+          "bug_id": "02929b1c-6c10-403f-adb0-52d45ce043ba",
+          "verification_id": "e267108f-1acc-43c7-94d1-35a9196b13a3",
+          "operation_id": "recordVerificationResult",
+          "event_id": "04a439c8-5b68-404e-80c0-4129c5119e76",
+          "response_bytes": 1754
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 9,
+        "submissions": 2,
+        "idempotency_records": 8,
+        "verification_result_snapshots": 1,
+        "outbox": 6
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-xXuZqr",
+      "httpRequests": 15,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-xXuZqr\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "351216c886249e9985c16f013acf5ad0dc43600e3f39fe0c9e834f3ef6f84ec1"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "597d835a-8c98-489f-b7a4-103ff97b89d8",
+          "account_id": "d4bcce5e-52b2-42ea-a84a-87619029f047",
+          "project_id": "568093cb-7290-4f81-aea4-23eb873755b6",
+          "actor_id": "235ed742-11dc-420e-8a4a-2fa2ffdaa311",
+          "bug_id": "c515d21a-e0f7-4a49-b8ac-bdbde4bf9b54",
+          "verification_id": "e49a7806-b9c6-464a-8ba6-c468e55e193f",
+          "operation_id": "recordLegacyVerificationResult",
+          "event_id": "aa86f126-7613-471e-834c-2f95b289355d",
+          "response_bytes": 1710
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 9,
+        "submissions": 1,
+        "idempotency_records": 8,
+        "verification_result_snapshots": 1,
+        "outbox": 6
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-AtxeuY",
+      "httpRequests": 15,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-AtxeuY\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "dff0a7294a6b3f12cb552fde6dfebc7315c906f3ff5eaf9bafdf85d547883da0"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "0baecf07-4f76-473c-af8c-da446f0be9de",
+          "account_id": "bf5d696c-89e6-4b18-9f0f-2918a2c9e9ce",
+          "project_id": "f93b0261-7720-43ce-a64e-cb1b7680ff49",
+          "actor_id": "168542fe-c926-4fa0-8e30-902839b119d2",
+          "bug_id": "1ee15c04-bdf8-47a1-bb0a-9d17afb9ad94",
+          "verification_id": "f6b6eabf-b8fb-4966-b19d-248bfc83e4a0",
+          "operation_id": "recordLegacyVerificationResult",
+          "event_id": "d6b3d584-2525-4274-b645-db0122b8db45",
+          "response_bytes": 1720
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 9,
+        "submissions": 1,
+        "idempotency_records": 8,
+        "verification_result_snapshots": 1,
+        "outbox": 6
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-RGWZZ5",
+      "httpRequests": 25,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-RGWZZ5\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "bc5f5c1ecd6c6d9864b87a0db2f97b35550f4ab36b713fcc012b059a65119ccb"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "129dcbce-343c-4345-9167-f88c4d7217c6",
+          "account_id": "faf77650-7096-48e3-ac77-d3368afd869e",
+          "project_id": "59107953-03b7-4583-b94c-5571d04a535c",
+          "actor_id": "8a0d3d84-5eb9-4ede-8357-d5c79be38582",
+          "bug_id": "a5b42297-7362-443e-957d-e97720ad09cb",
+          "verification_id": "55551d67-2ac7-4e19-83b1-2f97a14a3910",
+          "operation_id": "recordLegacyVerificationResult",
+          "event_id": "fb27cd91-5a18-4562-ba77-f0d9c8c508c8",
+          "response_bytes": 1710
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 1,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-xlGVhT",
+      "httpRequests": 22,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-xlGVhT\\fixture.sqlite",
+        "bytes": 1781760,
+        "sha256": "f7f6553c2d1a7b77ee0c8d03dccbf4610077c2c3e4846895e8ddbb2572ac21d0"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "1c817104-157a-4d1b-b619-c242148f1e4a",
+          "account_id": "ad10af93-5ab2-47f5-af10-3835155a79d1",
+          "project_id": "b39253bd-a0f9-4cfc-b1a7-3ace7b2ba145",
+          "actor_id": "4610527b-1f1a-4cc7-8722-4c7a43ac7aa5",
+          "bug_id": "980ce8a7-2ab3-40cd-a150-c9cee80802e4",
+          "verification_id": "c4c559ee-f06f-4452-b648-d5537a56aff1",
+          "operation_id": "recordLegacyVerificationResult",
+          "event_id": "95aedc4d-ef7e-4488-b7c8-a0073c85654c",
+          "response_bytes": 1720
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 1,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-RIbfkv",
+      "httpRequests": 17,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-RIbfkv\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "7ba3dcb58c2f45c69d73a05d3cf24c9e64c2ea46ec003af7691de0a70f25ff49"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "fc3e3e73-e0c6-4b06-bc1d-e403036956ef",
+          "account_id": "6341bdd9-54ac-4f5f-b4f4-f3aa25c3c5e1",
+          "project_id": "ee757327-9952-4e6a-8344-333768c05ecd",
+          "actor_id": "3789675c-19e9-42b1-88f0-ff14dde16f1f",
+          "bug_id": "881975aa-509e-4cb2-9603-00f839f3ee7b",
+          "verification_id": "868b786f-f0f6-4969-aa37-226210768ecf",
+          "operation_id": "recordVerificationResult",
+          "event_id": "42b87dcb-7aa4-4267-8a57-3a73f5ce61a1",
+          "response_bytes": 1744
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 2,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-cwDH6z",
+      "httpRequests": 12,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-cwDH6z\\fixture.sqlite",
+        "bytes": 2027520,
+        "sha256": "36459952b65ba9e04763140e9466a607a448c1eb0985bdde01f499b7b0d8b9a2"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "00f00c3a-bcc5-4e32-89ff-984a9b5e134e",
+          "account_id": "c3c0496f-50a4-4058-8dc5-081a8c6b120d",
+          "project_id": "c6496834-40ef-4c4e-8d5e-834958240894",
+          "actor_id": "64d7466e-a9c1-4e57-840a-c833b455aab8",
+          "bug_id": "f9072942-c27f-445f-ac37-429ef46bccde",
+          "verification_id": "8c00aca0-a6d2-4ec8-8da0-0d8e6afd45d6",
+          "operation_id": "recordVerificationResult",
+          "event_id": "ecccbf7b-9dee-43c7-8d15-b13063e526a0",
+          "response_bytes": 106665
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 2,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-BUXjOH",
+      "httpRequests": 14,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-BUXjOH\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "1a11d2d65879a50a626f5ded91abea1081b9fdb80ed54d119520258888f547db"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "b5d9445b-4f60-4cc8-b150-0bae6e7ac5de",
+          "account_id": "3c5a3a82-000a-44fb-b62a-65932b9a1ea9",
+          "project_id": "5fb98ec9-9f9c-4956-b05f-6ce48a2d2e59",
+          "actor_id": "adcb0c41-5aa7-4efa-8b1a-ff4159e6510c",
+          "bug_id": "b3a101c1-2b5d-4b9d-9a6d-51d06e71265f",
+          "verification_id": "4dc02d4a-99c9-4869-9092-c127d5f1c14c",
+          "operation_id": "recordVerificationResult",
+          "event_id": "d94e9ff4-b196-4078-9cf2-9d233731edc2",
+          "response_bytes": 1880
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 11,
+        "submissions": 2,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-KL4wGG",
+      "httpRequests": 13,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-KL4wGG\\fixture.sqlite",
+        "bytes": 1769472,
+        "sha256": "1fe72e7eaf1028b1180c5d69fda05655802335aa168350b73c9c8766324a758a"
+      },
+      "schema": 15,
+      "snapshots": [],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 2,
+        "idempotency_records": 6,
+        "verification_result_snapshots": 0,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-diAW2A",
+      "httpRequests": 10,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-diAW2A\\fixture.sqlite",
+        "bytes": 1769472,
+        "sha256": "6033e703064b18d69c6afef4a94233ce702d54f54f3ffe935fe69a3d41542833"
+      },
+      "schema": 15,
+      "snapshots": [],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 2,
+        "idempotency_records": 6,
+        "verification_result_snapshots": 0,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-mpuZiy",
+      "httpRequests": 12,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-mpuZiy\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "819a575bfea15b1befcf6cd23558982df8d4953291c8fac21c2a986805ee427c"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "3e6ae771-98da-4498-90c9-cbc4c3767b74",
+          "account_id": "88a034fa-7ae3-416b-9b3e-15e1a5163a6b",
+          "project_id": "b2862375-be5e-4a56-8886-a0b9622cdeab",
+          "actor_id": "874d7849-4fc7-49a9-8674-eacf721e86d7",
+          "bug_id": "0677e263-225e-4f78-8d77-3ad2760da9b3",
+          "verification_id": "358bf5dc-71e9-4b1f-baff-2437b4d1d80e",
+          "operation_id": "recordVerificationResult",
+          "event_id": "ffbfcf20-8c77-43ce-abcc-77fe0c4d4343",
+          "response_bytes": 1754
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 2,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-uRv9fU",
+      "httpRequests": 12,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-uRv9fU\\fixture.sqlite",
+        "bytes": 1773568,
+        "sha256": "fcba3b115c9155287f2af944680580361f2810a600ad33363e5c72b7ae2ffae7"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "906bc1b4-599d-4800-8a35-0954dd06c3d1",
+          "account_id": "c22aafd8-a470-4202-8028-b41a1e55ff49",
+          "project_id": "39b858ec-dd9c-4a5f-a574-4726e93bcdf3",
+          "actor_id": "e13c22be-eda8-4fa1-8e4b-ebc4681cbed4",
+          "bug_id": "14c35353-2396-4dce-9486-614e36e9c70c",
+          "verification_id": "4bf1136c-cb3b-43db-a467-311ab6e2273b",
+          "operation_id": "recordLegacyVerificationResult",
+          "event_id": "b95b397d-b0bd-4bb6-92ae-dbfc980efb0b",
+          "response_bytes": 1720
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 1,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    },
+    {
+      "directory": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-gH3H87",
+      "httpRequests": 16,
+      "database": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-phase-a-gH3H87\\fixture.sqlite",
+        "bytes": 1781760,
+        "sha256": "0661c8431840a452d429b78438d183eec730c8e67aed8165adc8638f245c96e7"
+      },
+      "schema": 15,
+      "snapshots": [
+        {
+          "id": "0df87551-5f6e-47ca-aa42-bf950f9614de",
+          "account_id": "ba3e33a1-c404-42ab-be9e-cba1063422db",
+          "project_id": "eb9e1a8b-8e59-4892-909f-878fa7c35968",
+          "actor_id": "a6d391bf-5c94-48ce-83de-3e2151b97afe",
+          "bug_id": "9e4ca7e4-00e3-4b73-80d0-5122c68ec842",
+          "verification_id": "689725fb-b1f0-4fee-be82-9412c90c05ff",
+          "operation_id": "recordVerificationResult",
+          "event_id": "bb0af7b1-0a42-4d50-931b-bd2c2f3309ca",
+          "response_bytes": 1744
+        }
+      ],
+      "tableCounts": {
+        "bugs": 1,
+        "events": 8,
+        "submissions": 2,
+        "idempotency_records": 7,
+        "verification_result_snapshots": 1,
+        "outbox": 5
+      }
+    }
+  ],
+  "failuresRetained": [
+    {
+      "log": "http-first.txt",
+      "kind": "harness",
+      "reason": "Snapshot used nonexistent notification_outbox table; actual notification records are in outbox."
+    },
+    {
+      "log": "http-second.txt",
+      "kind": "mixed",
+      "reason": "Harness default Accept/actor column/cross-project 404 corrected; true GET-after-soft-delete visibility leak fixed in verification store."
+    },
+    {
+      "log": "http-third.txt",
+      "kind": "implementation",
+      "reason": "Initial additive snapshot FK referenced a nonexistent events composite key; corrected to account/project/id and actual event type/resource fields before rerun."
+    },
+    {
+      "log": "http-long-first.txt",
+      "kind": "mixed",
+      "reason": "JSON escaped control text exceeded old audit event size (fixed only result audit bounded serialization); old-writer harness TS7 import lacked transpile API (changed to Node builtin stripTypeScriptTypes)."
+    },
+    {
+      "log": "storage-migration-first.txt",
+      "kind": "harness",
+      "reason": "getMobileBug requires third bugId argument; corrected without changing expected migration assertions."
+    },
+    {
+      "log": "storage-full-first.txt",
+      "kind": "toolchain",
+      "reason": "Extracted npm.cmd assumes installation layout; used the existing package test list through local tsx CLI after successful storage build."
+    },
+    {
+      "log": "storage-full-second.txt",
+      "kind": "implementation",
+      "reason": "116/118: unconditional assigned-verifier check tightened existing generic human actions. Moved policy into server-only frozen route command; existing tests unchanged, final118/118."
+    }
+  ],
+  "notCovered": [
+    "blocked result writes",
+    "result attachments9..20 or capture bundle submission",
+    "fail/supersede POST and workflow GET follow-on phases",
+    "deployed instance/client/MCP result acceptance",
+    "real external build or Relay execution",
+    "automatic reconstruction of historical IDs-only receipts"
+  ],
+  "finalSourceFrozen": true
+}
