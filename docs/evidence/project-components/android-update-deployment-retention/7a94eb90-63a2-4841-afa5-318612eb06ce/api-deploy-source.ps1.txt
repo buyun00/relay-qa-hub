@@ -1,0 +1,45 @@
+param([Parameter(Mandatory=$true)][ValidateSet('Stop','Start')][string]$Phase)
+$ErrorActionPreference='Stop'
+$taskSetup=Get-Content -LiteralPath '.tools/android-update-deploy-current.json' -Raw | ConvertFrom-Json
+if($taskSetup.runId -ne '7a94eb90-63a2-4841-afa5-318612eb06ce' -or $taskSetup.config -ne 'C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\instance.json'){throw 'Exact preview scope required'}
+$taskBeforePath='docs/evidence/project-components/android-update-deployment-retention/7a94eb90-63a2-4841-afa5-318612eb06ce/before.json'
+if((Get-FileHash -LiteralPath $taskBeforePath -Algorithm SHA256).Hash.ToLowerInvariant() -ne '7537f22daea58577de75d850fc6678f28c8e548594eafcd164ec7a9ec98df4ab'){throw 'Before proof changed'}
+$taskBefore=Get-Content -LiteralPath $taskBeforePath -Raw | ConvertFrom-Json
+if($taskBefore.status -ne 'passed'){throw 'Before proof must pass'}
+$taskOutput=Join-Path $taskSetup.root ('api-'+$Phase.ToLowerInvariant()+'.json')
+if(Test-Path -LiteralPath $taskOutput){throw 'Run output already exists'}
+$taskRecord=[ordered]@{schemaVersion=1;runId=$taskSetup.runId;phase=$Phase;startedAt=[DateTime]::UtcNow.ToString('o');status='running';services=@('api');config=$taskSetup.config;forcedDailyStop=$false}
+try {
+  if($Phase -eq 'Stop') {
+    $taskOld=Get-CimInstance Win32_Process -Filter 'ProcessId=10036'
+    if(-not $taskOld -or $taskOld.CreationDate.ToUniversalTime().ToString('o') -ne '2026-09-08T22:26:05.0349230Z'){throw 'Old API identity changed'}
+    $taskRecord.oldProcess=@{pid=$taskOld.ProcessId;createdAt=$taskOld.CreationDate.ToUniversalTime().ToString('o');executable=$taskOld.ExecutablePath}
+    $taskRecord.managerOutput=@(& .\scripts\project-components\Manage-QAHubPreview.ps1 -Action Stop -ConfigFile $taskSetup.config -Services api)
+    $taskOldAfter=Get-CimInstance Win32_Process -Filter 'ProcessId=10036'
+    $taskListeners=@(Get-NetTCPConnection -LocalPort 4419 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalAddress,LocalPort,OwningProcess)
+    $taskRecord.oldPidAbsent=($null -eq $taskOldAfter);$taskRecord.apiListeners=$taskListeners
+    if($taskOldAfter -or $taskListeners.Count -ne 0){throw 'Old API or listener remains after stop'}
+    $taskRecord.method='Owner-checked manager Stop-Process of exact preview API PID, followed by independent CIM absence and empty 4419 listener; not an HTTP graceful-stop claim.'
+  } else {
+    $taskStop=Get-Content -LiteralPath (Join-Path $taskSetup.root 'api-stop.json') -Raw | ConvertFrom-Json
+    if($taskStop.status -ne 'passed' -or -not $taskStop.oldPidAbsent){throw 'Verified stop required'}
+    if(Get-CimInstance Win32_Process -Filter 'ProcessId=10036'){throw 'Old PID exists before start'}
+    $taskRecord.managerOutput=@(& .\scripts\project-components\Manage-QAHubPreview.ps1 -Action Start -ConfigFile $taskSetup.config -Services api)
+    $taskReceipt=Get-Content -LiteralPath 'C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-7c86\logs\api-process.json' -Raw | ConvertFrom-Json
+    $taskActual=Get-CimInstance Win32_Process -Filter ('ProcessId='+$taskReceipt.pid)
+    if(-not $taskActual -or $taskActual.ProcessId -eq 10036){throw 'New API not running'}
+    $taskRecord.newProcess=@{pid=$taskActual.ProcessId;createdAt=$taskActual.CreationDate.ToUniversalTime().ToString('o');executable=$taskActual.ExecutablePath}
+    $taskRecord.ready=Invoke-RestMethod -Uri 'http://127.0.0.1:4419/api/v1/health/ready' -TimeoutSec 10
+    if($taskRecord.ready.status -ne 'ready' -or $taskRecord.ready.schemaVersion -ne '14'){throw 'Ready schema14 required'}
+  }
+  $taskRecord.status='passed'
+} catch {
+  $taskRecord.status='failed_retained';$taskRecord.failure=$_.Exception.Message
+} finally {
+  $taskRecord.completedAt=[DateTime]::UtcNow.ToString('o')
+  $taskJson=$taskRecord | ConvertTo-Json -Depth 12
+  $taskStream=[IO.File]::Open($taskOutput,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+  try{$taskBytes=[Text.UTF8Encoding]::new($false).GetBytes($taskJson+"`n");$taskStream.Write($taskBytes,0,$taskBytes.Length)}finally{$taskStream.Dispose()}
+  Write-Output $taskJson
+}
+if($taskRecord.status -ne 'passed'){exit 1}

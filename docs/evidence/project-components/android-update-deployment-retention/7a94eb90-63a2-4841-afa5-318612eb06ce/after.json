@@ -1,0 +1,4522 @@
+{
+  "schemaVersion": 1,
+  "runId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "phase": "after",
+  "status": "passed",
+  "startedAt": "2026-09-09T01:22:49.902Z",
+  "runnerSha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3",
+  "privateRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\backups\\android-update-7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "checks": [
+    {
+      "label": "BEFORE_PASSED",
+      "expected": "passed",
+      "actual": "passed",
+      "passed": true
+    },
+    {
+      "label": "RUNNER_UNCHANGED",
+      "expected": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3",
+      "actual": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3",
+      "passed": true
+    },
+    {
+      "label": "RETAINED_FILES_UNCHANGED",
+      "expected": {
+        "exists": true,
+        "count": 38,
+        "bytes": 79402480,
+        "files": [
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite",
+            "bytes": 3743744,
+            "sha256": "e0ccd08befa911c9b8e4fc0ece0b4a0f42e09a80bf910466d503735ae9dae803"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-attachment-inventory.json",
+            "bytes": 1056,
+            "sha256": "ff5e046205bbb05589cfc91421e8b56a308bb8d7f32eca20a0c1172b9ee45b25"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-attachment-restore.complete.json",
+            "bytes": 201,
+            "sha256": "61bf0245eb0a044b06e354bb402bd0e8d6c8da95e85f09f621d967565eba68f0"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-sqlite-archive-binding.json",
+            "bytes": 665,
+            "sha256": "58203eb453a54bfeca815df0b0faab1f031b9e2627e824bf94c3ef4fb62f62c2"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/5e/5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/cd/cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+            "bytes": 43311,
+            "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/e0/e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.manifest.json",
+            "bytes": 417,
+            "sha256": "e9fe2e1062011bb9454a3379c4767d921456d6bd099c0cd399752468ec3dc1ad"
+          },
+          {
+            "path": "data/online/qa-hub.sqlite",
+            "bytes": 3743744,
+            "sha256": "e0ccd08befa911c9b8e4fc0ece0b4a0f42e09a80bf910466d503735ae9dae803"
+          },
+          {
+            "path": "data/online/qa-hub.sqlite.manifest.json",
+            "bytes": 417,
+            "sha256": "e9fe2e1062011bb9454a3379c4767d921456d6bd099c0cd399752468ec3dc1ad"
+          },
+          {
+            "path": "data/quarantine/uploads/0af39b84-d0ab-44c2-8175-203aea5e333a/1/0.bin",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/quarantine/uploads/133d7b33-33b1-4ea1-8d6d-96f8d9c624df/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/22668b50-8a25-44b9-89e3-c307a51bb376/1/0.bin",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/quarantine/uploads/22a67428-d995-4311-9507-e6a1af5086ca/1/0.bin",
+            "bytes": 12,
+            "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+          },
+          {
+            "path": "data/quarantine/uploads/251f765b-81d9-4f3e-821b-98705ddb4955/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/4283305b-befd-4a9d-ab6f-d8ccb0ce3baa/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/45c5c6e0-683c-4594-b552-fe1ac4a3d900/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/5c13e8b9-4277-41f6-a800-0285802de83d/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/5e669a83-61ab-4f0e-ad73-cda6e1f4cb31/1/0.bin",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/quarantine/uploads/60333054-18a1-4d55-8f93-c4897674afeb/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/67d409fe-9eb0-4158-9747-cfe6d71a1e0f/1/0.bin",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/quarantine/uploads/6f8ece3a-56f5-4475-9e8e-22205d4df016/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/73705bd0-ceeb-4deb-b501-677cd7515509/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/73909d9b-8641-4d9b-9f81-5fa19e3e7a82/1/0.bin",
+            "bytes": 43311,
+            "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+          },
+          {
+            "path": "data/quarantine/uploads/7be282e4-6acf-4af6-b0cf-2102663e2bbd/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/7d9b757a-1640-415d-8546-01b3e799c666/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/85fa1e18-9506-470e-89d2-0bbc6c605da9/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/d5961d68-c8af-41c8-9721-6d1e62ce6eba/1/0.bin",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/quarantine/uploads/d88200b1-7ead-467c-aadf-421e246bf4ef/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/df885405-26de-4fec-98cb-2324a77fd68a/1/0.bin",
+            "bytes": 43311,
+            "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+          },
+          {
+            "path": "data/quarantine/uploads/ea1bd08c-ae9b-4096-814d-fc24d9f4872f/1/0.bin",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/quarantine/uploads/fb6f3bad-7d8a-4415-b75a-5332bbca552d/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "distribution/0-qa-hub-preview-7c86-windows-latest.json",
+            "bytes": 464,
+            "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+          },
+          {
+            "path": "distribution/1-qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+            "bytes": 35471405,
+            "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+          },
+          {
+            "path": "distribution/2-qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+            "bytes": 2600,
+            "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+          },
+          {
+            "path": "distribution/3-qa-hub-preview-code23.apk",
+            "bytes": 35536941,
+            "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+          },
+          {
+            "path": "runner.mjs",
+            "bytes": 30169,
+            "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3"
+          }
+        ],
+        "sha256": "55bbb75b95ed2a7127ce08638d2b1e1048a1c193d30aaa7a68c0e333580b862a"
+      },
+      "actual": {
+        "exists": true,
+        "count": 38,
+        "bytes": 79402480,
+        "files": [
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite",
+            "bytes": 3743744,
+            "sha256": "e0ccd08befa911c9b8e4fc0ece0b4a0f42e09a80bf910466d503735ae9dae803"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-attachment-inventory.json",
+            "bytes": 1056,
+            "sha256": "ff5e046205bbb05589cfc91421e8b56a308bb8d7f32eca20a0c1172b9ee45b25"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-attachment-restore.complete.json",
+            "bytes": 201,
+            "sha256": "61bf0245eb0a044b06e354bb402bd0e8d6c8da95e85f09f621d967565eba68f0"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-sqlite-archive-binding.json",
+            "bytes": 665,
+            "sha256": "58203eb453a54bfeca815df0b0faab1f031b9e2627e824bf94c3ef4fb62f62c2"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/5e/5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/cd/cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+            "bytes": 43311,
+            "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/e0/e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/archive/rpo/qa-hub.sqlite.manifest.json",
+            "bytes": 417,
+            "sha256": "e9fe2e1062011bb9454a3379c4767d921456d6bd099c0cd399752468ec3dc1ad"
+          },
+          {
+            "path": "data/online/qa-hub.sqlite",
+            "bytes": 3743744,
+            "sha256": "e0ccd08befa911c9b8e4fc0ece0b4a0f42e09a80bf910466d503735ae9dae803"
+          },
+          {
+            "path": "data/online/qa-hub.sqlite.manifest.json",
+            "bytes": 417,
+            "sha256": "e9fe2e1062011bb9454a3379c4767d921456d6bd099c0cd399752468ec3dc1ad"
+          },
+          {
+            "path": "data/quarantine/uploads/0af39b84-d0ab-44c2-8175-203aea5e333a/1/0.bin",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/quarantine/uploads/133d7b33-33b1-4ea1-8d6d-96f8d9c624df/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/22668b50-8a25-44b9-89e3-c307a51bb376/1/0.bin",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/quarantine/uploads/22a67428-d995-4311-9507-e6a1af5086ca/1/0.bin",
+            "bytes": 12,
+            "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+          },
+          {
+            "path": "data/quarantine/uploads/251f765b-81d9-4f3e-821b-98705ddb4955/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/4283305b-befd-4a9d-ab6f-d8ccb0ce3baa/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/45c5c6e0-683c-4594-b552-fe1ac4a3d900/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/5c13e8b9-4277-41f6-a800-0285802de83d/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/5e669a83-61ab-4f0e-ad73-cda6e1f4cb31/1/0.bin",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/quarantine/uploads/60333054-18a1-4d55-8f93-c4897674afeb/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/67d409fe-9eb0-4158-9747-cfe6d71a1e0f/1/0.bin",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/quarantine/uploads/6f8ece3a-56f5-4475-9e8e-22205d4df016/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/73705bd0-ceeb-4deb-b501-677cd7515509/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/73909d9b-8641-4d9b-9f81-5fa19e3e7a82/1/0.bin",
+            "bytes": 43311,
+            "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+          },
+          {
+            "path": "data/quarantine/uploads/7be282e4-6acf-4af6-b0cf-2102663e2bbd/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/7d9b757a-1640-415d-8546-01b3e799c666/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/85fa1e18-9506-470e-89d2-0bbc6c605da9/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/d5961d68-c8af-41c8-9721-6d1e62ce6eba/1/0.bin",
+            "bytes": 68,
+            "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+          },
+          {
+            "path": "data/quarantine/uploads/d88200b1-7ead-467c-aadf-421e246bf4ef/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "data/quarantine/uploads/df885405-26de-4fec-98cb-2324a77fd68a/1/0.bin",
+            "bytes": 43311,
+            "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+          },
+          {
+            "path": "data/quarantine/uploads/ea1bd08c-ae9b-4096-814d-fc24d9f4872f/1/0.bin",
+            "bytes": 184872,
+            "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+          },
+          {
+            "path": "data/quarantine/uploads/fb6f3bad-7d8a-4415-b75a-5332bbca552d/1/0.bin",
+            "bytes": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+          },
+          {
+            "path": "distribution/0-qa-hub-preview-7c86-windows-latest.json",
+            "bytes": 464,
+            "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+          },
+          {
+            "path": "distribution/1-qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+            "bytes": 35471405,
+            "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+          },
+          {
+            "path": "distribution/2-qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+            "bytes": 2600,
+            "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+          },
+          {
+            "path": "distribution/3-qa-hub-preview-code23.apk",
+            "bytes": 35536941,
+            "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+          },
+          {
+            "path": "runner.mjs",
+            "bytes": 30169,
+            "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3"
+          }
+        ],
+        "sha256": "55bbb75b95ed2a7127ce08638d2b1e1048a1c193d30aaa7a68c0e333580b862a"
+      },
+      "passed": true
+    },
+    {
+      "label": "DATABASE_AND_FILES_UNCHANGED",
+      "expected": {
+        "database": {
+          "schemaVersion": 14,
+          "componentGate": {
+            "configuredRows": 7,
+            "enabledRows": 0,
+            "missingRowsDefaultDisabled": true
+          },
+          "schema": [
+            {
+              "name": "accounts",
+              "definitionSha256": "ee50ec014065b6d578b308b986ab916fb534a1d84cf915eb06fefc17f7f9d004"
+            },
+            {
+              "name": "attachment_bindings",
+              "definitionSha256": "9453a8ee5218ff87fd313036a4ee4ca86c0a46c8941fcd32c40c16a9c3223d19"
+            },
+            {
+              "name": "attachments",
+              "definitionSha256": "3b822899b64d9766621c5dc7103a410575253d177dd4f35372335a179dc2991b"
+            },
+            {
+              "name": "auth_secret_replays",
+              "definitionSha256": "232da4c75ea5a27f915713bb644c05bb0edf03c9520a7ec320e8e04b11e9fab4"
+            },
+            {
+              "name": "blobs",
+              "definitionSha256": "0b0db830c0547388ad623e2b5f3644f6bd625125fdd8eb9788c997181bbefff0"
+            },
+            {
+              "name": "browser_sessions",
+              "definitionSha256": "bcbd5639823281fbca93af4a199d32bea9002f20dd89c9e4f9929cd4b315dbce"
+            },
+            {
+              "name": "bug_attachment_removals",
+              "definitionSha256": "56f0c2daba650d432f6cecc4bf6c1f61c4ab821fc9a62fdf1d48ab48843dab59"
+            },
+            {
+              "name": "bug_attachments",
+              "definitionSha256": "11acafcac88c7dade94524f82d8ab8506c7764b20177c6b580cf0f6380cf4374"
+            },
+            {
+              "name": "bug_closure_acceptances",
+              "definitionSha256": "45cef32304c77dc5ce4b3f87a0303822125fdb1e20314121dd838f29b35432a1"
+            },
+            {
+              "name": "bug_deletions",
+              "definitionSha256": "6ae75d79bf6bca7f246031e62f7b57544301ffaac37ed08b9bd45b32baf23f0b"
+            },
+            {
+              "name": "bugs",
+              "definitionSha256": "d60c81f8ec68100ed2d56d12d037ab9862c495f2abfef9fdf99b821b85a092a9"
+            },
+            {
+              "name": "bugs_fts",
+              "definitionSha256": "1ed73cc758a4eb28ae8bae43c2962a8a2901b0996fcd012c60dab6364749747a"
+            },
+            {
+              "name": "bugs_fts_config",
+              "definitionSha256": "3701d0b8f73b316fb8bfc74db4d98fb706c50f0630aa90a557f9e0a487e7f1c3"
+            },
+            {
+              "name": "bugs_fts_content",
+              "definitionSha256": "5889426c328e5b2e952706f2560ebcd6aacf136618b7df210c4e3f32f1dbed75"
+            },
+            {
+              "name": "bugs_fts_data",
+              "definitionSha256": "3e585aade6b1007ba06af45538a691dd77007194ab9c7562241783b488812ca9"
+            },
+            {
+              "name": "bugs_fts_docsize",
+              "definitionSha256": "d419326ebea8712f7aefe86dac2015f0c0cc7ad505c3c632c3ce107415eb7fe6"
+            },
+            {
+              "name": "bugs_fts_idx",
+              "definitionSha256": "2e03613dd3d75b22f7430721919cde6eb4ee255e0dbc9b9b72d22ddd4e78f9d6"
+            },
+            {
+              "name": "build_lineage_entries",
+              "definitionSha256": "e7bbf587e697e0f2e0c7445b0036625067628b52444315a40c3c8d51c9f66663"
+            },
+            {
+              "name": "build_lineages",
+              "definitionSha256": "a66dc294e0666dcc9386383e9046f0cfafb9a40dad190058db126e1fefb49323"
+            },
+            {
+              "name": "build_manifest_commits",
+              "definitionSha256": "19ceb60277e637a6bc2a7e06d223d44a94a2cdd474dcb8280229621f026656e8"
+            },
+            {
+              "name": "build_repair_links",
+              "definitionSha256": "f72e4159f764df677b4f47159aeab89e48fab360aed9e2072061f311b9d8cd98"
+            },
+            {
+              "name": "build_requirements",
+              "definitionSha256": "893dfdcf4aedaa70a130213ceea416e33558a60858ae6dce89fe90d1b781ea12"
+            },
+            {
+              "name": "builds",
+              "definitionSha256": "1bde9f8212f471e87c2f01c4703a72d5f18124282343967f289bc816b8a582a6"
+            },
+            {
+              "name": "capture_artifacts",
+              "definitionSha256": "54d441dde446784a928fefbb91ba2601657d5a23f4930c86f4b4a79b8133bdf1"
+            },
+            {
+              "name": "capture_bundles",
+              "definitionSha256": "04dd2439dacf9adf18beb2f7d6f333e5b5edcfd8613593c13d9b26528d93f264"
+            },
+            {
+              "name": "capture_poco_methods",
+              "definitionSha256": "200e8913bbe5ba216202812d16c0260c828e0689e3d763dbb904e7519595492a"
+            },
+            {
+              "name": "comment_attachments",
+              "definitionSha256": "caa347c98a0e9bca48dee1b4ce3ddeadc905d4cd1341082dca7a0a1064add006"
+            },
+            {
+              "name": "comments",
+              "definitionSha256": "2090ea8c75eba9cad6563eee4676290b20d709b494a8ce23ffcebf02e554f6e9"
+            },
+            {
+              "name": "device_installations",
+              "definitionSha256": "2e70642e6ebfda9bf052c2b553a97b7b85e99a4f8f1a78edfdedfdaf1ebe9f74"
+            },
+            {
+              "name": "events",
+              "definitionSha256": "88a6b4355252b0d2a3e498860b1c9f12d7ee792707b98228b1e38c8481000f6b"
+            },
+            {
+              "name": "idempotency_records",
+              "definitionSha256": "74fc1d15a7e9b2c5d10d3c077d3e387f86e65345a546eb595b025adc04e723a6"
+            },
+            {
+              "name": "inbox",
+              "definitionSha256": "71f723504efcdc20e1960a5e997fc1cae6924bdbb1ce2599dbe4803d891bde5b"
+            },
+            {
+              "name": "integration_links",
+              "definitionSha256": "a0961e707061b35a9420208a6938d244895a9e0bef0ba9e9cab405034baf2bee"
+            },
+            {
+              "name": "local_credentials",
+              "definitionSha256": "70d9772e62aad83dc25db6e0ad6196bfd8c93fe2e0861f73acde28f1281b4f69"
+            },
+            {
+              "name": "manual_completion_requests",
+              "definitionSha256": "1c8f53a1e89dbceaebd64c06b058f9c46e809ea387fa44daaa4f4ffd0b62873e"
+            },
+            {
+              "name": "membership_roles",
+              "definitionSha256": "d5585a8ab3637c3be89fb8efb44efe333690c6c67e575f4e96bcf98f4397478f"
+            },
+            {
+              "name": "memberships",
+              "definitionSha256": "03b5c978796e418fd3dd6adde8e220d2f090667763d8819012e1faeb1b91dfb9"
+            },
+            {
+              "name": "modules",
+              "definitionSha256": "e9f10066a363536cf2b3c61130e9210de8fcb8b6f7f3cde72c4d67d53e99ee90"
+            },
+            {
+              "name": "native_sessions",
+              "definitionSha256": "3674fc50685280b37f05d92c9688c1246f86d775cc0f03caf127f715cc200baf"
+            },
+            {
+              "name": "notification_devices",
+              "definitionSha256": "bacd023d1b635b3890ca9b7bc16cea85d81b7b5ebec9739ad8b993a79c71608c"
+            },
+            {
+              "name": "notifications",
+              "definitionSha256": "536fdeae9f134271274f39df7bb52f701a8908e0f4a1ce814b33423b113f6d30"
+            },
+            {
+              "name": "occurrence_attachments",
+              "definitionSha256": "c5d290a69529a6175a932e1ab50e461481b90f7af3f0c6e92175d75a5af4b6a4"
+            },
+            {
+              "name": "occurrence_build_lineage_facts",
+              "definitionSha256": "42809d2dd6795590b1e2c0b07d9799d35e702689a34b1fc8ec8f149e7627747a"
+            },
+            {
+              "name": "occurrences",
+              "definitionSha256": "a12952789e6c48bc9cef939bc1840662bd00757ba74c8fdb39b0fb26c8de324f"
+            },
+            {
+              "name": "outbox",
+              "definitionSha256": "d3c7c69f8641493c16fc147bed3899b6d42897cc7f73a9638ce23dd9a3f8aa68"
+            },
+            {
+              "name": "poco_enrichments",
+              "definitionSha256": "dae96c1bc44bdca2540d9b74c9d0aef9853ec059584655f402daa856a13f7626"
+            },
+            {
+              "name": "poco_snapshots",
+              "definitionSha256": "c132b6d5a8ee97c2dd2b1de0766ba94ff7a7158f5cdb29eec88a0cb115693ac4"
+            },
+            {
+              "name": "project_bug_counters",
+              "definitionSha256": "f8806753c43df25fad19b2b69676fe67bca1633d41bff0f9d7799831c820d3ab"
+            },
+            {
+              "name": "project_components",
+              "definitionSha256": "7745ada7a6c3209914a8dcfe50629403721ce715771c29d338a95aaa4ba9cda2"
+            },
+            {
+              "name": "project_identity_links",
+              "definitionSha256": "16277ab01272281a00520f79858c9502d14f650b8664d0af0118ba9a549a5d56"
+            },
+            {
+              "name": "project_management_events",
+              "definitionSha256": "3bdd9a767c6bf9f6ff28c17fb3f9f8f36193a413011ff2d46716a91670b38572"
+            },
+            {
+              "name": "projects",
+              "definitionSha256": "809cefcf6f85609fde819d9f618752cf13794c1511d8d2a5bd62d70ebfaf00fd"
+            },
+            {
+              "name": "push_subscriptions",
+              "definitionSha256": "a4cd073135c881648750943f562beaaf7b21da993f05637d499d3492d4192b00"
+            },
+            {
+              "name": "qingyu_bug_links",
+              "definitionSha256": "67a7342a5542d680e51481fd2a0984e118995393f00f771523b04ef4220e4d30"
+            },
+            {
+              "name": "refresh_token_families",
+              "definitionSha256": "fc68febec50ce10d7f5f52f0e808fd8adcae726e062248c02a547836b109ce12"
+            },
+            {
+              "name": "refresh_tokens",
+              "definitionSha256": "42be291af66a8f622d38890f321dfe59fcb921566f1f03034d38ecfd0fa6ef0d"
+            },
+            {
+              "name": "relay_receipts",
+              "definitionSha256": "ee7d25449a299852161971d9c968e195ab1af896fba5b69ea450d53420292c5c"
+            },
+            {
+              "name": "relay_rework_requests",
+              "definitionSha256": "d7541762fc2737d23c565b8e3b8cbfcf59e61e242e50dd67ae5d10def941b5e1"
+            },
+            {
+              "name": "repair_attempts",
+              "definitionSha256": "56dbfb1bc41f57ae7bdef85815ee8e4d4b0c7e28ed8f6068d87da83f11beea5c"
+            },
+            {
+              "name": "schema_migrations",
+              "definitionSha256": "6ad3ac43b24166ebe80b3c73a563201ee1acb77683f35e2ecd099e1930159281"
+            },
+            {
+              "name": "service_principals",
+              "definitionSha256": "553aa33265dc0ddfee7b87e6a48a5c138260fb95e354fde005065edf7787dbb1"
+            },
+            {
+              "name": "storage_command_authorizations",
+              "definitionSha256": "e32dd03bd8efa65bb5b4c9c44684f385614e31672ce0a1a9fa39352d6a043c0a"
+            },
+            {
+              "name": "submissions",
+              "definitionSha256": "b07392461094dfc576cb51435d788f5f92e3cf6d8f4ad2e3c311c68ecac8ca78"
+            },
+            {
+              "name": "upload_chunks",
+              "definitionSha256": "88d1a62b95478fa9c63b30fcd25ed15ff7c99c62b0ec4e14c9dae21c4f42828b"
+            },
+            {
+              "name": "upload_sessions",
+              "definitionSha256": "2814fd4a3ff5adb07c712579c83c4f4eefa627431246fc34316f9ffa2b01bbc1"
+            },
+            {
+              "name": "user_identity_links",
+              "definitionSha256": "213ff920e33bc95b5cd7bd7c4eda6230a9ff8a56ddf311963ce991bf2bfcb1ca"
+            },
+            {
+              "name": "user_management_events",
+              "definitionSha256": "3223267f14a0202df210821ef2058ffdeb9b687c769d162c65bab5accbd2c418"
+            },
+            {
+              "name": "users",
+              "definitionSha256": "d80bf92135a6a56f65ca412e2c69aed2340d149f5f0457e843f8f5c4534583cb"
+            },
+            {
+              "name": "verification_attachments",
+              "definitionSha256": "fd1bea514193501e89cbbcebfd512699ff92b06d0be7c9e576c30bc6921a778d"
+            },
+            {
+              "name": "verifications",
+              "definitionSha256": "9b69eb376b96885735fecccfd76e2adfe17f37bc44b16ef07f6ecd41e8cd1281"
+            }
+          ],
+          "groups": {
+            "business": [
+              "projects",
+              "users",
+              "memberships",
+              "membership_roles",
+              "modules",
+              "bugs",
+              "repair_attempts",
+              "verifications",
+              "events",
+              "comments",
+              "attachments",
+              "bug_attachments",
+              "bug_deletions",
+              "submissions",
+              "idempotency_records",
+              "manual_completion_requests",
+              "user_identity_links"
+            ],
+            "uploadAndCapture": [
+              "attachment_bindings",
+              "capture_artifacts",
+              "capture_bundles",
+              "capture_poco_methods",
+              "upload_chunks",
+              "upload_sessions"
+            ],
+            "remaining": [
+              "accounts",
+              "auth_secret_replays",
+              "blobs",
+              "browser_sessions",
+              "bug_attachment_removals",
+              "bug_closure_acceptances",
+              "bugs_fts",
+              "bugs_fts_config",
+              "bugs_fts_content",
+              "bugs_fts_data",
+              "bugs_fts_docsize",
+              "bugs_fts_idx",
+              "build_lineage_entries",
+              "build_lineages",
+              "build_manifest_commits",
+              "build_repair_links",
+              "build_requirements",
+              "builds",
+              "comment_attachments",
+              "device_installations",
+              "inbox",
+              "integration_links",
+              "local_credentials",
+              "native_sessions",
+              "notification_devices",
+              "notifications",
+              "occurrence_attachments",
+              "occurrence_build_lineage_facts",
+              "occurrences",
+              "outbox",
+              "poco_enrichments",
+              "poco_snapshots",
+              "project_bug_counters",
+              "project_components",
+              "project_identity_links",
+              "project_management_events",
+              "push_subscriptions",
+              "qingyu_bug_links",
+              "refresh_token_families",
+              "refresh_tokens",
+              "relay_receipts",
+              "relay_rework_requests",
+              "schema_migrations",
+              "service_principals",
+              "storage_command_authorizations",
+              "user_management_events",
+              "verification_attachments"
+            ]
+          },
+          "tables": {
+            "accounts": {
+              "count": 1,
+              "sha256": "29b834e6826874cdec6f47e497cbad7e7f34390628b527b942849a3fc6b50e57"
+            },
+            "attachment_bindings": {
+              "count": 20,
+              "sha256": "75336fada5314557bdf6893f0a201722443727ea4450f3677b565165fbabe72f"
+            },
+            "attachments": {
+              "count": 20,
+              "sha256": "cfda2544931ac05c1c02549c57a3fc83415f6d940008bed1c57ce0053a412475"
+            },
+            "auth_secret_replays": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "blobs": {
+              "count": 4,
+              "sha256": "29be9e024d00182d855fe6e0160d5179ed8d35a87c2e2c31de3ce4846db1f9c6"
+            },
+            "browser_sessions": {
+              "count": 154,
+              "sha256": "77b7fd3066a64ff6c217eb3d69d978f4a38d9e4509c0f6beb824bc00bda11872"
+            },
+            "bug_attachment_removals": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "bug_attachments": {
+              "count": 15,
+              "sha256": "3108f03ee7090bcc55c198852867862dd54fa650f10ffd4a8213955f7b1f22a4"
+            },
+            "bug_closure_acceptances": {
+              "count": 20,
+              "sha256": "a9e823a1f7b5028ec8c2fa2f0df60f2baca986f9a71e9c0ff21b6d07cff9d03c"
+            },
+            "bug_deletions": {
+              "count": 11,
+              "sha256": "46f84f5dfd32aaa0a02c207cda88537e9cb87a022b7c6eb464c39d51c89999dd"
+            },
+            "bugs": {
+              "count": 43,
+              "sha256": "3537c19181ae96d0c014caf241b08cb0919c45695d9952a7a01c8c34aeec9582"
+            },
+            "bugs_fts": {
+              "count": 43,
+              "sha256": "7fd6fc8039a9d36ba473e19fb0f2e984dba45104b5b5e4827c1d8403cb99d853"
+            },
+            "bugs_fts_config": {
+              "count": 1,
+              "sha256": "866ec843a7a852664f8f4c1690b8cee6ff1a5c3c2ff01c1cb94f49ab7f32e09e"
+            },
+            "bugs_fts_content": {
+              "count": 43,
+              "sha256": "a151b3f82affdea6944f0216b6d2d3f5fc9a988186f01d0e1c21f90cf38825c1"
+            },
+            "bugs_fts_data": {
+              "count": 19,
+              "sha256": "3d5fe2c9f376396c2c188b5d2267f737a3d99598ecaaf6516a84ee1890e744d1"
+            },
+            "bugs_fts_docsize": {
+              "count": 43,
+              "sha256": "8e62cae11b5b298c947efb72e44714649b7a6c19e341776d153eb4fa8e214476"
+            },
+            "bugs_fts_idx": {
+              "count": 17,
+              "sha256": "39f7d46f90457d76f305d31864aa9481d6687e4709814dcd031b2e8e268eab4e"
+            },
+            "build_lineage_entries": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_lineages": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_manifest_commits": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_repair_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_requirements": {
+              "count": 31,
+              "sha256": "5a05931f4657eb23ea9faeb8f0150e7486b00348b257f44da11d623a0cbebd5a"
+            },
+            "builds": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "capture_artifacts": {
+              "count": 1,
+              "sha256": "6c9494889e9a4322cf2a2638ab18c91523e2563c48bb5d774ab6cffc5af08c10"
+            },
+            "capture_bundles": {
+              "count": 1,
+              "sha256": "87c5256027df72b603dc1b78839ac92c4a03f73b428dde5d2df8f2d7ad684429"
+            },
+            "capture_poco_methods": {
+              "count": 6,
+              "sha256": "80115c6ec64a1b1e298437c3f0104657dfad97546807c6c6719bcfdb7b3d75bb"
+            },
+            "comment_attachments": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "comments": {
+              "count": 30,
+              "sha256": "0ad72aea8a23fda97b11bdf5c3f4921a5a72cac573d7eea7133263e01456e571"
+            },
+            "device_installations": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "events": {
+              "count": 299,
+              "sha256": "789319afcb9f4b7e4f84b477aee4a55ed4395f278fb23df82b8afea42e4816bf"
+            },
+            "idempotency_records": {
+              "count": 27,
+              "sha256": "a768cc41c1ca84b8cb8cd948b07660c6568fcb6b8d5c78fd32428201d96ecf5c"
+            },
+            "inbox": {
+              "count": 76,
+              "sha256": "bf392dfe061d416ae3562d4397bf1706ec61eaed6a51e7e5a180610f957f937f"
+            },
+            "integration_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "local_credentials": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "manual_completion_requests": {
+              "count": 26,
+              "sha256": "b75a8b2cfd2fb182fa093042846dc32b7ec91fbcc8b0524b83fc0e4f94b27090"
+            },
+            "membership_roles": {
+              "count": 644,
+              "sha256": "2d4659d85a1e0fe0167e15555606209d9b133bcc47d2f43971f0841eec8922c1"
+            },
+            "memberships": {
+              "count": 92,
+              "sha256": "044b190c753fa382160d07b9587b3f202a9cdbc308527df6c0bc2e309489aa00"
+            },
+            "modules": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "native_sessions": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "notification_devices": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "notifications": {
+              "count": 427,
+              "sha256": "0fee3ee71d561b6031cc8e0d24f9cb4ec9d2c132bae83d1f9686be4127d706be"
+            },
+            "occurrence_attachments": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "occurrence_build_lineage_facts": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "occurrences": {
+              "count": 43,
+              "sha256": "87acc9811c65245b50d41279f66d6f8aff292b9c62cf32b2aea40ff27ed763b9"
+            },
+            "outbox": {
+              "count": 128,
+              "sha256": "1b35d7f0f53fd70defdcb0af92ebd762bf319004a4087cdccfdec33141501b7e"
+            },
+            "poco_enrichments": {
+              "count": 1,
+              "sha256": "b0f6f474ad2724acf30d3bd0949652f714a3922c327ba3b36f69beaaa4733e54"
+            },
+            "poco_snapshots": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "project_bug_counters": {
+              "count": 18,
+              "sha256": "051e637fd7d302b184af978a3871a39f6ca28e39c85c80bec71e98f98251a5a8"
+            },
+            "project_components": {
+              "count": 7,
+              "sha256": "154cd1cf57fe624d17526b75e6e017a6b019bbe1992f97dae65a4c6a3523b9e3"
+            },
+            "project_identity_links": {
+              "count": 4,
+              "sha256": "bea032dae71a942c4b5c0d65350acc437ec84310e0692cec1098c41b0c35669d"
+            },
+            "project_management_events": {
+              "count": 134,
+              "sha256": "8301821b2eb62c2cea052d139c8063e2521f63fda9ce5922b9ec6ab0ec374f51"
+            },
+            "projects": {
+              "count": 27,
+              "sha256": "889b8e48eddc066ba84f2dd6e1a01e59b840a002b51653075ae09aac658c7cb4"
+            },
+            "push_subscriptions": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "qingyu_bug_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "refresh_token_families": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "refresh_tokens": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "relay_receipts": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "relay_rework_requests": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "repair_attempts": {
+              "count": 33,
+              "sha256": "18e6ea922b8acec651390d4cce88778670b7935cdab17ae014106d093ab48481"
+            },
+            "schema_migrations": {
+              "count": 14,
+              "sha256": "a10225e0d46840e5483ed14e13d82267df3d1f7a9e8ab8e58e658d4d74d4f59c"
+            },
+            "service_principals": {
+              "count": 1,
+              "sha256": "103b0636f3b995993c8b0f690fad7c6fa550daa75ffc1257e58bc068f18c6b33"
+            },
+            "storage_command_authorizations": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "submissions": {
+              "count": 100,
+              "sha256": "d635cca26a5f305dbaa6d93ed74fa3d0446b8b04247b387f5ad8273b3ff63a02"
+            },
+            "upload_chunks": {
+              "count": 22,
+              "sha256": "529a28180e0788c37034b45739f6e4cde3a8b745d7e950ea24d71da936f44bd6"
+            },
+            "upload_sessions": {
+              "count": 22,
+              "sha256": "a7f366c133eaf5b6326235ff194d3b1c5cce0ac0c652ceef51c92a61dca9ca9b"
+            },
+            "user_identity_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "user_management_events": {
+              "count": 9,
+              "sha256": "2dc04a97514f3943050bfba0486a28793497c82a69bf8e084b9d51ff59c86373"
+            },
+            "users": {
+              "count": 49,
+              "sha256": "350457e0f79a24394ed6c16b9381ad2807f2c991226f35357ba3612b5c8a013f"
+            },
+            "verification_attachments": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "verifications": {
+              "count": 27,
+              "sha256": "f4ac8525df8b5d75d8542033d90c32fc3faaa7377e0674613931dc5e75aceaed"
+            }
+          }
+        },
+        "evidence": {
+          "exists": true,
+          "count": 4,
+          "bytes": 228319,
+          "files": [
+            {
+              "path": "sha256/5e/5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "sha256/cd/cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+              "bytes": 43311,
+              "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+            },
+            {
+              "path": "sha256/e0/e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            }
+          ],
+          "sha256": "f1102edea627e037702fe3c0ee850d2f84db9c6e2b8de6bd66cc5852e7ed66eb"
+        },
+        "quarantine": {
+          "exists": true,
+          "count": 22,
+          "bytes": 642338,
+          "files": [
+            {
+              "path": "uploads/0af39b84-d0ab-44c2-8175-203aea5e333a/1/0.bin",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            },
+            {
+              "path": "uploads/133d7b33-33b1-4ea1-8d6d-96f8d9c624df/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/22668b50-8a25-44b9-89e3-c307a51bb376/1/0.bin",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "uploads/22a67428-d995-4311-9507-e6a1af5086ca/1/0.bin",
+              "bytes": 12,
+              "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+            },
+            {
+              "path": "uploads/251f765b-81d9-4f3e-821b-98705ddb4955/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/4283305b-befd-4a9d-ab6f-d8ccb0ce3baa/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/45c5c6e0-683c-4594-b552-fe1ac4a3d900/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/5c13e8b9-4277-41f6-a800-0285802de83d/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/5e669a83-61ab-4f0e-ad73-cda6e1f4cb31/1/0.bin",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            },
+            {
+              "path": "uploads/60333054-18a1-4d55-8f93-c4897674afeb/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/67d409fe-9eb0-4158-9747-cfe6d71a1e0f/1/0.bin",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "uploads/6f8ece3a-56f5-4475-9e8e-22205d4df016/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/73705bd0-ceeb-4deb-b501-677cd7515509/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/73909d9b-8641-4d9b-9f81-5fa19e3e7a82/1/0.bin",
+              "bytes": 43311,
+              "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+            },
+            {
+              "path": "uploads/7be282e4-6acf-4af6-b0cf-2102663e2bbd/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/7d9b757a-1640-415d-8546-01b3e799c666/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/85fa1e18-9506-470e-89d2-0bbc6c605da9/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/d5961d68-c8af-41c8-9721-6d1e62ce6eba/1/0.bin",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "uploads/d88200b1-7ead-467c-aadf-421e246bf4ef/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/df885405-26de-4fec-98cb-2324a77fd68a/1/0.bin",
+              "bytes": 43311,
+              "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+            },
+            {
+              "path": "uploads/ea1bd08c-ae9b-4096-814d-fc24d9f4872f/1/0.bin",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            },
+            {
+              "path": "uploads/fb6f3bad-7d8a-4415-b75a-5332bbca552d/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            }
+          ],
+          "sha256": "039abb0b6fd9c398e7856bdf54a7e8f234477c86ec9a0b85ac7178350fbc3a61"
+        }
+      },
+      "actual": {
+        "database": {
+          "schemaVersion": 14,
+          "componentGate": {
+            "configuredRows": 7,
+            "enabledRows": 0,
+            "missingRowsDefaultDisabled": true
+          },
+          "schema": [
+            {
+              "name": "accounts",
+              "definitionSha256": "ee50ec014065b6d578b308b986ab916fb534a1d84cf915eb06fefc17f7f9d004"
+            },
+            {
+              "name": "attachment_bindings",
+              "definitionSha256": "9453a8ee5218ff87fd313036a4ee4ca86c0a46c8941fcd32c40c16a9c3223d19"
+            },
+            {
+              "name": "attachments",
+              "definitionSha256": "3b822899b64d9766621c5dc7103a410575253d177dd4f35372335a179dc2991b"
+            },
+            {
+              "name": "auth_secret_replays",
+              "definitionSha256": "232da4c75ea5a27f915713bb644c05bb0edf03c9520a7ec320e8e04b11e9fab4"
+            },
+            {
+              "name": "blobs",
+              "definitionSha256": "0b0db830c0547388ad623e2b5f3644f6bd625125fdd8eb9788c997181bbefff0"
+            },
+            {
+              "name": "browser_sessions",
+              "definitionSha256": "bcbd5639823281fbca93af4a199d32bea9002f20dd89c9e4f9929cd4b315dbce"
+            },
+            {
+              "name": "bug_attachment_removals",
+              "definitionSha256": "56f0c2daba650d432f6cecc4bf6c1f61c4ab821fc9a62fdf1d48ab48843dab59"
+            },
+            {
+              "name": "bug_attachments",
+              "definitionSha256": "11acafcac88c7dade94524f82d8ab8506c7764b20177c6b580cf0f6380cf4374"
+            },
+            {
+              "name": "bug_closure_acceptances",
+              "definitionSha256": "45cef32304c77dc5ce4b3f87a0303822125fdb1e20314121dd838f29b35432a1"
+            },
+            {
+              "name": "bug_deletions",
+              "definitionSha256": "6ae75d79bf6bca7f246031e62f7b57544301ffaac37ed08b9bd45b32baf23f0b"
+            },
+            {
+              "name": "bugs",
+              "definitionSha256": "d60c81f8ec68100ed2d56d12d037ab9862c495f2abfef9fdf99b821b85a092a9"
+            },
+            {
+              "name": "bugs_fts",
+              "definitionSha256": "1ed73cc758a4eb28ae8bae43c2962a8a2901b0996fcd012c60dab6364749747a"
+            },
+            {
+              "name": "bugs_fts_config",
+              "definitionSha256": "3701d0b8f73b316fb8bfc74db4d98fb706c50f0630aa90a557f9e0a487e7f1c3"
+            },
+            {
+              "name": "bugs_fts_content",
+              "definitionSha256": "5889426c328e5b2e952706f2560ebcd6aacf136618b7df210c4e3f32f1dbed75"
+            },
+            {
+              "name": "bugs_fts_data",
+              "definitionSha256": "3e585aade6b1007ba06af45538a691dd77007194ab9c7562241783b488812ca9"
+            },
+            {
+              "name": "bugs_fts_docsize",
+              "definitionSha256": "d419326ebea8712f7aefe86dac2015f0c0cc7ad505c3c632c3ce107415eb7fe6"
+            },
+            {
+              "name": "bugs_fts_idx",
+              "definitionSha256": "2e03613dd3d75b22f7430721919cde6eb4ee255e0dbc9b9b72d22ddd4e78f9d6"
+            },
+            {
+              "name": "build_lineage_entries",
+              "definitionSha256": "e7bbf587e697e0f2e0c7445b0036625067628b52444315a40c3c8d51c9f66663"
+            },
+            {
+              "name": "build_lineages",
+              "definitionSha256": "a66dc294e0666dcc9386383e9046f0cfafb9a40dad190058db126e1fefb49323"
+            },
+            {
+              "name": "build_manifest_commits",
+              "definitionSha256": "19ceb60277e637a6bc2a7e06d223d44a94a2cdd474dcb8280229621f026656e8"
+            },
+            {
+              "name": "build_repair_links",
+              "definitionSha256": "f72e4159f764df677b4f47159aeab89e48fab360aed9e2072061f311b9d8cd98"
+            },
+            {
+              "name": "build_requirements",
+              "definitionSha256": "893dfdcf4aedaa70a130213ceea416e33558a60858ae6dce89fe90d1b781ea12"
+            },
+            {
+              "name": "builds",
+              "definitionSha256": "1bde9f8212f471e87c2f01c4703a72d5f18124282343967f289bc816b8a582a6"
+            },
+            {
+              "name": "capture_artifacts",
+              "definitionSha256": "54d441dde446784a928fefbb91ba2601657d5a23f4930c86f4b4a79b8133bdf1"
+            },
+            {
+              "name": "capture_bundles",
+              "definitionSha256": "04dd2439dacf9adf18beb2f7d6f333e5b5edcfd8613593c13d9b26528d93f264"
+            },
+            {
+              "name": "capture_poco_methods",
+              "definitionSha256": "200e8913bbe5ba216202812d16c0260c828e0689e3d763dbb904e7519595492a"
+            },
+            {
+              "name": "comment_attachments",
+              "definitionSha256": "caa347c98a0e9bca48dee1b4ce3ddeadc905d4cd1341082dca7a0a1064add006"
+            },
+            {
+              "name": "comments",
+              "definitionSha256": "2090ea8c75eba9cad6563eee4676290b20d709b494a8ce23ffcebf02e554f6e9"
+            },
+            {
+              "name": "device_installations",
+              "definitionSha256": "2e70642e6ebfda9bf052c2b553a97b7b85e99a4f8f1a78edfdedfdaf1ebe9f74"
+            },
+            {
+              "name": "events",
+              "definitionSha256": "88a6b4355252b0d2a3e498860b1c9f12d7ee792707b98228b1e38c8481000f6b"
+            },
+            {
+              "name": "idempotency_records",
+              "definitionSha256": "74fc1d15a7e9b2c5d10d3c077d3e387f86e65345a546eb595b025adc04e723a6"
+            },
+            {
+              "name": "inbox",
+              "definitionSha256": "71f723504efcdc20e1960a5e997fc1cae6924bdbb1ce2599dbe4803d891bde5b"
+            },
+            {
+              "name": "integration_links",
+              "definitionSha256": "a0961e707061b35a9420208a6938d244895a9e0bef0ba9e9cab405034baf2bee"
+            },
+            {
+              "name": "local_credentials",
+              "definitionSha256": "70d9772e62aad83dc25db6e0ad6196bfd8c93fe2e0861f73acde28f1281b4f69"
+            },
+            {
+              "name": "manual_completion_requests",
+              "definitionSha256": "1c8f53a1e89dbceaebd64c06b058f9c46e809ea387fa44daaa4f4ffd0b62873e"
+            },
+            {
+              "name": "membership_roles",
+              "definitionSha256": "d5585a8ab3637c3be89fb8efb44efe333690c6c67e575f4e96bcf98f4397478f"
+            },
+            {
+              "name": "memberships",
+              "definitionSha256": "03b5c978796e418fd3dd6adde8e220d2f090667763d8819012e1faeb1b91dfb9"
+            },
+            {
+              "name": "modules",
+              "definitionSha256": "e9f10066a363536cf2b3c61130e9210de8fcb8b6f7f3cde72c4d67d53e99ee90"
+            },
+            {
+              "name": "native_sessions",
+              "definitionSha256": "3674fc50685280b37f05d92c9688c1246f86d775cc0f03caf127f715cc200baf"
+            },
+            {
+              "name": "notification_devices",
+              "definitionSha256": "bacd023d1b635b3890ca9b7bc16cea85d81b7b5ebec9739ad8b993a79c71608c"
+            },
+            {
+              "name": "notifications",
+              "definitionSha256": "536fdeae9f134271274f39df7bb52f701a8908e0f4a1ce814b33423b113f6d30"
+            },
+            {
+              "name": "occurrence_attachments",
+              "definitionSha256": "c5d290a69529a6175a932e1ab50e461481b90f7af3f0c6e92175d75a5af4b6a4"
+            },
+            {
+              "name": "occurrence_build_lineage_facts",
+              "definitionSha256": "42809d2dd6795590b1e2c0b07d9799d35e702689a34b1fc8ec8f149e7627747a"
+            },
+            {
+              "name": "occurrences",
+              "definitionSha256": "a12952789e6c48bc9cef939bc1840662bd00757ba74c8fdb39b0fb26c8de324f"
+            },
+            {
+              "name": "outbox",
+              "definitionSha256": "d3c7c69f8641493c16fc147bed3899b6d42897cc7f73a9638ce23dd9a3f8aa68"
+            },
+            {
+              "name": "poco_enrichments",
+              "definitionSha256": "dae96c1bc44bdca2540d9b74c9d0aef9853ec059584655f402daa856a13f7626"
+            },
+            {
+              "name": "poco_snapshots",
+              "definitionSha256": "c132b6d5a8ee97c2dd2b1de0766ba94ff7a7158f5cdb29eec88a0cb115693ac4"
+            },
+            {
+              "name": "project_bug_counters",
+              "definitionSha256": "f8806753c43df25fad19b2b69676fe67bca1633d41bff0f9d7799831c820d3ab"
+            },
+            {
+              "name": "project_components",
+              "definitionSha256": "7745ada7a6c3209914a8dcfe50629403721ce715771c29d338a95aaa4ba9cda2"
+            },
+            {
+              "name": "project_identity_links",
+              "definitionSha256": "16277ab01272281a00520f79858c9502d14f650b8664d0af0118ba9a549a5d56"
+            },
+            {
+              "name": "project_management_events",
+              "definitionSha256": "3bdd9a767c6bf9f6ff28c17fb3f9f8f36193a413011ff2d46716a91670b38572"
+            },
+            {
+              "name": "projects",
+              "definitionSha256": "809cefcf6f85609fde819d9f618752cf13794c1511d8d2a5bd62d70ebfaf00fd"
+            },
+            {
+              "name": "push_subscriptions",
+              "definitionSha256": "a4cd073135c881648750943f562beaaf7b21da993f05637d499d3492d4192b00"
+            },
+            {
+              "name": "qingyu_bug_links",
+              "definitionSha256": "67a7342a5542d680e51481fd2a0984e118995393f00f771523b04ef4220e4d30"
+            },
+            {
+              "name": "refresh_token_families",
+              "definitionSha256": "fc68febec50ce10d7f5f52f0e808fd8adcae726e062248c02a547836b109ce12"
+            },
+            {
+              "name": "refresh_tokens",
+              "definitionSha256": "42be291af66a8f622d38890f321dfe59fcb921566f1f03034d38ecfd0fa6ef0d"
+            },
+            {
+              "name": "relay_receipts",
+              "definitionSha256": "ee7d25449a299852161971d9c968e195ab1af896fba5b69ea450d53420292c5c"
+            },
+            {
+              "name": "relay_rework_requests",
+              "definitionSha256": "d7541762fc2737d23c565b8e3b8cbfcf59e61e242e50dd67ae5d10def941b5e1"
+            },
+            {
+              "name": "repair_attempts",
+              "definitionSha256": "56dbfb1bc41f57ae7bdef85815ee8e4d4b0c7e28ed8f6068d87da83f11beea5c"
+            },
+            {
+              "name": "schema_migrations",
+              "definitionSha256": "6ad3ac43b24166ebe80b3c73a563201ee1acb77683f35e2ecd099e1930159281"
+            },
+            {
+              "name": "service_principals",
+              "definitionSha256": "553aa33265dc0ddfee7b87e6a48a5c138260fb95e354fde005065edf7787dbb1"
+            },
+            {
+              "name": "storage_command_authorizations",
+              "definitionSha256": "e32dd03bd8efa65bb5b4c9c44684f385614e31672ce0a1a9fa39352d6a043c0a"
+            },
+            {
+              "name": "submissions",
+              "definitionSha256": "b07392461094dfc576cb51435d788f5f92e3cf6d8f4ad2e3c311c68ecac8ca78"
+            },
+            {
+              "name": "upload_chunks",
+              "definitionSha256": "88d1a62b95478fa9c63b30fcd25ed15ff7c99c62b0ec4e14c9dae21c4f42828b"
+            },
+            {
+              "name": "upload_sessions",
+              "definitionSha256": "2814fd4a3ff5adb07c712579c83c4f4eefa627431246fc34316f9ffa2b01bbc1"
+            },
+            {
+              "name": "user_identity_links",
+              "definitionSha256": "213ff920e33bc95b5cd7bd7c4eda6230a9ff8a56ddf311963ce991bf2bfcb1ca"
+            },
+            {
+              "name": "user_management_events",
+              "definitionSha256": "3223267f14a0202df210821ef2058ffdeb9b687c769d162c65bab5accbd2c418"
+            },
+            {
+              "name": "users",
+              "definitionSha256": "d80bf92135a6a56f65ca412e2c69aed2340d149f5f0457e843f8f5c4534583cb"
+            },
+            {
+              "name": "verification_attachments",
+              "definitionSha256": "fd1bea514193501e89cbbcebfd512699ff92b06d0be7c9e576c30bc6921a778d"
+            },
+            {
+              "name": "verifications",
+              "definitionSha256": "9b69eb376b96885735fecccfd76e2adfe17f37bc44b16ef07f6ecd41e8cd1281"
+            }
+          ],
+          "groups": {
+            "business": [
+              "projects",
+              "users",
+              "memberships",
+              "membership_roles",
+              "modules",
+              "bugs",
+              "repair_attempts",
+              "verifications",
+              "events",
+              "comments",
+              "attachments",
+              "bug_attachments",
+              "bug_deletions",
+              "submissions",
+              "idempotency_records",
+              "manual_completion_requests",
+              "user_identity_links"
+            ],
+            "uploadAndCapture": [
+              "attachment_bindings",
+              "capture_artifacts",
+              "capture_bundles",
+              "capture_poco_methods",
+              "upload_chunks",
+              "upload_sessions"
+            ],
+            "remaining": [
+              "accounts",
+              "auth_secret_replays",
+              "blobs",
+              "browser_sessions",
+              "bug_attachment_removals",
+              "bug_closure_acceptances",
+              "bugs_fts",
+              "bugs_fts_config",
+              "bugs_fts_content",
+              "bugs_fts_data",
+              "bugs_fts_docsize",
+              "bugs_fts_idx",
+              "build_lineage_entries",
+              "build_lineages",
+              "build_manifest_commits",
+              "build_repair_links",
+              "build_requirements",
+              "builds",
+              "comment_attachments",
+              "device_installations",
+              "inbox",
+              "integration_links",
+              "local_credentials",
+              "native_sessions",
+              "notification_devices",
+              "notifications",
+              "occurrence_attachments",
+              "occurrence_build_lineage_facts",
+              "occurrences",
+              "outbox",
+              "poco_enrichments",
+              "poco_snapshots",
+              "project_bug_counters",
+              "project_components",
+              "project_identity_links",
+              "project_management_events",
+              "push_subscriptions",
+              "qingyu_bug_links",
+              "refresh_token_families",
+              "refresh_tokens",
+              "relay_receipts",
+              "relay_rework_requests",
+              "schema_migrations",
+              "service_principals",
+              "storage_command_authorizations",
+              "user_management_events",
+              "verification_attachments"
+            ]
+          },
+          "tables": {
+            "accounts": {
+              "count": 1,
+              "sha256": "29b834e6826874cdec6f47e497cbad7e7f34390628b527b942849a3fc6b50e57"
+            },
+            "attachment_bindings": {
+              "count": 20,
+              "sha256": "75336fada5314557bdf6893f0a201722443727ea4450f3677b565165fbabe72f"
+            },
+            "attachments": {
+              "count": 20,
+              "sha256": "cfda2544931ac05c1c02549c57a3fc83415f6d940008bed1c57ce0053a412475"
+            },
+            "auth_secret_replays": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "blobs": {
+              "count": 4,
+              "sha256": "29be9e024d00182d855fe6e0160d5179ed8d35a87c2e2c31de3ce4846db1f9c6"
+            },
+            "browser_sessions": {
+              "count": 154,
+              "sha256": "77b7fd3066a64ff6c217eb3d69d978f4a38d9e4509c0f6beb824bc00bda11872"
+            },
+            "bug_attachment_removals": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "bug_attachments": {
+              "count": 15,
+              "sha256": "3108f03ee7090bcc55c198852867862dd54fa650f10ffd4a8213955f7b1f22a4"
+            },
+            "bug_closure_acceptances": {
+              "count": 20,
+              "sha256": "a9e823a1f7b5028ec8c2fa2f0df60f2baca986f9a71e9c0ff21b6d07cff9d03c"
+            },
+            "bug_deletions": {
+              "count": 11,
+              "sha256": "46f84f5dfd32aaa0a02c207cda88537e9cb87a022b7c6eb464c39d51c89999dd"
+            },
+            "bugs": {
+              "count": 43,
+              "sha256": "3537c19181ae96d0c014caf241b08cb0919c45695d9952a7a01c8c34aeec9582"
+            },
+            "bugs_fts": {
+              "count": 43,
+              "sha256": "7fd6fc8039a9d36ba473e19fb0f2e984dba45104b5b5e4827c1d8403cb99d853"
+            },
+            "bugs_fts_config": {
+              "count": 1,
+              "sha256": "866ec843a7a852664f8f4c1690b8cee6ff1a5c3c2ff01c1cb94f49ab7f32e09e"
+            },
+            "bugs_fts_content": {
+              "count": 43,
+              "sha256": "a151b3f82affdea6944f0216b6d2d3f5fc9a988186f01d0e1c21f90cf38825c1"
+            },
+            "bugs_fts_data": {
+              "count": 19,
+              "sha256": "3d5fe2c9f376396c2c188b5d2267f737a3d99598ecaaf6516a84ee1890e744d1"
+            },
+            "bugs_fts_docsize": {
+              "count": 43,
+              "sha256": "8e62cae11b5b298c947efb72e44714649b7a6c19e341776d153eb4fa8e214476"
+            },
+            "bugs_fts_idx": {
+              "count": 17,
+              "sha256": "39f7d46f90457d76f305d31864aa9481d6687e4709814dcd031b2e8e268eab4e"
+            },
+            "build_lineage_entries": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_lineages": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_manifest_commits": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_repair_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "build_requirements": {
+              "count": 31,
+              "sha256": "5a05931f4657eb23ea9faeb8f0150e7486b00348b257f44da11d623a0cbebd5a"
+            },
+            "builds": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "capture_artifacts": {
+              "count": 1,
+              "sha256": "6c9494889e9a4322cf2a2638ab18c91523e2563c48bb5d774ab6cffc5af08c10"
+            },
+            "capture_bundles": {
+              "count": 1,
+              "sha256": "87c5256027df72b603dc1b78839ac92c4a03f73b428dde5d2df8f2d7ad684429"
+            },
+            "capture_poco_methods": {
+              "count": 6,
+              "sha256": "80115c6ec64a1b1e298437c3f0104657dfad97546807c6c6719bcfdb7b3d75bb"
+            },
+            "comment_attachments": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "comments": {
+              "count": 30,
+              "sha256": "0ad72aea8a23fda97b11bdf5c3f4921a5a72cac573d7eea7133263e01456e571"
+            },
+            "device_installations": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "events": {
+              "count": 299,
+              "sha256": "789319afcb9f4b7e4f84b477aee4a55ed4395f278fb23df82b8afea42e4816bf"
+            },
+            "idempotency_records": {
+              "count": 27,
+              "sha256": "a768cc41c1ca84b8cb8cd948b07660c6568fcb6b8d5c78fd32428201d96ecf5c"
+            },
+            "inbox": {
+              "count": 76,
+              "sha256": "bf392dfe061d416ae3562d4397bf1706ec61eaed6a51e7e5a180610f957f937f"
+            },
+            "integration_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "local_credentials": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "manual_completion_requests": {
+              "count": 26,
+              "sha256": "b75a8b2cfd2fb182fa093042846dc32b7ec91fbcc8b0524b83fc0e4f94b27090"
+            },
+            "membership_roles": {
+              "count": 644,
+              "sha256": "2d4659d85a1e0fe0167e15555606209d9b133bcc47d2f43971f0841eec8922c1"
+            },
+            "memberships": {
+              "count": 92,
+              "sha256": "044b190c753fa382160d07b9587b3f202a9cdbc308527df6c0bc2e309489aa00"
+            },
+            "modules": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "native_sessions": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "notification_devices": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "notifications": {
+              "count": 427,
+              "sha256": "0fee3ee71d561b6031cc8e0d24f9cb4ec9d2c132bae83d1f9686be4127d706be"
+            },
+            "occurrence_attachments": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "occurrence_build_lineage_facts": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "occurrences": {
+              "count": 43,
+              "sha256": "87acc9811c65245b50d41279f66d6f8aff292b9c62cf32b2aea40ff27ed763b9"
+            },
+            "outbox": {
+              "count": 128,
+              "sha256": "1b35d7f0f53fd70defdcb0af92ebd762bf319004a4087cdccfdec33141501b7e"
+            },
+            "poco_enrichments": {
+              "count": 1,
+              "sha256": "b0f6f474ad2724acf30d3bd0949652f714a3922c327ba3b36f69beaaa4733e54"
+            },
+            "poco_snapshots": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "project_bug_counters": {
+              "count": 18,
+              "sha256": "051e637fd7d302b184af978a3871a39f6ca28e39c85c80bec71e98f98251a5a8"
+            },
+            "project_components": {
+              "count": 7,
+              "sha256": "154cd1cf57fe624d17526b75e6e017a6b019bbe1992f97dae65a4c6a3523b9e3"
+            },
+            "project_identity_links": {
+              "count": 4,
+              "sha256": "bea032dae71a942c4b5c0d65350acc437ec84310e0692cec1098c41b0c35669d"
+            },
+            "project_management_events": {
+              "count": 134,
+              "sha256": "8301821b2eb62c2cea052d139c8063e2521f63fda9ce5922b9ec6ab0ec374f51"
+            },
+            "projects": {
+              "count": 27,
+              "sha256": "889b8e48eddc066ba84f2dd6e1a01e59b840a002b51653075ae09aac658c7cb4"
+            },
+            "push_subscriptions": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "qingyu_bug_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "refresh_token_families": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "refresh_tokens": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "relay_receipts": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "relay_rework_requests": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "repair_attempts": {
+              "count": 33,
+              "sha256": "18e6ea922b8acec651390d4cce88778670b7935cdab17ae014106d093ab48481"
+            },
+            "schema_migrations": {
+              "count": 14,
+              "sha256": "a10225e0d46840e5483ed14e13d82267df3d1f7a9e8ab8e58e658d4d74d4f59c"
+            },
+            "service_principals": {
+              "count": 1,
+              "sha256": "103b0636f3b995993c8b0f690fad7c6fa550daa75ffc1257e58bc068f18c6b33"
+            },
+            "storage_command_authorizations": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "submissions": {
+              "count": 100,
+              "sha256": "d635cca26a5f305dbaa6d93ed74fa3d0446b8b04247b387f5ad8273b3ff63a02"
+            },
+            "upload_chunks": {
+              "count": 22,
+              "sha256": "529a28180e0788c37034b45739f6e4cde3a8b745d7e950ea24d71da936f44bd6"
+            },
+            "upload_sessions": {
+              "count": 22,
+              "sha256": "a7f366c133eaf5b6326235ff194d3b1c5cce0ac0c652ceef51c92a61dca9ca9b"
+            },
+            "user_identity_links": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "user_management_events": {
+              "count": 9,
+              "sha256": "2dc04a97514f3943050bfba0486a28793497c82a69bf8e084b9d51ff59c86373"
+            },
+            "users": {
+              "count": 49,
+              "sha256": "350457e0f79a24394ed6c16b9381ad2807f2c991226f35357ba3612b5c8a013f"
+            },
+            "verification_attachments": {
+              "count": 0,
+              "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+            },
+            "verifications": {
+              "count": 27,
+              "sha256": "f4ac8525df8b5d75d8542033d90c32fc3faaa7377e0674613931dc5e75aceaed"
+            }
+          }
+        },
+        "evidence": {
+          "exists": true,
+          "count": 4,
+          "bytes": 228319,
+          "files": [
+            {
+              "path": "sha256/5e/5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "sha256/cd/cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+              "bytes": 43311,
+              "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+            },
+            {
+              "path": "sha256/e0/e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            }
+          ],
+          "sha256": "f1102edea627e037702fe3c0ee850d2f84db9c6e2b8de6bd66cc5852e7ed66eb"
+        },
+        "quarantine": {
+          "exists": true,
+          "count": 22,
+          "bytes": 642338,
+          "files": [
+            {
+              "path": "uploads/0af39b84-d0ab-44c2-8175-203aea5e333a/1/0.bin",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            },
+            {
+              "path": "uploads/133d7b33-33b1-4ea1-8d6d-96f8d9c624df/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/22668b50-8a25-44b9-89e3-c307a51bb376/1/0.bin",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "uploads/22a67428-d995-4311-9507-e6a1af5086ca/1/0.bin",
+              "bytes": 12,
+              "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+            },
+            {
+              "path": "uploads/251f765b-81d9-4f3e-821b-98705ddb4955/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/4283305b-befd-4a9d-ab6f-d8ccb0ce3baa/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/45c5c6e0-683c-4594-b552-fe1ac4a3d900/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/5c13e8b9-4277-41f6-a800-0285802de83d/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/5e669a83-61ab-4f0e-ad73-cda6e1f4cb31/1/0.bin",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            },
+            {
+              "path": "uploads/60333054-18a1-4d55-8f93-c4897674afeb/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/67d409fe-9eb0-4158-9747-cfe6d71a1e0f/1/0.bin",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "uploads/6f8ece3a-56f5-4475-9e8e-22205d4df016/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/73705bd0-ceeb-4deb-b501-677cd7515509/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/73909d9b-8641-4d9b-9f81-5fa19e3e7a82/1/0.bin",
+              "bytes": 43311,
+              "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+            },
+            {
+              "path": "uploads/7be282e4-6acf-4af6-b0cf-2102663e2bbd/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/7d9b757a-1640-415d-8546-01b3e799c666/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/85fa1e18-9506-470e-89d2-0bbc6c605da9/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/d5961d68-c8af-41c8-9721-6d1e62ce6eba/1/0.bin",
+              "bytes": 68,
+              "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+            },
+            {
+              "path": "uploads/d88200b1-7ead-467c-aadf-421e246bf4ef/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            },
+            {
+              "path": "uploads/df885405-26de-4fec-98cb-2324a77fd68a/1/0.bin",
+              "bytes": 43311,
+              "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+            },
+            {
+              "path": "uploads/ea1bd08c-ae9b-4096-814d-fc24d9f4872f/1/0.bin",
+              "bytes": 184872,
+              "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+            },
+            {
+              "path": "uploads/fb6f3bad-7d8a-4415-b75a-5332bbca552d/1/0.bin",
+              "bytes": 68,
+              "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+            }
+          ],
+          "sha256": "039abb0b6fd9c398e7856bdf54a7e8f234477c86ec9a0b85ac7178350fbc3a61"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "FIVE_OTHER_ENTRIES_PRODUCTION_CONFIG_FEED_UNCHANGED",
+      "expected": {
+        "host": {
+          "services": [
+            {
+              "service": "web",
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            },
+            {
+              "service": "mcp",
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            }
+          ],
+          "processes": [
+            {
+              "pid": 3452,
+              "createdAt": "2026-09-08T10:24:12.7633970Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 7420,
+              "createdAt": "2026-09-07T09:37:15.3473300Z",
+              "executable": null
+            },
+            {
+              "pid": 10744,
+              "createdAt": "2026-09-08T10:24:12.6574810Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 10844,
+              "createdAt": "2026-09-08T11:09:25.9817720Z",
+              "executable": null
+            },
+            {
+              "pid": 13820,
+              "createdAt": "2026-09-09T00:41:50.7436470Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 17160,
+              "createdAt": "2026-09-08T10:24:12.5269520Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 18596,
+              "createdAt": "2026-09-09T00:41:50.5866930Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 19500,
+              "createdAt": "2026-09-09T00:41:50.3889400Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 23328,
+              "createdAt": "2026-09-09T00:41:50.6081850Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 23944,
+              "createdAt": "2026-09-08T10:24:12.6985200Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            }
+          ],
+          "listeners": [
+            {
+              "LocalPort": 4174,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 7420
+            },
+            {
+              "LocalPort": 4274,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 20284
+            },
+            {
+              "LocalPort": 4319,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 10844
+            },
+            {
+              "LocalPort": 4420,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 19500
+            },
+            {
+              "LocalPort": 4421,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 15736
+            }
+          ],
+          "installed": {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+            "productVersion": "0.2.0-preview.8",
+            "fileVersion": "0.2.0.8"
+          }
+        },
+        "android": {
+          "preview": {
+            "packageName": "com.relayqahub.android.preview.debug",
+            "pids": [
+              23733
+            ],
+            "versionCode": 23,
+            "versionName": "0.2.0-preview.9",
+            "runtimeConfig": [
+              {
+                "path": "/sdcard/Android/media/com.relayqahub.android.preview.debug/qa-hub/config/qa-runtime.json",
+                "sha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca"
+              }
+            ],
+            "draftsAndPreferences": [
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+                "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf"
+              },
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+                "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-account-sessions-v1.xml",
+                "sha256": "5efdfb7f75d8bf22590246532bed3131fe33d453eccd70f47a3afae7b43e95e2"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+                "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+                "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf"
+              }
+            ]
+          },
+          "daily": {
+            "packageName": "com.relayqahub.android.debug",
+            "pids": [
+              5051
+            ],
+            "versionCode": 14,
+            "versionName": "0.1.13-debug",
+            "preferences": [
+              {
+                "path": "shared_prefs/qa_hub_credentials_v2.xml",
+                "sha256": "31996d447738cd0924c93e0ba643bdeba9becbbde246fb82c4edb924f48dc1a0"
+              },
+              {
+                "path": "shared_prefs/qa-hub-account-sessions-v1.xml",
+                "sha256": "b021f5e4a3bcde60266ddf3a1e2518bdb0af4da3fd26be070707aee9ef49226f"
+              },
+              {
+                "path": "shared_prefs/qa-hub-bug-draft-defaults-v1.xml",
+                "sha256": "f034664f85fdd56cbd75445f29d5e03bb3fd0eb1fcb6c34e6448e8c12323c58b"
+              },
+              {
+                "path": "shared_prefs/qa-hub-private-identity.xml",
+                "sha256": "5fe91f1c686ef179f120569bf1f47279ccd054f0d8490ff931384de128033fa9"
+              }
+            ]
+          }
+        },
+        "readiness": {
+          "httpApi": {
+            "port": 4419,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "web": {
+            "port": 4274,
+            "path": "/",
+            "statusCode": 200,
+            "bytes": 709,
+            "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+          },
+          "serverMcp": {
+            "port": 4421,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "localMcp": {
+            "port": 4420,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "service": "relay-qa-hub-desktop-mcp",
+            "endpoint": "/mcp",
+            "transport": "streamable-http"
+          },
+          "productionApi": {
+            "port": 4319,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "12"
+          }
+        },
+        "configuration": [
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+            "exists": true,
+            "bytes": 1151,
+            "sha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\people.json",
+            "exists": true,
+            "bytes": 66,
+            "sha256": "10fc26c3630f252c53009dc4debe20fd6a14a76192ec57daf060e482dfafcad2"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\secrets.json",
+            "exists": true,
+            "bytes": 237,
+            "sha256": "a22cfae14e96f164adc617b2a195bdc097a2a8cbc80d450a651badd35416ff69"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\preview-instance.json",
+            "exists": true,
+            "bytes": 561,
+            "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+            "exists": true,
+            "bytes": 19,
+            "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\desktop-runtime.json",
+            "exists": false
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\desktop-runtime.json",
+            "exists": false
+          }
+        ],
+        "distribution": {
+          "androidRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86",
+          "androidFeed": {
+            "exists": false,
+            "count": 0,
+            "bytes": 0,
+            "files": [],
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "files": [
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+              "bytes": 464,
+              "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+              "bytes": 35471405,
+              "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+              "bytes": 2600,
+              "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+              "bytes": 35536941,
+              "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+            }
+          ]
+        },
+        "productionFiles": [
+          {
+            "path": "D:/Relay-QA-Hub-Data/mvp-e2e-current.json",
+            "bytes": 2014,
+            "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub-Config/qa-people.json",
+            "bytes": 2268,
+            "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Windows-x64-latest.json",
+            "bytes": 413,
+            "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Setup-x64.exe",
+            "bytes": 150473551,
+            "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+            "bytes": 272,
+            "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+            "bytes": 355,
+            "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c"
+          }
+        ]
+      },
+      "actual": {
+        "host": {
+          "services": [
+            {
+              "service": "web",
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            },
+            {
+              "service": "mcp",
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            }
+          ],
+          "processes": [
+            {
+              "pid": 3452,
+              "createdAt": "2026-09-08T10:24:12.7633970Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 7420,
+              "createdAt": "2026-09-07T09:37:15.3473300Z",
+              "executable": null
+            },
+            {
+              "pid": 10744,
+              "createdAt": "2026-09-08T10:24:12.6574810Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 10844,
+              "createdAt": "2026-09-08T11:09:25.9817720Z",
+              "executable": null
+            },
+            {
+              "pid": 13820,
+              "createdAt": "2026-09-09T00:41:50.7436470Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 17160,
+              "createdAt": "2026-09-08T10:24:12.5269520Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 18596,
+              "createdAt": "2026-09-09T00:41:50.5866930Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 19500,
+              "createdAt": "2026-09-09T00:41:50.3889400Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 23328,
+              "createdAt": "2026-09-09T00:41:50.6081850Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 23944,
+              "createdAt": "2026-09-08T10:24:12.6985200Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            }
+          ],
+          "listeners": [
+            {
+              "LocalPort": 4174,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 7420
+            },
+            {
+              "LocalPort": 4274,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 20284
+            },
+            {
+              "LocalPort": 4319,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 10844
+            },
+            {
+              "LocalPort": 4420,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 19500
+            },
+            {
+              "LocalPort": 4421,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 15736
+            }
+          ],
+          "installed": {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+            "productVersion": "0.2.0-preview.8",
+            "fileVersion": "0.2.0.8"
+          }
+        },
+        "android": {
+          "preview": {
+            "packageName": "com.relayqahub.android.preview.debug",
+            "pids": [
+              23733
+            ],
+            "versionCode": 23,
+            "versionName": "0.2.0-preview.9",
+            "runtimeConfig": [
+              {
+                "path": "/sdcard/Android/media/com.relayqahub.android.preview.debug/qa-hub/config/qa-runtime.json",
+                "sha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca"
+              }
+            ],
+            "draftsAndPreferences": [
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+                "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf"
+              },
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+                "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-account-sessions-v1.xml",
+                "sha256": "5efdfb7f75d8bf22590246532bed3131fe33d453eccd70f47a3afae7b43e95e2"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+                "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+                "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf"
+              }
+            ]
+          },
+          "daily": {
+            "packageName": "com.relayqahub.android.debug",
+            "pids": [
+              5051
+            ],
+            "versionCode": 14,
+            "versionName": "0.1.13-debug",
+            "preferences": [
+              {
+                "path": "shared_prefs/qa_hub_credentials_v2.xml",
+                "sha256": "31996d447738cd0924c93e0ba643bdeba9becbbde246fb82c4edb924f48dc1a0"
+              },
+              {
+                "path": "shared_prefs/qa-hub-account-sessions-v1.xml",
+                "sha256": "b021f5e4a3bcde60266ddf3a1e2518bdb0af4da3fd26be070707aee9ef49226f"
+              },
+              {
+                "path": "shared_prefs/qa-hub-bug-draft-defaults-v1.xml",
+                "sha256": "f034664f85fdd56cbd75445f29d5e03bb3fd0eb1fcb6c34e6448e8c12323c58b"
+              },
+              {
+                "path": "shared_prefs/qa-hub-private-identity.xml",
+                "sha256": "5fe91f1c686ef179f120569bf1f47279ccd054f0d8490ff931384de128033fa9"
+              }
+            ]
+          }
+        },
+        "readiness": {
+          "httpApi": {
+            "port": 4419,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "web": {
+            "port": 4274,
+            "path": "/",
+            "statusCode": 200,
+            "bytes": 709,
+            "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+          },
+          "serverMcp": {
+            "port": 4421,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "localMcp": {
+            "port": 4420,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "service": "relay-qa-hub-desktop-mcp",
+            "endpoint": "/mcp",
+            "transport": "streamable-http"
+          },
+          "productionApi": {
+            "port": 4319,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "12"
+          }
+        },
+        "configuration": [
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+            "exists": true,
+            "bytes": 1151,
+            "sha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\people.json",
+            "exists": true,
+            "bytes": 66,
+            "sha256": "10fc26c3630f252c53009dc4debe20fd6a14a76192ec57daf060e482dfafcad2"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\secrets.json",
+            "exists": true,
+            "bytes": 237,
+            "sha256": "a22cfae14e96f164adc617b2a195bdc097a2a8cbc80d450a651badd35416ff69"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\preview-instance.json",
+            "exists": true,
+            "bytes": 561,
+            "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+            "exists": true,
+            "bytes": 19,
+            "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\desktop-runtime.json",
+            "exists": false
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\desktop-runtime.json",
+            "exists": false
+          }
+        ],
+        "distribution": {
+          "androidRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86",
+          "androidFeed": {
+            "exists": false,
+            "count": 0,
+            "bytes": 0,
+            "files": [],
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "files": [
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+              "bytes": 464,
+              "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+              "bytes": 35471405,
+              "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+              "bytes": 2600,
+              "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+              "bytes": 35536941,
+              "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+            }
+          ]
+        },
+        "productionFiles": [
+          {
+            "path": "D:/Relay-QA-Hub-Data/mvp-e2e-current.json",
+            "bytes": 2014,
+            "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub-Config/qa-people.json",
+            "bytes": 2268,
+            "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Windows-x64-latest.json",
+            "bytes": 413,
+            "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Setup-x64.exe",
+            "bytes": 150473551,
+            "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+            "bytes": 272,
+            "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+            "bytes": 355,
+            "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c"
+          }
+        ]
+      },
+      "passed": true
+    },
+    {
+      "label": "API_PROCESS_REPLACED",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "API_EXECUTABLE_UNCHANGED",
+      "expected": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "actual": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "passed": true
+    },
+    {
+      "label": "BOUNDARIES_STABLE_DURING_AFTER",
+      "expected": {
+        "host": {
+          "services": [
+            {
+              "service": "api",
+              "pid": 22852,
+              "createdAt": "2026-09-09T01:22:20.2728640Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            },
+            {
+              "service": "web",
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            },
+            {
+              "service": "mcp",
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            }
+          ],
+          "processes": [
+            {
+              "pid": 3452,
+              "createdAt": "2026-09-08T10:24:12.7633970Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 7420,
+              "createdAt": "2026-09-07T09:37:15.3473300Z",
+              "executable": null
+            },
+            {
+              "pid": 10744,
+              "createdAt": "2026-09-08T10:24:12.6574810Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 10844,
+              "createdAt": "2026-09-08T11:09:25.9817720Z",
+              "executable": null
+            },
+            {
+              "pid": 13820,
+              "createdAt": "2026-09-09T00:41:50.7436470Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 17160,
+              "createdAt": "2026-09-08T10:24:12.5269520Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 18596,
+              "createdAt": "2026-09-09T00:41:50.5866930Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 19500,
+              "createdAt": "2026-09-09T00:41:50.3889400Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 22852,
+              "createdAt": "2026-09-09T01:22:20.2728640Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 23328,
+              "createdAt": "2026-09-09T00:41:50.6081850Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 23944,
+              "createdAt": "2026-09-08T10:24:12.6985200Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            }
+          ],
+          "listeners": [
+            {
+              "LocalPort": 4174,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 7420
+            },
+            {
+              "LocalPort": 4274,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 20284
+            },
+            {
+              "LocalPort": 4319,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 10844
+            },
+            {
+              "LocalPort": 4419,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 22852
+            },
+            {
+              "LocalPort": 4420,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 19500
+            },
+            {
+              "LocalPort": 4421,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 15736
+            }
+          ],
+          "installed": {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+            "productVersion": "0.2.0-preview.8",
+            "fileVersion": "0.2.0.8"
+          }
+        },
+        "android": {
+          "preview": {
+            "packageName": "com.relayqahub.android.preview.debug",
+            "pids": [
+              23733
+            ],
+            "versionCode": 23,
+            "versionName": "0.2.0-preview.9",
+            "runtimeConfig": [
+              {
+                "path": "/sdcard/Android/media/com.relayqahub.android.preview.debug/qa-hub/config/qa-runtime.json",
+                "sha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca"
+              }
+            ],
+            "draftsAndPreferences": [
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+                "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf"
+              },
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+                "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-account-sessions-v1.xml",
+                "sha256": "5efdfb7f75d8bf22590246532bed3131fe33d453eccd70f47a3afae7b43e95e2"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+                "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+                "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf"
+              }
+            ]
+          },
+          "daily": {
+            "packageName": "com.relayqahub.android.debug",
+            "pids": [
+              5051
+            ],
+            "versionCode": 14,
+            "versionName": "0.1.13-debug",
+            "preferences": [
+              {
+                "path": "shared_prefs/qa_hub_credentials_v2.xml",
+                "sha256": "31996d447738cd0924c93e0ba643bdeba9becbbde246fb82c4edb924f48dc1a0"
+              },
+              {
+                "path": "shared_prefs/qa-hub-account-sessions-v1.xml",
+                "sha256": "b021f5e4a3bcde60266ddf3a1e2518bdb0af4da3fd26be070707aee9ef49226f"
+              },
+              {
+                "path": "shared_prefs/qa-hub-bug-draft-defaults-v1.xml",
+                "sha256": "f034664f85fdd56cbd75445f29d5e03bb3fd0eb1fcb6c34e6448e8c12323c58b"
+              },
+              {
+                "path": "shared_prefs/qa-hub-private-identity.xml",
+                "sha256": "5fe91f1c686ef179f120569bf1f47279ccd054f0d8490ff931384de128033fa9"
+              }
+            ]
+          }
+        },
+        "readiness": {
+          "httpApi": {
+            "port": 4419,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "web": {
+            "port": 4274,
+            "path": "/",
+            "statusCode": 200,
+            "bytes": 709,
+            "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+          },
+          "serverMcp": {
+            "port": 4421,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "localMcp": {
+            "port": 4420,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "service": "relay-qa-hub-desktop-mcp",
+            "endpoint": "/mcp",
+            "transport": "streamable-http"
+          },
+          "productionApi": {
+            "port": 4319,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "12"
+          }
+        },
+        "configuration": [
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+            "exists": true,
+            "bytes": 1151,
+            "sha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\people.json",
+            "exists": true,
+            "bytes": 66,
+            "sha256": "10fc26c3630f252c53009dc4debe20fd6a14a76192ec57daf060e482dfafcad2"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\secrets.json",
+            "exists": true,
+            "bytes": 237,
+            "sha256": "a22cfae14e96f164adc617b2a195bdc097a2a8cbc80d450a651badd35416ff69"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\preview-instance.json",
+            "exists": true,
+            "bytes": 561,
+            "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+            "exists": true,
+            "bytes": 19,
+            "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\desktop-runtime.json",
+            "exists": false
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\desktop-runtime.json",
+            "exists": false
+          }
+        ],
+        "distribution": {
+          "androidRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86",
+          "androidFeed": {
+            "exists": false,
+            "count": 0,
+            "bytes": 0,
+            "files": [],
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "files": [
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+              "bytes": 464,
+              "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+              "bytes": 35471405,
+              "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+              "bytes": 2600,
+              "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+              "bytes": 35536941,
+              "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+            }
+          ]
+        },
+        "productionFiles": [
+          {
+            "path": "D:/Relay-QA-Hub-Data/mvp-e2e-current.json",
+            "bytes": 2014,
+            "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub-Config/qa-people.json",
+            "bytes": 2268,
+            "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Windows-x64-latest.json",
+            "bytes": 413,
+            "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Setup-x64.exe",
+            "bytes": 150473551,
+            "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+            "bytes": 272,
+            "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+            "bytes": 355,
+            "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c"
+          }
+        ]
+      },
+      "actual": {
+        "host": {
+          "services": [
+            {
+              "service": "api",
+              "pid": 22852,
+              "createdAt": "2026-09-09T01:22:20.2728640Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            },
+            {
+              "service": "web",
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            },
+            {
+              "service": "mcp",
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+              "commandLineMatchesReceipt": true
+            }
+          ],
+          "processes": [
+            {
+              "pid": 3452,
+              "createdAt": "2026-09-08T10:24:12.7633970Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 7420,
+              "createdAt": "2026-09-07T09:37:15.3473300Z",
+              "executable": null
+            },
+            {
+              "pid": 10744,
+              "createdAt": "2026-09-08T10:24:12.6574810Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 10844,
+              "createdAt": "2026-09-08T11:09:25.9817720Z",
+              "executable": null
+            },
+            {
+              "pid": 13820,
+              "createdAt": "2026-09-09T00:41:50.7436470Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 15736,
+              "createdAt": "2026-09-08T16:46:02.4598690Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 17160,
+              "createdAt": "2026-09-08T10:24:12.5269520Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            },
+            {
+              "pid": 18596,
+              "createdAt": "2026-09-09T00:41:50.5866930Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 19500,
+              "createdAt": "2026-09-09T00:41:50.3889400Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 20284,
+              "createdAt": "2026-09-08T17:52:36.5080910Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 22852,
+              "createdAt": "2026-09-09T01:22:20.2728640Z",
+              "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+            },
+            {
+              "pid": 23328,
+              "createdAt": "2026-09-09T00:41:50.6081850Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+            },
+            {
+              "pid": 23944,
+              "createdAt": "2026-09-08T10:24:12.6985200Z",
+              "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+            }
+          ],
+          "listeners": [
+            {
+              "LocalPort": 4174,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 7420
+            },
+            {
+              "LocalPort": 4274,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 20284
+            },
+            {
+              "LocalPort": 4319,
+              "LocalAddress": "0.0.0.0",
+              "OwningProcess": 10844
+            },
+            {
+              "LocalPort": 4419,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 22852
+            },
+            {
+              "LocalPort": 4420,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 19500
+            },
+            {
+              "LocalPort": 4421,
+              "LocalAddress": "127.0.0.1",
+              "OwningProcess": 15736
+            }
+          ],
+          "installed": {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+            "productVersion": "0.2.0-preview.8",
+            "fileVersion": "0.2.0.8"
+          }
+        },
+        "android": {
+          "preview": {
+            "packageName": "com.relayqahub.android.preview.debug",
+            "pids": [
+              23733
+            ],
+            "versionCode": 23,
+            "versionName": "0.2.0-preview.9",
+            "runtimeConfig": [
+              {
+                "path": "/sdcard/Android/media/com.relayqahub.android.preview.debug/qa-hub/config/qa-runtime.json",
+                "sha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca"
+              }
+            ],
+            "draftsAndPreferences": [
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+                "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf"
+              },
+              {
+                "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+                "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-account-sessions-v1.xml",
+                "sha256": "5efdfb7f75d8bf22590246532bed3131fe33d453eccd70f47a3afae7b43e95e2"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+                "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19"
+              },
+              {
+                "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+                "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf"
+              }
+            ]
+          },
+          "daily": {
+            "packageName": "com.relayqahub.android.debug",
+            "pids": [
+              5051
+            ],
+            "versionCode": 14,
+            "versionName": "0.1.13-debug",
+            "preferences": [
+              {
+                "path": "shared_prefs/qa_hub_credentials_v2.xml",
+                "sha256": "31996d447738cd0924c93e0ba643bdeba9becbbde246fb82c4edb924f48dc1a0"
+              },
+              {
+                "path": "shared_prefs/qa-hub-account-sessions-v1.xml",
+                "sha256": "b021f5e4a3bcde60266ddf3a1e2518bdb0af4da3fd26be070707aee9ef49226f"
+              },
+              {
+                "path": "shared_prefs/qa-hub-bug-draft-defaults-v1.xml",
+                "sha256": "f034664f85fdd56cbd75445f29d5e03bb3fd0eb1fcb6c34e6448e8c12323c58b"
+              },
+              {
+                "path": "shared_prefs/qa-hub-private-identity.xml",
+                "sha256": "5fe91f1c686ef179f120569bf1f47279ccd054f0d8490ff931384de128033fa9"
+              }
+            ]
+          }
+        },
+        "readiness": {
+          "httpApi": {
+            "port": 4419,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "web": {
+            "port": 4274,
+            "path": "/",
+            "statusCode": 200,
+            "bytes": 709,
+            "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+          },
+          "serverMcp": {
+            "port": 4421,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "14"
+          },
+          "localMcp": {
+            "port": 4420,
+            "path": "/health",
+            "statusCode": 200,
+            "status": "ready",
+            "service": "relay-qa-hub-desktop-mcp",
+            "endpoint": "/mcp",
+            "transport": "streamable-http"
+          },
+          "productionApi": {
+            "port": 4319,
+            "path": "/api/v1/health/ready",
+            "statusCode": 200,
+            "status": "ready",
+            "schemaVersion": "12"
+          }
+        },
+        "configuration": [
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+            "exists": true,
+            "bytes": 1151,
+            "sha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\people.json",
+            "exists": true,
+            "bytes": 66,
+            "sha256": "10fc26c3630f252c53009dc4debe20fd6a14a76192ec57daf060e482dfafcad2"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\secrets.json",
+            "exists": true,
+            "bytes": 237,
+            "sha256": "a22cfae14e96f164adc617b2a195bdc097a2a8cbc80d450a651badd35416ff69"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\preview-instance.json",
+            "exists": true,
+            "bytes": 561,
+            "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+            "exists": true,
+            "bytes": 19,
+            "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+          },
+          {
+            "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\desktop-runtime.json",
+            "exists": false
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\desktop-runtime.json",
+            "exists": false
+          }
+        ],
+        "distribution": {
+          "androidRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86",
+          "androidFeed": {
+            "exists": false,
+            "count": 0,
+            "bytes": 0,
+            "files": [],
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "files": [
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+              "bytes": 464,
+              "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+              "bytes": 35471405,
+              "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+              "bytes": 2600,
+              "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+            },
+            {
+              "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+              "bytes": 35536941,
+              "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+            }
+          ]
+        },
+        "productionFiles": [
+          {
+            "path": "D:/Relay-QA-Hub-Data/mvp-e2e-current.json",
+            "bytes": 2014,
+            "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub-Config/qa-people.json",
+            "bytes": 2268,
+            "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Windows-x64-latest.json",
+            "bytes": 413,
+            "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e"
+          },
+          {
+            "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Setup-x64.exe",
+            "bytes": 150473551,
+            "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+            "bytes": 272,
+            "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a"
+          },
+          {
+            "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+            "bytes": 355,
+            "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c"
+          }
+        ]
+      },
+      "passed": true
+    }
+  ],
+  "boundaries": {
+    "serviceControl": false,
+    "feedPublication": false,
+    "adbExecutableStarted": false,
+    "copiedLiveWal": false,
+    "businessRequests": false,
+    "rawCredentialsPersisted": false
+  },
+  "sourceHead": "3cab5b89cedf7df22de82bd3fc820bc5d61aae89",
+  "nodeVersion": "v24.19.0",
+  "stage": "post-restart-comparison",
+  "observed": {
+    "host": {
+      "services": [
+        {
+          "service": "api",
+          "pid": 22852,
+          "createdAt": "2026-09-09T01:22:20.2728640Z",
+          "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLineMatchesReceipt": true
+        },
+        {
+          "service": "web",
+          "pid": 20284,
+          "createdAt": "2026-09-08T17:52:36.5080910Z",
+          "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLineMatchesReceipt": true
+        },
+        {
+          "service": "mcp",
+          "pid": 15736,
+          "createdAt": "2026-09-08T16:46:02.4598690Z",
+          "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLineMatchesReceipt": true
+        }
+      ],
+      "processes": [
+        {
+          "pid": 3452,
+          "createdAt": "2026-09-08T10:24:12.7633970Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+        },
+        {
+          "pid": 7420,
+          "createdAt": "2026-09-07T09:37:15.3473300Z",
+          "executable": null
+        },
+        {
+          "pid": 10744,
+          "createdAt": "2026-09-08T10:24:12.6574810Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+        },
+        {
+          "pid": 10844,
+          "createdAt": "2026-09-08T11:09:25.9817720Z",
+          "executable": null
+        },
+        {
+          "pid": 13820,
+          "createdAt": "2026-09-09T00:41:50.7436470Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+        },
+        {
+          "pid": 15736,
+          "createdAt": "2026-09-08T16:46:02.4598690Z",
+          "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+        },
+        {
+          "pid": 17160,
+          "createdAt": "2026-09-08T10:24:12.5269520Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+        },
+        {
+          "pid": 18596,
+          "createdAt": "2026-09-09T00:41:50.5866930Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+        },
+        {
+          "pid": 19500,
+          "createdAt": "2026-09-09T00:41:50.3889400Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+        },
+        {
+          "pid": 20284,
+          "createdAt": "2026-09-08T17:52:36.5080910Z",
+          "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+        },
+        {
+          "pid": 22852,
+          "createdAt": "2026-09-09T01:22:20.2728640Z",
+          "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+        },
+        {
+          "pid": 23328,
+          "createdAt": "2026-09-09T00:41:50.6081850Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe"
+        },
+        {
+          "pid": 23944,
+          "createdAt": "2026-09-08T10:24:12.6985200Z",
+          "executable": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe"
+        }
+      ],
+      "listeners": [
+        {
+          "LocalPort": 4174,
+          "LocalAddress": "0.0.0.0",
+          "OwningProcess": 7420
+        },
+        {
+          "LocalPort": 4274,
+          "LocalAddress": "127.0.0.1",
+          "OwningProcess": 20284
+        },
+        {
+          "LocalPort": 4319,
+          "LocalAddress": "0.0.0.0",
+          "OwningProcess": 10844
+        },
+        {
+          "LocalPort": 4419,
+          "LocalAddress": "127.0.0.1",
+          "OwningProcess": 22852
+        },
+        {
+          "LocalPort": 4420,
+          "LocalAddress": "127.0.0.1",
+          "OwningProcess": 19500
+        },
+        {
+          "LocalPort": 4421,
+          "LocalAddress": "127.0.0.1",
+          "OwningProcess": 15736
+        }
+      ],
+      "installed": {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "productVersion": "0.2.0-preview.8",
+        "fileVersion": "0.2.0.8"
+      }
+    },
+    "android": {
+      "preview": {
+        "packageName": "com.relayqahub.android.preview.debug",
+        "pids": [
+          23733
+        ],
+        "versionCode": 23,
+        "versionName": "0.2.0-preview.9",
+        "runtimeConfig": [
+          {
+            "path": "/sdcard/Android/media/com.relayqahub.android.preview.debug/qa-hub/config/qa-runtime.json",
+            "sha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca"
+          }
+        ],
+        "draftsAndPreferences": [
+          {
+            "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+            "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf"
+          },
+          {
+            "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+            "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc"
+          },
+          {
+            "path": "shared_prefs/qa-hub-preview-account-sessions-v1.xml",
+            "sha256": "5efdfb7f75d8bf22590246532bed3131fe33d453eccd70f47a3afae7b43e95e2"
+          },
+          {
+            "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+            "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19"
+          },
+          {
+            "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+            "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf"
+          }
+        ]
+      },
+      "daily": {
+        "packageName": "com.relayqahub.android.debug",
+        "pids": [
+          5051
+        ],
+        "versionCode": 14,
+        "versionName": "0.1.13-debug",
+        "preferences": [
+          {
+            "path": "shared_prefs/qa_hub_credentials_v2.xml",
+            "sha256": "31996d447738cd0924c93e0ba643bdeba9becbbde246fb82c4edb924f48dc1a0"
+          },
+          {
+            "path": "shared_prefs/qa-hub-account-sessions-v1.xml",
+            "sha256": "b021f5e4a3bcde60266ddf3a1e2518bdb0af4da3fd26be070707aee9ef49226f"
+          },
+          {
+            "path": "shared_prefs/qa-hub-bug-draft-defaults-v1.xml",
+            "sha256": "f034664f85fdd56cbd75445f29d5e03bb3fd0eb1fcb6c34e6448e8c12323c58b"
+          },
+          {
+            "path": "shared_prefs/qa-hub-private-identity.xml",
+            "sha256": "5fe91f1c686ef179f120569bf1f47279ccd054f0d8490ff931384de128033fa9"
+          }
+        ]
+      }
+    },
+    "readiness": {
+      "httpApi": {
+        "port": 4419,
+        "path": "/api/v1/health/ready",
+        "statusCode": 200,
+        "bytes": 150,
+        "sha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911",
+        "status": "ready",
+        "schemaVersion": "14"
+      },
+      "web": {
+        "port": 4274,
+        "path": "/",
+        "statusCode": 200,
+        "bytes": 709,
+        "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+      },
+      "serverMcp": {
+        "port": 4421,
+        "path": "/health",
+        "statusCode": 200,
+        "bytes": 150,
+        "sha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911",
+        "status": "ready",
+        "schemaVersion": "14"
+      },
+      "localMcp": {
+        "port": 4420,
+        "path": "/health",
+        "statusCode": 200,
+        "bytes": 103,
+        "sha256": "c05c7d7d7361318483d47782872c321e2b46c926624a3b2684777e2c03468dfd",
+        "status": "ready",
+        "service": "relay-qa-hub-desktop-mcp",
+        "endpoint": "/mcp",
+        "transport": "streamable-http"
+      },
+      "productionApi": {
+        "port": 4319,
+        "path": "/api/v1/health/ready",
+        "statusCode": 200,
+        "bytes": 150,
+        "sha256": "e37f6fd9dbfb89a77429a7fd6596f87808b5c540aba933a65d4b233504269808",
+        "status": "ready",
+        "schemaVersion": "12"
+      }
+    },
+    "configuration": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+        "exists": true,
+        "bytes": 1151,
+        "sha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\people.json",
+        "exists": true,
+        "bytes": 66,
+        "sha256": "10fc26c3630f252c53009dc4debe20fd6a14a76192ec57daf060e482dfafcad2"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\secrets.json",
+        "exists": true,
+        "bytes": 237,
+        "sha256": "a22cfae14e96f164adc617b2a195bdc097a2a8cbc80d450a651badd35416ff69"
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\preview-instance.json",
+        "exists": true,
+        "bytes": 561,
+        "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\.preview-instance-id",
+        "exists": true,
+        "bytes": 19,
+        "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\desktop-runtime.json",
+        "exists": false
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\desktop-runtime.json",
+        "exists": false
+      }
+    ],
+    "distribution": {
+      "androidRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86",
+      "androidFeed": {
+        "exists": false,
+        "count": 0,
+        "bytes": 0,
+        "files": [],
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "files": [
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+          "bytes": 464,
+          "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+          "bytes": 35471405,
+          "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+          "bytes": 2600,
+          "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+          "bytes": 35536941,
+          "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+        }
+      ]
+    },
+    "productionFiles": [
+      {
+        "path": "D:/Relay-QA-Hub-Data/mvp-e2e-current.json",
+        "bytes": 2014,
+        "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e"
+      },
+      {
+        "path": "D:/Relay-QA-Hub-Config/qa-people.json",
+        "bytes": 2268,
+        "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374"
+      },
+      {
+        "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Windows-x64-latest.json",
+        "bytes": 413,
+        "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e"
+      },
+      {
+        "path": "D:/Relay-QA-Hub/apps/desktop/release/installer/Relay-QA-Hub-Setup-x64.exe",
+        "bytes": 150473551,
+        "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+        "bytes": 272,
+        "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a"
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+        "bytes": 355,
+        "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c"
+      }
+    ]
+  },
+  "beforeProof": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-update-deployment-retention\\7a94eb90-63a2-4841-afa5-318612eb06ce\\before.json",
+    "bytes": 98159,
+    "sha256": "7537f22daea58577de75d850fc6678f28c8e548594eafcd164ec7a9ec98df4ab"
+  },
+  "currentData": {
+    "database": {
+      "schemaVersion": 14,
+      "componentGate": {
+        "configuredRows": 7,
+        "enabledRows": 0,
+        "missingRowsDefaultDisabled": true
+      },
+      "schema": [
+        {
+          "name": "accounts",
+          "definitionSha256": "ee50ec014065b6d578b308b986ab916fb534a1d84cf915eb06fefc17f7f9d004"
+        },
+        {
+          "name": "attachment_bindings",
+          "definitionSha256": "9453a8ee5218ff87fd313036a4ee4ca86c0a46c8941fcd32c40c16a9c3223d19"
+        },
+        {
+          "name": "attachments",
+          "definitionSha256": "3b822899b64d9766621c5dc7103a410575253d177dd4f35372335a179dc2991b"
+        },
+        {
+          "name": "auth_secret_replays",
+          "definitionSha256": "232da4c75ea5a27f915713bb644c05bb0edf03c9520a7ec320e8e04b11e9fab4"
+        },
+        {
+          "name": "blobs",
+          "definitionSha256": "0b0db830c0547388ad623e2b5f3644f6bd625125fdd8eb9788c997181bbefff0"
+        },
+        {
+          "name": "browser_sessions",
+          "definitionSha256": "bcbd5639823281fbca93af4a199d32bea9002f20dd89c9e4f9929cd4b315dbce"
+        },
+        {
+          "name": "bug_attachment_removals",
+          "definitionSha256": "56f0c2daba650d432f6cecc4bf6c1f61c4ab821fc9a62fdf1d48ab48843dab59"
+        },
+        {
+          "name": "bug_attachments",
+          "definitionSha256": "11acafcac88c7dade94524f82d8ab8506c7764b20177c6b580cf0f6380cf4374"
+        },
+        {
+          "name": "bug_closure_acceptances",
+          "definitionSha256": "45cef32304c77dc5ce4b3f87a0303822125fdb1e20314121dd838f29b35432a1"
+        },
+        {
+          "name": "bug_deletions",
+          "definitionSha256": "6ae75d79bf6bca7f246031e62f7b57544301ffaac37ed08b9bd45b32baf23f0b"
+        },
+        {
+          "name": "bugs",
+          "definitionSha256": "d60c81f8ec68100ed2d56d12d037ab9862c495f2abfef9fdf99b821b85a092a9"
+        },
+        {
+          "name": "bugs_fts",
+          "definitionSha256": "1ed73cc758a4eb28ae8bae43c2962a8a2901b0996fcd012c60dab6364749747a"
+        },
+        {
+          "name": "bugs_fts_config",
+          "definitionSha256": "3701d0b8f73b316fb8bfc74db4d98fb706c50f0630aa90a557f9e0a487e7f1c3"
+        },
+        {
+          "name": "bugs_fts_content",
+          "definitionSha256": "5889426c328e5b2e952706f2560ebcd6aacf136618b7df210c4e3f32f1dbed75"
+        },
+        {
+          "name": "bugs_fts_data",
+          "definitionSha256": "3e585aade6b1007ba06af45538a691dd77007194ab9c7562241783b488812ca9"
+        },
+        {
+          "name": "bugs_fts_docsize",
+          "definitionSha256": "d419326ebea8712f7aefe86dac2015f0c0cc7ad505c3c632c3ce107415eb7fe6"
+        },
+        {
+          "name": "bugs_fts_idx",
+          "definitionSha256": "2e03613dd3d75b22f7430721919cde6eb4ee255e0dbc9b9b72d22ddd4e78f9d6"
+        },
+        {
+          "name": "build_lineage_entries",
+          "definitionSha256": "e7bbf587e697e0f2e0c7445b0036625067628b52444315a40c3c8d51c9f66663"
+        },
+        {
+          "name": "build_lineages",
+          "definitionSha256": "a66dc294e0666dcc9386383e9046f0cfafb9a40dad190058db126e1fefb49323"
+        },
+        {
+          "name": "build_manifest_commits",
+          "definitionSha256": "19ceb60277e637a6bc2a7e06d223d44a94a2cdd474dcb8280229621f026656e8"
+        },
+        {
+          "name": "build_repair_links",
+          "definitionSha256": "f72e4159f764df677b4f47159aeab89e48fab360aed9e2072061f311b9d8cd98"
+        },
+        {
+          "name": "build_requirements",
+          "definitionSha256": "893dfdcf4aedaa70a130213ceea416e33558a60858ae6dce89fe90d1b781ea12"
+        },
+        {
+          "name": "builds",
+          "definitionSha256": "1bde9f8212f471e87c2f01c4703a72d5f18124282343967f289bc816b8a582a6"
+        },
+        {
+          "name": "capture_artifacts",
+          "definitionSha256": "54d441dde446784a928fefbb91ba2601657d5a23f4930c86f4b4a79b8133bdf1"
+        },
+        {
+          "name": "capture_bundles",
+          "definitionSha256": "04dd2439dacf9adf18beb2f7d6f333e5b5edcfd8613593c13d9b26528d93f264"
+        },
+        {
+          "name": "capture_poco_methods",
+          "definitionSha256": "200e8913bbe5ba216202812d16c0260c828e0689e3d763dbb904e7519595492a"
+        },
+        {
+          "name": "comment_attachments",
+          "definitionSha256": "caa347c98a0e9bca48dee1b4ce3ddeadc905d4cd1341082dca7a0a1064add006"
+        },
+        {
+          "name": "comments",
+          "definitionSha256": "2090ea8c75eba9cad6563eee4676290b20d709b494a8ce23ffcebf02e554f6e9"
+        },
+        {
+          "name": "device_installations",
+          "definitionSha256": "2e70642e6ebfda9bf052c2b553a97b7b85e99a4f8f1a78edfdedfdaf1ebe9f74"
+        },
+        {
+          "name": "events",
+          "definitionSha256": "88a6b4355252b0d2a3e498860b1c9f12d7ee792707b98228b1e38c8481000f6b"
+        },
+        {
+          "name": "idempotency_records",
+          "definitionSha256": "74fc1d15a7e9b2c5d10d3c077d3e387f86e65345a546eb595b025adc04e723a6"
+        },
+        {
+          "name": "inbox",
+          "definitionSha256": "71f723504efcdc20e1960a5e997fc1cae6924bdbb1ce2599dbe4803d891bde5b"
+        },
+        {
+          "name": "integration_links",
+          "definitionSha256": "a0961e707061b35a9420208a6938d244895a9e0bef0ba9e9cab405034baf2bee"
+        },
+        {
+          "name": "local_credentials",
+          "definitionSha256": "70d9772e62aad83dc25db6e0ad6196bfd8c93fe2e0861f73acde28f1281b4f69"
+        },
+        {
+          "name": "manual_completion_requests",
+          "definitionSha256": "1c8f53a1e89dbceaebd64c06b058f9c46e809ea387fa44daaa4f4ffd0b62873e"
+        },
+        {
+          "name": "membership_roles",
+          "definitionSha256": "d5585a8ab3637c3be89fb8efb44efe333690c6c67e575f4e96bcf98f4397478f"
+        },
+        {
+          "name": "memberships",
+          "definitionSha256": "03b5c978796e418fd3dd6adde8e220d2f090667763d8819012e1faeb1b91dfb9"
+        },
+        {
+          "name": "modules",
+          "definitionSha256": "e9f10066a363536cf2b3c61130e9210de8fcb8b6f7f3cde72c4d67d53e99ee90"
+        },
+        {
+          "name": "native_sessions",
+          "definitionSha256": "3674fc50685280b37f05d92c9688c1246f86d775cc0f03caf127f715cc200baf"
+        },
+        {
+          "name": "notification_devices",
+          "definitionSha256": "bacd023d1b635b3890ca9b7bc16cea85d81b7b5ebec9739ad8b993a79c71608c"
+        },
+        {
+          "name": "notifications",
+          "definitionSha256": "536fdeae9f134271274f39df7bb52f701a8908e0f4a1ce814b33423b113f6d30"
+        },
+        {
+          "name": "occurrence_attachments",
+          "definitionSha256": "c5d290a69529a6175a932e1ab50e461481b90f7af3f0c6e92175d75a5af4b6a4"
+        },
+        {
+          "name": "occurrence_build_lineage_facts",
+          "definitionSha256": "42809d2dd6795590b1e2c0b07d9799d35e702689a34b1fc8ec8f149e7627747a"
+        },
+        {
+          "name": "occurrences",
+          "definitionSha256": "a12952789e6c48bc9cef939bc1840662bd00757ba74c8fdb39b0fb26c8de324f"
+        },
+        {
+          "name": "outbox",
+          "definitionSha256": "d3c7c69f8641493c16fc147bed3899b6d42897cc7f73a9638ce23dd9a3f8aa68"
+        },
+        {
+          "name": "poco_enrichments",
+          "definitionSha256": "dae96c1bc44bdca2540d9b74c9d0aef9853ec059584655f402daa856a13f7626"
+        },
+        {
+          "name": "poco_snapshots",
+          "definitionSha256": "c132b6d5a8ee97c2dd2b1de0766ba94ff7a7158f5cdb29eec88a0cb115693ac4"
+        },
+        {
+          "name": "project_bug_counters",
+          "definitionSha256": "f8806753c43df25fad19b2b69676fe67bca1633d41bff0f9d7799831c820d3ab"
+        },
+        {
+          "name": "project_components",
+          "definitionSha256": "7745ada7a6c3209914a8dcfe50629403721ce715771c29d338a95aaa4ba9cda2"
+        },
+        {
+          "name": "project_identity_links",
+          "definitionSha256": "16277ab01272281a00520f79858c9502d14f650b8664d0af0118ba9a549a5d56"
+        },
+        {
+          "name": "project_management_events",
+          "definitionSha256": "3bdd9a767c6bf9f6ff28c17fb3f9f8f36193a413011ff2d46716a91670b38572"
+        },
+        {
+          "name": "projects",
+          "definitionSha256": "809cefcf6f85609fde819d9f618752cf13794c1511d8d2a5bd62d70ebfaf00fd"
+        },
+        {
+          "name": "push_subscriptions",
+          "definitionSha256": "a4cd073135c881648750943f562beaaf7b21da993f05637d499d3492d4192b00"
+        },
+        {
+          "name": "qingyu_bug_links",
+          "definitionSha256": "67a7342a5542d680e51481fd2a0984e118995393f00f771523b04ef4220e4d30"
+        },
+        {
+          "name": "refresh_token_families",
+          "definitionSha256": "fc68febec50ce10d7f5f52f0e808fd8adcae726e062248c02a547836b109ce12"
+        },
+        {
+          "name": "refresh_tokens",
+          "definitionSha256": "42be291af66a8f622d38890f321dfe59fcb921566f1f03034d38ecfd0fa6ef0d"
+        },
+        {
+          "name": "relay_receipts",
+          "definitionSha256": "ee7d25449a299852161971d9c968e195ab1af896fba5b69ea450d53420292c5c"
+        },
+        {
+          "name": "relay_rework_requests",
+          "definitionSha256": "d7541762fc2737d23c565b8e3b8cbfcf59e61e242e50dd67ae5d10def941b5e1"
+        },
+        {
+          "name": "repair_attempts",
+          "definitionSha256": "56dbfb1bc41f57ae7bdef85815ee8e4d4b0c7e28ed8f6068d87da83f11beea5c"
+        },
+        {
+          "name": "schema_migrations",
+          "definitionSha256": "6ad3ac43b24166ebe80b3c73a563201ee1acb77683f35e2ecd099e1930159281"
+        },
+        {
+          "name": "service_principals",
+          "definitionSha256": "553aa33265dc0ddfee7b87e6a48a5c138260fb95e354fde005065edf7787dbb1"
+        },
+        {
+          "name": "storage_command_authorizations",
+          "definitionSha256": "e32dd03bd8efa65bb5b4c9c44684f385614e31672ce0a1a9fa39352d6a043c0a"
+        },
+        {
+          "name": "submissions",
+          "definitionSha256": "b07392461094dfc576cb51435d788f5f92e3cf6d8f4ad2e3c311c68ecac8ca78"
+        },
+        {
+          "name": "upload_chunks",
+          "definitionSha256": "88d1a62b95478fa9c63b30fcd25ed15ff7c99c62b0ec4e14c9dae21c4f42828b"
+        },
+        {
+          "name": "upload_sessions",
+          "definitionSha256": "2814fd4a3ff5adb07c712579c83c4f4eefa627431246fc34316f9ffa2b01bbc1"
+        },
+        {
+          "name": "user_identity_links",
+          "definitionSha256": "213ff920e33bc95b5cd7bd7c4eda6230a9ff8a56ddf311963ce991bf2bfcb1ca"
+        },
+        {
+          "name": "user_management_events",
+          "definitionSha256": "3223267f14a0202df210821ef2058ffdeb9b687c769d162c65bab5accbd2c418"
+        },
+        {
+          "name": "users",
+          "definitionSha256": "d80bf92135a6a56f65ca412e2c69aed2340d149f5f0457e843f8f5c4534583cb"
+        },
+        {
+          "name": "verification_attachments",
+          "definitionSha256": "fd1bea514193501e89cbbcebfd512699ff92b06d0be7c9e576c30bc6921a778d"
+        },
+        {
+          "name": "verifications",
+          "definitionSha256": "9b69eb376b96885735fecccfd76e2adfe17f37bc44b16ef07f6ecd41e8cd1281"
+        }
+      ],
+      "groups": {
+        "business": [
+          "projects",
+          "users",
+          "memberships",
+          "membership_roles",
+          "modules",
+          "bugs",
+          "repair_attempts",
+          "verifications",
+          "events",
+          "comments",
+          "attachments",
+          "bug_attachments",
+          "bug_deletions",
+          "submissions",
+          "idempotency_records",
+          "manual_completion_requests",
+          "user_identity_links"
+        ],
+        "uploadAndCapture": [
+          "attachment_bindings",
+          "capture_artifacts",
+          "capture_bundles",
+          "capture_poco_methods",
+          "upload_chunks",
+          "upload_sessions"
+        ],
+        "remaining": [
+          "accounts",
+          "auth_secret_replays",
+          "blobs",
+          "browser_sessions",
+          "bug_attachment_removals",
+          "bug_closure_acceptances",
+          "bugs_fts",
+          "bugs_fts_config",
+          "bugs_fts_content",
+          "bugs_fts_data",
+          "bugs_fts_docsize",
+          "bugs_fts_idx",
+          "build_lineage_entries",
+          "build_lineages",
+          "build_manifest_commits",
+          "build_repair_links",
+          "build_requirements",
+          "builds",
+          "comment_attachments",
+          "device_installations",
+          "inbox",
+          "integration_links",
+          "local_credentials",
+          "native_sessions",
+          "notification_devices",
+          "notifications",
+          "occurrence_attachments",
+          "occurrence_build_lineage_facts",
+          "occurrences",
+          "outbox",
+          "poco_enrichments",
+          "poco_snapshots",
+          "project_bug_counters",
+          "project_components",
+          "project_identity_links",
+          "project_management_events",
+          "push_subscriptions",
+          "qingyu_bug_links",
+          "refresh_token_families",
+          "refresh_tokens",
+          "relay_receipts",
+          "relay_rework_requests",
+          "schema_migrations",
+          "service_principals",
+          "storage_command_authorizations",
+          "user_management_events",
+          "verification_attachments"
+        ]
+      },
+      "tables": {
+        "accounts": {
+          "count": 1,
+          "sha256": "29b834e6826874cdec6f47e497cbad7e7f34390628b527b942849a3fc6b50e57"
+        },
+        "attachment_bindings": {
+          "count": 20,
+          "sha256": "75336fada5314557bdf6893f0a201722443727ea4450f3677b565165fbabe72f"
+        },
+        "attachments": {
+          "count": 20,
+          "sha256": "cfda2544931ac05c1c02549c57a3fc83415f6d940008bed1c57ce0053a412475"
+        },
+        "auth_secret_replays": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "blobs": {
+          "count": 4,
+          "sha256": "29be9e024d00182d855fe6e0160d5179ed8d35a87c2e2c31de3ce4846db1f9c6"
+        },
+        "browser_sessions": {
+          "count": 154,
+          "sha256": "77b7fd3066a64ff6c217eb3d69d978f4a38d9e4509c0f6beb824bc00bda11872"
+        },
+        "bug_attachment_removals": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "bug_attachments": {
+          "count": 15,
+          "sha256": "3108f03ee7090bcc55c198852867862dd54fa650f10ffd4a8213955f7b1f22a4"
+        },
+        "bug_closure_acceptances": {
+          "count": 20,
+          "sha256": "a9e823a1f7b5028ec8c2fa2f0df60f2baca986f9a71e9c0ff21b6d07cff9d03c"
+        },
+        "bug_deletions": {
+          "count": 11,
+          "sha256": "46f84f5dfd32aaa0a02c207cda88537e9cb87a022b7c6eb464c39d51c89999dd"
+        },
+        "bugs": {
+          "count": 43,
+          "sha256": "3537c19181ae96d0c014caf241b08cb0919c45695d9952a7a01c8c34aeec9582"
+        },
+        "bugs_fts": {
+          "count": 43,
+          "sha256": "7fd6fc8039a9d36ba473e19fb0f2e984dba45104b5b5e4827c1d8403cb99d853"
+        },
+        "bugs_fts_config": {
+          "count": 1,
+          "sha256": "866ec843a7a852664f8f4c1690b8cee6ff1a5c3c2ff01c1cb94f49ab7f32e09e"
+        },
+        "bugs_fts_content": {
+          "count": 43,
+          "sha256": "a151b3f82affdea6944f0216b6d2d3f5fc9a988186f01d0e1c21f90cf38825c1"
+        },
+        "bugs_fts_data": {
+          "count": 19,
+          "sha256": "3d5fe2c9f376396c2c188b5d2267f737a3d99598ecaaf6516a84ee1890e744d1"
+        },
+        "bugs_fts_docsize": {
+          "count": 43,
+          "sha256": "8e62cae11b5b298c947efb72e44714649b7a6c19e341776d153eb4fa8e214476"
+        },
+        "bugs_fts_idx": {
+          "count": 17,
+          "sha256": "39f7d46f90457d76f305d31864aa9481d6687e4709814dcd031b2e8e268eab4e"
+        },
+        "build_lineage_entries": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "build_lineages": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "build_manifest_commits": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "build_repair_links": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "build_requirements": {
+          "count": 31,
+          "sha256": "5a05931f4657eb23ea9faeb8f0150e7486b00348b257f44da11d623a0cbebd5a"
+        },
+        "builds": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "capture_artifacts": {
+          "count": 1,
+          "sha256": "6c9494889e9a4322cf2a2638ab18c91523e2563c48bb5d774ab6cffc5af08c10"
+        },
+        "capture_bundles": {
+          "count": 1,
+          "sha256": "87c5256027df72b603dc1b78839ac92c4a03f73b428dde5d2df8f2d7ad684429"
+        },
+        "capture_poco_methods": {
+          "count": 6,
+          "sha256": "80115c6ec64a1b1e298437c3f0104657dfad97546807c6c6719bcfdb7b3d75bb"
+        },
+        "comment_attachments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "comments": {
+          "count": 30,
+          "sha256": "0ad72aea8a23fda97b11bdf5c3f4921a5a72cac573d7eea7133263e01456e571"
+        },
+        "device_installations": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "events": {
+          "count": 299,
+          "sha256": "789319afcb9f4b7e4f84b477aee4a55ed4395f278fb23df82b8afea42e4816bf"
+        },
+        "idempotency_records": {
+          "count": 27,
+          "sha256": "a768cc41c1ca84b8cb8cd948b07660c6568fcb6b8d5c78fd32428201d96ecf5c"
+        },
+        "inbox": {
+          "count": 76,
+          "sha256": "bf392dfe061d416ae3562d4397bf1706ec61eaed6a51e7e5a180610f957f937f"
+        },
+        "integration_links": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "local_credentials": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "manual_completion_requests": {
+          "count": 26,
+          "sha256": "b75a8b2cfd2fb182fa093042846dc32b7ec91fbcc8b0524b83fc0e4f94b27090"
+        },
+        "membership_roles": {
+          "count": 644,
+          "sha256": "2d4659d85a1e0fe0167e15555606209d9b133bcc47d2f43971f0841eec8922c1"
+        },
+        "memberships": {
+          "count": 92,
+          "sha256": "044b190c753fa382160d07b9587b3f202a9cdbc308527df6c0bc2e309489aa00"
+        },
+        "modules": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "native_sessions": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notification_devices": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notifications": {
+          "count": 427,
+          "sha256": "0fee3ee71d561b6031cc8e0d24f9cb4ec9d2c132bae83d1f9686be4127d706be"
+        },
+        "occurrence_attachments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "occurrence_build_lineage_facts": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "occurrences": {
+          "count": 43,
+          "sha256": "87acc9811c65245b50d41279f66d6f8aff292b9c62cf32b2aea40ff27ed763b9"
+        },
+        "outbox": {
+          "count": 128,
+          "sha256": "1b35d7f0f53fd70defdcb0af92ebd762bf319004a4087cdccfdec33141501b7e"
+        },
+        "poco_enrichments": {
+          "count": 1,
+          "sha256": "b0f6f474ad2724acf30d3bd0949652f714a3922c327ba3b36f69beaaa4733e54"
+        },
+        "poco_snapshots": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "project_bug_counters": {
+          "count": 18,
+          "sha256": "051e637fd7d302b184af978a3871a39f6ca28e39c85c80bec71e98f98251a5a8"
+        },
+        "project_components": {
+          "count": 7,
+          "sha256": "154cd1cf57fe624d17526b75e6e017a6b019bbe1992f97dae65a4c6a3523b9e3"
+        },
+        "project_identity_links": {
+          "count": 4,
+          "sha256": "bea032dae71a942c4b5c0d65350acc437ec84310e0692cec1098c41b0c35669d"
+        },
+        "project_management_events": {
+          "count": 134,
+          "sha256": "8301821b2eb62c2cea052d139c8063e2521f63fda9ce5922b9ec6ab0ec374f51"
+        },
+        "projects": {
+          "count": 27,
+          "sha256": "889b8e48eddc066ba84f2dd6e1a01e59b840a002b51653075ae09aac658c7cb4"
+        },
+        "push_subscriptions": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "qingyu_bug_links": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "refresh_token_families": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "refresh_tokens": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "relay_receipts": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "relay_rework_requests": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "repair_attempts": {
+          "count": 33,
+          "sha256": "18e6ea922b8acec651390d4cce88778670b7935cdab17ae014106d093ab48481"
+        },
+        "schema_migrations": {
+          "count": 14,
+          "sha256": "a10225e0d46840e5483ed14e13d82267df3d1f7a9e8ab8e58e658d4d74d4f59c"
+        },
+        "service_principals": {
+          "count": 1,
+          "sha256": "103b0636f3b995993c8b0f690fad7c6fa550daa75ffc1257e58bc068f18c6b33"
+        },
+        "storage_command_authorizations": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "submissions": {
+          "count": 100,
+          "sha256": "d635cca26a5f305dbaa6d93ed74fa3d0446b8b04247b387f5ad8273b3ff63a02"
+        },
+        "upload_chunks": {
+          "count": 22,
+          "sha256": "529a28180e0788c37034b45739f6e4cde3a8b745d7e950ea24d71da936f44bd6"
+        },
+        "upload_sessions": {
+          "count": 22,
+          "sha256": "a7f366c133eaf5b6326235ff194d3b1c5cce0ac0c652ceef51c92a61dca9ca9b"
+        },
+        "user_identity_links": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "user_management_events": {
+          "count": 9,
+          "sha256": "2dc04a97514f3943050bfba0486a28793497c82a69bf8e084b9d51ff59c86373"
+        },
+        "users": {
+          "count": 49,
+          "sha256": "350457e0f79a24394ed6c16b9381ad2807f2c991226f35357ba3612b5c8a013f"
+        },
+        "verification_attachments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "verifications": {
+          "count": 27,
+          "sha256": "f4ac8525df8b5d75d8542033d90c32fc3faaa7377e0674613931dc5e75aceaed"
+        }
+      }
+    },
+    "evidence": {
+      "exists": true,
+      "count": 4,
+      "bytes": 228319,
+      "files": [
+        {
+          "path": "sha256/5e/5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+          "bytes": 68,
+          "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+        },
+        {
+          "path": "sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "sha256/cd/cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+          "bytes": 43311,
+          "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+        },
+        {
+          "path": "sha256/e0/e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+          "bytes": 184872,
+          "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+        }
+      ],
+      "sha256": "f1102edea627e037702fe3c0ee850d2f84db9c6e2b8de6bd66cc5852e7ed66eb"
+    },
+    "quarantine": {
+      "exists": true,
+      "count": 22,
+      "bytes": 642338,
+      "files": [
+        {
+          "path": "uploads/0af39b84-d0ab-44c2-8175-203aea5e333a/1/0.bin",
+          "bytes": 184872,
+          "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+        },
+        {
+          "path": "uploads/133d7b33-33b1-4ea1-8d6d-96f8d9c624df/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/22668b50-8a25-44b9-89e3-c307a51bb376/1/0.bin",
+          "bytes": 68,
+          "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+        },
+        {
+          "path": "uploads/22a67428-d995-4311-9507-e6a1af5086ca/1/0.bin",
+          "bytes": 12,
+          "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+        },
+        {
+          "path": "uploads/251f765b-81d9-4f3e-821b-98705ddb4955/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/4283305b-befd-4a9d-ab6f-d8ccb0ce3baa/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/45c5c6e0-683c-4594-b552-fe1ac4a3d900/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/5c13e8b9-4277-41f6-a800-0285802de83d/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/5e669a83-61ab-4f0e-ad73-cda6e1f4cb31/1/0.bin",
+          "bytes": 184872,
+          "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+        },
+        {
+          "path": "uploads/60333054-18a1-4d55-8f93-c4897674afeb/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/67d409fe-9eb0-4158-9747-cfe6d71a1e0f/1/0.bin",
+          "bytes": 68,
+          "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+        },
+        {
+          "path": "uploads/6f8ece3a-56f5-4475-9e8e-22205d4df016/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/73705bd0-ceeb-4deb-b501-677cd7515509/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/73909d9b-8641-4d9b-9f81-5fa19e3e7a82/1/0.bin",
+          "bytes": 43311,
+          "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+        },
+        {
+          "path": "uploads/7be282e4-6acf-4af6-b0cf-2102663e2bbd/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/7d9b757a-1640-415d-8546-01b3e799c666/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/85fa1e18-9506-470e-89d2-0bbc6c605da9/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/d5961d68-c8af-41c8-9721-6d1e62ce6eba/1/0.bin",
+          "bytes": 68,
+          "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+        },
+        {
+          "path": "uploads/d88200b1-7ead-467c-aadf-421e246bf4ef/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        },
+        {
+          "path": "uploads/df885405-26de-4fec-98cb-2324a77fd68a/1/0.bin",
+          "bytes": 43311,
+          "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+        },
+        {
+          "path": "uploads/ea1bd08c-ae9b-4096-814d-fc24d9f4872f/1/0.bin",
+          "bytes": 184872,
+          "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+        },
+        {
+          "path": "uploads/fb6f3bad-7d8a-4415-b75a-5332bbca552d/1/0.bin",
+          "bytes": 68,
+          "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+        }
+      ],
+      "sha256": "039abb0b6fd9c398e7856bdf54a7e8f234477c86ec9a0b85ac7178350fbc3a61"
+    }
+  },
+  "completedAt": "2026-09-09T01:22:54.639Z"
+}

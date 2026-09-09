@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent_read_only_retention_source_review",
+  "recordedAt": "2026-09-09T01:17:21.129Z",
+  "status": "passed_source_review_with_explicit_process_exit_evidence_limit",
+  "reviewedRunnerSha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3",
+  "inputs": [
+    {
+      "path": "scripts/project-components/retain-preview-android-update-state.mjs",
+      "bytes": 30169,
+      "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3",
+      "expectedSha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3",
+      "expectedBytes": 30169
+    },
+    {
+      "path": "scripts/project-components/retain-preview-android-update-state.test.mjs",
+      "bytes": 10224,
+      "sha256": "c85bd6ebeadd9e12c4797132124b8039ea531655fa631221a8488e945422d543",
+      "expectedSha256": "c85bd6ebeadd9e12c4797132124b8039ea531655fa631221a8488e945422d543",
+      "expectedBytes": 10224
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/README.md",
+      "bytes": 8298,
+      "sha256": "ef19e92b4d36b79d8b4e8c1a093866b3a0c87dcb15a9aa34267c517c46051ace",
+      "expectedSha256": "ef19e92b4d36b79d8b4e8c1a093866b3a0c87dcb15a9aa34267c517c46051ace"
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/result.json",
+      "bytes": 3914,
+      "sha256": "b7c7aebd45194209ab70d84bef211bab4b983ecb167f438955e649afdc75393a"
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/local-fixture-final.log",
+      "bytes": 871,
+      "sha256": "f97d421048fee485bb6d7d3bc1b767078cb17de3c25324ad90e379f822230e4b",
+      "expectedSha256": "f97d421048fee485bb6d7d3bc1b767078cb17de3c25324ad90e379f822230e4b",
+      "expectedBytes": 871
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/local-fixture-first.log",
+      "bytes": 2971,
+      "sha256": "4a9c1d7651a8fc1338e6cf770ad801289d56e9f6fccc55559ee7929ceb7fe55a",
+      "expectedSha256": "4a9c1d7651a8fc1338e6cf770ad801289d56e9f6fccc55559ee7929ceb7fe55a",
+      "expectedBytes": 2971
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/local-fixture-freeze.log",
+      "bytes": 971,
+      "sha256": "6755ac41189aa682f7d0b9d639693461afe3545c5d3d9ec84fb74d7c9fef3ed8",
+      "expectedSha256": "6755ac41189aa682f7d0b9d639693461afe3545c5d3d9ec84fb74d7c9fef3ed8",
+      "expectedBytes": 971
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/node-check-freeze.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedBytes": 0
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/node-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedBytes": 0
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/scoped-eslint-freeze.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedBytes": 0
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/scoped-eslint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedBytes": 0
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/scoped-format-freeze.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "expectedSha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "expectedBytes": 68
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/preparation/runs/scoped-format.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "expectedSha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "expectedBytes": 68
+    }
+  ],
+  "checks": [
+    {
+      "id": "source_and_preparation_hashes",
+      "status": "passed_source_review",
+      "conclusion": "Runner, test, README, result and all nine listed logs match the frozen preparation references."
+    },
+    {
+      "id": "explicit_preview_only_entry",
+      "status": "passed_source_review",
+      "conclusion": "Default invocation returns not_run; explicit Windows phase, UUID, exact preview instance/source/runtime and fixed ports are required before operational observation."
+    },
+    {
+      "id": "existing_adb_transport_only",
+      "status": "passed_source_review",
+      "conclusion": "Seven fixed read commands use existing loopback ADB server 5037 and transport 127.0.0.1:16384; no adb executable, app start/stop, install or configuration mutation."
+    },
+    {
+      "id": "sqlite_consistent_backup",
+      "status": "passed_source_review",
+      "conclusion": "Ordinary live database opens readOnly with query_only read transaction; SQLite online backup produces the new consistent copy. Live DB/WAL/SHM files are not copied. Immutable mode is used only for the closed backup copy."
+    },
+    {
+      "id": "table_and_component_gate",
+      "status": "passed_source_review",
+      "conclusion": "Schema14 and zero enabled component rows required. All discovered non-sqlite user tables are fingerprinted, including required upload/capture tables; public output contains counts/hashes rather than row values."
+    },
+    {
+      "id": "attachment_and_quarantine_scope",
+      "status": "passed_source_review",
+      "conclusion": "Existing reference-aware attachment archive is independently validated. Quarantine uses create-only ordinary-file copying with before/after checks, rejecting links and WAL/SHM names. Unreferenced evidence files are inventoried, not claimed copied into the reference archive."
+    },
+    {
+      "id": "preserved_distribution_and_configuration",
+      "status": "passed_source_review",
+      "conclusion": "Existing Android feed and exact distribution artifacts receive new private copies. Public configuration evidence is file hashes only; installed preview API/Web/profile/cookie/MCP/feed boundaries are checked."
+    },
+    {
+      "id": "exact_comparison_scope",
+      "status": "passed_source_review",
+      "conclusion": "Both phase boundaries compare observed host, Android, configuration, distribution and production facts. After excludes only API identity for its main comparison, then separately requires new API creation time and same executable."
+    },
+    {
+      "id": "create_only_failure_history",
+      "status": "passed_source_review",
+      "conclusion": "Unique outputs refuse reuse; phase failures leave failed proof and retained files. Original local 5/7 failure and subsequent 7/7 and 8/8 logs remain unchanged. Existing underlying backup-library failure-target cleanup is disclosed."
+    },
+    {
+      "id": "fixture_validation_scope",
+      "status": "passed_source_review",
+      "conclusion": "Eight frozen checks use temporary local SQLite/files and an in-memory ADB socket. This review reads their logs and source without rerunning them or treating them as deployed-service acceptance."
+    }
+  ],
+  "reportedValidation": {
+    "fixtureChecks": [
+      {
+        "name": "default and malformed invocations are inert without reading a runtime or creating outputs",
+        "status": "passed_in_frozen_local_fixture_log"
+      },
+      {
+        "name": "actual WAL SQLite snapshot archives referenced bytes and quarantine without copying live sidecars",
+        "status": "passed_in_frozen_local_fixture_log"
+      },
+      {
+        "name": "missing referenced bytes fails with recovery DB retained and source untouched",
+        "status": "passed_in_frozen_local_fixture_log"
+      },
+      {
+        "name": "an enabled project component blocks the proposed restart baseline before backup",
+        "status": "passed_in_frozen_local_fixture_log"
+      },
+      {
+        "name": "create-only copy rejects stale facts, live WAL names and junctions without overwriting",
+        "status": "passed_in_frozen_local_fixture_log"
+      },
+      {
+        "name": "Android readers preserve version strings, accept hashes only and never expose preference values",
+        "status": "passed_in_frozen_local_fixture_log"
+      },
+      {
+        "name": "raw ADB transport uses fixed existing server and handles fragmented replies in memory only",
+        "status": "passed_in_frozen_local_fixture_log"
+      },
+      {
+        "name": "post-comparison excludes only the old API identity, retaining every other process and socket",
+        "status": "passed_in_frozen_local_fixture_log"
+      }
+    ],
+    "counts": {
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    "history": [
+      {
+        "log": "runs/local-fixture-first.log",
+        "tests": 7,
+        "failed": 2,
+        "classification": "private backup read created sidecars; trailing newline hash parser rejected",
+        "passed": 5
+      },
+      {
+        "log": "runs/local-fixture-final.log",
+        "tests": 7,
+        "failed": 0,
+        "passed": 7
+      },
+      {
+        "log": "runs/local-fixture-freeze.log",
+        "tests": 8,
+        "failed": 0,
+        "passed": 8
+      }
+    ],
+    "finalGate": {
+      "passed": 8,
+      "formatExit": 0,
+      "tests": 8,
+      "nodeCheckExit": 0,
+      "failed": 0,
+      "skipped": 0,
+      "lintExit": 0
+    },
+    "rerunByReviewer": false
+  },
+  "evidenceLimit": {
+    "id": "OLD_API_PROCESS_EXIT_REQUIRES_SEPARATE_EVIDENCE",
+    "source": {
+      "path": "scripts/project-components/retain-preview-android-update-state.mjs",
+      "hostSnapshotLine": 381,
+      "comparisonLine": 751
+    },
+    "description": "hostSnapshot records current listener owners and processes at the two EXE paths. The after phase confirms the replacement API receipt/start identity but does not independently query a previous API PID that has lost its listener. It cannot alone prove that the old API process has exited.",
+    "requiredSeparateEvidence": "Root must retain manager Stop plus a subsequent exact old-PID CIM absence and empty 4419-listener observation before Start.",
+    "blockingAssessment": "No source blocker for the reviewed before -> API-only deployment -> after plan when that separate exit proof and the stated quiet-window conditions are supplied."
+  },
+  "executionBoundary": {
+    "operationalReview": "not_run",
+    "reviewerInvokedRunner": false,
+    "reviewerReranTests": false,
+    "reviewerReadLiveInstance": false,
+    "reviewerReadLiveDatabase": false,
+    "reviewerConnectedHttpOrAdb": false,
+    "reviewerInspectedLiveProcesses": false,
+    "reviewerControlledServicesOrClients": false,
+    "reviewerPublishedFeed": false,
+    "originalProofsModified": false,
+    "soleCreatedFile": "docs/evidence/project-components/android-update-deployment-retention/preparation/independent-review.json",
+    "temporalNote": "This file records the completed source/log review only. Root reported beginning the authorized before-retention phase while this record was written; the reviewer did not query it, and no actual before/stop/start/after result is asserted here."
+  },
+  "limits": [
+    "No API deploy, Android feed publication, device update, production preservation outcome or real before/after pass is inferred from local fixtures.",
+    "Every non-sqlite user table is fingerprinted; this is not a claim to compare every sqlite_schema object or external legacy component filesystem queue.",
+    "Production Node executable paths may be null; equality of null values does not prove those executable paths.",
+    "The root-controlled quiet window remains required; unexpected table/file/session or client changes fail rather than being silently ignored."
+  ]
+}

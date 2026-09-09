@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "kind": "read_only_retained_before_artifact_review",
+  "recordedAt": "2026-09-09T01:22:59.506Z",
+  "status": "passed_retained_artifact_review",
+  "beforeProof": {
+    "path": "docs/evidence/project-components/android-update-deployment-retention/7a94eb90-63a2-4841-afa5-318612eb06ce/before.json",
+    "sha256": "7537f22daea58577de75d850fc6678f28c8e548594eafcd164ec7a9ec98df4ab",
+    "startedAt": "2026-09-09T01:16:48.147Z",
+    "completedAt": "2026-09-09T01:16:55.339Z"
+  },
+  "originalBeforeChecks": [
+    {
+      "label": "DISTRIBUTION_COPY_MATCH_0",
+      "passed": true
+    },
+    {
+      "label": "DISTRIBUTION_COPY_MATCH_1",
+      "passed": true
+    },
+    {
+      "label": "DISTRIBUTION_COPY_MATCH_2",
+      "passed": true
+    },
+    {
+      "label": "DISTRIBUTION_COPY_MATCH_3",
+      "passed": true
+    },
+    {
+      "label": "BOUNDARIES_STABLE_DURING_BEFORE",
+      "passed": true
+    }
+  ],
+  "review": {
+    "checks": 21,
+    "passed": 21,
+    "retainedFiles": 38,
+    "retainedBytes": 79402480,
+    "inventorySha256": "55bbb75b95ed2a7127ce08638d2b1e1048a1c193d30aaa7a68c0e333580b862a",
+    "archiveUserTables": 70,
+    "configuredComponentRows": 7,
+    "enabledComponentRows": 0,
+    "referencedAttachmentFiles": 4,
+    "referencedAttachmentBytes": 228319,
+    "quarantineFiles": 22,
+    "quarantineBytes": 642338
+  },
+  "checks": [
+    {
+      "name": "before_proof_pinned_sha",
+      "passed": true
+    },
+    {
+      "name": "exact_retained_root",
+      "passed": true
+    },
+    {
+      "name": "all_38_retained_file_bytes_and_hashes_match",
+      "passed": true
+    },
+    {
+      "name": "retained_total_and_inventory_hash_match",
+      "passed": true
+    },
+    {
+      "name": "five_original_checks_pass_and_remain_exact",
+      "passed": true
+    },
+    {
+      "name": "online_and_archived_db_and_manifests_byte_identical",
+      "passed": true
+    },
+    {
+      "name": "database_manifest_binds_sha_size_identity",
+      "passed": true
+    },
+    {
+      "name": "five_archive_reference_hashes_match",
+      "passed": true
+    },
+    {
+      "name": "complete_marker_binds_four_attachment_inventory",
+      "passed": true
+    },
+    {
+      "name": "binding_marker_links_database_manifest_and_attachment_markers",
+      "passed": true
+    },
+    {
+      "name": "four_referenced_attachment_files_exact",
+      "passed": true
+    },
+    {
+      "name": "archive_70_table_counts_and_hashes_match_recorded_source_snapshot",
+      "passed": true
+    },
+    {
+      "name": "archive_table_definitions_match_recorded_snapshot",
+      "passed": true
+    },
+    {
+      "name": "archive_schema14_and_all_configured_components_off",
+      "passed": true
+    },
+    {
+      "name": "archive_integrity_and_foreign_keys_clean",
+      "passed": true
+    },
+    {
+      "name": "four_archive_ready_clean_blob_references_match_inventory",
+      "passed": true
+    },
+    {
+      "name": "22_quarantine_file_records_match_saved_source_and_copy",
+      "passed": true
+    },
+    {
+      "name": "retained_distribution_and_runner_match_original_copy_receipts",
+      "passed": true
+    },
+    {
+      "name": "original_absent_android_feed_retained_as_empty_directory",
+      "passed": true
+    },
+    {
+      "name": "retained_files_unchanged_after_readonly_review_no_sidecars_created",
+      "passed": true
+    },
+    {
+      "name": "before_proof_bytes_unchanged_after_review",
+      "passed": true
+    }
+  ],
+  "retainedFileHashes": [
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite",
+      "bytes": 3743744,
+      "sha256": "e0ccd08befa911c9b8e4fc0ece0b4a0f42e09a80bf910466d503735ae9dae803"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-attachment-inventory.json",
+      "bytes": 1056,
+      "sha256": "ff5e046205bbb05589cfc91421e8b56a308bb8d7f32eca20a0c1172b9ee45b25"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-attachment-restore.complete.json",
+      "bytes": 201,
+      "sha256": "61bf0245eb0a044b06e354bb402bd0e8d6c8da95e85f09f621d967565eba68f0"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.attachments/.qa-hub-sqlite-archive-binding.json",
+      "bytes": 665,
+      "sha256": "58203eb453a54bfeca815df0b0faab1f031b9e2627e824bf94c3ef4fb62f62c2"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/5e/5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15",
+      "bytes": 68,
+      "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/6b/6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/cd/cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88",
+      "bytes": 43311,
+      "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.attachments/sha256/e0/e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+      "bytes": 184872,
+      "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+    },
+    {
+      "path": "data/archive/rpo/qa-hub.sqlite.manifest.json",
+      "bytes": 417,
+      "sha256": "e9fe2e1062011bb9454a3379c4767d921456d6bd099c0cd399752468ec3dc1ad"
+    },
+    {
+      "path": "data/online/qa-hub.sqlite",
+      "bytes": 3743744,
+      "sha256": "e0ccd08befa911c9b8e4fc0ece0b4a0f42e09a80bf910466d503735ae9dae803"
+    },
+    {
+      "path": "data/online/qa-hub.sqlite.manifest.json",
+      "bytes": 417,
+      "sha256": "e9fe2e1062011bb9454a3379c4767d921456d6bd099c0cd399752468ec3dc1ad"
+    },
+    {
+      "path": "data/quarantine/uploads/0af39b84-d0ab-44c2-8175-203aea5e333a/1/0.bin",
+      "bytes": 184872,
+      "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+    },
+    {
+      "path": "data/quarantine/uploads/133d7b33-33b1-4ea1-8d6d-96f8d9c624df/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/22668b50-8a25-44b9-89e3-c307a51bb376/1/0.bin",
+      "bytes": 68,
+      "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+    },
+    {
+      "path": "data/quarantine/uploads/22a67428-d995-4311-9507-e6a1af5086ca/1/0.bin",
+      "bytes": 12,
+      "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+    },
+    {
+      "path": "data/quarantine/uploads/251f765b-81d9-4f3e-821b-98705ddb4955/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/4283305b-befd-4a9d-ab6f-d8ccb0ce3baa/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/45c5c6e0-683c-4594-b552-fe1ac4a3d900/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/5c13e8b9-4277-41f6-a800-0285802de83d/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/5e669a83-61ab-4f0e-ad73-cda6e1f4cb31/1/0.bin",
+      "bytes": 184872,
+      "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+    },
+    {
+      "path": "data/quarantine/uploads/60333054-18a1-4d55-8f93-c4897674afeb/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/67d409fe-9eb0-4158-9747-cfe6d71a1e0f/1/0.bin",
+      "bytes": 68,
+      "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+    },
+    {
+      "path": "data/quarantine/uploads/6f8ece3a-56f5-4475-9e8e-22205d4df016/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/73705bd0-ceeb-4deb-b501-677cd7515509/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/73909d9b-8641-4d9b-9f81-5fa19e3e7a82/1/0.bin",
+      "bytes": 43311,
+      "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+    },
+    {
+      "path": "data/quarantine/uploads/7be282e4-6acf-4af6-b0cf-2102663e2bbd/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/7d9b757a-1640-415d-8546-01b3e799c666/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/85fa1e18-9506-470e-89d2-0bbc6c605da9/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/d5961d68-c8af-41c8-9721-6d1e62ce6eba/1/0.bin",
+      "bytes": 68,
+      "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+    },
+    {
+      "path": "data/quarantine/uploads/d88200b1-7ead-467c-aadf-421e246bf4ef/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "data/quarantine/uploads/df885405-26de-4fec-98cb-2324a77fd68a/1/0.bin",
+      "bytes": 43311,
+      "sha256": "cd6990dd7224ad2d1f7ec6d79891afba350bb2d87d633fa8b6c79457678c4c88"
+    },
+    {
+      "path": "data/quarantine/uploads/ea1bd08c-ae9b-4096-814d-fc24d9f4872f/1/0.bin",
+      "bytes": 184872,
+      "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+    },
+    {
+      "path": "data/quarantine/uploads/fb6f3bad-7d8a-4415-b75a-5332bbca552d/1/0.bin",
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    },
+    {
+      "path": "distribution/0-qa-hub-preview-7c86-windows-latest.json",
+      "bytes": 464,
+      "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+    },
+    {
+      "path": "distribution/1-qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+      "bytes": 35471405,
+      "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+    },
+    {
+      "path": "distribution/2-qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+      "bytes": 2600,
+      "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+    },
+    {
+      "path": "distribution/3-qa-hub-preview-code23.apk",
+      "bytes": 35536941,
+      "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+    },
+    {
+      "path": "runner.mjs",
+      "bytes": 30169,
+      "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3"
+    }
+  ],
+  "bindings": {
+    "databaseSha256": "e0ccd08befa911c9b8e4fc0ece0b4a0f42e09a80bf910466d503735ae9dae803",
+    "databaseManifestSha256": "e9fe2e1062011bb9454a3379c4767d921456d6bd099c0cd399752468ec3dc1ad",
+    "attachmentInventorySha256": "ff5e046205bbb05589cfc91421e8b56a308bb8d7f32eca20a0c1172b9ee45b25",
+    "attachmentCompleteMarkerSha256": "61bf0245eb0a044b06e354bb402bd0e8d6c8da95e85f09f621d967565eba68f0",
+    "attachmentBindingMarkerSha256": "58203eb453a54bfeca815df0b0faab1f031b9e2627e824bf94c3ef4fb62f62c2",
+    "tableFingerprintSha256": "8890a51747b40baef85323b2a1929d9a70d0323f3705ab95057ef4f6c6d575e0"
+  },
+  "method": {
+    "rootBoundToExactAuthorizedBackupDirectory": true,
+    "openedDatabase": "data/archive/rpo/qa-hub.sqlite",
+    "databaseOpenOptions": "readOnly + immutable=1 URI; query_only read transaction; no extension, migration, restore or backup execution",
+    "databaseRowContentsPrintedOrPersisted": false,
+    "queriedLiveDatabase": false,
+    "connectedHttpAdbOrCim": false,
+    "queriedCurrentProcessesOrServices": false,
+    "modifiedExistingFiles": false,
+    "createdOnly": "docs/evidence/project-components/android-update-deployment-retention/7a94eb90-63a2-4841-afa5-318612eb06ce/before-artifact-review.json"
+  },
+  "limits": [
+    "70-table and component-off rechecks are against the retained archive and compare the source fingerprint recorded at 01:16:48–01:16:55 UTC. They are not a fresh live-database readback.",
+    "The original five before-phase checks are preserved separately from this artifact audit. This file does not assert an API restart, successful after comparison, Android publication/update or current production state.",
+    "Reference-aware archive contains four ready/clean blobs. The evidence inventory and retained quarantine scopes do not establish a full external legacy queue/session backup.",
+    "Root manager Stop plus exact old-PID CIM absence and empty 4419 listener remain separate required restart evidence.",
+    "Private database row values were used only in memory for fingerprints; output contains counts, paths, sizes, SHA and marker metadata."
+  ]
+}

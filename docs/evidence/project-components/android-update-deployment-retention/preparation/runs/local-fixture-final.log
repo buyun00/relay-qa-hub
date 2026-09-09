@@ -1,0 +1,15 @@
+✔ default and malformed invocations are inert without reading a runtime or creating outputs (364.3463ms)
+✔ actual WAL SQLite snapshot archives referenced bytes and quarantine without copying live sidecars (225.6631ms)
+✔ missing referenced bytes fails with recovery DB retained and source untouched (147.501ms)
+✔ create-only copy rejects stale facts, live WAL names and junctions without overwriting (13.834ms)
+✔ Android readers preserve version strings, accept hashes only and never expose preference values (1.2178ms)
+✔ raw ADB transport uses fixed existing server and handles fragmented replies in memory only (1.1797ms)
+✔ post-comparison excludes only the old API identity, retaining every other process and socket (0.3638ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 962.3965

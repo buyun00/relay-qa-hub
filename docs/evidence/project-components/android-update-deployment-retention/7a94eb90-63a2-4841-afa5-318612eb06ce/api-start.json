@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "runId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "phase": "Start",
+  "startedAt": "2026-09-09T01:22:13.3358869Z",
+  "status": "passed",
+  "services": [
+    "api"
+  ],
+  "config": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+  "forcedDailyStop": false,
+  "managerOutput": [
+    "api ready PID 22852 port 4419"
+  ],
+  "newProcess": {
+    "pid": 22852,
+    "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "createdAt": "2026-09-09T01:22:20.2728640Z"
+  },
+  "ready": {
+    "status": "ready",
+    "schemaVersion": "14",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "completedAt": "2026-09-09T01:22:33.0606988Z"
+}

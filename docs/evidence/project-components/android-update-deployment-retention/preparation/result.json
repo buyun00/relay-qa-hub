@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "status": "prepared_not_run",
+  "preparedAt": "2026-09-09T01:13:00.5658681Z",
+  "sourceHead": "bc2b347dae282212a9119e5411b17fe144ca758c",
+  "sources": [
+    {
+      "path": "scripts/project-components/retain-preview-android-update-state.mjs",
+      "bytes": 30169,
+      "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3"
+    },
+    {
+      "path": "scripts/project-components/retain-preview-android-update-state.test.mjs",
+      "bytes": 10224,
+      "sha256": "c85bd6ebeadd9e12c4797132124b8039ea531655fa631221a8488e945422d543"
+    }
+  ],
+  "README": {
+    "sha256": "ef19e92b4d36b79d8b4e8c1a093866b3a0c87dcb15a9aa34267c517c46051ace",
+    "path": "README.md"
+  },
+  "history": [
+    {
+      "log": "runs/local-fixture-first.log",
+      "tests": 7,
+      "failed": 2,
+      "classification": "private backup read created sidecars; trailing newline hash parser rejected",
+      "passed": 5
+    },
+    {
+      "log": "runs/local-fixture-final.log",
+      "tests": 7,
+      "failed": 0,
+      "passed": 7
+    },
+    {
+      "log": "runs/local-fixture-freeze.log",
+      "tests": 8,
+      "failed": 0,
+      "passed": 8
+    }
+  ],
+  "finalGate": {
+    "passed": 8,
+    "formatExit": 0,
+    "tests": 8,
+    "nodeCheckExit": 0,
+    "failed": 0,
+    "skipped": 0,
+    "lintExit": 0
+  },
+  "logs": [
+    {
+      "path": "runs/local-fixture-final.log",
+      "bytes": 871,
+      "sha256": "f97d421048fee485bb6d7d3bc1b767078cb17de3c25324ad90e379f822230e4b"
+    },
+    {
+      "path": "runs/local-fixture-first.log",
+      "bytes": 2971,
+      "sha256": "4a9c1d7651a8fc1338e6cf770ad801289d56e9f6fccc55559ee7929ceb7fe55a"
+    },
+    {
+      "path": "runs/local-fixture-freeze.log",
+      "bytes": 971,
+      "sha256": "6755ac41189aa682f7d0b9d639693461afe3545c5d3d9ec84fb74d7c9fef3ed8"
+    },
+    {
+      "path": "runs/node-check-freeze.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/node-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/scoped-eslint-freeze.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/scoped-eslint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/scoped-format-freeze.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "runs/scoped-format.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    }
+  ],
+  "execution": {
+    "mainImported": false,
+    "actualServiceHttpOrProcessInspection": false,
+    "actualBefore": "not_run",
+    "actualAdbOrDeviceOperation": false,
+    "feedsPublished": false,
+    "productionDataOrFilesRead": false,
+    "liveDatabaseReadOrBackup": false,
+    "actualAfter": "not_run",
+    "servicesControlled": false,
+    "livePreviewConfigRead": false
+  },
+  "testsBoundary": "temporary synthetic SQLite including live fixture WAL; pure in-memory ADB socket; no runtime or device connection",
+  "proposedRunId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "commandForRootReview": [
+    "node scripts/project-components/retain-preview-android-update-state.mjs --run before C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json 7a94eb90-63a2-4841-afa5-318612eb06ce",
+    "node scripts/project-components/retain-preview-android-update-state.mjs --run after C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json 7a94eb90-63a2-4841-afa5-318612eb06ce"
+  ]
+}

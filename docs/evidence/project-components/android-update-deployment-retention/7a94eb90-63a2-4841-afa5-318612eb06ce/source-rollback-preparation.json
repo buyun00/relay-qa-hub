@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "runId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "root": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-update-deploy-7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "config": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+  "previousApiSource": {
+    "commit": "8f7330a559fc9611e93f2ef62df0e63639f07afc",
+    "archive": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-update-deploy-7a94eb90-63a2-4841-afa5-318612eb06ce\\previous-api-git-source.zip",
+    "bytes": 49209293,
+    "sha256": "a7be190235ac96dbf13ecc4aa6b2ffb82f8cb0b9ce15ac36b6d039ebb582cf2a",
+    "scope": "Committed source reconstruction input only; not a preserved or tested runnable old dist and not a database/profile archive."
+  },
+  "services": [
+    "api"
+  ],
+  "status": "prepared_no_runtime_service_action",
+  "at": "2026-09-09T01:11:00.211Z"
+}

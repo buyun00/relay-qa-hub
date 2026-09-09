@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "at": "2026-09-09T01:23:31.386Z",
+  "phase": "after_api_restart_before_feed",
+  "runId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "apiPidFromAfterProof": 22852,
+  "anonymous": true,
+  "requests": 2,
+  "results": [
+    {
+      "channel": "preview",
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/preview/latest.json",
+      "status": 404,
+      "body": {
+        "code": "ANDROID_UPDATE_NOT_FOUND"
+      },
+      "bytes": 35,
+      "sha256": "ae886404f2153724e0a2d2e07e83d9713405df398032596fd306bd562a07c79f"
+    },
+    {
+      "channel": "stable",
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/stable/latest.json",
+      "status": 401,
+      "body": {
+        "code": "UNAUTHENTICATED"
+      },
+      "bytes": 26,
+      "sha256": "1f140a8f94f1458500662df71546aaeb211c98d1457b2e048a767de3909017da"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "runId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+  "phase": "Stop",
+  "startedAt": "2026-09-09T01:21:57.8768118Z",
+  "status": "passed",
+  "services": [
+    "api"
+  ],
+  "config": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+  "forcedDailyStop": false,
+  "oldProcess": {
+    "pid": 10036,
+    "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "createdAt": "2026-09-08T22:26:05.0349230Z"
+  },
+  "managerOutput": [
+    "api stopped; all preview data and logs retained"
+  ],
+  "oldPidAbsent": true,
+  "apiListeners": [],
+  "method": "Owner-checked manager Stop-Process of exact preview API PID, followed by independent CIM absence and empty 4419 listener; not an HTTP graceful-stop claim.",
+  "completedAt": "2026-09-09T01:22:04.8979874Z"
+}

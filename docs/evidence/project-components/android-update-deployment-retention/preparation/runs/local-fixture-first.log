@@ -1,0 +1,49 @@
+✔ default and malformed invocations are inert without reading a runtime or creating outputs (402.4835ms)
+✖ actual WAL SQLite snapshot archives referenced bytes and quarantine without copying live sidecars (275.5677ms)
+✔ missing referenced bytes fails with recovery DB retained and source untouched (165.1047ms)
+✔ create-only copy rejects stale facts, live WAL names and junctions without overwriting (18.6907ms)
+✖ Android readers preserve version strings, accept hashes only and never expose preference values (0.7106ms)
+✔ raw ADB transport uses fixed existing server and handles fragmented replies in memory only (1.4757ms)
+✔ post-comparison excludes only the old API identity, retaining every other process and socket (0.3217ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1078.2794
+
+✖ failing tests:
+
+test at scripts\project-components\retain-preview-android-update-state.test.mjs:108:1
+✖ actual WAL SQLite snapshot archives referenced bytes and quarantine without copying live sidecars (275.5677ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/retain-preview-android-update-state.test.mjs:123:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts\project-components\retain-preview-android-update-state.test.mjs:176:1
+✖ Android readers preserve version strings, accept hashes only and never expose preference values (0.7106ms)
+  Error: ANDROID_HASH_READ_FAILED
+      at check (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/retain-preview-android-update-state.mjs:77:25)
+      at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/retain-preview-android-update-state.mjs:330:7
+      at Array.map (<anonymous>)
+      at parseAndroidHashes (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/retain-preview-android-update-state.mjs:328:6)
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/retain-preview-android-update-state.test.mjs:181:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
