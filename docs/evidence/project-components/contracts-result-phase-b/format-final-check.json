@@ -1,0 +1,22 @@
+{
+  "startedAt": "2026-09-09T03:19:59.885Z",
+  "finishedAt": "2026-09-09T03:20:00.455Z",
+  "command": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "node_modules/prettier/bin/prettier.cjs",
+    "--check",
+    "apps/api/src/mobile-verification.ts",
+    "apps/api/src/sqlite-mobile-verification-store.ts",
+    "packages/storage/src/mobile-verification-store.ts",
+    "packages/storage/src/verification-blocked-result-migration.ts",
+    "packages/storage/src/sqlite-migrations.ts",
+    "packages/storage/test/sqlite-migrations.test.ts",
+    "packages/storage/test/workflow-idempotency.test.ts",
+    "apps/api/test/verification-result-phase-a.test.mjs",
+    "apps/api/test/verification-result-phase-b.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\format-final-check.txt",
+  "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+}

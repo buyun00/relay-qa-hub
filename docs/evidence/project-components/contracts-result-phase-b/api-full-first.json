@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-09-09T03:15:33.995Z",
+  "finishedAt": "2026-09-09T03:15:52.473Z",
+  "command": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    ".tools/npm-12.0.2/package/bin/npm-cli.js",
+    "run",
+    "test",
+    "--workspace",
+    "@relay-qa-hub/api"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\api-full-first.txt",
+  "sha256": "3993976a3a181e057bcdc3e1fe0b6bd5ad00dbd47492bd92484fae67b1d4133c"
+}

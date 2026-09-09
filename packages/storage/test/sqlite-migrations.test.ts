@@ -531,7 +531,7 @@ test("v6 through current schema preserves existing Bugs and adds management, GM 
     const completed = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "backups"),
     });
-    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12, 13, 14, 15]);
+    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12, 13, 14, 15, 16]);
     assert.equal(completed.fromVersion, 7);
     assert.equal(completed.toVersion, SQLITE_SCHEMA_VERSION);
     assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);

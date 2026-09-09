@@ -4,6 +4,7 @@ import { relayLifecycleMigration } from "./relay-lifecycle-migration.js";
 import { PROJECT_MANAGEMENT_SQL } from "./project-management-migration.js";
 import { gmCommandMigration } from "./gm-command-migration.js";
 import { VERIFICATION_RESULT_SNAPSHOT_SQL } from "./verification-result-snapshot-migration.js";
+import { VERIFICATION_BLOCKED_RESULT_SQL } from "./verification-blocked-result-migration.js";
 
 export interface SqliteMigration {
   readonly version: number;
@@ -7511,6 +7512,7 @@ export const SQLITE_MIGRATIONS: readonly SqliteMigration[] = Object.freeze([
     gmCommandMigration(projectMigrations.map((entry) => entry.sql).join("\n")),
   ),
   migration(15, "immutable_verification_result_snapshots", VERIFICATION_RESULT_SNAPSHOT_SQL),
+  migration(16, "blocked_verification_result_receipts", VERIFICATION_BLOCKED_RESULT_SQL),
 ]);
 
 export const SQLITE_SCHEMA_VERSION = SQLITE_MIGRATIONS.at(-1)?.version ?? 0;

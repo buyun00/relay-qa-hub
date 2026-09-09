@@ -383,7 +383,7 @@ test("legacy Accept q-values and malformed bodies reject before any domain write
     { body, key: "k".repeat(201), contentType: "application/json" },
     { body, key: "k", contentType: vendor },
     {
-      body: { ...body, status: "blocked", blockedReason: "Later phase" },
+      body: { ...body, status: "blocked" },
       key: "k",
       contentType: "application/json",
     },

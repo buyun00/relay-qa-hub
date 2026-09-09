@@ -1,0 +1,477 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-09T03:22:08.888Z",
+  "status": "passed_scoped_source_and_archive",
+  "baseSourceCommit": "2d687b4",
+  "sourceFiles": [
+    {
+      "path": "apps/api/src/mobile-verification.ts",
+      "bytes": 9976,
+      "sha256": "e88e461f57f3d708af98b1067607521ffeef996ea7db37fe8d5eab823b5eec99"
+    },
+    {
+      "path": "apps/api/src/sqlite-mobile-verification-store.ts",
+      "bytes": 3963,
+      "sha256": "6745b4fe3b31418af95b0f5cc6f8b42ce4559f8940c980d5db94facd0d71efe9"
+    },
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "bytes": 47596,
+      "sha256": "a65b92ad3d47a7b135b76533673f4e3f77d671a8a3e7e47f3d3ebe1f7aa15c85"
+    },
+    {
+      "path": "packages/storage/src/verification-blocked-result-migration.ts",
+      "bytes": 993,
+      "sha256": "651654faea8f387c3d425a046787d4a4f5d93c85b89cc3874942f363344e7630"
+    },
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 327299,
+      "sha256": "938ae0ca3caa153733fda214dd1093a57dab5828b0336f4e4060176d657c2d88"
+    },
+    {
+      "path": "packages/storage/test/sqlite-migrations.test.ts",
+      "bytes": 35641,
+      "sha256": "407bc70ef8de04766571e2bad62c4dae61569bc8880d4572cfb90e97a23ee96c"
+    },
+    {
+      "path": "packages/storage/test/workflow-idempotency.test.ts",
+      "bytes": 17996,
+      "sha256": "34c076652fde887b9ccf9628ea7ee3e1f9f02202e809ff9f23dd0e5a7dc5cd45"
+    },
+    {
+      "path": "apps/api/test/verification-result-phase-a.test.mjs",
+      "bytes": 32775,
+      "sha256": "e9e6e0f32be048f535fa8236c33f7f336a294ce2cb57627aa1e189c5e7f28517"
+    },
+    {
+      "path": "apps/api/test/verification-result-phase-b.test.mjs",
+      "bytes": 19256,
+      "sha256": "a8fb4ddfdbf4db982c9d4d60c24bb56a7154d023846d71e9bb00d8989d2dfde9"
+    }
+  ],
+  "results": {
+    "api": {
+      "pass": 266,
+      "fail": 0,
+      "mjs": 233,
+      "ts": 33
+    },
+    "storage": {
+      "pass": 118,
+      "fail": 0
+    },
+    "blockedHttp": {
+      "groups": 6,
+      "requests": 114
+    },
+    "phaseARegression": {
+      "groups": 14,
+      "requests": 215
+    },
+    "archive": {
+      "checks": 11,
+      "tables": 70,
+      "originalReceipts": 7,
+      "authorizedStorageReplays": 4
+    }
+  },
+  "schema": {
+    "from": 15,
+    "to": 16,
+    "originalSchema15SqlUnchanged": true
+  },
+  "checks": [
+    {
+      "name": "build-storage-first",
+      "startedAt": "2026-09-09T03:11:37.964Z",
+      "finishedAt": "2026-09-09T03:11:40.171Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/storage/tsconfig.json"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\build-storage-first.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build-api-first",
+      "startedAt": "2026-09-09T03:11:56.363Z",
+      "finishedAt": "2026-09-09T03:11:59.333Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "apps/api/tsconfig.json"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\build-api-first.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "type-storage-first",
+      "startedAt": "2026-09-09T03:13:12.612Z",
+      "finishedAt": "2026-09-09T03:13:14.779Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "packages/storage/tsconfig.test.json"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\type-storage-first.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "phase-a-regression",
+      "startedAt": "2026-09-09T03:13:12.612Z",
+      "finishedAt": "2026-09-09T03:13:20.726Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "--test",
+        "apps/api/test/verification-result-phase-a.test.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\phase-a-regression.txt",
+      "sha256": "8f2887ad9955fc9ca6baab895afd87e4cd6ecfd80800c838db5980e70e569ef1"
+    },
+    {
+      "name": "blocked-http-second",
+      "startedAt": "2026-09-09T03:13:08.369Z",
+      "finishedAt": "2026-09-09T03:13:12.131Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "--test",
+        "apps/api/test/verification-result-phase-b.test.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\blocked-http-second.txt",
+      "sha256": "32e9f30f1d8121254aff4b5b284b781da0c5e8bf24dbaa6d1040d102b9d43d74"
+    },
+    {
+      "name": "schema16-archive-second",
+      "startedAt": "2026-09-09T03:15:33.295Z",
+      "finishedAt": "2026-09-09T03:15:33.514Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        ".tools/migrate-result-schema16.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\schema16-archive-second.txt",
+      "sha256": "7b136986a9cd0858a71e500da4f8dc97c340b6207779c83c12f67d3762df9bbf"
+    },
+    {
+      "name": "api-full-first",
+      "startedAt": "2026-09-09T03:15:33.995Z",
+      "finishedAt": "2026-09-09T03:15:52.473Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        ".tools/npm-12.0.2/package/bin/npm-cli.js",
+        "run",
+        "test",
+        "--workspace",
+        "@relay-qa-hub/api"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\api-full-first.txt",
+      "sha256": "3993976a3a181e057bcdc3e1fe0b6bd5ad00dbd47492bd92484fae67b1d4133c"
+    },
+    {
+      "name": "storage-full-first",
+      "startedAt": "2026-09-09T03:15:34.005Z",
+      "finishedAt": "2026-09-09T03:16:03.916Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        ".tools/npm-12.0.2/package/bin/npm-cli.js",
+        "run",
+        "test",
+        "--workspace",
+        "@relay-qa-hub/storage"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\storage-full-first.txt",
+      "sha256": "5988fc22b5fb2c81d07aded1e91e672728dc55c2b2874574221aae512d001b47"
+    },
+    {
+      "name": "lint-final",
+      "startedAt": "2026-09-09T03:17:02.634Z",
+      "finishedAt": "2026-09-09T03:17:03.743Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/eslint/bin/eslint.js",
+        "apps/api/src/mobile-verification.ts",
+        "apps/api/src/sqlite-mobile-verification-store.ts",
+        "packages/storage/src/mobile-verification-store.ts",
+        "packages/storage/src/verification-blocked-result-migration.ts",
+        "packages/storage/src/sqlite-migrations.ts",
+        "packages/storage/test/sqlite-migrations.test.ts",
+        "packages/storage/test/workflow-idempotency.test.ts",
+        "apps/api/test/verification-result-phase-a.test.mjs",
+        "apps/api/test/verification-result-phase-b.test.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\lint-final.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "frozen-contracts",
+      "startedAt": "2026-09-09T03:17:51.870Z",
+      "finishedAt": "2026-09-09T03:17:54.574Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        ".tools/npm-12.0.2/package/bin/npm-cli.js",
+        "run",
+        "test:contract"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\frozen-contracts.txt",
+      "sha256": "add15ad4af19b87d55b8a7e19dfbeb6513f9eb1846a36f54824b9f5f6d78f66c"
+    },
+    {
+      "name": "format-final-check",
+      "startedAt": "2026-09-09T03:19:59.885Z",
+      "finishedAt": "2026-09-09T03:20:00.455Z",
+      "command": [
+        "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "node_modules/prettier/bin/prettier.cjs",
+        "--check",
+        "apps/api/src/mobile-verification.ts",
+        "apps/api/src/sqlite-mobile-verification-store.ts",
+        "packages/storage/src/mobile-verification-store.ts",
+        "packages/storage/src/verification-blocked-result-migration.ts",
+        "packages/storage/src/sqlite-migrations.ts",
+        "packages/storage/test/sqlite-migrations.test.ts",
+        "packages/storage/test/workflow-idempotency.test.ts",
+        "apps/api/test/verification-result-phase-a.test.mjs",
+        "apps/api/test/verification-result-phase-b.test.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\format-final-check.txt",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    }
+  ],
+  "boundaries": {
+    "sharedPreviewDeployed": false,
+    "sharedPreviewSchema": 14,
+    "isolatedFullMainTestPending": true,
+    "mcpBlockedActionAvailable": false,
+    "externalComponentsUsed": false
+  },
+  "retainedFailures": [
+    {
+      "file": "lint-first.txt",
+      "reason": "Unused imports copied with the initial fixture; removed."
+    },
+    {
+      "file": "blocked-http-first.txt",
+      "pass": 2,
+      "fail": 4,
+      "reason": "Test expected reason fields in the frozen DTO, whose schema excludes them, and expected500 for an existing503 write-fault response. Corrected assertions verify SQL/full immutable DTO reasons, absence on frozen wire, and exact503 code. Product serializer unchanged."
+    },
+    {
+      "file": "schema16-archive-first.txt",
+      "reason": "Read-only assertion used nonexistent project_memberships name; actual authority relation is command_project_memberships. First migrated copy retained, corrected run used a fresh exclusive source copy."
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/api-full-first.json",
+      "bytes": 538,
+      "sha256": "095469c004fb652a62f4b3e2b17ccfafc68ace48ecfe88a0a0367d40ea230287"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/api-full-first.txt",
+      "bytes": 32077,
+      "sha256": "3993976a3a181e057bcdc3e1fe0b6bd5ad00dbd47492bd92484fae67b1d4133c"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/blocked-http-first.json",
+      "bytes": 499,
+      "sha256": "4743bb4911075d9b6638d9991d95b56c34e4acbc17ee95157405e61d33ede668"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/blocked-http-first.txt",
+      "bytes": 40063,
+      "sha256": "29d76cac8619b4f44c32f8dba66daff091b5733e762d7cf8a664b5fd18035c58"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/blocked-http-second.json",
+      "bytes": 500,
+      "sha256": "1caad01571942e507dce9d99a5c62140e24ac34522ae822acb7af9da254ff9aa"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/blocked-http-second.txt",
+      "bytes": 1413,
+      "sha256": "32e9f30f1d8121254aff4b5b284b781da0c5e8bf24dbaa6d1040d102b9d43d74"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/build-api-first.json",
+      "bytes": 503,
+      "sha256": "5323cb7c713c3f1d58b352f749702b8c8c9f257281e92fa6c19113e459a7c212"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/build-api-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/build-storage-first.json",
+      "bytes": 515,
+      "sha256": "17ec00a4387e1c0962a17478eaf6a2deaae8ce5f5efe0a76725bb66479119d86"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/build-storage-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/check-runner.mjs.txt",
+      "bytes": 1347,
+      "sha256": "3208eef8908d25c2e45c689d2229c81903be444ccc5d6b70b9e340cc0bc3f205"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/format-final-check.json",
+      "bytes": 991,
+      "sha256": "ff07d8303a62a5ea14de629942782dc35339c129c5b98a77632093bb1b099b8f"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/format-final-check.txt",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/format-final-write.json",
+      "bytes": 546,
+      "sha256": "2c2260bc88fc39706ced61c3916019b9af76fc991595399f9811e2e8703f6fc4"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/format-final-write.txt",
+      "bytes": 56,
+      "sha256": "1abdda6641de223ea32a0f2293ec954c5f84836d7fa5551e361c59cbffd8ba3d"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/format-first.json",
+      "bytes": 985,
+      "sha256": "f17e6941afe264205f5965b1ad2b54927cdeeb47fcc88f20713a6560f8623753"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/format-first.txt",
+      "bytes": 556,
+      "sha256": "e55a589e0e58562d0a3333505afb59e81e9f30c959c658504bf145bf65bb2ff9"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/frozen-contracts.json",
+      "bytes": 505,
+      "sha256": "792b95646ebfeba0e754c9e6dacc328e62ecdde9948d85ad293cba136a415407"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/frozen-contracts.txt",
+      "bytes": 1740,
+      "sha256": "add15ad4af19b87d55b8a7e19dfbeb6513f9eb1846a36f54824b9f5f6d78f66c"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/initial-test-author.mjs.txt",
+      "bytes": 8144,
+      "sha256": "08d588b1e68b1f58fdb44e1fc54f896b2f4b039f95ba1de23c5490e1ec68373e"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/lint-final.json",
+      "bytes": 963,
+      "sha256": "da001b0d60e4162b02aaba245bd0315a22d1d67e09f5e142738d2d9c4a905ef5"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/lint-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/lint-first.json",
+      "bytes": 518,
+      "sha256": "83c613ab1a5e7f606fee81081d1af1bb4ce5768a131df0ce9cfd4171aac5aadc"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/lint-first.txt",
+      "bytes": 862,
+      "sha256": "f8c7ac43a32b00f4ff5f73f375da74d86289fdbb17b6140674e8779d947d9904"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/migration-archive-final-source.mjs.txt",
+      "bytes": 7521,
+      "sha256": "9eeda8fcf15bb612c2ab9455f063f56a264c14464b25facf9572d1d0decda009"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/migration-archive-first-source.mjs.txt",
+      "bytes": 7112,
+      "sha256": "cb4dff7d7fae908c147412f6ab0114b29bd4c5f5a809ed03a894846abcb1d3b7"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/migration-archive.json",
+      "bytes": 12621,
+      "sha256": "cce18309cb9837686ddcab4302ede96198ed4e95d702ffe9040e5e2c3cf108cc"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/phase-a-regression.json",
+      "bytes": 499,
+      "sha256": "e5a5eae15c648df9904daa5ad50ceeb4aa6c6464059a1865d13e9f7fb28651e9"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/phase-a-regression.txt",
+      "bytes": 3381,
+      "sha256": "8f2887ad9955fc9ca6baab895afd87e4cd6ecfd80800c838db5980e70e569ef1"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/schema16-archive-first.json",
+      "bytes": 473,
+      "sha256": "643f429bdbf44813d188ff0e12d763c8183c146c05951df128b039bce902c99d"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/schema16-archive-first.txt",
+      "bytes": 549,
+      "sha256": "2787a489afb8fd63089619a7d3a7edc6b210c0fd60b0fdceee3479bb8ec2adbf"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/schema16-archive-second.json",
+      "bytes": 474,
+      "sha256": "923415ac249f0427972bb1fda47bab7760bde53eb540a8604815e03760493ac9"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/schema16-archive-second.txt",
+      "bytes": 174,
+      "sha256": "7b136986a9cd0858a71e500da4f8dc97c340b6207779c83c12f67d3762df9bbf"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/storage-full-first.json",
+      "bytes": 546,
+      "sha256": "12a2878024e46371a3105ca381bc019fcee529cb4949a6102cfd3fad196fc1e9"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/storage-full-first.txt",
+      "bytes": 12435,
+      "sha256": "5988fc22b5fb2c81d07aded1e91e672728dc55c2b2874574221aae512d001b47"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/type-storage-first.json",
+      "bytes": 535,
+      "sha256": "507cc50bbb73f28fc82c32e2c6c1ad16a95f83ed4b48c27e2cdb05d9a2476713"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-result-phase-b/type-storage-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

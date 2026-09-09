@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-09-09T03:13:12.612Z",
+  "finishedAt": "2026-09-09T03:13:20.726Z",
+  "command": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "--test",
+    "apps/api/test/verification-result-phase-a.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\phase-a-regression.txt",
+  "sha256": "8f2887ad9955fc9ca6baab895afd87e4cd6ecfd80800c838db5980e70e569ef1"
+}

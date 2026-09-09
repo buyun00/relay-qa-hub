@@ -77,6 +77,7 @@ test("schema14 to15 preserves every old table and retains a restorable pre-migra
     const before = contents(database);
     const migration = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(directory, "before-backup"),
+      targetVersion: 15,
     });
     assert.deepEqual(migration.appliedVersions, [15]);
     assert.equal(currentSqliteSchemaVersion(database), 15);

@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const [label,...args]=process.argv.slice(2);
+if(!/^[a-z0-9-]+$/u.test(label??'')||args.length===0)throw new Error('Expected unique label and node arguments');
+const root=path.resolve('docs/evidence/project-components/contracts-result-phase-b');
+fs.mkdirSync(root,{recursive:true});
+const file=path.join(root,label+'.txt');
+if(fs.existsSync(file))throw new Error('Retained check already exists');
+const startedAt=new Date().toISOString();
+const result=spawnSync(process.execPath,args,{encoding:'utf8',maxBuffer:20*1024*1024,windowsHide:true,env:{...process.env,PATH:path.resolve('.tools/task-bin')+path.delimiter+process.env.PATH}});
+const output=(result.stdout??'')+(result.stderr??'');
+fs.writeFileSync(file,output,{flag:'wx'});
+const report={startedAt,finishedAt:new Date().toISOString(),command:[process.execPath,...args],exitCode:result.status,signal:result.signal,error:result.error?.message,file:path.relative(process.cwd(),file),sha256:createHash('sha256').update(output).digest('hex')};
+fs.writeFileSync(path.join(root,label+'.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify(report));
+if(result.status!==0){console.log(output.slice(-16000));process.exitCode=1;}

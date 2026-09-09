@@ -1,0 +1,12 @@
+
+C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\verification-result-phase-b.test.mjs
+   3:10  error  'createHash' is defined but never used                                  no-unused-vars
+   7:24  error  'backup' is defined but never used                                      no-unused-vars
+  18:10  error  'execFileSync' is defined but never used                                no-unused-vars
+  19:10  error  'stripTypeScriptTypes' is defined but never used                        no-unused-vars
+  20:10  error  'pathToFileURL' is defined but never used                               no-unused-vars
+  21:10  error  'parseMobileRecordVerificationResultRequest' is defined but never used  no-unused-vars
+  23:10  error  'workflowReceipt' is defined but never used                             no-unused-vars
+
+✖ 7 problems (7 errors, 0 warnings)
+

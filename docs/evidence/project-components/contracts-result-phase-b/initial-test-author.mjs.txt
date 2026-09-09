@@ -1,0 +1,116 @@
+import fs from 'node:fs';
+const original = fs.readFileSync('apps/api/test/verification-result-phase-a.test.mjs','utf8');
+const helpers = original.slice(0,original.indexOf('for (const legacy of [false, true])'))
+  .replaceAll('phase-a.fixture.invalid','phase-b.fixture.invalid')
+  .replaceAll('qa-result-phase-a-','qa-result-phase-b-')
+  .replaceAll('Phase A human fixture','Phase B human fixture');
+const tests = `
+for (const legacy of [false, true]) {
+  test('blocked ' + (legacy ? 'legacy' : 'vendor') + ' retains the delivered Attempt and original receipt across another complete Verification', async (t) => {
+    const f = await fixture(t), r = await round(f);
+    const body = { ...bodyFor(r,'blocked',legacy), blockedReason:'Target device is unavailable' };
+    const options = {body, key:legacy ? 'blocked-original' : r.key, contentType:'application/json', accept:legacy ? 'application/json' : vendor};
+    const before = snapshot(f);
+    const original = await f.call(r.path,options);
+    const after = snapshot(f);
+    assert.equal(original.verification.status,'blocked');
+    assert.equal(original.verification.blockedReason,body.blockedReason);
+    assert.equal(original.verification.failureReason,null);
+    assert.equal(original.verification.version,r.verification.version+1);
+    assert.equal(original.bug.state,'ready_for_verification');
+    assert.equal(original.bug.version,before.bugs[0].version+1);
+    assert.equal(after.bugs[0].active_repair_attempt_id,r.attempt.id);
+    assert.equal(after.bugs[0].active_verification_id,null);
+    assert.deepEqual(after.repair_attempts,before.repair_attempts);
+    assert.equal(after.events.length,before.events.length+1);
+    assert.equal(after.outbox.length,before.outbox.length+1);
+    assert.equal(after.submissions.length,before.submissions.length+(legacy ? 0 : 1));
+    assert.equal(after.idempotency_records.length,before.idempotency_records.length+1);
+    assert.equal(after.verification_result_snapshots.length,1);
+    const event = after.events.at(-1);
+    assert.equal(event.actor_user_id,f.actorId);
+    assert.equal(event.from_state,'ready_for_verification');
+    assert.equal(event.to_state,'ready_for_verification');
+    assert.equal(JSON.parse(event.payload_json).status,'blocked');
+    assert.equal(JSON.parse(event.payload_json).reason,body.blockedReason);
+    assert.deepEqual(await f.call(r.path,options),legacy ? original : {...original,replayed:true});
+    assert.deepEqual(snapshot(f),after);
+    const different = await f.call(r.path,{...options,body:{...body,blockedReason:'Different reason'},expected:409});
+    assert.equal(different.code,'IDEMPOTENCY_PAYLOAD_MISMATCH');
+    assert.deepEqual(snapshot(f),after);
+    const laterBug = await f.call('bugs/'+r.bug.id,{method:'PATCH',body:{expectedVersion:original.bug.version,title:'Later edit retained'},key:'web:updateBug:bug:'+r.bug.id+':v'+original.bug.version});
+    let verification = await f.call('bugs/'+r.bug.id+'/verifications',{
+      body:{expectedVersion:laterBug.version,repairAttemptId:r.attempt.id,buildId:null,verifierId:f.actorId,criteria:'Device is now available'},
+      key:'workflow:createVerification:bug:'+r.bug.id+':attempt:'+r.attempt.id+':v'+laterBug.version,expected:201});
+    assert.notEqual(verification.id,r.verification.id);
+    verification = await f.call('verifications/'+verification.id+'/start',{body:{expectedVersion:verification.version},key:'workflow:startVerification:verification:'+verification.id+':v'+verification.version});
+    const current = snapshot(f);
+    const oldVersion = await f.call(r.path,{body:{expectedVersion:r.verification.version+1,status:'passed',resultSummary:'Cannot reuse terminal Verification'},contentType:'application/json',accept:'application/json',key:'old-blocked-new-key',expected:412});
+    assert.equal(oldVersion.code,'VERSION_CONFLICT');
+    assert.deepEqual(snapshot(f),current);
+    const passed = await f.call('verifications/'+verification.id+'/result',{
+      body:bodyFor({verification},'passed'),key:'workflow:recordVerificationResult:verification:'+verification.id+':v'+verification.version});
+    assert.equal(passed.bug.state,'closed');
+    const closed = snapshot(f);
+    assert.deepEqual(await f.call(r.path,options),legacy ? original : {...original,replayed:true});
+    assert.deepEqual(snapshot(f),closed);
+    assert.equal((await f.call('verifications/'+r.verification.id)).status,'blocked');
+    assert.equal(closed.verification_result_snapshots.length,2);
+    assert.deepEqual(closed.repair_attempts,before.repair_attempts);
+    assert.equal(closed.bugs[0].active_repair_attempt_id,null);
+    assert.equal(closed.bugs[0].active_verification_id,null);
+  });
+
+  test('blocked '+(legacy ? 'legacy' : 'vendor')+' reason guards and current authorization leave all transaction facts unchanged',async(t)=>{
+    const f=await fixture(t),r=await round(f), before=snapshot(f);
+    const body={...bodyFor(r,'blocked',legacy),blockedReason:'Waiting for device'};
+    const options={body,key:legacy ? 'reason-key' : r.key,contentType:'application/json',accept:legacy ? 'application/json':vendor};
+    for(const patch of [
+      {blockedReason:undefined},{blockedReason:''},{blockedReason:' '},{blockedReason:'x'.repeat(5001)},{blockedReason:null},{blockedReason:false},
+      {failureReason:'Not applicable'},{status:'failed',failureReason:'Failed but has blocked reason'},{status:'passed'},
+    ]) {
+      await f.call(r.path,{...options,body:{...body,...patch},expected:400});
+      assert.deepEqual(snapshot(f),before);
+    }
+    const peer=await f.request('auth/login',{body:{projectId:f.projectId,name:'Different verifier',client:'android'}});
+    await f.call(r.path,{...options,token:peer.accessToken,expected:403});
+    await f.call(r.path,{...options,token:f.other.accessToken,expected:403});
+    const wrongVersion = legacy ? {...body,expectedVersion:9} : {...body,expectedVersion:9};
+    await f.call(r.path,{...options,body:wrongVersion,key:legacy?'wrong-version':r.key.replace(/:v[0-9]+$/u,':v9'),expected:412});
+    assert.deepEqual(snapshot(f),before);
+    const first=await f.call(r.path,options);
+    assert.equal(first.verification.status,'blocked');
+    const committed=snapshot(f);
+    await f.call(r.path,{...options,token:peer.accessToken,expected:403});
+    assert.deepEqual(snapshot(f),committed);
+  });
+}
+
+test('blocked result full UTF-16 limits preserve original text while escaping audit payload safely',async(t)=>{
+  const f=await fixture(t),r=await round(f);
+  const reason='中\\u0001'.repeat(2500),summary='记\\u0002'.repeat(5000);
+  const body={...bodyFor(r,'blocked'),resultSummary:summary,blockedReason:reason};
+  const first=await f.call(r.path,{body,key:r.key});
+  assert.equal(first.verification.blockedReason,reason);
+  assert.equal(first.verification.resultSummary,summary);
+  const facts=snapshot(f),event=facts.events.at(-1);
+  assert.ok(Buffer.byteLength(event.payload_json,'utf8')<4096);
+  assert.deepEqual(await f.call(r.path,{body,key:r.key}),{...first,replayed:true});
+  assert.deepEqual(snapshot(f),facts);
+});
+
+test('blocked receipt failure rolls back Verification, Bug pointers, Event, outbox and snapshot atomically',async(t)=>{
+  const f=await fixture(t),r=await round(f),before=snapshot(f);
+  const db=new DatabaseSync(f.databaseFile);
+  try {db.exec(\"CREATE TRIGGER phase_b_receipt_fault BEFORE UPDATE ON idempotency_records WHEN new.status='committed' AND new.operation_id='recordVerificationResult' BEGIN SELECT RAISE(ABORT,'injected final receipt fault'); END;\");} finally {db.close();}
+  const body={...bodyFor(r,'blocked'),blockedReason:'Waiting for device'};
+  await f.call(r.path,{body,key:r.key,expected:500});
+  assert.deepEqual(snapshot(f),before);
+  const repair=new DatabaseSync(f.databaseFile);
+  try {repair.exec('DROP TRIGGER phase_b_receipt_fault');}finally{repair.close();}
+  const committed=await f.call(r.path,{body,key:r.key});
+  assert.equal(committed.verification.status,'blocked');
+  assert.equal(snapshot(f).verification_result_snapshots.length,1);
+});
+`;
+fs.writeFileSync('apps/api/test/verification-result-phase-b.test.mjs',helpers+tests,{flag:'wx'});

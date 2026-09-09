@@ -1,0 +1,20 @@
+✔ blocked vendor retains the delivered Attempt and original receipt across another complete Verification (755.9911ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-AqtR0W; 20 real HTTP requests
+✔ blocked vendor reason guards and current authorization leave all transaction facts unchanged (603.0032ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-faXUFO; 25 real HTTP requests
+✔ blocked legacy retains the delivered Attempt and original receipt across another complete Verification (592.1938ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-FBOZXa; 20 real HTTP requests
+✔ blocked legacy reason guards and current authorization leave all transaction facts unchanged (556.5653ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-jAElYA; 25 real HTTP requests
+✔ blocked result full UTF-16 limits preserve original text while escaping audit payload safely (430.815ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-f1S264; 12 real HTTP requests
+✔ blocked receipt failure rolls back Verification, Bug pointers, Event, outbox and snapshot atomically (484.7866ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-ApO2H8; 12 real HTTP requests
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3695.5429

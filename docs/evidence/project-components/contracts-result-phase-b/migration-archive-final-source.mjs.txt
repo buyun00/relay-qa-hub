@@ -1,0 +1,62 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {DatabaseSync,backup} from 'node:sqlite';
+import {SQLITE_MIGRATIONS} from '../packages/storage/dist/sqlite-migrations.js';
+import {migrateSqliteDatabase,currentSqliteSchemaVersion,openSqliteDatabaseForWorker,verifySqliteIntegrity} from '../packages/storage/dist/sqlite.js';
+import {recordMobileVerificationResult} from '../packages/storage/dist/mobile-verification-store.js';
+const source='C:/Users/lin0/.codex/parallel-runtimes/result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20/runs/be5c18d7-8150-4684-b7c4-a9044c11b796/consistent-before-stop.sqlite';
+const expected='5d0e8d9c768f0756ec6360da03ea5921f61de4118c6498547065d30998a69cea';
+const sha=x=>createHash('sha256').update(x).digest('hex');
+assert.equal(sha(fs.readFileSync(source)),expected);
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'qa-result-schema16-'));
+const copy=path.join(root,'schema15-to16.sqlite');
+fs.copyFileSync(source,copy,fs.constants.COPYFILE_EXCL);
+assert.equal(sha(fs.readFileSync(copy)),expected);
+const db=openSqliteDatabaseForWorker({databaseFile:copy,busyTimeoutMs:1000});
+const tables=db.prepare("SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name <> 'schema_migrations' ORDER BY name").all().map(r=>r.name);
+const contents=c=>Object.fromEntries(tables.map(name=>{const rows=c.prepare('SELECT * FROM "'+name.replaceAll('"','""')+'"').all();return[name,{rows:rows.length,sha256:sha(JSON.stringify(rows))}]}));
+const schema=c=>c.prepare("SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%' ORDER BY type,name").all();
+const checks=[];
+function check(name,fn){fn();checks.push({name,passed:true});}
+const before=contents(db),beforeSchema=schema(db),beforeMigrations=db.prepare('SELECT * FROM schema_migrations ORDER BY version').all();
+const snapshots=db.prepare('SELECT * FROM verification_result_snapshots ORDER BY id').all();
+check('original schema15 has seven immutable result snapshots',()=>{assert.equal(currentSqliteSchemaVersion(db),15);assert.equal(snapshots.length,7);});
+check('original applied migration checksums match unchanged source1..15',()=>{for(const row of beforeMigrations) assert.equal(row.checksum,SQLITE_MIGRATIONS.find(m=>m.version===row.version).checksum);});
+const migration=await migrateSqliteDatabase(db,copy,{targetVersion:16,backupRoot:path.join(root,'pre-migration')});
+check('only schema16 applied',()=>{assert.deepEqual(migration.appliedVersions,[16]);assert.equal(currentSqliteSchemaVersion(db),16);});
+check('all business tables and immutable full result bytes unchanged',()=>assert.deepEqual(contents(db),before));
+check('only precise result snapshot trigger replaced',()=>{
+  const afterSchema=schema(db),name='verification_result_snapshot_exact_effect';
+  assert.deepEqual(afterSchema.filter(r=>r.name!==name),beforeSchema.filter(r=>r.name!==name));
+  assert.equal(afterSchema.find(r=>r.name===name).sql,beforeSchema.find(r=>r.name===name).sql.replace("verification.status IN ('passed','failed')","verification.status IN ('passed','failed','blocked')"));
+});
+const old=new DatabaseSync(migration.backupPath,{readOnly:true});
+try{check('automatic premigration backup remains readable schema15 with identical history',()=>{assert.equal(currentSqliteSchemaVersion(old),15);assert.deepEqual(contents(old),before);assert.equal(verifySqliteIntegrity(old).ok,true);});}finally{old.close();}
+const replayed=[];
+for(const row of snapshots){
+  const effect=JSON.parse(row.response_json),v=effect.verification;
+  const active=db.prepare("SELECT 1 FROM command_project_memberships AS membership JOIN users AS actor ON actor.account_id=membership.account_id AND actor.id=membership.user_id AND actor.status='active' JOIN projects AS project ON project.account_id=membership.account_id AND project.id=membership.project_id AND project.status='active' JOIN accounts AS account ON account.id=membership.account_id AND account.status='active' WHERE membership.account_id=? AND membership.project_id=? AND membership.user_id=? AND membership.status='active'").get(row.account_id,row.project_id,row.actor_id);
+  const deleted=db.prepare('SELECT 1 FROM bug_deletions WHERE account_id=? AND project_id=? AND bug_id=?').get(row.account_id,row.project_id,row.bug_id);
+  if(!active||deleted||v.verifierId!==row.actor_id){replayed.push({id:row.id,status:'excluded_current_authorization_or_deleted_or_generic_human'});continue;}
+  const input={accountId:row.account_id,projectId:row.project_id,actorId:row.actor_id,verificationId:row.verification_id,clientSubmissionId:row.client_submission_id,expectedVersion:v.version-1,status:v.status,resultSummary:v.resultSummary,failureReason:v.failureReason,attachmentIds:effect.attachmentIds,captureBundleId:effect.captureBundleId,idempotencyKey:row.idempotency_key,requestDigest:row.request_digest,requireAssignedVerifier:true,createdAt:new Date().toISOString()};
+  db.exec('BEGIN IMMEDIATE');
+  try{const response=recordMobileVerificationResult(db,input);assert.deepEqual(response,{...effect,replayed:true});db.exec('COMMIT');}catch(error){db.exec('ROLLBACK');throw error;}
+  replayed.push({id:row.id,status:'original_storage_receipt_replayed'});
+}
+check('at least four authorized original storage receipts replay without domain writes',()=>{assert.ok(replayed.filter(r=>r.status==='original_storage_receipt_replayed').length>=4);assert.deepEqual(contents(db),before);});
+check('snapshot update and delete remain forbidden',()=>{
+  for(const sql of ["UPDATE verification_result_snapshots SET created_at=created_at WHERE id=?","DELETE FROM verification_result_snapshots WHERE id=?"])assert.throws(()=>db.prepare(sql).run(snapshots[0].id),/immutable|append-only/u);
+  assert.deepEqual(contents(db),before);
+});
+check('migrated integrity and foreign keys valid',()=>assert.equal(verifySqliteIntegrity(db).ok,true));
+const recoveredPath=path.join(root,'recovered-schema16.sqlite');
+await backup(db,recoveredPath);db.close();
+const recovered=new DatabaseSync(recoveredPath,{readOnly:true});
+try{check('reopened online recovered schema16 has identical tables and seven original receipts',()=>{assert.equal(currentSqliteSchemaVersion(recovered),16);assert.deepEqual(contents(recovered),before);assert.equal(verifySqliteIntegrity(recovered).ok,true);});}finally{recovered.close();}
+check('original archive file bytes unchanged',()=>assert.equal(sha(fs.readFileSync(source)),expected));
+const report={schemaVersion:1,recordedAt:new Date().toISOString(),status:'passed_scoped_schema15_to16_archive',source:{path:source,sha256:expected,bytes:fs.statSync(source).size},retainedDirectory:root,migration,businessTables:tables.length,snapshots:snapshots.length,checks,replayed,before,limits:['Only independent full-main experiment archive; no production/main-preview database opened or migrated.','Storage receipt replay uses original persisted request digests; this is not new HTTP or MCP acceptance.','Pre-migration backup and reopened post-migration backup are retained; no in-place downgrade.']};
+fs.writeFileSync('docs/evidence/project-components/contracts-result-phase-b/migration-archive.json',JSON.stringify(report,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({status:report.status,checks:checks.length,tables:tables.length,snapshots:snapshots.length,replayed:replayed.filter(r=>r.status==='original_storage_receipt_replayed').length,root}));

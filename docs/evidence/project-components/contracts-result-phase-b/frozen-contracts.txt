@@ -1,0 +1,17 @@
+Contract check passed: 9 schemas, 12/12 payload scenarios, 12/12 executable behavior scenarios, 12 transitions, 35 OpenAPI operations, 19 error codes. Relay automation cannot verify or close Bugs.
+Breaking-change check passed: 24 frozen contract and semantic files match version 1.0.0.
+App-first contract check passed: 9 frozen base schemas + 1 versioned schema, 51 payload scenarios, 12 inherited + 133 new behavior scenarios, 35 base + 19 new OpenAPI operations, 26 error codes.
+Additive compatibility passed: all 35 version 1.0.0 operations are byte-shape equivalent after declared media/security/parameter overlays; 19 operations are new in 1.1.0.
+Breaking-change check passed: 13 versioned files match contract 1.1.0; base 1.0.0 remains separate.
+npm notice run @relay-qa-hub/root@0.1.0-debug test:contract
+npm notice run npm run check:contracts && npm run check:contract-breaking && npm run check:contracts:app-first && npm run check:contract-additive && npm run check:contract-breaking:app-first
+npm notice run @relay-qa-hub/root@0.1.0-debug check:contracts
+npm notice run node packages/contracts/scripts/validate-contracts.mjs
+npm notice run @relay-qa-hub/root@0.1.0-debug check:contract-breaking
+npm notice run node packages/contracts/scripts/check-breaking.mjs
+npm notice run @relay-qa-hub/root@0.1.0-debug check:contracts:app-first
+npm notice run node packages/contracts/versions/1.1.0/scripts/validate-contracts.mjs
+npm notice run @relay-qa-hub/root@0.1.0-debug check:contract-additive
+npm notice run node packages/contracts/versions/1.1.0/scripts/check-additive.mjs
+npm notice run @relay-qa-hub/root@0.1.0-debug check:contract-breaking:app-first
+npm notice run node packages/contracts/versions/1.1.0/scripts/check-breaking.mjs

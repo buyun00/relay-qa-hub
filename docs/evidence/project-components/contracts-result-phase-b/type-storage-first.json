@@ -1,0 +1,15 @@
+{
+  "startedAt": "2026-09-09T03:13:12.612Z",
+  "finishedAt": "2026-09-09T03:13:14.779Z",
+  "command": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "-p",
+    "packages/storage/tsconfig.test.json"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\type-storage-first.txt",
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

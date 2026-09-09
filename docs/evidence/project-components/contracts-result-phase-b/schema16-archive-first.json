@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-09-09T03:14:46.141Z",
+  "finishedAt": "2026-09-09T03:14:46.309Z",
+  "command": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    ".tools/migrate-result-schema16.mjs"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\schema16-archive-first.txt",
+  "sha256": "2787a489afb8fd63089619a7d3a7edc6b210c0fd60b0fdceee3479bb8ec2adbf"
+}

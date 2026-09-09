@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-09-09T03:11:55.043Z",
+  "finishedAt": "2026-09-09T03:11:55.898Z",
+  "command": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "node_modules/eslint/bin/eslint.js",
+    "apps/api/test/verification-result-phase-b.test.mjs"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\lint-first.txt",
+  "sha256": "f8c7ac43a32b00f4ff5f73f375da74d86289fdbb17b6140674e8779d947d9904"
+}

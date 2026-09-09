@@ -1,0 +1,12 @@
+file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/.tools/migrate-result-schema16.mjs:41
+  const active=db.prepare("SELECT 1 FROM project_memberships WHERE account_id=? AND project_id=? AND user_id=? AND status='active'").get(row.account_id,row.project_id,row.actor_id);
+                  ^
+
+Error: no such table: project_memberships
+    at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/.tools/migrate-result-schema16.mjs:41:19 {
+  code: 'ERR_SQLITE_ERROR',
+  errcode: 1,
+  errstr: 'SQL logic error'
+}
+
+Node.js v24.19.0

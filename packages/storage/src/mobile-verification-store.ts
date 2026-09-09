@@ -73,8 +73,9 @@ interface RecordMobileVerificationResultBase extends MobileRelayScope {
 
 export type RecordMobileVerificationResultInput = RecordMobileVerificationResultBase &
   (
-    | { readonly status: "passed"; readonly failureReason: null }
-    | { readonly status: "failed"; readonly failureReason: string }
+    | { readonly status: "passed"; readonly failureReason: null; readonly blockedReason?: never }
+    | { readonly status: "failed"; readonly failureReason: string; readonly blockedReason?: never }
+    | { readonly status: "blocked"; readonly failureReason: null; readonly blockedReason: string }
   );
 
 export interface MobileVerificationResultResponse {
@@ -201,7 +202,7 @@ function requireDigest(value: string): void {
 }
 
 function requireText(value: string, field: string, maximum: number): void {
-  if (value.trim().length === 0 || value.length > maximum) {
+  if (typeof value !== "string" || value.trim().length === 0 || value.length > maximum) {
     throw new MobileRelayStorageError("INVALID_REQUEST", `${field} is invalid`);
   }
 }
@@ -952,6 +953,15 @@ export function recordMobileVerificationResult(
   requireText(input.resultSummary, "resultSummary", 10_000);
   if (input.status === "failed") {
     requireText(input.failureReason, "failureReason", 5_000);
+  } else if (input.status === "blocked") {
+    requireText(input.blockedReason, "blockedReason", 5_000);
+  }
+  if (
+    !["passed", "failed", "blocked"].includes(input.status) ||
+    (input.status !== "failed" && input.failureReason !== null) ||
+    (input.status !== "blocked" && input.blockedReason !== undefined)
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "Result reasons must match its status");
   }
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
@@ -1072,7 +1082,13 @@ export function recordMobileVerificationResult(
   const at = nextTimestamp(input.createdAt, current.updated_at);
   claimVerificationAttachments(database, input, bug.id);
   const eventId = randomUUID();
-  const nextBugState = input.status === "passed" ? "closed" : "ready";
+  const nextBugState =
+    input.status === "passed"
+      ? "closed"
+      : input.status === "failed"
+        ? "ready"
+        : "ready_for_verification";
+  const reason = input.status === "failed" ? input.failureReason : input.blockedReason;
   insertVerificationEvent(database, input, {
     id: eventId,
     bugId: bug.id,
@@ -1085,8 +1101,8 @@ export function recordMobileVerificationResult(
     toState: nextBugState,
     payload: {
       status: input.status,
-      summary: resultAuditText(input.resultSummary, input.status === "failed" ? 1_500 : 2_000),
-      ...(input.status === "failed" ? { reason: resultAuditText(input.failureReason, 1_500) } : {}),
+      summary: resultAuditText(input.resultSummary, reason === undefined ? 2_000 : 1_500),
+      ...(reason === undefined ? {} : { reason: resultAuditText(reason, 1_500) }),
       verificationId: current.id,
       repairAttemptId: current.repair_attempt_id,
       ...(current.build_id === null ? {} : { buildId: current.build_id }),
@@ -1106,7 +1122,7 @@ export function recordMobileVerificationResult(
   const updatedVerification = database
     .prepare(
       `UPDATE verifications
-       SET status = ?, result_summary = ?, failure_reason = ?, blocked_reason = NULL,
+       SET status = ?, result_summary = ?, failure_reason = ?, blocked_reason = ?,
            updated_at = ?, version = version + 1
        WHERE account_id = ? AND project_id = ? AND id = ?
          AND status = 'in_progress' AND version = ?`,
@@ -1115,6 +1131,7 @@ export function recordMobileVerificationResult(
       input.status,
       input.resultSummary,
       input.failureReason,
+      input.blockedReason ?? null,
       at,
       input.accountId,
       input.projectId,
@@ -1165,16 +1182,26 @@ export function recordMobileVerificationResult(
             attempt.id,
             current.id,
           )
-      : database
-          .prepare(
-            `UPDATE bugs
+      : input.status === "blocked"
+        ? database
+            .prepare(
+              `UPDATE bugs
+               SET active_verification_id = NULL, updated_at = ?, version = version + 1
+               WHERE account_id = ? AND project_id = ? AND id = ?
+                 AND state = 'ready_for_verification' AND version = ?
+                 AND active_repair_attempt_id = ? AND active_verification_id = ?`,
+            )
+            .run(at, input.accountId, input.projectId, bug.id, bug.version, attempt.id, current.id)
+        : database
+            .prepare(
+              `UPDATE bugs
              SET state = 'ready', active_repair_attempt_id = NULL,
                  active_verification_id = NULL, updated_at = ?, version = version + 1
              WHERE account_id = ? AND project_id = ? AND id = ?
                AND state = 'ready_for_verification' AND version = ?
                AND active_repair_attempt_id = ? AND active_verification_id = ?`,
-          )
-          .run(at, input.accountId, input.projectId, bug.id, bug.version, attempt.id, current.id);
+            )
+            .run(at, input.accountId, input.projectId, bug.id, bug.version, attempt.id, current.id);
   if (updatedBug.changes !== 1) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",

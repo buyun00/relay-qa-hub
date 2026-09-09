@@ -1,0 +1,1 @@
+{"status":"passed_scoped_schema15_to16_archive","checks":11,"tables":70,"snapshots":7,"replayed":4,"root":"C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-result-schema16-odaHs6"}

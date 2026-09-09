@@ -38,13 +38,18 @@ interface MobileRecordVerificationResultBase {
   readonly captureBundleId?: string | null;
 }
 
+type VerificationResultFields =
+  | { readonly status: "passed" }
+  | { readonly status: "failed"; readonly failureReason: string }
+  | { readonly status: "blocked"; readonly blockedReason: string };
+
 export type MobileVendorVerificationResultRequest = MobileRecordVerificationResultBase &
-  ({ readonly status: "passed" } | { readonly status: "failed"; readonly failureReason: string });
+  VerificationResultFields;
 
 export type MobileLegacyVerificationResultRequest = {
   readonly expectedVersion: number;
   readonly resultSummary: string;
-} & ({ readonly status: "passed" } | { readonly status: "failed"; readonly failureReason: string });
+} & VerificationResultFields;
 
 export type MobileRecordVerificationResultRequest =
   MobileVendorVerificationResultRequest | MobileLegacyVerificationResultRequest;
@@ -152,6 +157,25 @@ export function parseMobileStartVerificationRequest(
   };
 }
 
+function resultFields(body: Record<string, unknown>): VerificationResultFields {
+  const status = body["status"];
+  const failureReason = body["failureReason"];
+  const blockedReason = body["blockedReason"];
+  if (status === "failed" && blockedReason === undefined)
+    return {
+      status,
+      failureReason: boundedString(failureReason, "failureReason", 1, 5_000),
+    };
+  if (status === "blocked" && failureReason === undefined)
+    return {
+      status,
+      blockedReason: boundedString(blockedReason, "blockedReason", 1, 5_000),
+    };
+  if (status === "passed" && failureReason === undefined && blockedReason === undefined)
+    return { status };
+  throw new TypeError("Result must be passed, failed or blocked with only its applicable reason");
+}
+
 export function parseMobileRecordVerificationResultRequest(
   value: unknown,
 ): MobileVendorVerificationResultRequest;
@@ -182,23 +206,15 @@ export function parseMobileRecordVerificationResultRequest(
   ];
   const isVendor = vendorFields.some((key) => Object.hasOwn(body, key));
   if (options?.allowLegacy && !isVendor && media === "application/json") {
-    onlyKeys(body, new Set(["expectedVersion", "status", "resultSummary", "failureReason"]));
+    onlyKeys(
+      body,
+      new Set(["expectedVersion", "status", "resultSummary", "failureReason", "blockedReason"]),
+    );
     const common = {
       expectedVersion: positiveInteger(body["expectedVersion"], "expectedVersion"),
       resultSummary: boundedString(body["resultSummary"], "resultSummary", 1, 10_000),
     };
-    if (body["status"] === "failed")
-      return {
-        ...common,
-        status: "failed",
-        failureReason: boundedString(body["failureReason"], "failureReason", 1, 5_000),
-      };
-    if (body["status"] !== "passed" || body["failureReason"] !== undefined) {
-      throw new TypeError(
-        "Legacy result must be passed or failed with the applicable failureReason",
-      );
-    }
-    return { ...common, status: "passed" };
+    return { ...common, ...resultFields(body) };
   }
   onlyKeys(
     body,
@@ -209,6 +225,7 @@ export function parseMobileRecordVerificationResultRequest(
       "status",
       "resultSummary",
       "failureReason",
+      "blockedReason",
       "attachmentIds",
       "captureBundleId",
     ]),
@@ -216,16 +233,7 @@ export function parseMobileRecordVerificationResultRequest(
   if (body["submissionContractVersion"] !== "1.1.0") {
     throw new TypeError("submissionContractVersion must be 1.1.0");
   }
-  if (body["status"] !== "passed" && body["status"] !== "failed") {
-    throw new TypeError("status must be passed or failed");
-  }
-  const status = body["status"];
-  const failureReason = body["failureReason"];
-  if (status === "failed") {
-    boundedString(failureReason, "failureReason", 1, 5_000);
-  } else if (failureReason !== undefined) {
-    throw new TypeError("passed result cannot include failureReason");
-  }
+  const result = resultFields(body);
   if (!Array.isArray(body["attachmentIds"]) || body["attachmentIds"].length > 20) {
     throw new TypeError("attachmentIds must contain at most twenty UUIDs");
   }
@@ -247,13 +255,7 @@ export function parseMobileRecordVerificationResultRequest(
     attachmentIds,
     ...(captureBundleId === undefined ? {} : { captureBundleId: captureBundleId as string | null }),
   } as const;
-  return status === "failed"
-    ? {
-        ...common,
-        status: "failed",
-        failureReason: failureReason as string,
-      }
-    : { ...common, status: "passed" };
+  return { ...common, ...result };
 }
 
 export type {

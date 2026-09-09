@@ -99,7 +99,14 @@ export function createSqliteMobileVerificationStore(
               status: "failed",
               failureReason: request.failureReason,
             }
-          : { ...common, status: "passed", failureReason: null };
+          : request.status === "blocked"
+            ? {
+                ...common,
+                status: "blocked",
+                failureReason: null,
+                blockedReason: request.blockedReason,
+              }
+            : { ...common, status: "passed", failureReason: null };
       return options.worker.recordMobileVerificationResult(input);
     },
   };

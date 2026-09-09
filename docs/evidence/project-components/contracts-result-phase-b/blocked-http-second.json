@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-09-09T03:13:08.369Z",
+  "finishedAt": "2026-09-09T03:13:12.131Z",
+  "command": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "--test",
+    "apps/api/test/verification-result-phase-b.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs\\evidence\\project-components\\contracts-result-phase-b\\blocked-http-second.txt",
+  "sha256": "32e9f30f1d8121254aff4b5b284b781da0c5e8bf24dbaa6d1040d102b9d43d74"
+}
