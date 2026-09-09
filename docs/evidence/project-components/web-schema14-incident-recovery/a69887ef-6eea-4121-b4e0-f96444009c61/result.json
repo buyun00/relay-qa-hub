@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "runId": "a69887ef-6eea-4121-b4e0-f96444009c61",
+  "status": "passed",
+  "result": "schema14_baseline_restored_candidate_retained_verified",
+  "preview": {
+    "webPort": 4274,
+    "webPid": 20284,
+    "apiPort": 4419,
+    "apiPid": 22852,
+    "apiStatus": "ready",
+    "apiSchemaVersion": "14",
+    "processIdentitiesUnchanged": true
+  },
+  "activeBundle": {
+    "javascript": "assets/index-Br-CEXQI.js",
+    "javascriptSha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+    "stylesheet": "assets/index-CgNw0fhl.css",
+    "stylesheetSha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef",
+    "indexSha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+  },
+  "retained": {
+    "candidateTreeSha256": "66dc6d536b2a0ee8090f74238cdc1f10a78000b38f7df504ccfa7e34152a077e",
+    "verifiedSchema14BaselineTreeSha256": "627aadb2d6ac087b80e7929eb3b1d31f3555d85babcd147c0bd074a508dfc2c0",
+    "servedMergedTreeSha256": "7d2713aba3f0a318222d98518d06794dfc14839f624ceb9aab14abb27ac29109"
+  },
+  "checks": {
+    "recoveryProof": { "passed": 21, "total": 21 },
+    "baselineLineage": { "passed": 9, "total": 9 },
+    "priorBrowserAcceptance": { "passed": 59, "total": 59, "rerun": false }
+  },
+  "artifacts": {
+    "prepareSha256": "4483ea5aa9834413bca7a56ef5ff21e13e931581986e4e7acd912dbdcc20a2f1",
+    "recoverySha256": "e2b113c6fafd85e7494e24ad3e9624e6c012ecb08bf7814092def50c3c2b26fd",
+    "independentReviewSha256": "25d26006db477899b18a8c3bfda04fe1efaf932459e8382ea42aaea80887f7ea",
+    "runnerSha256": "0335c786cf8772ed9a8c503b814870ac06a681c08f60f9453f1b951e0b16a519"
+  },
+  "boundaries": {
+    "productionReads": 0,
+    "productionWrites": 0,
+    "serviceOperations": 0,
+    "businessDataWrites": 0,
+    "filesDeleted": 0,
+    "builds": 0
+  },
+  "limitation": "The incident review reused byte-identical prior browser evidence and did not rerun browser UI acceptance."
+}

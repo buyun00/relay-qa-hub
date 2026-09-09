@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "runId": "a69887ef-6eea-4121-b4e0-f96444009c61",
+  "status": "schema14_baseline_restored_candidate_retained_verified",
+  "startedAt": "2026-09-09T07:38:42.311Z",
+  "runnerSha256": "0335c786cf8772ed9a8c503b814870ac06a681c08f60f9453f1b951e0b16a519",
+  "planSha256": "b95e882232ad409fc4af119d4d999708755a6ad915e8a42c3d65a92afe12f113",
+  "retainedLock": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\.web-schema14-incident-recovery-a69887ef-6eea-4121-b4e0-f96444009c61.lock",
+  "boundaries": {
+    "builds": 0,
+    "serviceOperations": 0,
+    "productionReads": 0,
+    "filesDeleted": 0,
+    "candidateSnapshotRetained": true,
+    "mutableServedFile": "index.html"
+  },
+  "requests": [
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "assets/index-BqKaPXcA.css",
+      "status": 200,
+      "bytes": 92947,
+      "sha256": "a913efbf949eca6d30ae10b24152175b828919a19c7e1c8a03f3445738b18ff0",
+      "contentLength": "92947",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.577Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "assets/index-BqKaPXcA.css",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "92947",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.581Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "assets/index-DBOCJTQk.js",
+      "status": 200,
+      "bytes": 484595,
+      "sha256": "cba100d721e611dc4698cb594e2f2b29d7ebbb63bfe0b0a34ebd605cb994b963",
+      "contentLength": "484595",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.587Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "assets/index-DBOCJTQk.js",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "484595",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.589Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "assets/index-DBOCJTQk.js.map",
+      "status": 200,
+      "bytes": 1854121,
+      "sha256": "1ad6c0ae6ba08da1c6a7f75ac118305bd5c306842fcc2d95b21f9fefd9cadcf9",
+      "contentLength": "1854121",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.598Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "assets/index-DBOCJTQk.js.map",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "1854121",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.601Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "icon-licenses.txt",
+      "status": 200,
+      "bytes": 4308,
+      "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df",
+      "contentLength": "4308",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.603Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "icon-licenses.txt",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "4308",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.606Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "icons/qa-hub-192.svg",
+      "status": 200,
+      "bytes": 506,
+      "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.610Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "icons/qa-hub-192.svg",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.611Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "icons/qa-hub-512.svg",
+      "status": 200,
+      "bytes": 506,
+      "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.617Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "icons/qa-hub-512.svg",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.621Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "icons/qa-hub-maskable-512.svg",
+      "status": 200,
+      "bytes": 495,
+      "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c",
+      "contentLength": "495",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.622Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "icons/qa-hub-maskable-512.svg",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "495",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.624Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "GET",
+      "path": "index.html",
+      "status": 200,
+      "bytes": 709,
+      "sha256": "fd4c17ac45cd033dd1c9bd3833da3f90553da0402bf23b367d31f41edb75433e",
+      "contentLength": "709",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.627Z"
+    },
+    {
+      "phase": "candidate_before_recovery",
+      "method": "HEAD",
+      "path": "index.html",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "709",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:43.628Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "assets/index-BqKaPXcA.css",
+      "status": 200,
+      "bytes": 92947,
+      "sha256": "a913efbf949eca6d30ae10b24152175b828919a19c7e1c8a03f3445738b18ff0",
+      "contentLength": "92947",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.972Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "assets/index-BqKaPXcA.css",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "92947",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.975Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "assets/index-Br-CEXQI.js",
+      "status": 200,
+      "bytes": 477433,
+      "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+      "contentLength": "477433",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.979Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "assets/index-Br-CEXQI.js",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "477433",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.980Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "assets/index-Br-CEXQI.js.map",
+      "status": 200,
+      "bytes": 1829769,
+      "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328",
+      "contentLength": "1829769",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.989Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "assets/index-Br-CEXQI.js.map",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "1829769",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.991Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "assets/index-CgNw0fhl.css",
+      "status": 200,
+      "bytes": 91623,
+      "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef",
+      "contentLength": "91623",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.992Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "assets/index-CgNw0fhl.css",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "91623",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:44.996Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "assets/index-DBOCJTQk.js",
+      "status": 200,
+      "bytes": 484595,
+      "sha256": "cba100d721e611dc4698cb594e2f2b29d7ebbb63bfe0b0a34ebd605cb994b963",
+      "contentLength": "484595",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.000Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "assets/index-DBOCJTQk.js",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "484595",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.002Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "assets/index-DBOCJTQk.js.map",
+      "status": 200,
+      "bytes": 1854121,
+      "sha256": "1ad6c0ae6ba08da1c6a7f75ac118305bd5c306842fcc2d95b21f9fefd9cadcf9",
+      "contentLength": "1854121",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.010Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "assets/index-DBOCJTQk.js.map",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "1854121",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.012Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "icon-licenses.txt",
+      "status": 200,
+      "bytes": 4308,
+      "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df",
+      "contentLength": "4308",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.015Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "icon-licenses.txt",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "4308",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.017Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "icons/qa-hub-192.svg",
+      "status": 200,
+      "bytes": 506,
+      "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.021Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "icons/qa-hub-192.svg",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.022Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "icons/qa-hub-512.svg",
+      "status": 200,
+      "bytes": 506,
+      "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.024Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "icons/qa-hub-512.svg",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "506",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.025Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "icons/qa-hub-maskable-512.svg",
+      "status": 200,
+      "bytes": 495,
+      "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c",
+      "contentLength": "495",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.028Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "icons/qa-hub-maskable-512.svg",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "495",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.029Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "GET",
+      "path": "index.html",
+      "status": 200,
+      "bytes": 709,
+      "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367",
+      "contentLength": "709",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.032Z"
+    },
+    {
+      "phase": "schema14_baseline_after_recovery",
+      "method": "HEAD",
+      "path": "index.html",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "contentLength": "709",
+      "instance": "qa-hub-preview-7c86",
+      "observedAt": "2026-09-09T07:38:45.033Z"
+    }
+  ],
+  "webBefore": {
+    "pid": 20284,
+    "createdAt": "2026-09-08T17:52:36.5080910Z",
+    "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "commandLineSha256": "b25fc9673b6f1eb3c8c1b1dbe8847b32870785b99437d1df360ffa745dbca7cf",
+    "receipt": {
+      "bytes": 816,
+      "sha256": "412f4e1ac6388f3ea6b76885b180818ee6b6e1a124fac7396c0f40647166230a"
+    },
+    "port": 4274
+  },
+  "apiBefore": {
+    "status": 200,
+    "body": {
+      "status": "ready",
+      "schemaVersion": "14",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    }
+  },
+  "indexSwitched": true,
+  "apiAfter": {
+    "status": 200,
+    "body": {
+      "status": "ready",
+      "schemaVersion": "14",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    }
+  },
+  "webAfter": {
+    "pid": 20284,
+    "createdAt": "2026-09-08T17:52:36.5080910Z",
+    "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "commandLineSha256": "b25fc9673b6f1eb3c8c1b1dbe8847b32870785b99437d1df360ffa745dbca7cf",
+    "receipt": {
+      "bytes": 816,
+      "sha256": "412f4e1ac6388f3ea6b76885b180818ee6b6e1a124fac7396c0f40647166230a"
+    },
+    "port": 4274
+  },
+  "servedAfter": {
+    "exists": true,
+    "count": 11,
+    "bytes": 4837012,
+    "files": [
+      {
+        "path": "assets/index-BqKaPXcA.css",
+        "bytes": 92947,
+        "sha256": "a913efbf949eca6d30ae10b24152175b828919a19c7e1c8a03f3445738b18ff0"
+      },
+      {
+        "path": "assets/index-Br-CEXQI.js",
+        "bytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      {
+        "path": "assets/index-Br-CEXQI.js.map",
+        "bytes": 1829769,
+        "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328"
+      },
+      {
+        "path": "assets/index-CgNw0fhl.css",
+        "bytes": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      },
+      {
+        "path": "assets/index-DBOCJTQk.js",
+        "bytes": 484595,
+        "sha256": "cba100d721e611dc4698cb594e2f2b29d7ebbb63bfe0b0a34ebd605cb994b963"
+      },
+      {
+        "path": "assets/index-DBOCJTQk.js.map",
+        "bytes": 1854121,
+        "sha256": "1ad6c0ae6ba08da1c6a7f75ac118305bd5c306842fcc2d95b21f9fefd9cadcf9"
+      },
+      {
+        "path": "icon-licenses.txt",
+        "bytes": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      },
+      {
+        "path": "icons/qa-hub-192.svg",
+        "bytes": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      },
+      {
+        "path": "icons/qa-hub-512.svg",
+        "bytes": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      },
+      {
+        "path": "icons/qa-hub-maskable-512.svg",
+        "bytes": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      },
+      {
+        "path": "index.html",
+        "bytes": 709,
+        "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+      }
+    ],
+    "sha256": "7d2713aba3f0a318222d98518d06794dfc14839f624ceb9aab14abb27ac29109"
+  },
+  "completedAt": "2026-09-09T07:38:46.250Z"
+}

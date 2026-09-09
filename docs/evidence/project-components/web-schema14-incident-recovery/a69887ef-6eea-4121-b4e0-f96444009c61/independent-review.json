@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "runId": "a69887ef-6eea-4121-b4e0-f96444009c61",
+  "status": "passed",
+  "reviewedAt": "2026-09-09T07:47:14.8482928Z",
+  "reviewer": "independent_readonly_post_recovery",
+  "result": {
+    "recoveryProofChecks": {
+      "passed": 21,
+      "total": 21
+    },
+    "baselineLineageChecks": {
+      "passed": 9,
+      "total": 9
+    },
+    "aggregate": {
+      "passed": 30,
+      "total": 30
+    },
+    "discrepancies": []
+  },
+  "liveObservation": {
+    "web": {
+      "address": "127.0.0.1",
+      "port": 4274,
+      "pid": 20284,
+      "createdAt": "2026-09-08T17:52:36.5080910Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLineSha256": "b25fc9673b6f1eb3c8c1b1dbe8847b32870785b99437d1df360ffa745dbca7cf",
+      "receiptSha256": "412f4e1ac6388f3ea6b76885b180818ee6b6e1a124fac7396c0f40647166230a",
+      "soleListenerOwner": true,
+      "receiptIdentityMatched": true
+    },
+    "api": {
+      "address": "127.0.0.1",
+      "port": 4419,
+      "pid": 22852,
+      "createdAt": "2026-09-09T01:22:20.2728640Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLineSha256": "5ba38faaf25e0214057ba864f5483cbc06ee09951044980a457c53a81119e6e6",
+      "receiptSha256": "6521627ced1f373a099478103b0fdd2f7ea95a5995ced5d157bcdad03a4f0620",
+      "soleListenerOwner": true,
+      "receiptIdentityMatched": true,
+      "readiness": {
+        "directStatus": 200,
+        "proxiedStatus": 200,
+        "bodyBytes": 150,
+        "bodySha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911",
+        "status": "ready",
+        "schemaVersion": "14",
+        "checks": [
+          "database:ok",
+          "evidence:ok",
+          "worker:ok"
+        ]
+      }
+    },
+    "http": {
+      "method": "GET",
+      "staticRequests": 12,
+      "readinessRequests": 3,
+      "allStatuses200": true,
+      "allStaticInstanceHeadersMatched": true,
+      "allStaticCachePoliciesNoStore": true,
+      "allStaticLengthsAndHashesMatched": true
+    }
+  },
+  "servedTree": {
+    "path": "apps/web/dist",
+    "count": 11,
+    "bytes": 4837012,
+    "repositoryCanonicalSha256": "7d2713aba3f0a318222d98518d06794dfc14839f624ceb9aab14abb27ac29109",
+    "independentLineManifestSha256": "42ee997e4eebc63ff3c08d967cda8b3d169cc8007b031547e27ef0d2b1c5651a",
+    "indexSelects": {
+      "javascript": "assets/index-Br-CEXQI.js",
+      "stylesheet": "assets/index-CgNw0fhl.css"
+    },
+    "files": [
+      {
+        "path": "assets/index-BqKaPXcA.css",
+        "bytes": 92947,
+        "sha256": "a913efbf949eca6d30ae10b24152175b828919a19c7e1c8a03f3445738b18ff0",
+        "selectedByIndex": false,
+        "retainedCandidateAsset": true
+      },
+      {
+        "path": "assets/index-Br-CEXQI.js",
+        "bytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+        "selectedByIndex": true,
+        "retainedCandidateAsset": false
+      },
+      {
+        "path": "assets/index-Br-CEXQI.js.map",
+        "bytes": 1829769,
+        "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328",
+        "selectedByIndex": false,
+        "retainedCandidateAsset": false
+      },
+      {
+        "path": "assets/index-CgNw0fhl.css",
+        "bytes": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef",
+        "selectedByIndex": true,
+        "retainedCandidateAsset": false
+      },
+      {
+        "path": "assets/index-DBOCJTQk.js",
+        "bytes": 484595,
+        "sha256": "cba100d721e611dc4698cb594e2f2b29d7ebbb63bfe0b0a34ebd605cb994b963",
+        "selectedByIndex": false,
+        "retainedCandidateAsset": true
+      },
+      {
+        "path": "assets/index-DBOCJTQk.js.map",
+        "bytes": 1854121,
+        "sha256": "1ad6c0ae6ba08da1c6a7f75ac118305bd5c306842fcc2d95b21f9fefd9cadcf9",
+        "selectedByIndex": false,
+        "retainedCandidateAsset": true
+      },
+      {
+        "path": "icon-licenses.txt",
+        "bytes": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df",
+        "selectedByIndex": false,
+        "retainedCandidateAsset": true
+      },
+      {
+        "path": "icons/qa-hub-192.svg",
+        "bytes": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601",
+        "selectedByIndex": true,
+        "retainedCandidateAsset": true
+      },
+      {
+        "path": "icons/qa-hub-512.svg",
+        "bytes": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf",
+        "selectedByIndex": false,
+        "retainedCandidateAsset": true
+      },
+      {
+        "path": "icons/qa-hub-maskable-512.svg",
+        "bytes": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c",
+        "selectedByIndex": false,
+        "retainedCandidateAsset": true
+      },
+      {
+        "path": "index.html",
+        "bytes": 709,
+        "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367",
+        "selectedByIndex": true,
+        "retainedCandidateAsset": false
+      }
+    ]
+  },
+  "retainedSnapshots": {
+    "candidateBeforeRecovery": {
+      "path": "runtime:acceptance/web-schema14-incident-recovery-a69887ef-6eea-4121-b4e0-f96444009c61/candidate-dist-before-recovery",
+      "count": 8,
+      "bytes": 2438187,
+      "repositoryCanonicalSha256": "66dc6d536b2a0ee8090f74238cdc1f10a78000b38f7df504ccfa7e34152a077e",
+      "independentLineManifestSha256": "b17c1d50b7506a90b1195b153c2c08f32176134a4c8a821e134f8ffa55e5d4fc",
+      "indexSha256": "fd4c17ac45cd033dd1c9bd3833da3f90553da0402bf23b367d31f41edb75433e",
+      "javascriptSha256": "cba100d721e611dc4698cb594e2f2b29d7ebbb63bfe0b0a34ebd605cb994b963",
+      "javascriptMapSha256": "1ad6c0ae6ba08da1c6a7f75ac118305bd5c306842fcc2d95b21f9fefd9cadcf9",
+      "stylesheetSha256": "a913efbf949eca6d30ae10b24152175b828919a19c7e1c8a03f3445738b18ff0"
+    },
+    "verifiedSchema14Baseline": {
+      "path": "runtime:acceptance/web-schema14-incident-recovery-a69887ef-6eea-4121-b4e0-f96444009c61/verified-schema14-baseline",
+      "count": 8,
+      "bytes": 2405349,
+      "repositoryCanonicalSha256": "627aadb2d6ac087b80e7929eb3b1d31f3555d85babcd147c0bd074a508dfc2c0",
+      "independentLineManifestSha256": "0bbacf1491c725a87523f42f2812316718ad9fa9d0e90a40e44882638b156993",
+      "indexSha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367",
+      "javascriptSha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+      "javascriptMapSha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328",
+      "stylesheetSha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+    }
+  },
+  "proofChain": {
+    "plan": {
+      "path": "runtime:acceptance/web-schema14-incident-recovery-a69887ef-6eea-4121-b4e0-f96444009c61/plan.json",
+      "bytes": 13558,
+      "sha256": "b95e882232ad409fc4af119d4d999708755a6ad915e8a42c3d65a92afe12f113"
+    },
+    "runner": {
+      "bytes": 16458,
+      "sha256": "0335c786cf8772ed9a8c503b814870ac06a681c08f60f9453f1b951e0b16a519",
+      "sourcePrivateAndPublicCopiesMatched": true
+    },
+    "prepare": {
+      "path": "prepare.json",
+      "bytes": 13676,
+      "sha256": "4483ea5aa9834413bca7a56ef5ff21e13e931581986e4e7acd912dbdcc20a2f1"
+    },
+    "recovery": {
+      "path": "recovery.json",
+      "bytes": 18499,
+      "sha256": "e2b113c6fafd85e7494e24ad3e9624e6c012ecb08bf7814092def50c3c2b26fd",
+      "status": "schema14_baseline_restored_candidate_retained_verified",
+      "recordedRequests": 38,
+      "candidateBeforeRequests": 16,
+      "postRecoveryRequests": 22
+    },
+    "oneShotLock": {
+      "path": "runtime:acceptance/.web-schema14-incident-recovery-a69887ef-6eea-4121-b4e0-f96444009c61.lock",
+      "bytes": 288,
+      "sha256": "aad654dc6b8e72aee9a7365632d0cc63057efe0a28889121147791b8b3a2e4d3",
+      "runPlanAndRunnerMatched": true
+    }
+  },
+  "baselineLineage": {
+    "identicalTreeCopies": [
+      "runtime:packages/20260909T011704801Z/stage/web",
+      "runtime:acceptance/exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf/web-dist",
+      "runtime:acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/candidate-web-dist",
+      "runtime:acceptance/web-schema14-incident-recovery-a69887ef-6eea-4121-b4e0-f96444009c61/verified-schema14-baseline"
+    ],
+    "packageBuildResult": {
+      "path": "docs/evidence/project-components/exe-preview9-package-only/build-result.json",
+      "sha256": "d7804189e974ee3dad2fa3864a9d60220ef54cfa7a977959220197e7db809fe0",
+      "status": "packaged_verified_not_published",
+      "inventoryMatched": true
+    },
+    "originalPublication": {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
+      "sha256": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63",
+      "status": "published_verified",
+      "inventoryMatched": true
+    },
+    "originalBrowserGate": {
+      "path": "runtime:acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/browser-gate.json",
+      "sha256": "93cf0483a13b02ab8ed31f3799e61f69f2c76368ec51280a6c1388f48159c56c",
+      "status": "reviewed_published_Br-CEXQI",
+      "bundleSha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+    },
+    "originalBrowserProof": {
+      "path": "docs/evidence/project-components/web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "sha256": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
+      "status": "passed",
+      "checksPassed": 59,
+      "checksTotal": 59
+    },
+    "distinctPreBrColdRestore": {
+      "path": "runtime:acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/old-web-dist-cold-restore",
+      "indexJavascript": "assets/index-Ce9wROrH.js",
+      "indexSha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5",
+      "usedForThisRecovery": false
+    }
+  },
+  "checks": {
+    "recoveryProof": {
+      "passed": 21,
+      "total": 21,
+      "items": [
+        { "id": "run_ids", "passed": true, "detail": "Private plan and both public records use the requested recovery run ID." },
+        { "id": "statuses", "passed": true, "detail": "Preparation and terminal recovery statuses are exact." },
+        { "id": "plan_hash_chain", "passed": true, "detail": "Public prepare and recovery records bind plan SHA b95e882232ad409fc4af119d4d999708755a6ad915e8a42c3d65a92afe12f113." },
+        { "id": "runner_three_way", "passed": true, "detail": "Source, private, and public runner copies match SHA 0335c786cf8772ed9a8c503b814870ac06a681c08f60f9453f1b951e0b16a519." },
+        { "id": "prepare_is_exact_plan_plus_hash", "passed": true, "detail": "Removing the appended plan fact from prepare.json yields the exact private plan record." },
+        { "id": "candidate_retention", "passed": true, "detail": "The retained eight-file candidate snapshot matches the prepared preimage." },
+        { "id": "baseline_retention", "passed": true, "detail": "The retained eight-file schema-14 baseline matches the prepared baseline." },
+        { "id": "baseline_source_unchanged", "passed": true, "detail": "The package-stage baseline still matches the approved plan." },
+        { "id": "served_matches_recovery", "passed": true, "detail": "Current apps/web/dist exactly matches recovery.json servedAfter." },
+        { "id": "served_exact_merged_inventory", "passed": true, "detail": "The served tree is exactly the candidate and baseline union with the baseline index selected." },
+        { "id": "candidate_assets_retained_in_served", "passed": true, "detail": "All seven non-index candidate files remain byte-identical in the served tree." },
+        { "id": "baseline_active_index", "passed": true, "detail": "The active index is the retained Br-CEXQI baseline index." },
+        { "id": "process_receipt_chain", "passed": true, "detail": "Recorded Web before/after identities match the plan and the current process receipt." },
+        { "id": "api_chain", "passed": true, "detail": "API before/after and current readiness all report ready schema 14." },
+        { "id": "mutation_boundaries", "passed": true, "detail": "The recovery records zero builds, service operations, production reads, and deleted files; only served index.html was mutable." },
+        { "id": "request_count", "passed": true, "detail": "The recovery ledger contains exactly 38 requests." },
+        { "id": "candidate_http_ledger", "passed": true, "detail": "All 16 candidate-preimage GET and HEAD records match the retained files and headers." },
+        { "id": "recovered_http_ledger", "passed": true, "detail": "All 22 post-recovery GET and HEAD records match the merged files and headers." },
+        { "id": "request_chronology", "passed": true, "detail": "All recovery request timestamps are ordered within the recorded run interval." },
+        { "id": "one_shot_lock", "passed": true, "detail": "The retained lock binds the exact run, runner, and plan." },
+        { "id": "public_proof_hashes", "passed": true, "detail": "Prepare and recovery proof files match their independently computed hashes." }
+      ]
+    },
+    "baselineLineage": {
+      "passed": 9,
+      "total": 9,
+      "items": [
+        { "id": "four_baseline_trees_identical", "passed": true, "detail": "Package stage, package-only retention, original publication candidate, and recovery baseline are identical." },
+        { "id": "package_build_inventory_matches", "passed": true, "detail": "The retained baseline matches the frozen package build-result inventory." },
+        { "id": "original_deploy_published", "passed": true, "detail": "The original Br-CEXQI deploy is recorded as published_verified with indexSwitched true." },
+        { "id": "original_deploy_new_files_match", "passed": true, "detail": "Every baseline file matches a successful original deployment GET hash." },
+        { "id": "original_deploy_proof_hash_matches_gate", "passed": true, "detail": "The browser gate binds the exact original deployment proof hash." },
+        { "id": "browser_gate_bundle_matches", "passed": true, "detail": "The gate names the restored Br-CEXQI bundle and exact JavaScript hash." },
+        { "id": "browser_gate_hash", "passed": true, "detail": "The retained browser gate matches SHA 93cf0483a13b02ab8ed31f3799e61f69f2c76368ec51280a6c1388f48159c56c." },
+        { "id": "expected_baseline_tree", "passed": true, "detail": "The baseline has exactly eight files, 2,405,349 bytes, and canonical SHA 627aadb2d6ac087b80e7929eb3b1d31f3555d85babcd147c0bd074a508dfc2c0." },
+        { "id": "old_cold_restore_is_distinct", "passed": true, "detail": "The old-web-dist-cold-restore snapshot is the earlier Ce9wROrH tree and was not used for this recovery." }
+      ]
+    }
+  },
+  "method": {
+    "filesystem": "Enumerated and SHA-256 hashed the current served tree, both recovery snapshots, the package-stage baseline, two earlier retained baseline copies, the runner copies, process receipts, lock, and public proof files.",
+    "http": "Issued 12 read-only static GETs plus three readiness GETs. Compared status, byte length, SHA-256, instance header, and static cache policy where applicable.",
+    "processes": "Queried Web and API process identity and listener ownership twice and compared PID, UTC creation time, executable, command-line SHA-256, and receipt SHA-256.",
+    "proof": "Parsed the private plan and public prepare/recovery JSON, recomputed their hash chain, replayed the two request-ledger mappings, and compared the baseline to the original package, publication, and browser gate evidence.",
+    "credentialScan": "Compared three private runtime values in memory against the three public recovery files and ran bounded credential-pattern checks; no values were emitted or persisted."
+  },
+  "boundaries": {
+    "servedWrites": 0,
+    "runtimeWrites": 0,
+    "productionReads": 0,
+    "productionWrites": 0,
+    "serviceOperations": 0,
+    "builds": 0,
+    "browserOrUiOperations": 0,
+    "authenticatedWorkflowRequests": 0,
+    "deviceOperations": 0,
+    "filesDeleted": 0,
+    "productSourceFilesModified": 0,
+    "evidenceFilesCreated": 1,
+    "publicFilesCredentialScanned": 3,
+    "privateValuesComparedInMemory": 3,
+    "exactPrivateValueMatches": 0,
+    "credentialPatternMatches": 0
+  },
+  "limitations": [
+    "This independent review did not rerun browser UI acceptance; it proves that the restored bytes are identical to the previously recorded 59/59 browser-tested Br-CEXQI bundle.",
+    "This review did not exercise authenticated Bug workflows or make business-data writes.",
+    "This review did not restart a service, perform another rollback, delete an asset, or query production.",
+    "The retained DBOCJTQk and BqKaPXcA files remain directly readable at 4274, but the restored index does not select them."
+  ]
+}
