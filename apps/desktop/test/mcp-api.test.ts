@@ -321,6 +321,56 @@ test("shared GM login rejects conflicting projects before changing its session",
   assert.equal(api.calls.length, 1);
 });
 
+test("shared desktop MCP discovers and forwards terminal RepairAttempt tools unchanged", async () => {
+  const api = new ScriptedApi();
+  const definitions = [
+    {
+      name: "qa_fail_repair_attempt",
+      inputSchema: { type: "object", additionalProperties: false },
+    },
+    {
+      name: "qa_supersede_repair_attempt",
+      inputSchema: { type: "object", additionalProperties: false },
+    },
+  ];
+  api.queue("GET", "/api/v1/mcp/tools", { tools: definitions });
+  api.queue(
+    "POST",
+    "/api/v1/mcp/call",
+    { attempt: { id: ATTEMPT_ID, status: "failed" } },
+    { supersededAttempt: { id: ATTEMPT_ID, status: "superseded" } },
+  );
+  const tools = new QaHubMcpTools(api, tmpdir(), { sharedApi: true });
+  await tools.refreshDefinitions();
+  assert.deepEqual(tools.definitions, definitions);
+  const failArguments = {
+    projectId: PROJECT_ID,
+    attemptId: ATTEMPT_ID,
+    expectedVersion: 2,
+    reason: "Terminal failure",
+  };
+  const supersedeArguments = {
+    ...failArguments,
+    reason: "Replace the terminal attempt",
+    successor: { id: BUG_ID, mode: "human", assigneeId: USER_ID },
+  };
+  await tools.call("qa_fail_repair_attempt", failArguments);
+  await tools.call("qa_supersede_repair_attempt", supersedeArguments);
+  assert.deepEqual(
+    api.calls.slice(1).map(({ pathname, request }) => ({ pathname, body: request.body })),
+    [
+      {
+        pathname: "/api/v1/mcp/call",
+        body: { name: "qa_fail_repair_attempt", arguments: failArguments },
+      },
+      {
+        pathname: "/api/v1/mcp/call",
+        body: { name: "qa_supersede_repair_attempt", arguments: supersedeArguments },
+      },
+    ],
+  );
+});
+
 function captureDownloadFixture(kind = "poco_snapshot", mediaType = "application/json") {
   const bytes = Buffer.from('{"data":{"recentLogs":[{"message":"captured error"}]}}');
   const sha256 = createHash("sha256").update(bytes).digest("hex");

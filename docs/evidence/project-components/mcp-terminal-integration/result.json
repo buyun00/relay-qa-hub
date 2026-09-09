@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-09-09T14:42:11.0010669+08:00",
+  "baseCommit": "a7e2927f61e896e5e8fbc0161313473adb6f4dad",
+  "scope": "server and desktop-shared MCP catalog/adapters only",
+  "catalog": {
+    "totalTools": 94,
+    "addedTools": [
+      "qa_fail_repair_attempt",
+      "qa_supersede_repair_attempt"
+    ],
+    "serverJsonRpcAndHttpCatalogEqual": true,
+    "desktopSharedCatalogForwardingVerified": true
+  },
+  "terminalContract": {
+    "requestMediaType": "application/vnd.relay-qa-hub.v1.1+json",
+    "failRequired": [
+      "projectId",
+      "attemptId",
+      "expectedVersion",
+      "reason"
+    ],
+    "supersedeRequired": [
+      "projectId",
+      "attemptId",
+      "expectedVersion",
+      "reason",
+      "successor"
+    ],
+    "successorRequired": [
+      "id",
+      "mode",
+      "assigneeId"
+    ],
+    "canonicalKeyTemplate": "workflow:{operation}:attempt:{attemptId}:v{expectedVersion}",
+    "rejectsMismatchedExplicitKey": true,
+    "rejectsUnknownRootAndSuccessorFieldsBeforeDispatch": true
+  },
+  "verificationRegression": {
+    "tool": "qa_record_verification_result",
+    "sourceChanged": false,
+    "maximumAttachmentIds": 20,
+    "captureBundleIdSupported": true,
+    "twentyAttachmentsPlusCaptureForwarded": true,
+    "canonicalKeyPreserved": true
+  },
+  "checks": [
+    {
+      "command": "node --test apps/api/test/automation-terminal-repair-attempt.test.mjs",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "command": "node --test apps/api/test/automation-protocol.test.mjs",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0
+    },
+    {
+      "command": "node --test apps/api/test/automation-verification-result.test.mjs",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "command": "node --import tsx --test apps/api/test/automation-workflow-projection.test.ts",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "command": "node --import tsx --test apps/desktop/test/mcp-api.test.ts",
+      "exitCode": 0,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "command": "tsc isolated apps/api/src/automation.ts apps/api/src/automation-routes.ts --noEmit",
+      "exitCode": 0
+    },
+    {
+      "command": "tsc -p apps/desktop/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "command": "eslint <changed MCP API and desktop files>",
+      "exitCode": 0
+    },
+    {
+      "command": "prettier --check <changed MCP API and desktop files>",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check -- <changed MCP API and desktop files>",
+      "exitCode": 0
+    }
+  ],
+  "sourceSha256": {
+    "apps/api/src/automation.ts": "3a38acec0c4cc243e5c4bcf4118d8f4ea3f10ac54d97ddb198f63277e76e9776",
+    "apps/api/src/automation-routes.ts": "f58995ecd509d865fed6a9374c5ea35694aa403fc7191c13b25f22195adedc45",
+    "apps/api/test/automation-terminal-repair-attempt.test.mjs": "800da3ef89a6a1573aa4f3c020566ba624621333781d4ac0a15d0adfe5dc6949",
+    "apps/api/test/automation-protocol.test.mjs": "90eb332b50f1156e5d7746ccc6380d107ce606aadc2488264d017e55087ba730",
+    "apps/api/test/automation-verification-result.test.mjs": "6adf5d6be48dcf98fe9123da25e60782d9cc54427bc1c189e58d7aacf74288eb",
+    "apps/api/test/automation-workflow-projection.test.ts": "c0bebd9ece4c74ce436a6251a9bdbc4ab025b11dcc12393be3fe219b3138d180",
+    "apps/desktop/test/mcp-api.test.ts": "3736bf369d4a221c10c3a15d0f0e9d418d32a9ef134805167dee11c318c82c34"
+  },
+  "integrationAssumptions": [
+    "The application registers the committed terminal RepairAttempt routes and SQLite store before MCP calls reach them.",
+    "The terminal receipts and Verification evidence migrations are registered as schemas 18 and 19.",
+    "Desktop production MCP runs with sharedApi enabled and refreshes the server catalog at startup.",
+    "This evidence uses isolated Fastify injection and temporary SQLite fixtures; it does not touch preview or production data."
+  ]
+}

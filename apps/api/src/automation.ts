@@ -15,6 +15,9 @@ interface ToolDefinition {
   readonly inputSchema: Values;
   readonly annotations: Values;
 }
+const VENDOR_MEDIA_TYPE = "application/vnd.relay-qa-hub.v1.1+json";
+const UUID_PATTERN = "^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$";
+const uuidSchema = { type: "string", pattern: UUID_PATTERN };
 const textSchema = { type: "string", minLength: 1 };
 const properties = {
   projectId: textSchema,
@@ -63,25 +66,83 @@ function definition(
     },
   };
 }
+const terminalAttemptProperties = {
+  projectId: uuidSchema,
+  attemptId: uuidSchema,
+  expectedVersion: { type: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER },
+  reason: { type: "string", minLength: 1, maxLength: 5_000 },
+  idempotencyKey: { type: "string", minLength: 1, maxLength: 200 },
+};
+const terminalWriteAnnotations = {
+  readOnlyHint: false,
+  destructiveHint: true,
+  idempotentHint: true,
+  openWorldHint: false,
+};
+const TERMINAL_REPAIR_ATTEMPT_TOOLS: readonly ToolDefinition[] = [
+  {
+    name: "qa_fail_repair_attempt",
+    title: "将当前修复轮次标记为失败",
+    description:
+      "调用冻结的1.1修复轮次终止入口，将当前执行中的RepairAttempt标记为failed并释放Bug。必须提供RepairAttempt expectedVersion和真实失败原因；幂等键可省略以派生canonical键，显式值必须一致。返回HTTP业务服务保存的冻结结果。",
+    inputSchema: {
+      type: "object",
+      properties: terminalAttemptProperties,
+      required: ["projectId", "attemptId", "expectedVersion", "reason"],
+      additionalProperties: false,
+    },
+    annotations: terminalWriteAnnotations,
+  },
+  {
+    name: "qa_supersede_repair_attempt",
+    title: "原子替换当前修复轮次",
+    description:
+      "调用冻结的1.1修复轮次终止入口，在同一事务内将当前RepairAttempt标记为superseded并建立显式successor。必须提供旧轮次expectedVersion、替换原因和完整successor；幂等键可省略以派生canonical键，显式值必须一致。返回HTTP业务服务保存的冻结结果。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ...terminalAttemptProperties,
+        successor: {
+          type: "object",
+          properties: {
+            id: uuidSchema,
+            mode: { type: "string", enum: ["human", "relay", "external"] },
+            assigneeId: uuidSchema,
+            summary: { type: "string", minLength: 1, maxLength: 10_000 },
+          },
+          required: ["id", "mode", "assigneeId"],
+          additionalProperties: false,
+        },
+      },
+      required: ["projectId", "attemptId", "expectedVersion", "reason", "successor"],
+      additionalProperties: false,
+    },
+    annotations: terminalWriteAnnotations,
+  },
+];
 export const AUTOMATION_TOOLS: readonly ToolDefinition[] = [
   VERIFICATION_RESULT_AUTOMATION_TOOL,
-  ...AUTOMATION_HTTP_ROUTES.map(([name, title, method, path]) =>
-    definition(
-      name,
-      title,
-      [
-        ...new Set([
-          ...(name === "qa_get_session" ||
-          name === "qa_logout" ||
-          name === "qa_list_managed_projects"
-            ? []
-            : ["projectId"]),
-          ...Array.from(path.matchAll(/:([A-Za-z]+)/gu), (match) => match[1]!),
-        ]),
-      ],
-      method !== "GET",
-    ),
-  ),
+  ...AUTOMATION_HTTP_ROUTES.map(([name, title, method, path]) => {
+    const terminal = TERMINAL_REPAIR_ATTEMPT_TOOLS.find((tool) => tool.name === name);
+    return (
+      terminal ??
+      definition(
+        name,
+        title,
+        [
+          ...new Set([
+            ...(name === "qa_get_session" ||
+            name === "qa_logout" ||
+            name === "qa_list_managed_projects"
+              ? []
+              : ["projectId"]),
+            ...Array.from(path.matchAll(/:([A-Za-z]+)/gu), (match) => match[1]!),
+          ]),
+        ],
+        method !== "GET",
+      )
+    );
+  }),
   definition(
     "qa_put_upload_chunk",
     "上传一个附件分块并校验SHA256",
@@ -169,6 +230,71 @@ function encoded(input: Values, key: string): string {
   return encodeURIComponent(field(input, key));
 }
 
+function boundedText(input: Values, key: string, maximum: number): string {
+  const value = input[key];
+  if (typeof value !== "string" || !value.trim() || [...value].length > maximum)
+    throw new AutomationError("INVALID_REQUEST", 400);
+  return value;
+}
+
+function uuidField(input: Values, key: string): string {
+  const value = boundedText(input, key, 36);
+  if (!new RegExp(UUID_PATTERN, "u").test(value)) throw new AutomationError("INVALID_REQUEST", 400);
+  return value;
+}
+
+function terminalRepairAttemptAutomationRequest(
+  input: Values,
+  operation: "failRepairAttempt" | "supersedeRepairAttempt",
+): {
+  readonly path: string;
+  readonly body: Values;
+  readonly idempotencyKey: string;
+} {
+  const allowed = new Set([
+    "projectId",
+    "attemptId",
+    "expectedVersion",
+    "reason",
+    "idempotencyKey",
+    ...(operation === "supersedeRepairAttempt" ? ["successor"] : []),
+  ]);
+  if (Object.keys(input).some((key) => !allowed.has(key)))
+    throw new AutomationError("INVALID_REQUEST", 400);
+  uuidField(input, "projectId");
+  const attemptId = uuidField(input, "attemptId");
+  if (!Number.isSafeInteger(input["expectedVersion"]) || Number(input["expectedVersion"]) < 1)
+    throw new AutomationError("INVALID_REQUEST", 400);
+  const expectedVersion = Number(input["expectedVersion"]);
+  const reason = boundedText(input, "reason", 5_000);
+  let successor: Values | undefined;
+  if (operation === "supersedeRepairAttempt") {
+    const value = object(input["successor"]);
+    const successorKeys = new Set(["id", "mode", "assigneeId", "summary"]);
+    if (Object.keys(value).some((key) => !successorKeys.has(key)))
+      throw new AutomationError("INVALID_REQUEST", 400);
+    const mode = value["mode"];
+    if (!["human", "relay", "external"].includes(String(mode)))
+      throw new AutomationError("INVALID_REQUEST", 400);
+    successor = {
+      id: uuidField(value, "id"),
+      mode,
+      assigneeId: uuidField(value, "assigneeId"),
+      ...(value["summary"] === undefined ? {} : { summary: boundedText(value, "summary", 10_000) }),
+    };
+  }
+  const idempotencyKey = `workflow:${operation}:attempt:${attemptId}:v${expectedVersion}`;
+  if (input["idempotencyKey"] !== undefined && input["idempotencyKey"] !== idempotencyKey)
+    throw new AutomationError("INVALID_REQUEST", 400);
+  return {
+    path: `/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/${
+      operation === "failRepairAttempt" ? "fail" : "supersede"
+    }`,
+    body: { expectedVersion, reason, ...(successor ? { successor } : {}) },
+    idempotencyKey,
+  };
+}
+
 const LATEST_PROTOCOL_VERSION = "2025-06-18";
 // Earlier 2025-03-26 requires batches; this endpoint supports the single-message transport.
 const SUPPORTED_PROTOCOL_VERSIONS = new Set([LATEST_PROTOCOL_VERSION]);
@@ -208,8 +334,12 @@ export function registerAutomationRoutes(
     const input = object(raw);
     for (const required of tool.inputSchema["required"] as string[])
       if (input[required] === undefined) throw new AutomationError("INVALID_REQUEST", 400);
+    const allowedProperties =
+      name === "qa_fail_repair_attempt" || name === "qa_supersede_repair_attempt"
+        ? object(tool.inputSchema["properties"])
+        : properties;
     for (const key of Object.keys(input))
-      if (!(key in properties)) throw new AutomationError("INVALID_REQUEST", 400);
+      if (!(key in allowedProperties)) throw new AutomationError("INVALID_REQUEST", 400);
     const projectId = (tool.inputSchema["required"] as string[]).includes("projectId")
       ? field(input, "projectId")
       : typeof input["projectId"] === "string"
@@ -220,15 +350,16 @@ export function registerAutomationRoutes(
       path: string,
       body?: Values,
       key?: string,
+      contentType = "application/json",
     ) => {
       const response = await app.inject({
         method,
         url: path,
         headers: {
           ...credentials.get(request),
-          accept: "application/vnd.relay-qa-hub.v1.1+json",
+          accept: VENDOR_MEDIA_TYPE,
           ...(projectId ? { "x-qa-project-id": projectId } : {}),
-          ...(body ? { "content-type": "application/json" } : {}),
+          ...(body ? { "content-type": contentType } : {}),
           ...(key ? { "idempotency-key": key } : {}),
         },
         ...(body ? { payload: body } : {}),
@@ -249,6 +380,13 @@ export function registerAutomationRoutes(
         );
       return result;
     };
+    if (name === "qa_fail_repair_attempt" || name === "qa_supersede_repair_attempt") {
+      const command = terminalRepairAttemptAutomationRequest(
+        input,
+        name === "qa_fail_repair_attempt" ? "failRepairAttempt" : "supersedeRepairAttempt",
+      );
+      return send("POST", command.path, command.body, command.idempotencyKey, VENDOR_MEDIA_TYPE);
+    }
     const adapter = AUTOMATION_HTTP_ROUTES.find(([toolName]) => toolName === name);
     if (adapter) {
       const [, , method, template] = adapter;

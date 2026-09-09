@@ -33,6 +33,18 @@ export const AUTOMATION_HTTP_ROUTES = [
   ["qa_mark_duplicate", "标记重复 Bug 并保存理由", "POST", "/api/v1/bugs/:bugId/mark-duplicate"],
   ["qa_get_repair_attempt", "读取修复轮次", "GET", "/api/v1/repair-attempts/:attemptId"],
   [
+    "qa_fail_repair_attempt",
+    "将当前修复轮次标记为失败",
+    "POST",
+    "/api/v1/repair-attempts/:attemptId/fail",
+  ],
+  [
+    "qa_supersede_repair_attempt",
+    "原子替换当前修复轮次",
+    "POST",
+    "/api/v1/repair-attempts/:attemptId/supersede",
+  ],
+  [
     "qa_get_bug_workflow",
     "读取冻结工作流分页，query使用cursor和limitPerCollection",
     "GET",

@@ -185,7 +185,7 @@ test("workflow MCP preserves actual HTTP pages and current project authority", a
   });
   const catalog = (await rpc("tools/list", {})).tools;
   const sharedCatalog = await request("/api/v1/mcp/tools", { token: alice.accessToken });
-  assert.equal(catalog.length, 92);
+  assert.equal(catalog.length, 94);
   assert.deepEqual(sharedCatalog.tools, catalog);
   const tool = catalog.find((entry: { name: string }) => entry.name === "qa_get_bug_workflow");
   assert.ok(tool);
@@ -193,7 +193,12 @@ test("workflow MCP preserves actual HTTP pages and current project authority", a
   assert.equal(
     catalog.filter(
       (entry: { name: string }) =>
-        !["qa_get_bug_workflow", "qa_record_verification_result"].includes(entry.name),
+        ![
+          "qa_get_bug_workflow",
+          "qa_record_verification_result",
+          "qa_fail_repair_attempt",
+          "qa_supersede_repair_attempt",
+        ].includes(entry.name),
     ).length,
     90,
   );
