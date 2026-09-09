@@ -1,0 +1,47 @@
+{
+  "completedAt": "2026-09-09T04:42:59.2617235Z",
+  "method": "git checkout-index wrote only paths verified absent; no existing file was overwritten",
+  "allMatch": true,
+  "files": [
+    {
+      "path": ".env.example",
+      "object": "ee7221ba73fcbac5c3f8342831007f144ffdca23",
+      "matchesTree": true
+    },
+    {
+      "path": ".gitattributes",
+      "object": "377da4a5c4186ef7f69dd971427cdefbda60d7e5",
+      "matchesTree": true
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "object": "9ba1af32475e692931be2c039530289c559e4ce1",
+      "matchesTree": true
+    },
+    {
+      "path": ".gitignore",
+      "object": "142e509d4057d580fb7c2f1f824b83f7e9022922",
+      "matchesTree": true
+    },
+    {
+      "path": ".npmrc",
+      "object": "23f619956d7572a09b63fc80c63236b0df122a62",
+      "matchesTree": true
+    },
+    {
+      "path": ".prettierignore",
+      "object": "95dd15887503f9d08f73eae4dfcd6aa7c3de2173",
+      "matchesTree": true
+    },
+    {
+      "path": "apps/android/.gitignore",
+      "object": "45e7fee56d4a5b8341f67bb3689206ee7ba42869",
+      "matchesTree": true
+    }
+  ],
+  "currentHead": "8696c2974ed4c7540b8851c6e3bc573496f8b50e",
+  "worktreeRegistration": [
+    "worktree C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub",
+    "locked active QA Hub v2.1 isolated preview worktree"
+  ]
+}

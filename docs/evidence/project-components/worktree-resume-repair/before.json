@@ -1,0 +1,67 @@
+{
+  "observedAt": "2026-09-09T04:27:00Z",
+  "worktree": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+  "branch": "codex/project-components-v2-1",
+  "observedBranchHead": "5208a8aef2c777ad8f3bf8d3fe0fccb2120881c1",
+  "condition": "worktree source remained but .git gitfile and shared worktree admin entry were absent; seven tracked dotfiles were also absent",
+  "actions": [
+    "created a linked-worktree admin entry pointing at the existing branch",
+    "created only the missing .git gitfile",
+    "populated a new index with git read-tree HEAD without touching worktree files",
+    "locked the linked worktree against pruning",
+    "reconstructed the prior Phase D staging scope from handoff and committed it as 4eece8e"
+  ],
+  "never": [
+    "reset",
+    "clean",
+    "stash",
+    "rebase",
+    "production working tree write",
+    "source overwrite"
+  ],
+  "missingTrackedPaths": [
+    {
+      "path": ".env.example",
+      "mode": "100644",
+      "object": "ee7221ba73fcbac5c3f8342831007f144ffdca23",
+      "bytes": 2491
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "object": "377da4a5c4186ef7f69dd971427cdefbda60d7e5",
+      "bytes": 277
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "mode": "100644",
+      "object": "9ba1af32475e692931be2c039530289c559e4ce1",
+      "bytes": 372
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "object": "142e509d4057d580fb7c2f1f824b83f7e9022922",
+      "bytes": 468
+    },
+    {
+      "path": ".npmrc",
+      "mode": "100644",
+      "object": "23f619956d7572a09b63fc80c63236b0df122a62",
+      "bytes": 46
+    },
+    {
+      "path": ".prettierignore",
+      "mode": "100644",
+      "object": "95dd15887503f9d08f73eae4dfcd6aa7c3de2173",
+      "bytes": 61
+    },
+    {
+      "path": "apps/android/.gitignore",
+      "mode": "100644",
+      "object": "45e7fee56d4a5b8341f67bb3689206ee7ba42869",
+      "bytes": 46
+    }
+  ],
+  "stagingNote": "The deleted linked-worktree index was unavailable, so its old staging bits could not be recovered; source and evidence bytes remained and were restaged by exact documented paths."
+}
