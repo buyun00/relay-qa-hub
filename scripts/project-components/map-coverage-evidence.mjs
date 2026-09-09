@@ -2258,13 +2258,125 @@ if (recentWebDeploy) {
       "仅静态下载和发布时进程证据；无新服务启停，不代表真实Web loading页面验收，不将.9原生EXE UI传递到Web。",
   });
 }
+const detailLiveFile = "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json";
+const detailLive = recentProof(
+  detailLiveFile,
+  "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
+);
+if (detailLive) {
+  if (
+    detailLive.status !== "passed" ||
+    detailLive.checks.length !== 59 ||
+    detailLive.checks.some((entry) => entry.passed !== true) ||
+    detailLive.detailPlan.phase !== "retry_confirmed" ||
+    detailLive.detailPlan.requests.length !== 3 ||
+    detailLive.detailPlan.responses.length !== 2 ||
+    detailLive.unreleasedRealResponses.length !== 0
+  )
+    throw new Error("Actual Web detail loading proof differs from reviewed scope");
+  validationEvidence.push({
+    file: detailLiveFile,
+    matched: true,
+    summary:
+      "Br-CEXQI真实Edge59项：真实200暂留显示加载，注入Failed显示错误，实际Retry取得新200恢复同一详情",
+    scope:
+      "仅同项目文本Bug；四张实际截图、Bug与事件未变。背景components hold实际0，不证明超时/常态轮询或跨项目迟到响应。",
+  });
+}
+
+const membershipLiveFile =
+  "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json";
+const membershipLive = recentProof(
+  membershipLiveFile,
+  "55ac6023679282fb4a7a0a985ff79db0a2718999f1869e41fe60b25e569834e5",
+);
+if (membershipLive) {
+  if (
+    membershipLive.status !== "passed_scoped_server_mcp_membership" ||
+    membershipLive.checks.length !== 59 ||
+    membershipLive.checks.some((entry) => entry.passed !== true) ||
+    membershipLive.requests.length !== 35 ||
+    JSON.stringify(membershipLive.hostBefore) !== JSON.stringify(membershipLive.hostAfter) ||
+    membershipLive.boundaries.localMcpCalled !== false ||
+    membershipLive.boundaries.bugsCreated !== 0
+  )
+    throw new Error("Actual server MCP membership proof differs from reviewed scope");
+  const observation = rememberRecent({
+    id: "server-mcp-membership-e21431f0-59",
+    evidence: [membershipLiveFile],
+    version: {
+      apiPid: 22852,
+      apiSchema: 14,
+      serverMcpPid: 15736,
+      recordedAt: membershipLive.finishedAt,
+    },
+    completed:
+      "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
+    remaining:
+      "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。",
+  });
+  addRecentObservation(baselineItem(1), "server_mcp", observation);
+  // These two exact baseline/surface requirements were fully observed. Keep
+  // every pre-existing failure and retain the prior partial progress as history.
+  for (const number of [2, 4]) {
+    const item = baselineItem(number);
+    if (item.results.server_mcp.status === "failed") continue;
+    if (!item.manual.serverMembershipPriorProgress && item.manual.surfaceProgress?.server_mcp)
+      item.manual.serverMembershipPriorProgress = structuredClone(
+        item.manual.surfaceProgress.server_mcp,
+      );
+    item.manual.serverMembershipRun = observation;
+    record(
+      item,
+      "server_mcp",
+      "passed",
+      [membershipLiveFile],
+      number === 2
+        ? "实际server MCP：单项目登录返回A，多项目目录严格为有效所属A/B；A停用后仅B，恢复后仍是原ID与A/B。"
+        : "实际server MCP：只停用A的新员工关系，A重新姓名登录403且不自动恢复，B登录和读取继续可用、会员版本/角色不变；显式恢复A后同ID。",
+    );
+  }
+  validationEvidence.push({
+    file: membershipLiveFile,
+    matched: true,
+    summary: "服务端MCP人员真实59项，02/04的server MCP入口完成；01保留旧历史姓名组合未测",
+    scope:
+      "仅新A/B/新员工；35 RPC另加1 health GET，五组件off、无Bug写入，不传递到其它入口或整个基线。",
+  });
+}
+
+const phaseAFile = "contracts-result-phase-a/result.json";
+const phaseA = recentProof(
+  phaseAFile,
+  "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca",
+);
+if (phaseA) {
+  if (
+    phaseA.finalSourceFrozen !== true ||
+    phaseA.results.api.pass !== 260 ||
+    phaseA.results.storage.pass !== 118 ||
+    phaseA.results.phaseAHttp.requests !== 215 ||
+    phaseA.boundaries.deployed !== false ||
+    phaseA.schema.to !== 15
+  )
+    throw new Error("Phase A source/temporary HTTP proof differs from reviewed scope");
+  validationEvidence.push({
+    file: phaseAFile,
+    matched: true,
+    summary:
+      "Phase A源码：legacy passed/failed和不可变原回执，API260/Storage118及临时真实HTTP215通过，schema15加法恢复验证",
+    scope:
+      "该证据未部署常驻4419、未做完整main/MCP/客户端运行；blocked、附件9..20/capture、fail/supersede及workflow GET仍独立未完成。",
+  });
+}
+
 matrix.evidenceMapping.recentVersionedEvidence = {
   ...recentEvidence,
   inputSourceFileCount: Object.keys(matrix.sourceHashes).length,
   sourceSnapshotScope:
     "Input matrix sourceHashes/sourceHead describe its previous generation, not current source. This append neither refreshes that inventory nor clears revalidation flags.",
   statusPolicy:
-    "No status promotion. Historical passes/failures remain; current-source/new-node verification and whole baselines are independent.",
+    "Only server MCP baseline02/04 have explicit completed requirement promotion from the e21431f0 run. All other additions are evidence only. Historical failures and source revalidation remain; whole baselines are independent.",
 };
 
 // Several reviewed passes may temporarily revisit the same result. If its
@@ -2356,7 +2468,7 @@ const review = [
   "",
   "## 近期指定版本的部分实测",
   "",
-  "以下只补充原始版本的证据与精确入口，不提升任何行的状态，不清除旧失败或源码复验标记。EXE已通过的升级基线保留原结果，新版本事实另列；共享Web静态部署不代替浏览器loading验收。",
+  "以下补充原始版本证据；仅新e21431f0完整覆盖的02/04服务端MCP入口标通过，不清除旧失败或源码复验标记。EXE旧升级基线保留原结果；共享Web静态发布与另行实际loading验收分开。",
   "",
   ...recentEvidence.observations.map(
     (entry) =>
@@ -2367,7 +2479,7 @@ const review = [
       `- 清单缺项：${entry.selector}（${entry.sourceFile}）；仅保存原始观察，等待后续生成器盘点，不虚建当前条目或计通过。`,
   ),
   "",
-  "严格旧合同冻结失败保留为历史，后续六条响应边界修复已有独立五步门禁成功日志与实际HTTP读回。旧1.0请求/blocked写入、未注册的fail/supersede POST和workflow GET仍缺，静态合同通过不代表全部运行能力。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。",
+  "严格旧合同冻结失败保留为历史，后续六条响应边界修复已有独立五步门禁成功日志与实际HTTP读回。Phase A已在源码/临时SQLite完成旧1.0 passed/failed与原回执；该证据不代表常驻4419已加载schema15。blocked写入、未注册的fail/supersede POST和workflow GET仍缺，静态合同通过不代表全部运行能力。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。",
   "",
   "依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。",
   "",

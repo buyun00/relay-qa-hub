@@ -157,18 +157,12 @@ function normalized(value) {
 const first = chain(),
   second = chain();
 const firstIndex = new Map(first.items.map((item) => [item.id, item]));
-// Real discovery can retire stable IDs after a route declaration moves. Such
-// records must retain manual evidence in retiredItems; new discoveries must
-// still be current items and cannot inherit their prior pass.
-const retainedIndex = new Map(
-  [...first.items, ...first.retiredItems].map((item) => [item.id, item]),
-);
 const failedLosses = failed
   .filter(
     (entry) =>
-      JSON.stringify(retainedIndex.get(entry.id)?.results[entry.surface]) !==
+      JSON.stringify(firstIndex.get(entry.id)?.results[entry.surface]) !==
         JSON.stringify(entry.result) ||
-      JSON.stringify(retainedIndex.get(entry.id)?.manual.surfaceProgress?.[entry.surface]) !==
+      JSON.stringify(firstIndex.get(entry.id)?.manual.surfaceProgress?.[entry.surface]) !==
         JSON.stringify(entry.progress),
   )
   .map((entry) => entry.id + "/" + entry.surface);
@@ -181,7 +175,7 @@ const originalNotes = clone.items.flatMap((item) =>
 const notesMissing = originalNotes
   .filter(
     (entry) =>
-      !retainedIndex
+      !firstIndex
         .get(entry.id)
         ?.manual.retainedReviewNotes?.some(
           (note) => JSON.stringify(note) === JSON.stringify(entry.note),
@@ -192,25 +186,21 @@ const flagLosses = clone.items
   .filter((item) => item.needsRevalidation || item.manual.needsRevalidation)
   .filter(
     (item) =>
-      !retainedIndex.get(item.id)?.needsRevalidation &&
-      !retainedIndex.get(item.id)?.manual.needsRevalidation,
+      !firstIndex.get(item.id)?.needsRevalidation &&
+      !firstIndex.get(item.id)?.manual.needsRevalidation,
   )
   .map((item) => item.id);
 const after = Object.fromEntries(
   names.map((name) => [name, sha(fs.readFileSync(path.join(evidenceRoot, name)))]),
 );
 const checks = {
-  uniqueStableIdsAcrossCurrentAndRetired:
-    retainedIndex.size === first.items.length + first.retiredItems.length,
   compositeSemanticReplayStable: normalized(first) === normalized(second),
   allSyntheticFailedResultsAndProgressPreserved: failedLosses.length === 0,
   originalNotesPreserved: notesMissing.length === 0,
   originalRevalidationFlagsPreserved: flagLosses.length === 0,
   actualNewNodeNotAutomaticallyPassed: ["web", "exe"].every(
-    (surface) => newNode?.results[surface].status === "not_run",
+    (surface) => newNode.results[surface].status === "not_run",
   ),
-  newNodeCurrentAndNotRetired:
-    firstIndex.has(target.id) && !first.retiredItems.some((item) => item.id === target.id),
   newNodeHasExactSourceReview:
     newNode.needsRevalidation &&
     newNode.manual.sourceEvidenceReview.nodeId === target.id &&
@@ -237,9 +227,6 @@ const report = {
   fixture,
   sourceHashes,
   syntheticFailedSurfaces: failed.length,
-  retiredSyntheticFailedSurfaces: failed.filter(
-    (entry) => !firstIndex.has(entry.id) && retainedIndex.has(entry.id),
-  ),
   failedLosses,
   notesMissing,
   flagLosses,

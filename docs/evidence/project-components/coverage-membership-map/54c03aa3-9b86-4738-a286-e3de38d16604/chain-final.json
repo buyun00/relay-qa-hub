@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-09T03:16:08.679Z",
+  "passed": true,
+  "method": "Actual generator→mapper→generator source evaluated twice with real TypeScript discovery and public evidence reads; only the three generated output files redirected to a new real temporary directory. No app execution, API or service control.",
+  "fixture": "C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-coverage-chain-FZDCxR",
+  "sourceHashes": {
+    "generate-coverage-matrix.mjs": "bbd7621ee3d843f1c46608d899c4f34e3d408dc99a26e0e3c282c8f8063bb385",
+    "map-coverage-evidence.mjs": "685486b28a8b6934c26fc9a07871c74062e6bdd294ae3fb9f6d9488bb454d435"
+  },
+  "syntheticFailedSurfaces": 613,
+  "retiredSyntheticFailedSurfaces": [
+    {
+      "id": "http_route-73141f37d37021",
+      "surface": "http",
+      "result": {
+        "applicable": true,
+        "status": "failed",
+        "evidence": [
+          "synthetic negative proof"
+        ],
+        "actual": "manual negative observation",
+        "note": "manual negative note"
+      },
+      "progress": {
+        "completed": [
+          "manual subset"
+        ],
+        "remaining": [
+          "manual unresolved failure"
+        ],
+        "evidence": [
+          "synthetic negative proof"
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "id": "http_route-2af3ffd1e0e3b1",
+      "surface": "http",
+      "result": {
+        "applicable": true,
+        "status": "failed",
+        "evidence": [
+          "synthetic negative proof"
+        ],
+        "actual": "manual negative observation",
+        "note": "manual negative note"
+      },
+      "progress": {
+        "completed": [
+          "manual subset"
+        ],
+        "remaining": [
+          "manual unresolved failure"
+        ],
+        "evidence": [
+          "synthetic negative proof"
+        ],
+        "status": "partial"
+      }
+    }
+  ],
+  "failedLosses": [],
+  "notesMissing": [],
+  "flagLosses": [],
+  "semanticHashes": [
+    "2245ca04d67b789cf13af84fcf292b7217dffe2af27cab5f6c3f77dcd577eb8c",
+    "2245ca04d67b789cf13af84fcf292b7217dffe2af27cab5f6c3f77dcd577eb8c"
+  ],
+  "checks": {
+    "uniqueStableIdsAcrossCurrentAndRetired": true,
+    "compositeSemanticReplayStable": true,
+    "allSyntheticFailedResultsAndProgressPreserved": true,
+    "originalNotesPreserved": true,
+    "originalRevalidationFlagsPreserved": true,
+    "actualNewNodeNotAutomaticallyPassed": true,
+    "newNodeCurrentAndNotRetired": true,
+    "newNodeHasExactSourceReview": true,
+    "changedSourceNotAutomaticallyPassed": true,
+    "oldSourceResultsRetained": true,
+    "manualAnnotationRetained": true,
+    "actualWorkspaceGeneratedFilesUnchanged": true
+  },
+  "workspaceBefore": {
+    "coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+    "coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+  },
+  "workspaceAfter": {
+    "coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+    "coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+  }
+}

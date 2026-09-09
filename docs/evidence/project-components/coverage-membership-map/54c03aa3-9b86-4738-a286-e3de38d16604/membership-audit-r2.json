@@ -1,0 +1,1954 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-09T03:17:13.056Z",
+  "passed": true,
+  "checkCount": 173,
+  "method": "Full current/reference mapper, fixed Date, virtual matrix input and two in-memory output sinks; no generated workspace writes, service/UI/runtime calls. Three exact proof tamper and absence simulations affect virtual reads only.",
+  "input": {
+    "mapperSha256": "685486b28a8b6934c26fc9a07871c74062e6bdd294ae3fb9f6d9488bb454d435",
+    "matrixSha256": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "referenceCommit": "2d687b47b658d6d38e096872e9a92950bcb30c7d",
+    "referenceMapperSha256": "c0de8ebdc985eeecbda449977b0380d1eedef4de33cda2b9d6f524e3c81da02b",
+    "items": 991,
+    "retiredItems": 28
+  },
+  "promotions": [
+    "baseline-725921666b2c57/server_mcp",
+    "baseline-b949d66dbe2c5a/server_mcp"
+  ],
+  "syntheticFailedSurfaces": 2126,
+  "semanticHashes": [
+    "5efeda9857a9faeaa9dc3db10a14fb4c4283b60236712ce839702608b411df6a",
+    "5efeda9857a9faeaa9dc3db10a14fb4c4283b60236712ce839702608b411df6a"
+  ],
+  "proofAudit": [
+    {
+      "file": "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "sha256": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
+      "tamperError": "Recent version-bound evidence proof changed; re-review required: web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "tamperVirtualWrites": 0
+    },
+    {
+      "file": "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
+      "sha256": "55ac6023679282fb4a7a0a985ff79db0a2718999f1869e41fe60b25e569834e5",
+      "tamperError": "Recent version-bound evidence proof changed; re-review required: server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
+      "tamperVirtualWrites": 0
+    },
+    {
+      "file": "contracts-result-phase-a/result.json",
+      "sha256": "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca",
+      "tamperError": "Recent version-bound evidence proof changed; re-review required: contracts-result-phase-a/result.json",
+      "tamperVirtualWrites": 0
+    }
+  ],
+  "checks": [
+    {
+      "label": "only baseline02/04 server MCP statuses change",
+      "passed": true,
+      "actual": [
+        "baseline-725921666b2c57/server_mcp",
+        "baseline-b949d66dbe2c5a/server_mcp"
+      ],
+      "expected": [
+        "baseline-725921666b2c57/server_mcp",
+        "baseline-b949d66dbe2c5a/server_mcp"
+      ]
+    },
+    {
+      "label": "baseline 2 server MCP passed",
+      "passed": true,
+      "actual": "passed",
+      "expected": "passed"
+    },
+    {
+      "label": "baseline 2 apk result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [
+          "android-implementation.md",
+          "../../../apps/android/app/build/evidence/project-components/preview-code20-launched-ui.xml"
+        ],
+        "actual": "已实测：实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表。仍缺：尚未逐一核对该基线完整首登/原历史姓名/有效成员目录组合；物理Android设备未测。",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [
+          "android-implementation.md",
+          "../../../apps/android/app/build/evidence/project-components/preview-code20-launched-ui.xml"
+        ],
+        "actual": "已实测：实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表。仍缺：尚未逐一核对该基线完整首登/原历史姓名/有效成员目录组合；物理Android设备未测。",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 2 exe result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [],
+        "actual": "",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [],
+        "actual": "",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 2 web result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "web-browser/results.json",
+          "web-browser/07-project-b-draft.txt"
+        ],
+        "actual": "同名登录B登记第二个项目，选择器A/B；两者保持同一稳定userId。",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "web-browser/results.json",
+          "web-browser/07-project-b-draft.txt"
+        ],
+        "actual": "同名登录B登记第二个项目，选择器A/B；两者保持同一稳定userId。",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 2 http result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "runs/management-2026-09-08T17-53-20-441Z.json"
+        ],
+        "actual": "实际单项目员工只见A；同人A/B登记及撤销/恢复后目录和跨项目权限读回，非所属B列表/人员拒绝。",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "runs/management-2026-09-08T17-53-20-441Z.json"
+        ],
+        "actual": "实际单项目员工只见A；同人A/B登记及撤销/恢复后目录和跨项目权限读回，非所属B列表/人员拒绝。",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 2 local_mcp result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [
+          "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+          "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+        ],
+        "actual": "已实测：实际列出当前员工所属项目。仍缺：单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [
+          "runs/desktop-mcp-core-2026-09-08T17-52-57-495Z.json",
+          "redaction-corrections/desktop-mcp-core-2026-09-08T17-52-57-495Z.json"
+        ],
+        "actual": "已实测：实际列出当前员工所属项目。仍缺：单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 4 server MCP passed",
+      "passed": true,
+      "actual": "passed",
+      "expected": "passed"
+    },
+    {
+      "label": "baseline 4 apk result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [
+          "android-implementation.md",
+          "../../../apps/android/app/build/evidence/project-components/preview-code19-linked-readback.json",
+          "../../../apps/android/app/build/evidence/project-components/preview-code19-personnel-final-readback.json"
+        ],
+        "actual": "已实测：A 内原生停用/恢复及HTTP同名登录403/200已核对。仍缺：未在这次原生人员操作中验证同一人的 B 项目继续可用；物理设备未测。",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [
+          "android-implementation.md",
+          "../../../apps/android/app/build/evidence/project-components/preview-code19-linked-readback.json",
+          "../../../apps/android/app/build/evidence/project-components/preview-code19-personnel-final-readback.json"
+        ],
+        "actual": "已实测：A 内原生停用/恢复及HTTP同名登录403/200已核对。仍缺：未在这次原生人员操作中验证同一人的 B 项目继续可用；物理设备未测。",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 4 exe result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "exe-native-personnel/result.json",
+          "exe-native-personnel/README.md",
+          "exe-native-personnel/01-two-new-personnel.jpg",
+          "exe-native-personnel/01-two-new-personnel.txt",
+          "exe-native-personnel/02-linked-only-a.jpg",
+          "exe-native-personnel/02-linked-only-a.txt",
+          "exe-native-personnel/03-unlinked-original-id.jpg",
+          "exe-native-personnel/03-unlinked-original-id.txt",
+          "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+          "exe-native-personnel/04-disabled-a-b-still-active.txt",
+          "exe-native-personnel/05-restored-stable-identities.jpg",
+          "exe-native-personnel/05-restored-stable-identities.txt",
+          "exe-native-personnel/06-original-draft-preserved.jpg",
+          "exe-native-personnel/06-original-draft-preserved.txt"
+        ],
+        "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "exe-native-personnel/result.json",
+          "exe-native-personnel/README.md",
+          "exe-native-personnel/01-two-new-personnel.jpg",
+          "exe-native-personnel/01-two-new-personnel.txt",
+          "exe-native-personnel/02-linked-only-a.jpg",
+          "exe-native-personnel/02-linked-only-a.txt",
+          "exe-native-personnel/03-unlinked-original-id.jpg",
+          "exe-native-personnel/03-unlinked-original-id.txt",
+          "exe-native-personnel/04-disabled-a-b-still-active.jpg",
+          "exe-native-personnel/04-disabled-a-b-still-active.txt",
+          "exe-native-personnel/05-restored-stable-identities.jpg",
+          "exe-native-personnel/05-restored-stable-identities.txt",
+          "exe-native-personnel/06-original-draft-preserved.jpg",
+          "exe-native-personnel/06-original-draft-preserved.txt"
+        ],
+        "actual": "已安装preview.7原员工在A查看人员并实际关联/解除/停用/恢复四次；24辅助HTTP与只读SQLite核对2身份事件+2成员事件均为原actor。A主资格v1→v2停用→v3恢复，B两人active/v1且无身份关联；A同名登录及旧session403，B均200，原Bug DTO/文字+PNG草稿保持。新fixture历史任务数0，未证明非零任务引用保全。",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 4 web result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [],
+        "actual": "",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [],
+        "actual": "",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 4 http result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "runs/management-2026-09-08T17-53-20-441Z.json"
+        ],
+        "actual": "HTTP 实际验证项目 A 成员停用与版本恢复；B 保持可用，同名登录不能恢复显式停用成员。",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "passed",
+        "evidence": [
+          "runs/management-2026-09-08T17-53-20-441Z.json"
+        ],
+        "actual": "HTTP 实际验证项目 A 成员停用与版本恢复；B 保持可用，同名登录不能恢复显式停用成员。",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "baseline 4 local_mcp result unchanged",
+      "passed": true,
+      "actual": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [],
+        "actual": "",
+        "note": "Real execution and read-back required."
+      },
+      "expected": {
+        "applicable": true,
+        "status": "not_run",
+        "evidence": [],
+        "actual": "",
+        "note": "Real execution and read-back required."
+      }
+    },
+    {
+      "label": "whole-baseline pass set unchanged",
+      "passed": true,
+      "actual": [
+        "baseline-975dc5844a5921",
+        "baseline-163e4ace685493",
+        "baseline-9fff5a0bd4e750",
+        "baseline-be45d11bf5f799",
+        "baseline-bf491c9fd4acc9",
+        "baseline-ee6de045b248f3",
+        "baseline-6c00cb23392635"
+      ],
+      "expected": [
+        "baseline-975dc5844a5921",
+        "baseline-163e4ace685493",
+        "baseline-9fff5a0bd4e750",
+        "baseline-be45d11bf5f799",
+        "baseline-bf491c9fd4acc9",
+        "baseline-ee6de045b248f3",
+        "baseline-6c00cb23392635"
+      ]
+    },
+    {
+      "label": "two mapper passes matrix byte stable with fixed clock",
+      "passed": true,
+      "actual": "5efeda9857a9faeaa9dc3db10a14fb4c4283b60236712ce839702608b411df6a",
+      "expected": "5efeda9857a9faeaa9dc3db10a14fb4c4283b60236712ce839702608b411df6a"
+    },
+    {
+      "label": "two mapper passes review byte stable",
+      "passed": true,
+      "actual": "cfa43eabbc01c8d738f9ef5163c8f0396690418749385687dd5db1297f7cdfa8",
+      "expected": "cfa43eabbc01c8d738f9ef5163c8f0396690418749385687dd5db1297f7cdfa8"
+    },
+    {
+      "label": "retired items unchanged",
+      "passed": true,
+      "actual": {
+        "sha256": "b52bd99e7f2b55adcefdd2fe6144b45522372aae54001900c9991afaebad7631",
+        "serializedBytes": 69646
+      },
+      "expected": {
+        "sha256": "b52bd99e7f2b55adcefdd2fe6144b45522372aae54001900c9991afaebad7631",
+        "serializedBytes": 69646
+      }
+    },
+    {
+      "label": "all current/retired revalidation flags retained",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "all prior retained review notes retained",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "all actual failed result and progress bytes retained",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "source snapshot not silently revalidated",
+      "passed": true,
+      "actual": {
+        "sha256": "5170868fe91a281cd397f7257ff83ce6cead69750caada47142288f786cf70c9",
+        "serializedBytes": 22856
+      },
+      "expected": {
+        "sha256": "5170868fe91a281cd397f7257ff83ce6cead69750caada47142288f786cf70c9",
+        "serializedBytes": 22856
+      }
+    },
+    {
+      "label": "all synthetic current/retired failed surfaces and progress survive",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "negative replay stable",
+      "passed": true,
+      "actual": "add84e5ecc7f04b18b40bb44647f4b4e3f9f40508528f49ab41862041d9b4376",
+      "expected": "add84e5ecc7f04b18b40bb44647f4b4e3f9f40508528f49ab41862041d9b4376"
+    },
+    {
+      "label": "promotion 2 retains exact pre-addition mapped progress",
+      "passed": true,
+      "actual": {
+        "completed": [
+          "实际列出当前员工所属项目"
+        ],
+        "remaining": [
+          "单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖"
+        ],
+        "evidence": [
+          "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+        ],
+        "status": "partial"
+      },
+      "expected": {
+        "completed": [
+          "实际列出当前员工所属项目"
+        ],
+        "remaining": [
+          "单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖"
+        ],
+        "evidence": [
+          "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+        ],
+        "status": "partial"
+      }
+    },
+    {
+      "label": "promotion 2 retains manual note and progress history",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "promotion 2 flags remain true",
+      "passed": true,
+      "actual": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ]
+    },
+    {
+      "label": "promotion 2 unrelated manual field retained",
+      "passed": true,
+      "actual": {
+        "note": "keep unrelated manual fields",
+        "number": 2
+      },
+      "expected": {
+        "note": "keep unrelated manual fields",
+        "number": 2
+      }
+    },
+    {
+      "label": "promotion 4 retains exact pre-addition mapped progress",
+      "passed": true,
+      "actual": {
+        "status": "partial",
+        "completed": [
+          "prior partial"
+        ],
+        "remaining": [
+          "prior unresolved"
+        ],
+        "evidence": [
+          "synthetic-membership-progress"
+        ]
+      },
+      "expected": {
+        "status": "partial",
+        "completed": [
+          "prior partial"
+        ],
+        "remaining": [
+          "prior unresolved"
+        ],
+        "evidence": [
+          "synthetic-membership-progress"
+        ]
+      }
+    },
+    {
+      "label": "promotion 4 retains manual note and progress history",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "promotion 4 flags remain true",
+      "passed": true,
+      "actual": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ]
+    },
+    {
+      "label": "promotion 4 unrelated manual field retained",
+      "passed": true,
+      "actual": {
+        "note": "keep unrelated manual fields",
+        "number": 4
+      },
+      "expected": {
+        "note": "keep unrelated manual fields",
+        "number": 4
+      }
+    },
+    {
+      "label": "annotated promotion replay stable",
+      "passed": true,
+      "actual": "5b63aedda30b24f7d8ee2f890ad0dab3896e7383b50604de391eb318460b0562",
+      "expected": "5b63aedda30b24f7d8ee2f890ad0dab3896e7383b50604de391eb318460b0562"
+    },
+    {
+      "label": "proof SHA web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "passed": true,
+      "actual": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
+      "expected": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 0",
+      "passed": true,
+      "actual": 22852,
+      "expected": 22852
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 1",
+      "passed": true,
+      "actual": 1788916940272,
+      "expected": 1788916940272
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 2",
+      "passed": true,
+      "actual": 20284,
+      "expected": 20284
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 3",
+      "passed": true,
+      "actual": 1788889956508,
+      "expected": 1788889956508
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 4",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 5",
+      "passed": true,
+      "actual": "ready",
+      "expected": "ready"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 6",
+      "passed": true,
+      "actual": "14",
+      "expected": "14"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 7",
+      "passed": true,
+      "actual": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+      "expected": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 8",
+      "passed": true,
+      "actual": 477433,
+      "expected": 477433
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 9",
+      "passed": true,
+      "actual": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328",
+      "expected": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 10",
+      "passed": true,
+      "actual": 1829769,
+      "expected": 1829769
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 11",
+      "passed": true,
+      "actual": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef",
+      "expected": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 12",
+      "passed": true,
+      "actual": 91623,
+      "expected": 91623
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 13",
+      "passed": true,
+      "actual": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df",
+      "expected": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 14",
+      "passed": true,
+      "actual": 4308,
+      "expected": 4308
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 15",
+      "passed": true,
+      "actual": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601",
+      "expected": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 16",
+      "passed": true,
+      "actual": 506,
+      "expected": 506
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 17",
+      "passed": true,
+      "actual": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf",
+      "expected": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 18",
+      "passed": true,
+      "actual": 506,
+      "expected": 506
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 19",
+      "passed": true,
+      "actual": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c",
+      "expected": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 20",
+      "passed": true,
+      "actual": 495,
+      "expected": 495
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 21",
+      "passed": true,
+      "actual": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367",
+      "expected": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 22",
+      "passed": true,
+      "actual": 709,
+      "expected": 709
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 23",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 24",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 25",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 26",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 27",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 28",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 29",
+      "passed": true,
+      "actual": 201,
+      "expected": 201
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 30",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 31",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 32",
+      "passed": true,
+      "actual": 10812,
+      "expected": 10812
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 33",
+      "passed": true,
+      "actual": {
+        "url": "http://127.0.0.1:4274/assets/index-Br-CEXQI.js",
+        "status": 200,
+        "sizeBytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      "expected": {
+        "url": "http://127.0.0.1:4274/assets/index-Br-CEXQI.js",
+        "sizeBytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+        "status": 200
+      }
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 34",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 35",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 36",
+      "passed": true,
+      "actual": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "expected": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      }
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 37",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 38",
+      "passed": true,
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 39",
+      "passed": true,
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 40",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 41",
+      "passed": true,
+      "actual": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "expected": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      }
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 42",
+      "passed": true,
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 43",
+      "passed": true,
+      "actual": 3,
+      "expected": 3
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 44",
+      "passed": true,
+      "actual": 2,
+      "expected": 2
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 45",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 46",
+      "passed": true,
+      "actual": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "expected": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      }
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 47",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 48",
+      "passed": true,
+      "actual": {
+        "items": [
+          {
+            "schemaVersion": "1.0",
+            "id": "6f28cac1-421d-4104-ba87-ba63a9431744",
+            "type": "occurrence.appended",
+            "source": "qa_hub",
+            "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+            "bugId": "a7546808-eb74-4a3f-a85d-033e306c569a",
+            "aggregate": {
+              "type": "bug",
+              "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+              "version": 1
+            },
+            "sequence": 1,
+            "actor": {
+              "type": "user",
+              "id": "4021546f-0526-44f3-81b3-8a076a557a9f"
+            },
+            "correlationId": "1c82bb69-e5d9-4b26-94d7-2aceea7e13d2",
+            "causationId": null,
+            "occurredAt": "2026-09-09T02:23:12.896Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "occurrenceId": "b4049bce-3e9a-4391-a104-da3b92c9c8e5",
+              "fromVersion": 1,
+              "toVersion": 2
+            }
+          }
+        ],
+        "nextCursor": null
+      },
+      "expected": {
+        "items": [
+          {
+            "schemaVersion": "1.0",
+            "id": "6f28cac1-421d-4104-ba87-ba63a9431744",
+            "type": "occurrence.appended",
+            "source": "qa_hub",
+            "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+            "bugId": "a7546808-eb74-4a3f-a85d-033e306c569a",
+            "aggregate": {
+              "type": "bug",
+              "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+              "version": 1
+            },
+            "sequence": 1,
+            "actor": {
+              "type": "user",
+              "id": "4021546f-0526-44f3-81b3-8a076a557a9f"
+            },
+            "correlationId": "1c82bb69-e5d9-4b26-94d7-2aceea7e13d2",
+            "causationId": null,
+            "occurredAt": "2026-09-09T02:23:12.896Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "occurrenceId": "b4049bce-3e9a-4391-a104-da3b92c9c8e5",
+              "fromVersion": 1,
+              "toVersion": 2
+            }
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 49",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 50",
+      "passed": true,
+      "actual": [
+        "a7546808-eb74-4a3f-a85d-033e306c569a"
+      ],
+      "expected": [
+        "a7546808-eb74-4a3f-a85d-033e306c569a"
+      ]
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 51",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 52",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 53",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 54",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 55",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 56",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 57",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "proof actual/expected web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json 58",
+      "passed": true,
+      "actual": [
+        {
+          "port": 4419,
+          "address": "127.0.0.1",
+          "pid": 22852,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-09T01:22:20.2728640Z"
+        },
+        {
+          "port": 4274,
+          "address": "127.0.0.1",
+          "pid": 20284,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        }
+      ],
+      "expected": [
+        {
+          "port": 4419,
+          "address": "127.0.0.1",
+          "pid": 22852,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-09T01:22:20.2728640Z"
+        },
+        {
+          "port": 4274,
+          "address": "127.0.0.1",
+          "pid": 20284,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        }
+      ]
+    },
+    {
+      "label": "tamper rejected before any write web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "passed": true,
+      "actual": [
+        true,
+        0
+      ],
+      "expected": [
+        true,
+        0
+      ]
+    },
+    {
+      "label": "missing optional proof marked absent web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "new proof validation entry web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "validation-only proof does not affect any surface result web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "passed": true,
+      "actual": "ba066c3cfd9fc06403152f20adea1e86362ffe5af19eac4b2d7f123a8b2c054f",
+      "expected": "ba066c3cfd9fc06403152f20adea1e86362ffe5af19eac4b2d7f123a8b2c054f"
+    },
+    {
+      "label": "proof SHA server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
+      "passed": true,
+      "actual": "55ac6023679282fb4a7a0a985ff79db0a2718999f1869e41fe60b25e569834e5",
+      "expected": "55ac6023679282fb4a7a0a985ff79db0a2718999f1869e41fe60b25e569834e5"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 0",
+      "passed": true,
+      "actual": 22852,
+      "expected": 22852
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 1",
+      "passed": true,
+      "actual": 1788916940272,
+      "expected": 1788916940272
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 2",
+      "passed": true,
+      "actual": 15736,
+      "expected": 15736
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 3",
+      "passed": true,
+      "actual": 1788885962459,
+      "expected": 1788885962459
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 4",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 5",
+      "passed": true,
+      "actual": "ready",
+      "expected": "ready"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 6",
+      "passed": true,
+      "actual": "14",
+      "expected": "14"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 7",
+      "passed": true,
+      "actual": 90,
+      "expected": 90
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 8",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 9",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 10",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 11",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 12",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 13",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 14",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 15",
+      "passed": true,
+      "actual": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+      "expected": "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 16",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 17",
+      "passed": true,
+      "actual": "5c28c343-ba43-43c3-a180-d0bde0e845fa",
+      "expected": "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 18",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 19",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 20",
+      "passed": true,
+      "actual": "4234d5f0-8544-40af-938f-69ffb7d5edf3",
+      "expected": "4234d5f0-8544-40af-938f-69ffb7d5edf3"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 21",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 22",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 23",
+      "passed": true,
+      "actual": "5c28c343-ba43-43c3-a180-d0bde0e845fa",
+      "expected": "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 24",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 25",
+      "passed": true,
+      "actual": "74c86a59-289d-47b2-8bb4-b9bbd239778c",
+      "expected": "74c86a59-289d-47b2-8bb4-b9bbd239778c"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 26",
+      "passed": true,
+      "actual": [
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ],
+      "expected": [
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 27",
+      "passed": true,
+      "actual": [
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ],
+      "expected": [
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 28",
+      "passed": true,
+      "actual": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+      "expected": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 29",
+      "passed": true,
+      "actual": "4234d5f0-8544-40af-938f-69ffb7d5edf3",
+      "expected": "4234d5f0-8544-40af-938f-69ffb7d5edf3"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 30",
+      "passed": true,
+      "actual": [
+        "4234d5f0-8544-40af-938f-69ffb7d5edf3",
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ],
+      "expected": [
+        "4234d5f0-8544-40af-938f-69ffb7d5edf3",
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 31",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 32",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 33",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 34",
+      "passed": true,
+      "actual": "active",
+      "expected": "active"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 35",
+      "passed": true,
+      "actual": "active",
+      "expected": "active"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 36",
+      "passed": true,
+      "actual": {
+        "projectId": "5c28c343-ba43-43c3-a180-d0bde0e845fa",
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "active": false,
+        "version": 2
+      },
+      "expected": {
+        "projectId": "5c28c343-ba43-43c3-a180-d0bde0e845fa",
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "active": false,
+        "version": 2
+      }
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 37",
+      "passed": true,
+      "actual": {
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "displayName": "McpSharede21431f0e9274a3f8275167accb1eaef",
+        "status": "active",
+        "membershipStatus": "active",
+        "membershipVersion": 1,
+        "roles": [
+          "developer",
+          "project_admin",
+          "release_manager",
+          "reporter",
+          "triager",
+          "verifier",
+          "viewer"
+        ]
+      },
+      "expected": {
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "displayName": "McpSharede21431f0e9274a3f8275167accb1eaef",
+        "status": "active",
+        "membershipStatus": "active",
+        "membershipVersion": 1,
+        "roles": [
+          "developer",
+          "project_admin",
+          "release_manager",
+          "reporter",
+          "triager",
+          "verifier",
+          "viewer"
+        ]
+      }
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 38",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 39",
+      "passed": true,
+      "actual": [
+        "4234d5f0-8544-40af-938f-69ffb7d5edf3"
+      ],
+      "expected": [
+        "4234d5f0-8544-40af-938f-69ffb7d5edf3"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 40",
+      "passed": true,
+      "actual": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+      "expected": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 41",
+      "passed": true,
+      "actual": {
+        "projectId": "5c28c343-ba43-43c3-a180-d0bde0e845fa",
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "active": true,
+        "version": 3
+      },
+      "expected": {
+        "projectId": "5c28c343-ba43-43c3-a180-d0bde0e845fa",
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "active": true,
+        "version": 3
+      }
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 42",
+      "passed": true,
+      "actual": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+      "expected": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 43",
+      "passed": true,
+      "actual": [
+        "4234d5f0-8544-40af-938f-69ffb7d5edf3",
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ],
+      "expected": [
+        "4234d5f0-8544-40af-938f-69ffb7d5edf3",
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 44",
+      "passed": true,
+      "actual": [
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ],
+      "expected": [
+        "5c28c343-ba43-43c3-a180-d0bde0e845fa"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 45",
+      "passed": true,
+      "actual": {
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "displayName": "McpSharede21431f0e9274a3f8275167accb1eaef",
+        "status": "active",
+        "membershipStatus": "active",
+        "membershipVersion": 1,
+        "roles": [
+          "developer",
+          "project_admin",
+          "release_manager",
+          "reporter",
+          "triager",
+          "verifier",
+          "viewer"
+        ]
+      },
+      "expected": {
+        "userId": "4f4e5d93-5cb7-4a62-836d-7b21080a51e9",
+        "displayName": "McpSharede21431f0e9274a3f8275167accb1eaef",
+        "status": "active",
+        "membershipStatus": "active",
+        "membershipVersion": 1,
+        "roles": [
+          "developer",
+          "project_admin",
+          "release_manager",
+          "reporter",
+          "triager",
+          "verifier",
+          "viewer"
+        ]
+      }
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 46",
+      "passed": true,
+      "actual": 3,
+      "expected": 3
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 47",
+      "passed": true,
+      "actual": "active",
+      "expected": "active"
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 48",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 49",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 50",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 51",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 52",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 53",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 54",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 55",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 56",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 57",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "label": "proof actual/expected server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json 58",
+      "passed": true,
+      "actual": [
+        {
+          "port": 4419,
+          "pid": 22852,
+          "startedAt": "2026-09-09T01:22:20.2728640Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+        },
+        {
+          "port": 4421,
+          "pid": 15736,
+          "startedAt": "2026-09-08T16:46:02.4598690Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+        }
+      ],
+      "expected": [
+        {
+          "port": 4419,
+          "pid": 22852,
+          "startedAt": "2026-09-09T01:22:20.2728640Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+        },
+        {
+          "port": 4421,
+          "pid": 15736,
+          "startedAt": "2026-09-08T16:46:02.4598690Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+        }
+      ]
+    },
+    {
+      "label": "tamper rejected before any write server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
+      "passed": true,
+      "actual": [
+        true,
+        0
+      ],
+      "expected": [
+        true,
+        0
+      ]
+    },
+    {
+      "label": "missing optional proof marked absent server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "new proof validation entry server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "absent membership does not promote 2",
+      "passed": true,
+      "actual": "not_run",
+      "expected": "not_run"
+    },
+    {
+      "label": "absent membership does not promote 4",
+      "passed": true,
+      "actual": "not_run",
+      "expected": "not_run"
+    },
+    {
+      "label": "two denied membership MCP calls actually present",
+      "passed": true,
+      "actual": 2,
+      "expected": 2
+    },
+    {
+      "label": "real MCP denial envelope disabled A refuses same name",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "real MCP denial status disabled A refuses same name",
+      "passed": true,
+      "actual": 403,
+      "expected": 403
+    },
+    {
+      "label": "real MCP denial envelope old A token refuses A read",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "real MCP denial status old A token refuses A read",
+      "passed": true,
+      "actual": 403,
+      "expected": 403
+    },
+    {
+      "label": "proof SHA contracts-result-phase-a/result.json",
+      "passed": true,
+      "actual": "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca",
+      "expected": "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca"
+    },
+    {
+      "label": "tamper rejected before any write contracts-result-phase-a/result.json",
+      "passed": true,
+      "actual": [
+        true,
+        0
+      ],
+      "expected": [
+        true,
+        0
+      ]
+    },
+    {
+      "label": "missing optional proof marked absent contracts-result-phase-a/result.json",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "new proof validation entry contracts-result-phase-a/result.json",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "validation-only proof does not affect any surface result contracts-result-phase-a/result.json",
+      "passed": true,
+      "actual": "ba066c3cfd9fc06403152f20adea1e86362ffe5af19eac4b2d7f123a8b2c054f",
+      "expected": "ba066c3cfd9fc06403152f20adea1e86362ffe5af19eac4b2d7f123a8b2c054f"
+    },
+    {
+      "label": "exact two virtual outputs each normal run",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "actual three generated outputs unchanged",
+      "passed": true,
+      "actual": {
+        "docs\\evidence\\project-components\\coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+        "docs\\evidence\\project-components\\coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+        "docs\\evidence\\project-components\\coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+      },
+      "expected": {
+        "docs\\evidence\\project-components\\coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+        "docs\\evidence\\project-components\\coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+        "docs\\evidence\\project-components\\coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+      }
+    }
+  ],
+  "protectedBefore": {
+    "docs\\evidence\\project-components\\coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+    "docs\\evidence\\project-components\\coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+  },
+  "protectedAfter": {
+    "docs\\evidence\\project-components\\coverage-matrix.json": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041",
+    "docs\\evidence\\project-components\\coverage-matrix.md": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+  },
+  "limits": [
+    "This is a mapping/tool audit, not a live business rerun or current-source E2E.",
+    "The two promoted server MCP surfaces do not promote whole baselines or other clients.",
+    "Detail59 and Phase A source/temporary HTTP evidence remain validation-only; historical failures and source revalidation flags remain.",
+    "The separate generation-chain test validates real current-source discovery and current/retired preservation; this audit does not regenerate the actual matrix."
+  ]
+}

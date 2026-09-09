@@ -1,0 +1,2 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug npx
+npm notice run eslint scripts/project-components/coverage-generation-chain.test.mjs scripts/project-components/membership-map.audit.mjs

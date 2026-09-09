@@ -1,0 +1,96 @@
+{
+  "recordedAt": "2026-09-09T03:18:58.125Z",
+  "status": "frozen",
+  "files": [
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/README.md",
+      "size": 6023,
+      "sha256": "5411825312a569bb1bba1a7e24eccbe78a25ee41ca2b177f6d80b89a35bf81c2"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/chain-final.json",
+      "size": 3323,
+      "sha256": "1e33cd0e15f9ace2c721b982c3e7bcb8803c026aa337c4036711086938dbb7c5"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/chain-final.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/chain-initial-failure.json",
+      "size": 2181,
+      "sha256": "3cc138d1925a18eb7bd7ab45412bf8821390e7dadaa1fd14392191e9b960e1d9"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/chain-initial.mjs.txt",
+      "size": 8800,
+      "sha256": "a0c5f0c29c5311ceec73da1fbb40c5c42f35e3cac55af6776c76a21463ba4194"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/chain-initial.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/format.txt",
+      "size": 262,
+      "sha256": "cc4fcadb6d1e1c1ebc860d7aa0c26b5386a4f0e7f0e3e163816c15415e54da01"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/lint.txt",
+      "size": 186,
+      "sha256": "7f407e96f18c3eb66359476538158442baae8cd1793f7e6286884552114c6050"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/membership-audit-initial.mjs.txt",
+      "size": 15965,
+      "sha256": "69e53d01e337f0f7bf16a1dca9860f081de76e2b1f2db1f9df7648c84a363679"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/membership-audit-r2.json",
+      "size": 67442,
+      "sha256": "74aa459083e90934d5f17f14ad00594e7db1763ec8e44353ed245b4160613121"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/membership-audit-r2.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/membership-audit.json",
+      "size": 67311,
+      "sha256": "fc384796269cd604d98b822ffdac440e1c18df37f7f9addd12b45727ed438cfd"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/membership-audit.stderr.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/syntax-audit.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-membership-map/54c03aa3-9b86-4738-a286-e3de38d16604/syntax-chain.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "scripts/project-components/coverage-generation-chain.test.mjs",
+      "size": 9509,
+      "sha256": "80c5dfa33edb62a120303c8c08bb75f2709302e43d7d2b18b54e28c3d5f557b0"
+    },
+    {
+      "path": "scripts/project-components/membership-map.audit.mjs",
+      "size": 16089,
+      "sha256": "717afcb945a116a840b64fbb53f81833dc65b36ec0b7296f363674467c252d54"
+    }
+  ],
+  "scan": {
+    "hits": [],
+    "credentialFilesRead": 0
+  },
+  "mapperReadOnlySha256": "685486b28a8b6934c26fc9a07871c74062e6bdd294ae3fb9f6d9488bb454d435"
+}
