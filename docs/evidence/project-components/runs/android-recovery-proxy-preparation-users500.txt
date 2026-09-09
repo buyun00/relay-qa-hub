@@ -1,0 +1,30 @@
+not_run: requires --run <absolute private config>; no port opened, no API or device operation
+✔ configuration is explicit, pinned to preview and a unique outside-Git private run (1.985ms)
+✔ four real-function matching 201 decisions, then explicit native request, keep one effect/key/body (5.9839ms)
+✔ fifth request without the explicit matching marker is refused and never forwarded (4.3142ms)
+✔ first create requires observed empty scoped project and all-disabled components (0.7482ms)
+✔ unrelated mutations, project/actor/auth changes, encoded paths and binary uploads have zero forwarding (0.9405ms)
+✔ once captured, another key, whitespace or changed form cannot replace the original intent (1.3792ms)
+✔ every malformed or foreign real-function receipt is retained privately but never counted as a drop (2.7154ms)
+✔ same project and submission but different replay effect IDs stops the experiment (0.5198ms)
+✔ private request persistence failure causes no outbound call; receipt failure causes no intentional drop (0.7108ms)
+✔ concurrent old native POST is never forwarded twice and cannot overwrite a failed experiment (0.5724ms)
+✔ a disconnected client is not reported as the proxy successfully suppressing its receipt (1.0283ms)
+✔ known Bug reads stay bound to recorded receipt and status inspection never sends requests (0.5485ms)
+✔ optional exact native bootstrap forwards raw 200 but stores only an in-memory token digest (0.656ms)
+✔ bootstrap rejects altered login fields, GM, actor/project/account swaps and invalid tokens (1.2251ms)
+✔ code22 to code23 same-identity relogin rotates only the token binding and keeps original request (1.1712ms)
+✔ scoped public entry and project list support native establish without exposing other projects (0.3434ms)
+✔ overlapping native refresh waits for committed identity instead of rejecting a legitimate new Bug (0.4353ms)
+✔ unknown exception text and token-shaped strings cannot enter public diagnostics (0.2964ms)
+✔ native component page users limit500 is exact-scoped and cannot admit foreign response scope (0.5944ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 237.2112
+Checking formatting...
+All matched files use Prettier code style!

@@ -1,0 +1,521 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-09T00:15:23.095Z",
+  "runId": "f4ea57e7-b24e-434c-80dd-029686bc1a98",
+  "status": "packaged_verified_not_published",
+  "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+  "sourceDirty": true,
+  "acceptanceDirectory": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98",
+  "releaseId": "20260909T000712593Z",
+  "version": "0.2.0-preview.8",
+  "artifacts": {
+    "installer": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+      "bytes": 108333764,
+      "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+    },
+    "manifest": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-latest.json",
+      "bytes": 464,
+      "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+    },
+    "asar": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64\\resources\\app.asar",
+      "bytes": 5529881,
+      "sha256": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05"
+    },
+    "packagedConfig": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64\\preview-instance.json",
+      "bytes": 561,
+      "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+    },
+    "release": {
+      "schemaVersion": 1,
+      "releaseId": "20260909T000712593Z",
+      "version": "0.2.0-preview.8",
+      "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+      "sourceDirty": true,
+      "instanceId": "qa-hub-preview-7c86"
+    },
+    "bundle": {
+      "path": "web/assets/index-Ce9wROrH.js",
+      "bytes": 477454,
+      "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+    },
+    "metadata": {
+      "FileVersion": "0.2.0.8",
+      "ProductVersion": "0.2.0-preview.8",
+      "AuthenticodeStatus": ""
+    }
+  },
+  "receipt": {
+    "releaseId": "20260909T000712593Z",
+    "version": "0.2.0-preview.8",
+    "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+    "sourceDirty": true,
+    "installer": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+    "packageDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64",
+    "manifestPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-latest.json",
+    "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+    "bytes": 108333764
+  },
+  "verificationChecks": {
+    "passed": 41,
+    "total": 41
+  },
+  "gates": {
+    "typecheck": "passed",
+    "test": {
+      "passed": 104,
+      "total": 104
+    },
+    "build": "passed",
+    "packageProcessExit": 0
+  },
+  "runHistory": [
+    {
+      "record": "runs/first-build-result.json",
+      "status": "failed_retained",
+      "completedChecks": 23,
+      "allCompletedChecksPassed": true,
+      "failure": {
+        "name": "SyntaxError",
+        "message": "Unexpected token 'P', \"Packaging \"... is not valid JSON"
+      },
+      "interpretation": "Packaging exited 0. Harness parsed standard packager stdout prologue plus receipt as a single JSON value. Original failure retained; package not rerun."
+    },
+    {
+      "record": "runs/first-verification-result.json",
+      "status": "verification_failed_retained",
+      "completedChecks": 24,
+      "allCompletedChecksPassed": true,
+      "failure": {
+        "name": "Error",
+        "message": "\"web/assets/index-Ce9wROrH.js\" was not found in this archive"
+      },
+      "interpretation": "Windows asar nested path separator in harness. Archive listing and native path.join extraction prove intended file is present. Original failure retained."
+    },
+    {
+      "record": "runs/windows-verification-result.json",
+      "status": "packaged_verified_not_published",
+      "completedChecks": 41,
+      "allCompletedChecksPassed": true,
+      "interpretation": "Read existing generated receipt.json; path.join for Windows asar extraction; no rebuild or repackaging."
+    }
+  ],
+  "authenticode": {
+    "status": "NotSigned",
+    "signerPresent": false,
+    "record": "runs/authenticode-readback.json",
+    "warning": "Nested Windows PowerShell failed Microsoft.PowerShell.Security module autoload in the final verifier; its metadata AuthenticodeStatus is empty. Separate actual tool-host PowerShell readback returns NotSigned. Ed25519 manifest verification is independent and passed."
+  },
+  "preservation": {
+    "formalLatestUnchanged": true,
+    "formalDownloadsContainsNoNewInstaller": true,
+    "installedConfigurationUnchanged": true,
+    "installedExeAndAsarUnchanged": true,
+    "webDistWholeInventoryUnchanged": true,
+    "desktopAndHelperSourceUnchanged": true,
+    "exactPreviewDailyAndServiceProcessIdentitiesUnchanged": true,
+    "before": {
+      "observedAt": "2026-09-09T00:06:56.9276937Z",
+      "listeners": [
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4274,
+          "OwningProcess": 20284
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4419,
+          "OwningProcess": 10036
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4420,
+          "OwningProcess": 23924
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4421,
+          "OwningProcess": 15736
+        }
+      ],
+      "processes": [
+        {
+          "ProcessId": 3452,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z"
+        },
+        {
+          "ProcessId": 10036,
+          "ParentProcessId": 18924,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T22:26:05.0349230Z"
+        },
+        {
+          "ProcessId": 10744,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z"
+        },
+        {
+          "ProcessId": 11604,
+          "ParentProcessId": 23924,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.6599830Z"
+        },
+        {
+          "ProcessId": 12520,
+          "ParentProcessId": 23924,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.5462980Z"
+        },
+        {
+          "ProcessId": 15160,
+          "ParentProcessId": 23924,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.4997540Z"
+        },
+        {
+          "ProcessId": 15736,
+          "ParentProcessId": 3236,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T16:46:02.4598690Z"
+        },
+        {
+          "ProcessId": 17160,
+          "ParentProcessId": 24088,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z"
+        },
+        {
+          "ProcessId": 20284,
+          "ParentProcessId": 3032,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        },
+        {
+          "ProcessId": 23924,
+          "ParentProcessId": 20244,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.3376550Z"
+        },
+        {
+          "ProcessId": 23944,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z"
+        }
+      ],
+      "installedVersion": "0.2.0-preview.7",
+      "installedNativeVersion": "0.2.0.7"
+    },
+    "after": {
+      "observedAt": "2026-09-09T00:13:24.6987958Z",
+      "listeners": [
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4274,
+          "OwningProcess": 20284
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4419,
+          "OwningProcess": 10036
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4420,
+          "OwningProcess": 23924
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4421,
+          "OwningProcess": 15736
+        }
+      ],
+      "processes": [
+        {
+          "ProcessId": 3452,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z"
+        },
+        {
+          "ProcessId": 10036,
+          "ParentProcessId": 18924,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T22:26:05.0349230Z"
+        },
+        {
+          "ProcessId": 10744,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z"
+        },
+        {
+          "ProcessId": 11604,
+          "ParentProcessId": 23924,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.6599830Z"
+        },
+        {
+          "ProcessId": 12520,
+          "ParentProcessId": 23924,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.5462980Z"
+        },
+        {
+          "ProcessId": 15160,
+          "ParentProcessId": 23924,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.4997540Z"
+        },
+        {
+          "ProcessId": 15736,
+          "ParentProcessId": 3236,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T16:46:02.4598690Z"
+        },
+        {
+          "ProcessId": 17160,
+          "ParentProcessId": 24088,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z"
+        },
+        {
+          "ProcessId": 20284,
+          "ParentProcessId": 3032,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        },
+        {
+          "ProcessId": 23924,
+          "ParentProcessId": 20244,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-08T21:18:26.3376550Z"
+        },
+        {
+          "ProcessId": 23944,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z"
+        }
+      ],
+      "installedVersion": "0.2.0-preview.7",
+      "installedNativeVersion": "0.2.0.7"
+    }
+  },
+  "privateFiles": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\build-package-only.mjs",
+      "bytes": 13437,
+      "sha256": "3ce4575db29593bb8a96439d8db969b58ded71805b1cb0294b6dbda140b0cff0"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\verify-retained-package.mjs",
+      "bytes": 10209,
+      "sha256": "15d75ab67f95d2ebe7bb1bd3f625512cdb61fe795d62bc946a0dc0be48bed15c"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\verify-retained-package-windows.mjs",
+      "bytes": 10243,
+      "sha256": "0104d19f7ac28976e8ef9bd9c3121bd4c6e1285a7f7b22d9755574475e5b6b4a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\package-instance.json",
+      "bytes": 1221,
+      "sha256": "0396737017e7391686c9d552b9a27ccea72f05051817317c3cd6e556f420df55"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\before.json",
+      "bytes": 10452,
+      "sha256": "3ffe318e09c83dd456ee4fdfed163929d894adb1627861ae7280c78ac4607e38"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\served-manifest-before.json",
+      "bytes": 464,
+      "sha256": "ead43d0162c71581834e8917035db85f97c74e86a064b386894c6cdda24efc7c"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\source-status-before.txt",
+      "bytes": 1216,
+      "sha256": "3ba529b36904c5e032c1603f90384bf584d4bd6dc484002e1bda279e6a56b951"
+    }
+  ],
+  "rawCopies": [
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\result.json",
+        "bytes": 27009,
+        "sha256": "5d4ae504cc69d3a67b98e9e45251e54624c56e63ed34fb6eb4a82c6d45a7d9aa"
+      },
+      "copy": {
+        "path": "runs/first-build-result.json",
+        "bytes": 27009,
+        "sha256": "5d4ae504cc69d3a67b98e9e45251e54624c56e63ed34fb6eb4a82c6d45a7d9aa"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\verify-only-result.json",
+        "bytes": 6293,
+        "sha256": "97392973072d82371620205ad488bd4c3d45b09a16c44e181dc37941c9a81896"
+      },
+      "copy": {
+        "path": "runs/first-verification-result.json",
+        "bytes": 6293,
+        "sha256": "97392973072d82371620205ad488bd4c3d45b09a16c44e181dc37941c9a81896"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\verify-only-windows-result.json",
+        "bytes": 49550,
+        "sha256": "337c3eeaa018c0c3f01432c741929fe9aab720bbbd9b5cc6d0e5d4f4e9f2a8c7"
+      },
+      "copy": {
+        "path": "runs/windows-verification-result.json",
+        "bytes": 49550,
+        "sha256": "337c3eeaa018c0c3f01432c741929fe9aab720bbbd9b5cc6d0e5d4f4e9f2a8c7"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\authenticode-readback.json",
+        "bytes": 946,
+        "sha256": "0c9ed0452a814a88f077340143164fa3cfaec963d015ec0498b21e217f68513f"
+      },
+      "copy": {
+        "path": "runs/authenticode-readback.json",
+        "bytes": 946,
+        "sha256": "0c9ed0452a814a88f077340143164fa3cfaec963d015ec0498b21e217f68513f"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\desktop-typecheck.log",
+        "bytes": 98,
+        "sha256": "275e458afc146d3490ea24cfd0766c361c9a34e735a55022f12fd1ad865a41e7"
+      },
+      "copy": {
+        "path": "runs/desktop-typecheck.log",
+        "bytes": 98,
+        "sha256": "275e458afc146d3490ea24cfd0766c361c9a34e735a55022f12fd1ad865a41e7"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\desktop-test.log",
+        "bytes": 9473,
+        "sha256": "f3ed9b1804a292180af9ec2dd1710485f0137bac8ebd185af48d71aea48e7619"
+      },
+      "copy": {
+        "path": "runs/desktop-test.log",
+        "bytes": 9473,
+        "sha256": "f3ed9b1804a292180af9ec2dd1710485f0137bac8ebd185af48d71aea48e7619"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\desktop-build.log",
+        "bytes": 85,
+        "sha256": "f13170be305a4b8402010329cf666c95531fb30484912ac8527512697a76cfd5"
+      },
+      "copy": {
+        "path": "runs/desktop-build.log",
+        "bytes": 85,
+        "sha256": "f13170be305a4b8402010329cf666c95531fb30484912ac8527512697a76cfd5"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\package-preview.log",
+        "bytes": 881,
+        "sha256": "1794adaadc554e8cebc26e6ae676368f0dc286aacdf9e5ad98bde78a05693560"
+      },
+      "copy": {
+        "path": "runs/package-preview.log",
+        "bytes": 881,
+        "sha256": "1794adaadc554e8cebc26e6ae676368f0dc286aacdf9e5ad98bde78a05693560"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\updater-build.log",
+        "bytes": 232,
+        "sha256": "52383a4db410b72718a7ebf3edc3223fcdd6a83ccfba1156e1d92ecbde9d33ac"
+      },
+      "copy": {
+        "path": "runs/updater-build.log",
+        "bytes": 232,
+        "sha256": "52383a4db410b72718a7ebf3edc3223fcdd6a83ccfba1156e1d92ecbde9d33ac"
+      },
+      "identical": true
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\installer-build.log",
+        "bytes": 232,
+        "sha256": "52383a4db410b72718a7ebf3edc3223fcdd6a83ccfba1156e1d92ecbde9d33ac"
+      },
+      "copy": {
+        "path": "runs/installer-build.log",
+        "bytes": 232,
+        "sha256": "52383a4db410b72718a7ebf3edc3223fcdd6a83ccfba1156e1d92ecbde9d33ac"
+      },
+      "identical": true
+    }
+  ],
+  "notPerformed": [
+    "build again",
+    "publish served latest",
+    "install",
+    "launch or stop EXE/services",
+    "Web build",
+    "business mutation"
+  ],
+  "limitations": [
+    "No installed preview.8 native validation",
+    "No actual EXE normal restart or upgrade",
+    "No preview.8 local MCP4420 protocol/business readback",
+    "No EXE unknown-receipt recovery UI test",
+    "Original .7 native draft/UI not reread in this packaging-only scope; current process/config unchanged is not a new draft preservation proof"
+  ],
+  "planErrata": [
+    "package-preview stdout contains a non-JSON Packaging line: use generated packages/<releaseId>/receipt.json, not JSON.parse(all stdout).",
+    "Use path.join for @electron/asar nested extractFile names on Windows. Frozen preparation plan is retained as preparation history."
+  ]
+}

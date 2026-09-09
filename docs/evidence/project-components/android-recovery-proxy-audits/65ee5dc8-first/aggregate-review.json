@@ -1,0 +1,615 @@
+{
+  "schemaVersion": 1,
+  "kind": "read-only-aggregate-cross-review",
+  "reviewedAt": "2026-09-09T00:31:48.491Z",
+  "status": "failed",
+  "aggregate": {
+    "path": "docs/evidence/project-components/android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+    "sha256": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56"
+  },
+  "checks": [
+    {
+      "name": "aggregate-pinned-sha",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\device-before.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\preservation-before.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\native-first-submit.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\exhausted-before-upgrade.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\upgrade-code23.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-adopt-gesture.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\legacy-adoption-readback.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-confirm-gesture.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\confirmed-room-readback.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\device-after.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\upgrade-precheck-first-failure.json",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-legacy-adopted.png",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-legacy-adopted.xml",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-confirm-result.png",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-confirm-result.xml",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-restarted-edited-visible.png",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-restarted-edited-visible.xml",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-original-text-check.png",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-original-text-check.xml",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\android-code23-ui.mjs.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\preserve-code22-for-code23.mjs.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\upgrade-code23-after-exhaustion.mjs.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\finish-code23-upgrade.mjs.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\confirm-code23-native.mjs.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\archive-code23-confirmed.mjs.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-recovery-proxy-audits\\65ee5dc8-first\\proof.json",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-create-readback\\f0d296c0-da06-4423-83bc-a5a6d0d5e59c\\proof.json",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\preparation.json",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\BugDraftPreferences.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\FoundationViewModel.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\Daos.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\ScopedRepository.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\UnconfirmedCreateSubmission.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\DurableBugDraftCommit.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\work\\OfflineSyncEngine.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\ui\\FoundationScreen.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\test\\kotlin\\com\\relayqahub\\android\\work\\OfflineSyncEngineTest.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:apps\\android\\app\\src\\test\\kotlin\\com\\relayqahub\\android\\BugDraftPreferencesTest.kt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\assemble-code23.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-signature.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-manifest-tree.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\retained-installed-code22.apk",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-preview-code22-data.tar",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-preview-before-file-hashes.txt",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-code23-confirmed-data.tar",
+      "passed": true
+    },
+    {
+      "name": "hash:..\\..\\..\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-code22-exhausted-data.tar",
+      "passed": true
+    },
+    {
+      "name": "artifact-identical-to-preparation",
+      "passed": true
+    },
+    {
+      "name": "preparation-head-matches-result",
+      "passed": true
+    },
+    {
+      "name": "aggregate-upgrade-is-private-summary",
+      "passed": true
+    },
+    {
+      "name": "aggregate-adoption-is-private-summary",
+      "passed": true
+    },
+    {
+      "name": "aggregate-confirm-gesture-is-private-summary",
+      "passed": true
+    },
+    {
+      "name": "aggregate-room-is-private-summary",
+      "passed": true
+    },
+    {
+      "name": "aggregate-final-device-is-private-summary",
+      "passed": true
+    },
+    {
+      "name": "daily-version14-before-after",
+      "passed": true
+    },
+    {
+      "name": "daily-pid5051-before-after",
+      "passed": true
+    },
+    {
+      "name": "daily-settings-before-after-sha",
+      "passed": true
+    },
+    {
+      "name": "runtime-config-before-after-sha",
+      "passed": true
+    },
+    {
+      "name": "reverse-before-after-exact",
+      "passed": true
+    },
+    {
+      "name": "proxy-release-exit-summary",
+      "passed": true
+    },
+    {
+      "name": "preview-only-upgrade22-to23",
+      "passed": true
+    },
+    {
+      "name": "twelve-private-files-before-launch-retained",
+      "passed": true
+    },
+    {
+      "name": "legacy-row-state-attempts-error",
+      "passed": true
+    },
+    {
+      "name": "legacy-no-receipt-no-pending",
+      "passed": true
+    },
+    {
+      "name": "original-row-project-actor-operation",
+      "passed": true
+    },
+    {
+      "name": "original-payload-and-key-preserved",
+      "passed": true
+    },
+    {
+      "name": "adoption-same-original-intent",
+      "passed": true
+    },
+    {
+      "name": "adoption-before-fifth-native-confirmation",
+      "passed": true
+    },
+    {
+      "name": "cold-readback-summary-valid",
+      "passed": true
+    },
+    {
+      "name": "one-original-row-success-one-replayed-receipt",
+      "passed": true
+    },
+    {
+      "name": "old-two-rows-and-receipts-retained",
+      "passed": true
+    },
+    {
+      "name": "capture-anchor-hashes-retained",
+      "passed": true
+    },
+    {
+      "name": "drafts-retained-pending-cleared",
+      "passed": true
+    },
+    {
+      "name": "original-project-actor-restored-summary",
+      "passed": true
+    },
+    {
+      "name": "failed-precheck-retained-before-install",
+      "passed": true
+    },
+    {
+      "name": "original-submission-equals-independent-proxy",
+      "passed": true
+    },
+    {
+      "name": "canonical-service-ids-match-independent-proxy",
+      "passed": true
+    },
+    {
+      "name": "scope-and-canonical-ids-match-independent-api",
+      "passed": false
+    },
+    {
+      "name": "official-one-bug-one-event-zero-attachments-five-off",
+      "passed": true
+    },
+    {
+      "name": "four-drops-fifth-forward-replayed-and-stopped",
+      "passed": true
+    },
+    {
+      "name": "restart-caused-no-sixth-create",
+      "passed": true
+    },
+    {
+      "name": "original-A-and-old-text-visible-in-XML",
+      "passed": true
+    },
+    {
+      "name": "restarted-test-actor-and-edited-text-visible-in-XML",
+      "passed": true
+    },
+    {
+      "name": "published-screenshots-match-private-originals",
+      "passed": true
+    },
+    {
+      "name": "reference-files-stable-after-review",
+      "passed": true
+    }
+  ],
+  "counts": {
+    "checks": 86,
+    "passed": 85,
+    "failed": 1,
+    "hashedReferences": 47
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\device-before.json",
+      "sha256": "744325d7c616d8ddf4f6fd64a5835049396eb339a0234f67fddf5e0fedadd474",
+      "bytes": 905
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\preservation-before.json",
+      "sha256": "6f8dce48bf3378f0dc80b3baf9d85450b3b9d773680dacddf5a711c5af8e6022",
+      "bytes": 783
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\native-first-submit.json",
+      "sha256": "41018ca8bd5f27b9c8f9373151e4860a40bb8953feaf92c0eda441547c650b8a",
+      "bytes": 419
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\exhausted-before-upgrade.json",
+      "sha256": "973d94f6b4735a50c227a6d1a5c1b5b0a36c11bddb7101a27ec62df83e099651",
+      "bytes": 3841
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\upgrade-code23.json",
+      "sha256": "61637ae7d57261dc6da4e4de47fbf08d143e27facd7403f9a4af1e4244c3a2ca",
+      "bytes": 470
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-adopt-gesture.json",
+      "sha256": "3e8eb7a5cb491e0d80fd1a8c4a0189c07f354a6b6d38853d79db143083be0da0",
+      "bytes": 261
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\legacy-adoption-readback.json",
+      "sha256": "a3a93666d43185ab232fe9883d0bcf27e7d6873e3657e5992deef8d10dac5540",
+      "bytes": 716
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-confirm-gesture.json",
+      "sha256": "1016032802693c44936364b2712055f9443d3e887c12584d768286b6aaadf8e5",
+      "bytes": 144
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\confirmed-room-readback.json",
+      "sha256": "a0965b6cd0196383390f7e4fa261b5cb161b59737bf3d9957c91ff2fab477b28",
+      "bytes": 1291
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\device-after.json",
+      "sha256": "501454f4d44956e5335bc501e69cdc82591ef8bd49ea33fbe68f04a701a4ca62",
+      "bytes": 873
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\upgrade-precheck-first-failure.json",
+      "sha256": "a803cbf8e1bfb7244d1d3e74021d7bc8086b387aaf85793212cc1ba94cafed69",
+      "bytes": 430
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-legacy-adopted.png",
+      "sha256": "582524d46e47390030addedb7db0be82f7e96b7423b846ce99002c58f3ae7be8",
+      "bytes": 173044
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-legacy-adopted.xml",
+      "sha256": "a97de32adcb7f15bed29138f10bf0bcbbfc0c65bfea27a621f933f58e742bbd2",
+      "bytes": 22313
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-confirm-result.png",
+      "sha256": "1b256db20cacaa8e1de0403653cf3702d1556e13b1ffd6d234e69d841b698a69",
+      "bytes": 167630
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-confirm-result.xml",
+      "sha256": "befd0e3faf95064b4a889c7c90aa1d65b5bdd748f0273af630708af3da6a84e5",
+      "bytes": 22258
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-restarted-edited-visible.png",
+      "sha256": "7a09a54cde22d2514b195e47fe060b89e2ae50f2eb9044e36921319fca377c0f",
+      "bytes": 143397
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-restarted-edited-visible.xml",
+      "sha256": "31e884ace4a95bd7412b06153cb7dc3b288d847f79d0ba42f964364d24859a4f",
+      "bytes": 17717
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-original-text-check.png",
+      "sha256": "8889b65d96f0890e460c4262e232fabce3d762f3cf25f168cd750ad1b6dd288b",
+      "bytes": 158495
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-original-text-check.xml",
+      "sha256": "96a7c71892ba10113d8a3e7dbcc46e7579c09e37bb6f879ca9bf8a72018e9e79",
+      "bytes": 17683
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\android-code23-ui.mjs.txt",
+      "sha256": "ae9faf637f7b5a7e14822625e1238dd12c99c53cdbce08802cb95f7728d843d0",
+      "bytes": 1727
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\preserve-code22-for-code23.mjs.txt",
+      "sha256": "030b55568346670e180889cf10275949ee4f6e7a54c7de51307b9b82d9df224c",
+      "bytes": 2688
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\upgrade-code23-after-exhaustion.mjs.txt",
+      "sha256": "41f738dae909405b7fa9b31f9a0edbaf830223d2f05a42d999730d2f30545791",
+      "bytes": 6431
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\finish-code23-upgrade.mjs.txt",
+      "sha256": "7fa2742c7243910db62c95085fde08093477b7acf88ca5f9a45a14217005871c",
+      "bytes": 6375
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\confirm-code23-native.mjs.txt",
+      "sha256": "f5f9a828db09fd331c8f539d683e5201281d4cd832495380fcb5d99245f0ad7d",
+      "bytes": 3179
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\harness\\archive-code23-confirmed.mjs.txt",
+      "sha256": "0e3e05ead297777ef6826699de6bb3bf51320cccd494cb52d8fc2900f5378e9f",
+      "bytes": 6069
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-recovery-proxy-audits\\65ee5dc8-first\\proof.json",
+      "sha256": "ed0da76a9d89906ab14144423c8dcc985e7f11cf619f94250ff108c50b317b65",
+      "bytes": 8869
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-create-readback\\f0d296c0-da06-4423-83bc-a5a6d0d5e59c\\proof.json",
+      "sha256": "3d987a3619503af4a853cd256cb6347329793d56d0c4b8c215f7f407f3082c7f",
+      "bytes": 10335
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+      "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+      "bytes": 35536941
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\preparation.json",
+      "sha256": "01bed635041b4e5021a0511929a19314bde4307eb693c213bbf51f0607d8f8e0",
+      "bytes": 6686
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\BugDraftPreferences.kt",
+      "sha256": "710a77ed0afa5ec680bac1de4f689c264783a2dc5aaee2e873b88c19f7164bf5",
+      "bytes": 11797
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\FoundationViewModel.kt",
+      "sha256": "91529b32553ebcf41628851e76f756272a141eac580192ac141645162ddebdad",
+      "bytes": 126738
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\Daos.kt",
+      "sha256": "7aa6fa6b7826492fc1c01e0dbd923c0e0319a82a73dcd1e8ec8f6965ff18e7c9",
+      "bytes": 19394
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\ScopedRepository.kt",
+      "sha256": "69d6794b7b7c784d7f30f3551901cad77c265d58576cdecc9cd036e350bcf193",
+      "bytes": 9813
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\UnconfirmedCreateSubmission.kt",
+      "sha256": "eb9590c65a69223ff3ddff39b5e9655ad7243b105c817ca1ef9ef62bc80bb86e",
+      "bytes": 5583
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\data\\DurableBugDraftCommit.kt",
+      "sha256": "d36e190d927dbbb24108834f18680dabf6ba0291497dadd35a8aa049a542b7db",
+      "bytes": 944
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\work\\OfflineSyncEngine.kt",
+      "sha256": "c253c457fad29d377abdd0774d5443d0e71264aaa9cfe7682d15d08796a22da6",
+      "bytes": 17096
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\ui\\FoundationScreen.kt",
+      "sha256": "592ec742249e32c87f274029795c6ada50e2cf96be51fb135fae3df0ff093e3e",
+      "bytes": 104557
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\test\\kotlin\\com\\relayqahub\\android\\work\\OfflineSyncEngineTest.kt",
+      "sha256": "95ce6a53c23f22c3e83180a22c8d45c6503db7c403734028a500fee749df9580",
+      "bytes": 48035
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\android\\app\\src\\test\\kotlin\\com\\relayqahub\\android\\BugDraftPreferencesTest.kt",
+      "sha256": "5a969d26a5d642e8ce7cbfbb69972f50d8b9fcef81bee2083bfc5d766406ea63",
+      "bytes": 21263
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\assemble-code23.txt",
+      "sha256": "3d6ed2da802d5613665c614361abb7617bbb08ba266b6368c2428a6e7a820401",
+      "bytes": 2783
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-signature.txt",
+      "sha256": "8d565f7cc6f0f23af54862e04acaafe308acb00beadc9aade6010147dd82d913",
+      "bytes": 768
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-manifest-tree.txt",
+      "sha256": "16cef8454424d8fbbe29df183f8e8a4e40b78056ebe682a47b25e89daf55e593",
+      "bytes": 12458
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\retained-installed-code22.apk",
+      "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+      "bytes": 35471405
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-preview-code22-data.tar",
+      "sha256": "6ae35cd8dcd8269e5c976265b745b88f75613d6924245848341ae7d41cad6235",
+      "bytes": 1291776
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-preview-before-file-hashes.txt",
+      "sha256": "99ac38205169406bc9d30dd6cd2f83e7972dfafedde8f7aa549dac935b988bf3",
+      "bytes": 1434
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-code23-confirmed-data.tar",
+      "sha256": "314091de6d6bd03f40cdab4ed05963da9cede0ae1878b4de81a71316fd0fc4e6",
+      "bytes": 1329152
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\private-code22-exhausted-data.tar",
+      "sha256": "8adac9e4bcef4869607303c8d90a999740387cdba2bbd8c8f1a0a9f50f161283",
+      "bytes": 1329152
+    }
+  ],
+  "visualReview": {
+    "files": [
+      "code23-original-text-check.png",
+      "code23-restarted-edited-visible.png"
+    ],
+    "originalActorAndRetainedTextVisible": true,
+    "originalScreenshotPreviewVisible": true,
+    "restartedEditedTextVisible": true
+  },
+  "boundaries": [
+    "Read-only file review. No device, API, service, port, process, installation or business action performed in this cross-review.",
+    "Cold archive bytes were hashed but not unpacked or opened as SQLite; DB and package-manager claims bind root summaries and retained harness evidence.",
+    "Two public PNGs were independently viewed; the native gestures, installation and process observations were performed by root.",
+    "BuildConfig hash and certificate are linked to preparation/signature logs; this review does not rerun compilation or signature verification.",
+    "Text-only MuMu legacy exhausted-create recovery. Physical device, image-bearing unknown receipt, invalid receipt and unrelated lifecycle/comment/component recovery remain outside coverage."
+  ]
+}

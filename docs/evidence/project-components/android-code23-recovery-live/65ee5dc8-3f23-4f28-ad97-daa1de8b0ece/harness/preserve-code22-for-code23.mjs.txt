@@ -1,0 +1,17 @@
+import {readFileSync,writeFileSync} from 'node:fs';import {spawnSync} from 'node:child_process';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';import {join} from 'node:path';
+const s=JSON.parse(readFileSync('.tools/android-code23-current.json','utf8')),adb='C:/Users/lin0/AppData/Local/Android/Sdk/platform-tools/adb.exe';
+function run(args,max=256*1024*1024){const r=spawnSync(adb,['-s',s.serial,...args],{timeout:20000,maxBuffer:max,windowsHide:true});assert.equal(r.status,0,'adb failed: '+args.slice(0,5).join(' '));return r.stdout;}
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const before=JSON.parse(readFileSync(join(s.root,'device-before.json'),'utf8'));
+assert.equal(run(['shell','pidof',s.daily]).toString().trim(),before.dailyPid);
+const apkPath=run(['shell','pm','path',s.preview]).toString().trim();assert.match(apkPath,/^package:\/data\/app\/.*\/base\.apk$/);const apk=run(['exec-out','cat',apkPath.slice(8)]);assert.equal(sha(apk),'733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777');writeFileSync(join(s.root,'retained-installed-code22.apk'),apk,{flag:'wx'});
+// The immediately observed NEW_BUG screen contains saved text/image and no open annotation editor.
+run(['shell','am','force-stop',s.preview]);
+const pidCheck=spawnSync(adb,['-s',s.serial,'shell','pidof',s.preview],{encoding:'utf8',windowsHide:true});assert.equal((pidCheck.stdout||'').trim(),'');
+assert.equal(run(['shell','pidof',s.daily]).toString().trim(),before.dailyPid);
+const names=run(['shell','run-as',s.preview,'ls','-1']).toString().trim().split(/\r?\n/);
+const dirs=['shared_prefs','files','databases','no_backup'].filter(x=>names.includes(x));assert.ok(dirs.includes('shared_prefs')&&dirs.includes('files')&&dirs.includes('databases'));
+const tar=run(['exec-out','run-as',s.preview,'tar','-cf','-',...dirs]);writeFileSync(join(s.root,'private-preview-code22-data.tar'),tar,{flag:'wx'});
+const inventory=run(['shell','run-as',s.preview,'sh','-c',"'find "+dirs.join(' ')+" -type f -exec sha256sum {} \\;' "]).toString().trim();writeFileSync(join(s.root,'private-preview-before-file-hashes.txt'),inventory,{flag:'wx'});
+const report={recordedAt:new Date().toISOString(),previewOnlyQuiesced:true,dailyPidUnchanged:true,sourceApkPath:apkPath.slice(8),apkBytes:apk.length,apkSha256:sha(apk),archiveBytes:tar.length,archiveSha256:sha(tar),directories:dirs,inventoryFiles:inventory.split('\n').length,inventorySha256:sha(inventory),runtimeConfigSha256:before.runtimeConfigSha256,previewRestarted:false};
+writeFileSync(join(s.root,'preservation-before.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(report));

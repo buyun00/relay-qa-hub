@@ -1,0 +1,29 @@
+not_run: requires --run <absolute private config>; no port opened, no API or device operation
+✔ configuration is explicit, pinned to preview and a unique outside-Git private run (1.8013ms)
+✔ four real-function matching 201 decisions, then explicit native request, keep one effect/key/body (5.7324ms)
+✔ fifth request without the explicit matching marker is refused and never forwarded (4.1699ms)
+✔ first create requires observed empty scoped project and all-disabled components (0.694ms)
+✔ unrelated mutations, project/actor/auth changes, encoded paths and binary uploads have zero forwarding (0.9382ms)
+✔ once captured, another key, whitespace or changed form cannot replace the original intent (1.3261ms)
+✔ every malformed or foreign real-function receipt is retained privately but never counted as a drop (2.6514ms)
+✔ same project and submission but different replay effect IDs stops the experiment (0.5172ms)
+✔ private request persistence failure causes no outbound call; receipt failure causes no intentional drop (0.6971ms)
+✔ concurrent old native POST is never forwarded twice and cannot overwrite a failed experiment (0.5654ms)
+✔ a disconnected client is not reported as the proxy successfully suppressing its receipt (0.8727ms)
+✔ known Bug reads stay bound to recorded receipt and status inspection never sends requests (0.4839ms)
+✔ optional exact native bootstrap forwards raw 200 but stores only an in-memory token digest (0.6058ms)
+✔ bootstrap rejects altered login fields, GM, actor/project/account swaps and invalid tokens (1.1365ms)
+✔ code22 to code23 same-identity relogin rotates only the token binding and keeps original request (1.1179ms)
+✔ scoped public entry and project list support native establish without exposing other projects (0.3451ms)
+✔ overlapping native refresh waits for committed identity instead of rejecting a legitimate new Bug (0.4247ms)
+✔ unknown exception text and token-shaped strings cannot enter public diagnostics (0.3065ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 227.4018
+Checking formatting...
+All matched files use Prettier code style!

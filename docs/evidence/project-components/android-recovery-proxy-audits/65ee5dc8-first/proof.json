@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 1,
+  "kind": "read-only-android-proxy-artifact-audit",
+  "status": "passed",
+  "expectedScope": {
+    "runId": "65ee5dc8-3f23-4f28-ad97-daa1de8b0ece",
+    "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+    "actorId": "9229e801-0ad6-4616-85b4-d40d66b50822"
+  },
+  "expectedProxySha256": "a164c85357260430d8ad8d8566ca7d9f98249669823dbbe8ecf3ea621430d7af",
+  "sourceArtifacts": [
+    {
+      "name": "status.json",
+      "sizeBytes": 1251,
+      "sha256": "43a970be570ea4cbafa6a172c95163693a178c9a56fe58ed6eafdbbb9f4a4f67"
+    },
+    {
+      "name": "public-events.jsonl",
+      "sizeBytes": 9889,
+      "sha256": "c1fef1bb1babb5d333688077bd431e8e0c28f2ba6a3629a258eda8b576ff7d05"
+    },
+    {
+      "name": "original-request.json",
+      "sizeBytes": 813,
+      "sha256": "383224572c57c4d8cd703b0b5dcd97d70c978d4d9509ac4f35396f737a60bf03"
+    },
+    {
+      "name": "confirm-native-action.json",
+      "sizeBytes": 253,
+      "sha256": "9363f1c6ff0f71311dc21b07eefcafa00b90e6c51a7a0e3de1358a613f10bef0"
+    },
+    {
+      "name": "upstream-create-1.body",
+      "sizeBytes": 1018,
+      "sha256": "b976230e666e7ff891b056c7cf1ea74166e4e1922149fe61d9b5ddedfe301f0d"
+    },
+    {
+      "name": "upstream-create-2.body",
+      "sizeBytes": 1017,
+      "sha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b"
+    },
+    {
+      "name": "upstream-create-3.body",
+      "sizeBytes": 1017,
+      "sha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b"
+    },
+    {
+      "name": "upstream-create-4.body",
+      "sizeBytes": 1017,
+      "sha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b"
+    },
+    {
+      "name": "upstream-create-5.body",
+      "sizeBytes": 1017,
+      "sha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b"
+    }
+  ],
+  "originalRequest": {
+    "clientSubmissionId": "b09be705-f433-4806-ad53-a4fc733e7231",
+    "keySha256": "0b26b703720ace066ded8e0dc33df72c309deb2efb95344122703f3257f90ac7",
+    "bodySha256": "383224572c57c4d8cd703b0b5dcd97d70c978d4d9509ac4f35396f737a60bf03"
+  },
+  "canonicalServiceIds": {
+    "bugId": "1c838790-d125-4109-9b3c-5f4588f39146",
+    "occurrenceId": "83c3ad73-e355-4876-ac35-aea1a8b13515",
+    "eventId": "f9a6e3c9-9257-4be7-9624-aca435c8ba79",
+    "clientSubmissionId": "b09be705-f433-4806-ad53-a4fc733e7231"
+  },
+  "actions": [
+    {
+      "ordinal": 1,
+      "expectedAction": "drop_before_headers",
+      "upstreamStatus": 201,
+      "receiptSha256": "b976230e666e7ff891b056c7cf1ea74166e4e1922149fe61d9b5ddedfe301f0d",
+      "replayed": false
+    },
+    {
+      "ordinal": 2,
+      "expectedAction": "drop_before_headers",
+      "upstreamStatus": 201,
+      "receiptSha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b",
+      "replayed": true
+    },
+    {
+      "ordinal": 3,
+      "expectedAction": "drop_before_headers",
+      "upstreamStatus": 201,
+      "receiptSha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b",
+      "replayed": true
+    },
+    {
+      "ordinal": 4,
+      "expectedAction": "drop_before_headers",
+      "upstreamStatus": 201,
+      "receiptSha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b",
+      "replayed": true
+    },
+    {
+      "ordinal": 5,
+      "expectedAction": "forward_valid_201",
+      "upstreamStatus": 201,
+      "receiptSha256": "808d8c26cc1ae99afe109e815cd437ee621ab9ee77ae143a6d8e36fbaa07c95b",
+      "replayed": true
+    }
+  ],
+  "checks": [
+    {
+      "code": "expected_scope",
+      "passed": true
+    },
+    {
+      "code": "pinned_running_source",
+      "passed": true
+    },
+    {
+      "code": "terminal_confirmation",
+      "passed": true
+    },
+    {
+      "code": "exact_counts",
+      "passed": true
+    },
+    {
+      "code": "runner_prerequisites",
+      "passed": true
+    },
+    {
+      "code": "request_schema",
+      "passed": true
+    },
+    {
+      "code": "request_scope_text_only",
+      "passed": true
+    },
+    {
+      "code": "original_request_fingerprints",
+      "passed": true
+    },
+    {
+      "code": "exact_operator_marker",
+      "passed": true
+    },
+    {
+      "code": "five_create_events",
+      "passed": true
+    },
+    {
+      "code": "canonical_uuid_ids",
+      "passed": true
+    },
+    {
+      "code": "canonical_status_receipt",
+      "passed": true
+    },
+    {
+      "code": "receipt_1_schema",
+      "passed": true
+    },
+    {
+      "code": "receipt_1_scope",
+      "passed": true
+    },
+    {
+      "code": "receipt_1_same_effect_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_1_original_content_and_binding",
+      "passed": true
+    },
+    {
+      "code": "receipt_1_single_new_bug_snapshot",
+      "passed": true
+    },
+    {
+      "code": "event_1_request_and_receipt_hashes",
+      "passed": true
+    },
+    {
+      "code": "event_1_canonical_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_2_schema",
+      "passed": true
+    },
+    {
+      "code": "receipt_2_scope",
+      "passed": true
+    },
+    {
+      "code": "receipt_2_same_effect_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_2_original_content_and_binding",
+      "passed": true
+    },
+    {
+      "code": "receipt_2_single_new_bug_snapshot",
+      "passed": true
+    },
+    {
+      "code": "event_2_request_and_receipt_hashes",
+      "passed": true
+    },
+    {
+      "code": "event_2_canonical_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_3_schema",
+      "passed": true
+    },
+    {
+      "code": "receipt_3_scope",
+      "passed": true
+    },
+    {
+      "code": "receipt_3_same_effect_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_3_original_content_and_binding",
+      "passed": true
+    },
+    {
+      "code": "receipt_3_single_new_bug_snapshot",
+      "passed": true
+    },
+    {
+      "code": "event_3_request_and_receipt_hashes",
+      "passed": true
+    },
+    {
+      "code": "event_3_canonical_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_4_schema",
+      "passed": true
+    },
+    {
+      "code": "receipt_4_scope",
+      "passed": true
+    },
+    {
+      "code": "receipt_4_same_effect_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_4_original_content_and_binding",
+      "passed": true
+    },
+    {
+      "code": "receipt_4_single_new_bug_snapshot",
+      "passed": true
+    },
+    {
+      "code": "event_4_request_and_receipt_hashes",
+      "passed": true
+    },
+    {
+      "code": "event_4_canonical_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_5_schema",
+      "passed": true
+    },
+    {
+      "code": "receipt_5_scope",
+      "passed": true
+    },
+    {
+      "code": "receipt_5_same_effect_ids",
+      "passed": true
+    },
+    {
+      "code": "receipt_5_original_content_and_binding",
+      "passed": true
+    },
+    {
+      "code": "receipt_5_single_new_bug_snapshot",
+      "passed": true
+    },
+    {
+      "code": "event_5_request_and_receipt_hashes",
+      "passed": true
+    },
+    {
+      "code": "event_5_canonical_ids",
+      "passed": true
+    },
+    {
+      "code": "fifth_is_replayed",
+      "passed": true
+    },
+    {
+      "code": "event_order",
+      "passed": true
+    },
+    {
+      "code": "only_exact_optional_update_refusals",
+      "passed": true
+    },
+    {
+      "code": "refusal_counter",
+      "passed": true
+    },
+    {
+      "code": "no_adapter_failures",
+      "passed": true
+    },
+    {
+      "code": "bootstrap_scope_and_count",
+      "passed": true
+    },
+    {
+      "code": "all_handled_requests_accounted",
+      "passed": true
+    },
+    {
+      "code": "no_unknown_event_kind",
+      "passed": true
+    }
+  ],
+  "refusals": {
+    "total": 3,
+    "expectedOptionalUpdateGet": 3,
+    "unexpected": 0,
+    "knownPath": "/api/v1/android-updates/preview/latest.json",
+    "knownPathSha256": "3ad87b1ad8b878338b28824a3aa4ef321b346681ad3ac6b2ff72b7e8036f2740"
+  },
+  "runnerStopped": true,
+  "limits": {
+    "apiRequestedByAudit": false,
+    "deviceAccessedByAudit": false,
+    "proxyPortRequestedByAudit": false,
+    "rawBodiesPublished": false,
+    "authenticationReceiptBodiesRead": false,
+    "independentlyReadServerDatabase": false,
+    "independentlyReadNativeQueue": false,
+    "nativeGestureProvenByArtifactsAlone": false,
+    "numberOfAllServerBugsProven": false,
+    "prerequisiteGetBodies": "Only hashes and validated flags are retained by the pinned runner; original read payloads are not independently revalidated here.",
+    "conclusion": "Checks the pinned proxy's original request, five received API receipts and exact event/hash lineage. Independent official API count/readback and native UI/queue evidence remain necessary."
+  },
+  "auditedAt": "2026-09-09T00:21:09.883Z",
+  "auditScriptSha256": "fa600aed4ceea2e46eae35402b132b3d5e80b2b6e7c41ba5312f912e8387ac86"
+}

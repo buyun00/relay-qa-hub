@@ -1,0 +1,18 @@
+not_run: requires --audit <private-run-directory> <new-public-output-directory> <projectId> <actorId>; no API/device/port operation
+✔ valid artifact lineage audits four drops plus explicit same-request canonical confirmation without exposing text (5.2278ms)
+✔ optional update classification is one exact observed method/code/path hash (1.9494ms)
+✔ status scope, source, terminal phase, counters and original fingerprints cannot be substituted (4.1155ms)
+✔ canonical IDs, scoped actor, content, frozen schema and raw receipt hash remain independently checked (3.4095ms)
+✔ changed original request or operator marker fails even with unchanged request identifiers (1.8057ms)
+✔ missing/reordered/extra create events and mismatched action or sequence cannot pass (1.7592ms)
+✔ raw secret-like event additions are never copied into failed public output (0.5012ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 223.2389
+Checking formatting...
+All matched files use Prettier code style!

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T23:52:14.597Z",
+  "runId": "65ee5dc8-3f23-4f28-ad97-daa1de8b0ece",
+  "status": "artifact_verified_not_installed",
+  "repositoryHead": "33514cde1862e448cb56d7082177f34a88e42363",
+  "androidImplementationCommit": "fb2eca7158358a4e95ecc62f3666f5c2b47fbfa7",
+  "androidSourceHashes": [
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/BugDraftPreferences.kt",
+      "sha256": "710a77ed0afa5ec680bac1de4f689c264783a2dc5aaee2e873b88c19f7164bf5"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/FoundationViewModel.kt",
+      "sha256": "91529b32553ebcf41628851e76f756272a141eac580192ac141645162ddebdad"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/Daos.kt",
+      "sha256": "7aa6fa6b7826492fc1c01e0dbd923c0e0319a82a73dcd1e8ec8f6965ff18e7c9"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/ScopedRepository.kt",
+      "sha256": "69d6794b7b7c784d7f30f3551901cad77c265d58576cdecc9cd036e350bcf193"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/UnconfirmedCreateSubmission.kt",
+      "sha256": "eb9590c65a69223ff3ddff39b5e9655ad7243b105c817ca1ef9ef62bc80bb86e"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/data/DurableBugDraftCommit.kt",
+      "sha256": "d36e190d927dbbb24108834f18680dabf6ba0291497dadd35a8aa049a542b7db"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/work/OfflineSyncEngine.kt",
+      "sha256": "c253c457fad29d377abdd0774d5443d0e71264aaa9cfe7682d15d08796a22da6"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
+      "sha256": "592ec742249e32c87f274029795c6ada50e2cf96be51fb135fae3df0ff093e3e"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/work/OfflineSyncEngineTest.kt",
+      "sha256": "95ce6a53c23f22c3e83180a22c8d45c6503db7c403734028a500fee749df9580"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/BugDraftPreferencesTest.kt",
+      "sha256": "5a969d26a5d642e8ce7cbfbb69972f50d8b9fcef81bee2083bfc5d766406ea63"
+    }
+  ],
+  "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+  "actor": {
+    "observedAt": "2026-09-08T23:48:58.112Z",
+    "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+    "actorId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+    "name": "AndroidRecovery65ee5dc8"
+  },
+  "apiOrigin": "http://127.0.0.1:4419",
+  "componentsDisabled": true,
+  "artifact": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+    "bytes": 35536941,
+    "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+    "package": "com.relayqahub.android.preview.debug",
+    "versionCode": 23,
+    "versionName": "0.2.0-preview.9",
+    "certificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83",
+    "buildConfigSha256": "cc340a2f0b2fabddbb48a3815668ca3b7c2d554da11cfc15ffc2ca88f8bdb631",
+    "manifestTreeSha256": "16cef8454424d8fbbe29df183f8e8a4e40b78056ebe682a47b25e89daf55e593",
+    "authorities": [
+      "A: android:authorities(0x01010018)=\"com.relayqahub.android.preview.debug.apk-files\" (Raw: \"com.relayqahub.android.preview.debug.apk-files\")",
+      "A: android:authorities(0x01010018)=\"com.relayqahub.android.preview.debug.androidx-startup\" (Raw: \"com.relayqahub.android.preview.debug.androidx-startup\")"
+    ],
+    "deepLink": "qahub-preview",
+    "updateChannel": "preview"
+  },
+  "build": {
+    "command": ":app:assembleDebug --offline --no-daemon --max-workers=2 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs=-Xmx2g -PqaHubApiBaseUrl=http://127.0.0.1:4419/api/v1/ -PqaHubProjectId=b9a42a41-c15d-4393-8568-61d22a30ba98 -PqaHubVersionCode=23 -PqaHubVersionName=0.2.0-preview.9 -PqaHubGameApkDirectoryUrl=https://qa-hub.invalid/disabled/ -PqaHubPocoPort=5503",
+    "exitCode": 0,
+    "logSha256": "3d6ed2da802d5613665c614361abb7617bbb08ba266b6368c2428a6e7a820401"
+  },
+  "signatureVerification": {
+    "initialAttempt": "failed before signing check because JAVA_HOME was unset; no APK/device mutation",
+    "retry": "verified with explicit Android Studio JBR; certificate matches retained code22",
+    "retryExitCode": 0,
+    "logSha256": "8d565f7cc6f0f23af54862e04acaafe308acb00beadc9aade6010147dd82d913"
+  },
+  "deviceBefore": {
+    "observedAt": "2026-09-08T23:43:14.384Z",
+    "serial": "127.0.0.1:16384",
+    "preview": [
+      "    versionCode=22 minSdk=29 targetSdk=37\r",
+      "    versionName=0.2.0-preview.8\r",
+      "    lastUpdateTime=2026-09-09 04:40:30\r",
+      "      dataDir=/data/user/0/com.relayqahub.android.preview.debug\r"
+    ],
+    "daily": [
+      "    versionCode=14 minSdk=29 targetSdk=37\r",
+      "    versionName=0.1.13-debug\r",
+      "    lastUpdateTime=2026-09-08 16:57:11\r",
+      "      dataDir=/data/user/0/com.relayqahub.android.debug\r"
+    ],
+    "previewPid": "18941",
+    "dailyPid": "5051",
+    "reverse": "host-12 tcp:4419 tcp:4419",
+    "dailySettingsHash": "efdc244d8c362711a23ce9ff74efc8a3526d5f5809d01c4ac9e439a7715b0696",
+    "runtimeConfigSha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca",
+    "runtimeConfigKeys": [
+      "schemaVersion",
+      "apiBaseUrl"
+    ],
+    "runtimeConfigOrigin4419": true
+  },
+  "preservation": {
+    "recordedAt": "2026-09-08T23:44:54.156Z",
+    "previewOnlyQuiesced": true,
+    "dailyPidUnchanged": true,
+    "sourceApkPath": "/data/app/~~2jWKcOaoPbseU4Gep8EwSQ==/com.relayqahub.android.preview.debug-_nLwYxVgtAQyz7u0CC4yDw==/base.apk",
+    "apkBytes": 35471405,
+    "apkSha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+    "archiveBytes": 1291776,
+    "archiveSha256": "6ae35cd8dcd8269e5c976265b745b88f75613d6924245848341ae7d41cad6235",
+    "directories": [
+      "shared_prefs",
+      "files",
+      "databases",
+      "no_backup"
+    ],
+    "inventoryFiles": 12,
+    "inventorySha256": "99ac38205169406bc9d30dd6cd2f83e7972dfafedde8f7aa549dac935b988bf3",
+    "runtimeConfigSha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca",
+    "previewRestarted": false
+  },
+  "boundaries": {
+    "dailyPackageChanged": false,
+    "deviceReverseChanged": false,
+    "installedPreviewVersionStill22": true,
+    "previewWasNormallyRelaunched": true,
+    "oldUserDraftSubmitted": false,
+    "apiServiceRestarted": false,
+    "gamePocoVerified": false,
+    "clientRecoveryPassed": false
+  }
+}

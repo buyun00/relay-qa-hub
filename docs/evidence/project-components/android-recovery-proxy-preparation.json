@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T23:59:48.193Z",
+  "kind": "inert-android-proxy-preparation",
+  "sourceBaseHead": "33514cde1862e448cb56d7082177f34a88e42363",
+  "sourceFrozen": true,
+  "sourceFiles": [
+    {
+      "path": "scripts/project-components/android-recovery-proxy.mjs",
+      "sha256": "a164c85357260430d8ad8d8566ca7d9f98249669823dbbe8ecf3ea621430d7af"
+    },
+    {
+      "path": "scripts/project-components/android-recovery-proxy.test.mjs",
+      "sha256": "199c37077ed4e1da80acc72cbde63015222435051480752cba6ecee1357c4c78"
+    }
+  ],
+  "schemas": [
+    {
+      "path": "packages/contracts/versions/1.1.0/schemas/app-first.schema.json",
+      "sha256": "86c8737d9a73fda8e819da142554e3103889e35cd3226cd88b868f91c1287f08"
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/evidence/project-components/runs/android-recovery-proxy-preparation.txt",
+      "sha256": "42c66f2ec185c88213600dd4b0b5a5201e89591a01cb38578c023e8227c68480"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/android-recovery-proxy-preparation-users500.txt",
+      "sha256": "dca53eca0aa36c8e044a48cf44227665809936b5a85127bb7b69e0e569176e8c"
+    }
+  ],
+  "validation": {
+    "memoryTests": 19,
+    "failures": 0,
+    "nodeCheck": "passed",
+    "eslint": "passed",
+    "prettier": "passed",
+    "defaultCli": "not_run",
+    "defaultCliOpenedPort": false
+  },
+  "reviewCorrection": {
+    "issue": "Native tools page reads users?limit=500 before components; previous allowlist omitted the exact query.",
+    "fix": "Allow only that same-project query and validate users response scope; keep members?limit=100 exact, reject other added query forms.",
+    "newParameterizedTests": 1
+  },
+  "boundaries": {
+    "listened": false,
+    "outboundApi": false,
+    "adbOrDevice": false,
+    "browser": false,
+    "serviceMutation": false,
+    "productSourceChanged": false,
+    "actualFilesystemFailureTest": false,
+    "actualSocketDropTest": false,
+    "realNativeGestureTest": false,
+    "credentialBodiesUsed": false
+  },
+  "scope": {
+    "mode": "drop-create-201",
+    "textOnly": true,
+    "createRequests": 5,
+    "intentionalDrops": 4,
+    "explicitOperatorMarkerBeforeFifth": true,
+    "autonomousRetries": 0,
+    "bootstrapMax": 3,
+    "bootstrap": "Exact configured name/project/android and expected actor; non-GM/account continuity; token digest memory only; no raw login persistence.",
+    "unknownRoutes": "refused",
+    "corruptProtocolMode": false,
+    "uploads": false
+  },
+  "preservation": {
+    "privateOnly": ["original-request.json", "upstream-create-N.body"],
+    "publicOnly": "Fixed diagnostic codes, hashes, fresh scoped identifiers and counters; no bodies, headers or token digests.",
+    "oldRuns": "Existing output directories refused; no resume/reset/overwrite."
+  },
+  "limits": [
+    "Pure-memory forwarding and persistence boundaries; real socket, native upgrade/gesture and private filesystem durability require root run.",
+    "Operator marker does not itself prove an APK gesture.",
+    "Text legacy can use same live proxy across upgrade; pending attachment STAGE is not supported."
+  ]
+}

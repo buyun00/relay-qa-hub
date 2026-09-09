@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "kind": "root-evidence-summary-binding-audit",
+  "recordedAt": "2026-09-09T00:23:02.986Z",
+  "status": "passed",
+  "rootPrivateDirectory": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece",
+  "sourceFiles": [
+    {
+      "name": "legacy-adoption-readback.json",
+      "sha256": "a3a93666d43185ab232fe9883d0bcf27e7d6873e3657e5992deef8d10dac5540",
+      "sizeBytes": 716
+    },
+    {
+      "name": "code23-confirm-gesture.json",
+      "sha256": "1016032802693c44936364b2712055f9443d3e887c12584d768286b6aaadf8e5",
+      "sizeBytes": 144
+    },
+    {
+      "name": "confirmed-room-readback.json",
+      "sha256": "a0965b6cd0196383390f7e4fa261b5cb161b59737bf3d9957c91ff2fab477b28",
+      "sizeBytes": 1291
+    },
+    {
+      "name": "code23-restarted-edited-visible.xml",
+      "sha256": "31e884ace4a95bd7412b06153cb7dc3b288d847f79d0ba42f964364d24859a4f",
+      "sizeBytes": 17717
+    },
+    {
+      "name": "code23-restarted-edited-visible.png",
+      "sha256": "7a09a54cde22d2514b195e47fe060b89e2ae50f2eb9044e36921319fca377c0f",
+      "sizeBytes": 143397
+    }
+  ],
+  "independentApiProof": {
+    "path": "docs/evidence/project-components/android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json",
+    "sha256": "3d987a3619503af4a853cd256cb6347329793d56d0c4b8c215f7f407f3082c7f"
+  },
+  "independentProxyProof": {
+    "path": "docs/evidence/project-components/android-recovery-proxy-audits/65ee5dc8-first/proof.json",
+    "sha256": "ed0da76a9d89906ab14144423c8dcc985e7f11cf619f94250ff108c50b317b65"
+  },
+  "rootAggregateProof": "docs/evidence/project-components/android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+  "rootAggregateRead": false,
+  "operationId": "dd4aabb4-a87b-4b22-9590-727508c79cfc",
+  "clientSubmissionId": "b09be705-f433-4806-ad53-a4fc733e7231",
+  "payloadSha256": "383224572c57c4d8cd703b0b5dcd97d70c978d4d9509ac4f35396f737a60bf03",
+  "canonicalServiceIds": {
+    "bugId": "1c838790-d125-4109-9b3c-5f4588f39146",
+    "occurrenceId": "83c3ad73-e355-4876-ac35-aea1a8b13515",
+    "eventId": "f9a6e3c9-9257-4be7-9624-aca435c8ba79",
+    "clientSubmissionId": "b09be705-f433-4806-ad53-a4fc733e7231"
+  },
+  "nativeTapRecordedAt": "2026-09-09T00:17:07.349Z",
+  "fifthResponseRecordedAt": "2026-09-09T00:17:07.446Z",
+  "checks": [
+    {
+      "code": "adopted_scope_matches_official_project_actor",
+      "passed": true
+    },
+    {
+      "code": "adopted_original_submission_and_payload_match_proxy",
+      "passed": true
+    },
+    {
+      "code": "adoption_did_not_send_fifth_request",
+      "passed": true
+    },
+    {
+      "code": "explicit_native_gesture_precedes_fifth_response",
+      "passed": true
+    },
+    {
+      "code": "cold_room_snapshot_integrity_recorded",
+      "passed": true
+    },
+    {
+      "code": "same_operation_one_succeeded_row",
+      "passed": true
+    },
+    {
+      "code": "single_replayed_local_receipt_matches_api_and_proxy",
+      "passed": true
+    },
+    {
+      "code": "old_two_rows_and_receipts_recorded_unchanged",
+      "passed": true
+    },
+    {
+      "code": "pending_removed_and_edited_draft_retained",
+      "passed": true
+    },
+    {
+      "code": "restarted_xml_contains_edited_draft",
+      "passed": true
+    },
+    {
+      "code": "original_draft_runtime_daily_preservation_recorded",
+      "passed": true
+    }
+  ],
+  "boundaries": {
+    "newDeviceOperation": false,
+    "sqliteOpened": false,
+    "apkArchiveOpened": false,
+    "authenticationFilesRead": false,
+    "imagesCopied": false,
+    "rootSummariesComparedToIndependentApiAndProxy": true,
+    "rootColdDatabaseChecksNotIndependentlyReexecuted": true
+  }
+}

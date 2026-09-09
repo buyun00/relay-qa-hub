@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent-official-api-create-only-readback",
+  "runId": "f0d296c0-da06-4423-83bc-a5a6d0d5e59c",
+  "startedAt": "2026-09-09T00:20:41.576Z",
+  "status": "passed",
+  "expected": {
+    "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+    "actorId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+    "bugId": "1c838790-d125-4109-9b3c-5f4588f39146",
+    "occurrenceId": "83c3ad73-e355-4876-ac35-aea1a8b13515",
+    "eventId": "f9a6e3c9-9257-4be7-9624-aca435c8ba79",
+    "originalText": "LEGACY_CODE22_UNCERTAIN_65ee5dc8",
+    "editedText": "UNSUBMITTED_CODE22_TO_23_EDIT_65ee5dc8"
+  },
+  "sourceSha256": "d148a0279085a155296fbfbf28d0257daa6ac03cf4bad75c9b4473730c25a2a7",
+  "privateOutput": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\independent-create-readback-f0d296c0-da06-4423-83bc-a5a6d0d5e59c",
+  "reads": [
+    {
+      "label": "attachments",
+      "method": "GET",
+      "path": "/api/v1/bugs/1c838790-d125-4109-9b3c-5f4588f39146/attachments?limit=50",
+      "startedAt": "2026-09-09T00:20:41.610Z",
+      "completedAt": "2026-09-09T00:20:41.626Z",
+      "status": 200,
+      "rawFile": "6-attachments.response.json",
+      "rawSha256": "20e88ff1aca6233decb6d35de63de419f3adc2c8bf4511cce57b2b8170576522",
+      "response": {
+        "bugId": "1c838790-d125-4109-9b3c-5f4588f39146",
+        "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+        "snapshotSequence": 298,
+        "items": [],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "bugs",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=b9a42a41-c15d-4393-8568-61d22a30ba98&limit=100",
+      "startedAt": "2026-09-09T00:20:41.609Z",
+      "completedAt": "2026-09-09T00:20:41.618Z",
+      "status": 200,
+      "rawFile": "2-bugs.response.json",
+      "rawSha256": "d729e7ce031d2947b5370e284c73237d7285198765fac575b8f62b592961bfcc",
+      "response": {
+        "snapshotSequence": 298,
+        "items": [
+          {
+            "id": "1c838790-d125-4109-9b3c-5f4588f39146",
+            "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+            "number": 1,
+            "key": "AR65EE5DC83F234F-1",
+            "title": "LEGACY_CODE22_UNCERTAIN_65ee5dc8",
+            "description": "LEGACY_CODE22_UNCERTAIN_65ee5dc8",
+            "expectedBehavior": "按测试步骤可稳定复现并符合项目预期行为。",
+            "moduleId": null,
+            "state": "reported",
+            "severity": "S3",
+            "priority": "P3",
+            "reporterId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+            "ownerId": null,
+            "verificationOwnerId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+            "duplicateOfBugId": null,
+            "occurrenceCount": 1,
+            "reopenCount": 0,
+            "version": 1,
+            "createdAt": "2026-09-09T00:02:41.606Z",
+            "updatedAt": "2026-09-09T00:02:41.606Z",
+            "closedAt": null
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "components",
+      "method": "GET",
+      "path": "/api/v1/projects/b9a42a41-c15d-4393-8568-61d22a30ba98/components",
+      "startedAt": "2026-09-09T00:20:41.610Z",
+      "completedAt": "2026-09-09T00:20:41.622Z",
+      "status": 200,
+      "rawFile": "5-components.response.json",
+      "rawSha256": "6143882affba924f1c33d83cf7335e47fc8149ce228019ee6b4fd2da4727e12d",
+      "response": {
+        "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+        "items": [
+          {
+            "key": "build",
+            "displayName": "打包",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "build_upload.single",
+            "displayName": "单次打包上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "upload.incremental",
+            "displayName": "增量上传",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "relay.production",
+            "displayName": "Relay AI 制作",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          },
+          {
+            "key": "qingyu.sync",
+            "displayName": "第三方订单同步",
+            "enabled": false,
+            "status": "disabled",
+            "version": 0,
+            "config": {},
+            "updatedBy": null,
+            "updatedAt": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/api/v1/bugs/1c838790-d125-4109-9b3c-5f4588f39146",
+      "startedAt": "2026-09-09T00:20:41.609Z",
+      "completedAt": "2026-09-09T00:20:41.620Z",
+      "status": 200,
+      "rawFile": "3-detail.response.json",
+      "rawSha256": "7e7f39036e07569323240e3a6aba3d79790f396f1ccfa16278a1aa4bd5f8618f",
+      "response": {
+        "id": "1c838790-d125-4109-9b3c-5f4588f39146",
+        "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+        "number": 1,
+        "key": "AR65EE5DC83F234F-1",
+        "title": "LEGACY_CODE22_UNCERTAIN_65ee5dc8",
+        "description": "LEGACY_CODE22_UNCERTAIN_65ee5dc8",
+        "expectedBehavior": "按测试步骤可稳定复现并符合项目预期行为。",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+        "ownerId": null,
+        "verificationOwnerId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T00:02:41.606Z",
+        "updatedAt": "2026-09-09T00:02:41.606Z",
+        "closedAt": null
+      }
+    },
+    {
+      "label": "events",
+      "method": "GET",
+      "path": "/api/v1/bugs/1c838790-d125-4109-9b3c-5f4588f39146/events?limit=100",
+      "startedAt": "2026-09-09T00:20:41.610Z",
+      "completedAt": "2026-09-09T00:20:41.624Z",
+      "status": 200,
+      "rawFile": "4-events.response.json",
+      "rawSha256": "6ba48502875a7dc9e51d2dd6cc88bc31200883d952513260425e95756b714f53",
+      "response": {
+        "items": [
+          {
+            "schemaVersion": "1.0",
+            "id": "f9a6e3c9-9257-4be7-9624-aca435c8ba79",
+            "type": "occurrence.appended",
+            "source": "qa_hub",
+            "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+            "bugId": "1c838790-d125-4109-9b3c-5f4588f39146",
+            "aggregate": {
+              "type": "bug",
+              "id": "1c838790-d125-4109-9b3c-5f4588f39146",
+              "version": 1
+            },
+            "sequence": 1,
+            "actor": {
+              "type": "user",
+              "id": "9229e801-0ad6-4616-85b4-d40d66b50822"
+            },
+            "correlationId": "067ea2b2-debf-4568-bef4-69a1746f141e",
+            "causationId": null,
+            "occurredAt": "2026-09-09T00:02:41.606Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "occurrenceId": "83c3ad73-e355-4876-ac35-aea1a8b13515",
+              "fromVersion": 1,
+              "toVersion": 2
+            }
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "label": "project",
+      "method": "GET",
+      "path": "/api/v1/project-entry/b9a42a41-c15d-4393-8568-61d22a30ba98",
+      "startedAt": "2026-09-09T00:20:41.609Z",
+      "completedAt": "2026-09-09T00:20:41.615Z",
+      "status": 200,
+      "rawFile": "1-project.response.json",
+      "rawSha256": "9bcff23d1176bd5dfc74fc6c7820014bc43607a6bf03e410a601a7da11e23aa0",
+      "response": {
+        "id": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+        "key": "AR65EE5DC83F234F",
+        "name": "Android recovery 65ee5dc8-3f23-4f28-ad97-daa1de8b0ece",
+        "active": true,
+        "version": 1
+      }
+    }
+  ],
+  "checks": [
+    {
+      "code": "project_HTTP_200",
+      "passed": true
+    },
+    {
+      "code": "bugs_HTTP_200",
+      "passed": true
+    },
+    {
+      "code": "detail_HTTP_200",
+      "passed": true
+    },
+    {
+      "code": "components_HTTP_200",
+      "passed": true
+    },
+    {
+      "code": "events_HTTP_200",
+      "passed": true
+    },
+    {
+      "code": "attachments_HTTP_200",
+      "passed": true
+    },
+    {
+      "code": "all_six_read_requests_completed",
+      "passed": true
+    },
+    {
+      "code": "project_exact_active",
+      "passed": true
+    },
+    {
+      "code": "one_project_bug_no_cursor",
+      "passed": true
+    },
+    {
+      "code": "detail_exact_scope",
+      "passed": true
+    },
+    {
+      "code": "original_description_exact",
+      "passed": true
+    },
+    {
+      "code": "list_original_description_exact",
+      "passed": true
+    },
+    {
+      "code": "one_occurrence_reported_version1",
+      "passed": true
+    },
+    {
+      "code": "edited_draft_absent_from_readback",
+      "passed": true
+    },
+    {
+      "code": "all_events_in_exact_bug_project",
+      "passed": true
+    },
+    {
+      "code": "single_expected_occurrence_event",
+      "passed": true
+    },
+    {
+      "code": "no_additional_bug_events",
+      "passed": true
+    },
+    {
+      "code": "five_components_remain_disabled",
+      "passed": true
+    },
+    {
+      "code": "zero_text_fixture_attachments",
+      "passed": true
+    }
+  ],
+  "boundaries": {
+    "apiOrigin": "http://127.0.0.1:4419",
+    "businessMutations": 0,
+    "gmAuthenticationPosts": 1,
+    "deviceOperations": 0,
+    "proxyOperations": 0,
+    "servicesChanged": false,
+    "loginRawResponsePersisted": false
+  },
+  "gmAuthentication": {
+    "status": 200,
+    "isGm": true
+  },
+  "counts": {
+    "bugs": 1,
+    "events": 1,
+    "occurrenceEvents": 1,
+    "attachments": 0,
+    "components": 5
+  },
+  "completedAt": "2026-09-09T00:20:41.627Z"
+}

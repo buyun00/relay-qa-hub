@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "runId": "65ee5dc8-3f23-4f28-ad97-daa1de8b0ece",
+  "status": "passed_scoped_legacy_text_recovery",
+  "recordedAt": "2026-09-09T00:24:11.311Z",
+  "repositoryHead": "33514cde1862e448cb56d7082177f34a88e42363",
+  "artifact": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+    "bytes": 35536941,
+    "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+    "package": "com.relayqahub.android.preview.debug",
+    "versionCode": 23,
+    "versionName": "0.2.0-preview.9",
+    "certificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83",
+    "buildConfigSha256": "cc340a2f0b2fabddbb48a3815668ca3b7c2d554da11cfc15ffc2ca88f8bdb631",
+    "manifestTreeSha256": "16cef8454424d8fbbe29df183f8e8a4e40b78056ebe682a47b25e89daf55e593",
+    "authorities": [
+      "A: android:authorities(0x01010018)=\"com.relayqahub.android.preview.debug.apk-files\" (Raw: \"com.relayqahub.android.preview.debug.apk-files\")",
+      "A: android:authorities(0x01010018)=\"com.relayqahub.android.preview.debug.androidx-startup\" (Raw: \"com.relayqahub.android.preview.debug.androidx-startup\")"
+    ],
+    "deepLink": "qahub-preview",
+    "updateChannel": "preview"
+  },
+  "preparationSha256": "01bed635041b4e5021a0511929a19314bde4307eb693c213bbf51f0607d8f8e0",
+  "deviceKind": "MuMu emulator, not physical Android",
+  "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+  "actorId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+  "componentsDisabled": true,
+  "originalSubmission": {
+    "clientSubmissionId": "b09be705-f433-4806-ad53-a4fc733e7231",
+    "keySha256": "0b26b703720ace066ded8e0dc33df72c309deb2efb95344122703f3257f90ac7",
+    "bodySha256": "383224572c57c4d8cd703b0b5dcd97d70c978d4d9509ac4f35396f737a60bf03"
+  },
+  "receipt": {
+    "bugId": "1c838790-d125-4109-9b3c-5f4588f39146",
+    "occurrenceId": "83c3ad73-e355-4876-ac35-aea1a8b13515",
+    "eventId": "f9a6e3c9-9257-4be7-9624-aca435c8ba79",
+    "clientSubmissionId": "b09be705-f433-4806-ad53-a4fc733e7231"
+  },
+  "legacy": {
+    "operationId": "dd4aabb4-a87b-4b22-9590-727508c79cfc",
+    "stateBefore": "FAILED_PERMANENT",
+    "errorBefore": "RETRY_EXHAUSTED_NETWORK_IO",
+    "attemptsBefore": 4,
+    "receiptCountBefore": 0,
+    "pendingPreferenceBefore": false,
+    "firstAdoptionSentNoRequest": true,
+    "adoption": {
+      "recordedAt": "2026-09-09T00:17:07.348Z",
+      "operationId": "dd4aabb4-a87b-4b22-9590-727508c79cfc",
+      "scope": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "projectId": "b9a42a41-c15d-4393-8568-61d22a30ba98",
+        "actorId": "9229e801-0ad6-4616-85b4-d40d66b50822",
+        "installationId": "e8133264-aa97-3ea0-a149-ddc1219ec74c",
+        "sessionId": "f310c6db-b792-382d-afe5-28e172901f31"
+      },
+      "submissionId": "b09be705-f433-4806-ad53-a4fc733e7231",
+      "payloadSha256": "383224572c57c4d8cd703b0b5dcd97d70c978d4d9509ac4f35396f737a60bf03",
+      "originalQueueIntentUnchanged": true,
+      "editedDraftRetained": true,
+      "forwardedCreatesBeforeNativeConfirmation": 4,
+      "sourceUi": "code23-confirm-ready.xml"
+    }
+  },
+  "upgrade": {
+    "recordedAt": "2026-09-09T00:08:25.543Z",
+    "package": [
+      "    versionCode=23 minSdk=29 targetSdk=37\r",
+      "    versionName=0.2.0-preview.9\r",
+      "    lastUpdateTime=2026-09-09 08:08:25\r"
+    ],
+    "installExitCode": 0,
+    "preLaunchAllPrivateFilesUnchanged": 12,
+    "runtimeConfigUnchanged": true,
+    "dailyPidAndSettingsUnchanged": true,
+    "sourceApkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+    "previewActivityStarted": true
+  },
+  "confirmationGesture": {
+    "tappedAt": "2026-09-09T00:17:07.349Z",
+    "x": 1280,
+    "y": 995,
+    "sourceUi": "code23-confirm-ready.xml",
+    "explicitNativeSubmit": true
+  },
+  "room": {
+    "at": "2026-09-09T00:19:00.847Z",
+    "archive": {
+      "bytes": 1329152,
+      "sha256": "314091de6d6bd03f40cdab4ed05963da9cede0ae1878b4de81a71316fd0fc4e6"
+    },
+    "readOnlyColdSnapshot": true,
+    "integrityCheck": "ok",
+    "foreignKeyViolations": 0,
+    "freshProjectRows": 1,
+    "operationId": "dd4aabb4-a87b-4b22-9590-727508c79cfc",
+    "originalIntentUnchanged": true,
+    "state": "SUCCEEDED",
+    "attemptCount": 1,
+    "receiptCount": 1,
+    "receiptReplayed": true,
+    "receiptIds": {
+      "bugId": "1c838790-d125-4109-9b3c-5f4588f39146",
+      "occurrenceId": "83c3ad73-e355-4876-ac35-aea1a8b13515",
+      "eventId": "f9a6e3c9-9257-4be7-9624-aca435c8ba79",
+      "clientSubmissionId": "b09be705-f433-4806-ad53-a4fc733e7231"
+    },
+    "oldRowsUnchanged": 2,
+    "oldReceiptsUnchanged": true,
+    "pendingPreferenceRemoved": true,
+    "editedDraftRetained": true,
+    "originalDraftRetained": true,
+    "originalCaptureAnchors": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf  files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json\r\n9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc  files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+    "runtimeConfigUnchanged": true,
+    "dailyPidAndSettingsUnchanged": true,
+    "previewOnlyForceStopForColdArchive": true
+  },
+  "finalDevice": {
+    "at": "2026-09-09T00:24:11.248Z",
+    "previewVersionCode": 23,
+    "previewVersionName": "0.2.0-preview.9",
+    "previewPid": "23733",
+    "dailyVersionCode": 14,
+    "dailyPid": "5051",
+    "dailySettingsHash": "efdc244d8c362711a23ce9ff74efc8a3526d5f5809d01c4ac9e439a7715b0696",
+    "dailyPidAndSettingsUnchanged": true,
+    "runtimeConfigSha256": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca",
+    "runtimeConfigUnchanged": true,
+    "reverse": "host-12 tcp:4419 tcp:4419",
+    "reverseRestored": true,
+    "proxyPortReleased": true,
+    "proxyExitCode": 0,
+    "originalProjectRestored": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "originalActorNameVisible": "AndroidCaptureQA",
+    "originalDraftAndImageVisible": true,
+    "originalCaptureHashesUnchanged": true,
+    "editedDraftRetainedInOtherScope": true,
+    "noPendingPreference": true,
+    "forwardedCreatesAfterRestart": 5
+  },
+  "proxy": {
+    "phase": "confirmed",
+    "dropped": 4,
+    "forwardedCreates": 5,
+    "requests": 31,
+    "denied": 3,
+    "bootstrapCount": 3,
+    "proxyRetries": 0,
+    "runnerSha256": "a164c85357260430d8ad8d8566ca7d9f98249669823dbbe8ecf3ea621430d7af",
+    "optionalUnauthenticatedUpdaterDenials": 3
+  },
+  "failuresRetained": [
+    {
+      "name": "upgrade-precheck-first-failure.json",
+      "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
+    },
+    {
+      "name": "preparation signing verification attempt",
+      "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
+    }
+  ],
+  "independentEvidence": [
+    {
+      "path": "docs/evidence/project-components/android-recovery-proxy-audits/65ee5dc8-first/proof.json",
+      "sha256": "ed0da76a9d89906ab14144423c8dcc985e7f11cf619f94250ff108c50b317b65",
+      "status": "passed"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json",
+      "sha256": "3d987a3619503af4a853cd256cb6347329793d56d0c4b8c215f7f407f3082c7f",
+      "status": "passed"
+    }
+  ],
+  "privateEvidence": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\device-before.json",
+      "sha256": "744325d7c616d8ddf4f6fd64a5835049396eb339a0234f67fddf5e0fedadd474"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\preservation-before.json",
+      "sha256": "6f8dce48bf3378f0dc80b3baf9d85450b3b9d773680dacddf5a711c5af8e6022"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\native-first-submit.json",
+      "sha256": "41018ca8bd5f27b9c8f9373151e4860a40bb8953feaf92c0eda441547c650b8a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\exhausted-before-upgrade.json",
+      "sha256": "973d94f6b4735a50c227a6d1a5c1b5b0a36c11bddb7101a27ec62df83e099651"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\upgrade-code23.json",
+      "sha256": "61637ae7d57261dc6da4e4de47fbf08d143e27facd7403f9a4af1e4244c3a2ca"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-adopt-gesture.json",
+      "sha256": "3e8eb7a5cb491e0d80fd1a8c4a0189c07f354a6b6d38853d79db143083be0da0"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\legacy-adoption-readback.json",
+      "sha256": "a3a93666d43185ab232fe9883d0bcf27e7d6873e3657e5992deef8d10dac5540"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\code23-confirm-gesture.json",
+      "sha256": "1016032802693c44936364b2712055f9443d3e887c12584d768286b6aaadf8e5"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\confirmed-room-readback.json",
+      "sha256": "a0965b6cd0196383390f7e4fa261b5cb161b59737bf3d9957c91ff2fab477b28"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\device-after.json",
+      "sha256": "501454f4d44956e5335bc501e69cdc82591ef8bd49ea33fbe68f04a701a4ca62"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\upgrade-precheck-first-failure.json",
+      "sha256": "a803cbf8e1bfb7244d1d3e74021d7bc8086b387aaf85793212cc1ba94cafed69"
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "code23-legacy-adopted.png",
+      "bytes": 173044,
+      "sha256": "582524d46e47390030addedb7db0be82f7e96b7423b846ce99002c58f3ae7be8"
+    },
+    {
+      "path": "code23-legacy-adopted.xml",
+      "bytes": 22313,
+      "sha256": "a97de32adcb7f15bed29138f10bf0bcbbfc0c65bfea27a621f933f58e742bbd2"
+    },
+    {
+      "path": "code23-confirm-result.png",
+      "bytes": 167630,
+      "sha256": "1b256db20cacaa8e1de0403653cf3702d1556e13b1ffd6d234e69d841b698a69"
+    },
+    {
+      "path": "code23-confirm-result.xml",
+      "bytes": 22258,
+      "sha256": "befd0e3faf95064b4a889c7c90aa1d65b5bdd748f0273af630708af3da6a84e5"
+    },
+    {
+      "path": "code23-restarted-edited-visible.png",
+      "bytes": 143397,
+      "sha256": "7a09a54cde22d2514b195e47fe060b89e2ae50f2eb9044e36921319fca377c0f"
+    },
+    {
+      "path": "code23-restarted-edited-visible.xml",
+      "bytes": 17717,
+      "sha256": "31e884ace4a95bd7412b06153cb7dc3b288d847f79d0ba42f964364d24859a4f"
+    },
+    {
+      "path": "code23-original-text-check.png",
+      "bytes": 158495,
+      "sha256": "8889b65d96f0890e460c4262e232fabce3d762f3cf25f168cd750ad1b6dd288b"
+    },
+    {
+      "path": "code23-original-text-check.xml",
+      "bytes": 17683,
+      "sha256": "96a7c71892ba10113d8a3e7dbcc46e7579c09e37bb6f879ca9bf8a72018e9e79"
+    }
+  ],
+  "helperRecords": [
+    {
+      "path": "harness/android-code23-ui.mjs.txt",
+      "sha256": "ae9faf637f7b5a7e14822625e1238dd12c99c53cdbce08802cb95f7728d843d0"
+    },
+    {
+      "path": "harness/preserve-code22-for-code23.mjs.txt",
+      "sha256": "030b55568346670e180889cf10275949ee4f6e7a54c7de51307b9b82d9df224c"
+    },
+    {
+      "path": "harness/upgrade-code23-after-exhaustion.mjs.txt",
+      "sha256": "41f738dae909405b7fa9b31f9a0edbaf830223d2f05a42d999730d2f30545791"
+    },
+    {
+      "path": "harness/finish-code23-upgrade.mjs.txt",
+      "sha256": "7fa2742c7243910db62c95085fde08093477b7acf88ca5f9a45a14217005871c"
+    },
+    {
+      "path": "harness/confirm-code23-native.mjs.txt",
+      "sha256": "f5f9a828db09fd331c8f539d683e5201281d4cd832495380fcb5d99245f0ad7d"
+    },
+    {
+      "path": "harness/archive-code23-confirmed.mjs.txt",
+      "sha256": "0e3e05ead297777ef6826699de6bb3bf51320cccd494cb52d8fc2900f5378e9f"
+    }
+  ],
+  "limits": [
+    "Text-only legacy exhausted CREATE_BUG recovery on MuMu; physical Android unrun.",
+    "No image-bearing unknown receipt or invalid receipt live recovery covered here.",
+    "Only preview am force-stop for consistent private archive; this does not prove normal exit.",
+    "install-r in-place upgrade; not Android UI self-update.",
+    "No full baseline14/21 or complete six-entry acceptance claim.",
+    "APK artifact installed on test emulator; preview manifest publication is separate."
+  ]
+}

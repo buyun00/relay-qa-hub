@@ -204,3 +204,11 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 Android恢复源码已提交 `fb2eca7`：原提交身份、请求和图片持久保留，旧code22队列先确认，协议异常只由专用按钮按原请求重试。115/115单测和lint0错误/33警告；一处CRLF提交规范化在proof中保留前后哈希，没有声称重复运行测试。[源码与限制](android-offline-create-recovery.md)、[code23实际验收计划](android-code23-recovery-plan.md)。code23/.9已完成隔离构建，但本检查点设备仍为code22，EXE仍为preview.7；源码测试和构建不计作安装或原生恢复通过。
 
 矩阵映射保护修复已提交 `6b28723`：13项纯内存审计证明失败结果、401个复验标记、159条原说明均保留，说明归档稳定为218条；关闭两个保护分支的对照复现68条失败降级，现修复为0。[纯内存审计](mapper-memory-audit.json)。该审计没有写实际矩阵，后续实际重放另记，不能把静态映射审核计作业务验收。
+
+## 原生旧提交恢复与矩阵实际重放（2026-09-09 08:24 +08:00）
+
+上述准备检查点后，MuMu 上已完成 code22→code23 原位升级和文字旧记录恢复。四次真实201丢回执后，原队列重试耗尽；升级后第一次原生提交只认领旧记录，第二次按原key/body确认同一Bug。冷归档只读核对原操作、完整scope、payload和ID不变，新增一份匹配回执，其他两条旧记录及回执保留。重启后编辑稿仍在；切回原A/AndroidCaptureQA后，旧草稿与原图真实可见且哈希不变。日常APK code14/PID5051与偏好设置未变，4559代理正常退出，4419反向映射已恢复。[真实原生结果](android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/README.md)、[独立审计与保留的首次审计失败](android-recovery-proxy-audits/65ee5dc8-first/README.md)。这是模拟器文字恢复及install-r证据，应用内更新、带图未知回执、物理Android和完整基线14/21仍未完成。
+
+实际矩阵生成链先发现备注归档持续增长及新文本框继承旧通过，原失败保留；窄修复已提交 `b62e259`。两轮generate→map→generate共6次执行均成功，语义SHA同为`9682b626eed0074ce98a2dbb0337d46ce462baee4367d052d566f9d0a47c37a6`、差异0。991项/191源码、28退役历史、484复验标记，159条原备注保持；13个新节点均未自动通过。组合回归10/10，613个合成失败结果与进度不提升。[实际成功](coverage-actual-replay-88366a43.json)、[原失败](coverage-actual-replay-4e637e1a-failed.json)。本轮未把映射正确性当业务通过；整项仍只有09、10、11、12、15、23、24。
+
+EXE `.8` 独立打包及41项验包通过，包含Ce9wROrH共享Web；104项desktop测试通过，Ed25519使用原公钥，安装器及旧失败harness记录保留。[打包证明](exe-preview8-package-only/README.md)。该证明时点仍未发布/安装，实际升级另记。Android还发现预览客户端请求preview更新地址而API仅提供stable；独立通道修复正在本工作树验证，尚未部署，也未改生产通道。

@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "runId": "f4ea57e7-b24e-434c-80dd-029686bc1a98",
+  "mode": "verify retained package after stdout parsing harness failure; no repackaging",
+  "startedAt": "2026-09-09T00:12:07.418Z",
+  "originalRun": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\result.json",
+    "bytes": 27009,
+    "sha256": "5d4ae504cc69d3a67b98e9e45251e54624c56e63ed34fb6eb4a82c6d45a7d9aa"
+  },
+  "originalRunner": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\build-package-only.mjs",
+    "bytes": 13437,
+    "sha256": "3ce4575db29593bb8a96439d8db969b58ded71805b1cb0294b6dbda140b0cff0"
+  },
+  "checks": [
+    {
+      "label": "original failure is preserved",
+      "expected": "failed_retained",
+      "actual": "failed_retained",
+      "passed": true
+    },
+    {
+      "label": "original package exit",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "label": "original failure classification",
+      "expected": "SyntaxError",
+      "actual": "SyntaxError",
+      "passed": true
+    },
+    {
+      "label": "staged installer contained",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "staged manifest contained",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "version",
+      "expected": "0.2.0-preview.8",
+      "actual": "0.2.0-preview.8",
+      "passed": true
+    },
+    {
+      "label": "HEAD binding",
+      "expected": "33514cde1862e448cb56d7082177f34a88e42363",
+      "actual": "33514cde1862e448cb56d7082177f34a88e42363",
+      "passed": true
+    },
+    {
+      "label": "dirty accurately recorded",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "source HEAD unchanged",
+      "expected": "33514cde1862e448cb56d7082177f34a88e42363",
+      "actual": "33514cde1862e448cb56d7082177f34a88e42363",
+      "passed": true
+    },
+    {
+      "label": "Ed25519 signature with existing key",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "signed version",
+      "expected": "0.2.0-preview.8",
+      "actual": "0.2.0-preview.8",
+      "passed": true
+    },
+    {
+      "label": "signed releaseId",
+      "expected": "20260909T000712593Z",
+      "actual": "20260909T000712593Z",
+      "passed": true
+    },
+    {
+      "label": "signed installer bytes",
+      "expected": 108333764,
+      "actual": 108333764,
+      "passed": true
+    },
+    {
+      "label": "signed installer SHA256",
+      "expected": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "actual": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "passed": true
+    },
+    {
+      "label": "receipt installer SHA256",
+      "expected": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "actual": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "passed": true
+    },
+    {
+      "label": "all packaged/installed preview config fields equal",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "public key stays installed key",
+      "expected": "e0a52488fc59ed7c1c8c119d1ba73332a3cce7a33cad168754e46ebb2ff914b1",
+      "actual": "e0a52488fc59ed7c1c8c119d1ba73332a3cce7a33cad168754e46ebb2ff914b1",
+      "passed": true
+    },
+    {
+      "label": "profile path",
+      "expected": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile",
+      "actual": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile",
+      "passed": true
+    },
+    {
+      "label": "instance",
+      "expected": "qa-hub-preview-7c86",
+      "actual": "qa-hub-preview-7c86",
+      "passed": true
+    },
+    {
+      "label": "API origin",
+      "expected": "http://127.0.0.1:4419",
+      "actual": "http://127.0.0.1:4419",
+      "passed": true
+    },
+    {
+      "label": "Web origin",
+      "expected": "http://127.0.0.1:4274",
+      "actual": "http://127.0.0.1:4274",
+      "passed": true
+    },
+    {
+      "label": "MCP port",
+      "expected": 4420,
+      "actual": 4420,
+      "passed": true
+    },
+    {
+      "label": "cookie",
+      "expected": "qa-hub-preview-7c86-session",
+      "actual": "qa-hub-preview-7c86-session",
+      "passed": true
+    },
+    {
+      "label": "preview update URL",
+      "expected": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-latest.json",
+      "actual": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-latest.json",
+      "passed": true
+    }
+  ],
+  "notPerformed": [
+    "build again",
+    "publish served latest",
+    "install",
+    "launch or stop EXE/services",
+    "Web build",
+    "business mutation"
+  ],
+  "receipt": {
+    "releaseId": "20260909T000712593Z",
+    "version": "0.2.0-preview.8",
+    "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+    "sourceDirty": true,
+    "installer": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+    "packageDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64",
+    "manifestPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-latest.json",
+    "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+    "bytes": 108333764
+  },
+  "receiptSource": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\receipt.json",
+    "bytes": 858,
+    "sha256": "48f141b124a0305382bcdaaf1de3537d4bd6fdce7c762c2db243f68b6ba3a2e4"
+  },
+  "passed": false,
+  "status": "verification_failed_retained",
+  "failure": {
+    "name": "Error",
+    "message": "\"web/assets/index-Ce9wROrH.js\" was not found in this archive"
+  },
+  "finishedAt": "2026-09-09T00:12:12.129Z"
+}
