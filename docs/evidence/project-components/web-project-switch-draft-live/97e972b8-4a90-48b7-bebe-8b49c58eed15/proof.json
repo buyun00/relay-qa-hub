@@ -1,0 +1,441 @@
+{
+  "schemaVersion": 1,
+  "status": "failed_retained",
+  "runId": "97e972b8-4a90-48b7-bebe-8b49c58eed15",
+  "projectIds": [
+    "71a450c4-addd-40b3-84f4-e028ccd17dbc",
+    "74be9e8d-c71d-488c-b45e-ce1c4059a095"
+  ],
+  "employee": "SwitchSharedbd3ce3bbd23d48aa946a70138e988333",
+  "names": [
+    "SwitchOnlyA1fb6184ee0da4d0f8b4ed8bb1ad638ad",
+    "SwitchOnlyBdde644d6717443729ec31eaaa99ced42"
+  ],
+  "runtime": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15",
+  "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\edge-profile",
+  "startedAt": "2026-09-09T02:57:38.619Z",
+  "sourceSha256": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5",
+  "sourceProvenanceSha256": "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae",
+  "gate": {
+    "schemaVersion": 1,
+    "status": "reviewed_web_project_switch_draft",
+    "createdAt": "2026-09-09T02:56:50.152Z",
+    "instanceSha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b",
+    "runnerSha256": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5",
+    "webBundleSha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+    "api": {
+      "pid": 22852,
+      "startedAt": "2026-09-09T01:22:20.2728640Z",
+      "schemaVersion": 14
+    },
+    "web": {
+      "pid": 20284,
+      "startedAt": "2026-09-08T17:52:36.5080910Z"
+    },
+    "publicationProof": {
+      "path": "C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
+      "sha256": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63"
+    },
+    "gatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\web-project-switch-draft-92f622d8-49b9-4f10-a580-3463722b630d\\browser-gate.json",
+    "gateSha256": "2d4f59f32a81e3cc1c51c983f682e6c954c950ed66669645c0770ae2fd106dbe"
+  },
+  "checks": [
+    {
+      "at": "2026-09-09T02:57:40.215Z",
+      "label": "api PID",
+      "expected": 22852,
+      "actual": 22852,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.216Z",
+      "label": "api start",
+      "expected": 1788916940272,
+      "actual": 1788916940272,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.216Z",
+      "label": "api loopback",
+      "expected": "127.0.0.1",
+      "actual": "127.0.0.1",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.216Z",
+      "label": "web PID",
+      "expected": 20284,
+      "actual": 20284,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.216Z",
+      "label": "web start",
+      "expected": 1788889956508,
+      "actual": 1788889956508,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.216Z",
+      "label": "web loopback",
+      "expected": "127.0.0.1",
+      "actual": "127.0.0.1",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.271Z",
+      "label": "ready status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.271Z",
+      "label": "ready status",
+      "expected": "ready",
+      "actual": "ready",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.271Z",
+      "label": "reviewed schema",
+      "expected": "14",
+      "actual": "14",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.277Z",
+      "label": "asset assets/index-Br-CEXQI.js",
+      "expected": {
+        "size": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      "actual": {
+        "size": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.285Z",
+      "label": "asset assets/index-Br-CEXQI.js.map",
+      "expected": {
+        "size": 1829769,
+        "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328"
+      },
+      "actual": {
+        "size": 1829769,
+        "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.287Z",
+      "label": "asset assets/index-CgNw0fhl.css",
+      "expected": {
+        "size": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      },
+      "actual": {
+        "size": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.290Z",
+      "label": "asset icon-licenses.txt",
+      "expected": {
+        "size": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      },
+      "actual": {
+        "size": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.294Z",
+      "label": "asset icons/qa-hub-192.svg",
+      "expected": {
+        "size": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      },
+      "actual": {
+        "size": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.297Z",
+      "label": "asset icons/qa-hub-512.svg",
+      "expected": {
+        "size": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      },
+      "actual": {
+        "size": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.299Z",
+      "label": "asset icons/qa-hub-maskable-512.svg",
+      "expected": {
+        "size": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      },
+      "actual": {
+        "size": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.302Z",
+      "label": "asset index.html",
+      "expected": {
+        "size": 709,
+        "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+      },
+      "actual": {
+        "size": 709,
+        "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.309Z",
+      "label": "gm-login status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.314Z",
+      "label": "new-project-0 status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.322Z",
+      "label": "shared-login-0 status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.329Z",
+      "label": "exclusive-login-0 status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.332Z",
+      "label": "initial-five-off-0 status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.333Z",
+      "label": "component response project",
+      "expected": "71a450c4-addd-40b3-84f4-e028ccd17dbc",
+      "actual": "71a450c4-addd-40b3-84f4-e028ccd17dbc",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.333Z",
+      "label": "five component keys",
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.333Z",
+      "label": "five components remain disabled",
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.337Z",
+      "label": "initial-members-0 status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:57:40.337Z",
+      "label": "exact fixture members 0",
+      "expected": [
+        "8b0edfed-945f-4704-87ba-9e50ce669fd1",
+        "bef16987-f992-4b13-83a4-5c2c98da6cd4"
+      ],
+      "actual": [
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+        "8b0edfed-945f-4704-87ba-9e50ce669fd1",
+        "bef16987-f992-4b13-83a4-5c2c98da6cd4"
+      ],
+      "passed": false
+    }
+  ],
+  "requests": [
+    {
+      "at": "2026-09-09T02:57:40.271Z",
+      "kind": "fixture_api",
+      "label": "ready",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\001-ready.body",
+      "bytes": 150,
+      "sha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911"
+    },
+    {
+      "at": "2026-09-09T02:57:40.309Z",
+      "kind": "fixture_api",
+      "label": "gm-login",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "status": 200,
+      "responseSha256": "746bf36ce7c2de2ef2814d4e22937a817cf1ecf50bed53435ac7f48dae380156",
+      "bodyStored": false,
+      "requestBody": "[REDACTED]"
+    },
+    {
+      "at": "2026-09-09T02:57:40.313Z",
+      "kind": "fixture_api",
+      "label": "new-project-0",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\002-new-project-0.body",
+      "bytes": 151,
+      "sha256": "1abf3861f2534dce851348a1fff16833a8eeca9adf61a7e3ff7ba52db5955153",
+      "requestBody": {
+        "id": "71a450c4-addd-40b3-84f4-e028ccd17dbc",
+        "key": "SA97E972B84A9048",
+        "name": "Switch A 97e972b8-4a90-48b7-bebe-8b49c58eed15"
+      }
+    },
+    {
+      "at": "2026-09-09T02:57:40.322Z",
+      "kind": "fixture_api",
+      "label": "shared-login-0",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200,
+      "responseSha256": "c1b030e0cb8c7cf18ff2e0b8115aba42c8a7f6a5b1a61e42242fbb39c49be8fd",
+      "bodyStored": false,
+      "requestBody": "[REDACTED]"
+    },
+    {
+      "at": "2026-09-09T02:57:40.329Z",
+      "kind": "fixture_api",
+      "label": "exclusive-login-0",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200,
+      "responseSha256": "2f70bfcb38a41f051e263b879000491226983512b32346d5e898c753825d64d7",
+      "bodyStored": false,
+      "requestBody": "[REDACTED]"
+    },
+    {
+      "at": "2026-09-09T02:57:40.332Z",
+      "kind": "fixture_api",
+      "label": "initial-five-off-0",
+      "method": "GET",
+      "path": "/api/v1/projects/71a450c4-addd-40b3-84f4-e028ccd17dbc/components",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\003-initial-five-off-0.body",
+      "bytes": 813,
+      "sha256": "8d60a90fca94007265e9d687e4b3c5991f259e9fda9c579ce1cab82d6307ff99"
+    },
+    {
+      "at": "2026-09-09T02:57:40.337Z",
+      "kind": "fixture_api",
+      "label": "initial-members-0",
+      "method": "GET",
+      "path": "/api/v1/projects/71a450c4-addd-40b3-84f4-e028ccd17dbc/members?limit=100",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\004-initial-members-0.body",
+      "bytes": 951,
+      "sha256": "02ba1a1d6a604130bc06670b9667523c5d2665d71697e8ee9ea26a03ebfd19dd"
+    }
+  ],
+  "processes": [],
+  "checkpoints": [],
+  "bundles": [],
+  "holds": [],
+  "drafts": [],
+  "boundaries": {
+    "bugPosts": 0,
+    "uploadPosts": 0,
+    "commentsWritten": 0,
+    "componentMutations": 0,
+    "existingBrowserAttached": false,
+    "appAbortBypassed": false,
+    "syntheticSuccessfulResponses": false,
+    "forcedStop": false
+  },
+  "hostBefore": [
+    {
+      "port": 4419,
+      "address": "127.0.0.1",
+      "pid": 22852,
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "startedAt": "2026-09-09T01:22:20.2728640Z"
+    },
+    {
+      "port": 4274,
+      "address": "127.0.0.1",
+      "pid": 20284,
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "startedAt": "2026-09-08T17:52:36.5080910Z"
+    }
+  ],
+  "failure": "Error: Check failed: exact fixture members 0",
+  "finishedAt": "2026-09-09T02:57:40.337Z",
+  "lateScenario": {
+    "phase": "idle",
+    "requestId": null,
+    "networkId": null,
+    "bodySha256": null
+  },
+  "unreleasedRealResponses": [],
+  "limits": [
+    "A project switch keeps the application Abort mechanism; a confirmed cancellation is distinguished from a continuation acknowledgment, neither is fabricated callback delivery.",
+    "No Bug, attachment upload, comment or component business write is attempted. PNGs remain local unsubmitted draft Blobs.",
+    "Only this fresh profile and exact A/B draft keys are read. No proof of all continuous frames, other identities, devices or existing client drafts is claimed."
+  ]
+}

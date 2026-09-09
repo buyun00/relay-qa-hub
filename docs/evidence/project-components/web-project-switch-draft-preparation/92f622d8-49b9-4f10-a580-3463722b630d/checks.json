@@ -1,0 +1,56 @@
+{
+  "at": "2026-09-09T02:55:25.164Z",
+  "status": "passed_preparation_only",
+  "source": {
+    "path": "scripts/project-components/web-project-switch-draft-live.mjs",
+    "sha256": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5"
+  },
+  "tests": {
+    "path": "scripts/project-components/web-project-switch-draft-live.test.mjs",
+    "sha256": "c4303d72378f19ecd07e52ee128a99dcc088823fec15b85e8d3ed071d0a74645"
+  },
+  "rows": [
+    {
+      "label": "syntax-source",
+      "status": 0,
+      "signal": null,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-source.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "syntax-tests",
+      "status": 0,
+      "signal": null,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-tests.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "default-inert",
+      "status": 0,
+      "signal": null,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/default-inert.txt",
+      "sha256": "646bf17017466660f71ff47812e179e08a55ac7f2c24f5c7872ed6f15fe83b77"
+    },
+    {
+      "label": "pure-tests",
+      "status": 0,
+      "signal": null,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/pure-tests.txt",
+      "sha256": "025aadba0b6c6f7617ef3fc57b5d23ea741400cb76664aeac555acd5133f7dd2"
+    },
+    {
+      "label": "lint",
+      "status": 0,
+      "signal": null,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/lint.txt",
+      "sha256": "e5b84f2d1e61ea795b0d9944987954e036ebc065034f60bb72820dd4ec7aebeb"
+    },
+    {
+      "label": "format",
+      "status": 0,
+      "signal": null,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/format.txt",
+      "sha256": "47856fd82d9e9dc6c3e9e125a9b9b13519d01a5ceb9b0777d959f163896621ba"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "at": "2026-09-09T03:00:10.253Z",
+  "status": "passed_preparation_only",
+  "source": {
+    "path": "scripts/project-components/web-project-switch-draft-live.mjs",
+    "sha256": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+  },
+  "tests": {
+    "path": "scripts/project-components/web-project-switch-draft-live.test.mjs",
+    "sha256": "d10188a3c81838698c10157d80f569aadd4b0b283bd78e4a478ea8e0b359a7ec"
+  },
+  "rows": [
+    {
+      "label": "syntax-source",
+      "status": 0,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-source-r2.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "syntax-tests",
+      "status": 0,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-tests-r2.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "default-inert",
+      "status": 0,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/default-inert-r2.txt",
+      "sha256": "646bf17017466660f71ff47812e179e08a55ac7f2c24f5c7872ed6f15fe83b77"
+    },
+    {
+      "label": "pure-tests",
+      "status": 0,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/pure-tests-r2.txt",
+      "sha256": "b40db39b32cde9cb70657e093a71a58aac7eaebf7763de52366cdfc543f37e71"
+    },
+    {
+      "label": "lint",
+      "status": 0,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/lint-r2.txt",
+      "sha256": "e5b84f2d1e61ea795b0d9944987954e036ebc065034f60bb72820dd4ec7aebeb"
+    },
+    {
+      "label": "format",
+      "status": 0,
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/format-r2.txt",
+      "sha256": "47856fd82d9e9dc6c3e9e125a9b9b13519d01a5ceb9b0777d959f163896621ba"
+    }
+  ]
+}

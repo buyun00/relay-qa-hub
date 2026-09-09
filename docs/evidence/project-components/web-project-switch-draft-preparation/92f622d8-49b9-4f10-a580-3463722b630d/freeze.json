@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-09T03:11:05.523Z",
+  "status": "frozen",
+  "files": [
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/01-A-unsubmitted-text-PNG.png",
+      "size": 186400,
+      "sha256": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/02-B-unsubmitted-text-PNG.png",
+      "size": 186302,
+      "sha256": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/03-A-real-members-response-held.png",
+      "size": 88743,
+      "sha256": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/04-B-draft-before-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/05-B-draft-after-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/06-B-durable-draft-reloaded.png",
+      "size": 184908,
+      "sha256": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/07-A-draft-roundtrip.png",
+      "size": 186049,
+      "sha256": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/08-B-draft-roundtrip.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/README.md",
+      "size": 7814,
+      "sha256": "c84894dd6cb1b3dc66a08113c187bc51c4f15dccc62beae366ac42d477fa58b7"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/artifact-audit-first-failure.log.txt",
+      "size": 763,
+      "sha256": "760237315f4ca6bb5cb4632496347c4a8df1feb9a7fc327066c2cfd748559c95"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/artifact-audit-initial.mjs.txt",
+      "size": 12566,
+      "sha256": "38a82be8c2fa5d1b6940aee7db971d33658bf9f31cceb91a9f0d18755ceb2a63"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/artifact-audit.json",
+      "size": 137461,
+      "sha256": "0efb90b0c1901357dd9cf6aac1cc99789a8e0fc4c95fd2e21f7be2487295b589"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/artifact-audit.log.txt",
+      "size": 435,
+      "sha256": "afe059fb58d13b589bb258aad3a08d97bede1274a545e75cf6c73232c6c084df"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/artifact-audit.mjs",
+      "size": 12574,
+      "sha256": "c5f05a7d16a03274e4b1de4c56d9db04f9690e9f33265d8c346820373e9d74db"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json",
+      "size": 966444,
+      "sha256": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/runner.mjs.txt",
+      "size": 56872,
+      "sha256": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/97e972b8-4a90-48b7-bebe-8b49c58eed15/proof.json",
+      "size": 13856,
+      "sha256": "7c91a9e08c8537dc31f9a74e953af73d8213618a6c1d65867c38c8bcde884f90"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-live/97e972b8-4a90-48b7-bebe-8b49c58eed15/runner.mjs.txt",
+      "size": 56400,
+      "sha256": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/actual-first-run.log.txt",
+      "size": 431,
+      "sha256": "8889581bc880e47c50f9923a853efa19e4a562a69faec79f9bdeb47f20c5cda2"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/actual-second-run.log.txt",
+      "size": 423,
+      "sha256": "0a38dee4156f6645e3a74a011804d8571d90ec19f1a0fb1e6e67e6ea2d0bae58"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/checks-r2.json",
+      "size": 2162,
+      "sha256": "1c37cdacdb7f08b06872736e4c7970a4da0a52bb5514d77c44b9fbbc133240ee"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/checks.json",
+      "size": 2276,
+      "sha256": "f462105ce24bfbc16e4931090573795da8babe50aa213a20b1d16a52c0078d51"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/default-inert-r2.txt",
+      "size": 105,
+      "sha256": "646bf17017466660f71ff47812e179e08a55ac7f2c24f5c7872ed6f15fe83b77"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/default-inert.txt",
+      "size": 105,
+      "sha256": "646bf17017466660f71ff47812e179e08a55ac7f2c24f5c7872ed6f15fe83b77"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/followup-r2.md",
+      "size": 1900,
+      "sha256": "19679899e6dde062e8ca9566acbb2961d176434254b1d33c4dc3778669ac6a5b"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/format-r2.txt",
+      "size": 275,
+      "sha256": "47856fd82d9e9dc6c3e9e125a9b9b13519d01a5ceb9b0777d959f163896621ba"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/format.txt",
+      "size": 275,
+      "sha256": "47856fd82d9e9dc6c3e9e125a9b9b13519d01a5ceb9b0777d959f163896621ba"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/gate-reference-r2.json",
+      "size": 427,
+      "sha256": "50579ac488a33487ab622e5d2fe532ce1e87302f20d8f2f078dff7b3cdc954d6"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/gate-reference.json",
+      "size": 424,
+      "sha256": "a44ef2aeb2f6edc06d15e0514eec2cb2c7a7a2e16bec5a9f979be6d89fc67c3d"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/lint-r2.txt",
+      "size": 199,
+      "sha256": "e5b84f2d1e61ea795b0d9944987954e036ebc065034f60bb72820dd4ec7aebeb"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/lint.txt",
+      "size": 199,
+      "sha256": "e5b84f2d1e61ea795b0d9944987954e036ebc065034f60bb72820dd4ec7aebeb"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/plan.md",
+      "size": 5892,
+      "sha256": "729e2f8845f3df0d51a21393aff1c29d7f291e6ac9f96797c2b646eb795faa44"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/pure-tests-r2.txt",
+      "size": 1530,
+      "sha256": "b40db39b32cde9cb70657e093a71a58aac7eaebf7763de52366cdfc543f37e71"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/pure-tests.txt",
+      "size": 1425,
+      "sha256": "025aadba0b6c6f7617ef3fc57b5d23ea741400cb76664aeac555acd5133f7dd2"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-source-r2.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-source.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-tests-r2.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-project-switch-draft-preparation/92f622d8-49b9-4f10-a580-3463722b630d/syntax-tests.txt",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "scripts/project-components/web-project-switch-draft-live.mjs",
+      "size": 56872,
+      "sha256": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "path": "scripts/project-components/web-project-switch-draft-live.test.mjs",
+      "size": 12121,
+      "sha256": "d10188a3c81838698c10157d80f569aadd4b0b283bd78e4a478ea8e0b359a7ec"
+    }
+  ],
+  "scan": {
+    "textFiles": 32,
+    "patterns": [
+      "JWT",
+      "PEM",
+      "Bearer literal"
+    ],
+    "hits": [],
+    "credentialFilesRead": 0,
+    "knownSecretLiteralScan": "Not repeated after process exit; actual runner used its in-memory known-secret set before proof write. This artifact scan checks shapes only.",
+    "sourceTestsContain": "Synthetic test secrets and redaction field names; not live credentials."
+  },
+  "scope": "Only new two runners, their new preparation and two new actual-run evidence directories. No Git mutation."
+}

@@ -1,0 +1,3879 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "auditedAt": "2026-09-09T03:08:55.375Z",
+  "runId": "9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+  "mode": "artifact_only_same_agent_followup",
+  "noNetworkBrowserDeviceOrProfileAccess": true,
+  "originalProof": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\proof.json",
+    "size": 966444,
+    "sha256": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa"
+  },
+  "retainedFirstFailure": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\97e972b8-4a90-48b7-bebe-8b49c58eed15\\proof.json",
+    "size": 13856,
+    "sha256": "7c91a9e08c8537dc31f9a74e953af73d8213618a6c1d65867c38c8bcde884f90"
+  },
+  "checkCount": 400,
+  "checks": [
+    {
+      "label": "ten original public artifacts",
+      "passed": true,
+      "actual": 10,
+      "expected": 10
+    },
+    {
+      "label": "run status",
+      "passed": true,
+      "actual": "passed",
+      "expected": "passed"
+    },
+    {
+      "label": "164 actual checks",
+      "passed": true,
+      "actual": 164,
+      "expected": 164
+    },
+    {
+      "label": "recomputed run check: api PID",
+      "passed": true,
+      "actual": 22852,
+      "expected": 22852
+    },
+    {
+      "label": "recomputed run check: api start",
+      "passed": true,
+      "actual": 1788916940272,
+      "expected": 1788916940272
+    },
+    {
+      "label": "recomputed run check: api loopback",
+      "passed": true,
+      "actual": "127.0.0.1",
+      "expected": "127.0.0.1"
+    },
+    {
+      "label": "recomputed run check: web PID",
+      "passed": true,
+      "actual": 20284,
+      "expected": 20284
+    },
+    {
+      "label": "recomputed run check: web start",
+      "passed": true,
+      "actual": 1788889956508,
+      "expected": 1788889956508
+    },
+    {
+      "label": "recomputed run check: web loopback",
+      "passed": true,
+      "actual": "127.0.0.1",
+      "expected": "127.0.0.1"
+    },
+    {
+      "label": "recomputed run check: ready status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: ready status",
+      "passed": true,
+      "actual": "ready",
+      "expected": "ready"
+    },
+    {
+      "label": "recomputed run check: reviewed schema",
+      "passed": true,
+      "actual": "14",
+      "expected": "14"
+    },
+    {
+      "label": "recomputed run check: asset assets/index-Br-CEXQI.js",
+      "passed": true,
+      "actual": {
+        "size": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      "expected": {
+        "size": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      }
+    },
+    {
+      "label": "recomputed run check: asset assets/index-Br-CEXQI.js.map",
+      "passed": true,
+      "actual": {
+        "size": 1829769,
+        "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328"
+      },
+      "expected": {
+        "size": 1829769,
+        "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328"
+      }
+    },
+    {
+      "label": "recomputed run check: asset assets/index-CgNw0fhl.css",
+      "passed": true,
+      "actual": {
+        "size": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      },
+      "expected": {
+        "size": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      }
+    },
+    {
+      "label": "recomputed run check: asset icon-licenses.txt",
+      "passed": true,
+      "actual": {
+        "size": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      },
+      "expected": {
+        "size": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      }
+    },
+    {
+      "label": "recomputed run check: asset icons/qa-hub-192.svg",
+      "passed": true,
+      "actual": {
+        "size": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      },
+      "expected": {
+        "size": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      }
+    },
+    {
+      "label": "recomputed run check: asset icons/qa-hub-512.svg",
+      "passed": true,
+      "actual": {
+        "size": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      },
+      "expected": {
+        "size": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      }
+    },
+    {
+      "label": "recomputed run check: asset icons/qa-hub-maskable-512.svg",
+      "passed": true,
+      "actual": {
+        "size": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      },
+      "expected": {
+        "size": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      }
+    },
+    {
+      "label": "recomputed run check: asset index.html",
+      "passed": true,
+      "actual": {
+        "size": 709,
+        "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+      },
+      "expected": {
+        "size": 709,
+        "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+      }
+    },
+    {
+      "label": "recomputed run check: gm-login status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: new-project-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: shared-login-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: exclusive-login-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: initial-five-off-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: initial-members-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: exact fixture members 0",
+      "passed": true,
+      "actual": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: initial-empty-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: initial zero Bugs 0",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "recomputed run check: new-project-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: shared-login-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: exclusive-login-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: initial-five-off-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: initial-members-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: exact fixture members 1",
+      "passed": true,
+      "actual": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: initial-empty-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: initial zero Bugs 1",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "recomputed run check: three distinct new employees",
+      "passed": true,
+      "actual": 3,
+      "expected": 3
+    },
+    {
+      "label": "recomputed run check: CDP browser PID matches spawned process",
+      "passed": true,
+      "actual": 20980,
+      "expected": 20980
+    },
+    {
+      "label": "recomputed run check: actual browser bundle matches reviewed publication",
+      "passed": true,
+      "actual": {
+        "url": "http://127.0.0.1:4274/assets/index-Br-CEXQI.js",
+        "status": 200,
+        "sizeBytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      "expected": {
+        "url": "http://127.0.0.1:4274/assets/index-Br-CEXQI.js",
+        "sizeBytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+        "status": 200
+      }
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: initial A URL",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: new project draft initially empty 0",
+      "passed": true,
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "label": "recomputed run check: new project files initially empty 0",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 URL project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 project selection",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 verifier options",
+      "passed": true,
+      "actual": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 selected-project storage",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 0 visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: seed B URL",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: new project draft initially empty 1",
+      "passed": true,
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "label": "recomputed run check: new project files initially empty 1",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 URL project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 project selection",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 verifier options",
+      "passed": true,
+      "actual": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 selected-project storage",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: seed visible draft 1 visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: restored A URL",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: A restored before race URL project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: A restored before race project selection",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: A restored before race text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: A restored before race owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "recomputed run check: A restored before race verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: A restored before race owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: A restored before race verifier options",
+      "passed": true,
+      "actual": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: A restored before race selected-project storage",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: A restored before race visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: B while A held URL",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B before A settlement URL project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B before A settlement project selection",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B before A settlement text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: B before A settlement owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "recomputed run check: B before A settlement verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: B before A settlement owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: B before A settlement verifier options",
+      "passed": true,
+      "actual": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: B before A settlement selected-project storage",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B before A settlement visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: B after A settlement URL project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B after A settlement project selection",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B after A settlement text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: B after A settlement owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "recomputed run check: B after A settlement verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: B after A settlement owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: B after A settlement verifier options",
+      "passed": true,
+      "actual": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: B after A settlement selected-project storage",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B after A settlement visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: reloaded B URL",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B after actual reload URL project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B after actual reload project selection",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B after actual reload text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: B after actual reload owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "recomputed run check: B after actual reload verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: B after actual reload owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: B after actual reload verifier options",
+      "passed": true,
+      "actual": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: B after actual reload selected-project storage",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: B after actual reload visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: final A URL",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: final A restored URL project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: final A restored project selection",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: final A restored text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: final A restored owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "recomputed run check: final A restored verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: final A restored owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: final A restored verifier options",
+      "passed": true,
+      "actual": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: final A restored selected-project storage",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: final A restored visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: final B URL",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: final B restored URL project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: final B restored project selection",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: final B restored text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "recomputed run check: final B restored owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "recomputed run check: final B restored verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "recomputed run check: final B restored owner options",
+      "passed": true,
+      "actual": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "",
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: final B restored verifier options",
+      "passed": true,
+      "actual": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "recomputed run check: final B restored selected-project storage",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: final B restored visible PNG Blob",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "complete": true,
+          "width": 16,
+          "height": 16,
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "recomputed run check: final-empty-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: final zero Bugs 0",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "recomputed run check: final-five-off-0 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: local fixture PNG retained 0",
+      "passed": true,
+      "actual": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa",
+      "expected": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+    },
+    {
+      "label": "recomputed run check: final-empty-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: final zero Bugs 1",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "recomputed run check: final-five-off-1 status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "recomputed run check: component response project",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "recomputed run check: five component keys",
+      "passed": true,
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ]
+    },
+    {
+      "label": "recomputed run check: five components remain disabled",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "recomputed run check: local fixture PNG retained 1",
+      "passed": true,
+      "actual": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269",
+      "expected": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+    },
+    {
+      "label": "recomputed run check: only one browser login",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "label": "recomputed run check: no browser business POST",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "recomputed run check: API/Web process identities unchanged",
+      "passed": true,
+      "actual": [
+        {
+          "port": 4419,
+          "address": "127.0.0.1",
+          "pid": 22852,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-09T01:22:20.2728640Z"
+        },
+        {
+          "port": 4274,
+          "address": "127.0.0.1",
+          "pid": 20284,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        }
+      ],
+      "expected": [
+        {
+          "port": 4419,
+          "address": "127.0.0.1",
+          "pid": 22852,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-09T01:22:20.2728640Z"
+        },
+        {
+          "port": 4274,
+          "address": "127.0.0.1",
+          "pid": 20284,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        }
+      ]
+    },
+    {
+      "label": "reported actual checks all passed",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "SHA proof.json",
+      "passed": true,
+      "actual": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa",
+      "expected": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa"
+    },
+    {
+      "label": "SHA runner.mjs.txt",
+      "passed": true,
+      "actual": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82",
+      "expected": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "label": "SHA runner.mjs",
+      "passed": true,
+      "actual": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82",
+      "expected": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "label": "SHA web-project-switch-draft-live.mjs",
+      "passed": true,
+      "actual": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82",
+      "expected": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "label": "SHA web-project-switch-draft-live.test.mjs",
+      "passed": true,
+      "actual": "d10188a3c81838698c10157d80f569aadd4b0b283bd78e4a478ea8e0b359a7ec",
+      "expected": "d10188a3c81838698c10157d80f569aadd4b0b283bd78e4a478ea8e0b359a7ec"
+    },
+    {
+      "label": "SHA browser-gate.json",
+      "passed": true,
+      "actual": "bc67dc74bc95ad3ee18dba89ff128947e71e589bc5b9e09bc97cc4f4e9ff918e",
+      "expected": "bc67dc74bc95ad3ee18dba89ff128947e71e589bc5b9e09bc97cc4f4e9ff918e"
+    },
+    {
+      "label": "SHA deploy.json",
+      "passed": true,
+      "actual": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63",
+      "expected": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63"
+    },
+    {
+      "label": "SHA instance.json",
+      "passed": true,
+      "actual": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b",
+      "expected": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+    },
+    {
+      "label": "request/response ledger counts",
+      "passed": true,
+      "actual": {
+        "fixture_api": 18,
+        "browser_request": 47,
+        "browser_real_response": 28
+      },
+      "expected": {
+        "fixture_api": 18,
+        "browser_request": 47,
+        "browser_real_response": 28
+      }
+    },
+    {
+      "label": "eight allowed authentication/setup POSTs",
+      "passed": true,
+      "actual": 8,
+      "expected": 8
+    },
+    {
+      "label": "POST allowlist",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "two new project POST IDs",
+      "passed": true,
+      "actual": [
+        "2cba798b-4188-43e8-af1b-6fd3bed18976",
+        "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+      ],
+      "expected": [
+        "2cba798b-4188-43e8-af1b-6fd3bed18976",
+        "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+      ]
+    },
+    {
+      "label": "one browser login and no browser business POST",
+      "passed": true,
+      "actual": [
+        "login"
+      ],
+      "expected": [
+        "login"
+      ]
+    },
+    {
+      "label": "new shared and exclusive employees distinct",
+      "passed": true,
+      "actual": 3,
+      "expected": 3
+    },
+    {
+      "label": "SHA 001-ready.body",
+      "passed": true,
+      "actual": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911",
+      "expected": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911"
+    },
+    {
+      "label": "raw bytes 001-ready.body",
+      "passed": true,
+      "actual": 150,
+      "expected": 150
+    },
+    {
+      "label": "SHA 002-new-project-0.body",
+      "passed": true,
+      "actual": "af7b926c0c25e233adae8e553ae9da8b05573db3a1a1ff8e3549f8c3d333f89a",
+      "expected": "af7b926c0c25e233adae8e553ae9da8b05573db3a1a1ff8e3549f8c3d333f89a"
+    },
+    {
+      "label": "raw bytes 002-new-project-0.body",
+      "passed": true,
+      "actual": 151,
+      "expected": 151
+    },
+    {
+      "label": "SHA 003-initial-five-off-0.body",
+      "passed": true,
+      "actual": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67",
+      "expected": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "label": "raw bytes 003-initial-five-off-0.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 004-initial-members-0.body",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "raw bytes 004-initial-members-0.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 005-initial-empty-0.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 005-initial-empty-0.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 006-new-project-1.body",
+      "passed": true,
+      "actual": "0e28705aeed287cc9485c5c3501dbec4bf415bbde92225ab5491dd6da1aed2e7",
+      "expected": "0e28705aeed287cc9485c5c3501dbec4bf415bbde92225ab5491dd6da1aed2e7"
+    },
+    {
+      "label": "raw bytes 006-new-project-1.body",
+      "passed": true,
+      "actual": 151,
+      "expected": 151
+    },
+    {
+      "label": "SHA 007-initial-five-off-1.body",
+      "passed": true,
+      "actual": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81",
+      "expected": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "label": "raw bytes 007-initial-five-off-1.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 008-initial-members-1.body",
+      "passed": true,
+      "actual": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b",
+      "expected": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "label": "raw bytes 008-initial-members-1.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 009-initial-empty-1.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 009-initial-empty-1.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 010-browser-components.body",
+      "passed": true,
+      "actual": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67",
+      "expected": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "label": "raw bytes 010-browser-components.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 011-browser-members.body",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "raw bytes 011-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 012-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 012-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 013-browser-components.body",
+      "passed": true,
+      "actual": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81",
+      "expected": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "label": "raw bytes 013-browser-components.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 014-browser-members.body",
+      "passed": true,
+      "actual": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b",
+      "expected": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "label": "raw bytes 014-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 015-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 015-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 016-browser-components.body",
+      "passed": true,
+      "actual": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67",
+      "expected": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "label": "raw bytes 016-browser-components.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 017-browser-members.body",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "raw bytes 017-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 018-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 018-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 019-browser-members.body",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "raw bytes 019-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 020-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 020-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 021-browser-components.body",
+      "passed": true,
+      "actual": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81",
+      "expected": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "label": "raw bytes 021-browser-components.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 022-browser-members.body",
+      "passed": true,
+      "actual": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b",
+      "expected": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "label": "raw bytes 022-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 023-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 023-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 024-browser-components.body",
+      "passed": true,
+      "actual": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81",
+      "expected": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "label": "raw bytes 024-browser-components.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 025-browser-members.body",
+      "passed": true,
+      "actual": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b",
+      "expected": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "label": "raw bytes 025-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 026-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 026-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 027-browser-members.body",
+      "passed": true,
+      "actual": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b",
+      "expected": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "label": "raw bytes 027-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 028-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 028-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 029-browser-components.body",
+      "passed": true,
+      "actual": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67",
+      "expected": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "label": "raw bytes 029-browser-components.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 030-browser-members.body",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "raw bytes 030-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 031-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 031-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 032-browser-members.body",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "raw bytes 032-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 033-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 033-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 034-browser-components.body",
+      "passed": true,
+      "actual": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81",
+      "expected": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "label": "raw bytes 034-browser-components.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 035-browser-members.body",
+      "passed": true,
+      "actual": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b",
+      "expected": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "label": "raw bytes 035-browser-members.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA 036-browser-bugs.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 036-browser-bugs.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 037-final-empty-0.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 037-final-empty-0.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 038-final-five-off-0.body",
+      "passed": true,
+      "actual": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67",
+      "expected": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "label": "raw bytes 038-final-five-off-0.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 039-final-empty-1.body",
+      "passed": true,
+      "actual": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22",
+      "expected": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "label": "raw bytes 039-final-empty-1.body",
+      "passed": true,
+      "actual": 51,
+      "expected": 51
+    },
+    {
+      "label": "SHA 040-final-five-off-1.body",
+      "passed": true,
+      "actual": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81",
+      "expected": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "label": "raw bytes 040-final-five-off-1.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "40 non-auth raw bodies rehashed",
+      "passed": true,
+      "actual": 40,
+      "expected": 40
+    },
+    {
+      "label": "project 0 includes actual creator/shared/exclusive",
+      "passed": true,
+      "actual": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "project 0 final official Bug list empty",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "project 0 final component scope",
+      "passed": true,
+      "actual": "2cba798b-4188-43e8-af1b-6fd3bed18976",
+      "expected": "2cba798b-4188-43e8-af1b-6fd3bed18976"
+    },
+    {
+      "label": "project 0 five off",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "SHA unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+      "passed": true,
+      "actual": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa",
+      "expected": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+    },
+    {
+      "label": "project 0 several durable checkpoints",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "draft seed durable draft 0 exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft seed durable draft 0 unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft seed durable draft 0 owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "draft seed durable draft 0 verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft seed durable draft 0 PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "draft seed visible draft 0 persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft seed visible draft 0 persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft seed visible draft 0 persisted owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "draft seed visible draft 0 persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft seed visible draft 0 persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "draft A restored before race persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft A restored before race persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft A restored before race persisted owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "draft A restored before race persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft A restored before race persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "draft A durable draft after settlement exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft A durable draft after settlement unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft A durable draft after settlement owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "draft A durable draft after settlement verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft A durable draft after settlement PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "draft final A restored persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft final A restored persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft final A restored persisted owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "draft final A restored persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft final A restored persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "draft final independent persisted draft 0 exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"2cba798b-4188-43e8-af1b-6fd3bed18976\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft final independent persisted draft 0 unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_A_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft final independent persisted draft 0 owner",
+      "passed": true,
+      "actual": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+      "expected": "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d"
+    },
+    {
+      "label": "draft final independent persisted draft 0 verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft final independent persisted draft 0 PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+        }
+      ]
+    },
+    {
+      "label": "project 1 includes actual creator/shared/exclusive",
+      "passed": true,
+      "actual": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "409c5bc4-019b-463b-8e99-5f98d4415225",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "project 1 final official Bug list empty",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "project 1 final component scope",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "project 1 five off",
+      "passed": true,
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "SHA unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+      "passed": true,
+      "actual": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269",
+      "expected": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+    },
+    {
+      "label": "project 1 several durable checkpoints",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "draft seed durable draft 1 exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft seed durable draft 1 unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft seed durable draft 1 owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "draft seed durable draft 1 verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft seed durable draft 1 PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "draft seed visible draft 1 persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft seed visible draft 1 persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft seed visible draft 1 persisted owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "draft seed visible draft 1 persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft seed visible draft 1 persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "draft B before A settlement persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft B before A settlement persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft B before A settlement persisted owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "draft B before A settlement persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft B before A settlement persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "draft B after A settlement persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft B after A settlement persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft B after A settlement persisted owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "draft B after A settlement persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft B after A settlement persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "draft B after actual reload persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft B after actual reload persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft B after actual reload persisted owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "draft B after actual reload persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft B after actual reload persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "draft final B restored persisted exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft final B restored persisted unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft final B restored persisted owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "draft final B restored persisted verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft final B restored persisted PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "draft final independent persisted draft 1 exact scoped key",
+      "passed": true,
+      "actual": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]",
+      "expected": "qa-hub:preview:v2:[\"http://127.0.0.1:4274\",\"d6d2129c-02a9-4f33-878b-353b45f88ef3\",\"6c9ee84f-bea0-408c-8679-4fb59393f08f\",\"bug-drafts\"]"
+    },
+    {
+      "label": "draft final independent persisted draft 1 unsubmitted text",
+      "passed": true,
+      "actual": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013",
+      "expected": "UNSUBMITTED_B_PROJECT_SWITCH_9320822e-6d6d-4f78-a6cb-eb59cb0a7013"
+    },
+    {
+      "label": "draft final independent persisted draft 1 owner",
+      "passed": true,
+      "actual": "409c5bc4-019b-463b-8e99-5f98d4415225",
+      "expected": "409c5bc4-019b-463b-8e99-5f98d4415225"
+    },
+    {
+      "label": "draft final independent persisted draft 1 verifier",
+      "passed": true,
+      "actual": "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+      "expected": "6c9ee84f-bea0-408c-8679-4fb59393f08f"
+    },
+    {
+      "label": "draft final independent persisted draft 1 PNG File",
+      "passed": true,
+      "actual": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ],
+      "expected": [
+        {
+          "name": "unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+          "type": "image/png",
+          "size": 79,
+          "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+        }
+      ]
+    },
+    {
+      "label": "13 durable checkpoints",
+      "passed": true,
+      "actual": 13,
+      "expected": 13
+    },
+    {
+      "label": "true Abort path recorded",
+      "passed": true,
+      "actual": "canceled",
+      "expected": "canceled"
+    },
+    {
+      "label": "same Network ID across request hold switch and cancellation",
+      "passed": true,
+      "actual": [
+        "9456.28",
+        "9456.28",
+        "9456.28",
+        "9456.28"
+      ],
+      "expected": [
+        "9456.28",
+        "9456.28",
+        "9456.28",
+        "9456.28"
+      ]
+    },
+    {
+      "label": "exact cancellation true",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "cancellation happened after switch",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "B verified before cancellation accepted",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "settled project B",
+      "passed": true,
+      "actual": "d6d2129c-02a9-4f33-878b-353b45f88ef3",
+      "expected": "d6d2129c-02a9-4f33-878b-353b45f88ef3"
+    },
+    {
+      "label": "original genuine A body hash",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "controlled window below 15 seconds",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "held response was 200",
+      "passed": true,
+      "actual": 200,
+      "expected": 200
+    },
+    {
+      "label": "held response raw binding",
+      "passed": true,
+      "actual": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513",
+      "expected": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "label": "held original A member set",
+      "passed": true,
+      "actual": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ],
+      "expected": [
+        "0b556aaf-fb1e-4fbf-8a27-0c14c3a03d8d",
+        "6c9ee84f-bea0-408c-8679-4fb59393f08f",
+        "850912b5-61bf-4f6b-aae6-f7c59e1b087e"
+      ]
+    },
+    {
+      "label": "target was never continued after confirmed cancellation",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "zero unreleased real responses",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "normal own browser close",
+      "passed": true,
+      "actual": [
+        "launched",
+        "normal_close"
+      ],
+      "expected": [
+        "launched",
+        "normal_close"
+      ]
+    },
+    {
+      "label": "same browser PID",
+      "passed": true,
+      "actual": 20980,
+      "expected": 20980
+    },
+    {
+      "label": "own browser exited",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "label": "no forced stop",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "label": "eight screenshot checkpoints",
+      "passed": true,
+      "actual": 8,
+      "expected": 8
+    },
+    {
+      "label": "SHA 01-A-unsubmitted-text-PNG.png",
+      "passed": true,
+      "actual": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f",
+      "expected": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+    },
+    {
+      "label": "SHA 01-A-unsubmitted-text-PNG.png",
+      "passed": true,
+      "actual": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f",
+      "expected": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+    },
+    {
+      "label": "SHA 02-B-unsubmitted-text-PNG.png",
+      "passed": true,
+      "actual": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736",
+      "expected": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+    },
+    {
+      "label": "SHA 02-B-unsubmitted-text-PNG.png",
+      "passed": true,
+      "actual": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736",
+      "expected": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+    },
+    {
+      "label": "SHA 03-A-real-members-response-held.png",
+      "passed": true,
+      "actual": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21",
+      "expected": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+    },
+    {
+      "label": "SHA 03-A-real-members-response-held.png",
+      "passed": true,
+      "actual": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21",
+      "expected": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+    },
+    {
+      "label": "SHA 04-B-draft-before-A-settlement.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "SHA 04-B-draft-before-A-settlement.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "SHA 05-B-draft-after-A-settlement.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "SHA 05-B-draft-after-A-settlement.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "SHA 06-B-durable-draft-reloaded.png",
+      "passed": true,
+      "actual": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6",
+      "expected": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+    },
+    {
+      "label": "SHA 06-B-durable-draft-reloaded.png",
+      "passed": true,
+      "actual": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6",
+      "expected": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+    },
+    {
+      "label": "SHA 07-A-draft-roundtrip.png",
+      "passed": true,
+      "actual": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b",
+      "expected": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+    },
+    {
+      "label": "SHA 07-A-draft-roundtrip.png",
+      "passed": true,
+      "actual": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b",
+      "expected": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+    },
+    {
+      "label": "SHA 08-B-draft-roundtrip.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "SHA 08-B-draft-roundtrip.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "SHA proof.json",
+      "passed": true,
+      "actual": "7c91a9e08c8537dc31f9a74e953af73d8213618a6c1d65867c38c8bcde884f90",
+      "expected": "7c91a9e08c8537dc31f9a74e953af73d8213618a6c1d65867c38c8bcde884f90"
+    },
+    {
+      "label": "SHA runner.mjs.txt",
+      "passed": true,
+      "actual": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5",
+      "expected": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5"
+    },
+    {
+      "label": "SHA runner.mjs",
+      "passed": true,
+      "actual": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5",
+      "expected": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5"
+    },
+    {
+      "label": "first attempt retained as failure",
+      "passed": true,
+      "actual": "failed_retained",
+      "expected": "failed_retained"
+    },
+    {
+      "label": "first attempt no browser launch",
+      "passed": true,
+      "actual": [],
+      "expected": []
+    },
+    {
+      "label": "first failure was actual creator member",
+      "passed": true,
+      "actual": [
+        "exact fixture members 0"
+      ],
+      "expected": [
+        "exact fixture members 0"
+      ]
+    },
+    {
+      "label": "SHA 001-ready.body",
+      "passed": true,
+      "actual": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911",
+      "expected": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911"
+    },
+    {
+      "label": "raw bytes 001-ready.body",
+      "passed": true,
+      "actual": 150,
+      "expected": 150
+    },
+    {
+      "label": "SHA 002-new-project-0.body",
+      "passed": true,
+      "actual": "1abf3861f2534dce851348a1fff16833a8eeca9adf61a7e3ff7ba52db5955153",
+      "expected": "1abf3861f2534dce851348a1fff16833a8eeca9adf61a7e3ff7ba52db5955153"
+    },
+    {
+      "label": "raw bytes 002-new-project-0.body",
+      "passed": true,
+      "actual": 151,
+      "expected": 151
+    },
+    {
+      "label": "SHA 003-initial-five-off-0.body",
+      "passed": true,
+      "actual": "8d60a90fca94007265e9d687e4b3c5991f259e9fda9c579ce1cab82d6307ff99",
+      "expected": "8d60a90fca94007265e9d687e4b3c5991f259e9fda9c579ce1cab82d6307ff99"
+    },
+    {
+      "label": "raw bytes 003-initial-five-off-0.body",
+      "passed": true,
+      "actual": 813,
+      "expected": 813
+    },
+    {
+      "label": "SHA 004-initial-members-0.body",
+      "passed": true,
+      "actual": "02ba1a1d6a604130bc06670b9667523c5d2665d71697e8ee9ea26a03ebfd19dd",
+      "expected": "02ba1a1d6a604130bc06670b9667523c5d2665d71697e8ee9ea26a03ebfd19dd"
+    },
+    {
+      "label": "raw bytes 004-initial-members-0.body",
+      "passed": true,
+      "actual": 951,
+      "expected": 951
+    },
+    {
+      "label": "SHA browser-gate.json",
+      "passed": true,
+      "actual": "2d4f59f32a81e3cc1c51c983f682e6c954c950ed66669645c0770ae2fd106dbe",
+      "expected": "2d4f59f32a81e3cc1c51c983f682e6c954c950ed66669645c0770ae2fd106dbe"
+    },
+    {
+      "label": "original public unchanged 01-A-unsubmitted-text-PNG.png",
+      "passed": true,
+      "actual": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f",
+      "expected": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+    },
+    {
+      "label": "original public unchanged 02-B-unsubmitted-text-PNG.png",
+      "passed": true,
+      "actual": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736",
+      "expected": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+    },
+    {
+      "label": "original public unchanged 03-A-real-members-response-held.png",
+      "passed": true,
+      "actual": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21",
+      "expected": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+    },
+    {
+      "label": "original public unchanged 04-B-draft-before-A-settlement.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "original public unchanged 05-B-draft-after-A-settlement.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "original public unchanged 06-B-durable-draft-reloaded.png",
+      "passed": true,
+      "actual": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6",
+      "expected": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+    },
+    {
+      "label": "original public unchanged 07-A-draft-roundtrip.png",
+      "passed": true,
+      "actual": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b",
+      "expected": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+    },
+    {
+      "label": "original public unchanged 08-B-draft-roundtrip.png",
+      "passed": true,
+      "actual": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f",
+      "expected": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "label": "original public unchanged proof.json",
+      "passed": true,
+      "actual": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa",
+      "expected": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa"
+    },
+    {
+      "label": "original public unchanged runner.mjs.txt",
+      "passed": true,
+      "actual": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82",
+      "expected": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    }
+  ],
+  "files": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\01-A-unsubmitted-text-PNG.png",
+      "size": 186400,
+      "sha256": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\02-B-unsubmitted-text-PNG.png",
+      "size": 186302,
+      "sha256": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\03-A-real-members-response-held.png",
+      "size": 88743,
+      "sha256": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\05-B-draft-after-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\04-B-draft-before-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\06-B-durable-draft-reloaded.png",
+      "size": 184908,
+      "sha256": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\07-A-draft-roundtrip.png",
+      "size": 186049,
+      "sha256": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\runner.mjs.txt",
+      "size": 56872,
+      "sha256": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\08-B-draft-roundtrip.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\proof.json",
+      "size": 966444,
+      "sha256": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\proof.json",
+      "size": 966444,
+      "sha256": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\runner.mjs.txt",
+      "size": 56872,
+      "sha256": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\runner.mjs",
+      "size": 56872,
+      "sha256": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\web-project-switch-draft-live.mjs",
+      "size": 56872,
+      "sha256": "a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\web-project-switch-draft-live.test.mjs",
+      "size": 12121,
+      "sha256": "d10188a3c81838698c10157d80f569aadd4b0b283bd78e4a478ea8e0b359a7ec"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\web-project-switch-draft-92f622d8-49b9-4f10-a580-3463722b630d-r2\\browser-gate.json",
+      "size": 944,
+      "sha256": "bc67dc74bc95ad3ee18dba89ff128947e71e589bc5b9e09bc97cc4f4e9ff918e"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-fix-publication\\e2d5cb4b-9068-4f14-9f90-d292ee4af864\\deploy.json",
+      "size": 40539,
+      "sha256": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+      "size": 1151,
+      "sha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\001-ready.body",
+      "size": 150,
+      "sha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\002-new-project-0.body",
+      "size": 151,
+      "sha256": "af7b926c0c25e233adae8e553ae9da8b05573db3a1a1ff8e3549f8c3d333f89a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\003-initial-five-off-0.body",
+      "size": 813,
+      "sha256": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\004-initial-members-0.body",
+      "size": 951,
+      "sha256": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\005-initial-empty-0.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\006-new-project-1.body",
+      "size": 151,
+      "sha256": "0e28705aeed287cc9485c5c3501dbec4bf415bbde92225ab5491dd6da1aed2e7"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\007-initial-five-off-1.body",
+      "size": 813,
+      "sha256": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\008-initial-members-1.body",
+      "size": 951,
+      "sha256": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\009-initial-empty-1.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\010-browser-components.body",
+      "size": 813,
+      "sha256": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\011-browser-members.body",
+      "size": 951,
+      "sha256": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\012-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\013-browser-components.body",
+      "size": 813,
+      "sha256": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\014-browser-members.body",
+      "size": 951,
+      "sha256": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\015-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\016-browser-components.body",
+      "size": 813,
+      "sha256": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\017-browser-members.body",
+      "size": 951,
+      "sha256": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\018-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\019-browser-members.body",
+      "size": 951,
+      "sha256": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\020-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\021-browser-components.body",
+      "size": 813,
+      "sha256": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\022-browser-members.body",
+      "size": 951,
+      "sha256": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\023-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\024-browser-components.body",
+      "size": 813,
+      "sha256": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\025-browser-members.body",
+      "size": 951,
+      "sha256": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\026-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\027-browser-members.body",
+      "size": 951,
+      "sha256": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\028-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\029-browser-components.body",
+      "size": 813,
+      "sha256": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\030-browser-members.body",
+      "size": 951,
+      "sha256": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\031-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\032-browser-members.body",
+      "size": 951,
+      "sha256": "b826c55d99bb7001a2701e500130159c756a61e1ee4aa1617916f011c5a0c513"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\033-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\034-browser-components.body",
+      "size": 813,
+      "sha256": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\035-browser-members.body",
+      "size": 951,
+      "sha256": "adf7de373a0048f43da230e5c9ef261846486d5254c150f3f17c99b77f4c873b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\036-browser-bugs.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\037-final-empty-0.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\038-final-five-off-0.body",
+      "size": 813,
+      "sha256": "a35d7eef63c165e7e77d011a37c10189eac0c217330d56031c4864b7404ceb67"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\039-final-empty-1.body",
+      "size": 51,
+      "sha256": "45f14cd9fc22a8b73ab555aaf23d2e12629c0a78df497bfded5f75e7448fbd22"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\raw\\040-final-five-off-1.body",
+      "size": 813,
+      "sha256": "504f52828707ba77043bd462b14a5799f906056d04567e31794f708b9395ba81"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\unsubmitted-A-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+      "size": 79,
+      "sha256": "e6c79220953bc0a966fc8fb5e72c4bbf39d3abdac760277a29a091d5ccf742aa"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\unsubmitted-B-9320822e-6d6d-4f78-a6cb-eb59cb0a7013.png",
+      "size": 79,
+      "sha256": "04156bb30bd0571d2c1e381c2bc3f8e6e4c82e1d0a3f4e3bfe61d4229dd09269"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\01-A-unsubmitted-text-PNG.png",
+      "size": 186400,
+      "sha256": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\01-A-unsubmitted-text-PNG.png",
+      "size": 186400,
+      "sha256": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\02-B-unsubmitted-text-PNG.png",
+      "size": 186302,
+      "sha256": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\02-B-unsubmitted-text-PNG.png",
+      "size": 186302,
+      "sha256": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\03-A-real-members-response-held.png",
+      "size": 88743,
+      "sha256": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\03-A-real-members-response-held.png",
+      "size": 88743,
+      "sha256": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\04-B-draft-before-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\04-B-draft-before-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\05-B-draft-after-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\05-B-draft-after-A-settlement.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\06-B-durable-draft-reloaded.png",
+      "size": 184908,
+      "sha256": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\06-B-durable-draft-reloaded.png",
+      "size": 184908,
+      "sha256": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\07-A-draft-roundtrip.png",
+      "size": 186049,
+      "sha256": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\07-A-draft-roundtrip.png",
+      "size": 186049,
+      "sha256": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\08-B-draft-roundtrip.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\9320822e-6d6d-4f78-a6cb-eb59cb0a7013\\08-B-draft-roundtrip.png",
+      "size": 185954,
+      "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\97e972b8-4a90-48b7-bebe-8b49c58eed15\\proof.json",
+      "size": 13856,
+      "sha256": "7c91a9e08c8537dc31f9a74e953af73d8213618a6c1d65867c38c8bcde884f90"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\proof.json",
+      "size": 13856,
+      "sha256": "7c91a9e08c8537dc31f9a74e953af73d8213618a6c1d65867c38c8bcde884f90"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-live\\97e972b8-4a90-48b7-bebe-8b49c58eed15\\runner.mjs.txt",
+      "size": 56400,
+      "sha256": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\runner.mjs",
+      "size": 56400,
+      "sha256": "d328050a14066c284d88950c20ef7806ff38233e7960fa8af4d3374f823ad8c5"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\001-ready.body",
+      "size": 150,
+      "sha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\002-new-project-0.body",
+      "size": 151,
+      "sha256": "1abf3861f2534dce851348a1fff16833a8eeca9adf61a7e3ff7ba52db5955153"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\003-initial-five-off-0.body",
+      "size": 813,
+      "sha256": "8d60a90fca94007265e9d687e4b3c5991f259e9fda9c579ce1cab82d6307ff99"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-project-switch-draft-97e972b8-4a90-48b7-bebe-8b49c58eed15\\raw\\004-initial-members-0.body",
+      "size": 951,
+      "sha256": "02ba1a1d6a604130bc06670b9667523c5d2665d71697e8ee9ea26a03ebfd19dd"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\web-project-switch-draft-92f622d8-49b9-4f10-a580-3463722b630d\\browser-gate.json",
+      "size": 852,
+      "sha256": "2d4f59f32a81e3cc1c51c983f682e6c954c950ed66669645c0770ae2fd106dbe"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\checks.json",
+      "size": 2276,
+      "sha256": "f462105ce24bfbc16e4931090573795da8babe50aa213a20b1d16a52c0078d51"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\checks-r2.json",
+      "size": 2162,
+      "sha256": "1c37cdacdb7f08b06872736e4c7970a4da0a52bb5514d77c44b9fbbc133240ee"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\gate-reference.json",
+      "size": 424,
+      "sha256": "a44ef2aeb2f6edc06d15e0514eec2cb2c7a7a2e16bec5a9f979be6d89fc67c3d"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\gate-reference-r2.json",
+      "size": 427,
+      "sha256": "50579ac488a33487ab622e5d2fe532ce1e87302f20d8f2f078dff7b3cdc954d6"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\actual-first-run.log.txt",
+      "size": 431,
+      "sha256": "8889581bc880e47c50f9923a853efa19e4a562a69faec79f9bdeb47f20c5cda2"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\actual-second-run.log.txt",
+      "size": 423,
+      "sha256": "0a38dee4156f6645e3a74a011804d8571d90ec19f1a0fb1e6e67e6ea2d0bae58"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\pure-tests.txt",
+      "size": 1425,
+      "sha256": "025aadba0b6c6f7617ef3fc57b5d23ea741400cb76664aeac555acd5133f7dd2"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-project-switch-draft-preparation\\92f622d8-49b9-4f10-a580-3463722b630d\\pure-tests-r2.txt",
+      "size": 1530,
+      "sha256": "b40db39b32cde9cb70657e093a71a58aac7eaebf7763de52366cdfc543f37e71"
+    }
+  ],
+  "requestLedger": {
+    "fixture_api": 18,
+    "browser_request": 47,
+    "browser_real_response": 28,
+    "note": "93 is a mixed ledger count, not HTTP request count; eight asset preflights are separately checked."
+  },
+  "lateResponse": {
+    "networkId": "9456.28",
+    "settlement": "canceled",
+    "heldAt": "2026-09-09T03:00:44.803Z",
+    "switchAt": "2026-09-09T03:00:45.071Z",
+    "canceledAt": "2026-09-09T03:00:45.103Z",
+    "bVerifiedAt": "2026-09-09T03:00:45.257Z",
+    "settledAt": "2026-09-09T03:00:45.440Z",
+    "holdToSettlementMs": 637
+  },
+  "visualReview": {
+    "performedBy": "same executing agent via local image inspection",
+    "screenshots": [
+      {
+        "label": "01-A-unsubmitted-text-PNG",
+        "sha256": "27023ee1f50dbd13dfd6937f993d6acf4d890efb5477a83a674aed400c04f59f"
+      },
+      {
+        "label": "02-B-unsubmitted-text-PNG",
+        "sha256": "60790bca5eb857c08a8ade4cf6f8c1f5b48d3fb2ca66f09136b4450e76db1736"
+      },
+      {
+        "label": "03-A-real-members-response-held",
+        "sha256": "1b72ca4157ee2e60664358b87d1f4a9ca4d079bd94f1feff9564c8abc6ab8e21"
+      },
+      {
+        "label": "04-B-draft-before-A-settlement",
+        "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+      },
+      {
+        "label": "05-B-draft-after-A-settlement",
+        "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+      },
+      {
+        "label": "06-B-durable-draft-reloaded",
+        "sha256": "92302a772f1df5dae4e68971308d217ccc9580fcccb8aa1a63fe40953639c1a6"
+      },
+      {
+        "label": "07-A-draft-roundtrip",
+        "sha256": "a43d3e98b5fd04d4afb4bf39e9dc227bcd46fd5d5e9e8a63a05f396c64ee5d5b"
+      },
+      {
+        "label": "08-B-draft-roundtrip",
+        "sha256": "cf5d2da870b52db12340dc60e9edfaadcd2265e5eb6e1b6c40f912f91fc1a54f"
+      }
+    ],
+    "observations": [
+      "A red PNG and A text/owner recur in frames 01/07; B blue PNG and B text/owner recur in 02/04/05/06/08.",
+      "Frame 03 shows the A workbench during the genuine response hold; request timing comes from the ledger, not pixels.",
+      "The open modal blurs project text; exact URL/project/UUID assertions come from observed DOM and scoped draft reads. Long names/file labels are visibly truncated."
+    ]
+  },
+  "limits": [
+    "A project switch keeps the application Abort mechanism; a confirmed cancellation is distinguished from a continuation acknowledgment, neither is fabricated callback delivery.",
+    "No Bug, attachment upload, comment or component business write is attempted. PNGs remain local unsubmitted draft Blobs.",
+    "Only this fresh profile and exact A/B draft keys are read. No proof of all continuous frames, other identities, devices or existing client drafts is claimed.",
+    "The actual trajectory is Abort cancellation, not delivery of a stale A callback into B.",
+    "Authentication response bodies were intentionally not stored; their hashes cannot be recomputed from retained bodies.",
+    "This audit hashes stored records; it does not repeat live API/process/port observation or re-open the browser profile.",
+    "No continuous-frame absence claim, 15-second timeout execution, full browser process restart, cross-user/origin, existing-client preservation or submission success is inferred."
+  ]
+}

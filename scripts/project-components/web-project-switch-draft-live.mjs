@@ -1,0 +1,1446 @@
+import assert from "node:assert/strict";
+import { createHash, randomUUID } from "node:crypto";
+import { spawn, execFileSync } from "node:child_process";
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { createServer } from "node:net";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
+import { deflateSync } from "node:zlib";
+import {
+  canonicalInstancePath,
+  isInstancePathWithin,
+  readParallelInstanceConfig,
+} from "../../apps/api/src/parallel-instance.ts";
+
+export const WEB = "http://127.0.0.1:4274";
+export const EXPECTED_WEB = [
+  [
+    "assets/index-Br-CEXQI.js",
+    477433,
+    "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+  ],
+  [
+    "assets/index-Br-CEXQI.js.map",
+    1829769,
+    "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328",
+  ],
+  [
+    "assets/index-CgNw0fhl.css",
+    91623,
+    "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef",
+  ],
+  ["icon-licenses.txt", 4308, "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"],
+  ["icons/qa-hub-192.svg", 506, "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"],
+  ["icons/qa-hub-512.svg", 506, "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"],
+  [
+    "icons/qa-hub-maskable-512.svg",
+    495,
+    "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c",
+  ],
+  ["index.html", 709, "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"],
+];
+const sha = (value) => createHash("sha256").update(value).digest("hex");
+export function redact(value, secrets = new Set(), depth = 0) {
+  if (depth > 64) return "[REDACTED_NESTING_LIMIT]";
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed !== null && typeof parsed === "object")
+        return JSON.stringify(redact(parsed, secrets, depth + 1));
+      if (typeof parsed === "string") {
+        const clean = redact(parsed, secrets, depth + 1);
+        if (clean !== parsed) return JSON.stringify(clean);
+      }
+    } catch {
+      /* Preserve non-JSON primitive text. */
+    }
+    let clean = value;
+    for (const secret of secrets) clean = clean.replaceAll(secret, "[REDACTED]");
+    return clean.replace(/Bearer\s+[^\s"<>]+/giu, "Bearer [REDACTED]");
+  }
+  if (Array.isArray(value)) return value.map((x) => redact(x, secrets, depth + 1));
+  if (value && typeof value === "object")
+    return Object.fromEntries(
+      Object.entries(value).map(([key, v]) => [
+        key,
+        /token|secret|password|cookie|authorization|csrf|private.?key|credential/iu.test(key)
+          ? "[REDACTED]"
+          : redact(v, secrets, depth + 1),
+      ]),
+    );
+  return value;
+}
+
+export function classifyRequest(request, scope) {
+  const url = new URL(request.url),
+    method = request.method;
+  if (["about:", "blob:", "data:"].includes(url.protocol) && method === "GET")
+    return { kind: "local" };
+  assert.equal(url.origin, WEB, "BROWSER_ORIGIN_REFUSED");
+  const headers = new Map(
+    Object.entries(request.headers ?? {}).map(([k, v]) => [k.toLowerCase(), v]),
+  );
+  const query = (expected) =>
+    isDeepStrictEqual([...url.searchParams.entries()].sort(), Object.entries(expected).sort());
+  const scoped = (id) => {
+    assert(scope.projectIds.includes(id), "FIXTURE_PROJECT_REFUSED");
+    assert.equal(headers.get("x-qa-project-id"), id, "BROWSER_PROJECT_REFUSED");
+    return id;
+  };
+  if (
+    method === "GET" &&
+    url.pathname === "/" &&
+    scope.projectIds.some((id) => query({ projectId: id }))
+  )
+    return { kind: "document" };
+  if (
+    method === "GET" &&
+    query({}) &&
+    (EXPECTED_WEB.some(([path]) => url.pathname === "/" + path) || url.pathname === "/favicon.ico")
+  )
+    return { kind: "static" };
+  if (method === "GET" && query({}) && url.pathname === "/api/v1/auth/me") {
+    assert(
+      headers.get("x-qa-project-id") === undefined ||
+        scope.projectIds.includes(headers.get("x-qa-project-id")),
+    );
+    return { kind: "session" };
+  }
+  const entry = url.pathname.match(/^\/api\/v1\/project-entry\/([^/]+)$/u);
+  if (method === "GET" && entry && query({})) {
+    assert(scope.projectIds.includes(entry[1]));
+    assert(
+      headers.get("x-qa-project-id") === undefined || headers.get("x-qa-project-id") === entry[1],
+    );
+    return { kind: "entry", projectId: entry[1] };
+  }
+  if (method === "POST" && url.pathname === "/api/v1/auth/login" && query({})) {
+    scoped(scope.projectIds[0]);
+    assert.deepEqual(JSON.parse(request.postData), {
+      name: scope.employee,
+      projectId: scope.projectIds[0],
+      client: "web",
+    });
+    return { kind: "login", projectId: scope.projectIds[0] };
+  }
+  assert.equal(method, "GET", "BROWSER_MUTATION_REFUSED");
+  const project = url.pathname.match(/^\/api\/v1\/projects\/([^/]+)\/(members|components)$/u);
+  if (project && query(project[2] === "members" ? { limit: "100" } : {}))
+    return { kind: project[2], projectId: scoped(project[1]) };
+  if (url.pathname === "/api/v1/projects" && query({ limit: "50" }))
+    return { kind: "projects", projectId: scoped(headers.get("x-qa-project-id")) };
+  if (url.pathname === "/api/v1/bugs") {
+    const id = url.searchParams.get("projectId");
+    if (
+      query({ projectId: id, limit: "100" }) ||
+      query({ projectId: id, limit: "100", ownerId: scope.actorId })
+    )
+      return { kind: "bugs", projectId: scoped(id) };
+  }
+  throw new Error("BROWSER_ROUTE_REFUSED");
+}
+
+export class ProjectSwitchResponseLedger {
+  entries = new Map();
+  releases = new Map();
+  failures = new Map();
+  boundary = null;
+  constructor(call, record, now = Date.now) {
+    this.call = call;
+    this.record = record;
+    this.now = now;
+  }
+  pause(entry) {
+    assert(!this.entries.has(entry.requestId), "DUPLICATE_RESPONSE_PAUSE");
+    this.entries.set(entry.requestId, entry);
+  }
+  beginSwitch(from, to) {
+    assert(from && to && from !== to);
+    this.boundary = { from, to, beganAt: this.now(), verified: false };
+  }
+  verifyProject(to) {
+    assert.equal(to, this.boundary?.to);
+    this.boundary.verified = true;
+  }
+  noteNetworkFailure(event) {
+    assert.equal(typeof event.requestId, "string");
+    this.failures.set(event.requestId, {
+      networkId: event.requestId,
+      canceled: event.canceled === true,
+      errorText: String(event.errorText ?? ""),
+      observedAt: this.now(),
+    });
+  }
+  cancellation(entry) {
+    const failure = this.failures.get(entry.networkId),
+      boundary = this.boundary;
+    return boundary?.verified &&
+      entry.projectId === boundary.from &&
+      failure?.canceled === true &&
+      failure.observedAt >= boundary.beganAt
+      ? failure
+      : null;
+  }
+  release(
+    requestId,
+    action = "release_real_response_unmodified",
+    allowProjectCancellation = false,
+  ) {
+    if (this.releases.has(requestId)) return this.releases.get(requestId);
+    const entry = this.entries.get(requestId);
+    if (!entry) return Promise.resolve("already_released");
+    const consumeCancellation = () => {
+      const failure = allowProjectCancellation ? this.cancellation(entry) : null;
+      if (!failure) return false;
+      this.record({
+        ...entry,
+        action: "expected_project_switch_cancellation",
+        failure,
+        verifiedProjectId: this.boundary.to,
+      });
+      this.entries.delete(requestId);
+      return true;
+    };
+    const pending = Promise.resolve()
+      .then(async () => {
+        if (consumeCancellation()) return "canceled";
+        try {
+          await this.call("Fetch.continueRequest", { requestId });
+        } catch (error) {
+          if (consumeCancellation()) return "canceled";
+          throw error;
+        }
+        this.record({ ...entry, action });
+        this.entries.delete(requestId);
+        return "continued";
+      })
+      .finally(() => this.releases.delete(requestId));
+    this.releases.set(requestId, pending);
+    return pending;
+  }
+  async releaseAll(action, allowProjectCancellation = false) {
+    const results = await Promise.allSettled(
+      [...this.entries.keys()].map((id) => this.release(id, action, allowProjectCancellation)),
+    );
+    const failed = results.filter((x) => x.status === "rejected");
+    if (failed.length) throw new Error("REAL_RESPONSE_RELEASE_FAILED: " + failed.length);
+  }
+}
+
+export function solidPng(red, green, blue) {
+  for (const value of [red, green, blue])
+    assert(Number.isInteger(value) && value >= 0 && value <= 255);
+  const crc32 = (bytes) => {
+    let crc = 0xffffffff;
+    for (const byte of bytes) {
+      crc ^= byte;
+      for (let i = 0; i < 8; i++) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+  };
+  const chunk = (name, body) => {
+    const type = Buffer.from(name),
+      head = Buffer.alloc(4),
+      tail = Buffer.alloc(4);
+    head.writeUInt32BE(body.length);
+    tail.writeUInt32BE(crc32(Buffer.concat([type, body])));
+    return Buffer.concat([head, type, body, tail]);
+  };
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(16, 0);
+  header.writeUInt32BE(16, 4);
+  header[8] = 8;
+  header[9] = 2;
+  const pixels = Buffer.alloc(16 * (1 + 16 * 3));
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++) {
+      const at = y * 49 + 1 + x * 3;
+      pixels[at] = red;
+      pixels[at + 1] = green;
+      pixels[at + 2] = blue;
+    }
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk("IHDR", header),
+    chunk("IDAT", deflateSync(pixels)),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
+}
+
+export function validateExecutionGate(gate, runnerSha) {
+  assert.equal(gate.schemaVersion, 1);
+  assert.equal(gate.status, "reviewed_web_project_switch_draft");
+  assert.equal(gate.runnerSha256, runnerSha, "RUNNER_SHA_REFUSED");
+  assert.equal(gate.webBundleSha256, EXPECTED_WEB[0][2]);
+  for (const kind of ["api", "web"]) {
+    assert(Number.isSafeInteger(gate[kind]?.pid) && gate[kind].pid > 0);
+    assert(Number.isFinite(Date.parse(gate[kind]?.startedAt)));
+  }
+  assert(Number.isInteger(gate.api.schemaVersion) && gate.api.schemaVersion >= 14);
+  assert.equal(
+    gate.publicationProof?.sha256,
+    "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63",
+  );
+  assert.equal(
+    gate.instanceSha256,
+    "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b",
+  );
+}
+
+export function draftSignature(row) {
+  return {
+    content: row.newContent,
+    ownerId: row.newOwnerId,
+    verifierId: row.newVerifierId,
+    files: row.newFiles.map((file) => ({
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      sha256: file.sha256,
+    })),
+  };
+}
+export function fixtureMemberIds(gmActorId, sharedActorId, onlyActorId) {
+  const ids = [gmActorId, sharedActorId, onlyActorId];
+  assert(
+    ids.every((id) => typeof id === "string" && id.length > 0) && new Set(ids).size === 3,
+    "EXACT_CREATOR_AND_EMPLOYEES_REQUIRED",
+  );
+  return ids.sort();
+}
+
+async function run(instanceFile, gateFile) {
+  const sourceRoot = resolve(fileURLToPath(new URL("../..", import.meta.url)));
+  const expectedRuntime = canonicalInstancePath(
+    "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86",
+  );
+  assert.equal(canonicalInstancePath(instanceFile), join(expectedRuntime, "instance.json"));
+  const config = readParallelInstanceConfig(instanceFile);
+  assert.equal(config.runtimeRoot, expectedRuntime);
+  assert.equal(config.sourceRoot, canonicalInstancePath(sourceRoot));
+  assert.equal(config.instanceId, "qa-hub-preview-7c86");
+  assert.deepEqual(
+    [config.apiHost, config.apiPort, config.webHost, config.webPort],
+    ["127.0.0.1", 4419, "127.0.0.1", 4274],
+  );
+  const gatePath = canonicalInstancePath(gateFile);
+  assert(
+    isInstancePathWithin(gatePath, join(expectedRuntime, "acceptance")) &&
+      gatePath.endsWith("\\browser-gate.json"),
+    "EXPLICIT_ACCEPTANCE_GATE_REQUIRED",
+  );
+  const runnerBytes = readFileSync(fileURLToPath(import.meta.url)),
+    gate = JSON.parse(readFileSync(gatePath, "utf8"));
+  validateExecutionGate(gate, sha(runnerBytes));
+  assert.equal(sha(readFileSync(instanceFile)), gate.instanceSha256, "INSTANCE_SHA_REFUSED");
+  const publicationPath = canonicalInstancePath(
+    join(
+      sourceRoot,
+      "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
+    ),
+  );
+  assert.equal(canonicalInstancePath(gate.publicationProof.path), publicationPath);
+  assert.equal(sha(readFileSync(publicationPath)), gate.publicationProof.sha256);
+  const runId = randomUUID(),
+    projectIds = [randomUUID(), randomUUID()],
+    employee = "SwitchShared" + randomUUID().replaceAll("-", "");
+  const projectId = projectIds[0],
+    names = [
+      "SwitchOnlyA" + randomUUID().replaceAll("-", ""),
+      "SwitchOnlyB" + randomUUID().replaceAll("-", ""),
+    ];
+  const runtime = join(expectedRuntime, "web-project-switch-draft-" + runId),
+    profile = join(runtime, "edge-profile");
+  const output = join(
+    sourceRoot,
+    "docs/evidence/project-components/web-project-switch-draft-live",
+    runId,
+  );
+  assert(!existsSync(runtime) && !existsSync(output));
+  for (const path of [
+    runtime,
+    profile,
+    output,
+    join(runtime, "raw"),
+    join(runtime, "temp"),
+    join(runtime, "appdata"),
+    join(runtime, "localappdata"),
+  ])
+    mkdirSync(path, { recursive: true });
+  writeFileSync(join(runtime, "runner.mjs"), runnerBytes, { flag: "wx" });
+  writeFileSync(join(output, "runner.mjs.txt"), runnerBytes, { flag: "wx" });
+  const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+    api = "http://127.0.0.1:4419",
+    web = WEB,
+    debug = "http://127.0.0.1:9370";
+  const expectedBundle = {
+    url: web + "/" + EXPECTED_WEB[0][0],
+    sizeBytes: EXPECTED_WEB[0][1],
+    sha256: EXPECTED_WEB[0][2],
+  };
+  const secrets = new Set(),
+    evidence = {
+      schemaVersion: 1,
+      status: "running",
+      runId,
+      projectIds,
+      employee,
+      names,
+      runtime,
+      profile,
+      startedAt: new Date().toISOString(),
+      sourceSha256: sha(runnerBytes),
+      sourceProvenanceSha256: "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae",
+      gate: { ...gate, gatePath, gateSha256: sha(readFileSync(gatePath)) },
+      checks: [],
+      requests: [],
+      processes: [],
+      checkpoints: [],
+      bundles: [],
+      holds: [],
+      drafts: [],
+      boundaries: {
+        bugPosts: 0,
+        uploadPosts: 0,
+        commentsWritten: 0,
+        componentMutations: 0,
+        existingBrowserAttached: false,
+        appAbortBypassed: false,
+        syntheticSuccessfulResponses: false,
+        forcedStop: false,
+      },
+    };
+  function remember(value) {
+    if (!value || typeof value !== "object") return;
+    for (const [key, item] of Object.entries(value)) {
+      if (
+        /token|secret|password|cookie|authorization|csrf/iu.test(key) &&
+        typeof item === "string" &&
+        item.length > 8
+      )
+        secrets.add(item);
+      else remember(item);
+    }
+  }
+  function record(bucket, value) {
+    evidence[bucket].push(redact({ at: new Date().toISOString(), ...value }, secrets));
+  }
+  function check(label, expected, actual) {
+    const passed = isDeepStrictEqual(expected, actual);
+    record("checks", { label, expected, actual, passed });
+    if (!passed) throw new Error("Check failed: " + label);
+  }
+  let fatal,
+    child,
+    browser,
+    page,
+    pageSession,
+    actorId,
+    gmActorId,
+    closing = false,
+    seq = 0,
+    uiLogins = 0,
+    lateTimer,
+    lateDeadline;
+  const onlyActorIds = [],
+    fixtureTokens = [],
+    memberBodies = new Map(),
+    latestBugResponses = new Map();
+  const late = { phase: "idle", requestId: null, networkId: null, bodySha256: null };
+  const ledger = new ProjectSwitchResponseLedger(
+    (...args) => page.call(...args),
+    (entry) => record("holds", entry),
+  );
+  const media = projectIds.map((id, index) => {
+    const bytes = index === 0 ? solidPng(220, 40, 40) : solidPng(30, 90, 220),
+      path = join(runtime, `unsubmitted-${index === 0 ? "A" : "B"}-${runId}.png`);
+    writeFileSync(path, bytes, { flag: "wx" });
+    return {
+      projectId: id,
+      path,
+      name: path.split(/[\\/]/u).at(-1),
+      size: bytes.length,
+      sha256: sha(bytes),
+    };
+  });
+  const texts = projectIds.map(
+    (_id, index) => `UNSUBMITTED_${index === 0 ? "A" : "B"}_PROJECT_SWITCH_${runId}`,
+  );
+  const scope = () => ({ projectIds, employee, actorId });
+  const raw = (label, bytes) => {
+    const path = join(runtime, "raw", String(++seq).padStart(3, "0") + "-" + label + ".body");
+    writeFileSync(path, bytes, { flag: "wx" });
+    return { rawPath: path, bytes: bytes.length, sha256: sha(bytes) };
+  };
+  function componentBody(body, id) {
+    check("component response project", id, body.projectId);
+    check(
+      "five component keys",
+      ["build", "build_upload.single", "qingyu.sync", "relay.production", "upload.incremental"],
+      body.items.map((x) => x.key).sort(),
+    );
+    check(
+      "five components remain disabled",
+      [false, false, false, false, false],
+      body.items.map((x) => x.enabled),
+    );
+  }
+  async function apiRequest(
+    label,
+    path,
+    { method = "GET", body, token, requestProjectId, expected = 200 } = {},
+  ) {
+    const allowedReads = projectIds.flatMap((id) => [
+      `/api/v1/projects/${id}/components`,
+      `/api/v1/projects/${id}/members?limit=100`,
+      `/api/v1/bugs?projectId=${id}&limit=100`,
+    ]);
+    assert(
+      method === "GET"
+        ? path === "/api/v1/health/ready" || allowedReads.includes(path)
+        : method === "POST" &&
+            ["/api/v1/auth/gm/login", "/api/v1/auth/login", "/api/v1/gm/projects"].includes(path),
+      "FIXTURE_ROUTE_REFUSED",
+    );
+    if (method === "POST" && path === "/api/v1/gm/projects") assert(projectIds.includes(body.id));
+    if (method === "POST" && path === "/api/v1/auth/login")
+      assert(
+        projectIds.includes(body.projectId) &&
+          [employee, ...names].includes(body.name) &&
+          body.client === "android",
+      );
+    const response = await fetch(api + path, {
+      method,
+      redirect: "error",
+      signal: AbortSignal.timeout(15000),
+      headers: {
+        Accept: "application/vnd.relay-qa-hub.v1.1+json",
+        ...(body ? { "content-type": "application/json" } : {}),
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+        ...(requestProjectId ? { "x-qa-project-id": requestProjectId } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    const bytes = Buffer.from(await response.arrayBuffer()),
+      value = JSON.parse(bytes.toString("utf8"));
+    remember(value);
+    const authentication = path.startsWith("/api/v1/auth/");
+    record("requests", {
+      kind: "fixture_api",
+      label,
+      method,
+      path,
+      status: response.status,
+      ...(authentication ? { responseSha256: sha(bytes), bodyStored: false } : raw(label, bytes)),
+      requestBody: authentication ? "[REDACTED]" : body,
+    });
+    check(label + " status", expected, response.status);
+    return value;
+  }
+  function apiIdentity() {
+    const command =
+      "$ErrorActionPreference='Stop';$taskRows=@(foreach($taskPort in @(4419,4274)){$taskListener=@(Get-NetTCPConnection -LocalPort $taskPort -State Listen -ErrorAction Stop);if($taskListener.Count -ne 1){throw 'EXPECTED_SINGLE_LOOPBACK_LISTENER'};$taskP=Get-CimInstance Win32_Process -Filter ('ProcessId='+$taskListener[0].OwningProcess);[pscustomobject]@{port=$taskPort;address=$taskListener[0].LocalAddress;pid=[int]$taskP.ProcessId;path=$taskP.ExecutablePath;startedAt=$taskP.CreationDate.ToUniversalTime().ToString('o')}});$taskRows|ConvertTo-Json -Compress";
+    return JSON.parse(
+      execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", command], {
+        encoding: "utf8",
+        windowsHide: true,
+        timeout: 15000,
+      }),
+    );
+  }
+  function noteNetworkFailure(event) {
+    ledger.noteNetworkFailure(event);
+    if (event.requestId === late.networkId)
+      record("holds", {
+        action: "target_network_failure",
+        networkId: event.requestId,
+        canceled: event.canceled === true,
+        errorText: event.errorText,
+      });
+  }
+  async function intercept(event) {
+    let kind;
+    try {
+      kind = classifyRequest(event.request, scope());
+    } catch (error) {
+      record("requests", {
+        kind: "refused",
+        method: event.request.method,
+        targetSha256: sha(event.request.url),
+      });
+      await page.call("Fetch.failRequest", {
+        requestId: event.requestId,
+        errorReason: "BlockedByClient",
+      });
+      throw error;
+    }
+    const path = new URL(event.request.url).pathname + new URL(event.request.url).search;
+    const responseStage =
+      event.responseStatusCode !== undefined || event.responseErrorReason !== undefined;
+    if (!responseStage) {
+      assert(evidence.requests.length < 350, "REQUEST_BOUND_EXCEEDED");
+      if (fatal) {
+        await page.call("Fetch.failRequest", {
+          requestId: event.requestId,
+          errorReason: "BlockedByClient",
+        });
+        return;
+      }
+      record("requests", {
+        kind: "browser_request",
+        category: kind.kind,
+        projectId: kind.projectId,
+        requestId: event.requestId,
+        networkId: event.networkId,
+        method: event.request.method,
+        path,
+        bodySha256: sha(event.request.postData ?? ""),
+      });
+      if (kind.kind === "login") {
+        uiLogins++;
+        assert.equal(uiLogins, 1);
+      }
+      if (kind.kind === "members" && kind.projectId === projectIds[0] && late.phase === "armed") {
+        assert.equal(typeof event.networkId, "string");
+        late.phase = "requested";
+        late.requestId = event.requestId;
+        late.networkId = event.networkId;
+        record("holds", {
+          action: "target_A_members_request",
+          requestId: event.requestId,
+          networkId: event.networkId,
+          path,
+        });
+      }
+      await page.call("Fetch.continueRequest", { requestId: event.requestId });
+      return;
+    }
+    ledger.pause({
+      requestId: event.requestId,
+      networkId: event.networkId,
+      projectId: kind.projectId,
+      category: kind.kind,
+      status: event.responseStatusCode ?? null,
+    });
+    if (fatal) {
+      await ledger.release(event.requestId, "release_after_failure_unmodified", true);
+      return;
+    }
+    assert.equal(event.responseErrorReason, undefined, "UNEXPECTED_UPSTREAM_NETWORK_ERROR");
+    const payload = await page.call("Fetch.getResponseBody", { requestId: event.requestId });
+    const bytes = Buffer.from(payload.body, payload.base64Encoded ? "base64" : "utf8"),
+      body = JSON.parse(bytes.toString("utf8"));
+    remember(body);
+    ledger.entries.get(event.requestId).sha256 = sha(bytes);
+    record("requests", {
+      kind: "browser_real_response",
+      category: kind.kind,
+      projectId: kind.projectId,
+      requestId: event.requestId,
+      networkId: event.networkId,
+      path,
+      status: event.responseStatusCode,
+      ...(kind.kind === "login"
+        ? { responseSha256: sha(bytes), bodyStored: false }
+        : raw("browser-" + kind.kind, bytes)),
+    });
+    assert.equal(event.responseStatusCode, 200, "GENUINE_200_REQUIRED");
+    if (kind.kind === "login") {
+      assert.equal(body.userId, actorId);
+      assert.equal(body.projectId, projectIds[0]);
+      assert.equal(body.isGm, false);
+    }
+    if (kind.kind === "components") componentBody(body, kind.projectId);
+    if (kind.kind === "members") {
+      assert.equal(body.projectId, kind.projectId);
+      assert(
+        isDeepStrictEqual(
+          body.items.map((x) => x.userId).sort(),
+          fixtureMemberIds(gmActorId, actorId, onlyActorIds[projectIds.indexOf(kind.projectId)]),
+        ),
+      );
+      memberBodies.set(kind.projectId, body);
+      if (event.requestId === late.requestId) {
+        assert.equal(late.phase, "requested");
+        late.phase = "held";
+        late.bodySha256 = sha(bytes);
+        record("holds", {
+          action: "hold_A_members_real_200",
+          requestId: event.requestId,
+          networkId: event.networkId,
+          projectId: kind.projectId,
+          sha256: sha(bytes),
+        });
+        return;
+      }
+    }
+    if (kind.kind === "bugs") {
+      assert.deepEqual(body.items, []);
+      latestBugResponses.set(kind.projectId, event.requestId);
+    }
+    await ledger.release(event.requestId);
+  }
+
+  const pause = (ms) => new Promise((resolveDelay) => setTimeout(resolveDelay, ms));
+  async function until(label, fn, timeout = 20_000) {
+    const end = Date.now() + timeout;
+    while (Date.now() < end) {
+      if (fatal) throw fatal;
+      const value = await fn();
+      if (value) return value;
+      await pause(150);
+    }
+    throw new Error(`Timed out: ${label}`);
+  }
+  class Cdp {
+    constructor(url) {
+      assert.ok(url.startsWith("ws://127.0.0.1:9370/"));
+      this.socket = new WebSocket(url);
+      this.sequence = 0;
+      this.pending = new Map();
+      this.listeners = new Map();
+      this.open = new Promise((resolveOpen, rejectOpen) => {
+        this.socket.addEventListener("open", resolveOpen, { once: true });
+        this.socket.addEventListener("error", rejectOpen, { once: true });
+      });
+      this.socket.addEventListener("message", (event) => {
+        const message = JSON.parse(String(event.data));
+        if (message.id) {
+          const waiter = this.pending.get(message.id);
+          if (waiter) {
+            this.pending.delete(message.id);
+            clearTimeout(waiter.timer);
+            message.error
+              ? waiter.reject(new Error(message.error.message))
+              : waiter.resolve(message.result);
+          }
+        } else
+          for (const listener of this.listeners.get(message.method) ?? [])
+            Promise.resolve(listener(message.params, message.sessionId)).catch((cause) => {
+              if (!closing) fatal ??= cause;
+            });
+      });
+      this.socket.addEventListener("close", () => {
+        for (const waiter of this.pending.values()) {
+          clearTimeout(waiter.timer);
+          waiter.reject(new Error("Owned browser CDP closed"));
+        }
+        this.pending.clear();
+      });
+    }
+    on(method, listener) {
+      this.listeners.set(method, [...(this.listeners.get(method) ?? []), listener]);
+    }
+    async call(method, params = {}, sessionId) {
+      await this.open;
+      const id = ++this.sequence;
+      return new Promise((resolveCall, rejectCall) => {
+        const timer = setTimeout(() => {
+          this.pending.delete(id);
+          rejectCall(new Error(`CDP timeout: ${method}`));
+        }, 15_000);
+        this.pending.set(id, { resolve: resolveCall, reject: rejectCall, timer });
+        this.socket.send(
+          JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }),
+        );
+      });
+    }
+  }
+  async function evaluate(expression) {
+    const result = await page.call("Runtime.evaluate", {
+      expression,
+      awaitPromise: true,
+      returnByValue: true,
+    });
+    if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
+    return result.result.value;
+  }
+  async function portFree() {
+    const server = createServer();
+    await new Promise((resolveListen, rejectListen) => {
+      server.once("error", rejectListen);
+      server.listen(9370, "127.0.0.1", resolveListen);
+    });
+    await new Promise((resolveClose) => server.close(resolveClose));
+  }
+  function processIdentity(pid) {
+    assert.ok(Number.isSafeInteger(pid) && pid > 0);
+    const command = `$p = Get-CimInstance Win32_Process -Filter 'ProcessId=${pid}'; if ($null -ne $p) { [pscustomobject]@{pid=[int]$p.ProcessId;path=$p.ExecutablePath;startedAt=$p.CreationDate.ToUniversalTime().ToString('o')} | ConvertTo-Json -Compress }`;
+    const text = execFileSync(
+      "powershell.exe",
+      ["-NoProfile", "-NonInteractive", "-Command", command],
+      { encoding: "utf8", windowsHide: true },
+    ).trim();
+    return text ? JSON.parse(text) : null;
+  }
+  async function openBrowser() {
+    await portFree(); // Never connect to an occupied debugging port.
+    const launchedAt = new Date().toISOString();
+    child = spawn(
+      edgePath,
+      [
+        "--headless=new",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--disable-background-networking",
+        "--disable-component-update",
+        "--disable-sync",
+        "--disable-quic",
+        "--no-proxy-server",
+        "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1",
+        "--remote-debugging-address=127.0.0.1",
+        "--remote-debugging-port=9370",
+        `--user-data-dir=${profile}`,
+        `--disk-cache-dir=${join(runtime, "cache")}`,
+        `--crash-dumps-dir=${join(runtime, "crashes")}`,
+        "about:blank",
+      ],
+      {
+        cwd: runtime,
+        windowsHide: true,
+        stdio: "ignore",
+        env: {
+          SystemRoot: process.env.SystemRoot,
+          WINDIR: process.env.WINDIR,
+          TEMP: join(runtime, "temp"),
+          TMP: join(runtime, "temp"),
+          APPDATA: join(runtime, "appdata"),
+          LOCALAPPDATA: join(runtime, "localappdata"),
+        },
+      },
+    );
+    child.on("error", (cause) => {
+      fatal ??= cause;
+    });
+    const identity = await until("owned browser process identity", async () =>
+      processIdentity(child.pid),
+    );
+    assert.equal(identity.path.toLowerCase(), edgePath.toLowerCase());
+    assert.ok(Date.parse(identity.startedAt) >= Date.parse(launchedAt) - 1000);
+    record("processes", { phase: "launched", ...identity, profile });
+    const version = await until("owned CDP listener", async () => {
+      try {
+        const result = await fetch(`${debug}/json/version`, { signal: AbortSignal.timeout(1000) });
+        return result.ok ? result.json() : null;
+      } catch {
+        return null;
+      }
+    });
+    browser = new Cdp(version.webSocketDebuggerUrl);
+    const processInfo = await browser.call("SystemInfo.getProcessInfo");
+    check(
+      "CDP browser PID matches spawned process",
+      child.pid,
+      processInfo.processInfo.find((entry) => entry.type === "browser")?.id,
+    );
+    const target = await browser.call("Target.createTarget", { url: "about:blank" });
+    const attached = await browser.call("Target.attachToTarget", {
+      targetId: target.targetId,
+      flatten: true,
+    });
+    pageSession = attached.sessionId;
+    page = { call: (method, params = {}) => browser.call(method, params, pageSession) };
+    browser.on("Fetch.requestPaused", (event, sessionId) =>
+      sessionId === pageSession ? intercept(event) : undefined,
+    );
+    browser.on("Network.loadingFailed", (event, sessionId) => {
+      if (sessionId === pageSession) noteNetworkFailure(event);
+    });
+    const scriptResponses = new Map();
+    let observedBundle;
+    browser.on("Network.responseReceived", (event, sessionId) => {
+      if (
+        sessionId === pageSession &&
+        event.type === "Script" &&
+        new URL(event.response.url).origin === web
+      )
+        scriptResponses.set(event.requestId, {
+          url: event.response.url,
+          status: event.response.status,
+        });
+    });
+    browser.on("Network.loadingFinished", async (event, sessionId) => {
+      const response = scriptResponses.get(event.requestId);
+      if (sessionId !== pageSession || !response) return;
+      const result = await page.call("Network.getResponseBody", { requestId: event.requestId });
+      const bytes = Buffer.from(result.body, result.base64Encoded ? "base64" : "utf8");
+      const summary = { ...response, sizeBytes: bytes.length, sha256: sha(bytes) };
+      record("bundles", summary);
+      if (response.url === expectedBundle.url) observedBundle = summary;
+      scriptResponses.delete(event.requestId);
+    });
+    await page.call("Page.enable");
+    await page.call("Runtime.enable");
+    await page.call("DOM.getDocument");
+    await page.call("Network.enable");
+    await page.call("Network.setBypassServiceWorker", { bypass: true });
+    await page.call("Fetch.enable", {
+      patterns: [
+        { urlPattern: "*", requestStage: "Request" },
+        { urlPattern: "*api/v1/bugs*", requestStage: "Response" },
+        { urlPattern: "*api/v1/auth/login", requestStage: "Response" },
+        { urlPattern: "*api/v1/projects/*/components", requestStage: "Response" },
+        { urlPattern: "*api/v1/projects/*/members?limit=100", requestStage: "Response" },
+      ],
+    });
+    await page.call("Emulation.setDeviceMetricsOverride", {
+      width: 1440,
+      height: 1100,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    await page.call("Page.navigate", { url: `${web}/?projectId=${projectId}` });
+    await until("published detail-loading bundle loaded in owned page", async () => observedBundle);
+    check(
+      "actual browser bundle matches reviewed publication",
+      { ...expectedBundle, status: 200 },
+      observedBundle,
+    );
+  }
+  async function closeBrowser() {
+    if (!child) return;
+    closing = true;
+    const pid = child.pid;
+    if (browser) await browser.call("Browser.close").catch(() => undefined);
+    // No taskkill/kill fallback. An unclosed owned process is a retained failure requiring review.
+    const end = Date.now() + 15_000;
+    while (Date.now() < end && processIdentity(pid)) await pause(200);
+    const remaining = processIdentity(pid);
+    record("processes", { phase: "normal_close", pid, exited: remaining === null });
+    assert.equal(
+      remaining,
+      null,
+      "Owned browser did not exit via Browser.close; never kill another process",
+    );
+    child = browser = page = undefined;
+    await portFree();
+    closing = false;
+  }
+  const domFingerprints = new Map();
+  async function observe(label) {
+    const state = await evaluate(
+      `(() => { const nodes=[...document.querySelectorAll('button,input,textarea,select,summary,[role="button"]')].filter(e=>e.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}) && [...document.querySelectorAll('details:not([open])')].every(d=>!d.contains(e)||d.querySelector(':scope > summary')?.contains(e))); window.__qaProjectSwitchNodes=nodes; return {url:location.href,text:document.body.innerText.slice(0,14000),nodes:nodes.map((e,index)=>({index,tag:e.tagName.toLowerCase(),type:e.type||'',text:(e.innerText||'').trim(),label:e.getAttribute('aria-label')||'',placeholder:e.getAttribute('placeholder')||'',value:e.type==='password'?'':e.value||'',disabled:!!e.disabled,classes:e.className||'',labelText:(e.closest('label')?.innerText||'').trim(),inCreate:!!e.closest('.create-modal'),options:e.options?[...e.options].map(o=>({value:o.value,text:o.text})):undefined,inDialog:!!e.closest('[role=dialog]')}))}; })()`,
+    );
+    assert.equal(new URL(state.url).origin, web);
+    const digest = sha(JSON.stringify(state));
+    if (domFingerprints.get(label) !== digest) {
+      record("checkpoints", { label, kind: "observed_dom", ...state });
+      domFingerprints.set(label, digest);
+    }
+    return state;
+  }
+  async function control(label, predicate) {
+    return until(label, async () => {
+      const state = await observe(label);
+      const matches = state.nodes.filter((node) => !node.disabled && predicate(node));
+      assert.ok(matches.length <= 1, `Ambiguous observed control: ${label}`);
+      return matches[0];
+    });
+  }
+  async function click(label, predicate) {
+    const node = await control(label, predicate);
+    const rect = await evaluate(
+      `(() => { const e=window.__qaProjectSwitchNodes[${node.index}]; if(!e||!e.isConnected||e.disabled)throw Error('Observed control changed'); e.scrollIntoView({block:'center'}); const r=e.getBoundingClientRect(), x=r.x+r.width/2, y=r.y+r.height/2; if(!e.contains(document.elementFromPoint(x,y)))throw Error('Observed control is covered or clipped'); return {x,y}; })()`,
+    );
+    await page.call("Input.dispatchMouseEvent", {
+      type: "mousePressed",
+      ...rect,
+      button: "left",
+      clickCount: 1,
+    });
+    await page.call("Input.dispatchMouseEvent", {
+      type: "mouseReleased",
+      ...rect,
+      button: "left",
+      clickCount: 1,
+    });
+  }
+  const button = (text) => (node) => node.tag === "button" && node.text === text;
+  async function fill(label, predicate, text) {
+    const node = await control(label, predicate);
+    await evaluate(`window.__qaProjectSwitchNodes[${node.index}].focus()`);
+    await page.call("Input.dispatchKeyEvent", {
+      type: "keyDown",
+      key: "a",
+      code: "KeyA",
+      windowsVirtualKeyCode: 65,
+      modifiers: 2,
+    });
+    await page.call("Input.dispatchKeyEvent", {
+      type: "keyUp",
+      key: "a",
+      code: "KeyA",
+      windowsVirtualKeyCode: 65,
+      modifiers: 2,
+    });
+    await page.call("Input.insertText", { text });
+  }
+  async function screenshot(label) {
+    const shot = await page.call("Page.captureScreenshot", {
+      format: "png",
+      captureBeyondViewport: false,
+    });
+    const bytes = Buffer.from(shot.data, "base64");
+    const file = join(runtime, `${label}.png`);
+    writeFileSync(file, bytes, { flag: "wx" });
+    writeFileSync(join(output, `${label}.png`), bytes, { flag: "wx" });
+    record("checkpoints", {
+      kind: "screenshot",
+      label,
+      path: file,
+      sizeBytes: bytes.length,
+      sha256: sha(bytes),
+    });
+  }
+
+  async function press(key, code = key, windowsVirtualKeyCode = undefined) {
+    await page.call("Input.dispatchKeyEvent", {
+      type: "keyDown",
+      key,
+      code,
+      ...(windowsVirtualKeyCode ? { windowsVirtualKeyCode } : {}),
+    });
+    await page.call("Input.dispatchKeyEvent", {
+      type: "keyUp",
+      key,
+      code,
+      ...(windowsVirtualKeyCode ? { windowsVirtualKeyCode } : {}),
+    });
+  }
+  async function selectOption(label, predicate, value) {
+    const node = await control(label, predicate),
+      index = node.options.findIndex((x) => x.value === value);
+    assert(index >= 0, "OBSERVED_OPTION_REQUIRED");
+    record("checkpoints", {
+      label,
+      kind: "select_gesture_start",
+      beforeValue: node.value,
+      targetValue: value,
+      options: node.options,
+    });
+    if (node.value !== value) {
+      if (predicate === projectSelect) {
+        memberBodies.delete(value);
+        latestBugResponses.delete(value);
+      }
+      await evaluate(`window.__qaProjectSwitchNodes[${node.index}].focus()`);
+      await press("Home", "Home", 36);
+      for (let i = 0; i < index; i++) await press("ArrowDown", "ArrowDown", 40);
+      await press("Tab", "Tab", 9);
+    }
+    await control(label + " selected", (n) => predicate(n) && n.value === value);
+  }
+  const projectSelect = (n) => n.tag === "select" && n.label === "切换项目";
+  const contentInput = (n) =>
+    n.inCreate &&
+    n.tag === "textarea" &&
+    n.placeholder === "描述你看到的问题、复现位置和需要修复的表现";
+  const ownerSelect = (n) => n.inCreate && n.tag === "select" && n.labelText.startsWith("修复人");
+  const verifierSelect = (n) =>
+    n.inCreate && n.tag === "select" && n.labelText.startsWith("关闭人");
+  async function selectFile(index) {
+    const node = await control(
+      "PNG input " + index,
+      (n) => n.inCreate && n.tag === "input" && n.type === "file",
+    );
+    const object = await page.call("Runtime.evaluate", {
+      expression: `window.__qaProjectSwitchNodes[${node.index}]`,
+      returnByValue: false,
+    });
+    const description = await page.call("DOM.describeNode", { objectId: object.result.objectId });
+    await page.call("DOM.setFileInputFiles", {
+      files: [media[index].path],
+      backendNodeId: description.node.backendNodeId,
+    });
+  }
+  const draftKey = (id) => `qa-hub:preview:v2:${JSON.stringify([web, id, actorId, "bug-drafts"])}`;
+  async function persistedDraft(index) {
+    const key = draftKey(projectIds[index]);
+    return evaluate(
+      `(async()=>{const names=await indexedDB.databases();if(!names.some(x=>x.name==='qa-hub-preview-project-drafts-v1'))return null;const db=await new Promise((resolve,reject)=>{const q=indexedDB.open('qa-hub-preview-project-drafts-v1');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);});const value=await new Promise((resolve,reject)=>{const t=db.transaction('drafts','readonly'),q=t.objectStore('drafts').get(${JSON.stringify(key)});q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);});db.close();if(!value)return null;const files=await Promise.all((value.newFiles||[]).map(async file=>({name:file.name,type:file.type,size:file.size,lastModified:file.lastModified,sha256:[...new Uint8Array(await crypto.subtle.digest('SHA-256',await file.arrayBuffer()))].map(x=>x.toString(16).padStart(2,'0')).join('')})));return {key:${JSON.stringify(key)},newContent:value.newContent,newOwnerId:value.newOwnerId,newVerifierId:value.newVerifierId,newFiles:files,createOpen:value.createOpen};})()`,
+    );
+  }
+  const expectedDraft = (index) => ({
+    content: texts[index],
+    ownerId: onlyActorIds[index],
+    verifierId: actorId,
+    files: [
+      {
+        name: media[index].name,
+        type: "image/png",
+        size: media[index].size,
+        sha256: media[index].sha256,
+      },
+    ],
+  });
+  async function waitDraft(index, label) {
+    const row = await until(label, async () => {
+      const value = await persistedDraft(index);
+      return value && isDeepStrictEqual(draftSignature(value), expectedDraft(index)) ? value : null;
+    });
+    record("drafts", { label, projectId: projectIds[index], ...row });
+    return row;
+  }
+  async function visibleDraft(index, label) {
+    const state = await observe(label);
+    check(
+      label + " URL project",
+      projectIds[index],
+      new URL(state.url).searchParams.get("projectId"),
+    );
+    check(label + " project selection", projectIds[index], state.nodes.find(projectSelect)?.value);
+    check(label + " text", texts[index], state.nodes.find(contentInput)?.value);
+    const owner = state.nodes.find(ownerSelect),
+      verifier = state.nodes.find(verifierSelect);
+    check(label + " owner", onlyActorIds[index], owner?.value);
+    check(label + " verifier", actorId, verifier?.value);
+    check(
+      label + " owner options",
+      ["", ...fixtureMemberIds(gmActorId, actorId, onlyActorIds[index])].sort(),
+      owner?.options.map((x) => x.value).sort(),
+    );
+    check(
+      label + " verifier options",
+      fixtureMemberIds(gmActorId, actorId, onlyActorIds[index]),
+      verifier?.options.map((x) => x.value).sort(),
+    );
+    const selectedKey = `qa-hub:preview:v2:${JSON.stringify([web, "", "", "selected-project"])}`;
+    check(
+      label + " selected-project storage",
+      projectIds[index],
+      await evaluate(`sessionStorage.getItem(${JSON.stringify(selectedKey)})`),
+    );
+    const images = await evaluate(
+      `(async()=>Promise.all([...document.querySelectorAll('.create-image-previews img')].map(async image=>{if(!image.src.startsWith('blob:'))throw Error('PREVIEW_BLOB_REQUIRED');const bytes=await (await fetch(image.src)).arrayBuffer();return {name:image.alt,complete:image.complete,width:image.naturalWidth,height:image.naturalHeight,size:bytes.byteLength,sha256:[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('')};})))()`,
+    );
+    check(
+      label + " visible PNG Blob",
+      [
+        {
+          name: media[index].name,
+          complete: true,
+          width: 16,
+          height: 16,
+          size: media[index].size,
+          sha256: media[index].sha256,
+        },
+      ],
+      images,
+    );
+    await waitDraft(index, label + " persisted");
+  }
+  async function openCreate(label) {
+    const state = await observe(label + " before");
+    if (!state.nodes.some(contentInput)) await click(label, button("新建 Bug"));
+    await control(label + " form", contentInput);
+  }
+  async function closeCreate(label) {
+    await click(label, (n) => n.inCreate && button("取消")(n));
+    await until(
+      label + " closed",
+      async () => !(await observe(label + " state")).nodes.some(contentInput),
+    );
+  }
+  async function projectLoaded(index, label) {
+    await control(label + " selected", (n) => projectSelect(n) && n.value === projectIds[index]);
+    await until(
+      label + " member and empty Bug GET",
+      () => memberBodies.has(projectIds[index]) && latestBugResponses.has(projectIds[index]),
+    );
+    check(
+      label + " URL",
+      projectIds[index],
+      new URL((await observe(label + " scope")).url).searchParams.get("projectId"),
+    );
+  }
+  try {
+    const hostBefore = apiIdentity();
+    evidence.hostBefore = hostBefore;
+    for (const [kind, port] of [
+      ["api", 4419],
+      ["web", 4274],
+    ]) {
+      const actual = hostBefore.find((x) => x.port === port);
+      check(kind + " PID", gate[kind].pid, actual.pid);
+      check(kind + " start", Date.parse(gate[kind].startedAt), Date.parse(actual.startedAt));
+      check(kind + " loopback", "127.0.0.1", actual.address);
+    }
+    await portFree();
+    const ready = await apiRequest("ready", "/api/v1/health/ready");
+    check("ready status", "ready", ready.status);
+    check("reviewed schema", String(gate.api.schemaVersion), String(ready.schemaVersion));
+    for (const [path, size, hash] of EXPECTED_WEB) {
+      const response = await fetch(web + "/" + path, {
+        redirect: "error",
+        signal: AbortSignal.timeout(10000),
+      });
+      assert.equal(response.status, 200);
+      const bytes = Buffer.from(await response.arrayBuffer());
+      check("asset " + path, { size, sha256: hash }, { size: bytes.length, sha256: sha(bytes) });
+    }
+    let secretConfig;
+    try {
+      secretConfig = JSON.parse(readFileSync(config.secretsFile, "utf8").replace(/^\uFEFF/u, ""));
+    } catch {
+      throw new Error("Preview GM configuration unavailable; body omitted");
+    }
+    assert(typeof secretConfig.gmPassword === "string" && secretConfig.gmPassword.length > 0);
+    secrets.add(secretConfig.gmPassword);
+    const gm = await apiRequest("gm-login", "/api/v1/auth/gm/login", {
+      method: "POST",
+      body: { password: secretConfig.gmPassword, client: "android" },
+    });
+    assert.equal(gm.isGm, true);
+    gmActorId = gm.userId;
+    evidence.gmActorId = gmActorId;
+    secretConfig = undefined;
+    for (let i = 0; i < 2; i++) {
+      const project = await apiRequest("new-project-" + i, "/api/v1/gm/projects", {
+        method: "POST",
+        token: gm.accessToken,
+        body: {
+          id: projectIds[i],
+          key: (i === 0 ? "SA" : "SB") + runId.replaceAll("-", "").slice(0, 14).toUpperCase(),
+          name: (i === 0 ? "Switch A " : "Switch B ") + runId,
+        },
+      });
+      assert.equal(project.id, projectIds[i]);
+      const shared = await apiRequest("shared-login-" + i, "/api/v1/auth/login", {
+        method: "POST",
+        body: { name: employee, projectId: projectIds[i], client: "android" },
+      });
+      assert.equal(shared.projectId, projectIds[i]);
+      assert.equal(shared.isGm, false);
+      if (i === 0) {
+        actorId = shared.userId;
+      } else assert.equal(shared.userId, actorId);
+      fixtureTokens.push(shared.accessToken);
+      const only = await apiRequest("exclusive-login-" + i, "/api/v1/auth/login", {
+        method: "POST",
+        body: { name: names[i], projectId: projectIds[i], client: "android" },
+      });
+      assert.equal(only.projectId, projectIds[i]);
+      assert.equal(only.isGm, false);
+      onlyActorIds.push(only.userId);
+      componentBody(
+        await apiRequest("initial-five-off-" + i, `/api/v1/projects/${projectIds[i]}/components`, {
+          token: shared.accessToken,
+          requestProjectId: projectIds[i],
+        }),
+        projectIds[i],
+      );
+      const members = await apiRequest(
+        "initial-members-" + i,
+        `/api/v1/projects/${projectIds[i]}/members?limit=100`,
+        { token: shared.accessToken, requestProjectId: projectIds[i] },
+      );
+      check(
+        "exact fixture members " + i,
+        fixtureMemberIds(gmActorId, actorId, only.userId),
+        members.items.map((x) => x.userId).sort(),
+      );
+      const bugs = await apiRequest(
+        "initial-empty-" + i,
+        `/api/v1/bugs?projectId=${projectIds[i]}&limit=100`,
+        { token: shared.accessToken, requestProjectId: projectIds[i] },
+      );
+      check("initial zero Bugs " + i, [], bugs.items);
+    }
+    check("three distinct new employees", 3, new Set([actorId, ...onlyActorIds]).size);
+    evidence.actorId = actorId;
+    evidence.onlyActorIds = onlyActorIds;
+    evidence.media = media;
+    await openBrowser();
+    await fill(
+      "shared employee login",
+      (n) => n.tag === "input" && n.placeholder === "输入姓名",
+      employee,
+    );
+    await click("shared login", button("登录"));
+    await projectLoaded(0, "initial A");
+    for (let i = 0; i < 2; i++) {
+      if (i > 0) {
+        await selectOption("switch to seed B", projectSelect, projectIds[i]);
+        await projectLoaded(i, "seed B");
+      }
+      await openCreate("new draft " + i);
+      const before = await persistedDraft(i);
+      check("new project draft initially empty " + i, "", before?.newContent ?? "");
+      check("new project files initially empty " + i, [], before?.newFiles ?? []);
+      await fill("draft text " + i, contentInput, texts[i]);
+      await selectOption("draft owner " + i, ownerSelect, onlyActorIds[i]);
+      await selectOption("draft verifier " + i, verifierSelect, actorId);
+      await selectFile(i);
+      await waitDraft(i, "seed durable draft " + i);
+      await visibleDraft(i, "seed visible draft " + i);
+      await screenshot(i === 0 ? "01-A-unsubmitted-text-PNG" : "02-B-unsubmitted-text-PNG");
+      await closeCreate("preserve draft " + i);
+    }
+    await selectOption("return A before delayed read", projectSelect, projectIds[0]);
+    await projectLoaded(0, "restored A");
+    await openCreate("restored A draft");
+    await visibleDraft(0, "A restored before race");
+    await closeCreate("close A before real refresh");
+    late.phase = "armed";
+    record("holds", {
+      action: "arm_A_members_after_actual_refresh",
+      projectId: projectIds[0],
+      maximumMs: 15000,
+    });
+    lateTimer = setTimeout(() => {
+      fatal ??= new Error("LATE_RESPONSE_WINDOW_EXCEEDED");
+      lateDeadline = ledger
+        .releaseAll("deadline_release_unmodified", true)
+        .catch((error) =>
+          record("holds", { action: "deadline_release_failed", error: String(error) }),
+        );
+    }, 15000);
+    await click("actual A refresh", (n) => n.tag === "button" && n.label === "刷新");
+    await until("A genuine members 200 held", () => late.phase === "held");
+    await screenshot("03-A-real-members-response-held");
+    ledger.beginSwitch(projectIds[0], projectIds[1]);
+    record("holds", {
+      action: "begin_actual_A_to_B_switch",
+      requestId: late.requestId,
+      networkId: late.networkId,
+    });
+    await selectOption("actual project B switch", projectSelect, projectIds[1]);
+    await projectLoaded(1, "B while A held");
+    ledger.verifyProject(projectIds[1]);
+    record("holds", {
+      action: "B_verified_before_A_settlement",
+      projectId: projectIds[1],
+      requestId: late.requestId,
+    });
+    await openCreate("B restored while A held");
+    await visibleDraft(1, "B before A settlement");
+    await screenshot("04-B-draft-before-A-settlement");
+    late.settlement = await ledger.release(
+      late.requestId,
+      "release_late_A_response_unmodified",
+      true,
+    );
+    late.phase = "settled";
+    clearTimeout(lateTimer);
+    record("holds", {
+      action: "late_A_settled",
+      mode: late.settlement,
+      requestId: late.requestId,
+      networkId: late.networkId,
+      sha256: late.bodySha256,
+    });
+    await visibleDraft(1, "B after A settlement");
+    await waitDraft(0, "A durable draft after settlement");
+    await screenshot("05-B-draft-after-A-settlement");
+    memberBodies.delete(projectIds[1]);
+    latestBugResponses.delete(projectIds[1]);
+    await page.call("Page.reload", { ignoreCache: true });
+    await projectLoaded(1, "reloaded B");
+    await openCreate("B durable draft after reload");
+    await visibleDraft(1, "B after actual reload");
+    await screenshot("06-B-durable-draft-reloaded");
+    await closeCreate("close B after reload");
+    await selectOption("final A roundtrip", projectSelect, projectIds[0]);
+    await projectLoaded(0, "final A");
+    await openCreate("final A restored draft");
+    await visibleDraft(0, "final A restored");
+    await screenshot("07-A-draft-roundtrip");
+    await closeCreate("final A preserve");
+    await selectOption("final B roundtrip", projectSelect, projectIds[1]);
+    await projectLoaded(1, "final B");
+    await openCreate("final B restored draft");
+    await visibleDraft(1, "final B restored");
+    await screenshot("08-B-draft-roundtrip");
+    for (let i = 0; i < 2; i++) {
+      await waitDraft(i, "final independent persisted draft " + i);
+      const bugs = await apiRequest(
+        "final-empty-" + i,
+        `/api/v1/bugs?projectId=${projectIds[i]}&limit=100`,
+        { token: fixtureTokens[i], requestProjectId: projectIds[i] },
+      );
+      check("final zero Bugs " + i, [], bugs.items);
+      componentBody(
+        await apiRequest("final-five-off-" + i, `/api/v1/projects/${projectIds[i]}/components`, {
+          token: fixtureTokens[i],
+          requestProjectId: projectIds[i],
+        }),
+        projectIds[i],
+      );
+      check("local fixture PNG retained " + i, media[i].sha256, sha(readFileSync(media[i].path)));
+    }
+    check("only one browser login", 1, uiLogins);
+    check(
+      "no browser business POST",
+      [],
+      evidence.requests.filter(
+        (x) => x.kind === "browser_request" && x.method !== "GET" && x.category !== "login",
+      ),
+    );
+    check("API/Web process identities unchanged", hostBefore, apiIdentity());
+    if (fatal) throw fatal;
+    evidence.status = "passed";
+  } catch (error) {
+    evidence.status = "failed_retained";
+    evidence.failure = redact(String(error), secrets);
+    process.exitCode = 1;
+  } finally {
+    clearTimeout(lateTimer);
+    try {
+      await lateDeadline;
+      if (page) await ledger.releaseAll("finally_release_unmodified", true);
+    } catch (error) {
+      evidence.releaseFailure = redact(String(error), secrets);
+      evidence.status = "failed_retained";
+      process.exitCode = 1;
+    }
+    try {
+      await closeBrowser();
+    } catch (error) {
+      evidence.closeFailure = redact(String(error), secrets);
+      evidence.status = "failed_retained";
+      process.exitCode = 1;
+    }
+    if (fatal || ledger.entries.size) {
+      evidence.failure ??= redact(String(fatal ?? "UNRELEASED_REAL_RESPONSE"), secrets);
+      evidence.status = "failed_retained";
+      process.exitCode = 1;
+    }
+    evidence.finishedAt = new Date().toISOString();
+    evidence.lateScenario = late;
+    evidence.unreleasedRealResponses = [...ledger.entries.values()];
+    evidence.limits = [
+      "A project switch keeps the application Abort mechanism; a confirmed cancellation is distinguished from a continuation acknowledgment, neither is fabricated callback delivery.",
+      "No Bug, attachment upload, comment or component business write is attempted. PNGs remain local unsubmitted draft Blobs.",
+      "Only this fresh profile and exact A/B draft keys are read. No proof of all continuous frames, other identities, devices or existing client drafts is claimed.",
+    ];
+    const text = JSON.stringify(redact(evidence, secrets), null, 2) + "\n";
+    for (const value of secrets) assert(!text.includes(value), "PUBLIC_SECRET_LITERAL");
+    assert(
+      !/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}/u.test(
+        text,
+      ),
+    );
+    writeFileSync(join(output, "proof.json"), text, { flag: "wx" });
+    writeFileSync(join(runtime, "proof.json"), text, { flag: "wx" });
+    console.log(
+      JSON.stringify({
+        status: evidence.status,
+        runId,
+        proof: join(output, "proof.json"),
+        checks: evidence.checks.length,
+        profileRetained: profile,
+      }),
+    );
+  }
+}
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  if (process.argv[2] !== "--run")
+    console.log(
+      "not_run: --run <exact-preview-instance.json> <reviewed-browser-gate.json> required; no operational setup",
+    );
+  else {
+    assert.equal(process.argv.length, 5);
+    await run(process.argv[3], process.argv[4]);
+  }
+}

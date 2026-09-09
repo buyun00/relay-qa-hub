@@ -1,0 +1,9 @@
+# Actual run follow-up
+
+The original plan and preparation/check logs are retained. Its count of four memberships described the employee logins only. Actual project creation also inserts the GM creator's membership (`packages/storage/src/project-management-store.ts:451–457`). The first actual run `97e972b8-4a90-48b7-bebe-8b49c58eed15` stopped before Edge launch when the strict member-set assertion found this legitimate third member; it remains failed with its original source, gate, proof and log.
+
+The bounded revision adds exact creator/shared/exclusive member-set validation and one targeted pure test. It still rejects any other member and retains the first run. Source `a11a1a119045bb99bb383d69b1e1c85a1c93e7da0b3e2213f52e1e887241fc82`, tests `d10188a3c81838698c10157d80f569aadd4b0b283bd78e4a478ea8e0b359a7ec`, and the new gate `bc67dc74bc95ad3ee18dba89ff128947e71e589bc5b9e09bc97cc4f4e9ff918e` were reported to root before the authorized second run. Syntax/default-inert/17 pure tests/ESLint/Prettier passed in the `-r2` logs. No product code was changed.
+
+The [second actual result](../../web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/README.md) passed 164/164 checks with a genuine correlated Abort cancellation, durable A/B text/PNG/person selection preservation, zero business POSTs and normal browser close. Its new projects/three employees are distinct from the first failed fixture. The successful run's 400-check artifact audit and eight-frame visual inspection are follow-up verification of retained bytes, not another browser run or a claim that a canceled A callback was delivered.
+
+Actual second-run command used the new `acceptance/web-project-switch-draft-92f622d8-49b9-4f10-a580-3463722b630d-r2/browser-gate.json`; the original plan's unsuffixed gate was used only for the preserved first run. No further live invocation is requested by this follow-up.

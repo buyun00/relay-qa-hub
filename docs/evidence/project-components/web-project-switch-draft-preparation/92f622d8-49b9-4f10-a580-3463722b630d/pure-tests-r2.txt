@@ -1,0 +1,25 @@
+✔ member expectation includes only authenticated project creator and exact fresh employees (1.9676ms)
+✔ default command does not require config or open operational resources (99.7905ms)
+✔ exact A and B read queries and scoped header are accepted (1.1257ms)
+✔ project/header mismatch, extra query, other origin and writes are refused (1.5092ms)
+✔ browser permits only initial shared A login, never B recovery or sentinel login (1.0246ms)
+✔ only correlated canceled=true after switch plus verified B can consume A pause (0.4607ms)
+✔ CDP failure is not hidden by wrong Network id (0.2841ms)
+✔ CDP failure is not hidden by canceled false (0.1398ms)
+✔ CDP failure is not hidden by missing canceled (0.1751ms)
+✔ earlier cancellation or unverified B cannot legitimize release failure (0.3663ms)
+✔ default cleanup cannot accept even a known cancellation without explicit allowance (0.2188ms)
+✔ successful original continuation stays distinct from cancellation (0.1784ms)
+✔ unrelated B cancellation never settles old A response (0.2552ms)
+✔ concurrent release is deduplicated and failed entries do not prevent other attempts (0.2594ms)
+✔ new PNGs decode as deterministic distinct 16x16 RGB data (4.7448ms)
+✔ draft signature retains text, selected people and actual file hashes (0.1867ms)
+✔ execution gate requires source/instance/publication pins and explicit process identities (0.7245ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 226.8523

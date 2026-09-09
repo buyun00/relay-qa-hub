@@ -1,0 +1,24 @@
+✔ default command does not require config or open operational resources (103.9768ms)
+✔ exact A and B read queries and scoped header are accepted (1.6834ms)
+✔ project/header mismatch, extra query, other origin and writes are refused (1.8819ms)
+✔ browser permits only initial shared A login, never B recovery or sentinel login (1.0799ms)
+✔ only correlated canceled=true after switch plus verified B can consume A pause (0.4493ms)
+✔ CDP failure is not hidden by wrong Network id (0.3061ms)
+✔ CDP failure is not hidden by canceled false (0.1489ms)
+✔ CDP failure is not hidden by missing canceled (0.1356ms)
+✔ earlier cancellation or unverified B cannot legitimize release failure (0.3415ms)
+✔ default cleanup cannot accept even a known cancellation without explicit allowance (0.3007ms)
+✔ successful original continuation stays distinct from cancellation (0.263ms)
+✔ unrelated B cancellation never settles old A response (0.3153ms)
+✔ concurrent release is deduplicated and failed entries do not prevent other attempts (0.2761ms)
+✔ new PNGs decode as deterministic distinct 16x16 RGB data (5.5533ms)
+✔ draft signature retains text, selected people and actual file hashes (0.2151ms)
+✔ execution gate requires source/instance/publication pins and explicit process identities (0.728ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 233.5562

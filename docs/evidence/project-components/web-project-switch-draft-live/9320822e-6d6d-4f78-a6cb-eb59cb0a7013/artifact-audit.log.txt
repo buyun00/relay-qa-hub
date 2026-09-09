@@ -1,0 +1,3 @@
+Command: node docs/evidence/project-components/web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/artifact-audit.mjs
+Captured stdout from the successful artifact-only invocation (exit 0):
+{"status":"passed","checkCount":400,"fileEntries":93,"originalProofSha256":"6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa","firstFailureSha256":"7c91a9e08c8537dc31f9a74e953af73d8213618a6c1d65867c38c8bcde884f90"}
