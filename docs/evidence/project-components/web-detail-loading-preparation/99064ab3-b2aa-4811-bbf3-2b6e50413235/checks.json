@@ -1,0 +1,94 @@
+{
+  "status": "passed_preparation_only",
+  "at": "2026-09-09T02:17:04.598Z",
+  "source": {
+    "path": "scripts/project-components/web-detail-loading-live.mjs",
+    "sha256": "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae"
+  },
+  "tests": {
+    "path": "scripts/project-components/web-detail-loading-live.test.mjs",
+    "sha256": "12babaace3b71d4e380c620e63257e3797bf08f52f0dbe230dbb279a675ad497"
+  },
+  "results": [
+    {
+      "label": "syntax-source",
+      "command": [
+        "node",
+        "--check",
+        "scripts/project-components/web-detail-loading-live.mjs"
+      ],
+      "code": 0,
+      "signal": null,
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-preparation\\99064ab3-b2aa-4811-bbf3-2b6e50413235\\syntax-source.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "syntax-tests",
+      "command": [
+        "node",
+        "--check",
+        "scripts/project-components/web-detail-loading-live.test.mjs"
+      ],
+      "code": 0,
+      "signal": null,
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-preparation\\99064ab3-b2aa-4811-bbf3-2b6e50413235\\syntax-tests.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "default-inert",
+      "command": [
+        "node",
+        "scripts/project-components/web-detail-loading-live.mjs"
+      ],
+      "code": 0,
+      "signal": null,
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-preparation\\99064ab3-b2aa-4811-bbf3-2b6e50413235\\default-inert.txt",
+      "sha256": "f9f212bb2fba8bd840dd001036f7c584318598d99f58080caa5e24a63626d793"
+    },
+    {
+      "label": "pure-tests",
+      "command": [
+        "node",
+        "--test",
+        "scripts/project-components/web-detail-loading-live.test.mjs"
+      ],
+      "code": 0,
+      "signal": null,
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-preparation\\99064ab3-b2aa-4811-bbf3-2b6e50413235\\pure-tests.txt",
+      "sha256": "ef42769cb7d5326c42eafc44a1bf8abec5d9130e9967bc86509dd2c9359fb366"
+    },
+    {
+      "label": "lint",
+      "command": [
+        "node",
+        ".tools/npm-12.0.2/package/bin/npm-cli.js",
+        "exec",
+        "--",
+        "eslint",
+        "scripts/project-components/web-detail-loading-live.mjs",
+        "scripts/project-components/web-detail-loading-live.test.mjs"
+      ],
+      "code": 0,
+      "signal": null,
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-preparation\\99064ab3-b2aa-4811-bbf3-2b6e50413235\\lint.txt",
+      "sha256": "fce02e2d2a8f65193cdd7f3a9058a2be2f1e76bb70f0dffd8c05d360f6b45366"
+    },
+    {
+      "label": "format",
+      "command": [
+        "node",
+        ".tools/npm-12.0.2/package/bin/npm-cli.js",
+        "exec",
+        "--",
+        "prettier",
+        "--check",
+        "scripts/project-components/web-detail-loading-live.mjs",
+        "scripts/project-components/web-detail-loading-live.test.mjs"
+      ],
+      "code": 0,
+      "signal": null,
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-preparation\\99064ab3-b2aa-4811-bbf3-2b6e50413235\\format.txt",
+      "sha256": "aecd2e35d184576ae62c07822976e4c3f8c6550c13e2ef99c349836e74668256"
+    }
+  ]
+}

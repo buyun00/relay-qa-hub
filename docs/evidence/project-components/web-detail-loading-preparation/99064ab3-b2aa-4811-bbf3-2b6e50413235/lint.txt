@@ -1,0 +1,2 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug npx
+npm notice run eslint scripts/project-components/web-detail-loading-live.mjs scripts/project-components/web-detail-loading-live.test.mjs

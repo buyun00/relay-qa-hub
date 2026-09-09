@@ -1,0 +1,19 @@
+✔ default CLI is inert without even valid configuration arguments (104.5719ms)
+✔ allowlist accepts exact published assets and fixture reads only (1.4196ms)
+✔ browser login permits only exact fresh employee/project and web client (2.3656ms)
+✔ allowlist refuses different origins, records, project scopes, query widening and writes (1.2204ms)
+✔ real fault plan holds genuine 200, injects no successful response, and requires explicit Retry (6.3458ms)
+✔ fault plan refuses non-200, missing request, duplicate responses and extra details (0.825ms)
+✔ release helper attempts every held response, leaves failed entries, never rewrites body or status (0.5678ms)
+✔ actual response ledger retains a pause before JSON validation and releases it on failure (0.3762ms)
+✔ deadline and finally concurrent releases share one real CDP call per response (0.2643ms)
+✔ failed ledger release does not prevent others and can be attempted by final cleanup (0.4449ms)
+✔ redaction preserves primitive strings while removing synthetic secrets across JSON envelopes (0.811ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 232.135

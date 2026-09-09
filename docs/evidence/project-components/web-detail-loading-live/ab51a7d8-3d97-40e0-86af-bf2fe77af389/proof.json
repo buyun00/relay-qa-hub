@@ -1,0 +1,3275 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "runId": "ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+  "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+  "employee": "Detailab51a7d83d9740e086afbf2fe77af389",
+  "runtime": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+  "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\edge-profile",
+  "startedAt": "2026-09-09T02:23:11.098Z",
+  "checks": [
+    {
+      "at": "2026-09-09T02:23:12.781Z",
+      "label": "reviewed API PID",
+      "expected": 22852,
+      "actual": 22852,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.781Z",
+      "label": "reviewed API start",
+      "expected": 1788916940272,
+      "actual": 1788916940272,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.781Z",
+      "label": "reviewed Web PID",
+      "expected": 20284,
+      "actual": 20284,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.781Z",
+      "label": "reviewed Web start",
+      "expected": 1788889956508,
+      "actual": 1788889956508,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.838Z",
+      "label": "ready status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.838Z",
+      "label": "ready status",
+      "expected": "ready",
+      "actual": "ready",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.838Z",
+      "label": "schema14",
+      "expected": "14",
+      "actual": "14",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.844Z",
+      "label": "published asset SHA assets/index-Br-CEXQI.js",
+      "expected": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+      "actual": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.844Z",
+      "label": "published asset bytes assets/index-Br-CEXQI.js",
+      "expected": 477433,
+      "actual": 477433,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.852Z",
+      "label": "published asset SHA assets/index-Br-CEXQI.js.map",
+      "expected": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328",
+      "actual": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.852Z",
+      "label": "published asset bytes assets/index-Br-CEXQI.js.map",
+      "expected": 1829769,
+      "actual": 1829769,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.855Z",
+      "label": "published asset SHA assets/index-CgNw0fhl.css",
+      "expected": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef",
+      "actual": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.855Z",
+      "label": "published asset bytes assets/index-CgNw0fhl.css",
+      "expected": 91623,
+      "actual": 91623,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.858Z",
+      "label": "published asset SHA icon-licenses.txt",
+      "expected": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df",
+      "actual": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.858Z",
+      "label": "published asset bytes icon-licenses.txt",
+      "expected": 4308,
+      "actual": 4308,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.861Z",
+      "label": "published asset SHA icons/qa-hub-192.svg",
+      "expected": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601",
+      "actual": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.861Z",
+      "label": "published asset bytes icons/qa-hub-192.svg",
+      "expected": 506,
+      "actual": 506,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.864Z",
+      "label": "published asset SHA icons/qa-hub-512.svg",
+      "expected": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf",
+      "actual": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.864Z",
+      "label": "published asset bytes icons/qa-hub-512.svg",
+      "expected": 506,
+      "actual": 506,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.867Z",
+      "label": "published asset SHA icons/qa-hub-maskable-512.svg",
+      "expected": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c",
+      "actual": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.867Z",
+      "label": "published asset bytes icons/qa-hub-maskable-512.svg",
+      "expected": 495,
+      "actual": 495,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.868Z",
+      "label": "published asset SHA index.html",
+      "expected": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367",
+      "actual": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.868Z",
+      "label": "published asset bytes index.html",
+      "expected": 709,
+      "actual": 709,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.875Z",
+      "label": "gm-login status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.881Z",
+      "label": "fresh-project status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.888Z",
+      "label": "employee-login status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.892Z",
+      "label": "five-off status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.892Z",
+      "label": "exact five component keys",
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.892Z",
+      "label": "all five components disabled",
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.903Z",
+      "label": "one-bug status",
+      "expected": 201,
+      "actual": 201,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.908Z",
+      "label": "initial-detail status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:12.913Z",
+      "label": "initial-events status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:13.468Z",
+      "label": "CDP browser PID matches spawned process",
+      "expected": 10812,
+      "actual": 10812,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:13.707Z",
+      "label": "actual browser bundle matches reviewed publication",
+      "expected": {
+        "url": "http://127.0.0.1:4274/assets/index-Br-CEXQI.js",
+        "sizeBytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+        "status": 200
+      },
+      "actual": {
+        "url": "http://127.0.0.1:4274/assets/index-Br-CEXQI.js",
+        "status": 200,
+        "sizeBytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:13.834Z",
+      "label": "exact five component keys",
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:13.835Z",
+      "label": "all five components disabled",
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:13.904Z",
+      "label": "real detail body unchanged",
+      "expected": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "actual": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.050Z",
+      "label": "pending detail loading",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.050Z",
+      "label": "pending detail has no fabricated error",
+      "expected": "",
+      "actual": "",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.328Z",
+      "label": "first load no error",
+      "expected": "",
+      "actual": "",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.600Z",
+      "label": "network failure was injected",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.716Z",
+      "label": "real detail body unchanged",
+      "expected": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "actual": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.865Z",
+      "label": "retry clears error",
+      "expected": "",
+      "actual": "",
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.865Z",
+      "label": "three controlled detail requests",
+      "expected": 3,
+      "actual": 3,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:14.865Z",
+      "label": "two genuine detail200 responses",
+      "expected": 2,
+      "actual": 2,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.008Z",
+      "label": "final-detail status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.008Z",
+      "label": "Bug DTO unchanged",
+      "expected": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "actual": {
+        "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "number": 1,
+        "key": "DLAB51A7D83D9740-1",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "moduleId": null,
+        "state": "reported",
+        "severity": "S3",
+        "priority": "P3",
+        "reporterId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 1,
+        "createdAt": "2026-09-09T02:23:12.896Z",
+        "updatedAt": "2026-09-09T02:23:12.896Z",
+        "closedAt": null
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.013Z",
+      "label": "final-events status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.013Z",
+      "label": "Bug events unchanged",
+      "expected": {
+        "items": [
+          {
+            "schemaVersion": "1.0",
+            "id": "6f28cac1-421d-4104-ba87-ba63a9431744",
+            "type": "occurrence.appended",
+            "source": "qa_hub",
+            "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+            "bugId": "a7546808-eb74-4a3f-a85d-033e306c569a",
+            "aggregate": {
+              "type": "bug",
+              "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+              "version": 1
+            },
+            "sequence": 1,
+            "actor": {
+              "type": "user",
+              "id": "4021546f-0526-44f3-81b3-8a076a557a9f"
+            },
+            "correlationId": "1c82bb69-e5d9-4b26-94d7-2aceea7e13d2",
+            "causationId": null,
+            "occurredAt": "2026-09-09T02:23:12.896Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "occurrenceId": "b4049bce-3e9a-4391-a104-da3b92c9c8e5",
+              "fromVersion": 1,
+              "toVersion": 2
+            }
+          }
+        ],
+        "nextCursor": null
+      },
+      "actual": {
+        "items": [
+          {
+            "schemaVersion": "1.0",
+            "id": "6f28cac1-421d-4104-ba87-ba63a9431744",
+            "type": "occurrence.appended",
+            "source": "qa_hub",
+            "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+            "bugId": "a7546808-eb74-4a3f-a85d-033e306c569a",
+            "aggregate": {
+              "type": "bug",
+              "id": "a7546808-eb74-4a3f-a85d-033e306c569a",
+              "version": 1
+            },
+            "sequence": 1,
+            "actor": {
+              "type": "user",
+              "id": "4021546f-0526-44f3-81b3-8a076a557a9f"
+            },
+            "correlationId": "1c82bb69-e5d9-4b26-94d7-2aceea7e13d2",
+            "causationId": null,
+            "occurredAt": "2026-09-09T02:23:12.896Z",
+            "fromState": null,
+            "toState": null,
+            "payload": {
+              "occurrenceId": "b4049bce-3e9a-4391-a104-da3b92c9c8e5",
+              "fromVersion": 1,
+              "toVersion": 2
+            }
+          }
+        ],
+        "nextCursor": null
+      },
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.018Z",
+      "label": "final-list status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.018Z",
+      "label": "exactly one fixture Bug",
+      "expected": [
+        "a7546808-eb74-4a3f-a85d-033e306c569a"
+      ],
+      "actual": [
+        "a7546808-eb74-4a3f-a85d-033e306c569a"
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.022Z",
+      "label": "final-comments status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.022Z",
+      "label": "no comments",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.027Z",
+      "label": "final-attachments status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.027Z",
+      "label": "no attachments",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.030Z",
+      "label": "final-five-off status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.030Z",
+      "label": "exact five component keys",
+      "expected": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "actual": [
+        "build",
+        "build_upload.single",
+        "qingyu.sync",
+        "relay.production",
+        "upload.incremental"
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:15.030Z",
+      "label": "all five components disabled",
+      "expected": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "actual": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "at": "2026-09-09T02:23:16.512Z",
+      "label": "API/Web processes unchanged",
+      "expected": [
+        {
+          "port": 4419,
+          "address": "127.0.0.1",
+          "pid": 22852,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-09T01:22:20.2728640Z"
+        },
+        {
+          "port": 4274,
+          "address": "127.0.0.1",
+          "pid": 20284,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        }
+      ],
+      "actual": [
+        {
+          "port": 4419,
+          "address": "127.0.0.1",
+          "pid": 22852,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-09T01:22:20.2728640Z"
+        },
+        {
+          "port": 4274,
+          "address": "127.0.0.1",
+          "pid": 20284,
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "processes": [
+    {
+      "at": "2026-09-09T02:23:13.452Z",
+      "phase": "launched",
+      "pid": 10812,
+      "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+      "startedAt": "2026-09-09T02:23:12.9179740Z",
+      "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\edge-profile"
+    },
+    {
+      "at": "2026-09-09T02:23:17.105Z",
+      "phase": "normal_close",
+      "pid": 10812,
+      "exited": true
+    }
+  ],
+  "requests": [
+    {
+      "at": "2026-09-09T02:23:12.838Z",
+      "kind": "fixture_api",
+      "label": "ready",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\001-ready.body",
+      "bytes": 150,
+      "sha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911"
+    },
+    {
+      "at": "2026-09-09T02:23:12.875Z",
+      "kind": "fixture_api",
+      "label": "gm-login",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "status": 200,
+      "bodyStored": false,
+      "responseSha256": "d05ad64c4f2c75010c6e369dee533405bbc23a2486cf22e6b3eeeae18b164ca8",
+      "requestBody": "[REDACTED]"
+    },
+    {
+      "at": "2026-09-09T02:23:12.881Z",
+      "kind": "fixture_api",
+      "label": "fresh-project",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\002-fresh-project.body",
+      "bytes": 165,
+      "sha256": "d6b111384a52a2a1ba665dc8e90129572fd91c8248ca193f391cc86f41055ba4",
+      "requestBody": {
+        "id": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "key": "DLAB51A7D83D9740",
+        "name": "Detail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389"
+      }
+    },
+    {
+      "at": "2026-09-09T02:23:12.888Z",
+      "kind": "fixture_api",
+      "label": "employee-login",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200,
+      "bodyStored": false,
+      "responseSha256": "a390b222d2ffd5d9cc551211cecdab2a690f753b1a3e051352e40b04eefdf252",
+      "requestBody": "[REDACTED]"
+    },
+    {
+      "at": "2026-09-09T02:23:12.892Z",
+      "kind": "fixture_api",
+      "label": "five-off",
+      "method": "GET",
+      "path": "/api/v1/projects/ea42522b-70d1-4a8e-a23e-6ef23a4b9696/components",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\003-five-off.body",
+      "bytes": 813,
+      "sha256": "db6615f2079ae36e6914ab175ba4af960473887253f17160f6578daa83d28c5a"
+    },
+    {
+      "at": "2026-09-09T02:23:12.903Z",
+      "kind": "fixture_api",
+      "label": "one-bug",
+      "method": "POST",
+      "path": "/api/v1/bugs",
+      "status": 201,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\004-one-bug.body",
+      "bytes": 1121,
+      "sha256": "70e235b0a8857632c7e364af29fbd8633ddd149ff362d69d1a6b5138718b224b",
+      "requestBody": {
+        "submissionContractVersion": "1.1.0",
+        "clientSubmissionId": "d1da7b98-cf83-41ba-8f3f-fb374528d364",
+        "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+        "title": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "description": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+        "expectedBehavior": "Loading during pending read; explicit retry after a network failure",
+        "severity": "S3",
+        "priority": "P3",
+        "ownerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "verificationOwnerId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+        "occurrence": {
+          "observedAt": "2026-09-09T02:23:12.892Z",
+          "platform": "web",
+          "steps": [
+            "Read-only detail loading fixture"
+          ],
+          "actualBehavior": "WEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389"
+        },
+        "attachmentIds": [],
+        "captureBundleId": null
+      }
+    },
+    {
+      "at": "2026-09-09T02:23:12.908Z",
+      "kind": "fixture_api",
+      "label": "initial-detail",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\005-initial-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "at": "2026-09-09T02:23:12.913Z",
+      "kind": "fixture_api",
+      "label": "initial-events",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/events?limit=20",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\006-initial-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "at": "2026-09-09T02:23:13.552Z",
+      "kind": "browser_request",
+      "category": "document",
+      "method": "GET",
+      "path": "/",
+      "requestId": "interception-job-1.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.576Z",
+      "kind": "browser_request",
+      "category": "static",
+      "method": "GET",
+      "path": "/assets/index-Br-CEXQI.js",
+      "requestId": "interception-job-2.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.576Z",
+      "kind": "browser_request",
+      "category": "static",
+      "method": "GET",
+      "path": "/assets/index-CgNw0fhl.css",
+      "requestId": "interception-job-3.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.670Z",
+      "kind": "browser_request",
+      "category": "session",
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "requestId": "interception-job-4.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.670Z",
+      "kind": "browser_request",
+      "category": "static",
+      "method": "GET",
+      "path": "/icons/qa-hub-192.svg",
+      "requestId": "interception-job-5.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.729Z",
+      "kind": "browser_request",
+      "category": "entry",
+      "method": "GET",
+      "path": "/api/v1/project-entry/ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "requestId": "interception-job-6.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.755Z",
+      "kind": "browser_request",
+      "category": "login",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "requestId": "interception-job-7.0",
+      "bodySha256": "4ad9bac463c0c68f338c4656abba76ca8d04ea61486e0c2a713ab4214539b8cd"
+    },
+    {
+      "at": "2026-09-09T02:23:13.762Z",
+      "kind": "browser_real_response",
+      "category": "login",
+      "requestId": "interception-job-7.0",
+      "status": 200,
+      "responseSha256": "f59dc1275d5b3f86dd0642c8ae4f08b61c5eab7c70477437d2770af865a03e2e",
+      "bodyStored": false
+    },
+    {
+      "at": "2026-09-09T02:23:13.825Z",
+      "kind": "browser_request",
+      "category": "components",
+      "method": "GET",
+      "path": "/api/v1/projects/ea42522b-70d1-4a8e-a23e-6ef23a4b9696/components",
+      "requestId": "interception-job-8.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.826Z",
+      "kind": "browser_request",
+      "category": "projects",
+      "method": "GET",
+      "path": "/api/v1/projects",
+      "requestId": "interception-job-9.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.826Z",
+      "kind": "browser_request",
+      "category": "members",
+      "method": "GET",
+      "path": "/api/v1/projects/ea42522b-70d1-4a8e-a23e-6ef23a4b9696/members",
+      "requestId": "interception-job-10.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.827Z",
+      "kind": "browser_request",
+      "category": "bugs",
+      "method": "GET",
+      "path": "/api/v1/bugs",
+      "requestId": "interception-job-11.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.834Z",
+      "kind": "browser_real_response",
+      "category": "components",
+      "requestId": "interception-job-8.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\007-browser-components.body",
+      "bytes": 813,
+      "sha256": "db6615f2079ae36e6914ab175ba4af960473887253f17160f6578daa83d28c5a"
+    },
+    {
+      "at": "2026-09-09T02:23:13.837Z",
+      "kind": "browser_real_response",
+      "category": "bugs",
+      "requestId": "interception-job-11.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\008-browser-bugs.body",
+      "bytes": 825,
+      "sha256": "2e4cac9f1f5ccba4d37fd214c000042b2b3ae4be979e548abc4e7bb04c7a3532"
+    },
+    {
+      "at": "2026-09-09T02:23:13.897Z",
+      "kind": "browser_request",
+      "category": "detail",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a",
+      "requestId": "interception-job-12.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:13.904Z",
+      "kind": "browser_real_response",
+      "category": "detail",
+      "requestId": "interception-job-12.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\009-browser-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "at": "2026-09-09T02:23:14.171Z",
+      "kind": "browser_request",
+      "category": "events",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/events",
+      "requestId": "interception-job-13.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.172Z",
+      "kind": "browser_request",
+      "category": "attachments",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/attachments",
+      "requestId": "interception-job-14.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.173Z",
+      "kind": "browser_request",
+      "category": "detail-read",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/human-workflow",
+      "requestId": "interception-job-15.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.173Z",
+      "kind": "browser_request",
+      "category": "modules",
+      "method": "GET",
+      "path": "/api/v1/projects/ea42522b-70d1-4a8e-a23e-6ef23a4b9696/modules",
+      "requestId": "interception-job-16.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.174Z",
+      "kind": "browser_request",
+      "category": "detail-read",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/comments",
+      "requestId": "interception-job-17.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.178Z",
+      "kind": "browser_real_response",
+      "category": "events",
+      "requestId": "interception-job-13.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\010-browser-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "at": "2026-09-09T02:23:14.180Z",
+      "kind": "browser_real_response",
+      "category": "attachments",
+      "requestId": "interception-job-14.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\011-browser-attachments.body",
+      "bytes": 151,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09"
+    },
+    {
+      "at": "2026-09-09T02:23:14.181Z",
+      "kind": "browser_real_response",
+      "category": "detail-read",
+      "requestId": "interception-job-15.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\012-browser-detail-read.body",
+      "bytes": 152,
+      "sha256": "6fef03953ef2a8e704c54bd728487c37c472033e35f35e73d5ffef3b59a3e28b"
+    },
+    {
+      "at": "2026-09-09T02:23:14.183Z",
+      "kind": "browser_real_response",
+      "category": "detail-read",
+      "requestId": "interception-job-17.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\013-browser-detail-read.body",
+      "bytes": 128,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175"
+    },
+    {
+      "at": "2026-09-09T02:23:14.449Z",
+      "kind": "browser_request",
+      "category": "detail",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a",
+      "requestId": "interception-job-18.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.711Z",
+      "kind": "browser_request",
+      "category": "detail",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a",
+      "requestId": "interception-job-19.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.716Z",
+      "kind": "browser_real_response",
+      "category": "detail",
+      "requestId": "interception-job-19.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\014-browser-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "at": "2026-09-09T02:23:14.722Z",
+      "kind": "browser_request",
+      "category": "events",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/events",
+      "requestId": "interception-job-20.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.723Z",
+      "kind": "browser_request",
+      "category": "attachments",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/attachments",
+      "requestId": "interception-job-21.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.723Z",
+      "kind": "browser_request",
+      "category": "detail-read",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/human-workflow",
+      "requestId": "interception-job-22.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.724Z",
+      "kind": "browser_request",
+      "category": "modules",
+      "method": "GET",
+      "path": "/api/v1/projects/ea42522b-70d1-4a8e-a23e-6ef23a4b9696/modules",
+      "requestId": "interception-job-23.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.724Z",
+      "kind": "browser_request",
+      "category": "detail-read",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/comments",
+      "requestId": "interception-job-24.0",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "at": "2026-09-09T02:23:14.729Z",
+      "kind": "browser_real_response",
+      "category": "events",
+      "requestId": "interception-job-20.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\015-browser-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "at": "2026-09-09T02:23:14.731Z",
+      "kind": "browser_real_response",
+      "category": "attachments",
+      "requestId": "interception-job-21.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\016-browser-attachments.body",
+      "bytes": 151,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09"
+    },
+    {
+      "at": "2026-09-09T02:23:14.734Z",
+      "kind": "browser_real_response",
+      "category": "detail-read",
+      "requestId": "interception-job-22.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\017-browser-detail-read.body",
+      "bytes": 152,
+      "sha256": "6fef03953ef2a8e704c54bd728487c37c472033e35f35e73d5ffef3b59a3e28b"
+    },
+    {
+      "at": "2026-09-09T02:23:14.735Z",
+      "kind": "browser_real_response",
+      "category": "detail-read",
+      "requestId": "interception-job-24.0",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\018-browser-detail-read.body",
+      "bytes": 128,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175"
+    },
+    {
+      "at": "2026-09-09T02:23:15.008Z",
+      "kind": "fixture_api",
+      "label": "final-detail",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\019-final-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "at": "2026-09-09T02:23:15.013Z",
+      "kind": "fixture_api",
+      "label": "final-events",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/events?limit=20",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\020-final-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "at": "2026-09-09T02:23:15.018Z",
+      "kind": "fixture_api",
+      "label": "final-list",
+      "method": "GET",
+      "path": "/api/v1/bugs?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696&limit=100",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\021-final-list.body",
+      "bytes": 825,
+      "sha256": "2e4cac9f1f5ccba4d37fd214c000042b2b3ae4be979e548abc4e7bb04c7a3532"
+    },
+    {
+      "at": "2026-09-09T02:23:15.022Z",
+      "kind": "fixture_api",
+      "label": "final-comments",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/comments",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\022-final-comments.body",
+      "bytes": 128,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175"
+    },
+    {
+      "at": "2026-09-09T02:23:15.026Z",
+      "kind": "fixture_api",
+      "label": "final-attachments",
+      "method": "GET",
+      "path": "/api/v1/bugs/a7546808-eb74-4a3f-a85d-033e306c569a/attachments?limit=50",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\023-final-attachments.body",
+      "bytes": 151,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09"
+    },
+    {
+      "at": "2026-09-09T02:23:15.030Z",
+      "kind": "fixture_api",
+      "label": "final-five-off",
+      "method": "GET",
+      "path": "/api/v1/projects/ea42522b-70d1-4a8e-a23e-6ef23a4b9696/components",
+      "status": 200,
+      "rawPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\024-final-five-off.body",
+      "bytes": 813,
+      "sha256": "db6615f2079ae36e6914ab175ba4af960473887253f17160f6578daa83d28c5a"
+    }
+  ],
+  "checkpoints": [
+    {
+      "at": "2026-09-09T02:23:13.709Z",
+      "label": "employee name",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "QA Hub · 项目预览\n\n进入项目\n\n从项目入口填写姓名；首次登录仅登记到此项目。\n\n项目 ID 或入口短码\n姓名\n登录\nGM 管理入口",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "input",
+          "type": "text",
+          "text": "",
+          "label": "",
+          "placeholder": "使用 GM 提供的项目入口",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "text",
+          "text": "",
+          "label": "",
+          "placeholder": "输入姓名",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "submit",
+          "text": "登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "GM 管理入口",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "project-login-mode",
+          "inDialog": false
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:13.720Z",
+      "label": "employee login",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "QA Hub · 项目预览\n\n进入项目\n\n从项目入口填写姓名；首次登录仅登记到此项目。\n\n项目 ID 或入口短码\n姓名\n登录\nGM 管理入口",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "input",
+          "type": "text",
+          "text": "",
+          "label": "",
+          "placeholder": "使用 GM 提供的项目入口",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "text",
+          "text": "",
+          "label": "",
+          "placeholder": "输入姓名",
+          "value": "Detailab51a7d83d9740e086afbf2fe77af389",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "submit",
+          "text": "登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "GM 管理入口",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "project-login-mode",
+          "inDialog": false
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:13.730Z",
+      "label": "fixture row",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "QA Hub · 项目预览\n\n进入项目\n\n从项目入口填写姓名；首次登录仅登记到此项目。\n\n项目 ID 或入口短码\n姓名\n登录中…\nGM 管理入口",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "input",
+          "type": "text",
+          "text": "",
+          "label": "",
+          "placeholder": "使用 GM 提供的项目入口",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "text",
+          "text": "",
+          "label": "",
+          "placeholder": "输入姓名",
+          "value": "Detailab51a7d83d9740e086afbf2fe77af389",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "submit",
+          "text": "登录中…",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": true,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "GM 管理入口",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "project-login-mode",
+          "inDialog": false
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:13.883Z",
+      "label": "fixture row",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "Q\nQA Hub\n项目\nDetail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389\n预览\nCtrl K\n\n工作区\n\n工作台\n1\n总览\n全部\n组件历史\n用户管理\n2 位项目成员\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录\n\n2026年9月9日\n\n你好，Detailab51a7d83d9740e086afbf2fe77af389\n\n先完成需要你动作的 Bug，其他进度会自动留在工作台里。\n\n 新建 Bug\n已选中\n1\n待处理\n待分配、需补充或等待开始处理\n0\n处理中\n修复人正在处理\n0\n已完成待验收\n修复已完成，等待人工验收\n0\n关闭\n已验收并关闭\n人员范围\n我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM\n1 个事项\n事项\n当前动作人\n进度\n最后更新\nP3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+          "label": "切换项目",
+          "placeholder": "",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "search",
+          "text": "",
+          "label": "搜索编号、内容或人员",
+          "placeholder": "搜索编号、内容或人员",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "工作台\n1",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item is-active",
+          "inDialog": false
+        },
+        {
+          "index": 4,
+          "tag": "button",
+          "type": "button",
+          "text": "总览\n全部",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 5,
+          "tag": "button",
+          "type": "button",
+          "text": "组件历史",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 6,
+          "tag": "button",
+          "type": "button",
+          "text": "用户管理\n2 位项目成员",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "utility-card users-card",
+          "inDialog": false
+        },
+        {
+          "index": 7,
+          "tag": "button",
+          "type": "button",
+          "text": "9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "profile",
+          "inDialog": false
+        },
+        {
+          "index": 8,
+          "tag": "button",
+          "type": "button",
+          "text": "新建 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button",
+          "inDialog": false
+        },
+        {
+          "index": 9,
+          "tag": "button",
+          "type": "button",
+          "text": "已选中\n1\n待处理\n待分配、需补充或等待开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card is-selected",
+          "inDialog": false
+        },
+        {
+          "index": 10,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n处理中\n修复人正在处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 11,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n已完成待验收\n修复已完成，等待人工验收",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 12,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n关闭\n已验收并关闭",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 13,
+          "tag": "select",
+          "type": "select-one",
+          "text": "我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 14,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新列表",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button refresh-button",
+          "inDialog": false
+        },
+        {
+          "index": 15,
+          "tag": "button",
+          "type": "button",
+          "text": "P3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "table-row bug-row",
+          "inDialog": false
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:13.886Z",
+      "label": "first actual detail click",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "Q\nQA Hub\n项目\nDetail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389\n预览\nCtrl K\n\n工作区\n\n工作台\n1\n总览\n全部\n组件历史\n用户管理\n2 位项目成员\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录\n\n2026年9月9日\n\n你好，Detailab51a7d83d9740e086afbf2fe77af389\n\n先完成需要你动作的 Bug，其他进度会自动留在工作台里。\n\n 新建 Bug\n已选中\n1\n待处理\n待分配、需补充或等待开始处理\n0\n处理中\n修复人正在处理\n0\n已完成待验收\n修复已完成，等待人工验收\n0\n关闭\n已验收并关闭\n人员范围\n我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM\n1 个事项\n事项\n当前动作人\n进度\n最后更新\nP3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+          "label": "切换项目",
+          "placeholder": "",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "search",
+          "text": "",
+          "label": "搜索编号、内容或人员",
+          "placeholder": "搜索编号、内容或人员",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "工作台\n1",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item is-active",
+          "inDialog": false
+        },
+        {
+          "index": 4,
+          "tag": "button",
+          "type": "button",
+          "text": "总览\n全部",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 5,
+          "tag": "button",
+          "type": "button",
+          "text": "组件历史",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 6,
+          "tag": "button",
+          "type": "button",
+          "text": "用户管理\n2 位项目成员",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "utility-card users-card",
+          "inDialog": false
+        },
+        {
+          "index": 7,
+          "tag": "button",
+          "type": "button",
+          "text": "9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "profile",
+          "inDialog": false
+        },
+        {
+          "index": 8,
+          "tag": "button",
+          "type": "button",
+          "text": "新建 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button",
+          "inDialog": false
+        },
+        {
+          "index": 9,
+          "tag": "button",
+          "type": "button",
+          "text": "已选中\n1\n待处理\n待分配、需补充或等待开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card is-selected",
+          "inDialog": false
+        },
+        {
+          "index": 10,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n处理中\n修复人正在处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 11,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n已完成待验收\n修复已完成，等待人工验收",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 12,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n关闭\n已验收并关闭",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 13,
+          "tag": "select",
+          "type": "select-one",
+          "text": "我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 14,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新列表",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button refresh-button",
+          "inDialog": false
+        },
+        {
+          "index": 15,
+          "tag": "button",
+          "type": "button",
+          "text": "P3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "table-row bug-row",
+          "inDialog": false
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:14.050Z",
+      "label": "pending-real-200",
+      "state": {
+        "present": true,
+        "loading": true,
+        "errorTitle": "",
+        "errorText": "",
+        "loaded": false,
+        "text": "正在读取 Bug 详情…"
+      }
+    },
+    {
+      "at": "2026-09-09T02:23:14.168Z",
+      "kind": "screenshot",
+      "label": "01-real-response-held-loading",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\01-real-response-held-loading.png",
+      "sizeBytes": 84056,
+      "sha256": "640c46c13b08ca3deba174011f8964ee46ee5222cf571656ac30b58d51b880af"
+    },
+    {
+      "at": "2026-09-09T02:23:14.328Z",
+      "label": "first-real-200-loaded",
+      "state": {
+        "present": true,
+        "loading": false,
+        "errorTitle": "",
+        "errorText": "",
+        "loaded": true,
+        "text": "DLAB51A7D83D9740-1\nP3\n待处理\nBug 内容\nDetailab51a7d83d9740e086afbf2fe77af389 · 9/9 10:23\n编辑详情\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\n预期行为\n\nLoading during pending read; explicit retry after a network failure\n\n严重程度 S3\n优先级 P3\n模块 未设置\n截图与标注\n0 张 · 点击查看大图\n\n这条 Bug 没有图片附件。\n\n处理进度\n待处理\n待处理\n处理中\n已完成待验收\n关闭\n修复人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n关闭人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n保存分配\n状态轨迹与处理记录\n1 条\nPoco 详情（截图时游戏上下文）\n0 组\n\n这张任务目前没有带 captureId 的 Poco 上下文；普通截图和任务处理不受影响。\n\n开始处理\n人工标记完成\n删除 Bug"
+      }
+    },
+    {
+      "at": "2026-09-09T02:23:14.430Z",
+      "kind": "screenshot",
+      "label": "02-first-real-detail-loaded",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\02-first-real-detail-loaded.png",
+      "sizeBytes": 147701,
+      "sha256": "ed23bd6e64eb90874e998e34ff637d0090cc266388efb3ba446be4c0a3844a6e"
+    },
+    {
+      "at": "2026-09-09T02:23:14.432Z",
+      "label": "close first detail",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "Q\nQA Hub\n项目\nDetail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389\n预览\nCtrl K\n\n工作区\n\n工作台\n1\n总览\n全部\n组件历史\n用户管理\n2 位项目成员\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录\n\n2026年9月9日\n\n你好，Detailab51a7d83d9740e086afbf2fe77af389\n\n先完成需要你动作的 Bug，其他进度会自动留在工作台里。\n\n 新建 Bug\n已选中\n1\n待处理\n待分配、需补充或等待开始处理\n0\n处理中\n修复人正在处理\n0\n已完成待验收\n修复已完成，等待人工验收\n0\n关闭\n已验收并关闭\n人员范围\n我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM\n1 个事项\n事项\n当前动作人\n进度\n最后更新\nP3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23\nDLAB51A7D83D9740-1\nP3\n待处理\nBug 内容\nDetailab51a7d83d9740e086afbf2fe77af389 · 9/9 10:23\n编辑详情\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\n预期行为\n\nLoading during pending read; explicit retry after a network failure\n\n严重程度 S3\n优先级 P3\n模块 未设置\n截图与标注\n0 张 · 点击查看大图\n\n这条 Bug 没有图片附件。\n\n处理进度\n待处理\n待处理\n处理中\n已完成待验收\n关闭\n修复人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n关闭人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n保存分配\n状态轨迹与处理记录\n1 条\nPoco 详情（截图时游戏上下文）\n0 组\n\n这张任务目前没有带 captureId 的 Poco 上下文；普通截图和任务处理不受影响。\n\n开始处理\n人工标记完成\n删除 Bug",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+          "label": "切换项目",
+          "placeholder": "",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "search",
+          "text": "",
+          "label": "搜索编号、内容或人员",
+          "placeholder": "搜索编号、内容或人员",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "工作台\n1",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item is-active",
+          "inDialog": false
+        },
+        {
+          "index": 4,
+          "tag": "button",
+          "type": "button",
+          "text": "总览\n全部",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 5,
+          "tag": "button",
+          "type": "button",
+          "text": "组件历史",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 6,
+          "tag": "button",
+          "type": "button",
+          "text": "用户管理\n2 位项目成员",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "utility-card users-card",
+          "inDialog": false
+        },
+        {
+          "index": 7,
+          "tag": "button",
+          "type": "button",
+          "text": "9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "profile",
+          "inDialog": false
+        },
+        {
+          "index": 8,
+          "tag": "button",
+          "type": "button",
+          "text": "新建 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button",
+          "inDialog": false
+        },
+        {
+          "index": 9,
+          "tag": "button",
+          "type": "button",
+          "text": "已选中\n1\n待处理\n待分配、需补充或等待开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card is-selected",
+          "inDialog": false
+        },
+        {
+          "index": 10,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n处理中\n修复人正在处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 11,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n已完成待验收\n修复已完成，等待人工验收",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 12,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n关闭\n已验收并关闭",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 13,
+          "tag": "select",
+          "type": "select-one",
+          "text": "我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 14,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新列表",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button refresh-button",
+          "inDialog": false
+        },
+        {
+          "index": 15,
+          "tag": "button",
+          "type": "button",
+          "text": "P3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "table-row bug-row",
+          "inDialog": false
+        },
+        {
+          "index": 16,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "关闭详情",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-overlay-dismiss",
+          "inDialog": false
+        },
+        {
+          "index": 17,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "关闭详情",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-close",
+          "inDialog": true
+        },
+        {
+          "index": 18,
+          "tag": "button",
+          "type": "button",
+          "text": "编辑详情",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-edit-trigger",
+          "inDialog": true
+        },
+        {
+          "index": 19,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detailab51a7d83d9740e086afbf2fe77af389\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 20,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detailab51a7d83d9740e086afbf2fe77af389\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 21,
+          "tag": "button",
+          "type": "button",
+          "text": "保存分配",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "secondary-button assignment-save",
+          "inDialog": true
+        },
+        {
+          "index": 22,
+          "tag": "summary",
+          "type": "",
+          "text": "状态轨迹与处理记录\n1 条",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 23,
+          "tag": "summary",
+          "type": "",
+          "text": "Poco 详情（截图时游戏上下文）\n0 组",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 24,
+          "tag": "button",
+          "type": "button",
+          "text": "开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button wide",
+          "inDialog": true
+        },
+        {
+          "index": 25,
+          "tag": "button",
+          "type": "button",
+          "text": "人工标记完成",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button wide",
+          "inDialog": true
+        },
+        {
+          "index": 26,
+          "tag": "button",
+          "type": "button",
+          "text": "删除 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "danger-button",
+          "inDialog": true
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:14.442Z",
+      "label": "second actual detail click",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "Q\nQA Hub\n项目\nDetail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389\n预览\nCtrl K\n\n工作区\n\n工作台\n1\n总览\n全部\n组件历史\n用户管理\n2 位项目成员\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录\n\n2026年9月9日\n\n你好，Detailab51a7d83d9740e086afbf2fe77af389\n\n先完成需要你动作的 Bug，其他进度会自动留在工作台里。\n\n 新建 Bug\n已选中\n1\n待处理\n待分配、需补充或等待开始处理\n0\n处理中\n修复人正在处理\n0\n已完成待验收\n修复已完成，等待人工验收\n0\n关闭\n已验收并关闭\n人员范围\n我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM\n1 个事项\n事项\n当前动作人\n进度\n最后更新\nP3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+          "label": "切换项目",
+          "placeholder": "",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "search",
+          "text": "",
+          "label": "搜索编号、内容或人员",
+          "placeholder": "搜索编号、内容或人员",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "工作台\n1",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item is-active",
+          "inDialog": false
+        },
+        {
+          "index": 4,
+          "tag": "button",
+          "type": "button",
+          "text": "总览\n全部",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 5,
+          "tag": "button",
+          "type": "button",
+          "text": "组件历史",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 6,
+          "tag": "button",
+          "type": "button",
+          "text": "用户管理\n2 位项目成员",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "utility-card users-card",
+          "inDialog": false
+        },
+        {
+          "index": 7,
+          "tag": "button",
+          "type": "button",
+          "text": "9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "profile",
+          "inDialog": false
+        },
+        {
+          "index": 8,
+          "tag": "button",
+          "type": "button",
+          "text": "新建 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button",
+          "inDialog": false
+        },
+        {
+          "index": 9,
+          "tag": "button",
+          "type": "button",
+          "text": "已选中\n1\n待处理\n待分配、需补充或等待开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card is-selected",
+          "inDialog": false
+        },
+        {
+          "index": 10,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n处理中\n修复人正在处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 11,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n已完成待验收\n修复已完成，等待人工验收",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 12,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n关闭\n已验收并关闭",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 13,
+          "tag": "select",
+          "type": "select-one",
+          "text": "我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 14,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新列表",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button refresh-button",
+          "inDialog": false
+        },
+        {
+          "index": 15,
+          "tag": "button",
+          "type": "button",
+          "text": "P3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "table-row bug-row",
+          "inDialog": false
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:14.600Z",
+      "label": "actual-catch-error",
+      "state": {
+        "present": true,
+        "loading": false,
+        "errorTitle": "Bug 详情读取失败",
+        "errorText": "Failed to fetch",
+        "loaded": false,
+        "text": "Bug 详情读取失败\n\nFailed to fetch\n\n重新读取"
+      }
+    },
+    {
+      "at": "2026-09-09T02:23:14.701Z",
+      "kind": "screenshot",
+      "label": "03-actual-network-catch-error",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\03-actual-network-catch-error.png",
+      "sizeBytes": 91006,
+      "sha256": "1b4026575598ee9364c23c075c340a50a6332ed295ddc102fc650b8b0c77e876"
+    },
+    {
+      "at": "2026-09-09T02:23:14.703Z",
+      "label": "actual Retry",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "Q\nQA Hub\n项目\nDetail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389\n预览\nCtrl K\n\n工作区\n\n工作台\n1\n总览\n全部\n组件历史\n用户管理\n2 位项目成员\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录\n\n2026年9月9日\n\n你好，Detailab51a7d83d9740e086afbf2fe77af389\n\n先完成需要你动作的 Bug，其他进度会自动留在工作台里。\n\n 新建 Bug\n已选中\n1\n待处理\n待分配、需补充或等待开始处理\n0\n处理中\n修复人正在处理\n0\n已完成待验收\n修复已完成，等待人工验收\n0\n关闭\n已验收并关闭\n人员范围\n我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM\n1 个事项\n事项\n当前动作人\n进度\n最后更新\nP3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23\nBug 详情读取失败\n\nFailed to fetch\n\n重新读取",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+          "label": "切换项目",
+          "placeholder": "",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "search",
+          "text": "",
+          "label": "搜索编号、内容或人员",
+          "placeholder": "搜索编号、内容或人员",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "工作台\n1",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item is-active",
+          "inDialog": false
+        },
+        {
+          "index": 4,
+          "tag": "button",
+          "type": "button",
+          "text": "总览\n全部",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 5,
+          "tag": "button",
+          "type": "button",
+          "text": "组件历史",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 6,
+          "tag": "button",
+          "type": "button",
+          "text": "用户管理\n2 位项目成员",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "utility-card users-card",
+          "inDialog": false
+        },
+        {
+          "index": 7,
+          "tag": "button",
+          "type": "button",
+          "text": "9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "profile",
+          "inDialog": false
+        },
+        {
+          "index": 8,
+          "tag": "button",
+          "type": "button",
+          "text": "新建 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button",
+          "inDialog": false
+        },
+        {
+          "index": 9,
+          "tag": "button",
+          "type": "button",
+          "text": "已选中\n1\n待处理\n待分配、需补充或等待开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card is-selected",
+          "inDialog": false
+        },
+        {
+          "index": 10,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n处理中\n修复人正在处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 11,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n已完成待验收\n修复已完成，等待人工验收",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 12,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n关闭\n已验收并关闭",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 13,
+          "tag": "select",
+          "type": "select-one",
+          "text": "我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 14,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新列表",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button refresh-button",
+          "inDialog": false
+        },
+        {
+          "index": 15,
+          "tag": "button",
+          "type": "button",
+          "text": "P3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "table-row bug-row",
+          "inDialog": false
+        },
+        {
+          "index": 16,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "关闭详情",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-overlay-dismiss",
+          "inDialog": false
+        },
+        {
+          "index": 17,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "关闭详情",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-close detail-loading-close",
+          "inDialog": true
+        },
+        {
+          "index": 18,
+          "tag": "button",
+          "type": "button",
+          "text": "重新读取",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button",
+          "inDialog": true
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T02:23:14.865Z",
+      "label": "actual-retry-loaded",
+      "state": {
+        "present": true,
+        "loading": false,
+        "errorTitle": "",
+        "errorText": "",
+        "loaded": true,
+        "text": "DLAB51A7D83D9740-1\nP3\n待处理\nBug 内容\nDetailab51a7d83d9740e086afbf2fe77af389 · 9/9 10:23\n编辑详情\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\n预期行为\n\nLoading during pending read; explicit retry after a network failure\n\n严重程度 S3\n优先级 P3\n模块 未设置\n截图与标注\n0 张 · 点击查看大图\n\n这条 Bug 没有图片附件。\n\n处理进度\n待处理\n待处理\n处理中\n已完成待验收\n关闭\n修复人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n关闭人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n保存分配\n状态轨迹与处理记录\n1 条\nPoco 详情（截图时游戏上下文）\n0 组\n\n这张任务目前没有带 captureId 的 Poco 上下文；普通截图和任务处理不受影响。\n\n开始处理\n人工标记完成\n删除 Bug"
+      }
+    },
+    {
+      "at": "2026-09-09T02:23:14.994Z",
+      "kind": "screenshot",
+      "label": "04-actual-retry-real-200",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\04-actual-retry-real-200.png",
+      "sizeBytes": 147508,
+      "sha256": "d634bd92dd9ad692eead6f0c8d96272cf92c7ee2f42179568941d7624e10a4e4"
+    },
+    {
+      "at": "2026-09-09T02:23:14.996Z",
+      "label": "close confirmed detail",
+      "kind": "observed_dom",
+      "url": "http://127.0.0.1:4274/?projectId=ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+      "text": "Q\nQA Hub\n项目\nDetail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389\n预览\nCtrl K\n\n工作区\n\n工作台\n1\n总览\n全部\n组件历史\n用户管理\n2 位项目成员\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录\n\n2026年9月9日\n\n你好，Detailab51a7d83d9740e086afbf2fe77af389\n\n先完成需要你动作的 Bug，其他进度会自动留在工作台里。\n\n 新建 Bug\n已选中\n1\n待处理\n待分配、需补充或等待开始处理\n0\n处理中\n修复人正在处理\n0\n已完成待验收\n修复已完成，等待人工验收\n0\n关闭\n已验收并关闭\n人员范围\n我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM\n1 个事项\n事项\n当前动作人\n进度\n最后更新\nP3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23\nDLAB51A7D83D9740-1\nP3\n待处理\nBug 内容\nDetailab51a7d83d9740e086afbf2fe77af389 · 9/9 10:23\n编辑详情\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\n\n预期行为\n\nLoading during pending read; explicit retry after a network failure\n\n严重程度 S3\n优先级 P3\n模块 未设置\n截图与标注\n0 张 · 点击查看大图\n\n这条 Bug 没有图片附件。\n\n处理进度\n待处理\n待处理\n处理中\n已完成待验收\n关闭\n修复人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n关闭人\nDetailab51a7d83d9740e086afbf2fe77af389\nPreview GM\n保存分配\n状态轨迹与处理记录\n1 条\nPoco 详情（截图时游戏上下文）\n0 组\n\n这张任务目前没有带 captureId 的 Poco 上下文；普通截图和任务处理不受影响。\n\n开始处理\n人工标记完成\n删除 Bug",
+      "nodes": [
+        {
+          "index": 0,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detail loading fixture ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+          "label": "切换项目",
+          "placeholder": "",
+          "value": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 1,
+          "tag": "input",
+          "type": "search",
+          "text": "",
+          "label": "搜索编号、内容或人员",
+          "placeholder": "搜索编号、内容或人员",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 2,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button",
+          "inDialog": false
+        },
+        {
+          "index": 3,
+          "tag": "button",
+          "type": "button",
+          "text": "工作台\n1",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item is-active",
+          "inDialog": false
+        },
+        {
+          "index": 4,
+          "tag": "button",
+          "type": "button",
+          "text": "总览\n全部",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 5,
+          "tag": "button",
+          "type": "button",
+          "text": "组件历史",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "nav-item",
+          "inDialog": false
+        },
+        {
+          "index": 6,
+          "tag": "button",
+          "type": "button",
+          "text": "用户管理\n2 位项目成员",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "utility-card users-card",
+          "inDialog": false
+        },
+        {
+          "index": 7,
+          "tag": "button",
+          "type": "button",
+          "text": "9\nDetailab51a7d83d9740e086afbf2fe77af389\n点击退出登录",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "profile",
+          "inDialog": false
+        },
+        {
+          "index": 8,
+          "tag": "button",
+          "type": "button",
+          "text": "新建 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button",
+          "inDialog": false
+        },
+        {
+          "index": 9,
+          "tag": "button",
+          "type": "button",
+          "text": "已选中\n1\n待处理\n待分配、需补充或等待开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card is-selected",
+          "inDialog": false
+        },
+        {
+          "index": 10,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n处理中\n修复人正在处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 11,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n已完成待验收\n修复已完成，等待人工验收",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 12,
+          "tag": "button",
+          "type": "button",
+          "text": "0\n关闭\n已验收并关闭",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "summary-card",
+          "inDialog": false
+        },
+        {
+          "index": 13,
+          "tag": "select",
+          "type": "select-one",
+          "text": "我 · Detailab51a7d83d9740e086afbf2fe77af389\n整个团队\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": false
+        },
+        {
+          "index": 14,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "刷新列表",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "icon-button refresh-button",
+          "inDialog": false
+        },
+        {
+          "index": 15,
+          "tag": "button",
+          "type": "button",
+          "text": "P3\nWEB_DETAIL_LOADING_FIXTURE_ab51a7d8-3d97-40e0-86af-bf2fe77af389\nDLAB51A7D83D9740-1\n·\nDetailab51a7d83d9740e086afbf2fe77af389 修复\n·\nDetailab51a7d83d9740e086afbf2fe77af389 关闭\n9\nDetailab51a7d83d9740e086afbf2fe77af389\n修复人\n待处理\n9/9 10:23",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "table-row bug-row",
+          "inDialog": false
+        },
+        {
+          "index": 16,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "关闭详情",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-overlay-dismiss",
+          "inDialog": false
+        },
+        {
+          "index": 17,
+          "tag": "button",
+          "type": "button",
+          "text": "",
+          "label": "关闭详情",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-close",
+          "inDialog": true
+        },
+        {
+          "index": 18,
+          "tag": "button",
+          "type": "button",
+          "text": "编辑详情",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "detail-edit-trigger",
+          "inDialog": true
+        },
+        {
+          "index": 19,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detailab51a7d83d9740e086afbf2fe77af389\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 20,
+          "tag": "select",
+          "type": "select-one",
+          "text": "Detailab51a7d83d9740e086afbf2fe77af389\nPreview GM",
+          "label": "",
+          "placeholder": "",
+          "value": "4021546f-0526-44f3-81b3-8a076a557a9f",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 21,
+          "tag": "button",
+          "type": "button",
+          "text": "保存分配",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "secondary-button assignment-save",
+          "inDialog": true
+        },
+        {
+          "index": 22,
+          "tag": "summary",
+          "type": "",
+          "text": "状态轨迹与处理记录\n1 条",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 23,
+          "tag": "summary",
+          "type": "",
+          "text": "Poco 详情（截图时游戏上下文）\n0 组",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "",
+          "inDialog": true
+        },
+        {
+          "index": 24,
+          "tag": "button",
+          "type": "button",
+          "text": "开始处理",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button wide",
+          "inDialog": true
+        },
+        {
+          "index": 25,
+          "tag": "button",
+          "type": "button",
+          "text": "人工标记完成",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "primary-button wide",
+          "inDialog": true
+        },
+        {
+          "index": 26,
+          "tag": "button",
+          "type": "button",
+          "text": "删除 Bug",
+          "label": "",
+          "placeholder": "",
+          "value": "",
+          "disabled": false,
+          "classes": "danger-button",
+          "inDialog": true
+        }
+      ]
+    }
+  ],
+  "bundles": [
+    {
+      "at": "2026-09-09T02:23:13.669Z",
+      "url": "http://127.0.0.1:4274/assets/index-Br-CEXQI.js",
+      "status": 200,
+      "sizeBytes": 477433,
+      "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+    }
+  ],
+  "holds": [
+    {
+      "at": "2026-09-09T02:23:13.763Z",
+      "requestId": "interception-job-7.0",
+      "category": "login",
+      "status": 200,
+      "sha256": "f59dc1275d5b3f86dd0642c8ae4f08b61c5eab7c70477437d2770af865a03e2e",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:13.836Z",
+      "requestId": "interception-job-8.0",
+      "category": "components",
+      "status": 200,
+      "sha256": "db6615f2079ae36e6914ab175ba4af960473887253f17160f6578daa83d28c5a",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:13.838Z",
+      "requestId": "interception-job-11.0",
+      "category": "bugs",
+      "status": 200,
+      "sha256": "2e4cac9f1f5ccba4d37fd214c000042b2b3ae4be979e548abc4e7bb04c7a3532",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:13.884Z",
+      "action": "start_component_poll_isolation",
+      "maximumMs": 15000,
+      "initialFiveOffVerified": true
+    },
+    {
+      "at": "2026-09-09T02:23:13.897Z",
+      "action": "detail_request",
+      "mode": "delay",
+      "requestId": "interception-job-12.0"
+    },
+    {
+      "at": "2026-09-09T02:23:13.905Z",
+      "action": "hold_detail_real_200",
+      "requestId": "interception-job-12.0",
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "at": "2026-09-09T02:23:14.169Z",
+      "requestId": "interception-job-12.0",
+      "category": "detail",
+      "status": 200,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3",
+      "action": "release_detail_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.170Z",
+      "action": "release_detail_unmodified",
+      "requestId": "interception-job-12.0",
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "at": "2026-09-09T02:23:14.179Z",
+      "requestId": "interception-job-13.0",
+      "category": "events",
+      "status": 200,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.182Z",
+      "requestId": "interception-job-14.0",
+      "category": "attachments",
+      "status": 200,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.183Z",
+      "requestId": "interception-job-15.0",
+      "category": "detail-read",
+      "status": 200,
+      "sha256": "6fef03953ef2a8e704c54bd728487c37c472033e35f35e73d5ffef3b59a3e28b",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.184Z",
+      "requestId": "interception-job-17.0",
+      "category": "detail-read",
+      "status": 200,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.449Z",
+      "action": "detail_request",
+      "mode": "disconnect",
+      "requestId": "interception-job-18.0"
+    },
+    {
+      "at": "2026-09-09T02:23:14.449Z",
+      "action": "injected_network_failure",
+      "requestId": "interception-job-18.0",
+      "errorReason": "Failed",
+      "responseStatus": null
+    },
+    {
+      "at": "2026-09-09T02:23:14.711Z",
+      "action": "detail_request",
+      "mode": "retry",
+      "requestId": "interception-job-19.0"
+    },
+    {
+      "at": "2026-09-09T02:23:14.717Z",
+      "requestId": "interception-job-19.0",
+      "category": "detail",
+      "status": 200,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.730Z",
+      "requestId": "interception-job-20.0",
+      "category": "events",
+      "status": 200,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.734Z",
+      "requestId": "interception-job-21.0",
+      "category": "attachments",
+      "status": 200,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.735Z",
+      "requestId": "interception-job-22.0",
+      "category": "detail-read",
+      "status": 200,
+      "sha256": "6fef03953ef2a8e704c54bd728487c37c472033e35f35e73d5ffef3b59a3e28b",
+      "action": "release_real_response_unmodified"
+    },
+    {
+      "at": "2026-09-09T02:23:14.736Z",
+      "requestId": "interception-job-24.0",
+      "category": "detail-read",
+      "status": 200,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175",
+      "action": "release_real_response_unmodified"
+    }
+  ],
+  "gate": {
+    "status": "reviewed_published_Br-CEXQI",
+    "at": "2026-09-09T02:08:39.245Z",
+    "publicationProof": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-fix-publication\\e2d5cb4b-9068-4f14-9f90-d292ee4af864\\deploy.json",
+      "sha256": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63"
+    },
+    "postScope": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-fix-publication\\e2d5cb4b-9068-4f14-9f90-d292ee4af864\\post-scope.json",
+      "sha256": "08a29b138fe85562dfa2818e7190d34479f5f9b275705394cd5db4d50ee4bd72"
+    },
+    "bundleSha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae",
+    "api": {
+      "pid": 22852,
+      "startedAt": "2026-09-09T01:22:20.2728640Z"
+    },
+    "web": {
+      "pid": 20284,
+      "startedAt": "2026-09-08T17:52:36.5080910Z"
+    },
+    "scope": "One new isolated browser profile, fixture project and Bug; five components off. No existing browser, client, production or external component actions.",
+    "gatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864\\browser-gate.json",
+    "gateSha256": "93cf0483a13b02ab8ed31f3799e61f69f2c76368ec51280a6c1388f48159c56c"
+  },
+  "boundaries": {
+    "existingBrowserAttached": false,
+    "componentTasksCalled": false,
+    "syntheticSuccessfulResponses": false,
+    "appTimersChanged": false,
+    "commentsWritten": 0,
+    "attachmentsUploaded": 0,
+    "forcedStop": false,
+    "backgroundComponentPollIsolation": true,
+    "continuousAllFramesProved": false
+  },
+  "hostBefore": [
+    {
+      "port": 4419,
+      "address": "127.0.0.1",
+      "pid": 22852,
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "startedAt": "2026-09-09T01:22:20.2728640Z"
+    },
+    {
+      "port": 4274,
+      "address": "127.0.0.1",
+      "pid": 20284,
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "startedAt": "2026-09-08T17:52:36.5080910Z"
+    }
+  ],
+  "actorId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+  "bugId": "a7546808-eb74-4a3f-a85d-033e306c569a",
+  "finishedAt": "2026-09-09T02:23:17.106Z",
+  "detailPlan": {
+    "phase": "retry_confirmed",
+    "requests": [
+      {
+        "id": "interception-job-12.0",
+        "mode": "delay"
+      },
+      {
+        "id": "interception-job-18.0",
+        "mode": "disconnect"
+      },
+      {
+        "id": "interception-job-19.0",
+        "mode": "retry"
+      }
+    ],
+    "responses": [
+      "interception-job-12.0",
+      "interception-job-19.0"
+    ]
+  },
+  "unreleasedRealResponses": [],
+  "sourceSha256": "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae"
+}

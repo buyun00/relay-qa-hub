@@ -295,3 +295,15 @@ Android预览feed现已提供code23/0.2.0-preview.9，原APK SHA9cfa87eb…、35
 Windows预览latest已指向`.9`/release20260909T011704801Z，108334255字节/SHA2c50fe1b…安装器。已安装EXE通过原生应用内自更新进入`.9`（native0.2.0.9），主PID13564/start01:44:08.4163170Z并持有4420。原配置和公钥不变，旧`.8`回退目录、先前8个回退目录及安装器仍在；私有67文件冷副本只排除顶层updates，不能用作清理或覆盖原profile的依据。最终窗口仍显示原员工A的未提交文字及PNG。
 
 新EXE实际首选旧Bug显示加载后成功，无需重试；独立前后53/62项和安装产物114项通过。API22852、Web20284、server MCP15736及生产原进程/六文件在该次对照中保持。共享Web4274仍为Ce9wROrH，下一步只部署已冻结的独立8文件构建，并保留正在服务的旧目录与资源；不可在apps/web/dist直接build。所有完成声明仍限各自证据时段和入口，整体验收未完成。
+
+## 共享 Web 已切换至 Br-CEXQI
+
+上述检查点后，Web4274已实际发布bc2b347的详情加载修复，提交`d2b29c6`。新JS为`assets/index-Br-CEXQI.js`、477433字节、SHA813277e9…；新index为709字节、SHA22203c14…。Web20284/start2026-09-08T17:52:36.508091Z不变，18次GET/HEAD通过。完整旧10文件位于私有acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/old-web-dist-cold-restore；served目录现为12文件，旧资源留存。不能删除锁或pending后盲目重跑发布。
+
+API22852/schema14、server MCP15736、EXE`.9`/13564/local4420以及两条已发Windows/Android更新feed在后置检查中保持，生产六文件及原进程身份亦同。实际范围见[发布记录](web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/README.md)。此处仍不把静态Web发布计作真实浏览器加载/错误重试或回退已完成。后续工作流兼容Phase A只在本worktree和新临时fixture中实施，当前API运行实例不随源码编辑自动更新。
+
+## 共享 Web 浏览器验证后的保留状态
+
+Web详情加载与读取失败后点击重试已在新独立Edge中实际完成，run `ab51a7d8-3d97-40e0-86af-bf2fe77af389`，59/59检查通过。[执行记录](web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json)。Edge10812通过Browser.close正常退出，没有强杀；其独立profile与原始响应留在runtimeRoot/web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389。专用项目ea42522b-70d1-4a8e-a23e-6ef23a4b9696及唯一文本Bug a7546808-eb74-4a3f-a85d-033e306c569a保留，不删除验收数据。实际详情请求三次，两个成功响应、一次受控网络Failed；背景组件hold未触发，不算常态轮询时序验收。
+
+这次只观察4419/4274的既有PID及启动时间前后相同，未另作生产全盘盘点，未操作原生EXE或Android。已安装EXE与原草稿的最后直接观察仍按此前独立证据时点说明。Phase A源码与新临时schema实验继续独立进行，常驻API仍是22852/schema14；整体验收未完成。

@@ -1,0 +1,664 @@
+{
+  "schemaVersion": 1,
+  "status": "passed_with_explicit_limits",
+  "runId": "ab51a7d8-3d97-40e0-86af-bf2fe77af389",
+  "reviewedAt": "2026-09-09T02:31:46.062Z",
+  "reviewer": "/root/android_client",
+  "operator": "/root",
+  "scope": {
+    "newHttpRequests": 0,
+    "browserOrUiActions": 0,
+    "deviceActions": 0,
+    "serviceOrProcessActions": 0,
+    "liveProfileReads": 0,
+    "authenticationBodyReads": 0,
+    "originalFilesModified": 0
+  },
+  "checks": [
+    {
+      "label": "run status and exact identity",
+      "passed": true
+    },
+    {
+      "label": "profile is only referenced, within this new run",
+      "passed": true
+    },
+    {
+      "label": "all 59 declared checks independently compare equal",
+      "passed": true
+    },
+    {
+      "label": "private/public proof bytes identical",
+      "passed": true
+    },
+    {
+      "label": "run source matches frozen source",
+      "passed": true
+    },
+    {
+      "label": "private runner matches frozen source",
+      "passed": true
+    },
+    {
+      "label": "current runner remains unchanged",
+      "passed": true
+    },
+    {
+      "label": "frozen source uses original-response continuation, no fabricated success API",
+      "passed": true
+    },
+    {
+      "label": "frozen source uses normal Browser.close and no process kill",
+      "passed": true
+    },
+    {
+      "label": "exact gate SHA",
+      "passed": true
+    },
+    {
+      "label": "exact publication SHA",
+      "passed": true
+    },
+    {
+      "label": "publication was published_verified",
+      "passed": true
+    },
+    {
+      "label": "referenced publication post-scope SHA",
+      "passed": true
+    },
+    {
+      "label": "eight current asset checks match pinned publication file manifest",
+      "passed": true
+    },
+    {
+      "label": "actual browser bundle SHA and size",
+      "passed": true
+    },
+    {
+      "label": "24 distinct non-authentication raw files",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 001-ready.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 002-fresh-project.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 003-five-off.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 004-one-bug.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 005-initial-detail.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 006-initial-events.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 007-browser-components.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 008-browser-bugs.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 009-browser-detail.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 010-browser-events.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 011-browser-attachments.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 012-browser-detail-read.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 013-browser-detail-read.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 014-browser-detail.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 015-browser-events.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 016-browser-attachments.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 017-browser-detail-read.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 018-browser-detail-read.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 019-final-detail.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 020-final-events.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 021-final-list.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 022-final-comments.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 023-final-attachments.body",
+      "passed": true
+    },
+    {
+      "label": "raw bytes/hash 024-final-five-off.body",
+      "passed": true
+    },
+    {
+      "label": "ledger contains 14 direct calls, 24 browser requests and 13 captured real responses",
+      "passed": true
+    },
+    {
+      "label": "all recorded direct and intercepted response statuses are 2xx",
+      "passed": true
+    },
+    {
+      "label": "only expected direct POST operations",
+      "passed": true
+    },
+    {
+      "label": "only browser mutation is one login",
+      "passed": true
+    },
+    {
+      "label": "no refused or cancelled-after-failure records",
+      "passed": true
+    },
+    {
+      "label": "browser record-specific requests stay on this project/Bug",
+      "passed": true
+    },
+    {
+      "label": "browser login body hash matches fresh employee/project",
+      "passed": true
+    },
+    {
+      "label": "authentication raw bodies are not stored",
+      "passed": true
+    },
+    {
+      "label": "fresh project returned exact fixture id",
+      "passed": true
+    },
+    {
+      "label": "one create receipt and detail share Bug/project/actor",
+      "passed": true
+    },
+    {
+      "label": "create used expected text-only fresh intent",
+      "passed": true
+    },
+    {
+      "label": "before/after Bug DTO identical",
+      "passed": true
+    },
+    {
+      "label": "before/after event bodies identical and one same-scope event",
+      "passed": true
+    },
+    {
+      "label": "final exact one Bug and empty comments/attachments",
+      "passed": true
+    },
+    {
+      "label": "three retained component responses all five disabled and exact project",
+      "passed": true
+    },
+    {
+      "label": "three detail GETs match ordered plan",
+      "passed": true
+    },
+    {
+      "label": "two genuine detail 200 bodies match original/final bytes",
+      "passed": true
+    },
+    {
+      "label": "no successful response attributed to injected request",
+      "passed": true
+    },
+    {
+      "label": "one recorded Failed transport injection without server status",
+      "passed": true
+    },
+    {
+      "label": "duplicate first-release records describe one ID/hash",
+      "passed": true
+    },
+    {
+      "label": "pending actual DOM is loading without fabricated error",
+      "passed": true
+    },
+    {
+      "label": "pending DOM and screenshot occur while real response held",
+      "passed": true
+    },
+    {
+      "label": "first actual DOM loaded after original release",
+      "passed": true
+    },
+    {
+      "label": "catch DOM and error screenshot follow transport injection",
+      "passed": true
+    },
+    {
+      "label": "retry actual DOM loaded and error cleared after real 200",
+      "passed": true
+    },
+    {
+      "label": "four screenshot checkpoints",
+      "passed": true
+    },
+    {
+      "label": "screenshot public/private/proof hash 01-real-response-held-loading",
+      "passed": true
+    },
+    {
+      "label": "PNG dimensions 01-real-response-held-loading",
+      "passed": true
+    },
+    {
+      "label": "screenshot public/private/proof hash 02-first-real-detail-loaded",
+      "passed": true
+    },
+    {
+      "label": "PNG dimensions 02-first-real-detail-loaded",
+      "passed": true
+    },
+    {
+      "label": "screenshot public/private/proof hash 03-actual-network-catch-error",
+      "passed": true
+    },
+    {
+      "label": "PNG dimensions 03-actual-network-catch-error",
+      "passed": true
+    },
+    {
+      "label": "screenshot public/private/proof hash 04-actual-retry-real-200",
+      "passed": true
+    },
+    {
+      "label": "PNG dimensions 04-actual-retry-real-200",
+      "passed": true
+    },
+    {
+      "label": "no background replies were actually held",
+      "passed": true
+    },
+    {
+      "label": "no timeout/release error and no unreleased response",
+      "passed": true
+    },
+    {
+      "label": "recorded owned browser identity and normal exit",
+      "passed": true
+    },
+    {
+      "label": "recorded before/after API/Web process identities equal",
+      "passed": true
+    },
+    {
+      "label": "public artifact text scan has no JWT/private-key/long-Bearer literals",
+      "passed": true
+    },
+    {
+      "label": "six original public artifacts unchanged throughout audit",
+      "passed": true
+    }
+  ],
+  "originalBefore": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\proof.json",
+      "bytes": 113092,
+      "sha256": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\runner.mjs.txt",
+      "bytes": 45935,
+      "sha256": "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\01-real-response-held-loading.png",
+      "bytes": 84056,
+      "sha256": "640c46c13b08ca3deba174011f8964ee46ee5222cf571656ac30b58d51b880af"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\02-first-real-detail-loaded.png",
+      "bytes": 147701,
+      "sha256": "ed23bd6e64eb90874e998e34ff637d0090cc266388efb3ba446be4c0a3844a6e"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\03-actual-network-catch-error.png",
+      "bytes": 91006,
+      "sha256": "1b4026575598ee9364c23c075c340a50a6332ed295ddc102fc650b8b0c77e876"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\04-actual-retry-real-200.png",
+      "bytes": 147508,
+      "sha256": "d634bd92dd9ad692eead6f0c8d96272cf92c7ee2f42179568941d7624e10a4e4"
+    }
+  ],
+  "originalAfter": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\proof.json",
+      "bytes": 113092,
+      "sha256": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\runner.mjs.txt",
+      "bytes": 45935,
+      "sha256": "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\01-real-response-held-loading.png",
+      "bytes": 84056,
+      "sha256": "640c46c13b08ca3deba174011f8964ee46ee5222cf571656ac30b58d51b880af"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\02-first-real-detail-loaded.png",
+      "bytes": 147701,
+      "sha256": "ed23bd6e64eb90874e998e34ff637d0090cc266388efb3ba446be4c0a3844a6e"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\03-actual-network-catch-error.png",
+      "bytes": 91006,
+      "sha256": "1b4026575598ee9364c23c075c340a50a6332ed295ddc102fc650b8b0c77e876"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\04-actual-retry-real-200.png",
+      "bytes": 147508,
+      "sha256": "d634bd92dd9ad692eead6f0c8d96272cf92c7ee2f42179568941d7624e10a4e4"
+    }
+  ],
+  "rawReferences": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\001-ready.body",
+      "bytes": 150,
+      "sha256": "6123e6745e0b1df0e9abf61e40e45454da7479fd6209ec7d37f24862368a6911"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\002-fresh-project.body",
+      "bytes": 165,
+      "sha256": "d6b111384a52a2a1ba665dc8e90129572fd91c8248ca193f391cc86f41055ba4"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\003-five-off.body",
+      "bytes": 813,
+      "sha256": "db6615f2079ae36e6914ab175ba4af960473887253f17160f6578daa83d28c5a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\004-one-bug.body",
+      "bytes": 1121,
+      "sha256": "70e235b0a8857632c7e364af29fbd8633ddd149ff362d69d1a6b5138718b224b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\005-initial-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\006-initial-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\007-browser-components.body",
+      "bytes": 813,
+      "sha256": "db6615f2079ae36e6914ab175ba4af960473887253f17160f6578daa83d28c5a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\008-browser-bugs.body",
+      "bytes": 825,
+      "sha256": "2e4cac9f1f5ccba4d37fd214c000042b2b3ae4be979e548abc4e7bb04c7a3532"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\009-browser-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\010-browser-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\011-browser-attachments.body",
+      "bytes": 151,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\012-browser-detail-read.body",
+      "bytes": 152,
+      "sha256": "6fef03953ef2a8e704c54bd728487c37c472033e35f35e73d5ffef3b59a3e28b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\013-browser-detail-read.body",
+      "bytes": 128,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\014-browser-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\015-browser-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\016-browser-attachments.body",
+      "bytes": 151,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\017-browser-detail-read.body",
+      "bytes": 152,
+      "sha256": "6fef03953ef2a8e704c54bd728487c37c472033e35f35e73d5ffef3b59a3e28b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\018-browser-detail-read.body",
+      "bytes": 128,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\019-final-detail.body",
+      "bytes": 772,
+      "sha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\020-final-events.body",
+      "bytes": 648,
+      "sha256": "fe07f2e81762b4d5d6aaae729fe14f3ea69e8cb3e47f5c78612db7d2cc14de7a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\021-final-list.body",
+      "bytes": 825,
+      "sha256": "2e4cac9f1f5ccba4d37fd214c000042b2b3ae4be979e548abc4e7bb04c7a3532"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\022-final-comments.body",
+      "bytes": 128,
+      "sha256": "b4ec6107b169eeda14764500480447bd598cbcba8393e2156e3349250d950175"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\023-final-attachments.body",
+      "bytes": 151,
+      "sha256": "8a7b52e2b5d1d23ed1406acbc8128d4b8fb3bde889e77d8599266db67419ff09"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\raw\\024-final-five-off.body",
+      "bytes": 813,
+      "sha256": "db6615f2079ae36e6914ab175ba4af960473887253f17160f6578daa83d28c5a"
+    }
+  ],
+  "screenshotRefs": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\01-real-response-held-loading.png",
+      "bytes": 84056,
+      "sha256": "640c46c13b08ca3deba174011f8964ee46ee5222cf571656ac30b58d51b880af",
+      "privatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\01-real-response-held-loading.png",
+      "width": 1440,
+      "height": 1100
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\02-first-real-detail-loaded.png",
+      "bytes": 147701,
+      "sha256": "ed23bd6e64eb90874e998e34ff637d0090cc266388efb3ba446be4c0a3844a6e",
+      "privatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\02-first-real-detail-loaded.png",
+      "width": 1440,
+      "height": 1100
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\03-actual-network-catch-error.png",
+      "bytes": 91006,
+      "sha256": "1b4026575598ee9364c23c075c340a50a6332ed295ddc102fc650b8b0c77e876",
+      "privatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\03-actual-network-catch-error.png",
+      "width": 1440,
+      "height": 1100
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\04-actual-retry-real-200.png",
+      "bytes": 147508,
+      "sha256": "d634bd92dd9ad692eead6f0c8d96272cf92c7ee2f42179568941d7624e10a4e4",
+      "privatePath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-detail-loading-ab51a7d8-3d97-40e0-86af-bf2fe77af389\\04-actual-retry-real-200.png",
+      "width": 1440,
+      "height": 1100
+    }
+  ],
+  "gateRef": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864\\browser-gate.json",
+    "bytes": 1084,
+    "sha256": "93cf0483a13b02ab8ed31f3799e61f69f2c76368ec51280a6c1388f48159c56c"
+  },
+  "publicationRef": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-fix-publication\\e2d5cb4b-9068-4f14-9f90-d292ee4af864\\deploy.json",
+    "bytes": 40539,
+    "sha256": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63"
+  },
+  "postScopeRef": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-fix-publication\\e2d5cb4b-9068-4f14-9f90-d292ee4af864\\post-scope.json",
+    "bytes": 7407,
+    "sha256": "08a29b138fe85562dfa2818e7190d34479f5f9b275705394cd5db4d50ee4bd72"
+  },
+  "sourceRef": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\artifact-review.mjs",
+    "bytes": 25009,
+    "sha256": "dbfa98b58346f20c594116302f7422af3426b5f70b50ad2d25bb5d7e670b01d5"
+  },
+  "publicTextScan": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\proof.json",
+      "sha256": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
+      "jwt": 0,
+      "privateKey": 0,
+      "literalBearer": 0
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\runner.mjs.txt",
+      "sha256": "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae",
+      "jwt": 0,
+      "privateKey": 0,
+      "literalBearer": 0
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\artifact-review.mjs",
+      "sha256": "dbfa98b58346f20c594116302f7422af3426b5f70b50ad2d25bb5d7e670b01d5",
+      "jwt": 0,
+      "privateKey": 0,
+      "literalBearer": 0
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\web-detail-loading-live\\ab51a7d8-3d97-40e0-86af-bf2fe77af389\\README.md",
+      "sha256": "ab9ec1fc9037166bb3f01da7ec80efddaa2955b19a8ef4782aa1b1b321d79870",
+      "jwt": 0,
+      "privateKey": 0,
+      "literalBearer": 0
+    }
+  ],
+  "facts": {
+    "projectId": "ea42522b-70d1-4a8e-a23e-6ef23a4b9696",
+    "actorId": "4021546f-0526-44f3-81b3-8a076a557a9f",
+    "bugId": "a7546808-eb74-4a3f-a85d-033e306c569a",
+    "totalRunMs": 6008,
+    "directApiCalls": 14,
+    "browserRequestRecords": 24,
+    "interceptedRealResponseRecords": 13,
+    "recordedRequestLedgerRows": 51,
+    "originalRunChecks": 59,
+    "actualDetailGets": 3,
+    "genuineDetail200s": 2,
+    "firstResponseHeldMs": 264,
+    "backgroundRepliesHeld": 0,
+    "componentIsolationUpperBoundMs": 1124,
+    "componentIsolationUpperBoundBasis": "First final read follows releaseBackground in pinned source; no explicit end timestamp is persisted.",
+    "detailResponseSha256": "0a381fdba0d20cd0618cbf2d79da40e24671046f7d7df79955ce278904bfa2b3",
+    "firstDetailReleaseRecords": 2,
+    "firstDetailContinuationCallsFromPinnedSource": 1,
+    "initialAndFinalEventCount": 1,
+    "finalBugCount": 1,
+    "commentCount": 0,
+    "attachmentCount": 0,
+    "recordedBrowserPid": 10812,
+    "recordedNormalBrowserExit": true
+  },
+  "visualInspection": [
+    {
+      "file": "01-real-response-held-loading.png",
+      "observed": "Centered loading message and close control; no failure panel in this captured frame."
+    },
+    {
+      "file": "02-first-real-detail-loaded.png",
+      "observed": "Fixture DLAB51A7D83D9740-1 with expected text, P3/pending state, zero images and one history entry; detail rendered without error panel."
+    },
+    {
+      "file": "03-actual-network-catch-error.png",
+      "observed": "Bug detail read failure, Failed to fetch, and visible Retry control; no loaded detail content."
+    },
+    {
+      "file": "04-actual-retry-real-200.png",
+      "observed": "Same fixture content/state visible after Retry, zero images and one history entry; error panel cleared."
+    }
+  ],
+  "limitations": [
+    "Independent audit of retained bytes and four screenshots, not a second live browser/API run or an independent packet capture.",
+    "Browser request logs omit query/header values; exact query/project enforcement is attributable to the byte-pinned executed source. Some page GET response statuses are not captured by the configured response patterns.",
+    "Second detail failure was injected by CDP before a server reply; it does not prove an actual API outage or a server error response.",
+    "The isolation window was armed, but no subsequent component reply arrived to be held. Background hold release and 15-second expiry were not exercised live.",
+    "The first held reply has two release log entries from the ledger and flow recorder; pinned source issues one actual continuation. No raw CDP command transcript is retained.",
+    "Normal close and empty owned debug port are checks in pinned source; this review did not query current processes/ports, enumerate all browser children, or inspect a live profile.",
+    "Eight current entry assets matched the publication manifest; the publication retained additional old hashed bundles. This is not a claim that the entire served directory contains only eight files.",
+    "Four captured states do not prove all intermediate frames or every polling/fault timing. No image/comment mutations, multi-project races, component execution, or existing client drafts were tested here.",
+    "Authentication response hashes cannot be recomputed from raw bodies because those bodies were deliberately not persisted; no credentials were read for this audit."
+  ]
+}

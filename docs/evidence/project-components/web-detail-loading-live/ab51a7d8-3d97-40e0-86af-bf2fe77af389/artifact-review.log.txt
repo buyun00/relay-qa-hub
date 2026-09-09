@@ -1,0 +1,1 @@
+{"status":"passed_with_explicit_limits","checks":80,"failed":[],"originalProofSha256":"a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab","reviewSha256":"f649d95dcb24547a05b370d95f72523edc3dd28caf0cdf755d9247abb81f392a","sourceSha256":"dbfa98b58346f20c594116302f7422af3426b5f70b50ad2d25bb5d7e670b01d5","rawReferences":24,"screenshotCount":4}
