@@ -2401,12 +2401,12 @@ export default function App({
                 >
                   <AppIcon name="close" />
                 </button>
-                {detailLoading ? (
+                {detailLoading || detailError === null ? (
                   <span>正在读取 Bug 详情…</span>
                 ) : (
                   <div className="detail-load-error" role="alert">
                     <strong>Bug 详情读取失败</strong>
-                    <p>{detailError ?? "无法连接统一后端。"}</p>
+                    <p>{detailError}</p>
                     <button
                       className="primary-button"
                       onClick={() => void loadDetail(selectedId)}

@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "status": "source_fixed_and_verified_not_built_or_published",
+  "recordedAt": "2026-09-09T01:01:03.761Z",
+  "baseline": {
+    "repositoryHead": "3b16486251a24a84c5a1861ac67c439f0ac93b33",
+    "appSha256": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
+    "nativeVersion": "0.2.0-preview.8"
+  },
+  "cause": {
+    "resetSource": "apps/web/src/App.tsx:1038",
+    "openSource": "apps/web/src/App.tsx:1068",
+    "effectSource": "apps/web/src/App.tsx:1228",
+    "branchSource": "apps/web/src/App.tsx:2404",
+    "tuple": {
+      "selectedId": "non-null",
+      "detail": null,
+      "detailLoading": false,
+      "detailError": null
+    },
+    "observed": true,
+    "explanation": "Opening a new record or restoring selectedId can commit an empty detail before useEffect starts loadDetail. The old branch rendered a backend failure although no detail error existed.",
+    "deterministicReproduction": "Real App renderToStaticMarkup with restored selectedId failed the loading assertion before the two-line patch and passed afterward."
+  },
+  "implementation": {
+    "productLinesChanged": 2,
+    "errorRequiresExplicitDetailError": true,
+    "pendingWithoutErrorRendersLoading": true,
+    "requestFlowUnchanged": true,
+    "permissionsUnchanged": true,
+    "retryCallbackUnchanged": true
+  },
+  "sources": [
+    {
+      "path": "apps/web/src/App.tsx",
+      "sha256": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528"
+    },
+    {
+      "path": "apps/web/src/App.detail-loading.test.tsx",
+      "sha256": "cbf34823486a8eaaf7f32bf6cc42d247a71557d5206a796aece0872c20a19590"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "9294cf61d4ec0c4356b862134e7618b26e301d47de9397213ad7f69e27d8f3db"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "cb52af4bdd80cc30f428aff5869b7356359d43d1952ac79f095431a5a1e000e8"
+    }
+  ],
+  "tests": {
+    "framework": "React 19.2.8 + matching react-test-renderer 19.2.8; @types/react-test-renderer 19.1.0 dev-only",
+    "realAppMounted": true,
+    "hookStateNotMocked": true,
+    "transportResponsesDeferredAndMocked": true,
+    "unexpectedFetchCalls": 0,
+    "newCases": [
+      {
+        "line": 196,
+        "case": "Restored selectedId renders loading before effects; no fabricated error/retry button."
+      },
+      {
+        "line": 214,
+        "case": "Native-style App row onClick with pending getBug; Profiler observes every commit with no detail error, then a resolved response renders normal detail."
+      },
+      {
+        "line": 233,
+        "case": "Real App async catch renders the original Error message and retry button; clicking retries same Bug, pending clears error, successful response renders normal detail."
+      }
+    ],
+    "fullSuite": {
+      "files": 17,
+      "passed": 102,
+      "failed": 0
+    },
+    "typecheck": true,
+    "lint": true,
+    "format": true
+  },
+  "logs": [
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-before-fix.txt",
+      "sha256": "a4dd268e2dad0c41843206c11e2fed79670484a61370cab8c930d1bf13b55e4d"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-before-fix-r2.txt",
+      "sha256": "530a3dbdd925cc92e0489b9fe96a3b5adbeaf7e90d56896acecd4b0cdc3d4cfa"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-first-render-fixed.txt",
+      "sha256": "e804c6c824c128655c1c31d98b939d82a5c83adfe22f202eea9a067fe23149b2"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-async-first.txt",
+      "sha256": "4c358fa08d02cb8571064fdd7bb0d2626e5e2d04baba70273bbf1bd9228cfbf5"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-full-tests.txt",
+      "sha256": "9dc0bf9eb0c77a4a579e32203ce45093bdc71f8ce0cc75f2fbd0deb1f5080d14"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-typecheck.txt",
+      "sha256": "176d10f9e2779d0b4b4175338a00e2c15a137066131f69ea95f39b84d7d99056"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-lint.txt",
+      "sha256": "2abb4f506663b031f59e4c31172f397735c8688a6b1a1d7e3ba3ee70d19ce64c"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-final-tests.txt",
+      "sha256": "04f44737191de9bac27f3257534a4f423057bc025d01106fc9d2ad375048c04b"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-final-typecheck.txt",
+      "sha256": "176d10f9e2779d0b4b4175338a00e2c15a137066131f69ea95f39b84d7d99056"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-final-lint.txt",
+      "sha256": "1df4f2ad06ee10942f369ace6687baca3efc0a2eb166e94b1feee7592ed1c074"
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-format.txt",
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    }
+  ],
+  "failuresRetained": [
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-before-fix.txt",
+      "kind": "test harness startup",
+      "reason": "First invocation omitted mandatory explicit preview API target. No test ran. Retry supplied a disposable unreachable target; test transport rejects any unexpected network call."
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-before-fix-r2.txt",
+      "kind": "expected product regression before fix",
+      "reason": "Real App selected initial render displayed fabricated failure instead of loading."
+    },
+    {
+      "path": "docs/evidence/project-components/runs/web-detail-loading-lint.txt",
+      "kind": "new test lint",
+      "reason": "Non-null assertion rejected; replaced by explicit renderer mount guard and reran final suite/type/lint/format."
+    }
+  ],
+  "nativeInputReferences": [
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/after-old-bug-first-failure.json",
+      "sha256": "584cb8bc913b9fce1027ae7e6a27945b543b26d926f83b2ec0281c8bd6ca1e06"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/after-old-bug-first-failure-0.png",
+      "sha256": "6ae3a1ef2e10f8b9625f45e7f2974a1493d7bcebcc1a84ec77808f03a9e4199d"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/after-old-bug-observed-again.json",
+      "sha256": "dc87306908c00fa5c0d7b7ca40d1fe0cc0780b95d2d21164629df30fddd85d17"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/after-old-bug-observed-again-0.png",
+      "sha256": "ccde8c9e19e35d43c73b5fca1c55960347748b9afaaef2c734f89fa6738d3e2d"
+    }
+  ],
+  "historicalDist": [
+    {
+      "path": "apps/web/dist/index.html",
+      "expectedSha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5",
+      "currentSha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/dist/assets/index-Ce9wROrH.js",
+      "expectedSha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d",
+      "currentSha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d",
+      "unchanged": true
+    }
+  ],
+  "boundaries": {
+    "webDistBuilt": false,
+    "webPublished": false,
+    "desktopBuilt": false,
+    "desktopInstalled": false,
+    "apiOrStorageChanged": false,
+    "matrixChanged": false,
+    "deviceActions": 0,
+    "realFixedNativeUiVerification": false,
+    "old99AndWeb101And81AndExe8EvidenceRemainHistorical": true
+  },
+  "limitations": [
+    "This fixes and locally tests the shared Web source; the already installed preview.8 still contains its original bundle and can still show the old transient error.",
+    "The native screenshots show an initial error followed by normal detail without manual retry; the deterministic component regression establishes the matching state-path defect, not a network trace of the original frame.",
+    "Async tests mount real App/hooks/effects and row/retry callbacks, but API transport and unrelated persistence/icons are mocked; this is not a deployed UI or real HTTP test."
+  ]
+}

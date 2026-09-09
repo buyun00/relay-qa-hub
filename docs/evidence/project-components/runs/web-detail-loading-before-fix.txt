@@ -1,0 +1,14 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Startup Error ⎯⎯⎯⎯⎯⎯⎯⎯
+Error: QA_HUB_API_BASE_URL is required for the preview development server
+    at BasicMinimalPluginContext.configureServer (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/web/node_modules/.vite-temp/vite.config.ts.timestamp-1788915092623-05838372695328.mjs:25:29)
+    at _createServer (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/node_modules/vite/dist/node/chunks/node.js:26631:95)
+    at createViteServer (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:8902:17)
+    at createVitest (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14288:18)
+    at prepareVitest (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14655:14)
+    at startVitest (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14598:14)
+    at start (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/node_modules/vitest/dist/chunks/cac.uFydS1Z4.js:2340:15)
+    at CAC.run (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/node_modules/vitest/dist/chunks/cac.uFydS1Z4.js:2318:2)
+
+
+

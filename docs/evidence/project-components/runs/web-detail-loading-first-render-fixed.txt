@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/web
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  08:52:06
+   Duration  1.17s (transform 479ms, setup 0ms, import 971ms, tests 24ms, environment 0ms)
+

@@ -1,0 +1,2 @@
+npm notice run @relay-qa-hub/web@3.3.5 lint
+npm notice run eslint . --max-warnings=0

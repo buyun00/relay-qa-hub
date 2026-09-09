@@ -1,0 +1,2 @@
+npm notice run @relay-qa-hub/web@3.3.5 typecheck
+npm notice run tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit
