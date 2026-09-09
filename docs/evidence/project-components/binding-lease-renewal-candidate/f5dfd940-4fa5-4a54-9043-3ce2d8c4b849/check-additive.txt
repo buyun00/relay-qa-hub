@@ -1,0 +1,1 @@
+Additive compatibility passed: all 35 version 1.0.0 operations are byte-shape equivalent after declared media/security/parameter overlays; 19 operations are new in 1.1.0.

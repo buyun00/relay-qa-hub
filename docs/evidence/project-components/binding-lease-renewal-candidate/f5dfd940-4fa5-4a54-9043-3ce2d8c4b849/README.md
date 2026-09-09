@@ -1,0 +1,9 @@
+# Mobile attachment binding lease renewal candidate
+
+Run `f5dfd940-4fa5-4a54-9043-3ce2d8c4b849` validates the frozen v1.1 binding-renewal rule against an isolated schema-19 SQLite fixture and the HTTP adapter. A reservation now renews only after its prior unclaimed lease expires, with the same binding, attachment, submission, client attachment, intent, target Bug and actor. The requested generation must be exactly one higher and `expectedVersion` must equal the current aggregate version. The response advances that aggregate version once. Exact same-generation retries remain read-only replays; early, stale, skipped-generation, tuple-changing, claimed and released attempts fail.
+
+The storage fixture replaces SQLite's clock only inside the isolated test connection so it can cross the real 15-minute lease boundary without sleeping. Production connections keep `trusted_schema` disabled and use SQLite's own clock guards. The test verifies both database transition triggers: reserved to expired, then the same row back to reserved with a new expiry. It also proves rollback leaves every table unchanged for rejected requests and that a claimed binding never reopens.
+
+The complete storage run passed 124 tests, skipped the pre-existing retained Phase-B archive fixture once, and failed none. The API JavaScript run passed 248 tests; the TypeScript run passed 47. The five frozen contract checks, build/typecheck, ESLint and final Prettier check passed. [`source.diff`](source.diff) binds the exact four changed files to this run.
+
+[`harness-notes.md`](harness-notes.md) retains setup and formatting mistakes separately from product outcomes. This candidate has not yet been installed into the running schema-19 preview process, so a later fresh runtime HTTP test must verify the compiled storage path before release.

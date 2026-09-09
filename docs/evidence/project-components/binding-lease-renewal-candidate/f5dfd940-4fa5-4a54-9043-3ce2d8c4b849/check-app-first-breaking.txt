@@ -1,0 +1,1 @@
+Breaking-change check passed: 13 versioned files match contract 1.1.0; base 1.0.0 remains separate.

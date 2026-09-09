@@ -954,6 +954,8 @@ test("Android attachment upload follows the frozen init, chunk, finalize, bind w
   const chunkKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:upload:1:chunk:0`;
   const finalizeKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:upload:1:finalize`;
   const bindKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:bind:1`;
+  const renewKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:bind:2`;
+  let bindCalls = 0;
   const store = {
     async initUpload(command) {
       assert.equal(command.actorId, actorId);
@@ -1014,9 +1016,11 @@ test("Android attachment upload follows the frozen init, chunk, finalize, bind w
       };
     },
     async bindAttachment(command) {
-      assert.equal(command.idempotencyKey, bindKey);
+      bindCalls += 1;
+      assert.equal(command.idempotencyKey, bindCalls === 1 ? bindKey : renewKey);
       assert.equal(command.attachmentId, attachmentId);
-      assert.equal(command.request.expectedVersion, 3);
+      assert.equal(command.request.expectedVersion, bindCalls === 1 ? 3 : 4);
+      assert.equal(command.request.leaseGeneration, bindCalls);
       assert.equal(command.request.intent, "bug_create");
       assert.equal(command.request.targetQaItemId, undefined);
       return {
@@ -1025,12 +1029,12 @@ test("Android attachment upload follows the frozen init, chunk, finalize, bind w
         projectId,
         clientSubmissionId,
         clientAttachmentId,
-        leaseGeneration: 1,
+        leaseGeneration: bindCalls,
         intent: "bug_create",
         targetQaItemId: null,
         status: "reserved",
-        expiresAt: "2026-08-25T10:00:00.000Z",
-        version: 4,
+        expiresAt: bindCalls === 1 ? "2026-08-25T10:00:00.000Z" : "2026-08-25T10:15:00.000Z",
+        version: 3 + bindCalls,
         replayed: false,
       };
     },
@@ -1150,6 +1154,33 @@ test("Android attachment upload follows the frozen init, chunk, finalize, bind w
     version: 4,
     replayed: false,
   });
+
+  const renewed = await app.inject({
+    method: "POST",
+    url: MOBILE_ATTACHMENT_BIND_PATH.replace(":attachmentId", attachmentId),
+    headers: {
+      ...authHeaders,
+      "content-type": MOBILE_API_MEDIA_TYPE,
+      "idempotency-key": renewKey,
+    },
+    payload: JSON.stringify({
+      submissionContractVersion: "1.1.0",
+      expectedVersion: 4,
+      projectId,
+      clientSubmissionId,
+      clientAttachmentId,
+      leaseGeneration: 2,
+      intent: "bug_create",
+    }),
+  });
+  assert.equal(renewed.statusCode, 200);
+  assert.deepEqual(renewed.json(), {
+    ...bound.json(),
+    leaseGeneration: 2,
+    expiresAt: "2026-08-25T10:15:00.000Z",
+    version: 5,
+  });
+  assert.equal(bindCalls, 2);
 });
 
 test("server defaults to loopback and supports graceful stop plus restart", async () => {

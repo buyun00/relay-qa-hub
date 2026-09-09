@@ -1,0 +1,1 @@
+Breaking-change check passed: 24 frozen contract and semantic files match version 1.0.0.

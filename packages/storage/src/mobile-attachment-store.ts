@@ -903,7 +903,7 @@ export function bindMobileAttachment(
   }
   const existing = database
     .prepare(
-      `SELECT id, lease_generation, intent, target_bug_id, state, expires_at
+      `SELECT id, lease_generation, intent, target_bug_id, state, expires_at, version
        FROM attachment_bindings
        WHERE account_id = ? AND project_id = ? AND attachment_id = ?
        ORDER BY lease_generation DESC LIMIT 1`,
@@ -916,20 +916,104 @@ export function bindMobileAttachment(
         readonly target_bug_id: string | null;
         readonly state: string;
         readonly expires_at: string | null;
+        readonly version: number;
       }
     | undefined;
   if (existing) {
-    if (
-      existing.lease_generation !== input.leaseGeneration ||
-      existing.intent !== input.intent ||
-      existing.target_bug_id !== targetBugId ||
-      existing.state !== "reserved" ||
-      existing.expires_at === null
-    ) {
+    if (existing.intent !== input.intent || existing.target_bug_id !== targetBugId) {
       throw new SqliteStorageError(
         "SQLITE_IDEMPOTENCY_MISMATCH",
         "attachment reservation conflicts with its committed identity",
       );
+    }
+    if (existing.lease_generation === input.leaseGeneration) {
+      if (existing.state !== "reserved" || existing.expires_at === null) {
+        throw new SqliteStorageError(
+          "SQLITE_IDEMPOTENCY_MISMATCH",
+          "attachment reservation conflicts with its committed identity",
+        );
+      }
+      return Object.freeze({
+        bindingId: existing.id,
+        attachmentId: attachment.id,
+        projectId: attachment.project_id,
+        clientSubmissionId: attachment.client_submission_id,
+        clientAttachmentId: attachment.client_attachment_id,
+        leaseGeneration: existing.lease_generation,
+        intent: input.intent,
+        targetQaItemId: targetBugId,
+        status: "reserved",
+        expiresAt: existing.expires_at,
+        version: finalizedUpload.version + existing.lease_generation,
+        replayed: true,
+      });
+    }
+    const expectedCurrentVersion = finalizedUpload.version + existing.lease_generation;
+    if (
+      input.leaseGeneration !== existing.lease_generation + 1 ||
+      input.expectedVersion !== expectedCurrentVersion
+    ) {
+      throw new SqliteStorageError("SQLITE_UPLOAD_VERSION_CONFLICT", "attachment version conflict");
+    }
+    if (existing.state === "reserved") {
+      const expiresAtMs = Date.parse(existing.expires_at ?? "");
+      const boundAtMs = Date.parse(input.boundAt);
+      if (!Number.isFinite(expiresAtMs) || !Number.isFinite(boundAtMs) || boundAtMs < expiresAtMs) {
+        throw new SqliteStorageError(
+          "SQLITE_UPLOAD_VERSION_CONFLICT",
+          "attachment reservation has not expired",
+        );
+      }
+      const expired = database
+        .prepare(
+          `UPDATE attachment_bindings
+           SET state = 'expired', expires_at = NULL, version = version + 1
+           WHERE account_id = ? AND project_id = ? AND id = ?
+             AND attachment_id = ? AND lease_generation = ?
+             AND state = 'reserved' AND expires_at = ? AND version = ?`,
+        )
+        .run(
+          input.accountId,
+          input.projectId,
+          existing.id,
+          attachment.id,
+          existing.lease_generation,
+          existing.expires_at,
+          existing.version,
+        );
+      if (expired.changes !== 1) {
+        throw new SqliteStorageError(
+          "SQLITE_UPLOAD_VERSION_CONFLICT",
+          "attachment version conflict",
+        );
+      }
+    } else if (existing.state !== "expired") {
+      throw new SqliteStorageError(
+        "SQLITE_IDEMPOTENCY_MISMATCH",
+        "claimed or released attachment reservations cannot be renewed",
+      );
+    }
+    const expiresAt = addMilliseconds(input.boundAt, MOBILE_BINDING_TTL_MS);
+    const renewed = database
+      .prepare(
+        `UPDATE attachment_bindings
+         SET lease_generation = ?, state = 'reserved', expires_at = ?,
+             claimed_at = NULL, bound_at = ?, version = version + 1
+         WHERE account_id = ? AND project_id = ? AND id = ?
+           AND attachment_id = ? AND lease_generation = ? AND state = 'expired'`,
+      )
+      .run(
+        input.leaseGeneration,
+        expiresAt,
+        input.boundAt,
+        input.accountId,
+        input.projectId,
+        existing.id,
+        attachment.id,
+        existing.lease_generation,
+      );
+    if (renewed.changes !== 1) {
+      throw new SqliteStorageError("SQLITE_UPLOAD_VERSION_CONFLICT", "attachment version conflict");
     }
     return Object.freeze({
       bindingId: existing.id,
@@ -937,13 +1021,13 @@ export function bindMobileAttachment(
       projectId: attachment.project_id,
       clientSubmissionId: attachment.client_submission_id,
       clientAttachmentId: attachment.client_attachment_id,
-      leaseGeneration: existing.lease_generation,
+      leaseGeneration: input.leaseGeneration,
       intent: input.intent,
       targetQaItemId: targetBugId,
       status: "reserved",
-      expiresAt: existing.expires_at,
-      version: finalizedUpload.version + existing.lease_generation,
-      replayed: true,
+      expiresAt,
+      version: input.expectedVersion + 1,
+      replayed: false,
     });
   }
   if (input.leaseGeneration !== 1 || finalizedUpload.version !== input.expectedVersion) {

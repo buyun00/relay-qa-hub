@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "runId": "f5dfd940-4fa5-4a54-9043-3ce2d8c4b849",
+  "status": "passed_candidate_not_deployed",
+  "sourceHead": "095a3496d95f1744904f380e5633b5226a0a5798",
+  "source": [
+    {
+      "path": "packages/storage/src/mobile-attachment-store.ts",
+      "bytes": 51228,
+      "sha256": "48ca6a6b74ccceebba70fed638245187f55f18717357b41fde8aa5fb20e5c623"
+    },
+    {
+      "path": "packages/storage/test/mobile-attachment-binding.test.ts",
+      "bytes": 5216,
+      "sha256": "77bbf2ae427283e3f95b8e4206c143b7eacb6530e6fe98a031ce452699b7fc70"
+    },
+    {
+      "path": "packages/storage/package.json",
+      "bytes": 1225,
+      "sha256": "1d50847f0dce8f222b33fb78612b593cb788691d21923b349a5e4c5405c299fa"
+    },
+    {
+      "path": "apps/api/test/api.test.mjs",
+      "bytes": 42334,
+      "sha256": "3f70699616afa8a391557313da149d079e67cb3fee71e84bf031820aa0081e38"
+    }
+  ],
+  "behavior": {
+    "sameBindingIdAndTuple": true,
+    "generationMustAdvanceExactlyOne": true,
+    "renewalRequiresExpiredUnclaimedLease": true,
+    "expectedAggregateVersionRequired": true,
+    "responseAggregateVersionAdvancesOne": true,
+    "exactReplayReadOnly": true,
+    "claimedBindingNeverReopens": true,
+    "rejectedTransactionsUnchanged": true
+  },
+  "checks": {
+    "storageBuild": { "exitCode": 0 },
+    "storage": { "passed": 124, "failed": 0, "skipped": 1, "total": 125 },
+    "apiBuild": { "exitCode": 0 },
+    "apiJavaScript": { "passed": 248, "failed": 0, "skipped": 0, "total": 248 },
+    "apiTypeScript": { "passed": 47, "failed": 0, "skipped": 0, "total": 47 },
+    "storageTypecheck": { "exitCode": 0 },
+    "eslint": { "exitCode": 0 },
+    "prettier": { "exitCode": 0 },
+    "frozenContractChecks": { "passed": 5, "total": 5 },
+    "credentialPatternMatches": 0
+  },
+  "artifacts": {
+    "sourceDiffSha256": "0cce1ac97960410bfa504d6343b5a31b2ceb708cbc84f182dbdd814d1706aa9c",
+    "storageTestsSha256": "2b3756e5d839bf057f168fb1445e2a6f06860c2f20a2f6478abcefa45cae8c19",
+    "apiJavaScriptAfterFormatSha256": "13e57ac45add7767d5af598a2c6b425e8916e80bf7434a82a78e5acb6af07760",
+    "apiTypeScriptSha256": "fcfcb22bd78aec97db4d3e4966cf649eb9343ce2219cbdab4bf9e58c969b0759",
+    "finalFormatSha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+  },
+  "boundaries": {
+    "isolatedFixturesOnly": true,
+    "runningPreviewTouched": false,
+    "productionTouched": false,
+    "externalRequests": 0,
+    "filesDeleted": 0
+  },
+  "limitation": "The new compiled storage implementation has not yet been exercised through a newly started real HTTP preview process."
+}

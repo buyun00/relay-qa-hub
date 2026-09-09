@@ -1,0 +1,1 @@
+App-first contract check passed: 9 frozen base schemas + 1 versioned schema, 51 payload scenarios, 12 inherited + 133 new behavior scenarios, 35 base + 19 new OpenAPI operations, 26 error codes.

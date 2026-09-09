@@ -1,0 +1,6 @@
+# Retained harness corrections
+
+- The first three validation commands used `npm`/`npx`, which are not on this tool shell's PATH. They did not launch product code. The same checks were run through the configured Node executable and local package entry points.
+- The first all-TypeScript API invocation ran from the repository root. Six uploader-host fixtures then resolved their relative vendor executable outside `apps/desktop` and reported `UPLOADER_MISSING`; 41 unrelated tests passed. Re-running the identical files from `apps/api`, which is the package script's working directory, passed 47/47.
+- The first final format check found only `apps/api/test/api.test.mjs` unformatted. [`format-check-initial.txt`](format-check-initial.txt) retains that result. Prettier changed the test formatting, the final format check passed, and all 248 JavaScript API tests were rerun afterward.
+- While developing the fake-clock test, the first attempt used an application-defined `unixepoch` function while the isolated connection still had `trusted_schema` disabled; SQLite correctly rejected trigger use. The fixture now enables it only after replacing the clock and states why. A subsequent assertion compared SQLite's null-prototype row directly to a plain object; normalizing the row fixed the assertion. Neither attempt touched a running service or non-fixture database.
