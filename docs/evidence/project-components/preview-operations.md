@@ -281,3 +281,17 @@ EXE现已由应用内更新完成`.7`→`.8`（native0.2.0.8，release20260909T0
 共享Web坏媒体显式换稿81/81真实验收已提交`31eca88`，其fixture/profile/旧坏图及失败journal均保留。Android route/context修复`0a00ae2`已过246/246，但本检查点API4419仍PID10036、尚未部署或发布Android feed。后续先在无业务写入窗口完成一致SQLite+引用附件archive、quarantine及实际上传表/配置/PID对照，再只用manager显式`-Services api`操作该实例。
 
 Web详情加载修复`bc2b347`已过102/102，尚未出现在正式4274或已安装`.8`。4274直接服务apps/web/dist；下一包必须先构建到独立runtime web-dist，不能因打包而隐式替换正在服务的目录。当前旧Web包及所有证据继续保留，新构建、发布、原生`.9`验收分别记录；旧生产服务和日常客户端不操作。
+
+## 预览API更新完成后的运行状态
+
+API-only部署已实际完成并提交`947664b`，当前4419为PID22852/start2026-09-09T01:22:20.2728640Z，ready/schema14；旧10036经manager精确停止后另证CIM不存在、4419无监听。保全与前后对照通过，70表、全部附件/quarantine和其他入口/生产身份配置不变。[完整范围](android-update-deployment-retention/7a94eb90-63a2-4841-afa5-318612eb06ce/README.md)。私有38文件恢复点及旧API源码ZIP保留，后者只是重建输入。
+
+EXE当前仍`.8` PID19500，Web4274仍Ce9wROrH；Android仍code23，预览23733/日常5051。`.9`已在独立web-dist完成封包并提交`daf67d2`，只有staged manifest及安装器，尚未发布/安装。Android preview匿名latest现为正确注册路由返回的404/ANDROID_UPDATE_NOT_FOUND，原code23 feed将另行发布；stable匿名401是项目鉴权组合的实际结果。所有后续动作仍限独立预览通道，原生产与日常客户端保持。
+
+## code23 feed 与 .9 自更新完成后的运行状态
+
+Android预览feed现已提供code23/0.2.0-preview.9，原APK SHA9cfa87eb…、35536941字节；实际发布与13次下载校验已提交`5cb6947`。API4419和Web4274的manifest/APK均核对通过，旧code22下载仍在；发布锁和所有私有候选/旧文件副本保留。[feed执行记录](android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/README.md)。这是下载源发布，不是Android设备升级；本窗口未调用设备。
+
+Windows预览latest已指向`.9`/release20260909T011704801Z，108334255字节/SHA2c50fe1b…安装器。已安装EXE通过原生应用内自更新进入`.9`（native0.2.0.9），主PID13564/start01:44:08.4163170Z并持有4420。原配置和公钥不变，旧`.8`回退目录、先前8个回退目录及安装器仍在；私有67文件冷副本只排除顶层updates，不能用作清理或覆盖原profile的依据。最终窗口仍显示原员工A的未提交文字及PNG。
+
+新EXE实际首选旧Bug显示加载后成功，无需重试；独立前后53/62项和安装产物114项通过。API22852、Web20284、server MCP15736及生产原进程/六文件在该次对照中保持。共享Web4274仍为Ce9wROrH，下一步只部署已冻结的独立8文件构建，并保留正在服务的旧目录与资源；不可在apps/web/dist直接build。所有完成声明仍限各自证据时段和入口，整体验收未完成。

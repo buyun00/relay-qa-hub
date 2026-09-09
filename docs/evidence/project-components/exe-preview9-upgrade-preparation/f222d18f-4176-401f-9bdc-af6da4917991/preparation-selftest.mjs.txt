@@ -1,0 +1,41 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {join,relative} from 'node:path';
+const watcher=readFileSync(new URL('./exe9-cold-state-watch.mjs',import.meta.url),'utf8');
+const readback=readFileSync(new URL('./exe-preview9-independent-readback.mjs',import.meta.url),'utf8');
+const publisher=readFileSync(new URL('./publish-exe9-reviewed.mjs',import.meta.url),'utf8');
+const hash=x=>createHash('sha256').update(x).digest('hex');
+const extract=(source,begin,end)=>{assert.equal(source.split(begin).length,2);const tail=source.slice(source.indexOf(begin));assert(tail.includes(end));return tail.slice(0,tail.indexOf(end))};
+test('actual watcher enumeration excludes only top-level updates and copies nested application data',()=>{
+  const root='C:\\synthetic-only\\profile',nested=join(root,'cache');
+  const entries={ [root]:[['updates',true],['cache',true],['draft.bin',false]], [nested]:[['updates',false]] };
+  const bodies={ [join(root,'draft.bin')]:Buffer.from('synthetic draft'),[join(nested,'updates')]:Buffer.from('nested application file') };
+  const reads=[];
+  const context={assert,join,relative,sha:hash,readdirSync:p=>entries[p].map(([name,directory])=>({name,isDirectory:()=>directory,isFile:()=>!directory})),lstatSync:p=>({isSymbolicLink:()=>false,size:bodies[p]?.length??0}),readFileSync:p=>{reads.push(p);assert(bodies[p]);return bodies[p]}};
+  const source=extract(watcher,'const files=','\ntry{');
+  const files=vm.runInNewContext(source+'\nfiles',context);
+  const result=files(root);assert.equal(result.length,2);assert.equal(reads.length,2);assert(result.some(x=>x.relative===join('cache','updates')));assert(result.every(x=>!x.relative.startsWith('updates')));
+});
+test('actual watcher enumeration rejects a reparse entry before reading its bytes',()=>{
+  let reads=0;const files=vm.runInNewContext(extract(watcher,'const files=','\ntry{')+'\nfiles',{assert,join,relative,sha:hash,readdirSync:()=>[{name:'junction',isDirectory:()=>true,isFile:()=>false}],lstatSync:()=>({isSymbolicLink:()=>true}),readFileSync:()=>{reads++;return Buffer.alloc(0)}});
+  assert.throws(()=>files('C:\\synthetic-only\\profile'));assert.equal(reads,0);
+});
+test('actual before/after host projection permits only preview main identity change',()=>{
+  const unaffected=vm.runInNewContext(extract(readback,'function unaffectedHost(', '\nfunction hostSnapshot(')+'\nunaffectedHost');
+  const sample=(main,api=22852)=>({listeners:[{LocalPort:4420,LocalAddress:'127.0.0.1',OwningProcess:main},{LocalPort:4419,LocalAddress:'127.0.0.1',OwningProcess:api}],processes:[{pid:main,createdAt:'new-preview'},{pid:api,createdAt:'fixed-api'},{pid:17160,createdAt:'fixed-daily'}]});
+  const plain=x=>JSON.parse(JSON.stringify(x));assert.deepEqual(plain(unaffected(sample(19500),19500)),plain(unaffected(sample(20000),20000)));assert.notDeepEqual(plain(unaffected(sample(19500),19500)),plain(unaffected(sample(20000,99999),20000)));
+});
+test('actual readback redaction preserves primitive JSON strings and nested secret removal',()=>{
+  const redact=vm.runInNewContext(extract(readback,'function redact(', '\nconst allowedTools=')+'\nredact',{knownSecrets:new Set(),hash,Buffer});
+  assert.equal(redact('2.0'),'2.0');assert.equal(redact('1e3'),'1e3');assert.equal(redact('9007199254740993'),'9007199254740993');
+  const secret='synthetic-private-value';const value=JSON.stringify(JSON.stringify({credentials:{token:secret},version:'2.0'}));const clean=redact(value);assert(!clean.includes(secret));assert.equal(JSON.parse(JSON.parse(clean)).version,'2.0');
+});
+test('default execution guards precede operational reads and network/process calls',()=>{
+  for(const [source,flag,firstOperation]of [[publisher,'--publish-preview9','const config=readParallelInstanceConfig('],[watcher,'--watch','const setup=JSON.parse(readFileSync('],[readback,'--collect','const privateOut=']]){const guard=source.indexOf(`process.argv[2]!=='${flag}'`);assert(guard>=0);const exit=source.indexOf('process.exit(0)',guard);assert(exit>guard&&exit<source.indexOf(firstOperation))}
+  assert(!/private\.pem/u.test(publisher),'publisher needs only public-key verification');
+  assert(watcher.indexOf('const before=files(profile)')>watcher.indexOf("assert.ok(stopped,'No normal updater exit observed before deadline')"));
+  assert(!/qa_login|qa_create_bug|qa_add_comment/u.test(readback));
+});

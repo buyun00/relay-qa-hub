@@ -1,0 +1,21 @@
+{
+  "at": "2026-09-09T01:42:51.127Z",
+  "window": {
+    "app": "process:C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+    "id": 30803240,
+    "title": "Relay QA Hub"
+  },
+  "accessibility": {
+    "document_text": "QA HUB\n当前状态\n关闭设置\nQ\nRelay QA Hub\n当前版本 v0.2.0-preview.8\n服务连接\n已连接\n通知连接\n已连接\nMCP 服务\n运行中\n已是最新版本\n检查更新\n最小化\n最大化\n关闭窗口",
+    "focused_element": "0 窗口 Relay QA Hub Secondary Actions: Raise",
+    "tree": "Window: \"Relay QA Hub\", App: RelayQaHubPreview.exe.\n\t0 窗口 Relay QA Hub Secondary Actions: Raise\n\t\t1 窗格 (disabled)\n\t\t2 区域 Relay QA Hub\n\t\t\t3 区域\n\t\t\t\t4 区域\n\t\t\t\t\t5 区域\n\t\t\t\t\t\t6 区域\n\t\t\t\t\t\t\t7 区域\n\t\t\t\t\t\t\t\t8 区域\n\t\t\t\t\t\t\t\t\t9 文档 Relay QA Hub ID: RootWebArea\n\t\t\t\t\t\t\t\t\t\t298 对话框 当前状态 Secondary Actions: Raise\n\t\t\t\t\t\t\t\t\t\t\t299 文本 QA HUB\n\t\t\t\t\t\t\t\t\t\t\t300 标题 当前状态 ID: desktop-tools-title\n\t\t\t\t\t\t\t\t\t\t\t301 按钮 关闭设置\n\t\t\t\t\t\t\t\t\t\t\t302 文本 Q\n\t\t\t\t\t\t\t\t\t\t\t303 文本 Relay QA Hub\n\t\t\t\t\t\t\t\t\t\t\t304 文本 当前版本 v0.2.0-preview.8\n\t\t\t\t\t\t\t\t\t\t\t305 列表\n\t\t\t\t\t\t\t\t\t\t\t\t306 字词 服务连接\n\t\t\t\t\t\t\t\t\t\t\t\t\t307 文本 服务连接\n\t\t\t\t\t\t\t\t\t\t\t\t308 文本 已连接\n\t\t\t\t\t\t\t\t\t\t\t\t309 字词 通知连接\n\t\t\t\t\t\t\t\t\t\t\t\t\t310 文本 通知连接\n\t\t\t\t\t\t\t\t\t\t\t\t311 文本 已连接\n\t\t\t\t\t\t\t\t\t\t\t\t312 字词 MCP 服务\n\t\t\t\t\t\t\t\t\t\t\t\t\t313 文本 MCP 服务\n\t\t\t\t\t\t\t\t\t\t\t\t314 文本 运行中\n\t\t\t\t\t\t\t\t\t\t\t315 状态\n\t\t\t\t\t\t\t\t\t\t\t\t316 文本 已是最新版本\n\t\t\t\t\t\t\t\t\t\t\t317 按钮 检查更新\n\t\t\t\t\t\t\t\t\t\t\t318 组 窗口控制\n\t\t\t\t\t\t\t\t\t\t\t\t319 按钮 最小化 Description: 最小化\n\t\t\t\t\t\t\t\t\t\t\t\t320 切换按钮 最大化 Description: 最大化\n\t\t\t\t\t\t\t\t\t\t\t\t321 按钮 关闭窗口 Description: 关闭窗口，继续在托盘运行\n\t\t\t\t\t\t\t\t17 区域\n\nDocument text: ```\nQA HUB\n当前状态\n关闭设置\nQ\nRelay QA Hub\n当前版本 v0.2.0-preview.8\n服务连接\n已连接\n通知连接\n已连接\nMCP 服务\n运行中\n已是最新版本\n检查更新\n最小化\n最大化\n关闭窗口\n```"
+  },
+  "screenshots": [
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/before-update-status-0.png",
+      "id": "screenshot-0",
+      "bytes": 62089,
+      "sha256": "e32a9ec48d87a24285de3a19eb00611ab47a035f3d10592c18a3faa9e2d644c0"
+    }
+  ]
+}

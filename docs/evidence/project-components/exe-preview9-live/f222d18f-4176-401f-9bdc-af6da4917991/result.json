@@ -1,0 +1,689 @@
+{
+  "schemaVersion": 1,
+  "runId": "f222d18f-4176-401f-9bdc-af6da4917991",
+  "recordedAt": "2026-09-09T01:53:52.116Z",
+  "status": "self_update_and_retention_passed_with_sampled_loading_to_loaded_observation",
+  "release": {
+    "releaseId": "20260909T011704801Z",
+    "version": "0.2.0-preview.9",
+    "nativeVersion": "0.2.0.9",
+    "installerBytes": 108334255,
+    "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
+    "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
+    "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+    "sourceDirty": true
+  },
+  "actualUpdate": {
+    "publicationAt": "2026-09-09T01:42:31.781Z",
+    "entry": "Root operated the installed preview.8 current-status check/update flow and the native install-and-restart button. This aggregator performed artifact reads only.",
+    "downloadObservationAt": "2026-09-09T01:43:01.352Z",
+    "readyAt": "2026-09-09T01:43:14.838Z",
+    "installIntentAt": "2026-09-09T01:43:52.057Z",
+    "installReturnAt": "2026-09-09T01:43:52.293Z",
+    "updater": {
+      "schemaVersion": 1,
+      "status": "installed",
+      "releaseId": "20260909T011704801Z",
+      "version": "0.2.0-preview.9",
+      "recordedAt": "2026-09-09T01:44:08.000Z"
+    },
+    "updaterRawEncoding": "UTF-16LE without BOM",
+    "updaterRawSha256": "0131b3d8354a42bbe00a0ee25609ae58ded2b8a33583a24a482cea639dafbd83",
+    "previousPid": 19500,
+    "newPid": 13564,
+    "newProcessCreatedAt": "2026-09-09T01:44:08.4163170Z",
+    "normalExitEvidence": "Native updater + cold watcher source observations; no fresh process query by aggregator.",
+    "signature": "Existing Ed25519 key binding reviewed in artifact-review; Authenticode status belongs to package-only proof."
+  },
+  "nativeRetention": {
+    "actorId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "originalDraftText": "EXE第6版升级与回退保留草稿 2026-09-09：同一员工、项目A、PNG附件与未提交正文必须保留。",
+    "originalDraftFile": "exe-test-input.png",
+    "settledObservationFiles": [
+      "before-original-draft.json",
+      "after-original-draft-settled.json",
+      "final-original-draft-preserved.json"
+    ],
+    "originalTextAndPngVisible": true,
+    "draftUnsubmittedPerRootActions": true,
+    "draftSingleImageShaNotClaimed": true,
+    "oldBugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+    "oldBugKey": "TA1788885078625-13",
+    "oldBugState": "closed",
+    "oldBugVersion": 14,
+    "originalCommentVisible": true,
+    "nativeDisplayedHistoryItems": 20,
+    "storedDomainEventItems": 21,
+    "boundOldBugImage": {
+      "bytes": 184872,
+      "sha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b",
+      "scope": "Independent local MCP readback; does not establish the separate draft image hash."
+    }
+  },
+  "loadingObservation": {
+    "scope": "Sampled native first detail click after .9 upgrade only",
+    "first": {
+      "file": "first-detail-after-click.json",
+      "at": "2026-09-09T01:46:36.762Z",
+      "treeAndScreenshot": "正在读取 Bug 详情…",
+      "falseFailureVisible": false
+    },
+    "subsequent": {
+      "file": "first-detail-loaded.json",
+      "at": "2026-09-09T01:46:45.342Z",
+      "treeAndScreenshot": "Original closed Bug and bound PNG loaded",
+      "falseFailureVisible": false
+    },
+    "retryClicked": false,
+    "actionProvenance": "Root reported no retry/input between these captures; aggregator did not operate UI.",
+    "continuousAllFramesClaim": false,
+    "realNetworkFailureRetryTested": false,
+    "priorPreview8History": {
+      "path": "docs/evidence/project-components/exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
+      "bytes": 13722,
+      "sha256": "02522989982733987c86ee90132f3251e50a70f0a257a6c6b9723bf6cc6d867a"
+    }
+  },
+  "captureTimingLimits": [
+    {
+      "file": "check-update-click.json",
+      "description": "Tree/document text retains 已是最新版本 / 检查更新 while the screenshot shows downloading preview.9 at23%. These are non-simultaneous captures, not one synchronized frame."
+    },
+    {
+      "file": "after-original-draft.json",
+      "description": "Tree already contains draft text and PNG while first screenshot still shows workbench. The later after-original-draft-settled capture supplies consistent tree/screenshot draft evidence; both originals are retained."
+    }
+  ],
+  "coldRetention": {
+    "status": "passed",
+    "at": "2026-09-09T01:43:56.777Z",
+    "stopped": {
+      "at": "2026-09-09T01:43:55.136Z",
+      "state": {
+        "processes": [],
+        "listeners": []
+      }
+    },
+    "completedWithNoPreviewProcess": true,
+    "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile",
+    "destination": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991\\private-cold-application-state",
+    "fileCount": 67,
+    "totalBytes": 11579757,
+    "manifestSha256": "c1bef9024c01aae4fd1be651640f69ce569abd0ada3ec54109e870ea68ee6f4c",
+    "scope": "All profile application files except the top-level updates directory; not a whole-profile cold-copy claim.",
+    "sourceUnchanged": true,
+    "copiedBytesMatch": true,
+    "noSourceFilesChangedByWatcher": true
+  },
+  "independentReadback": [
+    {
+      "path": "docs/evidence/project-components/exe-preview9-independent/f222d18f-4176-401f-9bdc-af6da4917991/before/proof.json",
+      "bytes": 502997,
+      "sha256": "bd7801cd47c188c97b033a1f42d9c53f6b4efcfdcc5d02031a3403a80d35fc62",
+      "passedChecks": 53,
+      "requests": 11
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-independent/f222d18f-4176-401f-9bdc-af6da4917991/after/proof.json",
+      "bytes": 503705,
+      "sha256": "c82c6b92da9b639d91090676258ca80e13e03c15b919dcd7f00c76bb0b42a12d",
+      "passedChecks": 62,
+      "requests": 11
+    }
+  ],
+  "artifactReview": {
+    "path": "docs/evidence/project-components/exe-preview9-live-proof/artifact-review.json",
+    "bytes": 46158,
+    "sha256": "a8e4e463accc05e95e8bf6bbb2cf181f133ac597bc8978eb9b6751c13a844dd5",
+    "passedChecks": 114,
+    "coldCopyFilesIndependentlyRehashedByThatReview": 67,
+    "aggregatorRehashedLiveProfile": false
+  },
+  "productionBoundary": {
+    "evidence": {
+      "path": "docs/evidence/project-components/exe-preview9-independent/f222d18f-4176-401f-9bdc-af6da4917991/after/proof.json",
+      "bytes": 503705,
+      "sha256": "c82c6b92da9b639d91090676258ca80e13e03c15b919dcd7f00c76bb0b42a12d",
+      "passedChecks": 62,
+      "requests": 11
+    },
+    "sixProductionFilesAndThreeOriginalProcessRecordsUnchanged": true,
+    "previewApiWebServerMcpProcessRecordsUnchanged": true,
+    "scope": "Only the independent before/after observation interval. Production Node executable paths remain null where recorded; no fresh production probe."
+  },
+  "review": {
+    "checks": 64,
+    "passed": 64,
+    "artifacts": 35,
+    "secretScan": {
+      "decodedAndTextStringValues": 168,
+      "highConfidencePatternHits": 0,
+      "privateSecretsLoaded": false
+    },
+    "visualFilesReviewed": [
+      "before-original-draft-0.png",
+      "check-update-click-0.png",
+      "after-original-draft-0.png",
+      "after-original-draft-settled-0.png",
+      "first-detail-after-click-0.png",
+      "first-detail-loaded-0.png",
+      "original-comment-visible-0.png",
+      "final-original-draft-preserved-0.png"
+    ]
+  },
+  "checks": [
+    {
+      "id": "new_output_directory",
+      "passed": true
+    },
+    {
+      "id": "before53_after62_artifact114_pinned_sha",
+      "passed": true
+    },
+    {
+      "id": "three_independent_reviews_have_expected_pass_counts",
+      "passed": true
+    },
+    {
+      "id": "native_publication_release_and_artifact_match",
+      "passed": true
+    },
+    {
+      "id": "updater_raw_utf16le_matches_artifact_review",
+      "passed": true
+    },
+    {
+      "id": "install_intent_binds_actual_ready_control",
+      "passed": true
+    },
+    {
+      "id": "recorded_main_version_pid_and_listener_transition",
+      "passed": true
+    },
+    {
+      "id": "publication_download_ready_click_cold_installed_after_order",
+      "passed": true
+    },
+    {
+      "id": "cold_scope_and_peer_review_match",
+      "passed": true
+    },
+    {
+      "id": "same_original_draft_and_png_visible_in_settled_native_trees",
+      "passed": true
+    },
+    {
+      "id": "first_detail_loading_then_loaded_without_failure_in_sampled_trees",
+      "passed": true
+    },
+    {
+      "id": "old_history_and_comment_visible",
+      "passed": true
+    },
+    {
+      "id": "independent_original_session_bug_comment_bound_attachment_unchanged",
+      "passed": true
+    },
+    {
+      "id": "production_six_files_and_non_upgrade_processes_equal",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_before-original-draft",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_before-update-status",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_check-update-click",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_update-ready",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_install-click-return",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_after-first-window",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_after-original-draft",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_after-original-draft-settled",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_first-detail-after-click",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_first-detail-loaded",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_original-comment-visible",
+      "passed": true
+    },
+    {
+      "id": "screenshot_raw_hash_final-original-draft-preserved",
+      "passed": true
+    },
+    {
+      "id": "unique_artifact_names",
+      "passed": true
+    },
+    {
+      "id": "public_artifact_generic_secret_scan_clear",
+      "passed": true
+    },
+    {
+      "id": "preview8_failure_history_preserved",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_before-original-draft.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_before-original-draft-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_before-update-status.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_before-update-status-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_check-update-click.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_check-update-click-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_update-ready.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_update-ready-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_install-click-return.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_install-click-return-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_after-first-window.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_after-first-window-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_after-original-draft.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_after-original-draft-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_after-original-draft-settled.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_after-original-draft-settled-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_before-first-detail.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_first-detail-after-click.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_first-detail-after-click-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_first-detail-loaded.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_first-detail-loaded-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_original-history-expanded.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_original-comment-visible.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_original-comment-visible-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_final-original-draft-preserved.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_final-original-draft-preserved-0.png",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_install-click-intent.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_publication.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_cold-state-result.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_cold-watch-start.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_previous-served-manifest.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_previous-last-update-result.utf16le.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_last-update-result.utf16le.json",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_publish-exe9-reviewed.mjs.txt",
+      "passed": true
+    },
+    {
+      "id": "exact_copy_exe9-cold-state-watch.mjs.txt",
+      "passed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/before-original-draft.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/before-original-draft.json",
+      "bytes": 6822,
+      "sha256": "4b8e5988ca0fc97771847d639a01019b9a7fe75264b8e2ef58b4855c1899fe01",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/before-original-draft-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/before-original-draft-0.png",
+      "bytes": 79377,
+      "sha256": "27ac8cd6733a7a87e3c464be7e1ef6d2779622d64995b9c77abb6b63388d442b",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/before-update-status.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/before-update-status.json",
+      "bytes": 2803,
+      "sha256": "7b8199f9e38ca984895f65622857e14b340db2dc3707eb7897653faebcfe58f8",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/before-update-status-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/before-update-status-0.png",
+      "bytes": 62089,
+      "sha256": "e32a9ec48d87a24285de3a19eb00611ab47a035f3d10592c18a3faa9e2d644c0",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/check-update-click.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/check-update-click.json",
+      "bytes": 2803,
+      "sha256": "f33111208e7d84dff32e546d6708df9b4035506a8f617deae78e8ab90cafadf8",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/check-update-click-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/check-update-click-0.png",
+      "bytes": 68821,
+      "sha256": "ef32e1821a74c65ae25b3ebad3d6df091f92f1e89575cc9e9ca6740c27c34846",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/update-ready.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/update-ready.json",
+      "bytes": 2846,
+      "sha256": "8e8327424c0b5aa751fd19fa64a7f1e48505d88b42469b0f5a8fbe28e952e4ed",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/update-ready-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/update-ready-0.png",
+      "bytes": 68355,
+      "sha256": "0b05fce495f194452a907013da2db467ca5995c26368d2bc20326e4281fbfd05",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/install-click-return.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/install-click-return.json",
+      "bytes": 2865,
+      "sha256": "3b6eeac717e4dfc5d9e4aa569a361ea451fd9db60f469416e0588a71e1d9c1a2",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/install-click-return-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/install-click-return-0.png",
+      "bytes": 61656,
+      "sha256": "33cdd2a1cea36e933dd21790ac5994f9e411d212468e7b8a03c75cc4cbebc066",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/after-first-window.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/after-first-window.json",
+      "bytes": 6297,
+      "sha256": "0944a518f6b9657d651414ff5608d6ec3517fda31c65959d2f336c49b7cb2af1",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/after-first-window-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/after-first-window-0.png",
+      "bytes": 95919,
+      "sha256": "241851ab0696f3a771807934a5e632a3e09fccae3b4b2223a9513868856475d1",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft.json",
+      "bytes": 6423,
+      "sha256": "13573f406a14cd56293d7a8631ab530c9856f5e1c119e68353ffdff933df048f",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft-0.png",
+      "bytes": 96542,
+      "sha256": "e0d3c50661d69cf73c45fd8539b8f4c9cabc0e0b25e9d5c7c8a767fdd225a597",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft-settled.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft-settled.json",
+      "bytes": 6431,
+      "sha256": "e119a3a562b7d7c259a1ee64ff4ae396bfa4e66c8e8e716cc61c805c0a59a08d",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft-settled-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/after-original-draft-settled-0.png",
+      "bytes": 78876,
+      "sha256": "bc13b3e9af9a316d352c31c9e41cf5f14205dd86c6f2384412c13c1374ce8f92",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/before-first-detail.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/before-first-detail.json",
+      "bytes": 4728,
+      "sha256": "88491a6b4cfd8e1d517c80bee0e65d9f0b3d6a4f7dc259fc1e9188f3bb2a6291",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/first-detail-after-click.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/first-detail-after-click.json",
+      "bytes": 5281,
+      "sha256": "c2e7d59f327124805760d45080b45b9ce628623db1d8f26226f2921f55098b2c",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/first-detail-after-click-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/first-detail-after-click-0.png",
+      "bytes": 47105,
+      "sha256": "3ed0f72346c647622c95788b3b734ca565aaede91457cb32a4a7d5c71e2af074",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/first-detail-loaded.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/first-detail-loaded.json",
+      "bytes": 8082,
+      "sha256": "4298dfa5a8452e57578a1fcd85caee6e867ac0dded821b5ca91598eaa8d011dc",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/first-detail-loaded-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/first-detail-loaded-0.png",
+      "bytes": 102415,
+      "sha256": "ccde8c9e19e35d43c73b5fca1c55960347748b9afaaef2c734f89fa6738d3e2d",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/original-history-expanded.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/original-history-expanded.json",
+      "bytes": 13148,
+      "sha256": "a3192f0c920eeabbfa96c48156935dd2ea03c3460599f661d818a37cbcebf0af",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/original-comment-visible.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/original-comment-visible.json",
+      "bytes": 13469,
+      "sha256": "ceb8e2f32ca99249d85f46c9b223354b1ad8ce700b86f5e4ef58cf943c499a6b",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/original-comment-visible-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/original-comment-visible-0.png",
+      "bytes": 91327,
+      "sha256": "b3867327cc1b8a994ad0624138b19d7e11f80fd7a216570b5fffeba958a5f79b",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/final-original-draft-preserved.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/final-original-draft-preserved.json",
+      "bytes": 6828,
+      "sha256": "2723e210bd2e13464a3fa483e8dc7290a9067425324fc325674b5585df03ea5a",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/final-original-draft-preserved-0.png",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/final-original-draft-preserved-0.png",
+      "bytes": 79398,
+      "sha256": "4e037ff2ee90923ab589d1d5a545d5343c939298471e668499b7bf9466b3efd2",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/install-click-intent.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/install-click-intent.json",
+      "bytes": 370,
+      "sha256": "b6dfffc89c835bb6c8d7ccd227226db3a9ecf0d5de61f02b41f24360a856e1b5",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/publication.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/publication.json",
+      "bytes": 697,
+      "sha256": "6464642213fc9d47907dceb29e76b13b7fec6050f66545293fffffe01e2bd5ad",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/cold-state-result.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/cold-state-result.json",
+      "bytes": 850,
+      "sha256": "67277a55e5c5aa81167ca16cc99852c4f2f3f44b468aa6568f18a64add3be0a0",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/cold-watch-start.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/cold-watch-start.json",
+      "bytes": 1116,
+      "sha256": "e8d38fa06fe7bc6338d3097a7a07dc04279c2fe36237c978074c2dd5f3bca948",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/previous-served-manifest.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/previous-served-manifest.json",
+      "bytes": 464,
+      "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/previous-last-update-result.utf16le.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/previous-last-update-result.json",
+      "bytes": 288,
+      "sha256": "1bffcc02e602f250ca1d98a916e05808614dbbb956e433eb62087319702e008d",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/last-update-result.utf16le.json",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile/updates/last-update-result.json",
+      "bytes": 288,
+      "sha256": "0131b3d8354a42bbe00a0ee25609ae58ded2b8a33583a24a482cea639dafbd83",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/publish-exe9-reviewed.mjs.txt",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/publish-exe9-reviewed.mjs.txt",
+      "bytes": 6466,
+      "sha256": "d2f221045fa738ee74f49063c441445ee4632f9067bd85a4bb79bf7da2b0cc7f",
+      "rawBytesUnchanged": true
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/exe9-cold-state-watch.mjs.txt",
+      "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-f222d18f-4176-401f-9bdc-af6da4917991/exe9-cold-state-watch.mjs.txt",
+      "bytes": 4864,
+      "sha256": "81c4e66b5266742b357ba8ff0c1d5bcddc782f4d5054e3ee5e60d24dd128f22d",
+      "rawBytesUnchanged": true
+    }
+  ],
+  "limits": [
+    "Actual native observations are root-provided frozen evidence. This aggregation performs no HTTP/MCP, UI, ADB, CIM, service control, installation or feed publication.",
+    "Only the updater result was read from the live profile. Other live profile data was not opened; cold-copy facts are linked to the original watcher and the independent114-check artifact review.",
+    "Cold retention excludes top-level updates:67 files,11,579,757 bytes. It is not a whole-profile backup.",
+    "Visible draft text/PNG and the bound184,872-byte old Bug image are distinct assertions. No single-image draft SHA is inferred.",
+    "The .8 false-failure evidence is unchanged. .9 showed loading then loaded in the sampled native observations; this does not prove every intervening frame or a real network-failure retry.",
+    "No new EXE lost-response/rejected-media submission, rollback, physical Android or all-baseline acceptance is claimed.",
+    "Original package sourceCommit bc2b347/sourceDirtytrue is preserved; it is not rewritten as a clean later commit."
+  ]
+}

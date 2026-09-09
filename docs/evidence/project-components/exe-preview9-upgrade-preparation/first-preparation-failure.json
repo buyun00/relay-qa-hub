@@ -1,0 +1,15 @@
+{
+  "status": "failed_preparation_retained",
+  "stage": "first exact source replacement before any helper was emitted",
+  "failure": {
+    "code": "ERR_ASSERTION",
+    "needle": "--publish-preview8",
+    "expectedOccurrences": 1,
+    "actualOccurrences": 2
+  },
+  "runtimeDirectory": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-e2c95c2c-569d-42fe-afce-8bcb4ca3dd09",
+  "publisherInvocations": 0,
+  "watcherInvocations": 0,
+  "localMcpRequests": 0,
+  "profileContentsRead": false
+}

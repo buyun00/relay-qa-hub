@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-09T01:43:52.057Z",
+  "window": {
+    "app": "process:C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+    "id": 30803240,
+    "title": "Relay QA Hub"
+  },
+  "elementIndex": 317,
+  "observedLabel": "安装并重启",
+  "from": "0.2.0-preview.8",
+  "to": "0.2.0-preview.9",
+  "action": "native_in_app_self_update"
+}

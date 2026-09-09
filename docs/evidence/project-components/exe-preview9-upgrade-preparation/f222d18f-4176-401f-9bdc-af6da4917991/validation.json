@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "status": "prepared_static_checks_passed_not_run",
+  "recordedAt": "2026-09-09T01:36:57.496Z",
+  "runId": "f222d18f-4176-401f-9bdc-af6da4917991",
+  "operationalInvocations": 0,
+  "profileContentsRead": false,
+  "apiMcpUiDeviceActions": 0,
+  "syntaxAndDefaultChecks": [
+    {
+      "args": [
+        "--check",
+        "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\publish-exe9-reviewed.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\publish-exe9-reviewed.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "not_run: requires --publish-preview9 for the reviewed isolated release\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "--check",
+        "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\exe9-cold-state-watch.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\exe9-cold-state-watch.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "not_run: --watch explicitly waits for the current preview self-updater to quit; no process mutation\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "--check",
+        "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\exe-preview9-independent-readback.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\exe-preview9-independent-readback.mjs"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"status\":\"not_run\",\"reason\":\"Explicit --collect before|after and expected preview PID required.\"}\n",
+      "stderr": ""
+    }
+  ],
+  "pureMemoryTests": {
+    "command": "node --test .tools/exe9-preparation-selftest.mjs",
+    "exitCode": 0,
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "firstToolStdoutSummary": "Five actual-source function/default-order checks passed; first execution completed with duration_ms 103.9774.",
+    "source": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\exe9-preparation-selftest.mjs",
+      "bytes": 4486,
+      "sha256": "a40dfa1fd6bd252a5eb9b2f7e9a2a4d6329bcdeca562dc5696d5590208eda3d0"
+    },
+    "scope": [
+      "actual watcher file enumeration with injected in-memory filesystem: top-level updates excluded, nested application file preserved",
+      "actual watcher rejects reparse entry before read",
+      "actual unaffectedHost allows only main identity change; changed API rejected",
+      "actual redactor preserves primitive JSON strings and removes multi-encoded synthetic token",
+      "default explicit guards precede operational I/O"
+    ],
+    "realFilesystemProfileRead": false,
+    "networkRequests": 0
+  },
+  "powershellQuery": {
+    "querySha256": "bd63dec2d86e2501f09b0a71090904e7752680d8f4b5892eaeda7794ec295a66",
+    "parseOnly": true,
+    "exitCode": 0,
+    "stdout": "{\"parseErrors\":0,\"queryExecuted\":false}\r\n",
+    "stderr": ""
+  },
+  "independentReview": {
+    "reviewer": "project_backend",
+    "mode": "read-only source; no execution",
+    "blockers": 0,
+    "sourceHashes": [
+      "81c4e66b5266742b357ba8ff0c1d5bcddc782f4d5054e3ee5e60d24dd128f22d",
+      "404f891524967b9f1b772f7dc027a454c9f0147b130a28a941e256e8f050ef88"
+    ],
+    "limits": [
+      "watcher --watch performs profile realpath metadata validation before waiting; file body reads follow observed exit",
+      "host snapshot is listener owners and specified production/main PIDs, not every Windows process"
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync,copyFileSync,constants} from 'node:fs';
+import {join,resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const source=resolve('C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub');
+const run='f222d18f-4176-401f-9bdc-af6da4917991';
+const runtime=resolve('C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86');
+const acceptance=join(runtime,'acceptance/exe-preview9-live-'+run);
+const output=join(source,'docs/evidence/project-components/exe-preview9-upgrade-preparation',run);
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const fact=p=>({path:p,bytes:readFileSync(p).length,sha256:sha(readFileSync(p))});
+const save=(p,v)=>writeFileSync(p,JSON.stringify(v,null,2)+'\n',{flag:'wx'});
+if(process.argv[2]!=='--prepare'){console.log('not_run');process.exit(0)}
+mkdirSync(acceptance);mkdirSync(output);
+const setup={schemaVersion:1,status:'prepared_not_executed',runId:run,root:acceptance,expectedBefore:{pid:19500,version:'0.2.0-preview.8'},expectedAfter:{releaseId:'20260909T011704801Z',version:'0.2.0-preview.9'},scope:'Only root may invoke the separate explicit commands; preparation does not publish, watch, query API/device/UI or read profile body.'};
+save(join(source,'.tools/exe9-live-'+run+'.json'),setup);save(join(acceptance,'setup.json'),setup);
+const derivations=[];
+function derive(from,to,changes){let text=readFileSync(join(source,from),'utf8');const original=text;for(const [before,after,count=1]of changes){assert.equal(text.split(before).length-1,count,`exact replacement count ${before}`);text=text.replaceAll(before,after)}writeFileSync(join(source,to),text,{flag:'wx'});const name=to.split('/').at(-1);copyFileSync(join(source,to),join(acceptance,name+'.txt'),constants.COPYFILE_EXCL);copyFileSync(join(source,to),join(output,name+'.txt'),constants.COPYFILE_EXCL);derivations.push({original:fact(join(source,from)),derived:fact(join(source,to)),changes:changes.map(([before,after,count=1])=>({before,after,count})),originalSourcePreserved:sha(readFileSync(join(source,from)))===sha(original)});return text}
+derive('.tools/publish-exe8-reviewed.mjs','.tools/publish-exe9-reviewed.mjs',[
+ ['--publish-preview8','--publish-preview9',2],['.tools/exe8-live-current.json','.tools/exe9-live-'+run+'.json'],
+ ['acceptance/exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98','acceptance/exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf'],
+ ["assert.equal(receipt.version,'0.2.0-preview.8')","assert.equal(receipt.version,'0.2.0-preview.9')"],['20260909T000712593Z','20260909T011704801Z'],
+ ['8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417','5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9'],
+ ['b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147','2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336'],
+ ["assert.equal(JSON.parse(previous).version,'0.2.0-preview.7')","assert.equal(JSON.parse(previous).version,'0.2.0-preview.8');assert.equal(sha(previous),'8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417')"],
+ ['const oldResult=',"const old8Installer=join(config.downloadsRoot,'qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe');assert.equal(sha(readFileSync(old8Installer)),'b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147');const oldResult="],
+ ['const destination=',"const beforeProof=JSON.parse(readFileSync(join(live.root,'independent-before/proof.json'),'utf8'));assert.equal(beforeProof.status,'passed');assert.equal(beforeProof.runId,'"+run+"');assert.equal(beforeProof.host.installed.productVersion,'0.2.0-preview.8');assert.equal(beforeProof.tools.count,90);assert.equal(beforeProof.session.userId,'5ef57049-0e33-4476-8a3c-b320aa26bf68');assert.equal(beforeProof.session.projectId,'fb914b3b-4169-47f8-8dec-76f3a3cc780d');assert.equal(beforeProof.session.isGm,false);assert.ok(beforeProof.host.processes.some(p=>p.pid===19500&&p.exists));const destination="],
+ ['const report=',"assert.equal(sha(readFileSync(old8Installer)),'b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147');assert.equal(sha(readFileSync(installedConfig)),'aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83');const report="],
+ ['oldInstallerPreserved:true','oldInstallerPreserved:true,old8InstallerPreserved:true'],
+ ["assert.ok(isInstancePathWithin(canonicalInstancePath(live.root),join(config.runtimeRoot,'acceptance')))","assert.equal(canonicalInstancePath(live.root),canonicalInstancePath('"+acceptance.replaceAll('\\','/')+"'));assert.ok(isInstancePathWithin(canonicalInstancePath(live.root),join(config.runtimeRoot,'acceptance')))"],
+]);
+derive('.tools/exe8-cold-state-watch.mjs','.tools/exe9-cold-state-watch.mjs',[
+ ['.tools/exe8-live-current.json','.tools/exe9-live-'+run+'.json'],['p.Id===23924','p.Id===19500'],
+ ["assert.ok(resolve(root).startsWith(","assert.equal(resolve(root),resolve('"+acceptance.replaceAll('\\','/')+"'));assert.ok(resolve(root).startsWith("],
+ ["const initial=sample();assert.ok(initial.processes.some(p=>p.Id===19500));","const initial=sample();assert.ok(initial.processes.some(p=>p.Id===19500));assert.ok(initial.listeners.length>0&&initial.listeners.every(p=>p.OwningProcess===19500));"],
+]);
+derive('.tools/exe-preview8-independent-readback.mjs','.tools/exe-preview9-independent-readback.mjs',[
+ ['1786509a-9de7-4d1a-ba8c-9fb282c9c453',run],['exe-preview8-live-','exe-preview9-live-'],['exe-preview8-independent','exe-preview9-independent'],['preview8-readback','preview9-readback'],
+ ["const label=process.argv[3],mode=label==='before-r2'?'before':label,pid=Number(process.argv[4]);","const label=process.argv[3],mode=label,pid=Number(process.argv[4]);"],
+ ["['before-r2','after']","['before','after']"],["if(mode==='before')assert.equal(pid,23924,'PINNED_BEFORE_PID_REQUIRED');","if(mode==='before')assert.equal(pid,19500,'PINNED_BEFORE_PID_REQUIRED');else assert.notEqual(pid,19500,'NEW_AFTER_PID_REQUIRED');"],
+ ["mode==='before'?7:8","mode==='before'?8:9",2],['independent-before-r2/proof.json','independent-before/proof.json'],
+ ["  for(const b of baseline.previewProcesses.filter(x=>x.pid!==23924)){const current=proof.host.processes.find(x=>x.pid===b.pid);check('preview-service-start:'+b.pid,current?.exists&&Date.parse(current.createdAt)===Date.parse(b.createdAt))}","  proof.previewServiceBaseline='Fresh observed before collection; old preview API PID is deliberately not inherited from .8 evidence.';for(const port of [4419,4274,4421])check('preview-service-observed:'+port,proof.host.listeners.some(x=>x.LocalPort===port&&proof.host.processes.some(p=>p.pid===x.OwningProcess&&p.exists)));"],
+ ["proof.tools={count:catalog.tools.length,names:catalog.tools.map(x=>x.name)};","proof.tools={count:catalog.tools.length,names:catalog.tools.map(x=>x.name)};check('exact-shared-tool-count-90',proof.tools.count===90);"],
+ ["function hostSnapshot(){","function unaffectedHost(snapshot,mainPid){return{listeners:snapshot.listeners.filter(x=>x.LocalPort!==4420).sort((a,b)=>a.LocalPort-b.LocalPort||a.LocalAddress.localeCompare(b.LocalAddress)),processes:snapshot.processes.filter(x=>x.pid!==mainPid).sort((a,b)=>a.pid-b.pid)}}\nfunction hostSnapshot(){"],
+ ["check('six-production-files-stable-after-reads',proof.files.every(x=>sha(x.path)===x.sha256));","check('six-production-files-stable-after-reads',proof.files.every(x=>sha(x.path)===x.sha256));check('non-upgrade-processes-stable-during-reads',isDeepStrictEqual(unaffectedHost(proof.host,pid),unaffectedHost(proof.hostAfter,pid)));"],
+ ["check('tool-directory-before-after',JSON.stringify(previous.tools)===JSON.stringify(proof.tools))","check('tool-directory-before-after',JSON.stringify(previous.tools)===JSON.stringify(proof.tools));const previousPid=previous.host.listeners.find(x=>x.LocalPort===4420).OwningProcess;check('only-preview-main-pid-may-change-across-upgrade',isDeepStrictEqual(unaffectedHost(previous.host,previousPid),unaffectedHost(proof.host,pid)))"],
+]);
+const checks=[];
+for(const d of derivations){for(const args of [['--check',d.derived.path],[d.derived.path]]){const r=spawnSync(process.execPath,args,{cwd:source,encoding:'utf8',windowsHide:true,timeout:30000});checks.push({args,exitCode:r.status,stdout:r.stdout,stderr:r.stderr});assert.equal(r.status,0);if(args[0]!=='--check')assert.match(r.stdout,/not_run/u)}}
+save(join(output,'preparation.json'),{schemaVersion:1,status:'prepared_not_executed',recordedAt:new Date().toISOString(),...setup,derivations,checks,boundaries:{publisherInvocations:0,watcherInvocations:0,localMcpRequests:0,apiRequests:0,profileContentsRead:false,deviceActions:0,productSourceEdits:0}});
+copyFileSync(join(source,'.tools/prepare-exe9-live.mjs'),join(output,'preparation-generator.mjs.txt'),constants.COPYFILE_EXCL);
+console.log(JSON.stringify({status:'prepared_not_executed',runId:run,acceptance,output,helpers:derivations.map(x=>x.derived),checks:checks.length}));

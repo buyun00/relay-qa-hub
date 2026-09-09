@@ -1,0 +1,100 @@
+import assert from 'node:assert/strict';
+import {isDeepStrictEqual} from 'node:util';
+import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
+import {resolve,join} from 'node:path';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+
+const root=resolve('C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub');
+const run='f222d18f-4176-401f-9bdc-af6da4917991';
+const acceptance=resolve('C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview9-live-'+run);
+const expected={projectId:'fb914b3b-4169-47f8-8dec-76f3a3cc780d',actorId:'5ef57049-0e33-4476-8a3c-b320aa26bf68',bugId:'a32d175b-137c-47bd-bbd9-b952d4860b1e',commentId:'d7a5ee19-1145-4162-a9ff-44d89fa34f7c',attachmentId:'bbeaafee-effa-4265-873e-881111e40ae8',attachmentBytes:184872,attachmentSha256:'e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b'};
+const hash=x=>createHash('sha256').update(x).digest('hex');
+const sha=p=>hash(readFileSync(p));
+const identity=s=>Object.fromEntries(['accountId','userId','email','displayName','projectId','isGm'].map(k=>[k,s[k]]));
+const source=fileURLToPath(import.meta.url);
+const label=process.argv[3],mode=label,pid=Number(process.argv[4]);
+if(process.argv[2]!=='--collect'){console.log(JSON.stringify({status:'not_run',reason:'Explicit --collect before|after and expected preview PID required.'}));process.exit(0)}
+assert(['before','after'].includes(label)&&Number.isSafeInteger(pid)&&pid>0,'EXPLICIT_MODE_PID_REQUIRED');
+assert.equal(process.cwd().toLowerCase(),root.toLowerCase(),'WORKTREE_REQUIRED');
+if(mode==='before')assert.equal(pid,19500,'PINNED_BEFORE_PID_REQUIRED');else assert.notEqual(pid,19500,'NEW_AFTER_PID_REQUIRED');
+const privateOut=join(acceptance,'independent-'+label),publicOut=join(root,'docs/evidence/project-components/exe-preview9-independent',run,label);
+assert(!existsSync(privateOut)&&!existsSync(publicOut),'CREATE_ONLY_OUTPUT_REQUIRED');
+mkdirSync(privateOut);mkdirSync(publicOut,{recursive:true});
+writeFileSync(join(privateOut,'readback-source.mjs'),readFileSync(source),{flag:'wx'});
+const checks=[],requests=[],knownSecrets=new Set();
+const proof={schemaVersion:1,runId:run,mode,label,startedAt:new Date().toISOString(),status:'running',sourceSha256:sha(source),expected,privateOutput:privateOut,checks,requests,boundaries:{localMcpOnly:true,explicitLoginCalls:0,credentialsFilesRead:0,businessWrites:0,deviceActions:0,serviceMutations:0,profileCopy:false,productionFilesHashOnly:true,normalExitOrUpgradeProvedHere:false}};
+const check=(name,passed)=>{checks.push({name,passed:!!passed});assert(passed,name)};
+function redact(value,depth=0){
+  if(depth>64)return '[REDACTED_NESTING_LIMIT]';
+  if(typeof value==='string'){
+    let clean=value;
+    try{const decoded=JSON.parse(value);if(decoded!==null&&typeof decoded==='object')return JSON.stringify(redact(decoded,depth+1));if(typeof decoded==='string'){const nested=redact(decoded,depth+1);if(nested!==decoded)return JSON.stringify(nested)}}catch{}
+    for(const secret of knownSecrets)clean=clean.replaceAll(secret,'[REDACTED]');
+    return clean.replace(/Bearer\s+[A-Za-z0-9._~+/-]{20,}/giu,'Bearer [REDACTED]');
+  }
+  if(Array.isArray(value))return value.map(x=>redact(x,depth+1));
+  if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([key,v])=>{
+    if(/token|secret|password|cookie|authorization|private.?key|api.?key|credential/iu.test(key)){if(typeof v==='string'&&v.length>10)knownSecrets.add(v);return[key,'[REDACTED]']}
+    if(key==='blob'&&typeof v==='string'){const bytes=Buffer.from(v,'base64');return[key,{omitted:true,bytes:bytes.length,sha256:hash(bytes)}]}
+    return[key,redact(v,depth+1)];
+  }));
+  return value;
+}
+const allowedTools=new Set(['qa_get_session','qa_list_projects','qa_get_bug_context']);
+let seq=0;
+async function wire(label,url,body){
+  assert(['http://127.0.0.1:4420/mcp','http://127.0.0.1:4419/api/v1/health/ready','http://127.0.0.1:4319/api/v1/health/ready'].includes(url),'URL_REFUSED');
+  const at=new Date().toISOString();const response=await fetch(url,{method:body?'POST':'GET',headers:{accept:'application/json',...(body?{'content-type':'application/json','mcp-protocol-version':'2025-06-18'}:{})},...(body?{body:JSON.stringify(body)}:{}),redirect:'error',signal:AbortSignal.timeout(25000)});
+  const bytes=Buffer.from(await response.arrayBuffer());const rawFile=join(privateOut,`${String(requests.length+1).padStart(2,'0')}-${label}.body`);writeFileSync(rawFile,bytes,{flag:'wx'});const value=bytes.length?JSON.parse(bytes.toString('utf8')):null;
+  requests.push({label,url,method:body?'POST':'GET',request:body??null,startedAt:at,completedAt:new Date().toISOString(),status:response.status,rawFile,rawSha256:hash(bytes),response:redact(value)});
+  check(label+':http-status',response.status===(body&&!('id'in body)?202:200));return value;
+}
+async function rpc(method,params){
+  assert(['initialize','notifications/initialized','tools/list','resources/templates/list','tools/call','resources/read'].includes(method),'RPC_REFUSED');
+  if(method==='tools/call')assert(allowedTools.has(params.name),'TOOL_REFUSED');
+  const notification=method==='notifications/initialized';const id=notification?undefined:++seq;
+  const result=await wire((params?.name??method).replaceAll('/','-'),'http://127.0.0.1:4420/mcp',{jsonrpc:'2.0',...(notification?{}:{id}),method,...(params===undefined?{}:{params})});
+  if(notification){check('notification-empty-response',result===null);return null}
+  check(method+':rpc-valid',result.jsonrpc==='2.0'&&result.id===id&&!result.error);return result.result;
+}
+async function tool(name,args){const envelope=await rpc('tools/call',{name,arguments:args});check(name+':tool-success',envelope.isError===false);return envelope.structuredContent??JSON.parse(envelope.content[0].text)}
+function unaffectedHost(snapshot,mainPid){return{listeners:snapshot.listeners.filter(x=>x.LocalPort!==4420).sort((a,b)=>a.LocalPort-b.LocalPort||a.LocalAddress.localeCompare(b.LocalAddress)),processes:snapshot.processes.filter(x=>x.pid!==mainPid).sort((a,b)=>a.pid-b.pid)}}
+function hostSnapshot(){
+  const command=`$ErrorActionPreference='Stop'
+$taskPorts=@(4319,4174,4419,4274,4421,4420)
+$taskListeners=@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in $taskPorts } | Select-Object LocalAddress,LocalPort,OwningProcess)
+$taskIds=@(@(17160,10844,7420,${pid})+@($taskListeners | ForEach-Object { $_.OwningProcess }) | Sort-Object -Unique)
+$taskProcesses=@(foreach($taskId in $taskIds){$taskProcess=Get-CimInstance Win32_Process -Filter ('ProcessId = '+$taskId) -ErrorAction SilentlyContinue;if($null -eq $taskProcess){[pscustomobject]@{pid=$taskId;exists=$false};continue};$taskPath=$null;try{$taskPath=$taskProcess.ExecutablePath}catch{};[pscustomobject]@{pid=$taskId;exists=$true;createdAt=$taskProcess.CreationDate.ToUniversalTime().ToString('o');executable=$taskPath}})
+$taskExe='C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe'
+[pscustomobject]@{observedAt=[DateTime]::UtcNow.ToString('o');processes=$taskProcesses;listeners=$taskListeners;installed=[pscustomobject]@{path=$taskExe;productVersion=(Get-Item -LiteralPath $taskExe).VersionInfo.ProductVersion;fileVersion=(Get-Item -LiteralPath $taskExe).VersionInfo.FileVersion}} | ConvertTo-Json -Depth 8 -Compress`;
+  const p=spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',command],{encoding:'utf8',windowsHide:true,timeout:25000});if(p.status!==0)writeFileSync(join(privateOut,'host-snapshot-error.txt'),p.stderr??'',{flag:'wx'});assert.equal(p.status,0,'READONLY_HOST_SNAPSHOT_FAILED');return JSON.parse(p.stdout);
+}
+try{
+  const baselinePath=join(root,'docs/evidence/project-components/runs/production-after-verdict.json'),baseline=JSON.parse(readFileSync(baselinePath));proof.productionBaseline={path:baselinePath,sha256:sha(baselinePath)};
+  proof.files=baseline.files.map(f=>({path:f.path,sha256:sha(f.path),baselineSha256:f.sha256}));check('six-production-file-hashes-unchanged',proof.files.length===6&&proof.files.every(x=>x.sha256===x.baselineSha256));
+  proof.host=hostSnapshot();writeFileSync(join(privateOut,'host-snapshot.json'),JSON.stringify(proof.host,null,2)+'\n',{flag:'wx'});
+  const preview=proof.host.processes.find(x=>x.pid===pid);check('expected-preview-process-path',preview?.exists&&preview.executable==='C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe');check('local-mcp-owned-by-preview-pid',proof.host.listeners.filter(x=>x.LocalPort===4420).length>0&&proof.host.listeners.filter(x=>x.LocalPort===4420).every(x=>x.OwningProcess===pid));
+  check('expected-installed-version',proof.host.installed.productVersion===`0.2.0-preview.${mode==='before'?8:9}`);
+  for(const b of baseline.processes){const current=proof.host.processes.find(x=>x.pid===b.pid);check('production-process-start:'+b.pid,current?.exists&&Date.parse(current.createdAt)===Date.parse(b.createdAt));if(b.executable)check('production-process-path:'+b.pid,current.executable===b.executable)}
+  proof.previewServiceBaseline='Fresh observed before collection; old preview API PID is deliberately not inherited from .8 evidence.';for(const port of [4419,4274,4421])check('preview-service-observed:'+port,proof.host.listeners.some(x=>x.LocalPort===port&&proof.host.processes.some(p=>p.pid===x.OwningProcess&&p.exists)));
+  proof.productionReady=await wire('production-ready','http://127.0.0.1:4319/api/v1/health/ready');check('production-ready-schema12',proof.productionReady.status==='ready'&&proof.productionReady.schemaVersion==='12');
+  proof.previewReady=await wire('preview-ready','http://127.0.0.1:4419/api/v1/health/ready');check('preview-ready-schema14',proof.previewReady.status==='ready'&&proof.previewReady.schemaVersion==='14');
+  const init=await rpc('initialize',{protocolVersion:'2025-06-18',capabilities:{},clientInfo:{name:'preview9-readback',version:'1'}});proof.initialize=init;check('local-mcp-version',init.protocolVersion==='2025-06-18'&&init.serverInfo.version===`0.2.0-preview.${mode==='before'?8:9}`);await rpc('notifications/initialized');
+  const catalog=await rpc('tools/list',{});proof.tools={count:catalog.tools.length,names:catalog.tools.map(x=>x.name)};check('exact-shared-tool-count-90',proof.tools.count===90);check('required-read-tools-advertised',[...allowedTools,'qa_read_attachment'].every(n=>catalog.tools.some(x=>x.name===n)));check('required-tools-readonly-annotations',[...allowedTools,'qa_read_attachment'].every(n=>catalog.tools.find(x=>x.name===n)?.annotations?.readOnlyHint===true));
+  proof.session=await tool('qa_get_session',{});check('original-employee-session',proof.session.userId===expected.actorId&&proof.session.projectId===expected.projectId&&proof.session.isGm===false);
+  proof.projects=await tool('qa_list_projects',{});check('original-project-visible',proof.projects.items.some(x=>x.id===expected.projectId));
+  proof.context=await tool('qa_get_bug_context',{projectId:expected.projectId,bugId:expected.bugId});const old=JSON.parse(readFileSync(join(root,'docs/evidence/project-components/runs/exe-after-preview7-upgrade.json'))).business;
+  check('original-bug-full-DTO-preserved',isDeepStrictEqual(proof.context.bug,old.bug));check('original-comment-preserved',proof.context.comments.items.length===1&&proof.context.comments.items[0].id===expected.commentId&&proof.context.comments.items[0].body===old.comments.items[0].body);check('original-attachment-bound',proof.context.attachments.items.some(x=>x.id===expected.attachmentId||x.attachmentId===expected.attachmentId));
+  const templates=await rpc('resources/templates/list',{});proof.resourceTemplates=templates;const template=templates.resourceTemplates.find(x=>x.uriTemplate==='qa-hub://attachment/{projectId}/{bugId}/{attachmentId}');check('attachment-template-advertised',!!template);const uri=template.uriTemplate.replace('{projectId}',expected.projectId).replace('{bugId}',expected.bugId).replace('{attachmentId}',expected.attachmentId);
+  const resource=await rpc('resources/read',{uri});check('single-original-resource',resource.contents.length===1&&resource.contents[0].uri===uri&&resource.contents[0].mimeType==='image/png');const bytes=Buffer.from(resource.contents[0].blob,'base64');check('original-resource-bytes-sha',bytes.length===expected.attachmentBytes&&hash(bytes)===expected.attachmentSha256);writeFileSync(join(privateOut,'original-bound-attachment.png'),bytes,{flag:'wx'});proof.attachment={uri,mimeType:'image/png',bytes:bytes.length,sha256:hash(bytes)};
+  proof.sessionAfter=await tool('qa_get_session',{});check('session-unchanged-after-read',isDeepStrictEqual(identity(proof.sessionAfter),identity(proof.session)));
+  proof.hostAfter=hostSnapshot();check('preview-process-unchanged-during-reads',proof.hostAfter.processes.some(x=>x.pid===pid&&x.createdAt===preview.createdAt&&x.executable===preview.executable));check('six-production-files-stable-after-reads',proof.files.every(x=>sha(x.path)===x.sha256));check('non-upgrade-processes-stable-during-reads',isDeepStrictEqual(unaffectedHost(proof.host,pid),unaffectedHost(proof.hostAfter,pid)));
+  if(mode==='after'){const previous=JSON.parse(readFileSync(join(acceptance,'independent-before/proof.json')));check('before-succeeded',previous.status==='passed');check('same-script-before-after',previous.sourceSha256===proof.sourceSha256);check('original-session-before-after',isDeepStrictEqual(identity(previous.session),identity(proof.session)));check('original-bug-before-after',JSON.stringify(previous.context.bug)===JSON.stringify(proof.context.bug));check('original-comments-before-after',JSON.stringify(previous.context.comments)===JSON.stringify(proof.context.comments));check('original-image-before-after',JSON.stringify(previous.attachment)===JSON.stringify(proof.attachment));check('production-files-before-after',JSON.stringify(previous.files)===JSON.stringify(proof.files));check('tool-directory-before-after',JSON.stringify(previous.tools)===JSON.stringify(proof.tools));const previousPid=previous.host.listeners.find(x=>x.LocalPort===4420).OwningProcess;check('only-preview-main-pid-may-change-across-upgrade',isDeepStrictEqual(unaffectedHost(previous.host,previousPid),unaffectedHost(proof.host,pid)))}
+  proof.status='passed';
+}catch(error){proof.status='failed';proof.failure={name:error?.name??'Error',message:String(error?.message??'READBACK_FAILED').slice(0,500)}}finally{
+  proof.completedAt=new Date().toISOString();proof.counts={requests:requests.length,checks:checks.length,passed:checks.filter(x=>x.passed).length,failed:checks.filter(x=>!x.passed).length};
+  writeFileSync(join(privateOut,'proof.json'),JSON.stringify(proof,null,2)+'\n',{flag:'wx'});
+  const publicProof=redact(proof),text=JSON.stringify(publicProof,null,2)+'\n';for(const secret of knownSecrets)assert(!text.includes(secret),'SECRET_LITERAL_REFUSED');assert(!/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/u.test(text),'SECRET_PATTERN_REFUSED');writeFileSync(join(publicOut,'proof.json'),text,{flag:'wx'});console.log(JSON.stringify({status:proof.status,counts:proof.counts,failed:checks.filter(x=>!x.passed).map(x=>x.name),failure:proof.failure?.message,publicOutput:publicOut,sha256:sha(join(publicOut,'proof.json'))}));if(proof.status!=='passed')process.exitCode=1;
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "20260909T000712593Z",
+  "version": "0.2.0-preview.8",
+  "publishedAt": "2026-09-09T00:09:46.249Z",
+  "archive": {
+    "url": "/downloads/qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+    "size": 108333764,
+    "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+  },
+  "signature": "iotHQXxbPcyDsPxui6TbW0sUnUIAfwD9MRJoJhulbtHIsJMY2pc4T1BRHg/V8+3GQmbUfypH4trNS5A06l+TBQ=="
+}
