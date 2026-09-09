@@ -1,0 +1,56 @@
+[
+  {
+    "name": "audit-final",
+    "args": [
+      "scripts/project-components/parallel-evidence-map.audit.mjs",
+      "--expected-mapper",
+      "2ff1c4bbfcd8df06e1c093c32cbfde6f8c5f3182fbcc40dfb3a3328db5e35938"
+    ],
+    "startedAt": "2026-09-09T03:43:46.544Z",
+    "finishedAt": "2026-09-09T03:43:53.519Z",
+    "exitCode": 0
+  },
+  {
+    "name": "syntax-mapper-final",
+    "args": [
+      "--check",
+      "scripts/project-components/map-coverage-evidence.mjs"
+    ],
+    "startedAt": "2026-09-09T03:43:53.520Z",
+    "finishedAt": "2026-09-09T03:43:53.595Z",
+    "exitCode": 0
+  },
+  {
+    "name": "syntax-audit-final",
+    "args": [
+      "--check",
+      "scripts/project-components/parallel-evidence-map.audit.mjs"
+    ],
+    "startedAt": "2026-09-09T03:43:53.595Z",
+    "finishedAt": "2026-09-09T03:43:53.666Z",
+    "exitCode": 0
+  },
+  {
+    "name": "lint-final",
+    "args": [
+      "node_modules/eslint/bin/eslint.js",
+      "scripts/project-components/map-coverage-evidence.mjs",
+      "scripts/project-components/parallel-evidence-map.audit.mjs"
+    ],
+    "startedAt": "2026-09-09T03:43:53.667Z",
+    "finishedAt": "2026-09-09T03:43:54.745Z",
+    "exitCode": 0
+  },
+  {
+    "name": "format-final",
+    "args": [
+      "node_modules/prettier/bin/prettier.cjs",
+      "--check",
+      "scripts/project-components/map-coverage-evidence.mjs",
+      "scripts/project-components/parallel-evidence-map.audit.mjs"
+    ],
+    "startedAt": "2026-09-09T03:43:54.746Z",
+    "finishedAt": "2026-09-09T03:43:55.123Z",
+    "exitCode": 0
+  }
+]

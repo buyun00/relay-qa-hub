@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-09T03:31:54.909Z",
+  "generatedAt": "2026-09-09T03:31:51.123Z",
   "evidenceMapping": {
-    "at": "2026-09-09T03:31:53.248Z",
+    "at": "2026-09-09T03:31:49.480Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "redaction-corrections/index.json",
@@ -2105,7 +2105,7 @@
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-09T03:31:53.234Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.466Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2342,7 +2342,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.234Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.466Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3017,7 +3017,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.110Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.341Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3386,7 +3386,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.110Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.341Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -3694,7 +3694,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.113Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.344Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -3857,7 +3857,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.114Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.345Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -4054,7 +4054,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.116Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.347Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -4846,7 +4846,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.221Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.460Z",
         "workflowConcurrencyRuns": [
           {
             "runId": "e94223b3-82c5-469d-b7ca-eea306ba0aab",
@@ -5016,7 +5016,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.118Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.349Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -5786,7 +5786,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.119Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.350Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6426,7 +6426,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.228Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.460Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6589,7 +6589,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.120Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.351Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -7412,7 +7412,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.122Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.353Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -8582,7 +8582,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.123Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.354Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -14945,7 +14945,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.124Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.356Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15123,7 +15123,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.126Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.357Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15348,7 +15348,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.442Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -15492,7 +15492,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.442Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15715,7 +15715,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.130Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.361Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15932,7 +15932,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.443Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -16128,7 +16128,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.443Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -16303,7 +16303,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -16613,7 +16613,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.443Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -16816,7 +16816,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.442Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -17048,7 +17048,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.442Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -17407,7 +17407,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.139Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.370Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -17979,7 +17979,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.443Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -28494,7 +28494,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.207Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.438Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -29997,7 +29997,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.142Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.373Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -30332,7 +30332,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.143Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.374Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -32116,7 +32116,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -32598,7 +32598,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.206Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.437Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -33100,7 +33100,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.207Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.438Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -33558,7 +33558,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.209Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.439Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-662ac1e4f068be",
           "sourceFile": "apps/api/src/app.ts",
@@ -33946,7 +33946,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.209Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.440Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-f2b76a8f2d3bd2",
           "sourceFile": "apps/api/src/app.ts",
@@ -34247,7 +34247,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.210Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.441Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -34507,7 +34507,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.442Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-3f8b6d79c3ec5a",
           "sourceFile": "apps/api/src/app.ts",
@@ -34966,7 +34966,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-280fa057c65980",
           "sourceFile": "apps/api/src/app.ts",
@@ -35320,7 +35320,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.442Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-91587d5ccb9fcd",
           "sourceFile": "apps/api/src/app.ts",
@@ -35517,7 +35517,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-133e8410ae7ef7",
           "sourceFile": "apps/api/src/app.ts",
@@ -35719,7 +35719,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-45735bc8af628d",
           "sourceFile": "apps/api/src/app.ts",
@@ -36097,7 +36097,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-144efd0c9334b8",
           "sourceFile": "apps/api/src/app.ts",
@@ -36786,7 +36786,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.153Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.384Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -36995,7 +36995,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.441Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -37473,7 +37473,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.208Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.439Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-c72542c420f961",
           "sourceFile": "apps/api/src/app.ts",
@@ -38107,7 +38107,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-8d683a24515c8d",
           "sourceFile": "apps/api/src/app.ts",
@@ -38527,7 +38527,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.450Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-d250196281a746",
           "sourceFile": "apps/api/src/app.ts",
@@ -41180,7 +41180,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.330Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41362,7 +41362,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.330Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41467,7 +41467,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.330Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41645,7 +41645,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.330Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -43101,7 +43101,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.161Z"
+        "evidenceMappedAt": "2026-09-09T03:31:49.392Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -44028,7 +44028,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.230Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.461Z",
         "recentEvidenceObservations": [
           {
             "id": "exe-native-upgrade-7-to-8",
@@ -44256,7 +44256,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.230Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.462Z",
         "recentEvidenceObservations": [
           {
             "id": "exe-native-upgrade-7-to-8",
@@ -44773,7 +44773,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.161Z"
+        "evidenceMappedAt": "2026-09-09T03:31:49.392Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -75839,7 +75839,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.173Z",
+        "evidenceMappedAt": "2026-09-09T03:31:49.404Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"

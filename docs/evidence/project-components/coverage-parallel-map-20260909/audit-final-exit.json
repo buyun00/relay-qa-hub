@@ -1,0 +1,11 @@
+{
+  "name": "audit-final",
+  "args": [
+    "scripts/project-components/parallel-evidence-map.audit.mjs",
+    "--expected-mapper",
+    "2ff1c4bbfcd8df06e1c093c32cbfde6f8c5f3182fbcc40dfb3a3328db5e35938"
+  ],
+  "startedAt": "2026-09-09T03:43:46.544Z",
+  "finishedAt": "2026-09-09T03:43:53.519Z",
+  "exitCode": 0
+}

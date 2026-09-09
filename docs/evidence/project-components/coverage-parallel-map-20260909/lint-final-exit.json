@@ -1,0 +1,11 @@
+{
+  "name": "lint-final",
+  "args": [
+    "node_modules/eslint/bin/eslint.js",
+    "scripts/project-components/map-coverage-evidence.mjs",
+    "scripts/project-components/parallel-evidence-map.audit.mjs"
+  ],
+  "startedAt": "2026-09-09T03:43:53.667Z",
+  "finishedAt": "2026-09-09T03:43:54.745Z",
+  "exitCode": 0
+}

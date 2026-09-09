@@ -1,0 +1,31 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {spawnSync,execFileSync} from 'node:child_process';
+const base='docs/evidence/project-components';
+const auditDir=base+'/coverage-parallel-map-20260909';
+const actualDir=base+'/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const write=(p,s)=>fs.writeFileSync(p,s,{flag:'wx'});
+const mapper='scripts/project-components/map-coverage-evidence.mjs';
+const audit='scripts/project-components/parallel-evidence-map.audit.mjs';
+assert.equal(sha(fs.readFileSync(mapper)),'2ff1c4bbfcd8df06e1c093c32cbfde6f8c5f3182fbcc40dfb3a3328db5e35938');
+const checks=[];
+for(const [name,args] of [
+ ['audit-r4',[audit,'--expected-mapper',sha(fs.readFileSync(mapper))]],
+ ['syntax-mapper',['--check',mapper]],['syntax-audit',['--check',audit]],
+ ['lint',['node_modules/eslint/bin/eslint.js',mapper,audit]],
+ ['format',['node_modules/prettier/bin/prettier.cjs','--check',mapper,audit]],
+]){
+ const startedAt=new Date().toISOString();
+ const r=spawnSync(process.execPath,args,{encoding:'utf8',windowsHide:true,maxBuffer:10*1024*1024});
+ write(auditDir+'/'+name+(name==='audit-r4'?'.json':'.txt'),r.stdout??'');
+ write(auditDir+'/'+name+'.stderr.txt',r.stderr??'');
+ checks.push({name,args,startedAt,finishedAt:new Date().toISOString(),exitCode:r.status});
+ assert.equal(r.status,0,name);
+}
+write(auditDir+'/final-checks.json',JSON.stringify(checks,null,2)+'\n');
+write(auditDir+'/audit-current-source.mjs.txt',fs.readFileSync(audit));
+write(actualDir+'/refresh-coverage-protected.mjs.txt',fs.readFileSync('.tools/refresh-coverage-protected.mjs'));
+console.log(JSON.stringify({checks:checks.length,allPassed:true,audit:sha(fs.readFileSync(audit))}));

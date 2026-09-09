@@ -1,0 +1,10 @@
+{
+  "name": "syntax-audit-final",
+  "args": [
+    "--check",
+    "scripts/project-components/parallel-evidence-map.audit.mjs"
+  ],
+  "startedAt": "2026-09-09T03:43:53.595Z",
+  "finishedAt": "2026-09-09T03:43:53.666Z",
+  "exitCode": 0
+}

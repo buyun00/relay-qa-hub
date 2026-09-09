@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-09T03:31:54.909Z",
+  "generatedAt": "2026-09-09T03:31:52.861Z",
   "evidenceMapping": {
     "at": "2026-09-09T03:31:53.248Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",

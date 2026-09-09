@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "status": "passed_protected_actual_generation",
+  "recordedAt": "2026-09-09T03:31:55.063Z",
+  "sourcePins": [
+    {
+      "file": "scripts/project-components/generate-coverage-matrix.mjs",
+      "sha256": "bbd7621ee3d843f1c46608d899c4f34e3d408dc99a26e0e3c282c8f8063bb385"
+    },
+    {
+      "file": "scripts/project-components/map-coverage-evidence.mjs",
+      "sha256": "2ff1c4bbfcd8df06e1c093c32cbfde6f8c5f3182fbcc40dfb3a3328db5e35938"
+    }
+  ],
+  "stages": [
+    {
+      "name": "cycle1-stage1",
+      "tool": "generate-coverage-matrix.mjs",
+      "startedAt": "2026-09-09T03:31:47.502Z",
+      "finishedAt": "2026-09-09T03:31:49.162Z",
+      "exitCode": 0
+    },
+    {
+      "name": "cycle1-stage2",
+      "tool": "map-coverage-evidence.mjs",
+      "startedAt": "2026-09-09T03:31:49.183Z",
+      "finishedAt": "2026-09-09T03:31:49.523Z",
+      "exitCode": 0
+    },
+    {
+      "name": "cycle1-stage3",
+      "tool": "generate-coverage-matrix.mjs",
+      "startedAt": "2026-09-09T03:31:49.544Z",
+      "finishedAt": "2026-09-09T03:31:51.186Z",
+      "exitCode": 0
+    },
+    {
+      "name": "cycle2-stage1",
+      "tool": "generate-coverage-matrix.mjs",
+      "startedAt": "2026-09-09T03:31:51.213Z",
+      "finishedAt": "2026-09-09T03:31:52.929Z",
+      "exitCode": 0
+    },
+    {
+      "name": "cycle2-stage2",
+      "tool": "map-coverage-evidence.mjs",
+      "startedAt": "2026-09-09T03:31:52.949Z",
+      "finishedAt": "2026-09-09T03:31:53.289Z",
+      "exitCode": 0
+    },
+    {
+      "name": "cycle2-stage3",
+      "tool": "generate-coverage-matrix.mjs",
+      "startedAt": "2026-09-09T03:31:53.308Z",
+      "finishedAt": "2026-09-09T03:31:54.972Z",
+      "exitCode": 0
+    }
+  ],
+  "captures": [
+    {
+      "name": "before",
+      "files": [
+        {
+          "file": "coverage-matrix.json",
+          "bytes": 4515556,
+          "sha256": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990"
+        },
+        {
+          "file": "coverage-mapping-review.md",
+          "bytes": 53901,
+          "sha256": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041"
+        },
+        {
+          "file": "coverage-matrix.md",
+          "bytes": 185054,
+          "sha256": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+        }
+      ]
+    },
+    {
+      "name": "cycle1-stage1",
+      "files": [
+        {
+          "file": "coverage-matrix.json",
+          "bytes": 4523328,
+          "sha256": "946fb6f142dde7dcf14d7b99d2bbc0a972d7dac7cdc806a2670e5ccd55223fba"
+        },
+        {
+          "file": "coverage-mapping-review.md",
+          "bytes": 53901,
+          "sha256": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041"
+        },
+        {
+          "file": "coverage-matrix.md",
+          "bytes": 185149,
+          "sha256": "21a25b8cbe303fb852adbdf70d8489950e06fd23f3a2100d33aa0f186ed74e01"
+        }
+      ]
+    },
+    {
+      "name": "cycle1-stage2",
+      "files": [
+        {
+          "file": "coverage-matrix.json",
+          "bytes": 4590018,
+          "sha256": "efc7aa43cfdf1589fbd48600b033d74a3230b29ceb136f2facce303f61eb98ed"
+        },
+        {
+          "file": "coverage-mapping-review.md",
+          "bytes": 63250,
+          "sha256": "1f6662d5167080e361ead25204d6af6837da1db498d3aa265e20d74e15c6346d"
+        },
+        {
+          "file": "coverage-matrix.md",
+          "bytes": 185149,
+          "sha256": "21a25b8cbe303fb852adbdf70d8489950e06fd23f3a2100d33aa0f186ed74e01"
+        }
+      ]
+    },
+    {
+      "name": "cycle1-stage3",
+      "files": [
+        {
+          "file": "coverage-matrix.json",
+          "bytes": 4590018,
+          "sha256": "3374350c61b90e9cbd60e308d94e9f05560a931d3be0c2e171a43d6ba289920b"
+        },
+        {
+          "file": "coverage-mapping-review.md",
+          "bytes": 63250,
+          "sha256": "1f6662d5167080e361ead25204d6af6837da1db498d3aa265e20d74e15c6346d"
+        },
+        {
+          "file": "coverage-matrix.md",
+          "bytes": 185147,
+          "sha256": "ae4a9232f23ee4cfda344ebf19debbd84d356ce99de837b2d57c1ccb6270bfdf"
+        }
+      ]
+    },
+    {
+      "name": "cycle2-stage1",
+      "files": [
+        {
+          "file": "coverage-matrix.json",
+          "bytes": 4590018,
+          "sha256": "511bb77d7ade576525b7dbd00165e6dc23f2a24899144702fc6e404a6dc5d5f7"
+        },
+        {
+          "file": "coverage-mapping-review.md",
+          "bytes": 63250,
+          "sha256": "1f6662d5167080e361ead25204d6af6837da1db498d3aa265e20d74e15c6346d"
+        },
+        {
+          "file": "coverage-matrix.md",
+          "bytes": 185147,
+          "sha256": "c47bdf15996077d177c12f86833db7c479fe7a05466b1b968a89f72453f75f08"
+        }
+      ]
+    },
+    {
+      "name": "cycle2-stage2",
+      "files": [
+        {
+          "file": "coverage-matrix.json",
+          "bytes": 4590018,
+          "sha256": "92f68be5625b1a4ad5bfcc226ea6552fd44e4196a02236b4a8bfcea0940a80cc"
+        },
+        {
+          "file": "coverage-mapping-review.md",
+          "bytes": 63250,
+          "sha256": "cb30ea7fe50cb3c89e204776ffd1e5e5f0cac1f3ecd200469851be01f8171e58"
+        },
+        {
+          "file": "coverage-matrix.md",
+          "bytes": 185147,
+          "sha256": "c47bdf15996077d177c12f86833db7c479fe7a05466b1b968a89f72453f75f08"
+        }
+      ]
+    },
+    {
+      "name": "cycle2-stage3",
+      "files": [
+        {
+          "file": "coverage-matrix.json",
+          "bytes": 4590018,
+          "sha256": "467f7b0800f291ff9e271f896b99f7af8922960f463732d2a13350adf34645c1"
+        },
+        {
+          "file": "coverage-mapping-review.md",
+          "bytes": 63250,
+          "sha256": "cb30ea7fe50cb3c89e204776ffd1e5e5f0cac1f3ecd200469851be01f8171e58"
+        },
+        {
+          "file": "coverage-matrix.md",
+          "bytes": 185147,
+          "sha256": "d547d2141210ceab5b01b5e0744c28109edf3ccd24e7214294a890fde47ca964"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "two complete actual chains are semantically identical",
+      "passed": true
+    },
+    {
+      "name": "source inventory does not drift between actual cycles",
+      "passed": true
+    },
+    {
+      "name": "prior current and retired IDs all retained",
+      "passed": true
+    },
+    {
+      "name": "all prior failed surface results and progress preserved",
+      "passed": true
+    },
+    {
+      "name": "all old source revalidation flags remain",
+      "passed": true
+    },
+    {
+      "name": "all prior manual retained notes remain exact",
+      "passed": true
+    },
+    {
+      "name": "newly discovered source nodes are not automatically passed",
+      "passed": true
+    },
+    {
+      "name": "only exact existing server MCP baseline02/04 statuses may change",
+      "passed": true
+    },
+    {
+      "name": "whole baselines remain seven",
+      "passed": true
+    },
+    {
+      "name": "generator and mapper bytes remain fixed",
+      "passed": true
+    }
+  ],
+  "semanticSha256": "f09a7ae1f29d4b06c6b09b135a2dcefc25cfb90ef48a9264e4174b969f05fc8d",
+  "counts": {
+    "before": {
+      "items": 991,
+      "retired": 28,
+      "sources": 191
+    },
+    "after": {
+      "items": 991,
+      "retired": 30,
+      "sources": 193,
+      "revalidation": 484,
+      "notes": 159
+    }
+  },
+  "limits": [
+    "Static inventory and evidence mapping only; no API calls, service changes, installations or test outcome inference.",
+    "Unregistered Phase D source may appear as not_run static inventory; it is not proof of runtime availability.",
+    "All raw previous and intermediate generated files remain retained."
+  ]
+}

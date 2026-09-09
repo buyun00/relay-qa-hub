@@ -1,6 +1,6 @@
 # QA Hub 项目制与组件化真实验收矩阵
 
-生成时点：2026-09-09T03:31:54.909Z；设计 v2.1；源码 HEAD：`3b57719deed8d907fa84bba232e2939d18288351`。
+生成时点：2026-09-09T03:31:49.101Z；设计 v2.1；源码 HEAD：`3b57719deed8d907fa84bba232e2939d18288351`。
 
 本文件是代码和需求的验收清单，初始全部为 `not_run`。代码存在、静态推导、mock、编译成功、端口监听或排队成功均不算通过。逐入口真实操作并读回项目、操作人、状态、版本、事件、附件及最终产物后，才登记结果。
 
@@ -13,9 +13,9 @@ A = 此基线须通过该入口真实验收；— = 该条描述其他入口，�
 | 编号及场景 | APK | EXE | Web | HTTP API | server MCP | local MCP | 预期 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 01 项目入口姓名登录 | A · not_run | A · not_run | A · passed | A · passed | A · not_run | A · not_run | 首次登录只登记入口项目；原姓名仍解析为稳定原人员。 |
-| 02 单项目和多项目人员 | A · not_run | A · not_run | A · passed | A · passed | A · passed | A · not_run | 单项目直接进入；多项目只列出有效所属项目。 |
+| 02 单项目和多项目人员 | A · not_run | A · not_run | A · passed | A · passed | A · not_run | A · not_run | 单项目直接进入；多项目只列出有效所属项目。 |
 | 03 唯一 GM | A · not_run | A · not_run | A · not_run | A · passed | A · not_run | A · not_run | GM 管理全部项目；普通姓名 gm 不获得 GM 身份。 |
-| 04 项目人员停用 | A · not_run | A · passed | A · not_run | A · passed | A · passed | A · not_run | A 停用不影响 B；再次姓名登录不恢复显式停用关系。 |
+| 04 项目人员停用 | A · not_run | A · passed | A · not_run | A · passed | A · not_run | A · not_run | A 停用不影响 B；再次姓名登录不恢复显式停用关系。 |
 | 05 非所属项目读取 | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | A · not_run | 列表、详情、附件、日志和统计均不泄露其他项目。 |
 | 06 写入归属 | A · not_run | A · not_run | A · not_run | A · passed | A · passed | A · not_run | 编辑、评论、附件绑定和状态动作不能写到错误项目。 |
 | 07 项目快速切换 | A · not_run | A · not_run | A · not_run | — | — | — | A 迟到请求、草稿及人员选择不能覆盖 B。 |

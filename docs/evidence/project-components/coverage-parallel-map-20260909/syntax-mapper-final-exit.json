@@ -1,0 +1,10 @@
+{
+  "name": "syntax-mapper-final",
+  "args": [
+    "--check",
+    "scripts/project-components/map-coverage-evidence.mjs"
+  ],
+  "startedAt": "2026-09-09T03:43:53.520Z",
+  "finishedAt": "2026-09-09T03:43:53.595Z",
+  "exitCode": 0
+}

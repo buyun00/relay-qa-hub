@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-09T03:31:54.909Z",
+  "generatedAt": "2026-09-09T03:31:49.101Z",
   "evidenceMapping": {
-    "at": "2026-09-09T03:31:53.248Z",
+    "at": "2026-09-09T00:01:14.124Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "redaction-corrections/index.json",
@@ -156,22 +156,7 @@
       "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json",
       "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json",
       "web-submission-recovery-live/audit.json",
-      "web-submission-recovery-live/README.md",
-      "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
-      "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-      "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-      "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json",
-      "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
-      "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-      "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json",
-      "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
-      "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
-      "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
-      "contracts-result-phase-a/result.json",
-      "web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json",
-      "android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json",
-      "contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json",
-      "contracts-result-phase-b/result.json"
+      "web-submission-recovery-live/README.md"
     ],
     "proofHashes": {
       "redaction-corrections/index.json": "b7f7c147da5a718ef9a9312293b81b6acb716e16a0ba823127823a9969f15491",
@@ -325,22 +310,7 @@
       "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json": "e895f1114d9b86ac2272783e101a360617c1e28fc16537104a116a880446eef7",
       "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json": "3bd91b313315c54c457307facaaff52d900848dfc6da4fc8c096c8e70d1c4c84",
       "web-submission-recovery-live/audit.json": "8bf531f9baf759365339d5e32d5abfe0162ea04cdf6628adfc4b42ceeb27db29",
-      "web-submission-recovery-live/README.md": "f233ff30db0ee6a80c84be78a57ab85067f8444ff92a86d1e0b3e95fffb74f25",
-      "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json": "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb",
-      "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56",
-      "android-recovery-proxy-audits/65ee5dc8-first/proof.json": "ed0da76a9d89906ab14144423c8dcc985e7f11cf619f94250ff108c50b317b65",
-      "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json": "3d987a3619503af4a853cd256cb6347329793d56d0c4b8c215f7f407f3082c7f",
-      "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json": "ab97c596e0cd33811fe4311d7956ddd04d091f5feb9de4533bdeb3324bc56c7d",
-      "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json": "02522989982733987c86ee90132f3251e50a70f0a257a6c6b9723bf6cc6d867a",
-      "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json": "9a5184a94eee7493ac3020b052e9ae7775988c50fd993d04c745cd26eccfe789",
-      "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63",
-      "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
-      "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json": "55ac6023679282fb4a7a0a985ff79db0a2718999f1869e41fe60b25e569834e5",
-      "contracts-result-phase-a/result.json": "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca",
-      "web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa",
-      "android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json": "4a20b282bfb578600f215835b5c8dc1c36602c2201bef7bb9fc0e3232f04dfb7",
-      "contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json": "beaccbfa20d338e48fae91b235fca73752559f2151d0257912622871c9c6cac7",
-      "contracts-result-phase-b/result.json": "66b3e20e305af125c875f558c35acf8075dbca358283b0dca4a6abcfd5801f67"
+      "web-submission-recovery-live/README.md": "f233ff30db0ee6a80c84be78a57ab85067f8444ff92a86d1e0b3e95fffb74f25"
     },
     "validationEvidence": [
       {
@@ -575,60 +545,6 @@
         "summary": "Web61/61+typecheck/lint/build；outbox真实临时API/SQLite、外部请求0",
         "matched": true,
         "scope": "React静态渲染及隔离API实测；浏览器暂停条目点击未测"
-      },
-      {
-        "file": "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
-        "matched": true,
-        "summary": "code23同包preview feed发布13个真实HTTP：GET/HEAD/206 range及完整APK SHA核对；旧code22与发布时Windows.8保留",
-        "scope": "仅发布/下载与API身份记录；stable未选channel的401保留。不是APK原生自更新，后来的Windows.9更新不是本次失败。"
-      },
-      {
-        "file": "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
-        "matched": true,
-        "summary": "bc2b347对应.9包中共享Web部署：18 GET/HEAD全部200、8候选SHA、12 served文件及Web进程身份保持",
-        "scope": "仅静态下载和发布时进程证据；无新服务启停，不代表真实Web loading页面验收，不将.9原生EXE UI传递到Web。"
-      },
-      {
-        "file": "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
-        "matched": true,
-        "summary": "Br-CEXQI真实Edge59项：真实200暂留显示加载，注入Failed显示错误，实际Retry取得新200恢复同一详情",
-        "scope": "仅同项目文本Bug；四张实际截图、Bug与事件未变。背景components hold实际0，不证明超时/常态轮询或跨项目迟到响应。"
-      },
-      {
-        "file": "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
-        "matched": true,
-        "summary": "服务端MCP人员真实59项，02/04的server MCP入口完成；01保留旧历史姓名组合未测",
-        "scope": "仅新A/B/新员工；35 RPC另加1 health GET，五组件off、无Bug写入，不传递到其它入口或整个基线。"
-      },
-      {
-        "file": "contracts-result-phase-a/result.json",
-        "matched": true,
-        "summary": "Phase A源码：legacy passed/failed和不可变原回执，API260/Storage118及临时真实HTTP215通过，schema15加法恢复验证",
-        "scope": "该证据未部署常驻4419、未做完整main/MCP/客户端运行；blocked、附件9..20/capture、fail/supersede及workflow GET仍独立未完成。"
-      },
-      {
-        "file": "web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json",
-        "matched": true,
-        "summary": "真实Web A/B切换164项：A genuine200在实际切B时由同network request取消；两项目独立文字/人员/PNG经reload及往返保留",
-        "scope": "实际settlement=canceled，未绕过Abort或伪造旧回调送达；18直接+47浏览器请求与28响应记录分开，无Bug/上传/评论写入。"
-      },
-      {
-        "file": "android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json",
-        "matched": true,
-        "summary": "MuMu code23原生33项：单A/A-B/B-only目录、A撤权后同名拒绝/B可用、恢复同ID；原账号文字PNG及四稳定文件完整恢复",
-        "scope": "停用/恢复由GM官方HTTP辅助；原生自停用被disabled，无物理设备、原生网络403抓包或整项人员基线通过结论。"
-      },
-      {
-        "file": "contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json",
-        "matched": true,
-        "summary": "独立完整main/schema15+worker+server MCP：247项，111直接HTTP+16JSONRPC；legacy/vendor原receipt、权限与普通人工链真实通过",
-        "scope": "4459/4461专用临时实验服务正常退出、一致备份保留；不代表常驻4419已更新或客户端/外部组件已验收。"
-      },
-      {
-        "file": "contracts-result-phase-b/result.json",
-        "matched": true,
-        "summary": "PhaseB blocked源码API266/Storage118、六组114临时HTTP与15→16独立档案迁移11项通过，原70表/7份receipt保持",
-        "scope": "五份产品源码与四份测试按pin固定；本证据不含完整schema16 main运行。常驻4419仍14、MCP仍无blocked提交工具。"
       }
     ],
     "review": "coverage-mapping-review.md",
@@ -1353,316 +1269,6 @@
       "checks": 56,
       "races": 4,
       "scope": "HTTP/server MCP only: same manual completion intent and two opposite verdict races; pass won both. All fresh fixtures retained, five components disabled. Successful failure-side effects, UI and other entries remain untested here."
-    },
-    "recentVersionedEvidence": {
-      "observations": [
-        {
-          "id": "web-7904e2c-rejected-media-81",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-          "sourceHashesAtExecution": {
-            "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-            "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-            "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-            "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-          },
-          "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-          "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-        },
-        {
-          "id": "apk-code23-legacy-text-recovery",
-          "evidence": [
-            "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-            "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-            "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-          ],
-          "version": {
-            "code": 23,
-            "name": "0.2.0-preview.9",
-            "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-          },
-          "preservedFailures": [
-            {
-              "name": "upgrade-precheck-first-failure.json",
-              "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-            },
-            {
-              "name": "preparation signing verification attempt",
-              "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-            }
-          ],
-          "completed": "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。",
-          "remaining": "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
-        },
-        {
-          "id": "android-code23-feed-http13",
-          "evidence": [
-            "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json"
-          ],
-          "version": "code23/0.2.0-preview.9 publication; Windows manifest was .8 at this observation",
-          "completed": "已选择preview的匿名manifest/APK GET、HEAD及range均按原始13条ledger实测，原code22下载仍可用。",
-          "remaining": "仅固定preview下载输入；客户端更新UI、所有错误组合及物理设备未测。"
-        },
-        {
-          "id": "exe-native-upgrade-7-to-8",
-          "evidence": [
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-          ],
-          "version": {
-            "releaseId": "20260909T000712593Z",
-            "version": "0.2.0-preview.8",
-            "nativeVersion": "0.2.0.8",
-            "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-            "installerBytes": 108333764,
-            "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-          },
-          "preservedFinding": {
-            "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-            "status": "open_in_installed_preview8",
-            "firstObservation": "after-old-bug-first-failure.json",
-            "subsequentObservation": "after-old-bug-observed-again.json",
-            "retriedByUserOrRoot": false,
-            "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-          },
-          "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-          "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-        },
-        {
-          "id": "exe-native-upgrade-8-to-9",
-          "evidence": [
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-          ],
-          "version": {
-            "releaseId": "20260909T011704801Z",
-            "version": "0.2.0-preview.9",
-            "nativeVersion": "0.2.0.9",
-            "installerBytes": 108334255,
-            "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-            "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-            "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-            "sourceDirty": true
-          },
-          "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-          "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-          "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-        },
-        {
-          "id": "server-mcp-membership-e21431f0-59",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "version": {
-            "apiPid": 22852,
-            "apiSchema": 14,
-            "serverMcpPid": 15736,
-            "recordedAt": "2026-09-09T02:43:15.556Z"
-          },
-          "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-          "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
-        }
-      ],
-      "matches": [
-        {
-          "observation": "web-7904e2c-rejected-media-81",
-          "itemId": "baseline-4e70e4b8aea144",
-          "surface": "web",
-          "source": null,
-          "title": "14 并发和重复提交",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81",
-          "itemId": "web_control-f59fc9cda1c3d9",
-          "surface": "web",
-          "source": {
-            "file": "apps/web/src/App.tsx",
-            "line": 3413
-          },
-          "title": "button | 保留失败记录并提交修改稿 | type=\"button\" | onClick={() => void submitBug(undefined, false, bugRejection.id)}",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/init",
-          "itemId": "http_route-52f4781153b6ba",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 2559
-          },
-          "title": "POST /api/v1/uploads/init",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:PUT:/api/v1/uploads/:sessionId/chunks/:chunkNumber",
-          "itemId": "http_route-1aed7cd39c68f5",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 2593
-          },
-          "title": "PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/:sessionId/finalize",
-          "itemId": "http_route-fa84a8b7df5b30",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 2647
-          },
-          "title": "POST /api/v1/uploads/:sessionId/finalize",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/bugs",
-          "itemId": "http_route-869c95e9cb22b6",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 1379
-          },
-          "title": "POST /api/v1/bugs",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "apk-code23-legacy-text-recovery",
-          "itemId": "baseline-4e70e4b8aea144",
-          "surface": "apk",
-          "source": null,
-          "title": "14 并发和重复提交",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "apk-code23-legacy-text-recovery",
-          "itemId": "android_control-44808d673345f3",
-          "surface": "apk",
-          "source": {
-            "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
-            "line": 2036
-          },
-          "title": "onClick = { val bytes = image?.takeIf { savedStrokes.isNotEmpty() }?.let { renderAnnotatedPng(draft = draft, strokes = savedStrokes)",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "apk-code22-to23-adb-upgrade",
-          "itemId": "baseline-31809d764ba2e7",
-          "surface": "apk",
-          "source": null,
-          "title": "22 APK 共存与升级",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "baseline-ee6de045b248f3",
-          "surface": "exe",
-          "source": null,
-          "title": "23 EXE 共存与升级",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "desktop_ipc_action-1b2936d4f2c6aa",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 690
-          },
-          "title": "handle desktop:get-update-state",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "desktop_ipc_action-a5c0718eb53782",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 696
-          },
-          "title": "handle desktop:check-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "desktop_ipc_action-e1a9ae39f347bc",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 701
-          },
-          "title": "handle desktop:install-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "baseline-ee6de045b248f3",
-          "surface": "exe",
-          "source": null,
-          "title": "23 EXE 共存与升级",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "desktop_ipc_action-1b2936d4f2c6aa",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 690
-          },
-          "title": "handle desktop:get-update-state",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "desktop_ipc_action-a5c0718eb53782",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 696
-          },
-          "title": "handle desktop:check-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "desktop_ipc_action-e1a9ae39f347bc",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 701
-          },
-          "title": "handle desktop:install-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "server-mcp-membership-e21431f0-59",
-          "itemId": "baseline-950546b51f2cb2",
-          "surface": "server_mcp",
-          "source": null,
-          "title": "01 项目入口姓名登录",
-          "preservedStatus": "not_run"
-        }
-      ],
-      "unmatched": [
-        {
-          "observation": "android-code23-feed-http13",
-          "kind": "http_route",
-          "sourceFile": "apps/api/src/android-updates.ts",
-          "selector": "GET /api/v1/android-updates/preview/:fileName"
-        },
-        {
-          "observation": "android-code23-feed-http13",
-          "kind": "http_route",
-          "sourceFile": "apps/api/src/android-updates.ts",
-          "selector": "HEAD /api/v1/android-updates/preview/:fileName"
-        }
-      ],
-      "absent": [],
-      "inputSourceFileCount": 193,
-      "sourceSnapshotScope": "Input matrix sourceHashes/sourceHead describe its previous generation, not current source. This append neither refreshes that inventory nor clears revalidation flags.",
-      "statusPolicy": "Only server MCP baseline02/04 have explicit completed requirement promotion from the e21431f0 run. All other additions are evidence only. Historical failures and source revalidation remain; whole baselines are independent."
     }
   },
   "sourceHead": "3b57719deed8d907fa84bba232e2939d18288351",
@@ -2010,8 +1616,8 @@
         "not_run": 300
       },
       "server_mcp": {
-        "not_run": 230,
-        "passed": 32
+        "not_run": 232,
+        "passed": 30
       },
       "local_mcp": {
         "not_run": 251,
@@ -2086,11 +1692,10 @@
           "status": "not_run",
           "evidence": [
             "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
+            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
           ],
-          "actual": "已实测：实际项目姓名登录与项目目录、后续操作人读回；服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。。仍缺：完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖；旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际项目姓名登录与项目目录、后续操作人读回。仍缺：完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖。",
+          "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
@@ -2105,7 +1710,7 @@
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-09T03:31:53.234Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.003Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2123,17 +1728,13 @@
           },
           "server_mcp": {
             "completed": [
-              "实际项目姓名登录与项目目录、后续操作人读回",
-              "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。"
+              "实际项目姓名登录与项目目录、后续操作人读回"
             ],
             "remaining": [
-              "完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖",
-              "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
+              "完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-              "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-              "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
+              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
             ],
             "status": "partial"
           },
@@ -2243,22 +1844,6 @@
               "status": "partial"
             }
           }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "server-mcp-membership-e21431f0-59",
-            "evidence": [
-              "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-            ],
-            "version": {
-              "apiPid": 22852,
-              "apiSchema": 14,
-              "serverMcpPid": 15736,
-              "recordedAt": "2026-09-09T02:43:15.556Z"
-            },
-            "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-            "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
-          }
         ]
       },
       "needsRevalidation": false,
@@ -2323,12 +1908,13 @@
         },
         "server_mcp": {
           "applicable": true,
-          "status": "passed",
+          "status": "not_run",
           "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
+            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
           ],
-          "actual": "实际server MCP：单项目登录返回A，多项目目录严格为有效所属A/B；A停用后仅B，恢复后仍是原ID与A/B。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际列出当前员工所属项目。仍缺：单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。",
+          "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
@@ -2342,7 +1928,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.234Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.390Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2358,6 +1944,18 @@
             ],
             "status": "partial"
           },
+          "server_mcp": {
+            "completed": [
+              "实际列出当前员工所属项目"
+            ],
+            "remaining": [
+              "单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖"
+            ],
+            "evidence": [
+              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+            ],
+            "status": "partial"
+          },
           "local_mcp": {
             "completed": [
               "实际列出当前员工所属项目"
@@ -2370,32 +1968,6 @@
             ],
             "status": "partial"
           }
-        },
-        "serverMembershipPriorProgress": {
-          "completed": [
-            "实际列出当前员工所属项目"
-          ],
-          "remaining": [
-            "单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖"
-          ],
-          "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
-          ],
-          "status": "partial"
-        },
-        "serverMembershipRun": {
-          "id": "server-mcp-membership-e21431f0-59",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "version": {
-            "apiPid": 22852,
-            "apiSchema": 14,
-            "serverMcpPid": 15736,
-            "recordedAt": "2026-09-09T02:43:15.556Z"
-          },
-          "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-          "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
         }
       },
       "needsRevalidation": false,
@@ -2545,12 +2117,10 @@
         },
         "server_mcp": {
           "applicable": true,
-          "status": "passed",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "actual": "实际server MCP：只停用A的新员工关系，A重新姓名登录403且不自动恢复，B登录和读取继续可用、会员版本/角色不变；显式恢复A后同ID。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
@@ -2561,7 +2131,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:49.466Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.402Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2654,20 +2224,6 @@
           },
           "at": "2026-09-08T21:51:01.209Z",
           "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
-        },
-        "serverMembershipRun": {
-          "id": "server-mcp-membership-e21431f0-59",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "version": {
-            "apiPid": 22852,
-            "apiSchema": 14,
-            "serverMcpPid": 15736,
-            "recordedAt": "2026-09-09T02:43:15.556Z"
-          },
-          "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-          "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
         }
       },
       "needsRevalidation": false,
@@ -3017,7 +2573,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.110Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.007Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3386,7 +2942,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.110Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.007Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -3694,7 +3250,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.113Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.010Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -3857,7 +3413,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.114Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.011Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -4054,7 +3610,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.116Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.013Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -4372,13 +3928,9 @@
         "apk": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-            "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-            "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-          ],
-          "actual": "已实测：MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。。仍缺：仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "exe": {
           "applicable": true,
@@ -4394,10 +3946,9 @@
             "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json",
             "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json",
             "web-submission-recovery-live/audit.json",
-            "web-submission-recovery-live/README.md",
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
+            "web-submission-recovery-live/README.md"
           ],
-          "actual": "已实测：bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。；7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。；仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
+          "actual": "已实测：bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。。仍缺：该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。。",
           "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "http": {
@@ -4524,33 +4075,16 @@
           },
           "web": {
             "completed": [
-              "bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。",
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
+              "bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。"
             ],
             "remaining": [
-              "该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。",
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
+              "该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。"
             ],
             "evidence": [
               "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json",
               "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json",
               "web-submission-recovery-live/audit.json",
-              "web-submission-recovery-live/README.md",
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          },
-          "apk": {
-            "completed": [
-              "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。"
-            ],
-            "remaining": [
-              "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
-            ],
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
+              "web-submission-recovery-live/README.md"
             ],
             "status": "partial"
           }
@@ -4846,7 +4380,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.221Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.117Z",
         "workflowConcurrencyRuns": [
           {
             "runId": "e94223b3-82c5-469d-b7ca-eea306ba0aab",
@@ -4882,48 +4416,6 @@
             "status": "passed",
             "completedChecks": 101,
             "scope": "独立Edge实际页面与持久profile；只覆盖Bug/comment未知回执重放和正常浏览器重启"
-          }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          },
-          {
-            "id": "apk-code23-legacy-text-recovery",
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-            ],
-            "version": {
-              "code": 23,
-              "name": "0.2.0-preview.9",
-              "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-            },
-            "preservedFailures": [
-              {
-                "name": "upgrade-precheck-first-failure.json",
-                "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-              },
-              {
-                "name": "preparation signing verification attempt",
-                "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-              }
-            ],
-            "completed": "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。",
-            "remaining": "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
           }
         ]
       },
@@ -5016,7 +4508,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.118Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.015Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -5786,7 +5278,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.119Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.016Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6381,13 +5873,10 @@
             "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
             "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
             "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
-            "android-code22-no-code.json",
-            "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-            "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-            "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
+            "android-code22-no-code.json"
           ],
-          "actual": "已实测：MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留；code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留；MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。。仍缺：物理Android设备必测仍缺；应用内更新源/自安装链路未测；物理Android及应用内更新完整链路仍未验收；物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留；code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留。仍缺：物理Android设备必测仍缺；应用内更新源/自安装链路未测；物理Android及应用内更新完整链路仍未验收。",
+          "note": "Real execution and read-back required."
         },
         "exe": {
           "applicable": false,
@@ -6426,30 +5915,25 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.228Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.016Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
               "MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同",
               "日常code14/PID5051/安装时点/dataDir保留",
-              "code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留",
-              "MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。"
+              "code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留"
             ],
             "remaining": [
               "物理Android设备必测仍缺",
               "应用内更新源/自安装链路未测",
-              "物理Android及应用内更新完整链路仍未验收",
-              "物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。"
+              "物理Android及应用内更新完整链路仍未验收"
             ],
             "evidence": [
               "android-implementation.md",
               "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
               "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
               "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
-              "android-code22-no-code.json",
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
+              "android-code22-no-code.json"
             ],
             "status": "partial"
           }
@@ -6479,34 +5963,7 @@
               ]
             }
           }
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "apk-code22-to23-adb-upgrade",
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-            ],
-            "version": {
-              "code": 23,
-              "name": "0.2.0-preview.9",
-              "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-            },
-            "preservedFailures": [
-              {
-                "name": "upgrade-precheck-first-failure.json",
-                "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-              },
-              {
-                "name": "preparation signing verification attempt",
-                "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-              }
-            ],
-            "completed": "MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。",
-            "remaining": "物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。"
-          }
-        ]
+        }
       },
       "needsRevalidation": false,
       "generated": true
@@ -6589,7 +6046,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.120Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.017Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -6656,51 +6113,6 @@
               "runs/exe-preview6-restored-draft.txt"
             ],
             "progress": null
-          }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
           }
         ]
       },
@@ -7412,7 +6824,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.122Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.018Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -8582,7 +7994,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.123Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.020Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -14945,7 +14357,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.124Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.021Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15123,7 +14535,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.126Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.023Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15348,7 +14760,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -15492,7 +14904,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15715,7 +15127,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.130Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.026Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15932,7 +15344,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -16128,7 +15540,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -16303,7 +15715,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -16613,7 +16025,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -16816,7 +16228,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -17048,7 +16460,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -17407,7 +16819,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.139Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.035Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -17979,7 +17391,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -28494,7 +27906,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.207Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.103Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -29997,7 +29409,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.142Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.038Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -30332,7 +29744,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.143Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.039Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -32116,7 +31528,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -32252,23 +31664,6 @@
             "checks": 105,
             "failedChecks": 0,
             "additionalChecks": "18 resource comparisons reached after successful replay, plus HTTP409 status"
-          }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:POST:/api/v1/bugs",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
           }
         ]
       },
@@ -32598,7 +31993,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.206Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.102Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -33100,7 +32495,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.207Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.102Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -33558,7 +32953,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.209Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.104Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-662ac1e4f068be",
           "sourceFile": "apps/api/src/app.ts",
@@ -33946,7 +33341,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.209Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.105Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-f2b76a8f2d3bd2",
           "sourceFile": "apps/api/src/app.ts",
@@ -34247,7 +33642,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.210Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.106Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -34507,7 +33902,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-3f8b6d79c3ec5a",
           "sourceFile": "apps/api/src/app.ts",
@@ -34966,7 +34361,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.114Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-280fa057c65980",
           "sourceFile": "apps/api/src/app.ts",
@@ -35320,7 +34715,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.106Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-91587d5ccb9fcd",
           "sourceFile": "apps/api/src/app.ts",
@@ -35517,7 +34912,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-133e8410ae7ef7",
           "sourceFile": "apps/api/src/app.ts",
@@ -35719,7 +35114,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-45735bc8af628d",
           "sourceFile": "apps/api/src/app.ts",
@@ -36097,7 +35492,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-144efd0c9334b8",
           "sourceFile": "apps/api/src/app.ts",
@@ -36786,7 +36181,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.153Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.050Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -36995,7 +36390,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.106Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -37473,7 +36868,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.208Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.104Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-c72542c420f961",
           "sourceFile": "apps/api/src/app.ts",
@@ -38107,7 +37502,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-8d683a24515c8d",
           "sourceFile": "apps/api/src/app.ts",
@@ -38527,7 +37922,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-d250196281a746",
           "sourceFile": "apps/api/src/app.ts",
@@ -39281,11 +38676,9 @@
         "http": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "server_mcp": {
           "applicable": false,
@@ -39354,38 +38747,6 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/init",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.459Z",
-        "surfaceProgress": {
-          "http": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -39447,11 +38808,9 @@
         "http": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "server_mcp": {
           "applicable": false,
@@ -39520,38 +38879,6 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:PUT:/api/v1/uploads/:sessionId/chunks/:chunkNumber",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.459Z",
-        "surfaceProgress": {
-          "http": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -39613,11 +38940,9 @@
         "http": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "server_mcp": {
           "applicable": false,
@@ -39686,38 +39011,6 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/:sessionId/finalize",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.459Z",
-        "surfaceProgress": {
-          "http": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -41180,7 +40473,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41362,7 +40655,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41467,7 +40760,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41645,7 +40938,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -43101,7 +42394,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.161Z"
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -43746,12 +43039,9 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-          ],
-          "actual": "已实测：EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。；EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。。仍缺：.8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。；.9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "web": {
           "applicable": false,
@@ -43782,71 +43072,7 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.461Z",
-        "surfaceProgress": {
-          "exe": {
-            "completed": [
-              "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-              "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。"
-            ],
-            "remaining": [
-              ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。",
-              ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-            ],
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "status": "partial"
-          }
-        }
-      },
+      "manual": {},
       "needsRevalidation": true,
       "generated": true
     },
@@ -43888,12 +43114,10 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/exe-after-preview7-upgrade.json",
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+            "runs/exe-after-preview7-upgrade.json"
           ],
-          "actual": "已实测：实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。；EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。；EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖；.8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。；.9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+          "note": "Real execution and read-back required."
         },
         "web": {
           "applicable": false,
@@ -43937,19 +43161,13 @@
         "surfaceProgress": {
           "exe": {
             "completed": [
-              "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。",
-              "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-              "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。"
+              "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。"
             ],
             "remaining": [
-              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖",
-              ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。",
-              ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
             ],
             "evidence": [
-              "runs/exe-after-preview7-upgrade.json",
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+              "runs/exe-after-preview7-upgrade.json"
             ],
             "status": "partial"
           }
@@ -44028,52 +43246,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.230Z",
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-          }
-        ]
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -44116,12 +43289,10 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/exe-after-preview7-upgrade.json",
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+            "runs/exe-after-preview7-upgrade.json"
           ],
-          "actual": "已实测：实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。；EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。；EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖；.8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。；.9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+          "note": "Real execution and read-back required."
         },
         "web": {
           "applicable": false,
@@ -44165,19 +43336,13 @@
         "surfaceProgress": {
           "exe": {
             "completed": [
-              "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。",
-              "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-              "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。"
+              "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。"
             ],
             "remaining": [
-              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖",
-              ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。",
-              ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
             ],
             "evidence": [
-              "runs/exe-after-preview7-upgrade.json",
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+              "runs/exe-after-preview7-upgrade.json"
             ],
             "status": "partial"
           }
@@ -44256,52 +43421,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.230Z",
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-          }
-        ]
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -44773,7 +43893,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.161Z"
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -55327,11 +54447,9 @@
         "web": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "http": {
           "applicable": false,
@@ -55364,38 +54482,6 @@
           "reason": "new_source_node",
           "priorResults": null,
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.458Z",
-        "surfaceProgress": {
-          "web": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -75839,7 +74925,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.173Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.069Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -85774,34 +84860,7 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "apk-code23-legacy-text-recovery",
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-            ],
-            "version": {
-              "code": 23,
-              "name": "0.2.0-preview.9",
-              "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-            },
-            "preservedFailures": [
-              {
-                "name": "upgrade-precheck-first-failure.json",
-                "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-              },
-              {
-                "name": "preparation signing verification attempt",
-                "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-              }
-            ],
-            "completed": "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。",
-            "remaining": "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
-          }
-        ]
+        }
       },
       "needsRevalidation": true,
       "generated": true

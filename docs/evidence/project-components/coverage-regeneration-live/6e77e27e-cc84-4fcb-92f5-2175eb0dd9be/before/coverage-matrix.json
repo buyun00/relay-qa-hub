@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-09T03:31:54.909Z",
+  "generatedAt": "2026-09-09T00:01:15.729Z",
   "evidenceMapping": {
-    "at": "2026-09-09T03:31:53.248Z",
+    "at": "2026-09-09T00:01:14.124Z",
     "scope": "Only explicit real HTTP/MCP/browser observations. Unit/build results never mark external E2E or broad untested baselines passed.",
     "sourceReports": [
       "redaction-corrections/index.json",
@@ -156,22 +156,7 @@
       "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json",
       "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json",
       "web-submission-recovery-live/audit.json",
-      "web-submission-recovery-live/README.md",
-      "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
-      "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-      "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-      "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json",
-      "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
-      "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-      "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json",
-      "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
-      "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
-      "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
-      "contracts-result-phase-a/result.json",
-      "web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json",
-      "android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json",
-      "contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json",
-      "contracts-result-phase-b/result.json"
+      "web-submission-recovery-live/README.md"
     ],
     "proofHashes": {
       "redaction-corrections/index.json": "b7f7c147da5a718ef9a9312293b81b6acb716e16a0ba823127823a9969f15491",
@@ -325,22 +310,7 @@
       "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json": "e895f1114d9b86ac2272783e101a360617c1e28fc16537104a116a880446eef7",
       "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json": "3bd91b313315c54c457307facaaff52d900848dfc6da4fc8c096c8e70d1c4c84",
       "web-submission-recovery-live/audit.json": "8bf531f9baf759365339d5e32d5abfe0162ea04cdf6628adfc4b42ceeb27db29",
-      "web-submission-recovery-live/README.md": "f233ff30db0ee6a80c84be78a57ab85067f8444ff92a86d1e0b3e95fffb74f25",
-      "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json": "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb",
-      "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56",
-      "android-recovery-proxy-audits/65ee5dc8-first/proof.json": "ed0da76a9d89906ab14144423c8dcc985e7f11cf619f94250ff108c50b317b65",
-      "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json": "3d987a3619503af4a853cd256cb6347329793d56d0c4b8c215f7f407f3082c7f",
-      "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json": "ab97c596e0cd33811fe4311d7956ddd04d091f5feb9de4533bdeb3324bc56c7d",
-      "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json": "02522989982733987c86ee90132f3251e50a70f0a257a6c6b9723bf6cc6d867a",
-      "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json": "9a5184a94eee7493ac3020b052e9ae7775988c50fd993d04c745cd26eccfe789",
-      "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63",
-      "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
-      "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json": "55ac6023679282fb4a7a0a985ff79db0a2718999f1869e41fe60b25e569834e5",
-      "contracts-result-phase-a/result.json": "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca",
-      "web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json": "6ce9d4bc6fe346e64ad9e9535c87f8be7a761f3547fda911e2ba0b498663d0fa",
-      "android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json": "4a20b282bfb578600f215835b5c8dc1c36602c2201bef7bb9fc0e3232f04dfb7",
-      "contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json": "beaccbfa20d338e48fae91b235fca73752559f2151d0257912622871c9c6cac7",
-      "contracts-result-phase-b/result.json": "66b3e20e305af125c875f558c35acf8075dbca358283b0dca4a6abcfd5801f67"
+      "web-submission-recovery-live/README.md": "f233ff30db0ee6a80c84be78a57ab85067f8444ff92a86d1e0b3e95fffb74f25"
     },
     "validationEvidence": [
       {
@@ -575,60 +545,6 @@
         "summary": "Web61/61+typecheck/lint/build；outbox真实临时API/SQLite、外部请求0",
         "matched": true,
         "scope": "React静态渲染及隔离API实测；浏览器暂停条目点击未测"
-      },
-      {
-        "file": "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
-        "matched": true,
-        "summary": "code23同包preview feed发布13个真实HTTP：GET/HEAD/206 range及完整APK SHA核对；旧code22与发布时Windows.8保留",
-        "scope": "仅发布/下载与API身份记录；stable未选channel的401保留。不是APK原生自更新，后来的Windows.9更新不是本次失败。"
-      },
-      {
-        "file": "web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
-        "matched": true,
-        "summary": "bc2b347对应.9包中共享Web部署：18 GET/HEAD全部200、8候选SHA、12 served文件及Web进程身份保持",
-        "scope": "仅静态下载和发布时进程证据；无新服务启停，不代表真实Web loading页面验收，不将.9原生EXE UI传递到Web。"
-      },
-      {
-        "file": "web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
-        "matched": true,
-        "summary": "Br-CEXQI真实Edge59项：真实200暂留显示加载，注入Failed显示错误，实际Retry取得新200恢复同一详情",
-        "scope": "仅同项目文本Bug；四张实际截图、Bug与事件未变。背景components hold实际0，不证明超时/常态轮询或跨项目迟到响应。"
-      },
-      {
-        "file": "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
-        "matched": true,
-        "summary": "服务端MCP人员真实59项，02/04的server MCP入口完成；01保留旧历史姓名组合未测",
-        "scope": "仅新A/B/新员工；35 RPC另加1 health GET，五组件off、无Bug写入，不传递到其它入口或整个基线。"
-      },
-      {
-        "file": "contracts-result-phase-a/result.json",
-        "matched": true,
-        "summary": "Phase A源码：legacy passed/failed和不可变原回执，API260/Storage118及临时真实HTTP215通过，schema15加法恢复验证",
-        "scope": "该证据未部署常驻4419、未做完整main/MCP/客户端运行；blocked、附件9..20/capture、fail/supersede及workflow GET仍独立未完成。"
-      },
-      {
-        "file": "web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json",
-        "matched": true,
-        "summary": "真实Web A/B切换164项：A genuine200在实际切B时由同network request取消；两项目独立文字/人员/PNG经reload及往返保留",
-        "scope": "实际settlement=canceled，未绕过Abort或伪造旧回调送达；18直接+47浏览器请求与28响应记录分开，无Bug/上传/评论写入。"
-      },
-      {
-        "file": "android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json",
-        "matched": true,
-        "summary": "MuMu code23原生33项：单A/A-B/B-only目录、A撤权后同名拒绝/B可用、恢复同ID；原账号文字PNG及四稳定文件完整恢复",
-        "scope": "停用/恢复由GM官方HTTP辅助；原生自停用被disabled，无物理设备、原生网络403抓包或整项人员基线通过结论。"
-      },
-      {
-        "file": "contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json",
-        "matched": true,
-        "summary": "独立完整main/schema15+worker+server MCP：247项，111直接HTTP+16JSONRPC；legacy/vendor原receipt、权限与普通人工链真实通过",
-        "scope": "4459/4461专用临时实验服务正常退出、一致备份保留；不代表常驻4419已更新或客户端/外部组件已验收。"
-      },
-      {
-        "file": "contracts-result-phase-b/result.json",
-        "matched": true,
-        "summary": "PhaseB blocked源码API266/Storage118、六组114临时HTTP与15→16独立档案迁移11项通过，原70表/7份receipt保持",
-        "scope": "五份产品源码与四份测试按pin固定；本证据不含完整schema16 main运行。常驻4419仍14、MCP仍无blocked提交工具。"
       }
     ],
     "review": "coverage-mapping-review.md",
@@ -1353,319 +1269,9 @@
       "checks": 56,
       "races": 4,
       "scope": "HTTP/server MCP only: same manual completion intent and two opposite verdict races; pass won both. All fresh fixtures retained, five components disabled. Successful failure-side effects, UI and other entries remain untested here."
-    },
-    "recentVersionedEvidence": {
-      "observations": [
-        {
-          "id": "web-7904e2c-rejected-media-81",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-          "sourceHashesAtExecution": {
-            "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-            "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-            "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-            "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-          },
-          "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-          "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-        },
-        {
-          "id": "apk-code23-legacy-text-recovery",
-          "evidence": [
-            "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-            "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-            "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-          ],
-          "version": {
-            "code": 23,
-            "name": "0.2.0-preview.9",
-            "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-          },
-          "preservedFailures": [
-            {
-              "name": "upgrade-precheck-first-failure.json",
-              "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-            },
-            {
-              "name": "preparation signing verification attempt",
-              "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-            }
-          ],
-          "completed": "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。",
-          "remaining": "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
-        },
-        {
-          "id": "android-code23-feed-http13",
-          "evidence": [
-            "android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json"
-          ],
-          "version": "code23/0.2.0-preview.9 publication; Windows manifest was .8 at this observation",
-          "completed": "已选择preview的匿名manifest/APK GET、HEAD及range均按原始13条ledger实测，原code22下载仍可用。",
-          "remaining": "仅固定preview下载输入；客户端更新UI、所有错误组合及物理设备未测。"
-        },
-        {
-          "id": "exe-native-upgrade-7-to-8",
-          "evidence": [
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-          ],
-          "version": {
-            "releaseId": "20260909T000712593Z",
-            "version": "0.2.0-preview.8",
-            "nativeVersion": "0.2.0.8",
-            "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-            "installerBytes": 108333764,
-            "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-          },
-          "preservedFinding": {
-            "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-            "status": "open_in_installed_preview8",
-            "firstObservation": "after-old-bug-first-failure.json",
-            "subsequentObservation": "after-old-bug-observed-again.json",
-            "retriedByUserOrRoot": false,
-            "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-          },
-          "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-          "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-        },
-        {
-          "id": "exe-native-upgrade-8-to-9",
-          "evidence": [
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-          ],
-          "version": {
-            "releaseId": "20260909T011704801Z",
-            "version": "0.2.0-preview.9",
-            "nativeVersion": "0.2.0.9",
-            "installerBytes": 108334255,
-            "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-            "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-            "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-            "sourceDirty": true
-          },
-          "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-          "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-          "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-        },
-        {
-          "id": "server-mcp-membership-e21431f0-59",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "version": {
-            "apiPid": 22852,
-            "apiSchema": 14,
-            "serverMcpPid": 15736,
-            "recordedAt": "2026-09-09T02:43:15.556Z"
-          },
-          "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-          "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
-        }
-      ],
-      "matches": [
-        {
-          "observation": "web-7904e2c-rejected-media-81",
-          "itemId": "baseline-4e70e4b8aea144",
-          "surface": "web",
-          "source": null,
-          "title": "14 并发和重复提交",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81",
-          "itemId": "web_control-f59fc9cda1c3d9",
-          "surface": "web",
-          "source": {
-            "file": "apps/web/src/App.tsx",
-            "line": 3413
-          },
-          "title": "button | 保留失败记录并提交修改稿 | type=\"button\" | onClick={() => void submitBug(undefined, false, bugRejection.id)}",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/init",
-          "itemId": "http_route-52f4781153b6ba",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 2559
-          },
-          "title": "POST /api/v1/uploads/init",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:PUT:/api/v1/uploads/:sessionId/chunks/:chunkNumber",
-          "itemId": "http_route-1aed7cd39c68f5",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 2593
-          },
-          "title": "PUT /api/v1/uploads/:sessionId/chunks/:chunkNumber",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/:sessionId/finalize",
-          "itemId": "http_route-fa84a8b7df5b30",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 2647
-          },
-          "title": "POST /api/v1/uploads/:sessionId/finalize",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "web-7904e2c-rejected-media-81:POST:/api/v1/bugs",
-          "itemId": "http_route-869c95e9cb22b6",
-          "surface": "http",
-          "source": {
-            "file": "apps/api/src/app.ts",
-            "line": 1379
-          },
-          "title": "POST /api/v1/bugs",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "apk-code23-legacy-text-recovery",
-          "itemId": "baseline-4e70e4b8aea144",
-          "surface": "apk",
-          "source": null,
-          "title": "14 并发和重复提交",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "apk-code23-legacy-text-recovery",
-          "itemId": "android_control-44808d673345f3",
-          "surface": "apk",
-          "source": {
-            "file": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
-            "line": 2036
-          },
-          "title": "onClick = { val bytes = image?.takeIf { savedStrokes.isNotEmpty() }?.let { renderAnnotatedPng(draft = draft, strokes = savedStrokes)",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "apk-code22-to23-adb-upgrade",
-          "itemId": "baseline-31809d764ba2e7",
-          "surface": "apk",
-          "source": null,
-          "title": "22 APK 共存与升级",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "baseline-ee6de045b248f3",
-          "surface": "exe",
-          "source": null,
-          "title": "23 EXE 共存与升级",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "desktop_ipc_action-1b2936d4f2c6aa",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 690
-          },
-          "title": "handle desktop:get-update-state",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "desktop_ipc_action-a5c0718eb53782",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 696
-          },
-          "title": "handle desktop:check-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-7-to-8",
-          "itemId": "desktop_ipc_action-e1a9ae39f347bc",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 701
-          },
-          "title": "handle desktop:install-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "baseline-ee6de045b248f3",
-          "surface": "exe",
-          "source": null,
-          "title": "23 EXE 共存与升级",
-          "preservedStatus": "passed"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "desktop_ipc_action-1b2936d4f2c6aa",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 690
-          },
-          "title": "handle desktop:get-update-state",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "desktop_ipc_action-a5c0718eb53782",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 696
-          },
-          "title": "handle desktop:check-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "exe-native-upgrade-8-to-9",
-          "itemId": "desktop_ipc_action-e1a9ae39f347bc",
-          "surface": "exe",
-          "source": {
-            "file": "apps/desktop/src/main.ts",
-            "line": 701
-          },
-          "title": "handle desktop:install-update",
-          "preservedStatus": "not_run"
-        },
-        {
-          "observation": "server-mcp-membership-e21431f0-59",
-          "itemId": "baseline-950546b51f2cb2",
-          "surface": "server_mcp",
-          "source": null,
-          "title": "01 项目入口姓名登录",
-          "preservedStatus": "not_run"
-        }
-      ],
-      "unmatched": [
-        {
-          "observation": "android-code23-feed-http13",
-          "kind": "http_route",
-          "sourceFile": "apps/api/src/android-updates.ts",
-          "selector": "GET /api/v1/android-updates/preview/:fileName"
-        },
-        {
-          "observation": "android-code23-feed-http13",
-          "kind": "http_route",
-          "sourceFile": "apps/api/src/android-updates.ts",
-          "selector": "HEAD /api/v1/android-updates/preview/:fileName"
-        }
-      ],
-      "absent": [],
-      "inputSourceFileCount": 193,
-      "sourceSnapshotScope": "Input matrix sourceHashes/sourceHead describe its previous generation, not current source. This append neither refreshes that inventory nor clears revalidation flags.",
-      "statusPolicy": "Only server MCP baseline02/04 have explicit completed requirement promotion from the e21431f0 run. All other additions are evidence only. Historical failures and source revalidation remain; whole baselines are independent."
     }
   },
-  "sourceHead": "3b57719deed8d907fa84bba232e2939d18288351",
+  "sourceHead": "33514cde1862e448cb56d7082177f34a88e42363",
   "sourceRoots": [
     "apps/api/src",
     "apps/web/src",
@@ -1739,8 +1345,8 @@
     "apps/android/app/src/main/kotlin/com/relayqahub/android/work/OfflineSyncEngine.kt": "c253c457fad29d377abdd0774d5443d0e71264aaa9cfe7682d15d08796a22da6",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/work/OfflineSyncWorker.kt": "8a21d7135249a4ff7a5c5128f2f993c1654347e34d8b8803de4950d11da0dde9",
     "apps/android/app/src/main/kotlin/com/relayqahub/android/work/SyncScheduler.kt": "73fe9a7903c711dc1222009527fa1056847a3cfdeeeda5d865658e7e23e6a236",
-    "apps/api/src/android-updates.ts": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e",
-    "apps/api/src/app.ts": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+    "apps/api/src/android-updates.ts": "04eaa759eed6f92c3f32b9cc620973ae2ca73b1d0006ece64565c0842e1a3121",
+    "apps/api/src/app.ts": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
     "apps/api/src/automation-routes.ts": "3f9b81b7c10c3f09e5edf121e1f9ad7d35ca30ac1a0093573721da5816478761",
     "apps/api/src/automation.ts": "a48de5d4da277c6f2ba883f7b92dc5b5814a5be710fc66896433e6cd880e936e",
     "apps/api/src/backup-archive-worker-client.ts": "e022fa9180870c845012ac927d0b822159f408c748bbbf189c8366627ab0902d",
@@ -1751,14 +1357,14 @@
     "apps/api/src/bug-actions.ts": "9d1ee1c96e1850ab291d48270588c4ccbd044654836b2cf5bb9371dc2b3cf30f",
     "apps/api/src/build-upload-host.ts": "0e81ef8625f3a61f962358c55370c02b48c4d71e332862b73f0e71bb712b1ab7",
     "apps/api/src/config.ts": "97d321c746f6a2e5590eaf8a7311cd3af59f66f3617a2bf65505843a2f751428",
-    "apps/api/src/frozen-workflow-response.ts": "599762c9402571919ed6a8a501995c816d55fe962b44db95b6070f01bc301258",
+    "apps/api/src/frozen-workflow-response.ts": "4be4ac365b958bde9263d7a9fb201328f5a606721c2834685aa15bf920d2b44f",
     "apps/api/src/health.ts": "406ff4f0c169d3afccead5cfc8535027af8c81760ca768bfe446ed53c8bd7f79",
     "apps/api/src/import-execution-hold.ts": "7770ae7614e1d46398f889da9423106386cb8fc5daebda64e5157e89a98b5d49",
     "apps/api/src/increment-upload.ts": "bf21ecbaeb2e2a3bb43a522814da86bdb238fa65a55ffe29e0800e88aa4fd140",
     "apps/api/src/index.ts": "41dbd84a48af7adc2441cffb357b7fe311e61e6b61295bddca983963fa93cc68",
     "apps/api/src/jenkins-builds.ts": "6142e5f2e7b6d7b64cf3b53b56d41525be6b74fc5876a614d822c92cf3a67190",
     "apps/api/src/jenkins-progress.ts": "15975bebc8c0e99df6a7df81d5b42a69d324224710fc7f68144bb6f9e16fc10b",
-    "apps/api/src/main.ts": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd",
+    "apps/api/src/main.ts": "22a2f014fc18c6113dd473c57a2e8588de1d515e403a9acd353ae5a97cce4eba",
     "apps/api/src/mobile-attachments.ts": "8b6bf08255554f9ff560803aeefd69854796db9e5c6d0ef79c6bd5bb24a88229",
     "apps/api/src/mobile-bugs.ts": "3491ce7023e64f7dba4629e51679a52bd7f3ee362beaba58b44a8c389e0cc020",
     "apps/api/src/mobile-builds.ts": "aed85fa15e4972f8598fd143c5cd877094b09333275a5d2c33d90a8d59b05d28",
@@ -1774,13 +1380,13 @@
     "apps/api/src/mobile-relay-webhook.ts": "bc45dee3b21ec5d0cf4ad6a307862f94dde562a154f1e2ca68a044fb9c648767",
     "apps/api/src/mobile-relay.ts": "faaaf924eb3e819d62235fcf0c4b86c7eb4cc65dadc633b40e904507032aaf70",
     "apps/api/src/mobile-user-management.ts": "f87119d0244e773154efd3ff0720933cbfebc2ae2f884ac2168f0bb092a5ecf8",
-    "apps/api/src/mobile-verification.ts": "e88e461f57f3d708af98b1067607521ffeef996ea7db37fe8d5eab823b5eec99",
-    "apps/api/src/parallel-instance.ts": "272379786a9d8806a90c85c5e5ec6e1b07fc5c01ae50e01aed603a250e597fcf",
+    "apps/api/src/mobile-verification.ts": "f77069f2e45e4690c50f16a42f64418cec7125f20620861799c0405fccf0d022",
+    "apps/api/src/parallel-instance.ts": "00feaf310eb138f925810f88c5b91cffab503fbdccd5b3dae58de3ac87800ba4",
     "apps/api/src/people-config.ts": "8e0e764007b402eb4ef726f77a7467530a4f6b1a9ed79c7490bc85f92d5548aa",
     "apps/api/src/production-tasks.ts": "b1d4311bd4c39325ab92901e1bc5dc0b35d9299a8037aa3ac40c4c408cd2d6d2",
     "apps/api/src/project-components-runtime.ts": "cc626cdbf0da7e2761efcc5495c2b7ada38322a01697bb3108fccb6fc499376f",
     "apps/api/src/project-management.ts": "7f59ce43990cadc517d804f8819c0a8fcb933093192cf74df7d9c7eb2a975dc6",
-    "apps/api/src/project-request-context.ts": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab",
+    "apps/api/src/project-request-context.ts": "b39ace1eccdfac4cae7c8bc6d791aeea0a713eee9b3df71907f563a4ec5dcbf0",
     "apps/api/src/qingyu-client.ts": "b3db21ecec4e9500e8cc243b87409984aa18cd211a4a57df8038efc89bf89347",
     "apps/api/src/qingyu-integration.ts": "3725c3d2e0a063e0b6b08e5d14fa1bc9f0f4dec5bae02afcb753968bc85e7597",
     "apps/api/src/server.ts": "679f7834b88188ffdfd39e51d0d06e29ef76df7194d7ad76ad967f2319f6fba8",
@@ -1797,13 +1403,11 @@
     "apps/api/src/sqlite-mobile-relay-store.ts": "b509e25ab5b89585025d1d5a59f33ee741b086b0fab2d6c64f51eaca8edd226d",
     "apps/api/src/sqlite-mobile-relay-webhook-store.ts": "65d554525f467eabb9e32f1f3b598b51bec468925f57a19c8df4435917cffd3c",
     "apps/api/src/sqlite-mobile-user-management-store.ts": "9475e9ed73c4aaa8a052170e580fc54747a10ea45768243e78d95ae6be954695",
-    "apps/api/src/sqlite-mobile-verification-store.ts": "6745b4fe3b31418af95b0f5cc6f8b42ce4559f8940c980d5db94facd0d71efe9",
-    "apps/api/src/sqlite-workflow-projection-store.ts": "4a45e0c11f74453c449fe3661864d3ac9771f4be287449fbe0eed481412e6957",
+    "apps/api/src/sqlite-mobile-verification-store.ts": "55352855178da7b5ccab4d5e192f9484234a9e82b9d9097fdd53e39a9f10bbb7",
     "apps/api/src/upload-source.ts": "7b96fae864efa9376712f5030df6c5c4495edb83a81ecfc4ed69271c2a4f465f",
     "apps/api/src/uploader-host.ts": "a076e955249e1c5ffcfe330a379677ee066220de426de26defbd18d244cfa959",
     "apps/api/src/uploader-runner.ts": "f243a9437463c50c74964ba7b0cd2d3ec1b807990d3cb647a25340e59843706b",
     "apps/api/src/uploader-types.ts": "6524c6d4e6c5c25f9feb13f7572292cbdcc58858b244761144fc67dafd151991",
-    "apps/api/src/workflow-projection.ts": "d526bfba472c0b6863ed15bfc4c3d80e3f485b4f356acc1b4701b1991e242449",
     "apps/desktop/src/bridge-types.ts": "005764991b0a9bfefbac25863302908edfc5275efd8b5a51da1608ccd72aa682",
     "apps/desktop/src/config.ts": "39fbbc30596268604d943441c4b12d633c7a99a0abf30bcd9ef9dd93313bca66",
     "apps/desktop/src/main.ts": "bb611b59d11fc77b8f7e80fccadaf20dcff33739cdca75170e5631bea82d32cd",
@@ -1823,7 +1427,7 @@
     "apps/desktop/src/uploader-types.ts": "14df116e3eb40e852c4e65ff777c28f818c0f6d0a09ef4a810d39a9c3a250966",
     "apps/desktop/src/window-actions.ts": "e58677b11d8548368d5caba5e39d80735407e3287433900dacd5ca4827c9f08e",
     "apps/desktop/src/wss-client.ts": "f1113fb23ee74f7a1dbedcec4cbc6e402d656e169cf29fcf622d99418b3fb013",
-    "apps/web/src/App.tsx": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+    "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
     "apps/web/src/AppIcon.tsx": "156fc69b6e1a22373a772deddbdb81d3a4a9483905583402dd8376c37bce57cc",
     "apps/web/src/AuthGate.tsx": "8f42485a382ab73150ddb56614bca5653ed54c76151b4846d35210ffbce59a84",
     "apps/web/src/BuildTasksPanel.tsx": "4c1477f24c44da2ffca77728c4308b4e9461c325c24c93291a67e8ec35a32c2b",
@@ -1981,8 +1585,8 @@
       "desktop_ipc_action": 10,
       "desktop_menu_action": 6,
       "external_full_chain": 10,
-      "http_registration_template": 3,
-      "http_route": 192,
+      "http_registration_template": 2,
+      "http_route": 193,
       "mcp_tool": 109,
       "required_mcp_parity": 17,
       "state_action": 12,
@@ -1991,7 +1595,7 @@
       "web_page_component": 34
     },
     "baselineCount": 24,
-    "fileCount": 193,
+    "fileCount": 191,
     "resultsBySurface": {
       "apk": {
         "not_run": 271,
@@ -2010,8 +1614,8 @@
         "not_run": 300
       },
       "server_mcp": {
-        "not_run": 230,
-        "passed": 32
+        "not_run": 232,
+        "passed": 30
       },
       "local_mcp": {
         "not_run": 251,
@@ -2086,11 +1690,10 @@
           "status": "not_run",
           "evidence": [
             "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
+            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
           ],
-          "actual": "已实测：实际项目姓名登录与项目目录、后续操作人读回；服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。。仍缺：完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖；旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际项目姓名登录与项目目录、后续操作人读回。仍缺：完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖。",
+          "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
@@ -2105,7 +1708,7 @@
       },
       "manual": {
         "inventoryNote": "Design v2.1 section 13 baseline. Generator retention verified without marking any product test passed.",
-        "evidenceMappedAt": "2026-09-09T03:31:53.234Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.003Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2123,17 +1726,13 @@
           },
           "server_mcp": {
             "completed": [
-              "实际项目姓名登录与项目目录、后续操作人读回",
-              "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。"
+              "实际项目姓名登录与项目目录、后续操作人读回"
             ],
             "remaining": [
-              "完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖",
-              "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
+              "完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖"
             ],
             "evidence": [
-              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-              "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json",
-              "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
+              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
             ],
             "status": "partial"
           },
@@ -2243,22 +1842,6 @@
               "status": "partial"
             }
           }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "server-mcp-membership-e21431f0-59",
-            "evidence": [
-              "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-            ],
-            "version": {
-              "apiPid": 22852,
-              "apiSchema": 14,
-              "serverMcpPid": 15736,
-              "recordedAt": "2026-09-09T02:43:15.556Z"
-            },
-            "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-            "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
-          }
         ]
       },
       "needsRevalidation": false,
@@ -2323,12 +1906,13 @@
         },
         "server_mcp": {
           "applicable": true,
-          "status": "passed",
+          "status": "not_run",
           "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
+            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json",
+            "redaction-corrections/server-mcp-core-2026-09-08T18-22-11-243Z.json"
           ],
-          "actual": "实际server MCP：单项目登录返回A，多项目目录严格为有效所属A/B；A停用后仅B，恢复后仍是原ID与A/B。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际列出当前员工所属项目。仍缺：单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。",
+          "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
@@ -2342,7 +1926,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.234Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.390Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2358,6 +1942,18 @@
             ],
             "status": "partial"
           },
+          "server_mcp": {
+            "completed": [
+              "实际列出当前员工所属项目"
+            ],
+            "remaining": [
+              "单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖"
+            ],
+            "evidence": [
+              "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
+            ],
+            "status": "partial"
+          },
           "local_mcp": {
             "completed": [
               "实际列出当前员工所属项目"
@@ -2370,32 +1966,6 @@
             ],
             "status": "partial"
           }
-        },
-        "serverMembershipPriorProgress": {
-          "completed": [
-            "实际列出当前员工所属项目"
-          ],
-          "remaining": [
-            "单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖"
-          ],
-          "evidence": [
-            "runs/server-mcp-core-2026-09-08T18-22-11-243Z.json"
-          ],
-          "status": "partial"
-        },
-        "serverMembershipRun": {
-          "id": "server-mcp-membership-e21431f0-59",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "version": {
-            "apiPid": 22852,
-            "apiSchema": 14,
-            "serverMcpPid": 15736,
-            "recordedAt": "2026-09-09T02:43:15.556Z"
-          },
-          "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-          "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
         }
       },
       "needsRevalidation": false,
@@ -2545,12 +2115,10 @@
         },
         "server_mcp": {
           "applicable": true,
-          "status": "passed",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "actual": "实际server MCP：只停用A的新员工关系，A重新姓名登录403且不自动恢复，B登录和读取继续可用、会员版本/角色不变；显式恢复A后同ID。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "local_mcp": {
           "applicable": true,
@@ -2561,7 +2129,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:49.466Z",
+        "evidenceMappedAt": "2026-09-08T21:54:12.402Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -2654,20 +2222,6 @@
           },
           "at": "2026-09-08T21:51:01.209Z",
           "reason": "Root-reviewed installed EXE native personnel cases, no transfer to other clients."
-        },
-        "serverMembershipRun": {
-          "id": "server-mcp-membership-e21431f0-59",
-          "evidence": [
-            "server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json"
-          ],
-          "version": {
-            "apiPid": 22852,
-            "apiSchema": 14,
-            "serverMcpPid": 15736,
-            "recordedAt": "2026-09-09T02:43:15.556Z"
-          },
-          "completed": "服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。",
-          "remaining": "旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。"
         }
       },
       "needsRevalidation": false,
@@ -3017,7 +2571,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.110Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.007Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -3386,7 +2940,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.110Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.007Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -3694,7 +3248,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.113Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.010Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -3857,7 +3411,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.114Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.011Z",
         "surfaceProgress": {},
         "baselineCriterionReview": {
           "at": "2026-09-08T21:26:59.617Z",
@@ -4054,7 +3608,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.116Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.013Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -4372,13 +3926,9 @@
         "apk": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-            "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-            "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-          ],
-          "actual": "已实测：MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。。仍缺：仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "exe": {
           "applicable": true,
@@ -4394,10 +3944,9 @@
             "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json",
             "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json",
             "web-submission-recovery-live/audit.json",
-            "web-submission-recovery-live/README.md",
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
+            "web-submission-recovery-live/README.md"
           ],
-          "actual": "已实测：bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。；7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。；仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
+          "actual": "已实测：bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。。仍缺：该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。。",
           "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
         },
         "http": {
@@ -4524,33 +4073,16 @@
           },
           "web": {
             "completed": [
-              "bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。",
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
+              "bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。"
             ],
             "remaining": [
-              "该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。",
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
+              "该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。"
             ],
             "evidence": [
               "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json",
               "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json",
               "web-submission-recovery-live/audit.json",
-              "web-submission-recovery-live/README.md",
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          },
-          "apk": {
-            "completed": [
-              "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。"
-            ],
-            "remaining": [
-              "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
-            ],
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
+              "web-submission-recovery-live/README.md"
             ],
             "status": "partial"
           }
@@ -4846,7 +4378,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.221Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.117Z",
         "workflowConcurrencyRuns": [
           {
             "runId": "e94223b3-82c5-469d-b7ca-eea306ba0aab",
@@ -4882,48 +4414,6 @@
             "status": "passed",
             "completedChecks": 101,
             "scope": "独立Edge实际页面与持久profile；只覆盖Bug/comment未知回执重放和正常浏览器重启"
-          }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          },
-          {
-            "id": "apk-code23-legacy-text-recovery",
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-            ],
-            "version": {
-              "code": 23,
-              "name": "0.2.0-preview.9",
-              "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-            },
-            "preservedFailures": [
-              {
-                "name": "upgrade-precheck-first-failure.json",
-                "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-              },
-              {
-                "name": "preparation signing verification attempt",
-                "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-              }
-            ],
-            "completed": "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。",
-            "remaining": "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
           }
         ]
       },
@@ -5016,7 +4506,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.118Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.015Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -5786,7 +5276,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.119Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.016Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
@@ -6381,13 +5871,10 @@
             "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
             "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
             "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
-            "android-code22-no-code.json",
-            "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-            "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-            "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
+            "android-code22-no-code.json"
           ],
-          "actual": "已实测：MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留；code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留；MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。。仍缺：物理Android设备必测仍缺；应用内更新源/自安装链路未测；物理Android及应用内更新完整链路仍未验收；物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留；code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留。仍缺：物理Android设备必测仍缺；应用内更新源/自安装链路未测；物理Android及应用内更新完整链路仍未验收。",
+          "note": "Real execution and read-back required."
         },
         "exe": {
           "applicable": false,
@@ -6426,30 +5913,25 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.228Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.016Z",
         "surfaceProgress": {
           "apk": {
             "completed": [
               "MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同",
               "日常code14/PID5051/安装时点/dataDir保留",
-              "code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留",
-              "MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。"
+              "code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留"
             ],
             "remaining": [
               "物理Android设备必测仍缺",
               "应用内更新源/自安装链路未测",
-              "物理Android及应用内更新完整链路仍未验收",
-              "物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。"
+              "物理Android及应用内更新完整链路仍未验收"
             ],
             "evidence": [
               "android-implementation.md",
               "../../../apps/android/app/build/evidence/project-components/preview-code21-upgrade-before.json",
               "../../../apps/android/app/build/evidence/project-components/coexistence-code21-final.json",
               "../../../apps/android/app/build/evidence/project-components/preview-code21-draft-restored-ui.xml",
-              "android-code22-no-code.json",
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
+              "android-code22-no-code.json"
             ],
             "status": "partial"
           }
@@ -6479,34 +5961,7 @@
               ]
             }
           }
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "apk-code22-to23-adb-upgrade",
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-            ],
-            "version": {
-              "code": 23,
-              "name": "0.2.0-preview.9",
-              "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-            },
-            "preservedFailures": [
-              {
-                "name": "upgrade-precheck-first-failure.json",
-                "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-              },
-              {
-                "name": "preparation signing verification attempt",
-                "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-              }
-            ],
-            "completed": "MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。",
-            "remaining": "物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。"
-          }
-        ]
+        }
       },
       "needsRevalidation": false,
       "generated": true
@@ -6589,7 +6044,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.120Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.017Z",
         "preview7Upgrade": {
           "at": "2026-09-08T19:54:02.443Z",
           "proof": "runs/exe-after-preview7-upgrade.json",
@@ -6656,51 +6111,6 @@
               "runs/exe-preview6-restored-draft.txt"
             ],
             "progress": null
-          }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
           }
         ]
       },
@@ -6931,9 +6341,9 @@
       "generated": true
     },
     {
-      "id": "http_registration_template-4880c36556c3cb",
-      "kind": "http_registration_template",
-      "title": "route helper template: method=[\"GET\", \"HEAD\"] url=configuredChannel === \"preview\" ? ANDROID_PREVIEW_UPDATE_PATH : ANDROID_UPDATE_PATH",
+      "id": "http_route-73141f37d37021",
+      "kind": "http_route",
+      "title": "GET /api/v1/android-updates/stable/:fileName",
       "group": "persistence_upgrade",
       "baselineIds": [
         21,
@@ -6943,10 +6353,13 @@
       ],
       "source": {
         "file": "apps/api/src/android-updates.ts",
-        "line": 183
+        "line": 112
       },
-      "sourceHash": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e",
-      "requiresRuntimeExpansion": true,
+      "sourceHash": "04eaa759eed6f92c3f32b9cc620973ae2ca73b1d0006ece64565c0842e1a3121",
+      "method": "GET",
+      "path": "/api/v1/android-updates/stable/:fileName",
+      "registration": "route-object",
+      "declarationSource": null,
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -6954,7 +6367,7 @@
         "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
         "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
       ],
-      "expected": "Compare the runtime registered route table to all statically expanded helper calls; record every dynamic variant and add missing concrete tests.",
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
       "status": "not_run",
       "results": {
         "apk": {
@@ -7000,17 +6413,84 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {
-        "sourceEvidenceReview": {
-          "nodeId": "http_registration_template-4880c36556c3cb",
-          "sourceFile": "apps/api/src/android-updates.ts",
-          "previousSourceHash": null,
-          "firstChangedSourceHash": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e",
-          "reason": "new_source_node",
-          "priorResults": null,
-          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
+      "manual": {},
+      "needsRevalidation": true,
+      "generated": true
+    },
+    {
+      "id": "http_route-2af3ffd1e0e3b1",
+      "kind": "http_route",
+      "title": "HEAD /api/v1/android-updates/stable/:fileName",
+      "group": "persistence_upgrade",
+      "baselineIds": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "source": {
+        "file": "apps/api/src/android-updates.ts",
+        "line": 112
+      },
+      "sourceHash": "04eaa759eed6f92c3f32b9cc620973ae2ca73b1d0006ece64565c0842e1a3121",
+      "method": "HEAD",
+      "path": "/api/v1/android-updates/stable/:fileName",
+      "registration": "route-object",
+      "declarationSource": null,
+      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
+      "steps": [
+        "Prepare a fresh project-scoped test record and record its version.",
+        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
+        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
+        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
+      ],
+      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
+      "status": "not_run",
+      "results": {
+        "apk": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "exe": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "web": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "http": {
+          "applicable": true,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
+        },
+        "server_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+        },
+        "local_mcp": {
+          "applicable": false,
+          "status": "not_run",
+          "evidence": [],
+          "actual": "",
+          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
+      "manual": {},
       "needsRevalidation": true,
       "generated": true
     },
@@ -7412,7 +6892,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.122Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.018Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -8582,7 +8062,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.123Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.020Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -14945,7 +14425,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.124Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.021Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15123,7 +14603,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.126Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.023Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15348,7 +14828,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -15492,7 +14972,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15715,7 +15195,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.130Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.026Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -15932,7 +15412,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -16128,7 +15608,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -16303,7 +15783,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -16613,7 +16093,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -16816,7 +16296,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -17048,7 +16528,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -17407,7 +16887,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.139Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.035Z",
         "retainedReviewNotes": [
           {
             "surface": "server_mcp",
@@ -17979,7 +17459,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.212Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.108Z",
         "projectIsolationRuns": [
           {
             "runId": "789bd648-e5df-43d7-b5b1-283327f83b07",
@@ -28068,9 +27548,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 647
+        "line": 645
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/bugs/:bugId/comments",
       "registration": "direct",
@@ -28200,9 +27680,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 647
+        "line": 645
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/comments",
       "registration": "direct",
@@ -28494,7 +27974,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.207Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.103Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -28634,9 +28114,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 859
+        "line": 857
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/session",
       "registration": "direct",
@@ -28763,9 +28243,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 862
+        "line": 860
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/login/start",
       "registration": "direct",
@@ -28892,9 +28372,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 865
+        "line": 863
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/login/status",
       "registration": "direct",
@@ -29021,9 +28501,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 868
+        "line": 866
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/logout",
       "registration": "direct",
@@ -29150,9 +28630,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 871
+        "line": 869
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/projects",
       "registration": "direct",
@@ -29279,9 +28759,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 874
+        "line": 872
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/integrations/qingyu/defects",
       "registration": "direct",
@@ -29408,9 +28888,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 886
+        "line": 884
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/integrations/qingyu/import",
       "registration": "direct",
@@ -29537,9 +29017,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 909
+        "line": 907
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/integrations/qingyu",
       "registration": "direct",
@@ -29666,9 +29146,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 916
+        "line": 914
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/integrations/qingyu/resolve",
       "registration": "direct",
@@ -29798,9 +29278,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 941
+        "line": 939
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/health/live",
       "registration": "direct",
@@ -29930,9 +29410,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 953
+        "line": 951
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/health/ready",
       "registration": "direct",
@@ -29997,7 +29477,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.142Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.038Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -30132,9 +29612,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 965
+        "line": 963
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/health/deps",
       "registration": "direct",
@@ -30267,9 +29747,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 988
+        "line": 986
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/projects",
       "registration": "direct",
@@ -30332,7 +29812,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.143Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.039Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -30462,9 +29942,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1019
+        "line": 1017
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/members",
       "registration": "direct",
@@ -30597,9 +30077,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1056
+        "line": 1054
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/users",
       "registration": "direct",
@@ -30741,9 +30221,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1087
+        "line": 1085
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/projects/:projectId/users/:userId/identity-link",
       "registration": "direct",
@@ -30881,9 +30361,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1126
+        "line": 1124
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "DELETE",
       "path": "/api/v1/projects/:projectId/users/:userId/identity-link",
       "registration": "direct",
@@ -31021,9 +30501,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1162
+        "line": 1160
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "DELETE",
       "path": "/api/v1/projects/:projectId/users/:userId",
       "registration": "direct",
@@ -31156,9 +30636,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1198
+        "line": 1196
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/modules",
       "registration": "direct",
@@ -31538,9 +31018,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1230
+        "line": 1228
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/metrics/overview",
       "registration": "direct",
@@ -31915,9 +31395,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1266
+        "line": 1264
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/integrations/relay/webhooks",
       "registration": "direct",
@@ -32047,9 +31527,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1379
+        "line": 1377
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs",
       "registration": "direct",
@@ -32116,7 +31596,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -32253,23 +31733,6 @@
             "failedChecks": 0,
             "additionalChecks": "18 resource comparisons reached after successful replay, plus HTTP409 status"
           }
-        ],
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:POST:/api/v1/bugs",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
         ]
       },
       "needsRevalidation": true,
@@ -32290,9 +31753,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1412
+        "line": 1410
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs",
       "registration": "direct",
@@ -32598,7 +32061,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.206Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.102Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -32775,9 +32238,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1448
+        "line": 1446
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -33100,7 +32563,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.207Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.102Z",
         "reviewedEvidence": {
           "proofHashes": {
             "runs/frozen-workflow-live-2026-09-08T20-40-57-088Z.json": "de8200288602407e53747505620241fc89247c896c2b32bb86cdc47006e3e387",
@@ -33263,9 +32726,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1463
+        "line": 1461
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/attachments",
       "registration": "direct",
@@ -33558,7 +33021,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.209Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.104Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-662ac1e4f068be",
           "sourceFile": "apps/api/src/app.ts",
@@ -33651,9 +33114,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1501
+        "line": 1499
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/attachments/:attachmentId",
       "registration": "direct",
@@ -33946,7 +33409,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.209Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.105Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-f2b76a8f2d3bd2",
           "sourceFile": "apps/api/src/app.ts",
@@ -34039,9 +33502,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1538
+        "line": 1536
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/capture-bundles/:captureId/artifacts/:artifactKind",
       "registration": "direct",
@@ -34171,9 +33634,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1576
+        "line": 1574
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "PATCH",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -34247,7 +33710,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.210Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.106Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -34388,9 +33851,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1617
+        "line": 1615
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "DELETE",
       "path": "/api/v1/bugs/:bugId",
       "registration": "direct",
@@ -34507,7 +33970,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.107Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-3f8b6d79c3ec5a",
           "sourceFile": "apps/api/src/app.ts",
@@ -34597,9 +34060,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1668
+        "line": 1666
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/duplicate-candidates",
       "registration": "direct",
@@ -34729,9 +34192,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1700
+        "line": 1698
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/mark-duplicate",
       "registration": "direct",
@@ -34861,9 +34324,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1781
+        "line": 1779
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/transitions",
       "registration": "direct",
@@ -34966,7 +34429,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.114Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-280fa057c65980",
           "sourceFile": "apps/api/src/app.ts",
@@ -35063,9 +34526,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1806
+        "line": 1804
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/complete",
       "registration": "direct",
@@ -35195,9 +34658,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1831
+        "line": 1829
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/manual-complete",
       "registration": "direct",
@@ -35320,7 +34783,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.106Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-91587d5ccb9fcd",
           "sourceFile": "apps/api/src/app.ts",
@@ -35412,9 +34875,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1859
+        "line": 1857
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/repair-attempts",
       "registration": "direct",
@@ -35517,7 +34980,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-133e8410ae7ef7",
           "sourceFile": "apps/api/src/app.ts",
@@ -35614,9 +35077,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1900
+        "line": 1898
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/start",
       "registration": "direct",
@@ -35719,7 +35182,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-45735bc8af628d",
           "sourceFile": "apps/api/src/app.ts",
@@ -35816,9 +35279,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1933
+        "line": 1931
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/repair-attempts/:attemptId",
       "registration": "direct",
@@ -35992,9 +35455,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1953
+        "line": 1951
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/deliver",
       "registration": "direct",
@@ -36097,7 +35560,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-144efd0c9334b8",
           "sourceFile": "apps/api/src/app.ts",
@@ -36192,9 +35655,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 1986
+        "line": 1984
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/dispatch/relay",
       "registration": "direct",
@@ -36322,9 +35785,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2014
+        "line": 2012
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/repair-attempts/:attemptId/dispatch/relay/continue",
       "registration": "direct",
@@ -36452,9 +35915,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2042
+        "line": 2040
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/repair-attempts/:attemptId/relay-receipt",
       "registration": "direct",
@@ -36587,9 +36050,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2122
+        "line": 2104
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/projects/:projectId/human-workflows/latest",
       "registration": "direct",
@@ -36719,9 +36182,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2147
+        "line": 2129
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/human-workflow",
       "registration": "direct",
@@ -36786,7 +36249,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.153Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.050Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -36917,9 +36380,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2163
+        "line": 2145
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/comments",
       "registration": "direct",
@@ -36995,7 +36458,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.211Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.106Z",
         "retainedReviewNotes": [
           {
             "surface": "http",
@@ -37136,9 +36599,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2206
+        "line": 2188
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/bugs/:bugId/events",
       "registration": "direct",
@@ -37473,7 +36936,7 @@
           "at": "2026-09-08T21:26:59.617Z",
           "reason": "Actual EXE-absent direct HTTP and server JSON-RPC cases; preserve remaining full-function requirements."
         },
-        "evidenceMappedAt": "2026-09-09T03:31:53.208Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.104Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-c72542c420f961",
           "sourceFile": "apps/api/src/app.ts",
@@ -37566,9 +37029,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2226
+        "line": 2208
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/projects/:projectId/builds",
       "registration": "direct",
@@ -37698,9 +37161,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2257
+        "line": 2239
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/builds/:buildId",
       "registration": "direct",
@@ -37830,9 +37293,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2274
+        "line": 2256
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/builds/:buildId/link-repair",
       "registration": "direct",
@@ -37962,9 +37425,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2305
+        "line": 2287
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/bugs/:bugId/verifications",
       "registration": "direct",
@@ -38107,7 +37570,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-8d683a24515c8d",
           "sourceFile": "apps/api/src/app.ts",
@@ -38206,9 +37669,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2337
+        "line": 2319
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/verifications/:verificationId",
       "registration": "direct",
@@ -38382,9 +37845,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2360
+        "line": 2342
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/verifications/:verificationId/start",
       "registration": "direct",
@@ -38527,7 +37990,7 @@
             "progress": null
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.219Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.115Z",
         "sourceEvidenceReview": {
           "nodeId": "http_route-d250196281a746",
           "sourceFile": "apps/api/src/app.ts",
@@ -38626,9 +38089,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2394
+        "line": 2376
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/verifications/:verificationId/result",
       "registration": "direct",
@@ -38844,9 +38307,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2458
+        "line": 2432
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/notifications",
       "registration": "direct",
@@ -38976,9 +38439,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2502
+        "line": 2476
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/capture-bundles",
       "registration": "direct",
@@ -39108,9 +38571,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2544
+        "line": 2518
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "GET",
       "path": "/api/v1/capture-bundles/:captureId",
       "registration": "direct",
@@ -39240,9 +38703,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2559
+        "line": 2533
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/uploads/init",
       "registration": "direct",
@@ -39281,11 +38744,9 @@
         "http": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "server_mcp": {
           "applicable": false,
@@ -39354,38 +38815,6 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/init",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.459Z",
-        "surfaceProgress": {
-          "http": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -39406,9 +38835,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2593
+        "line": 2567
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "PUT",
       "path": "/api/v1/uploads/:sessionId/chunks/:chunkNumber",
       "registration": "direct",
@@ -39447,11 +38876,9 @@
         "http": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "server_mcp": {
           "applicable": false,
@@ -39520,38 +38947,6 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:PUT:/api/v1/uploads/:sessionId/chunks/:chunkNumber",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.459Z",
-        "surfaceProgress": {
-          "http": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -39572,9 +38967,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2647
+        "line": 2621
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/uploads/:sessionId/finalize",
       "registration": "direct",
@@ -39613,11 +39008,9 @@
         "http": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "server_mcp": {
           "applicable": false,
@@ -39686,38 +39079,6 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81:POST:/api/v1/uploads/:sessionId/finalize",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.459Z",
-        "surfaceProgress": {
-          "http": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -39738,9 +39099,9 @@
       ],
       "source": {
         "file": "apps/api/src/app.ts",
-        "line": 2691
+        "line": 2665
       },
-      "sourceHash": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f",
+      "sourceHash": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef",
       "method": "POST",
       "path": "/api/v1/attachments/:attachmentId/bind",
       "registration": "direct",
@@ -40032,98 +39393,6 @@
       },
       "manual": {},
       "needsRevalidation": false,
-      "generated": true
-    },
-    {
-      "id": "http_route-9d5a14e3a6cfb9",
-      "kind": "http_route",
-      "title": "GET /api/v1/bugs/:bugId/workflow",
-      "group": "project_people",
-      "baselineIds": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        10
-      ],
-      "source": {
-        "file": "apps/api/src/workflow-projection.ts",
-        "line": 74
-      },
-      "sourceHash": "d526bfba472c0b6863ed15bfc4c3d80e3f485b4f356acc1b4701b1991e242449",
-      "method": "GET",
-      "path": "/api/v1/bugs/:bugId/workflow",
-      "registration": "direct",
-      "declarationSource": null,
-      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
-      "steps": [
-        "Prepare a fresh project-scoped test record and record its version.",
-        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
-        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
-        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
-      ],
-      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
-      "results": {
-        "apk": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "exe": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "web": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "http": {
-          "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "Real execution and read-back required."
-        },
-        "server_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "local_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        }
-      },
-      "manual": {
-        "sourceEvidenceReview": {
-          "nodeId": "http_route-9d5a14e3a6cfb9",
-          "sourceFile": "apps/api/src/workflow-projection.ts",
-          "previousSourceHash": null,
-          "firstChangedSourceHash": "d526bfba472c0b6863ed15bfc4c3d80e3f485b4f356acc1b4701b1991e242449",
-          "reason": "new_source_node",
-          "priorResults": null,
-          "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        }
-      },
-      "needsRevalidation": true,
       "generated": true
     },
     {
@@ -41180,7 +40449,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41362,7 +40631,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41467,7 +40736,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -41645,7 +40914,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.099Z",
+        "evidenceMappedAt": "2026-09-09T00:01:13.996Z",
         "surfaceProgress": {
           "local_mcp": {
             "completed": [
@@ -43101,7 +42370,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.161Z"
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -43746,12 +43015,9 @@
         "exe": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-          ],
-          "actual": "已实测：EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。；EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。。仍缺：.8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。；.9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "web": {
           "applicable": false,
@@ -43782,71 +43048,7 @@
           "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
         }
       },
-      "manual": {
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.461Z",
-        "surfaceProgress": {
-          "exe": {
-            "completed": [
-              "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-              "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。"
-            ],
-            "remaining": [
-              ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。",
-              ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-            ],
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "status": "partial"
-          }
-        }
-      },
+      "manual": {},
       "needsRevalidation": true,
       "generated": true
     },
@@ -43888,12 +43090,10 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/exe-after-preview7-upgrade.json",
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+            "runs/exe-after-preview7-upgrade.json"
           ],
-          "actual": "已实测：实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。；EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。；EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖；.8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。；.9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+          "note": "Real execution and read-back required."
         },
         "web": {
           "applicable": false,
@@ -43937,19 +43137,13 @@
         "surfaceProgress": {
           "exe": {
             "completed": [
-              "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。",
-              "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-              "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。"
+              "实际原生面板检查更新通过desktop:check-update到ready；不可信sender及updater缺失等拒绝分支未测。"
             ],
             "remaining": [
-              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖",
-              ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。",
-              ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
             ],
             "evidence": [
-              "runs/exe-after-preview7-upgrade.json",
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+              "runs/exe-after-preview7-upgrade.json"
             ],
             "status": "partial"
           }
@@ -44028,52 +43222,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.230Z",
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-          }
-        ]
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -44116,12 +43265,10 @@
           "applicable": true,
           "status": "not_run",
           "evidence": [
-            "runs/exe-after-preview7-upgrade.json",
-            "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-            "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+            "runs/exe-after-preview7-upgrade.json"
           ],
-          "actual": "已实测：实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。；EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。；EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖；.8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。；.9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "actual": "已实测：实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。。仍缺：仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖。",
+          "note": "Real execution and read-back required."
         },
         "web": {
           "applicable": false,
@@ -44165,19 +43312,13 @@
         "surfaceProgress": {
           "exe": {
             "completed": [
-              "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。",
-              "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-              "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。"
+              "实际原生面板安装并重启通过desktop:install-update，最终installed.7与UTC/保留读回；不可信sender和安装失败分支未测。"
             ],
             "remaining": [
-              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖",
-              ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。",
-              ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
+              "仅此实际分支已测；此复合handler其它动作/参数/拒绝分支仍未逐项覆盖"
             ],
             "evidence": [
-              "runs/exe-after-preview7-upgrade.json",
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json",
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
+              "runs/exe-after-preview7-upgrade.json"
             ],
             "status": "partial"
           }
@@ -44256,52 +43397,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.230Z",
-        "recentEvidenceObservations": [
-          {
-            "id": "exe-native-upgrade-7-to-8",
-            "evidence": [
-              "exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T000712593Z",
-              "version": "0.2.0-preview.8",
-              "nativeVersion": "0.2.0.8",
-              "installerSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
-              "installerBytes": 108333764,
-              "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
-            },
-            "preservedFinding": {
-              "id": "DETAIL_FIRST_RENDER_FALSE_FAILURE",
-              "status": "open_in_installed_preview8",
-              "firstObservation": "after-old-bug-first-failure.json",
-              "subsequentObservation": "after-old-bug-observed-again.json",
-              "retriedByUserOrRoot": false,
-              "description": "First capture showed detail failure; subsequent read-only capture loaded the old Bug without clicking retry. Source fix and asynchronous App regression are separate work. No unsupported network-outage claim."
-            },
-            "completed": "EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。"
-          },
-          {
-            "id": "exe-native-upgrade-8-to-9",
-            "evidence": [
-              "exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json"
-            ],
-            "version": {
-              "releaseId": "20260909T011704801Z",
-              "version": "0.2.0-preview.9",
-              "nativeVersion": "0.2.0.9",
-              "installerBytes": 108334255,
-              "installerSha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
-              "manifestSha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9",
-              "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
-              "sourceDirty": true
-            },
-            "preservedFinding": "preview8 DETAIL_FIRST_RENDER_FALSE_FAILURE historical proof unchanged",
-            "completed": "EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。",
-            "remaining": ".9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。"
-          }
-        ]
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -44773,7 +43869,7 @@
             }
           }
         ],
-        "evidenceMappedAt": "2026-09-09T03:31:53.161Z"
+        "evidenceMappedAt": "2026-09-09T00:01:14.057Z"
       },
       "needsRevalidation": true,
       "generated": true
@@ -44945,7 +44041,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 468
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
       "steps": [
         "Prepare a fresh project-scoped test record and record its version.",
@@ -45076,7 +44172,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 1926
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -45215,7 +44311,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 1946
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -45347,7 +44443,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 1967
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -45479,7 +44575,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 1987
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -45611,7 +44707,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2002
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -45743,7 +44839,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2018
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -45875,7 +44971,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2029
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -46007,7 +45103,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2038
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -46137,7 +45233,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2054
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -46267,7 +45363,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2070
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -46399,7 +45495,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2086
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -46531,7 +45627,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2097
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -46663,7 +45759,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2107
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -46795,7 +45891,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2124
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -46924,7 +46020,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2152
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -47056,7 +46152,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2160
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -47201,7 +46297,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2180
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -47333,7 +46429,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2205
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -47465,7 +46561,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2219
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -47597,7 +46693,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2255
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -47732,7 +46828,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2317
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "UserManagementPage",
       "handlerNames": [
         "onChanged"
@@ -47867,7 +46963,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2326
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "ProjectManagementPage",
       "handlerNames": [
         "onChanged"
@@ -47999,7 +47095,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2387
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -48131,7 +47227,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2396
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -48263,7 +47359,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2410
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -48395,7 +47491,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2430
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -48527,7 +47623,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2443
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -48659,7 +47755,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2463
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "a",
       "handlerNames": [],
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
@@ -48789,7 +47885,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2479
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -48928,7 +48024,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2491
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "form",
       "handlerNames": [
         "onSubmit"
@@ -49067,7 +48163,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2499
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -49199,7 +48295,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2515
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "textarea",
       "handlerNames": [
         "onChange"
@@ -49338,7 +48434,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2531
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "textarea",
       "handlerNames": [
         "onChange"
@@ -49470,7 +48566,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2548
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -49602,7 +48698,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2568
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -49734,7 +48830,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2588
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -49866,7 +48962,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2609
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -49998,7 +49094,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2630
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -50130,7 +49226,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2688
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -50260,7 +49356,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2726
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -50390,7 +49486,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2742
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -50522,7 +49618,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2756
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -50654,7 +49750,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2769
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "summary",
       "handlerNames": [],
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
@@ -50784,7 +49880,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2794
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "form",
       "handlerNames": [
         "onSubmit"
@@ -50923,7 +50019,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2798
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -51012,7 +50108,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2806
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [],
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
@@ -51149,7 +50245,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2813
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -51238,7 +50334,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2822
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -51327,7 +50423,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2841
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -51459,7 +50555,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2849
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [],
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
@@ -51589,7 +50685,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2889
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -51721,7 +50817,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2901
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -51853,7 +50949,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2918
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -51996,7 +51092,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2940
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "textarea",
       "handlerNames": [
         "onChange"
@@ -52128,7 +51224,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2955
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -52258,7 +51354,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2975
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -52390,7 +51486,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 2993
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -52522,7 +51618,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3008
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -52665,7 +51761,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3021
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -52797,7 +51893,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3042
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -52940,7 +52036,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3061
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -53072,7 +52168,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3068
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -53201,7 +52297,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3090
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -53330,7 +52426,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3108
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -53459,7 +52555,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3119
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -53588,7 +52684,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3151
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -53717,7 +52813,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3163
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -53846,7 +52942,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3187
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -53975,7 +53071,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3231
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -54104,7 +53200,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3241
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -54233,7 +53329,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3279
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -54365,7 +53461,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3295
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "form",
       "handlerNames": [
         "onSubmit"
@@ -54497,7 +53593,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3305
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -54629,7 +53725,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3311
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "textarea",
       "handlerNames": [
         "onChange"
@@ -54718,7 +53814,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3325
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -54807,7 +53903,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3338
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -54896,7 +53992,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3352
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "select",
       "handlerNames": [
         "onChange"
@@ -54985,7 +54081,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3366
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "input",
       "handlerNames": [
         "onChange"
@@ -55117,7 +54213,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3387
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -55206,7 +54302,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3404
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -55295,7 +54391,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3413
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -55327,11 +54423,9 @@
         "web": {
           "applicable": true,
           "status": "not_run",
-          "evidence": [
-            "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-          ],
-          "actual": "已实测：7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺：仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。",
-          "note": "Status describes the explicitly recorded cases. Other guards and complete cross-surface baselines remain independently required."
+          "evidence": [],
+          "actual": "",
+          "note": "Real execution and read-back required."
         },
         "http": {
           "applicable": false,
@@ -55364,38 +54458,6 @@
           "reason": "new_source_node",
           "priorResults": null,
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "web-7904e2c-rejected-media-81",
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "version": "7904e2c2d7285003884a5788a83300fbf521dbf1",
-            "sourceHashesAtExecution": {
-              "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
-              "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
-              "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
-              "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
-            },
-            "completed": "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。",
-            "remaining": "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-          }
-        ],
-        "evidenceMappedAt": "2026-09-09T03:31:49.458Z",
-        "surfaceProgress": {
-          "web": {
-            "completed": [
-              "7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。"
-            ],
-            "remaining": [
-              "仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。"
-            ],
-            "evidence": [
-              "web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json"
-            ],
-            "status": "partial"
-          }
         }
       },
       "needsRevalidation": true,
@@ -55418,7 +54480,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3421
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [
         "onClick"
@@ -55550,7 +54612,7 @@
         "file": "apps/web/src/App.tsx",
         "line": 3428
       },
-      "sourceHash": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528",
+      "sourceHash": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554",
       "tag": "button",
       "handlerNames": [],
       "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
@@ -75839,7 +74901,7 @@
         }
       },
       "manual": {
-        "evidenceMappedAt": "2026-09-09T03:31:53.173Z",
+        "evidenceMappedAt": "2026-09-09T00:01:14.069Z",
         "reviewedEvidence": {
           "proofHashes": {
             "android-code22-no-code.json": "6a0490da68634961121ec1a7582d3fa43abc22a8c7be8f2a4907f1b4b22d77e2"
@@ -85774,34 +84836,7 @@
             }
           },
           "scope": "Historical results remain retained; this is a revalidation requirement, not new execution evidence."
-        },
-        "recentEvidenceObservations": [
-          {
-            "id": "apk-code23-legacy-text-recovery",
-            "evidence": [
-              "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
-              "android-recovery-proxy-audits/65ee5dc8-first/proof.json",
-              "android-code23-create-readback/f0d296c0-da06-4423-83bc-a5a6d0d5e59c/proof.json"
-            ],
-            "version": {
-              "code": 23,
-              "name": "0.2.0-preview.9",
-              "apkSha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
-            },
-            "preservedFailures": [
-              {
-                "name": "upgrade-precheck-first-failure.json",
-                "cause": "Harness required only one receipt table; valid attachment_pipeline_receipts also existed. Stopped before install. Corrected presence check reused the same cold archive without changing device DB."
-              },
-              {
-                "name": "preparation signing verification attempt",
-                "cause": "JAVA_HOME unset before signature check; explicit JBR verification passed, original record retained."
-              }
-            ],
-            "completed": "MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。",
-            "remaining": "仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。"
-          }
-        ]
+        }
       },
       "needsRevalidation": true,
       "generated": true
@@ -102306,164 +101341,6 @@
       "needsRevalidation": false,
       "generated": true,
       "retiredFromStaticInventoryAt": "2026-09-09T00:01:10.010Z",
-      "reviewRequired": true
-    },
-    {
-      "id": "http_route-73141f37d37021",
-      "kind": "http_route",
-      "title": "GET /api/v1/android-updates/stable/:fileName",
-      "group": "persistence_upgrade",
-      "baselineIds": [
-        21,
-        22,
-        23,
-        24
-      ],
-      "source": {
-        "file": "apps/api/src/android-updates.ts",
-        "line": 112
-      },
-      "sourceHash": "04eaa759eed6f92c3f32b9cc620973ae2ca73b1d0006ece64565c0842e1a3121",
-      "method": "GET",
-      "path": "/api/v1/android-updates/stable/:fileName",
-      "registration": "route-object",
-      "declarationSource": null,
-      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
-      "steps": [
-        "Prepare a fresh project-scoped test record and record its version.",
-        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
-        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
-        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
-      ],
-      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
-      "results": {
-        "apk": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "exe": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "web": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "http": {
-          "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "Real execution and read-back required."
-        },
-        "server_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "local_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        }
-      },
-      "manual": {},
-      "needsRevalidation": true,
-      "generated": true,
-      "retiredFromStaticInventoryAt": "2026-09-09T03:31:49.060Z",
-      "reviewRequired": true
-    },
-    {
-      "id": "http_route-2af3ffd1e0e3b1",
-      "kind": "http_route",
-      "title": "HEAD /api/v1/android-updates/stable/:fileName",
-      "group": "persistence_upgrade",
-      "baselineIds": [
-        21,
-        22,
-        23,
-        24
-      ],
-      "source": {
-        "file": "apps/api/src/android-updates.ts",
-        "line": 112
-      },
-      "sourceHash": "04eaa759eed6f92c3f32b9cc620973ae2ca73b1d0006ece64565c0842e1a3121",
-      "method": "HEAD",
-      "path": "/api/v1/android-updates/stable/:fileName",
-      "registration": "route-object",
-      "declarationSource": null,
-      "prerequisites": "Dedicated preview instance; projects A/B; A-only, B-only and shared employee; unique GM. External components require independent test targets.",
-      "steps": [
-        "Prepare a fresh project-scoped test record and record its version.",
-        "Invoke this actual runtime entry with its valid parameters; inspect the visible result.",
-        "Read back persisted project, actor, state/version, events, attachments or final artifact as applicable.",
-        "Repeat applicable error cases (wrong project/membership, stale version, repeat request, deleted record, disabled component)."
-      ],
-      "expected": "Behavior and persisted result match the design and current business contract; no cross-project or production writes.",
-      "status": "not_run",
-      "results": {
-        "apk": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "exe": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "web": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "http": {
-          "applicable": true,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "Real execution and read-back required."
-        },
-        "server_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        },
-        "local_mcp": {
-          "applicable": false,
-          "status": "not_run",
-          "evidence": [],
-          "actual": "",
-          "note": "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
-        }
-      },
-      "manual": {},
-      "needsRevalidation": true,
-      "generated": true,
-      "retiredFromStaticInventoryAt": "2026-09-09T03:31:49.061Z",
       "reviewRequired": true
     }
   ]

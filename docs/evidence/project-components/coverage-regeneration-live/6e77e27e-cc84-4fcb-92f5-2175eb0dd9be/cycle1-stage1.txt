@@ -1,0 +1,58 @@
+{
+  "generated": [
+    "docs/evidence/project-components/coverage-matrix.json",
+    "docs/evidence/project-components/coverage-matrix.md"
+  ],
+  "summary": {
+    "itemCount": 991,
+    "byKind": {
+      "android_background_operation": 8,
+      "android_control": 108,
+      "android_page_component": 41,
+      "background_operation": 16,
+      "background_timer": 16,
+      "baseline": 24,
+      "desktop_event": 12,
+      "desktop_ipc_action": 10,
+      "desktop_menu_action": 6,
+      "external_full_chain": 10,
+      "http_registration_template": 3,
+      "http_route": 192,
+      "mcp_tool": 109,
+      "required_mcp_parity": 17,
+      "state_action": 12,
+      "state_transition_pair": 100,
+      "web_control": 273,
+      "web_page_component": 34
+    },
+    "baselineCount": 24,
+    "fileCount": 193,
+    "resultsBySurface": {
+      "apk": {
+        "not_run": 271,
+        "passed": 21
+      },
+      "exe": {
+        "not_run": 459,
+        "passed": 19
+      },
+      "web": {
+        "passed": 26,
+        "not_run": 409
+      },
+      "http": {
+        "passed": 50,
+        "not_run": 300
+      },
+      "server_mcp": {
+        "not_run": 232,
+        "passed": 30
+      },
+      "local_mcp": {
+        "not_run": 251,
+        "passed": 12
+      }
+    }
+  },
+  "retiredItemCount": 30
+}

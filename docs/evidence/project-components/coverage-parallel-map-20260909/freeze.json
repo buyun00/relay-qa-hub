@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-09T03:46:04.147Z",
+  "sourceHead": "3b57719deed8d907fa84bba232e2939d18288351",
+  "files": [
+    {
+      "path": "scripts/project-components/map-coverage-evidence.mjs",
+      "bytes": 113476,
+      "sha256": "2ff1c4bbfcd8df06e1c093c32cbfde6f8c5f3182fbcc40dfb3a3328db5e35938"
+    },
+    {
+      "path": "scripts/project-components/parallel-evidence-map.audit.mjs",
+      "bytes": 17400,
+      "sha256": "142ec793779524949f5cad7acb05eab5ccccf355fd5b153ae58acf0badf16a63"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-matrix.json",
+      "bytes": 4590018,
+      "sha256": "467f7b0800f291ff9e271f896b99f7af8922960f463732d2a13350adf34645c1"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-mapping-review.md",
+      "bytes": 63250,
+      "sha256": "cb30ea7fe50cb3c89e204776ffd1e5e5f0cac1f3ecd200469851be01f8171e58"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-matrix.md",
+      "bytes": 185147,
+      "sha256": "d547d2141210ceab5b01b5e0744c28109edf3ccd24e7214294a890fde47ca964"
+    },
+    {
+      "path": "docs/evidence/project-components/IMPLEMENTATION.md",
+      "bytes": 65563,
+      "sha256": "2a26d276f2ef6ff4deb7912e841ecba34d4fa53832d5536d98798b6576f670f0"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-current-source.mjs.txt",
+      "bytes": 17400,
+      "sha256": "142ec793779524949f5cad7acb05eab5ccccf355fd5b153ae58acf0badf16a63"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-final-exit.json",
+      "bytes": 311,
+      "sha256": "87064b1e57760c433d0369c551ef62ffe6acf319eac09905fa11f987a8905d06"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-final.json",
+      "bytes": 263976,
+      "sha256": "b2270d09830bb86da4a74022e344455a85f9bfcef3de6f48c6fa5e4759d64f9f"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-first-source.mjs.txt",
+      "bytes": 16802,
+      "sha256": "58ad3351fe5940afe458643d030504e39fd7688b72fb8dd16b82f86f04cc4e99"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r2-source.mjs.txt",
+      "bytes": 17292,
+      "sha256": "67fddc02b11769b0a07b9a6f02878a6ba6ab787dc9dda2c155c6117513b3863c"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r2.json",
+      "bytes": 264116,
+      "sha256": "763e264ea742b817e39705387363a00e8108c5ebb5ec2e100a36e0e992ce2b3c"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r2.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r3-source.mjs.txt",
+      "bytes": 17307,
+      "sha256": "a6110503b1dd9be02d9347aca40b3a00f7dc4023b46946450126717b0452742c"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r3.json",
+      "bytes": 264024,
+      "sha256": "551cb4e0e54d325d8bb94d3a399f9794a0ceb02d77c308bb04cf33668852bdc8"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r3.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r4-source.mjs.txt",
+      "bytes": 17404,
+      "sha256": "b1ace308e388fd23f74554306e87f3cc7182bb3ecb1c994bc7109839f88f7b8d"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r4.json",
+      "bytes": 263976,
+      "sha256": "f51829edb962f2071177842c7efad93f994f276b39019851577e3a428fef0519"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit-r4.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit.json",
+      "bytes": 262863,
+      "sha256": "fe5be308e4a5c2d2d24964f4770f37fda1b853e413506f6c79730a819812dea7"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/audit.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/chain.json",
+      "bytes": 3323,
+      "sha256": "207f1d445f6c1826eda252732009baa0b372f711cf113ae10f97fe55c1338a54"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/final-check-first-runner.mjs.txt",
+      "bytes": 1847,
+      "sha256": "e45e8b77de6b0f917197027faeb3d8dc8e7beebd48938128589bc9b230d8cf9e"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/final-check-r2-runner.mjs.txt",
+      "bytes": 1847,
+      "sha256": "45b10a9a1864ee54711ee4182c102061944f8479a985e70d694ce1c7ce11d728"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/final-check-runner.mjs.txt",
+      "bytes": 1993,
+      "sha256": "6020b1c65f352d52db91d1ff82d5b65063bda068eaa0c477cc0d1ac8cdc39fb2"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/final-checks.json",
+      "bytes": 1544,
+      "sha256": "a901c6d6301a5e823aa270fcf603a3ec5e15314aa8be3a5b608f1a63e05eddea"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/format-final-exit.json",
+      "bytes": 336,
+      "sha256": "e0fd1dbe525bc5cf1143a1ef6b8502e11b6dc4724cd686fd70f1ae4f9927ad5a"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/format-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/format-final.txt",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/format.stderr.txt",
+      "bytes": 150,
+      "sha256": "237359681401f21da22f6b77e0dc1529eaa5517f047d40d78709e7d10e8c2c04"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/format.txt",
+      "bytes": 23,
+      "sha256": "ebe82dad128d5e5d8936334ceac09492f3c60bd9e0b4a16cc7fd7075513b33de"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/lint-final-exit.json",
+      "bytes": 314,
+      "sha256": "35c80fe289e5b5cef39f77e9f5f5755e97317758e9149b745f6a89d9b67607e1"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/lint-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/lint-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/lint.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/lint.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/mapper.mjs.txt",
+      "bytes": 113476,
+      "sha256": "2ff1c4bbfcd8df06e1c093c32cbfde6f8c5f3182fbcc40dfb3a3328db5e35938"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/README.md",
+      "bytes": 2662,
+      "sha256": "2eb02e11f1c9ed98348217b94aab28c34352c2330537c983f890c74bfbc9648d"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-audit-final-exit.json",
+      "bytes": 236,
+      "sha256": "1fbfeb224d220fa329c162894a51fff3a44465625d5414edf3c3278324c853a2"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-audit-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-audit-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-audit.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-audit.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-mapper-final-exit.json",
+      "bytes": 231,
+      "sha256": "20278f5c2e899c2749fc5be090de2260da86004f7b66fff6e17fdf776b4252ae"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-mapper-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-mapper-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-mapper.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-parallel-map-20260909/syntax-mapper.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/before/coverage-mapping-review.md",
+      "bytes": 53901,
+      "sha256": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/before/coverage-matrix.json",
+      "bytes": 4515556,
+      "sha256": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/before/coverage-matrix.md",
+      "bytes": 185054,
+      "sha256": "1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage1/coverage-mapping-review.md",
+      "bytes": 53901,
+      "sha256": "3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage1/coverage-matrix.json",
+      "bytes": 4523328,
+      "sha256": "946fb6f142dde7dcf14d7b99d2bbc0a972d7dac7cdc806a2670e5ccd55223fba"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage1/coverage-matrix.md",
+      "bytes": 185149,
+      "sha256": "21a25b8cbe303fb852adbdf70d8489950e06fd23f3a2100d33aa0f186ed74e01"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage1.txt",
+      "bytes": 1297,
+      "sha256": "0068a110c59ed5fc446efaeb423a6660240ee48276a3febe32e783b280808d41"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage2/coverage-mapping-review.md",
+      "bytes": 63250,
+      "sha256": "1f6662d5167080e361ead25204d6af6837da1db498d3aa265e20d74e15c6346d"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage2/coverage-matrix.json",
+      "bytes": 4590018,
+      "sha256": "efc7aa43cfdf1589fbd48600b033d74a3230b29ceb136f2facce303f61eb98ed"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage2/coverage-matrix.md",
+      "bytes": 185149,
+      "sha256": "21a25b8cbe303fb852adbdf70d8489950e06fd23f3a2100d33aa0f186ed74e01"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage2.txt",
+      "bytes": 27,
+      "sha256": "13d5f821b1032527c7c186e3b365f7873e50b1e12a773e0088fdeb9a2dedf2be"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage3/coverage-mapping-review.md",
+      "bytes": 63250,
+      "sha256": "1f6662d5167080e361ead25204d6af6837da1db498d3aa265e20d74e15c6346d"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage3/coverage-matrix.json",
+      "bytes": 4590018,
+      "sha256": "3374350c61b90e9cbd60e308d94e9f05560a931d3be0c2e171a43d6ba289920b"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage3/coverage-matrix.md",
+      "bytes": 185147,
+      "sha256": "ae4a9232f23ee4cfda344ebf19debbd84d356ce99de837b2d57c1ccb6270bfdf"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle1-stage3.txt",
+      "bytes": 1297,
+      "sha256": "66cb3c98a72dc6e3f488610a2b09c6d1a04032dae5c4e17a1bf5281243f544c4"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage1/coverage-mapping-review.md",
+      "bytes": 63250,
+      "sha256": "1f6662d5167080e361ead25204d6af6837da1db498d3aa265e20d74e15c6346d"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage1/coverage-matrix.json",
+      "bytes": 4590018,
+      "sha256": "511bb77d7ade576525b7dbd00165e6dc23f2a24899144702fc6e404a6dc5d5f7"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage1/coverage-matrix.md",
+      "bytes": 185147,
+      "sha256": "c47bdf15996077d177c12f86833db7c479fe7a05466b1b968a89f72453f75f08"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage1.txt",
+      "bytes": 1297,
+      "sha256": "66cb3c98a72dc6e3f488610a2b09c6d1a04032dae5c4e17a1bf5281243f544c4"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage2/coverage-mapping-review.md",
+      "bytes": 63250,
+      "sha256": "cb30ea7fe50cb3c89e204776ffd1e5e5f0cac1f3ecd200469851be01f8171e58"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage2/coverage-matrix.json",
+      "bytes": 4590018,
+      "sha256": "92f68be5625b1a4ad5bfcc226ea6552fd44e4196a02236b4a8bfcea0940a80cc"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage2/coverage-matrix.md",
+      "bytes": 185147,
+      "sha256": "c47bdf15996077d177c12f86833db7c479fe7a05466b1b968a89f72453f75f08"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage2.txt",
+      "bytes": 27,
+      "sha256": "13d5f821b1032527c7c186e3b365f7873e50b1e12a773e0088fdeb9a2dedf2be"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage3/coverage-mapping-review.md",
+      "bytes": 63250,
+      "sha256": "cb30ea7fe50cb3c89e204776ffd1e5e5f0cac1f3ecd200469851be01f8171e58"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage3/coverage-matrix.json",
+      "bytes": 4590018,
+      "sha256": "467f7b0800f291ff9e271f896b99f7af8922960f463732d2a13350adf34645c1"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage3/coverage-matrix.md",
+      "bytes": 185147,
+      "sha256": "d547d2141210ceab5b01b5e0744c28109edf3ccd24e7214294a890fde47ca964"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/cycle2-stage3.txt",
+      "bytes": 1297,
+      "sha256": "66cb3c98a72dc6e3f488610a2b09c6d1a04032dae5c4e17a1bf5281243f544c4"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/README.md",
+      "bytes": 1575,
+      "sha256": "b91a7b101f168d517bc1ef80359a491c7f3ab207989bc4c9c14e11132f6733cd"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/refresh-coverage-protected.mjs.txt",
+      "bytes": 6271,
+      "sha256": "76b261644feb2f602a50425b5270e50e19d15cad36b4eb2061b50a28b5951632"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/result.json",
+      "bytes": 7619,
+      "sha256": "37d678ebd0f7b42a4ea79dbdc482c902468165567d9f277a59c768c3eb1d18cc"
+    }
+  ],
+  "checks": {
+    "exactActualCaptureHashes": true,
+    "final648Checks": true,
+    "proofPins": 7,
+    "allSourceGatesExit0": true,
+    "knownPrivateValuesFound": 0
+  },
+  "limits": [
+    "Coverage inventory and evidence mapping only; historical baselines remain seven of twenty-four.",
+    "Concurrent product sources are excluded from this exact commit."
+  ]
+}

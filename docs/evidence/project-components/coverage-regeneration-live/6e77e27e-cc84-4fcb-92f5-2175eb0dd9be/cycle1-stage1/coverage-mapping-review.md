@@ -1,6 +1,6 @@
 # 实测证据映射审查
 
-生成时点：2026-09-09T03:31:53.248Z。只读已有证据，没有操作 UI、API 或生产。
+生成时点：2026-09-09T00:01:14.124Z。只读已有证据，没有操作 UI、API 或生产。
 
 `passed` 只代表该行明确注明的实际入口与输入。细目控件/路由通过不代表全部负向分支或上层基线通过；HTTP 15项、MCP 13项不称全部动作。未使用源码存在、共享实现、编译、单元或外部合同 fixture 代替真实外部执行。
 
@@ -9,9 +9,9 @@
 | 场景 | APK | EXE | Web | HTTP API | server MCP | local MCP |
 | --- | --- | --- | --- | --- | --- | --- |
 | 01 项目入口姓名登录 | not_run（部分实测） | not_run（部分实测） | passed | passed | not_run（部分实测） | not_run（部分实测） |
-| 02 单项目和多项目人员 | not_run（部分实测） | not_run | passed | passed | passed | not_run（部分实测） |
+| 02 单项目和多项目人员 | not_run（部分实测） | not_run | passed | passed | not_run（部分实测） | not_run（部分实测） |
 | 03 唯一 GM | not_run | not_run | not_run | passed | not_run | not_run |
-| 04 项目人员停用 | not_run（部分实测） | passed | not_run | passed | passed | not_run |
+| 04 项目人员停用 | not_run（部分实测） | passed | not_run | passed | not_run | not_run |
 | 05 非所属项目读取 | not_run | not_run | not_run | not_run（部分实测） | not_run（部分实测） | not_run |
 | 06 写入归属 | not_run | not_run | not_run | passed | passed | not_run |
 | 07 项目快速切换 | not_run（部分实测） | not_run（部分实测） | not_run | — | — | — |
@@ -21,7 +21,7 @@
 | 11 HTTP API 独立使用 | — | — | — | passed | — | — |
 | 12 服务端 MCP 独立使用 | — | — | — | — | passed | — |
 | 13 HTTP/MCP 对等 | — | — | — | not_run（部分实测） | not_run（部分实测） | not_run（部分实测） |
-| 14 并发和重复提交 | not_run（部分实测） | not_run | not_run（部分实测） | not_run（部分实测） | not_run（部分实测） | not_run（部分实测） |
+| 14 并发和重复提交 | not_run | not_run | not_run（部分实测） | not_run（部分实测） | not_run（部分实测） | not_run（部分实测） |
 | 15 附件三种读取 | — | — | — | passed | passed | passed |
 | 16 项目组件开关 | not_run | not_run | not_run | not_run（部分实测） | not_run | not_run |
 | 17 组件依赖和缺配置 | not_run | not_run | not_run | not_run（部分实测） | not_run | not_run |
@@ -39,9 +39,10 @@
 
 - 01 项目入口姓名登录 / APK：已测 实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表。仍缺 尚未逐一核对该基线完整首登/原历史姓名/有效成员目录组合；物理Android设备未测。
 - 01 项目入口姓名登录 / EXE：已测 .6原生退出清除磁盘身份且本地MCP拒绝，local MCP登录成功响应时身份已落盘；原生重登同人同项目恢复原文字+1图。。仍缺 完整首次成员登记/已有姓名稳定ID/多项目入口组合未全部覆盖；该序列未强停进程。。
-- 01 项目入口姓名登录 / server MCP：已测 实际项目姓名登录与项目目录、后续操作人读回；服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。。仍缺 完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖；旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。。
+- 01 项目入口姓名登录 / server MCP：已测 实际项目姓名登录与项目目录、后续操作人读回。仍缺 完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖。
 - 01 项目入口姓名登录 / local MCP：已测 实际项目姓名登录与项目目录、后续操作人读回。仍缺 完整首次成员登记/已有姓名稳定ID/多项目组合未逐项覆盖。
 - 02 单项目和多项目人员 / APK：已测 实际项目A姓名登录、进入B、回A，code20恢复同一身份与A列表。仍缺 尚未逐一核对该基线完整首登/原历史姓名/有效成员目录组合；物理Android设备未测。
+- 02 单项目和多项目人员 / server MCP：已测 实际列出当前员工所属项目。仍缺 单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。
 - 02 单项目和多项目人员 / local MCP：已测 实际列出当前员工所属项目。仍缺 单项目/多项目/撤销关系的完整目录组合未在该MCP入口覆盖。
 - 04 项目人员停用 / APK：已测 A 内原生停用/恢复及HTTP同名登录403/200已核对。仍缺 未在这次原生人员操作中验证同一人的 B 项目继续可用；物理设备未测。
 - 05 非所属项目读取 / HTTP API：已测 HTTP4419及服务JSON-RPC4421各自双向C/D测试：非成员403、双成员显式错记录项目404；每次拒绝后Bug/列表/评论/事件/附件字节/统计/分类相同，合法读取及写入对照成功。；实际PNG下载和MCP资源字节一致；仅当前HTTP/server MCP入口。仍缺 组件任务日志未执行，Bug事件/附件不替代日志；其它客户端、本地MCP和§17完整异常组合独立验收。
@@ -51,8 +52,7 @@
 - 13 HTTP/MCP 对等 / HTTP API：已测 真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过；真实预览六已注册POST的vendor/JSON冻结响应、两格式同请求重放与丰富历史读取；仅HTTP，没有独立MCP对照；EXE停止窗口内独立HTTP及服务JSON-RPC各自完成编辑、评论重放、人工完成重放、退回/再完成/关闭/删除，以及错项目403和旧版本412负例；逐请求进程边界保留。。仍缺 全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明；完整HTTP/MCP对等输入矩阵仍未逐项执行。
 - 13 HTTP/MCP 对等 / server MCP：已测 真实临时HTTP/SQLite与MCP资源、分页501评论/101附件、协议/项目权限及部分API对等用例通过 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具；EXE停止窗口内独立HTTP及服务JSON-RPC各自完成编辑、评论重放、人工完成重放、退回/再完成/关闭/删除，以及错项目403和旧版本412负例；逐请求进程边界保留。。仍缺 全部业务工具/动作的等价输入、版本/操作人/幂等/错误组合未完成；不是跨所有客户端的全量证明。
 - 13 HTTP/MCP 对等 / local MCP：已测 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。 实际预览.7本地4420和服务4421目录相同90工具，协议2025-06-18，不支持的协议头400；未逐一执行所有工具。仍缺 全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。
-- 14 并发和重复提交 / APK：已测 MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。。仍缺 仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。。
-- 14 并发和重复提交 / Web：已测 bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。；7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。。仍缺 该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。；仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。。
+- 14 并发和重复提交 / Web：已测 bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。。仍缺 该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。。
 - 14 并发和重复提交 / HTTP API：已测 真实同验收请求切换JSON/vendor重放，保留相同事件和Bug版本；EXE停止窗口内独立HTTP及服务JSON-RPC各自完成编辑、评论重放、人工完成重放、退回/再完成/关闭/删除，以及错项目403和旧版本412负例；逐请求进程边界保留。；真实两客户端12并发组、98请求/105检查通过；六人工流程动作同键并发及后续重放返回同一已提交资源，事件/操作者和重放后Bug不变，旧版本不同编辑键一胜一VERSION_CONFLICT。；创建同键不同payload实际HTTP409/IDEMPOTENCY_PAYLOAD_MISMATCH；创建、编辑、评论、验收通过和软删除同键无重复效果。首次19项产品失败原样留存并由同场景新proof对照修复。；f8e2c6da：66真实请求/56检查，两组同manual_complete意图和verify_pass/verify_fail、close/reject相反结论竞争；验收结果各仅一个版本和事件效果。胜方跨HTTP/server MCP重放同回执，败方旧版本及胜方变更payload均拒绝，原记录保留。。仍缺 全部动作/错误/并发组合的幂等验证仍不完整；APK/EXE/Web真实超时恢复及local MCP未由本轮测试；更多状态动作、全部附件阶段、组件外部任务及§17完整异常组合尚未测试；f8e2c6da中两次均由HTTP通过方胜出，不据此声称退回成功效果、客户端恢复或所有动作组合通过。
 - 14 并发和重复提交 / server MCP：已测 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。；EXE停止窗口内独立HTTP及服务JSON-RPC各自完成编辑、评论重放、人工完成重放、退回/再完成/关闭/删除，以及错项目403和旧版本412负例；逐请求进程边界保留。；真实两客户端12并发组、98请求/105检查通过；六人工流程动作同键并发及后续重放返回同一已提交资源，事件/操作者和重放后Bug不变，旧版本不同编辑键一胜一VERSION_CONFLICT。；创建同键不同payload实际HTTP409/IDEMPOTENCY_PAYLOAD_MISMATCH；创建、编辑、评论、验收通过和软删除同键无重复效果。首次19项产品失败原样留存并由同场景新proof对照修复。；f8e2c6da：66真实请求/56检查，两组同manual_complete意图和verify_pass/verify_fail、close/reject相反结论竞争；验收结果各仅一个版本和事件效果。胜方跨HTTP/server MCP重放同回执，败方旧版本及胜方变更payload均拒绝，原记录保留。。仍缺 全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。；APK/EXE/Web真实超时恢复及local MCP未由本轮测试；更多状态动作、全部附件阶段、组件外部任务及§17完整异常组合尚未测试；f8e2c6da中两次均由HTTP通过方胜出，不据此声称退回成功效果、客户端恢复或所有动作组合通过。
 - 14 并发和重复提交 / local MCP：已测 实际预览.6对应MCP入口默认删除、同请求重放、context拒绝和原记录/actor/version审计保留通过。。仍缺 全部业务动作的等价输入、版本/人员/幂等错误组合及并发场景仍未完成。。
@@ -74,7 +74,7 @@
 - 21 旧数据副本迁移 / HTTP API：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；新的held schema14 API真实26项：旧姓名稳定ID、100 Bug/2评论/1附件3487861字节hash，匿名401/跨项目404/hold409；五组件off、出站0、原身份和核心表保留，正常exit0；只读盘点53文件/3上传job/2chain/9Relay batch（17 items）及queue/WAL位置；没有复制、打开活SQLite或迁移。。仍缺 旧外部状态的位置和本地部分状态已盘点；活queue/WAL未打开，队列数量/状态未知；缺跨文件一致恢复集、明确项目/组件版本映射和实际迁移读回。Qingyu仅metadata，其密文/密钥恢复未验收。。
 - 21 旧数据副本迁移 / server MCP：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称；只读盘点53文件/3上传job/2chain/9Relay batch（17 items）及queue/WAL位置；没有复制、打开活SQLite或迁移。。仍缺 旧外部状态的位置和本地部分状态已盘点；活queue/WAL未打开，队列数量/状态未知；缺跨文件一致恢复集、明确项目/组件版本映射和实际迁移读回。Qingyu仅metadata，其密文/密钥恢复未验收。。
 - 21 旧数据副本迁移 / local MCP：已测 主SQLite固定归档schema12→14；原ID/878附件/58业务表指纹保留，2021条主outbox均sent且数量/指纹不变；上述为恢复集证据；本客户端/工具入口的服务读回未由该证据宣称；只读盘点53文件/3上传job/2chain/9Relay batch（17 items）及queue/WAL位置；没有复制、打开活SQLite或迁移。。仍缺 旧外部状态的位置和本地部分状态已盘点；活queue/WAL未打开，队列数量/状态未知；缺跨文件一致恢复集、明确项目/组件版本映射和实际迁移读回。Qingyu仅metadata，其密文/密钥恢复未验收。。
-- 22 APK 共存与升级 / APK：已测 MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留；code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留；MuMu code22→23/preview.9的ADB install-r实际通过，首次启动前12份私有文件保全；旧operation/原正文及PNG锚点、后改稿、日常14/PID5051与配置保留。。仍缺 物理Android设备必测仍缺；应用内更新源/自安装链路未测；物理Android及应用内更新完整链路仍未验收；物理Android及应用内检查/下载/自安装完整链仍未实测；下载feed发布不能补成客户端自更新。。
+- 22 APK 共存与升级 / APK：已测 MuMu预览15→21实际共存/ADB升级；20→21的文字/未提交PNG/sidecar三hash逐一相同；日常code14/PID5051/安装时点/dataDir保留；code21→22/preview.8实际ADB install-r成功，87unit/lint0errors；日常14/PID5051/安装时间/dataDir/四配置hash不变，预览草稿/PNG/sidecar保留。仍缺 物理Android设备必测仍缺；应用内更新源/自安装链路未测；物理Android及应用内更新完整链路仍未验收。
 
 独立 Jenkins、上传平台/对象存储、Relay 目的实例和轻语测试租户/凭据仍缺；所有 `external_full_chain` 保持 not_run。离线迁移的数据库/附件指纹证明没有替代各入口执行。异常停止预览 EXE 证明进程独立和草稿恢复，不能自动记为完整版本回退。
 已安装EXE的90工具共享目录与源码保留的18工具fallback目录分别统计；同名工具调用只通过共享目录对应行，fallback行保留未测，避免重复计数。
@@ -211,30 +211,8 @@ code22同一已验收APK已发布为不可变预览下载：[下载Android code2
 - 原始NSIS .onInit隔离native guard6/6：已有成功输出，见[runs/native-installer-guards.json](runs/native-installer-guards.json)。仅首建Programs、marker、junction与越界目录守卫；未执行真实用户完整首装或卸载。
 - .6 native helper以故意无效空配置实际返回failed并验证UTC序列化：已有成功输出，见[runs/native-updater-utc.json](runs/native-updater-utc.json)。预期失败仅验证UTC；没有调用installer，不计更新成功。
 - Web61/61+typecheck/lint/build；outbox真实临时API/SQLite、外部请求0：已有成功输出，见[runs/web-outbox-verification.json](runs/web-outbox-verification.json)。React静态渲染及隔离API实测；浏览器暂停条目点击未测。
-- code23同包preview feed发布13个真实HTTP：GET/HEAD/206 range及完整APK SHA核对；旧code22与发布时Windows.8保留：已有成功输出，见[android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json](android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json)。仅发布/下载与API身份记录；stable未选channel的401保留。不是APK原生自更新，后来的Windows.9更新不是本次失败。。
-- bc2b347对应.9包中共享Web部署：18 GET/HEAD全部200、8候选SHA、12 served文件及Web进程身份保持：已有成功输出，见[web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json](web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json)。仅静态下载和发布时进程证据；无新服务启停，不代表真实Web loading页面验收，不将.9原生EXE UI传递到Web。。
-- Br-CEXQI真实Edge59项：真实200暂留显示加载，注入Failed显示错误，实际Retry取得新200恢复同一详情：已有成功输出，见[web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json](web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json)。仅同项目文本Bug；四张实际截图、Bug与事件未变。背景components hold实际0，不证明超时/常态轮询或跨项目迟到响应。。
-- 服务端MCP人员真实59项，02/04的server MCP入口完成；01保留旧历史姓名组合未测：已有成功输出，见[server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json](server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json)。仅新A/B/新员工；35 RPC另加1 health GET，五组件off、无Bug写入，不传递到其它入口或整个基线。。
-- Phase A源码：legacy passed/failed和不可变原回执，API260/Storage118及临时真实HTTP215通过，schema15加法恢复验证：已有成功输出，见[contracts-result-phase-a/result.json](contracts-result-phase-a/result.json)。该证据未部署常驻4419、未做完整main/MCP/客户端运行；blocked、附件9..20/capture、fail/supersede及workflow GET仍独立未完成。。
-- 真实Web A/B切换164项：A genuine200在实际切B时由同network request取消；两项目独立文字/人员/PNG经reload及往返保留：已有成功输出，见[web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json](web-project-switch-draft-live/9320822e-6d6d-4f78-a6cb-eb59cb0a7013/proof.json)。实际settlement=canceled，未绕过Abort或伪造旧回调送达；18直接+47浏览器请求与28响应记录分开，无Bug/上传/评论写入。。
-- MuMu code23原生33项：单A/A-B/B-only目录、A撤权后同名拒绝/B可用、恢复同ID；原账号文字PNG及四稳定文件完整恢复：已有成功输出，见[android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json](android-personnel-live/fe334481-b448-4e51-8b83-8a63480f150c/result.json)。停用/恢复由GM官方HTTP辅助；原生自停用被disabled，无物理设备、原生网络403抓包或整项人员基线通过结论。。
-- 独立完整main/schema15+worker+server MCP：247项，111直接HTTP+16JSONRPC；legacy/vendor原receipt、权限与普通人工链真实通过：已有成功输出，见[contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json](contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json)。4459/4461专用临时实验服务正常退出、一致备份保留；不代表常驻4419已更新或客户端/外部组件已验收。。
-- PhaseB blocked源码API266/Storage118、六组114临时HTTP与15→16独立档案迁移11项通过，原70表/7份receipt保持：已有成功输出，见[contracts-result-phase-b/result.json](contracts-result-phase-b/result.json)。五份产品源码与四份测试按pin固定；本证据不含完整schema16 main运行。常驻4419仍14、MCP仍无blocked提交工具。。
 
-## 近期指定版本的部分实测
-
-以下补充原始版本证据；仅新e21431f0完整覆盖的02/04服务端MCP入口标通过，不清除旧失败或源码复验标记。EXE旧升级基线保留原结果；共享Web静态发布与另行实际loading验收分开。
-
-- web-7904e2c-rejected-media-81：[原始证据](web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json)。7904e2c共享Web的实际Edge81/81：坏PNG finalize返回真实400/UPLOAD_CONTENT_INVALID，Bug POST仍为0；显式保留失败记录并提交修改稿后真PNG只创建1个Bug，旧journal/坏Blob/隔离chunk保留，正常重启后再次读回。 仅新建Bug附件阶段的确定拒绝恢复；评论拒绝、未知提交后再拒绝、多窗口/强杀及其它客户端未测。该历史source SHA不重新验证当前改动。
-- apk-code23-legacy-text-recovery：[原始证据](android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json)。MuMu code22文本CREATE_BUG连续4次回执丢失耗尽后，install-r升code23；首次收养旧意图不发请求，原生再次提交用原operation/key/body取得同一Bug/occurrence/event，Room仅1回执；原稿与后改稿、日常14/PID5051保留。 仅模拟器旧文本CREATE_BUG；图片未知回执/坏回执/评论/其它写动作及物理Android未测。冷归档使用预览force-stop，不等于正常退出；3个可选更新未认证拒绝和原harness失败保留。
-- android-code23-feed-http13：[原始证据](android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json)。已选择preview的匿名manifest/APK GET、HEAD及range均按原始13条ledger实测，原code22下载仍可用。 仅固定preview下载输入；客户端更新UI、所有错误组合及物理设备未测。
-- exe-native-upgrade-7-to-8：[原始证据](exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json)。EXE实际原生7→8检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。 .8首开详情虚假失败仍保留为该版本未关闭缺陷；本轮不测提交未知回执/坏媒体恢复。
-- exe-native-upgrade-8-to-9：[原始证据](exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json)。EXE实际原生8→9检查/下载/安装并重启成功；同员工/项目、原正文与1图可见、旧Bug/评论及绑定PNG读回保留。冷副本67文件，仅应用状态，排除updates。 .9仅取样loading→loaded且未点retry；不证明连续所有帧或真实网络故障恢复。未提交单图SHA未由可见性推断，.8失败历史不改。
-- server-mcp-membership-e21431f0-59：[原始证据](server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json)。服务端4421实际35次JSON-RPC/59检查：新姓名首登与重复/跨项目ID稳定，单项目直接选A、目录只含有效所属项目；A停用后重新姓名登录及旧token读A均403，B登录/读回和会员字段不变，恢复A同原ID。 旧导入姓名/别名完整组合、原生客户端和本地EXE MCP独立验收；此运行不代表当前变更后的API源码已部署。
-- 清单缺项：GET /api/v1/android-updates/preview/:fileName（apps/api/src/android-updates.ts）；仅保存原始观察，等待后续生成器盘点，不虚建当前条目或计通过。
-- 清单缺项：HEAD /api/v1/android-updates/preview/:fileName（apps/api/src/android-updates.ts）；仅保存原始观察，等待后续生成器盘点，不虚建当前条目或计通过。
-
-严格旧合同冻结失败保留为历史，后续六条响应边界修复已有独立五步门禁成功日志与实际HTTP读回。Phase A旧1.0 passed/failed与原回执已完成独立完整main/schema15实测；PhaseB blocked在源码/临时HTTP/schema16档案恢复完成。常驻4419仍schema14，MCP blocked提交工具、fail/supersede POST和workflow GET仍待各自接线实测，静态合同通过不代表全部运行能力。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。
+严格旧合同冻结失败保留为历史，后续六条响应边界修复已有独立五步门禁成功日志与实际HTTP读回。旧1.0请求/blocked写入、未注册的fail/supersede POST和workflow GET仍缺，静态合同通过不代表全部运行能力。EXE各版本升级/回退/原生操作按对应proof记录，不能传递为所有控件通过。NSIS6项仅guard，不证明干净用户完整首装。完整迁移和服务回退仍按各自缺口与实际证据判定，不能从客户端恢复或表指纹推定完成。
 
 依次执行 `node scripts/project-components/generate-coverage-matrix.mjs`、`node scripts/project-components/map-coverage-evidence.mjs`、`node scripts/project-components/generate-coverage-matrix.mjs`。生成器保留 matching ID 的人工结果和 `manual.surfaceProgress`；源码变更仍保留 `needsRevalidation`，不会自动清除未复核标记。此映射器只对明确识别的证据行赋值；其它人工结果保留。
 

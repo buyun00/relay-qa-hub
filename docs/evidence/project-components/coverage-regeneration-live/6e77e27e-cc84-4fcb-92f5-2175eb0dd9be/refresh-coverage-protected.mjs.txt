@@ -1,0 +1,47 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {createHash,randomUUID} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const base=path.resolve('docs/evidence/project-components');
+const names=['coverage-matrix.json','coverage-mapping-review.md','coverage-matrix.md'];
+const expected=['53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990','3b3f665486f7becb466141aebab30a2d5914f9705cbda22fd42117ac395ca041','1dc6079d911e0072d843b713aa81df63dfb30b9c7adfb0ae481978caa087ea6c'];
+const sha=b=>createHash('sha256').update(b).digest('hex');
+for(let i=0;i<names.length;i++)assert.equal(sha(fs.readFileSync(path.join(base,names[i]))),expected[i],names[i]);
+const evidence=path.join(base,'coverage-regeneration-live',randomUUID());fs.mkdirSync(evidence,{recursive:true});
+const captures=[];
+function capture(name){const target=path.join(evidence,name);fs.mkdirSync(target);const files=names.map(file=>{const buffer=fs.readFileSync(path.join(base,file));fs.writeFileSync(path.join(target,file),buffer,{flag:'wx'});return{file,bytes:buffer.length,sha256:sha(buffer)};});captures.push({name,files});return JSON.parse(fs.readFileSync(path.join(base,names[0])));}
+const before=capture('before');
+const sourcePaths=['scripts/project-components/generate-coverage-matrix.mjs','scripts/project-components/map-coverage-evidence.mjs'];
+const sourcePins=sourcePaths.map(file=>({file,sha256:sha(fs.readFileSync(file))}));
+const results=[];
+let first,second;
+function normalized(input){const x=structuredClone(input);delete x.generatedAt;delete x.evidenceMapping.at;for(const i of [...x.items,...x.retiredItems])delete i.manual.evidenceMappedAt;return JSON.stringify(x);}
+function all(x){return [...x.items,...x.retiredItems];}
+const checkResults=[];
+function check(name,fn){fn();checkResults.push({name,passed:true});}
+try{
+  for(let cycle=1;cycle<=2;cycle++){
+    for(const [index,tool] of ['generate-coverage-matrix.mjs','map-coverage-evidence.mjs','generate-coverage-matrix.mjs'].entries()){
+      const startedAt=new Date().toISOString();
+      const run=spawnSync(process.execPath,['scripts/project-components/'+tool],{encoding:'utf8',windowsHide:true,maxBuffer:20*1024*1024});
+      const name='cycle'+cycle+'-stage'+(index+1);
+      fs.writeFileSync(path.join(evidence,name+'.txt'),(run.stdout??'')+(run.stderr??''),{flag:'wx'});
+      results.push({name,tool,startedAt,finishedAt:new Date().toISOString(),exitCode:run.status});assert.equal(run.status,0,name);
+      const state=capture(name);if(index===2){if(cycle===1)first=state;else second=state;}
+    }
+  }
+  const previous=new Map(all(before).map(i=>[i.id,i])),current=new Map(all(second).map(i=>[i.id,i]));
+  check('two complete actual chains are semantically identical',()=>assert.equal(sha(normalized(first)),sha(normalized(second))));
+  check('source inventory does not drift between actual cycles',()=>assert.deepEqual(first.sourceHashes,second.sourceHashes));
+  check('prior current and retired IDs all retained',()=>{for(const id of previous.keys())assert.ok(current.has(id),id);});
+  check('all prior failed surface results and progress preserved',()=>{for(const [id,i]of previous)for(const[s,r]of Object.entries(i.results))if(r.status==='failed'){assert.deepEqual(current.get(id).results[s],r,id+'/'+s);assert.deepEqual(current.get(id).manual.surfaceProgress?.[s],i.manual.surfaceProgress?.[s],id+'/'+s);}});
+  check('all old source revalidation flags remain',()=>{for(const [id,i]of previous)if(i.needsRevalidation||i.manual.needsRevalidation)assert.ok(current.get(id).needsRevalidation||current.get(id).manual.needsRevalidation,id);});
+  check('all prior manual retained notes remain exact',()=>{for(const [id,i]of previous)for(const note of i.manual.retainedReviewNotes??[])assert.ok(current.get(id).manual.retainedReviewNotes?.some(n=>JSON.stringify(n)===JSON.stringify(note)),id);});
+  check('newly discovered source nodes are not automatically passed',()=>{for(const i of second.items)if(!previous.has(i.id))for(const r of Object.values(i.results))if(r.applicable)assert.equal(r.status,'not_run',i.id);});
+  check('only exact existing server MCP baseline02/04 statuses may change',()=>{for(const i of second.items){const old=previous.get(i.id);if(!old)continue;for(const[s,r]of Object.entries(i.results)){if(r.status===old.results[s].status)continue;assert.ok(i.kind==='baseline'&&[2,4].includes(Number(i.title.slice(0,2)))&&s==='server_mcp'&&r.status==='passed',i.id+'/'+s);}}});
+  check('whole baselines remain seven',()=>assert.deepEqual(second.items.filter(i=>i.kind==='baseline'&&i.status==='passed').map(i=>Number(i.title.slice(0,2))),[9,10,11,12,15,23,24]));
+  check('generator and mapper bytes remain fixed',()=>{for(const i of sourcePins)assert.equal(sha(fs.readFileSync(i.file)),i.sha256);});
+  const report={schemaVersion:1,status:'passed_protected_actual_generation',recordedAt:new Date().toISOString(),sourcePins,stages:results,captures,checks:checkResults,semanticSha256:sha(normalized(second)),counts:{before:{items:before.items.length,retired:before.retiredItems.length,sources:Object.keys(before.sourceHashes).length},after:{items:second.items.length,retired:second.retiredItems.length,sources:Object.keys(second.sourceHashes).length,revalidation:second.items.filter(i=>i.needsRevalidation||i.manual.needsRevalidation).length,notes:second.items.reduce((n,i)=>n+(i.manual.retainedReviewNotes?.length??0),0)}},limits:['Static inventory and evidence mapping only; no API calls, service changes, installations or test outcome inference.','Unregistered Phase D source may appear as not_run static inventory; it is not proof of runtime availability.','All raw previous and intermediate generated files remain retained.']};
+  fs.writeFileSync(path.join(evidence,'result.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({evidence,...report.counts,checks:checkResults.length,semantic:report.semanticSha256}));
+}catch(error){fs.writeFileSync(path.join(evidence,'failed.json'),JSON.stringify({status:'failed_retained',error:error.stack,stages:results,captures,checks:checkResults},null,2)+'\n',{flag:'wx'});console.error(JSON.stringify({evidence,error:error.message}));process.exitCode=1;}

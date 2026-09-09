@@ -254,3 +254,11 @@ EXE`.9`真实自更新与原生观察已提交`af5133a`。随后共享Web独立�
 上述Web实际证据已提交`e7ee04f`。服务端MCP随后在新A/B项目完成35次JSON-RPC及独立1次health GET，59/59实际断言通过。[运行e21431f0](server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/README.md)：重复姓名与跨项目姓名登录保持同一ID；A-only目录不含B；共享员工A停用后A登录和旧token读A均403，B仍可登录/读取且会员版本和角色不变；恢复A后原ID与两项目目录恢复。A唯一停用/激活审计各1条，B无此两事件；两项目五组件一直关闭、Bug为0，API22852/MCP15736身份保持。该运行不包含旧导入姓名别名、原生UI或本地EXE MCP，也不自动更新矩阵通过状态。
 
 按用户最新并行要求，后续三个子任务分别独占新Web浏览器9370、MuMu设备、独立完整API/MCP临时实例4459/4461；主任务继续源码复核和统一矩阵。Phase D未注册workflow GET实现暂保留工作状态，待设备子任务后继续。部署、升级和主预览重启由主任务协调，不影响并行组或生产。
+
+## 并行实测、blocked结果和受保护矩阵刷新
+
+三个并行组已经实际执行并提交：Web A/B草稿164/164（`a293ed4`）、MuMu原生人员33/33（`7fee874`）、独立Phase A完整main 247/247及127次网络请求（`548992c`）。Web捕获真实A成员请求被切换动作取消，B文字/PNG/负责人/验收人及重开和A/B往返保持，不能称为已交付迟到A回调。Android完成A撤权/拒绝/B继续/恢复原ID并切回原员工的文字PNG草稿，GM辅助HTTP与原生输入分别计数；物理Android仍未验收。各首次失败、原始执行源码及独立审计均保留。
+
+Phase B已提交`12d8bb6`：schema16只扩展原结果快照触发器允许blocked，原15迁移SQL保持；blocked结束本次Verification、保留完整已交付RepairAttempt，允许随后新验收。源码API266/266、storage118/118、新114次真实临时HTTP与15→16归档复制迁移11项通过。完整main另在新隔离目录运行246/246、115次网络请求，并完成86/86关停后SQL/一致备份审计（`3b57719`）；原API/MCP正常SIGTERM退出。已有普通MCP工具blocked仍返回400，该轮不声称新冻结结果工具已经存在。4419继续原schema14代码，未在本批次部署或升级任何主客户端。[完整main证明](contracts-result-phase-b-live/README.md)。
+
+实际覆盖矩阵完成两轮生成链，6命令/10保全检查通过，语义SHA`f09a7ae1f29d4b06c6b09b135a2dcefc25cfb90ef48a9264e4174b969f05fc8d`；991项、193源码、30退役历史、484复验标记、159原备注，整项仍7/24。全部前后及中间文件原样保留。[实际刷新](coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/README.md)、[最终648项映射审计及历史失败](coverage-parallel-map-20260909/README.md)。后续工作流分页接线和新MCP工具仍在并行工作状态，本检查点不据未提交或未部署代码提升任何验收结果。
