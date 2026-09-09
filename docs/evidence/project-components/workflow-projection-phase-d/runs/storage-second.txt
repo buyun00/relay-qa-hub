@@ -1,0 +1,46 @@
+✖ five typed workflow groups: independent cursors, immutable old DTOs, exact final page and reopened DB (228.3356ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-LGkwUY
+✖ cursor authentication binds actor/account/project/Bug/filter; revocation, restoration and soft deletion revalidate (220.6384ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-DH4p7N
+✖ expiry and capacity reject explicitly, rollback leaves no partial snapshots, retained rows are immutable (225.4213ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-Kdn5GD
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 935.9993
+
+✖ failing tests:
+
+test at packages\storage\test\workflow-projection.test.ts:2:1459
+✖ five typed workflow groups: independent cursors, immutable old DTOs, exact final page and reopened DB (228.3356ms)
+  TypeError: Cannot read properties of null (reading 'id')
+      at <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:50:106)
+      at transaction (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:22:24)
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:50:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:76:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at packages\storage\test\workflow-projection.test.ts:2:3939
+✖ cursor authentication binds actor/account/project/Bug/filter; revocation, restoration and soft deletion revalidate (220.6384ms)
+  TypeError: Cannot read properties of null (reading 'id')
+      at <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:50:106)
+      at transaction (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:22:24)
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:50:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:112:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at packages\storage\test\workflow-projection.test.ts:2:5474
+✖ expiry and capacity reject explicitly, rollback leaves no partial snapshots, retained rows are immutable (225.4213ms)
+  TypeError: Cannot read properties of null (reading 'id')
+      at <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:50:106)
+      at transaction (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:22:24)
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:50:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\workflow-projection.test.ts:133:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

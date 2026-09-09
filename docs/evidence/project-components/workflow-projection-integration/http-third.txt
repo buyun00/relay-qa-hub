@@ -1,0 +1,31 @@
+✔ createApiApp requires authenticated project wiring for the new workflow endpoint (77.4793ms)
+✖ registered workflow HTTP uses real worker GM scope, durable pagination and current authorization (488.9994ms)
+ℹ retained isolated createApiApp fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-api-integration-SMyNaX
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 908.7679
+
+✖ failing tests:
+
+test at apps\api\test\workflow-projection-integration.test.mjs:24:1
+✖ registered workflow HTTP uses real worker GM scope, durable pagination and current authorization (488.9994ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/workflow-projection-integration.test.mjs:118:14)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

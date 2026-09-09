@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "--test",
+    "apps/api/test/*.test.ts"
+  ],
+  "startedAt": "2026-09-09T03:47:36.278Z",
+  "completedAt": "2026-09-09T03:47:43.048Z",
+  "exitCode": 1,
+  "retainedArchiveEnabled": false
+}

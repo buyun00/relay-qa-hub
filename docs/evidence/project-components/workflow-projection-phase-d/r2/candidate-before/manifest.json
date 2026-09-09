@@ -1,0 +1,56 @@
+{
+  "observedAt": "2026-09-09T03:28:59.950Z",
+  "scope": "Original candidate snapshot before HTTP media specificity fix; no prior files overwritten",
+  "facts": [
+    {
+      "source": "packages/storage/src/workflow-projection-types.ts",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-types.ts.txt",
+      "sha256": "9cd95f16a874af90d58957f1c933b67758f08f4fed8c89f781bbba5b2a9571eb"
+    },
+    {
+      "source": "packages/storage/src/workflow-projection-cursor.ts",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-cursor.ts.txt",
+      "sha256": "8b3d6fc86108c54d83228f354ed208b37c040d1ba7e917cf2875f2469f6a47db"
+    },
+    {
+      "source": "packages/storage/src/workflow-projection-migration.ts",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-migration.ts.txt",
+      "sha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba"
+    },
+    {
+      "source": "packages/storage/src/workflow-projection-store.ts",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-store.ts.txt",
+      "sha256": "96c965ac0ea0074125407e9d6c90a78a2775599e3fd69d095b90e47b57bad4d1"
+    },
+    {
+      "source": "packages/storage/test/workflow-projection.test.ts",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/test/workflow-projection.test.ts.txt",
+      "sha256": "a2b9fc12326b88b08aeb8a52a79efea5369ce6eaf8b098e5764509cfd194ad02"
+    },
+    {
+      "source": "apps/api/src/workflow-projection.ts",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/apps/api/src/workflow-projection.ts.txt",
+      "sha256": "8caa1b44167b2ba8679215ab20cc4ce527d889dc5a7276b5354ca22a983d2535"
+    },
+    {
+      "source": "apps/api/src/sqlite-workflow-projection-store.ts",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/apps/api/src/sqlite-workflow-projection-store.ts.txt",
+      "sha256": "4a45e0c11f74453c449fe3661864d3ac9771f4be287449fbe0eed481412e6957"
+    },
+    {
+      "source": "apps/api/test/workflow-projection.test.mjs",
+      "copy": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/apps/api/test/workflow-projection.test.mjs.txt",
+      "sha256": "111f3e09dfa4b81e54a949296cc87a6a1b66c422fb7cb98c4a5356bc5a360631"
+    },
+    {
+      "source": "docs\\evidence\\project-components\\workflow-projection-phase-d\\result.json",
+      "copy": "docs\\evidence\\project-components\\workflow-projection-phase-d\\r2\\candidate-before\\result.json",
+      "sha256": "e4220215831ae32186fbcc2c68c3eb81950364a5a1e4b2aa702e30aff3e50494"
+    },
+    {
+      "source": "docs\\evidence\\project-components\\workflow-projection-phase-d\\README.md",
+      "copy": "docs\\evidence\\project-components\\workflow-projection-phase-d\\r2\\candidate-before\\README.md",
+      "sha256": "ce7c4cebeaa89e224ed0ab9dab54264ca5b1103b67c5b48dc1485584620a0150"
+    }
+  ]
+}

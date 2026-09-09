@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "apps/api/test/*.test.mjs"
+  ],
+  "startedAt": "2026-09-09T03:47:36.270Z",
+  "completedAt": "2026-09-09T03:47:58.301Z",
+  "exitCode": 1,
+  "retainedArchiveEnabled": false
+}

@@ -1,0 +1,10 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "apps/api/test/*.test.mjs"
+  ],
+  "startedAt": "2026-09-09T03:45:42.062Z",
+  "completedAt": "2026-09-09T03:46:02.601Z",
+  "exitCode": 1
+}

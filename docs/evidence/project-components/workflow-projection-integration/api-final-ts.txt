@@ -1,0 +1,134 @@
+✔ exact queue and completed fresh ZIP hand off once with frozen defaults after restart (1955.673ms)
+✔ preflight failure prevents Jenkins submission and double submission coalesces (474.7811ms)
+✔ lost submission acknowledgement and submitting crash never replay build POST (514.4231ms)
+✔ lost upload acknowledgement recovers the same stable job ID (406.4148ms)
+✔ a Jenkins run waiting on the shared lock keeps its automatic upload pending (56.8483ms)
+✔ failed build or ZIP never starts automatic upload (40.9845ms)
+✔ cancelled build or ZIP never starts automatic upload (149.2397ms)
+✔ stale build or ZIP never starts automatic upload (159.7363ms)
+✔ newer build or ZIP never starts automatic upload (314.8296ms)
+✔ nozip build or ZIP never starts automatic upload (237.2234ms)
+✔ wrongqueue build or ZIP never starts automatic upload (335.8102ms)
+✔ overlap build or ZIP never starts automatic upload (583.0741ms)
+✔ owner switch pauses automation and cancellation retains Jenkins build (263.9961ms)
+✔ platform account switch pauses before upload and allows cancelling the pending handoff (438.3052ms)
+✔ iOS selects the newest ZIP by modification time and pins matching HEAD identity (65.6741ms)
+✔ empty, invalid and changing iOS sources stop before dispatch (6.4863ms)
+✖ iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch retry and resume (78.2557ms)
+✔ upload inputs exclude arbitrary paths, commands and historical version IDs (11.7766ms)
+✔ event projection tolerates partial JSONL and never returns tokens or raw error text (0.9267ms)
+✔ email login matches handover contract, validates access, saves compatible cache, keeps secrets out of snapshot (1136.6991ms)
+✔ failed access check preserves previous login and exposes no server text (554.5102ms)
+✔ subaccount redirects accept only the recorded origins and one token (353.3371ms)
+✔ bad local auth does not hide job history and can be repaired through login (1342.8317ms)
+✔ restart reads progress from disk, and only a verified published state is successful (361.4866ms)
+✔ live jobs prevent changing account and launching duplicate tasks; expired heartbeat is interrupted (300.7998ms)
+✖ recovery locks testing identity once status changes started; arbitrary job paths are rejected (252.7425ms)
+✖ supervised start and resume preserve the job target and original work directory (196.2191ms)
+✔ tampered executable is rejected before creating a task (535.2139ms)
+✖ build handoff persists source identity and returns one existing job after a lost acknowledgement (213.9542ms)
+✖ new jobs default to recorded parameters and persist version-only text behavior (121.1255ms)
+✖ final confirmation requires the persisted boundary and uses its own command exactly once (607.6556ms)
+✔ unreadable jobs remain present and are reported rather than silently discarded (57.8598ms)
+✔ a persisted job from another project is retained and cannot be resumed (81.705ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 27
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6673.3072
+
+✖ failing tests:
+
+test at apps\api\test\uploader-host.test.ts:1:768
+✖ iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch retry and resume (78.2557ms)
+  Error: UPLOADER_MISSING
+      at UploaderHost.verifiedExecutable (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:213:13)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:599:7)
+      at async UploaderHost.exclusive (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:196:14)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\uploader-host.test.ts:57:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at apps\api\test\uploader-host.test.ts:1:10377
+✖ recovery locks testing identity once status changes started; arbitrary job paths are rejected (252.7425ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /TEST_RESULT_LOCKED/. Input:
+  
+  'Error: UPLOADER_MISSING'
+  
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\uploader-host.test.ts:338:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: UPLOADER_MISSING
+        at UploaderHost.verifiedExecutable (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:213:13)
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:638:7)
+        at async UploaderHost.exclusive (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:196:14)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\uploader-host.test.ts:338:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    expected: /TEST_RESULT_LOCKED/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\api\test\uploader-host.test.ts:1:10789
+✖ supervised start and resume preserve the job target and original work directory (196.2191ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'rejected'
+  - 'fulfilled'
+  
+      at TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\uploader-host.test.ts:357:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'rejected',
+    expected: 'fulfilled',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\uploader-host.test.ts:6:1684
+✖ build handoff persists source identity and returns one existing job after a lost acknowledgement (213.9542ms)
+  Error: UPLOADER_MISSING
+      at UploaderHost.verifiedExecutable (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:213:13)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:599:7)
+      at async UploaderHost.exclusive (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:196:14)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\uploader-host.test.ts:406:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\test\uploader-host.test.ts:6:3083
+✖ new jobs default to recorded parameters and persist version-only text behavior (121.1255ms)
+  Error: UPLOADER_MISSING
+      at UploaderHost.verifiedExecutable (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:213:13)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:599:7)
+      at async UploaderHost.exclusive (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:196:14)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\uploader-host.test.ts:433:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\test\uploader-host.test.ts:6:4411
+✖ final confirmation requires the persisted boundary and uses its own command exactly once (607.6556ms)
+  Error: UPLOADER_MISSING
+      at UploaderHost.verifiedExecutable (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:213:13)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:638:7)
+      at async UploaderHost.exclusive (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\src\uploader-host.ts:196:14)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\uploader-host.test.ts:487:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

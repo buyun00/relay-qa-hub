@@ -1,0 +1,14 @@
+✔ five typed workflow groups: independent cursors, immutable old DTOs, exact final page and reopened DB (938.8961ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-uzDg6e
+✔ cursor authentication binds actor/account/project/Bug/filter; revocation, restoration and soft deletion revalidate (644.7369ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-L0nuY9
+✔ expiry and capacity reject explicitly, rollback leaves no partial snapshots, retained rows are immutable (604.1978ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-xoHl4G
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2586.5153

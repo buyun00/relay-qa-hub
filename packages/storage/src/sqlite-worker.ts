@@ -5,6 +5,10 @@ import type {
 } from "./repair-attempt-detail-store.js";
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { ProjectManagementInput } from "./project-management-store.js";
+import type {
+  BugWorkflowProjection,
+  GetBugWorkflowProjectionInput,
+} from "./workflow-projection-types.js";
 
 import type {
   BindMobileAttachmentInput,
@@ -267,6 +271,13 @@ export class SqliteStorageWorker {
   async ensureMobileScope(scope: MobileScopeBootstrap): Promise<void> {
     await this.initialization;
     await this.request("ensureMobileScope", scope);
+  }
+
+  async getBugWorkflowProjection(
+    input: GetBugWorkflowProjectionInput,
+  ): Promise<BugWorkflowProjection> {
+    await this.initialization;
+    return this.request("getBugWorkflowProjection", input);
   }
 
   async projectManagement<T = unknown>(input: ProjectManagementInput): Promise<T> {

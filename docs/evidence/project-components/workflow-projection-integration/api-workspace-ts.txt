@@ -1,0 +1,41 @@
+✔ exact queue and completed fresh ZIP hand off once with frozen defaults after restart (717.4407ms)
+✔ preflight failure prevents Jenkins submission and double submission coalesces (132.4131ms)
+✔ lost submission acknowledgement and submitting crash never replay build POST (215.4683ms)
+✔ lost upload acknowledgement recovers the same stable job ID (290.1486ms)
+✔ a Jenkins run waiting on the shared lock keeps its automatic upload pending (314.9719ms)
+✔ failed build or ZIP never starts automatic upload (160.5823ms)
+✔ cancelled build or ZIP never starts automatic upload (140.0506ms)
+✔ stale build or ZIP never starts automatic upload (147.5029ms)
+✔ newer build or ZIP never starts automatic upload (127.4915ms)
+✔ nozip build or ZIP never starts automatic upload (79.8126ms)
+✔ wrongqueue build or ZIP never starts automatic upload (176.6727ms)
+✔ overlap build or ZIP never starts automatic upload (108.2244ms)
+✔ owner switch pauses automation and cancellation retains Jenkins build (136.4689ms)
+✔ platform account switch pauses before upload and allows cancelling the pending handoff (229.988ms)
+✔ iOS selects the newest ZIP by modification time and pins matching HEAD identity (49.4293ms)
+✔ empty, invalid and changing iOS sources stop before dispatch (6.3088ms)
+✔ iOS jobs retain the selected ZIP through acknowledgement loss, prelaunch retry and resume (3360.5725ms)
+✔ upload inputs exclude arbitrary paths, commands and historical version IDs (1.5893ms)
+✔ event projection tolerates partial JSONL and never returns tokens or raw error text (0.8263ms)
+✔ email login matches handover contract, validates access, saves compatible cache, keeps secrets out of snapshot (50.2875ms)
+✔ failed access check preserves previous login and exposes no server text (94.0181ms)
+✔ subaccount redirects accept only the recorded origins and one token (77.0426ms)
+✔ bad local auth does not hide job history and can be repaired through login (284.842ms)
+✔ restart reads progress from disk, and only a verified published state is successful (207.0835ms)
+✔ live jobs prevent changing account and launching duplicate tasks; expired heartbeat is interrupted (237.795ms)
+✔ recovery locks testing identity once status changes started; arbitrary job paths are rejected (561.9225ms)
+✔ supervised start and resume preserve the job target and original work directory (997.5104ms)
+✔ tampered executable is rejected before creating a task (34.6921ms)
+✔ build handoff persists source identity and returns one existing job after a lost acknowledgement (516.7735ms)
+✔ new jobs default to recorded parameters and persist version-only text behavior (383.065ms)
+✔ final confirmation requires the persisted boundary and uses its own command exactly once (803.3773ms)
+✔ unreadable jobs remain present and are reported rather than silently discarded (12.0314ms)
+✔ a persisted job from another project is retained and cannot be resumed (40.1863ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8049.0933

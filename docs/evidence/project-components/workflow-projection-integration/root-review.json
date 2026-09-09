@@ -1,0 +1,25 @@
+{
+  "at": "2026-09-09T03:57:30.998Z",
+  "kind": "root independent source and artifact review",
+  "sourceHead": "e82503082b9be2c7243ef4b0c6a675192b45c80a",
+  "sourceFilesVerified": 18,
+  "compiledFilesVerified": 12,
+  "recordedSuiteTests": 399,
+  "checks": {
+    "scopeCapturedBeforeYield": true,
+    "currentAccessAndSoftDeletionCheckedEveryPage": true,
+    "trustedGmAuthorizationUsesSameTransaction": true,
+    "independentCollectionWatermarksAndFrozenDtos": true,
+    "cursorIntegrityScopeMembershipExpiryAndLimits": true,
+    "onlySafeTypedBuildAndRelayFieldsProjected": true,
+    "additiveSchema17OldMigrationInputsRetained": true,
+    "oldFailuresAndFirstCandidateBytesRetained": true
+  },
+  "limits": [
+    "Review is not a further live run.",
+    "Full main, client workflows and actual preview deployment remain separate pending work.",
+    "Frozen manifest omits INVALID_REQUEST/400 despite requiring invalid cursor rejection.",
+    "Expired snapshots are retained and explicit quotas can reject new snapshots; no historical cleanup added.",
+    "Build and Relay fixtures are local typed records, not external execution evidence."
+  ]
+}

@@ -1,0 +1,46 @@
+✔ createApiApp requires authenticated project wiring for the new workflow endpoint (121.9961ms)
+✖ registered workflow HTTP uses real worker GM scope, durable pagination and current authorization (595.551ms)
+ℹ retained isolated createApiApp fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-api-integration-V9Dq1s
+✔ registered worker freezes pages across reopen and binds GM authority to each message (751.453ms)
+ℹ retained isolated worker fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-worker-ULFBjH
+ℹ schema17 real worker: reopen, concurrent GM/member scope, rollback, revocation, restoration and soft deletion verified; auth rows and GM membership remain zero
+✔ retained Phase B schema16 archive migrates only its new copy to17 with all prior tables unchanged (345.1304ms)
+ℹ retained isolated migration copy C:\Users\lin0\AppData\Local\Temp\qa-workflow-migration17-OMY4I2
+ℹ {"originalSha256":"b1380cee2f8fa55732cdef74a171ec9af356b0b517c9495886bdf8ed4fb02d19","tables":70,"oldFingerprintsSha256":"8a48402bdb5a5557cc3ede39156b920772da8e762c112b7dbe7f8c85bfb2fa93","resultSnapshots":7,"migration":{"fromVersion":16,"toVersion":17,"appliedVersions":[17],"backupPath":"C:\\Users\\lin0\\AppData\\Local\\Temp\\qa-workflow-migration17-OMY4I2\\before17\\phase-b-copy.sqlite.v16-to-v17.727bc465-d091-40b4-9f30-681f71f5393a.sqlite"},"originalUnchanged":true}
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1287.8477
+
+✖ failing tests:
+
+test at apps\api\test\workflow-projection-integration.test.mjs:24:1
+✖ registered workflow HTTP uses real worker GM scope, durable pagination and current authorization (595.551ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+      200,
+  +   403,
+  -   404,
+      200,
+      200,
+  +   403
+  -   404
+    ]
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/workflow-projection-integration.test.mjs:104:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 200, 403, 200, 200, 403 ],
+    expected: [ 200, 404, 200, 200, 404 ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

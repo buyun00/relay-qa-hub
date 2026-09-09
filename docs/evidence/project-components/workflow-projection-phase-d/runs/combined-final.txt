@@ -1,0 +1,18 @@
+✔ actual source HTTP and SQLite: vendor pages, frozen limit, auth and exact project guards (356.7843ms)
+ℹ retained isolated source fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-http-tUtX2K
+ℹ actual random-loopback requests 20; statuses [200,200,200,200,401,404,400,400,400,400,400,400,400,400,406,406,200,200,500,403]; no live preview or external executor request
+✔ adapter snapshots project/actor and cursor before yielding; later request cannot retarget worker message (0.3661ms)
+✔ five typed workflow groups: independent cursors, immutable old DTOs, exact final page and reopened DB (892.9324ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-oDSpfE
+✔ cursor authentication binds actor/account/project/Bug/filter; revocation, restoration and soft deletion revalidate (603.5022ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-4RbOvE
+✔ expiry and capacity reject explicitly, rollback leaves no partial snapshots, retained rows are immutable (590.2117ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-VS4R7J
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2419.0746

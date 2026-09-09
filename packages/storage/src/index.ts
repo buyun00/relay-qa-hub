@@ -553,3 +553,10 @@ export type {
   GetRepairAttemptDetailInput,
   RepairAttemptDetail,
 } from "./repair-attempt-detail-store.js";
+export { getBugWorkflowProjection } from "./workflow-projection-store.js";
+export {
+  WorkflowProjectionError,
+  type BugWorkflowProjection,
+  type GetBugWorkflowProjectionInput,
+  type WorkflowProjectionOptions,
+} from "./workflow-projection-types.js";

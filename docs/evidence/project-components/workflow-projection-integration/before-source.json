@@ -1,0 +1,115 @@
+{
+  "observedAt": "2026-09-09T03:38:47.624Z",
+  "migrations": [
+    {
+      "version": 1,
+      "name": "app_first_core",
+      "checksum": "23f57392993b9ed0d379fd205f09088c610607730af8708fad5a294a92ad8151"
+    },
+    {
+      "version": 2,
+      "name": "bug_full_text_search",
+      "checksum": "e14e04b1c1d00a47ee1f7579cee1a6155e74e967d29e34ccf3b564d11a44089a"
+    },
+    {
+      "version": 3,
+      "name": "domain_audit_alignment",
+      "checksum": "55e14d0a47059911f552a74b7c99804d96bc824e26a2f529dd66d6bd7eaedd44"
+    },
+    {
+      "version": 4,
+      "name": "browser_sessions",
+      "checksum": "8e6f91ccb4d37919972db2147f5fc5d60036d5d8350160c99fb42af6624a1701"
+    },
+    {
+      "version": 5,
+      "name": "multi_actor_human_workflow",
+      "checksum": "c0955e0c777459937cbcfce8d2a05a037140ed2cb7ca5e36c56d083468b16a7e"
+    },
+    {
+      "version": 6,
+      "name": "qingyu_bug_links",
+      "checksum": "81e9788ce11d4faaec9c94605a041229201c545a0e7b95b752411f4e2941b98d"
+    },
+    {
+      "version": 7,
+      "name": "shared_project_bug_management",
+      "checksum": "c52f888a8885e68265e39f1b6e221ba83b49746ea097ae01da6d65906498fa1e"
+    },
+    {
+      "version": 8,
+      "name": "three_state_task_completion",
+      "checksum": "a34c15432def64828ee0234f2ea4bd2a826f1b84ca70407ebaf579aad1f08c44"
+    },
+    {
+      "version": 9,
+      "name": "editable_bug_attachments",
+      "checksum": "712ee684e3050cf7c079ae965ae98f833294fd6b13a9ea2bdc547909721e9098"
+    },
+    {
+      "version": 10,
+      "name": "user_identity_management",
+      "checksum": "820220a8568e5b8b13fbb49f4b1528f5bb75ca672b52d4c4276c99a4a7823bc6"
+    },
+    {
+      "version": 11,
+      "name": "relay_delivery_and_rework",
+      "checksum": "dba5b4b1641fbc0d28ea2d22140e191f26d087da1f95bc0dc636c449ca1041b5"
+    },
+    {
+      "version": 12,
+      "name": "human_completion_priority",
+      "checksum": "051d3f3b2b012aa34ae1aac81e9c11e683ffc68e4222bfc33d970619a9dc9eff"
+    },
+    {
+      "version": 13,
+      "name": "project_identity_and_components",
+      "checksum": "ce4f7c937968fc70efdd0103effa8d7e4ab306b9bacfeffeb0e0af56a748ba6a"
+    },
+    {
+      "version": 14,
+      "name": "authenticated_gm_command_authority",
+      "checksum": "2ec8c004579950e18c6a270901d866a270fce0cca87a1514e54a1b740895cef9"
+    },
+    {
+      "version": 15,
+      "name": "immutable_verification_result_snapshots",
+      "checksum": "5a6d8ed5b7ff4815d20ff613a2ad0c841512a919eb7e1cfa0adb72aa3c26fe6d"
+    },
+    {
+      "version": 16,
+      "name": "blocked_verification_result_receipts",
+      "checksum": "7297cf8cda0470ad0606b7ec6ded7766aa79f7de46e6521e9205332e735ea49c"
+    }
+  ],
+  "sources": [
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "sha256": "938ae0ca3caa153733fda214dd1093a57dab5828b0336f4e4060176d657c2d88"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker.ts",
+      "sha256": "06af1f8a1388aae3ddf786afe2345f085fe03efe50b956536f6163c8b3f05e26"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker-entry.ts",
+      "sha256": "2c9eaa7fa643e3e3617beb7c401ae2b939eca2d3ad9050d186717f65e83e9c0d"
+    },
+    {
+      "path": "packages/storage/src/index.ts",
+      "sha256": "8bbf748b7d84f6017277220ec4a2489e0c35ecafd42c0e55e8c468d668ada1d9"
+    },
+    {
+      "path": "packages/storage/package.json",
+      "sha256": "b7f70fbda8fbacb1ca3e13d0cb87fad8ce4cb9480f67d2296149abc956c9269a"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "sha256": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd"
+    }
+  ]
+}

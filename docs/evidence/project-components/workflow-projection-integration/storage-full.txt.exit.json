@@ -1,0 +1,25 @@
+{
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "--test",
+    "packages/storage/test/storage.test.ts",
+    "packages/storage/test/sqlite-migrations.test.ts",
+    "packages/storage/test/sqlite-invariants.test.ts",
+    "packages/storage/test/sqlite-backup.test.ts",
+    "packages/storage/test/sqlite-restore.test.ts",
+    "packages/storage/test/attachment-restore.test.ts",
+    "packages/storage/test/sqlite-archive.test.ts",
+    "packages/storage/test/qingyu-link-store.test.ts",
+    "packages/storage/test/user-management-store.test.ts",
+    "packages/storage/test/mobile-scope-branding.test.ts",
+    "packages/storage/test/project-management-store.test.ts",
+    "packages/storage/test/workflow-idempotency.test.ts",
+    "packages/storage/test/workflow-projection.test.ts",
+    "packages/storage/test/workflow-projection-worker.test.ts"
+  ],
+  "startedAt": "2026-09-09T03:45:42.049Z",
+  "completedAt": "2026-09-09T03:46:17.305Z",
+  "exitCode": 1
+}

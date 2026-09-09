@@ -1,0 +1,32 @@
+✖ actual source HTTP and SQLite: vendor pages, frozen limit, auth and exact project guards (337.8854ms)
+ℹ retained isolated source fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-http-Q5nrJ2
+ℹ actual random-loopback requests 17; statuses [200,200,200,200,401,404,400,400,400,400,400,400,400,400,406,406,200]; no live preview or external executor request
+✔ adapter snapshots project/actor and cursor before yielding; later request cannot retarget worker message (0.6873ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 694.5318
+
+✖ failing tests:
+
+test at apps\api\test\workflow-projection.test.mjs:194:1
+✖ actual source HTTP and SQLite: vendor pages, frozen limit, auth and exact project guards (337.8854ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 406
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/workflow-projection.test.mjs:239:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 406,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

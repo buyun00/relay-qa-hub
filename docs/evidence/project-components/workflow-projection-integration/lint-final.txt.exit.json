@@ -1,0 +1,27 @@
+{
+  "command": [
+    "node",
+    "node_modules/eslint/bin/eslint.js",
+    "packages/storage/src/sqlite-migrations.ts",
+    "packages/storage/src/sqlite-worker.ts",
+    "packages/storage/src/sqlite-worker-entry.ts",
+    "packages/storage/src/index.ts",
+    "packages/storage/src/workflow-projection-types.ts",
+    "packages/storage/src/workflow-projection-cursor.ts",
+    "packages/storage/src/workflow-projection-migration.ts",
+    "packages/storage/src/workflow-projection-store.ts",
+    "apps/api/src/app.ts",
+    "apps/api/src/main.ts",
+    "apps/api/src/workflow-projection.ts",
+    "apps/api/src/sqlite-workflow-projection-store.ts",
+    "packages/storage/test/workflow-projection.test.ts",
+    "packages/storage/test/workflow-projection-worker.test.ts",
+    "packages/storage/test/sqlite-migrations.test.ts",
+    "apps/api/test/workflow-projection.test.mjs",
+    "apps/api/test/workflow-projection-integration.test.mjs"
+  ],
+  "cwd": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+  "startedAt": "2026-09-09T03:50:07.438Z",
+  "completedAt": "2026-09-09T03:50:11.999Z",
+  "exitCode": 0
+}

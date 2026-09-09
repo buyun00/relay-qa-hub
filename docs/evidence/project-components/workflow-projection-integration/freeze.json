@@ -1,0 +1,495 @@
+{
+  "recordedAt": "2026-09-09T03:57:31.143Z",
+  "files": [
+    {
+      "path": "packages/storage/src/workflow-projection-types.ts",
+      "bytes": 2096,
+      "sha256": "9cd95f16a874af90d58957f1c933b67758f08f4fed8c89f781bbba5b2a9571eb"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-cursor.ts",
+      "bytes": 1935,
+      "sha256": "8b3d6fc86108c54d83228f354ed208b37c040d1ba7e917cf2875f2469f6a47db"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-migration.ts",
+      "bytes": 2899,
+      "sha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-store.ts",
+      "bytes": 22115,
+      "sha256": "96c965ac0ea0074125407e9d6c90a78a2775599e3fd69d095b90e47b57bad4d1"
+    },
+    {
+      "path": "packages/storage/test/workflow-projection.test.ts",
+      "bytes": 18450,
+      "sha256": "a2b9fc12326b88b08aeb8a52a79efea5369ce6eaf8b098e5764509cfd194ad02"
+    },
+    {
+      "path": "apps/api/src/workflow-projection.ts",
+      "bytes": 4296,
+      "sha256": "d526bfba472c0b6863ed15bfc4c3d80e3f485b4f356acc1b4701b1991e242449"
+    },
+    {
+      "path": "apps/api/src/sqlite-workflow-projection-store.ts",
+      "bytes": 998,
+      "sha256": "4a45e0c11f74453c449fe3661864d3ac9771f4be287449fbe0eed481412e6957"
+    },
+    {
+      "path": "apps/api/test/workflow-projection.test.mjs",
+      "bytes": 11231,
+      "sha256": "558d1f8aaceeba7783c25155d9ddd2669baa9d4c1034aa357eecdd929968ad6e"
+    },
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 327476,
+      "sha256": "c5300f55573bf7f5e9737f3ca5278c5420066e600990d553d6e5829d21806252"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker.ts",
+      "bytes": 29273,
+      "sha256": "a8793521fc74558af69e42611be8085002ed9b0702a6b9d2e39ad557bd2497c8"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker-entry.ts",
+      "bytes": 28397,
+      "sha256": "f06a77a59df163bad9b4b2c6ca1c96e04b7c31b771d1330fdd86207d0825d47f"
+    },
+    {
+      "path": "packages/storage/src/index.ts",
+      "bytes": 16951,
+      "sha256": "89f2ff5b70474012f8bf7a635bbaf717718fdad6367f4df7729d44837af2648d"
+    },
+    {
+      "path": "packages/storage/package.json",
+      "bytes": 1186,
+      "sha256": "a91cd65f49f03a182497ed43bba6cbe019e87252ea7bb8629b552ebe9b813c48"
+    },
+    {
+      "path": "packages/storage/test/sqlite-migrations.test.ts",
+      "bytes": 35645,
+      "sha256": "ca5900938c61eda02a158a967e2d190b238c30b94fab84605d3a85f8b06d67a2"
+    },
+    {
+      "path": "packages/storage/test/workflow-projection-worker.test.ts",
+      "bytes": 10827,
+      "sha256": "940f3fc66c316db549ce3582042182d416541ce17476de4fa1cc06cbe2955f04"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 108349,
+      "sha256": "99c401cba86a6a6443a6d9e21d607a5585049beed2149ab03fb76f48fae6e779"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25564,
+      "sha256": "46dab3d88c8b7677e7f3f03dc83716eb293bf4220482ed95e966b0fb2e06d900"
+    },
+    {
+      "path": "apps/api/test/workflow-projection-integration.test.mjs",
+      "bytes": 11118,
+      "sha256": "b7718473203cb4f9b56cc81a381ed235e411ecd0d23e25662eb247835d5792cc"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-build-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-build-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-built-source-final.txt",
+      "bytes": 34165,
+      "sha256": "a0611be9e5a4ad0839c8c6b82898fd708a58dd030007ea78088d18eafef6ee12"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-built-source-final.txt.exit.json",
+      "bytes": 254,
+      "sha256": "7d1689e83c4c87a963843e0a70a3896f1b26090a88e72c492749e26db8d1e9c2"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-final-mjs.txt",
+      "bytes": 34882,
+      "sha256": "5d84821f55b14765e998c2ee918f7abbdad31aca5f5b04a52b95ecace4746397"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-final-mjs.txt.exit.json",
+      "bytes": 220,
+      "sha256": "5414964e5cbee546eb4542c8a1083879f0df53bceed50b8195d2b2b20c6cdc16"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-final-ts.txt",
+      "bytes": 9279,
+      "sha256": "ccd3bbc3cef6e2c9f6fbbd6ace63e0a68868219ad76f4b83b8e33fc0b3e27b6c"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-final-ts.txt.exit.json",
+      "bytes": 246,
+      "sha256": "5cea2622f8169ab78faff1deeb4f9ef24c6ee49f6c04bded4776244f070359a9"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-full-mjs.txt",
+      "bytes": 35780,
+      "sha256": "be82540dbebc2b7a0d0e31c923f072ec44e67fc0d6184da5cb22b3313aeae2bb"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-full-mjs.txt.exit.json",
+      "bytes": 185,
+      "sha256": "7d3c4f5de2c969f4ff209aae7de14ae7780ee3efda05c950e219e9b2ed56b02f"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-noemit-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-workspace-mjs.txt",
+      "bytes": 34162,
+      "sha256": "31c86f2d612a041ed0fb9dec3b476afe93c72b8c87d0d5181fefa35b5804571e"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-workspace-mjs.txt.exit.json",
+      "bytes": 254,
+      "sha256": "97f870c642abe0cc75ceacc6167ec4ef4097c5822ed5ee2c0f7f1852f27dc04b"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-workspace-ts.txt",
+      "bytes": 3091,
+      "sha256": "91f0416fa810ce6ea7a2b57bf85b13bbb6fc1c851329e26e63de6109686fe76f"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/api-workspace-ts.txt.exit.json",
+      "bytes": 280,
+      "sha256": "f2670e1f25e7e436e9eeb3adc9e5104e50328add218d8b587693272aa5a28680"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/before-source.json",
+      "bytes": 3695,
+      "sha256": "08edd72d37638ee087a31cf7cc6f343e2c809541b18668cc6b0d37700c5d0639"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/candidate-dist-import.txt",
+      "bytes": 638,
+      "sha256": "b4738939dda1a007482329f97ca93307107dfb5ecd469b2e36ca54db10ba430e"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/candidate-r2-http-test.mjs.txt",
+      "bytes": 11219,
+      "sha256": "2634a203a9ef04c862991dc8885fbcf850a5271f5d82fe179b1b578e481508c5"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/contracts-final.exit.json",
+      "bytes": 609,
+      "sha256": "43c23ec6814cdc4e42cb9366d7495d167537c3f7623075f267511b6dcc76e08d"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/contracts-final.txt",
+      "bytes": 752,
+      "sha256": "c45f30a76dabb87cef4aa6795823a1021e338f41662c1e72c874589cc7aa95f0"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/format-check-final.txt",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/format-check-final.txt.exit.json",
+      "bytes": 1161,
+      "sha256": "c764e7a30defeb5fa54555ca3899e2f63e1babbc97855fc35acdedffcc67854e"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/format-write-final.txt",
+      "bytes": 259,
+      "sha256": "1a4eb7029fd8cd58be2e263f2c32736f542e9b2d39c1e0f75290ca0dc8d722ab"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/format-write-first.txt",
+      "bytes": 466,
+      "sha256": "89f9b0b31c8e01171282fedd84a969c7d079396194b472bd8d5325075d4f1f0e"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/http-fourth.txt",
+      "bytes": 3311,
+      "sha256": "6baca43be22a41e925fba280d70d9b6db9626822b9bb4bf89a3d8881a2d71b2e"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/http-third.txt",
+      "bytes": 1283,
+      "sha256": "6d5d7e68945e8eb3c4c951e1b5082e4d7fb64c13b7ad753382dbb12b52147670"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/integration-first.txt",
+      "bytes": 1778,
+      "sha256": "148caacbad5e408be7ba61911dcbf8a8c061cdb3b6503053b9c369f19bb821e6"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/integration-second.txt",
+      "bytes": 2513,
+      "sha256": "00a95735c6569f2f1f85e5dfeee946606ce2de34dfabd690633b97ee02fd5f03"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/lint-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/lint-final.txt.exit.json",
+      "bytes": 1104,
+      "sha256": "4fe1f24fcdaa5a50e1d1fd321db0643cd0b7e4d2091aa4362691db15c883642b"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/migration-artifact-review.json",
+      "bytes": 13332,
+      "sha256": "559c3a67ffb334ea131d55f1f8c5163680cd9d14d07276cf957bd181c324bbc3"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/README.md",
+      "bytes": 3178,
+      "sha256": "6383e56978746ed62f829473d565a38d959ad4f1afdbedfa1b07b863393d10be"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/result.json",
+      "bytes": 27961,
+      "sha256": "16a0903e528f41667cb092d5d4009cf9340cb506e2e3c42664544a1af98f06dd"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/root-review.json",
+      "bytes": 1147,
+      "sha256": "8e6227468f286f7f29f4d1a6f75da02959c9a55e4100d84844b449d350ac2f54"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/storage-build-second.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/storage-final.txt",
+      "bytes": 13626,
+      "sha256": "f2928bc9788ee6de0129c14ab2b739fc1032a3fbf186679f00401fb4044d1fcb"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/storage-final.txt.exit.json",
+      "bytes": 994,
+      "sha256": "72dc41d4339f2d661d042651201ae3faba209743c84fa4bb741291a40a9f7722"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/storage-full.txt",
+      "bytes": 14262,
+      "sha256": "606784e02c1ea3e7a40a8033047c7c5fd7e99cba34aa029bf29edd710a5810ea"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/storage-full.txt.exit.json",
+      "bytes": 960,
+      "sha256": "bf95e3dc5c2ed6a1f8b984c977f9337fcc2b0fdd33db0263d41dbc4c8eca83a3"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/storage-noemit-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-integration/storage-noemit-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/api-noemit.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/before-fix-http.txt",
+      "bytes": 1426,
+      "sha256": "2480ac9c28b8f82ca459aa06baeb15bfb8bba1280b2883e44531425905714550"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/apps/api/src/sqlite-workflow-projection-store.ts.txt",
+      "bytes": 998,
+      "sha256": "4a45e0c11f74453c449fe3661864d3ac9771f4be287449fbe0eed481412e6957"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/apps/api/src/workflow-projection.ts.txt",
+      "bytes": 4157,
+      "sha256": "8caa1b44167b2ba8679215ab20cc4ce527d889dc5a7276b5354ca22a983d2535"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/apps/api/test/workflow-projection.test.mjs.txt",
+      "bytes": 11025,
+      "sha256": "111f3e09dfa4b81e54a949296cc87a6a1b66c422fb7cb98c4a5356bc5a360631"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/manifest.json",
+      "bytes": 3282,
+      "sha256": "072eb3c09eb73a0579b1d1e748ba0fd743ac9c3890e3c87861903eea87bd3597"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-cursor.ts.txt",
+      "bytes": 1935,
+      "sha256": "8b3d6fc86108c54d83228f354ed208b37c040d1ba7e917cf2875f2469f6a47db"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-migration.ts.txt",
+      "bytes": 2899,
+      "sha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-store.ts.txt",
+      "bytes": 22115,
+      "sha256": "96c965ac0ea0074125407e9d6c90a78a2775599e3fd69d095b90e47b57bad4d1"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/src/workflow-projection-types.ts.txt",
+      "bytes": 2096,
+      "sha256": "9cd95f16a874af90d58957f1c933b67758f08f4fed8c89f781bbba5b2a9571eb"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/packages/storage/test/workflow-projection.test.ts.txt",
+      "bytes": 18450,
+      "sha256": "a2b9fc12326b88b08aeb8a52a79efea5369ce6eaf8b098e5764509cfd194ad02"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/README.md",
+      "bytes": 5020,
+      "sha256": "ce7c4cebeaa89e224ed0ab9dab54264ca5b1103b67c5b48dc1485584620a0150"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/result.json",
+      "bytes": 13369,
+      "sha256": "e4220215831ae32186fbcc2c68c3eb81950364a5a1e4b2aa702e30aff3e50494"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/combined-after.txt",
+      "bytes": 1320,
+      "sha256": "be7785f5ff15c0c6117d1e389d09ffc67b6e1b2ec00426d93d5f9d539669a1b6"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/format.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/lint.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/README.md",
+      "bytes": 1601,
+      "sha256": "530016b578e44ec1473704c80224dd98a4c816d6a237ea7a6699273c2f2e2cf1"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/result.json",
+      "bytes": 6795,
+      "sha256": "153ae302e92e7e601dd316c39496d9143ee8d2dac2cd495d02c005c15d623bf7"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/storage-noemit.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/README.md",
+      "bytes": 5020,
+      "sha256": "ce7c4cebeaa89e224ed0ab9dab54264ca5b1103b67c5b48dc1485584620a0150"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/result.json",
+      "bytes": 13369,
+      "sha256": "e4220215831ae32186fbcc2c68c3eb81950364a5a1e4b2aa702e30aff3e50494"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/api-first.txt",
+      "bytes": 618,
+      "sha256": "c46fb14b32a751fb4491e611cffd3d8444d626978205c71302d299a56e7d8ae9"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/api-noemit-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/api-typecheck-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/combined-final.txt",
+      "bytes": 1305,
+      "sha256": "cacface5c91db8ecf5e5a85853aacb7a15442da135590004bdc61785d78e6c09"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/combined-first.txt",
+      "bytes": 1303,
+      "sha256": "f3390be10794a2ddab03b97c0914d354f1d84665177a1e06d67122bd48d21d61"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/format-final.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/lint-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/lint-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-contract-sixth.txt",
+      "bytes": 804,
+      "sha256": "5730726794853a5dd061c1e735c8319de9e6466c052d930c0a245336762ee66f"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-fifth.txt",
+      "bytes": 803,
+      "sha256": "d06deeb96c8538a3c0f365b71d01bc5b51d63e4d28ce777b70fbece56b4d3cc6"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-first.txt",
+      "bytes": 4037,
+      "sha256": "ed8747fe0f255210718565660c934133b445a38efa2a56dff525eb0003f7b50c"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-fourth.txt",
+      "bytes": 1697,
+      "sha256": "6e70c0412860855ff325a41da6a7feb917184d8944518df43cb7aa62a413ed4c"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-noemit-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-second.txt",
+      "bytes": 3623,
+      "sha256": "e6d5418966190207a8c7a8a8d0563469b189a2b4fc3ecfb462ab47126a21b309"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-third.txt",
+      "bytes": 4263,
+      "sha256": "7a5d15a3df053bb14c33a7b94d7c6a7d58f440da3147b813931317350d0d64b3"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-typecheck-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-typecheck-second.txt",
+      "bytes": 2582,
+      "sha256": "8a7f7f22ae0427a3a420583e579ba37b06df7b6b405126ba25012234e70eaf54"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-typecheck-third.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

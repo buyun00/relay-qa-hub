@@ -1,0 +1,12 @@
+✔ actual source HTTP and SQLite: vendor pages, frozen limit, auth and exact project guards (346.6767ms)
+ℹ retained isolated source fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-http-5kpm9P
+ℹ actual random-loopback requests 24; statuses [200,200,200,200,401,404,400,400,400,400,400,400,400,400,406,406,406,406,200,200,200,200,500,403]; no live preview or external executor request
+✔ adapter snapshots project/actor and cursor before yielding; later request cannot retarget worker message (0.3411ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 597.6213

@@ -1,0 +1,25 @@
+{
+  "observedAt": "2026-09-09T03:51:32.281Z",
+  "results": [
+    {
+      "script": "packages/contracts/scripts/validate-contracts.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "packages/contracts/scripts/check-breaking.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "packages/contracts/versions/1.1.0/scripts/validate-contracts.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "packages/contracts/versions/1.1.0/scripts/check-additive.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "packages/contracts/versions/1.1.0/scripts/check-breaking.mjs",
+      "exitCode": 0
+    }
+  ]
+}

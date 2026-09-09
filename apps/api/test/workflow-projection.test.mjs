@@ -1,0 +1,314 @@
+import assert from "node:assert/strict";
+import { createHash, randomUUID } from "node:crypto";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import test from "node:test";
+import Fastify from "fastify";
+import {
+  openSqliteDatabaseForWorker,
+  migrateSqliteDatabase,
+} from "../../../packages/storage/dist/sqlite.js";
+import {
+  ensureMobileScope,
+  createMobileBug,
+} from "../../../packages/storage/dist/mobile-bug-store.js";
+import * as sessions from "../../../packages/storage/dist/browser-auth-store.js";
+import { projectManagement } from "../../../packages/storage/dist/project-management-store.js";
+import { WORKFLOW_PROJECTION_SNAPSHOT_SQL } from "../../../packages/storage/dist/workflow-projection-migration.js";
+import { getBugWorkflowProjection } from "../../../packages/storage/dist/workflow-projection-store.js";
+import {
+  registerBrowserAuthRoutes,
+  authenticateBrowserBearerRequest,
+  createSqliteBrowserAuthStore,
+} from "../dist/browser-auth.js";
+import { ProjectManagementService } from "../dist/project-management.js";
+import { ProjectRequestContext } from "../dist/project-request-context.js";
+import { registerWorkflowProjectionRoutes } from "../dist/workflow-projection.js";
+import { createSqliteWorkflowProjectionStore } from "../dist/sqlite-workflow-projection-store.js";
+import { MOBILE_API_MEDIA_TYPE } from "../dist/mobile-bugs.js";
+
+const hash = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+const at = () => new Date().toISOString();
+async function fixture(t) {
+  const directory = mkdtempSync(join(tmpdir(), "qa-workflow-http-"));
+  t.diagnostic(`retained isolated source fixture ${directory}`);
+  const databaseFile = join(directory, "workflow.sqlite");
+  const db = openSqliteDatabaseForWorker({ databaseFile, busyTimeoutMs: 5000 });
+  await migrateSqliteDatabase(db, databaseFile, { targetVersion: 15 });
+  const tx = (work) => {
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      const value = work();
+      db.exec("COMMIT");
+      return value;
+    } catch (error) {
+      db.exec("ROLLBACK");
+      throw error;
+    }
+  };
+  tx(() => db.exec(WORKFLOW_PROJECTION_SNAPSHOT_SQL));
+  const scope = {
+    accountId: randomUUID(),
+    projectId: randomUUID(),
+    actorId: randomUUID(),
+    membershipId: randomUUID(),
+    projectKey: "DWHTTP",
+    actorDisplayName: "Workflow reader",
+    createdAt: at(),
+  };
+  tx(() => ensureMobileScope(db, scope));
+  const otherProject = randomUUID();
+  tx(() =>
+    projectManagement(db, {
+      ...scope,
+      isGm: true,
+      operation: "create",
+      projectId: otherProject,
+      key: "DWOTHER",
+      name: "Other",
+      now: at(),
+    }),
+  );
+  const created = tx(() =>
+    createMobileBug(db, {
+      ...scope,
+      clientSubmissionId: randomUUID(),
+      payloadDigest: hash("http fixture"),
+      title: "HTTP workflow",
+      description: "Local",
+      expectedBehavior: "Frozen page",
+      severity: "S2",
+      priority: "P2",
+      ownerId: scope.actorId,
+      verificationOwnerId: scope.actorId,
+      occurrence: { observedAt: at(), platform: "web", steps: ["Read"], actualBehavior: "Seen" },
+      attachmentIds: [],
+      captureBundleId: null,
+      createdAt: at(),
+    }),
+  );
+  tx(() => {
+    const columns = db
+      .prepare("PRAGMA table_xinfo(occurrences)")
+      .all()
+      .filter((r) => r.hidden === 0)
+      .map((r) => r.name);
+    const row = db.prepare("SELECT * FROM occurrences WHERE id=?").get(created.occurrenceId);
+    const insert = db.prepare(
+      `INSERT INTO occurrences(${columns.join(",")}) VALUES(${columns.map(() => "?").join(",")})`,
+    );
+    for (let i = 0; i < 2; i++) {
+      const copy = { ...row, id: randomUUID(), client_submission_id: randomUUID() };
+      insert.run(...columns.map((c) => copy[c]));
+    }
+  });
+  const worker = {
+    runWithRequestAuthorization(_scope, work) {
+      return work();
+    },
+    projectManagement: async (input) => tx(() => projectManagement(db, input)),
+    getBugWorkflowProjection: async (input) => tx(() => getBugWorkflowProjection(db, input)),
+    ...Object.fromEntries(
+      [
+        "ensureBrowserAdmin",
+        "loginBrowserSession",
+        "createBrowserSession",
+        "resolveBrowserSession",
+        "revokeBrowserSession",
+      ].map((name) => [name, async (input) => tx(() => sessions[name](db, input))]),
+    ),
+  };
+  const service = new ProjectManagementService({
+    worker,
+    accountId: scope.accountId,
+    gmUserId: randomUUID(),
+  });
+  const context = new ProjectRequestContext();
+  const scoped = context.scope(scope);
+  const auth = {
+    store: createSqliteBrowserAuthStore({ worker }),
+    accountId: scope.accountId,
+    userId: scope.actorId,
+    actorId: scope.actorId,
+    adminEmail: "unused@example.invalid",
+    passwordlessLogin: async () => {
+      throw Error("Project required");
+    },
+    projectLogin: (name, projectId, now) => service.login(name, projectId, now),
+    sessionSecret: "local-workflow-fixture-only",
+    webOrigins: [],
+  };
+  const app = Fastify({ logger: false });
+  app.addHook("preHandler", async (request) => {
+    await authenticateBrowserBearerRequest(request, auth);
+  });
+  context.register(app, service);
+  registerBrowserAuthRoutes(app, auth);
+  registerWorkflowProjectionRoutes(
+    app,
+    createSqliteWorkflowProjectionStore({ worker, scope: scoped }),
+  );
+  const origin = await app.listen({ host: "127.0.0.1", port: 0 });
+  assert(
+    ![4174, 4274, 4319, 4320, 4419, 4420, 4421, 4459, 4461].includes(Number(new URL(origin).port)),
+  );
+  const ledger = [];
+  const request = async (path, options = {}) => {
+    const response = await fetch(origin + path, { ...options, signal: AbortSignal.timeout(5000) });
+    const body = await response.json();
+    ledger.push({
+      method: options.method ?? "GET",
+      path,
+      status: response.status,
+      media: response.headers.get("content-type"),
+    });
+    return { status: response.status, body, headers: response.headers };
+  };
+  const login = await request("/api/v1/auth/login", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      name: "Workflow reader",
+      projectId: scope.projectId,
+      client: "android",
+    }),
+  });
+  assert.equal(login.status, 200);
+  assert.equal(login.body.userId, scope.actorId);
+  const headers = {
+    authorization: "Bearer " + login.body.accessToken,
+    "x-qa-project-id": scope.projectId,
+    accept: MOBILE_API_MEDIA_TYPE,
+  };
+  t.after(async () => {
+    await app.close();
+    db.close();
+    t.diagnostic(
+      `actual random-loopback requests ${ledger.length}; statuses ${JSON.stringify(ledger.map((r) => r.status))}; no live preview or external executor request`,
+    );
+  });
+  return { db, tx, scope, headers, request, worker, bugId: created.bug.id, otherProject };
+}
+
+test("actual source HTTP and SQLite: vendor pages, frozen limit, auth and exact project guards", async (t) => {
+  const f = await fixture(t),
+    route = `/api/v1/bugs/${f.bugId}/workflow`;
+  const first = await f.request(route + "?limitPerCollection=1", { headers: f.headers });
+  assert.equal(first.status, 200);
+  assert(first.headers.get("content-type").startsWith(MOBILE_API_MEDIA_TYPE));
+  assert.equal(first.headers.get("cache-control"), "no-store");
+  assert.equal(first.body.occurrences.length, 1);
+  assert(first.body.nextCursor.length <= 500);
+  const paged = route + "?limitPerCollection=1&cursor=" + encodeURIComponent(first.body.nextCursor);
+  const a = await f.request(paged, { headers: f.headers }),
+    b = await f.request(paged, { headers: f.headers });
+  assert.equal(a.status, 200);
+  assert.deepEqual(a.body, b.body);
+  assert.equal((await f.request(route)).status, 401);
+  assert.equal(
+    (await f.request(route, { headers: { ...f.headers, "x-qa-project-id": f.otherProject } }))
+      .status,
+    404,
+  );
+  for (const query of [
+    "?limitPerCollection=0",
+    "?limitPerCollection=101",
+    "?limitPerCollection=1.5",
+    "?limitPerCollection=1&limitPerCollection=2",
+    "?unexpected=1",
+    "?cursor=" + "x".repeat(501),
+    "?cursor=invalid",
+  ])
+    assert.equal((await f.request(route + query, { headers: f.headers })).status, 400);
+  assert.equal(
+    (
+      await f.request(
+        route + "?limitPerCollection=2&cursor=" + encodeURIComponent(first.body.nextCursor),
+        { headers: f.headers },
+      )
+    ).status,
+    400,
+  );
+  for (const accept of [
+    "application/json",
+    `${MOBILE_API_MEDIA_TYPE};q=0, */*;q=1`,
+    "application/*;q=0, */*;q=1",
+    "*/*;q=1, application/*;q=0",
+  ])
+    assert.equal((await f.request(route, { headers: { ...f.headers, accept } })).status, 406);
+  for (const accept of [
+    "*/*",
+    `${MOBILE_API_MEDIA_TYPE}, application/json;q=0.9`,
+    `${MOBILE_API_MEDIA_TYPE};q=1, application/*;q=0, */*;q=0`,
+    "application/*;q=0.5, */*;q=0",
+  ])
+    assert.equal((await f.request(route, { headers: { ...f.headers, accept } })).status, 200);
+  const serialized = JSON.stringify(first.body);
+  const privateKey = f.db
+    .prepare("SELECT signing_key FROM workflow_projection_snapshots LIMIT 1")
+    .get().signing_key;
+  assert(!serialized.includes(Buffer.from(privateKey).toString("hex")));
+  assert(!serialized.includes(Buffer.from(privateKey).toString("base64")));
+  const readPage = f.worker.getBugWorkflowProjection;
+  f.worker.getBugWorkflowProjection = async () => {
+    throw new Error("fixture-private-db-key=" + Buffer.from(privateKey).toString("hex"));
+  };
+  const refused = await f.request(route, { headers: f.headers });
+  assert.equal(refused.status, 500);
+  assert.deepEqual(refused.body, { code: "INTERNAL_ERROR" });
+  f.worker.getBugWorkflowProjection = readPage;
+  f.tx(() =>
+    projectManagement(f.db, {
+      ...f.scope,
+      operation: "membership",
+      isGm: true,
+      userId: f.scope.actorId,
+      active: false,
+      expectedVersion: 1,
+      now: at(),
+    }),
+  );
+  assert.equal((await f.request(paged, { headers: f.headers })).status, 403);
+});
+
+test("adapter snapshots project/actor and cursor before yielding; later request cannot retarget worker message", async () => {
+  let projectId = randomUUID(),
+    release;
+  const input = [];
+  const wait = new Promise((resolve) => {
+    release = resolve;
+  });
+  const store = createSqliteWorkflowProjectionStore({
+    scope: {
+      accountId: randomUUID(),
+      get projectId() {
+        return projectId;
+      },
+    },
+    worker: {
+      async getBugWorkflowProjection(value) {
+        input.push(value);
+        await wait;
+        return value;
+      },
+    },
+  });
+  const firstProject = projectId,
+    actorId = randomUUID(),
+    bugId = randomUUID();
+  const pending = store.getPage({ actorId, bugId, cursor: "first", limitPerCollection: 1 });
+  projectId = randomUUID();
+  const second = store.getPage({
+    actorId: randomUUID(),
+    bugId: randomUUID(),
+    limitPerCollection: 2,
+  });
+  release();
+  await Promise.all([pending, second]);
+  assert.equal(input[0].projectId, firstProject);
+  assert.equal(input[0].actorId, actorId);
+  assert.equal(input[0].cursor, "first");
+  assert.equal(input[1].projectId, projectId);
+  assert(Object.isFrozen(input[0]));
+});

@@ -1,0 +1,35 @@
+✔ createApiApp requires authenticated project wiring for the new workflow endpoint (565.9767ms)
+✖ registered workflow HTTP uses real worker GM scope, durable pagination and current authorization (497.1833ms)
+ℹ retained isolated createApiApp fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-api-integration-jbPK4L
+✔ registered worker freezes pages across reopen and binds GM authority to each message (749.1471ms)
+ℹ retained isolated worker fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-worker-8Uixkl
+ℹ schema17 real worker: reopen, concurrent GM/member scope, rollback, revocation, restoration and soft deletion verified; auth rows and GM membership remain zero
+﹣ retained Phase B schema16 archive migrates only its new copy to17 with all prior tables unchanged (0.2533ms) # SKIP
+ℹ tests 4
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 1761.2965
+
+✖ failing tests:
+
+test at apps\api\test\workflow-projection-integration.test.mjs:24:1
+✖ registered workflow HTTP uses real worker GM scope, durable pagination and current authorization (497.1833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  403 !== 200
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/workflow-projection-integration.test.mjs:68:51)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 403,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

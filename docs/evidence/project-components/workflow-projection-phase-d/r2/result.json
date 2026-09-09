@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "observedAt": "2026-09-09T03:31:03.677Z",
+  "status": "passed_isolated_source_media_specificity_correction_registration_pending",
+  "priorResult": {
+    "path": "docs/evidence/project-components/workflow-projection-phase-d/result.json",
+    "bytes": 13369,
+    "sha256": "e4220215831ae32186fbcc2c68c3eb81950364a5a1e4b2aa702e30aff3e50494"
+  },
+  "priorReadme": {
+    "path": "docs/evidence/project-components/workflow-projection-phase-d/README.md",
+    "bytes": 5020,
+    "sha256": "ce7c4cebeaa89e224ed0ab9dab54264ca5b1103b67c5b48dc1485584620a0150"
+  },
+  "candidateSnapshot": {
+    "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/candidate-before/manifest.json",
+    "bytes": 3282,
+    "sha256": "072eb3c09eb73a0579b1d1e748ba0fd743ac9c3890e3c87861903eea87bd3597"
+  },
+  "priorSourceAndProofCopiesVerified": 10,
+  "priorLogsUnchanged": 18,
+  "sourceFiles": [
+    {
+      "path": "packages/storage/src/workflow-projection-types.ts",
+      "bytes": 2096,
+      "sha256": "9cd95f16a874af90d58957f1c933b67758f08f4fed8c89f781bbba5b2a9571eb"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-cursor.ts",
+      "bytes": 1935,
+      "sha256": "8b3d6fc86108c54d83228f354ed208b37c040d1ba7e917cf2875f2469f6a47db"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-migration.ts",
+      "bytes": 2899,
+      "sha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-store.ts",
+      "bytes": 22115,
+      "sha256": "96c965ac0ea0074125407e9d6c90a78a2775599e3fd69d095b90e47b57bad4d1"
+    },
+    {
+      "path": "packages/storage/test/workflow-projection.test.ts",
+      "bytes": 18450,
+      "sha256": "a2b9fc12326b88b08aeb8a52a79efea5369ce6eaf8b098e5764509cfd194ad02"
+    },
+    {
+      "path": "apps/api/src/workflow-projection.ts",
+      "bytes": 4296,
+      "sha256": "d526bfba472c0b6863ed15bfc4c3d80e3f485b4f356acc1b4701b1991e242449"
+    },
+    {
+      "path": "apps/api/src/sqlite-workflow-projection-store.ts",
+      "bytes": 998,
+      "sha256": "4a45e0c11f74453c449fe3661864d3ac9771f4be287449fbe0eed481412e6957"
+    },
+    {
+      "path": "apps/api/test/workflow-projection.test.mjs",
+      "bytes": 11219,
+      "sha256": "2634a203a9ef04c862991dc8885fbcf850a5271f5d82fe179b1b578e481508c5"
+    }
+  ],
+  "changedFiles": [
+    "apps/api/src/workflow-projection.ts",
+    "apps/api/test/workflow-projection.test.mjs"
+  ],
+  "unchangedSourceFiles": 6,
+  "scope": "Only new Phase D API acceptsVendor and its real HTTP test changed. No shared registration, dist, service, client, generator, matrix or prior evidence overwrite.",
+  "failure": {
+    "log": {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/before-fix-http.txt",
+      "bytes": 1426,
+      "sha256": "2480ac9c28b8f82ca459aa06baeb15bfb8bba1280b2883e44531425905714550"
+    },
+    "testExitCode": 1,
+    "requests": 17,
+    "tests": {
+      "passed": 1,
+      "failed": 1
+    },
+    "accept": "application/*;q=0, */*;q=1",
+    "actualStatus": 200,
+    "expectedStatus": 406
+  },
+  "correction": {
+    "precedence": [
+      "exact vendor media",
+      "application/*",
+      "*/*"
+    ],
+    "qZeroIsExplicitRejection": true,
+    "cases": [
+      {
+        "accept": "application/*;q=0, */*;q=1",
+        "status": 406
+      },
+      {
+        "accept": "*/*;q=1, application/*;q=0",
+        "status": 406
+      },
+      {
+        "accept": "application/vnd.relay-qa-hub.v1.1+json;q=1, application/*;q=0, */*;q=0",
+        "status": 200
+      },
+      {
+        "accept": "application/*;q=0.5, */*;q=0",
+        "status": 200
+      }
+    ],
+    "note": "These four added cases extend the existing exact-q0/vendor/json controls. This is a bounded representation-selection fix, not a claim of every RFC negotiation case."
+  },
+  "validation": {
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "actualRandomLoopbackRequests": 24,
+    "statuses": [
+      200,
+      200,
+      200,
+      200,
+      401,
+      404,
+      400,
+      400,
+      400,
+      400,
+      400,
+      400,
+      400,
+      400,
+      406,
+      406,
+      406,
+      406,
+      200,
+      200,
+      200,
+      200,
+      500,
+      403
+    ],
+    "log": {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/combined-after.txt",
+      "bytes": 1320,
+      "sha256": "be7785f5ff15c0c6117d1e389d09ffc67b6e1b2ec00426d93d5f9d539669a1b6"
+    },
+    "exitCode": 0,
+    "checks": [
+      {
+        "name": "storage-noemit",
+        "exitCode": 0,
+        "log": {
+          "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/storage-noemit.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "api-noemit",
+        "exitCode": 0,
+        "log": {
+          "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/api-noemit.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "lint",
+        "exitCode": 0,
+        "log": {
+          "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/lint.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "name": "format",
+        "exitCode": 0,
+        "log": {
+          "path": "docs/evidence/project-components/workflow-projection-phase-d/r2/format.txt",
+          "bytes": 68,
+          "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+        }
+      }
+    ]
+  },
+  "limits": [
+    "No live4419/4421, client, production, external executor or package/build/deploy operation. Only random loopback and retained temporary SQLite fixtures.",
+    "No whole baseline or full product completion claim. Root owns registry17, worker transaction plumbing, exports, app/main registration and later actual deployment.",
+    "Frozen manifest missing400 enum remains unchanged; invalid query/cursor actually returns400.",
+    "Historical environment.testSessionId remains the allowed opaque UUID field; no nonexistent server test-session relationship is invented.",
+    "New GET has vendor representation only. It does not replace human-workflow or claim legacy request support."
+  ],
+  "migration": {
+    "proposedVersion": 17,
+    "earlierProposal": 16,
+    "reason": "Root Phase B owns schema16; old proposal is retained as history.",
+    "testBaseSchema": 15,
+    "payloadAppliedInIsolatedTransaction": true,
+    "migrationRegistryNotChanged": true,
+    "actual16To17MigrationTested": false
+  }
+}

@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T03:25:31.516Z",
+  "repositoryHeadAtFinalReview": "12d8bb660b0c21a10f0dfe046105272f5f9dc911",
+  "status": "passed_isolated_source_contract_tests_registration_pending",
+  "sourceFiles": [
+    {
+      "path": "packages/storage/src/workflow-projection-types.ts",
+      "bytes": 2096,
+      "sha256": "9cd95f16a874af90d58957f1c933b67758f08f4fed8c89f781bbba5b2a9571eb"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-cursor.ts",
+      "bytes": 1935,
+      "sha256": "8b3d6fc86108c54d83228f354ed208b37c040d1ba7e917cf2875f2469f6a47db"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-migration.ts",
+      "bytes": 2899,
+      "sha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-store.ts",
+      "bytes": 22115,
+      "sha256": "96c965ac0ea0074125407e9d6c90a78a2775599e3fd69d095b90e47b57bad4d1"
+    },
+    {
+      "path": "packages/storage/test/workflow-projection.test.ts",
+      "bytes": 18450,
+      "sha256": "a2b9fc12326b88b08aeb8a52a79efea5369ce6eaf8b098e5764509cfd194ad02"
+    },
+    {
+      "path": "apps/api/src/workflow-projection.ts",
+      "bytes": 4157,
+      "sha256": "8caa1b44167b2ba8679215ab20cc4ce527d889dc5a7276b5354ca22a983d2535"
+    },
+    {
+      "path": "apps/api/src/sqlite-workflow-projection-store.ts",
+      "bytes": 998,
+      "sha256": "4a45e0c11f74453c449fe3661864d3ac9771f4be287449fbe0eed481412e6957"
+    },
+    {
+      "path": "apps/api/test/workflow-projection.test.mjs",
+      "bytes": 11025,
+      "sha256": "111f3e09dfa4b81e54a949296cc87a6a1b66c422fb7cb98c4a5356bc5a360631"
+    }
+  ],
+  "dependenciesAtFinalReview": [
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 327299,
+      "sha256": "938ae0ca3caa153733fda214dd1093a57dab5828b0336f4e4060176d657c2d88"
+    },
+    {
+      "path": "packages/storage/src/mobile-relay-store.ts",
+      "bytes": 163772,
+      "sha256": "7f50938a6342d1abe9a28c12c9a499d7fa0264461185e9e31b54bcfbf6e56e36"
+    },
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "bytes": 47596,
+      "sha256": "a65b92ad3d47a7b135b76533673f4e3f77d671a8a3e7e47f3d3ebe1f7aa15c85"
+    },
+    {
+      "path": "packages/storage/src/workflow-idempotency.ts",
+      "bytes": 5943,
+      "sha256": "d748ab0cb1133c4e2e0b963992f37d5169a3b78e92b086d097bbf60c1cedd5e0"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/schemas/app-first.schema.json",
+      "bytes": 112420,
+      "sha256": "86c8737d9a73fda8e819da142554e3103889e35cd3226cd88b868f91c1287f08"
+    },
+    {
+      "path": "packages/contracts/schemas/workflow.schema.json",
+      "bytes": 9486,
+      "sha256": "f62bec868db74155fdc741a161f42805162aa3dc4cc6c6af557ade0522eecbe3"
+    },
+    {
+      "path": "packages/contracts/schemas/build.schema.json",
+      "bytes": 6453,
+      "sha256": "258abd2595ea6ab9c62f92e7191e16814eca7919b2ffe35e0734695af9595383"
+    }
+  ],
+  "commands": [
+    {
+      "command": "node --import tsx --test packages/storage/test/workflow-projection.test.ts apps/api/test/workflow-projection.test.mjs",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/combined-final.txt",
+        "bytes": 1305,
+        "sha256": "cacface5c91db8ecf5e5a85853aacb7a15442da135590004bdc61785d78e6c09"
+      }
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit -p packages/storage/tsconfig.test.json",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-noemit-final.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit -p apps/api/tsconfig.json",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/api-noemit-final.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "node node_modules/eslint/bin/eslint.js (exact eight files in sourceFiles)",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/lint-final.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "node node_modules/prettier/bin/prettier.cjs --check (exact eight files in sourceFiles)",
+      "exitCode": 0,
+      "log": {
+        "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/format-final.txt",
+        "bytes": 68,
+        "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+      }
+    }
+  ],
+  "validation": {
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "loopbackRequests": 20,
+    "loopbackStatuses": [
+      200,
+      200,
+      200,
+      200,
+      401,
+      404,
+      400,
+      400,
+      400,
+      400,
+      400,
+      400,
+      400,
+      400,
+      406,
+      406,
+      200,
+      200,
+      500,
+      403
+    ],
+    "actualAuth": "Real BrowserAuth session storage and ProjectRequestContext with direct real SQLite worker port; no production worker registration",
+    "fiveCollections": {
+      "occurrences": 101,
+      "repairAttempts": 7,
+      "verifications": 3,
+      "builds": 3,
+      "relayReceipts": 3
+    },
+    "schemas": "Every page of the five nonempty groups validated against frozen workflowProjection 1.1.0 referencing frozen workflow/build schemas",
+    "buildFixture": "Three typed local SQL Builds with normalized manifest rows and typed occurrence references. This is not a Jenkins/Relay execution result.",
+    "relayFixture": "Formal local dispatchMobileRelay persisted queued receipts; no outbox claim/fetch/worker or external Relay executed. Real human completion and failed verification store commands create the historical rows.",
+    "persistence": "Reopened SQLite connection replays same cursor and DTO bytes; planned -> running after snapshot still reads planned snapshot; independent collection watermarks with 1 and 100 limits; completed groups remain empty; terminal cursor null",
+    "guards": [
+      "invalid signature",
+      "cursor >500",
+      "actor/account/project/Bug/filter binding",
+      "a second authorized actor cannot use first actor cursor",
+      "every-page active membership",
+      "revocation and restore invalidates old cursor",
+      "soft deletion rejects retained cursor",
+      "expiry",
+      "active and retained snapshot counts",
+      "per-snapshot and retained byte caps",
+      "rollback after injected third-item failure",
+      "append-only snapshot/header/cursor and sealed item set",
+      "private DB signing key and exception text excluded from HTTP"
+    ],
+    "livePreviewTouched": false,
+    "distWritten": false,
+    "publicRegistryChanged": false
+  },
+  "migration": {
+    "proposedVersion": 17,
+    "earlierProposal": 16,
+    "reason": "Root Phase B owns schema16; old proposal is retained as history.",
+    "testBaseSchema": 15,
+    "payloadAppliedInIsolatedTransaction": true,
+    "migrationRegistryNotChanged": true,
+    "actual16To17MigrationTested": false
+  },
+  "defaults": {
+    "limitPerCollection": 50,
+    "maxLimit": 100,
+    "cursorMaxChars": 500,
+    "ttlMs": 900000,
+    "maxSnapshotItems": 10000,
+    "maxSnapshotBytes": 67108864,
+    "maxActiveSnapshotsPerAccountActor": 64,
+    "maxRetainedSnapshotsPerAccountActor": 1024,
+    "maxRetainedBytesPerAccountActor": 268435456,
+    "expiryBehavior": "reject cursor without deleting snapshot",
+    "capacityBehavior": "RATE_LIMITED without silently dropping history"
+  },
+  "failuresRetained": [
+    {
+      "path": "runs/storage-first.txt",
+      "classification": "fixture setup omitted required busyTimeoutMs; fixed fixture"
+    },
+    {
+      "path": "runs/storage-second.txt",
+      "classification": "fixture wrongly assumed manual completion auto-created verification; added explicit create"
+    },
+    {
+      "path": "runs/storage-third.txt",
+      "classification": "fixture omitted explicit start verification; added start"
+    },
+    {
+      "path": "runs/storage-fourth.txt",
+      "classification": "fixture attempted immutable occurrence update; retained assertion of refusal and used legal planned->running mutation"
+    },
+    {
+      "path": "runs/storage-typecheck-second.txt",
+      "classification": "test inference errors for nullable cursor/query; fixed explicit test types"
+    }
+  ],
+  "boundaries": [
+    "No live4419/4421, client, production, external executor or package/build/deploy operation. Only random loopback and retained temporary SQLite fixtures.",
+    "No whole baseline or full product completion claim. Root owns registry17, worker transaction plumbing, exports, app/main registration and later actual deployment.",
+    "Frozen manifest missing400 enum remains unchanged; invalid query/cursor actually returns400.",
+    "Historical environment.testSessionId remains the allowed opaque UUID field; no nonexistent server test-session relationship is invented.",
+    "New GET has vendor representation only. It does not replace human-workflow or claim legacy request support."
+  ],
+  "logs": [
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/api-first.txt",
+      "bytes": 618,
+      "sha256": "c46fb14b32a751fb4491e611cffd3d8444d626978205c71302d299a56e7d8ae9"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/api-noemit-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/api-typecheck-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/combined-final.txt",
+      "bytes": 1305,
+      "sha256": "cacface5c91db8ecf5e5a85853aacb7a15442da135590004bdc61785d78e6c09"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/combined-first.txt",
+      "bytes": 1303,
+      "sha256": "f3390be10794a2ddab03b97c0914d354f1d84665177a1e06d67122bd48d21d61"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/format-final.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/lint-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/lint-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-contract-sixth.txt",
+      "bytes": 804,
+      "sha256": "5730726794853a5dd061c1e735c8319de9e6466c052d930c0a245336762ee66f"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-fifth.txt",
+      "bytes": 803,
+      "sha256": "d06deeb96c8538a3c0f365b71d01bc5b51d63e4d28ce777b70fbece56b4d3cc6"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-first.txt",
+      "bytes": 4037,
+      "sha256": "ed8747fe0f255210718565660c934133b445a38efa2a56dff525eb0003f7b50c"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-fourth.txt",
+      "bytes": 1697,
+      "sha256": "6e70c0412860855ff325a41da6a7feb917184d8944518df43cb7aa62a413ed4c"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-noemit-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-second.txt",
+      "bytes": 3623,
+      "sha256": "e6d5418966190207a8c7a8a8d0563469b189a2b4fc3ecfb462ab47126a21b309"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-third.txt",
+      "bytes": 4263,
+      "sha256": "7a5d15a3df053bb14c33a7b94d7c6a7d58f440da3147b813931317350d0d64b3"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-typecheck-first.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-typecheck-second.txt",
+      "bytes": 2582,
+      "sha256": "8a7f7f22ae0427a3a420583e579ba37b06df7b6b405126ba25012234e70eaf54"
+    },
+    {
+      "path": "docs/evidence/project-components/workflow-projection-phase-d/runs/storage-typecheck-third.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

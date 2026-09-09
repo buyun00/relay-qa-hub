@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
+import {
+  registerWorkflowProjectionRoutes,
+  type WorkflowProjectionStore,
+} from "./workflow-projection.js";
 
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 
@@ -262,6 +266,7 @@ export interface CreateApiAppOptions {
   readonly mobileBuildStore?: MobileBuildStore;
   readonly mobileDuplicateStore?: MobileDuplicateStore;
   readonly mobileVerificationStore?: MobileVerificationStore;
+  readonly workflowProjectionStore?: WorkflowProjectionStore;
   readonly mobileHumanWorkflowStore?: MobileHumanWorkflowStore;
   readonly mobileCommentStore?: MobileCommentStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
@@ -683,6 +688,12 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
   }
 
+  if (options.workflowProjectionStore) {
+    if (!browserAuth || !options.projectManagementService || !options.projectRequestContext) {
+      throw new Error("Workflow projection requires browser authentication and project context");
+    }
+    registerWorkflowProjectionRoutes(app, options.workflowProjectionStore);
+  }
   app.addHook("preHandler", async (request, reply) => {
     const nativeActorId = readHeader(request.headers[NATIVE_ACTOR_ID_HEADER]);
     if (nativeActorId === undefined) return;

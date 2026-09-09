@@ -1,0 +1,175 @@
+✔ inventories and restores one real referenced attachment (415.8766ms)
+✔ retains a failed marker when an inventoried attachment is missing (174.2966ms)
+✔ rejects a non-canonical storage key before writing a manifest (247.1493ms)
+✔ rejects a restore parent that resolves into the source evidence root (60.7669ms)
+✔ configured names update the exact existing scope once while preserving project identity (206.531ms)
+✔ GM migration changes only membership reads in existing typed audit guards (221.5275ms)
+✔ entry login enrolls only selected project, retains stable identity and employee compatibility (200.489ms)
+✔ disable and restore are project local; login never restores and B session stays usable (218.6627ms)
+✔ project links affect only matching login, directory and historical owner filters (303.8355ms)
+✔ components default disabled, redact configuration, enforce versions and dependency cascade (244.474ms)
+✔ project disable blocks login and reads without deleting history; reactivation uses version CAS (229.5519ms)
+✔ record project guard rejects wrong project while same employee can work in both (222.5015ms)
+✔ Qingyu Bug links survive in the migrated SQLite source of truth (625.9478ms)
+✔ archives a recovery point with its attachment companion and is idempotent (1199.5834ms)
+✔ fails closed on a missing attachment and retains only DB pair plus failed staging (329.0664ms)
+✔ creates a real online backup and manifest without leaking the source path (187.5917ms)
+✔ rejects a damaged backup before restore admission (410.6457ms)
+✔ manual completion takes priority over every Relay status, preserves history and remains verifiable (3859.2984ms)
+✔ verified Relay delivery, human rejection, durable next round and human acceptance preserve history (1603.0065ms)
+✔ new Bug notifications include content and route unassigned versus assigned work (474.4589ms)
+✔ a Bug cannot point at another Bug's active RepairAttempt (509.5973ms)
+✔ BuildRequirement, Verification, and RelayReceipt preserve Attempt-to-Bug identity (507.9673ms)
+✔ Relay service projection is repair-only and cannot author QA Bugs or Verification (394.3263ms)
+✔ external events and Relay receipt revisions preserve principal, handoff, and Build facts (399.1999ms)
+✔ native sessions and active push devices cannot lie about shared installations (321.712ms)
+✔ auth TTLs accept exact frozen maxima and reject one-second overflow or invalid dates (323.6656ms)
+✔ refresh token replacement stays in one family and advances exactly one generation (338.7113ms)
+✔ revoked auth state cannot resurrect and secret replay snapshots are append-only (292.2055ms)
+✔ expired native sessions cannot mint, activate, or consume refresh generations (4180.0478ms)
+✔ submitted capture context is shared with Bug readers while drafts and removed evidence stay private (298.959ms)
+✔ capture completion requires core Poco capabilities and snapshots stay bounded to captureId (269.56ms)
+✔ draft Poco method outcomes and snapshots are immutable append-only facts (225.4302ms)
+✔ Poco enrichment starts effect-free unavailable and advances once to a terminal exact-CAS fact (249.3477ms)
+✔ capture finalization rejects orphan or incomplete qa.snapshot evidence while accepting the exact triple (314.9506ms)
+✔ uploaded capture provenance and its artifact and Poco facts are immutable (201.0572ms)
+✔ attachments match both Blob identity and completed Upload metadata (599.9144ms)
+✔ upload chunks and leases remain immutable through exact completion (2272.1132ms)
+✔ Blob and Attachment evidence is one-way CAS and only exact finalized uploads can bind (210.1904ms)
+✔ attachment claims preserve the unexpired reservation identity and generation (1713.3177ms)
+✔ only ready clean owner attachments bind, and claimed typed evidence is immutable (337.0504ms)
+✔ submission intent targets preserve Bug, actor, and clientSubmission identity (208.1536ms)
+✔ idempotency reservations require complete audited terminal effects and remain immutable (205.2511ms)
+✔ Build lifecycle begins at version one, advances by CAS, and seals terminal facts (187.7125ms)
+✔ required BuildRequirement uses typed audits, manifest commit evidence, and its exact Verification Build (231.8386ms)
+✔ comments accept the frozen 20k contract limit without truncating 15k bodies (169.2414ms)
+✔ Bug tenant, key, and reporter identity stay fixed while allowed content keeps FTS exact (410.5729ms)
+✔ Occurrence environment Build references are generated, project-scoped, and optional (180.2823ms)
+✔ disabled accounts are one-way exact-CAS principals and cannot mint native sessions (151.7879ms)
+✔ disabled users are one-way exact-CAS principals and cannot mint native sessions (154.5722ms)
+✔ revoked device installations are one-way exact-CAS facts and cannot mint native sessions (152.182ms)
+✔ native sessions require an active user and a non-revoked installation (152.2722ms)
+✔ a refresh family cannot extend personal refresh lifetime beyond thirty days (160.8184ms)
+✔ future-issued refresh tokens cannot be inserted (154.9639ms)
+✔ legacy future-issued refresh tokens cannot activate or consume early (171.65ms)
+✔ auth secret replay versions match the committed session and active effect token (170.4111ms)
+✔ generic idempotency rejects native auth operations and recursively nested secrets (158.024ms)
+✔ committed generic idempotency replays the exact immutable typed submission effect (180.7663ms)
+✔ idempotency and upload leases anchor initial TTLs to the server clock (198.2634ms)
+✔ service principals are one-way CAS facts and external events name their exact resources (225.6781ms)
+✔ comments are append-only identity facts and cannot bypass version CAS (180.5541ms)
+✔ upload attempts serialize one current tuple and advance by exactly one after terminal (2258.6388ms)
+✔ capture artifacts transition from pending through exact attachment CAS and then seal (321.1563ms)
+✔ forward v3 rejects typed Build facts from disabled or archived principals (609.8103ms)
+✔ forward v3 accepts the frozen human repair_attempt.delivered BuildRequirement audit (184.5816ms)
+✔ forward v3 rejects the legacy repair.delivered BuildRequirement audit spelling (172.6796ms)
+✔ forward v3 stores a 5000-character decisionReason while its typed Event keeps a bounded truncation (180.2562ms)
+✔ forward v3 stores a 5000-character overrideReason while its typed Event keeps a bounded truncation (182.9035ms)
+✔ forward v3 preserves Windows-path decisions only through redacted typed Events (235.7914ms)
+✔ forward v3 persists redacted cookie and API-key reasons without exposing Event text (238.9187ms)
+✔ forward v3 durably preserves raw RepairAttempt failure truth behind bounded audit text (365.178ms)
+✔ forward v3 preserves a distinct current Verification creator and assigned verifier (288.3562ms)
+✔ forward v3 preserves delivered history and reopens only for a later ranked Build occurrence (650.4148ms)
+✔ forward v3 keeps Build lineage scoped, contiguous, immutable, and occurrence Events singular (234.6032ms)
+✔ forward v3 never reopens a no-Build closure from a later ranked Build occurrence (352.6438ms)
+✔ forward v3 rejects a naked Bug workflow jump without its typed audit Event (164.7996ms)
+✔ forward v3 rejects naked same-state pointers and lifecycle shortcut DML (401.9957ms)
+✔ forward v3 allows only exact vendor supersede and blocked Verification pointer changes (378.7404ms)
+✔ forward v3 rejects duplicate cycles, canonical repoints, and disabled workflow actors (229.381ms)
+✔ forward v3 rejects raw secrets in Event text while accepting explicit redaction (150.1754ms)
+✔ forward v3 enforces the frozen 16-key Event payload boundary for raw DML (133.8105ms)
+✔ forward v3 requires current reporter authority for an occurrence append Event (141.3618ms)
+✔ forward v3 requires developer authority for a RepairAttempt assignee (253.7538ms)
+✔ multi-actor no-code human workflow can be managed by any project member (557.2446ms)
+✔ a project member can complete a delivered code task without making Build a task state (368.8244ms)
+✔ any project member can soft-delete a Bug and hide it from reads (172.5623ms)
+✔ Bug editing claims new images and soft-removes old images without deleting evidence (219.3145ms)
+✔ browser identity ignores time expiry but still honors explicit revocation (529.513ms)
+✔ empty migration is repeatable and enables WAL, foreign keys, and integrity checks (451.6243ms)
+✖ v6 through current schema preserves existing Bugs and adds management, GM authority and result snapshots (560.9035ms)
+✔ v1 to v2 migration creates a backup and backfills full-text search (402.1393ms)
+✔ v2 to v3 adds durable RepairAttempt failure truth without rewriting history (225.1398ms)
+✔ two worker upgraders re-read locked history and apply every pending migration exactly once (1222.7008ms)
+✔ migration checksum drift is rejected before application code can continue (431.9104ms)
+✔ future on-disk schemas and requested downgrades are rejected explicitly (897.2981ms)
+✔ a conflict late in a migration rolls back every object and history change (549.3223ms)
+✔ composite foreign keys reject cross-account and cross-project records (374.8221ms)
+✔ events are append-only at the database boundary (648.6131ms)
+✔ BuildRequirement rejects impossible states and freezes its decision audit (356.8279ms)
+✔ dedicated worker serializes 50 concurrent bug creates into unique project numbers (1256.8781ms)
+✔ an unexpected worker exit is terminal and every later request fails promptly (774.7102ms)
+✔ restores a verified backup into a new fixed database root (444.6881ms)
+✔ rejects an existing restore root without changing it (231.2402ms)
+✔ storage config derives isolated paths without touching the filesystem (3.5627ms)
+✔ storage config rejects relative and source-overlapping data roots (1.2043ms)
+✔ environment parsing requires WAL and validates numeric bounds (1.0306ms)
+✔ health summary fails closed and preserves worst dependency state (1.3577ms)
+✔ explicit user links are reversible and retained as append-only history (231.5601ms)
+✔ disabling removes a duplicate from active membership without deleting its history (238.9166ms)
+✔ canonical owner filters include tasks still assigned to a linked historical ID (296.4595ms)
+✔ schema14 to15 preserves every old table and retains a restorable pre-migration backup (1289.2792ms)
+ℹ retained migration fixture C:\Users\lin0\AppData\Local\Temp\qa-result-migration15-fab5L4
+ℹ 69 old tables identical; SHA256 28cfbf7134dbc23cc520e386884b4f07e0e50aa4a24b5ccb5c876ea31679881c; original Bug 644f2f89-fa02-4ef9-81db-6fac7e15016a
+✔ transitionMobileBugReady: two workers replay one effect, reject changed payload and persist the original DTO (3317.5807ms)
+✔ createMobileManualRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (2329.0115ms)
+✔ startMobileRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (2224.9286ms)
+✔ deliverMobileRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (1866.2832ms)
+✔ createMobileVerification: two workers replay one effect, reject changed payload and persist the original DTO (1366.6866ms)
+✔ startMobileVerification: two workers replay one effect, reject changed payload and persist the original DTO (1262.4024ms)
+✔ receipt replay rechecks actor/project visibility, membership revocation, GM scope and soft deletion (757.2905ms)
+✔ a failure after effect writes rolls back domain, audit, notification and reserved receipt together (552.8923ms)
+✔ registered worker freezes pages across reopen and binds GM authority to each message (2966.2842ms)
+ℹ retained isolated worker fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-worker-HtG4KH
+ℹ schema17 real worker: reopen, concurrent GM/member scope, rollback, revocation, restoration and soft deletion verified; auth rows and GM membership remain zero
+﹣ retained Phase B schema16 archive migrates only its new copy to17 with all prior tables unchanged (1.3459ms) # SKIP
+✔ five typed workflow groups: independent cursors, immutable old DTOs, exact final page and reopened DB (2670.943ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-8y8hg0
+✔ cursor authentication binds actor/account/project/Bug/filter; revocation, restoration and soft deletion revalidate (1920.0332ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-C7vOFF
+✔ expiry and capacity reject explicitly, rollback leaves no partial snapshots, retained rows are immutable (1549.3579ms)
+ℹ retained isolated SQLite fixture: C:\Users\lin0\AppData\Local\Temp\qa-workflow-projection-WjxEGl
+ℹ tests 123
+ℹ suites 0
+ℹ pass 121
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 35175.8821
+
+✖ failing tests:
+
+test at packages\storage\test\sqlite-migrations.test.ts:54:1544
+✖ v6 through current schema preserves existing Bugs and adds management, GM authority and result snapshots (560.9035ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      8,
+      9,
+      10,
+      11,
+  ...
+      16,
+  +   17
+    ]
+  
+      at <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\sqlite-migrations.test.ts:534:12)
+      at async withDatabase (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\sqlite-migrations.test.ts:61:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\sqlite-migrations.test.ts:516:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [
+       8,  9, 10, 11, 12,
+      13, 14, 15, 16, 17
+    ],
+    expected: [
+       8,  9, 10, 11, 12,
+      13, 14, 15, 16
+    ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

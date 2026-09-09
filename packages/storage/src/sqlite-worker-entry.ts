@@ -1,4 +1,6 @@
 import { parentPort, workerData } from "node:worker_threads";
+import { getBugWorkflowProjection } from "./workflow-projection-store.js";
+import type { GetBugWorkflowProjectionInput } from "./workflow-projection-types.js";
 import {
   getRepairAttemptDetail,
   type GetRepairAttemptDetailInput,
@@ -215,6 +217,7 @@ interface WorkerRequest {
     | "listMobileProjectModules"
     | "getLatestMobileHumanWorkflow"
     | "getMobileHumanWorkflowForBug"
+    | "getBugWorkflowProjection"
     | "createMobileComment"
     | "listMobileBugEvents"
     | "listMobileDuplicateCandidates"
@@ -320,6 +323,11 @@ function inWriteTransaction<T>(work: (current: DatabaseSync) => T): T {
 }
 
 async function execute(request: WorkerRequest): Promise<unknown> {
+  if (request.operation === "getBugWorkflowProjection") {
+    return inWriteTransaction((current) =>
+      getBugWorkflowProjection(current, request.payload as GetBugWorkflowProjectionInput),
+    );
+  }
   if (isImportExecutionHeld(configuration.executionHoldFile)) {
     if (request.operation === "claimMobileRelayOutbox") return null;
     if (

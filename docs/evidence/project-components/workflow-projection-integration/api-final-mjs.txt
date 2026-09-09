@@ -1,0 +1,320 @@
+✔ real HTTP stable distribution remains anonymous with actual browser auth and project context (2435.9219ms)
+✔ real HTTP preview distribution remains anonymous with actual browser auth and project context (1615.8341ms)
+✔ Android channel parsing keeps stable default and rejects arbitrary channels (397.1569ms)
+✔ real HTTP stable default accepts legacy schema1 without channel and exposes no preview alias (566.3711ms)
+✔ real HTTP explicit preview serves exact metadata/APK bytes, HEAD, ranges and conditional reads (751.682ms)
+✔ real HTTP preview refuses wrong channel/package or malformed manifest without changing stable compatibility (1207.367ms)
+✔ real HTTP preview rejects traversal/unpublished filenames and reports missing feed without fallback (201.4625ms)
+✔ Bug update accepts a complete attachment set and rejects ambiguous image edits (4.4521ms)
+✔ backend account-name normalization is stable and preserves the display spelling (0.8979ms)
+✔ unique Chinese pinyin login preserves an existing exact account identity (156.0889ms)
+✔ project people directory preserves distinct stable IDs until explicitly linked (104.8564ms)
+✔ explicit identity links override spelling and expose old IDs for historical labels (0.7867ms)
+✔ user management routes preserve the explicit source and canonical IDs (635.9633ms)
+✔ backend people seed accepts only schema 4 without client-side aliases (65.3799ms)
+✔ checked-in backend people seed contains the default QA team (2.9676ms)
+✔ new Web and Android name login creates backend accounts and rejects the legacy pinyin body field (198.4355ms)
+✔ Bug overview query supports unassigned ownership and a 500-row window (1.0375ms)
+✔ capture metadata records positive Android API values without an admission floor (3.8843ms)
+✔ GET /api/v1/health/live returns the frozen liveness shape (155.2342ms)
+✔ android update feed serves uncached metadata and immutable APK ranges (212.4618ms)
+✔ human workflow routes preserve no-code and failed Verification contracts (45.9311ms)
+✔ Verification routes hide raw SQLite failures behind a retryable storage error (27.5631ms)
+✔ Android createBug persists an exact receipt, supports GET, and rejects a wrong token (35.0971ms)
+✔ Android attachment upload follows the frozen init, chunk, finalize, bind wire (76.3155ms)
+✔ server defaults to loopback and supports graceful stop plus restart (205.5373ms)
+✔ rejects ambiguous build provenance (0.5702ms)
+✔ normalizes an explicit set of exact browser origins (1.2146ms)
+✔ manual completion route binds the authenticated human, exact version and idempotency key (46.7043ms)
+▶ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation
+  ✔ secondary artifact fallback preserves exact bytes for another reader of the bound Bug (832.8206ms)
+  ✔ wrong Bug, project, membership, resource URI and nested capture project cannot expose evidence (746.9466ms)
+  ✔ only validated clean content is exposed; disk and transport checksum failures are rejected (717.4317ms)
+  ✔ soft deletion denies capture metadata and raw artifacts while preserving stored evidence (216.161ms)
+✔ MCP capture artifacts use real HTTP, SQLite bindings, content validation and project isolation (5982.6433ms)
+✔ actual MCP HTTP and SQLite: attachment upload, resource read, project isolation and API parity (3335.9299ms)
+✔ actual HTTP and SQLite paginate 501 comments and 101 bound attachments without scope or content loss (18248.3988ms)
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (1178.211ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (232.1816ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (198.7738ms)
+✔ actual MCP HTTP reports protocol errors separately and retains 90 tools plus the frozen result tool (257.664ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (313.984ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (19.6075ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (1347.0047ms)
+✔ actual worker MCP passed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (3867.01ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-YDxIj4; 18 real HTTP requests; schema 17
+✔ actual worker MCP failed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (2254.7528ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-YK5SgA; 18 real HTTP requests; schema 17
+✔ actual worker MCP blocked: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (2016.2592ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-KdEwGJ; 23 real HTTP requests; schema 17
+✔ MCP result catalog is additive, explicit and vendor-only; invalid scope/key/body never writes (1453.1036ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-GaBxSp; 29 real HTTP requests; schema 17
+✔ MCP result enforces current assigned verifier, Cookie CSRF, revocation and deletion on first write and replay (2464.3504ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-JflLtm; 21 real HTTP requests; schema 17
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-IgSZ3g; 13 real HTTP requests; schema 17
+✔ ordinary MCP human closure retains employee permissions and does not reinterpret blocked as an old action (951.4717ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-cMGFTQ; 15 real HTTP requests; schema 17
+✔ archive failure preserves local backups, startup and the next backup attempt (2303.533ms)
+✔ blocking archive work runs outside the API event loop (342.8899ms)
+✔ the production archive worker preserves the complete recovery-point contract (1530.5152ms)
+✔ keeps two newest and only the current 09:00 Shanghai anchor (3.3528ms)
+✔ schedules 09:00 precisely and catches a boundary crossed during a backup (0.3806ms)
+✔ retention configuration requires both archive and cadence (1.2102ms)
+✔ deletes whole obsolete groups on both volumes, audits, and is idempotent (7314.4271ms)
+✔ corrupt retained archive prevents every deletion, including local backups (2557.447ms)
+✔ a live cleanup lock refuses overlap and a dead owner's lock is recovered (2445.5024ms)
+✔ a junction inside an obsolete attachment group is preserved and never traversed for deletion (2308.3099ms)
+✔ production worker applies retention and reports cleanup failures without losing backup success (2951.7046ms)
+✔ ready alone does not dispatch; successful listen starts once and shutdown waits for real in-flight work before worker close (1821.7059ms)
+✔ a real occupied port never starts the queued runtime and closes it exactly once (1063.1199ms)
+✔ stop during pending startup never starts or double-closes the runtime (814.3507ms)
+✔ stop rejects new HTTP work and keeps the component database open until an in-flight route finishes (719.7718ms)
+✔ the real import hold blocks a previously queued enabled component after API startup (1446.7457ms)
+✔ default disabled components perform no external requests in a running API (772.8166ms)
+✔ synchronous application construction failure still closes the constructed runtime before the worker (782.7194ms)
+✔ component startup failure after bind closes the listener and runtime without duplicate close (733.7956ms)
+✔ component cleanup errors do not skip HTTP or worker cleanup (667.5749ms)
+✔ frozen response schemas reject every nonempty rich DTO extension (106.5811ms)
+✔ createRepairAttempt: default returns its frozen wire response without modifying history (368.6147ms)
+✔ createRepairAttempt: wildcard keeps current default returns its frozen wire response without modifying history (87.2924ms)
+✔ createRepairAttempt: explicit vendor returns its frozen wire response without modifying history (112.4767ms)
+✔ createRepairAttempt: legacy JSON returns its frozen wire response without modifying history (65.1324ms)
+✔ createRepairAttempt: vendor preferred over JSON returns its frozen wire response without modifying history (46.4509ms)
+✔ createRepairAttempt: JSON has higher quality returns its frozen wire response without modifying history (56.2622ms)
+✔ createRepairAttempt: equal quality puts JSON first returns its frozen wire response without modifying history (67.7672ms)
+✔ createRepairAttempt: equal quality puts vendor first returns its frozen wire response without modifying history (55.1838ms)
+✔ startRepairAttempt: default returns its frozen wire response without modifying history (41.4014ms)
+✔ startRepairAttempt: wildcard keeps current default returns its frozen wire response without modifying history (45.5744ms)
+✔ startRepairAttempt: explicit vendor returns its frozen wire response without modifying history (51.5578ms)
+✔ startRepairAttempt: legacy JSON returns its frozen wire response without modifying history (64.8836ms)
+✔ startRepairAttempt: vendor preferred over JSON returns its frozen wire response without modifying history (69.9849ms)
+✔ startRepairAttempt: JSON has higher quality returns its frozen wire response without modifying history (46.8835ms)
+✔ startRepairAttempt: equal quality puts JSON first returns its frozen wire response without modifying history (51.3301ms)
+✔ startRepairAttempt: equal quality puts vendor first returns its frozen wire response without modifying history (48.2206ms)
+✔ deliverRepairAttempt: default returns its frozen wire response without modifying history (34.7469ms)
+✔ deliverRepairAttempt: wildcard keeps current default returns its frozen wire response without modifying history (55.3867ms)
+✔ deliverRepairAttempt: explicit vendor returns its frozen wire response without modifying history (56.2199ms)
+✔ deliverRepairAttempt: legacy JSON returns its frozen wire response without modifying history (66.7709ms)
+✔ deliverRepairAttempt: vendor preferred over JSON returns its frozen wire response without modifying history (63.4834ms)
+✔ deliverRepairAttempt: JSON has higher quality returns its frozen wire response without modifying history (35.8177ms)
+✔ deliverRepairAttempt: equal quality puts JSON first returns its frozen wire response without modifying history (55.7009ms)
+✔ deliverRepairAttempt: equal quality puts vendor first returns its frozen wire response without modifying history (59.3303ms)
+✔ createVerification: default returns its frozen wire response without modifying history (45.357ms)
+✔ createVerification: wildcard keeps current default returns its frozen wire response without modifying history (49.0115ms)
+✔ createVerification: explicit vendor returns its frozen wire response without modifying history (41.5233ms)
+✔ createVerification: legacy JSON returns its frozen wire response without modifying history (48.6167ms)
+✔ createVerification: vendor preferred over JSON returns its frozen wire response without modifying history (43.8926ms)
+✔ createVerification: JSON has higher quality returns its frozen wire response without modifying history (36.172ms)
+✔ createVerification: equal quality puts JSON first returns its frozen wire response without modifying history (47.4187ms)
+✔ createVerification: equal quality puts vendor first returns its frozen wire response without modifying history (40.884ms)
+✔ startVerification: default returns its frozen wire response without modifying history (34.8617ms)
+✔ startVerification: wildcard keeps current default returns its frozen wire response without modifying history (51.4005ms)
+✔ startVerification: explicit vendor returns its frozen wire response without modifying history (54.2725ms)
+✔ startVerification: legacy JSON returns its frozen wire response without modifying history (39.3892ms)
+✔ startVerification: vendor preferred over JSON returns its frozen wire response without modifying history (46.9697ms)
+✔ startVerification: JSON has higher quality returns its frozen wire response without modifying history (42.2186ms)
+✔ startVerification: equal quality puts JSON first returns its frozen wire response without modifying history (37.6186ms)
+✔ startVerification: equal quality puts vendor first returns its frozen wire response without modifying history (33.4268ms)
+✔ recordVerificationResult: default returns its frozen wire response without modifying history (61.8447ms)
+✔ recordVerificationResult: wildcard keeps current default returns its frozen wire response without modifying history (33.6564ms)
+✔ recordVerificationResult: explicit vendor returns its frozen wire response without modifying history (40.7977ms)
+✔ recordVerificationResult: legacy JSON returns its frozen wire response without modifying history (56.6284ms)
+✔ recordVerificationResult: vendor preferred over JSON returns its frozen wire response without modifying history (37.4323ms)
+✔ recordVerificationResult: JSON has higher quality returns its frozen wire response without modifying history (24.5749ms)
+✔ recordVerificationResult: equal quality puts JSON first returns its frozen wire response without modifying history (32.306ms)
+✔ recordVerificationResult: equal quality puts vendor first returns its frozen wire response without modifying history (33.1056ms)
+✔ RepairAttempt detail keeps complete rich facts on its unfrozen GET (19.991ms)
+✔ Verification detail keeps complete rich facts on its unfrozen GET (19.7413ms)
+✔ Bug human-workflow history keeps complete rich facts on its unfrozen GET (18.0172ms)
+✔ submission is durable, idempotent, actor-bound and does not launch in the request (188.7321ms)
+✔ iOS source configuration survives queue restart and cannot use the Android build button (84.8086ms)
+✔ all users see existing upload progress and diagnostics without sharing account configuration (114.4377ms)
+✔ shared build records retain creator, queue and handoff across restart without exposing account binding (161.8905ms)
+✔ global queue serializes workers across users; confirmation reserves the channel (218.463ms)
+✔ unfinished failed task blocks its channel but not other products (102.0894ms)
+✔ restart retains active and failed checkpoints without replaying writes (141.0157ms)
+✔ a second API instance cannot claim the scheduler while the owner lives (147.4453ms)
+✔ lost dispatch acknowledgement reconciles the new run receipt (136.9948ms)
+✔ failed preflight retries the same queued identity and original input (106.7749ms)
+✔ queued tasks can be cancelled; started work and another user's tasks cannot (95.405ms)
+✔ account replacement cannot retarget queued uploads (53.2809ms)
+✔ combined build is queued without HTTP waiting and server restart does not resubmit (106.1756ms)
+{"level":30,"time":1788925660195,"pid":3908,"hostname":"win11-lin-main","reqId":"req-1","req":{"method":"GET","url":"/api/v1/increment-upload","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788925660204,"pid":3908,"hostname":"win11-lin-main","reqId":"req-1","res":{"statusCode":401},"responseTime":8.48869999999988,"msg":"request completed"}
+{"level":30,"time":1788925660207,"pid":3908,"hostname":"win11-lin-main","reqId":"req-2","req":{"method":"POST","url":"/api/v1/increment-upload/jobs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788925660240,"pid":3908,"hostname":"win11-lin-main","reqId":"req-2","res":{"statusCode":200},"responseTime":32.89690000000019,"msg":"request completed"}
+{"level":30,"time":1788925660240,"pid":3908,"hostname":"win11-lin-main","reqId":"req-3","req":{"method":"GET","url":"/api/v1/increment-upload/jobs/81fbcd22-bb5e-4cba-a600-4d903b204527/logs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788925660241,"pid":3908,"hostname":"win11-lin-main","reqId":"req-3","res":{"statusCode":200},"responseTime":0.8982999999998356,"msg":"request completed"}
+{"level":30,"time":1788925660242,"pid":3908,"hostname":"win11-lin-main","reqId":"req-4","req":{"method":"GET","url":"/api/v1/increment-upload","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788925660243,"pid":3908,"hostname":"win11-lin-main","reqId":"req-4","res":{"statusCode":200},"responseTime":0.9607999999998356,"msg":"request completed"}
+{"level":30,"time":1788925660244,"pid":3908,"hostname":"win11-lin-main","reqId":"req-5","req":{"method":"GET","url":"/api/v1/increment-upload/jobs/81fbcd22-bb5e-4cba-a600-4d903b204527/logs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788925660245,"pid":3908,"hostname":"win11-lin-main","reqId":"req-5","res":{"statusCode":200},"responseTime":0.7916000000000167,"msg":"request completed"}
+{"level":30,"time":1788925660245,"pid":3908,"hostname":"win11-lin-main","reqId":"req-6","req":{"method":"GET","url":"/api/v1/increment-upload/jobs/81fbcd22-bb5e-4cba-a600-4d903b204527/logs","host":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1788925660245,"pid":3908,"hostname":"win11-lin-main","reqId":"req-6","res":{"statusCode":401},"responseTime":0.26099999999996726,"msg":"request completed"}
+✔ authenticated API exposes queue and diagnostics without local bridge or credentials (498.7512ms)
+✔ lost launch acknowledgement still reserves the actual worker's channel (104.2451ms)
+✔ completed build hands off to upload before the next queued build can overwrite its ZIP (203.2917ms)
+✔ new submissions are accepted while server build polling is waiting on Jenkins (164.6733ms)
+✔ cancelling a queued recovery preserves the original failed task and its channel reservation (163.6396ms)
+✔ disabled queued work stays paused after re-enable until its owner explicitly resumes (150.5549ms)
+✔ disabling preserves a started build's source handoff while pausing the next build (206.3813ms)
+✔ the three presets match Jenkins UI and leave all unrelated defaults unset (101.7603ms)
+✔ expired crumb/session reauthenticates once, then submits with the new cookie (3.2524ms)
+✔ concurrent duplicate submissions reuse the receipt; conflicting reuse is rejected (3.601ms)
+✔ ambiguous timeout never automatically repeats a possibly accepted build (2.6494ms)
+✔ ambiguous server-error never automatically repeats a possibly accepted build (2.1339ms)
+✔ ambiguous redirect-login never automatically repeats a possibly accepted build (1.49ms)
+✔ disabled or changed jobs cannot silently launch the wrong build (1.6642ms)
+✔ status uses actual directories, scopes queue to this job and coalesces polling (9.318ms)
+✔ Jenkins outage does not hide available APK/IPA/ZIP files (1.6695ms)
+✔ download list rejects directories, traversal and empty files; classifies names independently (0.796ms)
+✔ routes require QA Hub authentication, validate preset and reject additional settings (640.915ms)
+✔ a started Jenkins run blocked by the shared build lock is queued without preparation alarms (6.7626ms)
+✔ recorded lock wait is subtracted from preparation and execution history, not raw build time (1.4883ms)
+✔ untimed lock wait has a lower bound and preparation timing starts after acquisition (0.8689ms)
+✔ cancellation while waiting and non-whitelisted log content do not pretend to execute preparation (0.5929ms)
+✔ positive stage evidence ends the queue display even when the acquisition marker is absent (0.4079ms)
+✔ timestamped stages carry actual boundaries, worker work and a separate Gradle timer (0.4779ms)
+✔ legacy logs retain stage order without inventing stage durations or exposing console secrets (0.4802ms)
+✔ resource-only history skips APK and ZIP, failures stop at the observed stage (1.5967ms)
+✔ matching successful stage history sets robust alarms; failures and other modes cannot skew it (1.1084ms)
+✔ untimed running stages use lower-bound observation and initial alarms, never become samples (0.6594ms)
+✔ monitor follows the precise queue executable, handles canceled/expired queues and tolerates log loss (56.3903ms)
+✔ missing explicit config fails before startup (2.3622ms)
+✔ preview overrides discard inherited production connections and secrets (132.167ms)
+✔ production ports, shared cookie, shared update channel and escaping roots fail (146.9952ms)
+✔ nested junction cannot redirect database or evidence to another directory (30.0395ms)
+✔ overlapping data and backup paths are rejected (36.6638ms)
+✔ actual HTTP and SQLite authorize the 101st Relay member/project and recheck revocation, GM and disabled scope (4852.9678ms)
+✔ project component pauses queued work without reenable replay and retains local history (664.6564ms)
+✔ eight bugs keep independent results, resume failed steps, and never resubmit successes (1889.8995ms)
+✔ lost creation response replays the durable request after restart without duplicate task (325.0444ms)
+✔ existing linked task is reused and continuation follows its original QA receipt (176.7611ms)
+✔ project authorization and attachment integrity are checked before submission (111.0075ms)
+✔ HTTP routes require authentication and a merge confirmation before any mutation (200.325ms)
+✔ project build queue pauses without replay; running task retains original version and verified artifact (1231.8035ms)
+✔ missing or escaping project configuration refuses execution before network (721.9965ms)
+✔ import execution hold prevents submission, retry and polling while local history remains readable (1313.2176ms)
+✔ Relay actions retain the task's original component endpoint after configuration changes (1096.057ms)
+✔ build-upload enqueue returns the persisted queued chain and performs no external execution (906.8599ms)
+✔ component HTTP routes preserve JSON string receipts and accept batch and outbox identifiers (329.0795ms)
+✔ iOS project source keeps its directory separator for scoped listing and ZIP resolution (771.7655ms)
+✔ real HTTP project name login, protected GM identity, scoped membership and isolated cookie (1756.1162ms)
+✔ actual API isolates concurrent users, explicit project headers and record-derived project context (2521.5665ms)
+✔ real SQLite Relay claims isolate projects, versions and legacy lanes; disabled queue needs explicit audited resume (2288.09ms)
+✔ worker import hold and transport second gate stop queued work without HTTP while history remains available (1069.9472ms)
+✔ project Qingyu component rejects polling/import when disabled and excludes other external projects (71.9477ms)
+✔ QingyuClient uses Relay-proven QR, own-defect, detail, and resolve protocols (58.2095ms)
+▶ QingyuClient recognizes already-completed tasks without requesting another transition
+  ✔ {"key":"RESOLVED","name":"已解决"} (1.4548ms)
+  ✔ {"key":"CLOSED","name":"已关闭"} (0.7905ms)
+  ✔ {"key":"COMPLETED","name":"已完成"} (0.7367ms)
+  ✔ "已完成" (0.8852ms)
+  ✔ "done" (0.5389ms)
+✔ QingyuClient recognizes already-completed tasks without requesting another transition (6.5329ms)
+✔ QingyuClient does not label a cancelled upstream task as successfully resolved (1.0779ms)
+✔ QingyuClient does not invent missing defect details (1.0324ms)
+▶ Qingyu integration persists encrypted sessions, imports idempotently, and resolves linked Bug
+  ✔ expired session persists sync failure without claiming upstream completion (36.4391ms)
+  ✔ missing session is recorded as a failed sync and remains retryable (146.3329ms)
+✔ Qingyu integration persists encrypted sessions, imports idempotently, and resolves linked Bug (347.6355ms)
+▶ human acceptance commits locally before best-effort Qingyu synchronization
+  ✔ successful or unlinked sync still returns a closed QA Hub Bug (98.3962ms)
+  ✔ not logged in still returns a closed QA Hub Bug (2.7389ms)
+  ✔ expired login still returns a closed QA Hub Bug (2.2637ms)
+  ✔ completed upstream has no transition still returns a closed QA Hub Bug (5.9173ms)
+  ✔ upstream did not confirm resolution still returns a closed QA Hub Bug (2.5051ms)
+  ✔ timeout still returns a closed QA Hub Bug (2.1797ms)
+  ✔ offline still returns a closed QA Hub Bug (1.8852ms)
+  ✔ unexpected adapter failure still returns a closed QA Hub Bug (1.8934ms)
+  ✔ acceptance replay does not repeat upstream synchronization (2.8831ms)
+  ✔ failed verification does not close or synchronize upstream (2.757ms)
+  ✔ local VERSION_CONFLICT prevents upstream synchronization (2.6639ms)
+  ✔ local FORBIDDEN prevents upstream synchronization (1.7311ms)
+  ✔ local INVALID_TRANSITION prevents upstream synchronization (2.2527ms)
+  ✔ local SQLITE_BUSY prevents upstream synchronization (1.7004ms)
+✔ human acceptance commits locally before best-effort Qingyu synchronization (404.0953ms)
+✔ explicit Qingyu resolve API reuses the verified linked-Bug synchronization (43.6688ms)
+✔ durable Relay transport carries prior handoff and human acceptance, and retries a transient failure (282.1583ms)
+✔ Bug creation replays one concurrent submission and reports changed payload as a public conflict (1710.9625ms)
+✔ SQLite human lifecycle preserves delivery/rejection facts while frozen responses and replay omit them (1353.2243ms)
+✔ historical GET reads all persisted modes without widening action permissions and hides forbidden/deleted Bugs (1203.9849ms)
+✖ real server supervisor records the worker result after the API closes (12181.0917ms)
+✔ real HTTP vendor passed preserves the exact original receipt after later Bug edits (2942.4479ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-VgZyDH; 16 real HTTP requests
+✔ real HTTP vendor failed preserves the exact original receipt after later Bug edits (1532.7736ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-e7Hpo1; 16 real HTTP requests
+✔ real HTTP legacy passed preserves the exact original receipt after later Bug edits (1132.6462ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-JzxhOj; 15 real HTTP requests
+✔ real HTTP legacy failed preserves the exact original receipt after later Bug edits (1521.1945ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-hYpfVP; 15 real HTTP requests
+✔ legacy Accept q-values and malformed bodies reject before any domain write (1080.2779ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-Cl9bM6; 25 real HTTP requests
+✔ Cookie CSRF, assigned verifier, target version and cross-project guards precede writes (1013.7488ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-uHWoBg; 22 real HTTP requests
+✔ same vendor key concurrent calls commit once; deleted targets refuse receipt reads (939.5292ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-amBkDL; 17 real HTTP requests
+✔ legal long Unicode/control text exceeds generic 64KiB while exact immutable replay and recovery remain valid (1248.0938ms)
+ℹ immutable result bytes=106665; online backup restored without re-execution
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-RWH7lB; 12 real HTTP requests
+✔ manual takeover preserves actual non-null parentAttemptId in frozen result and original replay (1090.1152ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-Z6w2AO; 14 real HTTP requests
+(node:5880) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ fixed pre-Phase-A writer leaves IDs-only history intact; new replay refuses to reconstruct it (765.5855ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-v1kKRS; 13 real HTTP requests
+✔ snapshot/pointer exact shape, types, scope and digest cannot be replaced; rejected transactions leave all facts intact (863.4373ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-OOPH0T; 10 real HTTP requests
+✔ vendor result final receipt failure rolls back domain, event, notification, snapshot and submission atomically (560.9062ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-tavzcZ; 12 real HTTP requests
+✔ legacy result final receipt failure rolls back domain, event, notification, snapshot and submission atomically (628.817ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-99BmpA; 12 real HTTP requests
+✔ ordinary multi-employee closure remains allowed while the frozen result requires its assigned verifier, including replay (587.3844ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-a-a4kuxX; 16 real HTTP requests
+✔ blocked vendor retains the delivered Attempt and original receipt across another complete Verification (2974.5457ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-WG9ZWc; 20 real HTTP requests
+✔ blocked vendor reason guards and current authorization leave all transaction facts unchanged (1555.0654ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-iWR5bq; 25 real HTTP requests
+✔ blocked legacy retains the delivered Attempt and original receipt across another complete Verification (1815.0419ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-wX9kPb; 20 real HTTP requests
+✔ blocked legacy reason guards and current authorization leave all transaction facts unchanged (1108.7664ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-qOBVST; 25 real HTTP requests
+✔ blocked result full UTF-16 limits preserve original text while escaping audit payload safely (907.8876ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-NlI8bD; 12 real HTTP requests
+✔ blocked receipt failure rolls back Verification, Bug pointers, Event, outbox and snapshot atomically (1005.3574ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-phase-b-Yan4Q8; 12 real HTTP requests
+✔ createApiApp requires authenticated project wiring for the new workflow endpoint (118.333ms)
+✔ registered workflow HTTP uses real worker GM scope, durable pagination and current authorization (1439.8261ms)
+ℹ retained isolated createApiApp fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-api-integration-ck62QX
+ℹ {"actualHttpRequests":19,"ledger":[{"method":"POST","path":"/api/v1/auth/login","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"POST","path":"/api/v1/auth/login","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"POST","path":"/api/v1/auth/gm/login","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":401,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":404,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/cc0017a8-9a37-4446-a17d-6da5eb0bece6/workflow","status":403,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":403,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/cc0017a8-9a37-4446-a17d-6da5eb0bece6/workflow","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/cc0017a8-9a37-4446-a17d-6da5eb0bece6/workflow","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":406,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":400,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/human-workflow","status":200,"media":"application/vnd.relay-qa-hub.v1.1+json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":403,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":400,"media":"application/json; charset=utf-8"},{"method":"GET","path":"/api/v1/bugs/b3308ecc-090e-4eef-92a5-fd38de002d54/workflow","status":404,"media":"application/json; charset=utf-8"}],"realWorker":true,"schema":17,"externalRequests":0}
+✔ actual source HTTP and SQLite: vendor pages, frozen limit, auth and exact project guards (996.2475ms)
+ℹ retained isolated source fixture C:\Users\lin0\AppData\Local\Temp\qa-workflow-http-3Hzy1A
+ℹ actual random-loopback requests 24; statuses [200,200,200,200,401,404,400,400,400,400,400,400,400,400,406,406,406,406,200,200,200,200,500,403]; no live preview or external executor request
+✔ adapter snapshots project/actor and cursor before yielding; later request cannot retarget worker message (0.8456ms)
+ℹ tests 243
+ℹ suites 0
+ℹ pass 242
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21969.4996
+
+✖ failing tests:
+
+test at apps\api\test\server-uploader-process.test.mjs:9:1
+✖ real server supervisor records the worker result after the API closes (12181.0917ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/server-uploader-process.test.mjs:86:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
