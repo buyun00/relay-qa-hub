@@ -1,0 +1,76 @@
+{
+  "runId": "fe334481-b448-4e51-8b83-8a63480f150c",
+  "at": "2026-09-09T03:04:01.737Z",
+  "observations": [
+    {
+      "command": "pidof com.relayqahub.android.preview.debug",
+      "sha256": "02c681d7cc3e4a4b005fb8cb59d8404437b9ff0775c59359ff871895c9ed6c9e",
+      "summary": "23733"
+    },
+    {
+      "command": "dumpsys package com.relayqahub.android.preview.debug",
+      "sha256": "0a37fd901cb16000119d68493ac38ef4f1844c8bc1669a14e8519eaf7ce0f7ba",
+      "summary": "    versionCode=23 minSdk=29 targetSdk=37\n    versionName=0.2.0-preview.9\n    lastUpdateTime=2026-09-09 08:08:25\n      dataDir=/data/user/0/com.relayqahub.android.preview.debug\n      firstInstallTime=2026-09-09 00:42:56"
+    },
+    {
+      "command": "pidof com.relayqahub.android.debug",
+      "sha256": "7c3afe3a3e156dc5c444f06025c5fbd09535cef5ffcb4d364586c71235ef10fc",
+      "summary": "5051"
+    },
+    {
+      "command": "dumpsys package com.relayqahub.android.debug",
+      "sha256": "16797c42d5d6a2fc6c5789f197ce4c594932b7882a4fbfaebb80f14d6c00a205",
+      "summary": "    versionCode=14 minSdk=29 targetSdk=37\n    versionName=0.1.13-debug\n    lastUpdateTime=2026-09-08 16:57:11\n      dataDir=/data/user/0/com.relayqahub.android.debug\n      firstInstallTime=2026-08-25 08:18:02"
+    },
+    {
+      "command": "sha256sum /sdcard/Android/media/com.relayqahub.android.preview.debug/qa-hub/config/qa-runtime.json",
+      "sha256": "5f6b1cfa939d7684db3655d6ce81b18d52db1bc2b473ed48cc660447fe7341fa",
+      "summary": "3e83ecef868c6fa0799f8bd01e0bf87196e3696e72dec6265db1916732c5d8ca  /sdcard/Android/media/com.relayqahub.android.preview.debug/qa-hub/config/qa-runtime.json"
+    },
+    {
+      "command": "run-as com.relayqahub.android.preview.debug sh -c 'find shared_prefs files/capture-drafts -type f -exec sha256sum {} \\;'",
+      "sha256": "d4598bceb81ee297fe7b85aad0ecf441b2bdfbbb58dd07e0d2f8342e602728cb",
+      "summary": "ac749397047030a3a0292defa8871d746a6c22af47c061d9922fc7c6290acb0b  shared_prefs/qa-hub-preview-account-sessions-v1.xml\n439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf  shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml\nb3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19  shared_prefs/qa-hub-preview-drafts-v2.xml\n70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf  files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json\n9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc  files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png"
+    },
+    {
+      "command": "run-as com.relayqahub.android.debug sh -c 'find shared_prefs -type f -exec sha256sum {} \\;'",
+      "sha256": "3135dcf7564a9525c89425766a843be30878aaff9e34ab96428df3b3d7a09018",
+      "summary": "b021f5e4a3bcde60266ddf3a1e2518bdb0af4da3fd26be070707aee9ef49226f  shared_prefs/qa-hub-account-sessions-v1.xml\n31996d447738cd0924c93e0ba643bdeba9becbbde246fb82c4edb924f48dc1a0  shared_prefs/qa_hub_credentials_v2.xml\n5fe91f1c686ef179f120569bf1f47279ccd054f0d8490ff931384de128033fa9  shared_prefs/qa-hub-private-identity.xml\nf034664f85fdd56cbd75445f29d5e03bb3fd0eb1fcb6c34e6448e8c12323c58b  shared_prefs/qa-hub-bug-draft-defaults-v1.xml"
+    }
+  ],
+  "previewPackagePidAndInstallUnchanged": true,
+  "dailyPackagePidInstallPreferencesUnchanged": true,
+  "previewConfigUnchanged": true,
+  "originalStableFiles": [
+    {
+      "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+      "bytes": 477,
+      "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf",
+      "afterSha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf",
+      "same": true
+    },
+    {
+      "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+      "bytes": 1290,
+      "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19",
+      "afterSha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19",
+      "same": true
+    },
+    {
+      "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+      "bytes": 743,
+      "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf",
+      "afterSha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf",
+      "same": true
+    },
+    {
+      "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+      "bytes": 150880,
+      "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc",
+      "afterSha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc",
+      "same": true
+    }
+  ],
+  "sessionVaultMayChangeByNormalLogin": true,
+  "roomCopied": false
+}

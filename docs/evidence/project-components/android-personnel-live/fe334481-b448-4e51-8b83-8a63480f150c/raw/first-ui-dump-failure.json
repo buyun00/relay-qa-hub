@@ -1,0 +1,6 @@
+{
+  "at": "2026-09-09T02:50:32.995Z",
+  "operation": "uiautomator dump unique before.xml",
+  "exitCode": 139,
+  "note": "First UI dump invocation failed; no app input, no business request, prior output not retained by initial harness. Preserve failure; inspect only this unique output if present."
+}

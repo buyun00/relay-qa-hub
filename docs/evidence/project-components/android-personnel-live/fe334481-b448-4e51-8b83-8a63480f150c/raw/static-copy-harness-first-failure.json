@@ -1,0 +1,1 @@
+{"error":"ERR_AMBIGUOUS_MODULE_SYNTAX","executed":false,"note":"require + top-level await rejected before any statement"}

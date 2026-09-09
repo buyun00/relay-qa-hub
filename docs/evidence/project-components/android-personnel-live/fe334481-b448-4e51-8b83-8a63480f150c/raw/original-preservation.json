@@ -1,0 +1,43 @@
+{
+  "at": "2026-09-09T02:51:57.170Z",
+  "files": [
+    {
+      "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+      "bytes": 477,
+      "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf"
+    },
+    {
+      "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+      "bytes": 1290,
+      "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19"
+    },
+    {
+      "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+      "bytes": 743,
+      "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf"
+    },
+    {
+      "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+      "bytes": 150880,
+      "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc"
+    }
+  ],
+  "staticAfterCopyHashesMatch": true,
+  "originalIdentity": {
+    "accountId": "10000000-0000-4000-8000-000000000020",
+    "actorId": "69730f4d-53d5-44bc-873d-7337a01e8365",
+    "name": "AndroidCaptureQA",
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "projectName": "真实HTTP验收A 2026-09-08T16-31-18-569Z"
+  },
+  "originalText": "UNSENT_CODE20_TO_CODE21_CAPTURE_DRAFT_KEEP",
+  "durableDraftPreferenceContainsOriginalText": true,
+  "uiShowsOriginalTextAndImage": true,
+  "roomCopied": false,
+  "roomPriorProof": "android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+  "sourcePreservation": [
+    "QaIdentityStore.kt:35 clear only identity fields",
+    "QaHubRoot.kt:141-147 credential+identity only",
+    "BugDraftPreferences scoped persistent draft"
+  ]
+}

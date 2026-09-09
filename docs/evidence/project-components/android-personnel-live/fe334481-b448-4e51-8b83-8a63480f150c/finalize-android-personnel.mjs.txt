@@ -1,0 +1,125 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+import assert from 'node:assert/strict';
+
+// Artifact only: no network, ADB, process, or application calls.
+const state = JSON.parse(fs.readFileSync('.tools/android-personnel-current.json'));
+const out = path.resolve('docs/evidence/project-components/android-personnel-live', state.runId);
+assert(!fs.existsSync(out), 'CREATE_ONLY_OUTPUT_EXISTS');
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const bytes = file => fs.readFileSync(path.join(state.root, file));
+const json = file => JSON.parse(bytes(file));
+const lines = file => bytes(file).toString('utf8').trim().split('\n').map(JSON.parse);
+const before = json('before-readonly.json');
+const after = json('after-readonly.json');
+const original = json('original-preservation.json');
+const fixture = json('fixture.json');
+const http = lines('http.jsonl');
+const ui = lines('ui-commands.jsonl');
+const actor = '54436391-12c3-42f3-8124-d3d650d4bb76';
+const checks = [];
+const check = (id, condition, evidence) => {
+  checks.push({ id, passed: Boolean(condition), evidence });
+  assert(condition, id);
+};
+const xml = phase => bytes(phase + '.xml').toString('utf8');
+const shows = (phase, texts) => texts.every(text => xml(phase).includes(text));
+const membership = (file, project) => json(file).projects.find(p => p.id === project).members.items.find(p => p.userId === actor);
+check('original-draft-before-durable-and-visible', original.staticAfterCopyHashesMatch && original.durableDraftPreferenceContainsOriginalText && shows('before-ui', [original.originalText, original.originalIdentity.name, '待提交的截图预览']), ['original-preservation.json', 'before-ui.xml']);
+check('native-new-name-first-a-login', shows('07-login-a', [fixture.name, 'Android人员A fe334481', '显示 0 条']), ['07-login-a.xml']);
+check('native-single-project-directory', shows('08-single-project-menu', ['Android人员A fe334481']) && !xml('08-single-project-menu').includes('Android人员B'), ['08-single-project-menu.xml']);
+check('native-b-entry-same-name', shows('10-enter-project-b', [fixture.name, 'Android人员B fe334481']), ['10-enter-project-b.xml']);
+check('native-two-project-directory', shows('11-multi-project-menu', ['Android人员A fe334481', 'Android人员B fe334481']), ['11-multi-project-menu.xml']);
+const initialA = membership('read-1788922562957.json', fixture.a);
+const initialB = membership('read-1788922562957.json', fixture.b);
+check('same-stable-actor-active-v1-both-projects', initialA?.membershipVersion === 1 && initialB?.membershipVersion === 1 && initialA.status === 'active' && initialB.status === 'active', ['read-1788922562957.json']);
+check('native-personnel-directory-visible', shows('13-project-tools', [fixture.name, 'Preview GM', '停用']), ['13-project-tools.xml']);
+check('disabled-self-button-tap-had-no-effect', hash(bytes('13-project-tools.png')) === hash(bytes('14-native-disable-self-a.png')) && membership('read-1788922596184.json', fixture.a).membershipVersion === 1, ['13-project-tools.png', '14-native-disable-self-a.png', 'read-1788922596184.json']);
+check('gm-disable-exact-a-only-v2', membership('disable-1788922601542.json', fixture.a).membershipVersion === 2 && membership('disable-1788922601542.json', fixture.a).membershipStatus === 'revoked' && membership('disable-1788922601542.json', fixture.b).membershipVersion === 1 && membership('disable-1788922601542.json', fixture.b).status === 'active', ['disable-1788922601542.json', 'http.jsonl']);
+check('native-existing-a-session-refresh-rejected', shows('15-native-a-revoked-read', ['PROJECT_NOT_ACCESSIBLE']), ['15-native-a-revoked-read.xml']);
+check('native-b-usable-during-a-revocation', shows('17-b-usable-a-disabled', [fixture.name, 'Android人员B fe334481', '显示 0 条']), ['17-b-usable-a-disabled.xml']);
+check('native-current-directory-only-b', shows('18-only-b-menu', ['Android人员B fe334481']) && !xml('18-only-b-menu').includes('Android人员A'), ['18-only-b-menu.xml']);
+const refusal = '当前项目的人员关系已停用，请联系项目人员恢复。';
+check('native-remembered-name-a-login-rejected', shows('19-disabled-a-login', [refusal]), ['19-disabled-a-login.xml']);
+check('native-explicit-same-name-a-login-rejected', shows('22-disabled-a-explicit-name-rejected', [fixture.name, refusal]), ['22-disabled-a-explicit-name-rejected.xml']);
+check('same-name-did-not-reactivate-membership', membership('read-1788922686909.json', fixture.a).membershipVersion === 2 && membership('read-1788922686909.json', fixture.a).membershipStatus === 'revoked' && membership('read-1788922686909.json', fixture.b).membershipVersion === 1, ['read-1788922686909.json']);
+check('native-b-usable-after-explicit-a-refusal', shows('24-b-workbench-after-refusal', [fixture.name, 'Android人员B fe334481', '显示 0 条']), ['24-b-workbench-after-refusal.xml']);
+check('gm-restore-a-only-v3', membership('restore-1788922710553.json', fixture.a).membershipVersion === 3 && membership('restore-1788922710553.json', fixture.a).status === 'active' && membership('restore-1788922710553.json', fixture.b).membershipVersion === 1, ['restore-1788922710553.json']);
+check('native-a-login-after-restoration', shows('25-a-restored-native', [fixture.name, 'Android人员A fe334481', '显示 0 条']), ['25-a-restored-native.xml']);
+check('native-restored-two-project-directory', shows('26-restored-both-projects', ['Android人员A fe334481', 'Android人员B fe334481']), ['26-restored-both-projects.xml']);
+check('final-managed-directory-same-actor-a3-b1', membership('read-1788922937115.json', fixture.a).membershipVersion === 3 && membership('read-1788922937115.json', fixture.b).membershipVersion === 1 && [fixture.a, fixture.b].every(p => membership('read-1788922937115.json', p).status === 'active'), ['read-1788922937115.json']);
+check('all-observed-project-components-off', http.filter(r => r.url.endsWith('/components')).every(r => r.response.items.length === 5 && r.response.items.every(c => c.enabled === false)), ['http.jsonl']);
+const puts = http.filter(r => r.method === 'PUT');
+check('only-two-gm-membership-mutations-and-exact-versions', puts.length === 2 && puts.every(r => r.url === `/api/v1/gm/projects/${fixture.a}/members/${actor}`) && puts[0].body.active === false && puts[0].body.expectedVersion === 1 && puts[1].body.active === true && puts[1].body.expectedVersion === 2, ['http.jsonl']);
+check('new-project-fixture-only', http.filter(r => r.method === 'POST' && r.url === '/api/v1/gm/projects').length === 2 && http.every(r => r.method === 'GET' || r.method === 'PUT' || r.url === '/api/v1/auth/gm/login' || r.url === '/api/v1/gm/projects'), ['http.jsonl']);
+check('supporting-http-55-actual-200', http.length === 55 && http.every(r => r.status === 200), ['http.jsonl']);
+check('native-original-identity-text-image-restored', shows('34-original-login-restored', [original.originalIdentity.name, original.originalIdentity.projectName, original.originalText, '待提交的截图预览']), ['34-original-login-restored.xml', '34-original-login-restored.png']);
+check('four-original-stable-files-exact-hash', after.originalStableFiles.length === 4 && after.originalStableFiles.every(f => f.same && f.sha256 === f.afterSha256), ['original-preservation.json', 'after-readonly.json']);
+check('preview-code23-pid-install-unchanged', after.previewPackagePidAndInstallUnchanged && after.observations[0].summary === '23733' && after.observations[1].summary.includes('versionCode=23'), ['before-readonly.json', 'after-readonly.json']);
+check('daily-code14-pid-install-prefs-unchanged', after.dailyPackagePidInstallPreferencesUnchanged && after.observations[2].summary === '5051' && after.observations[3].summary.includes('versionCode=14'), ['before-readonly.json', 'after-readonly.json']);
+check('preview-config-hash-unchanged', after.previewConfigUnchanged, ['before-readonly.json', 'after-readonly.json']);
+check('no-room-copy', original.roomCopied === false && after.roomCopied === false && fs.readdirSync(path.join(state.root, 'original-static')).every(p => p !== 'databases'), ['original-preservation.json', 'after-readonly.json']);
+const dumpFailures = ui.filter(r => r.status !== 0);
+check('ui-dump-diagnostics-retained-with-real-output', dumpFailures.length === 34 && dumpFailures.every(r => r.args.includes('uiautomator') && r.stdout.includes('UI hierchary dumped to:')), ['ui-commands.jsonl']);
+check('no-install-clear-force-stop-or-daily-action', ui.every(r => !r.args.some(x => ['install', 'uninstall', 'force-stop', 'clear'].includes(x))) && ui.filter(r => r.args.includes('am')).every(r => r.args.at(-1) === 'com.relayqahub.android.preview.debug'), ['ui-commands.jsonl']);
+
+const rawNames = fs.readdirSync(state.root, { withFileTypes: true }).filter(e => e.isFile()).map(e => e.name).sort();
+const secretFindings = [];
+function inspect(value, where) {
+  if (Array.isArray(value)) return value.forEach((v, i) => inspect(v, where + '/' + i));
+  if (value && typeof value === 'object') return Object.entries(value).forEach(([k, v]) => {
+    if (/^(?:accessToken|refreshToken|csrfToken|password|authorization|gmPassword|secret)$/i.test(k) && v !== '[REDACTED]' && v !== null) secretFindings.push(where + '/' + k);
+    inspect(v, where + '/' + k);
+  });
+  if (typeof value === 'string') {
+    if (/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|Bearer\s+(?!\[REDACTED\])[A-Za-z0-9._-]{20,}/.test(value)) secretFindings.push(where);
+    if (/^[\[{]/.test(value.trim())) { try { inspect(JSON.parse(value), where + '/decoded'); } catch {} }
+  }
+}
+for (const name of rawNames) {
+  if (name.endsWith('.json')) inspect(json(name), name);
+  else if (name.endsWith('.jsonl')) lines(name).forEach((v, i) => inspect(v, name + '/' + i));
+  else if (!name.endsWith('.png')) inspect(bytes(name).toString('utf8'), name);
+}
+check('public-raw-generic-secret-scan-clean', secretFindings.length === 0, ['http.jsonl', 'ui-commands.jsonl']);
+fs.mkdirSync(path.join(out, 'raw'), { recursive: true });
+const artifacts = rawNames.map(name => {
+  const buffer = bytes(name); const destination = path.join(out, 'raw', name);
+  fs.writeFileSync(destination, buffer, { flag: 'wx' });
+  assert.equal(hash(fs.readFileSync(destination)), hash(buffer));
+  return { path: 'raw/' + name, source: path.join(state.root, name), bytes: buffer.length, sha256: hash(buffer), exactCopy: true };
+});
+const helpers = ['.tools/android-personnel-ui.mjs', '.tools/android-personnel-api.mjs', '.tools/finalize-android-personnel.mjs'].map(file => {
+  const buffer = fs.readFileSync(file); const destination = path.basename(file) + '.txt';
+  fs.writeFileSync(path.join(out, destination), buffer, { flag: 'wx' });
+  return { path: destination, source: file, bytes: buffer.length, sha256: hash(buffer) };
+});
+const sourceFiles = ['QaIdentityStore.kt', 'BugDraftPreferences.kt', 'MainActivity.kt', 'ui/QaHubRoot.kt', 'ui/ProjectToolsScreen.kt'].map(file => {
+  const full = 'apps/android/app/src/main/kotlin/com/relayqahub/android/' + file;
+  return { path: full, sha256: hash(fs.readFileSync(full)), purpose: 'Read-only preservation and native button contract reference; this is not a current-source rebuild proof.' };
+});
+const prior = 'docs/evidence/project-components/' + original.roomPriorProof;
+const priorProof = { path: prior, sha256: hash(fs.readFileSync(prior)), scope: 'Earlier code23 install/recovery and coherent retained state only. No Room snapshot or Room equality claim is added by this run.' };
+const result = {
+  schemaVersion: 1, runId: state.runId, status: 'passed_native_personnel_project_isolation_with_gm_assistance', passed: true,
+  recordedAt: new Date().toISOString(), startedAt: before.at, completedDeviceObservationAt: after.at,
+  device: { serial: state.serial, kind: 'MuMu emulator; physical Android not tested', previewPackage: 'com.relayqahub.android.preview.debug', versionCode: 23, versionName: '0.2.0-preview.9', beforeAndAfterPid: 23733, dailyPackage: 'com.relayqahub.android.debug', dailyVersionCode: 14, dailyBeforeAndAfterPid: 5051 },
+  fixture: { ...fixture, actorId: actor, memberships: { a: { versions: [1, 2, 3], states: ['active', 'revoked', 'active'] }, b: { versions: [1], states: ['active'] } }, finalTaskCount: 0, retained: true },
+  execution: { operator: 'production_inventory agent through native Android input/deep-link plus supporting official preview HTTP', uiActions: 34, taps: 20, selectAll: 2, textInputs: 5, backKeys: 3, projectDeepLinks: 4, screenshots: 35, trees: 35, supportingHttpRequests: http.length, supportingHttpStatuses: { 200: http.length }, nativeHttpRequestsIntercepted: false, mutationsByGm: 'Two new projects; only the new employee A membership disabled then restored. Native self-disable is blocked by disabled parent button.', noBugOrCommentSubmission: true, roomCopied: false },
+  checks, checkCount: checks.length, passedChecks: checks.filter(c => c.passed).length,
+  originalRestoration: { identity: original.originalIdentity, text: original.originalText, stableFiles: after.originalStableFiles, nativeScreenshot: 'raw/34-original-login-restored.png', nativeTree: 'raw/34-original-login-restored.xml', sessionVault: 'Normal account switching changes the credential/session vault; no byte-equality claim is made for it.', retainedPrivateStaticRoot: path.join(state.root, 'original-static') },
+  diagnostics: { firstDump: 'raw/first-ui-dump-failure.json', initialStaticCopyParseFailure: 'raw/static-copy-harness-first-failure.json', dumpExitCounts: { 135: dumpFailures.filter(r => r.status === 135).length, 139: dumpFailures.filter(r => r.status === 139).length }, note: 'Dump nonzero codes accompany successfully written unique XML and retained stdout. No nonzero native input command occurred. The first dump did not retain stdout/stderr; that gap is preserved. The self-disable tap made no business mutation.' },
+  boundaries: [
+    'A revocation/restoration was performed by preview GM HTTP, not by native self-disable UI; native directory/login/session rejection and B usability were actually observed.',
+    'Cached A personnel rows and the stale A+B picker were still visible immediately after revocation; refresh rejected and the next successful B login reduced the directory to B. This run does not claim cached content was erased.',
+    'The 55 HTTP ledger rows are helper requests only. Native network calls were not intercepted, so their HTTP status/count is not inferred from screenshots.',
+    '35 trees and screenshots are sequential captures, not simultaneous frames or a continuous recording.',
+    'Original PNG and sidecar bytes plus identity/draft preferences were retained and rehashed; no active Room database/WAL copy or whole-profile equality claim.',
+    'No install, upgrade, clear-data, force-stop, daily application input, external component action, production mutation, or deletion. Five components remained disabled in every observed A/B response.',
+    'No native link/unlink mutation, nonzero historical task-reference retention, physical-device, or whole baseline completion is claimed.',
+  ],
+  priorProof, sourceFiles, helpers, publicSecretAudit: { genericRecursiveFindings: 0, privateSecretSourcesReadForAudit: false, passwordAndTokens: 'Redacted in memory when supporting HTTP was logged; private session preference content was not copied publicly.' }, artifacts,
+};
+fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(result, null, 2) + '\n', { flag: 'wx' });
+console.log(JSON.stringify({ out, checks: checks.length, artifacts: artifacts.length, resultSha256: hash(fs.readFileSync(path.join(out, 'result.json'))), bytes: artifacts.reduce((n,a)=>n+a.bytes,0) }));

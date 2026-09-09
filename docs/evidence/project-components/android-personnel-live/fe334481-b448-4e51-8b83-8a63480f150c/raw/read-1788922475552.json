@@ -1,0 +1,74 @@
+{
+  "at": "2026-09-09T02:54:35.541Z",
+  "actorId": "54436391-12c3-42f3-8124-d3d650d4bb76",
+  "projects": [
+    {
+      "id": "b41667b3-7fd7-415f-8851-8b59aba192d8",
+      "members": {
+        "projectId": "b41667b3-7fd7-415f-8851-8b59aba192d8",
+        "snapshotSequence": 0,
+        "items": [
+          {
+            "userId": "54436391-12c3-42f3-8124-d3d650d4bb76",
+            "projectId": "b41667b3-7fd7-415f-8851-8b59aba192d8",
+            "displayName": "AndroidPersonnelfe334481",
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "active": true,
+            "identity": "employee"
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "projectId": "b41667b3-7fd7-415f-8851-8b59aba192d8",
+            "displayName": "Preview GM",
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "active": true,
+            "identity": "employee"
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "id": "81cdaf01-e6ee-47b3-b9d1-7bbed6bd1c07",
+      "members": {
+        "projectId": "81cdaf01-e6ee-47b3-b9d1-7bbed6bd1c07",
+        "snapshotSequence": 0,
+        "items": [
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "projectId": "81cdaf01-e6ee-47b3-b9d1-7bbed6bd1c07",
+            "displayName": "Preview GM",
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "active": true,
+            "identity": "employee"
+          }
+        ],
+        "nextCursor": null
+      }
+    }
+  ]
+}

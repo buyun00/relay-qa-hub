@@ -1,0 +1,122 @@
+{
+  "at": "2026-09-09T02:56:41.531Z",
+  "actorId": "54436391-12c3-42f3-8124-d3d650d4bb76",
+  "projects": [
+    {
+      "id": "b41667b3-7fd7-415f-8851-8b59aba192d8",
+      "members": {
+        "projectId": "b41667b3-7fd7-415f-8851-8b59aba192d8",
+        "items": [
+          {
+            "userId": "54436391-12c3-42f3-8124-d3d650d4bb76",
+            "displayName": "AndroidPersonnelfe334481",
+            "status": "disabled",
+            "membershipStatus": "revoked",
+            "membershipVersion": 2,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 3,
+            "createdAt": "2026-09-09T02:54:24.340Z",
+            "updatedAt": "2026-09-09T02:54:24.340Z",
+            "protected": false
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 31,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "81cdaf01-e6ee-47b3-b9d1-7bbed6bd1c07",
+      "members": {
+        "projectId": "81cdaf01-e6ee-47b3-b9d1-7bbed6bd1c07",
+        "items": [
+          {
+            "userId": "54436391-12c3-42f3-8124-d3d650d4bb76",
+            "displayName": "AndroidPersonnelfe334481",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 3,
+            "createdAt": "2026-09-09T02:54:24.340Z",
+            "updatedAt": "2026-09-09T02:54:24.340Z",
+            "protected": false
+          },
+          {
+            "userId": "850912b5-61bf-4f6b-aae6-f7c59e1b087e",
+            "displayName": "Preview GM",
+            "status": "active",
+            "membershipStatus": "active",
+            "membershipVersion": 1,
+            "roles": [
+              "developer",
+              "project_admin",
+              "release_manager",
+              "reporter",
+              "triager",
+              "verifier",
+              "viewer"
+            ],
+            "identity": "employee",
+            "linkedToUserId": null,
+            "linkedToDisplayName": null,
+            "linkedUserCount": 0,
+            "taskCount": 0,
+            "activeSessionCount": 31,
+            "createdAt": "2026-09-08T16:24:05.236Z",
+            "updatedAt": "2026-09-08T16:24:05.236Z",
+            "protected": true
+          }
+        ]
+      }
+    }
+  ]
+}

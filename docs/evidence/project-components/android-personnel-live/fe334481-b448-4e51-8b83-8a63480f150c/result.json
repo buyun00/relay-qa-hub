@@ -1,0 +1,1151 @@
+{
+  "schemaVersion": 1,
+  "runId": "fe334481-b448-4e51-8b83-8a63480f150c",
+  "status": "passed_native_personnel_project_isolation_with_gm_assistance",
+  "passed": true,
+  "recordedAt": "2026-09-09T03:08:17.082Z",
+  "startedAt": "2026-09-09T02:49:34.057Z",
+  "completedDeviceObservationAt": "2026-09-09T03:04:01.737Z",
+  "device": {
+    "serial": "127.0.0.1:16384",
+    "kind": "MuMu emulator; physical Android not tested",
+    "previewPackage": "com.relayqahub.android.preview.debug",
+    "versionCode": 23,
+    "versionName": "0.2.0-preview.9",
+    "beforeAndAfterPid": 23733,
+    "dailyPackage": "com.relayqahub.android.debug",
+    "dailyVersionCode": 14,
+    "dailyBeforeAndAfterPid": 5051
+  },
+  "fixture": {
+    "runId": "fe334481-b448-4e51-8b83-8a63480f150c",
+    "name": "AndroidPersonnelfe334481",
+    "a": "b41667b3-7fd7-415f-8851-8b59aba192d8",
+    "b": "81cdaf01-e6ee-47b3-b9d1-7bbed6bd1c07",
+    "actorId": "54436391-12c3-42f3-8124-d3d650d4bb76",
+    "memberships": {
+      "a": {
+        "versions": [
+          1,
+          2,
+          3
+        ],
+        "states": [
+          "active",
+          "revoked",
+          "active"
+        ]
+      },
+      "b": {
+        "versions": [
+          1
+        ],
+        "states": [
+          "active"
+        ]
+      }
+    },
+    "finalTaskCount": 0,
+    "retained": true
+  },
+  "execution": {
+    "operator": "production_inventory agent through native Android input/deep-link plus supporting official preview HTTP",
+    "uiActions": 34,
+    "taps": 20,
+    "selectAll": 2,
+    "textInputs": 5,
+    "backKeys": 3,
+    "projectDeepLinks": 4,
+    "screenshots": 35,
+    "trees": 35,
+    "supportingHttpRequests": 55,
+    "supportingHttpStatuses": {
+      "200": 55
+    },
+    "nativeHttpRequestsIntercepted": false,
+    "mutationsByGm": "Two new projects; only the new employee A membership disabled then restored. Native self-disable is blocked by disabled parent button.",
+    "noBugOrCommentSubmission": true,
+    "roomCopied": false
+  },
+  "checks": [
+    {
+      "id": "original-draft-before-durable-and-visible",
+      "passed": true,
+      "evidence": [
+        "original-preservation.json",
+        "before-ui.xml"
+      ]
+    },
+    {
+      "id": "native-new-name-first-a-login",
+      "passed": true,
+      "evidence": [
+        "07-login-a.xml"
+      ]
+    },
+    {
+      "id": "native-single-project-directory",
+      "passed": true,
+      "evidence": [
+        "08-single-project-menu.xml"
+      ]
+    },
+    {
+      "id": "native-b-entry-same-name",
+      "passed": true,
+      "evidence": [
+        "10-enter-project-b.xml"
+      ]
+    },
+    {
+      "id": "native-two-project-directory",
+      "passed": true,
+      "evidence": [
+        "11-multi-project-menu.xml"
+      ]
+    },
+    {
+      "id": "same-stable-actor-active-v1-both-projects",
+      "passed": true,
+      "evidence": [
+        "read-1788922562957.json"
+      ]
+    },
+    {
+      "id": "native-personnel-directory-visible",
+      "passed": true,
+      "evidence": [
+        "13-project-tools.xml"
+      ]
+    },
+    {
+      "id": "disabled-self-button-tap-had-no-effect",
+      "passed": true,
+      "evidence": [
+        "13-project-tools.png",
+        "14-native-disable-self-a.png",
+        "read-1788922596184.json"
+      ]
+    },
+    {
+      "id": "gm-disable-exact-a-only-v2",
+      "passed": true,
+      "evidence": [
+        "disable-1788922601542.json",
+        "http.jsonl"
+      ]
+    },
+    {
+      "id": "native-existing-a-session-refresh-rejected",
+      "passed": true,
+      "evidence": [
+        "15-native-a-revoked-read.xml"
+      ]
+    },
+    {
+      "id": "native-b-usable-during-a-revocation",
+      "passed": true,
+      "evidence": [
+        "17-b-usable-a-disabled.xml"
+      ]
+    },
+    {
+      "id": "native-current-directory-only-b",
+      "passed": true,
+      "evidence": [
+        "18-only-b-menu.xml"
+      ]
+    },
+    {
+      "id": "native-remembered-name-a-login-rejected",
+      "passed": true,
+      "evidence": [
+        "19-disabled-a-login.xml"
+      ]
+    },
+    {
+      "id": "native-explicit-same-name-a-login-rejected",
+      "passed": true,
+      "evidence": [
+        "22-disabled-a-explicit-name-rejected.xml"
+      ]
+    },
+    {
+      "id": "same-name-did-not-reactivate-membership",
+      "passed": true,
+      "evidence": [
+        "read-1788922686909.json"
+      ]
+    },
+    {
+      "id": "native-b-usable-after-explicit-a-refusal",
+      "passed": true,
+      "evidence": [
+        "24-b-workbench-after-refusal.xml"
+      ]
+    },
+    {
+      "id": "gm-restore-a-only-v3",
+      "passed": true,
+      "evidence": [
+        "restore-1788922710553.json"
+      ]
+    },
+    {
+      "id": "native-a-login-after-restoration",
+      "passed": true,
+      "evidence": [
+        "25-a-restored-native.xml"
+      ]
+    },
+    {
+      "id": "native-restored-two-project-directory",
+      "passed": true,
+      "evidence": [
+        "26-restored-both-projects.xml"
+      ]
+    },
+    {
+      "id": "final-managed-directory-same-actor-a3-b1",
+      "passed": true,
+      "evidence": [
+        "read-1788922937115.json"
+      ]
+    },
+    {
+      "id": "all-observed-project-components-off",
+      "passed": true,
+      "evidence": [
+        "http.jsonl"
+      ]
+    },
+    {
+      "id": "only-two-gm-membership-mutations-and-exact-versions",
+      "passed": true,
+      "evidence": [
+        "http.jsonl"
+      ]
+    },
+    {
+      "id": "new-project-fixture-only",
+      "passed": true,
+      "evidence": [
+        "http.jsonl"
+      ]
+    },
+    {
+      "id": "supporting-http-55-actual-200",
+      "passed": true,
+      "evidence": [
+        "http.jsonl"
+      ]
+    },
+    {
+      "id": "native-original-identity-text-image-restored",
+      "passed": true,
+      "evidence": [
+        "34-original-login-restored.xml",
+        "34-original-login-restored.png"
+      ]
+    },
+    {
+      "id": "four-original-stable-files-exact-hash",
+      "passed": true,
+      "evidence": [
+        "original-preservation.json",
+        "after-readonly.json"
+      ]
+    },
+    {
+      "id": "preview-code23-pid-install-unchanged",
+      "passed": true,
+      "evidence": [
+        "before-readonly.json",
+        "after-readonly.json"
+      ]
+    },
+    {
+      "id": "daily-code14-pid-install-prefs-unchanged",
+      "passed": true,
+      "evidence": [
+        "before-readonly.json",
+        "after-readonly.json"
+      ]
+    },
+    {
+      "id": "preview-config-hash-unchanged",
+      "passed": true,
+      "evidence": [
+        "before-readonly.json",
+        "after-readonly.json"
+      ]
+    },
+    {
+      "id": "no-room-copy",
+      "passed": true,
+      "evidence": [
+        "original-preservation.json",
+        "after-readonly.json"
+      ]
+    },
+    {
+      "id": "ui-dump-diagnostics-retained-with-real-output",
+      "passed": true,
+      "evidence": [
+        "ui-commands.jsonl"
+      ]
+    },
+    {
+      "id": "no-install-clear-force-stop-or-daily-action",
+      "passed": true,
+      "evidence": [
+        "ui-commands.jsonl"
+      ]
+    },
+    {
+      "id": "public-raw-generic-secret-scan-clean",
+      "passed": true,
+      "evidence": [
+        "http.jsonl",
+        "ui-commands.jsonl"
+      ]
+    }
+  ],
+  "checkCount": 33,
+  "passedChecks": 33,
+  "originalRestoration": {
+    "identity": {
+      "accountId": "10000000-0000-4000-8000-000000000020",
+      "actorId": "69730f4d-53d5-44bc-873d-7337a01e8365",
+      "name": "AndroidCaptureQA",
+      "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+      "projectName": "真实HTTP验收A 2026-09-08T16-31-18-569Z"
+    },
+    "text": "UNSENT_CODE20_TO_CODE21_CAPTURE_DRAFT_KEEP",
+    "stableFiles": [
+      {
+        "path": "shared_prefs/qa-hub-preview-identity-526ef521-916f-3ec0-98bc-e9b42731c175.xml",
+        "bytes": 477,
+        "sha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf",
+        "afterSha256": "439616afe8c2d60efb10d6ae67464b080de3f4011e259f2f06ff7747db8e5cdf",
+        "same": true
+      },
+      {
+        "path": "shared_prefs/qa-hub-preview-drafts-v2.xml",
+        "bytes": 1290,
+        "sha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19",
+        "afterSha256": "b3d15761d1c37e610561a8c344751fecb3b5fc8f3772b69cd6bbb9404a05fe19",
+        "same": true
+      },
+      {
+        "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.pending.json",
+        "bytes": 743,
+        "sha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf",
+        "afterSha256": "70c4e916cb963741778c8634ce0fb929f425bc0e4434ea90a249f2025857a2bf",
+        "same": true
+      },
+      {
+        "path": "files/capture-drafts/10135789-72bc-41c1-8756-9dba13ae3a96.png",
+        "bytes": 150880,
+        "sha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc",
+        "afterSha256": "9b87034279be40b603fd48ff5bb739640493e7854dfd78d845612ff83202fcfc",
+        "same": true
+      }
+    ],
+    "nativeScreenshot": "raw/34-original-login-restored.png",
+    "nativeTree": "raw/34-original-login-restored.xml",
+    "sessionVault": "Normal account switching changes the credential/session vault; no byte-equality claim is made for it.",
+    "retainedPrivateStaticRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\original-static"
+  },
+  "diagnostics": {
+    "firstDump": "raw/first-ui-dump-failure.json",
+    "initialStaticCopyParseFailure": "raw/static-copy-harness-first-failure.json",
+    "dumpExitCounts": {
+      "135": 1,
+      "139": 33
+    },
+    "note": "Dump nonzero codes accompany successfully written unique XML and retained stdout. No nonzero native input command occurred. The first dump did not retain stdout/stderr; that gap is preserved. The self-disable tap made no business mutation."
+  },
+  "boundaries": [
+    "A revocation/restoration was performed by preview GM HTTP, not by native self-disable UI; native directory/login/session rejection and B usability were actually observed.",
+    "Cached A personnel rows and the stale A+B picker were still visible immediately after revocation; refresh rejected and the next successful B login reduced the directory to B. This run does not claim cached content was erased.",
+    "The 55 HTTP ledger rows are helper requests only. Native network calls were not intercepted, so their HTTP status/count is not inferred from screenshots.",
+    "35 trees and screenshots are sequential captures, not simultaneous frames or a continuous recording.",
+    "Original PNG and sidecar bytes plus identity/draft preferences were retained and rehashed; no active Room database/WAL copy or whole-profile equality claim.",
+    "No install, upgrade, clear-data, force-stop, daily application input, external component action, production mutation, or deletion. Five components remained disabled in every observed A/B response.",
+    "No native link/unlink mutation, nonzero historical task-reference retention, physical-device, or whole baseline completion is claimed."
+  ],
+  "priorProof": {
+    "path": "docs/evidence/project-components/android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+    "sha256": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56",
+    "scope": "Earlier code23 install/recovery and coherent retained state only. No Room snapshot or Room equality claim is added by this run."
+  },
+  "sourceFiles": [
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/QaIdentityStore.kt",
+      "sha256": "02ee7fa41534c96f1bf90cbea3aa6d6a79284968af47a3091feb76394d55e802",
+      "purpose": "Read-only preservation and native button contract reference; this is not a current-source rebuild proof."
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/BugDraftPreferences.kt",
+      "sha256": "710a77ed0afa5ec680bac1de4f689c264783a2dc5aaee2e873b88c19f7164bf5",
+      "purpose": "Read-only preservation and native button contract reference; this is not a current-source rebuild proof."
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/MainActivity.kt",
+      "sha256": "73353d16d1ca516e21ae5cbaf323dde635c1744921836144d827377a80de6496",
+      "purpose": "Read-only preservation and native button contract reference; this is not a current-source rebuild proof."
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/QaHubRoot.kt",
+      "sha256": "d15e19fb95b9fece7c486f37e6039a4682569b6403e360f0c041a1ef726d874c",
+      "purpose": "Read-only preservation and native button contract reference; this is not a current-source rebuild proof."
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/ProjectToolsScreen.kt",
+      "sha256": "b855afdc572dcb224cae5a34d7dad7e77d0fdde68eee59c46fe2cf2fad0e1b9e",
+      "purpose": "Read-only preservation and native button contract reference; this is not a current-source rebuild proof."
+    }
+  ],
+  "helpers": [
+    {
+      "path": "android-personnel-ui.mjs.txt",
+      "source": ".tools/android-personnel-ui.mjs",
+      "bytes": 2607,
+      "sha256": "c27208826ae1640bd706d12e74ecce01b9f9602fbce68d68fd6e03d40ab55320"
+    },
+    {
+      "path": "android-personnel-api.mjs.txt",
+      "source": ".tools/android-personnel-api.mjs",
+      "bytes": 3410,
+      "sha256": "5cb483556660fe1381a2580d696496b5f077a6b62df4cfdbf6de1137d37b7e20"
+    },
+    {
+      "path": "finalize-android-personnel.mjs.txt",
+      "source": ".tools/finalize-android-personnel.mjs",
+      "bytes": 15777,
+      "sha256": "fcef5f8d51adf0f2442035404151b5718953cde52a2523400ceed0be6179c590"
+    }
+  ],
+  "publicSecretAudit": {
+    "genericRecursiveFindings": 0,
+    "privateSecretSourcesReadForAudit": false,
+    "passwordAndTokens": "Redacted in memory when supporting HTTP was logged; private session preference content was not copied publicly."
+  },
+  "artifacts": [
+    {
+      "path": "raw/01-switch-identity.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\01-switch-identity.png",
+      "bytes": 95541,
+      "sha256": "c1a92b6afe424580ed33590dd40bf7e6a114e594efe812a0857500ed49fb2604",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/01-switch-identity.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\01-switch-identity.xml",
+      "bytes": 8074,
+      "sha256": "b15612d60e7948d8e7ea486dd82a3995a0586d6ef9ec00e55935540e853a7129",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/02-focus-project.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\02-focus-project.png",
+      "bytes": 97036,
+      "sha256": "57713f31203359d3b8f17bfd8ddcb32892922fcc17cd23de63d1a8812d071400",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/02-focus-project.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\02-focus-project.xml",
+      "bytes": 8073,
+      "sha256": "97ce6dafa24a444336bfb7c2f49e7fff5b7e5025f9c923741f9581c62f1f97bf",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/03-select-project.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\03-select-project.png",
+      "bytes": 96886,
+      "sha256": "89b3efc5dc0b618b92d3b1d9798a6b49666fb7fcd321370c0f86d551e688fa55",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/03-select-project.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\03-select-project.xml",
+      "bytes": 8073,
+      "sha256": "97ce6dafa24a444336bfb7c2f49e7fff5b7e5025f9c923741f9581c62f1f97bf",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/04-enter-project-a.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\04-enter-project-a.png",
+      "bytes": 89559,
+      "sha256": "6aa47302c607dcd225df741314cc6b37fa9ddff4886d94a60fcc1788f9461d29",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/04-enter-project-a.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\04-enter-project-a.xml",
+      "bytes": 8054,
+      "sha256": "ec41358e563e90004e9c61c4c28e1664f8e842a4d06dc44c13e27f76c0b4eb5a",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/05-focus-name.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\05-focus-name.png",
+      "bytes": 89184,
+      "sha256": "e126af5a7dd89bd8ac918c5ba9b65ee9a2d971e841f5038beb7d855949f873a7",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/05-focus-name.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\05-focus-name.xml",
+      "bytes": 8054,
+      "sha256": "0b2a2269da85ab3a7f5adc145dbbebc91887dbfc6fc31ac6419cfe687b502619",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/06-enter-name.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\06-enter-name.png",
+      "bytes": 98480,
+      "sha256": "2ab0cdc68a8b31aacb8032a8bd0de07aeeb97782df2e5e1c8f17ffe050fb3aa4",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/06-enter-name.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\06-enter-name.xml",
+      "bytes": 8076,
+      "sha256": "886a02c433f6d3cb40598e1c29982ba78103bb3fe1d5d01e36237c9993f6902b",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/07-login-a.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\07-login-a.png",
+      "bytes": 157838,
+      "sha256": "2e29433dd82c3a0ed4576a6a32210a64b12bb4cdedd209c7d49e62cddd57f459",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/07-login-a.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\07-login-a.xml",
+      "bytes": 25459,
+      "sha256": "481470bb2e35ec2a615b022e7bb53418d7c9db69b0ae00b593f23fb7111333a2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/08-single-project-menu.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\08-single-project-menu.png",
+      "bytes": 160960,
+      "sha256": "84a7afb28c7f811a5c277233c3cf0903da31f3506c2d8312007f5786e2f6cf12",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/08-single-project-menu.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\08-single-project-menu.xml",
+      "bytes": 2700,
+      "sha256": "b20075ebc074458e4f080bd6d808ae1f8d49af9b0670dfa816425efb5c36fe43",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/09-close-single-menu.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\09-close-single-menu.png",
+      "bytes": 157470,
+      "sha256": "389cd03e09b01b597d5c129682526248108c79e84660be92f5f916e88471cef5",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/09-close-single-menu.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\09-close-single-menu.xml",
+      "bytes": 25459,
+      "sha256": "481470bb2e35ec2a615b022e7bb53418d7c9db69b0ae00b593f23fb7111333a2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/10-enter-project-b.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\10-enter-project-b.png",
+      "bytes": 157929,
+      "sha256": "f5cef2026d9af5a95e4c7e7d02731b7214cb91565376eff5acc6bc51b3651e7c",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/10-enter-project-b.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\10-enter-project-b.xml",
+      "bytes": 25459,
+      "sha256": "de71421562427bd4d5a97e498720f64b626c77c11fce2d451a697965b66e73da",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/11-multi-project-menu.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\11-multi-project-menu.png",
+      "bytes": 166449,
+      "sha256": "82abf970b0dd67d8a1d35f757437617ea4da2536100063d5d774b557e4831b15",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/11-multi-project-menu.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\11-multi-project-menu.xml",
+      "bytes": 3452,
+      "sha256": "7efb12fb943c9e7cd4c8b47155af9814d7426efa7e1abdebe7f8baee2ed681d2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/12-return-a.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\12-return-a.png",
+      "bytes": 158146,
+      "sha256": "9746310dd48e015898e24d954d8dea66cfa17cacfd73494bded27c0855be807c",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/12-return-a.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\12-return-a.xml",
+      "bytes": 25459,
+      "sha256": "481470bb2e35ec2a615b022e7bb53418d7c9db69b0ae00b593f23fb7111333a2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/13-project-tools.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\13-project-tools.png",
+      "bytes": 117290,
+      "sha256": "0f19cb2d7eb1611e596b166b9a44390bc2ad42e5d9ab3c5836fcf301c687a61e",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/13-project-tools.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\13-project-tools.xml",
+      "bytes": 18777,
+      "sha256": "1f1c613b62c184465bf5e3f75a61bbe6ef80b8627e32de6d97ccd5e3e1861012",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/14-native-disable-self-a.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\14-native-disable-self-a.png",
+      "bytes": 117290,
+      "sha256": "0f19cb2d7eb1611e596b166b9a44390bc2ad42e5d9ab3c5836fcf301c687a61e",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/14-native-disable-self-a.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\14-native-disable-self-a.xml",
+      "bytes": 18777,
+      "sha256": "1f1c613b62c184465bf5e3f75a61bbe6ef80b8627e32de6d97ccd5e3e1861012",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/15-native-a-revoked-read.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\15-native-a-revoked-read.png",
+      "bytes": 120210,
+      "sha256": "32b9fa5b10093a4df465282a835ebca33f3ea024d477f0f6da7615796a3f28bc",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/15-native-a-revoked-read.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\15-native-a-revoked-read.xml",
+      "bytes": 17299,
+      "sha256": "805d3d2bcbbb3ea4fe12fc22444259e5f15a1ea2b09a1f2fc2a3c01cea454447",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/16-revoked-menu.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\16-revoked-menu.png",
+      "bytes": 126568,
+      "sha256": "d2ec27d89ec08b8f6d2eca2addb4815201eaf499a0c546f142dad84b8ea065da",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/16-revoked-menu.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\16-revoked-menu.xml",
+      "bytes": 3452,
+      "sha256": "7efb12fb943c9e7cd4c8b47155af9814d7426efa7e1abdebe7f8baee2ed681d2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/17-b-usable-a-disabled.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\17-b-usable-a-disabled.png",
+      "bytes": 158260,
+      "sha256": "31de71aece28d4be62231299bd81d36e27dc7c2fd0cf9537e1903102de995461",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/17-b-usable-a-disabled.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\17-b-usable-a-disabled.xml",
+      "bytes": 25459,
+      "sha256": "de71421562427bd4d5a97e498720f64b626c77c11fce2d451a697965b66e73da",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/18-only-b-menu.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\18-only-b-menu.png",
+      "bytes": 161754,
+      "sha256": "32f09796e784b0f32a5dc3dc40a627c9ebed45631782de39a08021f4aba5c7a8",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/18-only-b-menu.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\18-only-b-menu.xml",
+      "bytes": 2700,
+      "sha256": "aca451b2b5583ed22ac2dc698b607e7cfa430f89101876844c6aea37fd72cdbc",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/19-disabled-a-login.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\19-disabled-a-login.png",
+      "bytes": 106593,
+      "sha256": "5f08638491440cf3aa8d66b6c5ad2ef99c068e72dd378649ca4ad3d5532bc46c",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/19-disabled-a-login.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\19-disabled-a-login.xml",
+      "bytes": 8490,
+      "sha256": "0c9d0edf33169f77504dcc063416bc4edb85e1daabdd94f8d004a65fe4ace1a1",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/20-disabled-a-name-focus.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\20-disabled-a-name-focus.png",
+      "bytes": 106201,
+      "sha256": "0141c0a741d4f95b7058e9073df5d042c07a2f969f5c77d2949328e9f099bf60",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/20-disabled-a-name-focus.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\20-disabled-a-name-focus.xml",
+      "bytes": 8489,
+      "sha256": "5b7e11352fa710466850574973cc72fe13b5d0d90b7066c0125c5c9e1576b5f8",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/21-disabled-a-enter-name.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\21-disabled-a-enter-name.png",
+      "bytes": 115139,
+      "sha256": "e4c2fba50693b256619423d197876c3c71a59c7145f729d48889fc50ee912f91",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/21-disabled-a-enter-name.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\21-disabled-a-enter-name.xml",
+      "bytes": 8511,
+      "sha256": "3d7342332a4726cd0272f17df6e943aeb9b93f02b422a112b1849c3d9eaee20b",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/22-disabled-a-explicit-name-rejected.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\22-disabled-a-explicit-name-rejected.png",
+      "bytes": 115522,
+      "sha256": "3285e74c4a48679ffa14c2f60e06e04c1ea13002ccfec0e078d859987ba182f5",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/22-disabled-a-explicit-name-rejected.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\22-disabled-a-explicit-name-rejected.xml",
+      "bytes": 8512,
+      "sha256": "6f139b163f8e0421020ec5448e0a3235a9285fa41590a7370cf1e3aa7b010029",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/23-b-login-after-a-refusal.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\23-b-login-after-a-refusal.png",
+      "bytes": 162167,
+      "sha256": "caf113a94bf267ae8789dd7582e811deb74a993c172840d45a0cf2d0039b178f",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/23-b-login-after-a-refusal.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\23-b-login-after-a-refusal.xml",
+      "bytes": 2700,
+      "sha256": "aca451b2b5583ed22ac2dc698b607e7cfa430f89101876844c6aea37fd72cdbc",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/24-b-workbench-after-refusal.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\24-b-workbench-after-refusal.png",
+      "bytes": 158739,
+      "sha256": "e706c2937f04eef9adceaedf0fc40a5285bcf8153cc83e27177726af3e80ef93",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/24-b-workbench-after-refusal.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\24-b-workbench-after-refusal.xml",
+      "bytes": 25459,
+      "sha256": "de71421562427bd4d5a97e498720f64b626c77c11fce2d451a697965b66e73da",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/25-a-restored-native.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\25-a-restored-native.png",
+      "bytes": 158297,
+      "sha256": "9fc627d21603ffd49f1734b96213470a779fb69718f9546dca0411a51e36b24e",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/25-a-restored-native.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\25-a-restored-native.xml",
+      "bytes": 25459,
+      "sha256": "481470bb2e35ec2a615b022e7bb53418d7c9db69b0ae00b593f23fb7111333a2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/26-restored-both-projects.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\26-restored-both-projects.png",
+      "bytes": 165154,
+      "sha256": "2d6a17bf385fdb6e9e2234f14a503bf934d3a016d37f362baa8b6e6d9c6bb43e",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/26-restored-both-projects.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\26-restored-both-projects.xml",
+      "bytes": 3452,
+      "sha256": "7efb12fb943c9e7cd4c8b47155af9814d7426efa7e1abdebe7f8baee2ed681d2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/27-close-restored-menu.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\27-close-restored-menu.png",
+      "bytes": 157326,
+      "sha256": "ad1d9d039484e4924187c44ea3b6b09b87c04fd6634949dcd89757dcd17019c7",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/27-close-restored-menu.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\27-close-restored-menu.xml",
+      "bytes": 25459,
+      "sha256": "481470bb2e35ec2a615b022e7bb53418d7c9db69b0ae00b593f23fb7111333a2",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/28-switch-back-original.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\28-switch-back-original.png",
+      "bytes": 89035,
+      "sha256": "d58e90cacc494903737909214b63fe3f1ba4e1aa3cfba7a65cbe71e498ac203f",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/28-switch-back-original.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\28-switch-back-original.xml",
+      "bytes": 8055,
+      "sha256": "53a9a26803d8416b472a652394dc325cae29b1bfe9d503a94a2edbd094b6cc55",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/29-original-project-focus.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\29-original-project-focus.png",
+      "bytes": 90568,
+      "sha256": "52acf0c000f7189c3fbd5a30fb8b66d69669b402ca582bc4db22c58a3097e1f8",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/29-original-project-focus.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\29-original-project-focus.xml",
+      "bytes": 8054,
+      "sha256": "ec41358e563e90004e9c61c4c28e1664f8e842a4d06dc44c13e27f76c0b4eb5a",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/30-original-project-selected.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\30-original-project-selected.png",
+      "bytes": 90381,
+      "sha256": "f4705886e47a23a4db10aabb4d6634ee449ed77345f630ec6da180cf444ae238",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/30-original-project-selected.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\30-original-project-selected.xml",
+      "bytes": 8054,
+      "sha256": "ec41358e563e90004e9c61c4c28e1664f8e842a4d06dc44c13e27f76c0b4eb5a",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/31-original-project-input.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\31-original-project-input.png",
+      "bytes": 94809,
+      "sha256": "d38ab26946246004397545aa8cee576e83f0f33b339f1cffdf976682b11320fe",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/31-original-project-input.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\31-original-project-input.xml",
+      "bytes": 8073,
+      "sha256": "97ce6dafa24a444336bfb7c2f49e7fff5b7e5025f9c923741f9581c62f1f97bf",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/32-original-name-focus.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\32-original-name-focus.png",
+      "bytes": 94565,
+      "sha256": "1c6f2a3b26cc740dc40282cecca3fa32946051f42dabfba65353f01ce76295fd",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/32-original-name-focus.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\32-original-name-focus.xml",
+      "bytes": 8073,
+      "sha256": "bfa258befd723a76233caa278c1e9a6a36330e94a3d6743f5306891636c6b1ae",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/33-original-name-input.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\33-original-name-input.png",
+      "bytes": 103263,
+      "sha256": "4dc61645c09efb2be7540ebef09449926867eacb86a2227105eeaa1243a18b70",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/33-original-name-input.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\33-original-name-input.xml",
+      "bytes": 8087,
+      "sha256": "011b0b14e56b82bcf944a746c51f9297d464ee03bc1e095e2bedfd6602df1cbe",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/34-original-login-restored.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\34-original-login-restored.png",
+      "bytes": 158203,
+      "sha256": "c3433e15d05ed77174483181aab19a0a6a959869332093a1a63fd788c5c9ee6b",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/34-original-login-restored.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\34-original-login-restored.xml",
+      "bytes": 17683,
+      "sha256": "96a7c71892ba10113d8a3e7dbcc46e7579c09e37bb6f879ca9bf8a72018e9e79",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-read-0.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-read-0.txt",
+      "bytes": 5,
+      "sha256": "02c681d7cc3e4a4b005fb8cb59d8404437b9ff0775c59359ff871895c9ed6c9e",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-read-1.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-read-1.txt",
+      "bytes": 9177,
+      "sha256": "0a37fd901cb16000119d68493ac38ef4f1844c8bc1669a14e8519eaf7ce0f7ba",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-read-2.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-read-2.txt",
+      "bytes": 4,
+      "sha256": "7c3afe3a3e156dc5c444f06025c5fbd09535cef5ffcb4d364586c71235ef10fc",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-read-3.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-read-3.txt",
+      "bytes": 8878,
+      "sha256": "16797c42d5d6a2fc6c5789f197ce4c594932b7882a4fbfaebb80f14d6c00a205",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-read-4.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-read-4.txt",
+      "bytes": 154,
+      "sha256": "5f6b1cfa939d7684db3655d6ce81b18d52db1bc2b473ed48cc660447fe7341fa",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-read-5.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-read-5.txt",
+      "bytes": 634,
+      "sha256": "d4598bceb81ee297fe7b85aad0ecf441b2bdfbbb58dd07e0d2f8342e602728cb",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-read-6.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-read-6.txt",
+      "bytes": 433,
+      "sha256": "3135dcf7564a9525c89425766a843be30878aaff9e34ab96428df3b3d7a09018",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/after-readonly.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\after-readonly.json",
+      "bytes": 4696,
+      "sha256": "d34f281cbded1f95364473e603cad1c1206ec01576489e1be911ef42272511c4",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/before-readonly.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\before-readonly.json",
+      "bytes": 3380,
+      "sha256": "b4ac4f5a326c943b50dce53f22451d8c0d6dbb33a2fb6a7d35a5f184345a72ce",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/before-ui-read-status.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\before-ui-read-status.json",
+      "bytes": 38,
+      "sha256": "657fafc35d9af9c9076968ba473e5ce01cebfc4a2ee004c60de08dece2b79db6",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/before-ui.png",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\before-ui.png",
+      "bytes": 158151,
+      "sha256": "7a989cfef91a67d502f8139ec49eb92419e2e03fb01da2f57b105ca8353f433d",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/before-ui.xml",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\before-ui.xml",
+      "bytes": 17683,
+      "sha256": "96a7c71892ba10113d8a3e7dbcc46e7579c09e37bb6f879ca9bf8a72018e9e79",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/disable-1788922601542.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\disable-1788922601542.json",
+      "bytes": 3768,
+      "sha256": "83b6cb4eec29d6237a97a6d2c945a6d6c84ba9073482cac0ae6f740ba88c5359",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/first-ui-dump-failure.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\first-ui-dump-failure.json",
+      "bytes": 299,
+      "sha256": "a8f4ce68d10c713105d3978ad580e8d8bf456bac81950036ee2bc01a1e67d3d8",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/fixture-intent.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\fixture-intent.json",
+      "bytes": 185,
+      "sha256": "0a0a7955f2e51e0593ed8c366c11172ebc58df96f641b9fd62ca28fc8a5eba30",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/fixture.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\fixture.json",
+      "bytes": 185,
+      "sha256": "0a0a7955f2e51e0593ed8c366c11172ebc58df96f641b9fd62ca28fc8a5eba30",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/http.jsonl",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\http.jsonl",
+      "bytes": 51276,
+      "sha256": "6c95fde53ee39da2b04e850b13401f38ba503197add7cd0962504feeb7f8112a",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/original-preservation.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\original-preservation.json",
+      "bytes": 1647,
+      "sha256": "3d12ab7549c996f4f32391d1f5a99e56cb58be6a087b7438dcf8d2160b5f193f",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-0.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-0.txt",
+      "bytes": 5,
+      "sha256": "02c681d7cc3e4a4b005fb8cb59d8404437b9ff0775c59359ff871895c9ed6c9e",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-1.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-1.txt",
+      "bytes": 9178,
+      "sha256": "0f97deba4f1894e9de69ccad2987540f07dbe3d8a999b0ca793f506724ff4f40",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-1788922475552.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-1788922475552.json",
+      "bytes": 2060,
+      "sha256": "c55197a5d978f2da9db7c140c0b0373f72f3ba125ae5541e2b084cb3fb59259c",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-1788922527782.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-1788922527782.json",
+      "bytes": 2935,
+      "sha256": "0f4eaf752896333f3993ebaaaf8ea6e21877938d82fb3111cfd2e25523648dbd",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-1788922562957.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-1788922562957.json",
+      "bytes": 3765,
+      "sha256": "15391283131b3accaab71992c2d555d71f12888901ddd399ad840b3c488d8dd3",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-1788922596184.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-1788922596184.json",
+      "bytes": 3765,
+      "sha256": "8a0a7bf159b6dcf14bee9589f74e32c0bc06281f8caff2e8a67fc908c5d5da1a",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-1788922686909.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-1788922686909.json",
+      "bytes": 3768,
+      "sha256": "e12c0e96dc4f097cd0ed61e94d31b1dbe3ef93bd6921102c2f15162d1fda2c8e",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-1788922937115.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-1788922937115.json",
+      "bytes": 3765,
+      "sha256": "6100ffa0306de623bd37daffded7ce6573653b3ce0cb3c2ff7ee73146be775e9",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-2.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-2.txt",
+      "bytes": 4,
+      "sha256": "7c3afe3a3e156dc5c444f06025c5fbd09535cef5ffcb4d364586c71235ef10fc",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-3.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-3.txt",
+      "bytes": 8878,
+      "sha256": "b021c55365040e9932ef2cf9b80db89c6fdad53f9c74ee084c4bc1d61be5c206",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-4.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-4.txt",
+      "bytes": 154,
+      "sha256": "5f6b1cfa939d7684db3655d6ce81b18d52db1bc2b473ed48cc660447fe7341fa",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-5.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-5.txt",
+      "bytes": 634,
+      "sha256": "3eb7fd03287d9ab587da444b9d3ce5b5c3b74aa75b61a176d92d54b44c00cd24",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/read-6.txt",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\read-6.txt",
+      "bytes": 433,
+      "sha256": "3135dcf7564a9525c89425766a843be30878aaff9e34ab96428df3b3d7a09018",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/restore-1788922710553.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\restore-1788922710553.json",
+      "bytes": 3765,
+      "sha256": "04b7565985c45a252912e1d765f0842e1dbbf8ca72a618cfcec9f5191cb61416",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/static-copy-harness-first-failure.json",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\static-copy-harness-first-failure.json",
+      "bytes": 121,
+      "sha256": "7d167f4d1acac48891f4280aef17513decbf8b3edd11188d33cd2bfa00076e2d",
+      "exactCopy": true
+    },
+    {
+      "path": "raw/ui-commands.jsonl",
+      "source": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-personnel-fe334481-b448-4e51-8b83-8a63480f150c\\ui-commands.jsonl",
+      "bytes": 28098,
+      "sha256": "704375ae71ed7d2693ff6ddbdf88b88f322bcb6110f1e6b2ebd9bf69348f55ac",
+      "exactCopy": true
+    }
+  ]
+}
