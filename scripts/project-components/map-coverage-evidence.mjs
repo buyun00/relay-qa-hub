@@ -107,7 +107,14 @@ function retainReviewNote(item, surface) {
   const prior = item.results[surface];
   // Do not archive this mapper's own intermediate output again on every replay.
   // Existing history remains intact; human/legacy notes are retained before replacement.
-  if (!prior?.note || prior.note === automaticResultNote) return;
+  if (
+    !prior?.note ||
+    prior.note === automaticResultNote ||
+    prior.note === "Real execution and read-back required." ||
+    prior.note ===
+      "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."
+  )
+    return;
   const retained = structuredClone({
     surface,
     status: prior.status,
@@ -126,6 +133,17 @@ function retainReviewNote(item, surface) {
 }
 function record(item, surface, status, evidence, actual) {
   if (!item?.results[surface]?.applicable || item.results[surface].status === "failed") return;
+  // Title-based legacy observations cannot certify a new or changed UI node.
+  // The generator retains exact node/file/old-source results for review. Existing
+  // historical passes and their revalidation flags are not erased by this gate.
+  if (
+    status === "passed" &&
+    /^(?:web_control|android_control|web_page_component|android_page_component|desktop_event|desktop_ipc_action|desktop_menu_action)$/u.test(
+      item.kind,
+    ) &&
+    (item.needsRevalidation || item.manual.needsRevalidation)
+  )
+    return;
   const mappedEvidence = [
     ...new Set(
       evidence.flatMap((reference) => {
@@ -1189,9 +1207,57 @@ validationEvidence.push(
     summary: "7904e2c Web独立构建发布、3个实际HTTP下载SHA匹配、旧dist及全部旧assets保留",
     matched: true,
     scope:
-      "仅构建/发布和静态下载读回，无服务重启/安装版EXE更新；浏览器故障注入尚未执行，不修改客户端通过项",
+      "该发布记录仅证明构建和静态下载，无服务重启/安装版EXE更新；后续浏览器故障注入单独映射，不由发布提升客户端通过项",
   },
 );
+const androidPendingFile = "android-offline-create-recovery.json";
+verifyPinnedProofs(
+  {
+    [androidPendingFile]: "8ccfd05cb1a302c6627c80e6204519b416032617498f5e5297365b8c92c7c5ab",
+    "runs/android-offline-create-protocol-source.txt":
+      "6f40bd82c90066c73beb3ec38f100c9062921cc8e53d6a1f5299dc35405204d5",
+    "runs/android-offline-create-protocol-source-retry.txt":
+      "53a7683f1399cbf873d6b39ae6f1db97954c5d9d13ea8125a661172274df126a",
+  },
+  "Android pending submission source verification",
+);
+const androidPending = read(androidPendingFile);
+const androidNormalization = androidPending.preCommitLineEndingNormalization;
+if (
+  androidPending.sourceFrozen !== true ||
+  androidPending.sourceFiles.length !== 10 ||
+  new Set(androidPending.sourceFiles.map((file) => file.path)).size !== 10 ||
+  androidPending.unit.tests !== 115 ||
+  androidPending.unit.failures !== 0 ||
+  androidPending.unit.errors !== 0 ||
+  androidPending.lint.errors !== 0 ||
+  androidPending.limits.baseline14ClientPassClaim !== false ||
+  androidNormalization.testedRawSha256 !==
+    "0d13a3724d2866368d381338728179c4ba3e51308aaf9cedd2a7a45e1b694ca8" ||
+  androidNormalization.committedCanonicalSha256 !==
+    "710a77ed0afa5ec680bac1de4f689c264783a2dc5aaee2e873b88c19f7164bf5" ||
+  androidNormalization.removedCarriageReturns !== 1 ||
+  androidNormalization.onlyCRLFToLF !== true ||
+  androidNormalization.testsRerun !== false ||
+  !androidPending.sourceFiles.every(
+    (file) =>
+      file.path.startsWith("apps/android/app/src/") &&
+      createHash("sha256")
+        .update(fs.readFileSync(path.join(root, file.path)))
+        .digest("hex") === file.sha256,
+  )
+)
+  throw new Error("Android pending submission proof/current source differs from reviewed hashes");
+validationEvidence.push({
+  file: androidPendingFile,
+  summary: "Android 115/115、lint 0 error；严格核对提交fb2eca7的10份当前源码SHA",
+  matched: true,
+  sourceFiles: androidPending.sourceFiles,
+  normalization: androidNormalization,
+  preservedFailedVerification: androidPending.preservedFailedVerification,
+  scope:
+    "BugDraftPreferences测试原始SHA与提交canonical SHA分别保留，仅1个CRLF→LF、未重跑测试。OkHttp回环/受控DAO及偏好存储夹具，不是已安装APK、Compose/物理设备故障注入；不提升任何客户端结果。",
+});
 const nativeGuards = optionalRead("runs/native-installer-guards.json");
 if (
   nativeGuards?.summary?.passed === 6 &&
@@ -1781,6 +1847,118 @@ for (const surface of ["http", "server_mcp"]) {
       ...new Set([
         ...[].concat(prior?.remaining ?? []),
         "f8e2c6da中两次均由HTTP通过方胜出，不据此声称退回成功效果、客户端恢复或所有动作组合通过",
+      ]),
+    ],
+  );
+}
+
+const webRecoveryFirstFile =
+  "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json";
+const webRecoveryFinalFile =
+  "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json";
+verifyPinnedProofs(
+  {
+    [webRecoveryFirstFile]: "e895f1114d9b86ac2272783e101a360617c1e28fc16537104a116a880446eef7",
+    [webRecoveryFinalFile]: "3bd91b313315c54c457307facaaff52d900848dfc6da4fc8c096c8e70d1c4c84",
+    "web-submission-recovery-live/audit.json":
+      "8bf531f9baf759365339d5e32d5abfe0162ea04cdf6628adfc4b42ceeb27db29",
+    "web-submission-recovery-live/README.md":
+      "f233ff30db0ee6a80c84be78a57ab85067f8444ff92a86d1e0b3e95fffb74f25",
+  },
+  "Web unknown submission recovery real browser runs",
+);
+const webRecoveryFirst = read(webRecoveryFirstFile);
+const webRecoveryFinal = read(webRecoveryFinalFile);
+const webRecoveryAudit = read("web-submission-recovery-live/audit.json");
+if (
+  webRecoveryAudit.status !== "passed_with_preserved_first_run_harness_failure" ||
+  webRecoveryAudit.runs.length !== 2 ||
+  webRecoveryAudit.runs[0].recomputedEqualAndPassed !== 38 ||
+  webRecoveryAudit.runs[1].recomputedEqualAndPassed !== 101 ||
+  webRecoveryFirst.status !== "failed" ||
+  webRecoveryFirst.checks.length !== 38 ||
+  webRecoveryFirst.checks.some((check) => check.passed !== true) ||
+  webRecoveryFirst.failure !== "Error: Timed out: post comment once" ||
+  webRecoveryFinal.status !== "passed" ||
+  webRecoveryFinal.checks.length !== 101 ||
+  webRecoveryFinal.checks.some((check) => check.passed !== true) ||
+  webRecoveryFinal.faults.length !== 2 ||
+  webRecoveryFinal.boundaries.existingBrowserOrExeAttached !== false ||
+  webRecoveryFinal.boundaries.componentTasksCalled !== false ||
+  webRecoveryFinal.publishedSourceCommit !== pendingPublication.sourceCommit ||
+  Object.entries(webRecoveryFinal.sourceHashes).some(
+    ([file, sha256]) =>
+      !pendingSource.sourceFiles.some((entry) => entry.path === file && entry.sha256 === sha256),
+  ) ||
+  webRecoveryFinal.processes.filter((entry) => entry.phase === "launched").length !== 4 ||
+  webRecoveryFinal.processes.filter((entry) => entry.phase === "normal_close" && entry.exited)
+    .length !== 4 ||
+  webRecoveryFinal.bundles.length !== 4 ||
+  webRecoveryFinal.bundles.some(
+    (entry) => entry.status !== 200 || entry.sha256 !== webRecoveryFinal.expectedBundle.sha256,
+  )
+)
+  throw new Error("Web browser recovery proof differs from the reviewed two runs");
+for (const kind of ["bug", "comment"]) {
+  const fault = webRecoveryFinal.faults.find((entry) => entry.kind === kind);
+  const requests = webRecoveryFinal.requests.filter(
+    (entry) =>
+      entry.kind === "page_request" && entry.method === "POST" && entry.path === fault?.path,
+  );
+  const responses = webRecoveryFinal.requests.filter(
+    (entry) => entry.kind === "page_commit_response" && entry.path === fault?.path,
+  );
+  if (
+    fault?.phase !== "server_response_201_before_browser_delivery" ||
+    fault.action !== "Fetch.failRequest/Failed" ||
+    requests.length !== 2 ||
+    responses.length !== 2 ||
+    responses.some((entry) => entry.status !== 201) ||
+    JSON.stringify(requests[0].body) !== JSON.stringify(requests[1].body) ||
+    requests[0].headers["idempotency-key"] !== requests[1].headers["idempotency-key"]
+  )
+    throw new Error(`Web ${kind} recovery lacks the original request/key and real 201 pair`);
+}
+const webRecoveryItem = baselineItem(14);
+webRecoveryItem.manual.webSubmissionRecoveryRuns = [
+  {
+    evidence: webRecoveryFirstFile,
+    status: "failed",
+    completedChecks: 38,
+    failure: webRecoveryFirst.failure,
+    scope: "首轮harness未展开评论区，未发评论POST；原始失败及已创建fixture保留，不计完整恢复通过",
+  },
+  {
+    evidence: webRecoveryFinalFile,
+    status: "passed",
+    completedChecks: 101,
+    scope: "独立Edge实际页面与持久profile；只覆盖Bug/comment未知回执重放和正常浏览器重启",
+  },
+];
+if (webRecoveryItem.results.web.status !== "failed") {
+  const prior = webRecoveryItem.manual.surfaceProgress?.web;
+  partialBaseline(
+    14,
+    "web",
+    [
+      ...new Set([
+        ...webRecoveryItem.results.web.evidence,
+        webRecoveryFirstFile,
+        webRecoveryFinalFile,
+        "web-submission-recovery-live/audit.json",
+        "web-submission-recovery-live/README.md",
+      ]),
+    ],
+    [
+      ...new Set([
+        ...[].concat(prior?.completed ?? []),
+        "bf3a4621：实际Edge页面101/101；Bug及评论各在服务201后丢弃一次回执，修改草稿后正常关闭/重启同profile，再通过原结果确认按钮以原key/冻结payload重放；仅1个Bug/occurrence/评论及1份68B PNG同SHA，后改两份草稿保留并再次重启读回。",
+      ]),
+    ],
+    [
+      ...new Set([
+        ...[].concat(prior?.remaining ?? []),
+        "该Web实测未覆盖其它写动作、同时多窗口、附件上传中断、撤权/跨项目故障、进程强杀或所有幂等竞争组合；APK/EXE/HTTP/server MCP/local MCP结果不由此迁移。首轮38检查后harness失败保留。",
       ]),
     ],
   );

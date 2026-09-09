@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-08T23:50:24.314Z",
+  "passed": true,
+  "method": "Entire frozen mapper executed with new Function after removing four imports and replacing import.meta.url; normal runs substitute only the matrix read; every fs.writeFileSync is intercepted. Negative hash checks alter one proof/source read only in memory. Other reads remain real and read-only; fixed Date normalizes generated timestamps.",
+  "command": "node scripts/project-components/map-coverage-evidence.client-recovery.audit.mjs",
+  "input": {
+    "mapperSha256": "657d2ec8126435cb120623d900973d08b5e67bf73ec2ce11b2b47bf34f8179f6",
+    "matrixSha256": "aa09c534edb6d28454357ce90c0364ce7d2f7499f544320d8ca9a7002bd87bc7",
+    "actualReviewSha256": "1a75f83c7ea5662115110a596cd680b438e6a2d83e1497c3bdd4245542cd1201",
+    "inputMatrixPath": "docs\\evidence\\project-components\\coverage-matrix.json",
+    "matrixLastCommittedAt": "cb9454b195071e78b006dab5cdac1b8a900a1b9c",
+    "items": 985
+  },
+  "clientRecovery": {
+    "referenceCommit": "6b28723",
+    "referenceMapperSha256": "19acf90afb515919b13258733578dd9a8bb4328d84e9b80b2b9e8d5d9527fca5",
+    "deltaResultPaths": [
+      "baseline-4e70e4b8aea144/web/evidence.length",
+      "baseline-4e70e4b8aea144/web/actual",
+      "baseline-4e70e4b8aea144/web/note"
+    ],
+    "otherFiveBaseline14SurfaceDiffs": 0,
+    "otherEntryResultDiffs": 0,
+    "webFailedResultAndProgressDiffs": 0,
+    "baseline14WebStatus": "not_run",
+    "webRunHistory": [
+      {
+        "status": "failed",
+        "checks": 38,
+        "evidence": "web-submission-recovery-live/4f6387f6-244b-4115-916b-6fffe3db1efd/proof.json"
+      },
+      {
+        "status": "passed",
+        "checks": 101,
+        "evidence": "web-submission-recovery-live/bf3a4621-6c48-459e-b776-5c9011d7d327/proof.json"
+      }
+    ],
+    "androidCurrentSources": 10,
+    "androidNormalization": {
+      "recordedAt": "2026-09-08T23:40:28.051Z",
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/BugDraftPreferences.kt",
+      "testedRawSha256": "0d13a3724d2866368d381338728179c4ba3e51308aaf9cedd2a7a45e1b694ca8",
+      "committedCanonicalSha256": "710a77ed0afa5ec680bac1de4f689c264783a2dc5aaee2e873b88c19f7164bf5",
+      "removedCarriageReturns": 1,
+      "onlyCRLFToLF": true,
+      "testsRerun": false,
+      "note": "Repository eol=lf normalization only. Test evidence above was produced before this one-byte normalization; no Kotlin token or behavior changed."
+    },
+    "newProofAndSourceTamper": [
+      {
+        "path": "docs\\evidence\\project-components\\android-offline-create-recovery.json",
+        "rejected": true,
+        "virtualWrites": 0
+      },
+      {
+        "path": "apps\\android\\app\\src\\main\\kotlin\\com\\relayqahub\\android\\BugDraftPreferences.kt",
+        "rejected": true,
+        "virtualWrites": 0
+      },
+      {
+        "path": "docs\\evidence\\project-components\\web-submission-recovery-live\\bf3a4621-6c48-459e-b776-5c9011d7d327\\proof.json",
+        "rejected": true,
+        "virtualWrites": 0
+      }
+    ],
+    "retainedNotesExplanation": "159 original notes are preserved; the frozen prior mapper adds 59 once (218). This addition archives the previous baseline14 Web note once (219); the second run remains 219."
+  },
+  "previousAudit": {
+    "path": "docs/evidence/project-components/mapper-memory-audit.json",
+    "sha256": "4aadcf67407f8b1da3f6d15c4192f8244882c8afb97f78be59988405418839a9",
+    "frozenCommit": "6b28723",
+    "overwritten": false
+  },
+  "historicalBeforeFix": {
+    "observedInPriorReadOnlyAudit": true,
+    "firstRetainedNotes": 159,
+    "secondRetainedNotes": 198,
+    "changedPaths": 36,
+    "syntheticFailedDowngrades": 68,
+    "note": "Historical observation was captured before the fix. The current audit also reproduces the 68-status protection regression by disabling exactly the two central failed guards; that control is not a byte-identical reconstruction of the former source."
+  },
+  "results": {
+    "semanticReplayDiffs": 0,
+    "noteCounts": [159, 219, 219],
+    "originalNotesMissing": 0,
+    "syntheticFailedSurfaces": 612,
+    "failedResultDiffs": 0,
+    "failedProgressDiffs": 0,
+    "guardDisabledControlDowngrades": 68,
+    "unmeasuredClientSurfaceDiffs": 0,
+    "revalidationFlags": 401,
+    "flagDiffs": 0,
+    "mismatchedProofVirtualWrites": 0,
+    "mismatchedProofError": "Reviewed evidence changed; re-review required: baseline-950546b51f2cb2 / runs/exe-preview6-logout-readback.json",
+    "virtualWriteTargets": [
+      "docs\\evidence\\project-components\\coverage-matrix.json",
+      "docs\\evidence\\project-components\\coverage-mapping-review.md"
+    ],
+    "differencePaths": []
+  },
+  "checks": {
+    "onlyBaseline14WebResultDelta": true,
+    "otherFiveBaseline14SurfacesUnchanged": true,
+    "existingWebFailureAndProgressPreserved": true,
+    "webRemainsPartialWithBothRuns": true,
+    "androidValidationOnlyAndTenSources": true,
+    "newProofAndSourceHashFailuresBeforeWrite": true,
+    "semanticReplayStable": true,
+    "twoExpectedVirtualWrites": true,
+    "retainsAll159OriginalNotes": true,
+    "noteCountsStable": true,
+    "syntheticFailedResultsPreserved": true,
+    "syntheticFailedProgressPreserved": true,
+    "regressionControlDetects68Downgrades": true,
+    "unmeasuredClientSurfacesUnchanged": true,
+    "all401RevalidationFlagsPreserved": true,
+    "explicitManualAnnotationRetained": true,
+    "mismatchedProofRejectedBeforeWrite": true,
+    "protectedActualFilesUnchanged": true,
+    "rootVerdictPreservedAndClarified": true
+  },
+  "protectedFilesBefore": {
+    "scripts\\project-components\\map-coverage-evidence.mjs": "657d2ec8126435cb120623d900973d08b5e67bf73ec2ce11b2b47bf34f8179f6",
+    "docs\\evidence\\project-components\\coverage-matrix.json": "aa09c534edb6d28454357ce90c0364ce7d2f7499f544320d8ca9a7002bd87bc7",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "1a75f83c7ea5662115110a596cd680b438e6a2d83e1497c3bdd4245542cd1201"
+  },
+  "protectedFilesAfter": {
+    "scripts\\project-components\\map-coverage-evidence.mjs": "657d2ec8126435cb120623d900973d08b5e67bf73ec2ce11b2b47bf34f8179f6",
+    "docs\\evidence\\project-components\\coverage-matrix.json": "aa09c534edb6d28454357ce90c0364ce7d2f7499f544320d8ca9a7002bd87bc7",
+    "docs\\evidence\\project-components\\coverage-mapping-review.md": "1a75f83c7ea5662115110a596cd680b438e6a2d83e1497c3bdd4245542cd1201"
+  },
+  "limits": [
+    "Pure memory audit only: no actual generate/map output was written and no baseline result was published.",
+    "No UI, business API, service control or production probes. git show reads only the exact historical mapper for the incremental comparison.",
+    "Virtual timestamp is fixed only to compare mapping semantics.",
+    "For a later changed worktree, supply exact reviewed source/input snapshots with --mapper and --input-matrix; hash mismatch intentionally fails closed."
+  ],
+  "auditScript": {
+    "path": "scripts/project-components/map-coverage-evidence.client-recovery.audit.mjs",
+    "sha256": "85b186c39f2937631fd24f48f055ddc5536fb242447ffa7ae720b6dfc09b106a"
+  },
+  "checkExitStatus": {
+    "memoryAudit": 0,
+    "nodeCheck": 0,
+    "eslintMaxWarnings0": 0,
+    "prettierCheck": 0,
+    "gitDiffCheck": 0
+  },
+  "staticCommands": [
+    "node --check scripts/project-components/map-coverage-evidence.mjs",
+    "node --check scripts/project-components/map-coverage-evidence.client-recovery.audit.mjs",
+    "node node_modules/eslint/bin/eslint.js scripts/project-components/map-coverage-evidence.mjs scripts/project-components/map-coverage-evidence.client-recovery.audit.mjs --max-warnings=0",
+    "node node_modules/prettier/bin/prettier.cjs --check scripts/project-components/map-coverage-evidence.mjs scripts/project-components/map-coverage-evidence.client-recovery.audit.mjs",
+    "git diff --check -- scripts/project-components/map-coverage-evidence.mjs scripts/project-components/map-coverage-evidence.client-recovery.audit.mjs"
+  ],
+  "evidenceRecordedAt": "2026-09-08T23:50:24.344Z"
+}

@@ -229,6 +229,20 @@ function add({
   const sourceHash = source ? (sourceHashes[source.file] ?? null) : null;
   const component = group ?? groupFor(`${title} ${source?.file ?? ""}`);
   const manual = prior?.manual ?? {};
+  const changedSource = Boolean(prior?.sourceHash && sourceHash && prior.sourceHash !== sourceHash);
+  const newSourceNode = Boolean(!prior && source && previous.items.length);
+  if ((changedSource || newSourceNode) && !manual.sourceEvidenceReview) {
+    manual.sourceEvidenceReview = {
+      nodeId: id,
+      sourceFile: source.file,
+      previousSourceHash: prior?.sourceHash ?? null,
+      firstChangedSourceHash: sourceHash,
+      reason: changedSource ? "source_changed" : "new_source_node",
+      priorResults: prior ? structuredClone(prior.results) : null,
+      scope:
+        "Historical results remain retained; this is a revalidation requirement, not new execution evidence.",
+    };
+  }
   const results = Object.fromEntries(
     surfaces.map((surface) => [
       surface,
@@ -237,9 +251,11 @@ function add({
         status: prior?.results?.[surface]?.status ?? "not_run",
         evidence: prior?.results?.[surface]?.evidence ?? [],
         actual: prior?.results?.[surface]?.actual ?? "",
-        note: applicable.includes(surface)
-          ? "Real execution and read-back required."
-          : "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion.",
+        note:
+          prior?.results?.[surface]?.note ??
+          (applicable.includes(surface)
+            ? "Real execution and read-back required."
+            : "This entry inventories a different surface; requirement-level coverage is tracked separately. Not an accepted scope exclusion."),
       },
     ]),
   );
@@ -266,10 +282,7 @@ function add({
     status: prior?.status ?? "not_run",
     results,
     manual,
-    needsRevalidation: Boolean(
-      prior?.needsRevalidation ||
-      (prior?.sourceHash && sourceHash && prior.sourceHash !== sourceHash),
-    ),
+    needsRevalidation: Boolean(prior?.needsRevalidation || changedSource || newSourceNode),
     generated: true,
   });
 }
