@@ -1,0 +1,46 @@
+{
+  "observedAt": "2026-09-09T08:26:05.2133727Z",
+  "listeners": [
+    {
+      "port": 4519,
+      "pid": 14676,
+      "createdAt": "2026-09-09T06:50:21.3491250Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLineSha256": "98ab9b591addea17048ecf8c8433e83fa1d4e6e49c0a09e9d88c16817b636874"
+    },
+    {
+      "port": 4521,
+      "pid": 7472,
+      "createdAt": "2026-09-09T06:50:46.5226930Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLineSha256": "ea675d18c81f622408ce8b0bd3828ee46618910234a261f4757c51cd925d979d"
+    }
+  ],
+  "apiHealth": {
+    "status": "ready",
+    "schemaVersion": "19",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "instanceConfigSha256": "d5aaee5c958ad46598ded9766fcbae5085e69731fadcf2844f0240d453cc564c",
+  "operations": {
+    "httpGets": 1,
+    "serviceOperations": 0,
+    "businessWrites": 0,
+    "productionReads": 0,
+    "productionWrites": 0
+  },
+  "harnessNote": "An initial read-only process serialization used an unnecessary DMTF conversion and produced an empty listener array; this corrected record uses the CIM DateTime value directly."
+}

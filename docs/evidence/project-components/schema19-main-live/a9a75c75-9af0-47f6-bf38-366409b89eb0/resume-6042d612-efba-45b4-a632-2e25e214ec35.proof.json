@@ -1,0 +1,2662 @@
+{
+  "schemaVersion": 1,
+  "status": "failed_retained",
+  "resumeId": "6042d612-efba-45b4-a632-2e25e214ec35",
+  "resumedFromRunId": "a9a75c75-9af0-47f6-bf38-366409b89eb0",
+  "resumedFromProofSha256": "4761570027047205a7e43e9cb47763eeb37c99ac6f7cce42f37f4fa99e7c98c1",
+  "startedAt": "2026-09-09T07:18:01.543Z",
+  "instanceId": "qa-hub-preview-schema19-sol-0909",
+  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+  "sourceHead": "85d21028a8b5b0e872a34822d83516faee8c6445",
+  "sourceSha256": "dadbba45de012a7b558093992d965a311c68560fe7925de0afddd6ebf29cf74c",
+  "instanceConfigSha256": "d5aaee5c958ad46598ded9766fcbae5085e69731fadcf2844f0240d453cc564c",
+  "checks": [
+    {
+      "label": "same processes survived the failed assertion",
+      "actual": [
+        {
+          "port": 4519,
+          "pid": 14676,
+          "startedAt": "2026-09-09T06:50:21.3491250Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+        },
+        {
+          "port": 4521,
+          "pid": 7472,
+          "startedAt": "2026-09-09T06:50:46.5226930Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+        }
+      ],
+      "expected": [
+        {
+          "port": 4519,
+          "pid": 14676,
+          "startedAt": "2026-09-09T06:50:21.3491250Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+        },
+        {
+          "port": 4521,
+          "pid": 7472,
+          "startedAt": "2026-09-09T06:50:46.5226930Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+        }
+      ],
+      "at": "2026-09-09T07:18:03.006Z",
+      "passed": true
+    },
+    {
+      "label": "resumed API ready",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:18:03.047Z",
+      "passed": true
+    },
+    {
+      "label": "resumed API schema",
+      "actual": "19",
+      "expected": "19",
+      "at": "2026-09-09T07:18:03.047Z",
+      "passed": true
+    },
+    {
+      "label": "resumed MCP ready",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:18:03.047Z",
+      "passed": true
+    },
+    {
+      "label": "resumed MCP schema",
+      "actual": "19",
+      "expected": "19",
+      "at": "2026-09-09T07:18:03.047Z",
+      "passed": true
+    },
+    {
+      "label": "resume keeps employee identity",
+      "actual": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+      "expected": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+      "at": "2026-09-09T07:18:03.061Z",
+      "passed": true
+    },
+    {
+      "label": "capture remains bound to prior identity",
+      "actual": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+      "expected": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+      "at": "2026-09-09T07:18:03.072Z",
+      "passed": true
+    },
+    {
+      "label": "partial enrichment is correct for the synthetic fixture",
+      "actual": "partial",
+      "expected": "partial",
+      "at": "2026-09-09T07:18:03.072Z",
+      "passed": true
+    },
+    {
+      "label": "synthetic fixture attempted Poco",
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-09T07:18:03.072Z",
+      "passed": true
+    },
+    {
+      "label": "synthetic fixture negotiated two methods",
+      "actual": [
+        "GetSDKVersion",
+        "Screenshot"
+      ],
+      "expected": [
+        "GetSDKVersion",
+        "Screenshot"
+      ],
+      "at": "2026-09-09T07:18:03.072Z",
+      "passed": true
+    },
+    {
+      "label": "full allowlist remains visible",
+      "actual": 6,
+      "expected": 6,
+      "at": "2026-09-09T07:18:03.072Z",
+      "passed": true
+    },
+    {
+      "label": "prior passed verification persisted",
+      "actual": "passed",
+      "expected": "passed",
+      "at": "2026-09-09T07:18:03.079Z",
+      "passed": true
+    },
+    {
+      "label": "prior passed Bug remains closed",
+      "actual": "closed",
+      "expected": "closed",
+      "at": "2026-09-09T07:18:03.103Z",
+      "passed": true
+    },
+    {
+      "label": "prior passed result remains latest",
+      "actual": "passed",
+      "expected": "passed",
+      "at": "2026-09-09T07:18:03.103Z",
+      "passed": true
+    },
+    {
+      "label": "resumed attachment 0410f7d7-486f-4177-af8b-e0c925a4196a hash",
+      "actual": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "expected": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "at": "2026-09-09T07:18:03.112Z",
+      "passed": true
+    },
+    {
+      "label": "resumed attachment 0410f7d7-486f-4177-af8b-e0c925a4196a bytes",
+      "actual": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+      "expected": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+      "at": "2026-09-09T07:18:03.112Z",
+      "passed": true
+    },
+    {
+      "label": "resumed attachment 6479bbd9-5292-4d69-b14b-16f0183ce499 hash",
+      "actual": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61",
+      "expected": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61",
+      "at": "2026-09-09T07:18:03.121Z",
+      "passed": true
+    },
+    {
+      "label": "resumed attachment 6479bbd9-5292-4d69-b14b-16f0183ce499 bytes",
+      "actual": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYIIA",
+      "expected": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYIIA",
+      "at": "2026-09-09T07:18:03.121Z",
+      "passed": true
+    },
+    {
+      "label": "blocked verification resumed main path has Bug UUID",
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-09T07:18:03.134Z",
+      "passed": true
+    },
+    {
+      "label": "blocked result first write",
+      "actual": false,
+      "expected": false,
+      "at": "2026-09-09T07:18:03.319Z",
+      "passed": true
+    },
+    {
+      "label": "blocked Verification status",
+      "actual": "blocked",
+      "expected": "blocked",
+      "at": "2026-09-09T07:18:03.319Z",
+      "passed": true
+    },
+    {
+      "label": "blocked Bug state",
+      "actual": "ready_for_verification",
+      "expected": "ready_for_verification",
+      "at": "2026-09-09T07:18:03.319Z",
+      "passed": true
+    },
+    {
+      "label": "blocked RepairAttempt state",
+      "actual": "delivered",
+      "expected": "delivered",
+      "at": "2026-09-09T07:18:03.319Z",
+      "passed": true
+    },
+    {
+      "label": "blocked result replay",
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-09T07:18:03.329Z",
+      "passed": true
+    },
+    {
+      "label": "blocked result replay event",
+      "actual": "cd7d74f1-8bae-40a6-b2ce-f46c76529d49",
+      "expected": "cd7d74f1-8bae-40a6-b2ce-f46c76529d49",
+      "at": "2026-09-09T07:18:03.329Z",
+      "passed": true
+    },
+    {
+      "label": "blocked Verification readback",
+      "actual": "blocked",
+      "expected": "blocked",
+      "at": "2026-09-09T07:18:03.337Z",
+      "passed": true
+    },
+    {
+      "label": "failed verification resumed main path has Bug UUID",
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-09T07:18:03.350Z",
+      "passed": true
+    },
+    {
+      "label": "failed result first write",
+      "actual": false,
+      "expected": false,
+      "at": "2026-09-09T07:18:03.534Z",
+      "passed": true
+    },
+    {
+      "label": "failed Verification status",
+      "actual": "failed",
+      "expected": "failed",
+      "at": "2026-09-09T07:18:03.534Z",
+      "passed": true
+    },
+    {
+      "label": "failed Bug state",
+      "actual": "ready",
+      "expected": "in_progress",
+      "at": "2026-09-09T07:18:03.534Z",
+      "passed": false
+    }
+  ],
+  "requests": [
+    {
+      "transport": "server_mcp",
+      "label": "resume server MCP initialization",
+      "id": 1,
+      "method": "initialize",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {
+          "protocolVersion": "2025-06-18",
+          "capabilities": {},
+          "clientInfo": {
+            "name": "schema19-main-live-resume",
+            "version": "1"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.047Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 403,
+      "responseSha256": "a8ff06bffd5dbf249291240ea52cee1820cf149ffe024b2560d585ced7cc59f3",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "protocolVersion": "2025-06-18",
+          "capabilities": {
+            "tools": {
+              "listChanged": false
+            },
+            "resources": {
+              "subscribe": false,
+              "listChanged": false
+            }
+          },
+          "serverInfo": {
+            "name": "qa-hub-project-preview",
+            "version": "2.1"
+          },
+          "instructions": "Use explicit project IDs and project name sessions. Bug human acceptance is independent from optional integrations. Never report unexecuted checks as passed."
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.053Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "resume same employee login",
+      "id": 2,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_login",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "name": "Schema19a9a75c759af0"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.054Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1086,
+      "responseSha256": "7c55984dfca19edab3a3f94724fc6b7515e7221494f0fd770c42604af5bf4b7f",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"accountId\":\"10000000-0000-4000-8000-000000000020\",\"userId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"email\":\"qa-2715a6cabc984041cd791dad643bc43f1787e3ad68584b86a4cad2b223924208@local.invalid\",\"displayName\":\"Schema19a9a75c759af0\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"isGm\":false,\"expiresAt\":\"2094-09-27T10:32:10.056Z\"}"
+            }
+          ],
+          "structuredContent": {
+            "accountId": "10000000-0000-4000-8000-000000000020",
+            "userId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+            "email": "qa-2715a6cabc984041cd791dad643bc43f1787e3ad68584b86a4cad2b223924208@local.invalid",
+            "displayName": "Schema19a9a75c759af0",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "isGm": false,
+            "expiresAt": "2094-09-27T10:32:10.056Z"
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.061Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "resume at failed capture read",
+      "id": 3,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_get_capture",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "captureId": "d7b82ae5-bb41-4681-8afb-2a08a8f77835"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.061Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3650,
+      "responseSha256": "101222110d45a7db7247c61e0728e73f07a90623939609a16bedbf970d856c66",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"captureId\":\"d7b82ae5-bb41-4681-8afb-2a08a8f77835\",\"clientSubmissionId\":\"cb145dcc-a23a-4ca8-83a3-b38446d45b1f\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"capturedAt\":\"2026-09-09T07:12:33.434Z\",\"source\":\"overlay_single_tap\",\"primaryEvidenceClientAttachmentId\":\"7c3cbc84-fa59-4aae-b72d-1f57069086cf\",\"primaryEvidenceAttachmentId\":\"0410f7d7-486f-4177-af8b-e0c925a4196a\",\"artifacts\":[{\"captureId\":\"d7b82ae5-bb41-4681-8afb-2a08a8f77835\",\"clientAttachmentId\":\"7c3cbc84-fa59-4aae-b72d-1f57069086cf\",\"attachmentId\":\"0410f7d7-486f-4177-af8b-e0c925a4196a\",\"kind\":\"system_screenshot\",\"status\":\"succeeded\",\"startedAt\":\"2026-09-09T07:12:33.434Z\",\"endedAt\":\"2026-09-09T07:12:33.434Z\",\"skewMs\":0,\"truncated\":false,\"failureReason\":null},{\"captureId\":\"d7b82ae5-bb41-4681-8afb-2a08a8f77835\",\"clientAttachmentId\":\"d806417e-30ab-4f54-a6da-cdb2e4e34fdf\",\"attachmentId\":\"6479bbd9-5292-4d69-b14b-16f0183ce499\",\"kind\":\"poco_screenshot\",\"status\":\"succeeded\",\"startedAt\":\"2026-09-09T07:12:33.434Z\",\"endedAt\":\"2026-09-09T07:12:33.434Z\",\"skewMs\":0,\"truncated\":false,\"failureReason\":null}],\"enrichmentStatus\":\"partial\",\"poco\":{\"status\":\"partial\",\"attempted\":true,\"connectedPort\":5001,\"sdkVersion\":\"synthetic-main-fixture\",\"snapshotCapability\":\"standard_only\",\"screenSize\":null,\"allowedReadOnlyMethods\":[\"GetSDKVersion\",\"Screenshot\",\"Dump\",\"GetScreenSize\",\"GetDebugProfilingData\",\"qa.snapshot\"],\"negotiatedMethods\":[\"GetSDKVersion\",\"Screenshot\"],\"succeededMethods\":[\"GetSDKVersion\",\"Screenshot\"],\"failureReason\":null},\"deviceMetadata\":{\"manufacturer\":\"Synthetic\",\"model\":\"Retained isolated main fixture\",\"androidApi\":35,\"androidRelease\":\"15\",\"qaAppVersion\":\"schema19-main-live\",\"networkType\":\"offline\"}}"
+            }
+          ],
+          "structuredContent": {
+            "captureId": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+            "clientSubmissionId": "cb145dcc-a23a-4ca8-83a3-b38446d45b1f",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "capturedAt": "2026-09-09T07:12:33.434Z",
+            "source": "overlay_single_tap",
+            "primaryEvidenceClientAttachmentId": "7c3cbc84-fa59-4aae-b72d-1f57069086cf",
+            "primaryEvidenceAttachmentId": "0410f7d7-486f-4177-af8b-e0c925a4196a",
+            "artifacts": [
+              {
+                "captureId": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+                "clientAttachmentId": "7c3cbc84-fa59-4aae-b72d-1f57069086cf",
+                "attachmentId": "0410f7d7-486f-4177-af8b-e0c925a4196a",
+                "kind": "system_screenshot",
+                "status": "succeeded",
+                "startedAt": "2026-09-09T07:12:33.434Z",
+                "endedAt": "2026-09-09T07:12:33.434Z",
+                "skewMs": 0,
+                "truncated": false,
+                "failureReason": null
+              },
+              {
+                "captureId": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+                "clientAttachmentId": "d806417e-30ab-4f54-a6da-cdb2e4e34fdf",
+                "attachmentId": "6479bbd9-5292-4d69-b14b-16f0183ce499",
+                "kind": "poco_screenshot",
+                "status": "succeeded",
+                "startedAt": "2026-09-09T07:12:33.434Z",
+                "endedAt": "2026-09-09T07:12:33.434Z",
+                "skewMs": 0,
+                "truncated": false,
+                "failureReason": null
+              }
+            ],
+            "enrichmentStatus": "partial",
+            "poco": {
+              "status": "partial",
+              "attempted": true,
+              "connectedPort": 5001,
+              "sdkVersion": "synthetic-main-fixture",
+              "snapshotCapability": "standard_only",
+              "screenSize": null,
+              "allowedReadOnlyMethods": [
+                "GetSDKVersion",
+                "Screenshot",
+                "Dump",
+                "GetScreenSize",
+                "GetDebugProfilingData",
+                "qa.snapshot"
+              ],
+              "negotiatedMethods": [
+                "GetSDKVersion",
+                "Screenshot"
+              ],
+              "succeededMethods": [
+                "GetSDKVersion",
+                "Screenshot"
+              ],
+              "failureReason": null
+            },
+            "deviceMetadata": {
+              "manufacturer": "Synthetic",
+              "model": "Retained isolated main fixture",
+              "androidApi": 35,
+              "androidRelease": "15",
+              "qaAppVersion": "schema19-main-live",
+              "networkType": "offline"
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.071Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "read prior passed verification",
+      "id": 4,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_get_verification",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "5dce1a96-43c0-439d-b46b-4c1a5b80986a"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.072Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1018,
+      "responseSha256": "715822097f55fa3eaac8544ef4cac2d44c9e12fc2e08628411e76880346e0feb",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"id\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"buildId\":null,\"status\":\"passed\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"Captured passed verification exact acceptance criteria\",\"resultSummary\":\"Actual main process retained the exact evidence chain\",\"failureReason\":null,\"blockedReason\":null,\"version\":3}"
+            }
+          ],
+          "structuredContent": {
+            "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+            "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+            "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+            "buildId": null,
+            "status": "passed",
+            "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+            "criteriaSnapshot": "Captured passed verification exact acceptance criteria",
+            "resultSummary": "Actual main process retained the exact evidence chain",
+            "failureReason": null,
+            "blockedReason": null,
+            "version": 3
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.079Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "read prior closed Bug context",
+      "id": 5,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_get_bug_context",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.080Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 17148,
+      "responseSha256": "7e73657bda2ecbae05e9cf3210cd560fdc5729d90f7863117ae3c6f73f4761f1",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"bug\":{\"id\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":3,\"key\":\"S19A9A75C75-3\",\"title\":\"Captured passed verification\",\"description\":\"Captured passed verification through the isolated schema 19 main process\",\"expectedBehavior\":\"The frozen workflow persists exact state and evidence\",\"moduleId\":null,\"state\":\"closed\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-09T07:12:33.217Z\",\"updatedAt\":\"2026-09-09T07:12:33.470Z\",\"closedAt\":\"2026-09-09T07:12:33.470Z\"},\"comments\":{\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"items\":[],\"nextCursor\":null},\"events\":{\"items\":[{\"schemaVersion\":\"1.0\",\"id\":\"8a0d7bd0-06fc-4cde-9946-7161289cd4d2\",\"type\":\"verification.result_recorded\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"version\":6},\"sequence\":3,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"a504fe3d-3a7e-4216-ae97-a2502a700e01\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.470Z\",\"fromState\":\"ready_for_verification\",\"toState\":\"closed\",\"payload\":{\"status\":\"passed\",\"summary\":\"Actual main process retained the exact evidence chain\",\"verificationId\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1.0\",\"id\":\"2ff5d0f2-1e5f-4881-b04d-6335f6617c12\",\"type\":\"verification.started\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"version\":6},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"1360ad35-be01-42e3-a673-19181bfc41b4\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.371Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"status\":\"in_progress\",\"verificationId\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"fromVersion\":1,\"toVersion\":2}},{\"schemaVersion\":\"1.0\",\"id\":\"adb7b516-b2c6-4e40-9537-377cb7421d5a\",\"type\":\"verification.created\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"version\":6},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"43bf29b1-8413-4f24-b3b2-4f765e07e5b7\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.340Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"status\":\"requested\",\"verificationId\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"toVersion\":1}},{\"schemaVersion\":\"1.0\",\"id\":\"3c2a1ce3-f8a9-4a94-b0c4-c0e9fde71f82\",\"type\":\"repair_attempt.delivered\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"version\":6},\"sequence\":3,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"b218ea0b-4aba-4afd-8484-35a39710c15e\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.308Z\",\"fromState\":\"in_progress\",\"toState\":\"ready_for_verification\",\"payload\":{\"status\":\"delivered\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"reason\":\"This retained main acceptance exercises workflow persistence\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1.0\",\"id\":\"3ccec129-98bb-4ced-b97b-0340093afefb\",\"type\":\"repair_attempt.started\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"version\":6},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"c085fbbf-35c7-4c44-94bb-c94a43d61938\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.294Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"status\":\"running\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"fromVersion\":1,\"toVersion\":2}},{\"schemaVersion\":\"1.0\",\"id\":\"8fd2a319-b14e-4b47-838e-7e1f1c4d1d9d\",\"type\":\"repair_attempt.created\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"version\":6},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"b99d164b-0ecc-47a7-ac3f-bd99ae9864f9\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.258Z\",\"fromState\":\"ready\",\"toState\":\"in_progress\",\"payload\":{\"status\":\"planned\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"fromVersion\":2,\"toVersion\":3}},{\"schemaVersion\":\"1.0\",\"id\":\"8e7dd7fa-6fb4-4030-91d8-d0dd2458a925\",\"type\":\"bug.triage.ready\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"version\":6},\"sequence\":2,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"128457ea-93d2-4e06-9688-a02e9e70d12a\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.229Z\",\"fromState\":\"reported\",\"toState\":\"ready\",\"payload\":{\"status\":\"ready\",\"fromVersion\":1,\"toVersion\":2}},{\"schemaVersion\":\"1.0\",\"id\":\"2af7eedf-1f20-4464-9f58-d4a794fb1975\",\"type\":\"occurrence.appended\",\"source\":\"qa_hub\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"aggregate\":{\"type\":\"bug\",\"id\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"version\":6},\"sequence\":1,\"actor\":{\"type\":\"user\",\"id\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\"},\"correlationId\":\"ce86dbb9-ada5-4216-99f1-2299c6e7c3d9\",\"causationId\":null,\"occurredAt\":\"2026-09-09T07:12:33.217Z\",\"fromState\":null,\"toState\":null,\"payload\":{\"occurrenceId\":\"87211b05-a20d-4164-8e01-3761ce2dbb45\",\"fromVersion\":1,\"toVersion\":2}}],\"nextCursor\":null},\"attachments\":{\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"snapshotSequence\":19,\"items\":[{\"attachmentId\":\"0410f7d7-486f-4177-af8b-e0c925a4196a\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"clientSubmissionId\":\"cb145dcc-a23a-4ca8-83a3-b38446d45b1f\",\"clientAttachmentId\":\"7c3cbc84-fa59-4aae-b72d-1f57069086cf\",\"captureId\":\"d7b82ae5-bb41-4681-8afb-2a08a8f77835\",\"filename\":\"schema19-main-1.png\",\"mediaType\":\"image/png\",\"size\":68,\"sha256\":\"6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec\",\"scanStatus\":\"clean\",\"readyToBind\":true,\"bindingStatus\":\"claimed\",\"version\":2},{\"attachmentId\":\"6479bbd9-5292-4d69-b14b-16f0183ce499\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"clientSubmissionId\":\"cb145dcc-a23a-4ca8-83a3-b38446d45b1f\",\"clientAttachmentId\":\"d806417e-30ab-4f54-a6da-cdb2e4e34fdf\",\"captureId\":\"d7b82ae5-bb41-4681-8afb-2a08a8f77835\",\"filename\":\"schema19-main-2.png\",\"mediaType\":\"image/png\",\"size\":69,\"sha256\":\"ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61\",\"scanStatus\":\"clean\",\"readyToBind\":true,\"bindingStatus\":\"claimed\",\"version\":2}],\"nextCursor\":null},\"humanWorkflow\":{\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"repairAttempt\":null,\"buildRequirement\":null,\"build\":null,\"verification\":null,\"latestVerification\":{\"id\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"buildId\":null,\"status\":\"passed\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"Captured passed verification exact acceptance criteria\",\"resultSummary\":\"Actual main process retained the exact evidence chain\",\"failureReason\":null,\"blockedReason\":null,\"version\":3}}}"
+            }
+          ],
+          "structuredContent": {
+            "bug": {
+              "id": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 3,
+              "key": "S19A9A75C75-3",
+              "title": "Captured passed verification",
+              "description": "Captured passed verification through the isolated schema 19 main process",
+              "expectedBehavior": "The frozen workflow persists exact state and evidence",
+              "moduleId": null,
+              "state": "closed",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 6,
+              "createdAt": "2026-09-09T07:12:33.217Z",
+              "updatedAt": "2026-09-09T07:12:33.470Z",
+              "closedAt": "2026-09-09T07:12:33.470Z"
+            },
+            "comments": {
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+              "items": [],
+              "nextCursor": null
+            },
+            "events": {
+              "items": [
+                {
+                  "schemaVersion": "1.0",
+                  "id": "8a0d7bd0-06fc-4cde-9946-7161289cd4d2",
+                  "type": "verification.result_recorded",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+                    "version": 6
+                  },
+                  "sequence": 3,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "a504fe3d-3a7e-4216-ae97-a2502a700e01",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.470Z",
+                  "fromState": "ready_for_verification",
+                  "toState": "closed",
+                  "payload": {
+                    "status": "passed",
+                    "summary": "Actual main process retained the exact evidence chain",
+                    "verificationId": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+                    "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1.0",
+                  "id": "2ff5d0f2-1e5f-4881-b04d-6335f6617c12",
+                  "type": "verification.started",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+                    "version": 6
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "1360ad35-be01-42e3-a673-19181bfc41b4",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.371Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "status": "in_progress",
+                    "verificationId": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                },
+                {
+                  "schemaVersion": "1.0",
+                  "id": "adb7b516-b2c6-4e40-9537-377cb7421d5a",
+                  "type": "verification.created",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+                    "version": 6
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "43bf29b1-8413-4f24-b3b2-4f765e07e5b7",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.340Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "status": "requested",
+                    "verificationId": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+                    "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "toVersion": 1
+                  }
+                },
+                {
+                  "schemaVersion": "1.0",
+                  "id": "3c2a1ce3-f8a9-4a94-b0c4-c0e9fde71f82",
+                  "type": "repair_attempt.delivered",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "version": 6
+                  },
+                  "sequence": 3,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "b218ea0b-4aba-4afd-8484-35a39710c15e",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.308Z",
+                  "fromState": "in_progress",
+                  "toState": "ready_for_verification",
+                  "payload": {
+                    "status": "delivered",
+                    "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "reason": "This retained main acceptance exercises workflow persistence",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1.0",
+                  "id": "3ccec129-98bb-4ced-b97b-0340093afefb",
+                  "type": "repair_attempt.started",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "version": 6
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "c085fbbf-35c7-4c44-94bb-c94a43d61938",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.294Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "status": "running",
+                    "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                },
+                {
+                  "schemaVersion": "1.0",
+                  "id": "8fd2a319-b14e-4b47-838e-7e1f1c4d1d9d",
+                  "type": "repair_attempt.created",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "version": 6
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "b99d164b-0ecc-47a7-ac3f-bd99ae9864f9",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.258Z",
+                  "fromState": "ready",
+                  "toState": "in_progress",
+                  "payload": {
+                    "status": "planned",
+                    "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                    "fromVersion": 2,
+                    "toVersion": 3
+                  }
+                },
+                {
+                  "schemaVersion": "1.0",
+                  "id": "8e7dd7fa-6fb4-4030-91d8-d0dd2458a925",
+                  "type": "bug.triage.ready",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                    "version": 6
+                  },
+                  "sequence": 2,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "128457ea-93d2-4e06-9688-a02e9e70d12a",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.229Z",
+                  "fromState": "reported",
+                  "toState": "ready",
+                  "payload": {
+                    "status": "ready",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                },
+                {
+                  "schemaVersion": "1.0",
+                  "id": "2af7eedf-1f20-4464-9f58-d4a794fb1975",
+                  "type": "occurrence.appended",
+                  "source": "qa_hub",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                  "aggregate": {
+                    "type": "bug",
+                    "id": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                    "version": 6
+                  },
+                  "sequence": 1,
+                  "actor": {
+                    "type": "user",
+                    "id": "418dfa96-e46d-4c21-8411-4f1a43b83802"
+                  },
+                  "correlationId": "ce86dbb9-ada5-4216-99f1-2299c6e7c3d9",
+                  "causationId": null,
+                  "occurredAt": "2026-09-09T07:12:33.217Z",
+                  "fromState": null,
+                  "toState": null,
+                  "payload": {
+                    "occurrenceId": "87211b05-a20d-4164-8e01-3761ce2dbb45",
+                    "fromVersion": 1,
+                    "toVersion": 2
+                  }
+                }
+              ],
+              "nextCursor": null
+            },
+            "attachments": {
+              "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "snapshotSequence": 19,
+              "items": [
+                {
+                  "attachmentId": "0410f7d7-486f-4177-af8b-e0c925a4196a",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "clientSubmissionId": "cb145dcc-a23a-4ca8-83a3-b38446d45b1f",
+                  "clientAttachmentId": "7c3cbc84-fa59-4aae-b72d-1f57069086cf",
+                  "captureId": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+                  "filename": "schema19-main-1.png",
+                  "mediaType": "image/png",
+                  "size": 68,
+                  "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+                  "scanStatus": "clean",
+                  "readyToBind": true,
+                  "bindingStatus": "claimed",
+                  "version": 2
+                },
+                {
+                  "attachmentId": "6479bbd9-5292-4d69-b14b-16f0183ce499",
+                  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+                  "clientSubmissionId": "cb145dcc-a23a-4ca8-83a3-b38446d45b1f",
+                  "clientAttachmentId": "d806417e-30ab-4f54-a6da-cdb2e4e34fdf",
+                  "captureId": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+                  "filename": "schema19-main-2.png",
+                  "mediaType": "image/png",
+                  "size": 69,
+                  "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61",
+                  "scanStatus": "clean",
+                  "readyToBind": true,
+                  "bindingStatus": "claimed",
+                  "version": 2
+                }
+              ],
+              "nextCursor": null
+            },
+            "humanWorkflow": {
+              "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+              "repairAttempt": null,
+              "buildRequirement": null,
+              "build": null,
+              "verification": null,
+              "latestVerification": {
+                "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+                "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+                "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+                "buildId": null,
+                "status": "passed",
+                "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+                "criteriaSnapshot": "Captured passed verification exact acceptance criteria",
+                "resultSummary": "Actual main process retained the exact evidence chain",
+                "failureReason": null,
+                "blockedReason": null,
+                "version": 3
+              }
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.099Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "resume retained attachment 0410f7d7-486f-4177-af8b-e0c925a4196a",
+      "id": 6,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_read_attachment",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+            "attachmentId": "0410f7d7-486f-4177-af8b-e0c925a4196a"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.103Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1146,
+      "responseSha256": "ed600f88d58b87b99eb01501bd78fec03a0c6716ec7c7237082a860fada66681",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"uri\":\"qa-hub://attachment/0c62c78c-5732-43c4-82c2-26c5c2eb91a4/ede6d745-a1c8-4f1a-8e10-9b9d6287e602/0410f7d7-486f-4177-af8b-e0c925a4196a\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"attachmentId\":\"0410f7d7-486f-4177-af8b-e0c925a4196a\",\"size\":68,\"sha256\":\"6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec\",\"mimeType\":\"image/png\",\"blob\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=\"}"
+            }
+          ],
+          "structuredContent": {
+            "uri": "qa-hub://attachment/0c62c78c-5732-43c4-82c2-26c5c2eb91a4/ede6d745-a1c8-4f1a-8e10-9b9d6287e602/0410f7d7-486f-4177-af8b-e0c925a4196a",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+            "attachmentId": "0410f7d7-486f-4177-af8b-e0c925a4196a",
+            "size": 68,
+            "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+            "mimeType": "image/png",
+            "blob": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII="
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.112Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "resume retained attachment 6479bbd9-5292-4d69-b14b-16f0183ce499",
+      "id": 7,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_read_attachment",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+            "attachmentId": "6479bbd9-5292-4d69-b14b-16f0183ce499"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.112Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1146,
+      "responseSha256": "d300b03666f56a09f8fc608a9922ee860255f6a071323aa97d4cc3341ea57184",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"uri\":\"qa-hub://attachment/0c62c78c-5732-43c4-82c2-26c5c2eb91a4/ede6d745-a1c8-4f1a-8e10-9b9d6287e602/6479bbd9-5292-4d69-b14b-16f0183ce499\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"attachmentId\":\"6479bbd9-5292-4d69-b14b-16f0183ce499\",\"size\":69,\"sha256\":\"ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61\",\"mimeType\":\"image/png\",\"blob\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYIIA\"}"
+            }
+          ],
+          "structuredContent": {
+            "uri": "qa-hub://attachment/0c62c78c-5732-43c4-82c2-26c5c2eb91a4/ede6d745-a1c8-4f1a-8e10-9b9d6287e602/6479bbd9-5292-4d69-b14b-16f0183ce499",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+            "attachmentId": "6479bbd9-5292-4d69-b14b-16f0183ce499",
+            "size": 69,
+            "sha256": "ce4c75b1bcfffb5bb6e766bd12f9c532dee2c317bec452305ea20dfcbe4cec61",
+            "mimeType": "image/png",
+            "blob": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYIIA"
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.121Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "create blocked verification resumed main path",
+      "id": 8,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 8,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_create_bug",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "request": {
+              "submissionContractVersion": "1.1.0",
+              "clientSubmissionId": "336c2f71-577e-4573-9280-40c3de927f82",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "severity": "S2",
+              "priority": "P2",
+              "attachmentIds": [],
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "occurrence": {
+                "observedAt": "2026-09-09T07:18:03.121Z",
+                "platform": "web",
+                "steps": [
+                  "Resume from the exact retained evidence stage"
+                ],
+                "actualBehavior": "The result status is pending"
+              }
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.122Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2396,
+      "responseSha256": "53ba18c69c91483f55f2d3762d8f3baced161a2682d96b0f43f7c735de7ab4b7",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 8,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"clientSubmissionId\":\"336c2f71-577e-4573-9280-40c3de927f82\",\"qaItem\":{\"type\":\"bug\",\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"key\":\"S19A9A75C75-4\"},\"disposition\":\"created\",\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"reported\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":1,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.126Z\",\"closedAt\":null},\"occurrenceId\":\"a65a0b19-1b1e-4e48-959b-7dda0629a5a7\",\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"cd8cf337-c2b0-4034-92ad-dff05e795e48\",\"replayed\":false}"
+            }
+          ],
+          "structuredContent": {
+            "clientSubmissionId": "336c2f71-577e-4573-9280-40c3de927f82",
+            "qaItem": {
+              "type": "bug",
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "key": "S19A9A75C75-4"
+            },
+            "disposition": "created",
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "reported",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 1,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.126Z",
+              "closedAt": null
+            },
+            "occurrenceId": "a65a0b19-1b1e-4e48-959b-7dda0629a5a7",
+            "attachmentIds": [],
+            "captureBundleId": null,
+            "eventId": "cd8cf337-c2b0-4034-92ad-dff05e795e48",
+            "replayed": false
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.133Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "blocked verification resumed main path: ready",
+      "id": 9,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "action": "ready",
+            "expectedVersion": 1,
+            "idempotencyKey": "schema19-resume:ready:c4b363c4-6334-4f70-ade7-dffcdd46b30e"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.134Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3500,
+      "responseSha256": "1213ff3d139ead91700f8670589c816533ce68433b46a39c7950a98aee9d8735",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"ready\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"result\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":2,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.139Z\",\"closedAt\":null},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":2,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.139Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "ready",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "result": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 2,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.139Z",
+              "closedAt": null
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 2,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.139Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.163Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "blocked verification resumed main path: plan",
+      "id": 10,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 10,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "action": "plan_fix",
+            "expectedVersion": 2,
+            "idempotencyKey": "schema19-resume:plan_fix:1c4ff399-9bb9-419e-bc2b-10b6c8d0556f",
+            "request": {
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "summary": "blocked verification resumed main path planned work"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.164Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2853,
+      "responseSha256": "1e40dd3546c68db3e83b2b206f45a995a3259910390f10716209ad1d5b322436",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 10,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"plan_fix\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"result\":{\"id\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"sequence\":1,\"mode\":\"human\",\"status\":\"planned\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"blocked verification resumed main path planned work\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":null,\"failureReason\":null,\"targetBuildId\":null,\"version\":1},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"in_progress\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":3,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.168Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "plan_fix",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "result": {
+              "id": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "sequence": 1,
+              "mode": "human",
+              "status": "planned",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "blocked verification resumed main path planned work",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "patchUrl": null,
+              "noCodeReason": null,
+              "failureReason": null,
+              "targetBuildId": null,
+              "version": 1
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "in_progress",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 3,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.168Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.194Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "blocked verification resumed main path: start",
+      "id": 11,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 11,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "action": "begin_fix",
+            "expectedVersion": 1,
+            "idempotencyKey": "schema19-resume:begin_fix:ffbf5c87-5c99-4844-8e73-e468b68262c2",
+            "attemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.195Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2855,
+      "responseSha256": "b09e5e6e8537218fd9d3e59c24d9a40b4a1105c45ea470d8c7dc7c00605b045f",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 11,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"begin_fix\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"result\":{\"id\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"sequence\":1,\"mode\":\"human\",\"status\":\"running\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"blocked verification resumed main path planned work\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":null,\"failureReason\":null,\"targetBuildId\":null,\"version\":2},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"in_progress\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":3,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.168Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "begin_fix",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "result": {
+              "id": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "sequence": 1,
+              "mode": "human",
+              "status": "running",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "blocked verification resumed main path planned work",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "patchUrl": null,
+              "noCodeReason": null,
+              "failureReason": null,
+              "targetBuildId": null,
+              "version": 2
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "in_progress",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 3,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.168Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.208Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "blocked verification resumed main path: deliver",
+      "id": 12,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 12,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "action": "submit_fix",
+            "expectedVersion": 2,
+            "idempotencyKey": "schema19-resume:submit_fix:224a812b-fec9-4dc9-ac5f-e5932d88892c",
+            "attemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+            "request": {
+              "deliveryKind": "no_code",
+              "noCodeReason": "This resumed main acceptance exercises result persistence",
+              "summary": "blocked verification resumed main path ready for verification"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.209Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3015,
+      "responseSha256": "27090c483e7ebd6cdfaa3bb521bddc3c6b649d48128dce8c0562821d96e7573a",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 12,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"submit_fix\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"result\":{\"id\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"sequence\":1,\"mode\":\"human\",\"status\":\"delivered\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"blocked verification resumed main path ready for verification\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":\"This resumed main acceptance exercises result persistence\",\"failureReason\":null,\"targetBuildId\":null,\"version\":3},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":4,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.213Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "submit_fix",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "result": {
+              "id": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "sequence": 1,
+              "mode": "human",
+              "status": "delivered",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "blocked verification resumed main path ready for verification",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "patchUrl": null,
+              "noCodeReason": "This resumed main acceptance exercises result persistence",
+              "failureReason": null,
+              "targetBuildId": null,
+              "version": 3
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 4,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.213Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.241Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "blocked verification resumed main path: create verification",
+      "id": 13,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 13,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "action": "create_verification",
+            "expectedVersion": 4,
+            "idempotencyKey": "schema19-resume:create_verification:6f504ff1-c0cd-4457-befb-4642060cf4a4",
+            "request": {
+              "repairAttemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "buildId": null,
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteria": "blocked verification resumed main path exact acceptance criteria"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.242Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2839,
+      "responseSha256": "a667d8c73fc5d3191d4c9cc70906004ea030d12859a8be4f0e1e93483d343e53",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 13,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"create_verification\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"result\":{\"id\":\"426d147f-5c9a-4577-ab4a-3eb10524a919\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"repairAttemptId\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"buildId\":null,\"status\":\"requested\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"blocked verification resumed main path exact acceptance criteria\",\"resultSummary\":null,\"failureReason\":null,\"blockedReason\":null,\"version\":1},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":5,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.246Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "create_verification",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "result": {
+              "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "repairAttemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "buildId": null,
+              "status": "requested",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "blocked verification resumed main path exact acceptance criteria",
+              "resultSummary": null,
+              "failureReason": null,
+              "blockedReason": null,
+              "version": 1
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 5,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.246Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.272Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "blocked verification resumed main path: start verification",
+      "id": 14,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 14,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "action": "start_verification",
+            "expectedVersion": 1,
+            "idempotencyKey": "schema19-resume:start_verification:6f74e7e8-a818-4191-93e4-45a5fc4b5772",
+            "verificationId": "426d147f-5c9a-4577-ab4a-3eb10524a919"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.273Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2841,
+      "responseSha256": "72c83eb7ec0794a028166d4547bfdd153e88274a147eaace1ed273ed1effa980",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 14,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"start_verification\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"result\":{\"id\":\"426d147f-5c9a-4577-ab4a-3eb10524a919\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"repairAttemptId\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"buildId\":null,\"status\":\"in_progress\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"blocked verification resumed main path exact acceptance criteria\",\"resultSummary\":null,\"failureReason\":null,\"blockedReason\":null,\"version\":2},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":5,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.246Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "start_verification",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "result": {
+              "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "repairAttemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "buildId": null,
+              "status": "in_progress",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "blocked verification resumed main path exact acceptance criteria",
+              "resultSummary": null,
+              "failureReason": null,
+              "blockedReason": null,
+              "version": 2
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 5,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.246Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.286Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "record resumed blocked result",
+      "id": 15,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 15,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_record_verification_result",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+            "request": {
+              "submissionContractVersion": "1.1.0",
+              "clientSubmissionId": "d74189cc-9953-43e3-a55e-d251b852d90f",
+              "expectedVersion": 2,
+              "status": "blocked",
+              "resultSummary": "blocked was recorded after resuming at the exact failed stage",
+              "attachmentIds": [],
+              "blockedReason": "blocked was recorded after resuming at the exact failed stage"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.287Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3981,
+      "responseSha256": "b7d09cb3efb6b47342bad540dec621e2f0ee54d415dd009d166a8a8d146e39e4",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 15,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"clientSubmissionId\":\"d74189cc-9953-43e3-a55e-d251b852d90f\",\"qaItem\":{\"type\":\"bug\",\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"key\":\"S19A9A75C75-4\"},\"verification\":{\"id\":\"426d147f-5c9a-4577-ab4a-3eb10524a919\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"repairAttemptId\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"buildId\":null,\"status\":\"blocked\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"blocked verification resumed main path exact acceptance criteria\",\"resultSummary\":\"blocked was recorded after resuming at the exact failed stage\",\"version\":3},\"repairAttempt\":{\"id\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"sequence\":1,\"mode\":\"human\",\"status\":\"delivered\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"blocked verification resumed main path ready for verification\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"targetBuildId\":null,\"version\":3},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.291Z\",\"closedAt\":null},\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"cd7d74f1-8bae-40a6-b2ce-f46c76529d49\",\"replayed\":false}"
+            }
+          ],
+          "structuredContent": {
+            "clientSubmissionId": "d74189cc-9953-43e3-a55e-d251b852d90f",
+            "qaItem": {
+              "type": "bug",
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "key": "S19A9A75C75-4"
+            },
+            "verification": {
+              "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "repairAttemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "buildId": null,
+              "status": "blocked",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "blocked verification resumed main path exact acceptance criteria",
+              "resultSummary": "blocked was recorded after resuming at the exact failed stage",
+              "version": 3
+            },
+            "repairAttempt": {
+              "id": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "sequence": 1,
+              "mode": "human",
+              "status": "delivered",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "blocked verification resumed main path ready for verification",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "targetBuildId": null,
+              "version": 3
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 6,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.291Z",
+              "closedAt": null
+            },
+            "attachmentIds": [],
+            "captureBundleId": null,
+            "eventId": "cd7d74f1-8bae-40a6-b2ce-f46c76529d49",
+            "replayed": false
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.318Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "replay resumed blocked result",
+      "id": 16,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 16,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_record_verification_result",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+            "request": {
+              "submissionContractVersion": "1.1.0",
+              "clientSubmissionId": "d74189cc-9953-43e3-a55e-d251b852d90f",
+              "expectedVersion": 2,
+              "status": "blocked",
+              "resultSummary": "blocked was recorded after resuming at the exact failed stage",
+              "attachmentIds": [],
+              "blockedReason": "blocked was recorded after resuming at the exact failed stage"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.320Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3979,
+      "responseSha256": "5083c177d82ef36c5a738d1f11750ff07f810ea729cb4433b43c30a948b0266d",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 16,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"clientSubmissionId\":\"d74189cc-9953-43e3-a55e-d251b852d90f\",\"qaItem\":{\"type\":\"bug\",\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"key\":\"S19A9A75C75-4\"},\"verification\":{\"id\":\"426d147f-5c9a-4577-ab4a-3eb10524a919\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"repairAttemptId\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"buildId\":null,\"status\":\"blocked\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"blocked verification resumed main path exact acceptance criteria\",\"resultSummary\":\"blocked was recorded after resuming at the exact failed stage\",\"version\":3},\"repairAttempt\":{\"id\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"sequence\":1,\"mode\":\"human\",\"status\":\"delivered\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"blocked verification resumed main path ready for verification\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"targetBuildId\":null,\"version\":3},\"bug\":{\"id\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":4,\"key\":\"S19A9A75C75-4\",\"title\":\"blocked verification resumed main path\",\"description\":\"blocked verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-09T07:18:03.126Z\",\"updatedAt\":\"2026-09-09T07:18:03.291Z\",\"closedAt\":null},\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"cd7d74f1-8bae-40a6-b2ce-f46c76529d49\",\"replayed\":true}"
+            }
+          ],
+          "structuredContent": {
+            "clientSubmissionId": "d74189cc-9953-43e3-a55e-d251b852d90f",
+            "qaItem": {
+              "type": "bug",
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "key": "S19A9A75C75-4"
+            },
+            "verification": {
+              "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "repairAttemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "buildId": null,
+              "status": "blocked",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "blocked verification resumed main path exact acceptance criteria",
+              "resultSummary": "blocked was recorded after resuming at the exact failed stage",
+              "version": 3
+            },
+            "repairAttempt": {
+              "id": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+              "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "sequence": 1,
+              "mode": "human",
+              "status": "delivered",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "blocked verification resumed main path ready for verification",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "targetBuildId": null,
+              "version": 3
+            },
+            "bug": {
+              "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 4,
+              "key": "S19A9A75C75-4",
+              "title": "blocked verification resumed main path",
+              "description": "blocked verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 6,
+              "createdAt": "2026-09-09T07:18:03.126Z",
+              "updatedAt": "2026-09-09T07:18:03.291Z",
+              "closedAt": null
+            },
+            "attachmentIds": [],
+            "captureBundleId": null,
+            "eventId": "cd7d74f1-8bae-40a6-b2ce-f46c76529d49",
+            "replayed": true
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.328Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "read resumed blocked verification",
+      "id": 17,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_get_verification",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "426d147f-5c9a-4577-ab4a-3eb10524a919"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.329Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1177,
+      "responseSha256": "4610d7d2625fd620c736755cce83551b7b92b8fb0e6d99b2bbd7d208ee225d75",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"id\":\"426d147f-5c9a-4577-ab4a-3eb10524a919\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"repairAttemptId\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"buildId\":null,\"status\":\"blocked\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"blocked verification resumed main path exact acceptance criteria\",\"resultSummary\":\"blocked was recorded after resuming at the exact failed stage\",\"failureReason\":null,\"blockedReason\":\"blocked was recorded after resuming at the exact failed stage\",\"version\":3}"
+            }
+          ],
+          "structuredContent": {
+            "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "repairAttemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+            "buildId": null,
+            "status": "blocked",
+            "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+            "criteriaSnapshot": "blocked verification resumed main path exact acceptance criteria",
+            "resultSummary": "blocked was recorded after resuming at the exact failed stage",
+            "failureReason": null,
+            "blockedReason": "blocked was recorded after resuming at the exact failed stage",
+            "version": 3
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.337Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "create failed verification resumed main path",
+      "id": 18,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 18,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_create_bug",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "request": {
+              "submissionContractVersion": "1.1.0",
+              "clientSubmissionId": "93f796b3-14d6-4a4b-9f8a-681a45af101a",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "severity": "S2",
+              "priority": "P2",
+              "attachmentIds": [],
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "occurrence": {
+                "observedAt": "2026-09-09T07:18:03.337Z",
+                "platform": "web",
+                "steps": [
+                  "Resume from the exact retained evidence stage"
+                ],
+                "actualBehavior": "The result status is pending"
+              }
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.338Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2393,
+      "responseSha256": "429c411baeee4de3c90b492704169320b8eed180aa6279a3014df3b13cf68c47",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 18,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"clientSubmissionId\":\"93f796b3-14d6-4a4b-9f8a-681a45af101a\",\"qaItem\":{\"type\":\"bug\",\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"key\":\"S19A9A75C75-5\"},\"disposition\":\"created\",\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"reported\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":1,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.341Z\",\"closedAt\":null},\"occurrenceId\":\"438948a4-61b1-47e8-89b3-5727c676fd41\",\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"bd1032c3-b42e-471a-8773-f500778f45a1\",\"replayed\":false}"
+            }
+          ],
+          "structuredContent": {
+            "clientSubmissionId": "93f796b3-14d6-4a4b-9f8a-681a45af101a",
+            "qaItem": {
+              "type": "bug",
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "key": "S19A9A75C75-5"
+            },
+            "disposition": "created",
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "reported",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 1,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.341Z",
+              "closedAt": null
+            },
+            "occurrenceId": "438948a4-61b1-47e8-89b3-5727c676fd41",
+            "attachmentIds": [],
+            "captureBundleId": null,
+            "eventId": "bd1032c3-b42e-471a-8773-f500778f45a1",
+            "replayed": false
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.350Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "failed verification resumed main path: ready",
+      "id": 19,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 19,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "action": "ready",
+            "expectedVersion": 1,
+            "idempotencyKey": "schema19-resume:ready:dcc9c8fb-24f9-4283-8e85-9a802fe1d4e1"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.350Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3493,
+      "responseSha256": "ee1450fae9c1f65019d734a685c84c1ac5da4faafec693be8132b74b269d66c5",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 19,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"ready\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"result\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":2,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.355Z\",\"closedAt\":null},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":2,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.355Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "ready",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "result": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 2,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.355Z",
+              "closedAt": null
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 2,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.355Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.379Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "failed verification resumed main path: plan",
+      "id": 20,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 20,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "action": "plan_fix",
+            "expectedVersion": 2,
+            "idempotencyKey": "schema19-resume:plan_fix:3db228e3-b7ef-4af7-ad5b-bd527ec6b4d2",
+            "request": {
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "summary": "failed verification resumed main path planned work"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.380Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2847,
+      "responseSha256": "e83c06a31ca20568fe0bddef625efd9b797715bb8a75ca732e23d959e0a52e4f",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 20,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"plan_fix\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"result\":{\"id\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"sequence\":1,\"mode\":\"human\",\"status\":\"planned\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"failed verification resumed main path planned work\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":null,\"failureReason\":null,\"targetBuildId\":null,\"version\":1},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"in_progress\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":3,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.384Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "plan_fix",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "result": {
+              "id": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "sequence": 1,
+              "mode": "human",
+              "status": "planned",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "failed verification resumed main path planned work",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "patchUrl": null,
+              "noCodeReason": null,
+              "failureReason": null,
+              "targetBuildId": null,
+              "version": 1
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "in_progress",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 3,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.384Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.410Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "failed verification resumed main path: start",
+      "id": 21,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 21,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "action": "begin_fix",
+            "expectedVersion": 1,
+            "idempotencyKey": "schema19-resume:begin_fix:eb42716a-8f93-4e72-a013-6e964300431c",
+            "attemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.411Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2849,
+      "responseSha256": "c2d0e5190e354e86a357e54d5b9bc12a1d6a35332a2f3ddc4c79477b563109f1",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 21,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"begin_fix\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"result\":{\"id\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"sequence\":1,\"mode\":\"human\",\"status\":\"running\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"failed verification resumed main path planned work\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":null,\"failureReason\":null,\"targetBuildId\":null,\"version\":2},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"in_progress\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":3,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.384Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "begin_fix",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "result": {
+              "id": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "sequence": 1,
+              "mode": "human",
+              "status": "running",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "failed verification resumed main path planned work",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "patchUrl": null,
+              "noCodeReason": null,
+              "failureReason": null,
+              "targetBuildId": null,
+              "version": 2
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "in_progress",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 3,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.384Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.423Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "failed verification resumed main path: deliver",
+      "id": 22,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 22,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "action": "submit_fix",
+            "expectedVersion": 2,
+            "idempotencyKey": "schema19-resume:submit_fix:248b52d9-3593-4676-a3a7-7690af668c39",
+            "attemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+            "request": {
+              "deliveryKind": "no_code",
+              "noCodeReason": "This resumed main acceptance exercises result persistence",
+              "summary": "failed verification resumed main path ready for verification"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.424Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3009,
+      "responseSha256": "a78d7abcd80648aff8d7d463707fee68f85280e95be31ad870a1bacb22ad5fcf",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 22,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"submit_fix\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"result\":{\"id\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"sequence\":1,\"mode\":\"human\",\"status\":\"delivered\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"failed verification resumed main path ready for verification\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"patchUrl\":null,\"noCodeReason\":\"This resumed main acceptance exercises result persistence\",\"failureReason\":null,\"targetBuildId\":null,\"version\":3},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":4,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.429Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "submit_fix",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "result": {
+              "id": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "sequence": 1,
+              "mode": "human",
+              "status": "delivered",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "failed verification resumed main path ready for verification",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "patchUrl": null,
+              "noCodeReason": "This resumed main acceptance exercises result persistence",
+              "failureReason": null,
+              "targetBuildId": null,
+              "version": 3
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 4,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.429Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.456Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "failed verification resumed main path: create verification",
+      "id": 23,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 23,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "action": "create_verification",
+            "expectedVersion": 4,
+            "idempotencyKey": "schema19-resume:create_verification:626401a8-2d35-4e56-8226-8aab94c32636",
+            "request": {
+              "repairAttemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "buildId": null,
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteria": "failed verification resumed main path exact acceptance criteria"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.456Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2833,
+      "responseSha256": "13f1e4d4f52e9067119fb6472f5a7d0d2deff9c04ab278a4867ebaf7779542a3",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 23,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"create_verification\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"result\":{\"id\":\"7e8a79cd-8e56-47a6-9bf3-400e625aa055\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"repairAttemptId\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"buildId\":null,\"status\":\"requested\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"failed verification resumed main path exact acceptance criteria\",\"resultSummary\":null,\"failureReason\":null,\"blockedReason\":null,\"version\":1},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":5,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.461Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "create_verification",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "result": {
+              "id": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "repairAttemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "buildId": null,
+              "status": "requested",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "failed verification resumed main path exact acceptance criteria",
+              "resultSummary": null,
+              "failureReason": null,
+              "blockedReason": null,
+              "version": 1
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 5,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.461Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.486Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "failed verification resumed main path: start verification",
+      "id": 24,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 24,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_bug_action",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "action": "start_verification",
+            "expectedVersion": 1,
+            "idempotencyKey": "schema19-resume:start_verification:fb2e5761-e509-4b84-b74c-294b26fd8f54",
+            "verificationId": "7e8a79cd-8e56-47a6-9bf3-400e625aa055"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.487Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 2835,
+      "responseSha256": "98cdb680e6344ae09f8cd2097b2ff36f9966595fcadf8428c12cca46a0cc6dfa",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 24,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"action\":\"start_verification\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"result\":{\"id\":\"7e8a79cd-8e56-47a6-9bf3-400e625aa055\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"repairAttemptId\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"buildId\":null,\"status\":\"in_progress\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"failed verification resumed main path exact acceptance criteria\",\"resultSummary\":null,\"failureReason\":null,\"blockedReason\":null,\"version\":2},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready_for_verification\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":5,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.461Z\",\"closedAt\":null}}"
+            }
+          ],
+          "structuredContent": {
+            "action": "start_verification",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "result": {
+              "id": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "repairAttemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "buildId": null,
+              "status": "in_progress",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "failed verification resumed main path exact acceptance criteria",
+              "resultSummary": null,
+              "failureReason": null,
+              "blockedReason": null,
+              "version": 2
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready_for_verification",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 5,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.461Z",
+              "closedAt": null
+            }
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.498Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "record resumed failed result",
+      "id": 25,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 25,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_record_verification_result",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+            "request": {
+              "submissionContractVersion": "1.1.0",
+              "clientSubmissionId": "f75c2945-2009-4848-8041-eb7e16add90a",
+              "expectedVersion": 2,
+              "status": "failed",
+              "resultSummary": "failed was recorded after resuming at the exact failed stage",
+              "attachmentIds": [],
+              "failureReason": "failed was recorded after resuming at the exact failed stage"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:18:03.499Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3955,
+      "responseSha256": "112880f1015c4b9be588ea04c83e2166c2c9a45af6e57933e3ccb1e9b4454971",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 25,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"clientSubmissionId\":\"f75c2945-2009-4848-8041-eb7e16add90a\",\"qaItem\":{\"type\":\"bug\",\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"key\":\"S19A9A75C75-5\"},\"verification\":{\"id\":\"7e8a79cd-8e56-47a6-9bf3-400e625aa055\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"repairAttemptId\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"buildId\":null,\"status\":\"failed\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"failed verification resumed main path exact acceptance criteria\",\"resultSummary\":\"failed was recorded after resuming at the exact failed stage\",\"version\":3},\"repairAttempt\":{\"id\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"sequence\":1,\"mode\":\"human\",\"status\":\"verification_failed\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"failed verification resumed main path ready for verification\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"targetBuildId\":null,\"version\":4},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.503Z\",\"closedAt\":null},\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"3cf1bdd3-892b-4cc6-8ddf-e816a23a49a5\",\"replayed\":false}"
+            }
+          ],
+          "structuredContent": {
+            "clientSubmissionId": "f75c2945-2009-4848-8041-eb7e16add90a",
+            "qaItem": {
+              "type": "bug",
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "key": "S19A9A75C75-5"
+            },
+            "verification": {
+              "id": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "repairAttemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "buildId": null,
+              "status": "failed",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "failed verification resumed main path exact acceptance criteria",
+              "resultSummary": "failed was recorded after resuming at the exact failed stage",
+              "version": 3
+            },
+            "repairAttempt": {
+              "id": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "sequence": 1,
+              "mode": "human",
+              "status": "verification_failed",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "failed verification resumed main path ready for verification",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "targetBuildId": null,
+              "version": 4
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 6,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.503Z",
+              "closedAt": null
+            },
+            "attachmentIds": [],
+            "captureBundleId": null,
+            "eventId": "3cf1bdd3-892b-4cc6-8ddf-e816a23a49a5",
+            "replayed": false
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:18:03.533Z"
+    }
+  ],
+  "fixtures": {},
+  "boundaries": {
+    "resumedAtExactFailedStage": true,
+    "priorProjectAndRecordsReused": true,
+    "priorRequestsNotReplayed": true,
+    "isolatedRuntimeOnly": true,
+    "actualMainApi": true,
+    "actualServerMcpProxy": true,
+    "syntheticCaptureFixture": true,
+    "physicalDeviceUsed": false,
+    "localMcpCalled": false,
+    "browserUiOperated": false,
+    "externalComponentsEnabled": false,
+    "externalCalls": 0,
+    "productionTouched": false,
+    "existingPreview4419Touched": false,
+    "cleanupDeletes": false
+  },
+  "hostBefore": [
+    {
+      "port": 4519,
+      "pid": 14676,
+      "startedAt": "2026-09-09T06:50:21.3491250Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+    },
+    {
+      "port": 4521,
+      "pid": 7472,
+      "startedAt": "2026-09-09T06:50:46.5226930Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+    }
+  ],
+  "healthBefore": {
+    "api": {
+      "status": "ready",
+      "schemaVersion": "19",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    },
+    "serverMcp": {
+      "status": "ready",
+      "schemaVersion": "19",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    }
+  },
+  "failure": "AssertionError [ERR_ASSERTION]: failed Bug state\n+ actual - expected\n\n+ 'ready'\n- 'in_progress'\n\n    at check (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live-resume.mjs:192:12)\n    at submitOutcome (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live-resume.mjs:445:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async resume (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live-resume.mjs:478:27)\n    at async file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live-resume.mjs:604:5",
+  "finishedAt": "2026-09-09T07:18:03.535Z"
+}

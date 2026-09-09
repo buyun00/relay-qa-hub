@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "runId": "a9a75c75-9af0-47f6-bf38-366409b89eb0",
+  "status": "passed_after_exact_stage_resume_with_retained_harness_expectations",
+  "sourceHead": "85d21028a8b5b0e872a34822d83516faee8c6445",
+  "runtime": {
+    "instanceId": "qa-hub-preview-schema19-sol-0909",
+    "apiPort": 4519,
+    "apiPid": 14676,
+    "serverMcpPort": 4521,
+    "serverMcpPid": 7472,
+    "schemaVersion": "19",
+    "processesUnchanged": true,
+    "finalHealth": "ready"
+  },
+  "chain": [
+    {
+      "artifact": "proof.json",
+      "requests": 44,
+      "passedChecks": 69,
+      "failedHarnessExpectations": 1,
+      "resumeBehavior": "stopped after the first unexpected but valid response"
+    },
+    {
+      "artifact": "resume-6042d612-efba-45b4-a632-2e25e214ec35.proof.json",
+      "requests": 25,
+      "passedChecks": 29,
+      "failedHarnessExpectations": 1,
+      "resumeBehavior": "reused the committed project, capture, attachments and passed result"
+    },
+    {
+      "artifact": "finalize-0ba24e35-21b5-4f13-b0d2-ae1dbd5e9b44.proof.json",
+      "requests": 8,
+      "passedChecks": 33,
+      "failedHarnessExpectations": 0,
+      "resumeBehavior": "reused the committed failed result and completed terminal readback"
+    }
+  ],
+  "totals": {
+    "requests": 77,
+    "passedChecks": 131,
+    "retainedIncorrectExpectations": 2,
+    "businessFailures": 0
+  },
+  "retainedExpectationCorrections": [
+    {
+      "label": "capture enrichment",
+      "observed": "partial",
+      "incorrectExpected": "complete",
+      "reason": "The synthetic capture negotiated two of the six allowlisted Poco methods."
+    },
+    {
+      "label": "failed Bug state",
+      "observed": "ready",
+      "incorrectExpected": "in_progress",
+      "reason": "A failed Verification releases the Bug to ready and marks the attempt verification_failed."
+    }
+  ],
+  "artifacts": {
+    "proofSha256": "4761570027047205a7e43e9cb47763eeb37c99ac6f7cce42f37f4fa99e7c98c1",
+    "initialExecutedRunnerSha256": "9b6189052ccbe0169675e00af850f7a6ce4ab19a32524b956291e4c1afab383f",
+    "resumeProofSha256": "f5a287e60e24cb8ba74967d3b4ff8420ea0e51b1606a87ee3d7d7fee69991784",
+    "resumeExecutedRunnerSha256": "dadbba45de012a7b558093992d965a311c68560fe7925de0afddd6ebf29cf74c",
+    "finalizeProofSha256": "ca3922618c744883bd7aa2a62898fe164d8bb6581454fc44acdd6852d0988401",
+    "finalizeRunnerSha256": "000a7abf46ce1622cd722b7b0ae5cac81049ab5dd47f2f6d6f7b45e6fd96969f",
+    "correctedInitialRunnerSha256": "7fb0963896bec1510c2aa3a56ac0cfb7393db1913e73d6c0a1fd65840c515ab0",
+    "correctedResumeRunnerSha256": "f8ff888a49d2ce9f4d50b297707afb0f4aff3fb135fb89ae74e86734f97d9b00"
+  },
+  "boundaries": {
+    "isolatedRuntimeOnly": true,
+    "physicalDeviceUsed": false,
+    "localMcpCalled": false,
+    "browserUiOperated": false,
+    "externalComponentsEnabled": false,
+    "externalCalls": 0,
+    "productionTouched": false,
+    "sharedSchema14PreviewTouched": false,
+    "cleanupDeletes": false
+  },
+  "requiresFreshFinalRuntime": true
+}

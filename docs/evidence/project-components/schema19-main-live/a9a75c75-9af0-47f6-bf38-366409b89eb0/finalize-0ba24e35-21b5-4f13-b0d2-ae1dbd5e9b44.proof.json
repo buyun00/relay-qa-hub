@@ -1,0 +1,923 @@
+{
+  "schemaVersion": 1,
+  "status": "passed_finalized_schema19_actual_main_http_and_server_mcp",
+  "finalizeId": "0ba24e35-21b5-4f13-b0d2-ae1dbd5e9b44",
+  "resumedFromRunId": "a9a75c75-9af0-47f6-bf38-366409b89eb0",
+  "resumedFromResumeId": "6042d612-efba-45b4-a632-2e25e214ec35",
+  "initialProofSha256": "4761570027047205a7e43e9cb47763eeb37c99ac6f7cce42f37f4fa99e7c98c1",
+  "resumeProofSha256": "f5a287e60e24cb8ba74967d3b4ff8420ea0e51b1606a87ee3d7d7fee69991784",
+  "startedAt": "2026-09-09T07:22:55.258Z",
+  "instanceId": "qa-hub-preview-schema19-sol-0909",
+  "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+  "sourceHead": "85d21028a8b5b0e872a34822d83516faee8c6445",
+  "sourceSha256": "000a7abf46ce1622cd722b7b0ae5cac81049ab5dd47f2f6d6f7b45e6fd96969f",
+  "instanceConfigSha256": "d5aaee5c958ad46598ded9766fcbae5085e69731fadcf2844f0240d453cc564c",
+  "checks": [
+    {
+      "label": "same processes survived both retained assertion failures",
+      "actual": [
+        {
+          "port": 4519,
+          "pid": 14676,
+          "startedAt": "2026-09-09T06:50:21.3491250Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+        },
+        {
+          "port": 4521,
+          "pid": 7472,
+          "startedAt": "2026-09-09T06:50:46.5226930Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+        }
+      ],
+      "expected": [
+        {
+          "port": 4519,
+          "pid": 14676,
+          "startedAt": "2026-09-09T06:50:21.3491250Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+        },
+        {
+          "port": 4521,
+          "pid": 7472,
+          "startedAt": "2026-09-09T06:50:46.5226930Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+        }
+      ],
+      "at": "2026-09-09T07:22:57.134Z",
+      "passed": true
+    },
+    {
+      "label": "finalize API ready",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:22:57.185Z",
+      "passed": true
+    },
+    {
+      "label": "finalize API schema",
+      "actual": "19",
+      "expected": "19",
+      "at": "2026-09-09T07:22:57.185Z",
+      "passed": true
+    },
+    {
+      "label": "finalize MCP ready",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:22:57.185Z",
+      "passed": true
+    },
+    {
+      "label": "finalize MCP schema",
+      "actual": "19",
+      "expected": "19",
+      "at": "2026-09-09T07:22:57.186Z",
+      "passed": true
+    },
+    {
+      "label": "finalize keeps employee identity",
+      "actual": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+      "expected": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+      "at": "2026-09-09T07:22:57.206Z",
+      "passed": true
+    },
+    {
+      "label": "committed failed result correctly released Bug",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:22:57.206Z",
+      "passed": true
+    },
+    {
+      "label": "committed failed result marked attempt verification_failed",
+      "actual": "verification_failed",
+      "expected": "verification_failed",
+      "at": "2026-09-09T07:22:57.206Z",
+      "passed": true
+    },
+    {
+      "label": "failed result replay marker",
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-09T07:22:57.218Z",
+      "passed": true
+    },
+    {
+      "label": "failed result replay event",
+      "actual": "3cf1bdd3-892b-4cc6-8ddf-e816a23a49a5",
+      "expected": "3cf1bdd3-892b-4cc6-8ddf-e816a23a49a5",
+      "at": "2026-09-09T07:22:57.218Z",
+      "passed": true
+    },
+    {
+      "label": "failed replay retains ready Bug",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:22:57.218Z",
+      "passed": true
+    },
+    {
+      "label": "failed replay retains attempt state",
+      "actual": "verification_failed",
+      "expected": "verification_failed",
+      "at": "2026-09-09T07:22:57.218Z",
+      "passed": true
+    },
+    {
+      "label": "final passed verification status",
+      "actual": "passed",
+      "expected": "passed",
+      "at": "2026-09-09T07:22:57.230Z",
+      "passed": true
+    },
+    {
+      "label": "final blocked verification status",
+      "actual": "blocked",
+      "expected": "blocked",
+      "at": "2026-09-09T07:22:57.242Z",
+      "passed": true
+    },
+    {
+      "label": "final failed verification status",
+      "actual": "failed",
+      "expected": "failed",
+      "at": "2026-09-09T07:22:57.250Z",
+      "passed": true
+    },
+    {
+      "label": "direct HTTP failed-verification Bug state",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:22:57.255Z",
+      "passed": true
+    },
+    {
+      "label": "direct HTTP blocked-verification Bug state",
+      "actual": "ready_for_verification",
+      "expected": "ready_for_verification",
+      "at": "2026-09-09T07:22:57.260Z",
+      "passed": true
+    },
+    {
+      "label": "raw DB schema",
+      "actual": 19,
+      "expected": 19,
+      "at": "2026-09-09T07:22:57.273Z",
+      "passed": true
+    },
+    {
+      "label": "raw DB quick check",
+      "actual": [
+        "ok"
+      ],
+      "expected": [
+        "ok"
+      ],
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "trusted command authorization rows cleaned",
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "three terminal snapshots despite exact replays",
+      "actual": 3,
+      "expected": 3,
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "original superseded attempt retained",
+      "actual": "superseded",
+      "expected": "superseded",
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "external successor raw status",
+      "actual": "failed",
+      "expected": "failed",
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "external successor raw mode",
+      "actual": "external",
+      "expected": "external",
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "external successor raw parent",
+      "actual": "6fe70358-e4ed-46d6-9ec2-43aea07ab882",
+      "expected": "6fe70358-e4ed-46d6-9ec2-43aea07ab882",
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "three Verification result snapshots despite exact replays",
+      "actual": 3,
+      "expected": 3,
+      "at": "2026-09-09T07:22:57.286Z",
+      "passed": true
+    },
+    {
+      "label": "raw Verification status matrix",
+      "actual": [
+        {
+          "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+          "status": "blocked"
+        },
+        {
+          "id": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+          "status": "failed"
+        },
+        {
+          "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+          "status": "passed"
+        }
+      ],
+      "expected": [
+        {
+          "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+          "status": "blocked"
+        },
+        {
+          "id": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+          "status": "failed"
+        },
+        {
+          "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+          "status": "passed"
+        }
+      ],
+      "at": "2026-09-09T07:22:57.287Z",
+      "passed": true
+    },
+    {
+      "label": "raw Bug state matrix",
+      "actual": [
+        {
+          "id": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+          "state": "closed"
+        },
+        {
+          "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+          "state": "ready"
+        },
+        {
+          "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+          "state": "ready_for_verification"
+        }
+      ],
+      "expected": [
+        {
+          "id": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+          "state": "closed"
+        },
+        {
+          "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+          "state": "ready"
+        },
+        {
+          "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+          "state": "ready_for_verification"
+        }
+      ],
+      "at": "2026-09-09T07:22:57.287Z",
+      "passed": true
+    },
+    {
+      "label": "two exact passed-result attachments",
+      "actual": [
+        "0410f7d7-486f-4177-af8b-e0c925a4196a",
+        "6479bbd9-5292-4d69-b14b-16f0183ce499"
+      ],
+      "expected": [
+        "0410f7d7-486f-4177-af8b-e0c925a4196a",
+        "6479bbd9-5292-4d69-b14b-16f0183ce499"
+      ],
+      "at": "2026-09-09T07:22:57.287Z",
+      "passed": true
+    },
+    {
+      "label": "capture bundle remains bound",
+      "actual": "bound",
+      "expected": "bound",
+      "at": "2026-09-09T07:22:57.287Z",
+      "passed": true
+    },
+    {
+      "label": "process identities unchanged through exact-stage finalization",
+      "actual": [
+        {
+          "port": 4519,
+          "pid": 14676,
+          "startedAt": "2026-09-09T06:50:21.3491250Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+        },
+        {
+          "port": 4521,
+          "pid": 7472,
+          "startedAt": "2026-09-09T06:50:46.5226930Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+        }
+      ],
+      "expected": [
+        {
+          "port": 4519,
+          "pid": 14676,
+          "startedAt": "2026-09-09T06:50:21.3491250Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+        },
+        {
+          "port": 4521,
+          "pid": 7472,
+          "startedAt": "2026-09-09T06:50:46.5226930Z",
+          "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+        }
+      ],
+      "at": "2026-09-09T07:22:59.201Z",
+      "passed": true
+    },
+    {
+      "label": "server MCP remains ready",
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-09T07:22:59.212Z",
+      "passed": true
+    },
+    {
+      "label": "server MCP remains schema 19",
+      "actual": "19",
+      "expected": "19",
+      "at": "2026-09-09T07:22:59.212Z",
+      "passed": true
+    }
+  ],
+  "requests": [
+    {
+      "transport": "server_mcp",
+      "label": "finalize server MCP initialization",
+      "id": 1,
+      "method": "initialize",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {
+          "protocolVersion": "2025-06-18",
+          "capabilities": {},
+          "clientInfo": {
+            "name": "schema19-main-live-finalize",
+            "version": "1"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:22:57.186Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 403,
+      "responseSha256": "a8ff06bffd5dbf249291240ea52cee1820cf149ffe024b2560d585ced7cc59f3",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "protocolVersion": "2025-06-18",
+          "capabilities": {
+            "tools": {
+              "listChanged": false
+            },
+            "resources": {
+              "subscribe": false,
+              "listChanged": false
+            }
+          },
+          "serverInfo": {
+            "name": "qa-hub-project-preview",
+            "version": "2.1"
+          },
+          "instructions": "Use explicit project IDs and project name sessions. Bug human acceptance is independent from optional integrations. Never report unexecuted checks as passed."
+        }
+      },
+      "finishedAt": "2026-09-09T07:22:57.192Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "finalize same employee login",
+      "id": 2,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_login",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "name": "Schema19a9a75c759af0"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:22:57.192Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1086,
+      "responseSha256": "eab8d01a172cf41baef4a7914ab7768668fb2acdf2c1201f382997e07b679041",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"accountId\":\"10000000-0000-4000-8000-000000000020\",\"userId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"email\":\"qa-2715a6cabc984041cd791dad643bc43f1787e3ad68584b86a4cad2b223924208@local.invalid\",\"displayName\":\"Schema19a9a75c759af0\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"isGm\":false,\"expiresAt\":\"2094-09-27T10:37:04.198Z\"}"
+            }
+          ],
+          "structuredContent": {
+            "accountId": "10000000-0000-4000-8000-000000000020",
+            "userId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+            "email": "qa-2715a6cabc984041cd791dad643bc43f1787e3ad68584b86a4cad2b223924208@local.invalid",
+            "displayName": "Schema19a9a75c759af0",
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "isGm": false,
+            "expiresAt": "2094-09-27T10:37:04.198Z"
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:22:57.205Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "resume exact failed result replay",
+      "id": 3,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_record_verification_result",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+            "request": {
+              "submissionContractVersion": "1.1.0",
+              "clientSubmissionId": "f75c2945-2009-4848-8041-eb7e16add90a",
+              "expectedVersion": 2,
+              "status": "failed",
+              "resultSummary": "failed was recorded after resuming at the exact failed stage",
+              "attachmentIds": [],
+              "failureReason": "failed was recorded after resuming at the exact failed stage"
+            }
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:22:57.206Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 3952,
+      "responseSha256": "9e3328e1d47bfedd6122670f3035452df214eb7b1831abcbad4be6775b738224",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"clientSubmissionId\":\"f75c2945-2009-4848-8041-eb7e16add90a\",\"qaItem\":{\"type\":\"bug\",\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"key\":\"S19A9A75C75-5\"},\"verification\":{\"id\":\"7e8a79cd-8e56-47a6-9bf3-400e625aa055\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"repairAttemptId\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"buildId\":null,\"status\":\"failed\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"failed verification resumed main path exact acceptance criteria\",\"resultSummary\":\"failed was recorded after resuming at the exact failed stage\",\"version\":3},\"repairAttempt\":{\"id\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"sequence\":1,\"mode\":\"human\",\"status\":\"verification_failed\",\"assigneeId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"parentAttemptId\":null,\"summary\":\"failed verification resumed main path ready for verification\",\"branch\":null,\"commitSha\":null,\"mergeRequestUrl\":null,\"targetBuildId\":null,\"version\":4},\"bug\":{\"id\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"projectId\":\"0c62c78c-5732-43c4-82c2-26c5c2eb91a4\",\"number\":5,\"key\":\"S19A9A75C75-5\",\"title\":\"failed verification resumed main path\",\"description\":\"failed verification resumed main path resumed after the retained assertion\",\"expectedBehavior\":\"The result status persists through the actual main service\",\"moduleId\":null,\"state\":\"ready\",\"severity\":\"S2\",\"priority\":\"P2\",\"reporterId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"ownerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"verificationOwnerId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"duplicateOfBugId\":null,\"occurrenceCount\":1,\"reopenCount\":0,\"version\":6,\"createdAt\":\"2026-09-09T07:18:03.341Z\",\"updatedAt\":\"2026-09-09T07:18:03.503Z\",\"closedAt\":null},\"attachmentIds\":[],\"captureBundleId\":null,\"eventId\":\"3cf1bdd3-892b-4cc6-8ddf-e816a23a49a5\",\"replayed\":true}"
+            }
+          ],
+          "structuredContent": {
+            "clientSubmissionId": "f75c2945-2009-4848-8041-eb7e16add90a",
+            "qaItem": {
+              "type": "bug",
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "key": "S19A9A75C75-5"
+            },
+            "verification": {
+              "id": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "repairAttemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "buildId": null,
+              "status": "failed",
+              "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "criteriaSnapshot": "failed verification resumed main path exact acceptance criteria",
+              "resultSummary": "failed was recorded after resuming at the exact failed stage",
+              "version": 3
+            },
+            "repairAttempt": {
+              "id": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+              "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "sequence": 1,
+              "mode": "human",
+              "status": "verification_failed",
+              "assigneeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "parentAttemptId": null,
+              "summary": "failed verification resumed main path ready for verification",
+              "branch": null,
+              "commitSha": null,
+              "mergeRequestUrl": null,
+              "targetBuildId": null,
+              "version": 4
+            },
+            "bug": {
+              "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+              "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+              "number": 5,
+              "key": "S19A9A75C75-5",
+              "title": "failed verification resumed main path",
+              "description": "failed verification resumed main path resumed after the retained assertion",
+              "expectedBehavior": "The result status persists through the actual main service",
+              "moduleId": null,
+              "state": "ready",
+              "severity": "S2",
+              "priority": "P2",
+              "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+              "duplicateOfBugId": null,
+              "occurrenceCount": 1,
+              "reopenCount": 0,
+              "version": 6,
+              "createdAt": "2026-09-09T07:18:03.341Z",
+              "updatedAt": "2026-09-09T07:18:03.503Z",
+              "closedAt": null
+            },
+            "attachmentIds": [],
+            "captureBundleId": null,
+            "eventId": "3cf1bdd3-892b-4cc6-8ddf-e816a23a49a5",
+            "replayed": true
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:22:57.217Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "final passed verification readback",
+      "id": 4,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_get_verification",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "5dce1a96-43c0-439d-b46b-4c1a5b80986a"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:22:57.219Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1018,
+      "responseSha256": "715822097f55fa3eaac8544ef4cac2d44c9e12fc2e08628411e76880346e0feb",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"id\":\"5dce1a96-43c0-439d-b46b-4c1a5b80986a\",\"bugId\":\"ede6d745-a1c8-4f1a-8e10-9b9d6287e602\",\"repairAttemptId\":\"0db96cb2-fb2d-44b6-b091-0ea23026d657\",\"buildId\":null,\"status\":\"passed\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"Captured passed verification exact acceptance criteria\",\"resultSummary\":\"Actual main process retained the exact evidence chain\",\"failureReason\":null,\"blockedReason\":null,\"version\":3}"
+            }
+          ],
+          "structuredContent": {
+            "id": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+            "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+            "repairAttemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+            "buildId": null,
+            "status": "passed",
+            "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+            "criteriaSnapshot": "Captured passed verification exact acceptance criteria",
+            "resultSummary": "Actual main process retained the exact evidence chain",
+            "failureReason": null,
+            "blockedReason": null,
+            "version": 3
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:22:57.230Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "final blocked verification readback",
+      "id": 5,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_get_verification",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "426d147f-5c9a-4577-ab4a-3eb10524a919"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:22:57.230Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1176,
+      "responseSha256": "c9b157593ec57f0db0af70e874cacb5612381d7af7cf83e63a0f5b158cf215a6",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"id\":\"426d147f-5c9a-4577-ab4a-3eb10524a919\",\"bugId\":\"a0dc58ce-b0e7-43ed-8785-74581f58e8db\",\"repairAttemptId\":\"a5d0ada7-3013-443d-a627-d4c193d19f0e\",\"buildId\":null,\"status\":\"blocked\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"blocked verification resumed main path exact acceptance criteria\",\"resultSummary\":\"blocked was recorded after resuming at the exact failed stage\",\"failureReason\":null,\"blockedReason\":\"blocked was recorded after resuming at the exact failed stage\",\"version\":3}"
+            }
+          ],
+          "structuredContent": {
+            "id": "426d147f-5c9a-4577-ab4a-3eb10524a919",
+            "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+            "repairAttemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+            "buildId": null,
+            "status": "blocked",
+            "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+            "criteriaSnapshot": "blocked verification resumed main path exact acceptance criteria",
+            "resultSummary": "blocked was recorded after resuming at the exact failed stage",
+            "failureReason": null,
+            "blockedReason": "blocked was recorded after resuming at the exact failed stage",
+            "version": 3
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:22:57.241Z"
+    },
+    {
+      "transport": "server_mcp",
+      "label": "final failed verification readback",
+      "id": 6,
+      "method": "tools/call",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "method": "tools/call",
+        "params": {
+          "name": "qa_get_verification",
+          "arguments": {
+            "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+            "verificationId": "7e8a79cd-8e56-47a6-9bf3-400e625aa055"
+          }
+        }
+      },
+      "startedAt": "2026-09-09T07:22:57.242Z",
+      "httpStatus": 200,
+      "responseMedia": "application/json; charset=utf-8",
+      "responseSizeBytes": 1168,
+      "responseSha256": "3c8cfe38c8274b16f849f81611b41782c0a6230f2d3b0620b9719e5fff0a417d",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"id\":\"7e8a79cd-8e56-47a6-9bf3-400e625aa055\",\"bugId\":\"c4dc6a78-c95f-4d6a-b3de-90b2234cec88\",\"repairAttemptId\":\"7cf05793-98b3-4ce6-93cb-eba8aa638358\",\"buildId\":null,\"status\":\"failed\",\"verifierId\":\"418dfa96-e46d-4c21-8411-4f1a43b83802\",\"criteriaSnapshot\":\"failed verification resumed main path exact acceptance criteria\",\"resultSummary\":\"failed was recorded after resuming at the exact failed stage\",\"failureReason\":\"failed was recorded after resuming at the exact failed stage\",\"blockedReason\":null,\"version\":3}"
+            }
+          ],
+          "structuredContent": {
+            "id": "7e8a79cd-8e56-47a6-9bf3-400e625aa055",
+            "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+            "repairAttemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+            "buildId": null,
+            "status": "failed",
+            "verifierId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+            "criteriaSnapshot": "failed verification resumed main path exact acceptance criteria",
+            "resultSummary": "failed was recorded after resuming at the exact failed stage",
+            "failureReason": "failed was recorded after resuming at the exact failed stage",
+            "blockedReason": null,
+            "version": 3
+          },
+          "isError": false
+        }
+      },
+      "finishedAt": "2026-09-09T07:22:57.250Z"
+    },
+    {
+      "transport": "direct_http",
+      "label": "direct HTTP reads released failed-verification Bug",
+      "method": "GET",
+      "path": "/api/v1/bugs/c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+      "startedAt": "2026-09-09T07:22:57.251Z",
+      "httpStatus": 200,
+      "responseMedia": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "responseSizeBytes": 740,
+      "responseSha256": "b46870f65d29c74635cfd1f6eb6cc1a2bc79788d14b7257e16b06982d32b6c0c",
+      "response": {
+        "id": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+        "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+        "number": 5,
+        "key": "S19A9A75C75-5",
+        "title": "failed verification resumed main path",
+        "description": "failed verification resumed main path resumed after the retained assertion",
+        "expectedBehavior": "The result status persists through the actual main service",
+        "moduleId": null,
+        "state": "ready",
+        "severity": "S2",
+        "priority": "P2",
+        "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+        "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+        "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 6,
+        "createdAt": "2026-09-09T07:18:03.341Z",
+        "updatedAt": "2026-09-09T07:18:03.503Z",
+        "closedAt": null
+      },
+      "finishedAt": "2026-09-09T07:22:57.255Z"
+    },
+    {
+      "transport": "direct_http",
+      "label": "direct HTTP reads blocked-verification Bug",
+      "method": "GET",
+      "path": "/api/v1/bugs/a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+      "startedAt": "2026-09-09T07:22:57.255Z",
+      "httpStatus": 200,
+      "responseMedia": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+      "responseSizeBytes": 759,
+      "responseSha256": "b1be2a308fb66b4276d0122701a291f0392e62f4ff1329317d6a82b690a19e90",
+      "response": {
+        "id": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+        "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4",
+        "number": 4,
+        "key": "S19A9A75C75-4",
+        "title": "blocked verification resumed main path",
+        "description": "blocked verification resumed main path resumed after the retained assertion",
+        "expectedBehavior": "The result status persists through the actual main service",
+        "moduleId": null,
+        "state": "ready_for_verification",
+        "severity": "S2",
+        "priority": "P2",
+        "reporterId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+        "ownerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+        "verificationOwnerId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+        "duplicateOfBugId": null,
+        "occurrenceCount": 1,
+        "reopenCount": 0,
+        "version": 6,
+        "createdAt": "2026-09-09T07:18:03.126Z",
+        "updatedAt": "2026-09-09T07:18:03.291Z",
+        "closedAt": null
+      },
+      "finishedAt": "2026-09-09T07:22:57.260Z"
+    }
+  ],
+  "fixtures": {
+    "employeeId": "418dfa96-e46d-4c21-8411-4f1a43b83802",
+    "directAttemptId": "48b9f789-bf8c-4e69-a7fa-304023282b11",
+    "supersededAttemptId": "6fe70358-e4ed-46d6-9ec2-43aea07ab882",
+    "successorId": "18e52bd4-f056-4803-91c4-1fd58ebc4bd3",
+    "passed": {
+      "bugId": "ede6d745-a1c8-4f1a-8e10-9b9d6287e602",
+      "attemptId": "0db96cb2-fb2d-44b6-b091-0ea23026d657",
+      "verificationId": "5dce1a96-43c0-439d-b46b-4c1a5b80986a",
+      "captureId": "d7b82ae5-bb41-4681-8afb-2a08a8f77835",
+      "attachmentIds": [
+        "0410f7d7-486f-4177-af8b-e0c925a4196a",
+        "6479bbd9-5292-4d69-b14b-16f0183ce499"
+      ]
+    },
+    "blocked": {
+      "bugId": "a0dc58ce-b0e7-43ed-8785-74581f58e8db",
+      "attemptId": "a5d0ada7-3013-443d-a627-d4c193d19f0e",
+      "verificationId": "426d147f-5c9a-4577-ab4a-3eb10524a919"
+    },
+    "failed": {
+      "bugId": "c4dc6a78-c95f-4d6a-b3de-90b2234cec88",
+      "attemptId": "7cf05793-98b3-4ce6-93cb-eba8aa638358",
+      "verificationId": "7e8a79cd-8e56-47a6-9bf3-400e625aa055"
+    }
+  },
+  "boundaries": {
+    "resumedAtExactSecondFailedStage": true,
+    "priorProjectAndRecordsReused": true,
+    "noPriorBugOrUploadRecreated": true,
+    "isolatedRuntimeOnly": true,
+    "actualMainApi": true,
+    "actualServerMcpProxy": true,
+    "syntheticCaptureFixture": true,
+    "physicalDeviceUsed": false,
+    "localMcpCalled": false,
+    "browserUiOperated": false,
+    "externalComponentsEnabled": false,
+    "externalCalls": 0,
+    "productionTouched": false,
+    "existingPreview4419Touched": false,
+    "cleanupDeletes": false
+  },
+  "hostBefore": [
+    {
+      "port": 4519,
+      "pid": 14676,
+      "startedAt": "2026-09-09T06:50:21.3491250Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+    },
+    {
+      "port": 4521,
+      "pid": 7472,
+      "startedAt": "2026-09-09T06:50:46.5226930Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+    }
+  ],
+  "healthBefore": {
+    "api": {
+      "status": "ready",
+      "schemaVersion": "19",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    },
+    "serverMcp": {
+      "status": "ready",
+      "schemaVersion": "19",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    }
+  },
+  "hostAfter": [
+    {
+      "port": 4519,
+      "pid": 14676,
+      "startedAt": "2026-09-09T06:50:21.3491250Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json api"
+    },
+    {
+      "port": 4521,
+      "pid": 7472,
+      "startedAt": "2026-09-09T06:50:46.5226930Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" scripts/project-components/run-preview-service.mjs C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-schema19-sol-0909\\instance.json mcp"
+    }
+  ],
+  "healthAfter": {
+    "status": "ready",
+    "schemaVersion": "19",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "finishedAt": "2026-09-09T07:22:59.212Z"
+}
