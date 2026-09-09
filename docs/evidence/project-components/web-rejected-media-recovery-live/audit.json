@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "kind": "read-only-raw-artifact-audit",
+  "observedAt": "2026-09-09T00:40:39.948Z",
+  "status": "passed",
+  "runId": "5f3c9726-5374-4c7d-9ba4-57573901968e",
+  "liveExitCode": 0,
+  "proofSha256": "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb",
+  "method": "Recomputed parsed checks, request phase chronology, immutable journal and source/artifact byte hashes. No new UI, HTTP, database, or service operation during this audit.",
+  "checks": {
+    "recorded": 81,
+    "recomputedPass": 81,
+    "failedLabels": []
+  },
+  "source": {
+    "publishedCommit": "7904e2c2d7285003884a5788a83300fbf521dbf1",
+    "sourceHashes": {
+      "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
+      "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
+      "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
+      "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
+    },
+    "allCurrentSourceHashesEqual": true,
+    "runnerSha256": "dc1f93799397e9c45a5feb520722d1e46453288f4ddfcb53d6d8315923c9f2be",
+    "runnerCopyEqual": true,
+    "currentRunnerEqual": true
+  },
+  "fixture": {
+    "projectId": "5fbf115a-4f3f-4b44-bfb0-907da639b65b",
+    "actorId": "27818fb8-6f44-42a0-8dd8-cce791bc9262",
+    "oldSubmissionId": "23b8fcf5-20d7-46d3-a902-b3a1c2f38fba",
+    "newSubmissionId": "16c72a31-d04b-4baa-a93e-9af51c1e0624",
+    "bugId": "08f36597-a582-4bd2-96e4-2361bbb77315",
+    "attachmentId": "c5ea44a7-f39e-402a-834f-e35181ea2319",
+    "badUploadSessionId": "22a67428-d995-4311-9507-e6a1af5086ca"
+  },
+  "actualRequests": {
+    "browserRequestRecords": 65,
+    "browserMethodCounts": {
+      "POST": 7,
+      "PUT": 2,
+      "GET": 56
+    },
+    "directSetupAndReadiness": 3,
+    "knownApiRequestCount": 68,
+    "ledgerIsNotRequestCount": true,
+    "bugPostCount": 1,
+    "bugPostsBeforeRejection": 0,
+    "badFinalize": {
+      "status": 400,
+      "code": "UPLOAD_CONTENT_INVALID",
+      "actualResponseSha256": "1f6f3f5633255c3d4d6451829510207c7af6772d8b6f89a10c90a2a9311edfcb"
+    },
+    "uploadFinalizeStatuses": [400, 200],
+    "syntheticResponses": false,
+    "componentRoutes": 0
+  },
+  "retention": {
+    "oldCommitAttempts": 0,
+    "oldHasBugRequestBody": false,
+    "oldEntryOtherwiseExactlySame": true,
+    "supersededByMatchesNew": true,
+    "scopeExactlySame": true,
+    "newCommitAttempts": 1,
+    "finalEntryCount": 2,
+    "privateRuntimeProofBytesSame": true,
+    "badBytes": {
+      "filename": "rejected-truncated.png",
+      "sizeBytes": 12,
+      "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+    },
+    "goodBytes": {
+      "filename": "replacement-valid.png",
+      "sizeBytes": 68,
+      "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+    },
+    "quarantineReads": [
+      {
+        "label": "before replacement",
+        "sizeBytes": 12,
+        "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+      },
+      {
+        "label": "after recovery",
+        "sizeBytes": 12,
+        "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+      },
+      {
+        "label": "after restart",
+        "sizeBytes": 12,
+        "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86"
+      }
+    ]
+  },
+  "browser": {
+    "type": "dedicated headless Edge",
+    "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-rejected-media-recovery-5f3c9726-5374-4c7d-9ba4-57573901968e\\edge-profile",
+    "processes": [
+      {
+        "at": "2026-09-09T00:38:01.431Z",
+        "phase": "launched",
+        "pid": 10464,
+        "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+        "startedAt": "2026-09-09T00:38:00.5887130Z",
+        "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-rejected-media-recovery-5f3c9726-5374-4c7d-9ba4-57573901968e\\edge-profile"
+      },
+      {
+        "at": "2026-09-09T00:38:04.036Z",
+        "phase": "normal_close",
+        "pid": 10464,
+        "exited": true
+      },
+      {
+        "at": "2026-09-09T00:38:04.536Z",
+        "phase": "launched",
+        "pid": 14080,
+        "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+        "startedAt": "2026-09-09T00:38:04.0398400Z",
+        "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\web-rejected-media-recovery-5f3c9726-5374-4c7d-9ba4-57573901968e\\edge-profile"
+      },
+      {
+        "at": "2026-09-09T00:38:05.892Z",
+        "phase": "normal_close",
+        "pid": 14080,
+        "exited": true
+      }
+    ],
+    "normalCloseCount": 2,
+    "forcedStop": false
+  },
+  "visualInspection": {
+    "count": 3,
+    "files": [
+      "02-real-400-recovery-button.png",
+      "03-corrected-draft-before-explicit-action.png",
+      "05-final-retained-state.png"
+    ],
+    "observed": "Visible explicit recovery button, corrected text/valid PNG selection, and restored one-Bug detail with one attachment.",
+    "totalPngFiles": 5,
+    "allFiveImageBytesMatchRecordedHashes": true
+  },
+  "publicEvidenceScan": {
+    "stringsExamined": 3577,
+    "sensitiveFieldOrBearerJwtPemFindings": [],
+    "exactPrivateSecretLiteralScan": false,
+    "privateCredentialsNotReopenedForAudit": true
+  },
+  "artifacts": [
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/01-bad-media-draft.png",
+      "sizeBytes": 184988,
+      "sha256": "23f459dd346f1084c00dabd7e17a369bdc8f3c639b929d286a60bc1794b0976d"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/02-real-400-recovery-button.png",
+      "sizeBytes": 193388,
+      "sha256": "cba2ed39395505de831732c6ebba3f5337f57477425802f690a9aa9344203b2e"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/03-corrected-draft-before-explicit-action.png",
+      "sizeBytes": 187809,
+      "sha256": "9322d6288e9b9d5344a6615a51b4429d7da3bd88cf0f0f40ac0de7fc29eafb7f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/04-one-bug-old-failure-retained.png",
+      "sizeBytes": 128461,
+      "sha256": "1b67a1f03b0aa4156f68686c0ab07ea76319f81aa952ec0ffb1962f4baa18d7e"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/05-final-retained-state.png",
+      "sizeBytes": 128289,
+      "sha256": "f930cff25eb7902ee1a10bd8f1c504747782a384b0fede566c43459c5be60568"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/bad-media-finalize-400.json",
+      "sizeBytes": 473,
+      "sha256": "d903e4ca7a26c6f4ee0ec2c9262b418cf8d3080b927363836f135c55cf723467"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
+      "sizeBytes": 237342,
+      "sha256": "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/runner.mjs",
+      "sizeBytes": 40167,
+      "sha256": "dc1f93799397e9c45a5feb520722d1e46453288f4ddfcb53d6d8315923c9f2be"
+    }
+  ],
+  "limits": [
+    "Only first upload-phase definite rejection before any Bug POST.",
+    "Normal browser close/reopen only; no forced crash.",
+    "No comment-rejection, unknown-history 4xx, EXE/APK, external executor, or full baseline14 acceptance.",
+    "Original rejected upload/journal and fixture/profile remain; no cleanup."
+  ]
+}

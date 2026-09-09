@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "kind": "root-read-only-evidence-review",
+  "observedAt": "2026-09-09T00:59:14.088Z",
+  "runId": "5f3c9726-5374-4c7d-9ba4-57573901968e",
+  "status": "passed_scoped",
+  "auditSha256": "b7e2e0d07e5ee3387738f5aec1f1bb3d049cd9a265fec74067d1e3ae779709b9",
+  "checks": {
+    "recorded": 81,
+    "recomputedPass": 81,
+    "failedLabels": []
+  },
+  "artifacts": [
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/01-bad-media-draft.png",
+      "sizeBytes": 184988,
+      "sha256": "23f459dd346f1084c00dabd7e17a369bdc8f3c639b929d286a60bc1794b0976d",
+      "matched": true
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/02-real-400-recovery-button.png",
+      "sizeBytes": 193388,
+      "sha256": "cba2ed39395505de831732c6ebba3f5337f57477425802f690a9aa9344203b2e",
+      "matched": true
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/03-corrected-draft-before-explicit-action.png",
+      "sizeBytes": 187809,
+      "sha256": "9322d6288e9b9d5344a6615a51b4429d7da3bd88cf0f0f40ac0de7fc29eafb7f",
+      "matched": true
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/04-one-bug-old-failure-retained.png",
+      "sizeBytes": 128461,
+      "sha256": "1b67a1f03b0aa4156f68686c0ab07ea76319f81aa952ec0ffb1962f4baa18d7e",
+      "matched": true
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/05-final-retained-state.png",
+      "sizeBytes": 128289,
+      "sha256": "f930cff25eb7902ee1a10bd8f1c504747782a384b0fede566c43459c5be60568",
+      "matched": true
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/bad-media-finalize-400.json",
+      "sizeBytes": 473,
+      "sha256": "d903e4ca7a26c6f4ee0ec2c9262b418cf8d3080b927363836f135c55cf723467",
+      "matched": true
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
+      "sizeBytes": 237342,
+      "sha256": "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb",
+      "matched": true
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/runner.mjs",
+      "sizeBytes": 40167,
+      "sha256": "dc1f93799397e9c45a5feb520722d1e46453288f4ddfcb53d6d8315923c9f2be",
+      "matched": true
+    }
+  ],
+  "sourceBinding": "All four recorded source hashes matched committed 7904e2c bytes; current App.tsx is being changed separately and this is historical evidence.",
+  "visualInspection": {
+    "files": [
+      "02-real-400-recovery-button.png",
+      "03-corrected-draft-before-explicit-action.png",
+      "05-final-retained-state.png"
+    ],
+    "observed": "Original truncated PNG and explicit recovery button; corrected text and replacement file before explicit action; unique Bug and replacement attachment after normal reopen."
+  },
+  "secretScan": {
+    "files": 13,
+    "exactKnownPrivateValues": true,
+    "jwtAndPrivateKeyMarkers": true,
+    "findings": []
+  },
+  "newBusinessRequests": 0,
+  "limits": [
+    "Only first upload-phase definite rejection before any Bug POST.",
+    "Normal browser close/reopen only; no forced crash.",
+    "No comment-rejection, unknown-history 4xx, EXE/APK, external executor, or full baseline14 acceptance.",
+    "Original rejected upload/journal and fixture/profile remain; no cleanup."
+  ]
+}

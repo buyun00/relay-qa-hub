@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "prepared-live-browser-fixture",
+  "status": "not_run",
+  "recordedAt": "2026-09-09 00:36:10 UTC",
+  "scope": "One fresh preview project/actor; real malformed PNG finalize rejection followed by explicit UI replacement; no product/matrix/service changes.",
+  "headAtPreparation": "b62e25939705acb72162c6d031a5bdcd1cf8bb1c",
+  "runner": {
+    "path": "scripts/project-components/web-rejected-media-recovery-live.mjs",
+    "sha256": "dc1f93799397e9c45a5feb520722d1e46453288f4ddfcb53d6d8315923c9f2be"
+  },
+  "plan": {
+    "path": "docs/evidence/project-components/web-rejected-media-recovery-plan.md",
+    "sha256": "320bbe8d25e768090fae18ccd6ae0268b550e4d7f1786b08018a466b559d3df7"
+  },
+  "sourceHashes": {
+    "apps/web/src/pending-submission.ts": "723e2d6a83a7deb48ffa86b4ab3b0723bd5af418f6477339e6e59779ed2429d3",
+    "apps/web/src/api.ts": "b5e3c6164332e7e98aac120008315e3cdb93d4fcab2fd142105eccc128f5c2de",
+    "apps/web/src/project-drafts.ts": "6f0dbbca6f1d5c86e2e1b20c2d1503a93e314bf69ca3dd89c49a5314afbe9f01",
+    "apps/web/src/App.tsx": "b1e6b4eeedaf5f62d8bd1c4ce3715113f0069eaebc6ad5a35e178b586b015554"
+  },
+  "fixtures": {
+    "bad": {
+      "filename": "rejected-truncated.png",
+      "bytes": 12,
+      "sha256": "218ad85a233eff829618a6865ab681222b734c62d35a32b3eabd5c37d8945f86",
+      "meaning": "PNG signature retained, structurally truncated input; not a valid PNG"
+    },
+    "good": {
+      "filename": "replacement-valid.png",
+      "bytes": 68,
+      "sha256": "5e3d382db4dd83d59aa5742793ad6b7903409e865c83bcbc54835049f043bc15"
+    }
+  },
+  "staticChecks": {
+    "startedAt": "2026-09-09 00:35:39 UTC",
+    "checks": [
+      {
+        "command": "node --check scripts/project-components/web-rejected-media-recovery-live.mjs",
+        "chunk_id": "d63dd0",
+        "wall_time_seconds": 0.37797,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      {
+        "command": "node node_modules/eslint/bin/eslint.js scripts/project-components/web-rejected-media-recovery-live.mjs --max-warnings 0",
+        "chunk_id": "58d874",
+        "wall_time_seconds": 1.4292003,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      },
+      {
+        "command": "node node_modules/prettier/bin/prettier.cjs --check scripts/project-components/web-rejected-media-recovery-live.mjs docs/evidence/project-components/web-rejected-media-recovery-plan.md",
+        "chunk_id": "bbadf8",
+        "wall_time_seconds": 0.6482717,
+        "exit_code": 0,
+        "original_token_count": 17,
+        "output": "Checking formatting...\nAll matched files use Prettier code style!\n"
+      }
+    ]
+  },
+  "preparationBoundaries": {
+    "runtimeConfigurationRead": false,
+    "privateConfigurationRead": false,
+    "networkRequests": 0,
+    "browserLaunches": 0,
+    "productFilesModified": false,
+    "actualCoverageGenerated": false,
+    "rootReviewedAndAuthorizedOneExplicitRun": true,
+    "contractPeerReviewPending": true
+  },
+  "claimLimits": [
+    "Preparation is not a live result.",
+    "Only first upload-phase definite rejection before any Bug POST; unknown history and other 4xx are not declared safe.",
+    "No EXE/APK/client baseline completion."
+  ]
+}

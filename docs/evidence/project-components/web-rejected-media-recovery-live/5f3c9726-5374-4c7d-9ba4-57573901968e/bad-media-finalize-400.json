@@ -1,0 +1,11 @@
+{
+  "sessionId": "22a67428-d995-4311-9507-e6a1af5086ca",
+  "submissionId": "23b8fcf5-20d7-46d3-a902-b3a1c2f38fba",
+  "clientAttachmentId": "29bb7db0-5912-4f96-a88d-dfa4fa5d3867",
+  "status": 400,
+  "response": {
+    "code": "UPLOAD_CONTENT_INVALID",
+    "message": "附件内容与声明的类型、大小或校验值不一致，请保留草稿并选择正确的原始文件。"
+  },
+  "responseSha256": "1f6f3f5633255c3d4d6451829510207c7af6772d8b6f89a10c90a2a9311edfcb"
+}
