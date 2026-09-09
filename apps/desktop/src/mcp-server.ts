@@ -7,6 +7,7 @@ const SUPPORTED_PROTOCOL_VERSIONS = new Set(["2025-06-18", "2025-03-26", "2024-1
 const LATEST_PROTOCOL_VERSION = "2025-06-18";
 
 export const QA_HUB_MCP_INSTRUCTIONS =
+  "打包上传：qa_get_packaging_status 查询构建；qa_start_build 只打包；qa_build_and_upload 一键提交 Android 外网打包并由后端自动上传；qa_start_increment_upload 上传已有 Android/iOS ZIP。qa_get_increment_upload_status 查询持久化任务、排队原因和脱敏日志。写操作复用 requestId，超时后先查询原任务，不能生成新 ID 重复提交。accepted 或 upload_started 不代表发布完成；必须回读 job.published 和 remoteStatus。默认 mode=publish_workflow 完成正式发布；prepare_publish 停在最后确认前。任务执行在服务端，退出 EXE 不会中断已提交任务。" +
   "QA Hub 是 Bug 生命周期唯一事实源。先调用 qa_list_projects、qa_list_bugs 和 qa_get_bug_context；需要修复时调用 qa_begin_fix，然后在编辑器内做窄改动、运行真实验证、提交 Git，再用 qa_submit_fix 回写实际命令与提交 SHA。qa_submit_fix 记录代码交付，任务对用户显示为已完成待验收，精确构建匹配仍作为内部验收证据；进入已完成待验收后项目内任意已登录成员都能在详情中直接关闭，也能从详情删除单子，不再检查提报人、负责人或关闭人身份。验收通过会先自动把关联轻语单同步为已解决；需要单独补同步时，调用 qa_resolve_qingyu_bug 并传入 QA Hub 单号，它只解决关联轻语单，不替代本地验收。不要报告未执行的测试，不要抢占他人单子。附件先用 qa_materialize_attachment 下载并校验。";
 
 type JsonRpcId = string | number;

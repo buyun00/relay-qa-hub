@@ -6,6 +6,7 @@ import type { DesktopConfig } from "./config.js";
 import { isAllowedNetworkUrl } from "./config.js";
 import { DesktopBrowserSessionCookieStore, readBoundedBody } from "./network.js";
 import { callProductionTool, PRODUCTION_MCP_TOOLS } from "./mcp-production.js";
+import { callPackagingTool, PACKAGING_MCP_TOOLS } from "./mcp-packaging.js";
 
 const QA_MEDIA_TYPE = "application/vnd.relay-qa-hub.v1.1+json";
 const MAX_JSON_BYTES = 4 * 1024 * 1024;
@@ -345,6 +346,7 @@ const EXTERNAL_STATE_WRITE = Object.freeze({
 
 export const QA_HUB_MCP_TOOLS: readonly McpToolDefinition[] = Object.freeze([
   ...PRODUCTION_MCP_TOOLS,
+  ...PACKAGING_MCP_TOOLS,
   {
     name: "qa_list_projects",
     title: "列出 QA Hub 项目",
@@ -1320,6 +1322,8 @@ export class QaHubMcpTools {
   }
 
   async call(name: string, argumentsValue: unknown): Promise<unknown> {
+    if (PACKAGING_MCP_TOOLS.some((tool) => tool.name === name))
+      return callPackagingTool(name, argumentsValue, this.api);
     if (PRODUCTION_MCP_TOOLS.some((tool) => tool.name === name))
       return callProductionTool(name, argumentsValue, this.api, this.attachmentCacheRoot);
     switch (name) {
