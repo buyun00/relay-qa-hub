@@ -1,0 +1,23 @@
+node:fs:1631
+  const result = binding.readdir(
+                         ^
+
+Error: ENOENT: no such file or directory, scandir 'C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\upload-contract\dist'
+    at readdirSync (node:fs:1631:26)
+    at files (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/result-workflow-phase-d-e2e.mjs:30:10)
+    at tree (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/result-workflow-phase-d-e2e.mjs:43:10)
+    at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/result-workflow-phase-d-e2e.mjs:121:7
+    at Array.map (<anonymous>)
+    at prepare (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/result-workflow-phase-d-e2e.mjs:119:66)
+    at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/result-workflow-phase-d-e2e.mjs:289:44
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: 'C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\packages\\upload-contract\\dist'
+}
+
+Node.js v24.19.0
+exitCode=1

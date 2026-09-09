@@ -1,0 +1,8 @@
+{"milestone":"full_main_and_real_worker_ready","apiPid":19404,"mcpPid":7640,"schema":17,"runId":"667b0e87-e0fd-44bd-8bb3-c0506dbf5b81"}
+{"milestone":"result_format_completed","format":"legacy","status":"blocked","checks":57}
+{"milestone":"result_format_completed","format":"vendor","status":"blocked","checks":109}
+{"milestone":"new_tool_completed","status":"passed","checks":358}
+{"milestone":"new_tool_completed","status":"failed","checks":467}
+{"milestone":"new_tool_completed","status":"blocked","checks":581}
+{"milestone":"workflow_cursor_actual_reopen_completed","pages":2,"checks":658}
+{"status":"passed","runId":"667b0e87-e0fd-44bd-8bb3-c0506dbf5b81","requestCount":241,"checks":{"total":665,"passed":665},"resultPath":"C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\result-workflow-phase-d-live\\69618261-6c5a-4092-a8a6-2168a2768c8e\\667b0e87-e0fd-44bd-8bb3-c0506dbf5b81\\result.json","sha256":"a20f087468dd5bd29adef84359662313d6755ecde0c76c8ea4624b87fe18a08b"}

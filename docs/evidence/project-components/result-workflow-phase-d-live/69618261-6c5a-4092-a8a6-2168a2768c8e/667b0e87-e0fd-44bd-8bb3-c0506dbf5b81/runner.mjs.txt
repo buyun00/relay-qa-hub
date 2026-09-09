@@ -1,0 +1,1695 @@
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  readdirSync,
+  lstatSync,
+  existsSync,
+  copyFileSync,
+  constants,
+} from "node:fs";
+import { join, dirname, resolve, relative, sep } from "node:path";
+import { createRequire } from "node:module";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { createHash, randomUUID, randomBytes } from "node:crypto";
+import { spawn, execFileSync } from "node:child_process";
+import { DatabaseSync, backup } from "node:sqlite";
+const repo = fileURLToPath(new URL("../../", import.meta.url));
+const evidenceRoot = join(repo, "docs/evidence/project-components/result-workflow-phase-d-live");
+const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const fileHash = (path) => hash(readFileSync(path));
+const json = (path) => JSON.parse(readFileSync(path, "utf8"));
+function save(path, value) {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, JSON.stringify(value, null, 2) + "\n", { flag: "wx" });
+}
+function requireTrue(value, label) {
+  if (!value) throw new Error(label);
+}
+function files(root, prefix = "") {
+  return readdirSync(root, { withFileTypes: true }).flatMap((e) => {
+    const name = join(prefix, e.name),
+      path = join(root, e.name);
+    requireTrue(!lstatSync(path).isSymbolicLink(), "SOURCE_LINK_REFUSED");
+    return e.isDirectory() ? files(path, name) : [name];
+  });
+}
+function copy(from, to) {
+  mkdirSync(dirname(to), { recursive: true });
+  copyFileSync(from, to, constants.COPYFILE_EXCL);
+  requireTrue(fileHash(from) === fileHash(to), "COPY_HASH_MISMATCH");
+}
+function tree(root) {
+  return files(root)
+    .sort()
+    .map((path) => ({
+      path: path.split(sep).join("/"),
+      bytes: lstatSync(join(root, path)).size,
+      sha256: fileHash(join(root, path)),
+    }));
+}
+function copyTree(from, to, excludes = () => false) {
+  for (const path of files(from)) if (!excludes(path)) copy(join(from, path), join(to, path));
+}
+function packageRoot(req, name) {
+  let path = dirname(req.resolve(name));
+  while (true) {
+    if (existsSync(join(path, "package.json")) && json(join(path, "package.json")).name === name)
+      return path;
+    const parent = dirname(path);
+    requireTrue(parent !== path, "PACKAGE_ROOT_NOT_FOUND");
+    path = parent;
+  }
+}
+function packageCopy(from, to, ancestors = []) {
+  const rel = relative(repo, from);
+  requireTrue(
+    rel && !rel.startsWith("..") && !resolve(from).toLowerCase().startsWith("d:"),
+    "DEPENDENCY_OUTSIDE_WORKTREE",
+  );
+  const manifest = json(join(from, "package.json"));
+  if (ancestors.includes(from)) return;
+  for (const entry of readdirSync(from, { withFileTypes: true })) {
+    if (entry.name === "node_modules") continue;
+    const source = join(from, entry.name),
+      target = join(to, entry.name);
+    requireTrue(!entry.isSymbolicLink(), "PACKAGE_LINK_REFUSED");
+    if (entry.isDirectory()) copyTree(source, target);
+    else copy(source, target);
+  }
+  const req = createRequire(join(from, "package.json"));
+  for (const name of Object.keys({ ...manifest.dependencies, ...manifest.optionalDependencies })) {
+    let source;
+    try {
+      source = packageRoot(req, name);
+    } catch (error) {
+      if (manifest.optionalDependencies?.[name]) continue;
+      throw error;
+    }
+    packageCopy(source, join(to, "node_modules", name), [...ancestors, from]);
+  }
+}
+async function prepare(expectedCommit) {
+  const commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  requireTrue(
+    typeof expectedCommit === "string" &&
+      /^[0-9a-f]{40}$/.test(expectedCommit) &&
+      commit === expectedCommit,
+    "EXACT_REVIEWED_COMMIT_REQUIRED",
+  );
+  const inputEvidence = [
+    {
+      path: "docs/evidence/project-components/workflow-projection-integration/result.json",
+      sha256: "16a0903e528f41667cb092d5d4009cf9340cb506e2e3c42664544a1af98f06dd",
+    },
+    {
+      path: "docs/evidence/project-components/mcp-verification-result/result.json",
+      sha256: "c832b7afa92013a0dc002c4091374caa5de957bab93568af07ae21ece51fcfd8",
+    },
+  ];
+  for (const proof of inputEvidence) {
+    requireTrue(fileHash(join(repo, proof.path)) === proof.sha256, "VALIDATED_INPUT_PROOF_CHANGED");
+    for (const row of json(join(repo, proof.path)).sources)
+      requireTrue(
+        fileHash(join(repo, row.path)) === row.sha256,
+        "VALIDATED_SOURCE_CHANGED:" + row.path,
+      );
+  }
+  const distInput = Object.fromEntries(
+    ["apps/api/dist", "packages/storage/dist", "packages/upload-contract"].map((name) => [
+      name,
+      tree(join(repo, name)),
+    ]),
+  );
+  const sourceProof = {
+    source: [
+      "apps/api/src/automation.ts",
+      "apps/api/src/automation-verification-result.ts",
+      "apps/api/src/workflow-projection.ts",
+      "apps/api/src/sqlite-workflow-projection-store.ts",
+      "apps/api/src/main.ts",
+      "packages/storage/src/workflow-projection-types.ts",
+      "packages/storage/src/workflow-projection-cursor.ts",
+      "packages/storage/src/workflow-projection-store.ts",
+      "packages/storage/src/workflow-projection-migration.ts",
+      "packages/storage/src/sqlite-worker.ts",
+      "packages/storage/src/sqlite-worker-entry.ts",
+      "packages/storage/src/index.ts",
+      "apps/api/src/mobile-verification.ts",
+      "apps/api/src/sqlite-mobile-verification-store.ts",
+      "packages/storage/src/mobile-verification-store.ts",
+      "packages/storage/src/verification-blocked-result-migration.ts",
+      "packages/storage/src/sqlite-migrations.ts",
+      "apps/api/test/verification-result-phase-b.test.mjs",
+      "apps/api/src/frozen-workflow-response.ts",
+      "apps/api/src/app.ts",
+    ].map((path) => ({
+      path,
+      bytes: lstatSync(join(repo, path)).size,
+      sha256: fileHash(join(repo, path)),
+    })),
+  };
+  const id = randomUUID(),
+    base = join("C:/Users/lin0/.codex/parallel-runtimes", `result-workflow-d-${id}`);
+  const sourceRoot = join(base, "source"),
+    runtimeRoot = join(base, "runtime"),
+    evidence = join(evidenceRoot, id);
+  mkdirSync(base);
+  mkdirSync(sourceRoot);
+  mkdirSync(runtimeRoot);
+  mkdirSync(evidence, { recursive: true });
+  const instanceId = `qa-hub-preview-result-d-${id.slice(0, 8)}`;
+  const config = {
+    schemaVersion: 1,
+    instanceId,
+    sourceRoot,
+    runtimeRoot,
+    ...Object.fromEntries(
+      ["dataRoot", "backupRoot", "downloadsRoot", "logsRoot", "desktopRoot"].map((x) => [
+        x,
+        join(runtimeRoot, x),
+      ]),
+    ),
+    apiHost: "127.0.0.1",
+    apiPort: 4459,
+    webHost: "127.0.0.1",
+    webPort: 4458,
+    mcpPort: 4461,
+    desktopMcpPort: 4460,
+    cookieName: `${instanceId}-session`,
+    gmUserId: randomUUID(),
+    secretsFile: join(runtimeRoot, "secrets.json"),
+    peopleFile: join(runtimeRoot, "people.json"),
+    releaseChannel: instanceId,
+  };
+  for (const key of ["dataRoot", "backupRoot", "downloadsRoot", "logsRoot", "desktopRoot"])
+    mkdirSync(config[key]);
+  save(
+    config.secretsFile,
+    Object.fromEntries(
+      ["sessionSecret", "debugToken", "gmPassword"].map((x) => [
+        x,
+        randomBytes(48).toString("hex"),
+      ]),
+    ),
+  );
+  save(config.peopleFile, { schemaVersion: 4, projectKey: "LOCAL", people: [] });
+  save(join(config.dataRoot, ".qa-hub-import-hold.json"), {
+    markerVersion: 1,
+    state: "paused",
+    reason: "Independent Phase D + MCP result E2E: no external execution authorized",
+    heldExecutors: ["relay-outbox", "upload", "build", "qingyu-sync", "scheduled-jobs"],
+  });
+  const configPath = join(runtimeRoot, "instance.json");
+  save(configPath, config);
+  for (const name of ["apps/api", "packages/storage"]) {
+    copy(join(repo, name, "package.json"), join(sourceRoot, name, "package.json"));
+    copyTree(join(repo, name, "dist"), join(sourceRoot, name, "dist"));
+  }
+  copyTree(
+    join(repo, "packages/upload-contract"),
+    join(sourceRoot, "packages/upload-contract"),
+    (p) => p.startsWith("node_modules"),
+  );
+  for (const name of ["storage", "upload-contract"])
+    copyTree(
+      join(sourceRoot, "packages", name),
+      join(sourceRoot, "node_modules/@relay-qa-hub", name),
+    );
+  const req = createRequire(join(repo, "apps/api/package.json"));
+  for (const name of ["fastify", "pinyin-pro"])
+    packageCopy(packageRoot(req, name), join(sourceRoot, "node_modules", name));
+  for (const path of [
+    "apps/api/src/parallel-instance.ts",
+    "scripts/project-components/run-preview-service.mjs",
+    "scripts/project-components/preview-mcp.mjs",
+    "scripts/project-components/result-phase-b-guard.mjs",
+    "scripts/project-components/result-phase-b-guard-selftest.mjs",
+  ])
+    copy(join(repo, path), join(sourceRoot, path));
+  for (const row of sourceProof.source)
+    requireTrue(fileHash(join(repo, row.path)) === row.sha256, "SOURCE_CHANGED_DURING_COPY");
+  for (const [name, entries] of Object.entries(distInput))
+    requireTrue(
+      JSON.stringify(tree(join(repo, name))) === JSON.stringify(entries),
+      "DIST_CHANGED_DURING_COPY",
+    );
+  const closure = tree(sourceRoot);
+  save(join(base, "closure.json"), closure);
+  save(join(evidence, "closure.json"), closure);
+  const plan = {
+    id,
+    preparedAt: new Date().toISOString(),
+    commit,
+    inputEvidence,
+    distInput,
+    worktreeStatusAtPrepare: execFileSync("git", ["status", "--short"], {
+      cwd: repo,
+      encoding: "utf8",
+    }).trim(),
+    phaseDSourceFrozenAtPrepare: true,
+    node: { version: process.version, path: process.execPath, sha256: fileHash(process.execPath) },
+    sourceProofSha256: hash(JSON.stringify(sourceProof)),
+    sourcePins: sourceProof.source,
+    config,
+    configPath,
+    configSha256: fileHash(configPath),
+    base,
+    evidence,
+    sourceRoot,
+    closureSha256: fileHash(join(base, "closure.json")),
+    closureFiles: closure.length,
+    includesWorkflowProjection: true,
+    guardSha256: fileHash(join(sourceRoot, "scripts/project-components/result-phase-b-guard.mjs")),
+    runnerSha256: fileHash(fileURLToPath(import.meta.url)),
+    boundaries: {
+      services: [4459, 4461],
+      noBuildOrInstall: true,
+      productionOrPrimaryPreview: false,
+      externalExecutors: false,
+      guardIsNotMaliciousNativeSandbox: true,
+    },
+  };
+  save(join(base, "plan.json"), plan);
+  save(join(evidence, "prepare.json"), plan);
+  console.log(
+    JSON.stringify({
+      status: "prepared",
+      planPath: join(base, "plan.json"),
+      planSha256: fileHash(join(base, "plan.json")),
+      evidence,
+      closureFiles: closure.length,
+      closureSha256: plan.closureSha256,
+      configSha256: plan.configSha256,
+      guardSha256: plan.guardSha256,
+    }),
+  );
+}
+
+if (process.argv[2] === "--prepare") await prepare(process.argv[3]);
+else if (process.argv[2] === "--run") await run(process.argv[3], process.argv[4]);
+else
+  console.log(
+    JSON.stringify({
+      status: "not_run",
+      defaultInert: true,
+      modes: ["--prepare <reviewed-commit>", "--run <plan> <sha256>"],
+    }),
+  );
+
+async function run(planPath, expectedHash) {
+  requireTrue(fileHash(planPath) === expectedHash, "PLAN_PIN_MISMATCH");
+  const plan = json(planPath),
+    config = plan.config;
+  requireTrue(plan.configSha256 === fileHash(plan.configPath), "CONFIG_PIN_MISMATCH");
+  requireTrue(
+    plan.runnerSha256 === fileHash(fileURLToPath(import.meta.url)),
+    "RUNNER_PIN_MISMATCH",
+  );
+  requireTrue(
+    plan.node.sha256 === fileHash(process.execPath) && plan.node.version === process.version,
+    "NODE_PIN_MISMATCH",
+  );
+  requireTrue(
+    resolve(plan.base) ===
+      resolve("C:/Users/lin0/.codex/parallel-runtimes", "result-workflow-d-" + plan.id),
+    "ISOLATED_ROOT_REQUIRED",
+  );
+  requireTrue(
+    resolve(config.runtimeRoot) === resolve(plan.base, "runtime") &&
+      resolve(plan.sourceRoot) === resolve(plan.base, "source"),
+    "ISOLATED_PATH_MISMATCH",
+  );
+  requireTrue(
+    plan.closureSha256 === fileHash(join(plan.base, "closure.json")),
+    "CLOSURE_PIN_MISMATCH",
+  );
+  const expectedClosure = json(join(plan.base, "closure.json"));
+  requireTrue(
+    JSON.stringify(tree(plan.sourceRoot)) === JSON.stringify(expectedClosure),
+    "CLOSURE_BYTES_CHANGED",
+  );
+  requireTrue(
+    config.apiPort === 4459 && config.mcpPort === 4461 && config.apiHost === "127.0.0.1",
+    "PORT_SCOPE_MISMATCH",
+  );
+  requireTrue(
+    json(join(config.dataRoot, ".qa-hub-import-hold.json")).state === "paused",
+    "IMPORT_HOLD_REQUIRED",
+  );
+  const runId = randomUUID(),
+    publicRoot = join(plan.evidence, runId),
+    privateRoot = join(plan.base, "runs", runId);
+  mkdirSync(publicRoot);
+  mkdirSync(privateRoot, { recursive: true });
+  copy(fileURLToPath(import.meta.url), join(publicRoot, "runner.mjs.txt"));
+  const proof = {
+    kind: "isolated_full_main_worker_http_server_mcp",
+    status: "running",
+    runId,
+    startedAt: new Date().toISOString(),
+    planPath,
+    planSha256: expectedHash,
+    runnerSha256: fileHash(fileURLToPath(import.meta.url)),
+    configSha256: plan.configSha256,
+    closureSha256: plan.closureSha256,
+    guardSha256: plan.guardSha256,
+    checks: [],
+    requests: [],
+    processes: [],
+    fixtures: [],
+    boundaries: {
+      originalPreviewTouched: false,
+      productionTouched: false,
+      componentsOff: true,
+      importHoldReleased: false,
+      externalExecutorsRun: false,
+      assembledFastifyFixture: false,
+    },
+  };
+  const secrets = json(config.secretsFile),
+    secretValues = new Set(Object.values(secrets));
+  function remember(value) {
+    if (typeof value === "string") {
+      try {
+        const nested = JSON.parse(value);
+        if (nested && typeof nested === "object") remember(nested);
+      } catch {
+        /* literal */
+      }
+      return;
+    }
+    if (value && typeof value === "object")
+      for (const [key, item] of Object.entries(value)) {
+        if (
+          /token|cookie|password|secret|authorization/i.test(key) &&
+          typeof item === "string" &&
+          item.length > 3
+        )
+          secretValues.add(item);
+        remember(item);
+      }
+  }
+  function redact(value) {
+    if (typeof value === "string") {
+      try {
+        const nested = JSON.parse(value);
+        if (nested && typeof nested === "object") return JSON.stringify(redact(nested));
+      } catch {
+        /* primitive stays exact */
+      }
+      let text = value;
+      for (const secret of secretValues) text = text.split(secret).join("[REDACTED]");
+      return text.replace(/Bearer\s+[^\s"\\]+/gi, "Bearer [REDACTED]");
+    }
+    if (Array.isArray(value)) return value.map(redact);
+    if (value && typeof value === "object")
+      return Object.fromEntries(
+        Object.entries(value).map(([k, v]) => [
+          k,
+          /token|cookie|password|secret|authorization/i.test(k) ? "[REDACTED]" : redact(v),
+        ]),
+      );
+    return value;
+  }
+  function check(label, actual, expected) {
+    const passed = JSON.stringify(actual) === JSON.stringify(expected);
+    proof.checks.push({ label, expected: redact(expected), actual: redact(actual), passed });
+    if (!passed) throw new Error(`CHECK_FAILED:${label}`);
+  }
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([k]) =>
+      [
+        "systemroot",
+        "windir",
+        "comspec",
+        "path",
+        "temp",
+        "tmp",
+        "userprofile",
+        "appdata",
+        "localappdata",
+      ].includes(k.toLowerCase()),
+    ),
+  );
+  const guard = join(plan.sourceRoot, "scripts/project-components/result-phase-b-guard.mjs");
+  const children = [];
+  function launch(role, script, args = [], ipc = true) {
+    const label = `${role}-${children.filter((x) => x.record.role === role).length + 1}`;
+    const startedAt = new Date().toISOString(),
+      guardLog = join(privateRoot, `${label}-guard.jsonl`);
+    const child = spawn(
+      process.execPath,
+      ["--import", pathToFileURL(guard).href, script, ...args],
+      {
+        cwd: plan.sourceRoot,
+        windowsHide: true,
+        env: { ...env, QA_PHASE_B_ROLE: role, QA_PHASE_B_GUARD_LOG: guardLog },
+        stdio: ipc ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"],
+      },
+    );
+    const record = {
+      role,
+      label,
+      pid: child.pid,
+      startedAt,
+      executable: process.execPath,
+      script,
+      guardLog,
+      stdout: "",
+      stderr: "",
+      exit: null,
+    };
+    child.stdout.on("data", (chunk) => (record.stdout += chunk.toString()));
+    child.stderr.on("data", (chunk) => (record.stderr += chunk.toString()));
+    child.on("exit", (code, signal) => {
+      record.exit = { code, signal, at: new Date().toISOString() };
+    });
+    child.on("error", (e) => {
+      record.error = e.code ?? e.message;
+    });
+    children.push({ child, record });
+    proof.processes.push(record);
+    return { child, record };
+  }
+  async function exited(entry) {
+    const until = Date.now() + 30000;
+    while (entry.record.exit === null && Date.now() < until)
+      await new Promise((r) => setTimeout(r, 100));
+    requireTrue(entry.record.exit !== null, `OWNED_PROCESS_DID_NOT_EXIT:${entry.record.pid}`);
+  }
+  let sequence = 0,
+    rpcId = 0;
+  async function request(
+    path,
+    {
+      body,
+      token,
+      cookie,
+      csrf,
+      project,
+      key,
+      method = body === undefined ? "GET" : "POST",
+      accept = "application/json",
+      contentType = "application/json",
+      expected = 200,
+      port = 4459,
+    } = {},
+  ) {
+    requireTrue([4459, 4461].includes(port) && path.startsWith("/"), "REQUEST_SCOPE_INVALID");
+    const headers = {
+      accept,
+      origin: "http://127.0.0.1:4458",
+      ...(body === undefined ? {} : { "content-type": contentType }),
+      ...(project ? { "x-qa-project-id": project } : {}),
+      ...(key ? { "idempotency-key": key } : {}),
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...(cookie ? { cookie } : {}),
+      ...(csrf ? { "x-csrf-token": csrf } : {}),
+    };
+    const row = {
+      sequence: ++sequence,
+      startedAt: new Date().toISOString(),
+      port,
+      method,
+      path,
+      headers: Object.fromEntries(
+        Object.entries(headers).filter(
+          ([key]) => !["authorization", "cookie", "x-csrf-token"].includes(key),
+        ),
+      ),
+      body: redact(body),
+    };
+    proof.requests.push(row);
+    const response = await fetch(`http://127.0.0.1:${port}${path}`, {
+      method,
+      headers,
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      signal: AbortSignal.timeout(20000),
+    });
+    const text = await response.text();
+    let value;
+    try {
+      value = text ? JSON.parse(text) : null;
+    } catch {
+      value = text;
+    }
+    remember(value);
+    const setCookie = response.headers.get("set-cookie")?.split(";")[0];
+    if (setCookie) secretValues.add(setCookie);
+    Object.assign(row, {
+      completedAt: new Date().toISOString(),
+      status: response.status,
+      response: redact(value),
+      responseHeaders: {
+        contentType: response.headers.get("content-type"),
+        instance: response.headers.get("x-qa-hub-instance"),
+      },
+    });
+    check(`${row.sequence} ${method} ${port}${path} status`, response.status, expected);
+    return { value, cookie: setCookie };
+  }
+  const req = async (path, options = {}) => (await request(`/api/v1/${path}`, options)).value;
+  async function rpc(method, params, token, expected = 200, notification = false, auth = {}) {
+    const response = await request("/mcp", {
+      port: 4461,
+      body: {
+        jsonrpc: "2.0",
+        ...(notification ? {} : { id: ++rpcId }),
+        method,
+        ...(params === undefined ? {} : { params }),
+      },
+      token,
+      expected,
+      ...auth,
+    });
+    if (!notification) {
+      check(`${method} jsonrpc literal`, response.value.jsonrpc, "2.0");
+      requireTrue(!response.value.error, `RPC_ERROR:${method}`);
+    }
+    return response.value?.result;
+  }
+  async function tool(name, args, token, errorStatus, auth = {}) {
+    const result = await rpc("tools/call", { name, arguments: args }, token, 200, false, auth);
+    check(`tool ${name} error`, result.isError === true, errorStatus !== undefined);
+    const value =
+      result.structuredContent ?? JSON.parse(result.content.find((x) => x.type === "text").text);
+    check(
+      `tool ${name} JSON mirrors`,
+      JSON.parse(result.content.find((x) => x.type === "text").text),
+      value,
+    );
+    if (errorStatus !== undefined) check(`tool ${name} status`, value.status, errorStatus);
+    return value;
+  }
+  const databaseFile = join(config.dataRoot, "db/qa-hub.sqlite");
+  function snapshot() {
+    const db = new DatabaseSync(databaseFile, { readOnly: true });
+    try {
+      db.exec("BEGIN");
+      const value = Object.fromEntries(
+        [
+          "bugs",
+          "repair_attempts",
+          "verifications",
+          "events",
+          "submissions",
+          "idempotency_records",
+          "outbox",
+          "bug_deletions",
+          "verification_result_snapshots",
+        ].map((table) => {
+          const rows = db.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all();
+          return [table, { count: rows.length, sha256: hash(JSON.stringify(rows)) }];
+        }),
+      );
+      db.exec("COMMIT");
+      return value;
+    } finally {
+      db.close();
+    }
+  }
+  async function stopOwned(entry) {
+    requireTrue(entry.record.exit === null && entry.child.connected, "OWNED_IPC_REQUIRED");
+    entry.record.shutdownRequestedAt = new Date().toISOString();
+    entry.record.shutdownMechanism = "IPC command emits SIGTERM into original official handlers";
+    entry.child.send({ command: "phase-b-official-sigterm" });
+    await exited(entry);
+    check(entry.record.label + " official shutdown exit", entry.record.exit.code, 0);
+  }
+  async function deniedUnchanged(f, path, options, expected) {
+    const before = snapshot();
+    await f.call(path, { ...options, expected });
+    check(`denied ${expected} preserves domain ${path}`, snapshot(), before);
+  }
+  function bugBody(projectId, actorId, title = "Isolated full-main Phase D + MCP result result") {
+    return {
+      submissionContractVersion: "1.1.0",
+      clientSubmissionId: randomUUID(),
+      projectId,
+      title,
+      description: "Synthetic retained acceptance fixture",
+      expectedBehavior: "Exact immutable receipt",
+      severity: "S2",
+      priority: "P2",
+      attachmentIds: [],
+      ownerId: actorId,
+      verificationOwnerId: actorId,
+      occurrence: {
+        observedAt: new Date().toISOString(),
+        platform: "web",
+        steps: ["Full main acceptance"],
+        actualBehavior: "Pending review",
+      },
+    };
+  }
+  let gm;
+  async function fixture(label) {
+    const projectId = randomUUID();
+    await req("gm/projects", {
+      token: gm.accessToken,
+      body: {
+        id: projectId,
+        key: `A${randomUUID().slice(0, 8).toUpperCase()}`,
+        name: `Phase D + MCP result ${label}`,
+      },
+      expected: 200,
+    });
+    const name = `Phase D + MCP result ${label} ${randomUUID().slice(0, 8)}`;
+    const employee = await req("auth/login", { body: { projectId, name, client: "android" } });
+    const f = {
+      projectId,
+      name,
+      employee,
+      actorId: employee.userId,
+      call: (path, options = {}) =>
+        req(path, { token: employee.accessToken, project: projectId, ...options }),
+    };
+    f.bug = async () => {
+      const body = bugBody(projectId, f.actorId);
+      return (
+        await f.call("bugs", {
+          body,
+          key: `submission:${body.clientSubmissionId}:commit`,
+          expected: 201,
+          accept: vendor,
+        })
+      ).bug;
+    };
+    const components = await f.call(`projects/${projectId}/components`);
+    check(`${label} five components`, components.items.length, 5);
+    check(
+      `${label} all off`,
+      components.items.every((x) => x.enabled === false),
+      true,
+    );
+    proof.fixtures.push({ label, projectId, actorId: f.actorId, bugs: [] });
+    f.record = proof.fixtures.at(-1);
+    return f;
+  }
+  const vendor = "application/vnd.relay-qa-hub.v1.1+json";
+  async function round(f, parent = false) {
+    let bug = await f.bug();
+    f.record.bugs.push({ id: bug.id, initialVersion: bug.version });
+    bug = await f.call(`bugs/${bug.id}/transitions`, {
+      body: { expectedVersion: bug.version, toState: "ready" },
+      key: `workflow:transitionBug:bug:${bug.id}:v${bug.version}:ready`,
+    });
+    let attempt = await f.call(`bugs/${bug.id}/repair-attempts`, {
+      body: {
+        expectedVersion: bug.version,
+        mode: "human",
+        assigneeId: f.actorId,
+        summary: "Actual full main human round",
+      },
+      key: `workflow:createRepairAttempt:bug:${bug.id}:v${bug.version}`,
+      expected: 201,
+    });
+    const parentId = parent ? attempt.id : null;
+    if (parent) {
+      const current = await f.call(`bugs/${bug.id}`);
+      await f.call(`bugs/${bug.id}/manual-complete`, {
+        body: { expectedVersion: current.version, reason: "Human takes over prior round" },
+        key: `workflow:manualCompleteBug:bug:${bug.id}:v${current.version}`,
+      });
+      attempt = (await f.call(`bugs/${bug.id}/human-workflow`)).repairAttempt;
+    } else {
+      attempt = await f.call(`repair-attempts/${attempt.id}/start`, {
+        body: { expectedVersion: attempt.version },
+        key: `workflow:startRepairAttempt:attempt:${attempt.id}:v${attempt.version}`,
+      });
+      attempt = await f.call(`repair-attempts/${attempt.id}/deliver`, {
+        body: {
+          expectedVersion: attempt.version,
+          deliveryKind: "no_code",
+          noCodeReason: "Synthetic configuration fixed manually",
+          summary: "Delivered",
+        },
+        key: `workflow:deliverRepairAttempt:attempt:${attempt.id}:v${attempt.version}`,
+      });
+    }
+    bug = await f.call(`bugs/${bug.id}`);
+    let verification = await f.call(`bugs/${bug.id}/verifications`, {
+      body: {
+        expectedVersion: bug.version,
+        repairAttemptId: attempt.id,
+        buildId: null,
+        verifierId: f.actorId,
+        criteria: "Actual isolated verification",
+      },
+      key: `workflow:createVerification:bug:${bug.id}:attempt:${attempt.id}:v${bug.version}`,
+      expected: 201,
+    });
+    verification = await f.call(`verifications/${verification.id}/start`, {
+      body: { expectedVersion: verification.version },
+      key: `workflow:startVerification:verification:${verification.id}:v${verification.version}`,
+    });
+    return {
+      bug,
+      attempt,
+      parentId,
+      verification,
+      path: `verifications/${verification.id}/result`,
+      key: `workflow:recordVerificationResult:verification:${verification.id}:v${verification.version}`,
+    };
+  }
+  const resultBody = (r, status, legacy) => ({
+    ...(legacy
+      ? {}
+      : {
+          submissionContractVersion: "1.1.0",
+          clientSubmissionId: randomUUID(),
+          attachmentIds: [],
+        }),
+    expectedVersion: r.verification.version,
+    status,
+    resultSummary: "Original actual full-main result",
+    ...(status === "failed" ? { failureReason: "Synthetic remaining issue" } : {}),
+    ...(status === "blocked"
+      ? { blockedReason: "Synthetic target device is temporarily unavailable" }
+      : {}),
+  });
+  try {
+    const listeners = execFileSync(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-Command",
+        "$x=@(Get-NetTCPConnection -LocalPort 4459,4461 -State Listen -ErrorAction SilentlyContinue); ConvertTo-Json -Compress @{count=$x.Count}",
+      ],
+      { encoding: "utf8", windowsHide: true },
+    );
+    check("4459/4461 free before startup", JSON.parse(listeners).count, 0);
+    const self = launch(
+      "selftest",
+      join(plan.sourceRoot, "scripts/project-components/result-phase-b-guard-selftest.mjs"),
+      [],
+      false,
+    );
+    await exited(self);
+    check("preload selftest exit", self.record.exit.code, 0);
+    const guardResult = JSON.parse(self.record.stdout.trim());
+    check("guard main denials", guardResult.main.length, 10);
+    check("worker inherited denials", guardResult.worker.length, 10);
+    save(join(publicRoot, "guard-selftest.json"), guardResult);
+    const entry = join(plan.sourceRoot, "scripts/project-components/run-preview-service.mjs");
+    let api = launch("api", entry, [plan.configPath, "api"]);
+    async function ready(port, path, owned) {
+      for (let n = 0; n < 100; n++) {
+        if (owned.record.exit) throw new Error(`SERVICE_EXITED:${owned.record.role}`);
+        try {
+          const r = await fetch(`http://127.0.0.1:${port}${path}`, {
+            signal: AbortSignal.timeout(1000),
+          });
+          if (r.ok) {
+            const b = await r.json();
+            if (b.status === "ready") return;
+          }
+        } catch {
+          /* start delay */
+        }
+        await new Promise((r) => setTimeout(r, 150));
+      }
+      throw new Error(`SERVICE_NOT_READY:${port}`);
+    }
+    await ready(4459, "/api/v1/health/ready", api);
+    let mcp = launch("mcp", entry, [plan.configPath, "mcp"]);
+    await ready(4461, "/health", mcp);
+    const health = await req("health/ready");
+    proof.ready = health;
+    const db = new DatabaseSync(databaseFile, { readOnly: true });
+    try {
+      const migrations = db.prepare("SELECT * FROM schema_migrations ORDER BY version").all();
+      check("real worker schema17", migrations.at(-1).version, 17);
+      proof.schema = migrations.map((x) => ({ version: x.version, name: x.name }));
+    } finally {
+      db.close();
+    }
+    console.log(
+      JSON.stringify({
+        milestone: "full_main_and_real_worker_ready",
+        apiPid: api.child.pid,
+        mcpPid: mcp.child.pid,
+        schema: 17,
+        runId,
+      }),
+    );
+    gm = await req("auth/gm/login", { body: { password: secrets.gmPassword, client: "android" } });
+    for (const legacy of [true, false]) {
+      const status = "blocked";
+      const f = await fixture(`${legacy ? "legacy" : "vendor"}-${status}`),
+        r = await round(f, !legacy),
+        body = resultBody(r, status, legacy);
+      const options = {
+        body,
+        key: legacy ? "k".repeat(200) : r.key,
+        contentType: legacy ? "application/json" : vendor,
+        accept: legacy ? "application/json" : vendor,
+      };
+      const before = snapshot(),
+        first = await f.call(r.path, options),
+        committed = snapshot();
+      check(`${f.name} result state`, first.bug.state, "ready_for_verification");
+      check(
+        `${f.name} frozen response excludes reason field`,
+        Object.hasOwn(first.verification, "blockedReason"),
+        false,
+      );
+      check(
+        `${f.name} delivered attempt whole-table bytes preserved`,
+        committed.repair_attempts,
+        before.repair_attempts,
+      );
+      const sql = new DatabaseSync(databaseFile, { readOnly: true });
+      try {
+        sql.exec("BEGIN");
+        const pointers = sql
+          .prepare("SELECT active_repair_attempt_id,active_verification_id FROM bugs WHERE id=?")
+          .get(r.bug.id);
+        check(`${f.name} active repair retained`, pointers.active_repair_attempt_id, r.attempt.id);
+        check(`${f.name} active verification cleared`, pointers.active_verification_id, null);
+        const stored = sql
+          .prepare("SELECT blocked_reason,failure_reason FROM verifications WHERE id=?")
+          .get(r.verification.id);
+        check(`${f.name} real SQL blocked reason`, stored.blocked_reason, body.blockedReason);
+        check(`${f.name} real SQL failure reason null`, stored.failure_reason, null);
+        const receipt = sql
+          .prepare(
+            "SELECT response_json FROM verification_result_snapshots WHERE verification_id=?",
+          )
+          .get(r.verification.id);
+        check(
+          `${f.name} immutable full DTO blocked reason`,
+          JSON.parse(receipt.response_json).verification.blockedReason,
+          body.blockedReason,
+        );
+        sql.exec("COMMIT");
+      } finally {
+        sql.close();
+      }
+      check(
+        `${f.name} verification version`,
+        first.verification.version,
+        r.verification.version + 1,
+      );
+      check(`${f.name} one event`, committed.events.count, before.events.count + 1);
+      check(`${f.name} one notification`, committed.outbox.count, before.outbox.count + 1);
+      check(
+        `${f.name} snapshot`,
+        committed.verification_result_snapshots.count,
+        before.verification_result_snapshots.count + 1,
+      );
+      if (legacy)
+        check("legacy no invented client identity", Object.keys(first).sort(), [
+          "bug",
+          "verification",
+        ]);
+      else {
+        check("vendor client identity exact", first.clientSubmissionId, body.clientSubmissionId);
+        if (r.parentId)
+          check("non-first parent projection", first.repairAttempt.parentAttemptId, r.parentId);
+      }
+      const expectedReplay = legacy ? first : { ...first, replayed: true };
+      check(`${f.name} exact first replay`, await f.call(r.path, options), expectedReplay);
+      check(`${f.name} replay no domain effect`, snapshot(), committed);
+      const edit = await f.call(`bugs/${r.bug.id}`, {
+        method: "PATCH",
+        body: {
+          expectedVersion: first.bug.version,
+          title: "Later title must not replace original receipt",
+        },
+        key: `web:updateBug:bug:${r.bug.id}:v${first.bug.version}`,
+      });
+      const later = snapshot();
+      check(`${f.name} original after later edit`, await f.call(r.path, options), expectedReplay);
+      check(`${f.name} later replay unchanged`, snapshot(), later);
+      check("later edit advanced version", edit.version, first.bug.version + 1);
+      await deniedUnchanged(
+        f,
+        r.path,
+        { ...options, body: { ...body, blockedReason: "Changed reason" } },
+        409,
+      );
+      let nextVerification = await f.call(`bugs/${r.bug.id}/verifications`, {
+        body: {
+          expectedVersion: edit.version,
+          repairAttemptId: r.attempt.id,
+          buildId: null,
+          verifierId: f.actorId,
+          criteria: "Synthetic device is now available",
+        },
+        key: `workflow:createVerification:bug:${r.bug.id}:attempt:${r.attempt.id}:v${edit.version}`,
+        expected: 201,
+      });
+      check(
+        `${f.name} subsequent verification new identity`,
+        nextVerification.id !== r.verification.id,
+        true,
+      );
+      nextVerification = await f.call(`verifications/${nextVerification.id}/start`, {
+        body: { expectedVersion: nextVerification.version },
+        key: `workflow:startVerification:verification:${nextVerification.id}:v${nextVerification.version}`,
+      });
+      const oldTerminal = { verification: { version: first.verification.version } };
+      await deniedUnchanged(
+        f,
+        r.path,
+        {
+          body: resultBody(oldTerminal, "passed", legacy),
+          key: legacy
+            ? "new-key-old-blocked"
+            : `workflow:recordVerificationResult:verification:${r.verification.id}:v${first.verification.version}`,
+          contentType: options.contentType,
+          accept: options.accept,
+        },
+        412,
+      );
+      const passed = await f.call(`verifications/${nextVerification.id}/result`, {
+        body: resultBody({ verification: nextVerification }, "passed", false),
+        key: `workflow:recordVerificationResult:verification:${nextVerification.id}:v${nextVerification.version}`,
+        accept: vendor,
+      });
+      check(`${f.name} subsequent verification closes`, passed.bug.state, "closed");
+      const closedSnapshot = snapshot();
+      check(
+        `${f.name} blocked receipt remains original after another result`,
+        await f.call(r.path, options),
+        expectedReplay,
+      );
+      check(`${f.name} old receipt adds no facts after closure`, snapshot(), closedSnapshot);
+      check(
+        `${f.name} delivered attempt retained after new pass`,
+        closedSnapshot.repair_attempts,
+        before.repair_attempts,
+      );
+      check(
+        `${f.name} blocked historical verification remains`,
+        (await f.call(`verifications/${r.verification.id}`)).status,
+        "blocked",
+      );
+      f.record.result = {
+        bugId: r.bug.id,
+        verificationId: r.verification.id,
+        attemptId: r.attempt.id,
+        parentId: r.parentId,
+        result: status,
+        originalVersion: first.bug.version,
+        laterVersion: edit.version,
+        subsequentVerificationId: nextVerification.id,
+        closedVersion: passed.bug.version,
+        originalResponseSha256: hash(JSON.stringify(first)),
+        snapshot: committed.verification_result_snapshots,
+      };
+      console.log(
+        JSON.stringify({
+          milestone: "result_format_completed",
+          format: legacy ? "legacy" : "vendor",
+          status,
+          checks: proof.checks.length,
+        }),
+      );
+    }
+    const f = await fixture("authorization"),
+      r = await round(f),
+      body = resultBody(r, "blocked", true);
+    const browser = await request("/api/v1/auth/login", {
+      body: { projectId: f.projectId, name: f.name, client: "web" },
+    });
+    const peer = await req("auth/login", {
+      body: { projectId: f.projectId, name: `Other ${randomUUID()}`, client: "android" },
+    });
+    const options = {
+      body,
+      key: "cookie-result",
+      token: undefined,
+      cookie: browser.cookie,
+      accept: "application/json",
+    };
+    for (const patch of [
+      { blockedReason: undefined },
+      { blockedReason: "" },
+      { blockedReason: " ".repeat(3) },
+      { blockedReason: null },
+      { blockedReason: "x".repeat(5001) },
+      { failureReason: "Mixed reason invalid" },
+      { status: "passed" },
+    ]) {
+      await deniedUnchanged(f, r.path, { body: { ...body, ...patch }, key: "reason-invalid" }, 400);
+    }
+    await deniedUnchanged(f, r.path, options, 403);
+    await deniedUnchanged(f, r.path, { ...options, csrf: "wrong" }, 403);
+    await deniedUnchanged(f, r.path, { body, key: "not-assigned", token: peer.accessToken }, 403);
+    await deniedUnchanged(
+      f,
+      r.path,
+      { body: { ...body, requireAssignedVerifier: false }, key: "cannot-inject" },
+      400,
+    );
+    await deniedUnchanged(
+      f,
+      r.path,
+      { ...options, csrf: browser.value.csrfToken, body: { ...body, expectedVersion: 1 } },
+      412,
+    );
+    await deniedUnchanged(
+      f,
+      r.path,
+      { ...options, csrf: browser.value.csrfToken, accept: vendor },
+      406,
+    );
+    const first = await f.call(r.path, { ...options, csrf: browser.value.csrfToken });
+    check(
+      "Cookie first and Bearer original replay",
+      await f.call(r.path, { body, key: "cookie-result" }),
+      first,
+    );
+    const deniedProject = proof.fixtures[0].projectId;
+    await deniedUnchanged(f, r.path, { body, key: "cookie-result", project: deniedProject }, 404);
+    await req(`gm/projects/${f.projectId}/members/${f.actorId}`, {
+      token: gm.accessToken,
+      method: "PUT",
+      body: { active: false, expectedVersion: 1 },
+    });
+    await deniedUnchanged(f, r.path, { body, key: "cookie-result" }, 403);
+    const deleted = await fixture("deleted"),
+      dr = await round(deleted),
+      dbod = resultBody(dr, "blocked", false);
+    const dfirst = await deleted.call(dr.path, { body: dbod, key: dr.key, accept: vendor });
+    await deleted.call(`bugs/${dr.bug.id}?expectedVersion=${dfirst.bug.version}`, {
+      method: "DELETE",
+      key: `web:deleteBug:bug:${dr.bug.id}:v${dfirst.bug.version}`,
+    });
+    await deniedUnchanged(deleted, dr.path, { body: dbod, key: dr.key, accept: vendor }, 404);
+    await deleted.call(`verifications/${dr.verification.id}`, { expected: 404 });
+    await rpc("initialize", {
+      protocolVersion: "2025-03-26",
+      capabilities: {},
+      clientInfo: { name: "phase-d-full-main-e2e", version: "1.0" },
+    });
+    await rpc("notifications/initialized", undefined, undefined, 202, true);
+    const listed = await rpc("tools/list", {});
+    check("new shared tool catalog count", listed.tools.length, 91);
+    check(
+      "original tools remain",
+      listed.tools.filter((x) => x.name !== "qa_record_verification_result").length,
+      90,
+    );
+    const mf = await fixture("server-mcp");
+    const member = await tool("qa_login", { projectId: mf.projectId, name: `MCP ${randomUUID()}` });
+    const token = member.accessToken;
+    const mb = bugBody(mf.projectId, member.userId, "MCP actual manual workflow");
+    let created = await tool("qa_create_bug", { projectId: mf.projectId, request: mb }, token),
+      current = created.bug;
+    mf.record.bugs.push({
+      id: current.id,
+      actorId: member.userId,
+      initialVersion: current.version,
+    });
+    const mtool = (name, args, actor = token, errorStatus) =>
+      tool(name, { projectId: mf.projectId, bugId: current.id, ...args }, actor, errorStatus);
+    const unsupportedBefore = snapshot();
+    await mtool(
+      "qa_bug_action",
+      {
+        action: "blocked",
+        expectedVersion: current.version,
+        idempotencyKey: `phase-d:unsupported:${randomUUID()}`,
+        request: { blockedReason: "No MCP blocked action currently exists" },
+      },
+      token,
+      400,
+    );
+    check("unsupported MCP blocked action leaves no facts", snapshot(), unsupportedBefore);
+    const comment = { clientSubmissionId: randomUUID(), body: "MCP real persistent comment" };
+    const cfirst = await mtool("qa_add_comment", { request: comment });
+    check(
+      "MCP comment replay",
+      (await mtool("qa_add_comment", { request: comment })).comment.id,
+      cfirst.comment.id,
+    );
+    current = (await mtool("qa_get_bug_context", {})).bug;
+    const action = (name, version, requestBody, extra = {}, actor = token) =>
+      mtool(
+        "qa_bug_action",
+        {
+          action: name,
+          expectedVersion: version,
+          request: requestBody,
+          idempotencyKey: `phase-d:${randomUUID()}`,
+          ...extra,
+        },
+        actor,
+      );
+    await action("manual_complete", current.version, { reason: "Actual MCP human takeover" });
+    let context = await mtool("qa_get_bug_context", {});
+    current = context.bug;
+    check("MCP manual ready", current.state, "ready_for_verification");
+    const createdVerification = await action("create_verification", current.version, {
+      repairAttemptId: context.humanWorkflow.repairAttempt.id,
+      buildId: null,
+      verifierId: member.userId,
+      criteria: "MCP manual closure",
+    });
+    let verification = createdVerification.result;
+    verification = (
+      await action(
+        "start_verification",
+        verification.version,
+        {},
+        { verificationId: verification.id },
+      )
+    ).result;
+    const resultRequest = {
+      submissionContractVersion: "1.1.0",
+      clientSubmissionId: randomUUID(),
+      attachmentIds: [],
+      resultSummary: "Another active employee human closure remains allowed",
+    };
+    await req(`verifications/${verification.id}/result`, {
+      token: mf.employee.accessToken,
+      project: mf.projectId,
+      body: { ...resultRequest, status: "passed", expectedVersion: verification.version },
+      key: `workflow:recordVerificationResult:verification:${verification.id}:v${verification.version}`,
+      expected: 403,
+    });
+    const closeKey = `workflow:recordVerificationResult:verification:${verification.id}:v${verification.version}`;
+    const closeArgs = {
+      action: "verify_pass",
+      expectedVersion: verification.version,
+      verificationId: verification.id,
+      request: resultRequest,
+      idempotencyKey: closeKey,
+    };
+    const closed = await mtool("qa_bug_action", closeArgs, mf.employee.accessToken);
+    check("ordinary other employee MCP closure", closed.bug.state, "closed");
+    check("MCP original result actor", closed.result.eventId !== undefined, true);
+    check(
+      "MCP closure replay flag",
+      (await mtool("qa_bug_action", closeArgs, mf.employee.accessToken)).result.replayed,
+      true,
+    );
+    context = await mtool("qa_get_bug_context", {});
+    check(
+      "MCP latest verification after closed",
+      context.humanWorkflow.latestVerification.id,
+      verification.id,
+    );
+    check(
+      "MCP persistent comment content",
+      context.comments.items.some((x) => x.body === comment.body),
+      true,
+    );
+    await req(`verifications/${verification.id}/result`, {
+      token: mf.employee.accessToken,
+      project: mf.projectId,
+      body: { ...resultRequest, status: "passed", expectedVersion: verification.version },
+      key: closeKey,
+      expected: 403,
+    });
+    check(
+      "MCP components off",
+      (await mtool("qa_get_components", {})).items.every((x) => !x.enabled),
+      true,
+    );
+    for (const status of ["passed", "failed", "blocked"]) {
+      const tf = await fixture(`new-tool-${status}`),
+        tr = await round(tf, status === "blocked");
+      const tb = resultBody(tr, status, false);
+      const args = { projectId: tf.projectId, verificationId: tr.verification.id, request: tb };
+      const peer = await req("auth/login", {
+        body: { projectId: tf.projectId, name: `Tool peer ${randomUUID()}`, client: "android" },
+      });
+      const callTool = (a = args, actor = tf.employee.accessToken, error, auth) =>
+        tool("qa_record_verification_result", a, actor, error, auth);
+      const original = snapshot();
+      for (const [patch, code, statusCode] of [
+        [{ idempotencyKey: "wrong-key" }, "INVALID_REQUEST", 400],
+        [{ request: { ...tb, requireAssignedVerifier: false } }, "INVALID_REQUEST", 400],
+        [{ request: { ...tb, unknown: "reject" } }, "INVALID_REQUEST", 400],
+        [{ request: { ...tb, expectedVersion: 1 } }, "VERSION_CONFLICT", 412],
+        [{ projectId: proof.fixtures[0].projectId }, "NOT_FOUND", 404],
+      ]) {
+        check(
+          `${status} new tool guard code`,
+          (await callTool({ ...args, ...patch }, undefined, statusCode)).code,
+          code,
+        );
+        check(`${status} new tool guard preserves facts`, snapshot(), original);
+      }
+      check(
+        `${status} unassigned first rejected`,
+        (await callTool(args, peer.accessToken, 403)).code,
+        "FORBIDDEN",
+      );
+      check(`${status} unassigned preserves facts`, snapshot(), original);
+      let cookieAuth;
+      if (status === "blocked") {
+        const browser = await request("/api/v1/auth/login", {
+          body: { projectId: tf.projectId, name: tf.name, client: "web" },
+        });
+        cookieAuth = { token: undefined, cookie: browser.cookie, csrf: browser.value.csrfToken };
+        const missing = await request("/mcp", {
+          port: 4461,
+          cookie: browser.cookie,
+          body: {
+            jsonrpc: "2.0",
+            id: ++rpcId,
+            method: "tools/call",
+            params: { name: "qa_record_verification_result", arguments: args },
+          },
+          expected: 403,
+        });
+        check("server MCP Cookie requires CSRF", missing.value.code, "CSRF_TOKEN_INVALID");
+        check("server MCP rejected CSRF preserves facts", snapshot(), original);
+      }
+      const first = await callTool(args, tf.employee.accessToken, undefined, cookieAuth),
+        committed = snapshot();
+      check(`${status} new tool result`, first.verification.status, status);
+      check(`${status} original client identity`, first.clientSubmissionId, tb.clientSubmissionId);
+      check(`${status} original receipt first`, first.replayed, false);
+      check(`${status} one result event`, committed.events.count, original.events.count + 1);
+      check(`${status} one notification`, committed.outbox.count, original.outbox.count + 1);
+      check(
+        `${status} one result snapshot`,
+        committed.verification_result_snapshots.count,
+        original.verification_result_snapshots.count + 1,
+      );
+      const exact = { ...first, replayed: true };
+      check(
+        `${status} explicit canonical MCP replay`,
+        await callTool({ ...args, idempotencyKey: tr.key }),
+        exact,
+      );
+      check(
+        `${status} direct HTTP parity`,
+        await tf.call(tr.path, { body: tb, key: tr.key, accept: vendor }),
+        exact,
+      );
+      check(`${status} replay adds no facts`, snapshot(), committed);
+      const edited = await tf.call(`bugs/${tr.bug.id}`, {
+        method: "PATCH",
+        body: { expectedVersion: first.bug.version, title: "Post-tool edit retained" },
+        key: `web:updateBug:bug:${tr.bug.id}:v${first.bug.version}`,
+      });
+      const changed = snapshot();
+      check(`${status} old full receipt after later edit`, await callTool(), exact);
+      check(`${status} old receipt leaves edit intact`, snapshot(), changed);
+      check(
+        `${status} changed payload rejected`,
+        (
+          await callTool(
+            { ...args, request: { ...tb, resultSummary: "Changed original payload" } },
+            undefined,
+            409,
+          )
+        ).code,
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+      );
+      check(`${status} changed payload no facts`, snapshot(), changed);
+      check(
+        `${status} unassigned replay rejected`,
+        (await callTool(args, peer.accessToken, 403)).code,
+        "FORBIDDEN",
+      );
+      if (status === "blocked") {
+        check(
+          "new tool blocked whole Attempt preserved",
+          committed.repair_attempts,
+          original.repair_attempts,
+        );
+        check("new tool actual parent preserved", first.repairAttempt.parentAttemptId, tr.parentId);
+        let next = await tf.call(`bugs/${tr.bug.id}/verifications`, {
+          body: {
+            expectedVersion: edited.version,
+            repairAttemptId: tr.attempt.id,
+            buildId: null,
+            verifierId: tf.actorId,
+            criteria: "MCP target is available again",
+          },
+          key: `workflow:createVerification:bug:${tr.bug.id}:attempt:${tr.attempt.id}:v${edited.version}`,
+          expected: 201,
+        });
+        next = await tf.call(`verifications/${next.id}/start`, {
+          body: { expectedVersion: next.version },
+          key: `workflow:startVerification:verification:${next.id}:v${next.version}`,
+        });
+        const closed = await callTool({
+          projectId: tf.projectId,
+          verificationId: next.id,
+          request: resultBody({ verification: next }, "passed", false),
+        });
+        check("new tool next verification closes", closed.bug.state, "closed");
+        const after = snapshot();
+        check("new tool blocked receipt after a new pass", await callTool(), exact);
+        check("new tool blocked replay no later changes", snapshot(), after);
+      } else if (status === "failed") {
+        await req(`gm/projects/${tf.projectId}/members/${tf.actorId}`, {
+          token: gm.accessToken,
+          method: "PUT",
+          body: { active: false, expectedVersion: 1 },
+        });
+        const revoked = snapshot();
+        check(
+          "new tool revoked replay rejected",
+          (await callTool(args, undefined, 403)).code,
+          "PROJECT_NOT_ACCESSIBLE",
+        );
+        check("new tool revoked has no effects", snapshot(), revoked);
+        await req(`gm/projects/${tf.projectId}/members/${tf.actorId}`, {
+          token: gm.accessToken,
+          method: "PUT",
+          body: { active: true, expectedVersion: 2 },
+        });
+        const restored = snapshot();
+        check("new tool restored actor exact receipt", await callTool(), exact);
+        check("new tool restoration does not replay effects", snapshot(), restored);
+      } else {
+        await tf.call(`bugs/${tr.bug.id}?expectedVersion=${edited.version}`, {
+          method: "DELETE",
+          key: `web:deleteBug:bug:${tr.bug.id}:v${edited.version}`,
+        });
+        const removed = snapshot();
+        check(
+          "new tool deleted target rejected",
+          (await callTool(args, undefined, 404)).code,
+          "NOT_FOUND",
+        );
+        check("new tool deleted target no effects", snapshot(), removed);
+      }
+      tf.record.result = {
+        bugId: tr.bug.id,
+        verificationId: tr.verification.id,
+        status,
+        clientSubmissionId: tb.clientSubmissionId,
+        originalReceiptSha256: hash(JSON.stringify(first)),
+      };
+      console.log(
+        JSON.stringify({ milestone: "new_tool_completed", status, checks: proof.checks.length }),
+      );
+    }
+
+    // Workflow pagination uses actual human facts. Build/Relay collections are intentionally
+    // empty: no SQL-made tasks, component enabling or external execution is part of this run.
+    const wf = await fixture("workflow-persistent-cursor"),
+      wr = await round(wf, true);
+    const collections = [
+      "occurrences",
+      "repairAttempts",
+      "verifications",
+      "builds",
+      "relayReceipts",
+    ];
+    const workflowPath = `bugs/${wr.bug.id}/workflow`;
+    const page = (cursor, options = {}) =>
+      wf.call(
+        `${workflowPath}?limitPerCollection=1${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`,
+        { accept: vendor, ...options },
+      );
+    const frozenFirst = await page();
+    check("workflow actual first Bug", frozenFirst.bugId, wr.bug.id);
+    check("workflow first truncated by two actual Attempts", frozenFirst.truncated, true);
+    check(
+      "workflow bounded arrays",
+      collections.every((k) => Array.isArray(frozenFirst[k]) && frozenFirst[k].length <= 1),
+      true,
+    );
+    check(
+      "workflow nonempty original verification",
+      frozenFirst.verifications[0].status,
+      "in_progress",
+    );
+    const blockedBody = resultBody(wr, "blocked", false);
+    const blocked = await tool(
+      "qa_record_verification_result",
+      { projectId: wf.projectId, verificationId: wr.verification.id, request: blockedBody },
+      wf.employee.accessToken,
+    );
+    const beforeRestartPage = await page(frozenFirst.nextCursor);
+    check(
+      "workflow frozen version survives new result",
+      beforeRestartPage.bugVersion,
+      frozenFirst.bugVersion,
+    );
+    check(
+      "workflow sequence frozen",
+      beforeRestartPage.snapshotSequence,
+      frozenFirst.snapshotSequence,
+    );
+    const savedCursor = frozenFirst.nextCursor;
+    const beforeRestartFacts = snapshot();
+    await stopOwned(mcp);
+    await stopOwned(api);
+    const stoppedListeners = JSON.parse(
+      execFileSync(
+        "powershell.exe",
+        [
+          "-NoProfile",
+          "-Command",
+          "$x=@(Get-NetTCPConnection -LocalPort 4459,4461 -State Listen -ErrorAction SilentlyContinue); ConvertTo-Json -Compress @{count=$x.Count}",
+        ],
+        { encoding: "utf8", windowsHide: true },
+      ),
+    );
+    check("owned restart ports are free", stoppedListeners.count, 0);
+    api = launch("api", entry, [plan.configPath, "api"]);
+    await ready(4459, "/api/v1/health/ready", api);
+    mcp = launch("mcp", entry, [plan.configPath, "mcp"]);
+    await ready(4461, "/health", mcp);
+    check("normal process reopen preserves business facts", snapshot(), beforeRestartFacts);
+    check(
+      "persisted workflow cursor survives real main reopen",
+      await page(savedCursor),
+      beforeRestartPage,
+    );
+    check("restarted server catalog remains 91", (await rpc("tools/list", {})).tools.length, 91);
+    const aggregate = Object.fromEntries(collections.map((k) => [k, [...frozenFirst[k]]]));
+    let cursor = savedCursor,
+      pages = 1;
+    const seen = new Set();
+    while (cursor) {
+      requireTrue(!seen.has(cursor) && pages < 20, "WORKFLOW_CURSOR_LOOP");
+      seen.add(cursor);
+      const next = await page(cursor);
+      pages++;
+      check(
+        "workflow each page snapshot sequence",
+        next.snapshotSequence,
+        frozenFirst.snapshotSequence,
+      );
+      check("workflow each page Bug version", next.bugVersion, frozenFirst.bugVersion);
+      for (const key of collections) aggregate[key].push(...next[key]);
+      cursor = next.nextCursor;
+      check("workflow terminal consistency", next.truncated, cursor !== null);
+    }
+    check(
+      "workflow freezes pre-result verification status",
+      aggregate.verifications[0].status,
+      "in_progress",
+    );
+    check(
+      "workflow actual retained parent and child",
+      aggregate.repairAttempts.map((x) => x.id).sort(),
+      [wr.parentId, wr.attempt.id].sort(),
+    );
+    check(
+      "workflow no duplicate collection IDs",
+      collections.every((k) => new Set(aggregate[k].map((x) => x.id)).size === aggregate[k].length),
+      true,
+    );
+    check(
+      "workflow unexecuted external collections",
+      [aggregate.builds.length, aggregate.relayReceipts.length],
+      [0, 0],
+    );
+    const currentPage = await page();
+    check("workflow new snapshot sees blocked", currentPage.verifications[0].status, "blocked");
+    check(
+      "workflow new snapshot sees latest Bug version",
+      currentPage.bugVersion,
+      blocked.bug.version,
+    );
+    const scopePeer = await req("auth/login", {
+      body: { projectId: wf.projectId, name: `Cursor peer ${randomUUID()}`, client: "android" },
+    });
+    const otherBug = await wf.bug();
+    function workflowFacts() {
+      const db = new DatabaseSync(databaseFile, { readOnly: true });
+      try {
+        return {
+          domain: snapshot(),
+          projection: Object.fromEntries(
+            [
+              "workflow_projection_snapshots",
+              "workflow_projection_items",
+              "workflow_projection_cursors",
+            ].map((table) => {
+              const rows = db.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all();
+              return [table, { count: rows.length, sha256: hash(JSON.stringify(rows)) }];
+            }),
+          ),
+        };
+      } finally {
+        db.close();
+      }
+    }
+    for (const [path, options, statusCode] of [
+      [`${workflowPath}?cursor=invalid`, {}, 400],
+      [
+        `${workflowPath}?limitPerCollection=1&cursor=${encodeURIComponent(savedCursor.slice(0, -1) + (savedCursor.endsWith("A") ? "B" : "A"))}`,
+        {},
+        400,
+      ],
+      [`${workflowPath}?limitPerCollection=2&cursor=${encodeURIComponent(savedCursor)}`, {}, 400],
+      [
+        `bugs/${otherBug.id}/workflow?limitPerCollection=1&cursor=${encodeURIComponent(savedCursor)}`,
+        {},
+        400,
+      ],
+      [
+        `${workflowPath}?limitPerCollection=1&cursor=${encodeURIComponent(savedCursor)}`,
+        { token: scopePeer.accessToken },
+        400,
+      ],
+      [workflowPath, { project: proof.fixtures[0].projectId }, 404],
+      [workflowPath, { accept: "application/json" }, 406],
+      [workflowPath, { accept: "application/*;q=0,*/*;q=1" }, 406],
+    ]) {
+      const prior = workflowFacts();
+      await wf.call(path, { accept: vendor, ...options, expected: statusCode });
+      check("workflow rejected request preserves domain and projection", workflowFacts(), prior);
+    }
+    await req(`gm/projects/${wf.projectId}/members/${wf.actorId}`, {
+      token: gm.accessToken,
+      method: "PUT",
+      body: { active: false, expectedVersion: 1 },
+    });
+    const revokedWorkflow = workflowFacts();
+    await page(savedCursor, { expected: 403 });
+    check("workflow revoked has no effects", workflowFacts(), revokedWorkflow);
+    await req(`gm/projects/${wf.projectId}/members/${wf.actorId}`, {
+      token: gm.accessToken,
+      method: "PUT",
+      body: { active: true, expectedVersion: 2 },
+    });
+    const restoredWorkflow = workflowFacts();
+    await page(savedCursor, { expected: 400 });
+    check("workflow old cursor invalid after revoke restore", workflowFacts(), restoredWorkflow);
+    const afterRestore = await page();
+    check(
+      "workflow restored member may create fresh cursor",
+      typeof afterRestore.nextCursor,
+      "string",
+    );
+    const actualBug = await wf.call(`bugs/${wr.bug.id}`);
+    await wf.call(`bugs/${wr.bug.id}?expectedVersion=${actualBug.version}`, {
+      method: "DELETE",
+      key: `web:deleteBug:bug:${wr.bug.id}:v${actualBug.version}`,
+    });
+    const deletedWorkflow = workflowFacts();
+    await page(afterRestore.nextCursor, { expected: 404 });
+    await page(undefined, { expected: 404 });
+    check("workflow deleted Bug preserves historical snapshots", workflowFacts(), deletedWorkflow);
+    wf.record.workflow = {
+      bugId: wr.bug.id,
+      pages,
+      originalBugVersion: frozenFirst.bugVersion,
+      snapshotSequence: frozenFirst.snapshotSequence,
+      collections: Object.fromEntries(collections.map((k) => [k, aggregate[k].length])),
+      reopenedCursorSha256: hash(savedCursor),
+      privateCursorKeyExposed: false,
+    };
+    console.log(
+      JSON.stringify({
+        milestone: "workflow_cursor_actual_reopen_completed",
+        pages,
+        checks: proof.checks.length,
+      }),
+    );
+
+    const finalDb = new DatabaseSync(databaseFile, { readOnly: true });
+    try {
+      proof.databaseBeforeStop = {
+        snapshot: snapshot(),
+        integrity: finalDb.prepare("PRAGMA integrity_check").get(),
+        foreignKeys: finalDb.prepare("PRAGMA foreign_key_check").all(),
+        schema: 17,
+      };
+      check("foreign keys clean", proof.databaseBeforeStop.foreignKeys.length, 0);
+      await backup(finalDb, join(privateRoot, "consistent-before-stop.sqlite"));
+    } finally {
+      finalDb.close();
+    }
+    check(
+      "import hold remains paused",
+      json(join(config.dataRoot, ".qa-hub-import-hold.json")).state,
+      "paused",
+    );
+    check(
+      "frozen source closure remains exact",
+      hash(JSON.stringify(tree(plan.sourceRoot))),
+      hash(JSON.stringify(expectedClosure)),
+    );
+    for (const entry of children.filter((x) => x.record.role !== "selftest"))
+      check(
+        `${entry.record.role} no forbidden external attempts`,
+        existsSync(entry.record.guardLog) ? readFileSync(entry.record.guardLog, "utf8") : "",
+        "",
+      );
+    proof.status = "passed";
+  } catch (error) {
+    proof.status = "failed_retained";
+    proof.failure = { name: error.name, message: redact(error.message) };
+  } finally {
+    for (const entry of children.toReversed()) {
+      if (entry.record.exit === null && entry.child.connected) {
+        entry.record.shutdownRequestedAt = new Date().toISOString();
+        entry.record.shutdownMechanism =
+          "IPC command emits SIGTERM into original official handlers";
+        entry.child.send({ command: "phase-b-official-sigterm" });
+      }
+      try {
+        await exited(entry);
+      } catch (error) {
+        proof.status = "failed_retained";
+        proof.shutdownFailure = error.message;
+      }
+      save(join(privateRoot, `${entry.record.label}-process.json`), entry.record);
+    }
+    if (existsSync(databaseFile)) {
+      const db = new DatabaseSync(databaseFile, { readOnly: true });
+      try {
+        await backup(db, join(privateRoot, "consistent-after-stop.sqlite"));
+        proof.databaseAfterStop = {
+          snapshot: snapshot(),
+          integrity: db.prepare("PRAGMA integrity_check").get(),
+          archiveSha256: fileHash(join(privateRoot, "consistent-after-stop.sqlite")),
+        };
+      } finally {
+        db.close();
+      }
+    }
+    proof.finishedAt = new Date().toISOString();
+    proof.requestCount = proof.requests.length;
+    proof.checkCounts = {
+      total: proof.checks.length,
+      passed: proof.checks.filter((x) => x.passed).length,
+    };
+    proof.privateRoot = privateRoot;
+    const publicValue = redact(proof),
+      serialized = JSON.stringify(publicValue, null, 2) + "\n";
+    for (const secret of secretValues)
+      requireTrue(!serialized.includes(secret), "PUBLIC_SECRET_SCAN_FAILED");
+    writeFileSync(join(publicRoot, "result.json"), serialized, { flag: "wx" });
+    console.log(
+      JSON.stringify({
+        status: proof.status,
+        runId,
+        requestCount: proof.requestCount,
+        checks: proof.checkCounts,
+        resultPath: join(publicRoot, "result.json"),
+        sha256: fileHash(join(publicRoot, "result.json")),
+        failure: proof.failure,
+      }),
+    );
+  }
+}

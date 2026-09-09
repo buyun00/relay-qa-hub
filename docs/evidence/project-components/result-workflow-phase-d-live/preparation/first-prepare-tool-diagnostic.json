@@ -1,0 +1,9 @@
+{
+  "source": "Exact observed error-line excerpt from first exec tool response dc7e2a; full original response retained in conversation. This file is a transcription, not a raw run log.",
+  "exitCode": 1,
+  "phase": "pre-mkdir input enumeration",
+  "originalError": "ENOENT packages/upload-contract/dist",
+  "sourceSha256": "5d3efb1ce5fbb641bccabdfd127945d295bbbd13868a8813c9f6896ef900dd7b",
+  "diagnostic": "Error: ENOENT: no such file or directory, scandir 'C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\packages\\upload-contract\\dist'",
+  "rawReproduction": "prepare-before-fix-reproduced.txt"
+}

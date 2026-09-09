@@ -262,3 +262,15 @@ EXE`.9`真实自更新与原生观察已提交`af5133a`。随后共享Web独立�
 Phase B已提交`12d8bb6`：schema16只扩展原结果快照触发器允许blocked，原15迁移SQL保持；blocked结束本次Verification、保留完整已交付RepairAttempt，允许随后新验收。源码API266/266、storage118/118、新114次真实临时HTTP与15→16归档复制迁移11项通过。完整main另在新隔离目录运行246/246、115次网络请求，并完成86/86关停后SQL/一致备份审计（`3b57719`）；原API/MCP正常SIGTERM退出。已有普通MCP工具blocked仍返回400，该轮不声称新冻结结果工具已经存在。4419继续原schema14代码，未在本批次部署或升级任何主客户端。[完整main证明](contracts-result-phase-b-live/README.md)。
 
 实际覆盖矩阵完成两轮生成链，6命令/10保全检查通过，语义SHA`f09a7ae1f29d4b06c6b09b135a2dcefc25cfb90ef48a9264e4174b969f05fc8d`；991项、193源码、30退役历史、484复验标记、159原备注，整项仍7/24。全部前后及中间文件原样保留。[实际刷新](coverage-regeneration-live/6e77e27e-cc84-4fcb-92f5-2175eb0dd9be/README.md)、[最终648项映射审计及历史失败](coverage-parallel-map-20260909/README.md)。后续工作流分页接线和新MCP工具仍在并行工作状态，本检查点不据未提交或未部署代码提升任何验收结果。
+
+## 工作流分页接线与独立 EXE 本地 MCP
+
+覆盖刷新已提交`758ddf5`。新工具`qa_record_verification_result`随后提交`f319b5f`：调用已认证的冻结HTTP入口，显式客户端提交ID、指派验收人和canonical key约束，支持passed/failed/blocked原回执，不改变旧普通人工动作。新6组真实worker测试使用7个schema17库、137次网络请求；相关92/92回归及两个独立源码审查通过，原90工具另加1。该提交只完成源码与隔离HTTP组合，原运行目录仍90工具。[说明和保留失败](mcp-verification-result/README.md)。
+
+已安装`.9`的相同78文件程序字节复制到新程序目录，并使用两个全新profile完成本地MCP实测，提交`e825030`。先验证副本正常app.quit，再执行人员隔离：99/99，39条场景请求=36本地4470 JSON-RPC+3 GM辅助HTTP；A旧cookie撤权403、同名A拒绝、B不受影响、A恢复v3与原员工ID保持。两副本PID16684/21384均正常退出0、4470/4471释放；原13564/4420和已观测API/Web身份、六文件哈希保持。575项作者产物复核及root独立字节/断言复核通过。39不是完整后台网络数；这是独立副本的真实local MCP，不是原profile GUI/草稿的新验收。[完整过程与限制](local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/README.md)。
+
+Phase D公共接线已提交`5208a8a`：schema17持久保存同一快照的五集合安全DTO、各自分页位置与签名cursor；worker在同一事务内处理当前授权、GM临时资格和持久化，每页再次检查资格及软删除。Storage123/123、API276/276，编译/类型/lint/format与五项合同检查通过。真实createApiApp组合19次HTTP，原候选另24次；16→17新副本迁移保留70张旧表、7份结果快照及原迁移记录，原一致归档SHA保持。[接线证据与历史失败](workflow-projection-integration/README.md)。不将本地typed Build/Relay记录称为外部执行；冻结合同遗漏非法cursor的400枚举仍明确保留。
+
+本检查点主预览4419仍运行schema14，未重启API/MCP/客户端或操作生产。schema17与91工具的完整main运行正在新的独立闭包中准备；fail/supersede以及结果20附件/capture绑定分别进入独立候选实现。后续源码尚未重做矩阵，193源码与7/24只是上述已提交刷新时点的结果，不能据新接线自动提升整项通过。
+
+上述schema17/91完整main准备随后完成一次真实成功运行：`667b0e87-e0fd-44bd-8bb3-c0506dbf5b81`，665/665、241次网络请求（183 HTTP+58服务端JSON-RPC），后置186/186。新结果工具三状态、旧回执/权限与真实workflow游标跨官方SIGTERM关停重开均通过；两页包含1次出现、2修复轮次、1验收，Build/Relay数组为空。4服务生命周期均正常exit0，两个一致备份各2293760字节/SHA`3b6c72869fa7669e88e7800f6952fac3c4dd3ea258a42853d319c75f627cb636`，schema17/FK0/integrity通过，12份不可变结果保留。整个闭包固定5208a8a的5815文件，后续工作树92工具与C/E修改不进入这轮事实。[完整main及关停后审计](result-workflow-phase-d-live/README.md)。这次未部署主预览、未升级客户端或访问生产，也未改变矩阵的整体结论。

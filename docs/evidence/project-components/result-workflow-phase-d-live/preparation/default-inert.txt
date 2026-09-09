@@ -1,0 +1,1 @@
+{"status":"not_run","defaultInert":true,"modes":["--prepare <reviewed-commit>","--run <plan> <sha256>"]}
