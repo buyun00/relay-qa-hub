@@ -1,0 +1,21 @@
+{
+  "at": "2026-09-09T00:41:34.561Z",
+  "window": {
+    "app": "process:C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+    "id": 2820330,
+    "title": "Relay QA Hub"
+  },
+  "accessibility": {
+    "document_text": "QA HUB\n当前状态\n关闭设置\nQ\nRelay QA Hub\n当前版本 v0.2.0-preview.7\n服务连接\n已连接\n通知连接\n已连接\nMCP 服务\n运行中\n新版本 0.2.0-preview.8 已就绪\n安装并重启\n最小化\n最大化\n关闭窗口",
+    "focused_element": "9 文档 Relay QA Hub ID: RootWebArea",
+    "tree": "Window: \"Relay QA Hub\", App: RelayQaHubPreview.exe.\n\t0 窗口 Relay QA Hub Secondary Actions: Raise\n\t\t1 窗格 (disabled)\n\t\t2 区域 Relay QA Hub\n\t\t\t3 区域\n\t\t\t\t4 区域\n\t\t\t\t\t5 区域\n\t\t\t\t\t\t6 区域\n\t\t\t\t\t\t\t7 区域\n\t\t\t\t\t\t\t\t8 区域\n\t\t\t\t\t\t\t\t\t9 文档 Relay QA Hub ID: RootWebArea\n\t\t\t\t\t\t\t\t\t\t97 对话框 当前状态 Secondary Actions: Raise\n\t\t\t\t\t\t\t\t\t\t\t98 文本 QA HUB\n\t\t\t\t\t\t\t\t\t\t\t99 标题 当前状态 ID: desktop-tools-title\n\t\t\t\t\t\t\t\t\t\t\t100 按钮 关闭设置\n\t\t\t\t\t\t\t\t\t\t\t101 文本 Q\n\t\t\t\t\t\t\t\t\t\t\t102 文本 Relay QA Hub\n\t\t\t\t\t\t\t\t\t\t\t103 文本 当前版本 v0.2.0-preview.7\n\t\t\t\t\t\t\t\t\t\t\t104 列表\n\t\t\t\t\t\t\t\t\t\t\t\t105 字词 服务连接\n\t\t\t\t\t\t\t\t\t\t\t\t\t106 文本 服务连接\n\t\t\t\t\t\t\t\t\t\t\t\t107 文本 已连接\n\t\t\t\t\t\t\t\t\t\t\t\t108 字词 通知连接\n\t\t\t\t\t\t\t\t\t\t\t\t\t109 文本 通知连接\n\t\t\t\t\t\t\t\t\t\t\t\t110 文本 已连接\n\t\t\t\t\t\t\t\t\t\t\t\t111 字词 MCP 服务\n\t\t\t\t\t\t\t\t\t\t\t\t\t112 文本 MCP 服务\n\t\t\t\t\t\t\t\t\t\t\t\t113 文本 运行中\n\t\t\t\t\t\t\t\t\t\t\t114 状态\n\t\t\t\t\t\t\t\t\t\t\t\t115 文本 新版本 0.2.0-preview.8 已就绪\n\t\t\t\t\t\t\t\t\t\t\t116 按钮 安装并重启\n\t\t\t\t\t\t\t\t\t\t\t117 组 窗口控制\n\t\t\t\t\t\t\t\t\t\t\t\t118 按钮 最小化 Description: 最小化\n\t\t\t\t\t\t\t\t\t\t\t\t119 切换按钮 最大化 Description: 最大化\n\t\t\t\t\t\t\t\t\t\t\t\t120 按钮 关闭窗口 Description: 关闭窗口，继续在托盘运行\n\t\t\t\t\t\t\t\t72 区域\n\nDocument text: ```\nQA HUB\n当前状态\n关闭设置\nQ\nRelay QA Hub\n当前版本 v0.2.0-preview.7\n服务连接\n已连接\n通知连接\n已连接\nMCP 服务\n运行中\n新版本 0.2.0-preview.8 已就绪\n安装并重启\n最小化\n最大化\n关闭窗口\n```"
+  },
+  "screenshots": [
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/ready-to-install-0.png",
+      "id": "screenshot-0",
+      "bytes": 67698,
+      "sha256": "e5fdc84636a029f89aa25b15c755ad12fb7ed815b6c04fdc514bd08643bca30c"
+    }
+  ]
+}

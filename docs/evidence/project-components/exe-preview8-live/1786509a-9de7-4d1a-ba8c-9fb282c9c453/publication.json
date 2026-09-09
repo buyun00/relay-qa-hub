@@ -1,0 +1,16 @@
+{
+  "status": "published_verified",
+  "at": "2026-09-09T00:40:39.035Z",
+  "releaseId": "20260909T000712593Z",
+  "version": "0.2.0-preview.8",
+  "artifactSha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+  "artifactBytes": 108333764,
+  "manifestSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417",
+  "oldManifestSha256": "ead43d0162c71581834e8917035db85f97c74e86a064b386894c6cdda24efc7c",
+  "oldInstallerPreserved": true,
+  "installedConfigUnchanged": true,
+  "signatureVerifiedWithExistingKey": true,
+  "httpManifestAndInstallerHashMatched": true,
+  "previewOnly": true,
+  "applicationInstallTriggered": false
+}

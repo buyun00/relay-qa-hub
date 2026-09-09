@@ -273,3 +273,11 @@ MuMu预览APK现为code23/`0.2.0-preview.9`，已按原key/body找回code22耗�
 矩阵实际两轮生成已完成并提交`b62e259`，991项/191源码/28退役/484复验，语义零差异，原159条说明保留；13个新增控件未自动通过。首轮生成失败独立保留，整项通过仍为7/24。[重放证据](coverage-actual-replay-88366a43.json)。后续代码变化必须重新标识待复验，不得将旧摘要当当前新结果。
 
 EXE `.8` 的已验安装器留在独立staged-downloads，SHA `b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147`；[打包证据](exe-preview8-package-only/README.md)记录当时未发布/安装。root后续从实际`.7`应用内更新入口执行升级，结果另记。Android preview feed路由补齐仍处于源码测试阶段，API4419保持PID10036；APK及EXE的发布都只允许独立预览目录/通道。
+
+## 09:07 +08:00 独立实例新检查点
+
+EXE现已由应用内更新完成`.7`→`.8`（native0.2.0.8，release20260909T000712593Z，主PID19500/local MCP4420），正式预览Windows latest指向已验证b72f04e8…安装器。原项目A/员工/未提交文字+exe-test-input.png和既有Bug/评论/图片保持；旧`.7`包、manifest、backup目录及私有冷副本留存。[实际升级与限制](exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/README.md)。冷副本只包含排除顶层updates的67个应用文件，不可据此覆盖或清理原profile。原生详情首次误报单独保留为`.8`缺陷。
+
+共享Web坏媒体显式换稿81/81真实验收已提交`31eca88`，其fixture/profile/旧坏图及失败journal均保留。Android route/context修复`0a00ae2`已过246/246，但本检查点API4419仍PID10036、尚未部署或发布Android feed。后续先在无业务写入窗口完成一致SQLite+引用附件archive、quarantine及实际上传表/配置/PID对照，再只用manager显式`-Services api`操作该实例。
+
+Web详情加载修复`bc2b347`已过102/102，尚未出现在正式4274或已安装`.8`。4274直接服务apps/web/dist；下一包必须先构建到独立runtime web-dist，不能因打包而隐式替换正在服务的目录。当前旧Web包及所有证据继续保留，新构建、发布、原生`.9`验收分别记录；旧生产服务和日常客户端不操作。

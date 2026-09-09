@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "runId": "1786509a-9de7-4d1a-ba8c-9fb282c9c453",
+  "mode": "before",
+  "startedAt": "2026-09-09T00:38:42.133Z",
+  "status": "failed",
+  "sourceSha256": "6b0dff8edf6640b11b7bd296fd828c3e46295341c8e79ac9114e16742987f016",
+  "expected": {
+    "projectId": "fb914b3b-4169-47f8-8dec-76f3a3cc780d",
+    "actorId": "5ef57049-0e33-4476-8a3c-b320aa26bf68",
+    "bugId": "a32d175b-137c-47bd-bbd9-b952d4860b1e",
+    "commentId": "d7a5ee19-1145-4162-a9ff-44d89fa34f7c",
+    "attachmentId": "bbeaafee-effa-4265-873e-881111e40ae8",
+    "attachmentBytes": 184872,
+    "attachmentSha256": "e0ed7b4b96935f06855a05ce3372ada01b9585ed459d3d5c183f1c6dc8e7cb8b"
+  },
+  "privateOutput": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453\\independent-before",
+  "checks": [
+    {
+      "name": "six-production-file-hashes-unchanged",
+      "passed": true
+    }
+  ],
+  "requests": [],
+  "boundaries": {
+    "localMcpOnly": true,
+    "explicitLoginCalls": 0,
+    "credentialsFilesRead": "[REDACTED]",
+    "businessWrites": 0,
+    "deviceActions": 0,
+    "serviceMutations": 0,
+    "profileCopy": false,
+    "productionFilesHashOnly": true,
+    "normalExitOrUpgradeProvedHere": false
+  },
+  "productionBaseline": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\runs\\production-after-verdict.json",
+    "sha256": "e27b9e17c79c2bc3928b7c3718ab81e57824ffd936bbbea35c2e38c3468cca8d"
+  },
+  "files": [
+    {
+      "path": "D:\\Relay-QA-Hub-Data\\mvp-e2e-current.json",
+      "sha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e",
+      "baselineSha256": "dfbd1abbcfa2e81675ad98aea329a20fd6b1173b06d52688df91b5b2e4f2828e"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub-Config\\qa-people.json",
+      "sha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374",
+      "baselineSha256": "13588aa8d0bbcd74fa516b6668b8fe9767b6266a79330bacd12a81901d213374"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Windows-x64-latest.json",
+      "sha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e",
+      "baselineSha256": "c2fa894e890d3c75ed24cd400dc8bf07d937683bfea7a3f46a8a965d553f626e"
+    },
+    {
+      "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\installer\\Relay-QA-Hub-Setup-x64.exe",
+      "sha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf",
+      "baselineSha256": "aea3b25ad16e45449c62d893ac5fc01ed1f50bea5185f6f97d7f68e7b822f4cf"
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\desktop-runtime.json",
+      "sha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a",
+      "baselineSha256": "c50beda05fcecc4b2d1909d22b666c6d0112a99aed388ac8d7a3191d7831b68a"
+    },
+    {
+      "path": "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub\\desktop-runtime.json",
+      "sha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c",
+      "baselineSha256": "a0ce8b20327cdb56304abec21c4a5c1d61fd44a88efda5c6d1f727719ca6bd9c"
+    }
+  ],
+  "failure": {
+    "name": "AssertionError",
+    "message": "READONLY_HOST_SNAPSHOT_FAILED\n\n1 !== 0\n"
+  },
+  "completedAt": "2026-09-09T00:38:43.538Z",
+  "counts": {
+    "requests": 0,
+    "checks": 1,
+    "passed": 1,
+    "failed": 0
+  }
+}

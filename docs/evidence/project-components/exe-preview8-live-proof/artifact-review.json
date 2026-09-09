@@ -1,0 +1,605 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent-read-only-installed-artifact-review",
+  "observedAt": "2026-09-09T01:03:00.938Z",
+  "status": "passed_read_only_artifact_review",
+  "releaseId": "20260909T000712593Z",
+  "version": "0.2.0-preview.8",
+  "liveAcceptanceRoot": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453",
+  "installedRoot": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview",
+  "checks": [
+    {
+      "label": "formal manifest matches packaged exact bytes",
+      "expected": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417",
+      "actual": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417",
+      "passed": true
+    },
+    {
+      "label": "retained old manifest matches publication preimage",
+      "expected": "ead43d0162c71581834e8917035db85f97c74e86a064b386894c6cdda24efc7c",
+      "actual": "ead43d0162c71581834e8917035db85f97c74e86a064b386894c6cdda24efc7c",
+      "passed": true
+    },
+    {
+      "label": "configuration exact bytes preserve prior",
+      "expected": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+      "actual": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+      "passed": true
+    },
+    {
+      "label": "configuration exact bytes match package",
+      "expected": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+      "actual": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+      "passed": true
+    },
+    {
+      "label": "configuration matches original expected SHA",
+      "expected": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+      "actual": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+      "passed": true
+    },
+    {
+      "label": "installed and existing signing public key match",
+      "expected": "8e719ae43b1011965b3d0f283bc8e6b593b6729e3169086ed970a8b97ea49913",
+      "actual": "8e719ae43b1011965b3d0f283bc8e6b593b6729e3169086ed970a8b97ea49913",
+      "passed": true
+    },
+    {
+      "label": "public key algorithm",
+      "expected": "ed25519",
+      "actual": "ed25519",
+      "passed": true
+    },
+    {
+      "label": "new manifest Ed25519 signature using retained installed key",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "prior manifest uses same key",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "API origin retained",
+      "expected": "http://127.0.0.1:4419",
+      "actual": "http://127.0.0.1:4419",
+      "passed": true
+    },
+    {
+      "label": "Web origin retained",
+      "expected": "http://127.0.0.1:4274",
+      "actual": "http://127.0.0.1:4274",
+      "passed": true
+    },
+    {
+      "label": "local MCP port retained",
+      "expected": 4420,
+      "actual": 4420,
+      "passed": true
+    },
+    {
+      "label": "instance retained",
+      "expected": "qa-hub-preview-7c86",
+      "actual": "qa-hub-preview-7c86",
+      "passed": true
+    },
+    {
+      "label": "profile retained",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile",
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile",
+      "passed": true
+    },
+    {
+      "label": "manifest URL retained",
+      "expected": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-latest.json",
+      "actual": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-latest.json",
+      "passed": true
+    },
+    {
+      "label": "packaged installer SHA",
+      "expected": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "actual": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "passed": true
+    },
+    {
+      "label": "packaged installer bytes",
+      "expected": 108333764,
+      "actual": 108333764,
+      "passed": true
+    },
+    {
+      "label": "formal served installer SHA",
+      "expected": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "actual": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "passed": true
+    },
+    {
+      "label": "formal served installer bytes",
+      "expected": 108333764,
+      "actual": 108333764,
+      "passed": true
+    },
+    {
+      "label": "downloaded installer SHA",
+      "expected": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "actual": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147",
+      "passed": true
+    },
+    {
+      "label": "downloaded installer bytes",
+      "expected": 108333764,
+      "actual": 108333764,
+      "passed": true
+    },
+    {
+      "label": "previous installer retained SHA",
+      "expected": "fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a",
+      "actual": "fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a",
+      "passed": true
+    },
+    {
+      "label": "previous installer retained bytes",
+      "expected": 108378668,
+      "actual": 108378668,
+      "passed": true
+    },
+    {
+      "label": "RelayQaHubPreview.exe matches packaged bytes",
+      "expected": "752498c79106744a8d76cafa8806a283c349446ed8a425da79f4c1e46241e149",
+      "actual": "752498c79106744a8d76cafa8806a283c349446ed8a425da79f4c1e46241e149",
+      "passed": true
+    },
+    {
+      "label": "RelayQaHubUpdater.exe matches packaged bytes",
+      "expected": "f421cbb0f0ecf8bd6dfcd0e4ff6e8cec18cabe3f41077b6a30656104ea731dfa",
+      "actual": "f421cbb0f0ecf8bd6dfcd0e4ff6e8cec18cabe3f41077b6a30656104ea731dfa",
+      "passed": true
+    },
+    {
+      "label": "resources/app.asar matches packaged bytes",
+      "expected": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05",
+      "actual": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05",
+      "passed": true
+    },
+    {
+      "label": "installed asar matches reviewed package",
+      "expected": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05",
+      "actual": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05",
+      "passed": true
+    },
+    {
+      "label": "installed release metadata matches reviewed package",
+      "expected": {
+        "schemaVersion": 1,
+        "releaseId": "20260909T000712593Z",
+        "version": "0.2.0-preview.8",
+        "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+        "sourceDirty": true,
+        "instanceId": "qa-hub-preview-7c86"
+      },
+      "actual": {
+        "schemaVersion": 1,
+        "releaseId": "20260909T000712593Z",
+        "version": "0.2.0-preview.8",
+        "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+        "sourceDirty": true,
+        "instanceId": "qa-hub-preview-7c86"
+      },
+      "passed": true
+    },
+    {
+      "label": "installed shared Web SHA",
+      "expected": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d",
+      "actual": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d",
+      "passed": true
+    },
+    {
+      "label": "installed shared Web size",
+      "expected": 477454,
+      "actual": 477454,
+      "passed": true
+    },
+    {
+      "label": "native updater result installed",
+      "expected": "installed",
+      "actual": "installed",
+      "passed": true
+    },
+    {
+      "label": "native updater result release",
+      "expected": "20260909T000712593Z",
+      "actual": "20260909T000712593Z",
+      "passed": true
+    },
+    {
+      "label": "native updater result version",
+      "expected": "0.2.0-preview.8",
+      "actual": "0.2.0-preview.8",
+      "passed": true
+    },
+    {
+      "label": "native result is BOM-less UTF16LE",
+      "expected": "7b002200",
+      "actual": "7b002200",
+      "passed": true
+    },
+    {
+      "label": "native recorded UTC follows install action",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "native UTC closely matches result file mtime",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "prior raw updater result retained in updates",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "updater handoff PackagePath",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\updates\\20260909T000712593Z.exe",
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\updates\\20260909T000712593Z.exe",
+      "passed": true
+    },
+    {
+      "label": "updater handoff AppPath",
+      "expected": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+      "actual": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+      "passed": true
+    },
+    {
+      "label": "updater handoff UserDataPath",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile",
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile",
+      "passed": true
+    },
+    {
+      "label": "updater handoff ParentPid",
+      "expected": "23924",
+      "actual": "23924",
+      "passed": true
+    },
+    {
+      "label": "updater handoff ResultPath",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\updates\\last-update-result.json",
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\\updates\\last-update-result.json",
+      "passed": true
+    },
+    {
+      "label": "updater handoff ReleaseId",
+      "expected": "20260909T000712593Z",
+      "actual": "20260909T000712593Z",
+      "passed": true
+    },
+    {
+      "label": "updater handoff Version",
+      "expected": "0.2.0-preview.8",
+      "actual": "0.2.0-preview.8",
+      "passed": true
+    },
+    {
+      "label": "cold manifest raw SHA",
+      "expected": "9dc0de103c85a2dee1566582778520211c0b2a3a26018e394fe792949435c4cd",
+      "actual": "9dc0de103c85a2dee1566582778520211c0b2a3a26018e394fe792949435c4cd",
+      "passed": true
+    },
+    {
+      "label": "cold source before/after summaries equal",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "cold before/copied summaries equal",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "cold count",
+      "expected": 67,
+      "actual": 67,
+      "passed": true
+    },
+    {
+      "label": "cold total bytes",
+      "expected": 11041573,
+      "actual": 11041573,
+      "passed": true
+    },
+    {
+      "label": "cold excludes top-level updates",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "all retained cold copy files match manifest",
+      "expected": 67,
+      "actual": 67,
+      "passed": true
+    },
+    {
+      "label": "source watcher completed without preview process",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "label": "new backup contains prior release",
+      "expected": "20260908T194425490Z",
+      "actual": "20260908T194425490Z",
+      "passed": true
+    },
+    {
+      "label": "new backup contains prior version",
+      "expected": "0.2.0-preview.7",
+      "actual": "0.2.0-preview.7",
+      "passed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "formal preview manifest",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/downloads/qa-hub-preview-7c86-windows-latest.json",
+      "sizeBytes": 464,
+      "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+    },
+    {
+      "role": "retained previous manifest",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/previous-served-manifest.json",
+      "sizeBytes": 464,
+      "sha256": "ead43d0162c71581834e8917035db85f97c74e86a064b386894c6cdda24efc7c"
+    },
+    {
+      "role": "installed configuration",
+      "path": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview/preview-instance.json",
+      "sizeBytes": 561,
+      "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+    },
+    {
+      "role": "retained previous configuration",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/previous-installed-preview-instance.json",
+      "sizeBytes": 561,
+      "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+    },
+    {
+      "role": "packaged configuration",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64\\preview-instance.json",
+      "sizeBytes": 561,
+      "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+    },
+    {
+      "role": "packaged installer",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+      "sizeBytes": 108333764,
+      "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+    },
+    {
+      "role": "formal served installer",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/downloads/qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+      "sizeBytes": 108333764,
+      "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+    },
+    {
+      "role": "downloaded installer",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile/updates/20260909T000712593Z.exe",
+      "sizeBytes": 108333764,
+      "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+    },
+    {
+      "role": "retained previous installer",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/downloads/qa-hub-preview-7c86-windows-0.2.0-preview.7-20260908T194425490Z.exe",
+      "sizeBytes": 108378668,
+      "sha256": "fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a"
+    },
+    {
+      "role": "installed RelayQaHubPreview.exe",
+      "path": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview/RelayQaHubPreview.exe",
+      "sizeBytes": 235871744,
+      "sha256": "752498c79106744a8d76cafa8806a283c349446ed8a425da79f4c1e46241e149"
+    },
+    {
+      "role": "packaged RelayQaHubPreview.exe",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64/RelayQaHubPreview.exe",
+      "sizeBytes": 235871744,
+      "sha256": "752498c79106744a8d76cafa8806a283c349446ed8a425da79f4c1e46241e149"
+    },
+    {
+      "role": "installed RelayQaHubUpdater.exe",
+      "path": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview/RelayQaHubUpdater.exe",
+      "sizeBytes": 421981,
+      "sha256": "f421cbb0f0ecf8bd6dfcd0e4ff6e8cec18cabe3f41077b6a30656104ea731dfa"
+    },
+    {
+      "role": "packaged RelayQaHubUpdater.exe",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64/RelayQaHubUpdater.exe",
+      "sizeBytes": 421981,
+      "sha256": "f421cbb0f0ecf8bd6dfcd0e4ff6e8cec18cabe3f41077b6a30656104ea731dfa"
+    },
+    {
+      "role": "installed resources/app.asar",
+      "path": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview/resources/app.asar",
+      "sizeBytes": 5529881,
+      "sha256": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05"
+    },
+    {
+      "role": "packaged resources/app.asar",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T000712593Z\\portable\\RelayQaHubPreview-win32-x64/resources/app.asar",
+      "sizeBytes": 5529881,
+      "sha256": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05"
+    },
+    {
+      "role": "native raw updater result",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile/updates/last-update-result.json",
+      "sizeBytes": 288,
+      "sha256": "1bffcc02e602f250ca1d98a916e05808614dbbb956e433eb62087319702e008d"
+    },
+    {
+      "role": "previous raw update result",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/previous-last-update-result.json",
+      "sizeBytes": 288,
+      "sha256": "164daf3ec02a360f80205916746c2ce65cb1fad0bebc05373914d9001f4968a6"
+    },
+    {
+      "role": "native updater immutable handoff INI",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile/updates/updater-20260909T000712593Z-23924-d4c0a2ce-a1db-4f1e-92bd-82574c665e64/update.ini",
+      "sizeBytes": 996,
+      "sha256": "31a3a2e9fe4794721e39e9cf04f67063ae53beded63a94ee72e250fe96c19f4a"
+    },
+    {
+      "role": "native UTF16LE updater log",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile/updates/updater-20260909T000712593Z-23924-d4c0a2ce-a1db-4f1e-92bd-82574c665e64/update.log",
+      "sizeBytes": 254,
+      "sha256": "959a0d791d3fe03edf8b80bb725d192c2393c09586ee3cb550bbe6f032ef5a61"
+    },
+    {
+      "role": "native handoff readiness file",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile/updates/updater-20260909T000712593Z-23924-d4c0a2ce-a1db-4f1e-92bd-82574c665e64/ready.flag",
+      "sizeBytes": 50,
+      "sha256": "1488b0bdc6af5167bd8911e5a1ce0d24b1ab16b2abfed06b40d1f9778fad2726"
+    },
+    {
+      "role": "source cold-state completion result",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/cold-state-result.json",
+      "sizeBytes": 850,
+      "sha256": "594e8bdc5ff5b6502bd4940675cf2eaf00fec8b211a3b488df4f283d804e109f"
+    },
+    {
+      "role": "private cold manifest metadata hash",
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/private-cold-state-manifest.json",
+      "sizeBytes": 34987,
+      "sha256": "9dc0de103c85a2dee1566582778520211c0b2a3a26018e394fe792949435c4cd"
+    },
+    {
+      "role": "retained previous installation asar",
+      "path": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview.backup-20260909T000712593Z/resources/app.asar",
+      "sizeBytes": 3222440,
+      "sha256": "6b1eb7d4fe064a8c3046acaa744520d887790c69f7663e0f1b00ce37d3102ba9"
+    }
+  ],
+  "boundaries": {
+    "uiOperations": 0,
+    "httpOrMcpRequests": 0,
+    "processControlOrFreshProcessQueries": 0,
+    "feedWrites": 0,
+    "privateSigningKeyRead": false,
+    "liveApplicationStateContentsDecoded": false,
+    "liveProfileUpdatesMetadataRead": true,
+    "coldArchiveValidationReadsCopiedFilesOnly": true
+  },
+  "diagnostics": [
+    {
+      "stage": "first metadata read",
+      "classification": "reviewer decoding diagnostic; not an updater or installation failure",
+      "message": "The previous updater result is BOM-less UTF-16LE. An initial BOM-only UTF-8 selection raised JSON parse error. Decoder then recognized the NUL byte pattern; original bytes were not changed."
+    }
+  ],
+  "keyBinding": {
+    "publicPemUtf8Sha256": "e0a52488fc59ed7c1c8c119d1ba73332a3cce7a33cad168754e46ebb2ff914b1",
+    "spkiDerSha256": "8e719ae43b1011965b3d0f283bc8e6b593b6729e3169086ed970a8b97ea49913",
+    "privateKeyRead": false
+  },
+  "installedRelease": {
+    "schemaVersion": 1,
+    "releaseId": "20260909T000712593Z",
+    "version": "0.2.0-preview.8",
+    "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+    "sourceDirty": true,
+    "instanceId": "qa-hub-preview-7c86"
+  },
+  "embeddedPackage": {
+    "name": "qa-hub-project-preview",
+    "version": "0.2.0-preview.8",
+    "type": "module",
+    "main": "dist/main.js",
+    "productName": "QA Hub Preview",
+    "private": true
+  },
+  "rawUpdaterResult": {
+    "schemaVersion": 1,
+    "status": "installed",
+    "releaseId": "20260909T000712593Z",
+    "version": "0.2.0-preview.8",
+    "recordedAt": "2026-09-09T00:41:50.000Z",
+    "encoding": "UTF-16LE without BOM",
+    "rawBase64": "ewAiAHMAYwBoAGUAbQBhAFYAZQByAHMAaQBvAG4AIgA6ADEALAAiAHMAdABhAHQAdQBzACIAOgAiAGkAbgBzAHQAYQBsAGwAZQBkACIALAAiAHIAZQBsAGUAYQBzAGUASQBkACIAOgAiADIAMAAyADYAMAA5ADAAOQBUADAAMAAwADcAMQAyADUAOQAzAFoAIgAsACIAdgBlAHIAcwBpAG8AbgAiADoAIgAwAC4AMgAuADAALQBwAHIAZQB2AGkAZQB3AC4AOAAiACwAIgByAGUAYwBvAHIAZABlAGQAQQB0ACIAOgAiADIAMAAyADYALQAwADkALQAwADkAVAAwADAAOgA0ADEAOgA1ADAALgAwADAAMABaACIAfQANAAoA",
+    "rawSha256": "1bffcc02e602f250ca1d98a916e05808614dbbb956e433eb62087319702e008d"
+  },
+  "retainedResultSummaries": [
+    {
+      "name": "retained-update-result-88f1d364-7903-445b-86f9-ade583768eb6.json",
+      "sha256": "f4b3a56199b1ba754411724fbc8c60ac443fbbf9bb92bcbef53d009fe8ad40b5"
+    },
+    {
+      "name": "retained-update-result-8ec5010d-c688-4b88-a25a-673a966872f6.json",
+      "sha256": "ad07403b517582f8c1052ad674d6e780e18555d1282446dd9c82e2de2d5d0aee"
+    },
+    {
+      "name": "retained-update-result-9799e6b1-871c-4c2f-b9cb-ab8ac413b92c.json",
+      "sha256": "164daf3ec02a360f80205916746c2ce65cb1fad0bebc05373914d9001f4968a6"
+    },
+    {
+      "name": "retained-update-result-b537f8ed-1c1d-48e7-a346-c7b0fc590a7b.json",
+      "sha256": "81213d0918a78a5ef6c1ad59676395856a6fde30f699753b71933a89156b94b7"
+    }
+  ],
+  "updaterLog": [
+    "native updater started",
+    "handoff validated",
+    "main process exited; starting installer",
+    "update installed; relaunching application"
+  ],
+  "coldArchive": {
+    "sourceResultPath": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453/cold-state-result.json",
+    "sourceResultSha256": "594e8bdc5ff5b6502bd4940675cf2eaf00fec8b211a3b488df4f283d804e109f",
+    "scope": "All profile application files except the top-level updates directory; not a whole-profile cold-copy claim.",
+    "excludedTopDirectory": "updates",
+    "fileCount": 67,
+    "totalBytes": 11041573,
+    "retainedFilesIndependentlyHashed": 67,
+    "sourceSnapshotClaim": "before/after equality and process absence are taken from retained source watcher evidence; current live profile was not rehashed or independently monitored",
+    "notWholeProfile": true
+  },
+  "retainedInstallationBackup": {
+    "path": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview.backup-20260909T000712593Z",
+    "release": {
+      "schemaVersion": 1,
+      "releaseId": "20260908T194425490Z",
+      "version": "0.2.0-preview.7",
+      "sourceCommit": "3b1371cbbaee4ab31f5861fe3cd72d6ff93c4789",
+      "sourceDirty": false,
+      "instanceId": "qa-hub-preview-7c86"
+    },
+    "asarSha256": "6b1eb7d4fe064a8c3046acaa744520d887790c69f7663e0f1b00ce37d3102ba9"
+  },
+  "limits": [
+    "No UI/MCP/API calls or service/process changes by this reviewer.",
+    "No claim of whole-profile cold backup; top-level updates was deliberately excluded.",
+    "No fresh process or production identity claim from this artifact-only audit.",
+    "Native draft/business preservation is handled by root independent UI/MCP evidence.",
+    "Ed25519 manifest signature verification is distinct from Authenticode status; no new Authenticode check performed."
+  ],
+  "nativeVersionFileReadback": {
+    "method": "Read-only Get-Item VersionInfo, no executable launch",
+    "installed": {
+      "fileVersion": "0.2.0.8",
+      "productVersion": "0.2.0-preview.8",
+      "bytes": 235871744
+    },
+    "package": {
+      "fileVersion": "0.2.0.8",
+      "productVersion": "0.2.0-preview.8",
+      "bytes": 235871744
+    }
+  }
+}

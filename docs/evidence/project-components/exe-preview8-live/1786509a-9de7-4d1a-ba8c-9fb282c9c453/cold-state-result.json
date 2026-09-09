@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "at": "2026-09-09T00:41:38.754Z",
+  "stopped": {
+    "at": "2026-09-09T00:41:36.938Z",
+    "state": {
+      "processes": [],
+      "listeners": []
+    }
+  },
+  "completedWithNoPreviewProcess": true,
+  "source": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/desktop/profile",
+  "destination": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-live-1786509a-9de7-4d1a-ba8c-9fb282c9c453\\private-cold-application-state",
+  "fileCount": 67,
+  "totalBytes": 11041573,
+  "manifestSha256": "9dc0de103c85a2dee1566582778520211c0b2a3a26018e394fe792949435c4cd",
+  "scope": "All profile application files except the top-level updates directory; not a whole-profile cold-copy claim.",
+  "sourceUnchanged": true,
+  "copiedBytesMatch": true,
+  "noSourceFilesChangedByWatcher": true
+}

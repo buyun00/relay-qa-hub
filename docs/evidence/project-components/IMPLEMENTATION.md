@@ -212,3 +212,13 @@ Android恢复源码已提交 `fb2eca7`：原提交身份、请求和图片持久
 实际矩阵生成链先发现备注归档持续增长及新文本框继承旧通过，原失败保留；窄修复已提交 `b62e259`。两轮generate→map→generate共6次执行均成功，语义SHA同为`9682b626eed0074ce98a2dbb0337d46ce462baee4367d052d566f9d0a47c37a6`、差异0。991项/191源码、28退役历史、484复验标记，159条原备注保持；13个新节点均未自动通过。组合回归10/10，613个合成失败结果与进度不提升。[实际成功](coverage-actual-replay-88366a43.json)、[原失败](coverage-actual-replay-4e637e1a-failed.json)。本轮未把映射正确性当业务通过；整项仍只有09、10、11、12、15、23、24。
 
 EXE `.8` 独立打包及41项验包通过，包含Ce9wROrH共享Web；104项desktop测试通过，Ed25519使用原公钥，安装器及旧失败harness记录保留。[打包证明](exe-preview8-package-only/README.md)。该证明时点仍未发布/安装，实际升级另记。Android还发现预览客户端请求preview更新地址而API仅提供stable；独立通道修复正在本工作树验证，尚未部署，也未改生产通道。
+
+## 09:07 +08:00 实际升级与两项修复检查点
+
+EXE 已实际通过应用内入口从 `.7` 升级 `.8`，新PID19500/local MCP4420；原员工/项目、未提交文字及PNG、原closed/v14 Bug和20条处理记录保留。原生按钮、真实updater UTF-16LE回执、签名下载和安装字节闭合；独立前后51/51及59/59、产物复核54/54通过。正常更新退出窗口中保留67文件/11041573字节，明确排除顶层updates，不称完整profile冷备份。首次详情误报和一次控件在屏幕外的工具拒绝均保留。[实际原生过程及限制](exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/README.md)。六个生产文件哈希、三个生产进程和预览API/Web/serverMCP启动时点在该次独立对照中未变。
+
+Web 坏媒体拒绝后的显式换稿已完成一轮真实验收并提交 `31eca88`，81/81：真实finalize400后Bug POST仍0；人工换稿动作创建新意图，只生成一个Bug、occurrence和有效PNG，旧拒绝记录/坏Blob/quarantine chunk及两条journal跨正常重开保留。[原始证据与root复核](web-rejected-media-recovery-live/README.md)。这是14.Web的部分实测，不替代EXE/APK或未知提交史之后的4xx场景。
+
+Android独立preview更新路由及正式项目鉴权组合修复已提交 `0a00ae2`。初版31/244没有装配真实项目context，独立复审发现匿名更新会401；修正只公开已注册下载模板的GET/HEAD，12/12组合与完整246/246通过，业务/相邻/写路由继续验证权限。原401产品失败和一次测试路径404保留。[组合修正](android-preview-update-routing/auth-hook-correction/README.md)。本检查点仍未部署4419、未发布Android feed；API10036继续旧代码。
+
+详情首帧误报的两行共享Web修复已提交 `bc2b347`：无实际错误显示加载，真实错误仍可重试。真实App首帧/异步选中/失败后重试三项回归和完整102/102通过。[修复证据](web-detail-loading-fix.md)。当前4274和已安装`.8`仍是原Ce9wROrH包，后续`.9`先在独立web-dist构建；不能直接build正在被4274服务的apps/web/dist并将其称为仅打包。矩阵上一轮191源码哈希是历史快照，新源码须重新标为待复验；整项通过仍为7/24，未提升总验收状态。
