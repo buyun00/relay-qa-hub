@@ -1,0 +1,790 @@
+{
+  "schemaVersion": 1,
+  "status": "read_only_gap_review_no_implementation",
+  "recordedAt": "2026-09-09T02:09:50.912Z",
+  "sourceHead": "d2b29c67b5b8e10bc7f725fd081676432e7f758b",
+  "gaps": [
+    "legacy-1.0-result-request",
+    "blocked-result-write",
+    "fail-repair-attempt-post",
+    "supersede-repair-attempt-post",
+    "frozen-workflow-get"
+  ],
+  "sourceFacts": [
+    {
+      "path": "docs/design/project-components-transformation-2026-09-08.md",
+      "bytes": 55102,
+      "sha256": "8dabd8c8542f33659579bb0692a5831ef902abf710941655779513548c21af42"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-remediation-implementation.md",
+      "bytes": 6996,
+      "sha256": "fd7b952915077af3160b05aec478d75dd7bf0996ebf352f788a94d93225d53d9"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-remediation-implementation.json",
+      "bytes": 7889,
+      "sha256": "91a1e28322348ea2435583d53a5ccb4407b712c40ccc2752900dd33ef2189101"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/README.md",
+      "bytes": 8301,
+      "sha256": "b9d29477f1240797efa5a36d0da794865c44a4c35220d21ab4dda4237cb297cc"
+    },
+    {
+      "path": "packages/contracts/openapi/openapi.json",
+      "bytes": 314038,
+      "sha256": "1f5e3ba1e782d9ac4b95157c1dabcb5b54583241b2d40f6f936490fc95af2d94"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/openapi/openapi.json",
+      "bytes": 720240,
+      "sha256": "75a2d7c91ba26b67cad9a3b17a08bd3b0568a27a5e8a7aa1b854825832461714"
+    },
+    {
+      "path": "packages/contracts/src/api-manifest.json",
+      "bytes": 12572,
+      "sha256": "5bf4c40873d7e27365bb4f65b0bf4f9b0f977b8ac6a0128c70708db3125908c2"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/src/api-manifest.json",
+      "bytes": 68380,
+      "sha256": "240ac2ab4b0b7880d10c9e9ce8d62d22867a331bf74314e9f7a78c67f4fe20f6"
+    },
+    {
+      "path": "packages/contracts/schemas/bug.schema.json",
+      "bytes": 11151,
+      "sha256": "e7869948e3d0e417b8e61771c0ae6423d616c0e4534504dad8d5793b7e71ab9a"
+    },
+    {
+      "path": "packages/contracts/schemas/workflow.schema.json",
+      "bytes": 9486,
+      "sha256": "f62bec868db74155fdc741a161f42805162aa3dc4cc6c6af557ade0522eecbe3"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/schemas/app-first.schema.json",
+      "bytes": 112420,
+      "sha256": "86c8737d9a73fda8e819da142554e3103889e35cd3226cd88b868f91c1287f08"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/semantics/behavior-scenarios.json",
+      "bytes": 124523,
+      "sha256": "ad03007f26f482bdffbbb05d18fe6df0fd78d1b0dc80f4d11b6e9397fe3f729e"
+    },
+    {
+      "path": "packages/contracts/versions/1.1.0/src/evaluate-app-first-behavior.mjs",
+      "bytes": 278710,
+      "sha256": "78f4d6ad9f867ca4eae5bdf945bda224142113b6559c687e59071cbdd44dc385"
+    },
+    {
+      "path": "packages/domain/src/state-machine.ts",
+      "bytes": 84761,
+      "sha256": "b9d597f488ded7cd88586a420cddcecff6c6af92cc89a41e0740289e7c9c976b"
+    },
+    {
+      "path": "packages/domain/test/domain.test.mjs",
+      "bytes": 103812,
+      "sha256": "092a20a1a1642782bd111592530d7167c97cff2576bd5d759092eaf70155effb"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 106686,
+      "sha256": "290a44c2d7f73b8d6970e98765590aea6e80853fb4eec105d14cd1155d83db3a"
+    },
+    {
+      "path": "apps/api/src/mobile-verification.ts",
+      "bytes": 7755,
+      "sha256": "f77069f2e45e4690c50f16a42f64418cec7125f20620861799c0405fccf0d022"
+    },
+    {
+      "path": "apps/api/src/sqlite-mobile-verification-store.ts",
+      "bytes": 3545,
+      "sha256": "55352855178da7b5ccab4d5e192f9484234a9e82b9d9097fdd53e39a9f10bbb7"
+    },
+    {
+      "path": "apps/api/src/mobile-relay.ts",
+      "bytes": 15349,
+      "sha256": "faaaf924eb3e819d62235fcf0c4b86c7eb4cc65dadc633b40e904507032aaf70"
+    },
+    {
+      "path": "apps/api/src/bug-actions.ts",
+      "bytes": 7522,
+      "sha256": "9d1ee1c96e1850ab291d48270588c4ccbd044654836b2cf5bb9371dc2b3cf30f"
+    },
+    {
+      "path": "apps/api/src/automation.ts",
+      "bytes": 30347,
+      "sha256": "a48de5d4da277c6f2ba883f7b92dc5b5814a5be710fc66896433e6cd880e936e"
+    },
+    {
+      "path": "apps/api/src/automation-routes.ts",
+      "bytes": 7288,
+      "sha256": "3f9b81b7c10c3f09e5edf121e1f9ad7d35ca30ac1a0093573721da5816478761"
+    },
+    {
+      "path": "apps/api/src/project-request-context.ts",
+      "bytes": 5676,
+      "sha256": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab"
+    },
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "bytes": 42221,
+      "sha256": "b6e77504faeb146078d01e17d6d96a2546ebdf51380f097645198f1c3dad7458"
+    },
+    {
+      "path": "packages/storage/src/mobile-relay-store.ts",
+      "bytes": 163722,
+      "sha256": "c72d163a82b4965eb4a9d342a3ee66a415cbcf1cf7646fb40130a27898e55a15"
+    },
+    {
+      "path": "packages/storage/src/mobile-human-workflow-store.ts",
+      "bytes": 21394,
+      "sha256": "a10a654183215f1b283ce4907c8a04688a5f6b6bc34826b89cb267ade6f3888a"
+    },
+    {
+      "path": "packages/storage/src/workflow-idempotency.ts",
+      "bytes": 5875,
+      "sha256": "229d83ad9fdcc39378525ee2f45af3a84bd6da80461f91566d1e3168e3e3cbdf"
+    },
+    {
+      "path": "packages/storage/src/repair-attempt-detail-store.ts",
+      "bytes": 2876,
+      "sha256": "fe1172acc4b5b7b143c1a7b381d06a14b4750230429da07f5e7e73c04e4d7617"
+    },
+    {
+      "path": "packages/storage/src/scoped-list-cursor.ts",
+      "bytes": 1849,
+      "sha256": "310664160785034db6dd5af9947b89db662ceed007e0c83aed64fca4e87860f3"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker.ts",
+      "bytes": 28950,
+      "sha256": "06af1f8a1388aae3ddf786afe2345f085fe03efe50b956536f6163c8b3f05e26"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker-entry.ts",
+      "bytes": 28001,
+      "sha256": "2c9eaa7fa643e3e3617beb7c401ae2b939eca2d3ad9050d186717f65e83e9c0d"
+    },
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 326925,
+      "sha256": "f2f4bf39a0d92c1b013777687b90bb740c002d67014d4fab7cd1b7d4958c14ca"
+    }
+  ],
+  "operations": [
+    {
+      "version": "1.0",
+      "route": "/verifications/{verificationId}/result",
+      "method": "post",
+      "operationId": "recordVerificationResult",
+      "security": [
+        {
+          "sessionCookie": [],
+          "csrfHeader": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "verificationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": "Stable client action key. Reuse with a different canonical payload returns IDEMPOTENCY_PAYLOAD_MISMATCH."
+        }
+      ],
+      "requestMedia": [
+        "application/json"
+      ],
+      "responseMedia": [
+        "application/json"
+      ],
+      "errorStatusCodes": {
+        "400": [
+          "INVALID_REQUEST"
+        ],
+        "401": [
+          "UNAUTHENTICATED",
+          "INTEGRATION_SIGNATURE_INVALID"
+        ],
+        "403": [
+          "FORBIDDEN",
+          "INTEGRATION_AUTOMATION_FORBIDDEN"
+        ],
+        "404": [
+          "NOT_FOUND"
+        ],
+        "409": [
+          "INVALID_TRANSITION",
+          "ACTIVE_REPAIR_EXISTS",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRATION_EVENT_CONFLICT"
+        ],
+        "412": [
+          "VERSION_CONFLICT"
+        ],
+        "422": [
+          "GUARD_FAILED",
+          "UPLOAD_INVALID",
+          "RELAY_DELIVERY_EVIDENCE_INVALID",
+          "BUILD_IDENTITY_MISMATCH"
+        ],
+        "429": [
+          "RATE_LIMITED"
+        ],
+        "500": [
+          "INTERNAL_ERROR"
+        ]
+      }
+    },
+    {
+      "version": "1.0",
+      "route": "/repair-attempts/{attemptId}/fail",
+      "method": "post",
+      "operationId": "failRepairAttempt",
+      "security": [
+        {
+          "sessionCookie": [],
+          "csrfHeader": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "attemptId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": "Stable client action key. Reuse with a different canonical payload returns IDEMPOTENCY_PAYLOAD_MISMATCH."
+        }
+      ],
+      "requestMedia": [
+        "application/json"
+      ],
+      "responseMedia": [
+        "application/json"
+      ],
+      "errorStatusCodes": {
+        "400": [
+          "INVALID_REQUEST"
+        ],
+        "401": [
+          "UNAUTHENTICATED",
+          "INTEGRATION_SIGNATURE_INVALID"
+        ],
+        "403": [
+          "FORBIDDEN",
+          "INTEGRATION_AUTOMATION_FORBIDDEN"
+        ],
+        "404": [
+          "NOT_FOUND"
+        ],
+        "409": [
+          "INVALID_TRANSITION",
+          "ACTIVE_REPAIR_EXISTS",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRATION_EVENT_CONFLICT"
+        ],
+        "412": [
+          "VERSION_CONFLICT"
+        ],
+        "422": [
+          "GUARD_FAILED",
+          "UPLOAD_INVALID",
+          "RELAY_DELIVERY_EVIDENCE_INVALID",
+          "BUILD_IDENTITY_MISMATCH"
+        ],
+        "429": [
+          "RATE_LIMITED"
+        ],
+        "500": [
+          "INTERNAL_ERROR"
+        ]
+      }
+    },
+    {
+      "version": "1.0",
+      "route": "/repair-attempts/{attemptId}/supersede",
+      "method": "post",
+      "operationId": "supersedeRepairAttempt",
+      "security": [
+        {
+          "sessionCookie": [],
+          "csrfHeader": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "attemptId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": "Stable client action key. Reuse with a different canonical payload returns IDEMPOTENCY_PAYLOAD_MISMATCH."
+        }
+      ],
+      "requestMedia": [
+        "application/json"
+      ],
+      "responseMedia": [
+        "application/json"
+      ],
+      "errorStatusCodes": {
+        "400": [
+          "INVALID_REQUEST"
+        ],
+        "401": [
+          "UNAUTHENTICATED",
+          "INTEGRATION_SIGNATURE_INVALID"
+        ],
+        "403": [
+          "FORBIDDEN",
+          "INTEGRATION_AUTOMATION_FORBIDDEN"
+        ],
+        "404": [
+          "NOT_FOUND"
+        ],
+        "409": [
+          "INVALID_TRANSITION",
+          "ACTIVE_REPAIR_EXISTS",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRATION_EVENT_CONFLICT"
+        ],
+        "412": [
+          "VERSION_CONFLICT"
+        ],
+        "422": [
+          "GUARD_FAILED",
+          "UPLOAD_INVALID",
+          "RELAY_DELIVERY_EVIDENCE_INVALID",
+          "BUILD_IDENTITY_MISMATCH"
+        ],
+        "429": [
+          "RATE_LIMITED"
+        ],
+        "500": [
+          "INTERNAL_ERROR"
+        ]
+      }
+    },
+    {
+      "version": "1.1",
+      "route": "/verifications/{verificationId}/result",
+      "method": "post",
+      "operationId": "recordVerificationResult",
+      "security": [
+        {
+          "sessionCookie": [],
+          "csrfHeader": []
+        },
+        {
+          "nativeAccessToken": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "verificationId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": "Canonical key: workflow:recordVerificationResult:verification:<path.verificationId>:v<body.expectedVersion>. Same scoped key and canonical payload replays the original response; a different payload returns IDEMPOTENCY_PAYLOAD_MISMATCH."
+        }
+      ],
+      "requestMedia": [
+        "application/json",
+        "application/vnd.relay-qa-hub.v1.1+json"
+      ],
+      "responseMedia": [
+        "application/json",
+        "application/vnd.relay-qa-hub.v1.1+json"
+      ],
+      "errorStatusCodes": {
+        "400": [
+          "INVALID_REQUEST"
+        ],
+        "401": [
+          "UNAUTHENTICATED",
+          "INTEGRATION_SIGNATURE_INVALID"
+        ],
+        "403": [
+          "FORBIDDEN",
+          "INTEGRATION_AUTOMATION_FORBIDDEN"
+        ],
+        "404": [
+          "NOT_FOUND"
+        ],
+        "406": [
+          "NOT_ACCEPTABLE"
+        ],
+        "409": [
+          "INVALID_TRANSITION",
+          "ACTIVE_REPAIR_EXISTS",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRATION_EVENT_CONFLICT"
+        ],
+        "412": [
+          "VERSION_CONFLICT"
+        ],
+        "415": [
+          "UNSUPPORTED_MEDIA_TYPE"
+        ],
+        "422": [
+          "GUARD_FAILED",
+          "UPLOAD_INVALID",
+          "RELAY_DELIVERY_EVIDENCE_INVALID",
+          "BUILD_IDENTITY_MISMATCH"
+        ],
+        "429": [
+          "RATE_LIMITED"
+        ],
+        "500": [
+          "INTERNAL_ERROR"
+        ]
+      }
+    },
+    {
+      "version": "1.1",
+      "route": "/repair-attempts/{attemptId}/fail",
+      "method": "post",
+      "operationId": "failRepairAttempt",
+      "security": [
+        {
+          "sessionCookie": [],
+          "csrfHeader": []
+        },
+        {
+          "nativeAccessToken": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "attemptId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": "Canonical key: workflow:failRepairAttempt:attempt:<path.attemptId>:v<body.expectedVersion>. Same scoped key and canonical payload replays the original response; a different payload returns IDEMPOTENCY_PAYLOAD_MISMATCH."
+        }
+      ],
+      "requestMedia": [
+        "application/json",
+        "application/vnd.relay-qa-hub.v1.1+json"
+      ],
+      "responseMedia": [
+        "application/json",
+        "application/vnd.relay-qa-hub.v1.1+json"
+      ],
+      "errorStatusCodes": {
+        "400": [
+          "INVALID_REQUEST"
+        ],
+        "401": [
+          "UNAUTHENTICATED",
+          "INTEGRATION_SIGNATURE_INVALID"
+        ],
+        "403": [
+          "FORBIDDEN",
+          "INTEGRATION_AUTOMATION_FORBIDDEN"
+        ],
+        "404": [
+          "NOT_FOUND"
+        ],
+        "406": [
+          "NOT_ACCEPTABLE"
+        ],
+        "409": [
+          "INVALID_TRANSITION",
+          "ACTIVE_REPAIR_EXISTS",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRATION_EVENT_CONFLICT"
+        ],
+        "412": [
+          "VERSION_CONFLICT"
+        ],
+        "415": [
+          "UNSUPPORTED_MEDIA_TYPE"
+        ],
+        "422": [
+          "GUARD_FAILED",
+          "UPLOAD_INVALID",
+          "RELAY_DELIVERY_EVIDENCE_INVALID",
+          "BUILD_IDENTITY_MISMATCH"
+        ],
+        "429": [
+          "RATE_LIMITED"
+        ],
+        "500": [
+          "INTERNAL_ERROR"
+        ]
+      }
+    },
+    {
+      "version": "1.1",
+      "route": "/repair-attempts/{attemptId}/supersede",
+      "method": "post",
+      "operationId": "supersedeRepairAttempt",
+      "security": [
+        {
+          "sessionCookie": [],
+          "csrfHeader": []
+        },
+        {
+          "nativeAccessToken": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "attemptId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": "Canonical key: workflow:supersedeRepairAttempt:attempt:<path.attemptId>:v<body.expectedVersion>. Same scoped key and canonical payload replays the original response; a different payload returns IDEMPOTENCY_PAYLOAD_MISMATCH."
+        }
+      ],
+      "requestMedia": [
+        "application/json",
+        "application/vnd.relay-qa-hub.v1.1+json"
+      ],
+      "responseMedia": [
+        "application/json",
+        "application/vnd.relay-qa-hub.v1.1+json"
+      ],
+      "errorStatusCodes": {
+        "400": [
+          "INVALID_REQUEST"
+        ],
+        "401": [
+          "UNAUTHENTICATED",
+          "INTEGRATION_SIGNATURE_INVALID"
+        ],
+        "403": [
+          "FORBIDDEN",
+          "INTEGRATION_AUTOMATION_FORBIDDEN"
+        ],
+        "404": [
+          "NOT_FOUND"
+        ],
+        "406": [
+          "NOT_ACCEPTABLE"
+        ],
+        "409": [
+          "INVALID_TRANSITION",
+          "ACTIVE_REPAIR_EXISTS",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRATION_EVENT_CONFLICT"
+        ],
+        "412": [
+          "VERSION_CONFLICT"
+        ],
+        "415": [
+          "UNSUPPORTED_MEDIA_TYPE"
+        ],
+        "422": [
+          "GUARD_FAILED",
+          "UPLOAD_INVALID",
+          "RELAY_DELIVERY_EVIDENCE_INVALID",
+          "BUILD_IDENTITY_MISMATCH"
+        ],
+        "429": [
+          "RATE_LIMITED"
+        ],
+        "500": [
+          "INTERNAL_ERROR"
+        ]
+      }
+    },
+    {
+      "version": "1.1",
+      "route": "/bugs/{bugId}/workflow",
+      "method": "get",
+      "operationId": "getBugWorkflowProjection",
+      "security": [
+        {
+          "sessionCookie": []
+        },
+        {
+          "nativeAccessToken": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "bugId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        {
+          "name": "limitPerCollection",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          }
+        }
+      ],
+      "requestMedia": [],
+      "responseMedia": [
+        "application/vnd.relay-qa-hub.v1.1+json"
+      ],
+      "errorStatusCodes": {
+        "401": [
+          "UNAUTHENTICATED"
+        ],
+        "403": [
+          "FORBIDDEN"
+        ],
+        "404": [
+          "NOT_FOUND"
+        ],
+        "406": [
+          "NOT_ACCEPTABLE"
+        ],
+        "429": [
+          "RATE_LIMITED"
+        ],
+        "500": [
+          "INTERNAL_ERROR"
+        ]
+      }
+    }
+  ],
+  "plannedRequests": {
+    "path": "docs/evidence/project-components/contracts-remediation-gap-review/planned-requests.json",
+    "bytes": 4519,
+    "sha256": "985f3f74804d56b147b8fe200da7ae8166c061905705f8fca656e9e702f26df0"
+  },
+  "inputSchemaChecks": {
+    "total": 10,
+    "matchedExpected": 10,
+    "actualHttp": 0,
+    "actualSqlite": 0,
+    "domainExecution": 0
+  },
+  "frozenInternalBoundary": {
+    "semanticScenario": "workflow-cursor-is-bound-to-snapshot-sequence / workflow-cursor-cannot-cross-bug-resource",
+    "semanticExpected": "INVALID_REQUEST",
+    "workflowOpenApiListedStatuses": [
+      "200",
+      "401",
+      "403",
+      "404",
+      "406",
+      "429",
+      "500"
+    ],
+    "missingListedStatus": "400"
+  },
+  "scope": {
+    "runtimeDataReads": 0,
+    "networkRequests": 0,
+    "businessWrites": 0,
+    "productEdits": 0,
+    "contractEdits": 0,
+    "baselineEdits": 0,
+    "matrixEdits": 0,
+    "serviceOperations": 0,
+    "clientOperations": 0
+  },
+  "limitations": [
+    "Static evidence is not runtime behavior; all new functional paths remain unimplemented.",
+    "Human/no-code independent SQLite and HTTP validation need no external execution resources.",
+    "Nonempty external Build/Relay origin evidence remains separate from synthetic persistent contract fixtures.",
+    "Baseline 11/12 minimum evidence is not invalidated or expanded by this gap review."
+  ],
+  "readme": {
+    "path": "docs/evidence/project-components/contracts-remediation-gap-review/README.md",
+    "bytes": 18073,
+    "sha256": "c6759065e6118806ced0431ed5e181bcbc0153e6fe363352018e8be9bdd6854b"
+  }
+}

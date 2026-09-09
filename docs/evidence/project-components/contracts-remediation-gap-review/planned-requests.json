@@ -1,0 +1,132 @@
+{
+  "status": "synthetic_schema_validated_not_executed",
+  "warning": "All identifiers are non-live placeholders. No domain/HTTP/SQLite action was executed.",
+  "cases": [
+    {
+      "id": "legacy-passed",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/verificationResult",
+      "body": {
+        "expectedVersion": 2,
+        "status": "passed",
+        "resultSummary": "Synthetic independent legacy result"
+      },
+      "valid": true,
+      "actualSchemaAccepted": true
+    },
+    {
+      "id": "legacy-failed",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/verificationResult",
+      "body": {
+        "expectedVersion": 2,
+        "status": "failed",
+        "resultSummary": "Synthetic independent legacy result",
+        "failureReason": "Synthetic observed mismatch"
+      },
+      "valid": true,
+      "actualSchemaAccepted": true
+    },
+    {
+      "id": "legacy-blocked",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/verificationResult",
+      "body": {
+        "expectedVersion": 2,
+        "status": "blocked",
+        "resultSummary": "Synthetic independent legacy result",
+        "blockedReason": "Synthetic condition unavailable"
+      },
+      "valid": true,
+      "actualSchemaAccepted": true
+    },
+    {
+      "id": "vendor-blocked",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/recordVerificationResultRequest",
+      "body": {
+        "submissionContractVersion": "1.1.0",
+        "clientSubmissionId": "30000000-0000-4000-8000-000000000001",
+        "expectedVersion": 2,
+        "status": "blocked",
+        "resultSummary": "Synthetic local verification blocked",
+        "blockedReason": "Synthetic required local condition unavailable",
+        "attachmentIds": []
+      },
+      "valid": true,
+      "actualSchemaAccepted": true
+    },
+    {
+      "id": "fail",
+      "schema": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/attemptReasonCommand",
+      "body": {
+        "expectedVersion": 1,
+        "reason": "Synthetic human repair failure"
+      },
+      "valid": true,
+      "actualSchemaAccepted": true
+    },
+    {
+      "id": "legacy-supersede",
+      "schema": "https://qa-hub.local/contracts/workflow.schema.json#/$defs/attemptReasonCommand",
+      "body": {
+        "expectedVersion": 2,
+        "reason": "Synthetic explicit replacement"
+      },
+      "valid": true,
+      "actualSchemaAccepted": true
+    },
+    {
+      "id": "vendor-supersede",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/supersedeRepairAttemptRequest",
+      "body": {
+        "expectedVersion": 2,
+        "reason": "Synthetic atomic successor",
+        "successor": {
+          "id": "40000000-0000-4000-8000-000000000001",
+          "mode": "human",
+          "assigneeId": "20000000-0000-4000-8000-000000000003",
+          "summary": "Synthetic successor plan"
+        }
+      },
+      "valid": true,
+      "actualSchemaAccepted": true
+    },
+    {
+      "id": "vendor-blocked-missing-reason",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/recordVerificationResultRequest",
+      "body": {
+        "submissionContractVersion": "1.1.0",
+        "clientSubmissionId": "30000000-0000-4000-8000-000000000001",
+        "expectedVersion": 2,
+        "status": "blocked",
+        "resultSummary": "Synthetic local verification blocked",
+        "attachmentIds": []
+      },
+      "valid": false,
+      "actualSchemaAccepted": false
+    },
+    {
+      "id": "vendor-body-is-not-legacy-shape",
+      "schema": "https://qa-hub.local/contracts/bug.schema.json#/$defs/verificationResult",
+      "body": {
+        "submissionContractVersion": "1.1.0",
+        "clientSubmissionId": "30000000-0000-4000-8000-000000000001",
+        "expectedVersion": 2,
+        "status": "blocked",
+        "resultSummary": "Synthetic local verification blocked",
+        "blockedReason": "Synthetic required local condition unavailable",
+        "attachmentIds": []
+      },
+      "valid": false,
+      "actualSchemaAccepted": false
+    },
+    {
+      "id": "legacy-body-is-not-vendor-shape",
+      "schema": "https://qa-hub.local/contracts/1.1.0/app-first.schema.json#/$defs/recordVerificationResultRequest",
+      "body": {
+        "expectedVersion": 2,
+        "status": "passed",
+        "resultSummary": "Synthetic independent legacy result"
+      },
+      "valid": false,
+      "actualSchemaAccepted": false
+    }
+  ]
+}
