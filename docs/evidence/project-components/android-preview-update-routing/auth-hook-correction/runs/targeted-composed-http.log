@@ -1,0 +1,58 @@
+✖ real HTTP stable distribution remains anonymous with actual browser auth and project context (552.0567ms)
+✖ real HTTP preview distribution remains anonymous with actual browser auth and project context (305.3456ms)
+✔ Android channel parsing keeps stable default and rejects arbitrary channels (107.4891ms)
+✔ real HTTP stable default accepts legacy schema1 without channel and exposes no preview alias (112.8576ms)
+✔ real HTTP explicit preview serves exact metadata/APK bytes, HEAD, ranges and conditional reads (63.8117ms)
+✔ real HTTP preview refuses wrong channel/package or malformed manifest without changing stable compatibility (85.4742ms)
+✔ real HTTP preview rejects traversal/unpublished filenames and reports missing feed without fallback (34.3306ms)
+✔ missing explicit config fails before startup (1.7989ms)
+✔ preview overrides discard inherited production connections and secrets (20.7142ms)
+✔ production ports, shared cookie, shared update channel and escaping roots fail (68.1611ms)
+✔ nested junction cannot redirect database or evidence to another directory (16.468ms)
+✔ overlapping data and backup paths are rejected (22.1781ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 10
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1241.2772
+
+✖ failing tests:
+
+test at apps\api\test\android-update-auth-integration.test.mjs:126:3
+✖ real HTTP stable distribution remains anonymous with actual browser auth and project context (552.0567ms)
+  AssertionError [ERR_ASSERTION]: Browser auth must establish the principal before the project hook
+  
+  404 !== 200
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/android-update-auth-integration.test.mjs:181:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\android-update-auth-integration.test.mjs:126:3
+✖ real HTTP preview distribution remains anonymous with actual browser auth and project context (305.3456ms)
+  AssertionError [ERR_ASSERTION]: Browser auth must establish the principal before the project hook
+  
+  404 !== 200
+  
+      at TestContext.<anonymous> (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/api/test/android-update-auth-integration.test.mjs:181:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

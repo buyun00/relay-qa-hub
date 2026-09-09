@@ -1,6 +1,7 @@
 import { importExecutionHeld } from "./import-execution-hold.js";
 import { mkdirSync, readFileSync } from "node:fs";
 import { applyParallelInstanceEnvironment } from "./parallel-instance.js";
+import { parseAndroidUpdateChannel } from "./android-updates.js";
 import { ProjectManagementService } from "./project-management.js";
 import { ProjectRequestContext } from "./project-request-context.js";
 import { ProjectComponentsRuntime } from "./project-components-runtime.js";
@@ -441,6 +442,7 @@ async function run(): Promise<void> {
       isolateLegacyComponents: true,
       ...(configuredBuildSha === undefined ? {} : { buildSha: configuredBuildSha }),
       androidUpdateRoot: readAndroidUpdateRoot(storage.dataRoot),
+      androidUpdateChannel: parseAndroidUpdateChannel(process.env["QA_HUB_ANDROID_UPDATE_CHANNEL"]),
       incrementUploadRoot: join(storage.dataRoot, "integrations", "increment-upload"),
       ...(relayRuntime.endpoint && relayRuntime.bearerToken && relayRuntime.qaInstanceId
         ? {

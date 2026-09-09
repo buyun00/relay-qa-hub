@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T00:28:14.384Z",
+  "mode": "read-only source/config/artifact inventory before routing fix; no HTTP/device/process operation",
+  "artifact23": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+    "bytes": 35536941,
+    "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+  },
+  "retained22": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code22-acceptance\\qa-hub-preview-code22.apk",
+    "bytes": 35471405,
+    "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+  },
+  "downloadAndroidFiles": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+      "bytes": 35471405,
+      "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+      "bytes": 2600,
+      "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922"
+    }
+  ],
+  "expectedPreviewFeedRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86",
+  "previewRootExists": false,
+  "previewLatestExists": false,
+  "clientChannel": "preview",
+  "registeredSourceChannelBefore": "stable only",
+  "sourceFiles": [
+    {
+      "path": "apps/api/src/android-updates.ts",
+      "bytes": 4503,
+      "sha256": "04eaa759eed6f92c3f32b9cc620973ae2ca73b1d0006ece64565c0842e1a3121"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 106573,
+      "sha256": "e6b4f5da757a706daf42fb7219e01deabc27db4fd15ffdd6a6f2bc9afda7c7ef"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25203,
+      "sha256": "22a2f014fc18c6113dd473c57a2e8588de1d515e403a9acd353ae5a97cce4eba"
+    },
+    {
+      "path": "apps/api/src/parallel-instance.ts",
+      "bytes": 9435,
+      "sha256": "00feaf310eb138f925810f88c5b91cffab503fbdccd5b3dae58de3ac87800ba4"
+    },
+    {
+      "path": "scripts/Publish-QAHubAndroid.ps1",
+      "bytes": 4917,
+      "sha256": "8ed812311890063a6e0492ba039065d9fa58cfb51e607b79bac0c92cd66fc4ca"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/QaRuntimeConfig.kt",
+      "bytes": 4559,
+      "sha256": "b7e4e9d55bc884b2b5e180fa5d88bf05685cf9bd12ebfaef8d26aa8383a5fdcb"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/QaIdentityStore.kt",
+      "bytes": 2605,
+      "sha256": "02ee7fa41534c96f1bf90cbea3aa6d6a79284968af47a3091feb76394d55e802"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/network/ApkDistributionClient.kt",
+      "bytes": 14482,
+      "sha256": "044c1076a64847cbcf84b657aabf02b0ed1807da4c92b5844505dc57248a83cf"
+    },
+    {
+      "path": "apps/android/app/build.gradle.kts",
+      "bytes": 5231,
+      "sha256": "2b4cff7e120888fe6c0053cbb774b03e3eab0c6d8203f006d99173641ea11d0a"
+    }
+  ],
+  "historicalAcceptance": {
+    "path": "docs/evidence/project-components/android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+    "bytes": 13294,
+    "sha256": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56"
+  },
+  "limitations": [
+    "Current component switches not queried; prior native proof records all five off",
+    "Existing runtime and devices not read via API/adb",
+    "No feed published or source changed by this inventory"
+  ]
+}

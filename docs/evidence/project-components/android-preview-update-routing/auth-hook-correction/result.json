@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T00:53:56.3753235Z",
+  "status": "passed_isolated_http_correction",
+  "sourceHead": "3b16486251a24a84c5a1861ac67c439f0ac93b33",
+  "sourceDirty": true,
+  "sources": [
+    {
+      "path": "apps/api/src/android-updates.ts",
+      "sha256": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e",
+      "bytes": 7302
+    },
+    {
+      "path": "apps/api/src/project-request-context.ts",
+      "sha256": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab",
+      "bytes": 5676
+    },
+    {
+      "path": "apps/api/test/android-update-auth-integration.test.mjs",
+      "sha256": "3e200893eb932f104011240b1a4edd366423ed90b2191d6f8d465cc6240a1b2f",
+      "bytes": 8776
+    }
+  ],
+  "priorResult": {
+    "unchanged": true,
+    "path": "docs/evidence/project-components/android-preview-update-routing/result.json",
+    "sha256": "02dd009cd6348e44fcfed8e7c32463cf693f7bf439c8f312fad6673e330b24f1",
+    "gate": "pre-review 31 targeted / 244 full; did not prove composed anonymous auth"
+  },
+  "runs": [
+    {
+      "path": "runs/api-build.log",
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7",
+      "bytes": 89
+    },
+    {
+      "path": "runs/full-api.log",
+      "sha256": "f0a74e573ac5f6fce0dd055a04e92837577bf34eaccb73fbd1b032394aee1ae0",
+      "bytes": 27795
+    },
+    {
+      "path": "runs/pre-fix-composed-http.log",
+      "sha256": "d87fa94bc72fd1bca8bed563ea35bc263da84e07c014788f9e837708421458a8",
+      "bytes": 2046
+    },
+    {
+      "path": "runs/scoped-eslint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "runs/scoped-format.log",
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "bytes": 68
+    },
+    {
+      "path": "runs/targeted-composed-http-final.log",
+      "sha256": "ef62062fcd5d8633f35ee7b173a0989af3c452c05cf107b04b6c99393a5b9a8c",
+      "bytes": 1303
+    },
+    {
+      "path": "runs/targeted-composed-http.log",
+      "sha256": "0853b6549c3f9122b8e2c112e77b83c7fba5d44206ecb965c689e9295f47b018",
+      "bytes": 3028
+    }
+  ],
+  "history": [
+    {
+      "failed": 2,
+      "log": "runs/pre-fix-composed-http.log",
+      "tests": 2,
+      "exitCode": 1,
+      "classification": "product defect: composed anonymous metadata returned 401",
+      "passed": 0
+    },
+    {
+      "failed": 2,
+      "log": "runs/targeted-composed-http.log",
+      "tests": 12,
+      "exitCode": 1,
+      "classification": "harness positive control used unregistered scoped Bug list URL; anonymous downloads already passed",
+      "passed": 10
+    },
+    {
+      "failed": 0,
+      "log": "runs/targeted-composed-http-final.log",
+      "tests": 12,
+      "exitCode": 0,
+      "classification": "actual registered Bug list path query; all composed checks passed",
+      "passed": 12
+    }
+  ],
+  "fullGate": {
+    "includesBuild": true,
+    "cancelled": 0,
+    "log": "runs/full-api.log",
+    "mjsPassed": 213,
+    "skipped": 0,
+    "exitCode": 0,
+    "totalPassed": 246,
+    "failed": 0,
+    "tsPassed": 33
+  },
+  "lint": {
+    "log": "runs/scoped-eslint.log",
+    "exitCode": 0
+  },
+  "format": {
+    "log": "runs/scoped-format.log",
+    "exitCode": 0
+  },
+  "boundaries": {
+    "externalComponentRequests": false,
+    "fixture": "temporary SQLite and random loopback HTTP, synthetic APK transport bytes",
+    "existingServicesReadOrRestarted": false,
+    "apiMainStarted": false,
+    "feedPublished": false,
+    "liveDatabaseReadOrBackedUp": false,
+    "retentionRunner": "paused, not executed",
+    "devicesOrClientsOperated": false
+  }
+}

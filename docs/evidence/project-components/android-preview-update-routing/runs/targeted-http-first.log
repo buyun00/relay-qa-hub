@@ -1,0 +1,39 @@
+✔ Android channel parsing keeps stable default and rejects arbitrary channels (163.8341ms)
+✔ real HTTP stable default accepts legacy schema1 without channel and exposes no preview alias (123.9172ms)
+✔ real HTTP explicit preview serves exact metadata/APK bytes, HEAD, ranges and conditional reads (96.8246ms)
+✔ real HTTP preview refuses wrong channel/package or malformed manifest without changing stable compatibility (153.1545ms)
+✔ real HTTP preview rejects traversal/unpublished filenames and reports missing feed without fallback (49.4637ms)
+✔ Bug update accepts a complete attachment set and rejects ambiguous image edits (3.5524ms)
+✔ backend account-name normalization is stable and preserves the display spelling (0.8558ms)
+✔ unique Chinese pinyin login preserves an existing exact account identity (22.1485ms)
+✔ project people directory preserves distinct stable IDs until explicitly linked (17.4971ms)
+✔ explicit identity links override spelling and expose old IDs for historical labels (0.7986ms)
+✔ user management routes preserve the explicit source and canonical IDs (211.2623ms)
+✔ backend people seed accepts only schema 4 without client-side aliases (33.9796ms)
+✔ checked-in backend people seed contains the default QA team (2.1722ms)
+✔ new Web and Android name login creates backend accounts and rejects the legacy pinyin body field (40.7242ms)
+✔ Bug overview query supports unassigned ownership and a 500-row window (0.6831ms)
+✔ capture metadata records positive Android API values without an admission floor (2.6336ms)
+✔ GET /api/v1/health/live returns the frozen liveness shape (21.3986ms)
+✔ android update feed serves uncached metadata and immutable APK ranges (34.1768ms)
+✔ human workflow routes preserve no-code and failed Verification contracts (28.6998ms)
+✔ Verification routes hide raw SQLite failures behind a retryable storage error (14.132ms)
+✔ Android createBug persists an exact receipt, supports GET, and rejects a wrong token (19.4145ms)
+✔ Android attachment upload follows the frozen init, chunk, finalize, bind wire (18.7343ms)
+✔ server defaults to loopback and supports graceful stop plus restart (108.8823ms)
+✔ rejects ambiguous build provenance (0.653ms)
+✔ normalizes an explicit set of exact browser origins (0.9102ms)
+✔ manual completion route binds the authenticated human, exact version and idempotency key (20.7236ms)
+✔ missing explicit config fails before startup (1.2696ms)
+✔ preview overrides discard inherited production connections and secrets (22.025ms)
+✔ production ports, shared cookie, shared update channel and escaping roots fail (102.1418ms)
+✔ nested junction cannot redirect database or evidence to another directory (21.1923ms)
+✔ overlapping data and backup paths are rejected (31.8328ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1122.5873

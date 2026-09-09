@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent-read-only-source-review",
+  "observedAt": "2026-09-09T00:47:20.936Z",
+  "status": "blocked_source_review",
+  "reviewer": "production_inventory",
+  "currentRuntimeOrDeviceRequests": 0,
+  "testsRerun": 0,
+  "filesModifiedByReview": [],
+  "originalResult": {
+    "path": "docs/evidence/project-components/android-preview-update-routing/result.json",
+    "sha256": "02dd009cd6348e44fcfed8e7c32463cf693f7bf439c8f312fad6673e330b24f1",
+    "status": "source_verified_not_deployed",
+    "existingValidationScopePreserved": {
+      "targeted": {
+        "passed": 31,
+        "total": 31,
+        "failed": 0,
+        "skipped": 0,
+        "log": "runs/targeted-http-first.log"
+      },
+      "fullApi": {
+        "command": "npm run test --workspace @relay-qa-hub/api",
+        "compiled": true,
+        "mjs": 211,
+        "ts": 33,
+        "total": 244,
+        "failed": 0,
+        "skipped": 0,
+        "log": "runs/full-api-first.log"
+      }
+    }
+  },
+  "reviewedSourceFiles": [
+    {
+      "path": "apps/api/src/android-updates.ts",
+      "bytes": 6933,
+      "sha256": "60f6422fb2483245c768d68f1d885aa9c87e90c5ce25b07ac70bcdc935def2fe",
+      "currentBytesMatch": true
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 106686,
+      "sha256": "290a44c2d7f73b8d6970e98765590aea6e80853fb4eec105d14cd1155d83db3a",
+      "currentBytesMatch": true
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25370,
+      "sha256": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd",
+      "currentBytesMatch": true
+    },
+    {
+      "path": "apps/api/src/parallel-instance.ts",
+      "bytes": 9481,
+      "sha256": "272379786a9d8806a90c85c5e5ec6e1b07fc5c01ae50e01aed603a250e597fcf",
+      "currentBytesMatch": true
+    },
+    {
+      "path": "apps/api/test/parallel-instance.test.mjs",
+      "bytes": 4089,
+      "sha256": "ef82f93328e5a00c340d2e49761ba8fc5287e063191f668edb35b1a59bbcefbc",
+      "currentBytesMatch": true
+    },
+    {
+      "path": "apps/api/test/android-update-channels.test.mjs",
+      "bytes": 7683,
+      "sha256": "e4b3829ec05e3ecbf76cdb5ca8196dd0fe0054eaf9cc84878dadc40b9a78f383",
+      "currentBytesMatch": true
+    }
+  ],
+  "relatedSourceHashes": {
+    "apps/api/src/project-request-context.ts": "b39ace1eccdfac4cae7c8bc6d791aeea0a713eee9b3df71907f563a4ec5dcbf0",
+    "apps/api/src/browser-auth.ts": "b1d040a003c37ad34f97e9fda1a3dccbc2538e2c0329ee4571fa180a0924b0bf",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/AppContainer.kt": "4fc833e7a5457bf9f9cf128a0b87169cdba7a399fb6186a593258d8e84473496",
+    "apps/android/app/src/main/kotlin/com/relayqahub/android/network/ApkDistributionClient.kt": "044c1076a64847cbcf84b657aabf02b0ed1807da4c92b5844505dc57248a83cf"
+  },
+  "findings": [
+    {
+      "id": "ANDROID_UPDATE_SCOPE_GUARD",
+      "severity": "blocking_for_main_deployment",
+      "classification": "high-confidence code-path inference; not a live request observation",
+      "problem": "Main installs ProjectRequestContext for API requests; its public-route exemptions omit Android update routes. The unauthenticated Android distribution HTTP client will therefore receive UNAUTHENTICATED before the selected static route handler.",
+      "locations": [
+        {
+          "path": "apps/api/src/main.ts",
+          "lines": [280, 441],
+          "role": "actual context creation and app option"
+        },
+        {
+          "path": "apps/api/src/app.ts",
+          "lines": [633],
+          "role": "context hook registration"
+        },
+        {
+          "path": "apps/api/src/project-request-context.ts",
+          "lines": [49, 53, 58, 61, 62],
+          "role": "public exemptions include /updates/ but omit /android-updates/; missing principal returns401"
+        },
+        {
+          "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/AppContainer.kt",
+          "lines": [104, 112, 123, 125],
+          "role": "separate distribution client without authorization/project interceptor"
+        },
+        {
+          "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/network/ApkDistributionClient.kt",
+          "lines": [83, 85, 86, 148, 150],
+          "role": "manifest/APK GET without auth/project headers"
+        },
+        {
+          "path": "apps/api/test/android-update-channels.test.mjs",
+          "lines": [32, 37],
+          "role": "new route fixture lacks actual ProjectRequestContext/BrowserAuth composition"
+        }
+      ],
+      "impact": "A preview route that passes isolated route tests remains inaccessible to the actual native update client after deployment. Existing raw 31/244 successes remain valid for their tested fixtures.",
+      "minimalRemediation": "Allow only GET/HEAD requests whose registered route template exactly equals one selected stable/preview static update template to bypass project scope. Add a real HTTP fixture using actual ProjectRequestContext and BrowserAuth; keep ordinary business, nearby pseudo routes, unsupported methods and unselected channel restricted.",
+      "noBroadApiExemption": true
+    }
+  ],
+  "nonBlockingObservations": [
+    "Stable omitted channel/default behavior is unchanged by the diff.",
+    "Preview metadata requires exact preview.debug package/channel and rejects malformed metadata; binary APK signing verification remains a publication/client responsibility.",
+    "No observed plan step deletes prior feed/artifact evidence; API-only deployment waits for an explicit idle window and preserves data/attachments/quarantine/config/process identity."
+  ],
+  "preservation": "No source, original result, raw logs, plans, runtime or matrix altered. This newly created review record does not rewrite prior source_verified_not_deployed evidence."
+}

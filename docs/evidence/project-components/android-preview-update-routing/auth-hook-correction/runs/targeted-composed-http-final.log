@@ -1,0 +1,20 @@
+✔ real HTTP stable distribution remains anonymous with actual browser auth and project context (535.972ms)
+✔ real HTTP preview distribution remains anonymous with actual browser auth and project context (333.7767ms)
+✔ Android channel parsing keeps stable default and rejects arbitrary channels (102.2463ms)
+✔ real HTTP stable default accepts legacy schema1 without channel and exposes no preview alias (115.613ms)
+✔ real HTTP explicit preview serves exact metadata/APK bytes, HEAD, ranges and conditional reads (60.7012ms)
+✔ real HTTP preview refuses wrong channel/package or malformed manifest without changing stable compatibility (68.604ms)
+✔ real HTTP preview rejects traversal/unpublished filenames and reports missing feed without fallback (34.7096ms)
+✔ missing explicit config fails before startup (1.1823ms)
+✔ preview overrides discard inherited production connections and secrets (22.0159ms)
+✔ production ports, shared cookie, shared update channel and escaping roots fail (68.8599ms)
+✔ nested junction cannot redirect database or evidence to another directory (17.3266ms)
+✔ overlapping data and backup paths are rejected (27.1503ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1233.8471

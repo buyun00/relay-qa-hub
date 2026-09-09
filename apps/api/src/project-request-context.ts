@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { MobileScopeBootstrap } from "@relay-qa-hub/storage";
 import { getBrowserPrincipal } from "./browser-auth.js";
+import { isAndroidUpdateReadRoute } from "./android-updates.js";
 import type { ProjectManagementService } from "./project-management.js";
 
 interface RequestProject {
@@ -49,6 +50,7 @@ export class ProjectRequestContext {
     app.addHook("preHandler", async (request, reply) => {
       const path = request.url.split("?")[0]!;
       if (path === "/api/v1/mcp/tools") return;
+      if (isAndroidUpdateReadRoute(request)) return;
       if (
         !path.startsWith("/api/v1/") ||
         path.startsWith("/api/v1/health/") ||

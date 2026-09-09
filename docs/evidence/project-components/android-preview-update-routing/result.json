@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-09T00:41:54.306Z",
+  "status": "source_verified_not_deployed",
+  "sourceCommit": "3b16486251a24a84c5a1861ac67c439f0ac93b33",
+  "sourceDirty": true,
+  "changes": {
+    "channelValues": [
+      "stable",
+      "preview"
+    ],
+    "default": "stable",
+    "parallelInstance": "explicit preview; inherited channel discarded",
+    "registeredRoutes": "Only selected fixed channel; no arbitrary channel parameter or alias",
+    "previewMetadata": "schema1/channel preview/exact com.relayqahub.android.preview.debug/version-fileName-size-sha validation; bad metadata 503 ANDROID_UPDATE_METADATA_INVALID",
+    "stableCompatibility": "existing schema1 metadata without channel unchanged"
+  },
+  "sourceFiles": [
+    {
+      "path": "apps/api/src/android-updates.ts",
+      "bytes": 6933,
+      "sha256": "60f6422fb2483245c768d68f1d885aa9c87e90c5ce25b07ac70bcdc935def2fe"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 106686,
+      "sha256": "290a44c2d7f73b8d6970e98765590aea6e80853fb4eec105d14cd1155d83db3a"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25370,
+      "sha256": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd"
+    },
+    {
+      "path": "apps/api/src/parallel-instance.ts",
+      "bytes": 9481,
+      "sha256": "272379786a9d8806a90c85c5e5ec6e1b07fc5c01ae50e01aed603a250e597fcf"
+    },
+    {
+      "path": "apps/api/test/parallel-instance.test.mjs",
+      "bytes": 4089,
+      "sha256": "ef82f93328e5a00c340d2e49761ba8fc5287e063191f668edb35b1a59bbcefbc"
+    },
+    {
+      "path": "apps/api/test/android-update-channels.test.mjs",
+      "bytes": 7683,
+      "sha256": "e4b3829ec05e3ecbf76cdb5ca8196dd0fe0054eaf9cc84878dadc40b9a78f383"
+    }
+  ],
+  "validation": {
+    "apiBuild": {
+      "exitCode": 0,
+      "log": "runs/api-build-first.log"
+    },
+    "targeted": {
+      "passed": 31,
+      "total": 31,
+      "failed": 0,
+      "skipped": 0,
+      "log": "runs/targeted-http-first.log"
+    },
+    "fullApi": {
+      "command": "npm run test --workspace @relay-qa-hub/api",
+      "compiled": true,
+      "mjs": 211,
+      "ts": 33,
+      "total": 244,
+      "failed": 0,
+      "skipped": 0,
+      "log": "runs/full-api-first.log"
+    },
+    "lint": {
+      "exitCode": 0,
+      "log": "runs/scoped-eslint-captured.log"
+    },
+    "format": {
+      "exitCode": 0,
+      "log": "runs/format-first.log"
+    },
+    "transportScope": "new real HTTP fixtures use ephemeral 127.0.0.1 listen port0; no current API/main used",
+    "testApkBytes": "synthetic transport bytes; not an installable/signed APK claim"
+  },
+  "preservation": {
+    "unchangedFiles": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code23-recovery-65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\qa-hub-preview-code23.apk",
+        "bytes": 35536941,
+        "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+        "unchanged": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\android-code22-acceptance\\qa-hub-preview-code22.apk",
+        "bytes": 35471405,
+        "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+        "unchanged": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+        "bytes": 35471405,
+        "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+        "unchanged": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+        "bytes": 2600,
+        "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922",
+        "unchanged": true
+      }
+    ],
+    "previewLatestExists": false,
+    "published": false,
+    "serviceControlPerformed": false,
+    "deviceOperationsPerformed": false,
+    "webDistRebuilt": false,
+    "androidRecompiled": false
+  },
+  "logs": [
+    {
+      "path": "docs\\evidence\\project-components\\android-preview-update-routing\\runs\\api-build-first.log",
+      "bytes": 89,
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\android-preview-update-routing\\runs\\format-first.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\android-preview-update-routing\\runs\\full-api-first.log",
+      "bytes": 27567,
+      "sha256": "c04f4d4b0d643b8443c467c30ae0b4077a8bb497dbfeb84cde65e1ce398f4ea6"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\android-preview-update-routing\\runs\\scoped-eslint-captured.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\android-preview-update-routing\\runs\\targeted-http-first.log",
+      "bytes": 2960,
+      "sha256": "abab99f07d17064fc6bafc5db047b7557826d785431f9eb5a6f8cf02a9bcc3b0"
+    }
+  ],
+  "beforeProof": {
+    "path": "docs\\evidence\\project-components\\android-preview-update-routing\\before.json",
+    "bytes": 3725,
+    "sha256": "336070ab7da4c79ad6631204405681411cad9c34e4371eb23c80cb5299932d15"
+  },
+  "plans": [
+    {
+      "path": "docs\\evidence\\project-components\\android-preview-update-routing\\publication-plan.md",
+      "bytes": 8976,
+      "sha256": "44b63a6adfbbf212b0595f3cce4857bb98fc1fe82cdb776d6b9af13f62ed347f"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\android-preview-update-routing\\deployment-plan.md",
+      "bytes": 8091,
+      "sha256": "5c150446e2f84ca62da9857821a531dae8a9596a5ecfd6b27ebac1efd3d59e02"
+    }
+  ],
+  "firstFailures": [],
+  "limitations": [
+    "No deployment or current4419 HTTP proof",
+    "No actual code23 feed publication/download or native self-update",
+    "No current component switch requery; prior code23 proof records five off",
+    "Await root controlled API-only deployment and publication window"
+  ]
+}

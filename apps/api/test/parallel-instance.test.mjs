@@ -62,6 +62,7 @@ test("preview overrides discard inherited production connections and secrets", (
     QA_HUB_RELAY_M2M_URL: "http://production.invalid",
     QA_HUB_BACKUP_ENABLED: "true",
     QA_HUB_UPLOADER_SECRET: "production",
+    QA_HUB_ANDROID_UPDATE_CHANNEL: "stable",
     PATH: "preserved",
   };
   applyParallelInstanceEnvironment(env);
@@ -70,6 +71,11 @@ test("preview overrides discard inherited production connections and secrets", (
   assert.equal(env.QA_HUB_RELAY_M2M_URL, undefined);
   assert.equal(env.QA_HUB_UPLOADER_SECRET, undefined);
   assert.equal(env.QA_HUB_WEB_SESSION_COOKIE_NAME, "qa-hub-preview-test-session");
+  assert.equal(env.QA_HUB_ANDROID_UPDATE_CHANNEL, "preview");
+  assert.equal(
+    env.QA_HUB_ANDROID_UPDATE_ROOT,
+    join(f.config.downloadsRoot, "android", "qa-hub-preview-test"),
+  );
   assert.equal(env.PATH, "preserved");
 });
 test("production ports, shared cookie, shared update channel and escaping roots fail", (t) => {

@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent-read-only-source-and-artifact-review",
+  "observedAt": "2026-09-09T00:55:52.840Z",
+  "status": "passed_source_review_not_deployed",
+  "reviewer": "production_inventory",
+  "fixedFinding": "ANDROID_UPDATE_SCOPE_GUARD",
+  "afterResult": {
+    "path": "docs/evidence/project-components/android-preview-update-routing/auth-hook-correction/result.json",
+    "sha256": "8e932752d59972f79c81ba435835f706b813ecdef9eb9dabf4951f2d0f9c5293"
+  },
+  "sources": [
+    {
+      "path": "apps/api/src/android-updates.ts",
+      "sha256": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e",
+      "bytes": 7302,
+      "currentHashMatches": true
+    },
+    {
+      "path": "apps/api/src/project-request-context.ts",
+      "sha256": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab",
+      "bytes": 5676,
+      "currentHashMatches": true
+    },
+    {
+      "path": "apps/api/test/android-update-auth-integration.test.mjs",
+      "sha256": "3e200893eb932f104011240b1a4edd366423ed90b2191d6f8d465cc6240a1b2f",
+      "bytes": 8776,
+      "currentHashMatches": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "runs/api-build.log",
+      "sha256": "b9c98fd0721bc83302324eb703cf465164fc19a90180733402b8017e76ea43d7",
+      "bytes": 89,
+      "hashMatches": true,
+      "bytesMatch": true,
+      "counters": []
+    },
+    {
+      "path": "runs/full-api.log",
+      "sha256": "f0a74e573ac5f6fce0dd055a04e92837577bf34eaccb73fbd1b032394aee1ae0",
+      "bytes": 27795,
+      "hashMatches": true,
+      "bytesMatch": true,
+      "counters": [
+        "ℹ tests 213",
+        "ℹ pass 213",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ tests 33",
+        "ℹ pass 33",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0"
+      ]
+    },
+    {
+      "path": "runs/pre-fix-composed-http.log",
+      "sha256": "d87fa94bc72fd1bca8bed563ea35bc263da84e07c014788f9e837708421458a8",
+      "bytes": 2046,
+      "hashMatches": true,
+      "bytesMatch": true,
+      "counters": ["ℹ tests 2", "ℹ pass 0", "ℹ fail 2", "ℹ cancelled 0", "ℹ skipped 0"]
+    },
+    {
+      "path": "runs/scoped-eslint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "hashMatches": true,
+      "bytesMatch": true,
+      "counters": []
+    },
+    {
+      "path": "runs/scoped-format.log",
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "bytes": 68,
+      "hashMatches": true,
+      "bytesMatch": true,
+      "counters": []
+    },
+    {
+      "path": "runs/targeted-composed-http-final.log",
+      "sha256": "ef62062fcd5d8633f35ee7b173a0989af3c452c05cf107b04b6c99393a5b9a8c",
+      "bytes": 1303,
+      "hashMatches": true,
+      "bytesMatch": true,
+      "counters": ["ℹ tests 12", "ℹ pass 12", "ℹ fail 0", "ℹ cancelled 0", "ℹ skipped 0"]
+    },
+    {
+      "path": "runs/targeted-composed-http.log",
+      "sha256": "0853b6549c3f9122b8e2c112e77b83c7fba5d44206ecb965c689e9295f47b018",
+      "bytes": 3028,
+      "hashMatches": true,
+      "bytesMatch": true,
+      "counters": ["ℹ tests 12", "ℹ pass 10", "ℹ fail 2", "ℹ cancelled 0", "ℹ skipped 0"]
+    }
+  ],
+  "preserved": {
+    "beforeReviewSha256": "f85ac76a246e3a168d623dd77564566cad3811b87129241ee12f616974132832",
+    "priorResultSha256": "02dd009cd6348e44fcfed8e7c32463cf693f7bf439c8f312fad6673e330b24f1",
+    "beforeJsonStillBlocked": true,
+    "priorTargeted": 31,
+    "priorFull": 244,
+    "priorSourcesExplicitlyNotComposedAuth": true
+  },
+  "reviewConclusions": [
+    {
+      "check": "fixedRouteReadOnlyExemption",
+      "passed": true,
+      "evidence": "android-updates.ts isAndroidUpdateReadRoute uses GET/HEAD plus request.routeOptions.url exact equality to stable/preview fixed registered templates; project-request-context applies only that predicate."
+    },
+    {
+      "check": "realCompositionCovered",
+      "passed": true,
+      "evidence": "android-update-auth-integration.test.mjs uses actual SqliteStorageWorker, BrowserAuth, ProjectManagementService, ProjectRequestContext and context-scoped Bug store; anonymous metadata/APK/HEAD/Range/304 work in stable/default and preview fixtures."
+    },
+    {
+      "check": "noBroadBusinessBypass",
+      "passed": true,
+      "evidence": "Registered neighboring /admin/:fileName and exact read template with POST remain401, guarded handler count0; anonymous projects/Bugs401; valid own-project business200, nonmember403 and conflicting scope400."
+    },
+    {
+      "check": "strictPreviewAndStableCompatibility",
+      "passed": true,
+      "evidence": "Stable omission of channel remains compatible. Preview wrong daily package503; existing fixed-channel tests preserve schema/channel/name/size/SHA validation and filename containment."
+    },
+    {
+      "check": "plansPreservePublicationAndServiceBoundary",
+      "passed": true,
+      "evidence": "Original artifact bytes and certificate provenance, prior code22 direct download/feed/latest retention, no-overwrite immutable APK placement; API-only deployment after idle window and DB/referenced attachment/quarantine/config preservation. No default production publisher or device downgrade."
+    }
+  ],
+  "responseNuance": {
+    "selectedChannelAnonymous": "200 valid metadata/APK; invalid filename404; preview wrong-package metadata503",
+    "unselectedChannelInComposedMain": {
+      "anonymous": 401,
+      "withValidPrincipal": 404
+    },
+    "bareRouteTestUnselected": 404
+  },
+  "validationReadback": {
+    "targeted": {
+      "failed": 0,
+      "log": "runs/targeted-composed-http-final.log",
+      "tests": 12,
+      "exitCode": 0,
+      "classification": "actual registered Bug list path query; all composed checks passed",
+      "passed": 12
+    },
+    "fullGate": {
+      "includesBuild": true,
+      "cancelled": 0,
+      "log": "runs/full-api.log",
+      "mjsPassed": 213,
+      "skipped": 0,
+      "exitCode": 0,
+      "totalPassed": 246,
+      "failed": 0,
+      "tsPassed": 33
+    },
+    "preFixProductFailure": {
+      "failed": 2,
+      "log": "runs/pre-fix-composed-http.log",
+      "tests": 2,
+      "exitCode": 1,
+      "classification": "product defect: composed anonymous metadata returned 401",
+      "passed": 0
+    },
+    "firstCorrectionHarnessFailure": {
+      "failed": 2,
+      "log": "runs/targeted-composed-http.log",
+      "tests": 12,
+      "exitCode": 1,
+      "classification": "harness positive control used unregistered scoped Bug list URL; anonymous downloads already passed",
+      "passed": 10
+    },
+    "testsRerunByReviewer": 0
+  },
+  "reviewerBoundaries": {
+    "networkRequests": 0,
+    "appOrDeviceOperations": 0,
+    "runtimeReadsOrMutations": 0,
+    "sourceOrMatrixWrites": 0,
+    "onlyNewReviewJsonWritten": true
+  },
+  "limits": [
+    "No actual4419 deployment/feed publication/download or native install conclusion.",
+    "Synthetic APK fixture bytes test transport, not package signature parsing.",
+    "Original pre-review31/244 and first failures are retained, not rewritten."
+  ],
+  "unchangedOriginalSources": [
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 106686,
+      "sha256": "290a44c2d7f73b8d6970e98765590aea6e80853fb4eec105d14cd1155d83db3a",
+      "currentHashMatches": true
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25370,
+      "sha256": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd",
+      "currentHashMatches": true
+    },
+    {
+      "path": "apps/api/src/parallel-instance.ts",
+      "bytes": 9481,
+      "sha256": "272379786a9d8806a90c85c5e5ec6e1b07fc5c01ae50e01aed603a250e597fcf",
+      "currentHashMatches": true
+    },
+    {
+      "path": "apps/api/test/parallel-instance.test.mjs",
+      "bytes": 4089,
+      "sha256": "ef82f93328e5a00c340d2e49761ba8fc5287e063191f668edb35b1a59bbcefbc",
+      "currentHashMatches": true
+    },
+    {
+      "path": "apps/api/test/android-update-channels.test.mjs",
+      "bytes": 7683,
+      "sha256": "e4b3829ec05e3ecbf76cdb5ca8196dd0fe0054eaf9cc84878dadc40b9a78f383",
+      "currentHashMatches": true
+    }
+  ]
+}

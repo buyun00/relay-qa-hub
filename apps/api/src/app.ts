@@ -4,7 +4,7 @@ import { Readable } from "node:stream";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 
 import { API_SERVICE_NAME, API_VERSION, DEVELOPMENT_BUILD_SHA, resolveBuildSha } from "./config.js";
-import { registerAndroidUpdateRoutes } from "./android-updates.js";
+import { registerAndroidUpdateRoutes, type AndroidUpdateChannel } from "./android-updates.js";
 import {
   MAX_MOBILE_CHUNK_SIZE_BYTES,
   MOBILE_ATTACHMENT_BIND_PATH,
@@ -281,6 +281,7 @@ export interface CreateApiAppOptions {
   readonly debugActorId?: string;
   readonly browserAuth?: BrowserAuthOptions;
   readonly androidUpdateRoot?: string;
+  readonly androidUpdateChannel?: AndroidUpdateChannel;
   readonly jenkinsBuildService?: JenkinsBuildService;
   readonly incrementUploadRoot?: string;
   readonly incrementUploadService?: IncrementUploadService;
@@ -2738,7 +2739,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         : null,
     );
   }
-  registerAndroidUpdateRoutes(app, options.androidUpdateRoot);
+  registerAndroidUpdateRoutes(app, options.androidUpdateRoot, options.androidUpdateChannel);
   if (options.projectComponentsRuntime && options.projectRequestContext) {
     registerProjectComponentRoutes(app, {
       runtime: options.projectComponentsRuntime,

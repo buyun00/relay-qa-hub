@@ -225,6 +225,7 @@ export function parallelInstanceEnvironment(
     QA_HUB_GM_PASSWORD: secret("gmPassword"),
     QA_HUB_PEOPLE_CONFIG_FILE: config.peopleFile,
     QA_HUB_ANDROID_UPDATE_ROOT: join(config.downloadsRoot, "android", config.releaseChannel),
+    QA_HUB_ANDROID_UPDATE_CHANNEL: "preview",
     QA_HUB_QINGYU_STATE_FILE: join(config.dataRoot, "integrations", "qingyu-state.enc.json"),
     QA_HUB_RELEASE_CHANNEL: config.releaseChannel,
     QA_HUB_MCP_PORT: String(config.mcpPort),
