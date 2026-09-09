@@ -1,0 +1,52 @@
+command: node --import tsx --test apps/api/test/repair-attempt-terminal.test.ts
+observedAt: 2026-09-09T05:21:51.040Z
+exitCode: 0
+
+✔ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (1118.4791ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-OqQqac
+ℹ retained 6 candidate HTTP request/response records; SHA256 95e88f59114d2d566ee81b10fe52f4c6ba40abd2863ccd582c82cf5a067a8964
+✔ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (723.3781ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-KThzQn
+ℹ retained 5 candidate HTTP request/response records; SHA256 0d7f68b1697acc45546f68fb5f79fec5ebea267504fcbc9da69ff45da178aefa
+✔ candidate real HTTP: rejected successors and old versions rollback every fact (496.1401ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-vEqvVt
+ℹ retained 5 candidate HTTP request/response records; SHA256 b3c98a5290f10343ba18872e1edc1e2773f9a0bfb1d49ec9725cdd26f795c411
+✔ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (612.9073ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-iNick6
+ℹ retained 4 candidate HTTP request/response records; SHA256 4adb710a8f0b270dc990575a959625b00ea26b04c98d1052045299087ee5baa9
+✔ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (528.4312ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-vxWZTW
+ℹ retained 6 candidate HTTP request/response records; SHA256 7f34aaab1c255742dfa53d134303840069a327521616fdbbc67420ed8cb03dff
+✔ candidate immutable snapshot exceeds 64KiB with maximum multibyte reason/two summaries and complete Bug (490.741ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-927MLd
+ℹ retained 2 candidate HTTP request/response records; SHA256 af91b4ed51df163cac77714eb5f6b426f7729b2bf8eacd1f854474d8369617e3
+✔ candidate legacy two-step HTTP requires latest exact parent, preserves original receipt and never dispatches (968.6886ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-01t3Ov
+ℹ retained 18 candidate HTTP request/response records; SHA256 c4f24041ae6c425e83ea4ca742b6a9e940450006a13c0d3c66507e440529c7f1
+✔ candidate human Cookie+CSRF is required for legacy session writes and GM authorization is transaction-scoped (497.2659ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-c8iiYh
+ℹ retained 1 candidate HTTP request/response records; SHA256 f7d16f1db49c0670ce3961546cb945517c55a5263231957c1896114b80053026
+✔ candidate immutable snapshot rejects insertion with copied metadata and forged facts (387.9886ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-qJYVzn
+ℹ retained 1 candidate HTTP request/response records; SHA256 7b4bab6044986940f6f6b91d568d18f475f0640ae4c751a3fa1a52b200963f55
+✔ candidate late snapshot failure rolls back Attempt/Bug/successor/audit/outbox/receipt, then original request succeeds (422.3146ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-OdxvFm
+ℹ retained 2 candidate HTTP request/response records; SHA256 378db35fd788808b8b5fd19a3f30c5c18c6359741f9bb778309af9c2ff91ab29
+✔ candidate delivered and already-terminal history refuses fresh mutations (577.6134ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-dK0QgM
+ℹ retained 4 candidate HTTP request/response records; SHA256 ff5e4ff1765f1504359cdafa120c02d2ac0bb9cd33cc8d1f221e731d8601e0e6
+✔ candidate explicit JSON/vendor media preference is separate from successor command semantics (961.4858ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-p37mCJ
+ℹ retained 6 candidate HTTP request/response records; SHA256 e9e201693d7fd8b9cb6569dd201aefefce5a9a9d2bbe83a456003a0c63dd8afd
+✔ candidate replay preserves the originally negotiated HTTP receipt across later Accept headers (333.6146ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-kziomA
+ℹ retained 2 candidate HTTP request/response records; SHA256 98e8bc6ce9f710d280735e8f68a907a1cc5aaf267b439254c73ad1fe9ea3a543
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9326.9507
+

@@ -1,0 +1,247 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { createHash, randomUUID } from "node:crypto";
+import { mkdtemp, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import Fastify from "fastify";
+import { createRequire } from "node:module";
+import { migrateSqliteDatabase, openSqliteDatabaseForWorker, verifySqliteIntegrity } from "../../../packages/storage/src/sqlite.ts";
+import { ensureMobileScope, createMobileBug, deleteMobileBug, getMobileBug } from "../../../packages/storage/src/mobile-bug-store.ts";
+import { ensureMobileRelayRoles, transitionMobileBugReady, createMobileManualRepairAttempt, startMobileRepairAttempt } from "../../../packages/storage/src/mobile-relay-store.ts";
+import { projectManagement } from "../../../packages/storage/src/project-management-store.ts";
+import * as sessions from "../../../packages/storage/src/browser-auth-store.ts";
+import { REPAIR_ATTEMPT_TERMINAL_SNAPSHOT_SQL } from "../../../packages/storage/src/repair-attempt-terminal-migration.ts";
+import { terminateRepairAttempt, getTerminalRepairAttemptHistory } from "../../../packages/storage/src/repair-attempt-terminal-store.ts";
+import { registerTerminalRepairAttemptRoutes } from "../src/repair-attempt-terminal.ts";
+import { authenticateBrowserRequest, authenticateBrowserBearerRequest, createSqliteBrowserAuthStore, registerBrowserAuthRoutes } from "../src/browser-auth.ts";
+import { MOBILE_API_MEDIA_TYPE } from "../src/mobile-bugs.ts";
+
+const now = () => new Date().toISOString();
+const digest = (v: unknown) => createHash("sha256").update(JSON.stringify(v)).digest("hex");
+const require = createRequire(import.meta.url);
+const Ajv = require("ajv/dist/2020.js").default;
+const formats = require("ajv-formats").default;
+async function validators() {
+  const ajv = new Ajv({ strict: false, allErrors: true });
+  formats(ajv);
+  for (const name of ["common", "bug", "workflow", "build", "relay"]) {
+    const file = new URL(`../../../packages/contracts/schemas/${name}.schema.json`, import.meta.url);
+    try { ajv.addSchema(JSON.parse(await readFile(file, "utf8"))); } catch (error) {
+      if ((error as { code?: string }).code !== "ENOENT") throw error;
+    }
+  }
+  const native = JSON.parse(await readFile(new URL("../../../packages/contracts/versions/1.1.0/schemas/app-first.schema.json", import.meta.url), "utf8"));
+  ajv.addSchema(native);
+  const attempt = ajv.compile({ $ref: "https://qa-hub.local/contracts/workflow.schema.json#/$defs/repairAttempt" });
+  const successor = ajv.compile({ $ref: `${native.$id}#/$defs/supersedeRepairAttemptResponse` });
+  return { attempt, successor };
+}
+async function fixture(t: test.TestContext) {
+  const directory = await mkdtemp(join(tmpdir(), "qa-terminal-c-"));
+  t.diagnostic(`retained isolated fixture ${directory}`);
+  const file = join(directory, "main.sqlite");
+  const db = openSqliteDatabaseForWorker({ databaseFile: file, busyTimeoutMs: 5000 });
+  await migrateSqliteDatabase(db, file);
+  db.exec(REPAIR_ATTEMPT_TERMINAL_SNAPSHOT_SQL);
+  const scope = { accountId: randomUUID(), projectId: randomUUID(), actorId: randomUUID() };
+  const tx = <T>(fn: () => T): T => {
+    db.exec("BEGIN IMMEDIATE");
+    try { const result = fn(); db.exec("COMMIT"); return result; }
+    catch (error) { if (db.isTransaction) db.exec("ROLLBACK"); throw error; }
+  };
+  tx(() => {
+    const bootstrap = { ...scope, membershipId: randomUUID(), projectKey: "TERM", createdAt: now() };
+    ensureMobileScope(db, bootstrap);
+    ensureMobileRelayRoles(db, bootstrap);
+  });
+  const app = Fastify({ logger: false, bodyLimit: 1048576 });
+  app.addContentTypeParser(MOBILE_API_MEDIA_TYPE, { parseAs: "string" }, (_, body, done) => {
+    try { done(null, JSON.parse(String(body))); } catch (error) { done(error as Error); }
+  });
+  const worker = {
+    ensureBrowserAdmin: async (input: sessions.EnsureBrowserAdminInput) => tx(() => sessions.ensureBrowserAdmin(db, input)),
+    loginBrowserSession: async (input: sessions.LoginBrowserSessionInput) => tx(() => sessions.loginBrowserSession(db, input)),
+    createBrowserSession: async (input: sessions.CreateBrowserSessionInput) => tx(() => sessions.createBrowserSession(db, input)),
+    resolveBrowserSession: async (input: sessions.ResolveBrowserSessionInput) => sessions.resolveBrowserSession(db, input),
+    revokeBrowserSession: async (input: sessions.RevokeBrowserSessionInput) => tx(() => sessions.revokeBrowserSession(db, input)),
+  };
+  const auth = { store: createSqliteBrowserAuthStore({ worker }), ...scope, userId: scope.actorId,
+    adminEmail: "terminal-fixture@local.invalid", sessionSecret: randomUUID() + randomUUID(),
+    webOrigins: ["http://terminal-fixture.local"], gm: { userId: scope.actorId, password: randomUUID() },
+    passwordlessLogin: async () => { throw Error("Explicit project required"); },
+    projectLogin: async (name: string, projectId: string, at: string) => tx(() => projectManagement(db,
+      { ...scope, operation: "login", projectId, name, now: at })) as { userId: string; projectId: string },
+  };
+  registerBrowserAuthRoutes(app, auth);
+  app.addHook("preHandler", async (request, reply) => {
+    if (request.url.startsWith("/api/v1/auth/")) return;
+    if (await authenticateBrowserBearerRequest(request, auth)) return;
+    await authenticateBrowserRequest(request, reply, auth);
+  });
+  registerTerminalRepairAttemptRoutes(app, { execute: (command) => tx(() => terminateRepairAttempt(db, command)) });
+  await app.listen({ host: "127.0.0.1", port: 0 });
+  t.after(async () => { await app.close(); assert.equal(verifySqliteIntegrity(db).ok, true); db.close(); });
+  const origin = `http://127.0.0.1:${(app.server.address() as { port: number }).port}`;
+  const loginResponse = await fetch(origin + "/api/v1/auth/login", { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name: `TerminalActor${randomUUID()}`, projectId: scope.projectId, client: "android" }) });
+  assert.equal(loginResponse.status, 200);
+  const login = await loginResponse.json() as { accessToken: string; userId: string };
+  const actor = { ...scope, actorId: login.userId };
+  const snapshot = () => Object.fromEntries(["bugs", "repair_attempts", "events", "outbox", "idempotency_records", "repair_attempt_terminal_snapshots"]
+    .map((table) => [table, db.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all()]));
+  const plan = (running = false, maximum = false) => tx(() => {
+    const created = createMobileBug(db, { ...actor, clientSubmissionId: randomUUID(), payloadDigest: digest(randomUUID()),
+      title: maximum ? "界".repeat(300) : "Terminal candidate", description: maximum ? "界".repeat(20000) : "Preserved description",
+      expectedBehavior: maximum ? "界".repeat(10000) : "One immutable result", severity: "S2", priority: "P2", ownerId: actor.actorId,
+      verificationOwnerId: actor.actorId, occurrence: { observedAt: now(), platform: "web", steps: ["Verify terminal command"], actualBehavior: "Fixture" },
+      attachmentIds: [], captureBundleId: null, createdAt: now() });
+    const base = { ...actor, idempotencyKey: randomUUID(), requestDigest: digest(randomUUID()), createdAt: now() };
+    const ready = transitionMobileBugReady(db, { ...base, bugId: created.bug.id, expectedVersion: 1 });
+    const attempt = createMobileManualRepairAttempt(db, { ...base, idempotencyKey: randomUUID(), bugId: created.bug.id,
+      expectedVersion: ready.version, assigneeId: actor.actorId, summary: maximum ? "原".repeat(10000) : "Original human plan" });
+    return running ? startMobileRepairAttempt(db, { ...base, idempotencyKey: randomUUID(), attemptId: attempt.id,
+      expectedVersion: attempt.version, reason: "Begin" }) : attempt;
+  });
+  const send = async (attempt: { id: string; version: number }, suffix: "fail" | "supersede", body: object,
+    options: { vendor?: boolean; accept?: string; token?: string; projectId?: string; key?: string } = {}) => {
+    const operation = suffix === "fail" ? "failRepairAttempt" : "supersedeRepairAttempt";
+    const response = await fetch(`${origin}/api/v1/repair-attempts/${attempt.id}/${suffix}`, {
+      method: "POST", headers: { "content-type": options.vendor ? MOBILE_API_MEDIA_TYPE : "application/json",
+        authorization: `Bearer ${options.token ?? login.accessToken}`, "x-qa-project-id": options.projectId ?? actor.projectId,
+        "idempotency-key": options.key ?? `workflow:${operation}:attempt:${attempt.id}:v${attempt.version}`,
+        ...(options.accept === undefined ? {} : { accept: options.accept }) }, body: JSON.stringify(body) });
+    return { status: response.status, contentType: response.headers.get("content-type"), body: await response.json() as Record<string, any> };
+  };
+  return { db, file, app, origin, tx, scope, actor, login, snapshot, plan, send };
+}
+
+test("candidate real HTTP: planned/running fail retains summary/reason and immutable replay", async (t) => {
+  const f = await fixture(t), schemas = await validators();
+  for (const running of [false, true]) {
+    const attempt = f.plan(running), before = getMobileBug(f.db, f.actor, attempt.bugId)!;
+    const body = { expectedVersion: attempt.version, reason: "Stop this attempt with full reason" };
+    const result = await f.send(attempt, "fail", body, { vendor: running });
+    assert.equal(result.status, 200, JSON.stringify(result.body));
+    assert.equal(schemas.attempt(result.body), true, JSON.stringify(schemas.attempt.errors));
+    assert.equal(result.body.summary, body.reason);
+    const historical = getTerminalRepairAttemptHistory(f.db, { ...f.actor, attemptId: attempt.id })!;
+    assert.equal(historical.summary, "Original human plan");
+    assert.equal(historical.failureReason, body.reason);
+    assert.equal(getMobileBug(f.db, f.actor, attempt.bugId)!.version, before.version + 1);
+    const once = f.snapshot();
+    const replay = await f.send(attempt, "fail", body, { vendor: running });
+    assert.deepEqual(replay.body, result.body);
+    assert.deepEqual(f.snapshot(), once);
+    const changed = await f.send(attempt, "fail", { ...body, reason: "Changed intent" }, { vendor: running });
+    assert.equal(changed.status, 409);
+    assert.equal(changed.body.code, "IDEMPOTENCY_PAYLOAD_MISMATCH");
+    assert.deepEqual(f.snapshot(), once);
+  }
+});
+
+test("candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid", async (t) => {
+  const f = await fixture(t), schemas = await validators();
+  const legacy = f.plan();
+  const legacyResult = await f.send(legacy, "supersede", { expectedVersion: 1, reason: "Legacy supersede reason" });
+  assert.equal(legacyResult.status, 200, JSON.stringify(legacyResult.body));
+  assert.equal(schemas.attempt(legacyResult.body), true);
+  assert.equal(getMobileBug(f.db, f.actor, legacy.bugId)!.state, "ready");
+  assert.equal(f.db.prepare("SELECT count(*) AS n FROM repair_attempts WHERE bug_id=?").get(legacy.bugId)!.n, 1);
+  assert.equal(getTerminalRepairAttemptHistory(f.db, { ...f.actor, attemptId: legacy.id })!.supersedeReason, "Legacy supersede reason");
+  const attempt = f.plan(true), successorId = randomUUID();
+  const before = getMobileBug(f.db, f.actor, attempt.bugId)!;
+  const body = { expectedVersion: 2, reason: "Choose a distinct explicit successor", successor: { id: successorId, mode: "human", assigneeId: f.actor.actorId, summary: "New human plan" } };
+  const result = await f.send(attempt, "supersede", body, { vendor: true });
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  assert.equal(schemas.successor(result.body), true, JSON.stringify(schemas.successor.errors));
+  assert.equal(result.body.supersededAttempt.summary, body.reason);
+  assert.equal(result.body.successorAttempt.parentAttemptId, attempt.id);
+  assert.equal(result.body.successorAttempt.sequence, 2);
+  assert.equal(result.body.successorAttempt.version, 1);
+  assert.equal(result.body.bug.version, before.version + 1);
+  assert.equal(result.body.bug.state, "in_progress");
+  assert.equal(getTerminalRepairAttemptHistory(f.db, { ...f.actor, attemptId: attempt.id })!.summary, "Original human plan");
+  const state = f.snapshot();
+  const replay = await f.send(attempt, "supersede", body, { vendor: true });
+  assert.deepEqual(replay.body, { ...result.body, replayed: true });
+  assert.deepEqual(f.snapshot(), state);
+  const followup = await f.send({ id: successorId, version: 1 }, "fail", { expectedVersion: 1, reason: "Later state change" });
+  assert.equal(followup.status, 200);
+  const old = await f.send(attempt, "supersede", body, { vendor: true });
+  assert.deepEqual(old.body, { ...result.body, replayed: true });
+});
+
+test("candidate real HTTP: rejected successors and old versions rollback every fact", async (t) => {
+  const f = await fixture(t), attempt = f.plan();
+  const base = { expectedVersion: 1, reason: "Atomic rollback", successor: { id: randomUUID(), mode: "human", assigneeId: f.actor.actorId } };
+  for (const body of [{ ...base, successor: { ...base.successor, id: attempt.id } },
+    { ...base, successor: { ...base.successor, assigneeId: randomUUID() } }, { ...base, expectedVersion: 9 }]) {
+    const before = f.snapshot();
+    const result = await f.send({ ...attempt, version: body.expectedVersion }, "supersede", body, { vendor: true });
+    assert.equal(result.status, body.expectedVersion === 9 ? 412 : 422, JSON.stringify(result.body));
+    assert.deepEqual(f.snapshot(), before);
+  }
+  const before = f.snapshot();
+  const cannotRepresent = await f.send(attempt, "supersede", { expectedVersion: 1, reason: "No successor in this representation" }, { accept: MOBILE_API_MEDIA_TYPE });
+  assert.equal(cannotRepresent.status, 406);
+  assert.deepEqual(f.snapshot(), before);
+  const result = await f.send(attempt, "supersede", base, { vendor: true });
+  assert.equal(result.status, 200);
+});
+
+test("candidate real HTTP: concurrent same key replays once; opposite actions have one winner", async (t) => {
+  const f = await fixture(t), attempt = f.plan();
+  const body = { expectedVersion: 1, reason: "Concurrent identical intent", successor: { id: randomUUID(), mode: "human", assigneeId: f.actor.actorId } };
+  const replies = await Promise.all([f.send(attempt, "supersede", body, { vendor: true }), f.send(attempt, "supersede", body, { vendor: true })]);
+  assert.deepEqual(replies.map((v) => v.status), [200, 200]);
+  assert.deepEqual(replies.map((v) => v.body.replayed).sort(), [false, true]);
+  assert.equal(f.db.prepare("SELECT count(*) AS n FROM events WHERE bug_id=? AND type='repair_attempt.superseded'").get(attempt.bugId)!.n, 1);
+  const second = f.plan();
+  const competing = await Promise.all([f.send(second, "fail", { expectedVersion: 1, reason: "Failed" }),
+    f.send(second, "supersede", { expectedVersion: 1, reason: "Superseded" })]);
+  assert.deepEqual(competing.map((v) => v.status).sort(), [200, 412]);
+});
+
+test("candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug", async (t) => {
+  const f = await fixture(t), attempt = f.plan();
+  const body = { expectedVersion: 1, reason: "Current authorization on replay" };
+  const result = await f.send(attempt, "fail", body);
+  assert.equal(result.status, 200);
+  const before = f.snapshot();
+  const other = randomUUID();
+  f.tx(() => projectManagement(f.db, { ...f.scope, operation: "create", isGm: true, projectId: other, key: "OTHER", name: "Other isolated project", now: now() }));
+  f.tx(() => projectManagement(f.db, { ...f.scope, operation: "membership", isGm: true, projectId: f.actor.projectId,
+    userId: f.actor.actorId, active: false, expectedVersion: 1, now: now() }));
+  const disabled = await f.send(attempt, "fail", body);
+  assert.equal(disabled.status, 403);
+  const wrong = await f.send(attempt, "fail", body, { projectId: other });
+  assert.equal(wrong.status, 403);
+  f.tx(() => projectManagement(f.db, { ...f.scope, operation: "membership", isGm: true, projectId: f.actor.projectId,
+    userId: f.actor.actorId, active: true, expectedVersion: 2, now: now() }));
+  const restored = await f.send(attempt, "fail", body);
+  assert.deepEqual(restored.body, result.body);
+  const currentBug = getMobileBug(f.db, f.actor, attempt.bugId)!;
+  f.tx(() => deleteMobileBug(f.db, { ...f.actor, bugId: attempt.bugId, expectedVersion: currentBug.version,
+    reason: "Delete only fixture", idempotencyKey: randomUUID(), requestDigest: digest("delete"), createdAt: now() }));
+  const deleted = await f.send(attempt, "fail", body);
+  assert.equal(deleted.status, 404);
+  assert.equal(getTerminalRepairAttemptHistory(f.db, { ...f.actor, attemptId: attempt.id }), null);
+  assert.equal(f.db.prepare("SELECT count(*) AS n FROM repair_attempt_terminal_snapshots").get()!.n, 1);
+  assert.ok(before);
+});
+
+test("candidate immutable snapshot exceeds 64KiB with all maximum multibyte user fields", async (t) => {
+  const f = await fixture(t), attempt = f.plan(false, true);
+  const body = { expectedVersion: 1, reason: "因".repeat(5000), successor: { id: randomUUID(), mode: "human", assigneeId: f.actor.actorId, summary: "继".repeat(10000) } };
+  const result = await f.send(attempt, "supersede", body, { vendor: true });
+  assert.equal(result.status, 200, JSON.stringify(result.body));
+  const row = f.db.prepare("SELECT length(CAST(response_json AS BLOB)) AS bytes FROM repair_attempt_terminal_snapshots").get()!;
+  assert.ok(Number(row.bytes) > 65536);
+  assert.equal(result.body.supersededAttempt.summary, body.reason);
+  assert.equal(result.body.successorAttempt.summary, body.successor.summary);
+  const replay = await f.send(attempt, "supersede", body, { vendor: true });
+  assert.deepEqual(replay.body, { ...result.body, replayed: true });
+  assert.throws(() => f.db.exec("UPDATE repair_attempt_terminal_snapshots SET reason='overwrite'"), /immutable/);
+  assert.throws(() => f.db.exec("DELETE FROM repair_attempt_terminal_snapshots"), /retained/);
+});

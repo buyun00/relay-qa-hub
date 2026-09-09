@@ -1,0 +1,20 @@
+✔ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (764.8755ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-oGtKGn
+✔ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (564.7753ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-fULrYi
+✔ candidate real HTTP: rejected successors and old versions rollback every fact (384.4563ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-tyUqUQ
+✔ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (423.408ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-EZeCQf
+✔ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (304.6991ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-WyVNIl
+✔ candidate immutable snapshot exceeds 64KiB with maximum multibyte reason/two summaries and complete Bug (323.4963ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-D44rhy
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3642.3159

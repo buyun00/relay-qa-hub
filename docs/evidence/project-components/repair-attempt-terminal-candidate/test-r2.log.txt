@@ -1,0 +1,39 @@
+✔ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (551.1244ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-sV3OKU
+✔ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (419.8756ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-hX4Mog
+✔ candidate real HTTP: rejected successors and old versions rollback every fact (251.0401ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-m0UsG4
+✔ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (332.2353ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-JrkLPK
+✔ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (252.1943ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-HbRRpf
+✖ candidate immutable snapshot exceeds 64KiB with all maximum multibyte user fields (187.461ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-adkSha
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2591.6304
+
+✖ failing tests:
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:15147
+✖ candidate immutable snapshot exceeds 64KiB with all maximum multibyte user fields (187.461ms)
+  Error: generic idempotency response must not persist authentication secrets
+      at Object.commit (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\src\workflow-idempotency.ts:155:10)
+      at transitionMobileBugReady (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\src\mobile-relay-store.ts:1639:18)
+      at <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:106:19)
+      at tx (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:51:26)
+      at Object.plan (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:99:54)
+      at TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:241:43)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1811,
+    errstr: 'constraint failed'
+  }

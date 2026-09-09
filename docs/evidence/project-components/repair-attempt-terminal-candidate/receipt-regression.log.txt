@@ -1,0 +1,19 @@
+✔ schema14 to15 preserves every old table and retains a restorable pre-migration backup (213.897ms)
+ℹ retained migration fixture C:\Users\lin0\AppData\Local\Temp\qa-result-migration15-JIUg2w
+ℹ 69 old tables identical; SHA256 b5e01f7817d5432375a6291558bc4cd100dab0d0be1a95aa7d6eb6ff721e0c2c; original Bug 15858868-4fce-4f54-9e6e-867da81b14d3
+✔ transitionMobileBugReady: two workers replay one effect, reject changed payload and persist the original DTO (1073.3638ms)
+✔ createMobileManualRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (987.4191ms)
+✔ startMobileRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (892.4357ms)
+✔ deliverMobileRepairAttempt: two workers replay one effect, reject changed payload and persist the original DTO (829.7027ms)
+✔ createMobileVerification: two workers replay one effect, reject changed payload and persist the original DTO (826.3309ms)
+✔ startMobileVerification: two workers replay one effect, reject changed payload and persist the original DTO (763.6328ms)
+✔ receipt replay rechecks actor/project visibility, membership revocation, GM scope and soft deletion (466.603ms)
+✔ a failure after effect writes rolls back domain, audit, notification and reserved receipt together (367.0065ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6598.3198

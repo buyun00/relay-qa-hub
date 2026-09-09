@@ -1,0 +1,6 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug npx
+npm notice run tsc -p docs/evidence/project-components/repair-attempt-terminal-candidate/tsconfig.fixture.json
+apps/api/test/repair-attempt-terminal.test.ts(634,7): error TS2353: Object literal may only specify known properties, and 'reason' does not exist in type 'DeleteMobileBugInput'.
+apps/api/test/repair-attempt-terminal.test.ts(822,14): error TS2339: Property 'reason' does not exist on type '{ id: `${string}-${string}-${string}-${string}-${string}`; }'.
+apps/api/test/repair-attempt-terminal.test.ts(823,32): error TS2339: Property 'reason' does not exist on type '{ id: `${string}-${string}-${string}-${string}-${string}`; }'.
+apps/api/test/repair-attempt-terminal.test.ts(825,12): error TS2339: Property 'response_json' does not exist on type '{ id: `${string}-${string}-${string}-${string}-${string}`; }'.

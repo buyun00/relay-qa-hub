@@ -1,0 +1,40 @@
+✔ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (497.0561ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-OSAtuJ
+✔ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (389.5618ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-ND5vCh
+✔ candidate real HTTP: rejected successors and old versions rollback every fact (240.3136ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-KrBNJ8
+✔ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (301.6917ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-uu607r
+✔ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (251.5199ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-JV7zEN
+✔ candidate immutable snapshot exceeds 64KiB with maximum multibyte reason/two summaries and complete Bug (245.0396ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-7lf7J9
+✖ candidate legacy two-step HTTP requires latest exact parent, preserves original receipt and never dispatches (541.2712ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-x1MgNn
+✔ candidate human Cookie+CSRF is required for legacy session writes and GM authorization is transaction-scoped (322.1887ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-7oQQFG
+✔ candidate snapshot rejects forged typed fields and reason; rollback leaves command runnable (228.8942ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-zrpixS
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3510.783
+
+✖ failing tests:
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:17358
+✖ candidate legacy two-step HTTP requires latest exact parent, preserves original receipt and never dispatches (541.2712ms)
+  Error: no such table: relay_handoffs
+      at TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:304:21)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }

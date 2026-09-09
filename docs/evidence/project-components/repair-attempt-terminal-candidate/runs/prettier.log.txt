@@ -1,0 +1,7 @@
+command: .\node_modules\.bin\prettier.cmd --check packages/storage/src/workflow-idempotency.ts packages/storage/src/repair-attempt-terminal-migration.ts packages/storage/src/repair-attempt-terminal-store.ts apps/api/src/repair-attempt-terminal.ts apps/api/test/repair-attempt-terminal.test.ts
+observedAt: 2026-09-09T05:21:51.040Z
+exitCode: 0
+
+Checking formatting...
+All matched files use Prettier code style!
+

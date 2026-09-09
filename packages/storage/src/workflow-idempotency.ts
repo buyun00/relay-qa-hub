@@ -16,10 +16,35 @@ type WorkflowOperation =
   | "deliverRepairAttempt"
   | "createVerification"
   | "startVerification"
+  | "failRepairAttempt"
+  | "supersedeRepairAttempt"
   | "recordVerificationResult"
   | "recordLegacyVerificationResult";
 
 type WorkflowTarget = Readonly<{ type: "bug" | "repair_attempt" | "verification"; id: string }>;
+
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (!value || typeof value !== "object") return value;
+  const record = value as Record<string, unknown>;
+  return Object.fromEntries(
+    Object.keys(record)
+      .sort()
+      .map((key) => [key, canonicalize(record[key])]),
+  );
+}
+
+/** Frozen non-secret receipt digest: identity, operation, request and scope are all bound. */
+export function canonicalWorkflowRequestDigest(
+  operationId: string,
+  scope: Readonly<Record<string, unknown>>,
+  request: unknown,
+  idempotencyKey: string,
+): string {
+  return createHash("sha256")
+    .update(JSON.stringify(canonicalize({ idempotencyKey, operationId, request, scope })))
+    .digest("hex");
+}
 
 function reject(code: string, message: string): never {
   throw Object.assign(new Error(message), { code });

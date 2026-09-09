@@ -1,0 +1,32 @@
+✔ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (482.2448ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-gXNlKI
+✔ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (378.2511ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-9xFtKF
+✔ candidate real HTTP: rejected successors and old versions rollback every fact (238.6964ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-xweQrN
+✔ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (296.0488ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-cjonss
+✔ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (239.2454ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-Axu30b
+✔ candidate immutable snapshot exceeds 64KiB with maximum multibyte reason/two summaries and complete Bug (244.9993ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-SgdUt1
+✔ candidate legacy two-step HTTP requires latest exact parent, preserves original receipt and never dispatches (522.8849ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-hJaD23
+✔ candidate human Cookie+CSRF is required for legacy session writes and GM authorization is transaction-scoped (319.0487ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-ONo3ci
+✔ candidate immutable snapshot rejects insertion with copied metadata and forged facts (216.2119ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-p4hGNt
+✔ candidate late snapshot failure rolls back Attempt/Bug/successor/audit/outbox/receipt, then original request succeeds (249.784ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-1u6NNM
+✔ candidate delivered and already-terminal history refuses fresh mutations (305.7611ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-hArIMb
+✔ candidate explicit JSON/vendor media preference is separate from successor command semantics (543.7318ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-8b1SMP
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4514.647

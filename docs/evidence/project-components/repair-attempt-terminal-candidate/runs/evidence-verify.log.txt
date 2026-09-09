@@ -1,0 +1,8 @@
+command: node evidence JSON, source hash, and focused summary verifier
+observedAt: 2026-09-09T05:27:01.737Z
+exitCode: 0
+
+JSON parse: passed
+source hashes: passed
+focused summary: 13 passed, 0 failed
+

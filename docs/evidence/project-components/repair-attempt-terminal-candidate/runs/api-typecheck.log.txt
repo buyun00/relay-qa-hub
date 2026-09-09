@@ -1,0 +1,6 @@
+command: .\node_modules\.bin\tsc.cmd -p apps/api/tsconfig.json --noEmit --pretty false
+observedAt: 2026-09-09T05:21:51.040Z
+exitCode: 0
+
+(no stdout or stderr)
+

@@ -1,0 +1,44 @@
+✔ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (698.6888ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-1l8ObK
+ℹ retained 6 candidate HTTP request/response records; SHA256 2404071d953f4c8fd6e25220f47bcbc755fad773e801229bc48ba22ba27408f1
+✔ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (522.5496ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-WbTNVI
+ℹ retained 5 candidate HTTP request/response records; SHA256 f4db200c1ba2a115be9a663245e440f50b50b45e821a6091f4d2d797a7a59033
+✔ candidate real HTTP: rejected successors and old versions rollback every fact (318.6187ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-NvsjwQ
+ℹ retained 5 candidate HTTP request/response records; SHA256 e76b42823d9dde215607a76c92da87842428d0688dfc1d883384176885364e58
+✔ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (357.386ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-iB0xux
+ℹ retained 4 candidate HTTP request/response records; SHA256 400a7b93ddec0be901cfb7ff2d6adf3724cda3a443821337a4cab803c115ee09
+✔ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (301.5067ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-XbUr8D
+ℹ retained 6 candidate HTTP request/response records; SHA256 0b2c304109d903842bf7a5c6ee103c6faa40884a3c580e954bb74f0e44b587db
+✔ candidate immutable snapshot exceeds 64KiB with maximum multibyte reason/two summaries and complete Bug (314.0573ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-lXZdWH
+ℹ retained 2 candidate HTTP request/response records; SHA256 b8c15b45e928dac8f25ef2e8de3ff63c03b29756b66078867dec79c9d3701bb2
+✔ candidate legacy two-step HTTP requires latest exact parent, preserves original receipt and never dispatches (588.6655ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-kQcmMf
+ℹ retained 18 candidate HTTP request/response records; SHA256 2e5abf2b4a1dac90c9409e1b9e5ca8aec522e6c2421755fa33ba0497c8233aa7
+✔ candidate human Cookie+CSRF is required for legacy session writes and GM authorization is transaction-scoped (325.1318ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-jsKFIy
+ℹ retained 1 candidate HTTP request/response records; SHA256 4f7a9c070181d943d5b53bef0d6b65fe26ab32c8a0dd7f6b8b387a169cf2ee20
+✔ candidate immutable snapshot rejects insertion with copied metadata and forged facts (248.1161ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-YyIJB6
+ℹ retained 1 candidate HTTP request/response records; SHA256 029e51c14bfaa0c97e0842ce91b334368e2296aeb3cb2c060acf570e0e431beb
+✔ candidate late snapshot failure rolls back Attempt/Bug/successor/audit/outbox/receipt, then original request succeeds (273.0518ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-Mlgm4I
+ℹ retained 2 candidate HTTP request/response records; SHA256 4a354fe99f4198eda7e66088768d98dd349d7f3cc6de72babc2755abc75315a7
+✔ candidate delivered and already-terminal history refuses fresh mutations (327.7575ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-oBKzD3
+ℹ retained 4 candidate HTTP request/response records; SHA256 5947f09afb320443212810361b52660cd78b8b2027297657da89463f152599ae
+✔ candidate explicit JSON/vendor media preference is separate from successor command semantics (571.7403ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-fztqA3
+ℹ retained 6 candidate HTTP request/response records; SHA256 9e45a57daa0a50eb0c57fa2e440bad5419f330d1449b3f0dfba5f8b42508a68a
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5416.0403

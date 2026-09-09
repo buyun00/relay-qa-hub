@@ -1,0 +1,100 @@
+{
+  "schema": "relay-qa-hub.repair-attempt-terminal-candidate-source-freeze.v1",
+  "observedAt": "2026-09-09T13:22:48.2640260+08:00",
+  "branch": "codex/project-components-v2-1",
+  "head": "f0fb48e0637af1303773f4371d20eba6a23cc396",
+  "baseSchemaVersion": 17,
+  "candidateAssignedVersion": null,
+  "candidateRegistered": false,
+  "frozenMigrationSources": [
+    {
+      "version": 15,
+      "path": "packages/storage/src/verification-result-snapshot-migration.ts",
+      "headSha256": "593d3c42e2e4ddd454fd77ccc114589e71bab9d743cc3253826f85bd3f10912a",
+      "workingSha256": "593d3c42e2e4ddd454fd77ccc114589e71bab9d743cc3253826f85bd3f10912a",
+      "bytes": 9547,
+      "unchanged": true
+    },
+    {
+      "version": 16,
+      "path": "packages/storage/src/verification-blocked-result-migration.ts",
+      "headSha256": "651654faea8f387c3d425a046787d4a4f5d93c85b89cc3874942f363344e7630",
+      "workingSha256": "651654faea8f387c3d425a046787d4a4f5d93c85b89cc3874942f363344e7630",
+      "bytes": 993,
+      "unchanged": true
+    },
+    {
+      "version": 17,
+      "path": "packages/storage/src/workflow-projection-migration.ts",
+      "headSha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba",
+      "workingSha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba",
+      "bytes": 2899,
+      "unchanged": true
+    }
+  ],
+  "schemaHistory": [
+    {
+      "version": 15,
+      "name": "immutable_verification_result_snapshots",
+      "checksum": "5a6d8ed5b7ff4815d20ff613a2ad0c841512a919eb7e1cfa0adb72aa3c26fe6d"
+    },
+    {
+      "version": 16,
+      "name": "blocked_verification_result_receipts",
+      "checksum": "7297cf8cda0470ad0606b7ec6ded7766aa79f7de46e6521e9205332e735ea49c"
+    },
+    {
+      "version": 17,
+      "name": "immutable_workflow_projection_pages",
+      "checksum": "d193e8763af1525014a572b899cbe20fae32660f8847025ce6b1675c23f6566f"
+    }
+  ],
+  "candidateSources": [
+    {
+      "path": "packages/storage/src/workflow-idempotency.ts",
+      "headSha256": "d748ab0cb1133c4e2e0b963992f37d5169a3b78e92b086d097bbf60c1cedd5e0",
+      "workingSha256": "e68c31fe43c12134455ff46866ef8ecc6cb51e51092deb3d4e95cee222d4daa4",
+      "bytes": 6755
+    },
+    {
+      "path": "packages/storage/src/repair-attempt-terminal-migration.ts",
+      "headSha256": null,
+      "workingSha256": "c74a7e8afe5f44e2d305b488293321ab74121ebf06f97cce8d87f8f7344024c9",
+      "bytes": 15717
+    },
+    {
+      "path": "packages/storage/src/repair-attempt-terminal-store.ts",
+      "headSha256": null,
+      "workingSha256": "ad230fb8c92ae139a41904fd4c085602fb99a37147aea01190ac5a36fd60ec0c",
+      "bytes": 21975
+    },
+    {
+      "path": "apps/api/src/repair-attempt-terminal.ts",
+      "headSha256": null,
+      "workingSha256": "84042e3dddac7d63ce4ab47a50e2fa2a76af8443503440073486121958c3f826",
+      "bytes": 13274
+    },
+    {
+      "path": "apps/api/test/repair-attempt-terminal.test.ts",
+      "headSha256": null,
+      "workingSha256": "ba2952b62ba5b570dfb445f28d19f4ee594bce0e96c141e6557fcb67e5ae12a8",
+      "bytes": 39222
+    },
+    {
+      "path": "docs/evidence/project-components/repair-attempt-terminal-candidate/tsconfig.fixture.json",
+      "headSha256": null,
+      "workingSha256": "dec4c8a5585dfe99c09dcad9becf8027caf967b6c96ce68dbdc26ee1210822b9",
+      "bytes": 266
+    }
+  ],
+  "finalRunLogSha256": {
+    "api-typecheck.log.txt": "5c06bdab0720211efe96eb0d09568880db668ad144450b4619655065cf533aba",
+    "diff-check.log.txt": "7373816421d0a358bdb33d8da036a3251cbd4abcec1be5678e4478fa3fe7fde6",
+    "evidence-verify.log.txt": "ff6c5dab5ad3599407923796341e790ea048c8fa03c197d6c7e7724bfb221d50",
+    "eslint.log.txt": "3ebe378d9f5ad5b470f98eebb6003763ae1b0c13587f1080fe45394e8f8f4c98",
+    "fixture-typecheck.log.txt": "da45c4208b2ec1407d73523a7b253066436760cd605237a0bcf549f17f3da3ef",
+    "focused-http-13.log.txt": "1295ea6e8022b16aacec440a4d55197da8a8f9187dcb1b4855d939790eeed351",
+    "prettier.log.txt": "d04dc80c9c4894e48bcf58b2b68c7e96972ea747c9e2b03a921d0513c0692937",
+    "storage-typecheck.log.txt": "a5dfce37de0597582a6c079a8f29307a19de960da2a8f886a7163c4e2fa12c5f"
+  }
+}

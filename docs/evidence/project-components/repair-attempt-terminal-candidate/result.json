@@ -1,0 +1,78 @@
+{
+  "schema": "relay-qa-hub.repair-attempt-terminal-candidate-result.v1",
+  "observedAt": "2026-09-09T13:22:48.2640260+08:00",
+  "branch": "codex/project-components-v2-1",
+  "head": "f0fb48e0637af1303773f4371d20eba6a23cc396",
+  "status": "passed_candidate",
+  "scope": "unnumbered additive terminal RepairAttempt migration, storage adapter, and API route candidate applied after a real schema-17 migration",
+  "migration": {
+    "baseUserVersion": 17,
+    "assignedVersion": null,
+    "registeredInSqliteMigrations": false,
+    "frozenVersionsUnchanged": [15, 16, 17]
+  },
+  "eventCompatibility": {
+    "failRepairAttemptStates": ["in_progress", "ready"],
+    "legacySupersedeStates": ["in_progress", "ready"],
+    "vendorAtomicSupersedeStates": [null, null],
+    "terminalPayloadKeys": [
+      "status",
+      "repairAttemptId",
+      "reason",
+      "fromVersion",
+      "toVersion"
+    ],
+    "legacyFollowupCreatePayloadKeys": [
+      "status",
+      "repairAttemptId",
+      "fromVersion",
+      "toVersion"
+    ],
+    "singleTerminalEffectEvent": true,
+    "baseGuardsWeakened": false
+  },
+  "focused": {
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 9326.9507,
+    "realLoopbackHttp": true,
+    "realSchema17SqliteFiles": true,
+    "candidateMigrationAppliedSeparately": true,
+    "postShutdownIntegrityChecked": true,
+    "firstNegotiatedMediaReplayVerified": true,
+    "canonicalIntentDigestVerified": true
+  },
+  "staticChecks": {
+    "fixtureTypecheck": "passed",
+    "storageTypecheck": "passed",
+    "apiTypecheck": "passed",
+    "focusedEslint": "passed",
+    "focusedPrettier": "passed",
+    "scopedGitDiffCheck": "passed",
+    "evidenceVerification": "passed"
+  },
+  "verified": [
+    "planned and running RepairAttempt failure",
+    "legacy two-step supersede and exact parent follow-up",
+    "vendor atomic successor supersede",
+    "exact terminal and creation Event payloads",
+    "bounded or redacted Event reason with raw durable truth",
+    "immutable snapshots and committed receipts",
+    "same-key replay, changed-intent rejection, and opposite-action serialization",
+    "membership, project, GM, and soft-delete authorization rechecks",
+    "transaction rollback after injected late snapshot failure",
+    "first negotiated response media replay and canonical request digest"
+  ],
+  "notVerified": [
+    "numbered migration-chain integration",
+    "storage index or worker integration",
+    "application or automation route registration",
+    "combined API, MCP, Web, EXE, or APK runtime",
+    "preview or production migration",
+    "upgrade or rollback"
+  ],
+  "productionTouched": false,
+  "previewTouched": false
+}

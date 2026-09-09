@@ -1,0 +1,136 @@
+✖ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (267.6192ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-s2KYGp
+✖ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (166.2138ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-7yFu4M
+✖ candidate real HTTP: rejected successors and old versions rollback every fact (159.3188ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-wOszaT
+✖ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (154.107ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-lYJEv0
+✖ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (149.237ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-ENRksU
+✖ candidate immutable snapshot exceeds 64KiB with all maximum multibyte user fields (148.73ms)
+ℹ retained isolated fixture C:\Users\lin0\AppData\Local\Temp\qa-terminal-c-lZewIz
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1461.3672
+
+✖ failing tests:
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:7794
+✖ candidate real HTTP: planned/running fail retains summary/reason and immutable replay (267.6192ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:88:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:120:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:9077
+✖ candidate real HTTP: legacy supersede has no successor; vendor successor is atomic and schema-valid (166.2138ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:88:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:144:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:11214
+✖ candidate real HTTP: rejected successors and old versions rollback every fact (159.3188ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:88:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:176:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:12256
+✖ candidate real HTTP: concurrent same key replays once; opposite actions have one winner (154.107ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:88:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:194:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:13177
+✖ candidate real HTTP: replay reauthorizes revoked membership, wrong project and deleted Bug (149.237ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:88:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:207:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\test\repair-attempt-terminal.test.ts:1:14841
+✖ candidate immutable snapshot exceeds 64KiB with all maximum multibyte user fields (148.73ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at fixture (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:88:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\repair-attempt-terminal.test.ts:235:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
