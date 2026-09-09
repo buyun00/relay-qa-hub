@@ -1,0 +1,76 @@
+{
+  "createdAt": "2026-09-09T03:26:16.5722371Z",
+  "kind": "phase_b_full_main_frozen_evidence",
+  "noCommit": true,
+  "scripts": [
+    {
+      "path": "scripts/project-components/result-phase-b-e2e.mjs",
+      "sha256": "ad15f3c1bca4882152f722d1de2232cc48fb83c9a6698ea397bd16d2c5572f01"
+    },
+    {
+      "path": "scripts/project-components/result-phase-b-guard.mjs",
+      "sha256": "a11df8fc32fb3bbc927b937596fa1a512a3486805837fde7394eb1cd001f0346"
+    },
+    {
+      "path": "scripts/project-components/result-phase-b-guard-selftest.mjs",
+      "sha256": "e391bff826cb44b3a0ea7d3a960721e23225f870e04390356f6166f9321629b4"
+    }
+  ],
+  "files": [
+    {
+      "bytes": 62305,
+      "sha256": "14824c98c8a80a90d3daccfd3a34818560b7b85883bfb62873f2501c1742523c",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/audit-1788924138805.json"
+    },
+    {
+      "bytes": 6119,
+      "sha256": "606d51881089af6f9893ecca3c6bfc1f9bc59235ece4782121b52b2ef1be9ab4",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/audit-1788924189124.json"
+    },
+    {
+      "bytes": 65085,
+      "sha256": "c40bdd1ca93fefe8d226d48a61267a58ddb813ad538e251417401f7ec47fb53e",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/audit-1788924225990.json"
+    },
+    {
+      "bytes": 10867,
+      "sha256": "485239f11b9ec2a427d3fc5da3a9eae804e507597d82d125c4c47543a6c74b69",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/audit.mjs"
+    },
+    {
+      "bytes": 10537,
+      "sha256": "fe6862fd5328f3c394ff229b76754f8772cf067863f6ce489da0a5cff8591042",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/README.md"
+    },
+    {
+      "bytes": 1352120,
+      "sha256": "f099470fe6d4067a1223dffbbf9f366cd5c16c87c015df7ddf11e90ce92c93d0",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/93ba2b78-ec31-41ad-a62e-540218654fc2/closure.json"
+    },
+    {
+      "bytes": 6225,
+      "sha256": "6d1dfbbd99c242993d67716a392c37a58a7ba00e608ed04f01473a461cb169d1",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/93ba2b78-ec31-41ad-a62e-540218654fc2/prepare.json"
+    },
+    {
+      "bytes": 1253,
+      "sha256": "483d1afc3cc109fe5ce68aae937ea30abb6a9127fd0f1c61e9bfed5b79aaacbf",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/93ba2b78-ec31-41ad-a62e-540218654fc2/fd3648a5-61f9-4c17-8c44-fa6eb00e5341/guard-selftest.json"
+    },
+    {
+      "bytes": 880565,
+      "sha256": "2978f312e9047be9d58b95c6e6e7b624acba5e88ba548b22b0d62a54aea9ab84",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/93ba2b78-ec31-41ad-a62e-540218654fc2/fd3648a5-61f9-4c17-8c44-fa6eb00e5341/result.json"
+    },
+    {
+      "bytes": 45782,
+      "sha256": "ad15f3c1bca4882152f722d1de2232cc48fb83c9a6698ea397bd16d2c5572f01",
+      "path": "docs/evidence/project-components/contracts-result-phase-b-live/93ba2b78-ec31-41ad-a62e-540218654fc2/fd3648a5-61f9-4c17-8c44-fa6eb00e5341/runner.mjs.txt"
+    }
+  ],
+  "staticChecks": {
+    "prettier": "passed",
+    "nodeCheck": "passed",
+    "eslint": "passed"
+  }
+}

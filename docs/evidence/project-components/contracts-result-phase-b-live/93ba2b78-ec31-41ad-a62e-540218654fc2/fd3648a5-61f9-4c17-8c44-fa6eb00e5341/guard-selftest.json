@@ -1,0 +1,88 @@
+{
+  "status": "passed",
+  "main": [
+    {
+      "name": "fetch",
+      "denied": true
+    },
+    {
+      "name": "http",
+      "denied": true
+    },
+    {
+      "name": "https",
+      "denied": true
+    },
+    {
+      "name": "socket",
+      "denied": true
+    },
+    {
+      "name": "listen",
+      "denied": true
+    },
+    {
+      "name": "tls",
+      "denied": true
+    },
+    {
+      "name": "dns",
+      "denied": true
+    },
+    {
+      "name": "dgram",
+      "denied": true
+    },
+    {
+      "name": "spawn",
+      "denied": true
+    },
+    {
+      "name": "exec",
+      "denied": true
+    }
+  ],
+  "worker": [
+    {
+      "name": "fetch",
+      "denied": true
+    },
+    {
+      "name": "http",
+      "denied": true
+    },
+    {
+      "name": "https",
+      "denied": true
+    },
+    {
+      "name": "socket",
+      "denied": true
+    },
+    {
+      "name": "listen",
+      "denied": true
+    },
+    {
+      "name": "tls",
+      "denied": true
+    },
+    {
+      "name": "dns",
+      "denied": true
+    },
+    {
+      "name": "dgram",
+      "denied": true
+    },
+    {
+      "name": "spawn",
+      "denied": true
+    },
+    {
+      "name": "exec",
+      "denied": true
+    }
+  ],
+  "boundary": "Guard denial proof only; not application E2E"
+}

@@ -1,0 +1,122 @@
+{
+  "id": "93ba2b78-ec31-41ad-a62e-540218654fc2",
+  "preparedAt": "2026-09-09T03:19:01.671Z",
+  "commit": "a293ed4895fe1d3de3c1f8b308ca41eeaa52ed07",
+  "phaseAParentCommit": "2d687b4",
+  "phaseBSourceFrozenAtPrepare": true,
+  "node": {
+    "version": "v24.19.0",
+    "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+  },
+  "sourceProofSha256": "e2118b3c763846e32a02d1f7f0ceced912ff4173faefe43b40a53917af69f141",
+  "sourcePins": [
+    {
+      "path": "apps/api/src/mobile-verification.ts",
+      "bytes": 9976,
+      "sha256": "e88e461f57f3d708af98b1067607521ffeef996ea7db37fe8d5eab823b5eec99"
+    },
+    {
+      "path": "apps/api/src/sqlite-mobile-verification-store.ts",
+      "bytes": 3963,
+      "sha256": "6745b4fe3b31418af95b0f5cc6f8b42ce4559f8940c980d5db94facd0d71efe9"
+    },
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "bytes": 47596,
+      "sha256": "a65b92ad3d47a7b135b76533673f4e3f77d671a8a3e7e47f3d3ebe1f7aa15c85"
+    },
+    {
+      "path": "packages/storage/src/verification-blocked-result-migration.ts",
+      "bytes": 993,
+      "sha256": "651654faea8f387c3d425a046787d4a4f5d93c85b89cc3874942f363344e7630"
+    },
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 327299,
+      "sha256": "938ae0ca3caa153733fda214dd1093a57dab5828b0336f4e4060176d657c2d88"
+    },
+    {
+      "path": "apps/api/test/verification-result-phase-b.test.mjs",
+      "bytes": 19256,
+      "sha256": "a8fb4ddfdbf4db982c9d4d60c24bb56a7154d023846d71e9bb00d8989d2dfde9"
+    },
+    {
+      "path": "apps/api/src/frozen-workflow-response.ts",
+      "bytes": 4331,
+      "sha256": "599762c9402571919ed6a8a501995c816d55fe962b44db95b6070f01bc301258"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 107855,
+      "sha256": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f"
+    }
+  ],
+  "config": {
+    "schemaVersion": 1,
+    "instanceId": "qa-hub-preview-result-b-93ba2b78",
+    "sourceRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\source",
+    "runtimeRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime",
+    "dataRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\dataRoot",
+    "backupRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\backupRoot",
+    "downloadsRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\downloadsRoot",
+    "logsRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\logsRoot",
+    "desktopRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\desktopRoot",
+    "apiHost": "127.0.0.1",
+    "apiPort": 4459,
+    "webHost": "127.0.0.1",
+    "webPort": 4458,
+    "mcpPort": 4461,
+    "desktopMcpPort": 4460,
+    "cookieName": "qa-hub-preview-result-b-93ba2b78-session",
+    "gmUserId": "3cf3f36f-1e34-49f6-bcd3-1657a76a74c8",
+    "secretsFile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\secrets.json",
+    "peopleFile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\people.json",
+    "releaseChannel": "qa-hub-preview-result-b-93ba2b78"
+  },
+  "configPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runtime\\instance.json",
+  "configSha256": "5b6a981cb8cdfea2991fb1b5a12169a35dd622106595f271e667de9d420811f5",
+  "base": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2",
+  "evidence": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\contracts-result-phase-b-live\\93ba2b78-ec31-41ad-a62e-540218654fc2",
+  "sourceRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\source",
+  "closureSha256": "f099470fe6d4067a1223dffbbf9f366cd5c16c87c015df7ddf11e90ce92c93d0",
+  "closureFiles": 5771,
+  "excludedD": [
+    "apps/api/dist/sqlite-workflow-projection-store.d.ts",
+    "apps/api/dist/sqlite-workflow-projection-store.d.ts.map",
+    "apps/api/dist/sqlite-workflow-projection-store.js",
+    "apps/api/dist/sqlite-workflow-projection-store.js.map",
+    "apps/api/dist/workflow-projection.d.ts",
+    "apps/api/dist/workflow-projection.d.ts.map",
+    "apps/api/dist/workflow-projection.js",
+    "apps/api/dist/workflow-projection.js.map",
+    "packages/storage/dist/workflow-projection-cursor.d.ts",
+    "packages/storage/dist/workflow-projection-cursor.d.ts.map",
+    "packages/storage/dist/workflow-projection-cursor.js",
+    "packages/storage/dist/workflow-projection-cursor.js.map",
+    "packages/storage/dist/workflow-projection-migration.d.ts",
+    "packages/storage/dist/workflow-projection-migration.d.ts.map",
+    "packages/storage/dist/workflow-projection-migration.js",
+    "packages/storage/dist/workflow-projection-migration.js.map",
+    "packages/storage/dist/workflow-projection-store.d.ts",
+    "packages/storage/dist/workflow-projection-store.d.ts.map",
+    "packages/storage/dist/workflow-projection-store.js",
+    "packages/storage/dist/workflow-projection-store.js.map",
+    "packages/storage/dist/workflow-projection-types.d.ts",
+    "packages/storage/dist/workflow-projection-types.d.ts.map",
+    "packages/storage/dist/workflow-projection-types.js",
+    "packages/storage/dist/workflow-projection-types.js.map"
+  ],
+  "guardSha256": "a11df8fc32fb3bbc927b937596fa1a512a3486805837fde7394eb1cd001f0346",
+  "runnerSha256": "74298fa38d4df8310f272f004a1398aebb23ec44e80746acb637abd382c8357e",
+  "boundaries": {
+    "services": [
+      4459,
+      4461
+    ],
+    "noBuildOrInstall": true,
+    "productionOrPrimaryPreview": false,
+    "externalExecutors": false,
+    "guardIsNotMaliciousNativeSandbox": true
+  }
+}

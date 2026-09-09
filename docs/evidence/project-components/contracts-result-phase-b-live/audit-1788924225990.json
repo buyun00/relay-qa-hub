@@ -1,0 +1,1730 @@
+{
+  "kind": "post_run_readonly_artifact_and_consistent_sql_audit",
+  "at": "2026-09-09T03:23:44.673Z",
+  "rawPath": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\contracts-result-phase-b-live\\93ba2b78-ec31-41ad-a62e-540218654fc2\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\result.json",
+  "rawSha256": "2978f312e9047be9d58b95c6e6e7b624acba5e88ba548b22b0d62a54aea9ab84",
+  "sourceSha256": "485239f11b9ec2a427d3fc5da3a9eae804e507597d82d125c4c47543a6c74b69",
+  "checks": [
+    {
+      "label": "raw source frozen hash",
+      "actual": "2978f312e9047be9d58b95c6e6e7b624acba5e88ba548b22b0d62a54aea9ab84",
+      "expected": "2978f312e9047be9d58b95c6e6e7b624acba5e88ba548b22b0d62a54aea9ab84",
+      "passed": true
+    },
+    {
+      "label": "all 246 checks independently actual equals expected",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "request ledger exact",
+      "actual": 115,
+      "expected": 115,
+      "passed": true
+    },
+    {
+      "label": "only permitted ports",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "no executor routes",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "Phase B source pins retained",
+      "actual": 8,
+      "expected": 8,
+      "passed": true
+    },
+    {
+      "label": "unfinished D dist excluded",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "before/after official shutdown domain unchanged",
+      "actual": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "expected": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "owned selftest exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned api exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned api official SIGTERM",
+      "actual": "IPC command emits SIGTERM into original official handlers",
+      "expected": "IPC command emits SIGTERM into original official handlers",
+      "passed": true
+    },
+    {
+      "label": "owned mcp exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned mcp official SIGTERM",
+      "actual": "IPC command emits SIGTERM into original official handlers",
+      "expected": "IPC command emits SIGTERM into original official handlers",
+      "passed": true
+    },
+    {
+      "label": "owned process identities absent (PID, executable, lifetime)",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "4459/4461 listeners absent",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-before-stop.sqlite exact domain readback",
+      "actual": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "expected": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-before-stop.sqlite integrity",
+      "actual": "ok",
+      "expected": "ok",
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-before-stop.sqlite foreign keys",
+      "actual": [],
+      "expected": [],
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-after-stop.sqlite exact domain readback",
+      "actual": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "expected": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-after-stop.sqlite integrity",
+      "actual": "ok",
+      "expected": "ok",
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-after-stop.sqlite foreign keys",
+      "actual": [],
+      "expected": [],
+      "passed": true
+    },
+    {
+      "label": "seven immutable result receipts retained",
+      "actual": 7,
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 event actor binding",
+      "actual": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+      "expected": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 event digest",
+      "actual": "439f78c97a51c1be0fe1cee902e5a25df35c07558e5d7535526f95981d7c02d8",
+      "expected": "439f78c97a51c1be0fe1cee902e5a25df35c07558e5d7535526f95981d7c02d8",
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 project",
+      "actual": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+      "expected": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 bug",
+      "actual": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+      "expected": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 event Verification identity",
+      "actual": "acd9fb6a-a4d4-4bc3-94ed-6a0b57b5f255",
+      "expected": "acd9fb6a-a4d4-4bc3-94ed-6a0b57b5f255",
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 event typed result version",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6 HTTP original complete negotiated DTO projection exact",
+      "actual": {
+        "verification": {
+          "id": "acd9fb6a-a4d4-4bc3-94ed-6a0b57b5f255",
+          "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "repairAttemptId": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "bug": {
+          "id": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "projectId": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+          "number": 1,
+          "key": "AC55691F0-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "ownerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "verificationOwnerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:26.574Z",
+          "updatedAt": "2026-09-09T03:21:26.731Z",
+          "closedAt": null
+        }
+      },
+      "expected": {
+        "verification": {
+          "id": "acd9fb6a-a4d4-4bc3-94ed-6a0b57b5f255",
+          "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "repairAttemptId": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "bug": {
+          "id": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "projectId": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+          "number": 1,
+          "key": "AC55691F0-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "ownerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "verificationOwnerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:26.574Z",
+          "updatedAt": "2026-09-09T03:21:26.731Z",
+          "closedAt": null
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 event actor binding",
+      "actual": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+      "expected": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 event digest",
+      "actual": "7806d2d3f8c1e5b5c75ee5b043dae7b5541e8547f2fe0d7a82d573057ed06cff",
+      "expected": "7806d2d3f8c1e5b5c75ee5b043dae7b5541e8547f2fe0d7a82d573057ed06cff",
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 project",
+      "actual": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+      "expected": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 bug",
+      "actual": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+      "expected": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 event Verification identity",
+      "actual": "2df9d48d-41b3-489b-8f97-5d0fcb5d5b9f",
+      "expected": "2df9d48d-41b3-489b-8f97-5d0fcb5d5b9f",
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 event typed result version",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "7bce33a5-89a4-4900-a4f9-ade07f505f56 HTTP original complete negotiated DTO projection exact",
+      "actual": {
+        "clientSubmissionId": "085ef2a6-886f-4d59-9216-ff2118ec8568",
+        "qaItem": {
+          "type": "bug",
+          "id": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "key": "AC55691F0-1"
+        },
+        "verification": {
+          "id": "2df9d48d-41b3-489b-8f97-5d0fcb5d5b9f",
+          "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "repairAttemptId": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+          "buildId": null,
+          "status": "passed",
+          "verifierId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "criteriaSnapshot": "Synthetic device is now available",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+          "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "sequence": 1,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "parentAttemptId": null,
+          "summary": "Delivered",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "projectId": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+          "number": 1,
+          "key": "AC55691F0-1",
+          "title": "Later title must not replace original receipt",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "closed",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "ownerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "verificationOwnerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 9,
+          "createdAt": "2026-09-09T03:21:26.574Z",
+          "updatedAt": "2026-09-09T03:21:26.938Z",
+          "closedAt": "2026-09-09T03:21:26.938Z"
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "ca01ca3f-3f66-4ebb-aa6b-a0ea1f6b6576",
+        "replayed": false
+      },
+      "expected": {
+        "clientSubmissionId": "085ef2a6-886f-4d59-9216-ff2118ec8568",
+        "qaItem": {
+          "type": "bug",
+          "id": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "key": "AC55691F0-1"
+        },
+        "verification": {
+          "id": "2df9d48d-41b3-489b-8f97-5d0fcb5d5b9f",
+          "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "repairAttemptId": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+          "buildId": null,
+          "status": "passed",
+          "verifierId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "criteriaSnapshot": "Synthetic device is now available",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+          "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "sequence": 1,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "parentAttemptId": null,
+          "summary": "Delivered",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+          "projectId": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+          "number": 1,
+          "key": "AC55691F0-1",
+          "title": "Later title must not replace original receipt",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "closed",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "ownerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "verificationOwnerId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 9,
+          "createdAt": "2026-09-09T03:21:26.574Z",
+          "updatedAt": "2026-09-09T03:21:26.938Z",
+          "closedAt": "2026-09-09T03:21:26.938Z"
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "ca01ca3f-3f66-4ebb-aa6b-a0ea1f6b6576",
+        "replayed": false
+      },
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a event actor binding",
+      "actual": "a29be94f-1b52-417c-87ca-8d0737900d68",
+      "expected": "a29be94f-1b52-417c-87ca-8d0737900d68",
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a event digest",
+      "actual": "535e891ad6cfd02c3dd4425753111644245e5921aaea33004f7cad0385c2a555",
+      "expected": "535e891ad6cfd02c3dd4425753111644245e5921aaea33004f7cad0385c2a555",
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a project",
+      "actual": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+      "expected": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a bug",
+      "actual": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+      "expected": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a event Verification identity",
+      "actual": "a6211b92-1e00-40db-ae62-a6954fff2074",
+      "expected": "a6211b92-1e00-40db-ae62-a6954fff2074",
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a event typed result version",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a HTTP original complete negotiated DTO projection exact",
+      "actual": {
+        "clientSubmissionId": "6c0fd268-c37d-403e-88ab-3a9172070962",
+        "qaItem": {
+          "type": "bug",
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "key": "AFF67A1C8-1"
+        },
+        "verification": {
+          "id": "a6211b92-1e00-40db-ae62-a6954fff2074",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "repairAttemptId": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "sequence": 2,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "parentAttemptId": "39505596-0645-465e-98f2-4057d359df5f",
+          "summary": "Human takes over prior round",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "projectId": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+          "number": 1,
+          "key": "AFF67A1C8-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "ownerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "verificationOwnerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 8,
+          "createdAt": "2026-09-09T03:21:27.013Z",
+          "updatedAt": "2026-09-09T03:21:27.204Z",
+          "closedAt": null
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "d695c15b-6672-4198-9b15-90c032e3c992",
+        "replayed": false
+      },
+      "expected": {
+        "clientSubmissionId": "6c0fd268-c37d-403e-88ab-3a9172070962",
+        "qaItem": {
+          "type": "bug",
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "key": "AFF67A1C8-1"
+        },
+        "verification": {
+          "id": "a6211b92-1e00-40db-ae62-a6954fff2074",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "repairAttemptId": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "sequence": 2,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "parentAttemptId": "39505596-0645-465e-98f2-4057d359df5f",
+          "summary": "Human takes over prior round",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "projectId": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+          "number": 1,
+          "key": "AFF67A1C8-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "ownerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "verificationOwnerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 8,
+          "createdAt": "2026-09-09T03:21:27.013Z",
+          "updatedAt": "2026-09-09T03:21:27.204Z",
+          "closedAt": null
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "d695c15b-6672-4198-9b15-90c032e3c992",
+        "replayed": false
+      },
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a event actor binding",
+      "actual": "a29be94f-1b52-417c-87ca-8d0737900d68",
+      "expected": "a29be94f-1b52-417c-87ca-8d0737900d68",
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a event digest",
+      "actual": "b25395dbb4195435eb7b84039e48d92ac6dd4104c4c153dbb195cb59ed6e02d3",
+      "expected": "b25395dbb4195435eb7b84039e48d92ac6dd4104c4c153dbb195cb59ed6e02d3",
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a project",
+      "actual": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+      "expected": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a bug",
+      "actual": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+      "expected": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a event Verification identity",
+      "actual": "6a567077-1d27-40fc-9874-cbc22ad9a913",
+      "expected": "6a567077-1d27-40fc-9874-cbc22ad9a913",
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a event typed result version",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "7779e7fc-5a35-4e04-af7c-fe862c72581a HTTP original complete negotiated DTO projection exact",
+      "actual": {
+        "clientSubmissionId": "78b60d4e-6151-4f9d-aafb-47b33fcca8de",
+        "qaItem": {
+          "type": "bug",
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "key": "AFF67A1C8-1"
+        },
+        "verification": {
+          "id": "6a567077-1d27-40fc-9874-cbc22ad9a913",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "repairAttemptId": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "buildId": null,
+          "status": "passed",
+          "verifierId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "criteriaSnapshot": "Synthetic device is now available",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "sequence": 2,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "parentAttemptId": "39505596-0645-465e-98f2-4057d359df5f",
+          "summary": "Human takes over prior round",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "projectId": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+          "number": 1,
+          "key": "AFF67A1C8-1",
+          "title": "Later title must not replace original receipt",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "closed",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "ownerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "verificationOwnerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 11,
+          "createdAt": "2026-09-09T03:21:27.013Z",
+          "updatedAt": "2026-09-09T03:21:27.406Z",
+          "closedAt": "2026-09-09T03:21:27.406Z"
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "c0786118-6229-47d5-a6cf-0390b70488d3",
+        "replayed": false
+      },
+      "expected": {
+        "clientSubmissionId": "78b60d4e-6151-4f9d-aafb-47b33fcca8de",
+        "qaItem": {
+          "type": "bug",
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "key": "AFF67A1C8-1"
+        },
+        "verification": {
+          "id": "6a567077-1d27-40fc-9874-cbc22ad9a913",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "repairAttemptId": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "buildId": null,
+          "status": "passed",
+          "verifierId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "criteriaSnapshot": "Synthetic device is now available",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "341be6b7-0009-4285-9efa-de039a46bcb9",
+          "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "sequence": 2,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "parentAttemptId": "39505596-0645-465e-98f2-4057d359df5f",
+          "summary": "Human takes over prior round",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+          "projectId": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+          "number": 1,
+          "key": "AFF67A1C8-1",
+          "title": "Later title must not replace original receipt",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "closed",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "ownerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "verificationOwnerId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 11,
+          "createdAt": "2026-09-09T03:21:27.013Z",
+          "updatedAt": "2026-09-09T03:21:27.406Z",
+          "closedAt": "2026-09-09T03:21:27.406Z"
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "c0786118-6229-47d5-a6cf-0390b70488d3",
+        "replayed": false
+      },
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 event actor binding",
+      "actual": "9cde04b6-894b-488b-825b-1c8498dda346",
+      "expected": "9cde04b6-894b-488b-825b-1c8498dda346",
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 event digest",
+      "actual": "439f78c97a51c1be0fe1cee902e5a25df35c07558e5d7535526f95981d7c02d8",
+      "expected": "439f78c97a51c1be0fe1cee902e5a25df35c07558e5d7535526f95981d7c02d8",
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 project",
+      "actual": "f51facc6-7cbb-4c46-8554-7e68cc058361",
+      "expected": "f51facc6-7cbb-4c46-8554-7e68cc058361",
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 bug",
+      "actual": "2111ccb8-1f73-42f9-af3b-ee190bad01ac",
+      "expected": "2111ccb8-1f73-42f9-af3b-ee190bad01ac",
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 event Verification identity",
+      "actual": "1cb50690-f46e-480e-8bd2-73ad2990fdee",
+      "expected": "1cb50690-f46e-480e-8bd2-73ad2990fdee",
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 event typed result version",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "c00ab5fd-f97e-48ce-831e-77e227b06c07 HTTP original complete negotiated DTO projection exact",
+      "actual": {
+        "verification": {
+          "id": "1cb50690-f46e-480e-8bd2-73ad2990fdee",
+          "bugId": "2111ccb8-1f73-42f9-af3b-ee190bad01ac",
+          "repairAttemptId": "8f62225a-1be9-4219-a689-b58c8f372248",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "bug": {
+          "id": "2111ccb8-1f73-42f9-af3b-ee190bad01ac",
+          "projectId": "f51facc6-7cbb-4c46-8554-7e68cc058361",
+          "number": 1,
+          "key": "A757CAFD8-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "ownerId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "verificationOwnerId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:27.485Z",
+          "updatedAt": "2026-09-09T03:21:27.956Z",
+          "closedAt": null
+        }
+      },
+      "expected": {
+        "verification": {
+          "id": "1cb50690-f46e-480e-8bd2-73ad2990fdee",
+          "bugId": "2111ccb8-1f73-42f9-af3b-ee190bad01ac",
+          "repairAttemptId": "8f62225a-1be9-4219-a689-b58c8f372248",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "bug": {
+          "id": "2111ccb8-1f73-42f9-af3b-ee190bad01ac",
+          "projectId": "f51facc6-7cbb-4c46-8554-7e68cc058361",
+          "number": 1,
+          "key": "A757CAFD8-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "ownerId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "verificationOwnerId": "9cde04b6-894b-488b-825b-1c8498dda346",
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:27.485Z",
+          "updatedAt": "2026-09-09T03:21:27.956Z",
+          "closedAt": null
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 event actor binding",
+      "actual": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+      "expected": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 event digest",
+      "actual": "964df2c443b76db77b20e44721bf8c9b090e9df2c9d386d7866a999f313bc497",
+      "expected": "964df2c443b76db77b20e44721bf8c9b090e9df2c9d386d7866a999f313bc497",
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 project",
+      "actual": "95b622ee-cff8-4924-8e35-c290e5ab48d8",
+      "expected": "95b622ee-cff8-4924-8e35-c290e5ab48d8",
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 bug",
+      "actual": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+      "expected": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 event Verification identity",
+      "actual": "8b4f57b3-f0b3-4853-8621-65e484bd5ffa",
+      "expected": "8b4f57b3-f0b3-4853-8621-65e484bd5ffa",
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 event typed result version",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "1dc2339a-a550-4c36-8dd2-e4a0173483d7 HTTP original complete negotiated DTO projection exact",
+      "actual": {
+        "clientSubmissionId": "9fba417a-708f-4568-8b10-8f2e7e3217a7",
+        "qaItem": {
+          "type": "bug",
+          "id": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "key": "A8F6B3F90-1"
+        },
+        "verification": {
+          "id": "8b4f57b3-f0b3-4853-8621-65e484bd5ffa",
+          "bugId": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "repairAttemptId": "d9f41a25-17bc-4395-b77c-18f86101556d",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "d9f41a25-17bc-4395-b77c-18f86101556d",
+          "bugId": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "sequence": 1,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "parentAttemptId": null,
+          "summary": "Delivered",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "projectId": "95b622ee-cff8-4924-8e35-c290e5ab48d8",
+          "number": 1,
+          "key": "A8F6B3F90-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "ownerId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "verificationOwnerId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:28.061Z",
+          "updatedAt": "2026-09-09T03:21:28.200Z",
+          "closedAt": null
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "e234a46d-cde9-4fa2-990c-da12463f0250",
+        "replayed": false
+      },
+      "expected": {
+        "clientSubmissionId": "9fba417a-708f-4568-8b10-8f2e7e3217a7",
+        "qaItem": {
+          "type": "bug",
+          "id": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "key": "A8F6B3F90-1"
+        },
+        "verification": {
+          "id": "8b4f57b3-f0b3-4853-8621-65e484bd5ffa",
+          "bugId": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "repairAttemptId": "d9f41a25-17bc-4395-b77c-18f86101556d",
+          "buildId": null,
+          "status": "blocked",
+          "verifierId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "criteriaSnapshot": "Actual isolated verification",
+          "resultSummary": "Original actual full-main result",
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "d9f41a25-17bc-4395-b77c-18f86101556d",
+          "bugId": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "sequence": 1,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "parentAttemptId": null,
+          "summary": "Delivered",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+          "projectId": "95b622ee-cff8-4924-8e35-c290e5ab48d8",
+          "number": 1,
+          "key": "A8F6B3F90-1",
+          "title": "Isolated full-main Phase B result",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "ready_for_verification",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "ownerId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "verificationOwnerId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:28.061Z",
+          "updatedAt": "2026-09-09T03:21:28.200Z",
+          "closedAt": null
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "e234a46d-cde9-4fa2-990c-da12463f0250",
+        "replayed": false
+      },
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce event actor binding",
+      "actual": "b1a974c8-622e-4f1b-8552-48be50d97cc7",
+      "expected": "b1a974c8-622e-4f1b-8552-48be50d97cc7",
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce event digest",
+      "actual": "50475a702ac02e8a558ee0a687dd84a27aa0892620d4cc5310ab5e3a56fefaea",
+      "expected": "50475a702ac02e8a558ee0a687dd84a27aa0892620d4cc5310ab5e3a56fefaea",
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce project",
+      "actual": "9dada826-e6bb-40f0-9ee6-75a194c033fc",
+      "expected": "9dada826-e6bb-40f0-9ee6-75a194c033fc",
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce bug",
+      "actual": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+      "expected": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce event Verification identity",
+      "actual": "b13aabee-3c0f-4832-b2d9-b5a269bf1960",
+      "expected": "b13aabee-3c0f-4832-b2d9-b5a269bf1960",
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce event typed result version",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce MCP original full DTO exact",
+      "actual": {
+        "clientSubmissionId": "8e1bf28e-a8c6-47e4-91e9-66796cf13ba8",
+        "qaItem": {
+          "type": "bug",
+          "id": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "key": "A4F2B13F2-1"
+        },
+        "verification": {
+          "id": "b13aabee-3c0f-4832-b2d9-b5a269bf1960",
+          "bugId": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "repairAttemptId": "3a876094-dc13-41ac-aee5-fbb6c6b3bb91",
+          "buildId": null,
+          "status": "passed",
+          "verifierId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "criteriaSnapshot": "MCP manual closure",
+          "resultSummary": "Another active employee human closure remains allowed",
+          "failureReason": null,
+          "blockedReason": null,
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "3a876094-dc13-41ac-aee5-fbb6c6b3bb91",
+          "bugId": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "sequence": 1,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "parentAttemptId": null,
+          "summary": "Actual MCP human takeover",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "patchUrl": null,
+          "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+          "failureReason": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "projectId": "9dada826-e6bb-40f0-9ee6-75a194c033fc",
+          "number": 1,
+          "key": "A4F2B13F2-1",
+          "title": "MCP actual manual workflow",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "closed",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "ownerId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "verificationOwnerId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:28.483Z",
+          "updatedAt": "2026-09-09T03:21:28.696Z",
+          "closedAt": "2026-09-09T03:21:28.696Z"
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "222a505d-6e7d-4a36-a763-cd87145bf293",
+        "replayed": false
+      },
+      "expected": {
+        "clientSubmissionId": "8e1bf28e-a8c6-47e4-91e9-66796cf13ba8",
+        "qaItem": {
+          "type": "bug",
+          "id": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "key": "A4F2B13F2-1"
+        },
+        "verification": {
+          "id": "b13aabee-3c0f-4832-b2d9-b5a269bf1960",
+          "bugId": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "repairAttemptId": "3a876094-dc13-41ac-aee5-fbb6c6b3bb91",
+          "buildId": null,
+          "status": "passed",
+          "verifierId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "criteriaSnapshot": "MCP manual closure",
+          "resultSummary": "Another active employee human closure remains allowed",
+          "failureReason": null,
+          "blockedReason": null,
+          "version": 3
+        },
+        "repairAttempt": {
+          "id": "3a876094-dc13-41ac-aee5-fbb6c6b3bb91",
+          "bugId": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "sequence": 1,
+          "mode": "human",
+          "status": "delivered",
+          "assigneeId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "parentAttemptId": null,
+          "summary": "Actual MCP human takeover",
+          "branch": null,
+          "commitSha": null,
+          "mergeRequestUrl": null,
+          "patchUrl": null,
+          "noCodeReason": "人工确认修复完成并提交验收；本次人工操作不要求自动交付代码或构建凭证。",
+          "failureReason": null,
+          "targetBuildId": null,
+          "version": 3
+        },
+        "bug": {
+          "id": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+          "projectId": "9dada826-e6bb-40f0-9ee6-75a194c033fc",
+          "number": 1,
+          "key": "A4F2B13F2-1",
+          "title": "MCP actual manual workflow",
+          "description": "Synthetic retained acceptance fixture",
+          "expectedBehavior": "Exact immutable receipt",
+          "moduleId": null,
+          "state": "closed",
+          "severity": "S2",
+          "priority": "P2",
+          "reporterId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "ownerId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "verificationOwnerId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+          "duplicateOfBugId": null,
+          "occurrenceCount": 1,
+          "reopenCount": 0,
+          "version": 6,
+          "createdAt": "2026-09-09T03:21:28.483Z",
+          "updatedAt": "2026-09-09T03:21:28.696Z",
+          "closedAt": "2026-09-09T03:21:28.696Z"
+        },
+        "attachmentIds": [],
+        "captureBundleId": null,
+        "eventId": "222a505d-6e7d-4a36-a763-cd87145bf293",
+        "replayed": false
+      },
+      "passed": true
+    },
+    {
+      "label": "ordinary human closure by another active employee preserved",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "valid successor round preserved",
+      "actual": 2,
+      "expected": 2,
+      "passed": true
+    },
+    {
+      "label": "four blocked immutable snapshots",
+      "actual": 4,
+      "expected": 4,
+      "passed": true
+    },
+    {
+      "label": "three passed immutable snapshots",
+      "actual": 3,
+      "expected": 3,
+      "passed": true
+    },
+    {
+      "label": "api-process.json no guard denial",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "label": "mcp-process.json no guard denial",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "label": "exact instance secret values absent from public raw",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC primitive version preserved",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    }
+  ],
+  "evidence": {
+    "requestCounts": {
+      "directHttp": 98,
+      "serverMcpJsonRpc": 17,
+      "totalOnWireHarnessRequests": 115,
+      "note": "MCP internal app.inject mirrors are not counted as extra HTTP; readiness polling before ledger is excluded."
+    },
+    "finalHost": {
+      "ownedPids": [],
+      "listeners": [],
+      "capturedAt": "2026-09-09T03:23:45.8852408Z"
+    },
+    "reusedNumericPids": [],
+    "archives": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-before-stop.sqlite",
+        "sha256": "b1380cee2f8fa55732cdef74a171ec9af356b0b517c9495886bdf8ed4fb02d19",
+        "bytes": 1966080,
+        "fingerprint": {
+          "bugs": {
+            "count": 5,
+            "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+          },
+          "repair_attempts": {
+            "count": 6,
+            "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+          },
+          "verifications": {
+            "count": 7,
+            "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+          },
+          "events": {
+            "count": 52,
+            "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+          },
+          "submissions": {
+            "count": 11,
+            "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+          },
+          "idempotency_records": {
+            "count": 41,
+            "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+          },
+          "outbox": {
+            "count": 27,
+            "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+          },
+          "bug_deletions": {
+            "count": 1,
+            "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+          },
+          "verification_result_snapshots": {
+            "count": 7,
+            "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+          }
+        }
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-b-93ba2b78-ec31-41ad-a62e-540218654fc2\\runs\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\consistent-after-stop.sqlite",
+        "sha256": "b1380cee2f8fa55732cdef74a171ec9af356b0b517c9495886bdf8ed4fb02d19",
+        "bytes": 1966080,
+        "fingerprint": {
+          "bugs": {
+            "count": 5,
+            "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+          },
+          "repair_attempts": {
+            "count": 6,
+            "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+          },
+          "verifications": {
+            "count": 7,
+            "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+          },
+          "events": {
+            "count": 52,
+            "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+          },
+          "submissions": {
+            "count": 11,
+            "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+          },
+          "idempotency_records": {
+            "count": 41,
+            "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+          },
+          "outbox": {
+            "count": 27,
+            "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+          },
+          "bug_deletions": {
+            "count": 1,
+            "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+          },
+          "verification_result_snapshots": {
+            "count": 7,
+            "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+          }
+        }
+      }
+    ],
+    "receipts": [
+      {
+        "snapshotId": "86c6b6c4-fddb-48ab-8e00-4923af8cf0c6",
+        "projectId": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+        "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+        "verificationId": "acd9fb6a-a4d4-4bc3-94ed-6a0b57b5f255",
+        "actorId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+        "assignedVerifierId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+        "eventId": "18c02343-4a2a-4db0-8375-a76424f60fb4",
+        "eventType": "verification.result_recorded",
+        "operation": "recordLegacyVerificationResult",
+        "bytes": 1798,
+        "responseSha256": "e19241b4492a57721f6e117991d005d6ccff74949f88a1f80d6da66a73b9a330",
+        "resultStatus": "blocked",
+        "bugVersion": 6,
+        "verificationVersion": 3,
+        "attemptId": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+        "parentAttemptId": null
+      },
+      {
+        "snapshotId": "7bce33a5-89a4-4900-a4f9-ade07f505f56",
+        "projectId": "23fe6f13-d9af-45fa-9d34-a38492a8d36f",
+        "bugId": "5eb9bd1c-8a2c-4a8c-932c-15b740125d8b",
+        "verificationId": "2df9d48d-41b3-489b-8f97-5d0fcb5d5b9f",
+        "actorId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+        "assignedVerifierId": "a3922a06-b9e7-4480-879d-f31c6e6de801",
+        "eventId": "ca01ca3f-3f66-4ebb-aa6b-a0ea1f6b6576",
+        "eventType": "verification.result_recorded",
+        "operation": "recordVerificationResult",
+        "bytes": 1806,
+        "responseSha256": "a8cabe71169eeb67993c559ee9331113e80dbb865ef1acf1bbe461c874148327",
+        "resultStatus": "passed",
+        "bugVersion": 9,
+        "verificationVersion": 3,
+        "attemptId": "88f1d149-ec61-4da1-94c4-b3cc526f4d8a",
+        "parentAttemptId": null
+      },
+      {
+        "snapshotId": "efa5f7c7-5bbc-4da4-985a-e82cc3c5457a",
+        "projectId": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+        "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+        "verificationId": "a6211b92-1e00-40db-ae62-a6954fff2074",
+        "actorId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+        "assignedVerifierId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+        "eventId": "d695c15b-6672-4198-9b15-90c032e3c992",
+        "eventType": "verification.result_recorded",
+        "operation": "recordVerificationResult",
+        "bytes": 1952,
+        "responseSha256": "7d772b759e4318397925c3b2505c5337917b9cdd303c442c5440b43f8295dfdf",
+        "resultStatus": "blocked",
+        "bugVersion": 8,
+        "verificationVersion": 3,
+        "attemptId": "341be6b7-0009-4285-9efa-de039a46bcb9",
+        "parentAttemptId": "39505596-0645-465e-98f2-4057d359df5f"
+      },
+      {
+        "snapshotId": "7779e7fc-5a35-4e04-af7c-fe862c72581a",
+        "projectId": "71d11f0e-b5f9-4325-bebc-dbfd3fa4a4c7",
+        "bugId": "260f7e8b-ad28-4f33-b9df-9b7aebb3b9e0",
+        "verificationId": "6a567077-1d27-40fc-9874-cbc22ad9a913",
+        "actorId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+        "assignedVerifierId": "a29be94f-1b52-417c-87ca-8d0737900d68",
+        "eventId": "c0786118-6229-47d5-a6cf-0390b70488d3",
+        "eventType": "verification.result_recorded",
+        "operation": "recordVerificationResult",
+        "bytes": 1927,
+        "responseSha256": "81b262201ffd2c4fb135ec2b116231f3c653ffc1262d3cf5ecfff8edf72cdb0e",
+        "resultStatus": "passed",
+        "bugVersion": 11,
+        "verificationVersion": 3,
+        "attemptId": "341be6b7-0009-4285-9efa-de039a46bcb9",
+        "parentAttemptId": "39505596-0645-465e-98f2-4057d359df5f"
+      },
+      {
+        "snapshotId": "c00ab5fd-f97e-48ce-831e-77e227b06c07",
+        "projectId": "f51facc6-7cbb-4c46-8554-7e68cc058361",
+        "bugId": "2111ccb8-1f73-42f9-af3b-ee190bad01ac",
+        "verificationId": "1cb50690-f46e-480e-8bd2-73ad2990fdee",
+        "actorId": "9cde04b6-894b-488b-825b-1c8498dda346",
+        "assignedVerifierId": "9cde04b6-894b-488b-825b-1c8498dda346",
+        "eventId": "35c75298-c2da-4553-a9f3-f2cbf87b6c21",
+        "eventType": "verification.result_recorded",
+        "operation": "recordLegacyVerificationResult",
+        "bytes": 1798,
+        "responseSha256": "a9985cead4b099338db109d4234d1c664a076744b8cc90c1ef220f9ab9bb3cd0",
+        "resultStatus": "blocked",
+        "bugVersion": 6,
+        "verificationVersion": 3,
+        "attemptId": "8f62225a-1be9-4219-a689-b58c8f372248",
+        "parentAttemptId": null
+      },
+      {
+        "snapshotId": "1dc2339a-a550-4c36-8dd2-e4a0173483d7",
+        "projectId": "95b622ee-cff8-4924-8e35-c290e5ab48d8",
+        "bugId": "6a6b9212-f426-4607-a3c9-9f7de05cb8e8",
+        "verificationId": "8b4f57b3-f0b3-4853-8621-65e484bd5ffa",
+        "actorId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+        "assignedVerifierId": "1d022a1e-ebe9-4395-8e1f-dfe4910d5216",
+        "eventId": "e234a46d-cde9-4fa2-990c-da12463f0250",
+        "eventType": "verification.result_recorded",
+        "operation": "recordVerificationResult",
+        "bytes": 1832,
+        "responseSha256": "e9cc2f610739aa78f9ef24d5dc1dc7173210d7274b71d3f0454082d6d0c0b737",
+        "resultStatus": "blocked",
+        "bugVersion": 6,
+        "verificationVersion": 3,
+        "attemptId": "d9f41a25-17bc-4395-b77c-18f86101556d",
+        "parentAttemptId": null
+      },
+      {
+        "snapshotId": "b63aa333-2f47-4d7c-be7c-83e97a59d1ce",
+        "projectId": "9dada826-e6bb-40f0-9ee6-75a194c033fc",
+        "bugId": "88549957-d22c-4729-9cf9-2d99b827e3a5",
+        "verificationId": "b13aabee-3c0f-4832-b2d9-b5a269bf1960",
+        "actorId": "b1a974c8-622e-4f1b-8552-48be50d97cc7",
+        "assignedVerifierId": "92a7bf7e-bf1c-4201-866d-cdc96b8fe1e2",
+        "eventId": "222a505d-6e7d-4a36-a763-cd87145bf293",
+        "eventType": "verification.result_recorded",
+        "operation": "recordVerificationResult",
+        "bytes": 1876,
+        "responseSha256": "1dced3fa11a0e459c0a3a0c9685555205751284647979173fe3fd66ac7093da5",
+        "resultStatus": "passed",
+        "bugVersion": 6,
+        "verificationVersion": 3,
+        "attemptId": "3a876094-dc13-41ac-aee5-fbb6c6b3bb91",
+        "parentAttemptId": null
+      }
+    ]
+  },
+  "boundaries": {
+    "readOnlyDatabase": true,
+    "noHttp": true,
+    "noServiceOperation": true,
+    "noProductionRead": true
+  },
+  "status": "passed",
+  "checkCounts": {
+    "total": 86,
+    "passed": 86
+  }
+}

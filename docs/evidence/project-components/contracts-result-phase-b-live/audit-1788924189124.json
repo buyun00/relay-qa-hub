@@ -1,0 +1,198 @@
+{
+  "kind": "post_run_readonly_artifact_and_consistent_sql_audit",
+  "at": "2026-09-09T03:23:07.698Z",
+  "rawPath": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\contracts-result-phase-b-live\\93ba2b78-ec31-41ad-a62e-540218654fc2\\fd3648a5-61f9-4c17-8c44-fa6eb00e5341\\result.json",
+  "rawSha256": "2978f312e9047be9d58b95c6e6e7b624acba5e88ba548b22b0d62a54aea9ab84",
+  "sourceSha256": "05076e13cb2ad524c871db7df0a0f2d314326da9bd6158e69306251530063595",
+  "checks": [
+    {
+      "label": "raw source frozen hash",
+      "actual": "2978f312e9047be9d58b95c6e6e7b624acba5e88ba548b22b0d62a54aea9ab84",
+      "expected": "2978f312e9047be9d58b95c6e6e7b624acba5e88ba548b22b0d62a54aea9ab84",
+      "passed": true
+    },
+    {
+      "label": "all 246 checks independently actual equals expected",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "request ledger exact",
+      "actual": 115,
+      "expected": 115,
+      "passed": true
+    },
+    {
+      "label": "only permitted ports",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "no executor routes",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "Phase B source pins retained",
+      "actual": 8,
+      "expected": 8,
+      "passed": true
+    },
+    {
+      "label": "unfinished D dist excluded",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "before/after official shutdown domain unchanged",
+      "actual": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "expected": {
+        "bugs": {
+          "count": 5,
+          "sha256": "cc63abed912d2c7ece904db5209bdda3985b3a616d8c64df57ee5f43167ab190"
+        },
+        "repair_attempts": {
+          "count": 6,
+          "sha256": "b6be9a3877daecad077285162b53ae82ef1187c5e8083737797bc8f17610e2a5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "2e10bddeeca5cf237fe4826a8af5be7a80d78c7f424928aba5bab63964d44477"
+        },
+        "events": {
+          "count": 52,
+          "sha256": "0b9f4ecdb0fa23bd1ab4fd5fc86094b2ccef1b771357aa1aa99690b6f025c342"
+        },
+        "submissions": {
+          "count": 11,
+          "sha256": "43fd81130c7f9cf95b622cd39d29340296a0c2baa4f9baa40fcd73446e3866fb"
+        },
+        "idempotency_records": {
+          "count": 41,
+          "sha256": "e137838d5b00bcaa9908b22f8f821e8fe98f14aa7a8301d927d87d84c23813a1"
+        },
+        "outbox": {
+          "count": 27,
+          "sha256": "504c6365bf260c2325040f5a58d9a24644a4418cbda9523d24ffe5bfc24c50cf"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "9f14c0f474672278524c4a782315713be8434875c393d1c55af613e687c54aac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "8fd091e75bfb8dd298e6dfd71284d7dfbfd132bd023bb771d176e88d40fcaf5e"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "owned selftest exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned api exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned api official SIGTERM",
+      "actual": "IPC command emits SIGTERM into original official handlers",
+      "expected": "IPC command emits SIGTERM into original official handlers",
+      "passed": true
+    },
+    {
+      "label": "owned mcp exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned mcp official SIGTERM",
+      "actual": "IPC command emits SIGTERM into original official handlers",
+      "expected": "IPC command emits SIGTERM into original official handlers",
+      "passed": true
+    },
+    {
+      "label": "owned PIDs absent",
+      "actual": 1,
+      "expected": 0,
+      "passed": false
+    }
+  ],
+  "evidence": {
+    "requestCounts": {
+      "directHttp": 98,
+      "serverMcpJsonRpc": 17,
+      "totalOnWireHarnessRequests": 115,
+      "note": "MCP internal app.inject mirrors are not counted as extra HTTP; readiness polling before ledger is excluded."
+    },
+    "finalHost": {
+      "ownedPids": [
+        {
+          "ProcessId": 17196,
+          "CreationDate": "/Date(1788924186928)/",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe"
+        }
+      ],
+      "listeners": [],
+      "capturedAt": "2026-09-09T03:23:09.0697897Z"
+    }
+  },
+  "boundaries": {
+    "readOnlyDatabase": true,
+    "noHttp": true,
+    "noServiceOperation": true,
+    "noProductionRead": true
+  },
+  "status": "failed_retained",
+  "failure": "owned PIDs absent",
+  "checkCounts": {
+    "total": 14,
+    "passed": 13
+  }
+}
