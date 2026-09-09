@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "runId": "29a9b98b-2fa8-4625-a465-5d75a91b70e8",
+  "mode": "--publish",
+  "status": "published_and_http_readback_verified",
+  "startedAt": "2026-09-09T01:40:47.025Z",
+  "runnerSha256": "6606d9564506ae6af7ba7e404c81db605403a7be95cac40a5d2eb374909b3a1b",
+  "requests": [
+    {
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/preview/latest.json",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:48.516Z",
+      "completedAt": "2026-09-09T01:40:48.556Z",
+      "status": 404,
+      "bytes": 35,
+      "sha256": "ae886404f2153724e0a2d2e07e83d9713405df398032596fd306bd562a07c79f",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-length": "35"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/preview/latest.json",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:48.764Z",
+      "completedAt": "2026-09-09T01:40:48.773Z",
+      "status": 200,
+      "bytes": 386,
+      "sha256": "6986c64031f0d013ae99f465009c1653b1f641ea25d740d316f3c6c3ae1b88d9",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-length": "386",
+        "etag": "W/\"182-1a083d327f5\"",
+        "cache-control": "no-store"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/preview/latest.json",
+      "method": "HEAD",
+      "startedAt": "2026-09-09T01:40:48.773Z",
+      "completedAt": "2026-09-09T01:40:48.780Z",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-length": "386",
+        "etag": "W/\"182-1a083d327f5\"",
+        "cache-control": "no-store"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/preview/Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+      "method": "HEAD",
+      "startedAt": "2026-09-09T01:40:48.780Z",
+      "completedAt": "2026-09-09T01:40:48.784Z",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headers": {
+        "content-type": "application/vnd.android.package-archive",
+        "content-length": "35536941",
+        "etag": "W/\"21e402d-1a083693844\"",
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/preview/Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:48.784Z",
+      "completedAt": "2026-09-09T01:40:48.914Z",
+      "status": 200,
+      "bytes": 35536941,
+      "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+      "headers": {
+        "content-type": "application/vnd.android.package-archive",
+        "content-length": "35536941",
+        "etag": "W/\"21e402d-1a083693844\"",
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4274/downloads/android/qa-hub-preview-7c86/latest.json",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:48.937Z",
+      "completedAt": "2026-09-09T01:40:48.946Z",
+      "status": 200,
+      "bytes": 386,
+      "sha256": "6986c64031f0d013ae99f465009c1653b1f641ea25d740d316f3c6c3ae1b88d9",
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "386",
+        "cache-control": "no-store",
+        "x-qa-hub-instance": "qa-hub-preview-7c86"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4274/downloads/android/qa-hub-preview-7c86/latest.json",
+      "method": "HEAD",
+      "startedAt": "2026-09-09T01:40:48.946Z",
+      "completedAt": "2026-09-09T01:40:48.950Z",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "386",
+        "cache-control": "no-store",
+        "x-qa-hub-instance": "qa-hub-preview-7c86"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4274/downloads/android/qa-hub-preview-7c86/Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+      "method": "HEAD",
+      "startedAt": "2026-09-09T01:40:48.950Z",
+      "completedAt": "2026-09-09T01:40:48.953Z",
+      "status": 200,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headers": {
+        "content-type": "application/vnd.android.package-archive",
+        "content-length": "35536941",
+        "cache-control": "no-store",
+        "x-qa-hub-instance": "qa-hub-preview-7c86"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4274/downloads/android/qa-hub-preview-7c86/Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:48.953Z",
+      "completedAt": "2026-09-09T01:40:49.044Z",
+      "status": 200,
+      "bytes": 35536941,
+      "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+      "headers": {
+        "content-type": "application/vnd.android.package-archive",
+        "content-length": "35536941",
+        "cache-control": "no-store",
+        "x-qa-hub-instance": "qa-hub-preview-7c86"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/preview/Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+      "method": "GET",
+      "range": "bytes=0-31",
+      "startedAt": "2026-09-09T01:40:49.069Z",
+      "completedAt": "2026-09-09T01:40:49.075Z",
+      "status": 206,
+      "bytes": 32,
+      "sha256": "6f04e3f80dc3aa690819f3ae657109de147bee395e341122e91687ee2aeeecf0",
+      "headers": {
+        "content-type": "application/vnd.android.package-archive",
+        "content-length": "32",
+        "content-range": "bytes 0-31/35536941",
+        "etag": "W/\"21e402d-1a083693844\"",
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:49.086Z",
+      "completedAt": "2026-09-09T01:40:49.191Z",
+      "status": 200,
+      "bytes": 35471405,
+      "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+      "headers": {
+        "content-type": "application/vnd.android.package-archive",
+        "content-length": "35471405",
+        "cache-control": "no-store",
+        "x-qa-hub-instance": "qa-hub-preview-7c86"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4274/downloads/qa-hub-preview-7c86-windows-latest.json",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:49.214Z",
+      "completedAt": "2026-09-09T01:40:49.218Z",
+      "status": 200,
+      "bytes": 464,
+      "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417",
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "464",
+        "cache-control": "no-store",
+        "x-qa-hub-instance": "qa-hub-preview-7c86"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4419/api/v1/android-updates/stable/latest.json",
+      "method": "GET",
+      "startedAt": "2026-09-09T01:40:49.218Z",
+      "completedAt": "2026-09-09T01:40:49.222Z",
+      "status": 401,
+      "bytes": 26,
+      "sha256": "1f140a8f94f1458500662df71546aaeb211c98d1457b2e048a767de3909017da",
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-length": "26"
+      }
+    }
+  ],
+  "boundaries": {
+    "productionPublisherUsed": false,
+    "servicesControlled": false,
+    "devicesOperated": false,
+    "apkRebuilt": false,
+    "rawCredentialsRead": false,
+    "nativeUpdateVerified": false
+  },
+  "sources": [
+    {
+      "path": "apps/api/src/android-updates.ts",
+      "bytes": 7302,
+      "sha256": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 106686,
+      "sha256": "290a44c2d7f73b8d6970e98765590aea6e80853fb4eec105d14cd1155d83db3a"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25370,
+      "sha256": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd"
+    },
+    {
+      "path": "apps/api/src/parallel-instance.ts",
+      "bytes": 9481,
+      "sha256": "272379786a9d8806a90c85c5e5ec6e1b07fc5c01ae50e01aed603a250e597fcf"
+    },
+    {
+      "path": "apps/api/src/project-request-context.ts",
+      "bytes": 5676,
+      "sha256": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab"
+    },
+    {
+      "path": "apps/api/test/android-update-channels.test.mjs",
+      "bytes": 7683,
+      "sha256": "e4b3829ec05e3ecbf76cdb5ca8196dd0fe0054eaf9cc84878dadc40b9a78f383"
+    },
+    {
+      "path": "apps/api/test/android-update-auth-integration.test.mjs",
+      "bytes": 8776,
+      "sha256": "3e200893eb932f104011240b1a4edd366423ed90b2191d6f8d465cc6240a1b2f"
+    },
+    {
+      "path": "apps/api/test/parallel-instance.test.mjs",
+      "bytes": 4089,
+      "sha256": "ef82f93328e5a00c340d2e49761ba8fc5287e063191f668edb35b1a59bbcefbc"
+    },
+    {
+      "path": "scripts/project-components/retain-preview-android-update-state.mjs",
+      "bytes": 30169,
+      "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3"
+    }
+  ],
+  "origin": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\result.json",
+    "bytes": 13294,
+    "sha256": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56",
+    "artifact": {
+      "versionCode": 23,
+      "versionName": "0.2.0-preview.9",
+      "packageName": "com.relayqahub.android.preview.debug",
+      "fileName": "Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+      "size": 35536941,
+      "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548",
+      "sourceCommit": "33514cde1862e448cb56d7082177f34a88e42363",
+      "certificateSha256": "9bbf6d2a68c27871c00abc3203fb319629aabacdcac03674483262bcf09e2a83"
+    },
+    "signingVerification": "bound to identical bytes and retained prior apksigner/native proof; no new APK build or install"
+  },
+  "deployment": {
+    "runId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+    "beforePath": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-update-deployment-retention\\7a94eb90-63a2-4841-afa5-318612eb06ce\\before.json",
+    "before": {
+      "bytes": 98159,
+      "sha256": "7537f22daea58577de75d850fc6678f28c8e548594eafcd164ec7a9ec98df4ab"
+    },
+    "afterPath": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-update-deployment-retention\\7a94eb90-63a2-4841-afa5-318612eb06ce\\after.json",
+    "after": {
+      "bytes": 182214,
+      "sha256": "6c362d01dffe02afd6e017cef2b4e71f0d7337ad06bb5c56b890853c54affe0b"
+    }
+  },
+  "apiBefore": {
+    "pid": 22852,
+    "createdAt": "2026-09-09T01:22:20.2728640Z",
+    "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "receiptMatches": true
+  },
+  "componentGate": {
+    "configuredRows": 7,
+    "enabledRows": 0,
+    "missingRowsDefaultDisabled": true
+  },
+  "lock": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86\\.code23-publication.lock",
+    "bytes": 347,
+    "sha256": "40ae0e0bba2cae635dd1dab3c986b91bada0cc7964807906761780f72e7054d8",
+    "retained": true
+  },
+  "apkPublication": {
+    "disposition": "created",
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86\\Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+    "temp": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86\\.code23-artifact-70e68314-e549-47f7-8cb4-48c71cbb51e1.pending",
+    "bytes": 35536941,
+    "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+  },
+  "latestPublication": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86\\latest.json",
+    "temp": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86\\.latest-aa2c0ec2-6ec3-4807-ab31-10cb46f8b2ff.pending",
+    "tempRetained": true,
+    "before": {
+      "exists": false
+    },
+    "after": {
+      "bytes": 386,
+      "sha256": "6986c64031f0d013ae99f465009c1653b1f641ea25d740d316f3c6c3ae1b88d9"
+    }
+  },
+  "apiAfter": {
+    "pid": 22852,
+    "createdAt": "2026-09-09T01:22:20.2728640Z",
+    "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "receiptMatches": true
+  },
+  "completedAt": "2026-09-09T01:40:50.420Z"
+}

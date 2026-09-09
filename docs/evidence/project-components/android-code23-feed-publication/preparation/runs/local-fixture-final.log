@@ -1,0 +1,17 @@
+✔ default and invalid explicit modes have no runtime/HTTP action (419.4059ms)
+✔ manifest fixes original package, numeric version, origin commit and exact original APK bytes (0.2461ms)
+✔ frozen API source and retention dependency pins match the reviewed repository files (6.3272ms)
+✔ deployment proof validation rejects missing checks, failed before, cross-run, changed binding and enabled components (1.1168ms)
+✔ verified APK temp is create-only linked, retained and identical-existing is never overwritten (21.7556ms)
+✔ first latest publication atomically links complete bytes and leaves temp available (13.2466ms)
+✔ reviewed existing latest is fully retained before atomic replacement; stale preimage refuses (15.48ms)
+✔ distribution reader records only safe headers and exact bytes using in-memory HTTP responses (19.6192ms)
+✔ unsupported host, route, mutation or range never invokes transport; oversize response fails (0.8753ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 765.6507

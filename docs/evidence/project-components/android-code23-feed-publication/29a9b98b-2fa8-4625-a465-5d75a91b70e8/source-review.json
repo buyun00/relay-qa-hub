@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent_static_publisher_and_saved_prepare_review",
+  "recordedAt": "2026-09-09T01:36:22.992Z",
+  "status": "passed_source_review_no_high_confidence_blocker",
+  "checks": [
+    {
+      "id": "publisher_and_test_frozen_sha",
+      "passed": true,
+      "scope": "actual repository bytes"
+    },
+    {
+      "id": "public_prepare_sha_and_zero_http",
+      "passed": true,
+      "scope": "recorded root prepare only"
+    },
+    {
+      "id": "retained_plan_sha_and_public_plan_equal",
+      "passed": true,
+      "scope": "saved acceptance plan, not live instance config"
+    },
+    {
+      "id": "exact_saved_acceptance_scope",
+      "passed": true,
+      "scope": "all artifact reads below exact saved acceptance root"
+    },
+    {
+      "id": "386_byte_candidate_and_fixed_code23_identity",
+      "passed": true,
+      "scope": "manifest is prepared metadata, not native update evidence"
+    },
+    {
+      "id": "saved_candidate_apk_exact_original_bytes",
+      "passed": true,
+      "scope": "saved copy only; original live artifact was not re-read"
+    },
+    {
+      "id": "eight_api_and_one_retention_source_pins_current",
+      "passed": true,
+      "scope": "actual repository source hashes"
+    },
+    {
+      "id": "saved_code22_receipt_and_windows8_manifest_preserved",
+      "passed": true,
+      "scope": "current saved preserved copies; live download root not re-read"
+    },
+    {
+      "id": "retained_origin_proof_and_signer_binding",
+      "passed": true,
+      "scope": "historical retained native/signature proof; no re-sign/build/install"
+    },
+    {
+      "id": "exact_after_sha_and_before_binding",
+      "passed": true,
+      "scope": "public 7a94 before/after proof bytes"
+    },
+    {
+      "id": "deployment_all_checks_pass_and_schema_off_api_identity_recorded",
+      "passed": true,
+      "scope": "recorded after identity; reviewer did not query current PID or database"
+    },
+    {
+      "id": "prepare_feed_absence_recorded",
+      "passed": true,
+      "scope": "snapshot assertion only; publisher rechecks actual preimage before mutation"
+    },
+    {
+      "id": "author_fixture_and_static_logs_pinned",
+      "passed": true,
+      "scope": "five frozen logs and README"
+    },
+    {
+      "id": "nine_local_fixtures_pass_in_frozen_log",
+      "passed": true,
+      "scope": "not re-run; temporary filesystem and in-memory Response tests"
+    }
+  ],
+  "sourceConclusions": [
+    {
+      "id": "default_prepare_publish_boundaries",
+      "conclusion": "Default inert. Prepare creates only a new acceptance candidate/preserved set and public proof, performs no HTTP and does not write feed. Publish requires exact runner, saved-plan and approved after hashes."
+    },
+    {
+      "id": "mutation_scope",
+      "conclusion": "Instance validator and exact source/runtime/port checks bind writes to preview download/android/<instance>, new private acceptance copies and public proof. No service, device or business mutation path."
+    },
+    {
+      "id": "artifact_and_manifest_publication",
+      "conclusion": "APK source/temp bytes are checked before same-directory create-only hardlink; existing identical APK is accepted without overwrite. Reviewed old latest bytes are retained before a unique durable temp replaces an existing latest; absent latest uses create-only hardlink. Fixed retained publication lock prevents a second cooperating run."
+    },
+    {
+      "id": "prepublication_gates",
+      "conclusion": "Nine source pins, exact origin/signing proof, saved old distribution files, full feed preimage, fixed7a94 before/after chain, current receipt/CIM/listener API identity, schema14/components-off and anonymous old feed match all precede feed mutation."
+    },
+    {
+      "id": "download_verification",
+      "conclusion": "Only allowlisted loopback preview GET/HEAD and exact bytes=0-31 Range reads; redirects rejected, size capped, no auth/cookie supplied, only safe headers stored. API+Web manifest/APK hash, MIME/size, code22 and Windows latest retention, unselected stable401 all checked after publication."
+    },
+    {
+      "id": "failure_history",
+      "conclusion": "Create-only proof/lock/temp/preserved outputs remain on failure. Post-publication validation failure may leave a published artifact/latest and failed_retained proof; there is no claimed automatic rollback or retry."
+    }
+  ],
+  "inputs": [
+    {
+      "path": "scripts/project-components/publish-preview-android-code23.mjs",
+      "bytes": 27512,
+      "sha256": "6606d9564506ae6af7ba7e404c81db605403a7be95cac40a5d2eb374909b3a1b"
+    },
+    {
+      "path": "scripts/project-components/publish-preview-android-code23.test.mjs",
+      "bytes": 9085,
+      "sha256": "a78ab5a096756b119eede7355b42a317cce1d098a2f922227b65bfa30301471a"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/preparation/result.json",
+      "bytes": 2868,
+      "sha256": "067c5eac0c47e0e7f2bf6f5d78474b4b3a2a89588360492e3e29edb0c818bf9c"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/preparation/README.md",
+      "bytes": 6701,
+      "sha256": "5ef044fc89394d2ca972a1942cb55b78a61a92365528f687899a31025e2729f1"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/prepare.json",
+      "bytes": 8150,
+      "sha256": "63e6d4c165d3dd7ec660054d08b87562743422434c1f8883a55a159661e766ce"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-code23-feed-29a9b98b-2fa8-4625-a465-5d75a91b70e8\\prepare.json",
+      "bytes": 4583,
+      "sha256": "86a6711c18d3c06cf718d875dad9a9fc29d003397ab5619584a4adb42a75afc0"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\android-code23-recovery-live\\65ee5dc8-3f23-4f28-ad97-daa1de8b0ece\\result.json",
+      "bytes": 13294,
+      "sha256": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56"
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/7a94eb90-63a2-4841-afa5-318612eb06ce/before.json",
+      "bytes": 98159,
+      "sha256": "7537f22daea58577de75d850fc6678f28c8e548594eafcd164ec7a9ec98df4ab"
+    },
+    {
+      "path": "docs/evidence/project-components/android-update-deployment-retention/7a94eb90-63a2-4841-afa5-318612eb06ce/after.json",
+      "bytes": 182214,
+      "sha256": "6c362d01dffe02afd6e017cef2b4e71f0d7337ad06bb5c56b890853c54affe0b"
+    }
+  ],
+  "sourcePins": [
+    {
+      "path": "apps/api/src/android-updates.ts",
+      "bytes": 7302,
+      "sha256": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e",
+      "expectedSha256": "368e4013e58a9f4fb28a128ff5d55de4cd77d3d9176e90c9b9862d08b0e45c5e"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 106686,
+      "sha256": "290a44c2d7f73b8d6970e98765590aea6e80853fb4eec105d14cd1155d83db3a",
+      "expectedSha256": "290a44c2d7f73b8d6970e98765590aea6e80853fb4eec105d14cd1155d83db3a"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25370,
+      "sha256": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd",
+      "expectedSha256": "fc9f8b58eac2f2d89296da95eaf06a404464a2252ff2cd31a15ddccb676650bd"
+    },
+    {
+      "path": "apps/api/src/parallel-instance.ts",
+      "bytes": 9481,
+      "sha256": "272379786a9d8806a90c85c5e5ec6e1b07fc5c01ae50e01aed603a250e597fcf",
+      "expectedSha256": "272379786a9d8806a90c85c5e5ec6e1b07fc5c01ae50e01aed603a250e597fcf"
+    },
+    {
+      "path": "apps/api/src/project-request-context.ts",
+      "bytes": 5676,
+      "sha256": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab",
+      "expectedSha256": "070ce75ac44875a8d338dcb927ba1f4cc89fbdedc8cd9753b0e34e909a132bab"
+    },
+    {
+      "path": "apps/api/test/android-update-channels.test.mjs",
+      "bytes": 7683,
+      "sha256": "e4b3829ec05e3ecbf76cdb5ca8196dd0fe0054eaf9cc84878dadc40b9a78f383",
+      "expectedSha256": "e4b3829ec05e3ecbf76cdb5ca8196dd0fe0054eaf9cc84878dadc40b9a78f383"
+    },
+    {
+      "path": "apps/api/test/android-update-auth-integration.test.mjs",
+      "bytes": 8776,
+      "sha256": "3e200893eb932f104011240b1a4edd366423ed90b2191d6f8d465cc6240a1b2f",
+      "expectedSha256": "3e200893eb932f104011240b1a4edd366423ed90b2191d6f8d465cc6240a1b2f"
+    },
+    {
+      "path": "apps/api/test/parallel-instance.test.mjs",
+      "bytes": 4089,
+      "sha256": "ef82f93328e5a00c340d2e49761ba8fc5287e063191f668edb35b1a59bbcefbc",
+      "expectedSha256": "ef82f93328e5a00c340d2e49761ba8fc5287e063191f668edb35b1a59bbcefbc"
+    },
+    {
+      "path": "scripts/project-components/retain-preview-android-update-state.mjs",
+      "bytes": 30169,
+      "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3",
+      "expectedSha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3"
+    }
+  ],
+  "savedArtifacts": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-code23-feed-29a9b98b-2fa8-4625-a465-5d75a91b70e8\\candidate\\latest.json",
+      "bytes": 386,
+      "sha256": "6986c64031f0d013ae99f465009c1653b1f641ea25d740d316f3c6c3ae1b88d9"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-code23-feed-29a9b98b-2fa8-4625-a465-5d75a91b70e8\\candidate\\Relay-QA-Hub-Android-23-0.2.0-preview.9.apk",
+      "bytes": 35536941,
+      "sha256": "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-code23-feed-29a9b98b-2fa8-4625-a465-5d75a91b70e8\\preserved\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk",
+      "bytes": 35471405,
+      "sha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+      "expectedSha256": "733088b8f876c41ce767627c6de8dfe12e00803c0b61ff13c6facd3b8982d777",
+      "expectedBytes": 35471405
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-code23-feed-29a9b98b-2fa8-4625-a465-5d75a91b70e8\\preserved\\qa-hub-preview-7c86-android-0.2.0-preview.8-code22.apk.receipt.json",
+      "bytes": 2600,
+      "sha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922",
+      "expectedSha256": "d8a13bd89a403c1a0d754978e07d22f3c1592329269269f273f40fe869954922",
+      "expectedBytes": 2600
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\android-code23-feed-29a9b98b-2fa8-4625-a465-5d75a91b70e8\\preserved\\qa-hub-preview-7c86-windows-latest.json",
+      "bytes": 464,
+      "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417",
+      "expectedSha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417",
+      "expectedBytes": 464
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/preparation/runs/local-fixture-final.log",
+      "bytes": 1081,
+      "sha256": "e669a11bb0441353c6491481ce2737b50e2bed000cfafca0eea8ea24569aadff",
+      "expectedSha256": "e669a11bb0441353c6491481ce2737b50e2bed000cfafca0eea8ea24569aadff",
+      "expectedBytes": 1081
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/preparation/runs/local-fixture-first.log",
+      "bytes": 849,
+      "sha256": "a1c915a14d6669c55bb8602efe6ad1fd8e7dc2ecb49f6ae38f5ad378a4f87307",
+      "expectedSha256": "a1c915a14d6669c55bb8602efe6ad1fd8e7dc2ecb49f6ae38f5ad378a4f87307",
+      "expectedBytes": 849
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/preparation/runs/node-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedBytes": 0
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/preparation/runs/scoped-eslint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expectedBytes": 0
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/preparation/runs/scoped-format.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "expectedSha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283",
+      "expectedBytes": 68
+    }
+  ],
+  "fixtureValidation": {
+    "names": [
+      "default and invalid explicit modes have no runtime/HTTP action",
+      "manifest fixes original package, numeric version, origin commit and exact original APK bytes",
+      "frozen API source and retention dependency pins match the reviewed repository files",
+      "deployment proof validation rejects missing checks, failed before, cross-run, changed binding and enabled components",
+      "verified APK temp is create-only linked, retained and identical-existing is never overwritten",
+      "first latest publication atomically links complete bytes and leaves temp available",
+      "reviewed existing latest is fully retained before atomic replacement; stale preimage refuses",
+      "distribution reader records only safe headers and exact bytes using in-memory HTTP responses",
+      "unsupported host, route, mutation or range never invokes transport; oversize response fails"
+    ],
+    "tests": 9,
+    "passed": 9,
+    "failed": 0,
+    "history": [
+      {
+        "passed": 7,
+        "failed": 0,
+        "tests": 7,
+        "log": "runs/local-fixture-first.log"
+      },
+      {
+        "passed": 9,
+        "failed": 0,
+        "tests": 9,
+        "log": "runs/local-fixture-final.log"
+      }
+    ],
+    "rerunByReviewer": false
+  },
+  "boundaries": {
+    "reviewerReadLiveConfig": false,
+    "reviewerReadLiveDatabase": false,
+    "reviewerReadLiveFeedOrOriginalApk": false,
+    "reviewerQueriedHttpAdbCim": false,
+    "reviewerRanPrepareOrPublish": false,
+    "reviewerChangedSourceOrOriginalProofs": false,
+    "createdOnly": "docs/evidence/project-components/android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/source-review.json"
+  },
+  "limits": [
+    "Read-only review of frozen repository source, public proofs and exact saved acceptance copies. No actual publish/download verification or native Android update is asserted.",
+    "Current API/off/feed guards described above are publisher code paths; this reviewer did not execute them. The approved after proof remains a historical observation.",
+    "The existing-manifest branch relies on the root-controlled no-concurrent-publisher window and preimage checks; rename is not a universal compare-and-swap against unrelated writers. Current prepared feed was absent, so its publication path uses create-only linking.",
+    "The retained .code23-publication.lock is intentional and is not removed automatically; any failed publish must be inspected rather than blindly retried or cleaned.",
+    "APK historical sourceCommit, native/signature proof and exact bytes are preserved; publishing this same code23 package does not establish physical-device or in-app update acceptance."
+  ]
+}

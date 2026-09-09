@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "status": "prepared_not_run_by_author",
+  "preparedAt": "2026-09-09T01:33:48.4250109Z",
+  "sourceHead": "daf67d27e4389066a162417019808c6d58890fbc",
+  "sources": [
+    {
+      "path": "scripts/project-components/publish-preview-android-code23.mjs",
+      "bytes": 27512,
+      "sha256": "6606d9564506ae6af7ba7e404c81db605403a7be95cac40a5d2eb374909b3a1b"
+    },
+    {
+      "path": "scripts/project-components/publish-preview-android-code23.test.mjs",
+      "bytes": 9085,
+      "sha256": "a78ab5a096756b119eede7355b42a317cce1d098a2f922227b65bfa30301471a"
+    }
+  ],
+  "README": {
+    "sha256": "5ef044fc89394d2ca972a1942cb55b78a61a92365528f687899a31025e2729f1",
+    "path": "README.md"
+  },
+  "history": [
+    {
+      "passed": 7,
+      "failed": 0,
+      "tests": 7,
+      "log": "runs/local-fixture-first.log"
+    },
+    {
+      "passed": 9,
+      "failed": 0,
+      "tests": 9,
+      "log": "runs/local-fixture-final.log"
+    }
+  ],
+  "finalGate": {
+    "passed": 9,
+    "failed": 0,
+    "tests": 9,
+    "eslintExit": 0,
+    "formatExit": 0,
+    "skipped": 0,
+    "nodeCheckExit": 0
+  },
+  "logs": [
+    {
+      "path": "runs/local-fixture-final.log",
+      "bytes": 1081,
+      "sha256": "e669a11bb0441353c6491481ce2737b50e2bed000cfafca0eea8ea24569aadff"
+    },
+    {
+      "path": "runs/local-fixture-first.log",
+      "bytes": 849,
+      "sha256": "a1c915a14d6669c55bb8602efe6ad1fd8e7dc2ecb49f6ae38f5ad378a4f87307"
+    },
+    {
+      "path": "runs/node-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/scoped-eslint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/scoped-format.log",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    }
+  ],
+  "executionByAuthor": {
+    "liveRuntimeOrDatabaseReads": 0,
+    "feedWrites": 0,
+    "prepare": "not_run",
+    "realHttpRequests": 0,
+    "deviceOperations": 0,
+    "serviceOperations": 0,
+    "liveArtifactReads": 0,
+    "apiSourceChanged": false,
+    "publish": "not_run"
+  },
+  "rootSubsequentPrepareReported": {
+    "runId": "29a9b98b-2fa8-4625-a465-5d75a91b70e8",
+    "planSha256": "86a6711c18d3c06cf718d875dad9a9fc29d003397ab5619584a4adb42a75afc0",
+    "recording": "parent message; execution proof belongs to separate run directory"
+  },
+  "testScope": "temporary files and pure in-memory Response; repository source and proof reads only",
+  "requiredDeployment": {
+    "executionOwner": "root",
+    "runId": "7a94eb90-63a2-4841-afa5-318612eb06ce",
+    "approvedAfterSha256": "6c362d01dffe02afd6e017cef2b4e71f0d7337ad06bb5c56b890853c54affe0b"
+  }
+}

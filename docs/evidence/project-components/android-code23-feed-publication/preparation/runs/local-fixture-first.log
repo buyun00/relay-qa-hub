@@ -1,0 +1,15 @@
+✔ default and invalid explicit modes have no runtime/HTTP action (366.3111ms)
+✔ manifest fixes original package, numeric version, origin commit and exact original APK bytes (0.2286ms)
+✔ verified APK temp is create-only linked, retained and identical-existing is never overwritten (32.4575ms)
+✔ first latest publication atomically links complete bytes and leaves temp available (15.8291ms)
+✔ reviewed existing latest is fully retained before atomic replacement; stale preimage refuses (27.0023ms)
+✔ distribution reader records only safe headers and exact bytes using in-memory HTTP responses (18.808ms)
+✔ unsupported host, route, mutation or range never invokes transport; oversize response fails (0.8379ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 666.4913
