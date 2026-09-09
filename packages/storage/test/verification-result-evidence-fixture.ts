@@ -104,6 +104,11 @@ export interface StagedVerificationEvidence {
   readonly attachments: MobileFinalizedAttachment[];
   readonly bindings: MobileAttachmentReservation[];
 }
+export interface VerificationEvidenceScope {
+  readonly accountId: string;
+  readonly projectId: string;
+  readonly actorId: string;
+}
 export async function evidenceFixture(
   t: { diagnostic(message: string): void },
   options: { readonly applyEvidenceMigration?: boolean } = {},
@@ -131,16 +136,16 @@ export async function evidenceFixture(
     ensureMobileScope(database, bootstrap);
     ensureMobileRelayRoles(database, bootstrap);
   });
-  const common = () => ({
-    ...scope,
+  const common = (activeScope: VerificationEvidenceScope = scope) => ({
+    ...activeScope,
     createdAt: stamp(),
     idempotencyKey: randomUUID(),
     requestDigest: digest(randomUUID()),
   });
-  const prepareVerification = () => {
+  const prepareVerification = (activeScope: VerificationEvidenceScope = scope) => {
     const bug = tx(database, () =>
       createMobileBug(database, {
-        ...scope,
+        ...activeScope,
         clientSubmissionId: randomUUID(),
         payloadDigest: digest(randomUUID()),
         title: "Verification evidence",
@@ -148,8 +153,8 @@ export async function evidenceFixture(
         expectedBehavior: "Keep original result",
         severity: "S2",
         priority: "P2",
-        ownerId: scope.actorId,
-        verificationOwnerId: scope.actorId,
+        ownerId: activeScope.actorId,
+        verificationOwnerId: activeScope.actorId,
         occurrence: {
           observedAt: stamp(),
           platform: "android",
@@ -161,40 +166,40 @@ export async function evidenceFixture(
         createdAt: stamp(),
       }),
     ).bug;
-    const version = () => getMobileBug(database, scope, bug.id)!.version;
+    const version = () => getMobileBug(database, activeScope, bug.id)!.version;
     tx(database, () =>
       transitionMobileBugReady(database, {
-        ...common(),
+        ...common(activeScope),
         bugId: bug.id,
         expectedVersion: version(),
       }),
     );
     tx(database, () =>
       manuallyCompleteMobileBug(database, {
-        ...common(),
+        ...common(activeScope),
         bugId: bug.id,
         expectedVersion: version(),
         reason: "Local human completion",
       }),
     );
     const attempt = getMobileHumanWorkflowForBug(database, {
-      ...scope,
+      ...activeScope,
       bugId: bug.id,
     }).repairAttempt!;
     const requested = tx(database, () =>
       createMobileVerification(database, {
-        ...common(),
+        ...common(activeScope),
         bugId: bug.id,
         expectedVersion: version(),
         repairAttemptId: attempt.id,
         buildId: null,
-        verifierId: scope.actorId,
+        verifierId: activeScope.actorId,
         criteria: "Inspect retained evidence",
       }),
     );
     const verification = tx(database, () =>
       startMobileVerification(database, {
-        ...common(),
+        ...common(activeScope),
         verificationId: requested.id,
         expectedVersion: requested.version,
         reason: null,
@@ -206,11 +211,12 @@ export async function evidenceFixture(
     clientSubmissionId: string,
     captureId: string | null = null,
     bytes: Uint8Array = PNG,
+    activeScope: VerificationEvidenceScope = scope,
   ) => {
     const clientAttachmentId = randomUUID();
     const session = tx(database, () =>
       initMobileUpload(database, {
-        ...scope,
+        ...activeScope,
         clientSubmissionId,
         clientAttachmentId,
         captureId,
@@ -227,7 +233,7 @@ export async function evidenceFixture(
       const chunkBytes = bytes.subarray(index * session.chunkSize, (index + 1) * session.chunkSize);
       version = tx(database, () =>
         putMobileUploadChunk(database, roots, {
-          ...scope,
+          ...activeScope,
           sessionId: session.sessionId,
           clientSubmissionId,
           clientAttachmentId,
@@ -242,7 +248,7 @@ export async function evidenceFixture(
     }
     return tx(database, () =>
       finalizeMobileUpload(database, roots, {
-        ...scope,
+        ...activeScope,
         sessionId: session.sessionId,
         clientSubmissionId,
         clientAttachmentId,
@@ -260,12 +266,13 @@ export async function evidenceFixture(
     reservationTarget?: string,
     bytes: Uint8Array = PNG,
     bindingIntent: "verification_result" | "bug_create" = "verification_result",
+    activeScope: VerificationEvidenceScope = scope,
   ): StagedVerificationEvidence => {
-    const target = prepareVerification(),
+    const target = prepareVerification(activeScope),
       clientSubmissionId = randomUUID(),
       captureId = withCapture ? randomUUID() : null;
     const attachments = Array.from({ length: count }, () =>
-      upload(clientSubmissionId, captureId, bytes),
+      upload(clientSubmissionId, captureId, bytes, activeScope),
     );
     if (withCapture) {
       if (count < 1 || count > 2) throw Error("This fixture uses at most two typed PNG artifacts");
@@ -273,7 +280,7 @@ export async function evidenceFixture(
       const createdAt = stamp();
       tx(database, () =>
         createMobileCapture(database, {
-          ...scope,
+          ...activeScope,
           clientSubmissionId,
           captureId: captureId!,
           capturedAt: createdAt,
@@ -331,7 +338,7 @@ export async function evidenceFixture(
     const bindings = attachments.map((attachment) =>
       tx(database, () =>
         bindMobileAttachment(database, {
-          ...scope,
+          ...activeScope,
           attachmentId: attachment.attachmentId,
           expectedVersion: attachment.version,
           clientSubmissionId,
@@ -346,7 +353,7 @@ export async function evidenceFixture(
       ),
     );
     const input: RecordMobileVerificationResultInput = {
-      ...common(),
+      ...common(activeScope),
       verificationId: target.verification.id,
       expectedVersion: target.verification.version,
       requireAssignedVerifier: true,
@@ -361,6 +368,25 @@ export async function evidenceFixture(
   };
   const submit = (input: RecordMobileVerificationResultInput) =>
     tx(database, () => recordMobileVerificationResult(database, input));
+  const addProjectScope = (projectKey: string) => {
+    const projectScope = { ...scope, projectId: randomUUID() };
+    const projectBootstrap = {
+      ...projectScope,
+      membershipId: randomUUID(),
+      projectKey,
+      createdAt: stamp(),
+    };
+    tx(database, () => {
+      ensureMobileScope(database, projectBootstrap);
+      ensureMobileRelayRoles(database, projectBootstrap);
+    });
+    return { scope: projectScope, bootstrap: projectBootstrap };
+  };
+  const stageForScope = (
+    activeScope: VerificationEvidenceScope,
+    count: number,
+    withCapture = false,
+  ) => stage(count, withCapture, undefined, PNG, "verification_result", activeScope);
   return {
     directory,
     databaseFile,
@@ -372,6 +398,8 @@ export async function evidenceFixture(
     prepareVerification,
     upload,
     stage,
+    addProjectScope,
+    stageForScope,
     submit,
   };
 }

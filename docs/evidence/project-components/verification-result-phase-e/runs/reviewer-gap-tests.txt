@@ -1,0 +1,35 @@
+COMMAND
+cwd: repository root
+.\node_modules\.bin\tsx.cmd --test packages/storage/test/verification-result-evidence.test.ts
+
+SOURCE HEAD
+f0fb48e0637af1303773f4371d20eba6a23cc396
+
+RESULT
+exit_code: 0
+duration_ms: 13530.6847
+
+PASS schema 15/16/17 history and an existing result receipt remain byte-for-byte unchanged (465.2453ms)
+PASS every attachment count from 9 through 20 commits actual PNG reservations once (4784.2238ms)
+PASS capture passed/failed/blocked results share exact successful artifacts and retain current read authorization (847.2466ms)
+PASS 21 attachments and wrong capture/actor/project/submission/target reject without any committed mutation (1431.979ms)
+PASS database trigger rejects a direct 21st Verification attachment and rolls back its claim (586.8733ms)
+PASS two active project memberships isolate real attachment and capture decoys (701.059ms)
+PASS Bug attachment edits cannot remove immutable Verification evidence (370.5092ms)
+PASS each effect stage rolls back attachment/capture/result/audit/notification/receipt together (592.2524ms)
+PASS exact result and generic receipt SQL guards reject forged capture facts before commit (576.2735ms)
+PASS removing an original Bug primary hides its capture metadata, raw image and artifact without deleting evidence (346.8366ms)
+PASS actual PNG bytes total exactly100MiB succeeds and one additional byte is rejected atomically (2527.8716ms)
+
+diagnostic: Raw verification_attachments insert hit the 20-item trigger branch; claim rolled back
+diagnostic: Same actor had two active project memberships; real neighboring attachment/capture identities stayed project-scoped
+diagnostic: All 11 actual SQLite failure points rolled back; retained media SHA b1ff9c8ea3a780bad09b346c423d2d0e46815926879b18e841d928376a946640
+diagnostic: Actual valid ancillary-padded PNG upload/finalize/claim: 104857600 bytes committed; 104857601 bytes rejected by TypeScript and the raw SQLite trigger; direct claim rolled back; all files retained
+
+tests: 11
+suites: 0
+pass: 11
+fail: 0
+cancelled: 0
+skipped: 0
+todo: 0

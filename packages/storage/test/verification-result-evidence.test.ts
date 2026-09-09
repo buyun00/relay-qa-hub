@@ -53,6 +53,46 @@ function captureIdentityValues(
     .map((row) => row["capture_id"]);
 }
 
+function claimAndInsertVerificationAttachment(
+  database: DatabaseSync,
+  input: {
+    readonly accountId: string;
+    readonly projectId: string;
+    readonly verificationId: string;
+    readonly attachmentId: string;
+    readonly bindingId: string;
+  },
+): void {
+  const claimed = database
+    .prepare(
+      `UPDATE attachment_bindings
+       SET state='claimed',expires_at=NULL,claimed_at=?,version=version+1
+       WHERE account_id=? AND project_id=? AND id=? AND attachment_id=? AND state='reserved'`,
+    )
+    .run(stamp(), input.accountId, input.projectId, input.bindingId, input.attachmentId);
+  const attachment = database
+    .prepare(
+      `UPDATE attachments SET version=version+1
+       WHERE account_id=? AND project_id=? AND id=?`,
+    )
+    .run(input.accountId, input.projectId, input.attachmentId);
+  assert.equal(claimed.changes, 1);
+  assert.equal(attachment.changes, 1);
+  database
+    .prepare(
+      `INSERT INTO verification_attachments(
+         account_id,project_id,verification_id,attachment_id,binding_id
+       ) VALUES (?,?,?,?,?)`,
+    )
+    .run(
+      input.accountId,
+      input.projectId,
+      input.verificationId,
+      input.attachmentId,
+      input.bindingId,
+    );
+}
+
 test("schema 15/16/17 history and an existing result receipt remain byte-for-byte unchanged", async (t) => {
   const f = await evidenceFixture(t, { applyEvidenceMigration: false });
   let closed = false;
@@ -351,6 +391,223 @@ test("21 attachments and wrong capture/actor/project/submission/target reject wi
   }
 });
 
+test("database trigger rejects a direct 21st Verification attachment and rolls back its claim", async (t) => {
+  const f = await evidenceFixture(t);
+  try {
+    const draft = f.stage(20);
+    const extra = f.upload(draft.input.clientSubmissionId!);
+    const { bindMobileAttachment } = await import("../src/mobile-attachment-store.ts");
+    const extraBinding = tx(f.database, () =>
+      bindMobileAttachment(f.database, {
+        ...f.scope,
+        attachmentId: extra.attachmentId,
+        expectedVersion: extra.version,
+        clientSubmissionId: draft.input.clientSubmissionId!,
+        clientAttachmentId: extra.clientAttachmentId,
+        leaseGeneration: 1,
+        intent: "verification_result",
+        targetQaItemId: draft.bugId,
+        boundAt: stamp(),
+      }),
+    );
+    assert.equal(f.submit(draft.input).attachmentIds.length, 20);
+    const boundary = f.database
+      .prepare(
+        `SELECT count(*) AS count, sum(attachment.size_bytes) AS bytes
+         FROM verification_attachments AS link
+         JOIN attachments AS attachment
+           ON attachment.account_id=link.account_id
+          AND attachment.project_id=link.project_id
+          AND attachment.id=link.attachment_id
+         WHERE link.account_id=? AND link.project_id=? AND link.verification_id=?`,
+      )
+      .get(f.scope.accountId, f.scope.projectId, draft.verification.id)!;
+    assert.equal(boundary["count"], 20);
+    assert.ok(Number(boundary["bytes"]) + extra.size < 100 * 1024 * 1024);
+    const before = fingerprint(f.database);
+    assert.throws(
+      () =>
+        tx(f.database, () =>
+          claimAndInsertVerificationAttachment(f.database, {
+            ...f.scope,
+            verificationId: draft.verification.id,
+            attachmentId: extra.attachmentId,
+            bindingId: extraBinding.bindingId,
+          }),
+        ),
+      /Verification evidence permits at most twenty attachments totaling 100 MiB/,
+    );
+    assert.deepEqual(fingerprint(f.database), before);
+    assert.equal(
+      f.database
+        .prepare(
+          `SELECT count(*) AS count FROM verification_attachments
+           WHERE account_id=? AND project_id=? AND verification_id=?`,
+        )
+        .get(f.scope.accountId, f.scope.projectId, draft.verification.id)!["count"],
+      20,
+    );
+    t.diagnostic(
+      "Raw verification_attachments insert hit the 20-item trigger branch; claim rolled back",
+    );
+  } finally {
+    f.database.close();
+  }
+});
+
+test("two active project memberships isolate real attachment and capture decoys", async (t) => {
+  const f = await evidenceFixture(t);
+  try {
+    const decoyProject = f.addProjectScope("VREVIDENCEDECOY");
+    const primary = f.stage(1, true);
+    const decoy = f.stageForScope(decoyProject.scope, 1, true);
+    assert.equal(
+      f.database
+        .prepare(
+          `SELECT count(*) AS count FROM projects
+           WHERE account_id=? AND status='active' AND id IN (?,?)`,
+        )
+        .get(f.scope.accountId, f.scope.projectId, decoyProject.scope.projectId)!["count"],
+      2,
+    );
+    assert.equal(
+      f.database
+        .prepare(
+          `SELECT count(*) AS count FROM memberships
+           WHERE account_id=? AND user_id=? AND status='active' AND project_id IN (?,?)`,
+        )
+        .get(f.scope.accountId, f.scope.actorId, f.scope.projectId, decoyProject.scope.projectId)![
+        "count"
+      ],
+      2,
+    );
+    const decoyFacts = f.database
+      .prepare(
+        `SELECT attachment.status AS attachment_status,
+                attachment.scan_state AS scan_state,
+                upload.status AS upload_status,
+                binding.state AS binding_state,
+                capture.status AS capture_status
+         FROM attachments AS attachment
+         JOIN upload_sessions AS upload
+           ON upload.account_id=attachment.account_id
+          AND upload.project_id=attachment.project_id
+          AND upload.id=attachment.upload_session_id
+          AND upload.finalized_attachment_id=attachment.id
+         JOIN attachment_bindings AS binding
+           ON binding.account_id=attachment.account_id
+          AND binding.project_id=attachment.project_id
+          AND binding.attachment_id=attachment.id
+         JOIN capture_bundles AS capture
+           ON capture.account_id=attachment.account_id
+          AND capture.project_id=attachment.project_id
+          AND capture.id=attachment.capture_id
+         WHERE attachment.account_id=? AND attachment.project_id=?
+           AND attachment.id=? AND capture.id=?`,
+      )
+      .get(
+        decoyProject.scope.accountId,
+        decoyProject.scope.projectId,
+        decoy.input.attachmentIds[0]!,
+        decoy.input.captureBundleId!,
+      )!;
+    assert.deepEqual(
+      { ...decoyFacts },
+      {
+        attachment_status: "ready",
+        scan_state: "clean",
+        upload_status: "finalized",
+        binding_state: "reserved",
+        capture_status: "uploaded",
+      },
+    );
+    assert.equal(
+      getMobileCapture(f.database, {
+        ...f.scope,
+        captureId: decoy.input.captureBundleId!,
+      }),
+      null,
+    );
+    assert.ok(
+      getMobileCapture(f.database, {
+        ...decoyProject.scope,
+        captureId: decoy.input.captureBundleId!,
+      }),
+    );
+    for (const changes of [
+      { attachmentIds: decoy.input.attachmentIds },
+      { captureBundleId: decoy.input.captureBundleId },
+      {
+        attachmentIds: decoy.input.attachmentIds,
+        captureBundleId: decoy.input.captureBundleId,
+      },
+    ]) {
+      const before = fingerprint(f.database);
+      assert.throws(() => f.submit({ ...primary.input, ...changes }), {
+        code: "INVALID_REQUEST",
+      });
+      assert.deepEqual(fingerprint(f.database), before);
+    }
+    let before = fingerprint(f.database);
+    assert.throws(
+      () =>
+        f.submit({
+          ...primary.input,
+          projectId: decoyProject.scope.projectId,
+          attachmentIds: decoy.input.attachmentIds,
+          captureBundleId: decoy.input.captureBundleId,
+        }),
+      { code: "NOT_FOUND" },
+    );
+    assert.deepEqual(fingerprint(f.database), before);
+    const primaryResult = f.submit(primary.input);
+    const decoyResult = f.submit(decoy.input);
+    assert.equal(primaryResult.captureBundleId, primary.input.captureBundleId);
+    assert.equal(decoyResult.captureBundleId, decoy.input.captureBundleId);
+    assert.ok(
+      getMobileAttachment(f.database, f.roots, {
+        ...decoyProject.scope,
+        attachmentId: decoy.input.attachmentIds[0]!,
+      }),
+    );
+    assert.equal(
+      getMobileAttachment(f.database, f.roots, {
+        ...f.scope,
+        attachmentId: decoy.input.attachmentIds[0]!,
+      }),
+      null,
+    );
+    assert.equal(
+      getMobileAttachment(f.database, f.roots, {
+        ...decoyProject.scope,
+        attachmentId: primary.input.attachmentIds[0]!,
+      }),
+      null,
+    );
+    const links = f.database
+      .prepare(
+        `SELECT project_id,verification_id,attachment_id FROM verification_attachments
+         WHERE account_id=? AND verification_id IN (?,?) ORDER BY project_id`,
+      )
+      .all(f.scope.accountId, primary.verification.id, decoy.verification.id);
+    assert.deepEqual(
+      links.map((row) => [row["project_id"], row["verification_id"], row["attachment_id"]]),
+      [
+        [f.scope.projectId, primary.verification.id, primary.input.attachmentIds[0]!],
+        [decoyProject.scope.projectId, decoy.verification.id, decoy.input.attachmentIds[0]!],
+      ].sort(([left], [right]) => String(left).localeCompare(String(right))),
+    );
+    before = fingerprint(f.database);
+    assert.deepEqual(f.submit(primary.input), { ...primaryResult, replayed: true });
+    assert.deepEqual(fingerprint(f.database), before);
+    t.diagnostic(
+      "Same actor had two active project memberships; real neighboring attachment/capture identities stayed project-scoped",
+    );
+  } finally {
+    f.database.close();
+  }
+});
+
 test("Bug attachment edits cannot remove immutable Verification evidence", async (t) => {
   const f = await evidenceFixture(t);
   try {
@@ -599,7 +856,7 @@ test("actual PNG bytes total exactly100MiB succeeds and one additional byte is r
     const overflow = f.stage(19, false, undefined, bytes),
       extra = f.upload(overflow.input.clientSubmissionId!, null, paddedPng(bytes.length + 1));
     const { bindMobileAttachment } = await import("../src/mobile-attachment-store.ts");
-    tx(f.database, () =>
+    const extraBinding = tx(f.database, () =>
       bindMobileAttachment(f.database, {
         ...f.scope,
         attachmentId: extra.attachmentId,
@@ -620,8 +877,36 @@ test("actual PNG bytes total exactly100MiB succeeds and one additional byte is r
     const before = fingerprint(f.database);
     assert.throws(() => f.submit(input), { code: "INVALID_REQUEST" });
     assert.deepEqual(fingerprint(f.database), before);
+    assert.equal(f.submit(overflow.input).attachmentIds.length, 19);
+    const linked = f.database
+      .prepare(
+        `SELECT count(*) AS count, sum(attachment.size_bytes) AS bytes
+         FROM verification_attachments AS link
+         JOIN attachments AS attachment
+           ON attachment.account_id=link.account_id
+          AND attachment.project_id=link.project_id
+          AND attachment.id=link.attachment_id
+         WHERE link.account_id=? AND link.project_id=? AND link.verification_id=?`,
+      )
+      .get(f.scope.accountId, f.scope.projectId, overflow.verification.id)!;
+    assert.equal(linked["count"], 19);
+    assert.equal(linked["bytes"], 95 * 1024 * 1024);
+    const beforeDirectInsert = fingerprint(f.database);
+    assert.throws(
+      () =>
+        tx(f.database, () =>
+          claimAndInsertVerificationAttachment(f.database, {
+            ...f.scope,
+            verificationId: overflow.verification.id,
+            attachmentId: extra.attachmentId,
+            bindingId: extraBinding.bindingId,
+          }),
+        ),
+      /Verification evidence permits at most twenty attachments totaling 100 MiB/,
+    );
+    assert.deepEqual(fingerprint(f.database), beforeDirectInsert);
     t.diagnostic(
-      "Actual valid ancillary-padded PNG upload/finalize/claim: 104857600 bytes committed; 104857601 bytes rejected; all files retained",
+      "Actual valid ancillary-padded PNG upload/finalize/claim: 104857600 bytes committed; 104857601 bytes rejected by TypeScript and the raw SQLite trigger; direct claim rolled back; all files retained",
     );
   } finally {
     f.database.close();
