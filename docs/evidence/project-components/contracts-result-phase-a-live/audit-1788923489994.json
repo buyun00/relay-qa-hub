@@ -1,0 +1,529 @@
+{
+  "kind": "post_run_readonly_artifact_and_consistent_sql_audit",
+  "at": "2026-09-09T03:11:28.872Z",
+  "rawPath": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\contracts-result-phase-a-live\\e9662073-77cf-44b5-a04d-3649e1651e20\\be5c18d7-8150-4684-b7c4-a9044c11b796\\result.json",
+  "rawSha256": "beaccbfa20d338e48fae91b235fca73752559f2151d0257912622871c9c6cac7",
+  "sourceSha256": "64a35b1271e43134447047bbb4f9e32a8305462bcc291368d3504bb0f6016a71",
+  "checks": [
+    {
+      "label": "raw source frozen hash",
+      "actual": "beaccbfa20d338e48fae91b235fca73752559f2151d0257912622871c9c6cac7",
+      "expected": "beaccbfa20d338e48fae91b235fca73752559f2151d0257912622871c9c6cac7",
+      "passed": true
+    },
+    {
+      "label": "all 247 checks independently actual equals expected",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "request ledger exact",
+      "actual": 127,
+      "expected": 127,
+      "passed": true
+    },
+    {
+      "label": "only permitted ports",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "no executor routes",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "label": "source closure copied original products",
+      "actual": "scripts/project-components/result-phase-a-guard.mjs",
+      "expected": "scripts/project-components/result-phase-a-guard.mjs",
+      "passed": true
+    },
+    {
+      "label": "before/after official shutdown domain unchanged",
+      "actual": {
+        "bugs": {
+          "count": 7,
+          "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+        },
+        "repair_attempts": {
+          "count": 8,
+          "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+        },
+        "events": {
+          "count": 64,
+          "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+        },
+        "submissions": {
+          "count": 12,
+          "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+        },
+        "idempotency_records": {
+          "count": 51,
+          "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+        },
+        "outbox": {
+          "count": 37,
+          "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+        }
+      },
+      "expected": {
+        "bugs": {
+          "count": 7,
+          "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+        },
+        "repair_attempts": {
+          "count": 8,
+          "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+        },
+        "events": {
+          "count": 64,
+          "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+        },
+        "submissions": {
+          "count": 12,
+          "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+        },
+        "idempotency_records": {
+          "count": 51,
+          "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+        },
+        "outbox": {
+          "count": 37,
+          "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "owned selftest exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned api exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned api official SIGTERM",
+      "actual": "IPC command emits SIGTERM into original official handlers",
+      "expected": "IPC command emits SIGTERM into original official handlers",
+      "passed": true
+    },
+    {
+      "label": "owned mcp exit",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "owned mcp official SIGTERM",
+      "actual": "IPC command emits SIGTERM into original official handlers",
+      "expected": "IPC command emits SIGTERM into original official handlers",
+      "passed": true
+    },
+    {
+      "label": "owned PIDs absent",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "4459/4461 listeners absent",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-before-stop.sqlite exact domain readback",
+      "actual": {
+        "bugs": {
+          "count": 7,
+          "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+        },
+        "repair_attempts": {
+          "count": 8,
+          "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+        },
+        "events": {
+          "count": 64,
+          "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+        },
+        "submissions": {
+          "count": 12,
+          "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+        },
+        "idempotency_records": {
+          "count": 51,
+          "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+        },
+        "outbox": {
+          "count": 37,
+          "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+        }
+      },
+      "expected": {
+        "bugs": {
+          "count": 7,
+          "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+        },
+        "repair_attempts": {
+          "count": 8,
+          "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+        },
+        "events": {
+          "count": 64,
+          "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+        },
+        "submissions": {
+          "count": 12,
+          "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+        },
+        "idempotency_records": {
+          "count": 51,
+          "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+        },
+        "outbox": {
+          "count": 37,
+          "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-before-stop.sqlite integrity",
+      "actual": "ok",
+      "expected": "ok",
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-before-stop.sqlite foreign keys",
+      "actual": [],
+      "expected": [],
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-after-stop.sqlite exact domain readback",
+      "actual": {
+        "bugs": {
+          "count": 7,
+          "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+        },
+        "repair_attempts": {
+          "count": 8,
+          "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+        },
+        "events": {
+          "count": 64,
+          "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+        },
+        "submissions": {
+          "count": 12,
+          "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+        },
+        "idempotency_records": {
+          "count": 51,
+          "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+        },
+        "outbox": {
+          "count": 37,
+          "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+        }
+      },
+      "expected": {
+        "bugs": {
+          "count": 7,
+          "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+        },
+        "repair_attempts": {
+          "count": 8,
+          "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+        },
+        "verifications": {
+          "count": 7,
+          "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+        },
+        "events": {
+          "count": 64,
+          "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+        },
+        "submissions": {
+          "count": 12,
+          "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+        },
+        "idempotency_records": {
+          "count": 51,
+          "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+        },
+        "outbox": {
+          "count": 37,
+          "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+        },
+        "bug_deletions": {
+          "count": 1,
+          "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+        },
+        "verification_result_snapshots": {
+          "count": 7,
+          "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-after-stop.sqlite integrity",
+      "actual": "ok",
+      "expected": "ok",
+      "passed": true
+    },
+    {
+      "label": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-after-stop.sqlite foreign keys",
+      "actual": [],
+      "expected": [],
+      "passed": true
+    },
+    {
+      "label": "seven immutable result receipts retained",
+      "actual": 7,
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "label": "8ca5a57d-ca75-4c15-b315-d2096bf74ed1 event actor binding",
+      "actual": "314a2afc-1652-4dcd-8256-77e88cf8642e",
+      "expected": "314a2afc-1652-4dcd-8256-77e88cf8642e",
+      "passed": true
+    },
+    {
+      "label": "8ca5a57d-ca75-4c15-b315-d2096bf74ed1 event digest",
+      "actual": "f0ccf13884126ed7531de1f5f6c5e3a2540d11525b7e91b3b87531e93169558a",
+      "expected": "f0ccf13884126ed7531de1f5f6c5e3a2540d11525b7e91b3b87531e93169558a",
+      "passed": true
+    },
+    {
+      "label": "8ca5a57d-ca75-4c15-b315-d2096bf74ed1 project",
+      "actual": "845411c8-7f2f-46a8-a22b-de51e88e73e2",
+      "expected": "845411c8-7f2f-46a8-a22b-de51e88e73e2",
+      "passed": true
+    },
+    {
+      "label": "8ca5a57d-ca75-4c15-b315-d2096bf74ed1 bug",
+      "actual": "d84ada0e-3cad-4601-8d22-be6286c91ba6",
+      "expected": "d84ada0e-3cad-4601-8d22-be6286c91ba6",
+      "passed": true
+    },
+    {
+      "label": "8ca5a57d-ca75-4c15-b315-d2096bf74ed1 unique typed result event",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "label": "8ca5a57d-ca75-4c15-b315-d2096bf74ed1 HTTP original verification DTO exact",
+      "actual": {
+        "id": "34c14798-3202-4780-b766-60f6ba18d40a",
+        "bugId": "d84ada0e-3cad-4601-8d22-be6286c91ba6",
+        "repairAttemptId": "6aff24a5-0735-4465-9567-9c103b691a41",
+        "buildId": null,
+        "status": "passed",
+        "verifierId": "314a2afc-1652-4dcd-8256-77e88cf8642e",
+        "criteriaSnapshot": "Actual isolated verification",
+        "resultSummary": "Original actual full-main result",
+        "version": 3
+      },
+      "expected": {
+        "id": "34c14798-3202-4780-b766-60f6ba18d40a",
+        "bugId": "d84ada0e-3cad-4601-8d22-be6286c91ba6",
+        "repairAttemptId": "6aff24a5-0735-4465-9567-9c103b691a41",
+        "buildId": null,
+        "status": "passed",
+        "verifierId": "314a2afc-1652-4dcd-8256-77e88cf8642e",
+        "criteriaSnapshot": "Actual isolated verification",
+        "resultSummary": "Original actual full-main result",
+        "failureReason": null,
+        "blockedReason": null,
+        "version": 3
+      },
+      "passed": false
+    }
+  ],
+  "evidence": {
+    "requestCounts": {
+      "directHttp": 111,
+      "serverMcpJsonRpc": 16,
+      "totalOnWireHarnessRequests": 127,
+      "note": "MCP internal app.inject mirrors are not counted as extra HTTP; readiness polling before ledger is excluded."
+    },
+    "finalHost": {
+      "ownedPids": [],
+      "listeners": [],
+      "capturedAt": "2026-09-09T03:11:29.8756890Z"
+    },
+    "archives": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-before-stop.sqlite",
+        "sha256": "5d0e8d9c768f0756ec6360da03ea5921f61de4118c6498547065d30998a69cea",
+        "bytes": 2035712,
+        "fingerprint": {
+          "bugs": {
+            "count": 7,
+            "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+          },
+          "repair_attempts": {
+            "count": 8,
+            "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+          },
+          "verifications": {
+            "count": 7,
+            "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+          },
+          "events": {
+            "count": 64,
+            "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+          },
+          "submissions": {
+            "count": 12,
+            "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+          },
+          "idempotency_records": {
+            "count": 51,
+            "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+          },
+          "outbox": {
+            "count": 37,
+            "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+          },
+          "bug_deletions": {
+            "count": 1,
+            "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+          },
+          "verification_result_snapshots": {
+            "count": 7,
+            "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+          }
+        }
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\be5c18d7-8150-4684-b7c4-a9044c11b796\\consistent-after-stop.sqlite",
+        "sha256": "5d0e8d9c768f0756ec6360da03ea5921f61de4118c6498547065d30998a69cea",
+        "bytes": 2035712,
+        "fingerprint": {
+          "bugs": {
+            "count": 7,
+            "sha256": "bc4da4d1a0967cf1bd10f56573d8d9fdb5f136ad646fb9a62a4b273216d4c7b8"
+          },
+          "repair_attempts": {
+            "count": 8,
+            "sha256": "e7d350eaba6aec9a21bd3058548c09bf1efae99de9eaf0f99c6c33ff0dfae4b5"
+          },
+          "verifications": {
+            "count": 7,
+            "sha256": "dee3414cbf29713a94594069a08ea50c4e0b8485b56301d0f509249fd61ebe85"
+          },
+          "events": {
+            "count": 64,
+            "sha256": "e8f409e8cfd67e0084471f9331ceb744e8e5564fd9b4cabf38c6e4b4cfb6a7b6"
+          },
+          "submissions": {
+            "count": 12,
+            "sha256": "5fcfaf2ea456b38da11193e99d4de079397f3ab76a007805b4760ea176117d33"
+          },
+          "idempotency_records": {
+            "count": 51,
+            "sha256": "d7829380a5667dc96ef25c7e55c76ec0e74556c055fffd83561336bf8142d749"
+          },
+          "outbox": {
+            "count": 37,
+            "sha256": "4bbe7034021f2112d104d20cbbd3f5074bb64109ecbe3d5d97efe0bde97d7dce"
+          },
+          "bug_deletions": {
+            "count": 1,
+            "sha256": "437dac4ae81b54c335c6055d48d250d9cc96fa58ae707fb756e2fa39e84a09ac"
+          },
+          "verification_result_snapshots": {
+            "count": 7,
+            "sha256": "9c1dc7f32ea9ffe3fce8afc973d305efed2504c64365dd6afbef451b97e53b32"
+          }
+        }
+      }
+    ],
+    "receipts": []
+  },
+  "boundaries": {
+    "readOnlyDatabase": true,
+    "noHttp": true,
+    "noServiceOperation": true,
+    "noProductionRead": true
+  },
+  "status": "failed_retained",
+  "failure": "8ca5a57d-ca75-4c15-b315-d2096bf74ed1 HTTP original verification DTO exact",
+  "checkCounts": {
+    "total": 27,
+    "passed": 26
+  }
+}

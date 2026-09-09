@@ -1,0 +1,129 @@
+{
+  "id": "663e1ea3-5c33-4a98-988a-4d49166ae366",
+  "preparedAt": "2026-09-09T02:59:32.562Z",
+  "commit": "2d687b47b658d6d38e096872e9a92950bcb30c7d",
+  "phaseACommit": "2d687b4",
+  "node": {
+    "version": "v24.19.0",
+    "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+  },
+  "sourceProofSha256": "b35d2d0d774ce94ca902629625b68a068cdff21edc49f64000471e45a3e449ca",
+  "sourcePins": [
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 107855,
+      "sha256": "9e2b101e62139b0b4c1ee189fba6f24e7137aa5a4d193e5a74ee9ead03fd701f"
+    },
+    {
+      "path": "apps/api/src/frozen-workflow-response.ts",
+      "bytes": 4331,
+      "sha256": "599762c9402571919ed6a8a501995c816d55fe962b44db95b6070f01bc301258"
+    },
+    {
+      "path": "apps/api/src/mobile-verification.ts",
+      "bytes": 10014,
+      "sha256": "e19335e3e5dbe8bfd268cdfe3c2b3391219787444f9e0c941483439e8a9bbc84"
+    },
+    {
+      "path": "apps/api/src/sqlite-mobile-verification-store.ts",
+      "bytes": 3735,
+      "sha256": "4d96cc184251e0bd15dc7136a2b1e531277a1d8505a230e9777940b46743a691"
+    },
+    {
+      "path": "packages/storage/src/mobile-relay-store.ts",
+      "bytes": 163772,
+      "sha256": "7f50938a6342d1abe9a28c12c9a499d7fa0264461185e9e31b54bcfbf6e56e36"
+    },
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "bytes": 46266,
+      "sha256": "e23d13c46286516ee19b4a04d3a381f2fb2a3dd2b4a629095006b0fefd582a5a"
+    },
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 327115,
+      "sha256": "90221613c779477900915a137561eba8587769117e1bd11843a9cc38b045bd12"
+    },
+    {
+      "path": "packages/storage/src/workflow-idempotency.ts",
+      "bytes": 5943,
+      "sha256": "d748ab0cb1133c4e2e0b963992f37d5169a3b78e92b086d097bbf60c1cedd5e0"
+    },
+    {
+      "path": "packages/storage/src/verification-result-snapshot-migration.ts",
+      "bytes": 9547,
+      "sha256": "593d3c42e2e4ddd454fd77ccc114589e71bab9d743cc3253826f85bd3f10912a"
+    },
+    {
+      "path": "packages/storage/test/sqlite-migrations.test.ts",
+      "bytes": 35637,
+      "sha256": "5a387b42f84713f71a7745f85a82936d41a6303f93df40c55e1e4d8866376028"
+    },
+    {
+      "path": "packages/storage/test/workflow-idempotency.test.ts",
+      "bytes": 17971,
+      "sha256": "975b9b6ccb9189f9b8832ecb600f14ecc7e9e9cb30b061442583786d4d2c5c6b"
+    },
+    {
+      "path": "apps/api/test/verification-result-phase-a.test.mjs",
+      "bytes": 32805,
+      "sha256": "20ef301abb986a53d4786e1d12f0ffa0e9f81b114460af3845d5ea5ed760b697"
+    }
+  ],
+  "config": {
+    "schemaVersion": 1,
+    "instanceId": "qa-hub-preview-result-a-663e1ea3",
+    "sourceRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\source",
+    "runtimeRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime",
+    "dataRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\dataRoot",
+    "backupRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\backupRoot",
+    "downloadsRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\downloadsRoot",
+    "logsRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\logsRoot",
+    "desktopRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\desktopRoot",
+    "apiHost": "127.0.0.1",
+    "apiPort": 4459,
+    "webHost": "127.0.0.1",
+    "webPort": 4458,
+    "mcpPort": 4461,
+    "desktopMcpPort": 4460,
+    "cookieName": "qa-hub-preview-result-a-663e1ea3-session",
+    "gmUserId": "98a3e16c-18eb-4537-a900-536eacd5e5d1",
+    "secretsFile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\secrets.json",
+    "peopleFile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\people.json",
+    "releaseChannel": "qa-hub-preview-result-a-663e1ea3"
+  },
+  "configPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runtime\\instance.json",
+  "configSha256": "03453012b205b8cf40f48938afed5dfa5ecbda9fe53fc6f41375cb8eb601f225",
+  "base": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366",
+  "evidence": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\contracts-result-phase-a-live\\663e1ea3-5c33-4a98-988a-4d49166ae366",
+  "sourceRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\source",
+  "closureSha256": "274722c5c264a06c2e9723006d6463b1cdf9a115978bd7992b58cf593613387d",
+  "closureFiles": 5763,
+  "excludedD": [
+    "packages/storage/dist/workflow-projection-cursor.d.ts",
+    "packages/storage/dist/workflow-projection-cursor.d.ts.map",
+    "packages/storage/dist/workflow-projection-cursor.js",
+    "packages/storage/dist/workflow-projection-cursor.js.map",
+    "packages/storage/dist/workflow-projection-migration.d.ts",
+    "packages/storage/dist/workflow-projection-migration.d.ts.map",
+    "packages/storage/dist/workflow-projection-migration.js",
+    "packages/storage/dist/workflow-projection-migration.js.map",
+    "packages/storage/dist/workflow-projection-types.d.ts",
+    "packages/storage/dist/workflow-projection-types.d.ts.map",
+    "packages/storage/dist/workflow-projection-types.js",
+    "packages/storage/dist/workflow-projection-types.js.map"
+  ],
+  "guardSha256": "e21298dc89212e3465e80ecf5156c8b5e1c35d2c2a769470983765119a7072b9",
+  "runnerSha256": "1c44180e6d60c3f09b326888fffa099cec93465a47c03209d5f1ce224d502774",
+  "boundaries": {
+    "services": [
+      4459,
+      4461
+    ],
+    "noBuildOrInstall": true,
+    "productionOrPrimaryPreview": false,
+    "externalExecutors": false,
+    "guardIsNotMaliciousNativeSandbox": true
+  }
+}

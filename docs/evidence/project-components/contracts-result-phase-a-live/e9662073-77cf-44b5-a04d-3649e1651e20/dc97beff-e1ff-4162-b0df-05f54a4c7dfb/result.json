@@ -1,0 +1,353 @@
+{
+  "kind": "isolated_full_main_worker_http_server_mcp",
+  "status": "failed_retained",
+  "runId": "dc97beff-e1ff-4162-b0df-05f54a4c7dfb",
+  "startedAt": "2026-09-09T03:07:40.286Z",
+  "planPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\plan.json",
+  "planSha256": "92c82df8a872b0f750918024cf12ec6bde050cc4945ab3272774d2e1fb2ce36e",
+  "runnerSha256": "4c94169e53ada26d1cd510f20520ebddc5c5879cc470c40c9e6793108a61386a",
+  "configSha256": "51096c689260debe77ea62743ad99809643a5de1c1374673016d2f36a6526df7",
+  "closureSha256": "0838760bdb7c01796d8e6d72c4bb68e8f31461f77f7bd19239de7f531d5099e9",
+  "guardSha256": "b64b2dd6462dd8404c5f77a107936c6557111bcba503ff65aad0612c0b9b4949",
+  "checks": [
+    {
+      "label": "4459/4461 free before startup",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "label": "preload selftest exit",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "label": "guard main denials",
+      "expected": 10,
+      "actual": 10,
+      "passed": true
+    },
+    {
+      "label": "worker inherited denials",
+      "expected": 10,
+      "actual": 10,
+      "passed": true
+    },
+    {
+      "label": "1 GET 4459/api/v1/health/ready status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "label": "real worker schema15",
+      "expected": 15,
+      "actual": 15,
+      "passed": true
+    },
+    {
+      "label": "2 POST 4459/api/v1/auth/gm/login status",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "label": "3 POST 4459/api/v1/gm/projects status",
+      "expected": 201,
+      "actual": 400,
+      "passed": false
+    }
+  ],
+  "requests": [
+    {
+      "sequence": 1,
+      "startedAt": "2026-09-09T03:07:42.452Z",
+      "port": 4459,
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "headers": {
+        "accept": "application/json",
+        "origin": "http://127.0.0.1:4458"
+      },
+      "completedAt": "2026-09-09T03:07:42.458Z",
+      "status": 200,
+      "response": {
+        "status": "ready",
+        "schemaVersion": "15",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      },
+      "responseHeaders": {
+        "contentType": "application/json; charset=utf-8",
+        "instance": null
+      }
+    },
+    {
+      "sequence": 2,
+      "startedAt": "2026-09-09T03:07:42.478Z",
+      "port": 4459,
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "headers": {
+        "accept": "application/json",
+        "origin": "http://127.0.0.1:4458",
+        "content-type": "application/json"
+      },
+      "body": {
+        "password": "[REDACTED]",
+        "client": "android"
+      },
+      "completedAt": "2026-09-09T03:07:42.487Z",
+      "status": 200,
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "8dae9a30-01c0-413d-84a8-797b14c408f0",
+        "email": "qa-b92dcb64da744e5245c8ad99ceeca75c6d719402fc65e323ea07fff842e5d657@local.invalid",
+        "displayName": "Preview GM",
+        "csrfToken": "[REDACTED]",
+        "isGm": true,
+        "accessToken": "[REDACTED]",
+        "expiresAt": "2094-09-27T06:21:49.484Z"
+      },
+      "responseHeaders": {
+        "contentType": "application/vnd.relay-qa-hub.v1.1+json; charset=utf-8",
+        "instance": null
+      }
+    },
+    {
+      "sequence": 3,
+      "startedAt": "2026-09-09T03:07:42.488Z",
+      "port": 4459,
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "headers": {
+        "accept": "application/json",
+        "origin": "http://127.0.0.1:4458",
+        "content-type": "application/json"
+      },
+      "body": {
+        "id": "511bf129-37c5-4c70-a7fe-a06255222daf",
+        "key": "A8d040416",
+        "name": "Phase A legacy-passed"
+      },
+      "completedAt": "2026-09-09T03:07:42.493Z",
+      "status": 400,
+      "response": {
+        "code": "INVALID_REQUEST",
+        "message": "project key or name is invalid"
+      },
+      "responseHeaders": {
+        "contentType": "application/json; charset=utf-8",
+        "instance": null
+      }
+    }
+  ],
+  "processes": [
+    {
+      "role": "selftest",
+      "pid": 20520,
+      "startedAt": "2026-09-09T03:07:41.256Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "script": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\source\\scripts\\project-components\\result-phase-a-guard-selftest.mjs",
+      "guardLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\dc97beff-e1ff-4162-b0df-05f54a4c7dfb\\selftest-guard.jsonl",
+      "stdout": "{\"status\":\"passed\",\"main\":[{\"name\":\"fetch\",\"denied\":true},{\"name\":\"http\",\"denied\":true},{\"name\":\"https\",\"denied\":true},{\"name\":\"socket\",\"denied\":true},{\"name\":\"listen\",\"denied\":true},{\"name\":\"tls\",\"denied\":true},{\"name\":\"dns\",\"denied\":true},{\"name\":\"dgram\",\"denied\":true},{\"name\":\"spawn\",\"denied\":true},{\"name\":\"exec\",\"denied\":true}],\"worker\":[{\"name\":\"fetch\",\"denied\":true},{\"name\":\"http\",\"denied\":true},{\"name\":\"https\",\"denied\":true},{\"name\":\"socket\",\"denied\":true},{\"name\":\"listen\",\"denied\":true},{\"name\":\"tls\",\"denied\":true},{\"name\":\"dns\",\"denied\":true},{\"name\":\"dgram\",\"denied\":true},{\"name\":\"spawn\",\"denied\":true},{\"name\":\"exec\",\"denied\":true}],\"boundary\":\"Guard denial proof only; not application E2E\"}",
+      "stderr": "",
+      "exit": {
+        "code": 0,
+        "signal": null,
+        "at": "2026-09-09T03:07:41.406Z"
+      }
+    },
+    {
+      "role": "api",
+      "pid": 7040,
+      "startedAt": "2026-09-09T03:07:41.467Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "script": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\source\\scripts\\project-components\\run-preview-service.mjs",
+      "guardLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\dc97beff-e1ff-4162-b0df-05f54a4c7dfb\\api-guard.jsonl",
+      "stdout": "{\"event\":\"parallel-instance.validated\",\"instanceId\":\"qa-hub-preview-result-a-e9662073\",\"sourceRoot\":\"C:\\\\Users\\\\lin0\\\\.codex\\\\parallel-runtimes\\\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\\\source\",\"dataRoot\":\"C:\\\\Users\\\\lin0\\\\.codex\\\\parallel-runtimes\\\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\\\runtime\\\\dataRoot\",\"apiPort\":4459}\n{\"level\":30,\"time\":1788923262232,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"msg\":\"Server listening at http://127.0.0.1:4459\"}\n{\"level\":30,\"time\":1788923262233,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"address\":\"http://127.0.0.1:4459\",\"databaseFile\":\"C:\\\\Users\\\\lin0\\\\.codex\\\\parallel-runtimes\\\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\\\runtime\\\\dataRoot\\\\db\\\\qa-hub.sqlite\",\"msg\":\"Relay QA Hub API started\"}\n{\"level\":30,\"time\":1788923262257,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-1\",\"req\":{\"method\":\"GET\",\"url\":\"/api/v1/health/ready\",\"host\":\"127.0.0.1:4459\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":61028},\"msg\":\"incoming request\"}\n{\"level\":30,\"time\":1788923262276,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-1\",\"res\":{\"statusCode\":200},\"responseTime\":18.520099999999957,\"msg\":\"request completed\"}\n{\"level\":30,\"time\":1788923262444,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-2\",\"req\":{\"method\":\"GET\",\"url\":\"/api/v1/health/ready\",\"host\":\"127.0.0.1:4459\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":61031},\"msg\":\"incoming request\"}\n{\"level\":30,\"time\":1788923262449,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-2\",\"res\":{\"statusCode\":200},\"responseTime\":5.053600000000074,\"msg\":\"request completed\"}\n{\"level\":30,\"time\":1788923262453,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-3\",\"req\":{\"method\":\"GET\",\"url\":\"/api/v1/health/ready\",\"host\":\"127.0.0.1:4459\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":61028},\"msg\":\"incoming request\"}\n{\"level\":30,\"time\":1788923262457,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-3\",\"res\":{\"statusCode\":200},\"responseTime\":4.143400000000042,\"msg\":\"request completed\"}\n{\"level\":30,\"time\":1788923262482,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-4\",\"req\":{\"method\":\"POST\",\"url\":\"/api/v1/auth/gm/login\",\"host\":\"127.0.0.1:4459\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":61032},\"msg\":\"incoming request\"}\n{\"level\":30,\"time\":1788923262487,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-4\",\"res\":{\"statusCode\":200},\"responseTime\":4.540700000000015,\"msg\":\"request completed\"}\n{\"level\":30,\"time\":1788923262489,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-5\",\"req\":{\"method\":\"POST\",\"url\":\"/api/v1/gm/projects\",\"host\":\"127.0.0.1:4459\",\"remoteAddress\":\"127.0.0.1\",\"remotePort\":61028},\"msg\":\"incoming request\"}\n{\"level\":30,\"time\":1788923262492,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"reqId\":\"req-5\",\"res\":{\"statusCode\":400},\"responseTime\":2.7040000000000646,\"msg\":\"request completed\"}\n{\"level\":30,\"time\":1788923262594,\"pid\":7040,\"hostname\":\"win11-lin-main\",\"signal\":\"SIGTERM\",\"msg\":\"stopping Relay QA Hub API\"}\n",
+      "stderr": "",
+      "exit": {
+        "code": 0,
+        "signal": null,
+        "at": "2026-09-09T03:07:42.629Z"
+      },
+      "shutdownRequestedAt": "2026-09-09T03:07:42.594Z",
+      "shutdownMechanism": "IPC command emits SIGTERM into original official handlers"
+    },
+    {
+      "role": "mcp",
+      "pid": 22572,
+      "startedAt": "2026-09-09T03:07:42.280Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "script": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\source\\scripts\\project-components\\run-preview-service.mjs",
+      "guardLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\dc97beff-e1ff-4162-b0df-05f54a4c7dfb\\mcp-guard.jsonl",
+      "stdout": "{\"event\":\"preview-mcp.started\",\"instanceId\":\"qa-hub-preview-result-a-e9662073\",\"address\":\"http://127.0.0.1:4461/mcp\",\"authentication\":\"project session Bearer [REDACTED]\"}",
+      "stderr": "",
+      "exit": {
+        "code": 0,
+        "signal": null,
+        "at": "2026-09-09T03:07:42.503Z"
+      },
+      "shutdownRequestedAt": "2026-09-09T03:07:42.493Z",
+      "shutdownMechanism": "IPC command emits SIGTERM into original official handlers"
+    }
+  ],
+  "fixtures": [],
+  "boundaries": {
+    "originalPreviewTouched": false,
+    "productionTouched": false,
+    "componentsOff": true,
+    "importHoldReleased": false,
+    "externalExecutorsRun": false,
+    "assembledFastifyFixture": false
+  },
+  "ready": {
+    "status": "ready",
+    "schemaVersion": "15",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "schema": [
+    {
+      "version": 1,
+      "name": "app_first_core"
+    },
+    {
+      "version": 2,
+      "name": "bug_full_text_search"
+    },
+    {
+      "version": 3,
+      "name": "domain_audit_alignment"
+    },
+    {
+      "version": 4,
+      "name": "browser_sessions"
+    },
+    {
+      "version": 5,
+      "name": "multi_actor_human_workflow"
+    },
+    {
+      "version": 6,
+      "name": "qingyu_bug_links"
+    },
+    {
+      "version": 7,
+      "name": "shared_project_bug_management"
+    },
+    {
+      "version": 8,
+      "name": "three_state_task_completion"
+    },
+    {
+      "version": 9,
+      "name": "editable_bug_attachments"
+    },
+    {
+      "version": 10,
+      "name": "user_identity_management"
+    },
+    {
+      "version": 11,
+      "name": "relay_delivery_and_rework"
+    },
+    {
+      "version": 12,
+      "name": "human_completion_priority"
+    },
+    {
+      "version": 13,
+      "name": "project_identity_and_components"
+    },
+    {
+      "version": 14,
+      "name": "authenticated_gm_command_authority"
+    },
+    {
+      "version": 15,
+      "name": "immutable_verification_result_snapshots"
+    }
+  ],
+  "failure": {
+    "name": "Error",
+    "message": "CHECK_FAILED:3 POST 4459/api/v1/gm/projects status"
+  },
+  "databaseAfterStop": {
+    "snapshot": {
+      "bugs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "repair_attempts": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "verifications": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "events": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "submissions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "idempotency_records": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "outbox": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "bug_deletions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "verification_result_snapshots": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "integrity": {
+      "integrity_check": "ok"
+    },
+    "archiveSha256": "2a3bfc3ab9aa92de3493e6fe7352569ee07d59210903ad5e3a6e4d85ba10e9d7"
+  },
+  "finishedAt": "2026-09-09T03:07:42.733Z",
+  "requestCount": 3,
+  "checkCounts": {
+    "total": 8,
+    "passed": 7
+  },
+  "privateRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-e9662073-77cf-44b5-a04d-3649e1651e20\\runs\\dc97beff-e1ff-4162-b0df-05f54a4c7dfb"
+}

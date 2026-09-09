@@ -1,0 +1,122 @@
+{
+  "noCommit": true,
+  "createdAt": "2026-09-09T03:15:08.9534266Z",
+  "executedGuardCopies": "executed-guard.mjs.txt and executed-guard-selftest.mjs.txt retain runtime bytes; author sources later formatting only",
+  "scripts": [
+    {
+      "sha256": "3ab4d665d619bb295746024823bc1f443916d57cfb13d396fa10581cb5928be0",
+      "path": "scripts/project-components/result-phase-a-e2e.mjs"
+    },
+    {
+      "sha256": "91342ede099a7cac664d11db50d4f052cb8dd785047d2ecc553cf16ae8abb457",
+      "path": "scripts/project-components/result-phase-a-guard.mjs"
+    },
+    {
+      "sha256": "a82d07eefce27cfa26425f0e6a76e5e1f987d8798c6e649d6242255ff6f77c2b",
+      "path": "scripts/project-components/result-phase-a-guard-selftest.mjs"
+    }
+  ],
+  "kind": "phase_a_full_main_frozen_evidence",
+  "staticChecks": {
+    "nodeCheck": "passed",
+    "prettier": "passed",
+    "eslint": "passed"
+  },
+  "files": [
+    {
+      "sha256": "ac8ecee5dca6eb891d1369a8fc0c65289a96904fea60e8eaa0975ecee1388df0",
+      "bytes": 18913,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/audit-1788923489994.json"
+    },
+    {
+      "sha256": "f5410a4b79e32ae8e9d54dcef74be063e826caa5e750eedb329ec053f4b23e31",
+      "bytes": 59875,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/audit-1788923528226.json"
+    },
+    {
+      "sha256": "44e2a7c4f8a3982d4ed3bc024977e0ef427e97280d7794ad262d58ee2b97ca29",
+      "bytes": 9793,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/audit.mjs"
+    },
+    {
+      "sha256": "2fd9bb444ce14e926cc7c6b0abe609d2525eb04e4e10b451f6d98aeb9b2dab03",
+      "bytes": 1579,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/executed-guard-selftest.mjs.txt"
+    },
+    {
+      "sha256": "b64b2dd6462dd8404c5f77a107936c6557111bcba503ff65aad0612c0b9b4949",
+      "bytes": 3431,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/executed-guard.mjs.txt"
+    },
+    {
+      "sha256": "0bafb532bf41cd643b5c0b596d93a7b7b42ad8704733a1d314ef3fc85e56164b",
+      "bytes": 10084,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/README.md"
+    },
+    {
+      "sha256": "274722c5c264a06c2e9723006d6463b1cdf9a115978bd7992b58cf593613387d",
+      "bytes": 1350534,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/663e1ea3-5c33-4a98-988a-4d49166ae366/closure.json"
+    },
+    {
+      "sha256": "8b7deb0179ed36782460d5a741a03011b61226e0b3a6a1212b251f0ccce293ac",
+      "bytes": 6238,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/663e1ea3-5c33-4a98-988a-4d49166ae366/prepare.json"
+    },
+    {
+      "sha256": "483d1afc3cc109fe5ce68aae937ea30abb6a9127fd0f1c61e9bfed5b79aaacbf",
+      "bytes": 1253,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/663e1ea3-5c33-4a98-988a-4d49166ae366/205dcee1-e94d-4e5f-ab65-a1414d2ec923/guard-selftest.json"
+    },
+    {
+      "sha256": "867375ad2aed601640443916d85a588f7af8df3aeec4a0270685944eb075674f",
+      "bytes": 6484,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/663e1ea3-5c33-4a98-988a-4d49166ae366/205dcee1-e94d-4e5f-ab65-a1414d2ec923/result.json"
+    },
+    {
+      "sha256": "cda3099b1b783285203260d37b4c4fd4b1527d42485ebea5281163d401ffd5f6",
+      "bytes": 39406,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/663e1ea3-5c33-4a98-988a-4d49166ae366/205dcee1-e94d-4e5f-ab65-a1414d2ec923/runner.mjs.txt"
+    },
+    {
+      "sha256": "0838760bdb7c01796d8e6d72c4bb68e8f31461f77f7bd19239de7f531d5099e9",
+      "bytes": 1350534,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/closure.json"
+    },
+    {
+      "sha256": "92c82df8a872b0f750918024cf12ec6bde050cc4945ab3272774d2e1fb2ce36e",
+      "bytes": 6576,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/prepare.json"
+    },
+    {
+      "sha256": "483d1afc3cc109fe5ce68aae937ea30abb6a9127fd0f1c61e9bfed5b79aaacbf",
+      "bytes": 1253,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/guard-selftest.json"
+    },
+    {
+      "sha256": "beaccbfa20d338e48fae91b235fca73752559f2151d0257912622871c9c6cac7",
+      "bytes": 896804,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/result.json"
+    },
+    {
+      "sha256": "3ab4d665d619bb295746024823bc1f443916d57cfb13d396fa10581cb5928be0",
+      "bytes": 40625,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/be5c18d7-8150-4684-b7c4-a9044c11b796/runner.mjs.txt"
+    },
+    {
+      "sha256": "483d1afc3cc109fe5ce68aae937ea30abb6a9127fd0f1c61e9bfed5b79aaacbf",
+      "bytes": 1253,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/dc97beff-e1ff-4162-b0df-05f54a4c7dfb/guard-selftest.json"
+    },
+    {
+      "sha256": "426412a4be6fb4c5afd08c31261472d5f44a2ad3657ecf8ecf9c7ec4a4643600",
+      "bytes": 14825,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/dc97beff-e1ff-4162-b0df-05f54a4c7dfb/result.json"
+    },
+    {
+      "sha256": "4c94169e53ada26d1cd510f20520ebddc5c5879cc470c40c9e6793108a61386a",
+      "bytes": 40580,
+      "path": "docs/evidence/project-components/contracts-result-phase-a-live/e9662073-77cf-44b5-a04d-3649e1651e20/dc97beff-e1ff-4162-b0df-05f54a4c7dfb/runner.mjs.txt"
+    }
+  ]
+}

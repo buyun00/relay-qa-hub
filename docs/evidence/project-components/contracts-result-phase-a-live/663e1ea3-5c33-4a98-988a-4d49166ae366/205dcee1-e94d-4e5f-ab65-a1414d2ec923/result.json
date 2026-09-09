@@ -1,0 +1,137 @@
+{
+  "kind": "isolated_full_main_worker_http_server_mcp",
+  "status": "failed_retained",
+  "runId": "205dcee1-e94d-4e5f-ab65-a1414d2ec923",
+  "startedAt": "2026-09-09T03:04:50.949Z",
+  "planPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\plan.json",
+  "planSha256": "8b7deb0179ed36782460d5a741a03011b61226e0b3a6a1212b251f0ccce293ac",
+  "runnerSha256": "cda3099b1b783285203260d37b4c4fd4b1527d42485ebea5281163d401ffd5f6",
+  "configSha256": "03453012b205b8cf40f48938afed5dfa5ecbda9fe53fc6f41375cb8eb601f225",
+  "closureSha256": "274722c5c264a06c2e9723006d6463b1cdf9a115978bd7992b58cf593613387d",
+  "guardSha256": "e21298dc89212e3465e80ecf5156c8b5e1c35d2c2a769470983765119a7072b9",
+  "checks": [
+    {
+      "label": "4459/4461 free before startup",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "label": "preload selftest exit",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "label": "guard main denials",
+      "expected": 10,
+      "actual": 10,
+      "passed": true
+    },
+    {
+      "label": "worker inherited denials",
+      "expected": 10,
+      "actual": 10,
+      "passed": true
+    }
+  ],
+  "requests": [],
+  "processes": [
+    {
+      "role": "selftest",
+      "pid": 6336,
+      "startedAt": "2026-09-09T03:04:51.981Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "script": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\source\\scripts\\project-components\\result-phase-a-guard-selftest.mjs",
+      "guardLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runs\\205dcee1-e94d-4e5f-ab65-a1414d2ec923\\selftest-guard.jsonl",
+      "stdout": "{\"status\":\"passed\",\"main\":[{\"name\":\"fetch\",\"denied\":true},{\"name\":\"http\",\"denied\":true},{\"name\":\"https\",\"denied\":true},{\"name\":\"socket\",\"denied\":true},{\"name\":\"listen\",\"denied\":true},{\"name\":\"tls\",\"denied\":true},{\"name\":\"dns\",\"denied\":true},{\"name\":\"dgram\",\"denied\":true},{\"name\":\"spawn\",\"denied\":true},{\"name\":\"exec\",\"denied\":true}],\"worker\":[{\"name\":\"fetch\",\"denied\":true},{\"name\":\"http\",\"denied\":true},{\"name\":\"https\",\"denied\":true},{\"name\":\"socket\",\"denied\":true},{\"name\":\"listen\",\"denied\":true},{\"name\":\"tls\",\"denied\":true},{\"name\":\"dns\",\"denied\":true},{\"name\":\"dgram\",\"denied\":true},{\"name\":\"spawn\",\"denied\":true},{\"name\":\"exec\",\"denied\":true}],\"boundary\":\"Guard denial proof only; not application E2E\"}",
+      "stderr": "",
+      "exit": {
+        "code": 0,
+        "signal": null,
+        "at": "2026-09-09T03:04:52.144Z"
+      }
+    },
+    {
+      "role": "api",
+      "pid": 20028,
+      "startedAt": "2026-09-09T03:04:52.195Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "script": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\source\\scripts\\project-components\\run-preview-service.mjs",
+      "guardLog": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runs\\205dcee1-e94d-4e5f-ab65-a1414d2ec923\\api-guard.jsonl",
+      "stdout": "{\"event\":\"parallel-instance.validated\",\"instanceId\":\"qa-hub-preview-result-a-663e1ea3\",\"sourceRoot\":\"C:\\\\Users\\\\lin0\\\\.codex\\\\parallel-runtimes\\\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\\\source\",\"dataRoot\":\"C:\\\\Users\\\\lin0\\\\.codex\\\\parallel-runtimes\\\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\\\runtime\\\\dataRoot\",\"apiPort\":4459}\n{\"level\":50,\"time\":1788923092965,\"pid\":20028,\"hostname\":\"win11-lin-main\",\"error\":{\"code\":\"PHASE_A_GUARD_DENIED\"},\"msg\":\"Relay QA Hub API failed to start\"}\n{\"level\":30,\"time\":1788923107385,\"pid\":20028,\"hostname\":\"win11-lin-main\",\"signal\":\"SIGTERM\",\"msg\":\"stopping Relay QA Hub API\"}\n",
+      "stderr": "",
+      "exit": {
+        "code": 0,
+        "signal": null,
+        "at": "2026-09-09T03:05:07.400Z"
+      },
+      "shutdownRequestedAt": "2026-09-09T03:05:07.385Z",
+      "shutdownMechanism": "IPC command emits SIGTERM into original official handlers"
+    }
+  ],
+  "fixtures": [],
+  "boundaries": {
+    "originalPreviewTouched": false,
+    "productionTouched": false,
+    "componentsOff": true,
+    "importHoldReleased": false,
+    "externalExecutorsRun": false,
+    "assembledFastifyFixture": false
+  },
+  "failure": {
+    "name": "Error",
+    "message": "SERVICE_NOT_READY:4459"
+  },
+  "databaseAfterStop": {
+    "snapshot": {
+      "bugs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "repair_attempts": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "verifications": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "events": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "submissions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "idempotency_records": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "outbox": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "bug_deletions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "verification_result_snapshots": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "integrity": {
+      "integrity_check": "ok"
+    },
+    "archiveSha256": "a502d7fe021d45be137587d78acf2636e34c2d02fbfe39bb5ff985efd1e89c5f"
+  },
+  "finishedAt": "2026-09-09T03:05:07.529Z",
+  "requestCount": 0,
+  "checkCounts": {
+    "total": 4,
+    "passed": 4
+  },
+  "privateRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\result-phase-a-663e1ea3-5c33-4a98-988a-4d49166ae366\\runs\\205dcee1-e94d-4e5f-ab65-a1414d2ec923"
+}
