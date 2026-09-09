@@ -1,0 +1,13 @@
+✔ inspector fuse requires exactly enabled V1 CLI inspect (1.7782ms)
+✔ copy config retains API cookie identity but isolates profile port and feed (0.9374ms)
+✔ copy config refuses outside experiment or invented API cookie (3.1422ms)
+✔ local login/read are exact new scopes and have no per-request credential override (0.9476ms)
+✔ GM auxiliary permits only exact A shared version1 disable and version2 restore (0.4296ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 90.6448

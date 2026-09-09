@@ -1,0 +1,2625 @@
+{
+  "schemaVersion": 1,
+  "status": "failed_artifact_review",
+  "runId": "2de5de4f-aa73-4b77-b8b0-4273ec83f5b9",
+  "reviewedAt": "2026-09-09T03:48:49.557Z",
+  "reviewKind": "same agent artifact-only verification after actual processes exited; no new network/UI observation",
+  "proof": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\local-mcp-membership-live\\2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\proof.json",
+    "bytes": 537921,
+    "sha256": "763e49a4d2cc8edeef42c1448c189641828686d6e221fd366d73a7c4d33a05a3"
+  },
+  "source": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\local-mcp-membership-live.mjs",
+    "bytes": 36721,
+    "sha256": "b116392325539b228102796fff008c2aae5975f6e019f17482da5ec91754cb8d"
+  },
+  "test": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\local-mcp-membership-live.test.mjs",
+    "bytes": 3955,
+    "sha256": "a1d9d64af7afed4050cccef2a9f3c9f109d472021a709539440cb35636870bc0"
+  },
+  "dependency": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\server-mcp-membership-live.mjs",
+    "bytes": 20543,
+    "sha256": "78551518f34c5703f083c26f558e07076ee518cadea9209f71890f82bbd418c2",
+    "committedBlobSha256": "78551518f34c5703f083c26f558e07076ee518cadea9209f71890f82bbd418c2"
+  },
+  "requestAccounting": {
+    "recordedTotal": 39,
+    "local4470": {
+      "total": 36,
+      "initialize": 1,
+      "catalog": 1,
+      "toolsCall": 34,
+      "toolCounts": {
+        "qa_login_gm": 2,
+        "qa_create_project": 2,
+        "qa_get_components": 4,
+        "qa_login": 9,
+        "qa_list_projects": 6,
+        "qa_list_users": 5,
+        "qa_list_bugs": 4,
+        "qa_list_management_events": 2
+      }
+    },
+    "auxiliary4419": {
+      "total": 3,
+      "gmLogin": 1,
+      "membershipPatch": 2
+    },
+    "separatelyRecordedNonceUpdateGet": 1,
+    "healthReadinessPolls": {
+      "exactAttempts": null,
+      "includedIn39": false
+    },
+    "inspectorDiscoveryPolls": {
+      "exactAttempts": null,
+      "includedIn39": false
+    },
+    "inspectorWebSocketCommands": {
+      "includedIn39": false
+    },
+    "copyAutomaticTraffic": "not a complete network trace; startup notification/renderer API reads and nonce update checks are outside the 39-entry ledger"
+  },
+  "rawRecords": [
+    {
+      "label": "initialize isolated copied EXE",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-1.json",
+      "bytes": 642,
+      "sha256": "30f0c1a640fa0b5a65986073c501c4f523de47522a8b12792f94c6a9626fdfd1"
+    },
+    {
+      "label": "copy catalog",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-2.json",
+      "bytes": 150337,
+      "sha256": "99862834022aa10b1213b152c1377739f60a41ba8e8d55cd1120b0e49517acf4"
+    },
+    {
+      "label": "create only new project 0",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-4.json",
+      "bytes": 487,
+      "sha256": "da5fba4129226c5a10726476490b6774fd31d39c66ec1c0105a67652873b46c3"
+    },
+    {
+      "label": "initial five off 0",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-5.json",
+      "bytes": 2288,
+      "sha256": "94d8a27ee25708931384ecd0f3949965ad97db85260b90e9d1d7b3df6224f9af"
+    },
+    {
+      "label": "create only new project 1",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-6.json",
+      "bytes": 487,
+      "sha256": "c21227282a2057a2528b2a6725529d8404a1b70d1b947f95e34b849dd7795fe0"
+    },
+    {
+      "label": "initial five off 1",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-7.json",
+      "bytes": 2288,
+      "sha256": "bbfd7def1698b885b763cb0b0669d083da1ab6d29145eeb364120dfa73f1a3f3"
+    },
+    {
+      "label": "single directory",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-10.json",
+      "bytes": 966,
+      "sha256": "2aca856affaa7ce36f79ed4898e03a4050c484e1d61b573bc69757afdec5e5a4"
+    },
+    {
+      "label": "shared initial directory",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-12.json",
+      "bytes": 966,
+      "sha256": "9c83590f6b23c6e9e4dafa2298a7ab6e496567716bfa3471e314f985ab8c1b75"
+    },
+    {
+      "label": "shared A B directory",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-14.json",
+      "bytes": 1694,
+      "sha256": "892825573f32e9fd43737f9bab4e264728fd8c3c0d1f99da5de984d37454d244"
+    },
+    {
+      "label": "A people before revoke",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-15.json",
+      "bytes": 4034,
+      "sha256": "6a92ba43ccf2d6787b9dfea2af808a1f09458fcd36f211025d776de37acee7c6"
+    },
+    {
+      "label": "B people before revoke",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-16.json",
+      "bytes": 2753,
+      "sha256": "05f95a84b44cd8086ab7956f96f78947c65aca3916e6598a5545ef0adc7c7100"
+    },
+    {
+      "label": "GM revokes only fresh shared A",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\auxiliary-disable.json",
+      "bytes": 127,
+      "sha256": "960d1622c2214383eef9c0c5af2e5454aae40d371dbbdcfe564ba578cf292601"
+    },
+    {
+      "label": "existing A cookie refuses A read after revoke",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-18.json",
+      "bytes": 251,
+      "sha256": "994ed43ea270429492e1fbefabb76e8b122bb5e2f63b4bde8510778cf25f2f07"
+    },
+    {
+      "label": "B directory excludes disabled A",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-21.json",
+      "bytes": 966,
+      "sha256": "5496cbe1ffea6850fdc7a54d2b323400d629b6f2aa82281019bfd816de2332c1"
+    },
+    {
+      "label": "B unaffected Bug read",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-22.json",
+      "bytes": 236,
+      "sha256": "313b828e8a6d33a6fab23ab77d9f972e824ff279dbaa1b184bcaf997e1d03c94"
+    },
+    {
+      "label": "B exact personnel unchanged",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-23.json",
+      "bytes": 2753,
+      "sha256": "2bddc58a5e4bf069b0251a2f10b72ee498a1ce4a357adde2264b2a85c38222fd"
+    },
+    {
+      "label": "GM restores same fresh A membership",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\auxiliary-restore.json",
+      "bytes": 126,
+      "sha256": "c13dc10e8afc89e52f1edbf98eb2e3849ac94b87633dc554bfd5ee0c6eeb5c30"
+    },
+    {
+      "label": "restored directory",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-25.json",
+      "bytes": 1694,
+      "sha256": "11ed4318acefdad2b1a0e23e665d3c550b48533d789fa9b3878a05f3d8b46fb9"
+    },
+    {
+      "label": "restored A personnel",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-26.json",
+      "bytes": 4034,
+      "sha256": "f2ea7b2780b274027ca842fb7b5982a6e6304e7dde7b166b2a14c320a3db3d22"
+    },
+    {
+      "label": "final B personnel",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-27.json",
+      "bytes": 2753,
+      "sha256": "51900d929cca9cd0714d0b0088c277870753f1e0aa8fc41f8f0855e005254a31"
+    },
+    {
+      "label": "final five off",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-28.json",
+      "bytes": 2289,
+      "sha256": "0e28cc1ad5a1d81fe07fdd2b0aa1e5286d0f3c2aca85d5a68fd8296a42f5d5ae"
+    },
+    {
+      "label": "final no Bug writes",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-29.json",
+      "bytes": 236,
+      "sha256": "5072d9e0f45630ce32db5991b53b5da427444f14c3f02e8e9cc470f63ee989ba"
+    },
+    {
+      "label": "final five off",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-30.json",
+      "bytes": 2289,
+      "sha256": "2000569fcc124dfa2f4ad2a24a24bbbeec1b85cffff976ce01b711797cc452e8"
+    },
+    {
+      "label": "final no Bug writes",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-31.json",
+      "bytes": 236,
+      "sha256": "aed73894e939ff7c9c2ee00f4f7c6ffb3044a839d9ab53d884b9e560f9e476e5"
+    },
+    {
+      "label": "single final directory",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-33.json",
+      "bytes": 966,
+      "sha256": "4d4725b4f3b25f4997939fe96fb93be22c512ed0ce20f516801096023e88fa8e"
+    },
+    {
+      "label": "management audit b8fbf7ff-b9ab-4e01-ab1d-ac8cd99c1b65",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-35.json",
+      "bytes": 3531,
+      "sha256": "bb1a84b21c4b22e73f27c83cc37052a26ae353f8bb25b37103c0e3e6221fa4c7"
+    },
+    {
+      "label": "management audit 07cde190-2365-48b3-8b01-16a5fc421fae",
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\raw\\local-36.json",
+      "bytes": 1637,
+      "sha256": "2b02260e41c97f84bab25d28ee73ee3084c578ab783d8d5c795594fb7b21b3dd"
+    }
+  ],
+  "privateMetadata": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\quit-probe-preview-instance.json",
+      "bytes": 731,
+      "sha256": "e87342aa36ea8c135278e5bbd249074b92423d7234638406be5f5a0c3510780b"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\membership-preview-instance.json",
+      "bytes": 731,
+      "sha256": "19b359887c383053530d2a604d228dd6667dbdbc936949966d4f3eb579bfdb12"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\quit-probe-stdout.txt",
+      "bytes": 398,
+      "sha256": "f0ced82d84e98502c3d32181cbd80f109c65c2ec2bd9bf3679cc6a2a3a699342"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\quit-probe-stderr.txt",
+      "bytes": 478,
+      "sha256": "f9a5b4f5d8b47c4f14993c72fee511c54c8eb9b13141cfa2f532a5d82557e511"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\membership-stdout.txt",
+      "bytes": 398,
+      "sha256": "f0ced82d84e98502c3d32181cbd80f109c65c2ec2bd9bf3679cc6a2a3a699342"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\local-mcp-membership-copy-2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\membership-stderr.txt",
+      "bytes": 478,
+      "sha256": "95467045e9d55892bef95ff8228de9174a6ebd740c999c15c122090687f70935"
+    }
+  ],
+  "packageCopySummary": {
+    "files": 78,
+    "bytes": 378180695,
+    "inventorySource": "proof.packageInputs; all copied bytes rehashed"
+  },
+  "protectedSnapshot": {
+    "files": 6,
+    "source": "proof.protectedBefore/protectedAfter",
+    "readAgainDuringReview": false,
+    "wholeProfileClaim": false
+  },
+  "limitations": [
+    "Same installed preview9 executable/asar bytes in an independent copy/profile; not original GUI/profile testing.",
+    "Local MCP uses the copy's real shared cookie session. There is no per-request actor-token override; GM revoke/restore are explicitly separate auxiliary HTTP calls.",
+    "Original remembered identity is hashed without decoding; original draft databases/WAL/files are not read or copied.",
+    "No physical device, whole-profile preservation, external components, update installation or publication is exercised.",
+    "Login receipts are deliberately absent from raw retention; public redacted identity and recorded raw-response SHA remain, so original login bodies cannot be rehashed.",
+    "B membership comparison covers userId, status, version, roles and identity, not volatile session counts.",
+    "No GUI screenshots are appropriate for this MCP-only task. The review does not establish original GUI session behavior."
+  ],
+  "firstFailure": {
+    "runId": "09b01307-28c0-4d3a-a7d9-49bb4cb1c07c",
+    "checks": 18,
+    "requests": 0,
+    "processLaunches": 0,
+    "proof": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\local-mcp-membership-live\\09b01307-28c0-4d3a-a7d9-49bb4cb1c07c\\proof.json",
+      "bytes": 25916,
+      "sha256": "79819528189391818641f9727dea6e107373fbf6dbd269f2a5c43206e069d403"
+    },
+    "source": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\local-mcp-membership-live\\09b01307-28c0-4d3a-a7d9-49bb4cb1c07c\\runner.mjs.txt",
+      "bytes": 36429,
+      "sha256": "9ec11b0dec69dd8060edeeb3a1494b5c9cbf75abaa8f04ae88691a4fea73ecaa"
+    }
+  },
+  "checks": [
+    {
+      "label": "pinned successful proof",
+      "passed": true
+    },
+    {
+      "label": "pinned initial failed proof",
+      "passed": true
+    },
+    {
+      "label": "actual successful status",
+      "passed": true
+    },
+    {
+      "label": "actual checks count",
+      "passed": true
+    },
+    {
+      "label": "actual check 1 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 1 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 2 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 2 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 3 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 3 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 4 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 4 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 5 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 5 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 6 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 6 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 7 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 7 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 8 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 8 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 9 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 9 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 10 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 10 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 11 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 11 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 12 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 12 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 13 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 13 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 14 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 14 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 15 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 15 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 16 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 16 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 17 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 17 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 18 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 18 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 19 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 19 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 20 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 20 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 21 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 21 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 22 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 22 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 23 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 23 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 24 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 24 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 25 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 25 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 26 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 26 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 27 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 27 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 28 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 28 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 29 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 29 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 30 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 30 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 31 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 31 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 32 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 32 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 33 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 33 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 34 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 34 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 35 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 35 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 36 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 36 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 37 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 37 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 38 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 38 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 39 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 39 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 40 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 40 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 41 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 41 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 42 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 42 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 43 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 43 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 44 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 44 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 45 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 45 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 46 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 46 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 47 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 47 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 48 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 48 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 49 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 49 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 50 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 50 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 51 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 51 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 52 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 52 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 53 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 53 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 54 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 54 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 55 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 55 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 56 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 56 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 57 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 57 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 58 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 58 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 59 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 59 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 60 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 60 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 61 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 61 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 62 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 62 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 63 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 63 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 64 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 64 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 65 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 65 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 66 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 66 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 67 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 67 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 68 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 68 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 69 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 69 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 70 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 70 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 71 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 71 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 72 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 72 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 73 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 73 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 74 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 74 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 75 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 75 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 76 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 76 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 77 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 77 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 78 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 78 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 79 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 79 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 80 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 80 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 81 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 81 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 82 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 82 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 83 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 83 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 84 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 84 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 85 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 85 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 86 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 86 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 87 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 87 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 88 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 88 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 89 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 89 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 90 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 90 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 91 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 91 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 92 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 92 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 93 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 93 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 94 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 94 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 95 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 95 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 96 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 96 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 97 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 97 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 98 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 98 values",
+      "passed": true
+    },
+    {
+      "label": "actual check 99 flag",
+      "passed": true
+    },
+    {
+      "label": "actual check 99 values",
+      "passed": true
+    },
+    {
+      "label": "39 recorded requests",
+      "passed": true
+    },
+    {
+      "label": "36 local JSON-RPC requests",
+      "passed": true
+    },
+    {
+      "label": "3 auxiliary HTTP requests",
+      "passed": true
+    },
+    {
+      "label": "local sequential IDs",
+      "passed": true
+    },
+    {
+      "label": "local method counts",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 1",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 1",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 2",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 2",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 3",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 3",
+      "passed": true
+    },
+    {
+      "label": "local request 3 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 4",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 4",
+      "passed": true
+    },
+    {
+      "label": "local request 4 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 5",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 5",
+      "passed": true
+    },
+    {
+      "label": "local request 5 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 5 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 6",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 6",
+      "passed": true
+    },
+    {
+      "label": "local request 6 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 7",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 7",
+      "passed": true
+    },
+    {
+      "label": "local request 7 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 7 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 8",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 8",
+      "passed": true
+    },
+    {
+      "label": "local request 8 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 8 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 8 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 9",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 9",
+      "passed": true
+    },
+    {
+      "label": "local request 9 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 9 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 9 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 10",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 10",
+      "passed": true
+    },
+    {
+      "label": "local request 10 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 11",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 11",
+      "passed": true
+    },
+    {
+      "label": "local request 11 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 11 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 11 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 12",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 12",
+      "passed": true
+    },
+    {
+      "label": "local request 12 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 13",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 13",
+      "passed": true
+    },
+    {
+      "label": "local request 13 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 13 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 13 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 14",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 14",
+      "passed": true
+    },
+    {
+      "label": "local request 14 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 15",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 15",
+      "passed": true
+    },
+    {
+      "label": "local request 15 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 15 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 16",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 16",
+      "passed": true
+    },
+    {
+      "label": "local request 16 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 16 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 17",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 17",
+      "passed": true
+    },
+    {
+      "label": "local request 17 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 17 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 17 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 18",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 18",
+      "passed": true
+    },
+    {
+      "label": "local request 18 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 18 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 19",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 19",
+      "passed": true
+    },
+    {
+      "label": "local request 19 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 19 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 19 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 20",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 20",
+      "passed": true
+    },
+    {
+      "label": "local request 20 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 20 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 20 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 21",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 21",
+      "passed": true
+    },
+    {
+      "label": "local request 21 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 22",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 22",
+      "passed": true
+    },
+    {
+      "label": "local request 22 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 22 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 23",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 23",
+      "passed": true
+    },
+    {
+      "label": "local request 23 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 23 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 24",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 24",
+      "passed": true
+    },
+    {
+      "label": "local request 24 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 24 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 24 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 25",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 25",
+      "passed": true
+    },
+    {
+      "label": "local request 25 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 26",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 26",
+      "passed": true
+    },
+    {
+      "label": "local request 26 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 26 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 27",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 27",
+      "passed": true
+    },
+    {
+      "label": "local request 27 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 27 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 28",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 28",
+      "passed": true
+    },
+    {
+      "label": "local request 28 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 28 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 29",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 29",
+      "passed": true
+    },
+    {
+      "label": "local request 29 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 29 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 30",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 30",
+      "passed": true
+    },
+    {
+      "label": "local request 30 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 30 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 31",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 31",
+      "passed": true
+    },
+    {
+      "label": "local request 31 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 31 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 32",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 32",
+      "passed": true
+    },
+    {
+      "label": "local request 32 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 32 new project",
+      "passed": true
+    },
+    {
+      "label": "local login 32 fresh name",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 33",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 33",
+      "passed": true
+    },
+    {
+      "label": "local request 33 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 34",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 34",
+      "passed": true
+    },
+    {
+      "label": "local request 34 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 35",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 35",
+      "passed": true
+    },
+    {
+      "label": "local request 35 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 35 new project",
+      "passed": true
+    },
+    {
+      "label": "HTTP status 36",
+      "passed": true
+    },
+    {
+      "label": "JSON-RPC response ID 36",
+      "passed": true
+    },
+    {
+      "label": "local request 36 has no credential override",
+      "passed": true
+    },
+    {
+      "label": "local request 36 new project",
+      "passed": true
+    },
+    {
+      "label": "only bounded tools",
+      "passed": true
+    },
+    {
+      "label": "11 local login requests including refused login",
+      "passed": true
+    },
+    {
+      "label": "2 new project writes",
+      "passed": true
+    },
+    {
+      "label": "auxiliary login route",
+      "passed": true
+    },
+    {
+      "label": "auxiliary 1 exact A relationship",
+      "passed": true
+    },
+    {
+      "label": "auxiliary 1 returned CAS",
+      "passed": true
+    },
+    {
+      "label": "auxiliary 2 exact A relationship",
+      "passed": true
+    },
+    {
+      "label": "auxiliary 2 returned CAS",
+      "passed": true
+    },
+    {
+      "label": "local catalog 90",
+      "passed": true
+    },
+    {
+      "label": "catalog actual response",
+      "passed": true
+    },
+    {
+      "label": "initialize protocol primitive preserved",
+      "passed": true
+    },
+    {
+      "label": "initialize .9",
+      "passed": true
+    },
+    {
+      "label": "single identity 8",
+      "passed": true
+    },
+    {
+      "label": "single identity 9",
+      "passed": true
+    },
+    {
+      "label": "single identity 32",
+      "passed": true
+    },
+    {
+      "label": "shared identity 11",
+      "passed": true
+    },
+    {
+      "label": "shared identity 13",
+      "passed": true
+    },
+    {
+      "label": "shared identity 17",
+      "passed": true
+    },
+    {
+      "label": "shared identity 20",
+      "passed": true
+    },
+    {
+      "label": "shared identity 24",
+      "passed": true
+    },
+    {
+      "label": "different employee identities",
+      "passed": true
+    },
+    {
+      "label": "directory only A 10",
+      "passed": true
+    },
+    {
+      "label": "directory only A 12",
+      "passed": true
+    },
+    {
+      "label": "directory only A 33",
+      "passed": true
+    },
+    {
+      "label": "directory A B 14",
+      "passed": true
+    },
+    {
+      "label": "directory A B 25",
+      "passed": true
+    },
+    {
+      "label": "disabled A omitted from directory",
+      "passed": true
+    },
+    {
+      "label": "single never member of B",
+      "passed": true
+    },
+    {
+      "label": "initial membership version 15",
+      "passed": true
+    },
+    {
+      "label": "initial membership version 16",
+      "passed": true
+    },
+    {
+      "label": "restored A membership 3",
+      "passed": true
+    },
+    {
+      "label": "restored A active",
+      "passed": true
+    },
+    {
+      "label": "B unchanged after disable",
+      "passed": true
+    },
+    {
+      "label": "B unchanged after restore",
+      "passed": true
+    },
+    {
+      "label": "denial 18 is MCP error",
+      "passed": true
+    },
+    {
+      "label": "denial 18 precise code/status",
+      "passed": true
+    },
+    {
+      "label": "denial 19 is MCP error",
+      "passed": true
+    },
+    {
+      "label": "denial 19 precise code/status",
+      "passed": true
+    },
+    {
+      "label": "revocation order 1",
+      "passed": true
+    },
+    {
+      "label": "revocation order 2",
+      "passed": true
+    },
+    {
+      "label": "revocation order 3",
+      "passed": true
+    },
+    {
+      "label": "revocation order 4",
+      "passed": true
+    },
+    {
+      "label": "no intervening local login before old cookie denial",
+      "passed": true
+    },
+    {
+      "label": "five component records 5",
+      "passed": true
+    },
+    {
+      "label": "five all off 5",
+      "passed": true
+    },
+    {
+      "label": "five component records 7",
+      "passed": true
+    },
+    {
+      "label": "five all off 7",
+      "passed": true
+    },
+    {
+      "label": "five component records 28",
+      "passed": true
+    },
+    {
+      "label": "five all off 28",
+      "passed": true
+    },
+    {
+      "label": "five component records 30",
+      "passed": true
+    },
+    {
+      "label": "five all off 30",
+      "passed": true
+    },
+    {
+      "label": "empty Bug list 22",
+      "passed": true
+    },
+    {
+      "label": "empty Bug list 29",
+      "passed": true
+    },
+    {
+      "label": "empty Bug list 31",
+      "passed": true
+    },
+    {
+      "label": "audit 35 membership.disabled",
+      "passed": true
+    },
+    {
+      "label": "audit 35 membership.activated",
+      "passed": true
+    },
+    {
+      "label": "audit 36 membership.disabled",
+      "passed": true
+    },
+    {
+      "label": "audit 36 membership.activated",
+      "passed": true
+    },
+    {
+      "label": "runner current bytes equal executed",
+      "passed": true
+    },
+    {
+      "label": "test frozen SHA",
+      "passed": true
+    },
+    {
+      "label": "source archive public 2de5de4f-aa73-4b77-b8b0-4273ec83f5b9",
+      "passed": true
+    },
+    {
+      "label": "source archive private 2de5de4f-aa73-4b77-b8b0-4273ec83f5b9",
+      "passed": true
+    },
+    {
+      "label": "private proof 2de5de4f-aa73-4b77-b8b0-4273ec83f5b9",
+      "passed": true
+    },
+    {
+      "label": "source archive public 09b01307-28c0-4d3a-a7d9-49bb4cb1c07c",
+      "passed": true
+    },
+    {
+      "label": "source archive private 09b01307-28c0-4d3a-a7d9-49bb4cb1c07c",
+      "passed": true
+    },
+    {
+      "label": "private proof 09b01307-28c0-4d3a-a7d9-49bb4cb1c07c",
+      "passed": true
+    },
+    {
+      "label": "raw hash 1",
+      "passed": true
+    },
+    {
+      "label": "raw object 1",
+      "passed": true
+    },
+    {
+      "label": "raw hash 2",
+      "passed": true
+    },
+    {
+      "label": "raw hash 5",
+      "passed": true
+    },
+    {
+      "label": "raw object 5",
+      "passed": false
+    },
+    {
+      "label": "raw hash 6",
+      "passed": true
+    },
+    {
+      "label": "raw object 6",
+      "passed": false
+    },
+    {
+      "label": "raw hash 7",
+      "passed": true
+    },
+    {
+      "label": "raw object 7",
+      "passed": false
+    },
+    {
+      "label": "raw hash 8",
+      "passed": true
+    },
+    {
+      "label": "raw object 8",
+      "passed": false
+    },
+    {
+      "label": "raw hash 11",
+      "passed": true
+    },
+    {
+      "label": "raw object 11",
+      "passed": false
+    },
+    {
+      "label": "raw hash 13",
+      "passed": true
+    },
+    {
+      "label": "raw object 13",
+      "passed": false
+    },
+    {
+      "label": "raw hash 15",
+      "passed": true
+    },
+    {
+      "label": "raw object 15",
+      "passed": false
+    },
+    {
+      "label": "raw hash 16",
+      "passed": true
+    },
+    {
+      "label": "raw object 16",
+      "passed": false
+    },
+    {
+      "label": "raw hash 17",
+      "passed": true
+    },
+    {
+      "label": "raw object 17",
+      "passed": false
+    },
+    {
+      "label": "raw hash 19",
+      "passed": true
+    },
+    {
+      "label": "raw object 19",
+      "passed": true
+    },
+    {
+      "label": "raw hash 20",
+      "passed": true
+    },
+    {
+      "label": "raw object 20",
+      "passed": false
+    },
+    {
+      "label": "raw hash 23",
+      "passed": true
+    },
+    {
+      "label": "raw object 23",
+      "passed": false
+    },
+    {
+      "label": "raw hash 24",
+      "passed": true
+    },
+    {
+      "label": "raw object 24",
+      "passed": false
+    },
+    {
+      "label": "raw hash 25",
+      "passed": true
+    },
+    {
+      "label": "raw object 25",
+      "passed": false
+    },
+    {
+      "label": "raw hash 26",
+      "passed": true
+    },
+    {
+      "label": "raw object 26",
+      "passed": true
+    },
+    {
+      "label": "raw hash 28",
+      "passed": true
+    },
+    {
+      "label": "raw object 28",
+      "passed": false
+    },
+    {
+      "label": "raw hash 29",
+      "passed": true
+    },
+    {
+      "label": "raw object 29",
+      "passed": false
+    },
+    {
+      "label": "raw hash 30",
+      "passed": true
+    },
+    {
+      "label": "raw object 30",
+      "passed": false
+    },
+    {
+      "label": "raw hash 31",
+      "passed": true
+    },
+    {
+      "label": "raw object 31",
+      "passed": false
+    },
+    {
+      "label": "raw hash 32",
+      "passed": true
+    },
+    {
+      "label": "raw object 32",
+      "passed": false
+    },
+    {
+      "label": "raw hash 33",
+      "passed": true
+    },
+    {
+      "label": "raw object 33",
+      "passed": false
+    },
+    {
+      "label": "raw hash 34",
+      "passed": true
+    },
+    {
+      "label": "raw object 34",
+      "passed": false
+    },
+    {
+      "label": "raw hash 36",
+      "passed": true
+    },
+    {
+      "label": "raw object 36",
+      "passed": false
+    },
+    {
+      "label": "raw hash 38",
+      "passed": true
+    },
+    {
+      "label": "raw object 38",
+      "passed": false
+    },
+    {
+      "label": "raw hash 39",
+      "passed": true
+    },
+    {
+      "label": "raw object 39",
+      "passed": false
+    },
+    {
+      "label": "27 non-auth raw bodies retained",
+      "passed": true
+    },
+    {
+      "label": "raw directory exact inventory",
+      "passed": true
+    },
+    {
+      "label": "12 auth responses deliberately have no raw body",
+      "passed": true
+    },
+    {
+      "label": "copied package .preview-instance-id",
+      "passed": true
+    },
+    {
+      "label": "copied package chrome_100_percent.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package chrome_200_percent.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package d3dcompiler_47.dll",
+      "passed": true
+    },
+    {
+      "label": "copied package dxcompiler.dll",
+      "passed": true
+    },
+    {
+      "label": "copied package dxil.dll",
+      "passed": true
+    },
+    {
+      "label": "copied package ffmpeg.dll",
+      "passed": true
+    },
+    {
+      "label": "copied package icudtl.dat",
+      "passed": true
+    },
+    {
+      "label": "copied package libEGL.dll",
+      "passed": true
+    },
+    {
+      "label": "copied package libGLESv2.dll",
+      "passed": true
+    },
+    {
+      "label": "copied package LICENSE",
+      "passed": true
+    },
+    {
+      "label": "copied package LICENSES.chromium.html",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\af.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\am.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ar.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\bg.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\bn.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ca.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\cs.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\da.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\de.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\el.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\en-GB.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\en-US.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\es-419.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\es.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\et.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\fa.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\fi.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\fil.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\fr.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\gu.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\he.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\hi.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\hr.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\hu.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\id.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\it.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ja.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\kn.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ko.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\lt.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\lv.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ml.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\mr.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ms.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\nb.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\nl.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\pl.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\pt-BR.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\pt-PT.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ro.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ru.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\sk.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\sl.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\sr.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\sv.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\sw.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ta.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\te.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\th.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\tr.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\uk.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\ur.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\vi.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\zh-CN.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package locales\\zh-TW.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package preview-instance.json",
+      "passed": true
+    },
+    {
+      "label": "copied package RelayQaHubPreview.exe",
+      "passed": true
+    },
+    {
+      "label": "copied package RelayQaHubUpdater.exe",
+      "passed": true
+    },
+    {
+      "label": "copied package resources.pak",
+      "passed": true
+    },
+    {
+      "label": "copied package resources\\app.asar",
+      "passed": true
+    },
+    {
+      "label": "copied package snapshot_blob.bin",
+      "passed": true
+    },
+    {
+      "label": "copied package v8_context_snapshot.bin",
+      "passed": true
+    },
+    {
+      "label": "copied package version",
+      "passed": true
+    },
+    {
+      "label": "copied package vk_swiftshader_icd.json",
+      "passed": true
+    },
+    {
+      "label": "copied package vk_swiftshader.dll",
+      "passed": true
+    },
+    {
+      "label": "copied package vulkan-1.dll",
+      "passed": true
+    },
+    {
+      "label": "78 package files",
+      "passed": true
+    },
+    {
+      "label": "378180695 package bytes",
+      "passed": true
+    },
+    {
+      "label": "copy config hash quit-probe",
+      "passed": true
+    },
+    {
+      "label": "profile inside experiment quit-probe",
+      "passed": true
+    },
+    {
+      "label": "copy config hash membership",
+      "passed": true
+    },
+    {
+      "label": "profile inside experiment membership",
+      "passed": true
+    },
+    {
+      "label": "normal quit PID quit-probe",
+      "passed": true
+    },
+    {
+      "label": "normal quit exit quit-probe",
+      "passed": true
+    },
+    {
+      "label": "inspector PID quit-probe",
+      "passed": true
+    },
+    {
+      "label": "inspector profile quit-probe",
+      "passed": true
+    },
+    {
+      "label": "inspector own exe quit-probe",
+      "passed": true
+    },
+    {
+      "label": "ready before quit quit-probe",
+      "passed": true
+    },
+    {
+      "label": "quit before four minute watchdog quit-probe",
+      "passed": true
+    },
+    {
+      "label": "normal quit PID membership",
+      "passed": true
+    },
+    {
+      "label": "normal quit exit membership",
+      "passed": true
+    },
+    {
+      "label": "inspector PID membership",
+      "passed": true
+    },
+    {
+      "label": "inspector profile membership",
+      "passed": true
+    },
+    {
+      "label": "inspector own exe membership",
+      "passed": true
+    },
+    {
+      "label": "ready before quit membership",
+      "passed": true
+    },
+    {
+      "label": "quit before four minute watchdog membership",
+      "passed": true
+    },
+    {
+      "label": "quit probe exits before membership launch",
+      "passed": true
+    },
+    {
+      "label": "protected files unchanged in actual before/after",
+      "passed": true
+    },
+    {
+      "label": "host identities unchanged in actual before/after",
+      "passed": true
+    },
+    {
+      "label": "own ports recorded released",
+      "passed": true
+    },
+    {
+      "label": "no update artifacts",
+      "passed": true
+    },
+    {
+      "label": "nonce manifest genuinely 404",
+      "passed": true
+    },
+    {
+      "label": "original MCP and UI untouched declaration",
+      "passed": true
+    },
+    {
+      "label": "first run failed before requests",
+      "passed": true
+    },
+    {
+      "label": "unchanged committed helper normalized text",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 552,
+    "failed": 23
+  },
+  "frozenInputs": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\local-mcp-membership-live\\2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\proof.json",
+      "bytes": 537921,
+      "sha256": "763e49a4d2cc8edeef42c1448c189641828686d6e221fd366d73a7c4d33a05a3"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\local-mcp-membership-live\\2de5de4f-aa73-4b77-b8b0-4273ec83f5b9\\runner.mjs.txt",
+      "bytes": 36721,
+      "sha256": "b116392325539b228102796fff008c2aae5975f6e019f17482da5ec91754cb8d"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\local-mcp-membership-live\\09b01307-28c0-4d3a-a7d9-49bb4cb1c07c\\proof.json",
+      "bytes": 25916,
+      "sha256": "79819528189391818641f9727dea6e107373fbf6dbd269f2a5c43206e069d403"
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\local-mcp-membership-live\\09b01307-28c0-4d3a-a7d9-49bb4cb1c07c\\runner.mjs.txt",
+      "bytes": 36429,
+      "sha256": "9ec11b0dec69dd8060edeeb3a1494b5c9cbf75abaa8f04ae88691a4fea73ecaa"
+    }
+  ]
+}

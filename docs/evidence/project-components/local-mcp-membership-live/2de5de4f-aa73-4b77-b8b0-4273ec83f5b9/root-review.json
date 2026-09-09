@@ -1,0 +1,28 @@
+{
+  "at": "2026-09-09T03:53:38.004Z",
+  "kind": "root independent artifact and bounded source review",
+  "proofSha256": "763e49a4d2cc8edeef42c1448c189641828686d6e221fd366d73a7c4d33a05a3",
+  "freezeSha256": "e1e8bb9e1d14ce8eafabca9b7efe16ba208bdb2d8c577ce7db37f26d430a1958",
+  "filesVerified": 26,
+  "actualChecks": 99,
+  "authorArtifactChecks": 575,
+  "scenarioRequests": {
+    "localCopy4470": 36,
+    "gmAuxiliary4419": 3,
+    "total": 39
+  },
+  "reviewed": {
+    "ownCopyNormalQuitGateBeforeMembership": true,
+    "independentPhysicalProfilesAndUnpublishedFeed": true,
+    "original4420NotCalled": true,
+    "sharedLocalSessionSemanticsExplicit": true,
+    "originalSixFilesAndObservedProcessSnapshotOnly": true,
+    "firstRuntimeAndAuditFailuresRetained": true
+  },
+  "limits": [
+    "No runtime/profile/port/UI reread during this review.",
+    "39 is the scenario ledger, not a complete network count.",
+    "Same installed package bytes in an independent copy; no original GUI/draft acceptance inferred.",
+    "Native and server MCP tests remain separate evidence; no coverage-matrix promotion performed."
+  ]
+}

@@ -1,0 +1,29 @@
+# Independent copied EXE local MCP membership run
+
+The installed `.9` local MCP uses the same main-process cookie/remembered identity as its GUI. `apps/desktop/src/mcp-api.ts:349–361` commits successful login identity; `main.ts:815–824` shares that store and durable callback. `mcp-server.ts:280–292` does not select a different actor from request Authorization. Therefore no login, logout or business call will be sent to the original 4420/13564 process.
+
+Root authorized a new verified executable copy and explicitly scoped GM auxiliary HTTP for the revoke/restore boundary. The new runner is `scripts/project-components/local-mcp-membership-live.mjs`; default invocation is inert. Syntax, 5 pure guard tests, default-inert, ESLint and Prettier passed. Initial runner SHA `9ec11b0dec69dd8060edeeb3a1494b5c9cbf75abaa8f04ae88691a4fea73ecaa`, test SHA `441d7fc636ff76590789eaf68665674ece9f8fdfc7094c39a6427373a32911f4`.
+
+Only the immutable, previously verified `.9` package directory is copied into a fresh `runtime/acceptance/local-mcp-membership-copy-<UUID>/app`. Every package file is hashed and copied without overwrite or links. The EXE and ASAR must match the currently installed originals, with ASAR SHA `6bc9f7508f663bd34c3896894369a7f9cafc6cc8c57542465315373a77790636`. No profile, remembered identity, token, Cookie DB or draft file is copied. Configuration comes from new explicit `QA_HUB_PREVIEW_DESKTOP_CONFIG` files; `desktop-runtime.json` is not used as an assumed override for this package entry point.
+
+The copied configuration keeps logical `instanceId=qa-hub-preview-7c86` and `cookieName=qa-hub-preview-7c86-session` only because 4419 issues that cookie. Each fresh profile resides below an exact `qa-hub-preview-7c86` path component inside this new experiment. MCP is 4470. The copied manifest URL is a unique, unserved same-origin nonce path containing the instance ID; its actual 404 is checked. The real program's five-second update check remains enabled, but cannot download from that unserved URL; no feed is published or installer invoked. The actual installed `preview-config.js` parser is executed with the new configuration before any process launch. `main.ts` calls `app.setPath('userData',...)` before the unchanged `requestSingleInstanceLock`.
+
+## Normal-close prerequisite
+
+The actual installed EXE's V1 fuse wire is `101100011`, with `EnableNodeCliInspectArguments` enabled. Electron officially supports [main-process `--inspect`](https://www.electronjs.org/docs/latest/tutorial/debugging-main-process); its [fuse documentation](https://www.electronjs.org/docs/latest/tutorial/fuses) and [wire definition](https://github.com/electron/fuses/blob/main/src/config.ts) distinguish this from assuming that any packaged executable permits debugging. No fuse is modified.
+
+A first `quit-probe` process uses `--inspect=4471 --hidden`, fresh profile and exact copied EXE. Before any auth/business work, the runner confirms 4471 is owned by that new PID, evaluates only its PID/executable/profile/version, arms an own-process normal `app.quit` deadline, and asks that same process to quit normally. It must exit 0 and release 4470/4471. There is no kill/force-stop fallback and no use of the original process's inspector or window. A second launch, with a separate fresh membership profile, occurs only after this actual normal-close probe passes. Its four-minute deadline also calls ordinary `app.quit`; source/ASAR and the application Abort/timing code are unchanged.
+
+## Real fixture sequence
+
+All local JSON-RPC goes only to copied-process 4470. It initializes/version-checks, reads the 90-tool directory, logs into GM on the copy, creates two fresh projects and verifies five components off. Two independently named new employees are used: one single-project A employee and one shared A/B employee. Repeated login must keep IDs; directory and personnel readbacks must match effective memberships.
+
+To test an existing A session without pretending local MCP supports per-request tokens, the copy explicitly logs into A and retains its real cookie. A separate GM session obtained with official HTTP is held only in runner memory. Its sole business changes are PATCH of the new shared employee's new A membership: `{active:false,expectedVersion:1}`, then `{active:true,expectedVersion:2}`. The current copy A cookie must receive 403 on A read after revocation; same-name A login must also be refused. Then actual local B login succeeds with the same global ID, only B appears in the directory, B membership fields remain unchanged, restoration yields A version 3 and the original ID, and final A/B reads show zero Bugs/five off. Local GM management-event reads confirm one A disable, one A activate and none in B. No Bug, attachment, comment, component, production or original-profile mutation is allowed.
+
+The original installed config/EXE/ASAR, original remembered-identity file (hash-only, no decoding), instance file and Windows feed are hashed before/after; original 13564/start `2026-09-09T01:44:08.4163170Z`/4420 and API 22852/start `2026-09-09T01:22:20.2728640Z` must remain. Normal copied-process close and both port releases are required. Original live LevelDB/WAL/draft files are never read or copied. Evidence explicitly describes identical installed bytes in an independent copy, not the original GUI/profile's personnel flow. Auth secrets stay in memory; public responses are redacted, raw non-auth responses stay only in the new private experiment.
+
+```powershell
+node scripts/project-components/local-mcp-membership-live.mjs --run
+```
+
+First failure is retained without overwriting source/log/proof. If normal-close support cannot be demonstrated, no dependent membership fixture writes are performed. The original EXE and user drafts are never used as a fallback.

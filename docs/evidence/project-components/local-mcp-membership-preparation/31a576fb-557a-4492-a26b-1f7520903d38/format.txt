@@ -1,0 +1,4 @@
+npm notice run @relay-qa-hub/root@0.1.0-debug npx
+npm notice run prettier --check scripts/project-components/local-mcp-membership-live.mjs scripts/project-components/local-mcp-membership-live.test.mjs
+Checking formatting...
+All matched files use Prettier code style!

@@ -1,0 +1,1 @@
+not_run: explicit --run required; installed original MCP authentication is forbidden; only a new verified copy may run

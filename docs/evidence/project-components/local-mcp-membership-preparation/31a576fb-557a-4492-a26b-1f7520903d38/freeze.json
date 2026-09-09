@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "status": "frozen",
+  "createdAt": "2026-09-09T03:51:57.617Z",
+  "scope": "only two new evidence helpers/tests and new preparation/actual-run artifacts; no original runtime/profile reads at freeze",
+  "files": [
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/09b01307-28c0-4d3a-a7d9-49bb4cb1c07c/proof.json",
+      "bytes": 25916,
+      "sha256": "79819528189391818641f9727dea6e107373fbf6dbd269f2a5c43206e069d403",
+      "lfCanonicalSha256": "79819528189391818641f9727dea6e107373fbf6dbd269f2a5c43206e069d403",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/09b01307-28c0-4d3a-a7d9-49bb4cb1c07c/runner.mjs.txt",
+      "bytes": 36429,
+      "sha256": "9ec11b0dec69dd8060edeeb3a1494b5c9cbf75abaa8f04ae88691a4fea73ecaa",
+      "lfCanonicalSha256": "9ec11b0dec69dd8060edeeb3a1494b5c9cbf75abaa8f04ae88691a4fea73ecaa",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/README.md",
+      "bytes": 8597,
+      "sha256": "790af5ff3ca8ea77e338b9823f1f0cb7f814948482e731b6bf258aa88e6e0f45",
+      "lfCanonicalSha256": "790af5ff3ca8ea77e338b9823f1f0cb7f814948482e731b6bf258aa88e6e0f45",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/artifact-review-r2.json",
+      "bytes": 60963,
+      "sha256": "cc6cc6bf903d5b621047e6bbd8fe929953eb53c883f661e3749f3df43d6d0eda",
+      "lfCanonicalSha256": "cc6cc6bf903d5b621047e6bbd8fe929953eb53c883f661e3749f3df43d6d0eda",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/artifact-review-r2.log.txt",
+      "bytes": 224,
+      "sha256": "1de3396676ab819f7453b073bb33e182dae995d61d35eae753151c7db3098308",
+      "lfCanonicalSha256": "24d892a66f088e5d0a405079b692e4241a096a75e7766510faf7d6c9fc59373e",
+      "crlfCount": 1
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/artifact-review-r2.mjs",
+      "bytes": 16173,
+      "sha256": "d79f664fc06ac620512fc2d452dfd87e27b347abc90886eaffe2b312e46e12e2",
+      "lfCanonicalSha256": "d79f664fc06ac620512fc2d452dfd87e27b347abc90886eaffe2b312e46e12e2",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/artifact-review.json",
+      "bytes": 60987,
+      "sha256": "0f74ed641f13d246e3068257a2239296946e33ba3c13d41a861f243f04e113a4",
+      "lfCanonicalSha256": "0f74ed641f13d246e3068257a2239296946e33ba3c13d41a861f243f04e113a4",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/artifact-review.log.txt",
+      "bytes": 225,
+      "sha256": "0386d95b486ea066cfa49c4c80727fe0ac14618c766739d3c265247a83fd22cd",
+      "lfCanonicalSha256": "edc13d126f239d85a2f79a1a30690fe2aa12affdfb8fcf3d07045600ca141e46",
+      "crlfCount": 1
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/artifact-review.mjs",
+      "bytes": 15618,
+      "sha256": "d6e08631e98628b9772f200b52e5af212abb6ff122dfebca142f02905b55ba63",
+      "lfCanonicalSha256": "d6e08631e98628b9772f200b52e5af212abb6ff122dfebca142f02905b55ba63",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/proof.json",
+      "bytes": 537921,
+      "sha256": "763e49a4d2cc8edeef42c1448c189641828686d6e221fd366d73a7c4d33a05a3",
+      "lfCanonicalSha256": "763e49a4d2cc8edeef42c1448c189641828686d6e221fd366d73a7c4d33a05a3",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-live/2de5de4f-aa73-4b77-b8b0-4273ec83f5b9/runner.mjs.txt",
+      "bytes": 36721,
+      "sha256": "b116392325539b228102796fff008c2aae5975f6e019f17482da5ec91754cb8d",
+      "lfCanonicalSha256": "b116392325539b228102796fff008c2aae5975f6e019f17482da5ec91754cb8d",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/actual-first-run.txt",
+      "bytes": 540,
+      "sha256": "f601f72a0dcfc46b0ba72d198b8e4a6dc456f9cd70085462f298fe22651deced",
+      "lfCanonicalSha256": "f601f72a0dcfc46b0ba72d198b8e4a6dc456f9cd70085462f298fe22651deced",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/actual-second-run.txt",
+      "bytes": 392,
+      "sha256": "f70b4b2a4cac0f5999b95df000fad2a50f255e79f4c73b7f522421af6fe5b2cd",
+      "lfCanonicalSha256": "f70b4b2a4cac0f5999b95df000fad2a50f255e79f4c73b7f522421af6fe5b2cd",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/followup-r2.md",
+      "bytes": 2028,
+      "sha256": "04a040a5a91422ac1cea30f46e6bfb555370279cbed2165be89ace8477eb11ef",
+      "lfCanonicalSha256": "04a040a5a91422ac1cea30f46e6bfb555370279cbed2165be89ace8477eb11ef",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/format-r2.txt",
+      "bytes": 267,
+      "sha256": "0c34db87d6433fa4e2fe1081dc84b626adc624a74f8073687fee0ae760996a12",
+      "lfCanonicalSha256": "0c34db87d6433fa4e2fe1081dc84b626adc624a74f8073687fee0ae760996a12",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/format.txt",
+      "bytes": 267,
+      "sha256": "0c34db87d6433fa4e2fe1081dc84b626adc624a74f8073687fee0ae760996a12",
+      "lfCanonicalSha256": "0c34db87d6433fa4e2fe1081dc84b626adc624a74f8073687fee0ae760996a12",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/inert.txt",
+      "bytes": 119,
+      "sha256": "0910e889b00a14633fb0c9fe209c998aba14c5a22eff52f9634ebd557c48400b",
+      "lfCanonicalSha256": "0910e889b00a14633fb0c9fe209c998aba14c5a22eff52f9634ebd557c48400b",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/lint-r2.txt",
+      "bytes": 191,
+      "sha256": "e29a3bfe66e4204ba52d6fb8ab44ced5e4d02f545853bcf7e6541cbe20233cc8",
+      "lfCanonicalSha256": "e29a3bfe66e4204ba52d6fb8ab44ced5e4d02f545853bcf7e6541cbe20233cc8",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/lint.txt",
+      "bytes": 191,
+      "sha256": "e29a3bfe66e4204ba52d6fb8ab44ced5e4d02f545853bcf7e6541cbe20233cc8",
+      "lfCanonicalSha256": "e29a3bfe66e4204ba52d6fb8ab44ced5e4d02f545853bcf7e6541cbe20233cc8",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/plan.md",
+      "bytes": 5813,
+      "sha256": "63834de9f878c89c0fc5ce6237576426c732fe5a5fb5f7c58c2eb399c1d3aeb8",
+      "lfCanonicalSha256": "63834de9f878c89c0fc5ce6237576426c732fe5a5fb5f7c58c2eb399c1d3aeb8",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/syntax-r2.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lfCanonicalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/syntax.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lfCanonicalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/tests-r2.txt",
+      "bytes": 540,
+      "sha256": "a5225cdeac93a7d34fb5202a8d10182fadb1dc5863803c5a55a251cf59c29d90",
+      "lfCanonicalSha256": "a5225cdeac93a7d34fb5202a8d10182fadb1dc5863803c5a55a251cf59c29d90",
+      "crlfCount": 0
+    },
+    {
+      "path": "docs/evidence/project-components/local-mcp-membership-preparation/31a576fb-557a-4492-a26b-1f7520903d38/tests.txt",
+      "bytes": 541,
+      "sha256": "e6cdfb226cc2323d5c7772d4f8a4a18f1da2913b21a3fa10e977b015e3779216",
+      "lfCanonicalSha256": "e6cdfb226cc2323d5c7772d4f8a4a18f1da2913b21a3fa10e977b015e3779216",
+      "crlfCount": 0
+    },
+    {
+      "path": "scripts/project-components/local-mcp-membership-live.mjs",
+      "bytes": 36721,
+      "sha256": "b116392325539b228102796fff008c2aae5975f6e019f17482da5ec91754cb8d",
+      "lfCanonicalSha256": "b116392325539b228102796fff008c2aae5975f6e019f17482da5ec91754cb8d",
+      "crlfCount": 0
+    },
+    {
+      "path": "scripts/project-components/local-mcp-membership-live.test.mjs",
+      "bytes": 3955,
+      "sha256": "a1d9d64af7afed4050cccef2a9f3c9f109d472021a709539440cb35636870bc0",
+      "lfCanonicalSha256": "a1d9d64af7afed4050cccef2a9f3c9f109d472021a709539440cb35636870bc0",
+      "crlfCount": 0
+    }
+  ],
+  "readOnlyDependency": {
+    "path": "scripts/project-components/server-mcp-membership-live.mjs",
+    "sha256": "78551518f34c5703f083c26f558e07076ee518cadea9209f71890f82bbd418c2",
+    "lfCanonicalSha256": "78551518f34c5703f083c26f558e07076ee518cadea9209f71890f82bbd418c2"
+  },
+  "secretAudit": {
+    "publicFilesScanned": 26,
+    "patternFindings": [],
+    "checks": [
+      "JWT-shaped literal",
+      "long Bearer literal",
+      "PEM private key",
+      "recursive JSON sensitive string-value fields including object/array JSON text"
+    ],
+    "allowlist": [
+      "synthetic-only literal in pure credential-override rejection test",
+      "schema/type descriptions and evidence source identifier names are not credentials"
+    ],
+    "actualSecretSet": "Actual runner scanned all public proof against its in-memory real secret set before writing. Artifact review did not reload secrets and does not claim a new real-token scan."
+  },
+  "notForStaging": [
+    "runtime acceptance application copies",
+    "runtime fresh profiles and remembered identity",
+    "runtime private raw responses/configs/stdout/stderr"
+  ],
+  "limits": [
+    "No further HTTP, ports, GUI, device or profile reads after the actual run.",
+    "These raw and LF-canonical hashes document Git line normalization separately from executed-source hashes.",
+    "The first test-source snapshot was not retained; only its original SHA and logs are available."
+  ]
+}
