@@ -55,6 +55,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import org.json.JSONObject
 
 data class FoundationUiState(
@@ -399,7 +400,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     init {
         // WorkManager persists operations, but an interrupted continuation may be absent. Reconcile
         // the current durable scope whenever the authenticated app surface is opened.
-        appContainer.syncScheduler.enqueue(scope)
+        uploadQueuedBugsNow()
     }
 
     val apkInstallRequests = apkInstallRequestChannel.receiveAsFlow()
@@ -789,7 +790,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun scheduleConstrainedSync() {
         appContainer.syncScheduler.enqueue(scope)
-        lastAction.value = "Sync scheduled with connected-network and battery constraints."
+        lastAction.value = "已安排联网后自动重试，低电量不会阻止上传。"
     }
 
     fun runLiveSmoke() {
@@ -872,6 +873,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             if (previous != null && previous.state != QueueState.FAILED_PERMANENT) {
                 lastAction.value = "$actionLabel 已在持久队列中，无需重复提交。"
                 if (navigateAfterQueue) finishNewBugForm()
+                uploadQueuedBugsNow()
                 onCompleted()
                 return@launch
             }
@@ -942,7 +944,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     ),
                 )
                 val operationId = appContainer.scopedRepository.enqueue(scope, request)
-                appContainer.syncScheduler.enqueue(scope)
                 operationId
             }
             result.onSuccess { operationId ->
@@ -950,6 +951,9 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     "$actionLabel 已安全保存 (${operationId.take(8)})，正在提交；服务端确认后会出现在列表中。" +
                         if (captureId == null) "" else " Poco 上下文将在线尽力附加，失败不阻断 Bug。"
                 if (navigateAfterQueue) finishNewBugForm()
+                // Persistence has committed. A scheduler/network failure must NEVER enter the
+                // draft-persistence cleanup path and delete this operation's saved images.
+                uploadQueuedBugsNow()
             }.onFailure { failure ->
                 persistedAttachmentIds.forEach { attachmentId ->
                     runCatching {
@@ -971,6 +975,29 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
         captureDraft.value = CaptureDraftUiState()
         newBugFormRevision.value += 1
         page.value = QaHubPage.BUG_LIST
+    }
+
+    private fun uploadQueuedBugsNow() {
+        // Durable fallback survives navigation/process death. Foreground upload does not wait
+        // for WorkManager constraints or the system's next scheduling opportunity.
+        runCatching { appContainer.syncScheduler.enqueue(scope) }
+        viewModelScope.launch {
+            try {
+                val result = appContainer.syncEngine.run(scope)
+                if (result is SyncRunResult.ContinueAt) {
+                    appContainer.syncScheduler.enqueueContinuation(
+                        scope,
+                        maxOf(0L, result.nextAttemptAtEpochMs - System.currentTimeMillis()),
+                    )
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                // Keep the durable queue and attachments; a later worker/open can recover them.
+                lastAction.value = "内容已保存在本机，上传尚未完成，将在恢复连接后重试。"
+                runCatching { appContainer.syncScheduler.enqueue(scope) }
+            }
+        }
     }
 
     /**
@@ -1137,7 +1164,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
             bugWorkbench.value = BugWorkbenchUiState(phase = "loading")
-            lastAction.value = "Reading project Bugs from the QA Hub…"
             runCatching {
                 appContainer.bugWorkbenchClient.listBugs(
                     projectId = scope.projectId,
@@ -1156,8 +1182,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     firstTitle = first?.title,
                     items = result.items,
                 )
-                lastAction.value =
-                    "QA Hub read back ${result.items.size} project Bug(s)."
             }.onFailure { failure ->
                 setBugWorkbenchFailure(
                     if (failure is BugWorkbenchFailure) {
@@ -1175,7 +1199,6 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             phase = "failed",
             errorCode = code,
         )
-        lastAction.value = "QA Hub Bug list failed: $code."
     }
 
     fun openBugDetail(bugId: String) {

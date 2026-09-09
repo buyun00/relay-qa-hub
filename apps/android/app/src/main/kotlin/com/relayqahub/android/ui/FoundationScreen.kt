@@ -961,6 +961,7 @@ private fun BugListPage(
                     }
                 }
             }
+            item { SubmissionStatusCard(state) }
             when {
                 state.bugWorkbench.phase == "loading" -> item {
                     EmptyListCard("正在刷新项目 Bug…")
@@ -2025,6 +2026,7 @@ private fun NewBugPage(
             ) {
                 Text("提交 Bug", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.ExtraBold)
             }
+            SubmissionStatusCard(state)
             if (state.lastAction.isNotBlank()) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),

@@ -12,13 +12,13 @@ val qaHubApiBaseUrl = providers.gradleProperty("qaHubApiBaseUrl")
 val qaHubGameApkDirectoryUrl = providers.gradleProperty("qaHubGameApkDirectoryUrl")
     .orElse("http://10.100.5.129:8000/apk/")
 val qaHubVersionCode = providers.gradleProperty("qaHubVersionCode")
-    .orElse("14")
+    .orElse("15")
     .map { value ->
         value.toIntOrNull()?.takeIf { it > 0 }
             ?: error("qaHubVersionCode must be a positive integer")
     }
 val qaHubVersionName = providers.gradleProperty("qaHubVersionName")
-    .orElse("0.1.13-debug")
+    .orElse("0.1.14-debug")
 val qaHubPocoPort = providers.gradleProperty("qaHubPocoPort")
     .orElse("5001")
     .map { value ->

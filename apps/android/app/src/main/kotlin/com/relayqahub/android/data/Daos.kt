@@ -194,7 +194,7 @@ interface OfflineOperationDao {
             "WHERE accountId = :accountId AND projectId = :projectId " +
             "AND actorId = :actorId AND installationId = :installationId " +
             "AND sessionId = :sessionId " +
-            "AND state IN ('PENDING', 'RUNNING', 'RETRY', 'BLOCKED_AUTH', 'BLOCKED_DEVICE')",
+            "AND state IN ('PENDING', 'RUNNING', 'RETRY', 'BLOCKED_AUTH', 'BLOCKED_DEVICE', 'FAILED_PERMANENT')",
     )
     fun observeOutstandingCount(
         accountId: String,
