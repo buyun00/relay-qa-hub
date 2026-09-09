@@ -1,0 +1,19 @@
+✔ default CLI is inert, including when invoked from an empty unrelated directory (187.8862ms)
+✔ traversal, encoded paths, Windows aliases and duplicate case inventory are rejected (20.0519ms)
+✔ whole old tree and candidate are retained create-only and independently verified (38.4423ms)
+✔ assets install first without changing HTML, then one index switch selects new bytes (32.4343ms)
+✔ explicit old-index restoration keeps both generations of immutable assets (59.2498ms)
+✔ same-path changed non-index asset is refused before publication (14.9534ms)
+✔ candidate tampering rejects asset installation and leaves original HTML (13.295ms)
+✔ an existing different new asset cannot be overwritten; failure retains all files (11.34ms)
+✔ changed HTML preimage fails closed after assets with no auto-revert or deletion (21.7762ms)
+✔ junction candidate tree and served parent are refused, no outside file is changed (12.5676ms)
+✔ unknown mode and production-shaped arguments do not access config or mutate temp directory (382.6415ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 998.9738

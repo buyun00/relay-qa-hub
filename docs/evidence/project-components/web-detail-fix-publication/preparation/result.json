@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "status": "inert_helper_verified_not_prepared_or_deployed",
+  "recordedAt": "2026-09-09T01:57:30.851Z",
+  "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+  "preparationHead": "af5133abb3abea3423b8e6e1a75ec49e425bfccd",
+  "sourceFiles": [
+    {
+      "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+      "bytes": 22660,
+      "sha256": "ec8324fb5abc1173fc25416949d04ae30a687538742537a35279a92ce9b5888a"
+    },
+    {
+      "path": "scripts/project-components/publish-preview-web-detail-fix.test.mjs",
+      "bytes": 7997,
+      "sha256": "13f411d37dff222e569ce407f673eb0b05330a9110cbfc947d1bce97d33ac68f"
+    }
+  ],
+  "readme": {
+    "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/README.md",
+    "bytes": 9187,
+    "sha256": "57c2d4da55425b3d08db4255b193e19d84601f86c0321ccecfb8c21056aed271"
+  },
+  "checks": {
+    "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/checks.json",
+    "bytes": 2179,
+    "sha256": "f5ce8c42e295c112f679889dc2adeed01ddb18e21dced2041a0846fdb7a6ccd4"
+  },
+  "gates": [
+    {
+      "completedAt": "2026-09-09T01:55:30.5730657Z",
+      "startedAt": "2026-09-09T01:55:29.5405166Z",
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-frozen.txt",
+      "name": "tests-frozen",
+      "exitCode": 0,
+      "sha256": "f1c4c1e55e19f872314824f5916607e08ea5fed867e95b95992063c625185dce"
+    },
+    {
+      "completedAt": "2026-09-09T01:55:30.6357872Z",
+      "startedAt": "2026-09-09T01:55:30.5847824Z",
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-runner.txt",
+      "name": "nodecheck-frozen-runner",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "completedAt": "2026-09-09T01:55:30.6899340Z",
+      "startedAt": "2026-09-09T01:55:30.6362904Z",
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-test.txt",
+      "name": "nodecheck-frozen-test",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "completedAt": "2026-09-09T01:55:31.5239972Z",
+      "startedAt": "2026-09-09T01:55:30.6903342Z",
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-frozen.txt",
+      "name": "lint-frozen",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "completedAt": "2026-09-09T01:55:31.7546771Z",
+      "startedAt": "2026-09-09T01:55:31.5255595Z",
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-frozen.txt",
+      "name": "format-frozen",
+      "exitCode": 0,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "completedAt": "2026-09-09T01:55:31.9102028Z",
+      "startedAt": "2026-09-09T01:55:31.7555515Z",
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/default-inert-frozen.txt",
+      "name": "default-inert-frozen",
+      "exitCode": 0,
+      "sha256": "55f80dcbc248e1e02c6f91712a5daad60a91021946f8b739b2811ed66e01c9cd"
+    }
+  ],
+  "tests": {
+    "passed": 11,
+    "total": 11,
+    "realNetworkRequests": 0,
+    "previewServiceOperations": 0,
+    "fixtures": "system temp only; all retained"
+  },
+  "history": [
+    {
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-first.txt",
+      "passed": 10,
+      "failed": 1,
+      "classification": "Harness parsed last line instead of complete pretty-printed stderr JSON. Original log retained; corrected assertion uses complete JSON."
+    },
+    {
+      "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-first.txt",
+      "failed": 1,
+      "classification": "Unnecessary regex slash escape removed. Original lint log retained."
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/default-inert-frozen.txt",
+      "bytes": 270,
+      "sha256": "55f80dcbc248e1e02c6f91712a5daad60a91021946f8b739b2811ed66e01c9cd"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/default-inert.txt",
+      "bytes": 270,
+      "sha256": "55f80dcbc248e1e02c6f91712a5daad60a91021946f8b739b2811ed66e01c9cd"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-check.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-final-write.txt",
+      "bytes": 165,
+      "sha256": "21a6f811cce1af50a9fc8c2bfe0f433d778eef20c945825066950e95b7e18ee8"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-frozen.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-write.txt",
+      "bytes": 142,
+      "sha256": "c9616e684a602b17f2e2ffa188359039c0bf42421e831e66c9b681a90f455f8f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-first.txt",
+      "bytes": 224,
+      "sha256": "8847f3a3a711ebda9857413e960d2f687372e75083fa2da0f3a2895aba3f0b47"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-frozen.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-runner.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-test.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-runner.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-test.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-final.txt",
+      "bytes": 1181,
+      "sha256": "ad23e1d394370b4de239c5b5ae85b4f0b524daca26de42bd6153d77c01e918e5"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-first.txt",
+      "bytes": 2061,
+      "sha256": "d5062ab70e39b3c392fc1bc0492d35736d3828ad440a23bd97abcdcb84c461b2"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-frozen.txt",
+      "bytes": 1183,
+      "sha256": "f1c4c1e55e19f872314824f5916607e08ea5fed867e95b95992063c625185dce"
+    }
+  ],
+  "provenance": {
+    "packageRunId": "7ed02aa0-3669-4f85-932a-2cf3ed0eadaf",
+    "prepared": {
+      "path": "docs/evidence/project-components/exe-preview9-package-only/prepared.json",
+      "bytes": 21312,
+      "sha256": "ae86788cfa46d11ffd8ff37674ad2b558782caec809437ab1ef642bf45dda220"
+    },
+    "build": {
+      "path": "docs/evidence/project-components/exe-preview9-package-only/build-result.json",
+      "bytes": 46282,
+      "sha256": "d7804189e974ee3dad2fa3864a9d60220ef54cfa7a977959220197e7db809fe0"
+    },
+    "result": {
+      "path": "docs/evidence/project-components/exe-preview9-package-only/result.json",
+      "bytes": 8420,
+      "sha256": "48b9ca590887cc76339677ea86f7e326d5cadb4abcace677c81c707c18849837"
+    },
+    "fix": {
+      "path": "docs/evidence/project-components/web-detail-loading-fix.json",
+      "bytes": 8470,
+      "sha256": "1e2cc70ef1797eed139521a9ba36af8303695cf19abf1917bad168276f4d3042"
+    },
+    "oldFiles": [
+      {
+        "path": "assets/index-Ce9wROrH.js",
+        "bytes": 477454,
+        "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+      },
+      {
+        "path": "assets/index-Ce9wROrH.js.map",
+        "bytes": 1829460,
+        "sha256": "ce6a8263f152a2a349db4d19b42e5cc60fce3e2a9b32d90db23abc32003fafcd"
+      },
+      {
+        "path": "assets/index-CgNw0fhl.css",
+        "bytes": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      },
+      {
+        "path": "assets/index-CUjaBP8S.js",
+        "bytes": 467013,
+        "sha256": "a001eacfd1aae18facd6ad0e4ffd34e24e2abaf9b98c9612eac69678f0c30962"
+      },
+      {
+        "path": "assets/index-CUjaBP8S.js.map",
+        "bytes": 1782565,
+        "sha256": "9b75066ba577ec1b466b41d8b2fed82f1b67e257844f7db9c5000e46b16f552a"
+      },
+      {
+        "path": "icon-licenses.txt",
+        "bytes": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      },
+      {
+        "path": "icons/qa-hub-192.svg",
+        "bytes": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      },
+      {
+        "path": "icons/qa-hub-512.svg",
+        "bytes": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      },
+      {
+        "path": "icons/qa-hub-maskable-512.svg",
+        "bytes": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      },
+      {
+        "path": "index.html",
+        "bytes": 709,
+        "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+      }
+    ],
+    "newFiles": [
+      {
+        "path": "assets/index-Br-CEXQI.js",
+        "bytes": 477433,
+        "sha256": "813277e9792c91d27b2e153322a0a2bfcad277ec57723df712f7d84ae24ad3ae"
+      },
+      {
+        "path": "assets/index-Br-CEXQI.js.map",
+        "bytes": 1829769,
+        "sha256": "0fe085cf7652afec28a494f30bf6b1dcd46bf1ba8e1793984f8bceef2e298328"
+      },
+      {
+        "path": "assets/index-CgNw0fhl.css",
+        "bytes": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      },
+      {
+        "path": "icon-licenses.txt",
+        "bytes": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      },
+      {
+        "path": "icons/qa-hub-192.svg",
+        "bytes": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      },
+      {
+        "path": "icons/qa-hub-512.svg",
+        "bytes": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      },
+      {
+        "path": "icons/qa-hub-maskable-512.svg",
+        "bytes": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      },
+      {
+        "path": "index.html",
+        "bytes": 709,
+        "sha256": "22203c14cade9462e21d31b42beb2103c6c1ecabb1ebc2af00aa316968ff7367"
+      }
+    ]
+  },
+  "future": {
+    "prepare": "--prepare INSTANCE UUID",
+    "deploy": "--deploy INSTANCE UUID APPROVED_RUNNER_SHA APPROVED_PLAN_SHA",
+    "restoreIndex": "--restore-index INSTANCE UUID APPROVED_RUNNER_SHA APPROVED_PLAN_SHA APPROVED_DEPLOY_PROOF_SHA",
+    "expectedDeployHttpRequests": 18,
+    "expectedRestoreHttpRequests": 22
+  },
+  "boundaries": {
+    "actualPrepare": false,
+    "actualPublish": false,
+    "actualRestore": false,
+    "actualHttp": false,
+    "actualBrowser": false,
+    "apiOrServiceOperation": false,
+    "webBuild": false,
+    "productSourceChanged": false,
+    "existingProofChanged": false,
+    "gitIndexChanged": false,
+    "uiAcceptance": "not_run",
+    "coldDirectoryRestore": "not_run"
+  },
+  "notes": [
+    "All eight candidate hashes are pinned to the retained .9 package-only result; no current source rebuild is performed.",
+    "Successful deployment retains old assets; only explicitly pinned index preimage is replaced, resulting in 12 served files.",
+    "Failed postchecks may follow an already switched index. Locks, files and evidence remain; no auto rollback or retry.",
+    "Default inert means no application-data reads/writes; Node necessarily loads helper modules.",
+    "Independent reviewer is requested separately; this result records executed pure/temp gates only."
+  ]
+}

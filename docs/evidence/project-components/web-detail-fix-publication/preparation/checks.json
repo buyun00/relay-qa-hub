@@ -1,0 +1,50 @@
+[
+  {
+    "completedAt": "2026-09-09T01:55:30.5730657Z",
+    "startedAt": "2026-09-09T01:55:29.5405166Z",
+    "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-frozen.txt",
+    "name": "tests-frozen",
+    "exitCode": 0,
+    "sha256": "f1c4c1e55e19f872314824f5916607e08ea5fed867e95b95992063c625185dce"
+  },
+  {
+    "completedAt": "2026-09-09T01:55:30.6357872Z",
+    "startedAt": "2026-09-09T01:55:30.5847824Z",
+    "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-runner.txt",
+    "name": "nodecheck-frozen-runner",
+    "exitCode": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "completedAt": "2026-09-09T01:55:30.6899340Z",
+    "startedAt": "2026-09-09T01:55:30.6362904Z",
+    "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-test.txt",
+    "name": "nodecheck-frozen-test",
+    "exitCode": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "completedAt": "2026-09-09T01:55:31.5239972Z",
+    "startedAt": "2026-09-09T01:55:30.6903342Z",
+    "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-frozen.txt",
+    "name": "lint-frozen",
+    "exitCode": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "completedAt": "2026-09-09T01:55:31.7546771Z",
+    "startedAt": "2026-09-09T01:55:31.5255595Z",
+    "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-frozen.txt",
+    "name": "format-frozen",
+    "exitCode": 0,
+    "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+  },
+  {
+    "completedAt": "2026-09-09T01:55:31.9102028Z",
+    "startedAt": "2026-09-09T01:55:31.7555515Z",
+    "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/default-inert-frozen.txt",
+    "name": "default-inert-frozen",
+    "exitCode": 0,
+    "sha256": "55f80dcbc248e1e02c6f91712a5daad60a91021946f8b739b2811ed66e01c9cd"
+  }
+]

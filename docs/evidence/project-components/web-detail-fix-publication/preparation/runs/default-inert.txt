@@ -1,0 +1,9 @@
+{
+  "status": "not_run",
+  "reads": 0,
+  "writes": 0,
+  "http": 0,
+  "builds": 0,
+  "serviceOperations": 0,
+  "usage": "--prepare INSTANCE UUID | --deploy INSTANCE UUID RUNNER_SHA PLAN_SHA | --restore-index INSTANCE UUID RUNNER_SHA PLAN_SHA DEPLOY_PROOF_SHA"
+}

@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T02:08:17.352Z",
+  "status": "passed",
+  "runId": "e2d5cb4b-9068-4f14-9f90-d292ee4af864",
+  "reviewer": "production_inventory",
+  "method": "Artifact-only independent hash/ledger/inventory comparison. Read public source-review/prepare/deploy/post-scope and saved plan/runner/old/candidate/lock; no publisher execution and no live served, production, config, feed or process access.",
+  "checks": {
+    "passed": 15,
+    "total": 15,
+    "items": [
+      {
+        "id": "approved_prepare_deploy_chain",
+        "passed": true,
+        "detail": "Exact public prepare/saved plan/runner/deploy SHA chain; successful single recorded deploy with indexSwitched true."
+      },
+      {
+        "id": "source_and_web_identity_unchanged",
+        "passed": true,
+        "detail": "Recorded source hashes and exact Web process/receipt identity unchanged before/after; this review does not re-query the current process."
+      },
+      {
+        "id": "saved_old10_candidate8_still_exact",
+        "passed": true,
+        "detail": "Rehashed only saved 18 file copies; no live served or original package directory read."
+      },
+      {
+        "id": "recorded_served_merged12",
+        "passed": true,
+        "detail": "Deployment recorded 12 files / 6,961,841 bytes: nine old non-index files retained plus two new assets and new index. This is receipt validation, not a new live tree enumeration."
+      },
+      {
+        "id": "exact_18_read_ledger",
+        "passed": true,
+        "detail": "Exactly initial old index GET/HEAD plus all eight candidate GET/HEAD pairs; 9 GET and 9 HEAD."
+      },
+      {
+        "id": "all_http_status_headers_and_bytes",
+        "passed": true,
+        "detail": "All 18 statuses/instance/cache/length checks and nine GET hashes match retained bytes; HEAD bodies are empty. Response bodies were hashed in the original runner, not retained as separate HTTP-body files."
+      },
+      {
+        "id": "recorded_request_chronology",
+        "passed": true,
+        "detail": "Request timestamps are ordered within deploy; post-scope starts after deploy completes."
+      },
+      {
+        "id": "retained_lock_identity",
+        "passed": true,
+        "detail": "The saved one-shot lock remains and binds this exact deploy; no lock or scratch cleanup performed."
+      },
+      {
+        "id": "post_scope_link_and_eight_checks",
+        "passed": true,
+        "detail": "Original post-scope 8/8 and source-copy SHA are bound to this deploy and the preceding EXE .9 after proof."
+      },
+      {
+        "id": "six_production_hashes_recorded_preserved",
+        "passed": true,
+        "detail": "All six before/after production hashes match the pinned earlier observation. Production paths were not opened in this review."
+      },
+      {
+        "id": "seven_processes_six_listeners_recorded_preserved",
+        "passed": true,
+        "detail": "Exact saved PID/start/executable and listener tuples match. Two production Node executable paths remain null; no stronger path identity claim."
+      },
+      {
+        "id": "two_saved_readiness_results",
+        "passed": true,
+        "detail": "Saved two GET readiness results are internally self-consistent: production schema12 and preview schema14. No new HTTP requests."
+      },
+      {
+        "id": "preview_config_windows9_android23_feed_hashes",
+        "passed": true,
+        "detail": "Recorded preview config, Windows .9 manifest and Android code23 feed hashes unchanged; no current file/feed reads."
+      },
+      {
+        "id": "narrow_mutation_and_acceptance_boundaries",
+        "passed": true,
+        "detail": "Actual deploy is Web asset/index publication only; post-scope adds two readonly health GETs. This does not prove browser detail loading, restore-index or full cold directory restore."
+      },
+      {
+        "id": "public_metadata_pattern_scan",
+        "passed": true,
+        "detail": "Five bounded public inputs have no matching JWT/private-key/non-redacted credential-value patterns. No private secrets read or exact-secret-value comparison."
+      }
+    ]
+  },
+  "deployment": {
+    "startedAt": "2026-09-09T02:03:40.200Z",
+    "completedAt": "2026-09-09T02:03:43.872Z",
+    "status": "published_verified",
+    "requests": 18,
+    "get": 9,
+    "head": 9,
+    "allStatuses": 200,
+    "servedCount": 12,
+    "servedBytes": 6961841,
+    "servedInventorySha256": "a47ef4220c4407ed40346fbe9bb99e5061c4678fe77f1f87d19d077f483d0202",
+    "webIdentity": {
+      "pid": 20284,
+      "createdAt": "2026-09-08T17:52:36.5080910Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLineSha256": "b25fc9673b6f1eb3c8c1b1dbe8847b32870785b99437d1df360ffa745dbca7cf",
+      "port": 4274,
+      "receiptSha256": "412f4e1ac6388f3ea6b76885b180818ee6b6e1a124fac7396c0f40647166230a"
+    }
+  },
+  "retainedCopies": [
+    {
+      "folder": "old-web-dist-cold-restore",
+      "count": 10,
+      "bytes": 4654639,
+      "inventorySha256": "0f13df047e3e7765ecd9b3091a11e595b882f4b2e1a1b0fff1551e32099a7c77"
+    },
+    {
+      "folder": "candidate-web-dist",
+      "count": 8,
+      "bytes": 2405349,
+      "inventorySha256": "627aadb2d6ac087b80e7929eb3b1d31f3555d85babcd147c0bd074a508dfc2c0"
+    }
+  ],
+  "postScope": {
+    "startedAt": "2026-09-09T02:03:59.049Z",
+    "completedAt": "2026-09-09T02:04:00.874Z",
+    "checksPassed": 8,
+    "requests": 2,
+    "productionFiles": 6,
+    "processes": 7,
+    "listeners": 6,
+    "readiness": {
+      "production": "ready/schema12",
+      "preview": "ready/schema14"
+    },
+    "nullExecutablePids": [
+      7420,
+      10844
+    ],
+    "configAndFeedHashes": [
+      {
+        "path": "C:/Users/lin0/AppData/Local/Programs/RelayQaHubPreview/preview-instance.json",
+        "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+        "sha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\android\\qa-hub-preview-7c86\\latest.json",
+        "sha256": "6986c64031f0d013ae99f465009c1653b1f641ea25d740d316f3c6c3ae1b88d9"
+      }
+    ]
+  },
+  "references": [
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/source-review.json",
+      "bytes": 18804,
+      "sha256": "440d0fc0edeccf62f1bed3b393af3fa68bc15c98ecefcd9f8de8badc7241c788"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/prepare.json",
+      "bytes": 36687,
+      "sha256": "b3f07e9b87a2a49549343816dcff8963a57efb863cff61de581a6ef8a98b39c0"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/deploy.json",
+      "bytes": 40539,
+      "sha256": "0ec3abdbdbe85e1d3ab79155a8dcc2f31c21e999e634834ddb488000e90cff63"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/post-scope.json",
+      "bytes": 7407,
+      "sha256": "08a29b138fe85562dfa2818e7190d34479f5f9b275705394cd5db4d50ee4bd72"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/post-scope-source.mjs.txt",
+      "bytes": 5008,
+      "sha256": "17e05c192f36f989ede699aa3f1b5b23ade1890a85ccb5f030cf9af51a38130a"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/plan.json",
+      "bytes": 36603,
+      "sha256": "438d4d0578241ddb32b2dda720c96162537520c97b475abb74f38e49a29ff1a9"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/runner.mjs.txt",
+      "bytes": 22660,
+      "sha256": "ec8324fb5abc1173fc25416949d04ae30a687538742537a35279a92ce9b5888a"
+    },
+    {
+      "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+      "bytes": 22660,
+      "sha256": "ec8324fb5abc1173fc25416949d04ae30a687538742537a35279a92ce9b5888a"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-independent/f222d18f-4176-401f-9bdc-af6da4917991/after/proof.json",
+      "bytes": 503705,
+      "sha256": "c82c6b92da9b639d91090676258ca80e13e03c15b919dcd7f00c76bb0b42a12d"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/.web-detail-fix-publication.lock",
+      "bytes": 283,
+      "sha256": "6a240ffd3b1b1bfb0bd9dd2544c5e922627db216a3b119caff941ccd83f5b1ab"
+    }
+  ],
+  "history": [
+    {
+      "kind": "review_harness_syntax_error",
+      "effect": "First readonly metadata-inspection Node invocation had an extra closing parenthesis; parse failed before executing file reads or writes. The next corrected inspection succeeded. This did not run publication or HTTP and is not a business failure."
+    },
+    {
+      "kind": "author_preparation_history",
+      "reference": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/source-review.json",
+      "effect": "Original 10/11 test-harness failure and lint escape error retained; final local fixture 11/11 already recorded separately."
+    }
+  ],
+  "boundaries": {
+    "reviewerHttp": 0,
+    "reviewerProcessQueries": 0,
+    "reviewerDeviceOrUi": 0,
+    "reviewerServiceOperations": 0,
+    "reviewerLiveServedReads": 0,
+    "reviewerProductionReads": 0,
+    "reviewerLiveConfigOrFeedReads": 0,
+    "originalArtifactWrites": 0,
+    "publisherRunsByReviewer": 0,
+    "actualRestore": "not_run",
+    "browserAcceptance": "not_run"
+  },
+  "limitations": [
+    "Receipts establish execution-time observations only, not current runtime freshness.",
+    "Original static HTTP response body files are not separately retained; this audit compares captured statuses/headers/byte counts/SHA against saved exact artifacts.",
+    "Source-review remains the earlier prepare-only review; it is not retroactively rewritten as a deploy proof.",
+    "No new feature/baseline pass is inferred from static publication."
+  ]
+}

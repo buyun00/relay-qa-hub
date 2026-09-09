@@ -1,0 +1,6 @@
+
+C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\scripts\project-components\publish-preview-web-detail-fix.mjs
+  98:21  error  Unnecessary escape character: \/  no-useless-escape
+
+✖ 1 problem (1 error, 0 warnings)
+

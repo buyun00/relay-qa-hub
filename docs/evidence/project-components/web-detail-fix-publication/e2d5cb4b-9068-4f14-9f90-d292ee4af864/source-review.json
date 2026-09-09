@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T02:05:31.845Z",
+  "status": "no_high_confidence_blocker_in_bounded_source_and_saved_prepare_review",
+  "runId": "e2d5cb4b-9068-4f14-9f90-d292ee4af864",
+  "reviewer": "production_inventory",
+  "method": "Read frozen source/test and author logs without importing or executing publisher; independently hash approved repo files and only saved plan/runner/old/candidate copies; compare byte inventories and record source control-flow findings.",
+  "checks": {
+    "passed": 16,
+    "total": 16,
+    "items": [
+      {
+        "id": "source_and_proof_raw_hashes",
+        "passed": true,
+        "detail": "35 exact files hashed; author result, runner/test, 16 logs, prepared plan/public pair and source pins remain as recorded."
+      },
+      {
+        "id": "public_plan_exact_pair",
+        "passed": true,
+        "detail": "Public prepare equals saved plan after removing only public planSha256."
+      },
+      {
+        "id": "saved_old_and_candidate_trees",
+        "passed": true,
+        "detail": "All 18 saved file bytes match pinned inventories; no unknown files or links."
+      },
+      {
+        "id": "merged_asset_scope",
+        "passed": true,
+        "detail": "Five same-path non-index files identical, two new immutable assets, one index replacement; expected merged tree has 12 files."
+      },
+      {
+        "id": "author_fixture_evidence",
+        "passed": true,
+        "detail": "Frozen log says 11/11, six gate exit codes 0; no tests rerun by reviewer. Initial test 10/11 and lint failure logs retained."
+      },
+      {
+        "id": "prepare_only_evidence",
+        "passed": true,
+        "detail": "Root prepare status and saved source/Web identity pairs match; recorded builds/http/serviceOperations/servedWrites each 0."
+      },
+      {
+        "id": "exact_scope_and_lineage",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 239
+        },
+        "detail": "Fixed instance/worktree/loopback ports and config hash; package prepared/build/result linkage and seven pinned source/proof files."
+      },
+      {
+        "id": "inert_default",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 370
+        },
+        "detail": "No mode invokes no application data access or operations; module loading is not counted as application-data access."
+      },
+      {
+        "id": "approved_runner_plan_and_full_preimage",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 450
+        },
+        "detail": "Deploy requires exact runner and prepared plan SHA, same source snapshot, old 10/candidate 8 full inventories and original package inventory."
+      },
+      {
+        "id": "create_only_assets",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 137
+        },
+        "detail": "Assets are checked before reading/copying; immutable same-path collisions reject; hard-link creation cannot overwrite a destination; pending files remain outside served tree."
+      },
+      {
+        "id": "sole_index_replacement",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 157
+        },
+        "detail": "Exact index preimage checked twice; durable temporary file then same-volume rename. Root single-writer window is necessary; not a universal atomic compare-and-swap against unrelated writers."
+      },
+      {
+        "id": "whole_tree_and_process_identity",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 509
+        },
+        "detail": "Whole expected tree and exact prepared Web process identity are rechecked around the index switch; this reviewer did not query a process or served tree."
+      },
+      {
+        "id": "readonly_download_validation",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 316
+        },
+        "detail": "Only approved relative candidate paths, fixed loopback 4274 GET/HEAD, redirects refused; exact SHA/length/instance/no-store checks; normal deploy expects 18 reads."
+      },
+      {
+        "id": "retained_lock_and_failures",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 477
+        },
+        "detail": "Permanent one-shot publication/restore locks; files and failed proof retained. A failed postcheck may leave a switched index."
+      },
+      {
+        "id": "explicit_restore_index_scope",
+        "passed": true,
+        "source": {
+          "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+          "line": 474
+        },
+        "detail": "Restore needs exact successful deploy proof SHA, replaces only index, keeps both generations of assets; not automatic recovery from a failed_retained deployment."
+      },
+      {
+        "id": "bounded_public_metadata_scan",
+        "passed": true,
+        "detail": "Prepared public/private plan and author public result contain no matching JWT/private-key/non-redacted credential-field patterns; private secrets were not read. This is a pattern scan, not secret-value comparison."
+      }
+    ]
+  },
+  "preparedObservation": {
+    "startedAt": "2026-09-09T01:57:01.077Z",
+    "completedAt": "2026-09-09T01:57:03.903Z",
+    "status": "prepared_not_deployed",
+    "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+    "planSha256": "438d4d0578241ddb32b2dda720c96162537520c97b475abb74f38e49a29ff1a9",
+    "recordedWebIdentity": {
+      "pid": 20284,
+      "createdAt": "2026-09-08T17:52:36.5080910Z",
+      "executable": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLineSha256": "b25fc9673b6f1eb3c8c1b1dbe8847b32870785b99437d1df360ffa745dbca7cf",
+      "port": 4274,
+      "receiptSha256": "412f4e1ac6388f3ea6b76885b180818ee6b6e1a124fac7396c0f40647166230a"
+    },
+    "sourceBeforeAfterEqual": true,
+    "webBeforeAfterEqual": true,
+    "boundaries": {
+      "builds": 0,
+      "http": 0,
+      "serviceOperations": 0,
+      "servedWrites": 0
+    }
+  },
+  "retainedCopies": [
+    {
+      "folder": "old-web-dist-cold-restore",
+      "count": 10,
+      "bytes": 4654639,
+      "inventorySha256": "0f13df047e3e7765ecd9b3091a11e595b882f4b2e1a1b0fff1551e32099a7c77",
+      "allRawFileHashesMatch": true,
+      "unknownFiles": 0,
+      "links": 0
+    },
+    {
+      "folder": "candidate-web-dist",
+      "count": 8,
+      "bytes": 2405349,
+      "inventorySha256": "627aadb2d6ac087b80e7929eb3b1d31f3555d85babcd147c0bd074a508dfc2c0",
+      "allRawFileHashesMatch": true,
+      "unknownFiles": 0,
+      "links": 0
+    }
+  ],
+  "authorFixtureResults": {
+    "passed": 11,
+    "total": 11,
+    "gates": [
+      {
+        "completedAt": "2026-09-09T01:55:30.5730657Z",
+        "startedAt": "2026-09-09T01:55:29.5405166Z",
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-frozen.txt",
+        "name": "tests-frozen",
+        "exitCode": 0,
+        "sha256": "f1c4c1e55e19f872314824f5916607e08ea5fed867e95b95992063c625185dce"
+      },
+      {
+        "completedAt": "2026-09-09T01:55:30.6357872Z",
+        "startedAt": "2026-09-09T01:55:30.5847824Z",
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-runner.txt",
+        "name": "nodecheck-frozen-runner",
+        "exitCode": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "completedAt": "2026-09-09T01:55:30.6899340Z",
+        "startedAt": "2026-09-09T01:55:30.6362904Z",
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-test.txt",
+        "name": "nodecheck-frozen-test",
+        "exitCode": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "completedAt": "2026-09-09T01:55:31.5239972Z",
+        "startedAt": "2026-09-09T01:55:30.6903342Z",
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-frozen.txt",
+        "name": "lint-frozen",
+        "exitCode": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "completedAt": "2026-09-09T01:55:31.7546771Z",
+        "startedAt": "2026-09-09T01:55:31.5255595Z",
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-frozen.txt",
+        "name": "format-frozen",
+        "exitCode": 0,
+        "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+      },
+      {
+        "completedAt": "2026-09-09T01:55:31.9102028Z",
+        "startedAt": "2026-09-09T01:55:31.7555515Z",
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/default-inert-frozen.txt",
+        "name": "default-inert-frozen",
+        "exitCode": 0,
+        "sha256": "55f80dcbc248e1e02c6f91712a5daad60a91021946f8b739b2811ed66e01c9cd"
+      }
+    ],
+    "history": [
+      {
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-first.txt",
+        "passed": 10,
+        "failed": 1,
+        "classification": "Harness parsed last line instead of complete pretty-printed stderr JSON. Original log retained; corrected assertion uses complete JSON."
+      },
+      {
+        "log": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-first.txt",
+        "failed": 1,
+        "classification": "Unnecessary regex slash escape removed. Original lint log retained."
+      }
+    ]
+  },
+  "references": [
+    {
+      "path": "scripts/project-components/publish-preview-web-detail-fix.mjs",
+      "bytes": 22660,
+      "sha256": "ec8324fb5abc1173fc25416949d04ae30a687538742537a35279a92ce9b5888a"
+    },
+    {
+      "path": "scripts/project-components/publish-preview-web-detail-fix.test.mjs",
+      "bytes": 7997,
+      "sha256": "13f411d37dff222e569ce407f673eb0b05330a9110cbfc947d1bce97d33ac68f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/result.json",
+      "bytes": 13092,
+      "sha256": "be666088de2a3fe0f8cfac91b2ffe79ca6af163a65e69580f529001b10a73d32"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/e2d5cb4b-9068-4f14-9f90-d292ee4af864/prepare.json",
+      "bytes": 36687,
+      "sha256": "b3f07e9b87a2a49549343816dcff8963a57efb863cff61de581a6ef8a98b39c0"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/plan.json",
+      "bytes": 36603,
+      "sha256": "438d4d0578241ddb32b2dda720c96162537520c97b475abb74f38e49a29ff1a9"
+    },
+    {
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-7c86/acceptance/web-detail-fix-publication-e2d5cb4b-9068-4f14-9f90-d292ee4af864/runner.mjs.txt",
+      "bytes": 22660,
+      "sha256": "ec8324fb5abc1173fc25416949d04ae30a687538742537a35279a92ce9b5888a"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/README.md",
+      "bytes": 9187,
+      "sha256": "57c2d4da55425b3d08db4255b193e19d84601f86c0321ccecfb8c21056aed271"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/checks.json",
+      "bytes": 2179,
+      "sha256": "f5ce8c42e295c112f679889dc2adeed01ddb18e21dced2041a0846fdb7a6ccd4"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/default-inert-frozen.txt",
+      "bytes": 270,
+      "sha256": "55f80dcbc248e1e02c6f91712a5daad60a91021946f8b739b2811ed66e01c9cd"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/default-inert.txt",
+      "bytes": 270,
+      "sha256": "55f80dcbc248e1e02c6f91712a5daad60a91021946f8b739b2811ed66e01c9cd"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-check.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-final-write.txt",
+      "bytes": 165,
+      "sha256": "21a6f811cce1af50a9fc8c2bfe0f433d778eef20c945825066950e95b7e18ee8"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-frozen.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/format-write.txt",
+      "bytes": 142,
+      "sha256": "c9616e684a602b17f2e2ffa188359039c0bf42421e831e66c9b681a90f455f8f"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-first.txt",
+      "bytes": 224,
+      "sha256": "8847f3a3a711ebda9857413e960d2f687372e75083fa2da0f3a2895aba3f0b47"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/lint-frozen.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-runner.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-frozen-test.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-runner.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/nodecheck-test.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-final.txt",
+      "bytes": 1181,
+      "sha256": "ad23e1d394370b4de239c5b5ae85b4f0b524daca26de42bd6153d77c01e918e5"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-first.txt",
+      "bytes": 2061,
+      "sha256": "d5062ab70e39b3c392fc1bc0492d35736d3828ad440a23bd97abcdcb84c461b2"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-fix-publication/preparation/runs/tests-frozen.txt",
+      "bytes": 1183,
+      "sha256": "f1c4c1e55e19f872314824f5916607e08ea5fed867e95b95992063c625185dce"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-package-only/prepared.json",
+      "bytes": 21312,
+      "sha256": "ae86788cfa46d11ffd8ff37674ad2b558782caec809437ab1ef642bf45dda220"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-package-only/build-result.json",
+      "bytes": 46282,
+      "sha256": "d7804189e974ee3dad2fa3864a9d60220ef54cfa7a977959220197e7db809fe0"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-package-only/result.json",
+      "bytes": 8420,
+      "sha256": "48b9ca590887cc76339677ea86f7e326d5cadb4abcace677c81c707c18849837"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-loading-fix.json",
+      "bytes": 8470,
+      "sha256": "1e2cc70ef1797eed139521a9ba36af8303695cf19abf1917bad168276f4d3042"
+    },
+    {
+      "path": "scripts/project-components/preview-web.mjs",
+      "bytes": 5162,
+      "sha256": "5b4f19b93fdd515c529f45ecee3091e50d08929ea1981963e4774d93ce4ba982"
+    },
+    {
+      "path": "scripts/project-components/run-preview-service.mjs",
+      "bytes": 991,
+      "sha256": "02f2bc79611c6e8a13c60b35e03d1e75ad87686a81e67f7a3ef81bc13072b833"
+    },
+    {
+      "path": "scripts/project-components/retain-preview-android-update-state.mjs",
+      "bytes": 30169,
+      "sha256": "669042c8c82307d02bd291e9de99b1ddc5af86694a83425158bd55ee35c000f3"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "bytes": 136992,
+      "sha256": "b2952e9d1dc66821a784593cd1c56a04f6f817fafbb017782486f9bc088c4528"
+    },
+    {
+      "path": "apps/web/src/App.detail-loading.test.tsx",
+      "bytes": 8755,
+      "sha256": "cbf34823486a8eaaf7f32bf6cc42d247a71557d5206a796aece0872c20a19590"
+    },
+    {
+      "path": "apps/web/package.json",
+      "bytes": 1243,
+      "sha256": "9294cf61d4ec0c4356b862134e7618b26e301d47de9397213ad7f69e27d8f3db"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 244845,
+      "sha256": "cb52af4bdd80cc30f428aff5869b7356359d43d1952ac79f095431a5a1e000e8"
+    }
+  ],
+  "boundaries": {
+    "reviewerNetworkRequests": 0,
+    "reviewerPublisherModesRun": 0,
+    "reviewerTestsRun": 0,
+    "liveServedDirectoryReads": 0,
+    "liveConfigReads": 0,
+    "processQueries": 0,
+    "serviceOperations": 0,
+    "uiDeviceOperations": 0,
+    "productOrOriginalProofWrites": 0,
+    "newFiles": [
+      "source-review.json"
+    ],
+    "actualDeployOrRestore": "not_evaluated",
+    "uiAcceptance": "not_run"
+  },
+  "limits": [
+    "Root is the sole authorized publisher; this review does not perform prepare/deploy/restore or establish their actual outcomes.",
+    "The saved prepare observation is historical; no current process/config/served-state freshness query was made. The runner must revalidate them at deployment.",
+    "Failure retains lock and partial state and may follow an index switch; no automatic revert/retry. Successful-deploy-only restore is narrower than recovery from arbitrary failures.",
+    "Only the fixed old/candidate package lineage and mutation boundary were reviewed; no broad feature or baseline pass is inferred."
+  ]
+}
