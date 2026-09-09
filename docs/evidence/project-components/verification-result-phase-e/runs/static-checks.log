@@ -1,0 +1,39 @@
+STORAGE TEST TYPECHECK
+cwd: packages/storage
+command: ..\..\node_modules\.bin\tsc.cmd --noEmit -p tsconfig.test.json
+exit_code: 0
+console_output: empty
+
+STORAGE BUILD
+cwd: packages/storage
+command: ..\..\node_modules\.bin\tsc.cmd -p tsconfig.json
+exit_code: 0
+console_output: empty
+
+FOCUSED ESLINT
+cwd: repository root
+command: .\node_modules\.bin\eslint.cmd packages/storage/src/verification-result-evidence-migration.ts packages/storage/src/verification-result-evidence-store.ts packages/storage/src/mobile-attachment-store.ts packages/storage/src/mobile-capture-store.ts packages/storage/src/mobile-verification-store.ts packages/storage/test/verification-result-evidence-fixture.ts packages/storage/test/verification-result-evidence.test.ts
+exit_code: 0
+console_output: empty
+
+FOCUSED PRETTIER
+cwd: repository root
+command: .\node_modules\.bin\prettier.cmd --check packages/storage/src/verification-result-evidence-migration.ts packages/storage/src/verification-result-evidence-store.ts packages/storage/src/mobile-attachment-store.ts packages/storage/src/mobile-capture-store.ts packages/storage/src/mobile-verification-store.ts packages/storage/test/verification-result-evidence-fixture.ts packages/storage/test/verification-result-evidence.test.ts
+exit_code: 0
+console_output:
+Checking formatting...
+All matched files use Prettier code style!
+
+DIFF CHECK
+cwd: repository root
+command: git diff --check -- packages/storage/src/mobile-attachment-store.ts packages/storage/src/mobile-capture-store.ts packages/storage/src/mobile-verification-store.ts packages/storage/src/workflow-idempotency.ts
+exit_code: 0
+console_output: empty
+
+FRESH SCHEMA 17 CHECK
+cwd: packages/storage
+result_user_version: 17
+integrity_check: ok
+foreign_key_violation_count: 0
+retained_database: C:\Users\lin0\AppData\Local\Temp\qa-phase-e-schema-5OuQvZ\state.sqlite
+

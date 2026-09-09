@@ -1,0 +1,30 @@
+COMMAND
+cwd: packages/storage
+..\..\node_modules\.bin\tsx.cmd --test test\verification-result-evidence.test.ts
+
+RESULT
+exit_code: 0
+duration_ms: 10906.9537
+
+PASS schema 15/16/17 history and an existing result receipt remain byte-for-byte unchanged
+PASS every attachment count from 9 through 20 commits actual PNG reservations once
+PASS capture passed/failed/blocked results share exact successful artifacts and retain current read authorization
+PASS 21 attachments and wrong capture/actor/project/submission/target reject without any committed mutation
+PASS Bug attachment edits cannot remove immutable Verification evidence
+PASS each effect stage rolls back attachment/capture/result/audit/notification/receipt together
+PASS exact result and generic receipt SQL guards reject forged capture facts before commit
+PASS removing an original Bug primary hides its capture metadata, raw image and artifact without deleting evidence
+PASS actual PNG bytes total exactly100MiB succeeds and one additional byte is rejected atomically
+
+diagnostic: All 11 actual SQLite failure points rolled back.
+diagnostic: Retained media SHA256 b1ff9c8ea3a780bad09b346c423d2d0e46815926879b18e841d928376a946640.
+diagnostic: Actual valid ancillary-padded PNG upload/finalize/claim accepted 104857600 bytes and rejected 104857601 bytes; fixture files were retained.
+
+tests: 9
+suites: 0
+pass: 9
+fail: 0
+cancelled: 0
+skipped: 0
+todo: 0
+

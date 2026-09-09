@@ -5,7 +5,6 @@ import type { DatabaseSync } from "node:sqlite";
 
 import { hasActiveAttachmentReadMembership } from "./mobile-attachment-store.js";
 import { SqliteStorageError } from "./sqlite.js";
-import { BUG_ATTACHMENT_LINKS_SQL } from "./bug-attachment-links.js";
 
 export const MOBILE_CAPTURE_ALLOWED_METHODS = Object.freeze([
   "GetSDKVersion",
@@ -860,7 +859,7 @@ export function getMobileCapture(
   const visibleBug = database
     .prepare(
       `SELECT 1
-       FROM ${BUG_ATTACHMENT_LINKS_SQL} AS link
+       FROM bug_attachments AS link
        JOIN bugs AS bug
          ON bug.account_id = link.account_id
         AND bug.project_id = link.project_id

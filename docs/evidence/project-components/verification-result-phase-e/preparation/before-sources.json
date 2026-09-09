@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-09-09T04:07:27.379Z",
+  "files": [
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "copy": "docs/evidence/project-components/verification-result-phase-e/preparation/mobile-verification-store.ts.txt",
+      "sha256": "a65b92ad3d47a7b135b76533673f4e3f77d671a8a3e7e47f3d3ebe1f7aa15c85"
+    },
+    {
+      "path": "packages/storage/src/mobile-capture-store.ts",
+      "copy": "docs/evidence/project-components/verification-result-phase-e/preparation/mobile-capture-store.ts.txt",
+      "sha256": "d51459d5c086b9e790a4c0239ac766c283369e04847f24f20f7825a63f047888"
+    },
+    {
+      "path": "packages/storage/src/mobile-attachment-store.ts",
+      "copy": "docs/evidence/project-components/verification-result-phase-e/preparation/mobile-attachment-store.ts.txt",
+      "sha256": "14eb5a3fb314f375400f5ad65583f62d18c114be484aa04483b5ab063c3101c6"
+    },
+    {
+      "path": "packages/storage/src/verification-result-snapshot-migration.ts",
+      "copy": "docs/evidence/project-components/verification-result-phase-e/preparation/verification-result-snapshot-migration.ts.txt",
+      "sha256": "593d3c42e2e4ddd454fd77ccc114589e71bab9d743cc3253826f85bd3f10912a"
+    },
+    {
+      "path": "packages/storage/src/verification-blocked-result-migration.ts",
+      "copy": "docs/evidence/project-components/verification-result-phase-e/preparation/verification-blocked-result-migration.ts.txt",
+      "sha256": "651654faea8f387c3d425a046787d4a4f5d93c85b89cc3874942f363344e7630"
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-migration.ts",
+      "copy": "docs/evidence/project-components/verification-result-phase-e/preparation/workflow-projection-migration.ts.txt",
+      "sha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+COMMAND
+cwd: packages/storage
+..\..\node_modules\.bin\tsx.cmd --test test\storage.test.ts test\sqlite-migrations.test.ts test\sqlite-invariants.test.ts test\sqlite-backup.test.ts test\sqlite-restore.test.ts test\attachment-restore.test.ts test\sqlite-archive.test.ts test\qingyu-link-store.test.ts test\user-management-store.test.ts test\mobile-scope-branding.test.ts test\project-management-store.test.ts test\workflow-idempotency.test.ts test\workflow-projection.test.ts test\workflow-projection-worker.test.ts test\verification-result-evidence.test.ts
+
+RESULT
+exit_code: 0
+duration_ms: 38900.7151
+tests: 132
+suites: 0
+pass: 131
+fail: 0
+cancelled: 0
+skipped: 1
+todo: 0
+
+The one skip was the existing optional test named:
+retained Phase B schema16 archive migrates only its new copy to17 with all prior tables unchanged
+
+The Phase E tests in this combined run all passed. The run also passed the existing schema migration, SQLite invariant, capture, attachment, upload, idempotency, workflow projection, backup, restore, archive, project-management, user-management, and storage configuration suites.
+

@@ -1,0 +1,71 @@
+{
+  "schema": "relay-qa-hub.verification-result-phase-e-candidate-result.v1",
+  "observedAt": "2026-09-09T12:47:23.0907704+08:00",
+  "branch": "codex/project-components-v2-1",
+  "head": "5c18a7e4049459cf5ff7f5e6a1cb22039c435e30",
+  "status": "passed_storage_candidate",
+  "scope": "unnumbered additive storage candidate applied after a real schema-17 migration",
+  "migration": {
+    "baseUserVersion": 17,
+    "assignedVersion": null,
+    "registeredInSqliteMigrations": false,
+    "frozenVersionsUnchanged": [15, 16, 17],
+    "schemaHistoryRowsUnchanged": true,
+    "preCandidateReceiptRowsUnchanged": true,
+    "freshSchemaIntegrity": "ok",
+    "freshSchemaForeignKeyViolationCount": 0
+  },
+  "focused": {
+    "tests": 9,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 10906.9537,
+    "realSqliteFiles": true,
+    "realUploadedFileBytes": true,
+    "attachmentCountsAccepted": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+    "attachmentCountRejected": 21,
+    "exactAggregateBytesAccepted": 104857600,
+    "aggregateBytesRejected": 104857601,
+    "captureStatusesAccepted": ["passed", "failed", "blocked"],
+    "injectedRollbackPoints": 11,
+    "retainedPngSha256": "b1ff9c8ea3a780bad09b346c423d2d0e46815926879b18e841d928376a946640"
+  },
+  "storageRegression": {
+    "tests": 132,
+    "passed": 131,
+    "failed": 0,
+    "skipped": 1,
+    "durationMs": 38900.7151,
+    "skip": "pre-existing optional retained Phase B schema16 archive fixture"
+  },
+  "staticChecks": {
+    "storageBuild": "passed",
+    "storageTestTypecheck": "passed",
+    "focusedEslint": "passed",
+    "focusedPrettier": "passed",
+    "gitDiffCheck": "passed"
+  },
+  "verified": [
+    "schema 15, 16 and 17 source and history preservation",
+    "old result receipt and snapshot bytes unchanged across candidate application and reopen",
+    "all attachment counts 9 through 20",
+    "exact 100 MiB aggregate boundary",
+    "exact account, project, actor, submission, target, reservation and capture identity",
+    "capture successful artifact set equality and primary evidence",
+    "atomic attachment, capture, workflow, audit, notification, snapshot, submission and receipt rollback",
+    "immutable result snapshots and committed receipts",
+    "membership, soft-delete, ordinary attachment removal and immutable Verification-evidence reads"
+  ],
+  "notVerified": [
+    "numbered migration-chain integration after Phase C",
+    "preview deployment or migration",
+    "HTTP or server MCP runtime path",
+    "Web, EXE, local MCP or APK installed-client path",
+    "physical Android device",
+    "upgrade or rollback",
+    "production behavior"
+  ],
+  "productionTouched": false,
+  "previewTouched": false
+}

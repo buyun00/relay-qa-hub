@@ -1,0 +1,4 @@
+retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-np7Kaw
+{ attachments: 9, capture: false, status: 'passed' }
+{ attachments: 20, capture: false, status: 'passed' }
+{ attachments: 1, capture: true, status: 'passed' }

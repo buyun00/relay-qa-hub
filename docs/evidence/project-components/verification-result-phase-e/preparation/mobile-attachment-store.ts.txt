@@ -1073,13 +1073,6 @@ function selectClaimedAttachment(
              WHERE deletion.account_id = binding.account_id
                AND deletion.project_id = binding.project_id
                AND deletion.bug_id = binding.target_bug_id
-           )
-           AND NOT EXISTS (
-             SELECT 1 FROM bug_attachment_removals AS removal
-             WHERE removal.account_id = binding.account_id
-               AND removal.project_id = binding.project_id
-               AND removal.bug_id = binding.target_bug_id
-               AND removal.attachment_id = attachment.id
            )`,
       )
       .get(input.accountId, input.projectId, attachmentId) as ClaimedAttachmentRow | undefined) ??
@@ -1283,7 +1276,7 @@ function selectMobileCaptureArtifact(
           AND primary_binding.attachment_id = bundle.primary_attachment_id
           AND primary_binding.target_bug_id = bug.id
           AND primary_binding.state = 'claimed'
-         JOIN ${BUG_ATTACHMENT_LINKS_SQL} AS primary_link
+         JOIN bug_attachments AS primary_link
            ON primary_link.account_id = bug.account_id
           AND primary_link.project_id = bug.project_id
           AND primary_link.bug_id = bug.id
@@ -1313,13 +1306,6 @@ function selectMobileCaptureArtifact(
          WHERE bug.account_id = ?
            AND bug.project_id = ?
            AND bug.id = ?
-           AND NOT EXISTS (
-             SELECT 1 FROM bug_attachment_removals AS removal
-             WHERE removal.account_id = bug.account_id
-               AND removal.project_id = bug.project_id
-               AND removal.bug_id = bug.id
-               AND removal.attachment_id IN (bundle.primary_attachment_id, attachment.id)
-           )
            AND NOT EXISTS (
              SELECT 1 FROM bug_deletions AS deletion
              WHERE deletion.account_id = bug.account_id

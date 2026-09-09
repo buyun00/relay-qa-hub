@@ -1,0 +1,1 @@
+packages/storage/test/verification-result-evidence-fixture.ts(34,23): error TS4058: Return type of exported function has or is using name 'RecordMobileVerificationResultBase' from external module "C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/packages/storage/src/mobile-verification-store" but cannot be named.

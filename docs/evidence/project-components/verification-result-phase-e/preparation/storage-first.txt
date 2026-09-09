@@ -1,0 +1,36 @@
+✔ 9 and20 actual uploaded PNG reservations commit once and replay the immutable result after reopen (780.9201ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-Tk7mzE
+✔ capture passed/failed/blocked results share exact successful artifacts and retain current read authorization (717.2958ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-RKhsKB
+✔ 21 attachments and wrong capture/actor/project/submission/target reject without any committed mutation (949.381ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-e5oab0
+✖ each effect stage rolls back attachment/capture/result/audit/notification/receipt together (308.0721ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-uzRLoO
+✔ exact result and generic receipt SQL guards reject forged capture facts before commit (465.7645ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-IB8m0X
+✔ removing an original Bug primary hides its capture metadata, raw image and artifact without deleting evidence (279.9354ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-yINvey
+✔ actual PNG bytes total exactly100MiB succeeds and one additional byte is rejected atomically (1978.202ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-74qTxQ
+ℹ Actual valid ancillary-padded PNG upload/finalize/claim: 104857600 bytes committed; 104857601 bytes rejected; all files retained
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5741.2392
+
+✖ failing tests:
+
+test at packages\storage\test\verification-result-evidence.test.ts:1:5908
+✖ each effect stage rolls back attachment/capture/result/audit/notification/receipt together (308.0721ms)
+  Error: no such table: notification_outbox
+      at TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\verification-result-evidence.test.ts:69:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'ERR_SQLITE_ERROR',
+    errcode: 1,
+    errstr: 'SQL logic error'
+  }

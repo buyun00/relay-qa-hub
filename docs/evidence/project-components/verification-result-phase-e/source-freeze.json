@@ -1,0 +1,94 @@
+{
+  "schema": "relay-qa-hub.verification-result-phase-e-source-freeze.v1",
+  "observedAt": "2026-09-09T12:47:23.0907704+08:00",
+  "branch": "codex/project-components-v2-1",
+  "head": "5c18a7e4049459cf5ff7f5e6a1cb22039c435e30",
+  "preparationManifest": "preparation/before-sources.json",
+  "frozenMigrationSources": [
+    {
+      "path": "packages/storage/src/verification-result-snapshot-migration.ts",
+      "beforeSha256": "593d3c42e2e4ddd454fd77ccc114589e71bab9d743cc3253826f85bd3f10912a",
+      "afterSha256": "593d3c42e2e4ddd454fd77ccc114589e71bab9d743cc3253826f85bd3f10912a",
+      "unchanged": true
+    },
+    {
+      "path": "packages/storage/src/verification-blocked-result-migration.ts",
+      "beforeSha256": "651654faea8f387c3d425a046787d4a4f5d93c85b89cc3874942f363344e7630",
+      "afterSha256": "651654faea8f387c3d425a046787d4a4f5d93c85b89cc3874942f363344e7630",
+      "unchanged": true
+    },
+    {
+      "path": "packages/storage/src/workflow-projection-migration.ts",
+      "beforeSha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba",
+      "afterSha256": "ed204e2a60997072425cdb5dc943cf65778965ff2fcd6fe2de3c51732df073ba",
+      "unchanged": true
+    }
+  ],
+  "schemaHistory": [
+    {
+      "version": 15,
+      "name": "immutable_verification_result_snapshots",
+      "checksum": "5a6d8ed5b7ff4815d20ff613a2ad0c841512a919eb7e1cfa0adb72aa3c26fe6d"
+    },
+    {
+      "version": 16,
+      "name": "blocked_verification_result_receipts",
+      "checksum": "7297cf8cda0470ad0606b7ec6ded7766aa79f7de46e6521e9205332e735ea49c"
+    },
+    {
+      "version": 17,
+      "name": "immutable_workflow_projection_pages",
+      "checksum": "d193e8763af1525014a572b899cbe20fae32660f8847025ce6b1675c23f6566f"
+    }
+  ],
+  "phaseESources": [
+    {
+      "path": "packages/storage/src/mobile-attachment-store.ts",
+      "beforeSha256": "14eb5a3fb314f375400f5ad65583f62d18c114be484aa04483b5ab063c3101c6",
+      "afterSha256": "6a527a590a9e968e026636d11070c6ce5a816bdb1886905e38ce1bb306e245c6",
+      "bytes": 47992
+    },
+    {
+      "path": "packages/storage/src/mobile-capture-store.ts",
+      "beforeSha256": "d51459d5c086b9e790a4c0239ac766c283369e04847f24f20f7825a63f047888",
+      "afterSha256": "2a691e566b85b5a381b99728092bf40d3325efdd6d647c16033a1ea43ca39e6a",
+      "bytes": 33707
+    },
+    {
+      "path": "packages/storage/src/mobile-verification-store.ts",
+      "beforeSha256": "a65b92ad3d47a7b135b76533673f4e3f77d671a8a3e7e47f3d3ebe1f7aa15c85",
+      "afterSha256": "26e95f0ec1d9cfd0c606cc4d609064833cd83d348240358a76c650dc711a034a",
+      "bytes": 44516
+    },
+    {
+      "path": "packages/storage/src/verification-result-evidence-migration.ts",
+      "beforeSha256": null,
+      "afterSha256": "493e47604bf88a807ff0ac982a869a4822022e2cc0fe8a18000d83cbf8ea7b67",
+      "bytes": 7170
+    },
+    {
+      "path": "packages/storage/src/verification-result-evidence-store.ts",
+      "beforeSha256": null,
+      "afterSha256": "28a64036b72b833380d1e0ceee42aa92a8911524e2e9897e077c9f7cd4692500",
+      "bytes": 8264
+    },
+    {
+      "path": "packages/storage/test/verification-result-evidence-fixture.ts",
+      "beforeSha256": null,
+      "afterSha256": "d4a6d4c121ec0ae75d4eaecf8cf23fe10747cd469fa739b3ac847ad7ac3a43da",
+      "bytes": 12644
+    },
+    {
+      "path": "packages/storage/test/verification-result-evidence.test.ts",
+      "beforeSha256": null,
+      "afterSha256": "a0f6fc584c104ccdd7a257f19203f63574b64d951d7f9a1e665b194583ea3874",
+      "bytes": 22710
+    }
+  ],
+  "sharedFileNotEditedByPhaseE": {
+    "path": "packages/storage/src/workflow-idempotency.ts",
+    "sha256AtObservation": "106dff7bd5be5cef378379e7bbc8a1aff8ca1b58db2abd8dbe8f3cc0b7348702",
+    "bytes": 5996,
+    "owner": "Phase C coordination"
+  }
+}

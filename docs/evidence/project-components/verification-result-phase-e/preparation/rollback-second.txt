@@ -1,0 +1,11 @@
+✔ each effect stage rolls back attachment/capture/result/audit/notification/receipt together (489.8394ms)
+ℹ retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-T7qAw0
+ℹ All 11 actual SQLite failure points rolled back; retained media SHA b1ff9c8ea3a780bad09b346c423d2d0e46815926879b18e841d928376a946640
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 726.4656

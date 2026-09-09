@@ -1,0 +1,18 @@
+retained isolated verification evidence fixture C:\Users\lin0\AppData\Local\Temp\qa-verification-evidence-59W3Ut
+C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\src\mobile-attachment-store.ts:493
+    throw new SqliteStorageError(
+          ^
+
+SqliteStorageError: upload chunk idempotency key does not match its session identity
+    at putMobileUploadChunk (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\src\mobile-attachment-store.ts:493:11)
+    at <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\verification-result-evidence-fixture.ts:54:33)
+    at tx (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\verification-result-evidence-fixture.ts:21:24)
+    at upload (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\verification-result-evidence-fixture.ts:54:17)
+    at <anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\verification-result-evidence-fixture.ts:59:53)
+    at Array.from (<anonymous>)
+    at Object.stage (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\packages\storage\test\verification-result-evidence-fixture.ts:59:29)
+    at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/[eval1]:1:176 {
+  code: 'SQLITE_IDEMPOTENCY_MISMATCH'
+}
+
+Node.js v24.19.0
