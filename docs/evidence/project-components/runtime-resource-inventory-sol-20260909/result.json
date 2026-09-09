@@ -1,0 +1,30 @@
+{
+  "schema": "relay-qa-hub.runtime-resource-inventory.v1",
+  "observedAt": "2026-09-09T13:36:39.2041384+08:00",
+  "sourceHead": "7897332",
+  "mode": "read_only",
+  "preview": {
+    "instanceId": "qa-hub-preview-7c86",
+    "api": { "port": 4419, "pid": 22852, "ready": true, "schemaVersion": 14 },
+    "web": { "port": 4274, "pid": 20284, "httpStatus": 200 },
+    "serverMcp": { "port": 4421, "pid": 15736, "ready": true, "schemaVersion": 14, "toolCount": 90 },
+    "desktop": { "localMcpPort": 4420, "pid": 13564, "version": "0.2.0-preview.9" },
+    "android": { "transport": "mumu", "serial": "127.0.0.1:16384", "versionCode": 23, "physical": false }
+  },
+  "production": {
+    "api": { "port": 4319, "pid": 10844, "ready": true, "schemaVersion": 12 },
+    "web": { "port": 4174, "pid": 7420, "httpStatus": 200 },
+    "desktop": { "localMcpPort": 4320, "pid": 17160, "installedVersion": "3.3.4" },
+    "touched": false
+  },
+  "external": {
+    "jenkinsBuild": "not_run_missing_isolated_resources",
+    "singleBuildUpload": "not_run_missing_isolated_resources",
+    "incrementalUpload": "not_run_missing_isolated_resources",
+    "relayProduction": "not_run_only_shared_production_project",
+    "qingyuSync": "not_run_missing_isolated_identity",
+    "physicalAndroid": "not_run_no_device"
+  },
+  "secretsRead": false,
+  "mutationsPerformed": false
+}
