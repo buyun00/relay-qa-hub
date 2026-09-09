@@ -1,4 +1,4 @@
-# Server incremental upload (3.3.5)
+# Server incremental upload (3.3.6)
 
 The API server owns uploads and the external-build/upload workflow. Web and EXE
 submit authenticated requests and display persistent server snapshots. Closing the
@@ -66,13 +66,21 @@ identity and reads the original worker result instead of repeating launches. A
 machine restart leaves interrupted work recoverable with the original ZIP. Unknown
 writes are reconciled only on explicit recovery, never blindly replayed.
 
-Worker 0.4.3 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
+Worker 0.4.4 reads explicit server-owned `OZDQP_AUTH_FILE` and `OZDQP_LOCK_ROOT`.
 The API does not accept client-selected paths, executables, origins or historical
 version IDs. Eight 5 MiB COS parts run concurrently, with serialized STS renewal and
 checkpoint writes; recovery sends only missing verified parts. The SDK's synchronous
 request deadline is 180 seconds (its `ConnectionTimeoutMs` also bounds transfer),
 with a 90-second read/write timeout. COS error diagnostics retain status codes and
 transport exception types, excluding messages, signed URLs and credentials.
+
+Atomic checkpoint writes tolerate temporary Windows access/sharing/lock violations
+with at most ten local retries over approximately 1.8 seconds. The last durable
+state remains intact until the replacement succeeds. This retry never repeats a
+COS request. Persistent or non-transient storage failures report
+`CHECKPOINT_WRITE_FAILED`; the prior state and pending temporary file are retained.
+Failure events still reach the supervisor's stdout receipt when the journal itself
+cannot be written. Readers opened by the worker allow atomic file replacement.
 
 Completion always serializes parts in numeric order. If a previous merge has an
 uncertain result and the finished object cannot be inspected, recovery may continue

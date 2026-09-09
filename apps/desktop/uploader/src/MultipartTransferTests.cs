@@ -14,6 +14,30 @@ public static class MultipartTransferTests
     static void Check(bool value,string message){if(!value)throw new Exception("Multipart test: "+message);}
     public static async Task Run(string root,Func<string,Func<Task>,Task> test,CancellationToken ct)
     {
+        await test("checkpoint_retries_temporary_windows_reader_without_repeating_transfer",async()=>{
+            if(!OperatingSystem.IsWindows())return;
+            using var journal=new Journal(Path.Combine(root,"checkpoint-reader"));var state=new JobState();journal.Save(state);
+            using var reader=new FileStream(journal.StatePath,FileMode.Open,FileAccess.Read,FileShare.ReadWrite);
+            state.Parts[1]="confirmed-etag";
+            var save=Task.Run(()=>journal.Save(state),ct);
+            await Task.Delay(300,ct);
+            Check(!save.IsCompleted&&journal.Read()!.Parts.Count==0,"checkpoint must remain intact while replacement is blocked");
+            reader.Dispose();await save.WaitAsync(TimeSpan.FromSeconds(5),ct);
+            Check(journal.Read()!.Parts[1]=="confirmed-etag","acknowledgment was not saved after reader released");
+        });
+        await test("checkpoint_persistent_access_denial_is_bounded_and_keeps_original_state",async()=>{
+            if(!OperatingSystem.IsWindows())return;
+            using var journal=new Journal(Path.Combine(root,"checkpoint-blocked"));var state=new JobState();journal.Save(state);
+            var original=await File.ReadAllBytesAsync(journal.StatePath,ct);
+            using var reader=new FileStream(journal.StatePath,FileMode.Open,FileAccess.Read,FileShare.ReadWrite);
+            state.Parts[1]="confirmed-etag";var watch=Stopwatch.StartNew();bool failed=false;
+            try{journal.Save(state);}catch(UploadException e) when(e.Code=="CHECKPOINT_WRITE_FAILED"){failed=true;}
+            Check(failed&&watch.Elapsed<TimeSpan.FromSeconds(5),"persistent access denial must stop with the checkpoint error");
+            Check((await File.ReadAllBytesAsync(journal.StatePath,ct)).SequenceEqual(original),"last durable checkpoint was overwritten");
+            Check(File.Exists(journal.StatePath+".tmp"),"pending checkpoint evidence was lost");
+            reader.Dispose();journal.Save(state);
+            Check(journal.Read()!.Parts.Count==1,"original checkpoint cannot be recovered after unlock");
+        });
         await test("cos_completion_serializes_parts_in_numeric_order_after_parallel_acks",()=>{
             var parts=new Dictionary<int,string>{{3,"etag3"},{1,"etag1"},{12,"etag12"},{2,"etag2"}};
             var request=TencentUploader.CreateCompletion("fixture-1250000000","fixture.bin","fixture-upload",parts);
