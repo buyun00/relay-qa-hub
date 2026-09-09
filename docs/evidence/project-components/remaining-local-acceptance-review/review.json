@@ -1,0 +1,417 @@
+{
+  "schemaVersion": 1,
+  "status": "read_only_priorities_no_execution",
+  "observedAt": "2026-09-09T02:36:30.834Z",
+  "sourceHeadAtObservation": "e7ee04f01a976fa196ee97afcafec2deaa38f70b",
+  "scope": {
+    "writes": [
+      "docs/evidence/project-components/remaining-local-acceptance-review/README.md",
+      "docs/evidence/project-components/remaining-local-acceptance-review/review.json"
+    ],
+    "networkCalls": 0,
+    "uiOperations": 0,
+    "deviceOperations": 0,
+    "processOrServiceQueries": 0,
+    "liveDatabaseReads": 0,
+    "sourceOrMatrixEdits": 0,
+    "privateSecretsRead": false
+  },
+  "inputMatrix": {
+    "sha256": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990",
+    "items": 991,
+    "retiredItems": 28,
+    "sourceFiles": 191,
+    "wholePassed": [
+      "09",
+      "10",
+      "11",
+      "12",
+      "15",
+      "23",
+      "24"
+    ],
+    "baselineTotal": 24,
+    "sourceSnapshotIsHistorical": true,
+    "currentApplicationSourcesNotRehashed": true,
+    "statusUnchanged": true
+  },
+  "environmentAssumption": {
+    "origin": "root-provided task boundary and referenced historical proofs; not probed by this review",
+    "api": "127.0.0.1:4419",
+    "web": "127.0.0.1:4274",
+    "serverMcp": "127.0.0.1:4421",
+    "localMcp": "127.0.0.1:4420",
+    "exe": "installed preview.9",
+    "android": "MuMu preview code23",
+    "components": "all five disabled; must be rechecked before a later authorized run"
+  },
+  "designReferences": {
+    "independentScope": "16.1–16.5, lines489–542",
+    "perSurfaceActualAcceptance": "17.1–17.3, lines544–579",
+    "physicalDeviceStillRequired": "17.3 line571"
+  },
+  "priorities": [
+    {
+      "priority": 1,
+      "id": "local-07-late-project-response",
+      "baselineIds": [
+        "baseline-1caaffa318e7ef",
+        "baseline-859a50aef5dcd0"
+      ],
+      "surfaces": [
+        "web",
+        "exe",
+        "apk"
+      ],
+      "classification": "new_real_client_acceptance_with_narrow_harness_extension",
+      "target": "先用独立 Web profile 在新 A/B 项目人为扣留 A 的真实详情/人员响应，切 B、编辑 B 文字/图片/人员选择，再释放 A；核 B 屏幕、请求作用域与草稿不变，回 A 仍有 A 原稿。之后分别安排 EXE/APK，不能从共享实现传递通过。",
+      "reuse": [
+        "scripts/project-components/web-detail-loading-live.mjs",
+        "scripts/project-components/web-dual-window.fixture.mjs"
+      ],
+      "development": "扩展现有 exact-scope 延迟计划和项目切换选择器；先核当前组件取消/快照守卫，发现问题才修产品。现有 runner 不是 A/B 场景即用命令。",
+      "alreadyCovered": "ab51 的59项是同项目 loading→真实响应、网络失败与重试；旧双标签证据是并行草稿/撤权恢复。两者都不替代 A 迟到响应覆盖 B 的场景。",
+      "preservation": "仅新 A/B、专属浏览器 profile；保留错误帧、真实响应时间及文件原字节 SHA；不改应用计时器，不向既有原生草稿注入故障。",
+      "cannotClaim": [
+        "全部草稿类别已覆盖",
+        "APK/EXE 从 Web 继承通过",
+        "连续所有画面无异常"
+      ]
+    },
+    {
+      "priority": 2,
+      "id": "local-14-installed-client-recovery",
+      "baselineIds": [
+        "baseline-4e70e4b8aea144"
+      ],
+      "surfaces": [
+        "exe",
+        "apk"
+      ],
+      "classification": "new_real_installed_client_acceptance_with_reviewed_fault_driver",
+      "target": "EXE .9 在新项目实际创建/评论成功回执丢失后，经正常重新打开或审定的故障窗口重试原意图；APK code23 补带图片提交的上传/创建断点、明确附件拒绝后显式换稿，以及错误成功回执拒绝。逐分支执行，不合成一次全通过。",
+      "reuse": [
+        "scripts/project-components/web-submission-recovery-live.mjs",
+        "scripts/project-components/web-rejected-media-recovery-live.mjs",
+        "scripts/project-components/android-recovery-proxy.mjs",
+        "docs/evidence/project-components/exe-preview8-recovery-plan.md",
+        "docs/evidence/project-components/android-code23-recovery-plan.md"
+      ],
+      "development": "EXE 需要只绑定精确预览客户端的新 fault driver/native 观察适配；APK proxy 需要精确阶段/图片/协议分支扩展。旧 .8 计划须按实际 .9 安装和新 artifact hash 重订，不能直接复用旧进程/包 pin。",
+      "alreadyCovered": "Web101未知回执与81坏媒体已实际通过；APK23只证明 legacy text 的4次真实201丢失及同原意图恢复；EXE .9升级与草稿保全不等于 native 未知提交测试。",
+      "assertions": [
+        "同原 operation/idempotency key/业务ID/冻结 payload/observedAt/附件 identity 与上传阶段",
+        "只产生一份 Bug/评论/轮次效果，保存后续改稿和原拒绝记录",
+        "当前权限或未知历史不自动换新ID",
+        "明确成功只确认对应未改原稿；恢复后可继续人工操作"
+      ],
+      "preservation": "新项目/actor 与原 EXE 员工、未提交 PNG、原 closed Bug 分离；保留冷备份范围、签名/包名、代理原配置与失败。APK 禁止 pm clear、卸载和清数据 instrumentation；已保存图片与未保存笔画分开说明。",
+      "cannotClaim": [
+        "完整基线14",
+        "真实 APK 物理设备",
+        "真实服务器返回了代理注入的错误协议",
+        "updates 被排除的冷备份是完整 profile"
+      ]
+    },
+    {
+      "priority": 3,
+      "id": "local-06-13-14-local-mcp-parity",
+      "baselineIds": [
+        "baseline-5c52f5c41e5ecf",
+        "baseline-893c7e29e95d73",
+        "baseline-4e70e4b8aea144"
+      ],
+      "surfaces": [
+        "local_mcp",
+        "http"
+      ],
+      "classification": "new_real_local_mcp_acceptance_after_identity_window",
+      "target": "针对本地4420，用两个全新项目的等价操作与直接HTTP作配对：错项目写入、旧版本、同键并发/重放、异体409和软删除拒绝；比较实际版本、操作人、事件与回执，不只比较 HTTP200。",
+      "reuse": [
+        "scripts/project-components/project-isolation-live.mjs",
+        "scripts/project-components/workflow-concurrency-live.mjs",
+        "scripts/project-components/workflow-verdict-concurrency-live.mjs",
+        "scripts/project-components/mcp-core.smoke.mjs"
+      ],
+      "development": "已有 isolation/concurrency runner 固定4419/4421，需新增受审定4420 driver/返回解析和身份保存恢复；不能仅改一个 URL 视为准备完成。产品暂不假定需要改动。",
+      "alreadyCovered": "HTTP与独立server MCP的既有1997请求隔离、98请求六动作重放及验收竞争不覆盖本地4420。HTTP事件/附件也不能填05组件日志缺口。",
+      "preservation": "local MCP login 会影响已安装 EXE 持久身份，须由 root 排定独占身份窗口并核原身份/文字/PNG保全；这一步不与 root 的 server MCP 人员用例混用。所有 fixture 留存。",
+      "cannotClaim": [
+        "全部MCP工具对等",
+        "五个其它客户端入口自动通过",
+        "组件外部任务幂等完成"
+      ]
+    },
+    {
+      "priority": 4,
+      "id": "local-16-disabled-entry-denial",
+      "baselineIds": [
+        "baseline-a319c440956804",
+        "baseline-21c8b804d710c5",
+        "baseline-bef18a8f7e8f2b",
+        "baseline-f5391f66bc0973"
+      ],
+      "surfaces": [
+        "http",
+        "server_mcp",
+        "web"
+      ],
+      "classification": "disabled_real_endpoint_subset_then_separate_local_held_history_fixture",
+      "target": "在新项目五组件保持关闭时，逐个合法形状调用仍可到达的旧构建/上传/Relay/Qingyu创建入口，确认组件拒绝、无新任务/outbox/文件提交、Bug页仍可用；只读历史和非成员拒绝按确切路由独立留证。",
+      "reuse": [
+        "scripts/project-components/management.smoke.mjs",
+        "scripts/project-components/project-isolation-live.mjs"
+      ],
+      "development": "新增禁止配置启用的精确路由白名单与组件前后快照；现有 management 主要测配置/依赖，isolation 明确排除了组件路由，不能原样重跑。非空日志/暂停条目需另建执行 hold 的临时持久 fixture 和新端口，限制全部外部调用；不得往真实已有队列插造数据。",
+      "alreadyCovered": "管理HTTP已验证A/B配置隔离、依赖和needs_configuration；native三历史tab主要为空；web-outbox证明是临时SQLite/API，无真实有数据浏览器点击。",
+      "preservation": "新项目一直 all-off；没有合格安全门禁就不放行组件写请求。源测试可 fail-if-called，实际预览的拒绝证据需对应任务/事件/文件快照，不能把一次409当全部后台零出站证明。",
+      "cannotClaim": [
+        "18运行中停用完整链",
+        "19真实外部回调",
+        "非空日志实际执行器来源",
+        "17所有客户端和真实连接完整通过"
+      ]
+    },
+    {
+      "priority": 5,
+      "id": "local-phase-d-frozen-workflow-projection",
+      "baselineIds": [
+        "baseline-893c7e29e95d73"
+      ],
+      "surfaces": [
+        "http"
+      ],
+      "classification": "implementation_then_local_persistent_contract_fixture_not_external_e2e",
+      "target": "实现 frozen workflow GET：occurrences、repairAttempts、verifications、builds、relayReceipts 五集合安全DTO，持久冻结快照和各集合独立cursor；分页期间新写入/旧事实更新不得混入，当前撤权/删除仍拒绝。",
+      "reuse": [
+        "docs/evidence/project-components/contracts-remediation-gap-review/README.md",
+        "scripts/project-components/frozen-workflow-live.mjs"
+      ],
+      "development": "独立 projection/cursor/store/API adapter/tests 与后续 schema16 新迁移文件；Phase A 的 schema15 和公共迁移/worker/route 注册由 root 协调接线。先发精确文件分工，获确认后实施；不改冻结合同。",
+      "assertions": [
+        "五个数组都有严格schema；默认50/最大100，UUID升序，耗尽集合不重放",
+        "跨Bug/项目/actor、membership变更、limit/filter、cursor篡改/过期和重启策略",
+        "超过100且不均衡的集合、快照后新增和旧DTO更改、全部终止",
+        "全 account/project/Bug/附件/Build/receipt 关系与安全字段投影"
+      ],
+      "alreadyCovered": "丰富 human-workflow 与已注册六个冻结 mutation 读回都不等于未注册 frozen workflow GET；Phase A 正在推进，不能预记已完成。",
+      "preservation": "所有写入只在独立 tempDB 合同 fixture。非空Build/Relay可用明确标注的持久本地合同数据；不声称真实外部执行来源。冻结400枚举与cursor行为的内部缺口原样保留报告。",
+      "cannotClaim": [
+        "当前预览已注册该GET",
+        "server/local MCP随HTTP自动完成",
+        "非空本地Build/Relay是外部端到端"
+      ]
+    }
+  ],
+  "parallelOwnedWork": [
+    {
+      "owner": "/root",
+      "scope": "Server MCP 新A/B项目人员：稳定姓名ID、单/多项目、A停用/B继续、恢复",
+      "baselines": [
+        "01",
+        "02",
+        "04"
+      ],
+      "state": "preparing per root message; no completion inferred",
+      "doNotDuplicate": true
+    },
+    {
+      "owner": "/root/project_backend",
+      "scope": "Phase A/schema15 verification_result_snapshots",
+      "state": "implementation in progress per root; not deployed or passed by this review"
+    }
+  ],
+  "localButNotImmediate": [
+    {
+      "scope": "01/02/04 APK/EXE本身未完整的登录目录与A停用/B继续；普通姓名gm无特权",
+      "reason": "可复用 root 的新人员 fixture，但每端仍需真正操作，EXE04旧通过不必重做。不能从服务MCP准备推断本地MCP或APK结果。"
+    },
+    {
+      "scope": "APK应用内自更新",
+      "reason": "code23 feed发布与ADB覆盖升级已经做过；现在同code23 feed不能证明一次更高版本自更新。需新的更高versionCode签名预览包、独立feed发布和实际应用内安装；这是本地发布准备，不是必须外部账号。"
+    }
+  ],
+  "blockers": [
+    {
+      "scope": "18/19/20及§17完整组件执行",
+      "kind": "dedicated_external_resources",
+      "requiredInputs": [
+        "Jenkins专用baseUrl/job/credentialRef/presets/artifact URL及独立workspace/磁盘容量",
+        "上传独立apiBase/loginBase/sourceUrl/defaults/credentialRef，targetPrefix/testDirectoryPrefix/releaseDirectoryPrefix均为测试隔离目标",
+        "Relay测试baseUrl、relayInstanceId、externalProjectId(projectKey)与回执/回调认证引用",
+        "轻语测试租户/项目/可用测试记录和凭据引用"
+      ],
+      "boundary": "拒绝/暂停/本地历史fixture可以先测；真实调度、运行中停用、取消/回调、发布与外部失败链不能用它替代。凭据在执行时从私有配置读，不写进证据。"
+    },
+    {
+      "scope": "21旧外部状态迁移",
+      "kind": "coherent_recovery_set_and_import_mapping_missing",
+      "requiredInputs": [
+        "live increment queue/WAL的一致导出及未完成数量",
+        "3jobs/2chains/9batches、owner/workspace/job文件与主库同一恢复点的清单、hash和project/componentVersion映射",
+        "Qingyu会话/密钥可恢复材料与受控导入hold/recovery策略"
+      ],
+      "boundary": "53文件位置与部分允许字段已盘点；主DB/附件/58表/2021 sent outbox不覆盖这些独立目录。不是单纯缺网络，也不能未经一致导出直接复制活主文件。"
+    },
+    {
+      "scope": "22与§17.3",
+      "kind": "physical_android_device",
+      "requiredInputs": [
+        "可连接的真实Android测试设备及MediaProjection/文件访问/安装更新权限",
+        "与每日应用隔离的preview包名、同签名升级包和充足可保留存储"
+      ],
+      "boundary": "MuMu23、APK下载13HTTP、ADB install-r及草稿保全不能取消最终物理设备要求。"
+    }
+  ],
+  "readOnlyFindings": [
+    {
+      "type": "new_evidence_not_yet_in_frozen_matrix",
+      "path": "docs/evidence/project-components/web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "sha256": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab",
+      "checks": 59,
+      "status": "passed",
+      "meaning": "同项目loading/网络失败重试已做，不把它列为下一次重复任务；跨项目迟到仍未覆盖。"
+    },
+    {
+      "type": "no_new_whole_pass",
+      "meaning": "保持7/24与原failed/progress/needsRevalidation，不把近期安装/媒体/模拟器partial扩大。"
+    }
+  ],
+  "sources": [
+    {
+      "path": "docs/design/project-components-transformation-2026-09-08.md",
+      "bytes": 55102,
+      "sha256": "8dabd8c8542f33659579bb0692a5831ef902abf710941655779513548c21af42"
+    },
+    {
+      "path": "docs/evidence/project-components/coverage-matrix.json",
+      "bytes": 4515556,
+      "sha256": "53eafe84381682efdb6a56cca8c2fd5044883a3e341a99b8b06eb242d8044990"
+    },
+    {
+      "path": "docs/evidence/project-components/IMPLEMENTATION.md",
+      "bytes": 62525,
+      "sha256": "e001794def227ce154d359b15cc27d9b2d5aa5f8ace67cf899cf32aa95bdb230"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-remediation-gap-review/README.md",
+      "bytes": 18073,
+      "sha256": "c6759065e6118806ced0431ed5e181bcbc0153e6fe363352018e8be9bdd6854b"
+    },
+    {
+      "path": "docs/evidence/project-components/contracts-remediation-gap-review/review.json",
+      "bytes": 21395,
+      "sha256": "92fe89a9dc08b423df616716e221442a07a9c11121457514ebe7d7f2c5806e92"
+    },
+    {
+      "path": "docs/evidence/project-components/baseline21-external-state-inventory.md",
+      "bytes": 13407,
+      "sha256": "935c3abccfa5810f42ff8c184949c6419d6a0e3d5c6b791f9760d26221744817"
+    },
+    {
+      "path": "docs/evidence/project-components/baseline21-external-state-inventory.json",
+      "bytes": 94120,
+      "sha256": "1acf9e4bb348d643650cc2266bb401c4c8420715264a9479ebd833c33172235e"
+    },
+    {
+      "path": "docs/evidence/project-components/web-browser/dual-window-results.json",
+      "bytes": 5300,
+      "sha256": "90d042a62fa85c4bfd5f07161800378aebcbff0929f6a81fc9f7acf6fe17321a"
+    },
+    {
+      "path": "docs/evidence/project-components/web-detail-loading-live/ab51a7d8-3d97-40e0-86af-bf2fe77af389/proof.json",
+      "bytes": 113092,
+      "sha256": "a860b14e12fdd1abe799e118722e4acf280903ae0e7c1b6c1a2cb790925bdcab"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-recovery-plan.md",
+      "bytes": 14567,
+      "sha256": "f0384fa1a0f32b83d136c2cf961fb630e05683545ca4868cc30105c0aabea222"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview8-recovery-plan.md",
+      "bytes": 30776,
+      "sha256": "e98bda91594311e7fde99da02df4e50ffe93366dab509573772546ea44f68af5"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-recovery-live/65ee5dc8-3f23-4f28-ad97-daa1de8b0ece/result.json",
+      "bytes": 13294,
+      "sha256": "5fe38d5fc111354e57763525b31c5705a04461627a3436e1bcb8580be586bc56"
+    },
+    {
+      "path": "docs/evidence/project-components/exe-preview9-live/f222d18f-4176-401f-9bdc-af6da4917991/result.json",
+      "bytes": 30300,
+      "sha256": "9a5184a94eee7493ac3020b052e9ae7775988c50fd993d04c745cd26eccfe789"
+    },
+    {
+      "path": "docs/evidence/project-components/web-rejected-media-recovery-live/5f3c9726-5374-4c7d-9ba4-57573901968e/proof.json",
+      "bytes": 237342,
+      "sha256": "26b0310da268968626efa3cbde1be10461c05a77563b1d071b74008ffa1509fb"
+    },
+    {
+      "path": "docs/evidence/project-components/android-code23-feed-publication/29a9b98b-2fa8-4625-a465-5d75a91b70e8/publish.json",
+      "bytes": 12970,
+      "sha256": "ab97c596e0cd33811fe4311d7956ddd04d091f5feb9de4533bdeb3324bc56c7d"
+    },
+    {
+      "path": "scripts/project-components/web-detail-loading-live.mjs",
+      "bytes": 45935,
+      "sha256": "29aec997bfacc12f646254dd7aad7f9794200446686b33d27b0efcf1c5bd07ae"
+    },
+    {
+      "path": "scripts/project-components/web-dual-window.fixture.mjs",
+      "bytes": 3266,
+      "sha256": "17acc2bbc7383c83fd9b3b084cf289d5030524fa7c2109f5acabfcfa1fd1225d"
+    },
+    {
+      "path": "scripts/project-components/web-submission-recovery-live.mjs",
+      "bytes": 37979,
+      "sha256": "c68945dc9c2fcaaa1d338c3707266a205f5a4943f521485490a5738be1b4ded8"
+    },
+    {
+      "path": "scripts/project-components/web-rejected-media-recovery-live.mjs",
+      "bytes": 40167,
+      "sha256": "dc1f93799397e9c45a5feb520722d1e46453288f4ddfcb53d6d8315923c9f2be"
+    },
+    {
+      "path": "scripts/project-components/project-isolation-live.mjs",
+      "bytes": 31712,
+      "sha256": "de8dbd8ac16a78677e24c60046fe4ae4c6ea141878d92a47279f3ec2e30ee4ab"
+    },
+    {
+      "path": "scripts/project-components/workflow-concurrency-live.mjs",
+      "bytes": 22261,
+      "sha256": "7a52b6f23f637ce646cb862cdef3ffd5c09d6145cf4ab4b57e19e2c451152c86"
+    },
+    {
+      "path": "scripts/project-components/workflow-verdict-concurrency-live.mjs",
+      "bytes": 20808,
+      "sha256": "9519a9c9a93cee8e6c7d06e4201fc51d23fedc453b96c8b7f6a3fc3d0b8ba17e"
+    },
+    {
+      "path": "scripts/project-components/mcp-core.smoke.mjs",
+      "bytes": 7225,
+      "sha256": "8c6be5321eedad76c2b0840899bb2afbf1d256eca3b711f4bc60879bb6ad24d4"
+    },
+    {
+      "path": "scripts/project-components/management.smoke.mjs",
+      "bytes": 16994,
+      "sha256": "bb4ecfe2dc1644110bca9bbc21da4c4f237f63143b8c5c8945b9bdcea9123378"
+    },
+    {
+      "path": "scripts/project-components/android-recovery-proxy.mjs",
+      "bytes": 32357,
+      "sha256": "a164c85357260430d8ad8d8566ca7d9f98249669823dbbe8ecf3ea621430d7af"
+    },
+    {
+      "path": "scripts/project-components/frozen-workflow-live.mjs",
+      "bytes": 12412,
+      "sha256": "a16b86a0e5f252c8b38749fb37ae2731bef20210d61f75da346cdc281d7adaa1"
+    },
+    {
+      "path": "scripts/project-components/offline-import.mjs",
+      "bytes": 11578,
+      "sha256": "6443f305ee121593afcd6a10d78aaa9c6a992c0134d3eb6cc00da38b9126ffda"
+    }
+  ]
+}

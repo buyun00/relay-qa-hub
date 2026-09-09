@@ -1,0 +1,77 @@
+{
+  "runId": "a21b3974-5c2c-43df-940f-e56572e20b76",
+  "status": "prepared_not_run",
+  "results": [
+    {
+      "label": "format-write",
+      "args": [
+        "node_modules/prettier/bin/prettier.cjs",
+        "--write",
+        "scripts/project-components/server-mcp-membership-live.mjs",
+        "scripts/project-components/server-mcp-membership-live.test.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "syntax-source",
+      "args": [
+        "--check",
+        "scripts/project-components/server-mcp-membership-live.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "syntax-tests",
+      "args": [
+        "--check",
+        "scripts/project-components/server-mcp-membership-live.test.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "pure-tests",
+      "args": [
+        "--test",
+        "scripts/project-components/server-mcp-membership-live.test.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "default-inert",
+      "args": [
+        "scripts/project-components/server-mcp-membership-live.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "lint",
+      "args": [
+        "node_modules/eslint/bin/eslint.js",
+        "scripts/project-components/server-mcp-membership-live.mjs",
+        "scripts/project-components/server-mcp-membership-live.test.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "format-check",
+      "args": [
+        "node_modules/prettier/bin/prettier.cjs",
+        "--check",
+        "scripts/project-components/server-mcp-membership-live.mjs",
+        "scripts/project-components/server-mcp-membership-live.test.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "files": [
+    {
+      "path": "scripts/project-components/server-mcp-membership-live.mjs",
+      "sha256": "78551518f34c5703f083c26f558e07076ee518cadea9209f71890f82bbd418c2"
+    },
+    {
+      "path": "scripts/project-components/server-mcp-membership-live.test.mjs",
+      "sha256": "e000b8d2b454428acc02bff30419c507ea0a02a2c78b7bfe478337e6014d173a"
+    }
+  ],
+  "networkCalls": 0
+}

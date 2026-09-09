@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "status": "passed_root_artifact_review",
+  "reviewedAt": "2026-09-09T02:45:04.370Z",
+  "proof": {
+    "path": "docs/evidence/project-components/server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/proof.json",
+    "bytes": 493859,
+    "sha256": "55ac6023679282fb4a7a0a985ff79db0a2718999f1869e41fe60b25e569834e5"
+  },
+  "source": {
+    "path": "docs/evidence/project-components/server-mcp-membership-live/e21431f0-e927-4a3f-8275-167accb1eaef/runner.mjs.txt",
+    "bytes": 20543,
+    "sha256": "78551518f34c5703f083c26f558e07076ee518cadea9209f71890f82bbd418c2"
+  },
+  "checks": [
+    {
+      "label": "all 59 actual assertions passed",
+      "passed": true
+    },
+    {
+      "label": "executed source and working copy pin",
+      "passed": true
+    },
+    {
+      "label": "35 unique JSON-RPC exchanges with matching IDs",
+      "passed": true
+    },
+    {
+      "label": "all retained non-authentication tool arguments stay in new fixture scope",
+      "passed": true
+    },
+    {
+      "label": "exact two project creations",
+      "passed": true
+    },
+    {
+      "label": "only intended A shared membership changes",
+      "passed": true
+    },
+    {
+      "label": "exact two current membership denials",
+      "passed": true
+    },
+    {
+      "label": "stable identities across successful repeated logins",
+      "passed": true
+    },
+    {
+      "label": "final directories match shared and single memberships",
+      "passed": true
+    },
+    {
+      "label": "all four component observations remain disabled",
+      "passed": true
+    },
+    {
+      "label": "two final project Bug lists empty",
+      "passed": true
+    },
+    {
+      "label": "A disable and restoration audit, none in B",
+      "passed": true
+    },
+    {
+      "label": "recorded API and server MCP identity preservation",
+      "passed": true
+    },
+    {
+      "label": "public proof excludes configured secret values and JWT/private-key material",
+      "passed": true
+    }
+  ],
+  "scope": "Artifact-only root review; no new HTTP, MCP, browser, device, service, live database or process calls.",
+  "limits": [
+    "35 JSON-RPC requests plus one separate MCP proxy health GET.",
+    "Public responses are recursively redacted; original authentication bodies are not retained and their hashes cannot be independently recomputed.",
+    "No imported historical-name alias, native client UI, local EXE MCP or external component proof.",
+    "No production-wide inventory repeated. New projects and employees remain; A membership was restored."
+  ]
+}
