@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "status": "packaged_verified_not_published",
+  "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+  "runId": "7ed02aa0-3669-4f85-932a-2cf3ed0eadaf",
+  "releaseId": "20260909T011704801Z",
+  "version": "0.2.0-preview.9",
+  "nativeVersion": "0.2.0.9",
+  "prepared": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\exe-preview9-package-only\\prepared.json",
+    "bytes": 21312,
+    "sha256": "ae86788cfa46d11ffd8ff37674ad2b558782caec809437ab1ef642bf45dda220"
+  },
+  "build": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\docs\\evidence\\project-components\\exe-preview9-package-only\\build-result.json",
+    "bytes": 46282,
+    "sha256": "d7804189e974ee3dad2fa3864a9d60220ef54cfa7a977959220197e7db809fe0"
+  },
+  "completedAt": "2026-09-09T01:20:12.913Z",
+  "checks": {
+    "passed": 29,
+    "total": 29,
+    "desktopTests": 104
+  },
+  "artifacts": {
+    "installer": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.9-20260909T011704801Z.exe",
+      "bytes": 108334255,
+      "sha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336"
+    },
+    "manifest": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\staged-downloads\\qa-hub-preview-7c86-windows-latest.json",
+      "bytes": 464,
+      "sha256": "5e2c0d17eca2829154fb97749d6c26295e15dfdce7f388a1218f0317853f6ad9"
+    },
+    "asar": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T011704801Z\\portable\\RelayQaHubPreview-win32-x64\\resources\\app.asar",
+      "bytes": 3280063,
+      "sha256": "6bc9f7508f663bd34c3896894369a7f9cafc6cc8c57542465315373a77790636"
+    },
+    "release": {
+      "schemaVersion": 1,
+      "releaseId": "20260909T011704801Z",
+      "version": "0.2.0-preview.9",
+      "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+      "sourceDirty": true,
+      "instanceId": "qa-hub-preview-7c86"
+    },
+    "metadata": {
+      "fileVersion": "0.2.0.9",
+      "productVersion": "0.2.0-preview.9"
+    },
+    "packagedConfig": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T011704801Z\\portable\\RelayQaHubPreview-win32-x64\\preview-instance.json",
+      "bytes": 561,
+      "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+    }
+  },
+  "authenticode": {
+    "recordedAt": "2026-09-09T01:20:53.8990332Z",
+    "executedInstaller": false,
+    "signatures": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.9-20260909T011704801Z.exe",
+        "sha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
+        "status": "NotSigned",
+        "signatureType": "None",
+        "signerCertificatePresent": false
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T011704801Z\\portable\\RelayQaHubPreview-win32-x64\\RelayQaHubPreview.exe",
+        "sha256": "da3e107e4219f0f3d068b6178f92abd9a232b44faaa47977db1ffcf556b8dd59",
+        "status": "NotSigned",
+        "signatureType": "None",
+        "signerCertificatePresent": false
+      }
+    ],
+    "ed25519ManifestVerifiedByBuild": true
+  },
+  "inputs": {
+    "runner": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\preview9\\package-only.mjs",
+      "bytes": 17557,
+      "sha256": "fa2ac651dc5718a8c5743f7770aaf8805fdde4b0ce32bf15f4d726de572b4902"
+    },
+    "originalHelper": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\package-preview.mjs",
+      "bytes": 7669,
+      "sha256": "d36670be4ae8cf2c008f6be81c5fdc8982cdc0e2f3a2408c04903d6f1ba648e3"
+    },
+    "derivedHelper": {
+      "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\preview9\\package-preview-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf.mjs",
+      "bytes": 7852,
+      "sha256": "7b1dfb712b8ef52a6437a905fc69352fde03ed417370eca0d26cf8d3c7b61e0c"
+    },
+    "exactHelperChange": {
+      "from": "cpSync(join(config.sourceRoot, source), join(stage, destination), {",
+      "to": "cpSync(source === \"apps/web/dist\" ? \"C:\\\\Users\\\\lin0\\\\.codex\\\\parallel-runtimes\\\\qa-hub-preview-7c86\\\\acceptance\\\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\\\web-dist\" : join(config.sourceRoot, source), join(stage, destination), {",
+      "count": 1
+    },
+    "stageConfig": {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\package-instance.json",
+      "bytes": 1234,
+      "sha256": "8de53879886b8a73cc1cedb9cc6ac71a4059d3f238f8dd0159f75898be8292c3"
+    },
+    "makensis": {
+      "path": "C:/Users/lin0/AppData/Local/electron-builder/Cache/nsis-3.0.4.1/nsis-3.0.4.1-1mx3n/makensis.exe",
+      "bytes": 2560,
+      "sha256": "f2b2b7726ac0d4e720dff52bfca11a5518d550fc75ed34a48dc47921527293f0"
+    }
+  },
+  "preservation": {
+    "servedWeb": {
+      "files": 10,
+      "bytes": 4654639,
+      "beforeCopyAfterBuildEqual": true,
+      "retainedAt": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\retained-served-web-dist"
+    },
+    "installedVersion": "0.2.0-preview.8",
+    "installedConfigSha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83",
+    "rollbackDirectories": 8,
+    "oldInstallers": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+        "bytes": 108333764,
+        "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+        "bytes": 108333764,
+        "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.7-20260908T194425490Z.exe",
+        "bytes": 108378668,
+        "sha256": "fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a"
+      }
+    ],
+    "protectedFilesProcessesAndListenersUnchanged": true
+  },
+  "boundary": {
+    "formalLatestPublished": false,
+    "servedWebChanged": false,
+    "installedExeChanged": false,
+    "serviceActions": 0,
+    "deviceActions": 0,
+    "installerExecuted": false,
+    "packagedNativeUiAcceptance": "not_run",
+    "apiServiceCodeUnchanged": true,
+    "baselineMatrixChanged": false
+  },
+  "historicalEvidence": {
+    "webFix": "../web-detail-loading-fix.json",
+    "installedPreview8": "../exe-preview8-live/1786509a-9de7-4d1a-ba8c-9fb282c9c453/result.json"
+  },
+  "logs": [
+    {
+      "name": "web-build-isolated",
+      "exitCode": 0,
+      "log": "web-build-isolated.log",
+      "sha256": "18c13443cb23c26c0f038610d5ea3505d1753bed6d4ee8f4ee6a699a2066eada"
+    },
+    {
+      "name": "desktop-typecheck",
+      "exitCode": 0,
+      "log": "desktop-typecheck.log",
+      "sha256": "275e458afc146d3490ea24cfd0766c361c9a34e735a55022f12fd1ad865a41e7"
+    },
+    {
+      "name": "desktop-test",
+      "exitCode": 0,
+      "log": "desktop-test.log",
+      "sha256": "d0ec74dd4293bdeb259bc444cc3e5653871e5391687b3f5ae74045ae474413f9"
+    },
+    {
+      "name": "desktop-build",
+      "exitCode": 0,
+      "log": "desktop-build.log",
+      "sha256": "f13170be305a4b8402010329cf666c95531fb30484912ac8527512697a76cfd5"
+    },
+    {
+      "name": "package-preview9",
+      "exitCode": 0,
+      "log": "package-preview9.log",
+      "sha256": "b820e5fcce05e4ec9328898196d8f99e926731a74b35ad5a88dfc4dbd60acf5b"
+    }
+  ]
+}

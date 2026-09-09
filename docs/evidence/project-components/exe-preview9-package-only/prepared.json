@@ -1,0 +1,511 @@
+{
+  "schemaVersion": 1,
+  "status": "prepared_not_built_or_published",
+  "runId": "7ed02aa0-3669-4f85-932a-2cf3ed0eadaf",
+  "recordedAt": "2026-09-09T01:12:02.584Z",
+  "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+  "sourceDirty": true,
+  "sourceRoot": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub",
+  "runtimeRoot": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86",
+  "acceptance": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf",
+  "stagedDownloads": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\staged-downloads",
+  "webDist": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\web-dist",
+  "stageConfig": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\package-instance.json",
+    "bytes": 1234,
+    "sha256": "8de53879886b8a73cc1cedb9cc6ac71a4059d3f238f8dd0159f75898be8292c3"
+  },
+  "runner": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\preview9\\package-only.mjs",
+    "bytes": 17557,
+    "sha256": "fa2ac651dc5718a8c5743f7770aaf8805fdde4b0ce32bf15f4d726de572b4902"
+  },
+  "originalHelper": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\package-preview.mjs",
+    "bytes": 7669,
+    "sha256": "d36670be4ae8cf2c008f6be81c5fdc8982cdc0e2f3a2408c04903d6f1ba648e3"
+  },
+  "derivedHelper": {
+    "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\preview9\\package-preview-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf.mjs",
+    "bytes": 7852,
+    "sha256": "7b1dfb712b8ef52a6437a905fc69352fde03ed417370eca0d26cf8d3c7b61e0c"
+  },
+  "exactHelperChange": {
+    "from": "cpSync(join(config.sourceRoot, source), join(stage, destination), {",
+    "to": "cpSync(source === \"apps/web/dist\" ? \"C:\\\\Users\\\\lin0\\\\.codex\\\\parallel-runtimes\\\\qa-hub-preview-7c86\\\\acceptance\\\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\\\web-dist\" : join(config.sourceRoot, source), join(stage, destination), {",
+    "count": 1
+  },
+  "makensis": {
+    "path": "C:/Users/lin0/AppData/Local/electron-builder/Cache/nsis-3.0.4.1/nsis-3.0.4.1-1mx3n/makensis.exe",
+    "bytes": 2560,
+    "sha256": "f2b2b7726ac0d4e720dff52bfca11a5518d550fc75ed34a48dc47921527293f0"
+  },
+  "before": {
+    "files": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\instance.json",
+        "bytes": 1151,
+        "sha256": "2b8e97ce9b62d072b74eaf00015fb04f5b818d318203f2a91e59d15873da349b"
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\preview-instance.json",
+        "bytes": 561,
+        "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "bytes": 235871744,
+        "sha256": "752498c79106744a8d76cafa8806a283c349446ed8a425da79f4c1e46241e149"
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\resources\\app.asar",
+        "bytes": 5529881,
+        "sha256": "0f278a740a90f198d74fce03205a311463f1f626f7d634389c6ca794540fab05"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop-signing\\public.pem",
+        "bytes": 113,
+        "sha256": "e0a52488fc59ed7c1c8c119d1ba73332a3cce7a33cad168754e46ebb2ff914b1"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-latest.json",
+        "bytes": 464,
+        "sha256": "8345d8cbf7353cde9a6c077224f32886c5b433d2efb4dcd0c39cca86df94e417"
+      }
+    ],
+    "processes": {
+      "observedAt": "2026-09-09T01:11:54.6193840Z",
+      "listeners": [
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4274,
+          "OwningProcess": 20284
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4419,
+          "OwningProcess": 10036
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4420,
+          "OwningProcess": 19500
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 4421,
+          "OwningProcess": 15736
+        }
+      ],
+      "processes": [
+        {
+          "ProcessId": 3452,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z"
+        },
+        {
+          "ProcessId": 10036,
+          "ParentProcessId": 18924,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T22:26:05.0349230Z"
+        },
+        {
+          "ProcessId": 10744,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z"
+        },
+        {
+          "ProcessId": 13820,
+          "ParentProcessId": 19500,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T00:41:50.7436470Z"
+        },
+        {
+          "ProcessId": 15736,
+          "ParentProcessId": 3236,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T16:46:02.4598690Z"
+        },
+        {
+          "ProcessId": 17160,
+          "ParentProcessId": 24088,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z"
+        },
+        {
+          "ProcessId": 18596,
+          "ParentProcessId": 19500,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T00:41:50.5866930Z"
+        },
+        {
+          "ProcessId": 19500,
+          "ParentProcessId": 472,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T00:41:50.3889400Z"
+        },
+        {
+          "ProcessId": 20284,
+          "ParentProcessId": 3032,
+          "Name": "node.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "startedAt": "2026-09-08T17:52:36.5080910Z"
+        },
+        {
+          "ProcessId": 23328,
+          "ParentProcessId": 19500,
+          "Name": "RelayQaHubPreview.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T00:41:50.6081850Z"
+        },
+        {
+          "ProcessId": 23944,
+          "ParentProcessId": 17160,
+          "Name": "RelayQaHub.exe",
+          "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z"
+        }
+      ],
+      "version": "0.2.0-preview.8",
+      "nativeVersion": "0.2.0.8"
+    },
+    "webDist": [
+      {
+        "path": "assets/index-Ce9wROrH.js",
+        "bytes": 477454,
+        "sha256": "c6e0392ff28cbb86a27aec2dc1fe1cd4b47bb3eb9e22025c95e58a7187ab367d"
+      },
+      {
+        "path": "assets/index-Ce9wROrH.js.map",
+        "bytes": 1829460,
+        "sha256": "ce6a8263f152a2a349db4d19b42e5cc60fce3e2a9b32d90db23abc32003fafcd"
+      },
+      {
+        "path": "assets/index-CgNw0fhl.css",
+        "bytes": 91623,
+        "sha256": "a29d8e6c6129a4b11c3f69ae9d28a76865cd18bbed5db3236588a1b16dbdfcef"
+      },
+      {
+        "path": "assets/index-CUjaBP8S.js",
+        "bytes": 467013,
+        "sha256": "a001eacfd1aae18facd6ad0e4ffd34e24e2abaf9b98c9612eac69678f0c30962"
+      },
+      {
+        "path": "assets/index-CUjaBP8S.js.map",
+        "bytes": 1782565,
+        "sha256": "9b75066ba577ec1b466b41d8b2fed82f1b67e257844f7db9c5000e46b16f552a"
+      },
+      {
+        "path": "icon-licenses.txt",
+        "bytes": 4308,
+        "sha256": "908f55df09e44dabb1275ec56a8d7313e0dc1460db7d42e3ddc070da7f9c13df"
+      },
+      {
+        "path": "icons/qa-hub-192.svg",
+        "bytes": 506,
+        "sha256": "79679389893f674b4ed89f2f8cd2a7cb21ae1a7064a45708b953cd6e194aa601"
+      },
+      {
+        "path": "icons/qa-hub-512.svg",
+        "bytes": 506,
+        "sha256": "e780a52ccb3bef1f9d3f1b7a9fc36a3afab1a53f845f6f9fa757ed420ccb5faf"
+      },
+      {
+        "path": "icons/qa-hub-maskable-512.svg",
+        "bytes": 495,
+        "sha256": "3be5b71b759df34841a1f108911afac151834eed6ea9876081340b516727019c"
+      },
+      {
+        "path": "index.html",
+        "bytes": 709,
+        "sha256": "6cda7cc65a884dcaafd1ea1f8e2a3b424032cd53f0d2d972b749b374be1408b5"
+      }
+    ],
+    "desktopSource": [
+      {
+        "path": "bridge-types.ts",
+        "bytes": 3159,
+        "sha256": "005764991b0a9bfefbac25863302908edfc5275efd8b5a51da1608ccd72aa682"
+      },
+      {
+        "path": "config.ts",
+        "bytes": 7876,
+        "sha256": "39fbbc30596268604d943441c4b12d633c7a99a0abf30bcd9ef9dd93313bca66"
+      },
+      {
+        "path": "main.ts",
+        "bytes": 32332,
+        "sha256": "bb611b59d11fc77b8f7e80fccadaf20dcff33739cdca75170e5631bea82d32cd"
+      },
+      {
+        "path": "mcp-api.ts",
+        "bytes": 56967,
+        "sha256": "2bab4fd222fe58c2711a8ae3ecdd791e85b42277d25c60faacc1fb03fa58b80c"
+      },
+      {
+        "path": "mcp-production.ts",
+        "bytes": 13018,
+        "sha256": "afeb61285d4f0fd70d6c5fe94d6d9065ed9a4e90da341be86ceb6686fa9d6baa"
+      },
+      {
+        "path": "mcp-server.ts",
+        "bytes": 14642,
+        "sha256": "9f14f007f6bb5c5d91598944348549f567b3e08f0ffde7263d07671098ff4285"
+      },
+      {
+        "path": "network.ts",
+        "bytes": 16001,
+        "sha256": "a06a27a5a984bb2acd1aa009c074f6d0b92700d0cb5a9d1f81ca0155392bd732"
+      },
+      {
+        "path": "notification-history.ts",
+        "bytes": 2694,
+        "sha256": "bfd09d5157f8b3d25138d673b4d1b342e9c16999586d2499616d1aa5cdf8bc28"
+      },
+      {
+        "path": "notification-transport.ts",
+        "bytes": 17290,
+        "sha256": "6eb451734e123284f8415d80be13735b1ab65bfb6b4da3a26288a40c12880299"
+      },
+      {
+        "path": "package-downloads.ts",
+        "bytes": 656,
+        "sha256": "d3fc633ff20252d410f0cfd2afc55faf373602879e8d24d041ae4d582d0e9ef2"
+      },
+      {
+        "path": "packaging-notifications.ts",
+        "bytes": 795,
+        "sha256": "1cbc93903a915029d7fb35e9c8e7ca38444372cbd0cc7bf7b44fa1315b2c7f68"
+      },
+      {
+        "path": "portable-updater.ts",
+        "bytes": 19674,
+        "sha256": "9a1e04a4b8122e3a180d44a4a00c7bb4a9e5df799e0322b63febd82852dd8212"
+      },
+      {
+        "path": "preload.cts",
+        "bytes": 10638,
+        "sha256": "dc10560b82618c4b8d12edfed912572dd4815f1190c196c6ca3a0efb197a787a"
+      },
+      {
+        "path": "preview-config.ts",
+        "bytes": 4874,
+        "sha256": "799d14b1545a6b05d1ed326bb9ef405171140a3fb61ed8469686df5d28ed083c"
+      },
+      {
+        "path": "remembered-identity.ts",
+        "bytes": 6983,
+        "sha256": "bb57795f77f648ad6004f4c2d1170c02d35564100d00b31b8b49ce5ab0815f5a"
+      },
+      {
+        "path": "renderer.d.ts",
+        "bytes": 166,
+        "sha256": "7398e1ac6b87473e87e5c95cb85df37101ce146c998acae75c1cbceabe234944"
+      },
+      {
+        "path": "runtime-config.ts",
+        "bytes": 10495,
+        "sha256": "87d9c7aa68cfb770c87ade3295e5aa9ec6f0dfe01bc5b21a4c0a1becab403534"
+      },
+      {
+        "path": "uploader-types.ts",
+        "bytes": 112,
+        "sha256": "14df116e3eb40e852c4e65ff777c28f818c0f6d0a09ef4a810d39a9c3a250966"
+      },
+      {
+        "path": "window-actions.ts",
+        "bytes": 888,
+        "sha256": "e58677b11d8548368d5caba5e39d80735407e3287433900dacd5ca4827c9f08e"
+      },
+      {
+        "path": "wss-client.ts",
+        "bytes": 10474,
+        "sha256": "f1113fb23ee74f7a1dbedcec4cbc6e402d656e169cf29fcf622d99418b3fb013"
+      }
+    ],
+    "helpers": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\package-preview.mjs",
+        "bytes": 7669,
+        "sha256": "d36670be4ae8cf2c008f6be81c5fdc8982cdc0e2f3a2408c04903d6f1ba648e3"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\preview-installer.nsi",
+        "bytes": 5155,
+        "sha256": "ce7f07b501aeca5a0b49cea07e30e44a4567e06616ff8fd52e3eda377760bf78"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\apps\\desktop\\scripts\\updater.nsi",
+        "bytes": 4393,
+        "sha256": "9fbb728fbdf10fc164da753c10d14b293f65ede2f4b9ff1c91d20a1b61c02411"
+      }
+    ],
+    "retainedInstallers": [
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview8-f4ea57e7-b24e-434c-80dd-029686bc1a98\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+        "bytes": 108333764,
+        "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.8-20260909T000712593Z.exe",
+        "bytes": 108333764,
+        "sha256": "b72f04e882873ea0c6f69ccbb09aa7eb612a20343cff0708c0a4816d6dafa147"
+      },
+      {
+        "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.7-20260908T194425490Z.exe",
+        "bytes": 108378668,
+        "sha256": "fbf0656285474e2b4d521178cb9107dd26d3426dd463b9198fc21b239e02152a"
+      }
+    ],
+    "rollbackDirectories": [
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T172125402Z",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T172125402Z\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T172125402Z\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T174125783Z",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T174125783Z\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T174125783Z\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T175032165Z",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T175032165Z\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T175032165Z\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T182326239Z",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T182326239Z\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T182326239Z\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T185123338Z",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T185123338Z\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T185123338Z\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T185123338Z-1",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T185123338Z-1\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T185123338Z-1\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T194425490Z",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T194425490Z\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260908T194425490Z\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      },
+      {
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260909T000712593Z",
+        "marker": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260909T000712593Z\\.preview-instance-id",
+          "bytes": 19,
+          "sha256": "193e885c5c901fc602b30f00e97fbba076e8e186a4b3cad593d55a980d73964f"
+        },
+        "config": {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview.backup-20260909T000712593Z\\preview-instance.json",
+          "bytes": 561,
+          "sha256": "aa98507fd6dbe84c360e845859af69c4f5ed1724975ecc10b7561015cf76ac83"
+        },
+        "exeExists": true
+      }
+    ],
+    "privateSigningKey": {
+      "exists": true,
+      "bytes": 119,
+      "bodyRead": false
+    }
+  },
+  "retainedServedWeb": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\retained-served-web-dist",
+    "files": 10,
+    "bytes": 4654639,
+    "threePassMatch": true
+  },
+  "guards": {
+    "signingPairMustAlreadyExist": true,
+    "privateKeyBodyReadDuringPreparation": false,
+    "onlyConfigFieldChanged": "downloadsRoot",
+    "servedWebUntouched": true,
+    "noBuild": true,
+    "noPublish": true,
+    "noClientOrServiceAction": true
+  },
+  "futureCommand": [
+    "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\.tools\\preview9\\package-only.mjs",
+    "--build",
+    "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\prepared.json"
+  ]
+}

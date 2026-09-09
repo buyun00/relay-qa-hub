@@ -1,0 +1,5 @@
+--- original
++++ derived
+@@ unique Web input expression @@
+-cpSync(join(config.sourceRoot, source), join(stage, destination), {
++cpSync(source === "apps/web/dist" ? "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\web-dist" : join(config.sourceRoot, source), join(stage, destination), {

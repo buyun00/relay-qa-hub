@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-09-09T01:20:53.8990332Z",
+  "executedInstaller": false,
+  "signatures": [
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.9-20260909T011704801Z.exe",
+      "sha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
+      "status": "NotSigned",
+      "signatureType": "None",
+      "signerCertificatePresent": false
+    },
+    {
+      "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T011704801Z\\portable\\RelayQaHubPreview-win32-x64\\RelayQaHubPreview.exe",
+      "sha256": "da3e107e4219f0f3d068b6178f92abd9a232b44faaa47977db1ffcf556b8dd59",
+      "status": "NotSigned",
+      "signatureType": "None",
+      "signerCertificatePresent": false
+    }
+  ],
+  "ed25519ManifestVerifiedByBuild": true
+}

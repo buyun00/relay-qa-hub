@@ -1,0 +1,11 @@
+{
+  "releaseId": "20260909T011704801Z",
+  "version": "0.2.0-preview.9",
+  "sourceCommit": "bc2b347dae282212a9119e5411b17fe144ca758c",
+  "sourceDirty": true,
+  "installer": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\staged-downloads\\qa-hub-preview-7c86-windows-0.2.0-preview.9-20260909T011704801Z.exe",
+  "packageDirectory": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\packages\\20260909T011704801Z\\portable\\RelayQaHubPreview-win32-x64",
+  "manifestPath": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\acceptance\\exe-preview9-package-only-7ed02aa0-3669-4f85-932a-2cf3ed0eadaf\\staged-downloads\\qa-hub-preview-7c86-windows-latest.json",
+  "sha256": "2c50fe1bf5d0f37cdf91c0e0ea449aab6b644f44669fd26a794647d990ad4336",
+  "bytes": 108334255
+}
