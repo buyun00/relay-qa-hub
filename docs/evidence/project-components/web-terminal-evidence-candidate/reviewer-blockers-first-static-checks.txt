@@ -1,0 +1,15 @@
+Command (from apps/web):
+node ../../node_modules/eslint/bin/eslint.js . --max-warnings=0
+
+Initial result: exit 1
+App.detail-loading.test.tsx:513:33 @typescript-eslint/no-invalid-void-type
+App.detail-loading.test.tsx:572:23 @typescript-eslint/no-non-null-assertion
+App.test.tsx:244:23 @typescript-eslint/no-non-null-assertion
+api.test.ts:699:49 @typescript-eslint/no-non-null-assertion
+4 errors.
+
+Command (from apps/web):
+node ../../node_modules/prettier/bin/prettier.cjs --check src/App.tsx src/AuthGate.tsx src/api.ts src/App.test.tsx src/App.detail-loading.test.tsx src/api.test.ts src/app.css
+
+Initial result: exit 1
+Formatting warnings: App.tsx, api.ts, App.test.tsx, App.detail-loading.test.tsx, api.test.ts.

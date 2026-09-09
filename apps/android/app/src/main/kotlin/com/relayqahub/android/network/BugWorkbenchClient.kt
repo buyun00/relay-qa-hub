@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.security.MessageDigest
+import java.time.OffsetDateTime
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -31,9 +32,17 @@ class BugWorkbenchClient(
         state: String? = null,
         limit: Int,
         accessToken: String,
+        ownerId: String? = null,
+        verificationOwnerId: String? = null,
+        cursor: String? = null,
     ): BugWorkbenchResult = withContext(Dispatchers.IO) {
-        require(runCatching { UUID.fromString(projectId) }.isSuccess)
+        require(STRICT_UUID_PATTERN.matches(projectId) && runCatching { UUID.fromString(projectId) }.isSuccess)
         state?.let { require(it in BUG_STATES) }
+        ownerId?.let { require(STRICT_UUID_PATTERN.matches(it) && runCatching { UUID.fromString(it) }.isSuccess) }
+        verificationOwnerId?.let {
+            require(STRICT_UUID_PATTERN.matches(it) && runCatching { UUID.fromString(it) }.isSuccess)
+        }
+        cursor?.let { require(WORKBENCH_CURSOR_PATTERN.matches(it)) }
         require(limit in 1..MAX_ITEMS)
         require(accessToken.isNotBlank())
         val base = apiBaseUrl.resolve("bugs")
@@ -41,6 +50,9 @@ class BugWorkbenchClient(
         val url = base.newBuilder().apply {
             addQueryParameter("projectId", projectId)
             state?.let { addQueryParameter("state", it) }
+            ownerId?.let { addQueryParameter("ownerId", it) }
+            verificationOwnerId?.let { addQueryParameter("verificationOwnerId", it) }
+            cursor?.let { addQueryParameter("cursor", it) }
             addQueryParameter("limit", limit.toString())
         }.build()
         val request = Request.Builder()
@@ -69,10 +81,13 @@ class BugWorkbenchClient(
             } catch (_: RuntimeException) {
                 throw BugWorkbenchFailure("INVALID_WORKBENCH_RESPONSE")
             }
-            val snapshotSequence = root.optLong("snapshotSequence", -1)
+            if (root.keys().asSequence().toSet() != NATIVE_BUG_LIST_FIELDS) {
+                throw BugWorkbenchFailure("INVALID_WORKBENCH_RESPONSE")
+            }
+            val snapshotSequence = root.requiredSnapshotSequence()
             val itemsJson = root.optJSONArray("items")
                 ?: throw BugWorkbenchFailure("WORKBENCH_ITEMS_MISSING")
-            if (snapshotSequence < 0 || itemsJson.length() > limit) {
+            if (itemsJson.length() > limit) {
                 throw BugWorkbenchFailure("INVALID_WORKBENCH_RESPONSE")
             }
             val items = buildList {
@@ -86,12 +101,179 @@ class BugWorkbenchClient(
                     add(parsed)
                 }
             }
+            val nextCursor = when {
+                !root.has("nextCursor") ->
+                    throw BugWorkbenchFailure("WORKBENCH_CURSOR_INVALID")
+                root.isNull("nextCursor") -> null
+                root.get("nextCursor") is String -> root.getString("nextCursor").also {
+                    if (!WORKBENCH_CURSOR_PATTERN.matches(it)) {
+                        throw BugWorkbenchFailure("WORKBENCH_CURSOR_INVALID")
+                    }
+                }
+                else -> throw BugWorkbenchFailure("WORKBENCH_CURSOR_INVALID")
+            }
             BugWorkbenchResult(
                 snapshotSequence = snapshotSequence,
                 items = items,
-                nextCursor = if (root.isNull("nextCursor")) null else root.optString("nextCursor"),
+                nextCursor = nextCursor,
             )
         }
+    }
+
+    /** Loads the complete personal workbench from the owner and verifier indexes at one snapshot. */
+    suspend fun listAssignedBugs(
+        projectId: String,
+        actorId: String,
+        limitPerPage: Int,
+        accessToken: String,
+    ): BugWorkbenchResult = withContext(Dispatchers.IO) {
+        require(STRICT_UUID_PATTERN.matches(actorId) && runCatching { UUID.fromString(actorId) }.isSuccess)
+        val owned = listAssignmentPages(
+            projectId = projectId,
+            actorId = actorId,
+            limitPerPage = limitPerPage,
+            accessToken = accessToken,
+            byVerificationOwner = false,
+        )
+        val verifying = listAssignmentPages(
+            projectId = projectId,
+            actorId = actorId,
+            limitPerPage = limitPerPage,
+            accessToken = accessToken,
+            byVerificationOwner = true,
+        )
+        if (owned.snapshotSequence != verifying.snapshotSequence) {
+            throw BugWorkbenchFailure("WORKBENCH_SNAPSHOT_CHANGED")
+        }
+        val merged = linkedMapOf<String, WorkbenchBug>()
+        (owned.items + verifying.items).forEach { bug ->
+            val previous = merged[bug.id]
+            if (previous == null) {
+                merged[bug.id] = bug
+            } else {
+                if (previous.withoutAssignmentProof() != bug.withoutAssignmentProof()) {
+                    throw BugWorkbenchFailure("WORKBENCH_ITEM_CHANGED")
+                }
+                merged[bug.id] = previous.copy(
+                    ownerAssignmentProof = previous.ownerAssignmentProof ?: bug.ownerAssignmentProof,
+                    verifierAssignmentProof =
+                        previous.verifierAssignmentProof ?: bug.verifierAssignmentProof,
+                )
+            }
+        }
+        BugWorkbenchResult(
+            snapshotSequence = owned.snapshotSequence,
+            items = merged.values.sortedWith(
+                compareByDescending<WorkbenchBug> { it.updatedAt }
+                    .thenByDescending { it.number }
+                    .thenByDescending { it.id },
+            ),
+            nextCursor = null,
+        )
+    }
+
+    /** Loads the complete project Bug index at one snapshot for an authorization recheck. */
+    suspend fun listProjectBugs(
+        projectId: String,
+        limitPerPage: Int,
+        accessToken: String,
+    ): BugWorkbenchResult = withContext(Dispatchers.IO) {
+        var cursor: String? = null
+        var snapshotSequence: Long? = null
+        val seenCursors = mutableSetOf<String>()
+        val collected = linkedMapOf<String, WorkbenchBug>()
+        repeat(MAX_WORKBENCH_PAGES) {
+            val page = listBugs(
+                projectId = projectId,
+                limit = limitPerPage,
+                accessToken = accessToken,
+                cursor = cursor,
+            )
+            if (snapshotSequence == null) {
+                snapshotSequence = page.snapshotSequence
+            } else if (snapshotSequence != page.snapshotSequence) {
+                throw BugWorkbenchFailure("WORKBENCH_SNAPSHOT_CHANGED")
+            }
+            page.items.forEach { bug ->
+                val previous = collected.putIfAbsent(bug.id, bug)
+                if (previous != null) {
+                    throw BugWorkbenchFailure(
+                        if (previous == bug) "WORKBENCH_ITEM_REPEATED" else "WORKBENCH_ITEM_CHANGED",
+                    )
+                }
+                if (collected.size > MAX_PROJECT_ITEMS) {
+                    throw BugWorkbenchFailure("WORKBENCH_ITEM_LIMIT_EXCEEDED")
+                }
+            }
+            val next = page.nextCursor
+                ?: return@withContext BugWorkbenchResult(
+                    checkNotNull(snapshotSequence),
+                    collected.values.toList(),
+                    null,
+                )
+            if (!seenCursors.add(next)) {
+                throw BugWorkbenchFailure("WORKBENCH_CURSOR_REPEATED")
+            }
+            cursor = next
+        }
+        throw BugWorkbenchFailure("WORKBENCH_PAGE_LIMIT_EXCEEDED")
+    }
+
+    private suspend fun listAssignmentPages(
+        projectId: String,
+        actorId: String,
+        limitPerPage: Int,
+        accessToken: String,
+        byVerificationOwner: Boolean,
+    ): BugWorkbenchResult {
+        var cursor: String? = null
+        var snapshotSequence: Long? = null
+        val seenCursors = mutableSetOf<String>()
+        val collected = linkedMapOf<String, WorkbenchBug>()
+        repeat(MAX_WORKBENCH_PAGES) {
+            val page = listBugs(
+                projectId = projectId,
+                state = null,
+                limit = limitPerPage,
+                accessToken = accessToken,
+                ownerId = actorId.takeUnless { byVerificationOwner },
+                verificationOwnerId = actorId.takeIf { byVerificationOwner },
+                cursor = cursor,
+            )
+            if (snapshotSequence == null) {
+                snapshotSequence = page.snapshotSequence
+            } else if (snapshotSequence != page.snapshotSequence) {
+                throw BugWorkbenchFailure("WORKBENCH_SNAPSHOT_CHANGED")
+            }
+            page.items.forEach { bug ->
+                val proof = WorkbenchAssignmentProof(
+                    projectId = projectId,
+                    actorId = actorId,
+                    snapshotSequence = page.snapshotSequence,
+                )
+                val assigned = if (byVerificationOwner) {
+                    bug.copy(verifierAssignmentProof = proof)
+                } else {
+                    bug.copy(ownerAssignmentProof = proof)
+                }
+                val previous = collected.putIfAbsent(assigned.id, assigned)
+                if (previous != null) {
+                    throw BugWorkbenchFailure(
+                        if (previous == assigned) "WORKBENCH_ITEM_REPEATED" else "WORKBENCH_ITEM_CHANGED",
+                    )
+                }
+                if (collected.size > MAX_ASSIGNED_ITEMS) {
+                    throw BugWorkbenchFailure("WORKBENCH_ITEM_LIMIT_EXCEEDED")
+                }
+            }
+            val next = page.nextCursor
+                ?: return BugWorkbenchResult(checkNotNull(snapshotSequence), collected.values.toList(), null)
+            if (!seenCursors.add(next)) {
+                throw BugWorkbenchFailure("WORKBENCH_CURSOR_REPEATED")
+            }
+            cursor = next
+        }
+        throw BugWorkbenchFailure("WORKBENCH_PAGE_LIMIT_EXCEEDED")
     }
 
     suspend fun getBug(
@@ -387,20 +569,35 @@ class BugWorkbenchClient(
     }
 
     private fun parseBug(item: JSONObject, expectedProjectId: String?): WorkbenchBug {
-        val bugId = item.optString("id")
-        val itemProjectId = item.optString("projectId")
-        val key = item.optString("key")
-        val title = item.optString("title")
-        val itemState = item.optString("state")
-        val reporterId = item.optString("reporterId")
-        val occurrenceCount = item.optInt("occurrenceCount", -1)
-        val updatedAt = item.optString("updatedAt")
+        if (item.keys().asSequence().toSet() != NATIVE_BUG_FIELDS) {
+            throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+        }
+        val bugId = item.workbenchRequiredUuid("id")
+        val itemProjectId = item.workbenchRequiredUuid("projectId")
+        val number = item.workbenchRequiredInt("number", 1)
+        val key = item.workbenchRequiredString("key", allowBlank = false)
+        val title = item.workbenchRequiredString("title", allowBlank = false)
+        val description = item.workbenchRequiredString("description", allowBlank = false)
+        val expectedBehavior = item.workbenchRequiredString("expectedBehavior", allowBlank = false)
+        val moduleId = item.workbenchRequiredNullableUuid("moduleId")
+        val itemState = item.workbenchRequiredString("state", allowBlank = false)
+        val severity = item.workbenchRequiredString("severity", allowBlank = false)
+        val priority = item.workbenchRequiredString("priority", allowBlank = false)
+        val reporterId = item.workbenchRequiredUuid("reporterId")
+        val ownerId = item.workbenchRequiredNullableUuid("ownerId")
+        val verificationOwnerId = item.workbenchRequiredNullableUuid("verificationOwnerId")
+        val duplicateOfBugId = item.workbenchRequiredNullableUuid("duplicateOfBugId")
+        val occurrenceCount = item.workbenchRequiredInt("occurrenceCount", 1)
+        val reopenCount = item.workbenchRequiredInt("reopenCount", 0)
+        val version = item.workbenchRequiredInt("version", 1)
+        val createdAt = item.workbenchRequiredTimestamp("createdAt")
+        val updatedAt = item.workbenchRequiredTimestamp("updatedAt")
+        val closedAt = item.workbenchRequiredNullableTimestamp("closedAt")
         if (
-            runCatching { UUID.fromString(bugId) }.isFailure ||
-            runCatching { UUID.fromString(itemProjectId) }.isFailure ||
             (expectedProjectId != null && itemProjectId != expectedProjectId) ||
-            key.isBlank() || title.isBlank() || itemState !in BUG_STATES ||
-            reporterId.isBlank() || occurrenceCount < 0 || updatedAt.isBlank()
+            itemState !in BUG_STATES || severity !in SEVERITIES || priority !in PRIORITIES ||
+            !BUG_KEY_PATTERN.matches(key) || key.substringAfterLast('-').toIntOrNull() != number ||
+            title.length > 300 || description.length > 20_000 || expectedBehavior.length > 10_000
         ) throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
         return WorkbenchBug(
             id = bugId,
@@ -411,28 +608,34 @@ class BugWorkbenchClient(
             occurrenceCount = occurrenceCount,
             updatedAt = updatedAt,
             reporterId = reporterId,
-            ownerId = item.optString("ownerId").takeIf { !item.isNull("ownerId") && it.isNotBlank() },
-            verificationOwnerId = item.optString("verificationOwnerId")
-                .takeIf { !item.isNull("verificationOwnerId") && it.isNotBlank() },
-            description = item.optString("description"),
-            expectedBehavior = item.optString("expectedBehavior"),
-            moduleId = item.optString("moduleId").takeIf { !item.isNull("moduleId") && it.isNotBlank() },
-            severity = item.optString("severity"),
-            priority = item.optString("priority"),
-            createdAt = item.optString("createdAt").ifBlank { updatedAt },
-            closedAt = item.optString("closedAt").takeIf { !item.isNull("closedAt") && it.isNotBlank() },
-            version = item.optInt("version", 1).coerceAtLeast(1),
+            ownerId = ownerId,
+            verificationOwnerId = verificationOwnerId,
+            description = description,
+            expectedBehavior = expectedBehavior,
+            moduleId = moduleId,
+            severity = severity,
+            priority = priority,
+            createdAt = createdAt,
+            closedAt = closedAt,
+            version = version,
+            number = number,
+            duplicateOfBugId = duplicateOfBugId,
+            reopenCount = reopenCount,
         )
     }
 
     private companion object {
         const val MAX_RESPONSE_BYTES = 1024 * 1024
         const val MAX_ITEMS = 100
+        const val MAX_WORKBENCH_PAGES = 100
+        const val MAX_ASSIGNED_ITEMS = MAX_ITEMS * MAX_WORKBENCH_PAGES * 2
+        const val MAX_PROJECT_ITEMS = MAX_ITEMS * MAX_WORKBENCH_PAGES
         const val MAX_DETAIL_IMAGES = 4
         const val MAX_DETAIL_IMAGE_BYTES = 24 * 1024 * 1024
         const val MAX_ATTACHMENT_METADATA_BYTES = 2L * 1024 * 1024 * 1024
         const val MAX_ATTACHMENTS = 20
         val SHA256_PATTERN = Regex("^[0-9a-f]{64}$")
+        val WORKBENCH_CURSOR_PATTERN = Regex("^b1\\.[A-Za-z0-9_-]{1,400}\\.[A-Za-z0-9_-]{43}$")
         val SEVERITIES = setOf("S0", "S1", "S2", "S3", "S4")
         val PRIORITIES = setOf("P0", "P1", "P2", "P3", "P4")
         val BUG_STATES = setOf(
@@ -447,8 +650,27 @@ class BugWorkbenchClient(
             "rejected",
             "duplicate",
         )
+        val BUG_KEY_PATTERN = Regex("^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$")
+        val NATIVE_BUG_FIELDS = setOf(
+            "id", "projectId", "number", "key", "title", "description", "expectedBehavior",
+            "moduleId", "state", "severity", "priority", "reporterId", "ownerId",
+            "verificationOwnerId", "duplicateOfBugId", "occurrenceCount", "reopenCount",
+            "version", "createdAt", "updatedAt", "closedAt",
+        )
+        val NATIVE_BUG_LIST_FIELDS = setOf("snapshotSequence", "items", "nextCursor")
     }
 }
+
+/**
+ * Proof that the server's scoped assignment index matched this Bug for the current actor. The
+ * assigned UUID may be a canonical identity alias, so callers must use this proof rather than
+ * comparing the response field directly with [actorId].
+ */
+data class WorkbenchAssignmentProof(
+    val projectId: String,
+    val actorId: String,
+    val snapshotSequence: Long,
+)
 
 data class WorkbenchBug(
     val id: String,
@@ -469,7 +691,50 @@ data class WorkbenchBug(
     val createdAt: String = "",
     val closedAt: String? = null,
     val version: Int = 1,
+    val number: Int = 0,
+    val duplicateOfBugId: String? = null,
+    val reopenCount: Int = 0,
+    val ownerAssignmentProof: WorkbenchAssignmentProof? = null,
+    val verifierAssignmentProof: WorkbenchAssignmentProof? = null,
 )
+
+internal fun WorkbenchBug.hasVerifierAssignmentProof(
+    expectedProjectId: String,
+    expectedActorId: String,
+    expectedSnapshotSequence: Long,
+): Boolean = verifierAssignmentProof == WorkbenchAssignmentProof(
+    projectId = expectedProjectId,
+    actorId = expectedActorId,
+    snapshotSequence = expectedSnapshotSequence,
+) && projectId == expectedProjectId
+
+internal fun WorkbenchBug.hasOwnerAssignmentProof(
+    expectedProjectId: String,
+    expectedActorId: String,
+    expectedSnapshotSequence: Long,
+): Boolean = ownerId != null && ownerAssignmentProof == WorkbenchAssignmentProof(
+    projectId = expectedProjectId,
+    actorId = expectedActorId,
+    snapshotSequence = expectedSnapshotSequence,
+) && projectId == expectedProjectId
+
+private fun WorkbenchBug.withoutAssignmentProof(): WorkbenchBug = copy(
+    ownerAssignmentProof = null,
+    verifierAssignmentProof = null,
+)
+
+internal fun WorkbenchBug.inheritAssignmentProofIfSameProjection(
+    source: WorkbenchBug?,
+): WorkbenchBug = if (
+    source != null && withoutAssignmentProof() == source.withoutAssignmentProof()
+) {
+    copy(
+        ownerAssignmentProof = source.ownerAssignmentProof,
+        verifierAssignmentProof = source.verifierAssignmentProof,
+    )
+} else {
+    this
+}
 
 data class WorkbenchBugAttachmentMetadata(
     val attachmentId: String,
@@ -524,6 +789,61 @@ data class BugWorkbenchResult(
 
 class BugWorkbenchFailure(val code: String) : RuntimeException()
 
+private fun JSONObject.requiredSnapshotSequence(): Long {
+    if (!has("snapshotSequence")) throw BugWorkbenchFailure("WORKBENCH_SNAPSHOT_INVALID")
+    val value = when (val raw = get("snapshotSequence")) {
+        is Int -> raw.toLong()
+        is Long -> raw
+        else -> throw BugWorkbenchFailure("WORKBENCH_SNAPSHOT_INVALID")
+    }
+    if (value !in 0..9_007_199_254_740_991L) {
+        throw BugWorkbenchFailure("WORKBENCH_SNAPSHOT_INVALID")
+    }
+    return value
+}
+
+private fun JSONObject.workbenchRequiredString(key: String, allowBlank: Boolean): String {
+    if (!has(key) || isNull(key) || get(key) !is String) {
+        throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+    }
+    return getString(key).also {
+        if (!allowBlank && it.isBlank()) throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+    }
+}
+
+private fun JSONObject.workbenchRequiredUuid(key: String): String =
+    workbenchRequiredString(key, allowBlank = false).also {
+        if (!STRICT_UUID_PATTERN.matches(it) || runCatching { UUID.fromString(it) }.isFailure) {
+            throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+        }
+    }
+
+private fun JSONObject.workbenchRequiredNullableUuid(key: String): String? {
+    if (!has(key)) throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+    if (isNull(key)) return null
+    return workbenchRequiredUuid(key)
+}
+
+private fun JSONObject.workbenchRequiredInt(key: String, minimum: Int): Int {
+    if (!has(key) || get(key) !is Int) throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+    return getInt(key).also {
+        if (it < minimum) throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+    }
+}
+
+private fun JSONObject.workbenchRequiredTimestamp(key: String): String =
+    workbenchRequiredString(key, allowBlank = false).also {
+        if (runCatching { OffsetDateTime.parse(it) }.isFailure) {
+            throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+        }
+    }
+
+private fun JSONObject.workbenchRequiredNullableTimestamp(key: String): String? {
+    if (!has(key)) throw BugWorkbenchFailure("INVALID_WORKBENCH_ITEM")
+    if (isNull(key)) return null
+    return workbenchRequiredTimestamp(key)
+}
+
 private fun InputStream.readWorkbenchUtf8(maxBytes: Int): String {
     val output = ByteArrayOutputStream(minOf(maxBytes, 8 * 1024))
     val buffer = ByteArray(8 * 1024)
@@ -558,3 +878,7 @@ private fun ByteArray.sha256Hex(): String = MessageDigest.getInstance("SHA-256")
 
 private fun Throwable.workbenchCode(fallback: String): String =
     (this as? BugWorkbenchFailure)?.code ?: fallback
+
+private val STRICT_UUID_PATTERN = Regex(
+    "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+)

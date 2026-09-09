@@ -98,6 +98,7 @@ export interface QingyuImportResult {
 }
 
 let browserCsrfToken: string | null = null;
+export const APP_FIRST_API_MEDIA_TYPE = "application/vnd.relay-qa-hub.v1.1+json";
 const RECOVERABLE_SESSION_CODES = new Set(["UNAUTHENTICATED", "NATIVE_SESSION_INVALID"]);
 const API_REQUEST_TIMEOUT_MS = 25_000;
 const API_TRANSFER_TIMEOUT_MS = 65_000;
@@ -133,9 +134,11 @@ export type BugSeverity = "S0" | "S1" | "S2" | "S3" | "S4";
 export interface BugListFilters {
   readonly q?: string;
   readonly ownerId?: string;
+  readonly verificationOwnerId?: string;
   readonly ownerState?: "assigned" | "unassigned";
   readonly state?: BugListState;
   readonly severity?: BugSeverity;
+  readonly cursor?: string;
 }
 
 export type ProjectRole =
@@ -158,7 +161,7 @@ export interface VisibleProject {
 export interface VisibleProjectList {
   readonly snapshotSequence: number;
   readonly items: readonly VisibleProject[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface ProjectMember {
@@ -166,16 +169,14 @@ export interface ProjectMember {
   readonly projectId: string;
   readonly displayName: string;
   readonly roles: readonly ProjectRole[];
-  readonly linkedUserIds?: readonly string[];
   readonly active: true;
-  readonly membershipVersion?: number;
 }
 
 export interface ProjectMemberList {
   readonly projectId: string;
   readonly snapshotSequence: number;
   readonly items: readonly ProjectMember[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface ManagedProjectUser {
@@ -234,26 +235,32 @@ export type BugPriority = "P0" | "P1" | "P2" | "P3" | "P4";
 
 export interface BugListItem {
   readonly id: string;
+  readonly projectId: string;
+  readonly number: number;
   readonly key: string;
   readonly title: string;
+  readonly description: string;
+  readonly expectedBehavior: string;
+  readonly moduleId: string | null;
   readonly state: BugListState;
   readonly severity: BugSeverity;
   readonly priority: BugPriority;
-  readonly updatedAt: string;
   readonly reporterId: string;
   readonly ownerId: string | null;
   readonly verificationOwnerId: string | null;
-  readonly description: string;
-  readonly expectedBehavior: string;
+  readonly duplicateOfBugId: string | null;
+  readonly occurrenceCount: number;
+  readonly reopenCount: number;
   readonly version: number;
   readonly createdAt: string;
+  readonly updatedAt: string;
   readonly closedAt: string | null;
 }
 
 export interface BugListResponse {
   readonly snapshotSequence: number;
   readonly items: readonly BugListItem[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface ProjectMetricsOverview {
@@ -270,21 +277,7 @@ export interface ProjectMetricsOverview {
   }[];
 }
 
-export interface BugDetail extends BugListItem {
-  readonly projectId: string;
-  readonly number: number;
-  readonly description: string;
-  readonly expectedBehavior: string;
-  readonly moduleId: string | null;
-  readonly ownerId: string | null;
-  readonly verificationOwnerId: string | null;
-  readonly duplicateOfBugId: string | null;
-  readonly occurrenceCount: number;
-  readonly reopenCount: number;
-  readonly version: number;
-  readonly createdAt: string;
-  readonly closedAt: string | null;
-}
+export type BugDetail = BugListItem;
 
 export interface UpdateBugDetailsInput {
   readonly title?: string;
@@ -378,7 +371,8 @@ export interface DuplicateCandidateList {
 }
 
 export interface BugEvent {
-  readonly schemaVersion: "1.0";
+  readonly projectionVersion: "1.1.0";
+  readonly redactionPolicyVersion: "1.0.0";
   readonly id: string;
   readonly type: string;
   readonly source: string;
@@ -400,6 +394,9 @@ export interface BugEvent {
 }
 
 export interface BugEventsResponse {
+  readonly projectId: string;
+  readonly bugId: string;
+  readonly snapshotSequence: number;
   readonly items: readonly BugEvent[];
   readonly nextCursor: null;
 }
@@ -418,25 +415,258 @@ export interface CommentCreationResponse {
 }
 
 export interface BugComment {
-  id: string;
-  body: string;
-  authorId: string;
-  createdAt: string;
-}
-export async function listBugComments(bugId: string): Promise<{ items: BugComment[] }> {
-  return (await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/comments`)) as {
-    items: BugComment[];
-  };
+  readonly id: string;
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly authorId: string;
+  readonly body: string;
+  readonly attachmentIds: readonly string[];
+  readonly createdAt: string;
+  readonly version: number;
 }
 
-export interface RelayRepairAttempt {
+export interface BugCommentsResponse {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly BugComment[];
+  readonly nextCursor: null;
+}
+
+interface BugTimelinePage<T> {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly T[];
+  readonly nextCursor: string | null;
+}
+
+const BUG_TIMELINE_PAGE_FIELDS = new Set([
+  "bugId",
+  "projectId",
+  "snapshotSequence",
+  "items",
+  "nextCursor",
+]);
+const BUG_COMMENT_FIELDS = new Set([
+  "id",
+  "bugId",
+  "projectId",
+  "authorId",
+  "body",
+  "attachmentIds",
+  "createdAt",
+  "version",
+]);
+const BUG_EVENT_FIELDS = new Set([
+  "projectionVersion",
+  "redactionPolicyVersion",
+  "id",
+  "type",
+  "source",
+  "projectId",
+  "bugId",
+  "aggregate",
+  "sequence",
+  "actor",
+  "correlationId",
+  "causationId",
+  "occurredAt",
+  "fromState",
+  "toState",
+  "payload",
+]);
+const BUG_TIMELINE_MAX_PAGES = 100;
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isBugComment(value: unknown, bugId: string, projectId: string): value is BugComment {
+  if (!isObjectRecord(value) || !hasExactKeys(value, BUG_COMMENT_FIELDS)) return false;
+  return (
+    typeof value.id === "string" &&
+    UUID_PATTERN.test(value.id) &&
+    value.bugId === bugId &&
+    value.projectId === projectId &&
+    typeof value.authorId === "string" &&
+    UUID_PATTERN.test(value.authorId) &&
+    typeof value.body === "string" &&
+    value.body.length >= 1 &&
+    value.body.length <= 20_000 &&
+    Array.isArray(value.attachmentIds) &&
+    value.attachmentIds.length <= 20 &&
+    value.attachmentIds.every(
+      (attachmentId) => typeof attachmentId === "string" && UUID_PATTERN.test(attachmentId),
+    ) &&
+    new Set(value.attachmentIds).size === value.attachmentIds.length &&
+    typeof value.createdAt === "string" &&
+    Number.isFinite(Date.parse(value.createdAt)) &&
+    Number.isSafeInteger(value.version) &&
+    (value.version as number) >= 1
+  );
+}
+
+function isBugEvent(value: unknown, bugId: string, projectId: string): value is BugEvent {
+  if (!isObjectRecord(value) || !hasExactKeys(value, BUG_EVENT_FIELDS)) return false;
+  const aggregate = value.aggregate;
+  const actor = value.actor;
+  return (
+    value.projectionVersion === "1.1.0" &&
+    value.redactionPolicyVersion === "1.0.0" &&
+    typeof value.id === "string" &&
+    UUID_PATTERN.test(value.id) &&
+    typeof value.type === "string" &&
+    value.type.length >= 1 &&
+    typeof value.source === "string" &&
+    value.source.length >= 1 &&
+    value.projectId === projectId &&
+    value.bugId === bugId &&
+    isObjectRecord(aggregate) &&
+    hasExactKeys(aggregate, new Set(["type", "id", "version"])) &&
+    typeof aggregate.type === "string" &&
+    aggregate.type.length >= 1 &&
+    typeof aggregate.id === "string" &&
+    UUID_PATTERN.test(aggregate.id) &&
+    Number.isSafeInteger(aggregate.version) &&
+    (aggregate.version as number) >= 1 &&
+    Number.isSafeInteger(value.sequence) &&
+    (value.sequence as number) >= 1 &&
+    isObjectRecord(actor) &&
+    hasExactKeys(actor, new Set(["type", "id"])) &&
+    typeof actor.type === "string" &&
+    actor.type.length >= 1 &&
+    (actor.id === null || (typeof actor.id === "string" && actor.id.length >= 1)) &&
+    typeof value.correlationId === "string" &&
+    value.correlationId.length >= 1 &&
+    (value.causationId === null ||
+      (typeof value.causationId === "string" && value.causationId.length >= 1)) &&
+    typeof value.occurredAt === "string" &&
+    Number.isFinite(Date.parse(value.occurredAt)) &&
+    (value.fromState === null || typeof value.fromState === "string") &&
+    (value.toState === null || typeof value.toState === "string") &&
+    isObjectRecord(value.payload)
+  );
+}
+
+async function listCompleteBugTimeline<T>(options: {
+  readonly bugId: string;
+  readonly resource: "comments" | "events";
+  readonly pageSize: number;
+  readonly invalidCode: string;
+  readonly cursorCode: string;
+  readonly snapshotCode: string;
+  readonly tooLargeCode: string;
+  readonly validateItem: (value: unknown, bugId: string, projectId: string) => value is T;
+}): Promise<BugTimelinePage<T> & { readonly nextCursor: null }> {
+  const items = new Map<string, T>();
+  const seenCursors = new Set<string>();
+  let cursor: string | undefined;
+  let snapshotSequence: number | undefined;
+  let projectId: string | undefined;
+
+  for (let pageNumber = 0; pageNumber < BUG_TIMELINE_MAX_PAGES; pageNumber += 1) {
+    const query = new URLSearchParams({ limit: String(options.pageSize) });
+    if (cursor !== undefined) query.set("cursor", cursor);
+    const body = requireRecord(
+      await requestJson(
+        `/api/v1/bugs/${encodeURIComponent(options.bugId)}/${options.resource}?${query}`,
+      ),
+      options.resource.toUpperCase(),
+    );
+    if (
+      !hasExactKeys(body, BUG_TIMELINE_PAGE_FIELDS) ||
+      body.bugId !== options.bugId ||
+      typeof body.projectId !== "string" ||
+      !UUID_PATTERN.test(body.projectId) ||
+      !Number.isSafeInteger(body.snapshotSequence) ||
+      (body.snapshotSequence as number) < 0 ||
+      !Array.isArray(body.items) ||
+      body.items.length > options.pageSize ||
+      !isCursor(body.nextCursor)
+    ) {
+      throw new QaHubApiError(200, options.invalidCode);
+    }
+    if (snapshotSequence === undefined) {
+      snapshotSequence = body.snapshotSequence as number;
+      projectId = body.projectId;
+    } else if (body.snapshotSequence !== snapshotSequence || body.projectId !== projectId) {
+      throw new QaHubApiError(200, options.snapshotCode);
+    }
+    const pageProjectId = projectId;
+    if (pageProjectId === undefined) throw new QaHubApiError(200, options.invalidCode);
+    for (const item of body.items) {
+      if (!options.validateItem(item, options.bugId, pageProjectId)) {
+        throw new QaHubApiError(200, options.invalidCode);
+      }
+      const id = (item as { readonly id: string }).id;
+      if (items.has(id)) throw new QaHubApiError(200, options.invalidCode);
+      items.set(id, item);
+    }
+    if (body.nextCursor === null) {
+      return {
+        bugId: options.bugId,
+        projectId: pageProjectId,
+        snapshotSequence,
+        items: [...items.values()],
+        nextCursor: null,
+      };
+    }
+    if (seenCursors.has(body.nextCursor)) {
+      throw new QaHubApiError(200, options.cursorCode);
+    }
+    seenCursors.add(body.nextCursor);
+    cursor = body.nextCursor;
+  }
+  throw new QaHubApiError(200, options.tooLargeCode);
+}
+
+export async function listBugComments(bugId: string): Promise<BugCommentsResponse> {
+  return listCompleteBugTimeline({
+    bugId,
+    resource: "comments",
+    pageSize: 50,
+    invalidCode: "INVALID_COMMENTS",
+    cursorCode: "INVALID_COMMENT_CURSOR",
+    snapshotCode: "INVALID_COMMENT_SNAPSHOT",
+    tooLargeCode: "COMMENT_HISTORY_TOO_LARGE",
+    validateItem: isBugComment,
+  });
+}
+
+export type RepairMode = "human" | "relay" | "external";
+
+export type RepairAttemptStatus =
+  | "planned"
+  | "queued"
+  | "running"
+  | "needs_input"
+  | "blocked"
+  | "delivered"
+  | "failed"
+  | "verification_failed"
+  | "cancelled"
+  | "superseded";
+
+export interface RepairAttempt {
   readonly id: string;
   readonly bugId: string;
   readonly sequence: number;
+  readonly mode: RepairMode;
+  readonly status: RepairAttemptStatus;
+  readonly assigneeId: string;
+  readonly parentAttemptId: string | null;
+  readonly summary: string | null;
+  readonly branch: string | null;
+  readonly commitSha: string | null;
+  readonly mergeRequestUrl: string | null;
+  readonly targetBuildId: string | null;
+  readonly version: number;
+}
+
+export interface RelayRepairAttempt extends RepairAttempt {
   readonly mode: "relay";
   readonly status: "planned";
-  readonly assigneeId: string;
-  readonly version: number;
 }
 
 export interface RelayDispatchAccepted {
@@ -478,17 +708,16 @@ export interface RelayReceipt {
   readonly version: number;
 }
 
-export interface HumanRepairAttempt {
-  readonly id: string;
-  readonly bugId: string;
-  readonly sequence: number;
-  readonly mode: "human" | "relay";
-  readonly status: "planned" | "running" | "delivered" | "verification_failed";
-  readonly assigneeId: string;
-  readonly summary: string | null;
-  readonly branch: string | null;
-  readonly commitSha: string | null;
-  readonly version: number;
+export interface HumanRepairAttempt extends RepairAttempt {
+  readonly mode: "human";
+}
+
+export interface SupersedeRepairAttemptResponse {
+  readonly supersededAttempt: RepairAttempt;
+  readonly successorAttempt: RepairAttempt;
+  readonly bug: BugDetail;
+  readonly eventId: string;
+  readonly replayed: boolean;
 }
 
 export interface BuildRecord {
@@ -539,7 +768,7 @@ export interface HumanWorkflowSnapshot {
   readonly relayAcceptance?: { readonly status: string; readonly lastError: string | null } | null;
   readonly relayRework?: { readonly status: string; readonly lastError: string | null } | null;
   readonly bugId: string;
-  readonly repairAttempt: HumanRepairAttempt | null;
+  readonly repairAttempt: RepairAttempt | null;
   readonly buildRequirement: {
     readonly id: string;
     readonly repairAttemptId: string;
@@ -560,14 +789,30 @@ export interface VerificationRecord {
   readonly verifierId: string;
   readonly criteriaSnapshot: string;
   readonly resultSummary: string | null;
+  readonly failureReason: string | null;
+  readonly blockedReason: string | null;
   readonly version: number;
 }
+
+export interface VerificationOwnershipExpectation {
+  readonly bugId: string;
+  readonly repairAttemptId: string;
+  readonly verifierId: string;
+}
+
+export type VerificationIdentityExpectation = VerificationOwnershipExpectation & {
+  readonly verificationId: string;
+};
+
+export type VerificationResultExpectation = VerificationIdentityExpectation & {
+  readonly projectId: string;
+};
 
 export interface VerificationResultResponse {
   readonly clientSubmissionId: string;
   readonly qaItem: { readonly type: "bug"; readonly id: string; readonly key: string };
-  readonly verification: VerificationRecord;
-  readonly repairAttempt: HumanRepairAttempt;
+  readonly verification: Omit<VerificationRecord, "failureReason" | "blockedReason">;
+  readonly repairAttempt: RepairAttempt;
   readonly bug: BugDetail;
   readonly attachmentIds: readonly string[];
   readonly captureBundleId: string | null;
@@ -626,10 +871,132 @@ function readErrorCode(value: unknown): string | null {
   return typeof code === "string" ? code : null;
 }
 
-function isBugListResponse(value: unknown): value is BugListResponse {
+const UUID_PATTERN =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
+const DATE_TIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u;
+const BUG_KEY_PATTERN = /^[A-Z][A-Z0-9]{1,15}-[1-9][0-9]*$/u;
+const BUG_KEYS = new Set([
+  "id",
+  "projectId",
+  "number",
+  "key",
+  "title",
+  "description",
+  "expectedBehavior",
+  "moduleId",
+  "state",
+  "severity",
+  "priority",
+  "reporterId",
+  "ownerId",
+  "verificationOwnerId",
+  "duplicateOfBugId",
+  "occurrenceCount",
+  "reopenCount",
+  "version",
+  "createdAt",
+  "updatedAt",
+  "closedAt",
+]);
+
+function hasExactKeys(value: Record<string, unknown>, keys: ReadonlySet<string>): boolean {
+  return (
+    Object.keys(value).length === keys.size && Object.keys(value).every((key) => keys.has(key))
+  );
+}
+
+function isUuidOrNull(value: unknown): boolean {
+  return value === null || (typeof value === "string" && UUID_PATTERN.test(value));
+}
+
+function isDateTime(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  const match = DATE_TIME_PATTERN.exec(value);
+  if (match === null || !Number.isFinite(Date.parse(value))) return false;
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+  const hour = Number(value.slice(11, 13));
+  const minute = Number(value.slice(14, 16));
+  const second = Number(value.slice(17, 19));
+  if (hour > 23 || minute > 59 || second > 59) return false;
+  const calendar = new Date(0);
+  calendar.setUTCHours(0, 0, 0, 0);
+  calendar.setUTCFullYear(year, month - 1, day);
+  return (
+    calendar.getUTCFullYear() === year &&
+    calendar.getUTCMonth() === month - 1 &&
+    calendar.getUTCDate() === day
+  );
+}
+
+function isBoundedString(value: unknown, minimum: number, maximum: number): value is string {
+  return typeof value === "string" && [...value].length >= minimum && [...value].length <= maximum;
+}
+
+function isBugListItem(value: unknown, expectedProjectId: string): value is BugListItem {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
-  const response = value as { readonly snapshotSequence?: unknown; readonly items?: unknown };
-  return Number.isSafeInteger(response.snapshotSequence) && Array.isArray(response.items);
+  const item = value as Record<string, unknown>;
+  return (
+    hasExactKeys(item, BUG_KEYS) &&
+    typeof item["id"] === "string" &&
+    UUID_PATTERN.test(item["id"]) &&
+    item["projectId"] === expectedProjectId &&
+    Number.isSafeInteger(item["number"]) &&
+    (item["number"] as number) >= 1 &&
+    typeof item["key"] === "string" &&
+    BUG_KEY_PATTERN.test(item["key"]) &&
+    isBoundedString(item["title"], 1, 300) &&
+    isBoundedString(item["description"], 1, 20_000) &&
+    isBoundedString(item["expectedBehavior"], 1, 10_000) &&
+    isUuidOrNull(item["moduleId"]) &&
+    typeof item["state"] === "string" &&
+    BUG_LIST_STATES.has(item["state"] as BugListState) &&
+    typeof item["severity"] === "string" &&
+    ["S0", "S1", "S2", "S3", "S4"].includes(item["severity"]) &&
+    typeof item["priority"] === "string" &&
+    ["P0", "P1", "P2", "P3", "P4"].includes(item["priority"]) &&
+    typeof item["reporterId"] === "string" &&
+    UUID_PATTERN.test(item["reporterId"]) &&
+    isUuidOrNull(item["ownerId"]) &&
+    isUuidOrNull(item["verificationOwnerId"]) &&
+    isUuidOrNull(item["duplicateOfBugId"]) &&
+    Number.isSafeInteger(item["occurrenceCount"]) &&
+    (item["occurrenceCount"] as number) >= 1 &&
+    Number.isSafeInteger(item["reopenCount"]) &&
+    (item["reopenCount"] as number) >= 0 &&
+    Number.isSafeInteger(item["version"]) &&
+    (item["version"] as number) >= 1 &&
+    isDateTime(item["createdAt"]) &&
+    isDateTime(item["updatedAt"]) &&
+    (item["closedAt"] === null || isDateTime(item["closedAt"]))
+  );
+}
+
+function isBugListResponse(value: unknown, expectedProjectId: string): value is BugListResponse {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const response = value as Record<string, unknown>;
+  if (
+    !hasExactKeys(response, new Set(["snapshotSequence", "items", "nextCursor"])) ||
+    !Number.isSafeInteger(response["snapshotSequence"]) ||
+    (response["snapshotSequence"] as number) < 0 ||
+    !Array.isArray(response["items"]) ||
+    response["items"].length > 100 ||
+    !(
+      response["nextCursor"] === null ||
+      (typeof response["nextCursor"] === "string" &&
+        response["nextCursor"].length >= 1 &&
+        response["nextCursor"].length <= 500)
+    )
+  ) {
+    return false;
+  }
+  const ids = new Set<string>();
+  for (const item of response["items"]) {
+    if (!isBugListItem(item, expectedProjectId) || ids.has(item.id)) return false;
+    ids.add(item.id);
+  }
+  return true;
 }
 
 const BUG_LIST_STATES = new Set<BugListState>([
@@ -689,10 +1056,101 @@ function isProjectMetricsOverview(
   return seenStates.size === BUG_LIST_STATES.size;
 }
 
+const PROJECT_ROLES = new Set<ProjectRole>([
+  "viewer",
+  "reporter",
+  "developer",
+  "verifier",
+  "triager",
+  "release_manager",
+  "project_admin",
+]);
+const VISIBLE_PROJECT_KEYS = new Set(["id", "key", "name", "active", "roles"]);
+const PROJECT_MEMBER_KEYS = new Set(["userId", "projectId", "displayName", "roles", "active"]);
+
+function isRoleList(value: unknown): value is readonly ProjectRole[] {
+  return (
+    Array.isArray(value) &&
+    value.length >= 1 &&
+    value.every((role) => typeof role === "string" && PROJECT_ROLES.has(role as ProjectRole)) &&
+    new Set(value).size === value.length
+  );
+}
+
+function isCursor(value: unknown): value is string | null {
+  return value === null || (typeof value === "string" && value.length >= 1 && value.length <= 500);
+}
+
+function isVisibleProject(value: unknown): value is VisibleProject {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const item = value as Record<string, unknown>;
+  return (
+    hasExactKeys(item, VISIBLE_PROJECT_KEYS) &&
+    typeof item["id"] === "string" &&
+    UUID_PATTERN.test(item["id"]) &&
+    typeof item["key"] === "string" &&
+    /^[A-Z][A-Z0-9]{1,15}$/u.test(item["key"]) &&
+    isBoundedString(item["name"], 1, 200) &&
+    item["active"] === true &&
+    isRoleList(item["roles"])
+  );
+}
+
 function isVisibleProjectList(value: unknown): value is VisibleProjectList {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
-  const response = value as { readonly snapshotSequence?: unknown; readonly items?: unknown };
-  return Number.isSafeInteger(response.snapshotSequence) && Array.isArray(response.items);
+  const response = value as Record<string, unknown>;
+  if (
+    !hasExactKeys(response, new Set(["snapshotSequence", "items", "nextCursor"])) ||
+    !Number.isSafeInteger(response["snapshotSequence"]) ||
+    (response["snapshotSequence"] as number) < 0 ||
+    !Array.isArray(response["items"]) ||
+    response["items"].length > 100 ||
+    !isCursor(response["nextCursor"])
+  ) {
+    return false;
+  }
+  const ids = new Set<string>();
+  return response["items"].every((item) => {
+    if (!isVisibleProject(item) || ids.has(item.id)) return false;
+    ids.add(item.id);
+    return true;
+  });
+}
+
+function isProjectMember(value: unknown, projectId: string): value is ProjectMember {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const item = value as Record<string, unknown>;
+  return (
+    hasExactKeys(item, PROJECT_MEMBER_KEYS) &&
+    typeof item["userId"] === "string" &&
+    UUID_PATTERN.test(item["userId"]) &&
+    item["projectId"] === projectId &&
+    isBoundedString(item["displayName"], 1, 200) &&
+    isRoleList(item["roles"]) &&
+    item["active"] === true
+  );
+}
+
+function isProjectMemberList(value: unknown, projectId: string): value is ProjectMemberList {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const response = value as Record<string, unknown>;
+  if (
+    !hasExactKeys(response, new Set(["projectId", "snapshotSequence", "items", "nextCursor"])) ||
+    response["projectId"] !== projectId ||
+    !Number.isSafeInteger(response["snapshotSequence"]) ||
+    (response["snapshotSequence"] as number) < 0 ||
+    !Array.isArray(response["items"]) ||
+    response["items"].length > 100 ||
+    !isCursor(response["nextCursor"])
+  ) {
+    return false;
+  }
+  const ids = new Set<string>();
+  return response["items"].every((item) => {
+    if (!isProjectMember(item, projectId) || ids.has(item.userId)) return false;
+    ids.add(item.userId);
+    return true;
+  });
 }
 
 function isProjectScopedList(value: unknown, projectId: string): boolean {
@@ -1042,14 +1500,82 @@ export async function listBugs(
   const query = new URLSearchParams({ projectId, limit: String(limit) });
   if (filters.q !== undefined) query.set("q", filters.q);
   if (filters.ownerId !== undefined) query.set("ownerId", filters.ownerId);
+  if (filters.verificationOwnerId !== undefined)
+    query.set("verificationOwnerId", filters.verificationOwnerId);
   if (filters.ownerState !== undefined) query.set("ownerState", filters.ownerState);
   if (filters.state !== undefined) query.set("state", filters.state);
   if (filters.severity !== undefined) query.set("severity", filters.severity);
+  if (filters.cursor !== undefined) query.set("cursor", filters.cursor);
   const body = await requestJson(`/api/v1/bugs?${query.toString()}`, {
     ...(signal === undefined ? {} : { signal }),
   });
-  if (!isBugListResponse(body)) throw new QaHubApiError(200, "INVALID_RESPONSE");
+  if (!isBugListResponse(body, projectId)) throw new QaHubApiError(200, "INVALID_RESPONSE");
   return body;
+}
+
+/**
+ * Read a complete stable-filter Bug stream. Freeze the first page's snapshot
+ * sequence, reject cross-page drift, and restart once only when the server
+ * explicitly invalidates a continuation cursor.
+ */
+export async function listAllBugs(
+  projectId: string,
+  filters: Omit<BugListFilters, "cursor"> = {},
+  signal?: AbortSignal,
+  limit = 500,
+): Promise<BugListResponse> {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const items = new Map<string, BugListItem>();
+    const seenCursors = new Set<string>();
+    let cursor: string | undefined;
+    let snapshotSequence: number | undefined;
+    let complete = false;
+    try {
+      while (!complete) {
+        const page = await listBugs(
+          projectId,
+          { ...filters, ...(cursor === undefined ? {} : { cursor }) },
+          signal,
+          limit,
+        );
+        if (snapshotSequence === undefined) {
+          snapshotSequence = page.snapshotSequence;
+        } else if (page.snapshotSequence !== snapshotSequence) {
+          throw new QaHubApiError(200, "INVALID_BUG_LIST_SNAPSHOT");
+        }
+        for (const item of page.items) {
+          if (items.has(item.id)) throw new QaHubApiError(200, "INVALID_RESPONSE");
+          items.set(item.id, item);
+        }
+        if (page.nextCursor === null) {
+          complete = true;
+        } else {
+          if (page.nextCursor.length === 0 || seenCursors.has(page.nextCursor)) {
+            throw new QaHubApiError(200, "INVALID_BUG_LIST_CURSOR");
+          }
+          seenCursors.add(page.nextCursor);
+          cursor = page.nextCursor;
+        }
+      }
+      if (snapshotSequence === undefined) {
+        throw new QaHubApiError(200, "INVALID_BUG_LIST_SNAPSHOT");
+      }
+      return {
+        snapshotSequence,
+        items: [...items.values()],
+        nextCursor: null,
+      };
+    } catch (cause) {
+      const invalidatedContinuation =
+        cursor !== undefined &&
+        cause instanceof QaHubApiError &&
+        cause.status === 400 &&
+        cause.code === "INVALID_REQUEST";
+      if (attempt === 0 && invalidatedContinuation) continue;
+      throw cause;
+    }
+  }
+  throw new QaHubApiError(400, "INVALID_REQUEST");
 }
 
 export async function getProjectMetricsOverview(
@@ -1068,19 +1594,67 @@ export async function getProjectMetricsOverview(
 }
 
 export async function listVisibleProjects(): Promise<VisibleProjectList> {
-  const body = await requestJson("/api/v1/projects?limit=50");
-  if (!isVisibleProjectList(body)) throw new QaHubApiError(200, "INVALID_PROJECT_LIST");
-  return body;
+  const items = new Map<string, VisibleProject>();
+  const seenCursors = new Set<string>();
+  let cursor: string | undefined;
+  let snapshotSequence: number | undefined;
+  while (true) {
+    const query = new URLSearchParams({ limit: "100" });
+    if (cursor !== undefined) query.set("cursor", cursor);
+    const body = await requestJson(`/api/v1/projects?${query.toString()}`);
+    if (!isVisibleProjectList(body)) throw new QaHubApiError(200, "INVALID_PROJECT_LIST");
+    if (snapshotSequence === undefined) snapshotSequence = body.snapshotSequence;
+    else if (body.snapshotSequence !== snapshotSequence) {
+      throw new QaHubApiError(200, "INVALID_PROJECT_LIST_SNAPSHOT");
+    }
+    for (const item of body.items) {
+      if (items.has(item.id)) throw new QaHubApiError(200, "INVALID_PROJECT_LIST");
+      items.set(item.id, item);
+    }
+    if (body.nextCursor === null) {
+      return { snapshotSequence, items: [...items.values()], nextCursor: null };
+    }
+    if (seenCursors.has(body.nextCursor)) {
+      throw new QaHubApiError(200, "INVALID_PROJECT_LIST_CURSOR");
+    }
+    seenCursors.add(body.nextCursor);
+    cursor = body.nextCursor;
+  }
 }
 
 export async function listProjectMembers(projectId: string): Promise<ProjectMemberList> {
-  const body = await requestJson(
-    `/api/v1/projects/${encodeURIComponent(projectId)}/members?limit=100`,
-  );
-  if (!isProjectScopedList(body, projectId)) {
-    throw new QaHubApiError(200, "INVALID_PROJECT_MEMBER_LIST");
+  const items = new Map<string, ProjectMember>();
+  const seenCursors = new Set<string>();
+  let cursor: string | undefined;
+  let snapshotSequence: number | undefined;
+  while (true) {
+    const query = new URLSearchParams({ limit: "100" });
+    if (cursor !== undefined) query.set("cursor", cursor);
+    const body = await requestJson(
+      `/api/v1/projects/${encodeURIComponent(projectId)}/members?${query.toString()}`,
+    );
+    if (!isProjectMemberList(body, projectId)) {
+      throw new QaHubApiError(200, "INVALID_PROJECT_MEMBER_LIST");
+    }
+    if (snapshotSequence === undefined) snapshotSequence = body.snapshotSequence;
+    else if (body.snapshotSequence !== snapshotSequence) {
+      throw new QaHubApiError(200, "INVALID_PROJECT_MEMBER_LIST_SNAPSHOT");
+    }
+    for (const item of body.items) {
+      if (items.has(item.userId)) {
+        throw new QaHubApiError(200, "INVALID_PROJECT_MEMBER_LIST");
+      }
+      items.set(item.userId, item);
+    }
+    if (body.nextCursor === null) {
+      return { projectId, snapshotSequence, items: [...items.values()], nextCursor: null };
+    }
+    if (seenCursors.has(body.nextCursor)) {
+      throw new QaHubApiError(200, "INVALID_PROJECT_MEMBER_LIST_CURSOR");
+    }
+    seenCursors.add(body.nextCursor);
+    cursor = body.nextCursor;
   }
-  return body as unknown as ProjectMemberList;
 }
 
 export async function listManagedProjectUsers(projectId: string): Promise<ManagedProjectUserList> {
@@ -1240,6 +1814,41 @@ export async function getHumanWorkflow(bugId: string): Promise<HumanWorkflowSnap
     throw new QaHubApiError(200, "INVALID_HUMAN_WORKFLOW");
   }
   return body as unknown as HumanWorkflowSnapshot;
+}
+
+interface BugWorkflowProjectionPage {
+  readonly bugId: string;
+  readonly repairAttempts: readonly RepairAttempt[];
+  readonly nextCursor: string | null;
+}
+
+/** Read every repair round from one frozen projection so terminal modes and statuses survive refresh. */
+export async function listBugRepairAttempts(bugId: string): Promise<readonly RepairAttempt[]> {
+  const attempts = new Map<string, RepairAttempt>();
+  let cursor: string | null = null;
+  const seenCursors = new Set<string>();
+  for (let pageNumber = 0; pageNumber < 100; pageNumber += 1) {
+    const query = new URLSearchParams({ limitPerCollection: "100" });
+    if (cursor !== null) query.set("cursor", cursor);
+    const body = requireRecord(
+      await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/workflow?${query}`),
+      "BUG_WORKFLOW",
+    );
+    if (
+      body.bugId !== bugId ||
+      !Array.isArray(body.repairAttempts) ||
+      (body.nextCursor !== null && typeof body.nextCursor !== "string")
+    ) {
+      throw new QaHubApiError(200, "INVALID_BUG_WORKFLOW");
+    }
+    const projection = body as unknown as BugWorkflowProjectionPage;
+    for (const attempt of projection.repairAttempts) attempts.set(attempt.id, attempt);
+    cursor = projection.nextCursor;
+    if (cursor === null) return [...attempts.values()];
+    if (seenCursors.has(cursor)) throw new QaHubApiError(200, "INVALID_BUG_WORKFLOW_CURSOR");
+    seenCursors.add(cursor);
+  }
+  throw new QaHubApiError(200, "BUG_WORKFLOW_TOO_LARGE");
 }
 
 export async function listDuplicateCandidates(bugId: string): Promise<DuplicateCandidateList> {
@@ -1445,6 +2054,21 @@ export interface UploadFinalizeResponse {
   readonly version: number;
 }
 
+export interface AttachmentBindingResponse {
+  readonly bindingId: string;
+  readonly attachmentId: string;
+  readonly projectId: string;
+  readonly clientSubmissionId: string;
+  readonly clientAttachmentId: string;
+  readonly leaseGeneration: number;
+  readonly intent: "bug_create" | "verification_result";
+  readonly targetQaItemId: string | null;
+  readonly status: "reserved";
+  readonly expiresAt: string;
+  readonly version: number;
+  readonly replayed: boolean;
+}
+
 function csrfHeadersForMutation(): Record<string, string> {
   return browserCsrfToken === null ? {} : { "X-CSRF-Token": browserCsrfToken };
 }
@@ -1461,12 +2085,180 @@ export interface UploadCheckpoint {
   readonly nextChunk: number;
   readonly version?: number | undefined;
   readonly finalized?: UploadFinalizeResponse | undefined;
+  readonly binding?: AttachmentBindingResponse | undefined;
+  /** Legacy draft marker. A missing binding receipt cannot prove an active lease. */
   readonly bound?: boolean | undefined;
 }
 interface DurableUploadOptions {
   readonly checkpoint?: UploadCheckpoint;
   readonly saveCheckpoint?: (checkpoint: UploadCheckpoint) => Promise<void>;
   readonly scope?: RequestInit;
+  readonly deferBinding?: boolean;
+  readonly minimumBindingRunwayMs?: number;
+  readonly now?: () => number;
+}
+
+export function verificationAttachmentBindingHasRunway(
+  checkpoint: UploadCheckpoint,
+  now: number,
+  minimumRunwayMs = 0,
+  expectedScope?: {
+    readonly projectId: string;
+    readonly clientSubmissionId: string;
+    readonly targetQaItemId: string;
+  },
+): boolean {
+  const binding = checkpoint.binding;
+  const finalized = checkpoint.finalized;
+  const expiresAt = binding === undefined ? Number.NaN : Date.parse(binding.expiresAt);
+  return (
+    binding !== undefined &&
+    finalized !== undefined &&
+    binding.status === "reserved" &&
+    binding.intent === "verification_result" &&
+    binding.attachmentId === finalized.attachmentId &&
+    binding.clientAttachmentId === checkpoint.clientAttachmentId &&
+    (expectedScope === undefined ||
+      (binding.projectId === expectedScope.projectId &&
+        binding.clientSubmissionId === expectedScope.clientSubmissionId &&
+        binding.targetQaItemId === expectedScope.targetQaItemId)) &&
+    Number.isSafeInteger(binding.leaseGeneration) &&
+    binding.leaseGeneration >= 1 &&
+    Number.isFinite(expiresAt) &&
+    expiresAt > now &&
+    expiresAt - now >= minimumRunwayMs
+  );
+}
+
+function parseAttachmentBindingResponse(
+  value: unknown,
+  expected: {
+    readonly bindingId?: string;
+    readonly attachmentId: string;
+    readonly projectId: string;
+    readonly clientSubmissionId: string;
+    readonly clientAttachmentId: string;
+    readonly leaseGeneration: number;
+    readonly intent: "bug_create" | "verification_result";
+    readonly targetQaItemId: string | null;
+    readonly expectedVersion: number;
+  },
+): AttachmentBindingResponse {
+  const binding = requireRecord(value, "ATTACHMENT_BINDING");
+  if (
+    typeof binding.bindingId !== "string" ||
+    binding.bindingId.length === 0 ||
+    (expected.bindingId !== undefined && binding.bindingId !== expected.bindingId) ||
+    binding.attachmentId !== expected.attachmentId ||
+    binding.projectId !== expected.projectId ||
+    binding.clientSubmissionId !== expected.clientSubmissionId ||
+    binding.clientAttachmentId !== expected.clientAttachmentId ||
+    binding.leaseGeneration !== expected.leaseGeneration ||
+    binding.intent !== expected.intent ||
+    binding.targetQaItemId !== expected.targetQaItemId ||
+    binding.status !== "reserved" ||
+    typeof binding.expiresAt !== "string" ||
+    !Number.isFinite(Date.parse(binding.expiresAt)) ||
+    binding.version !== expected.expectedVersion + 1 ||
+    typeof binding.replayed !== "boolean"
+  ) {
+    throw new QaHubApiError(200, "INVALID_ATTACHMENT_BINDING");
+  }
+  return binding as unknown as AttachmentBindingResponse;
+}
+
+/**
+ * Keep a frozen Verification attachment identity alive without changing the
+ * frozen result body. The server permits generation N+1 only after generation
+ * N has expired; an active reservation is returned unchanged.
+ */
+export async function refreshVerificationAttachmentBinding(input: {
+  readonly projectId: string;
+  readonly bugId: string;
+  readonly clientSubmissionId: string;
+  readonly checkpoint: UploadCheckpoint;
+  readonly saveCheckpoint?: (checkpoint: UploadCheckpoint) => Promise<void>;
+  readonly scope?: RequestInit;
+  readonly now?: () => number;
+}): Promise<UploadCheckpoint> {
+  const scope = input.scope ?? projectRequestSnapshot({}, input.projectId);
+  const now = input.now ?? Date.now;
+  const checkpoint = input.checkpoint;
+  const finalized = checkpoint.finalized;
+  const binding = checkpoint.binding;
+  const expectedScope = {
+    projectId: input.projectId,
+    clientSubmissionId: input.clientSubmissionId,
+    targetQaItemId: input.bugId,
+  } as const;
+  if (
+    finalized === undefined ||
+    binding === undefined ||
+    binding.bindingId.length === 0 ||
+    binding.attachmentId !== finalized.attachmentId ||
+    binding.projectId !== expectedScope.projectId ||
+    binding.clientSubmissionId !== expectedScope.clientSubmissionId ||
+    binding.clientAttachmentId !== checkpoint.clientAttachmentId ||
+    binding.intent !== "verification_result" ||
+    binding.targetQaItemId !== expectedScope.targetQaItemId ||
+    binding.status !== "reserved" ||
+    !Number.isSafeInteger(binding.leaseGeneration) ||
+    binding.leaseGeneration < 1 ||
+    !Number.isSafeInteger(binding.version) ||
+    binding.version !== finalized.version + binding.leaseGeneration ||
+    !Number.isFinite(Date.parse(binding.expiresAt))
+  ) {
+    throw new QaHubApiError(409, "FROZEN_VERIFICATION_ATTACHMENT_CHECKPOINT_INVALID");
+  }
+  if (verificationAttachmentBindingHasRunway(checkpoint, now(), 0, expectedScope)) {
+    return checkpoint;
+  }
+
+  const leaseGeneration = binding.leaseGeneration + 1;
+  assertProjectRequest(scope);
+  const rawBinding = await requestJson(
+    `/api/v1/attachments/${encodeURIComponent(finalized.attachmentId)}/bind`,
+    submissionRequest(
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": APP_FIRST_API_MEDIA_TYPE,
+          "Idempotency-Key": `submission:${input.clientSubmissionId}:attachment:${checkpoint.clientAttachmentId}:bind:${leaseGeneration}`,
+        },
+        body: JSON.stringify({
+          submissionContractVersion: "1.1.0",
+          expectedVersion: binding.version,
+          projectId: input.projectId,
+          clientSubmissionId: input.clientSubmissionId,
+          clientAttachmentId: checkpoint.clientAttachmentId,
+          leaseGeneration,
+          intent: "verification_result",
+          targetQaItemId: input.bugId,
+        }),
+      },
+      scope,
+      input.projectId,
+    ),
+    input.scope === undefined,
+  );
+  const refreshedBinding = parseAttachmentBindingResponse(rawBinding, {
+    bindingId: binding.bindingId,
+    attachmentId: finalized.attachmentId,
+    projectId: input.projectId,
+    clientSubmissionId: input.clientSubmissionId,
+    clientAttachmentId: checkpoint.clientAttachmentId,
+    leaseGeneration,
+    intent: "verification_result",
+    targetQaItemId: input.bugId,
+    expectedVersion: binding.version,
+  });
+  const refreshed = { ...checkpoint, binding: refreshedBinding, bound: true };
+  await input.saveCheckpoint?.(refreshed);
+  assertProjectRequest(scope);
+  if (!verificationAttachmentBindingHasRunway(refreshed, now(), 0, expectedScope)) {
+    throw new QaHubApiError(409, "ATTACHMENT_BINDING_LEASE_TOO_SHORT");
+  }
+  return refreshed;
 }
 
 export async function uploadBugCreateAttachment(
@@ -1479,12 +2271,14 @@ export async function uploadBugCreateAttachment(
   return uploadSubmissionAttachment({ ...input, intent: "bug_create" });
 }
 
-export async function uploadVerificationAttachment(input: {
-  readonly projectId: string;
-  readonly bugId: string;
-  readonly clientSubmissionId: string;
-  readonly file: File;
-}): Promise<string> {
+export async function uploadVerificationAttachment(
+  input: {
+    readonly projectId: string;
+    readonly bugId: string;
+    readonly clientSubmissionId: string;
+    readonly file: File;
+  } & DurableUploadOptions,
+): Promise<string> {
   return uploadSubmissionAttachment({
     ...input,
     intent: "verification_result",
@@ -1500,11 +2294,43 @@ async function uploadSubmissionAttachment(
     readonly intent: "bug_create" | "verification_result";
     readonly targetQaItemId?: string;
   } & DurableUploadOptions,
+  remainingFreshIdentityFallbacks = 1,
+  forceFreshIdentity = false,
 ): Promise<string> {
   const scope = input.scope ?? projectRequestSnapshot({}, input.projectId);
-  let checkpoint: UploadCheckpoint = input.checkpoint ?? {
+  const now = input.now ?? Date.now;
+  const minimumBindingRunwayMs = input.minimumBindingRunwayMs ?? 0;
+  if (
+    !Number.isSafeInteger(minimumBindingRunwayMs) ||
+    minimumBindingRunwayMs < 0 ||
+    minimumBindingRunwayMs > 10 * 60_000
+  ) {
+    throw new TypeError("minimumBindingRunwayMs must be an integer from 0 through 600000");
+  }
+  const currentSha256 = await sha256Hex(input.file);
+  let retainedCheckpoint =
+    !forceFreshIdentity && input.checkpoint?.sha256 === currentSha256
+      ? input.checkpoint
+      : undefined;
+  let leaseFallbacksRemaining = remainingFreshIdentityFallbacks;
+  if (
+    input.intent === "verification_result" &&
+    retainedCheckpoint !== undefined &&
+    (retainedCheckpoint.binding !== undefined || retainedCheckpoint.bound === true) &&
+    !verificationAttachmentBindingHasRunway(retainedCheckpoint, now(), minimumBindingRunwayMs, {
+      projectId: input.projectId,
+      clientSubmissionId: input.clientSubmissionId,
+      targetQaItemId: input.targetQaItemId ?? "",
+    })
+  ) {
+    // The server rejects renewal before expiry. Before the result is frozen we
+    // can safely re-upload under a fresh identity to obtain enough lease runway.
+    retainedCheckpoint = undefined;
+    leaseFallbacksRemaining -= 1;
+  }
+  let checkpoint: UploadCheckpoint = retainedCheckpoint ?? {
     clientAttachmentId: crypto.randomUUID(),
-    sha256: await sha256Hex(input.file),
+    sha256: currentSha256,
     nextChunk: 0,
   };
   const save = async (patch: Partial<UploadCheckpoint>) => {
@@ -1512,9 +2338,12 @@ async function uploadSubmissionAttachment(
     await input.saveCheckpoint?.(checkpoint);
     assertProjectRequest(scope);
   };
+  // Persist identity before the first request. This also replaces a same-metadata
+  // file's stale checkpoint after its bytes produce a different digest.
+  if (input.intent === "verification_result" && retainedCheckpoint === undefined) await save({});
   const clientAttachmentId = checkpoint.clientAttachmentId;
   const uploadAttempt = 1;
-  const sha256 = checkpoint.sha256;
+  const sha256 = currentSha256;
   assertProjectRequest(scope);
   const initBody =
     checkpoint.init ??
@@ -1633,8 +2462,16 @@ async function uploadSubmissionAttachment(
     throw new QaHubApiError(200, "INVALID_UPLOAD_FINALIZE");
   if (!checkpoint.finalized) await save({ finalized });
 
-  if (!checkpoint.bound) {
-    await requestJson(
+  const hasActiveBinding =
+    input.intent === "verification_result"
+      ? verificationAttachmentBindingHasRunway(checkpoint, now(), minimumBindingRunwayMs, {
+          projectId: input.projectId,
+          clientSubmissionId: input.clientSubmissionId,
+          targetQaItemId: input.targetQaItemId ?? "",
+        })
+      : checkpoint.binding !== undefined || checkpoint.bound === true;
+  if (!hasActiveBinding && input.deferBinding !== true) {
+    const rawBinding = await requestJson(
       `/api/v1/attachments/${encodeURIComponent(finalized.attachmentId)}/bind`,
       submissionRequest(
         {
@@ -1659,7 +2496,35 @@ async function uploadSubmissionAttachment(
       ),
       input.scope === undefined,
     );
-    await save({ bound: true });
+    if (input.intent === "bug_create") {
+      await save({ bound: true });
+      return finalized.attachmentId;
+    }
+    const expectedTarget = input.targetQaItemId ?? null;
+    const typedBinding = parseAttachmentBindingResponse(rawBinding, {
+      attachmentId: finalized.attachmentId,
+      projectId: input.projectId,
+      clientSubmissionId: input.clientSubmissionId,
+      clientAttachmentId,
+      leaseGeneration: 1,
+      intent: input.intent,
+      targetQaItemId: expectedTarget,
+      expectedVersion: finalized.version,
+    });
+    await save({ binding: typedBinding, bound: true });
+    if (
+      input.intent === "verification_result" &&
+      !verificationAttachmentBindingHasRunway(
+        { ...checkpoint, binding: typedBinding },
+        now(),
+        minimumBindingRunwayMs,
+      )
+    ) {
+      if (leaseFallbacksRemaining > 0) {
+        return uploadSubmissionAttachment(input, leaseFallbacksRemaining - 1, true);
+      }
+      throw new QaHubApiError(409, "ATTACHMENT_BINDING_LEASE_TOO_SHORT");
+    }
   }
   return finalized.attachmentId;
 }
@@ -1731,12 +2596,16 @@ export async function completeBugForVerification(
 }
 
 export async function listBugEvents(bugId: string): Promise<BugEventsResponse> {
-  const body = requireRecord(
-    await requestJson(`/api/v1/bugs/${encodeURIComponent(bugId)}/events?limit=20`),
-    "EVENTS",
-  );
-  if (!Array.isArray(body.items)) throw new QaHubApiError(200, "INVALID_EVENTS");
-  return body as unknown as BugEventsResponse;
+  return listCompleteBugTimeline({
+    bugId,
+    resource: "events",
+    pageSize: 20,
+    invalidCode: "INVALID_EVENTS",
+    cursorCode: "INVALID_EVENT_CURSOR",
+    snapshotCode: "INVALID_EVENT_SNAPSHOT",
+    tooLargeCode: "EVENT_HISTORY_TOO_LARGE",
+    validateItem: isBugEvent,
+  });
 }
 
 export async function addBugComment(
@@ -1898,6 +2767,66 @@ export async function deliverHumanRepairAttemptNoCode(
   return requireRecord(body, "HUMAN_ATTEMPT") as unknown as HumanRepairAttempt;
 }
 
+export async function failRepairAttempt(
+  attemptId: string,
+  expectedVersion: number,
+  reason: string,
+): Promise<RepairAttempt> {
+  const body = await requestJson(`/api/v1/repair-attempts/${encodeURIComponent(attemptId)}/fail`, {
+    method: "POST",
+    headers: {
+      Accept: APP_FIRST_API_MEDIA_TYPE,
+      "Content-Type": APP_FIRST_API_MEDIA_TYPE,
+      "Idempotency-Key": `workflow:failRepairAttempt:attempt:${attemptId}:v${expectedVersion}`,
+    },
+    body: JSON.stringify({ expectedVersion, reason }),
+  });
+  return requireRecord(body, "REPAIR_ATTEMPT") as unknown as RepairAttempt;
+}
+
+export async function supersedeRepairAttempt(input: {
+  readonly attemptId: string;
+  readonly expectedVersion: number;
+  readonly reason: string;
+  readonly successor: {
+    readonly id: string;
+    readonly mode: RepairMode;
+    readonly assigneeId: string;
+    readonly summary?: string;
+  };
+}): Promise<SupersedeRepairAttemptResponse> {
+  const body = await requestJson(
+    `/api/v1/repair-attempts/${encodeURIComponent(input.attemptId)}/supersede`,
+    {
+      method: "POST",
+      headers: {
+        Accept: APP_FIRST_API_MEDIA_TYPE,
+        "Content-Type": APP_FIRST_API_MEDIA_TYPE,
+        "Idempotency-Key": `workflow:supersedeRepairAttempt:attempt:${input.attemptId}:v${input.expectedVersion}`,
+      },
+      body: JSON.stringify({
+        expectedVersion: input.expectedVersion,
+        reason: input.reason,
+        successor: input.successor,
+      }),
+    },
+  );
+  const record = requireRecord(body, "REPAIR_ATTEMPT_SUPERSEDE");
+  if (
+    typeof record.supersededAttempt !== "object" ||
+    record.supersededAttempt === null ||
+    typeof record.successorAttempt !== "object" ||
+    record.successorAttempt === null ||
+    typeof record.bug !== "object" ||
+    record.bug === null ||
+    typeof record.eventId !== "string" ||
+    typeof record.replayed !== "boolean"
+  ) {
+    throw new QaHubApiError(200, "INVALID_REPAIR_ATTEMPT_SUPERSEDE");
+  }
+  return record as unknown as SupersedeRepairAttemptResponse;
+}
+
 export async function registerManualBuild(input: {
   readonly projectId: string;
   readonly externalId: string;
@@ -1990,17 +2919,40 @@ export async function createVerification(input: {
       criteria: input.criteria,
     }),
   });
-  return requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+  const verification = requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+  if (
+    !verificationRecordMatchesIdentity(verification, {
+      bugId: input.bugId,
+      repairAttemptId: input.repairAttemptId,
+      verifierId: input.verifierId,
+    }) ||
+    verification.buildId !== input.buildId ||
+    verification.criteriaSnapshot !== input.criteria ||
+    verification.status !== "requested" ||
+    verification.resultSummary !== null ||
+    verification.version !== 1
+  ) {
+    throw new QaHubApiError(200, "VERIFICATION_CREATE_RESPONSE_MISMATCH");
+  }
+  return verification;
 }
 
-export async function getVerification(verificationId: string): Promise<VerificationRecord> {
+export async function getVerification(
+  verificationId: string,
+  expected: VerificationOwnershipExpectation,
+): Promise<VerificationRecord> {
   const body = await requestJson(`/api/v1/verifications/${encodeURIComponent(verificationId)}`);
-  return requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+  const verification = requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+  if (!verificationRecordMatchesIdentity(verification, { ...expected, verificationId })) {
+    throw new QaHubApiError(200, "VERIFICATION_READBACK_SCOPE_MISMATCH");
+  }
+  return verification;
 }
 
 export async function startVerification(
   verificationId: string,
   expectedVersion: number,
+  expected: VerificationOwnershipExpectation,
 ): Promise<VerificationRecord> {
   const body = await requestJson(
     `/api/v1/verifications/${encodeURIComponent(verificationId)}/start`,
@@ -2016,7 +2968,15 @@ export async function startVerification(
       }),
     },
   );
-  return requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+  const verification = requireRecord(body, "VERIFICATION") as unknown as VerificationRecord;
+  if (
+    !verificationRecordMatchesIdentity(verification, { ...expected, verificationId }) ||
+    verification.status !== "in_progress" ||
+    verification.version !== expectedVersion + 1
+  ) {
+    throw new QaHubApiError(200, "VERIFICATION_START_RESPONSE_MISMATCH");
+  }
+  return verification;
 }
 
 export async function recordVerificationPassed(
@@ -2024,26 +2984,18 @@ export async function recordVerificationPassed(
   expectedVersion: number,
   resultSummary: string,
   clientSubmissionId: string,
+  attachmentIds: readonly string[] = [],
+  captureBundleId: string | null = null,
 ): Promise<VerificationResultResponse> {
-  const body = await requestJson(
-    `/api/v1/verifications/${encodeURIComponent(verificationId)}/result`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
-        "Idempotency-Key": `workflow:recordVerificationResult:verification:${verificationId}:v${expectedVersion}`,
-      },
-      body: JSON.stringify({
-        submissionContractVersion: "1.1.0",
-        clientSubmissionId,
-        expectedVersion,
-        status: "passed",
-        resultSummary,
-        attachmentIds: [],
-      }),
-    },
-  );
-  return requireRecord(body, "VERIFICATION_RESULT") as unknown as VerificationResultResponse;
+  return recordVerificationResult({
+    verificationId,
+    expectedVersion,
+    resultSummary,
+    clientSubmissionId,
+    status: "passed",
+    attachmentIds,
+    captureBundleId,
+  });
 }
 
 export async function recordVerificationFailed(
@@ -2053,27 +3005,181 @@ export async function recordVerificationFailed(
   failureReason: string,
   clientSubmissionId: string,
   attachmentIds: readonly string[] = [],
+  captureBundleId: string | null = null,
 ): Promise<VerificationResultResponse> {
+  return recordVerificationResult({
+    verificationId,
+    expectedVersion,
+    resultSummary,
+    clientSubmissionId,
+    status: "failed",
+    failureReason,
+    attachmentIds,
+    captureBundleId,
+  });
+}
+
+export async function recordVerificationBlocked(
+  verificationId: string,
+  expectedVersion: number,
+  resultSummary: string,
+  blockedReason: string,
+  clientSubmissionId: string,
+  attachmentIds: readonly string[] = [],
+  captureBundleId: string | null = null,
+): Promise<VerificationResultResponse> {
+  return recordVerificationResult({
+    verificationId,
+    expectedVersion,
+    resultSummary,
+    clientSubmissionId,
+    status: "blocked",
+    blockedReason,
+    attachmentIds,
+    captureBundleId,
+  });
+}
+
+export type VerificationOutcome = "passed" | "failed" | "blocked";
+
+export type VerificationResultCommand = {
+  readonly verificationId: string;
+  readonly expectedVersion: number;
+  readonly resultSummary: string;
+  readonly clientSubmissionId: string;
+  readonly attachmentIds: readonly string[];
+  readonly captureBundleId: string | null;
+} & (
+  | { readonly status: "passed" }
+  | { readonly status: "failed"; readonly failureReason: string }
+  | { readonly status: "blocked"; readonly blockedReason: string }
+);
+
+export type FrozenVerificationResultRequest = VerificationResultCommand & {
+  readonly requestBody: string;
+};
+
+function verificationResultRequestBody(input: VerificationResultCommand): string {
+  return JSON.stringify({
+    submissionContractVersion: "1.1.0",
+    clientSubmissionId: input.clientSubmissionId,
+    expectedVersion: input.expectedVersion,
+    status: input.status,
+    resultSummary: input.resultSummary,
+    ...(input.status === "failed" ? { failureReason: input.failureReason } : {}),
+    ...(input.status === "blocked" ? { blockedReason: input.blockedReason } : {}),
+    attachmentIds: input.attachmentIds,
+    ...(input.captureBundleId === null ? {} : { captureBundleId: input.captureBundleId }),
+  });
+}
+
+export function freezeVerificationResultRequest(
+  input: VerificationResultCommand,
+): FrozenVerificationResultRequest {
+  const frozenInput = {
+    ...input,
+    // The receipt projects evidence in attachment-id order. Freeze the request in
+    // that same canonical order so a matching committed result can be compared byte-for-byte.
+    attachmentIds: Object.freeze([...input.attachmentIds].sort()),
+  } as VerificationResultCommand;
+  return Object.freeze({
+    ...frozenInput,
+    requestBody: verificationResultRequestBody(frozenInput),
+  });
+}
+
+export function verificationRecordMatchesIdentity(
+  value: unknown,
+  expected: VerificationOwnershipExpectation & { readonly verificationId?: string },
+): value is VerificationRecord {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const verification = value as Record<string, unknown>;
+  return (
+    typeof verification["id"] === "string" &&
+    UUID_PATTERN.test(verification["id"]) &&
+    (expected.verificationId === undefined || verification["id"] === expected.verificationId) &&
+    verification["bugId"] === expected.bugId &&
+    verification["repairAttemptId"] === expected.repairAttemptId &&
+    verification["verifierId"] === expected.verifierId
+  );
+}
+
+export function verificationResultReceiptMatches(
+  frozen: FrozenVerificationResultRequest,
+  response: VerificationResultResponse,
+  expected: VerificationResultExpectation,
+): boolean {
+  const terminalProjectionMatches =
+    frozen.status === "passed"
+      ? response.bug.state === "closed" && response.repairAttempt.status === "delivered"
+      : frozen.status === "failed"
+        ? response.bug.state === "ready" && response.repairAttempt.status === "verification_failed"
+        : response.bug.state === "ready_for_verification" &&
+          response.repairAttempt.status === "delivered";
+  return (
+    expected.verificationId === frozen.verificationId &&
+    response.clientSubmissionId === frozen.clientSubmissionId &&
+    verificationRecordMatchesIdentity(response.verification, expected) &&
+    response.verification.status === frozen.status &&
+    response.verification.resultSummary === frozen.resultSummary &&
+    response.verification.version === frozen.expectedVersion + 1 &&
+    response.qaItem.type === "bug" &&
+    response.qaItem.id === expected.bugId &&
+    response.qaItem.key === response.bug.key &&
+    response.bug.id === expected.bugId &&
+    response.bug.projectId === expected.projectId &&
+    response.repairAttempt.id === expected.repairAttemptId &&
+    response.repairAttempt.bugId === expected.bugId &&
+    terminalProjectionMatches &&
+    response.attachmentIds.length === frozen.attachmentIds.length &&
+    response.attachmentIds.every((id, index) => id === frozen.attachmentIds[index]) &&
+    response.captureBundleId === frozen.captureBundleId &&
+    typeof response.eventId === "string" &&
+    response.eventId.length > 0 &&
+    typeof response.replayed === "boolean"
+  );
+}
+
+export function verificationResultReadbackMatches(
+  frozen: FrozenVerificationResultRequest,
+  verification: VerificationRecord,
+  expected: VerificationIdentityExpectation,
+): boolean {
+  return (
+    expected.verificationId === frozen.verificationId &&
+    verificationRecordMatchesIdentity(verification, expected) &&
+    verification.status === frozen.status &&
+    verification.resultSummary === frozen.resultSummary &&
+    verification.failureReason === (frozen.status === "failed" ? frozen.failureReason : null) &&
+    verification.blockedReason === (frozen.status === "blocked" ? frozen.blockedReason : null) &&
+    verification.version === frozen.expectedVersion + 1
+  );
+}
+
+export async function recordFrozenVerificationResult(
+  frozen: FrozenVerificationResultRequest,
+): Promise<VerificationResultResponse> {
+  if (frozen.requestBody !== verificationResultRequestBody(frozen)) {
+    throw new QaHubApiError(400, "FROZEN_VERIFICATION_RESULT_MISMATCH");
+  }
   const body = await requestJson(
-    `/api/v1/verifications/${encodeURIComponent(verificationId)}/result`,
+    `/api/v1/verifications/${encodeURIComponent(frozen.verificationId)}/result`,
     {
       method: "POST",
       headers: {
-        "Content-Type": "application/vnd.relay-qa-hub.v1.1+json",
-        "Idempotency-Key": `workflow:recordVerificationResult:verification:${verificationId}:v${expectedVersion}`,
+        "Content-Type": APP_FIRST_API_MEDIA_TYPE,
+        "Idempotency-Key": `workflow:recordVerificationResult:verification:${frozen.verificationId}:v${frozen.expectedVersion}`,
       },
-      body: JSON.stringify({
-        submissionContractVersion: "1.1.0",
-        clientSubmissionId,
-        expectedVersion,
-        status: "failed",
-        resultSummary,
-        failureReason,
-        attachmentIds,
-      }),
+      body: frozen.requestBody,
     },
   );
   return requireRecord(body, "VERIFICATION_RESULT") as unknown as VerificationResultResponse;
+}
+
+async function recordVerificationResult(
+  input: VerificationResultCommand,
+): Promise<VerificationResultResponse> {
+  return recordFrozenVerificationResult(freezeVerificationResultRequest(input));
 }
 
 export async function getQingyuSession(): Promise<QingyuSession> {

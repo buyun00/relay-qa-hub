@@ -15,6 +15,7 @@ import { createSqliteMobileHumanWorkflowStore } from "../dist/sqlite-mobile-huma
 import { createSqliteMobileBugStore } from "../dist/sqlite-mobile-bug-store.js";
 import { createSqliteMobileRelayStore } from "../dist/sqlite-mobile-relay-store.js";
 import { createSqliteRepairAttemptTerminalStore } from "../dist/sqlite-repair-attempt-terminal-store.js";
+import { createSqliteMobileProjectDirectoryStore } from "../dist/sqlite-mobile-project-directory-store.js";
 import { MOBILE_API_MEDIA_TYPE } from "../dist/mobile-bugs.js";
 
 const now = () => new Date().toISOString();
@@ -75,7 +76,8 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
   const accountId = randomUUID(),
     gmUserId = randomUUID(),
     aId = randomUUID(),
-    bId = randomUUID();
+    bId = randomUUID(),
+    historicalUserId = randomUUID();
   const bootstrap = {
     accountId,
     projectId: aId,
@@ -88,7 +90,7 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
   const ledger = [];
   try {
     await worker.ensureMobileScope(bootstrap);
-    assert.equal((await worker.initialization).migration.toVersion, 19);
+    assert.equal((await worker.initialization).migration.toVersion, 20);
     const bCreatorId = randomUUID();
     await worker.ensureMobileScope({
       ...bootstrap,
@@ -98,6 +100,85 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
       projectKey: "DWIREB",
       createdAt: now(),
     });
+    await worker.ensureMobileScope({
+      ...bootstrap,
+      actorId: historicalUserId,
+      membershipId: projectMembershipId(aId, historicalUserId),
+      actorDisplayName: "Historical Workflow Alias",
+      createdAt: now(),
+    });
+    const historicalScope = { accountId, projectId: aId, actorId: gmUserId };
+    const historicalBug = await worker.createMobileBug({
+      ...historicalScope,
+      clientSubmissionId: randomUUID(),
+      payloadDigest: digest("historical-assignment"),
+      title: "Historical identity projection",
+      description: "Assignments were recorded before the project identity link",
+      expectedBehavior: "Read DTOs name the active canonical member",
+      severity: "S2",
+      priority: "P2",
+      ownerId: historicalUserId,
+      verificationOwnerId: historicalUserId,
+      occurrence: {
+        observedAt: now(),
+        platform: "web",
+        steps: ["Link the assigned historical identity"],
+        actualBehavior: "The stored assignment keeps the historical ID",
+      },
+      attachmentIds: [],
+      captureBundleId: null,
+      createdAt: now(),
+    });
+    const historicalReady = await worker.transitionMobileBugReady({
+      ...historicalScope,
+      bugId: historicalBug.bug.id,
+      expectedVersion: historicalBug.bug.version,
+      idempotencyKey: randomUUID(),
+      requestDigest: digest("historical-ready"),
+      createdAt: now(),
+    });
+    const historicalAttempt = await worker.createMobileManualRepairAttempt({
+      ...historicalScope,
+      bugId: historicalBug.bug.id,
+      expectedVersion: historicalReady.version,
+      assigneeId: historicalUserId,
+      summary: "Historical alias assignment",
+      idempotencyKey: randomUUID(),
+      requestDigest: digest("historical-attempt"),
+      createdAt: now(),
+    });
+    const activeModuleId = randomUUID();
+    const inactiveModuleId = randomUUID();
+    const otherProjectModuleId = randomUUID();
+    const moduleDatabase = new DatabaseSync(databaseFile);
+    try {
+      const insertModule = moduleDatabase.prepare(
+        `INSERT INTO modules(id, account_id, project_id, name, active, created_at, updated_at, version)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+      );
+      const moduleAt = now();
+      insertModule.run(activeModuleId, accountId, aId, "Active API module", 1, moduleAt, moduleAt);
+      insertModule.run(
+        inactiveModuleId,
+        accountId,
+        aId,
+        "Inactive API module",
+        0,
+        moduleAt,
+        moduleAt,
+      );
+      insertModule.run(
+        otherProjectModuleId,
+        accountId,
+        bId,
+        "Other API module",
+        1,
+        moduleAt,
+        moduleAt,
+      );
+    } finally {
+      moduleDatabase.close();
+    }
     const service = new ProjectManagementService({ worker, accountId, gmUserId });
     const context = new ProjectRequestContext();
     const scope = context.scope(bootstrap);
@@ -109,6 +190,11 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
       workflowProjectionStore: createSqliteWorkflowProjectionStore({ worker, scope }),
       mobileBugStore: createSqliteMobileBugStore({ worker, scope }),
       mobileHumanWorkflowStore: createSqliteMobileHumanWorkflowStore({ worker, scope }),
+      mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
+        worker,
+        scope,
+        gmUserId,
+      }),
       mobileRelayStore: createSqliteMobileRelayStore({
         worker,
         scope,
@@ -161,13 +247,101 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
     const login = (name, projectId) =>
       request("/api/v1/auth/login", { body: { name, projectId, client: "android" } });
     const alice = await login("Workflow Alice", aId),
-      bob = await login("Workflow Bob", bId);
+      bob = await login("Workflow Bob", bId),
+      historicalLogin = await login("Historical Workflow Alias", aId);
     const gm = await request("/api/v1/auth/gm/login", {
       body: { password: "workflow-integration-gm-only", client: "android" },
     });
-    for (const result of [alice, bob, gm]) assert.equal(result.status, 200);
+    for (const result of [alice, bob, historicalLogin, gm]) assert.equal(result.status, 200);
+    const gmProjects = await request("/api/v1/projects?limit=100", {
+      token: gm.data.accessToken,
+    });
+    assert.equal(gmProjects.status, 200, JSON.stringify(gmProjects.data));
+    assert.deepEqual(gmProjects.data.items.map((project) => project.id).sort(), [aId, bId].sort());
+    assert.ok(gmProjects.data.items.every((project) => project.roles.includes("project_admin")));
+    const employeeProjects = await request("/api/v1/projects?limit=100", {
+      token: alice.data.accessToken,
+      headers: { "x-qa-is-gm": "true" },
+    });
+    assert.equal(employeeProjects.status, 200, JSON.stringify(employeeProjects.data));
+    assert.deepEqual(
+      employeeProjects.data.items.map((project) => project.id),
+      [aId],
+    );
+    assert.equal(historicalLogin.data.userId, historicalUserId);
+    await worker.linkManagedUser({
+      ...historicalScope,
+      userId: historicalUserId,
+      canonicalUserId: gmUserId,
+      protectedUserIds: [],
+      createdAt: now(),
+    });
+    const canonicalSession = await request("/api/v1/auth/me", {
+      token: historicalLogin.data.accessToken,
+      projectId: aId,
+    });
+    assert.equal(canonicalSession.status, 200, JSON.stringify(canonicalSession.data));
+    assert.equal(canonicalSession.data.userId, gmUserId);
+    const canonicalOwnerList = await request(
+      `/api/v1/bugs?projectId=${aId}&ownerId=${gmUserId}&limit=50`,
+      { token: historicalLogin.data.accessToken, projectId: aId },
+    );
+    assert.equal(canonicalOwnerList.status, 200, JSON.stringify(canonicalOwnerList.data));
+    const canonicalListBug = canonicalOwnerList.data.items.find(
+      (bug) => bug.id === historicalBug.bug.id,
+    );
+    assert.equal(canonicalListBug.ownerId, gmUserId);
+    assert.equal(canonicalListBug.verificationOwnerId, gmUserId);
+    const canonicalDetail = await request(`/api/v1/bugs/${historicalBug.bug.id}`, {
+      token: historicalLogin.data.accessToken,
+      projectId: aId,
+    });
+    assert.equal(canonicalDetail.status, 200, JSON.stringify(canonicalDetail.data));
+    assert.equal(canonicalDetail.data.ownerId, gmUserId);
+    assert.equal(canonicalDetail.data.verificationOwnerId, gmUserId);
+    const canonicalWorkflow = await request(`/api/v1/bugs/${historicalBug.bug.id}/human-workflow`, {
+      token: historicalLogin.data.accessToken,
+      projectId: aId,
+    });
+    assert.equal(canonicalWorkflow.status, 200, JSON.stringify(canonicalWorkflow.data));
+    assert.equal(canonicalWorkflow.data.repairAttempt.id, historicalAttempt.id);
+    assert.equal(canonicalWorkflow.data.repairAttempt.assigneeId, gmUserId);
     const a = { accountId, projectId: aId, actorId: alice.data.userId };
     const b = { accountId, projectId: bId, actorId: bob.data.userId };
+    const postCategorizedBug = (moduleId, clientSubmissionId) =>
+      request("/api/v1/bugs", {
+        token: alice.data.accessToken,
+        projectId: aId,
+        body: {
+          submissionContractVersion: "1.1.0",
+          projectId: aId,
+          clientSubmissionId,
+          title: "Categorized API Bug",
+          description: "The module survives the public API and worker boundary",
+          expectedBehavior: "Only an active same-project module is accepted",
+          moduleId,
+          severity: "S2",
+          priority: "P2",
+          occurrence: {
+            observedAt: now(),
+            platform: "web",
+            steps: ["Submit the categorized Bug"],
+            actualBehavior: "The request reaches storage",
+          },
+        },
+        headers: {
+          "content-type": MOBILE_API_MEDIA_TYPE,
+          "idempotency-key": `submission:${clientSubmissionId}:commit`,
+        },
+      });
+    const categorized = await postCategorizedBug(activeModuleId, randomUUID());
+    assert.equal(categorized.status, 201, JSON.stringify(categorized.data));
+    assert.equal(categorized.data.bug.moduleId, activeModuleId);
+    for (const moduleId of [inactiveModuleId, otherProjectModuleId]) {
+      const rejected = await postCategorizedBug(moduleId, randomUUID());
+      assert.equal(rejected.status, 400, JSON.stringify(rejected.data));
+      assert.equal(rejected.data.code, "INVALID_REQUEST");
+    }
     const create = (input) =>
       worker.createMobileBug({
         ...input,
@@ -191,7 +365,54 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
         createdAt: now(),
       });
     const bugA = await create(a),
-      bugB = await create(b);
+      bugB = await create(b),
+      listBugA = await create(a);
+    const listPath = `/api/v1/bugs?projectId=${aId}&verificationOwnerId=${a.actorId}&limit=1`;
+    const listFirst = await request(listPath, {
+      token: alice.data.accessToken,
+      projectId: aId,
+    });
+    assert.equal(listFirst.status, 200, JSON.stringify(listFirst.data));
+    assert.equal(listFirst.data.items.length, 1);
+    assert.match(listFirst.data.nextCursor, /^b1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{43}$/u);
+    const listSecond = await request(
+      `${listPath}&cursor=${encodeURIComponent(listFirst.data.nextCursor)}`,
+      { token: alice.data.accessToken, projectId: aId },
+    );
+    assert.equal(listSecond.status, 200, JSON.stringify(listSecond.data));
+    assert.equal(listSecond.data.items.length, 1);
+    assert.equal(listSecond.data.nextCursor, null);
+    assert.equal(listSecond.data.snapshotSequence, listFirst.data.snapshotSequence);
+    assert.deepEqual(
+      new Set([...listFirst.data.items, ...listSecond.data.items].map((bug) => bug.id)),
+      new Set([bugA.bug.id, listBugA.bug.id]),
+    );
+    const gmSelectedProject = await request("/api/v1/bugs?limit=500&sort=created_desc", {
+      token: gm.data.accessToken,
+      projectId: aId,
+    });
+    assert.equal(gmSelectedProject.status, 200, JSON.stringify(gmSelectedProject.data));
+    assert.ok(gmSelectedProject.data.items.length <= 100);
+    assert.ok(gmSelectedProject.data.items.every((bug) => bug.projectId === aId));
+    assert.ok(gmSelectedProject.data.items.some((bug) => bug.id === bugA.bug.id));
+    assert.ok(gmSelectedProject.data.items.every((bug) => bug.id !== bugB.bug.id));
+    const gmProjectB = await request("/api/v1/bugs?limit=500&sort=created_desc", {
+      token: gm.data.accessToken,
+      projectId: bId,
+    });
+    assert.equal(gmProjectB.status, 200, JSON.stringify(gmProjectB.data));
+    assert.ok(gmProjectB.data.items.every((bug) => bug.projectId === bId));
+    assert.ok(gmProjectB.data.items.some((bug) => bug.id === bugB.bug.id));
+    assert.ok(gmProjectB.data.items.every((bug) => bug.id !== bugA.bug.id));
+    const tamperedCursor = `${listFirst.data.nextCursor.slice(0, -1)}${
+      listFirst.data.nextCursor.endsWith("a") ? "b" : "a"
+    }`;
+    const rejectedCursor = await request(
+      `${listPath}&cursor=${encodeURIComponent(tamperedCursor)}`,
+      { token: alice.data.accessToken, projectId: aId },
+    );
+    assert.equal(rejectedCursor.status, 400);
+    assert.equal(rejectedCursor.data.code, "INVALID_REQUEST");
 
     const runningAttempt = async (scope, token) => {
       const created = await create(scope);
@@ -502,7 +723,7 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
         actualHttpRequests: ledger.length,
         ledger,
         realWorker: true,
-        schema: 19,
+        schema: 20,
         externalRequests: 0,
       }),
     );

@@ -1,14 +1,17 @@
 package com.relayqahub.android
 
 import android.content.SharedPreferences
+import com.relayqahub.android.data.AccountProjectScope
 import com.relayqahub.android.data.NewOfflineOperation
 import com.relayqahub.android.data.OfflineOperationEntity
 import com.relayqahub.android.data.QueueState
 import com.relayqahub.android.data.noBugPostRejectionFingerprint
 import com.relayqahub.android.data.commitDurableBugDraft
+import com.relayqahub.android.network.AttachmentUploadCheckpoint
 import java.lang.reflect.Proxy
 import java.nio.file.Files
 import java.security.MessageDigest
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -342,6 +345,304 @@ class BugDraftPreferencesTest {
         val preferences = BugDraftPreferences(storage.value)
         assertTrue(runCatching { preferences.pending("scope") }.isFailure)
         assertTrue(runCatching { preferences.savePending("scope", pending) }.isFailure)
+    }
+
+    @Test
+    fun `verification submission keeps one identity and frozen blocked evidence across retry and project activity`() {
+        val storage = MemoryPreferences()
+        val preferences = BugDraftPreferences(storage.value)
+        val verificationScope = AccountProjectScope(
+            accountId = "10000000-0000-4000-8000-000000000001",
+            projectId = "20000000-0000-4000-8000-000000000001",
+            actorId = "30000000-0000-4000-8000-000000000001",
+            installationId = "40000000-0000-4000-8000-000000000001",
+            sessionId = "50000000-0000-4000-8000-000000000001",
+        )
+        val bugId = "60000000-0000-4000-8000-000000000001"
+        val verificationId = "70000000-0000-4000-8000-000000000001"
+        val clientAttachmentId = "80000000-0000-4000-8000-000000000001"
+        val attachmentId = "90000000-0000-4000-8000-000000000001"
+        val sessionId = "90000000-0000-4000-8000-000000000002"
+        val bindingId = "90000000-0000-4000-8000-000000000003"
+        val captureBundleId = "a0000000-0000-4000-8000-000000000001"
+
+        val opened = preferences.openVerification("project-one", verificationScope, bugId, verificationId)
+        val frozen = FrozenVerificationResult(
+            verificationId = verificationId,
+            expectedVersion = 2,
+            status = "blocked",
+            resultSummary = "测试环境尚未就绪",
+            attachmentIds = listOf(attachmentId),
+            captureBundleId = captureBundleId,
+            blockedReason = "测试环境尚未就绪",
+        )
+        val captureBound = opened.copy(captureBundleId = captureBundleId)
+        preferences.saveVerification("project-one", captureBound)
+        preferences.saveVerification(
+            "project-one",
+            captureBound.copy(
+                attachments = listOf(
+                    PendingVerificationAttachment(
+                        clientAttachmentId = clientAttachmentId,
+                        filename = "blocked-evidence.png",
+                        mediaType = "image/png",
+                        expectedSize = 3,
+                        sha256 = "a".repeat(64),
+                        attachmentId = attachmentId,
+                        uploadCheckpoint = AttachmentUploadCheckpoint(
+                            sessionId = sessionId,
+                            chunkSize = 262_144,
+                            expectedChunkCount = 1,
+                            confirmedChunks = listOf(0),
+                            uploadVersion = 2,
+                            uploadExpiresAt = "2090-01-01T00:00:00Z",
+                            attachmentId = attachmentId,
+                            finalizedVersion = 3,
+                            finalizeConfirmed = true,
+                            bindingId = bindingId,
+                            leaseGeneration = 1,
+                            bindingVersion = 4,
+                            bindingExpiresAt = "2090-01-01T00:15:00Z",
+                        ),
+                    ),
+                ),
+                frozenResult = frozen,
+            ),
+        )
+        preferences.openVerification(
+            "other-project",
+            verificationScope.copy(projectId = "20000000-0000-4000-8000-000000000002"),
+            "60000000-0000-4000-8000-000000000002",
+            "70000000-0000-4000-8000-000000000002",
+        )
+
+        val restartedPreferences = BugDraftPreferences(storage.value)
+        val crossSessionFailure = runCatching {
+            restartedPreferences.pendingVerificationForBug(
+                "project-one",
+                verificationScope.copy(sessionId = "50000000-0000-4000-8000-000000000099"),
+                bugId,
+            )
+        }.exceptionOrNull()
+        assertTrue(crossSessionFailure is IllegalStateException)
+        val reopened = restartedPreferences.pendingVerificationForBug(
+            "project-one",
+            verificationScope,
+            bugId,
+        )
+        assertEquals(opened.clientSubmissionId, reopened?.clientSubmissionId)
+        assertEquals(frozen, reopened?.frozenResult)
+        assertEquals(bindingId, reopened?.attachments?.single()?.uploadCheckpoint?.bindingId)
+        assertEquals(null, preferences.confirmVerification("project-one", verificationId, UUID.randomUUID().toString()))
+        assertEquals(opened.clientSubmissionId, preferences.pendingVerification("project-one", verificationId)?.clientSubmissionId)
+        assertEquals(opened.clientSubmissionId, preferences.confirmVerification(
+            "project-one", verificationId, opened.clientSubmissionId,
+        )?.clientSubmissionId)
+        assertEquals(null, preferences.pendingVerificationForBug("project-one", verificationScope, bugId))
+    }
+
+    @Test
+    fun `verification persistence accepts canonical frozen ids for reverse attachment selection`() {
+        val storage = MemoryPreferences()
+        val preferences = BugDraftPreferences(storage.value)
+        val verificationScope = AccountProjectScope(
+            "10000000-0000-4000-8000-000000000001",
+            "20000000-0000-4000-8000-000000000001",
+            "30000000-0000-4000-8000-000000000001",
+            "40000000-0000-4000-8000-000000000001",
+            "50000000-0000-4000-8000-000000000001",
+        )
+        val bugId = "60000000-0000-4000-8000-000000000001"
+        val verificationId = "70000000-0000-4000-8000-000000000001"
+        val firstId = "80000000-0000-4000-8000-000000000001"
+        val secondId = "80000000-0000-4000-8000-000000000002"
+        val opened = preferences.openVerification("ordered", verificationScope, bugId, verificationId)
+        fun attachment(index: Int, attachmentId: String) = PendingVerificationAttachment(
+            clientAttachmentId = "90000000-0000-4000-8000-00000000000$index",
+            filename = "$index.png",
+            mediaType = "image/png",
+            expectedSize = 1,
+            sha256 = index.toString().repeat(64),
+            attachmentId = attachmentId,
+            uploadCheckpoint = AttachmentUploadCheckpoint(
+                sessionId = "a0000000-0000-4000-8000-00000000000$index",
+                chunkSize = 262_144,
+                expectedChunkCount = 1,
+                confirmedChunks = listOf(0),
+                uploadVersion = 2,
+                uploadExpiresAt = "2090-01-01T00:00:00Z",
+                attachmentId = attachmentId,
+                finalizedVersion = 3,
+                finalizeConfirmed = true,
+                bindingId = "b0000000-0000-4000-8000-00000000000$index",
+                leaseGeneration = 1,
+                bindingVersion = 4,
+                bindingExpiresAt = "2090-01-01T00:15:00Z",
+            ),
+        )
+        val selectedInReverse = listOf(attachment(2, secondId), attachment(1, firstId))
+        val frozen = FrozenVerificationResult(
+            verificationId,
+            2,
+            "passed",
+            "Passed",
+            listOf(firstId, secondId),
+        )
+
+        preferences.saveVerification(
+            "ordered",
+            opened.copy(attachments = selectedInReverse, frozenResult = frozen),
+        )
+
+        val reopened = checkNotNull(BugDraftPreferences(storage.value).pendingVerification("ordered", verificationId))
+        assertEquals(listOf(secondId, firstId), reopened.attachments.map { it.attachmentId })
+        assertEquals(listOf(firstId, secondId), reopened.frozenResult?.attachmentIds)
+    }
+
+    @Test
+    fun `verification capture identity locks when upload init is durably checkpointed`() {
+        val storage = MemoryPreferences()
+        val preferences = BugDraftPreferences(storage.value)
+        val verificationScope = AccountProjectScope(
+            "10000000-0000-4000-8000-000000000001",
+            "20000000-0000-4000-8000-000000000001",
+            "30000000-0000-4000-8000-000000000001",
+            "40000000-0000-4000-8000-000000000001",
+            "50000000-0000-4000-8000-000000000001",
+        )
+        val bugId = "60000000-0000-4000-8000-000000000001"
+        val verificationId = "70000000-0000-4000-8000-000000000001"
+        val firstCaptureId = "80000000-0000-4000-8000-000000000001"
+        val otherCaptureId = "80000000-0000-4000-8000-000000000002"
+        val opened = preferences.openVerification("capture-lock", verificationScope, bugId, verificationId)
+        val initialized = opened.copy(
+            captureBundleId = firstCaptureId,
+            attachments = listOf(
+                PendingVerificationAttachment(
+                    clientAttachmentId = "90000000-0000-4000-8000-000000000001",
+                    filename = "evidence.png",
+                    mediaType = "image/png",
+                    expectedSize = 3,
+                    sha256 = "a".repeat(64),
+                    uploadCheckpoint = AttachmentUploadCheckpoint(
+                        sessionId = "a0000000-0000-4000-8000-000000000001",
+                        chunkSize = 262_144,
+                        expectedChunkCount = 1,
+                        uploadVersion = 1,
+                        uploadExpiresAt = "2090-01-01T00:00:00Z",
+                    ),
+                ),
+            ),
+        )
+        preferences.saveVerification("capture-lock", opened.copy(captureBundleId = firstCaptureId))
+        preferences.saveVerification("capture-lock", initialized)
+
+        val reopened = checkNotNull(
+            BugDraftPreferences(storage.value).pendingVerification("capture-lock", verificationId),
+        )
+        assertEquals(firstCaptureId, reopened.captureBundleId)
+        assertTrue(
+            runCatching {
+                preferences.saveVerification(
+                    "capture-lock",
+                    reopened.copy(captureBundleId = otherCaptureId),
+                )
+            }.isFailure,
+        )
+        assertEquals(
+            firstCaptureId,
+            BugDraftPreferences(storage.value)
+                .pendingVerification("capture-lock", verificationId)
+                ?.captureBundleId,
+        )
+    }
+
+    @Test
+    fun `verification persistence rejects out of contract upload checkpoint bounds`() {
+        val preferences = BugDraftPreferences(MemoryPreferences().value)
+        val verificationScope = AccountProjectScope(
+            "10000000-0000-4000-8000-000000000001",
+            "20000000-0000-4000-8000-000000000001",
+            "30000000-0000-4000-8000-000000000001",
+            "40000000-0000-4000-8000-000000000001",
+            "50000000-0000-4000-8000-000000000001",
+        )
+        val opened = preferences.openVerification(
+            "checkpoint-bounds",
+            verificationScope,
+            "60000000-0000-4000-8000-000000000001",
+            "70000000-0000-4000-8000-000000000001",
+        )
+        fun submission(chunkSize: Int, chunkCount: Int) = opened.copy(
+            attachments = listOf(
+                PendingVerificationAttachment(
+                    clientAttachmentId = "80000000-0000-4000-8000-000000000001",
+                    filename = "evidence.png",
+                    mediaType = "image/png",
+                    expectedSize = 3,
+                    sha256 = "a".repeat(64),
+                    uploadCheckpoint = AttachmentUploadCheckpoint(
+                        sessionId = "90000000-0000-4000-8000-000000000001",
+                        chunkSize = chunkSize,
+                        expectedChunkCount = chunkCount,
+                        uploadVersion = 1,
+                        uploadExpiresAt = "2090-01-01T00:00:00Z",
+                    ),
+                ),
+            ),
+        )
+
+        assertTrue(
+            runCatching {
+                preferences.saveVerification("checkpoint-bounds", submission(262_143, 1))
+            }.isFailure,
+        )
+        assertTrue(
+            runCatching {
+                preferences.saveVerification("checkpoint-bounds", submission(262_144, 2_001))
+            }.isFailure,
+        )
+    }
+
+    @Test
+    fun `verification submission rejects replacement identity scope instance and frozen payload`() {
+        val preferences = BugDraftPreferences(MemoryPreferences().value)
+        val verificationScope = AccountProjectScope(
+            "10000000-0000-4000-8000-000000000001",
+            "20000000-0000-4000-8000-000000000001",
+            "30000000-0000-4000-8000-000000000001",
+            "40000000-0000-4000-8000-000000000001",
+            "50000000-0000-4000-8000-000000000001",
+        )
+        val bugId = "60000000-0000-4000-8000-000000000001"
+        val verificationId = "70000000-0000-4000-8000-000000000001"
+        val opened = preferences.openVerification("scope", verificationScope, bugId, verificationId)
+        assertTrue(runCatching {
+            preferences.saveVerification("scope", opened.copy(clientSubmissionId = UUID.randomUUID().toString()))
+        }.isFailure)
+        assertTrue(runCatching {
+            preferences.openVerification(
+                "scope", verificationScope, bugId, "70000000-0000-4000-8000-000000000002",
+            )
+        }.isFailure)
+        assertTrue(runCatching {
+            preferences.pendingVerificationForBug(
+                "scope",
+                verificationScope.copy(projectId = "20000000-0000-4000-8000-000000000002"),
+                bugId,
+            )
+        }.isFailure)
+        val frozen = FrozenVerificationResult(
+            verificationId, 2, "passed", "通过", emptyList(),
+        )
+        preferences.saveVerification("scope", opened.copy(frozenResult = frozen))
+        assertTrue(runCatching {
+            preferences.saveVerification(
+                "scope",
+                opened.copy(frozenResult = frozen.copy(status = "failed", failureReason = "改成失败")),
+            )
+        }.isFailure)
+        assertEquals(frozen, preferences.pendingVerification("scope", verificationId)?.frozenResult)
     }
 
     /** Implements only the storage boundary; all draft serialization and decisions use the real class. */

@@ -1,8 +1,15 @@
 import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 
+import { APP_SCHEME } from "./config.js";
+
+const INSTANCE_PATTERN = /^qa-hub-preview-([a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))$/u;
+const LEGACY_INSTANCE_ID = "qa-hub-preview-7c86";
+
 export interface PreviewDesktopIdentity {
   readonly instanceId: string;
+  readonly appScheme: string;
+  readonly appUserModelId: string;
   readonly profileDirectory: string;
   readonly cookieName: string;
   readonly updateManifestUrl: string;
@@ -47,7 +54,26 @@ export function loadPreviewDesktopIdentity(
   };
   if (value["schemaVersion"] !== 1) throw new Error("PREVIEW_CONFIG_SCHEMA_INVALID");
   const instanceId = text("instanceId");
-  if (!/^qa-hub-preview-[a-z0-9-]+$/u.test(instanceId)) throw new Error("PREVIEW_ID_INVALID");
+  const instanceMatch = INSTANCE_PATTERN.exec(instanceId);
+  if (instanceMatch === null || instanceId.includes("--")) throw new Error("PREVIEW_ID_INVALID");
+  const suffix = instanceMatch[1];
+  if (suffix === undefined) throw new Error("PREVIEW_ID_INVALID");
+  const expectedAppScheme = instanceId === LEGACY_INSTANCE_ID ? APP_SCHEME : instanceId;
+  const appScheme =
+    value["appScheme"] === undefined && instanceId === LEGACY_INSTANCE_ID
+      ? APP_SCHEME
+      : text("appScheme");
+  if (appScheme !== expectedAppScheme) throw new Error("PREVIEW_APP_SCHEME_MISMATCH");
+  const expectedAppUserModelId =
+    instanceId === LEGACY_INSTANCE_ID
+      ? "com.relayqahub.desktop.preview"
+      : `com.relayqahub.desktop.preview.${suffix.replaceAll("-", ".")}`;
+  const appUserModelId =
+    value["appUserModelId"] === undefined && instanceId === LEGACY_INSTANCE_ID
+      ? expectedAppUserModelId
+      : text("appUserModelId");
+  if (appUserModelId !== expectedAppUserModelId)
+    throw new Error("PREVIEW_APP_USER_MODEL_ID_MISMATCH");
   const profile = text("profileDirectory");
   if (!path.isAbsolute(profile)) throw new Error("PREVIEW_PROFILE_MUST_BE_ABSOLUTE");
   const profileDirectory = canonical(profile);
@@ -103,6 +129,7 @@ export function loadPreviewDesktopIdentity(
   for (const key of Object.keys(environment))
     if (key.startsWith("QA_HUB_")) delete environment[key];
   Object.assign(environment, {
+    QA_HUB_DESKTOP_APP_SCHEME: appScheme,
     QA_HUB_DESKTOP_API_BASE_URL: api.toString(),
     QA_HUB_DESKTOP_CSRF_ORIGIN: csrf.origin,
     QA_HUB_DESKTOP_ALLOW_LOOPBACK_HTTP: "1",
@@ -118,6 +145,8 @@ export function loadPreviewDesktopIdentity(
   });
   return {
     instanceId,
+    appScheme,
+    appUserModelId,
     profileDirectory,
     cookieName,
     updateManifestUrl: manifest.toString(),

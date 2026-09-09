@@ -1,6 +1,13 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
+import { digestMobileReadBinding } from "./mobile-read-cursor.js";
+import {
+  requireMobileReadLimit,
+  requireMobileReadUuid,
+  resolveMobileReadAuthorization,
+} from "./mobile-read-authorization.js";
+import { readMobileSnapshotPage } from "./mobile-read-snapshot-store.js";
 import { MobileRelayStorageError, type MobileRelayScope } from "./mobile-relay-store.js";
 
 const UUID_PATTERN =
@@ -66,6 +73,39 @@ export interface RegisterMobileBuildResult {
   readonly eventId: string;
   readonly outboxMessageId: string;
   readonly replayed: boolean;
+}
+
+export interface ListMobileProjectBuildsInput extends MobileRelayScope {
+  readonly authorizationProjectId: string;
+  readonly status?: BuildStatus;
+  readonly cursor?: string;
+  readonly limit: number;
+}
+
+export interface MobileBuildListItem {
+  readonly id: string;
+  readonly projectId: string;
+  readonly provider: BuildProvider;
+  readonly externalId: string;
+  readonly versionName: string;
+  readonly channel: string;
+  readonly projectKey: string;
+  readonly branch: string;
+  readonly sourceCommitSha: string;
+  readonly mode: BuildMode;
+  readonly status: BuildStatus;
+  readonly manifest: {
+    readonly commitShas: readonly string[];
+    readonly artifactSha256?: string;
+  };
+  readonly version: number;
+}
+
+export interface MobileProjectBuildList {
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly MobileBuildListItem[];
+  readonly nextCursor: string | null;
 }
 
 interface BuildRow {
@@ -171,8 +211,14 @@ function toBuild(row: BuildRow): MobileBuildRecord {
     };
     if (
       !Array.isArray(decoded.commitShas) ||
-      decoded.commitShas.some((commit) => typeof commit !== "string") ||
-      (decoded.artifactSha256 !== undefined && typeof decoded.artifactSha256 !== "string")
+      decoded.commitShas.length < 1 ||
+      decoded.commitShas.some(
+        (commit) => typeof commit !== "string" || !COMMIT_PATTERN.test(commit),
+      ) ||
+      new Set(decoded.commitShas).size !== decoded.commitShas.length ||
+      (decoded.artifactSha256 !== undefined &&
+        (typeof decoded.artifactSha256 !== "string" ||
+          !SHA256_PATTERN.test(decoded.artifactSha256)))
     ) {
       throw new Error("invalid manifest");
     }
@@ -736,4 +782,89 @@ export function getMobileBuild(
   requireRole(database, input, "reporter");
   const row = readBuild(database, input, input.buildId);
   return row ? toBuild(row) : null;
+}
+
+export function listMobileProjectBuilds(
+  database: DatabaseSync,
+  input: ListMobileProjectBuildsInput,
+  cursorSigningKey: Uint8Array,
+): MobileProjectBuildList {
+  requireMobileReadUuid(input.accountId, "accountId");
+  requireMobileReadUuid(input.projectId, "projectId");
+  requireMobileReadUuid(input.actorId, "actorId");
+  requireMobileReadLimit(input.limit);
+  if (
+    input.status !== undefined &&
+    !["registered", "queued", "building", "validating", "publishing", "ready", "failed"].includes(
+      input.status,
+    )
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "status is invalid");
+  }
+  const filterDigest = digestMobileReadBinding({
+    limit: input.limit,
+    projectId: input.projectId,
+    status: input.status ?? null,
+  });
+  const page = readMobileSnapshotPage(database, {
+    kind: "project-builds",
+    accountId: input.accountId,
+    actorId: input.actorId,
+    authorizationProjectId: input.authorizationProjectId,
+    authorizationDigest: () =>
+      resolveMobileReadAuthorization(database, input, input.projectId).digest,
+    filterDigest,
+    ...(input.cursor === undefined ? {} : { cursor: input.cursor }),
+    limit: input.limit,
+    signingKey: cursorSigningKey,
+    materialize: () => {
+      const rows = database
+        .prepare(
+          `SELECT id, project_id, provider, external_id, version_name, channel,
+                  project_key, branch, source_commit_sha, mode, status, manifest_json,
+                  artifact_sha256, download_url, version
+           FROM builds
+           WHERE account_id = ? AND project_id = ? AND (? IS NULL OR status = ?)
+           ORDER BY id ASC`,
+        )
+        .all(
+          input.accountId,
+          input.projectId,
+          input.status ?? null,
+          input.status ?? null,
+        ) as unknown as BuildRow[];
+      const items: readonly MobileBuildListItem[] = Object.freeze(
+        rows.map((row) => {
+          const build = toBuild(row);
+          return Object.freeze({
+            id: build.id,
+            projectId: build.projectId,
+            provider: build.provider,
+            externalId: build.externalId,
+            versionName: build.versionName,
+            channel: build.channel,
+            projectKey: build.projectKey,
+            branch: build.branch,
+            sourceCommitSha: build.sourceCommitSha,
+            mode: build.mode,
+            status: build.status,
+            manifest: Object.freeze({
+              commitShas: build.manifest.commitShas,
+              ...(build.manifest.artifactSha256 === null
+                ? {}
+                : { artifactSha256: build.manifest.artifactSha256 }),
+            }),
+            version: build.version,
+          });
+        }),
+      );
+      return Object.freeze({ items, metadata: Object.freeze({}) });
+    },
+  });
+  return Object.freeze({
+    projectId: input.projectId,
+    snapshotSequence: page.snapshotSequence,
+    items: page.items,
+    nextCursor: page.nextCursor,
+  });
 }

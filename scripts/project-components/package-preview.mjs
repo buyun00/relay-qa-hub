@@ -13,12 +13,19 @@ import { execFileSync } from "node:child_process";
 import { createHash, generateKeyPairSync, sign } from "node:crypto";
 import { packager } from "@electron/packager";
 import { readParallelInstanceConfig } from "../../apps/api/src/parallel-instance.ts";
+import {
+  assertCleanPreviewPackageSource,
+  derivePreviewPackageIdentity,
+} from "./preview-package-identity.mjs";
 
 const config = readParallelInstanceConfig(process.argv[2]);
 const makensis = process.argv[3];
 const buildNumber = Number(process.argv[4] ?? 1);
 if (!makensis || !existsSync(makensis) || !Number.isSafeInteger(buildNumber) || buildNumber < 1)
   throw new Error("Explicit NSIS executable and positive build number required");
+const packageIdentity = derivePreviewPackageIdentity(config.instanceId);
+// This gate precedes every runtime/package mutation. Recheck before publication below.
+const { sourceCommit, sourceDirty } = assertCleanPreviewPackageSource(config.sourceRoot);
 const releaseId = new Date().toISOString().replace(/[-:.]/gu, "");
 const version = `0.2.0-preview.${buildNumber}`;
 const root = join(config.runtimeRoot, "packages", releaseId);
@@ -36,22 +43,14 @@ for (const [source, destination] of [
     force: false,
   });
 }
-const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
-  cwd: config.sourceRoot,
-  encoding: "utf8",
-}).trim();
-const sourceDirty = !!execFileSync("git", ["status", "--porcelain"], {
-  cwd: config.sourceRoot,
-  encoding: "utf8",
-}).trim();
 const save = (file, value) =>
   writeFileSync(file, JSON.stringify(value, null, 2) + "\n", { flag: "wx" });
 save(join(stage, "package.json"), {
-  name: "qa-hub-project-preview",
+  name: `qa-hub-project-preview-${config.instanceId.slice("qa-hub-preview-".length)}`,
   version,
   type: "module",
   main: "dist/main.js",
-  productName: "QA Hub Preview",
+  productName: packageIdentity.displayName,
   private: true,
 });
 save(join(stage, "release.json"), {
@@ -61,6 +60,7 @@ save(join(stage, "release.json"), {
   sourceCommit,
   sourceDirty,
   instanceId: config.instanceId,
+  packageIdentity,
 });
 const assets = join(stage, "assets");
 mkdirSync(assets);
@@ -106,7 +106,7 @@ if (createHash("sha256").update(readFileSync(zipTarget)).digest("hex") !== check
   throw new Error("ELECTRON_ZIP_HASH_MISMATCH");
 const packaged = await packager({
   dir: stage,
-  name: "RelayQaHubPreview",
+  name: packageIdentity.executableBaseName,
   platform: "win32",
   arch: "x64",
   out: join(root, "portable"),
@@ -120,8 +120,8 @@ const packaged = await packager({
   electronZipDir: electronCache,
   win32metadata: {
     CompanyName: "QA Hub Preview",
-    FileDescription: "QA Hub Project Preview",
-    ProductName: "QA Hub Project Preview",
+    FileDescription: packageIdentity.displayName,
+    ProductName: packageIdentity.displayName,
   },
 });
 const packageDirectory = packaged[0];
@@ -134,6 +134,8 @@ save(join(packageDirectory, "preview-instance.json"), {
   apiBaseUrl: `http://${config.apiHost}:${config.apiPort}`,
   csrfOrigin: `http://${config.webHost}:${config.webPort}`,
   cookieName: config.cookieName,
+  appScheme: packageIdentity.protocolScheme,
+  appUserModelId: packageIdentity.appUserModelId,
   mcpPort: config.desktopMcpPort,
   updateManifestUrl: `http://${config.webHost}:${config.webPort}/downloads/${config.instanceId}-windows-latest.json`,
   updatePublicKeyPem,
@@ -146,7 +148,7 @@ updater = updater
   .replaceAll("Relay QA Hub native updater", "QA Hub Preview native updater");
 updater = updater.replace(
   "app_exists:",
-  'app_exists:\n  StrCmp $AppPath "$LOCALAPPDATA\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe" +2\n  Goto invalid_config',
+  `app_exists:\n  StrCmp $AppPath "$LOCALAPPDATA\\Programs\\${packageIdentity.installDirectoryName}\\${packageIdentity.executableBaseName}.exe" +2\n  Goto invalid_config`,
 );
 const updaterScript = join(root, "preview-updater.nsi");
 writeFileSync(updaterScript, updater, { flag: "wx" });
@@ -163,22 +165,28 @@ writeFileSync(
   ]),
 );
 const installerName = `${config.instanceId}-windows-${version}-${releaseId}.exe`;
-const installer = join(config.downloadsRoot, installerName);
+const stagedInstaller = join(root, installerName);
 writeFileSync(
   join(root, "installer-build.log"),
   compile([
     "/V2",
-    `/DOUTPUT_FILE=${installer}`,
+    `/DOUTPUT_FILE=${stagedInstaller}`,
     `/DPACKAGE_DIR=${packageDirectory}`,
     `/DICON_FILE=${icon}`,
     `/DBUILD_NUMBER=${buildNumber}`,
     `/DAPP_VERSION=${version}`,
     `/DRELEASE_ID=${releaseId}`,
     `/DINSTANCE_ID=${config.instanceId}`,
+    `/DINSTALL_DIRECTORY_NAME=${packageIdentity.installDirectoryName}`,
+    `/DEXECUTABLE_BASENAME=${packageIdentity.executableBaseName}`,
+    `/DUNINSTALL_REGISTRY_KEY=${packageIdentity.uninstallRegistryKey}`,
+    `/DSHORTCUT_NAME=${packageIdentity.shortcutName}`,
+    `/DPROTOCOL_SCHEME=${packageIdentity.protocolScheme}`,
+    `/DDISPLAY_NAME=${packageIdentity.displayName}`,
     join(config.sourceRoot, "scripts/project-components/preview-installer.nsi"),
   ]),
 );
-const archive = readFileSync(installer);
+const archive = readFileSync(stagedInstaller);
 const payload = {
   schemaVersion: 1,
   releaseId,
@@ -198,6 +206,9 @@ const signature = sign(
 save(join(root, "signed-manifest.json"), { ...payload, signature });
 const manifestPath = join(config.downloadsRoot, `${config.instanceId}-windows-latest.json`);
 const temporary = `${manifestPath}.${releaseId}.tmp`;
+assertCleanPreviewPackageSource(config.sourceRoot, sourceCommit);
+const installer = join(config.downloadsRoot, installerName);
+writeFileSync(installer, archive, { flag: "wx" });
 save(temporary, { ...payload, signature });
 renameSync(temporary, manifestPath);
 const receipt = {
@@ -205,6 +216,7 @@ const receipt = {
   version,
   sourceCommit,
   sourceDirty,
+  packageIdentity,
   installer,
   packageDirectory,
   manifestPath,

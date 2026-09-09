@@ -185,7 +185,7 @@ test("actual MCP HTTP accepts notifications and responses without executing tool
   assert.equal(f.calls.length, 0);
 });
 
-test("actual MCP HTTP reports protocol errors separately and retains 90 tools plus four frozen workflow tools", async (t) => {
+test("actual MCP HTTP reports protocol errors separately and retains 90 generic tools plus six explicit workflow tools", async (t) => {
   const f = await fixture(t);
   assert.equal((await f.rpc("unknown/method", {})).error.code, -32601);
   assert.equal((await f.rpc("notifications/initialized", {})).error.code, -32601);
@@ -205,7 +205,7 @@ test("actual MCP HTTP reports protocol errors separately and retains 90 tools pl
     assert.equal((await f.rpc(method, params)).error.code, -32602);
   assert.equal(f.calls.length, 0);
   const catalog = (await f.rpc("tools/list")).result.tools;
-  assert.equal(catalog.length, 94);
+  assert.equal(catalog.length, 96);
   assert.equal(
     catalog.filter(
       (tool) =>
@@ -214,6 +214,8 @@ test("actual MCP HTTP reports protocol errors separately and retains 90 tools pl
           "qa_get_bug_workflow",
           "qa_fail_repair_attempt",
           "qa_supersede_repair_attempt",
+          "qa_begin_fix",
+          "qa_submit_fix",
         ].includes(tool.name),
     ).length,
     90,

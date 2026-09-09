@@ -344,13 +344,19 @@ export type {
   MobileHumanWorkflowForBugProjection,
   MobileHumanWorkflowProjection,
 } from "./mobile-human-workflow-store.js";
-export { createMobileComment, listMobileBugEvents } from "./mobile-comment-store.js";
+export {
+  createMobileComment,
+  listMobileBugComments,
+  listMobileBugEvents,
+} from "./mobile-comment-store.js";
 export type {
   CreateMobileCommentInput,
+  ListMobileBugCommentsInput,
   ListMobileBugEventsInput,
   MobileBugEvent,
   MobileBugEvents,
   MobileCommentCreation,
+  MobileCommentList,
   MobileCommentRecord,
 } from "./mobile-comment-store.js";
 export { listMobileBugs } from "./mobile-bug-list-store.js";
@@ -505,9 +511,16 @@ export type {
   QingyuLinkSyncStatus,
   UpdateQingyuLinkSyncInput,
 } from "./qingyu-link-store.js";
-export { getMobileBuild, registerMobileBuild } from "./mobile-build-store.js";
+export {
+  getMobileBuild,
+  listMobileProjectBuilds,
+  registerMobileBuild,
+} from "./mobile-build-store.js";
 export type {
+  ListMobileProjectBuildsInput,
+  MobileBuildListItem,
   MobileBuildRecord,
+  MobileProjectBuildList,
   RegisterMobileBuildInput,
   RegisterMobileBuildResult,
 } from "./mobile-build-store.js";

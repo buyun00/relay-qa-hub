@@ -62,8 +62,10 @@ import {
 } from "./mobile-human-workflow-store.js";
 import {
   createMobileComment,
+  listMobileBugComments,
   listMobileBugEvents,
   type CreateMobileCommentInput,
+  type ListMobileBugCommentsInput,
   type ListMobileBugEventsInput,
 } from "./mobile-comment-store.js";
 import {
@@ -73,7 +75,9 @@ import {
 } from "./mobile-capture-store.js";
 import {
   getMobileBuild,
+  listMobileProjectBuilds,
   registerMobileBuild,
+  type ListMobileProjectBuildsInput,
   type RegisterMobileBuildInput,
 } from "./mobile-build-store.js";
 import {
@@ -186,6 +190,7 @@ interface WorkerConfiguration {
   readonly qaInstanceId?: string;
   readonly relayPrincipalId?: string;
   readonly allowUnsafeTestCommands?: boolean;
+  readonly mobileBugCursorSigningKey: Uint8Array;
 }
 
 import { projectManagement, type ProjectManagementInput } from "./project-management-store.js";
@@ -225,12 +230,14 @@ interface WorkerRequest {
     | "getMobileHumanWorkflowForBug"
     | "getBugWorkflowProjection"
     | "createMobileComment"
+    | "listMobileBugComments"
     | "listMobileBugEvents"
     | "listMobileDuplicateCandidates"
     | "markMobileBugDuplicate"
     | "createMobileCapture"
     | "getMobileCapture"
     | "registerMobileBuild"
+    | "listMobileProjectBuilds"
     | "getMobileBuild"
     | "createMobileVerification"
     | "getMobileVerification"
@@ -482,7 +489,13 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   }
 
   if (request.operation === "listMobileBugs") {
-    return listMobileBugs(requireDatabase(), request.payload as ListMobileBugsInput);
+    return inWriteTransaction((current) =>
+      listMobileBugs(
+        current,
+        request.payload as ListMobileBugsInput,
+        configuration.mobileBugCursorSigningKey,
+      ),
+    );
   }
 
   if (request.operation === "getMobileMetricsOverview") {
@@ -496,6 +509,7 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return listMobileVisibleProjects(
       requireDatabase(),
       request.payload as ListMobileVisibleProjectsInput,
+      configuration.mobileBugCursorSigningKey,
     );
   }
 
@@ -510,6 +524,7 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return listMobileProjectMembers(
       requireDatabase(),
       request.payload as ListMobileProjectMembersInput,
+      configuration.mobileBugCursorSigningKey,
     );
   }
 
@@ -545,7 +560,19 @@ async function execute(request: WorkerRequest): Promise<unknown> {
   }
 
   if (request.operation === "listMobileBugEvents") {
-    return listMobileBugEvents(requireDatabase(), request.payload as ListMobileBugEventsInput);
+    return listMobileBugEvents(
+      requireDatabase(),
+      request.payload as ListMobileBugEventsInput,
+      configuration.mobileBugCursorSigningKey,
+    );
+  }
+
+  if (request.operation === "listMobileBugComments") {
+    return listMobileBugComments(
+      requireDatabase(),
+      request.payload as ListMobileBugCommentsInput,
+      configuration.mobileBugCursorSigningKey,
+    );
   }
 
   if (request.operation === "listMobileDuplicateCandidates") {
@@ -589,6 +616,14 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     );
   }
 
+  if (request.operation === "listMobileProjectBuilds") {
+    return listMobileProjectBuilds(
+      requireDatabase(),
+      request.payload as ListMobileProjectBuildsInput,
+      configuration.mobileBugCursorSigningKey,
+    );
+  }
+
   if (request.operation === "getMobileBuild") {
     const payload = request.payload as {
       readonly accountId: string;
@@ -626,7 +661,11 @@ async function execute(request: WorkerRequest): Promise<unknown> {
 
   if (request.operation === "syncAndListMobileNotifications") {
     return inWriteTransaction((current) =>
-      syncAndListMobileNotifications(current, request.payload as ListMobileNotificationsInput),
+      syncAndListMobileNotifications(
+        current,
+        request.payload as ListMobileNotificationsInput,
+        configuration.mobileBugCursorSigningKey,
+      ),
     );
   }
 
@@ -890,11 +929,23 @@ async function executeAuthorized(request: WorkerRequest): Promise<unknown> {
   const authorization = request.authorization;
   if (!authorization) return execute(request);
   const payload = request.payload as Record<string, unknown> | undefined;
+  const usesAuthorizationProject = new Set([
+    "listMobileBugs",
+    "listMobileVisibleProjects",
+    "listMobileProjectMembers",
+    "listMobileProjectBuilds",
+    "listMobileBugComments",
+    "listMobileBugEvents",
+    "syncAndListMobileNotifications",
+  ]).has(request.operation);
+  const payloadAuthorizationProjectId = usesAuthorizationProject
+    ? (payload?.["authorizationProjectId"] ?? payload?.["projectId"])
+    : payload?.["projectId"];
   // A capability is for one actor and project, never for adjacent worker messages.
   if (
     !payload ||
     payload["accountId"] !== authorization.accountId ||
-    payload["projectId"] !== authorization.projectId ||
+    payloadAuthorizationProjectId !== authorization.projectId ||
     payload["actorId"] !== authorization.actorId
   ) {
     return execute(request);

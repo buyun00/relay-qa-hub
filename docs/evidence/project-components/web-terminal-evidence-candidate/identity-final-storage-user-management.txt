@@ -1,0 +1,12 @@
+✔ explicit user links are reversible and retained as append-only history (76.2147ms)
+✔ disabling removes a duplicate from active membership without deleting its history (69.332ms)
+✔ canonical owner filters include tasks still assigned to a linked historical ID (83.235ms)
+✔ verification-owner filters and opaque cursors return every canonical assignment (89.7362ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 599.0678

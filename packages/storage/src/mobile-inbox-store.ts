@@ -1,6 +1,13 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
+import { digestMobileReadBinding } from "./mobile-read-cursor.js";
+import {
+  requireMobileReadLimit,
+  requireMobileReadUuid,
+  resolveMobileReadAuthorization,
+} from "./mobile-read-authorization.js";
+import { readMobileSnapshotPage } from "./mobile-read-snapshot-store.js";
 import { MobileRelayStorageError, type MobileRelayScope } from "./mobile-relay-store.js";
 
 const NOTIFICATION_SOURCE = "qa-hub.notifications";
@@ -27,6 +34,7 @@ export interface MobileNotificationRecord {
 }
 
 export interface MobileNotificationList {
+  readonly snapshotSequence: number;
   readonly items: readonly MobileNotificationRecord[];
   readonly nextCursor: string | null;
   readonly unreadCount: number;
@@ -35,6 +43,10 @@ export interface MobileNotificationList {
 }
 
 export interface ListMobileNotificationsInput extends MobileRelayScope {
+  readonly authorizationProjectId?: string;
+  readonly requestedProjectId?: string;
+  readonly unreadOnly?: boolean;
+  readonly cursor?: string;
   readonly limit: number;
   readonly now: string;
 }
@@ -81,6 +93,7 @@ interface BugNotificationRow {
 }
 
 interface NotificationRow {
+  readonly row_id: number;
   readonly id: string;
   readonly account_id: string;
   readonly project_id: string;
@@ -111,12 +124,6 @@ function requireTransaction(database: DatabaseSync): void {
 function requireUuid(value: string, field: string): void {
   if (!UUID_PATTERN.test(value)) {
     throw new MobileRelayStorageError("INVALID_REQUEST", `${field} must be a UUID`);
-  }
-}
-
-function requireLimit(value: number): void {
-  if (!Number.isSafeInteger(value) || value < 1 || value > 100) {
-    throw new MobileRelayStorageError("INVALID_REQUEST", "limit must be between 1 and 100");
   }
 }
 
@@ -469,47 +476,135 @@ function toNotification(row: NotificationRow): MobileNotificationRecord {
 export function syncAndListMobileNotifications(
   database: DatabaseSync,
   input: ListMobileNotificationsInput,
+  cursorSigningKey?: Uint8Array,
 ): MobileNotificationList {
   requireTransaction(database);
   requireUuid(input.accountId, "accountId");
   requireUuid(input.projectId, "projectId");
   requireUuid(input.actorId, "actorId");
-  requireLimit(input.limit);
+  requireMobileReadLimit(input.limit);
   requireTimestamp(input.now);
-  const sync = consumeNotificationOutbox(database, input);
-  const rows = database
-    .prepare(
-      `SELECT notification.id, notification.account_id, notification.project_id,
-              notification.user_id, notification.type, notification.title, notification.bug_id,
-              notification.source_event_id, notification.payload_json, notification.created_at,
-              notification.read_at, notification.version, event.type AS event_type,
-              event.to_state AS event_to_state, event.aggregate_sequence AS event_aggregate_sequence,
-              event.payload_json AS event_payload_json
-       FROM notifications AS notification
-       JOIN events AS event ON event.account_id = notification.account_id
-         AND event.project_id = notification.project_id AND event.id = notification.source_event_id
-       WHERE notification.account_id = ? AND notification.project_id = ? AND notification.user_id = ?
-       ORDER BY notification.created_at DESC, notification.id DESC
-       LIMIT ?`,
-    )
-    .all(
-      input.accountId,
-      input.projectId,
-      input.actorId,
-      input.limit,
-    ) as unknown as NotificationRow[];
-  const unread = database
-    .prepare(
-      `SELECT COUNT(*) AS count
-       FROM notifications
-       WHERE account_id = ? AND project_id = ? AND user_id = ? AND read_at IS NULL`,
-    )
-    .get(input.accountId, input.projectId, input.actorId) as { readonly count: number };
+  if (input.requestedProjectId !== undefined) {
+    requireMobileReadUuid(input.requestedProjectId, "projectId");
+  }
+  if (input.unreadOnly !== undefined && typeof input.unreadOnly !== "boolean") {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "unreadOnly must be boolean");
+  }
+  const authorization = resolveMobileReadAuthorization(
+    database,
+    {
+      accountId: input.accountId,
+      actorId: input.actorId,
+      authorizationProjectId: input.authorizationProjectId ?? input.projectId,
+    },
+    input.requestedProjectId,
+  );
+  let consumed = 0;
+  let duplicate = 0;
+  for (const projectId of authorization.authorizedProjectIds) {
+    const sync = consumeNotificationOutbox(database, { ...input, projectId });
+    consumed += sync.consumed;
+    duplicate += sync.duplicate;
+  }
+  const projectIds =
+    input.requestedProjectId === undefined
+      ? authorization.authorizedProjectIds
+      : Object.freeze([input.requestedProjectId]);
+  const placeholders = projectIds.map(() => "?").join(", ");
+  const filterDigest = digestMobileReadBinding({
+    limit: input.limit,
+    projectId: input.requestedProjectId ?? null,
+    unreadOnly: input.unreadOnly ?? false,
+  });
+  if (input.cursor !== undefined && cursorSigningKey === undefined) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "cursor signing is unavailable");
+  }
+  const materialize = () => {
+    const rows = database
+      .prepare(
+        `SELECT notification.rowid AS row_id, notification.id, notification.account_id,
+                notification.project_id, notification.user_id, notification.type,
+                notification.title, notification.bug_id, notification.source_event_id,
+                notification.payload_json, notification.created_at, notification.read_at,
+                notification.version, event.type AS event_type,
+                event.to_state AS event_to_state,
+                event.aggregate_sequence AS event_aggregate_sequence,
+                event.payload_json AS event_payload_json
+         FROM notifications AS notification
+         JOIN events AS event ON event.account_id = notification.account_id
+           AND event.project_id = notification.project_id
+           AND event.id = notification.source_event_id
+         WHERE notification.account_id = ? AND notification.user_id = ?
+           AND notification.project_id IN (${placeholders})
+           AND (? = 0 OR notification.read_at IS NULL)
+         ORDER BY notification.created_at DESC, notification.id DESC`,
+      )
+      .all(
+        input.accountId,
+        input.actorId,
+        ...projectIds,
+        input.unreadOnly === true ? 1 : 0,
+      ) as unknown as NotificationRow[];
+    const unread = database
+      .prepare(
+        `SELECT COUNT(*) AS count
+         FROM notifications
+         WHERE account_id = ? AND user_id = ? AND project_id IN (${placeholders})
+           AND read_at IS NULL`,
+      )
+      .get(input.accountId, input.actorId, ...projectIds) as { readonly count: number };
+    return Object.freeze({
+      items: Object.freeze(rows.map(toNotification)),
+      metadata: Object.freeze({ unreadCount: unread.count }),
+    });
+  };
+  if (cursorSigningKey === undefined) {
+    const direct = materialize();
+    const watermark = database
+      .prepare(
+        `SELECT COALESCE(MAX(rowid), 0) AS snapshot_sequence
+         FROM notifications
+         WHERE account_id = ? AND user_id = ? AND project_id IN (${placeholders})`,
+      )
+      .get(input.accountId, input.actorId, ...projectIds) as {
+      readonly snapshot_sequence: number;
+    };
+    return Object.freeze({
+      snapshotSequence: watermark.snapshot_sequence,
+      items: Object.freeze(direct.items.slice(0, input.limit)),
+      nextCursor: null,
+      unreadCount: direct.metadata.unreadCount,
+      consumed,
+      duplicate,
+    });
+  }
+  const page = readMobileSnapshotPage(database, {
+    kind: "notifications",
+    accountId: input.accountId,
+    actorId: input.actorId,
+    authorizationProjectId: input.authorizationProjectId ?? input.projectId,
+    authorizationDigest: () =>
+      resolveMobileReadAuthorization(
+        database,
+        {
+          accountId: input.accountId,
+          actorId: input.actorId,
+          authorizationProjectId: input.authorizationProjectId ?? input.projectId,
+        },
+        input.requestedProjectId,
+      ).digest,
+    filterDigest,
+    ...(input.cursor === undefined ? {} : { cursor: input.cursor }),
+    limit: input.limit,
+    signingKey: cursorSigningKey,
+    materialize,
+  });
   return Object.freeze({
-    items: Object.freeze(rows.map(toNotification)),
-    nextCursor: null,
-    unreadCount: unread.count,
-    consumed: sync.consumed,
-    duplicate: sync.duplicate,
+    snapshotSequence: page.snapshotSequence,
+    items: page.items,
+    nextCursor: page.nextCursor,
+    unreadCount: page.metadata.unreadCount,
+    consumed,
+    duplicate,
   });
 }

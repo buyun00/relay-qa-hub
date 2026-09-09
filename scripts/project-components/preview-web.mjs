@@ -18,6 +18,26 @@ const TYPES = {
   ".exe": "application/vnd.microsoft.portable-executable",
   ".zip": "application/zip",
 };
+
+function parseSingleByteRange(value, size) {
+  if (typeof value !== "string") return null;
+  const match = /^bytes=(\d*)-(\d*)$/u.exec(value);
+  if (match === null || (match[1] === "" && match[2] === "") || size === 0) return false;
+  const first = match[1];
+  const last = match[2];
+  if (first === "") {
+    const suffixLength = Number(last);
+    if (!Number.isSafeInteger(suffixLength) || suffixLength <= 0) return false;
+    return { start: Math.max(size - suffixLength, 0), end: size - 1 };
+  }
+  const start = Number(first);
+  if (!Number.isSafeInteger(start) || start >= size) return false;
+  if (last === "") return { start, end: size - 1 };
+  const requestedEnd = Number(last);
+  if (!Number.isSafeInteger(requestedEnd) || requestedEnd < start) return false;
+  return { start, end: Math.min(requestedEnd, size - 1) };
+}
+
 export async function startPreviewWeb(config) {
   const webRoot = canonicalInstancePath(join(config.sourceRoot, "apps/web/dist"));
   statSync(join(webRoot, "index.html"));
@@ -67,13 +87,28 @@ export async function startPreviewWeb(config) {
         response.writeHead(404).end();
         return;
       }
-      response.writeHead(200, {
+      const range = download ? parseSingleByteRange(request.headers.range, info.size) : null;
+      if (range === false) {
+        response.writeHead(416, {
+          "accept-ranges": "bytes",
+          "content-range": `bytes */${info.size}`,
+          "content-length": 0,
+          "cache-control": "no-store",
+        });
+        response.end();
+        return;
+      }
+      const start = range?.start ?? 0;
+      const end = range?.end ?? info.size - 1;
+      response.writeHead(range === null ? 200 : 206, {
         "content-type": TYPES[extname(file)] ?? "application/octet-stream",
-        "content-length": info.size,
+        "content-length": end - start + 1,
         "cache-control": "no-store",
+        ...(download ? { "accept-ranges": "bytes" } : {}),
+        ...(range === null ? {} : { "content-range": `bytes ${start}-${end}/${info.size}` }),
       });
       if (request.method === "HEAD") response.end();
-      else createReadStream(file).pipe(response);
+      else createReadStream(file, range === null ? undefined : { start, end }).pipe(response);
     } catch {
       response.writeHead(404).end();
     }

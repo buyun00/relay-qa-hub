@@ -17,10 +17,12 @@ data class QaPeopleConfig(
     val schemaVersion: Int,
     val projectKey: String,
     val people: List<QaPerson>,
+    val snapshotSequence: Long = 0,
 ) {
     val activeFixers: List<QaPerson>
         get() = people.filter { it.active && QaPersonRole.FIXER in it.roles }
 
     val activeVerifiers: List<QaPerson>
         get() = people.filter { it.active && QaPersonRole.VERIFIER in it.roles }
+
 }

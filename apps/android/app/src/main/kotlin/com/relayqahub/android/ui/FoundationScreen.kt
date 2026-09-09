@@ -104,6 +104,8 @@ import com.relayqahub.android.QaPersonRole
 import com.relayqahub.android.network.ApkArtifact
 import com.relayqahub.android.network.WorkbenchBug
 import com.relayqahub.android.network.WorkbenchBugImage
+import com.relayqahub.android.network.hasOwnerAssignmentProof
+import com.relayqahub.android.network.hasVerifierAssignmentProof
 import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -130,12 +132,20 @@ internal data class BugListFilters(
 internal fun filterBugs(
     bugs: List<WorkbenchBug>,
     filters: BugListFilters,
+    assignmentSnapshotSequence: Long? = null,
 ): List<WorkbenchBug> = bugs.filter { bug ->
     val reporterMatches = filters.reporterId == null || bug.reporterId == filters.reporterId
     val ownerMatches = when (filters.ownerId) {
         null -> true
         UNASSIGNED_OWNER_FILTER -> bug.ownerId == null
-        else -> bug.ownerId == filters.ownerId
+        else -> bug.ownerId == filters.ownerId || (
+            assignmentSnapshotSequence != null &&
+                bug.hasOwnerAssignmentProof(
+                    expectedProjectId = bug.projectId,
+                    expectedActorId = filters.ownerId,
+                    expectedSnapshotSequence = assignmentSnapshotSequence,
+                )
+            )
     }
     val statusMatches = when (filters.status) {
         BugStatusFilter.ALL -> true
@@ -886,6 +896,7 @@ private fun BugListPage(
     val visibleItems = filterBugs(
         bugs = state.bugWorkbench.items,
         filters = BugListFilters(reporterId = reporterId, ownerId = ownerId, status = status),
+        assignmentSnapshotSequence = state.bugWorkbench.snapshotSequence,
     )
     val activePeople = state.people.people.filter { it.active }
     Box(modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -980,7 +991,12 @@ private fun BugListPage(
                     EmptyListCard("当前筛选下没有 Bug")
                 }
                 else -> items(visibleItems, key = { it.id }) { bug ->
-                    BugRow(bug = bug, people = state.people.people, onClick = { onOpenBug(bug) })
+                    BugRow(
+                        bug = bug,
+                        people = state.people.people,
+                        assignmentSnapshotSequence = state.bugWorkbench.snapshotSequence,
+                        onClick = { onOpenBug(bug) },
+                    )
                 }
             }
         }
@@ -989,6 +1005,7 @@ private fun BugListPage(
         BugDetailDialog(
             state = state.bugDetail,
             people = state.people.people,
+            assignmentSnapshotSequence = state.bugWorkbench.snapshotSequence,
             onDismiss = onCloseBug,
             onSave = onSaveBug,
             onWorkflowChanged = { deleted -> if (deleted) onCloseBug() else state.bugDetail.bug?.let(onOpenBug); onRefresh() },
@@ -1135,8 +1152,16 @@ private fun SectionCard(
 private fun BugRow(
     bug: WorkbenchBug,
     people: List<QaPerson>,
+    assignmentSnapshotSequence: Long,
     onClick: () -> Unit,
 ) {
+    val ownerName = assignmentPersonName(
+        people = people,
+        bug = bug,
+        assignment = BugAssignment.OWNER,
+        assignmentSnapshotSequence = assignmentSnapshotSequence,
+        unassignedLabel = "待分配",
+    )
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().testTag("bug-row-${bug.key}"),
@@ -1190,11 +1215,11 @@ private fun BugRow(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        PersonAvatar(personName(people, bug.ownerId, "待分配"))
+                        PersonAvatar(ownerName)
                         Spacer(Modifier.width(7.dp))
                         Column {
                             Text(
-                                personName(people, bug.ownerId, "待分配"),
+                                ownerName,
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -1285,6 +1310,7 @@ private fun priorityContentColor(priority: String): Color = when (priorityLabel(
 private fun BugDetailDialog(
     state: BugDetailUiState,
     people: List<QaPerson>,
+    assignmentSnapshotSequence: Long,
     onDismiss: () -> Unit,
     onSave: (BugEditDraft) -> Unit,
     onWorkflowChanged: (Boolean) -> Unit,
@@ -1352,6 +1378,7 @@ private fun BugDetailDialog(
                             state = state,
                             bug = bug,
                             people = people,
+                            assignmentSnapshotSequence = assignmentSnapshotSequence,
                             onSave = onSave,
                             onWorkflowChanged = onWorkflowChanged,
                         )
@@ -1367,6 +1394,7 @@ private fun EditableBugDetail(
     state: BugDetailUiState,
     bug: WorkbenchBug,
     people: List<QaPerson>,
+    assignmentSnapshotSequence: Long,
     onSave: (BugEditDraft) -> Unit,
     onWorkflowChanged: (Boolean) -> Unit,
 ) {
@@ -1398,6 +1426,11 @@ private fun EditableBugDetail(
     }
     val downloadedImages = state.images.associateBy { it.attachmentId }
     val availableModules = state.modules.filter { it.active || it.id == bug.moduleId }
+    val assignmentPeople = assignmentPeopleForBug(
+        people = people,
+        bug = bug,
+        assignmentSnapshotSequence = assignmentSnapshotSequence,
+    )
     val moduleOptions = listOf(null to "未分模块") +
         if (bug.moduleId != null && availableModules.none { it.id == bug.moduleId }) {
             listOf(bug.moduleId to "当前模块（目录暂不可用）")
@@ -1556,7 +1589,7 @@ private fun EditableBugDetail(
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         PersonPicker(
                             label = "负责人",
-                            people = people.filter { it.active },
+                            people = assignmentPeople.filter { it.active },
                             role = QaPersonRole.FIXER,
                             selectedId = ownerId,
                             onSelected = { ownerId = it },
@@ -1565,7 +1598,7 @@ private fun EditableBugDetail(
                         )
                         PersonPicker(
                             label = "验收人",
-                            people = people.filter { it.active },
+                            people = assignmentPeople.filter { it.active },
                             role = QaPersonRole.VERIFIER,
                             selectedId = verifierId,
                             onSelected = { verifierId = it },
@@ -1658,12 +1691,30 @@ private fun EditableBugDetail(
             item { Text("部分图片暂时无法读取：$code", color = MaterialTheme.colorScheme.error) }
         }
         if (!editing) {
-            item { BugLifecyclePanel(bug = bug, onChanged = onWorkflowChanged) }
+            item { BugLifecyclePanel(bug = bug, people = people, onChanged = onWorkflowChanged) }
             item {
                 SectionCard(title = "分工与进度", subtitle = "状态流转仍遵循 Bug 工作流") {
                     DetailFact("提报人", personName(people, bug.reporterId, "未知"))
-                    DetailFact("责任人", personName(people, bug.ownerId, "待分配"))
-                    DetailFact("验收人", personName(people, bug.verificationOwnerId, "待分配"))
+                    DetailFact(
+                        "责任人",
+                        assignmentPersonName(
+                            people,
+                            bug,
+                            BugAssignment.OWNER,
+                            assignmentSnapshotSequence,
+                            "待分配",
+                        ),
+                    )
+                    DetailFact(
+                        "验收人",
+                        assignmentPersonName(
+                            people,
+                            bug,
+                            BugAssignment.VERIFIER,
+                            assignmentSnapshotSequence,
+                            "待分配",
+                        ),
+                    )
                     DetailFact("创建时间", displayTime(bug.createdAt))
                     DetailFact("最后更新", displayTime(bug.updatedAt))
                     DetailFact("出现次数", bug.occurrenceCount.toString())
@@ -1768,7 +1819,7 @@ private fun AttachmentPlaceholder(filename: String, onRemove: (() -> Unit)?) {
     }
 }
 
-private fun readBugEditImage(context: Context, uri: Uri): BugEditImageUpload? = runCatching {
+internal fun readBugEditImage(context: Context, uri: Uri): BugEditImageUpload? = runCatching {
     val resolver = context.contentResolver
     val rawMediaType = resolver.getType(uri)?.lowercase().orEmpty()
     val mediaType = when (rawMediaType) {
@@ -2410,6 +2461,92 @@ private fun renderAnnotatedPng(
 
 private fun personName(people: List<QaPerson>, id: String?, fallback: String): String =
     id?.let { personId -> people.firstOrNull { it.id == personId }?.displayName } ?: fallback
+
+internal enum class BugAssignment {
+    OWNER,
+    VERIFIER,
+}
+
+/**
+ * Resolves a historical source ID only when the matching server-filtered assignment stream proves
+ * that it belongs to a canonical member at this exact project snapshot.
+ */
+internal fun assignmentPersonName(
+    people: List<QaPerson>,
+    bug: WorkbenchBug,
+    assignment: BugAssignment,
+    assignmentSnapshotSequence: Long,
+    unassignedLabel: String,
+): String {
+    val sourceId = when (assignment) {
+        BugAssignment.OWNER -> bug.ownerId
+        BugAssignment.VERIFIER -> bug.verificationOwnerId
+    } ?: return unassignedLabel
+    people.firstOrNull { it.id == sourceId }?.let { return it.displayName }
+    val proof = when (assignment) {
+        BugAssignment.OWNER -> bug.ownerAssignmentProof
+        BugAssignment.VERIFIER -> bug.verifierAssignmentProof
+    }
+    val canonicalId = proof?.actorId?.takeIf { actorId ->
+        when (assignment) {
+            BugAssignment.OWNER -> bug.hasOwnerAssignmentProof(
+                bug.projectId,
+                actorId,
+                assignmentSnapshotSequence,
+            )
+            BugAssignment.VERIFIER -> bug.verificationOwnerId != null &&
+                bug.hasVerifierAssignmentProof(
+                    bug.projectId,
+                    actorId,
+                    assignmentSnapshotSequence,
+                )
+        }
+    }
+    return people.firstOrNull { it.id == canonicalId }?.displayName
+        ?: "历史人员 · ${sourceId.take(8)}"
+}
+
+/** Adds display-only source-ID options backed by exact assignment authority. */
+internal fun assignmentPeopleForBug(
+    people: List<QaPerson>,
+    bug: WorkbenchBug,
+    assignmentSnapshotSequence: Long,
+): List<QaPerson> {
+    val aliases = buildList {
+        listOf(
+            Triple(BugAssignment.OWNER, bug.ownerId, QaPersonRole.FIXER),
+            Triple(BugAssignment.VERIFIER, bug.verificationOwnerId, QaPersonRole.VERIFIER),
+        ).forEach { (assignment, sourceId, requiredRole) ->
+            if (sourceId == null || people.any { it.id == sourceId }) return@forEach
+            val proof = when (assignment) {
+                BugAssignment.OWNER -> bug.ownerAssignmentProof
+                BugAssignment.VERIFIER -> bug.verifierAssignmentProof
+            } ?: return@forEach
+            val authoritative = when (assignment) {
+                BugAssignment.OWNER -> bug.hasOwnerAssignmentProof(
+                    bug.projectId,
+                    proof.actorId,
+                    assignmentSnapshotSequence,
+                )
+                BugAssignment.VERIFIER -> bug.hasVerifierAssignmentProof(
+                    bug.projectId,
+                    proof.actorId,
+                    assignmentSnapshotSequence,
+                )
+            }
+            val canonical = people.singleOrNull { it.id == proof.actorId }
+            if (authoritative && canonical != null && requiredRole in canonical.roles) {
+                add(
+                    canonical.copy(
+                        id = sourceId,
+                        displayName = "${canonical.displayName}（历史身份）",
+                    ),
+                )
+            }
+        }
+    }
+    return (people + aliases).distinctBy { it.id }
+}
 
 internal fun bugStateLabel(state: String): String = when (state) {
     "reported" -> "待处理"

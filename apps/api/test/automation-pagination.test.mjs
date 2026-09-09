@@ -273,30 +273,60 @@ test(
       const firstComments = await call("qa_list_comments", identifiers);
       assert.equal(firstComments.items.length, 100);
       assert.ok(firstComments.nextCursor);
-      assert.ok(firstComments.nextCursor.length < 1024);
-      const fullFirstComments = await call("qa_list_comments", {
-        ...identifiers,
-        query: { limit: 500 },
-      });
-      assert.equal(fullFirstComments.items.length, 500);
-      const lastComments = await call("qa_list_comments", {
-        ...identifiers,
-        query: { limit: 500, cursor: fullFirstComments.nextCursor },
-      });
-      assert.equal(lastComments.items.length, 1);
-      assert.equal(lastComments.nextCursor, null);
+      assert.ok(firstComments.nextCursor.length <= 500);
+      await call(
+        "qa_list_comments",
+        {
+          ...identifiers,
+          query: { limit: 500 },
+        },
+        "INVALID_REQUEST",
+      );
+      const oversizedHttpComments = await httpGet(
+        `/api/v1/projects/${projectId}/bugs/${bugId}/comments?limit=500`,
+      );
+      assert.equal(oversizedHttpComments.status, 400);
+      assert.deepEqual(oversizedHttpComments.body, { code: "INVALID_REQUEST" });
+      const commentPages = [firstComments],
+        seenCommentCursors = new Set([firstComments.nextCursor]);
+      let commentCursor = firstComments.nextCursor;
+      while (commentCursor) {
+        const page = await call("qa_list_comments", {
+          ...identifiers,
+          query: { limit: 100, cursor: commentCursor },
+        });
+        commentPages.push(page);
+        commentCursor = page.nextCursor;
+        if (commentCursor) {
+          assert.equal(seenCommentCursors.has(commentCursor), false);
+          seenCommentCursors.add(commentCursor);
+        }
+      }
+      assert.equal(commentPages.length, 6);
+      assert.equal(commentPages.at(-1).items.length, 1);
+      assert.equal(commentPages.at(-1).nextCursor, null);
       assert.deepEqual(
-        [...fullFirstComments.items, ...lastComments.items].map((item) => item.id),
+        commentPages.flatMap((page) => page.items.map((item) => item.id)),
         commentIds.sort(),
       );
-      const httpComments = await httpGet(
-        `/api/v1/projects/${projectId}/bugs/${bugId}/comments?limit=500&cursor=${fullFirstComments.nextCursor}`,
+      const firstHttpComments = await httpGet(
+        `/api/v1/projects/${projectId}/bugs/${bugId}/comments?limit=100`,
       );
-      assert.equal(httpComments.status, 200);
-      assert.deepEqual(httpComments.body, lastComments);
+      assert.equal(firstHttpComments.status, 200, JSON.stringify(firstHttpComments.body));
+      assert.equal(firstHttpComments.body.items.length, 100);
+      assert.ok(firstHttpComments.body.nextCursor);
+      const secondHttpComments = await httpGet(
+        `/api/v1/projects/${projectId}/bugs/${bugId}/comments?limit=100&cursor=${encodeURIComponent(firstHttpComments.body.nextCursor)}`,
+      );
+      assert.equal(secondHttpComments.status, 200, JSON.stringify(secondHttpComments.body));
+      assert.deepEqual(
+        secondHttpComments.body.items.map((item) => item.id),
+        commentPages[1].items.map((item) => item.id),
+      );
       const contextPage = await call("qa_get_bug_context", identifiers);
-      assert.equal(contextPage.comments.items.length, 100);
-      assert.equal(contextPage.comments.nextCursor, firstComments.nextCursor);
+      assert.equal(contextPage.comments.items.length, 50);
+      assert.ok(contextPage.comments.nextCursor);
+      assert.ok(contextPage.comments.nextCursor.length <= 500);
 
       const firstAttachments = await call("qa_list_attachments", identifiers);
       assert.equal(firstAttachments.items.length, 50);
@@ -355,11 +385,12 @@ test(
         other.accessToken,
       );
 
-      for (const value of ["", "bad-cursor", firstAttachments.nextCursor])
+      await call("qa_list_comments", { ...identifiers, query: { cursor: "" } }, "INVALID_REQUEST");
+      for (const value of ["bad-cursor", firstAttachments.nextCursor])
         await call(
           "qa_list_comments",
           { ...identifiers, query: { cursor: value } },
-          "INVALID_CURSOR",
+          "INVALID_REQUEST",
         );
       for (const value of ["", "bad-cursor", firstComments.nextCursor])
         await call(
@@ -371,15 +402,17 @@ test(
         ["qa_list_comments", firstComments.nextCursor],
         ["qa_list_attachments", firstAttachments.nextCursor],
       ]) {
+        const expectedCursorError =
+          tool === "qa_list_comments" ? "INVALID_REQUEST" : "INVALID_CURSOR";
         await call(
           tool,
           { projectId, bugId: sameProjectBugId, query: { cursor: savedCursor } },
-          "INVALID_CURSOR",
+          expectedCursorError,
         );
         await call(
           tool,
           { projectId: otherProjectId, bugId: otherBugId, query: { cursor: savedCursor } },
-          "INVALID_CURSOR",
+          expectedCursorError,
           other.accessToken,
         );
       }

@@ -1,0 +1,79 @@
+{
+  "recordedAt": "2026-09-09T17:21:49+08:00",
+  "branch": "codex/project-components-v2-1",
+  "sourceHead": "029188ba25df1c3e940437f1e78fa05ba011aed8",
+  "scope": "android-workflow-and-retry-hardening-candidate",
+  "committed": false,
+  "productionTouched": false,
+  "livePreviewApiMutated": false,
+  "deviceInstalled": false,
+  "sourceBinding": {
+    "path": "docs/evidence/project-components/android-terminal-evidence-candidate/source-binding.json",
+    "sha256": "f378b0dcba69184b9f0ebc891e8bc7f4148c21730c6d306a285446841d0a18a7",
+    "trackedDiffCommand": "git diff --binary -- apps/android",
+    "trackedDiffSizeBytes": 174516,
+    "trackedDiffSha256": "f282f8805d1c9ef389a753b45d9b8e4bfdfe5ca08670286cff82ca6a80ab328e",
+    "changedFileCount": 12,
+    "changedSourceAggregateSha256": "02a4053b7ea86e076d1976561ddda436b4c78ea1bab418bbb9784956fc47e51d"
+  },
+  "checks": {
+    "sourceDefault": {
+      "command": ".\\gradlew.bat :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --no-daemon --max-workers=2 '-Dorg.gradle.parallel=false' '-Dorg.gradle.jvmargs=-Xmx2g' '-PqaHubApiBaseUrl=http://127.0.0.1:4419/api/v1/' '-PqaHubProjectId=10000000-0000-4000-8000-000000000099'",
+      "result": "passed",
+      "duration": "2m43s",
+      "versionCode": 15,
+      "versionName": "0.1.14-debug",
+      "upgradeableOverInstalledCode23": false,
+      "precededFinalRetryFix": true,
+      "apkRetained": false,
+      "apkSizeBytes": 35782697,
+      "apkSha256": "8b0ae3bf9f581604c1d36528da5c39cb48ad6650037aae83ffbdbf0109ffa2ce"
+    },
+    "previewCandidate": {
+      "command": ".\\gradlew.bat :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --no-daemon --max-workers=2 '-Dorg.gradle.parallel=false' '-Dorg.gradle.jvmargs=-Xmx2g' '-PqaHubApiBaseUrl=http://127.0.0.1:4519/api/v1/' '-PqaHubProjectId=0c62c78c-5732-43c4-82c2-26c5c2eb91a4' '-PqaHubVersionCode=24' '-PqaHubVersionName=0.2.0-preview.10'",
+      "result": "passed",
+      "duration": "1m20s",
+      "actionableTasks": 58,
+      "executedTasks": 11,
+      "upToDateTasks": 47,
+      "unitSuites": 23,
+      "unitTests": 133,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "lintWarnings": 35,
+      "lintErrors": 0,
+      "gradleLogPath": "docs/evidence/project-components/android-terminal-evidence-candidate/gradle-preview-code24.log",
+      "gradleLogSha256": "70347dc8379a65a0e582d460c4232bd00dadfd1a324c7b872336c375a5c945cf"
+    },
+    "harnessPreflight": {
+      "initialFailures": [
+        "required preview Gradle properties omitted",
+        "ANDROID_HOME omitted"
+      ],
+      "testsStarted": false,
+      "corrected": true,
+      "suppressedTestFailures": 0,
+      "postBuildInspectionCorrection": "root-relative paths were first evaluated from apps/android, then rerun from repository root"
+    }
+  },
+  "apk": {
+    "path": "apps/android/app/build/outputs/apk/debug/app-debug.apk",
+    "applicationId": "com.relayqahub.android.preview.debug",
+    "versionCode": 24,
+    "versionName": "0.2.0-preview.10",
+    "minSdk": 29,
+    "targetSdk": 37,
+    "sizeBytes": 37026695,
+    "sha256": "28e5248848e65d767ec2bf71b627d55f274e5e3a0c95c4cf68756b58dffa0e19",
+    "outputMetadataSha256": "4f093509ec1b1f8aa8be44a121ab16398c0c47d460988e014bc5865284918828",
+    "apiBaseUrl": "http://127.0.0.1:4519/api/v1/",
+    "projectId": "0c62c78c-5732-43c4-82c2-26c5c2eb91a4"
+  },
+  "gaps": [
+    "No installed-device, upgrade, touch, image-picker, Android process-death, or real network-interruption E2E was run.",
+    "No live verification upload/result or binding-renewal E2E was run.",
+    "The panel can reference but does not create a capture bundle under the pending verification submission.",
+    "Relay and external successor execution were not dispatched or exercised."
+  ]
+}

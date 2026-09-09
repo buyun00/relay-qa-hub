@@ -1,0 +1,8 @@
+QA_HUB_API_BASE_URL=http://127.0.0.1:4539 node ../../node_modules/vitest/vitest.mjs run src/api.test.ts src/App.test.tsx src/App.detail-loading.test.tsx
+QA_HUB_API_BASE_URL=http://127.0.0.1:4539 node ../../node_modules/vitest/vitest.mjs run
+node ../../node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+node ../../node_modules/typescript/bin/tsc -p tsconfig.node.json --noEmit
+node ../../node_modules/eslint/bin/eslint.js . --max-warnings=0
+node ../../node_modules/vite/bin/vite.js build --outDir C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-schema19-sol-0909/builds/web-retry-hardening-final-20260909T192500
+node node_modules/prettier/bin/prettier.cjs --check <changed Web files and evidence README>
+git diff --check -- apps/web/src docs/evidence/project-components/web-terminal-evidence-candidate

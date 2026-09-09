@@ -28,7 +28,7 @@ const png = Buffer.from(
 );
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
-test("server MCP commits captured Verification evidence through real HTTP and schema 19 storage", async (t) => {
+test("server MCP commits captured Verification evidence through real HTTP and schema 20 storage", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "qa-verification-evidence-http-"));
   const evidenceRoot = join(root, "evidence");
   const quarantineRoot = join(root, "quarantine");
@@ -57,7 +57,7 @@ test("server MCP commits captured Verification evidence through real HTTP and sc
   let requestCount = 0;
   try {
     await worker.ensureMobileScope(bootstrap);
-    assert.equal((await worker.initialization).migration.toVersion, 19);
+    assert.equal((await worker.initialization).migration.toVersion, 20);
     const management = new ProjectManagementService({ accountId, gmUserId, worker });
     const context = new ProjectRequestContext();
     const scope = context.scope(bootstrap);
@@ -325,7 +325,7 @@ test("server MCP commits captured Verification evidence through real HTTP and sc
 
     const readback = new DatabaseSync(databaseFile, { readOnly: true });
     try {
-      assert.equal(readback.prepare("PRAGMA user_version").get().user_version, 19);
+      assert.equal(readback.prepare("PRAGMA user_version").get().user_version, 20);
       assert.equal(
         readback
           .prepare("SELECT count(*) AS count FROM verification_attachments WHERE verification_id=?")
@@ -368,7 +368,7 @@ test("server MCP commits captured Verification evidence through real HTTP and sc
       join(root, "result.json"),
       JSON.stringify(
         {
-          schema: 19,
+          schema: 20,
           realHttp: true,
           serverMcp: true,
           requestCount,

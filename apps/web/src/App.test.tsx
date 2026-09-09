@@ -2,20 +2,32 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import App, {
+  canActAsVerificationActor,
   canSaveBugDetailDraft,
   canCompleteDeliveredTask,
   canManuallyCompleteBug,
   canDirectCloseBug,
   canReturnCompletedBug,
+  canSubmitVerificationOutcome,
   canSubmitNewBug,
+  canTerminateRepairAttempt,
   collectClipboardImages,
+  frozenVerificationResultMatchesScope,
   mergeCreateBugImages,
   mutationLabelForScope,
+  repairAttemptAllowsNewWork,
   runRecoverableVerificationStep,
   selectableQingyuDefectIds,
   updateQingyuDefectSelection,
+  verificationUploadCheckpointForReuse,
 } from "./App";
-import { QaHubApiError, type BugDetail } from "./api";
+import {
+  freezeVerificationResultRequest,
+  QaHubApiError,
+  type BugDetail,
+  type RepairAttempt,
+  type UploadCheckpoint,
+} from "./api";
 import { product } from "./product";
 
 describe("Relay QA Hub browser workbench", () => {
@@ -36,6 +48,7 @@ describe("Relay QA Hub browser workbench", () => {
     const markup = renderToStaticMarkup(
       <App
         onSignOut={() => undefined}
+        onDraftChange={async () => undefined}
         principal={{
           accountId: "10000000-0000-4000-8000-000000000001",
           userId: "10000000-0000-4000-8000-000000000003",
@@ -163,13 +176,200 @@ describe("Relay QA Hub browser workbench", () => {
     expect(canDirectCloseBug("closed", true, "passed")).toBe(false);
   });
 
-  it("lets any project member reject a completed Bug back to pending", () => {
+  it("keeps lifecycle eligibility separate from verifier authorization", () => {
     expect(canReturnCompletedBug("awaiting_build", true, null)).toBe(true);
     expect(canReturnCompletedBug("ready_for_verification", true, null)).toBe(true);
     expect(canReturnCompletedBug("ready_for_verification", true, "requested")).toBe(true);
     expect(canReturnCompletedBug("ready_for_verification", true, "in_progress")).toBe(true);
     expect(canReturnCompletedBug("awaiting_build", false, null)).toBe(false);
     expect(canReturnCompletedBug("in_progress", true, null)).toBe(false);
+  });
+
+  it("requires an explicit reason for failed or blocked acceptance while allowing a pass", () => {
+    expect(canSubmitVerificationOutcome("passed", "", null)).toBe(true);
+    expect(canSubmitVerificationOutcome("failed", "", null)).toBe(false);
+    expect(canSubmitVerificationOutcome("blocked", "  device unavailable  ", null)).toBe(true);
+    expect(canSubmitVerificationOutcome("passed", "verified", "正在提交")).toBe(false);
+  });
+
+  it("offers terminal controls only for an active repair and allows new work after it ends", () => {
+    const attempt: RepairAttempt = {
+      id: "40000000-0000-4000-8000-000000000001",
+      bugId: "20000000-0000-4000-8000-000000000001",
+      sequence: 1,
+      mode: "external",
+      status: "planned",
+      assigneeId: "10000000-0000-4000-8000-000000000003",
+      parentAttemptId: null,
+      summary: null,
+      branch: null,
+      commitSha: null,
+      mergeRequestUrl: null,
+      targetBuildId: null,
+      version: 1,
+    };
+
+    for (const status of ["planned", "queued", "running", "needs_input", "blocked"] as const) {
+      expect(canTerminateRepairAttempt({ ...attempt, status })).toBe(true);
+      expect(repairAttemptAllowsNewWork({ ...attempt, status })).toBe(false);
+    }
+    for (const status of ["failed", "verification_failed", "cancelled", "superseded"] as const) {
+      expect(canTerminateRepairAttempt({ ...attempt, status })).toBe(false);
+      expect(repairAttemptAllowsNewWork({ ...attempt, status })).toBe(true);
+    }
+  });
+
+  it("keeps finalized Verification attachment identity while leasing incomplete uploads", () => {
+    const incomplete: UploadCheckpoint = {
+      clientAttachmentId: "50000000-0000-4000-8000-000000000001",
+      sha256: "a".repeat(64),
+      init: { sessionId: "upload-1", chunkSize: 1024, version: 1 },
+      nextChunk: 1,
+      version: 2,
+    };
+    const finalized: UploadCheckpoint = {
+      ...incomplete,
+      finalized: {
+        attachmentId: "50000000-0000-4000-8000-000000000002",
+        readyToBind: true,
+        version: 3,
+      },
+    };
+    const bound: UploadCheckpoint = {
+      ...finalized,
+      binding: {
+        bindingId: "50000000-0000-4000-8000-000000000003",
+        attachmentId: "50000000-0000-4000-8000-000000000002",
+        projectId: "30000000-0000-4000-8000-000000000001",
+        clientSubmissionId: "70000000-0000-4000-8000-000000000001",
+        clientAttachmentId: finalized.clientAttachmentId,
+        leaseGeneration: 1,
+        intent: "verification_result",
+        targetQaItemId: "20000000-0000-4000-8000-000000000001",
+        status: "reserved",
+        expiresAt: new Date(1_200_000).toISOString(),
+        version: 4,
+        replayed: false,
+      },
+      bound: true,
+    };
+    const legacyBound: UploadCheckpoint = { ...finalized, bound: true };
+
+    expect(
+      verificationUploadCheckpointForReuse(
+        { checkpoint: incomplete, updatedAt: 999_000 },
+        1_000_000,
+      ),
+    ).toBe(incomplete);
+    expect(
+      verificationUploadCheckpointForReuse({ checkpoint: incomplete, updatedAt: 0 }, 1_000_000),
+    ).toBeUndefined();
+    expect(
+      verificationUploadCheckpointForReuse(
+        { checkpoint: incomplete, updatedAt: 1_000_001 },
+        1_000_000,
+      ),
+    ).toBeUndefined();
+    expect(
+      verificationUploadCheckpointForReuse({ checkpoint: finalized, updatedAt: 0 }, 1_000_000),
+    ).toBe(finalized);
+    expect(
+      verificationUploadCheckpointForReuse({ checkpoint: bound, updatedAt: 0 }, 1_000_000),
+    ).toBe(bound);
+    expect(
+      verificationUploadCheckpointForReuse({ checkpoint: bound, updatedAt: 0 }, 1_000_000, 300_000),
+    ).toBeUndefined();
+    expect(
+      verificationUploadCheckpointForReuse({ checkpoint: legacyBound, updatedAt: 0 }, 1_000_000),
+    ).toBeUndefined();
+    if (bound.binding === undefined) throw new Error("Bound checkpoint fixture is invalid");
+    expect(
+      verificationUploadCheckpointForReuse(
+        {
+          checkpoint: {
+            ...bound,
+            binding: { ...bound.binding, expiresAt: new Date(1_000_000).toISOString() },
+          },
+          updatedAt: 0,
+        },
+        1_000_000,
+      ),
+    ).toBeUndefined();
+  });
+
+  it("binds verification actions to current project visibility and the actual Verification actor", () => {
+    const actorId = "10000000-0000-4000-8000-000000000011";
+    const otherActorId = "10000000-0000-4000-8000-000000000012";
+    const projectId = "30000000-0000-4000-8000-000000000001";
+    const bugId = "20000000-0000-4000-8000-000000000001";
+    const authority = { actorId, projectId, snapshotSequence: 17, bugIds: [bugId] };
+    const scopedBug = { id: bugId, projectId };
+    const ownVerification = { bugId, verifierId: actorId };
+    const otherVerification = { bugId, verifierId: otherActorId };
+
+    expect(canActAsVerificationActor(authority, actorId, scopedBug, 17, null)).toBe(true);
+    expect(canActAsVerificationActor(authority, actorId, scopedBug, 17, ownVerification)).toBe(
+      true,
+    );
+    expect(canActAsVerificationActor(authority, actorId, scopedBug, 17, otherVerification)).toBe(
+      false,
+    );
+    expect(canActAsVerificationActor(authority, otherActorId, scopedBug, 17, null)).toBe(false);
+    expect(canActAsVerificationActor(authority, actorId, scopedBug, 18, null)).toBe(false);
+    expect(
+      canActAsVerificationActor(
+        authority,
+        actorId,
+        { ...scopedBug, projectId: "30000000-0000-4000-8000-000000000002" },
+        17,
+        null,
+      ),
+    ).toBe(false);
+    expect(
+      canActAsVerificationActor(
+        authority,
+        actorId,
+        { ...scopedBug, id: "20000000-0000-4000-8000-000000000002" },
+        17,
+        null,
+      ),
+    ).toBe(false);
+    expect(
+      canActAsVerificationActor(authority, actorId, scopedBug, 17, {
+        ...ownVerification,
+        bugId: "20000000-0000-4000-8000-000000000002",
+      }),
+    ).toBe(false);
+  });
+
+  it("keeps a frozen Verification result scoped to project, actor, Bug, attempt, and draft", () => {
+    const request = freezeVerificationResultRequest({
+      verificationId: "50000000-0000-4000-8000-000000000010",
+      expectedVersion: 3,
+      resultSummary: "Frozen summary",
+      clientSubmissionId: "70000000-0000-4000-8000-000000000010",
+      status: "passed",
+      attachmentIds: ["60000000-0000-4000-8000-000000000010"],
+      captureBundleId: "80000000-0000-4000-8000-000000000010",
+    });
+    const scope = {
+      projectId: "30000000-0000-4000-8000-000000000001",
+      actorId: "10000000-0000-4000-8000-000000000003",
+      bugId: "20000000-0000-4000-8000-000000000001",
+      repairAttemptId: "40000000-0000-4000-8000-000000000001",
+      draftKey: "20000000-0000-4000-8000-000000000001:40000000-0000-4000-8000-000000000001",
+    };
+    const frozen = { ...request, ...scope };
+
+    expect(frozenVerificationResultMatchesScope(frozen, scope)).toBe(true);
+    for (const [key, value] of Object.entries(scope)) {
+      expect(
+        frozenVerificationResultMatchesScope(frozen, {
+          ...scope,
+          [key]: `${value}-different`,
+        }),
+      ).toBe(false);
+    }
   });
 
   it("reconciles a committed Verification write instead of surfacing a SQLite error", async () => {

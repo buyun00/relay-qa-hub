@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import type {
   CreateMobileCommentInput,
+  ListMobileBugCommentsInput,
   MobileScopeBootstrap,
   SqliteStorageWorker,
 } from "@relay-qa-hub/storage";
@@ -30,6 +31,17 @@ export function createSqliteMobileCommentStore(
     }) as const;
 
   return {
+    async listComments(query) {
+      const input: ListMobileBugCommentsInput = {
+        ...actorScope(query.actorId),
+        authorizationProjectId: options.scope.projectId,
+        bugId: query.bugId,
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+        limit: query.limit,
+      };
+      return options.worker.listMobileBugComments(input);
+    },
+
     async addComment(command) {
       const input: CreateMobileCommentInput = {
         ...actorScope(command.actorId),
@@ -47,7 +59,10 @@ export function createSqliteMobileCommentStore(
     async listEvents(query) {
       return options.worker.listMobileBugEvents({
         ...actorScope(query.actorId),
+        authorizationProjectId: options.scope.projectId,
         bugId: query.bugId,
+        ...(query.afterSequence === undefined ? {} : { afterSequence: query.afterSequence }),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
         limit: query.limit,
       });
     },

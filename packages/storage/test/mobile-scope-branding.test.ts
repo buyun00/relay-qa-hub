@@ -70,11 +70,16 @@ test("configured names update the exact existing scope once while preserving pro
       ],
       "OZDQP",
     );
-    const directory = listMobileVisibleProjects(database, {
-      accountId: scope.accountId,
-      actorId: scope.actorId,
-      limit: 10,
-    });
+    const directory = listMobileVisibleProjects(
+      database,
+      {
+        accountId: scope.accountId,
+        actorId: scope.actorId,
+        authorizationProjectId: scope.projectId,
+        limit: 10,
+      },
+      new Uint8Array(32),
+    );
     assert.equal(directory.items.find((p) => p.id === scope.projectId)?.name, "OZDQP");
     apply(renamed);
     assert.deepEqual(

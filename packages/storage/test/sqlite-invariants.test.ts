@@ -31,6 +31,7 @@ import {
   MOBILE_CAPTURE_ALLOWED_METHODS,
 } from "../src/mobile-capture-store.ts";
 import { listMobileBugs } from "../src/mobile-bug-list-store.ts";
+import { linkManagedUser } from "../src/user-management-store.ts";
 import { syncAndListMobileNotifications } from "../src/mobile-inbox-store.ts";
 import {
   completeMobileBugForVerification,
@@ -44,6 +45,7 @@ import {
 } from "../src/mobile-relay-store.ts";
 import {
   createMobileVerification,
+  getMobileVerification,
   recordMobileVerificationResult,
   startMobileVerification,
 } from "../src/mobile-verification-store.ts";
@@ -64,12 +66,22 @@ test("manual completion takes priority over every Relay status, preserves histor
     const at = databaseTime(database);
     insertActiveMembershipRole(database, tenant, identifier(8_501), "triager");
     insertActiveMembershipRole(database, tenant, identifier(8_502), "developer");
+    insertActiveMembershipRole(database, tenant, identifier(8_505), "verifier");
     insertActiveMembershipRole(
       database,
       tenant,
       identifier(8_503),
       "viewer",
       tenant.secondaryUserId,
+    );
+    transaction(database, () =>
+      linkManagedUser(database, {
+        ...scope,
+        userId: tenant.secondaryUserId,
+        canonicalUserId: tenant.userId,
+        protectedUserIds: [],
+        createdAt: at,
+      }),
     );
     const principalId = identifier(8_504);
     insertServicePrincipal(database, tenant, principalId);
@@ -177,7 +189,7 @@ test("manual completion takes priority over every Relay status, preserves histor
       const workflow = getMobileHumanWorkflowForBug(database, { ...human, bugId });
       assert.equal(workflow.repairAttempt?.mode, "human");
       assert.equal(workflow.repairAttempt?.status, "delivered");
-      assert.equal(workflow.repairAttempt?.assigneeId, human.actorId);
+      assert.equal(workflow.repairAttempt?.assigneeId, tenant.userId);
       assert.equal(
         database.prepare("SELECT status FROM repair_attempts WHERE id=?").get(attempt.id)?.status,
         "superseded",
@@ -225,7 +237,7 @@ test("manual completion takes priority over every Relay status, preserves histor
           expectedVersion: completed.version,
           repairAttemptId: workflow.repairAttempt!.id,
           buildId: null,
-          verifierId: tenant.userId,
+          verifierId: index === 0 ? tenant.secondaryUserId : tenant.userId,
           criteria: "Verify the human fix",
           idempotencyKey: "verify-" + index,
           requestDigest: digest(8_900 + index),
@@ -233,37 +245,63 @@ test("manual completion takes priority over every Relay status, preserves histor
         }),
       );
       assert.equal(verification.status, "requested");
+      assert.equal(verification.verifierId, tenant.userId);
       const activeWorkflow = getMobileHumanWorkflowForBug(database, { ...human, bugId });
       assert.equal(activeWorkflow.verification?.id, verification.id);
+      assert.equal(activeWorkflow.verification?.verifierId, tenant.userId);
       assert.equal(activeWorkflow.latestVerification?.id, verification.id);
-      const started = transaction(database, () =>
-        startMobileVerification(database, {
-          ...scope,
+      assert.equal(
+        getMobileVerification(database, {
+          ...human,
           verificationId: verification.id,
-          expectedVersion: verification.version,
-          reason: null,
-          idempotencyKey: "start-" + index,
-          requestDigest: digest(9_000 + index),
-          createdAt: at,
-        }),
+        })?.verifierId,
+        tenant.userId,
       );
+      const startInput = {
+        ...scope,
+        verificationId: verification.id,
+        expectedVersion: verification.version,
+        reason: null,
+        idempotencyKey: "start-" + index,
+        requestDigest: digest(9_000 + index),
+        createdAt: at,
+      };
+      const started = transaction(database, () => startMobileVerification(database, startInput));
+      assert.equal(started.verifierId, tenant.userId);
+      assert.deepEqual(
+        transaction(database, () => startMobileVerification(database, startInput)),
+        started,
+      );
+      const resultInput = {
+        ...scope,
+        verificationId: verification.id,
+        expectedVersion: started.version,
+        status: "passed" as const,
+        failureReason: null,
+        resultSummary: "Human acceptance passed",
+        clientSubmissionId: identifier(9_100 + index),
+        attachmentIds: [],
+        captureBundleId: null,
+        idempotencyKey: "result-" + index,
+        requestDigest: digest(9_200 + index),
+        createdAt: at,
+      };
       const result = transaction(database, () =>
-        recordMobileVerificationResult(database, {
-          ...scope,
-          verificationId: verification.id,
-          expectedVersion: started.version,
-          status: "passed",
-          failureReason: null,
-          resultSummary: "Human acceptance passed",
-          clientSubmissionId: identifier(9_100 + index),
-          attachmentIds: [],
-          captureBundleId: null,
-          idempotencyKey: "result-" + index,
-          requestDigest: digest(9_200 + index),
-          createdAt: at,
-        }),
+        recordMobileVerificationResult(database, resultInput),
       );
       assert.equal(result.bug.state, "closed");
+      assert.equal(result.verification.verifierId, tenant.userId);
+      assert.equal(result.repairAttempt.assigneeId, tenant.userId);
+      assert.equal(result.bug.ownerId, tenant.userId);
+      assert.equal(result.bug.verificationOwnerId, tenant.userId);
+      const replayedResult = transaction(database, () =>
+        recordMobileVerificationResult(database, resultInput),
+      );
+      assert.equal(replayedResult.replayed, true);
+      assert.equal(replayedResult.verification.verifierId, tenant.userId);
+      assert.equal(replayedResult.repairAttempt.assigneeId, tenant.userId);
+      assert.equal(replayedResult.bug.ownerId, tenant.userId);
+      assert.equal(replayedResult.bug.verificationOwnerId, tenant.userId);
       const closedWorkflow = getMobileHumanWorkflowForBug(database, { ...human, bugId });
       assert.equal(closedWorkflow.verification, null);
       assert.equal(closedWorkflow.latestVerification?.id, verification.id);
@@ -341,11 +379,12 @@ test("verified Relay delivery, human rejection, durable next round and human acc
     const later = (minutes: number) => new Date(Date.parse(at) + minutes * 60_000).toISOString();
     insertActiveMembershipRole(database, tenant, identifier(8_113), "triager");
     insertActiveMembershipRole(database, tenant, identifier(8_114), "developer");
+    insertActiveMembershipRole(database, tenant, identifier(8_116), "verifier");
     insertActiveMembershipRole(
       database,
       tenant,
       identifier(8_115),
-      "viewer",
+      "verifier",
       tenant.secondaryUserId,
     );
     insertServicePrincipal(database, tenant, principalId);
@@ -11369,7 +11408,7 @@ test("forward v3 requires developer authority for a RepairAttempt assignee", asy
   });
 });
 
-test("multi-actor no-code human workflow can be managed by any project member", async () => {
+test("multi-actor no-code repair remains shared while Verification stays with its verifier", async () => {
   await withDatabase((database) => {
     const tenant = seedTenant(database, 5_400, "MHW");
     const bugId = identifier(5_410);
@@ -11384,24 +11423,9 @@ test("multi-actor no-code human workflow can be managed by any project member", 
       projectId: tenant.projectId,
       actorId: tenant.secondaryUserId,
     } as const;
-    const observerId = identifier(5_415);
-    const observerScope = {
-      accountId: tenant.accountId,
-      projectId: tenant.projectId,
-      actorId: observerId,
-    } as const;
-
-    database
-      .prepare(
-        `INSERT INTO users(
-          id, account_id, email, display_name, status, created_at, updated_at, version
-        ) VALUES (?, ?, ?, 'Project observer', 'active', ?, ?, 1)`,
-      )
-      .run(observerId, tenant.accountId, "observer-5400@example.invalid", CREATED_AT, CREATED_AT);
-    insertActiveMembershipRole(database, tenant, identifier(5_416), "viewer", observerId);
-
     insertActiveMembershipRole(database, tenant, identifier(5_411), "triager");
     insertActiveMembershipRole(database, tenant, identifier(5_412), "reporter");
+    insertActiveMembershipRole(database, tenant, identifier(5_417), "verifier");
     insertActiveMembershipRole(
       database,
       tenant,
@@ -11611,6 +11635,21 @@ test("multi-actor no-code human workflow can be managed by any project member", 
     );
     assert.equal(rejectedVerification.verifierId, tenant.secondaryUserId);
     assert.equal(rejectedVerification.buildId, null);
+    assert.throws(
+      () =>
+        transaction(database, () =>
+          startMobileVerification(database, {
+            ...primaryScope,
+            verificationId: rejectedVerification.id,
+            expectedVersion: rejectedVerification.version,
+            reason: null,
+            idempotencyKey: "wrong-verifier-start",
+            requestDigest: digest(5_419),
+            createdAt: workflowAt,
+          }),
+        ),
+      /assigned verifier/u,
+    );
     const startedRejectedVerification = transaction(database, () =>
       startMobileVerification(database, {
         ...developerScope,
@@ -11627,7 +11666,7 @@ test("multi-actor no-code human workflow can be managed by any project member", 
       55,
     );
     const failedRequest = {
-      ...primaryScope,
+      ...developerScope,
       verificationId: rejectedVerification.id,
       expectedVersion: startedRejectedVerification.version,
       status: "failed" as const,
@@ -11696,7 +11735,7 @@ test("multi-actor no-code human workflow can be managed by any project member", 
     );
     const startedPassedVerification = transaction(database, () =>
       startMobileVerification(database, {
-        ...observerScope,
+        ...developerScope,
         verificationId: passedVerification.id,
         expectedVersion: passedVerification.version,
         reason: null,
@@ -11707,7 +11746,7 @@ test("multi-actor no-code human workflow can be managed by any project member", 
     );
     const passedResult = transaction(database, () =>
       recordMobileVerificationResult(database, {
-        ...observerScope,
+        ...developerScope,
         verificationId: passedVerification.id,
         expectedVersion: startedPassedVerification.version,
         status: "passed",
@@ -12035,12 +12074,16 @@ test("any project member can soft-delete a Bug and hide it from reads", async ()
       null,
     );
     assert.equal(
-      listMobileBugs(database, {
-        accountId: tenant.accountId,
-        projectId: tenant.projectId,
-        actorId: tenant.secondaryUserId,
-        limit: 100,
-      }).items.length,
+      listMobileBugs(
+        database,
+        {
+          accountId: tenant.accountId,
+          projectId: tenant.projectId,
+          actorId: tenant.secondaryUserId,
+          limit: 100,
+        },
+        new Uint8Array(32).fill(7),
+      ).items.length,
       0,
     );
     assert.deepEqual(

@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID, scryptSync, timingSafeEqual } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
+import { canonicalProjectUserId } from "./project-identity-projection.js";
 import { SqliteStorageError } from "./sqlite.js";
 
 const SCRYPT_KEY_LENGTH = 64;
@@ -394,12 +395,32 @@ export function resolveBrowserSession(
       }
     | undefined;
   if (!row) return null;
+  const projectedUserId =
+    row.login_project_id === null
+      ? row.user_id
+      : canonicalProjectUserId(
+          database,
+          { accountId: row.account_id, projectId: row.login_project_id },
+          row.user_id,
+        );
+  const projectedUser =
+    projectedUserId === row.user_id
+      ? row
+      : (database
+          .prepare(
+            `SELECT email, display_name
+             FROM users
+             WHERE account_id = ? AND id = ? AND status = 'active'`,
+          )
+          .get(row.account_id, projectedUserId) as
+          { readonly email: string; readonly display_name: string } | undefined);
+  if (!projectedUser) return null;
   return Object.freeze({
     accountId: row.account_id,
-    userId: row.user_id,
-    actorId: row.user_id,
-    email: row.email,
-    displayName: row.display_name,
+    userId: projectedUserId,
+    actorId: projectedUserId,
+    email: projectedUser.email,
+    displayName: projectedUser.display_name,
     ...(row.login_project_id === null ? {} : { projectId: row.login_project_id }),
     ...(row.is_gm === 1 ? { isGm: true } : {}),
   });

@@ -1,0 +1,18 @@
+Captured: 2026-09-09T17:36:33+08:00
+Context: first static checks after adding bounded Bug-list snapshot restart tests.
+
+COMMAND=node ../../node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+src/api.test.ts(223,43): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/api.test.ts(248,43): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+EXIT_CODE=1
+
+COMMAND=node ../../node_modules/eslint/bin/eslint.js . --max-warnings=0
+apps/web/src/api.test.ts
+  213:39  error  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  239:39  error  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  262:39  error  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+3 problems (3 errors, 0 warnings)
+EXIT_CODE=1
+
+Resolution: the response-queue test doubles now accept the request URL explicitly and throw when the fixture queue is exhausted. No product source changed for this fixture-only failure.

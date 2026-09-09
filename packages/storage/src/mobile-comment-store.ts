@@ -1,7 +1,20 @@
 import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
+import {
+  decodeMobileReadCursor,
+  digestMobileReadBinding,
+  encodeMobileReadCursor,
+  requireMobileReadPosition,
+} from "./mobile-read-cursor.js";
+import {
+  readMobileProjectSnapshotSequence,
+  requireMobileReadLimit,
+  requireMobileReadUuid,
+  resolveMobileReadAuthorization,
+} from "./mobile-read-authorization.js";
 import { MobileRelayStorageError, type MobileRelayScope } from "./mobile-relay-store.js";
+import { canonicalProjectUserId } from "./project-identity-projection.js";
 
 const UUID_PATTERN =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
@@ -18,6 +31,8 @@ export interface MobileCommentRecord {
   readonly createdAt: string;
   readonly version: 1;
 }
+
+export type MobileCommentListItem = Omit<MobileCommentRecord, "clientSubmissionId">;
 
 export interface CreateMobileCommentInput extends MobileRelayScope {
   readonly bugId: string;
@@ -38,19 +53,45 @@ export interface MobileCommentCreation {
 }
 
 export interface ListMobileBugEventsInput extends MobileRelayScope {
+  readonly authorizationProjectId?: string;
   readonly bugId: string;
+  readonly afterSequence?: number;
+  readonly cursor?: string;
   readonly limit: number;
 }
 
+export interface ListMobileBugCommentsInput extends MobileRelayScope {
+  readonly authorizationProjectId?: string;
+  readonly bugId: string;
+  readonly cursor?: string;
+  readonly limit: number;
+}
+
+export interface MobileCommentList {
+  readonly bugId: string;
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly items: readonly MobileCommentListItem[];
+  readonly nextCursor: string | null;
+}
+
 export interface MobileBugEvent {
-  readonly schemaVersion: "1.0";
+  readonly projectionVersion: "1.1.0";
+  readonly redactionPolicyVersion: "1.0.0";
   readonly id: string;
   readonly type: string;
   readonly source: string;
   readonly projectId: string;
   readonly bugId: string;
   readonly aggregate: {
-    readonly type: "bug";
+    readonly type:
+      | "bug"
+      | "repair_attempt"
+      | "build"
+      | "verification"
+      | "upload"
+      | "notification"
+      | "integration";
     readonly id: string;
     readonly version: number;
   };
@@ -68,8 +109,11 @@ export interface MobileBugEvent {
 }
 
 export interface MobileBugEvents {
+  readonly projectId: string;
+  readonly bugId: string;
+  readonly snapshotSequence: number;
   readonly items: readonly MobileBugEvent[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 interface CommentRow {
@@ -89,6 +133,7 @@ interface EventRow {
   readonly source: string;
   readonly project_id: string;
   readonly bug_id: string;
+  readonly aggregate_type: string;
   readonly aggregate_id: string;
   readonly aggregate_version: number;
   readonly sequence: number;
@@ -126,15 +171,6 @@ function requireBody(value: string): void {
 function requireTimestamp(value: string): void {
   if (!Number.isFinite(Date.parse(value))) {
     throw new MobileRelayStorageError("INVALID_REQUEST", "createdAt is invalid");
-  }
-}
-
-function requireLimit(value: number): void {
-  if (!Number.isSafeInteger(value) || value < 1 || value > 100) {
-    throw new MobileRelayStorageError(
-      "INVALID_REQUEST",
-      "limit must be an integer from 1 through 100",
-    );
   }
 }
 
@@ -182,7 +218,7 @@ function readComment(
     id: row.id,
     bugId: row.bug_id,
     projectId: row.project_id,
-    authorId: row.author_id,
+    authorId: canonicalProjectUserId(database, input, row.author_id),
     clientSubmissionId: row.client_submission_id,
     body: row.body,
     attachmentIds: Object.freeze([]),
@@ -392,81 +428,467 @@ export function createMobileComment(
   return loadCommentCreation(database, input, false);
 }
 
+function requireReadableBug(
+  database: DatabaseSync,
+  input: MobileRelayScope & { readonly bugId: string },
+): void {
+  const bug = database
+    .prepare(
+      `SELECT 1 AS present FROM bugs
+       WHERE account_id = ? AND project_id = ? AND id = ?
+         AND NOT EXISTS (
+           SELECT 1 FROM bug_deletions AS deletion
+           WHERE deletion.account_id = bugs.account_id
+             AND deletion.project_id = bugs.project_id AND deletion.bug_id = bugs.id
+         )`,
+    )
+    .get(input.accountId, input.projectId, input.bugId);
+  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
+}
+
+function commentAttachments(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  commentId: string,
+): readonly string[] {
+  const rows = database
+    .prepare(
+      `SELECT attachment_id FROM comment_attachments
+       WHERE account_id = ? AND project_id = ? AND comment_id = ?
+       ORDER BY attachment_id`,
+    )
+    .all(input.accountId, input.projectId, commentId) as unknown as {
+    readonly attachment_id: string;
+  }[];
+  if (rows.length > 20 || rows.some((row) => !UUID_PATTERN.test(row.attachment_id))) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "comment attachments are invalid");
+  }
+  return Object.freeze(rows.map((row) => row.attachment_id));
+}
+
+function projectIdentityProjectionBinding(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+): readonly Readonly<Record<string, unknown>>[] {
+  return Object.freeze(
+    database
+      .prepare(
+        `SELECT link.source_user_id, link.canonical_user_id,
+                EXISTS (
+                  SELECT 1 FROM users AS canonical
+                  WHERE canonical.account_id = link.account_id
+                    AND canonical.id = link.canonical_user_id
+                    AND canonical.status = 'active'
+                ) AS canonical_user_active,
+                EXISTS (
+                  SELECT 1 FROM command_project_memberships AS membership
+                  WHERE membership.account_id = link.account_id
+                    AND membership.project_id = link.project_id
+                    AND membership.user_id = link.canonical_user_id
+                    AND membership.status = 'active'
+                ) AS canonical_membership_active
+         FROM project_identity_links AS link
+         WHERE link.account_id = ? AND link.project_id = ? AND link.status = 'active'
+         ORDER BY link.source_user_id, link.canonical_user_id`,
+      )
+      .all(input.accountId, input.projectId)
+      .map((row) => Object.freeze({ ...row })),
+  );
+}
+
+export function listMobileBugComments(
+  database: DatabaseSync,
+  input: ListMobileBugCommentsInput,
+  cursorSigningKey: Uint8Array,
+): MobileCommentList {
+  requireMobileReadUuid(input.accountId, "accountId");
+  requireMobileReadUuid(input.projectId, "projectId");
+  requireMobileReadUuid(input.actorId, "actorId");
+  requireMobileReadUuid(input.bugId, "bugId");
+  requireMobileReadLimit(input.limit);
+  const authorization = resolveMobileReadAuthorization(
+    database,
+    { ...input, authorizationProjectId: input.authorizationProjectId ?? input.projectId },
+    input.projectId,
+  );
+  requireReadableBug(database, input);
+  const authorizationDigest = authorization.digest;
+  const filterDigest = digestMobileReadBinding({
+    projectId: input.projectId,
+    bugId: input.bugId,
+    identityProjection: projectIdentityProjectionBinding(database, input),
+  });
+  const decoded = decodeMobileReadCursor(input.cursor, {
+    kind: "bug-comments",
+    authorizationDigest,
+    filterDigest,
+    signingKey: cursorSigningKey,
+  });
+  const snapshotSequence =
+    decoded?.snapshotSequence ??
+    readMobileProjectSnapshotSequence(database, input.accountId, [input.projectId]);
+  let cursorCreatedAt: string | null = null;
+  let cursorId: string | null = null;
+  if (decoded !== null) {
+    const position = requireMobileReadPosition(decoded.position, ["createdAt", "id"]);
+    if (
+      typeof position["createdAt"] !== "string" ||
+      !Number.isFinite(Date.parse(position["createdAt"])) ||
+      typeof position["id"] !== "string" ||
+      !UUID_PATTERN.test(position["id"])
+    ) {
+      throw new MobileRelayStorageError("INVALID_REQUEST", "cursor is invalid for this list");
+    }
+    cursorCreatedAt = position["createdAt"];
+    cursorId = position["id"];
+  }
+  const rows = database
+    .prepare(
+      `SELECT comment.id, comment.bug_id, comment.project_id, comment.author_id,
+              comment.client_submission_id, comment.body, comment.created_at, comment.version
+       FROM comments AS comment
+       WHERE comment.account_id = ? AND comment.project_id = ? AND comment.bug_id = ?
+         AND EXISTS (
+           SELECT 1 FROM events AS creation
+           WHERE creation.account_id = comment.account_id
+             AND creation.project_id = comment.project_id
+             AND creation.bug_id = comment.bug_id
+             AND creation.resource_type = 'comment' AND creation.resource_id = comment.id
+             AND creation.event_position <= ?
+         )
+         AND (? IS NULL OR comment.created_at > ? OR
+              (comment.created_at = ? AND comment.id > ?))
+       ORDER BY comment.created_at ASC, comment.id ASC
+       LIMIT ?`,
+    )
+    .all(
+      input.accountId,
+      input.projectId,
+      input.bugId,
+      snapshotSequence,
+      cursorCreatedAt,
+      cursorCreatedAt,
+      cursorCreatedAt,
+      cursorId,
+      input.limit + 1,
+    ) as unknown as CommentRow[];
+  const hasMore = rows.length > input.limit;
+  const pageRows = hasMore ? rows.slice(0, input.limit) : rows;
+  const items = Object.freeze(
+    pageRows.map((row) =>
+      Object.freeze({
+        id: row.id,
+        bugId: row.bug_id,
+        projectId: row.project_id,
+        authorId: canonicalProjectUserId(database, input, row.author_id),
+        body: row.body,
+        attachmentIds: commentAttachments(database, input, row.id),
+        createdAt: row.created_at,
+        version: row.version,
+      }),
+    ),
+  );
+  const last = items.at(-1);
+  return Object.freeze({
+    bugId: input.bugId,
+    projectId: input.projectId,
+    snapshotSequence,
+    items,
+    nextCursor:
+      hasMore && last !== undefined
+        ? encodeMobileReadCursor(
+            {
+              kind: "bug-comments",
+              authorizationDigest,
+              filterDigest,
+              snapshotSequence,
+              position: { createdAt: last.createdAt, id: last.id },
+            },
+            cursorSigningKey,
+          )
+        : null,
+  });
+}
+
+const AUDIT_UUID_FIELDS = new Set([
+  "relatedBugId",
+  "repairAttemptId",
+  "buildId",
+  "verificationId",
+  "attachmentId",
+  "captureId",
+  "handoffId",
+  "commentId",
+  "occurrenceId",
+]);
+
+function projectAuditPayload(payloadJson: string): Readonly<Record<string, unknown>> {
+  let decoded: unknown;
+  try {
+    decoded = JSON.parse(payloadJson);
+  } catch {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+  }
+  if (decoded === null || typeof decoded !== "object" || Array.isArray(decoded)) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+  }
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(decoded as Record<string, unknown>)) {
+    if (AUDIT_UUID_FIELDS.has(key)) {
+      if (typeof value !== "string" || !UUID_PATTERN.test(value)) {
+        throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+      }
+      result[key] = value;
+    } else if (key === "summary" || key === "reason") {
+      if (typeof value !== "string" || value.length < 1 || value.length > 2_000) {
+        throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+      }
+      result[key] = value;
+    } else if (key === "status") {
+      if (typeof value !== "string" || !/^[a-z][a-z0-9_]{0,99}$/u.test(value)) {
+        throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+      }
+      result[key] = value;
+    } else if (key === "commitSha") {
+      if (typeof value !== "string" || !/^[0-9a-f]{40}$/u.test(value)) {
+        throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+      }
+      result[key] = value;
+    } else if (key === "attachmentCount") {
+      if (!Number.isSafeInteger(value) || (value as number) < 0 || (value as number) > 20) {
+        throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+      }
+      result[key] = value;
+    } else if (key === "fromVersion" || key === "toVersion") {
+      if (!Number.isSafeInteger(value) || (value as number) < 1) {
+        throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
+      }
+      result[key] = value;
+    }
+  }
+  return Object.freeze(result);
+}
+
+function auditAggregate(row: EventRow): MobileBugEvent["aggregate"] {
+  const allowed = new Set([
+    "bug",
+    "repair_attempt",
+    "build",
+    "verification",
+    "upload",
+    "notification",
+    "integration",
+  ]);
+  const type = allowed.has(row.aggregate_type) ? row.aggregate_type : "bug";
+  const id = type === "bug" && row.aggregate_type !== "bug" ? row.bug_id : row.aggregate_id;
+  if (
+    !UUID_PATTERN.test(id) ||
+    !Number.isSafeInteger(row.aggregate_version) ||
+    row.aggregate_version < 1
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "event aggregate is invalid");
+  }
+  return Object.freeze({
+    type: type as MobileBugEvent["aggregate"]["type"],
+    id,
+    version: row.aggregate_version,
+  });
+}
+
+function toAuditEvent(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  row: EventRow,
+): MobileBugEvent {
+  if (
+    !UUID_PATTERN.test(row.id) ||
+    !/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/u.test(row.event_type) ||
+    !["qa_hub", "relay", "build"].includes(row.source) ||
+    !UUID_PATTERN.test(row.project_id) ||
+    !UUID_PATTERN.test(row.bug_id) ||
+    !Number.isSafeInteger(row.sequence) ||
+    row.sequence < 1 ||
+    !UUID_PATTERN.test(row.correlation_id) ||
+    (row.causation_id !== null && !UUID_PATTERN.test(row.causation_id)) ||
+    !Number.isFinite(Date.parse(row.created_at))
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "event projection is invalid");
+  }
+  const actorId =
+    row.actor_type === "user" && row.actor_id !== null
+      ? canonicalProjectUserId(database, input, row.actor_id)
+      : row.actor_id;
+  if (
+    (row.actor_type === "system" && actorId !== null) ||
+    (row.actor_type !== "system" && (actorId === null || !UUID_PATTERN.test(actorId)))
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "event actor is invalid");
+  }
+  const payload = projectAuditPayload(row.payload_json);
+  if (
+    (row.event_type === "bug.closed" || row.to_state === "closed") &&
+    typeof payload["verificationId"] !== "string"
+  ) {
+    throw new MobileRelayStorageError(
+      "INVALID_REQUEST",
+      "closed event lacks verification identity",
+    );
+  }
+  if (
+    (row.source === "relay" || row.source === "build") &&
+    (row.event_type.startsWith("bug.") ||
+      row.event_type.startsWith("verification.") ||
+      row.from_state !== null ||
+      row.to_state !== null ||
+      ["accepted", "verified", "closed", "passed", "rejected"].includes(
+        String(payload["status"] ?? ""),
+      ))
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "external event projection is invalid");
+  }
+  return Object.freeze({
+    projectionVersion: "1.1.0",
+    redactionPolicyVersion: "1.0.0",
+    id: row.id,
+    type: row.event_type,
+    source: row.source,
+    projectId: row.project_id,
+    bugId: row.bug_id,
+    aggregate: auditAggregate(row),
+    sequence: row.sequence,
+    actor: Object.freeze({ type: row.actor_type, id: actorId }),
+    correlationId: row.correlation_id,
+    causationId: row.causation_id,
+    occurredAt: row.created_at,
+    fromState: row.from_state,
+    toState: row.to_state,
+    payload,
+  });
+}
+
 export function listMobileBugEvents(
   database: DatabaseSync,
   input: ListMobileBugEventsInput,
+  cursorSigningKey: Uint8Array,
 ): MobileBugEvents {
-  requireUuid(input.accountId, "accountId");
-  requireUuid(input.projectId, "projectId");
-  requireUuid(input.actorId, "actorId");
-  requireUuid(input.bugId, "bugId");
-  requireLimit(input.limit);
-  requireProjectMembership(database, input);
-
-  const bug = database
+  requireMobileReadUuid(input.accountId, "accountId");
+  requireMobileReadUuid(input.projectId, "projectId");
+  requireMobileReadUuid(input.actorId, "actorId");
+  requireMobileReadUuid(input.bugId, "bugId");
+  requireMobileReadLimit(input.limit);
+  const requestedAfterSequence = input.afterSequence;
+  if (
+    requestedAfterSequence !== undefined &&
+    (!Number.isSafeInteger(requestedAfterSequence) || requestedAfterSequence < 0)
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "afterSequence is invalid");
+  }
+  const authorization = resolveMobileReadAuthorization(
+    database,
+    { ...input, authorizationProjectId: input.authorizationProjectId ?? input.projectId },
+    input.projectId,
+  );
+  requireReadableBug(database, input);
+  const filterDigest = digestMobileReadBinding({
+    projectId: input.projectId,
+    bugId: input.bugId,
+    identityProjection: projectIdentityProjectionBinding(database, input),
+  });
+  const decoded = decodeMobileReadCursor(input.cursor, {
+    kind: "bug-events",
+    authorizationDigest: authorization.digest,
+    filterDigest,
+    signingKey: cursorSigningKey,
+  });
+  let anchor = requestedAfterSequence ?? 0;
+  let lastSequence = anchor;
+  if (decoded !== null) {
+    const position = requireMobileReadPosition(decoded.position, ["anchor", "id", "sequence"]);
+    if (
+      !Number.isSafeInteger(position["anchor"]) ||
+      (position["anchor"] as number) < 0 ||
+      !Number.isSafeInteger(position["sequence"]) ||
+      (position["sequence"] as number) < (position["anchor"] as number) ||
+      typeof position["id"] !== "string" ||
+      !UUID_PATTERN.test(position["id"])
+    ) {
+      throw new MobileRelayStorageError("INVALID_REQUEST", "cursor is invalid for this list");
+    }
+    if (
+      requestedAfterSequence !== undefined &&
+      requestedAfterSequence !== (position["anchor"] as number)
+    ) {
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        "afterSequence does not match the cursor anchor",
+      );
+    }
+    anchor = position["anchor"] as number;
+    lastSequence = position["sequence"] as number;
+  }
+  const count = database
     .prepare(
-      `SELECT id
-       FROM bugs
-       WHERE account_id = ? AND project_id = ? AND id = ?`,
+      `SELECT COUNT(*) AS count FROM events
+       WHERE account_id = ? AND project_id = ? AND bug_id = ?`,
     )
-    .get(input.accountId, input.projectId, input.bugId) as { readonly id: string } | undefined;
-  if (!bug) throw new MobileRelayStorageError("NOT_FOUND", "Bug was not found");
-
+    .get(input.accountId, input.projectId, input.bugId) as { readonly count: number };
+  const snapshotSequence = decoded?.snapshotSequence ?? count.count;
+  if (
+    !Number.isSafeInteger(snapshotSequence) ||
+    snapshotSequence < 0 ||
+    lastSequence > snapshotSequence
+  ) {
+    throw new MobileRelayStorageError("INVALID_REQUEST", "cursor is invalid for this list");
+  }
   const rows = database
     .prepare(
-      `SELECT event.id, event.type AS event_type, event.source, event.project_id,
-              event.bug_id, event.aggregate_id, bug.version AS aggregate_version,
-              event.aggregate_sequence AS sequence, event.actor_type,
-              COALESCE(event.actor_user_id, event.actor_service_principal_id) AS actor_id,
-              event.correlation_id, event.causation_id, event.from_state, event.to_state,
-              event.created_at, event.payload_json
-       FROM events AS event
-       JOIN bugs AS bug
-         ON bug.account_id = event.account_id
-        AND bug.project_id = event.project_id
-        AND bug.id = event.bug_id
-       WHERE event.account_id = ? AND event.project_id = ? AND event.bug_id = ?
-       ORDER BY event.event_position DESC
+      `WITH bug_events AS (
+         SELECT event.id, event.type AS event_type, event.source, event.project_id,
+                event.bug_id, event.aggregate_type, event.aggregate_id,
+                COALESCE(event.resource_version_after, event.aggregate_sequence) AS aggregate_version,
+                ROW_NUMBER() OVER (ORDER BY event.event_position ASC) AS sequence,
+                event.actor_type,
+                COALESCE(event.actor_user_id, event.actor_service_principal_id) AS actor_id,
+                event.correlation_id, event.causation_id, event.from_state, event.to_state,
+                event.created_at, event.payload_json
+         FROM events AS event
+         WHERE event.account_id = ? AND event.project_id = ? AND event.bug_id = ?
+       )
+       SELECT * FROM bug_events
+       WHERE sequence > ? AND sequence <= ?
+       ORDER BY sequence ASC, id ASC
        LIMIT ?`,
     )
-    .all(input.accountId, input.projectId, input.bugId, input.limit) as unknown as EventRow[];
-
+    .all(
+      input.accountId,
+      input.projectId,
+      input.bugId,
+      Math.max(anchor, lastSequence),
+      snapshotSequence,
+      input.limit + 1,
+    ) as unknown as EventRow[];
+  const hasMore = rows.length > input.limit;
+  const items = Object.freeze(
+    (hasMore ? rows.slice(0, input.limit) : rows).map((row) => toAuditEvent(database, input, row)),
+  );
+  const last = items.at(-1);
   return Object.freeze({
-    items: Object.freeze(
-      rows.map((row) => {
-        let payload: Readonly<Record<string, unknown>>;
-        try {
-          const parsed: unknown = JSON.parse(row.payload_json);
-          if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-            throw new Error("event payload is not an object");
-          }
-          payload = Object.freeze(parsed as Record<string, unknown>);
-        } catch {
-          throw new MobileRelayStorageError("INVALID_REQUEST", "event payload is invalid");
-        }
-        return Object.freeze({
-          schemaVersion: "1.0" as const,
-          id: row.id,
-          type: row.event_type,
-          source: row.source,
-          projectId: row.project_id,
-          bugId: row.bug_id,
-          aggregate: Object.freeze({
-            type: "bug" as const,
-            id: row.aggregate_id,
-            version: row.aggregate_version,
-          }),
-          sequence: row.sequence,
-          actor: Object.freeze({ type: row.actor_type, id: row.actor_id }),
-          correlationId: row.correlation_id,
-          causationId: row.causation_id,
-          occurredAt: row.created_at,
-          fromState: row.from_state,
-          toState: row.to_state,
-          payload,
-        });
-      }),
-    ),
-    nextCursor: null,
+    projectId: input.projectId,
+    bugId: input.bugId,
+    snapshotSequence,
+    items,
+    nextCursor:
+      hasMore && last !== undefined
+        ? encodeMobileReadCursor(
+            {
+              kind: "bug-events",
+              authorizationDigest: authorization.digest,
+              filterDigest,
+              snapshotSequence,
+              position: { anchor, id: last.id, sequence: last.sequence },
+            },
+            cursorSigningKey,
+          )
+        : null,
   });
 }

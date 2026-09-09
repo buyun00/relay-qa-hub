@@ -1,0 +1,5 @@
+CAPTURED_AT=2026-09-09T10:13:53.9703669Z
+COMMAND=node ../../node_modules/prettier/bin/prettier.cjs --check src/App.tsx src/AuthGate.tsx src/api.ts src/App.test.tsx src/App.detail-loading.test.tsx src/api.test.ts src/app.css
+Checking formatting...
+All matched files use Prettier code style!
+EXIT_CODE=0

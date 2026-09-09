@@ -532,7 +532,7 @@ test("v6 through current schema preserves existing Bugs and adds management, GM 
     const completed = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "backups"),
     });
-    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
     assert.equal(completed.fromVersion, 7);
     assert.equal(completed.toVersion, SQLITE_SCHEMA_VERSION);
     assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);
@@ -618,9 +618,9 @@ test("v17 upgrades through registered v18 and v19 with backup, immutable history
     const upgrade = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "v17-backups"),
     });
-    assert.deepEqual(upgrade.appliedVersions, [18, 19]);
+    assert.deepEqual(upgrade.appliedVersions, [18, 19, 20]);
     assert.equal(upgrade.fromVersion, 17);
-    assert.equal(upgrade.toVersion, 19);
+    assert.equal(upgrade.toVersion, SQLITE_SCHEMA_VERSION);
     assert.ok(upgrade.backupPath);
     assert.ok(existsSync(upgrade.backupPath));
     assert.ok(statSync(upgrade.backupPath).size > 0);
@@ -697,8 +697,8 @@ test("v17 upgrades through registered v18 and v19 with backup, immutable history
         backupRoot: join(root, "reopen-backups"),
       });
       assert.deepEqual(repeat, {
-        fromVersion: 19,
-        toVersion: 19,
+        fromVersion: SQLITE_SCHEMA_VERSION,
+        toVersion: SQLITE_SCHEMA_VERSION,
         appliedVersions: [],
         backupPath: null,
       });

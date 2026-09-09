@@ -89,62 +89,125 @@ class AccountSessionClient(
         projectKey: String,
         accessToken: String,
     ): QaPeopleConfig = withContext(Dispatchers.IO) {
-        require(runCatching { UUID.fromString(projectId) }.isSuccess)
+        require(
+            STRICT_PEOPLE_UUID.matches(projectId) &&
+                runCatching { UUID.fromString(projectId) }.isSuccess,
+        )
         val base = apiBaseUrl.resolve("projects/$projectId/members")
             ?: throw AccountSessionFailure("INVALID_PEOPLE_PATH")
-        val request = Request.Builder()
-            .url(base.newBuilder().addQueryParameter("limit", "100").build())
-            .header("Accept", QaHubApiContract.JSON_ACCEPT)
-            .header("Authorization", "Bearer $accessToken")
-            .get()
-            .build()
-        val response = try {
-            httpClient.newCall(request).execute()
-        } catch (_: IOException) {
-            throw AccountSessionFailure("NETWORK_IO")
-        }
-        response.use { result ->
-            val body = result.body?.byteStream()?.use { it.readBoundedUtf8(MAX_RESPONSE_BYTES) }
-                .orEmpty()
-            if (result.code != 200) {
-                val code = runCatching { JSONObject(body).optString("code") }.getOrNull().orEmpty()
-                throw AccountSessionFailure(code.ifBlank { "HTTP_${result.code}" })
+        val people = mutableListOf<QaPerson>()
+        val canonicalIds = mutableSetOf<String>()
+        val seenCursors = mutableSetOf<String>()
+        var cursor: String? = null
+        var frozenSnapshotSequence: Long? = null
+        repeat(MAX_PEOPLE_PAGES) {
+            val request = Request.Builder()
+                .url(base.newBuilder().addQueryParameter("limit", "100").apply {
+                    cursor?.let { addQueryParameter("cursor", it) }
+                }.build())
+                .header("Accept", QaHubApiContract.JSON_ACCEPT)
+                .header("Authorization", "Bearer $accessToken")
+                .get()
+                .build()
+            val response = try {
+                httpClient.newCall(request).execute()
+            } catch (_: IOException) {
+                throw AccountSessionFailure("NETWORK_IO")
             }
-            val root = parseObject(body, "INVALID_PEOPLE_RESPONSE")
-            if (root.optString("projectId") != projectId) {
+            val root = response.use { result ->
+                val body = result.body?.byteStream()?.use { it.readBoundedUtf8(MAX_RESPONSE_BYTES) }
+                    .orEmpty()
+                if (result.code != 200) {
+                    val code = runCatching { JSONObject(body).optString("code") }.getOrNull().orEmpty()
+                    throw AccountSessionFailure(code.ifBlank { "HTTP_${result.code}" })
+                }
+                parseObject(body, "INVALID_PEOPLE_RESPONSE")
+            }
+            if (root.keys().asSequence().toSet() != PEOPLE_LIST_FIELDS) {
                 throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+            }
+            if (
+                !root.has("projectId") || root.get("projectId") !is String ||
+                root.getString("projectId") != projectId
+            ) {
+                throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+            }
+            val snapshotSequence = root.requiredPeopleSnapshotSequence()
+            if (frozenSnapshotSequence == null) {
+                frozenSnapshotSequence = snapshotSequence
+            } else if (frozenSnapshotSequence != snapshotSequence) {
+                throw AccountSessionFailure("PEOPLE_SNAPSHOT_CHANGED")
             }
             val items = root.optJSONArray("items")
                 ?: throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
             if (items.length() > 100) throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
-            val people = buildList {
-                for (index in 0 until items.length()) {
-                    val item = items.optJSONObject(index)
-                        ?: throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
-                    val userId = item.optString("userId")
-                    val displayName = item.optString("displayName")
-                    val rolesJson = item.optJSONArray("roles")
-                        ?: throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
-                    if (
-                        runCatching { UUID.fromString(userId) }.isFailure ||
-                        displayName.isBlank() ||
-                        !item.optBoolean("active", false)
-                    ) {
-                        throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
-                    }
-                    val roles = buildSet {
-                        for (roleIndex in 0 until rolesJson.length()) {
-                            when (rolesJson.optString(roleIndex)) {
-                                "developer" -> add(QaPersonRole.FIXER)
-                                "verifier" -> add(QaPersonRole.VERIFIER)
-                            }
+            for (index in 0 until items.length()) {
+                val item = items.optJSONObject(index)
+                    ?: throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                if (item.keys().asSequence().toSet() != PEOPLE_ITEM_FIELDS) {
+                    throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                }
+                val userId = item.requiredPeopleString("userId")
+                val displayName = item.requiredPeopleString("displayName")
+                val rolesJson = item.optJSONArray("roles")
+                    ?: throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                if (
+                    !STRICT_PEOPLE_UUID.matches(userId) ||
+                    runCatching { UUID.fromString(userId) }.isFailure ||
+                    item.requiredPeopleString("projectId") != projectId ||
+                    displayName.isBlank() || displayName.length > 200 ||
+                    !item.has("active") || item.get("active") !is Boolean
+                ) {
+                    throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                }
+                val roleNames = mutableSetOf<String>()
+                val roles = buildSet {
+                    for (roleIndex in 0 until rolesJson.length()) {
+                        val rawRole = rolesJson.get(roleIndex)
+                        if (rawRole !is String || !roleNames.add(rawRole)) {
+                            throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                        }
+                        if (rawRole !in PROJECT_ROLES) {
+                            throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                        }
+                        when (rawRole) {
+                            "developer" -> add(QaPersonRole.FIXER)
+                            "verifier" -> add(QaPersonRole.VERIFIER)
                         }
                     }
-                    add(QaPerson(userId, displayName, setOf(QaPersonRole.FIXER, QaPersonRole.VERIFIER), active = true))
+                }
+                if (roleNames.isEmpty() || !canonicalIds.add(userId)) {
+                    throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                }
+                people += QaPerson(userId, displayName, roles, active = item.getBoolean("active"))
+                if (people.size > MAX_PEOPLE_ITEMS) {
+                    throw AccountSessionFailure("PEOPLE_ITEM_LIMIT_EXCEEDED")
                 }
             }
-            QaPeopleConfig(schemaVersion = 4, projectKey = projectKey, people = people)
+            val nextCursor = when {
+                !root.has("nextCursor") -> throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                root.isNull("nextCursor") -> null
+                root.get("nextCursor") is String -> root.getString("nextCursor").also {
+                    if (it.isBlank() || it.length > 500) {
+                        throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+                    }
+                }
+                else -> throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+            }
+            if (nextCursor == null) {
+                return@withContext QaPeopleConfig(
+                    schemaVersion = 4,
+                    projectKey = projectKey,
+                    people = people,
+                    snapshotSequence = checkNotNull(frozenSnapshotSequence),
+                )
+            }
+            if (!seenCursors.add(nextCursor)) {
+                throw AccountSessionFailure("PEOPLE_CURSOR_REPEATED")
+            }
+            cursor = nextCursor
         }
+        throw AccountSessionFailure("PEOPLE_PAGE_LIMIT_EXCEEDED")
     }
 
     private fun parseObject(body: String, errorCode: String): JSONObject = try {
@@ -156,7 +219,38 @@ class AccountSessionClient(
     private companion object {
         const val MAX_RESPONSE_BYTES = 256 * 1024
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
+        val PEOPLE_LIST_FIELDS = setOf("projectId", "snapshotSequence", "items", "nextCursor")
+        val PEOPLE_ITEM_FIELDS = setOf("userId", "projectId", "displayName", "roles", "active")
+        val PROJECT_ROLES = setOf(
+            "viewer", "reporter", "developer", "verifier", "triager", "release_manager",
+            "project_admin",
+        )
+        val STRICT_PEOPLE_UUID = Regex(
+            "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        )
+        const val MAX_PEOPLE_PAGES = 100
+        const val MAX_PEOPLE_ITEMS = 10_000
     }
+}
+
+private fun JSONObject.requiredPeopleString(key: String): String {
+    if (!has(key) || isNull(key) || get(key) !is String) {
+        throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+    }
+    return getString(key)
+}
+
+private fun JSONObject.requiredPeopleSnapshotSequence(): Long {
+    if (!has("snapshotSequence")) throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+    val sequence = when (val raw = get("snapshotSequence")) {
+        is Int -> raw.toLong()
+        is Long -> raw
+        else -> throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+    }
+    if (sequence !in 0..9_007_199_254_740_991L) {
+        throw AccountSessionFailure("INVALID_PEOPLE_RESPONSE")
+    }
+    return sequence
 }
 
 private fun String.toJsonString(): String = buildString {

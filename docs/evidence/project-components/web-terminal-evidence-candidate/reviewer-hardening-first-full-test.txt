@@ -1,0 +1,18 @@
+Command (from apps/web):
+$env:QA_HUB_API_BASE_URL='http://127.0.0.1:4999'
+node ../../node_modules/vitest/vitest.mjs run
+
+Observed initial result: exit 1
+Test Files 1 failed | 16 passed (17)
+Tests 25 failed | 98 passed (123)
+Failing file: src/pending-submission.test.ts
+
+Representative failure:
+QaHubApiError: INVALID_ATTACHMENT_BINDING
+at uploadSubmissionAttachment src/api.ts
+
+Diagnosis:
+The full binding-receipt validation and new-identity checkpoint path had been applied to the shared Bug-create uploader. The existing durable Bug submission journal already commits its attachment identity before calling the uploader, and its in-memory server intentionally returns the legacy minimal Bug-create bind response.
+
+Correction:
+The strict full receipt, lease runway, and fresh-identity behavior were scoped to Verification uploads. Bug creation retained its existing journal-owned durable protocol and bind behavior. The same full command then passed 123/123; see reviewer-hardening-full-test.txt.

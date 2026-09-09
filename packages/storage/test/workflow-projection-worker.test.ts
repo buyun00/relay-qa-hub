@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import { SqliteStorageWorker } from "../src/sqlite-worker.ts";
-import { SQLITE_MIGRATIONS } from "../src/sqlite-migrations.ts";
+import { SQLITE_MIGRATIONS, SQLITE_SCHEMA_VERSION } from "../src/sqlite-migrations.ts";
 import { currentSqliteSchemaVersion, verifySqliteIntegrity } from "../src/sqlite.ts";
 
 const at = () => new Date().toISOString();
@@ -17,14 +17,19 @@ test("registered worker freezes pages across reopen and binds GM authority to ea
   const directory = mkdtempSync(join(tmpdir(), "qa-workflow-worker-"));
   t.diagnostic(`retained isolated worker fixture ${directory}`);
   const databaseFile = join(directory, "workflow.sqlite");
-  const options = { databaseFile, busyTimeoutMs: 5000, backupRoot: join(directory, "backups") };
+  const options = {
+    databaseFile,
+    busyTimeoutMs: 5000,
+    backupRoot: join(directory, "backups"),
+    mobileBugCursorSigningKey: new Uint8Array(32).fill(5),
+  };
   let worker = new SqliteStorageWorker(options);
   const accountId = randomUUID();
   const a = { accountId, projectId: randomUUID(), actorId: randomUUID() };
   const b = { accountId, projectId: randomUUID(), actorId: randomUUID() };
   const gm = { accountId, projectId: randomUUID(), actorId: randomUUID() };
   try {
-    assert.equal((await worker.initialization).migration.toVersion, 19);
+    assert.equal((await worker.initialization).migration.toVersion, SQLITE_SCHEMA_VERSION);
     for (const [index, scope] of [a, b, gm].entries()) {
       await worker.ensureMobileScope({
         ...scope,
@@ -56,6 +61,20 @@ test("registered worker freezes pages across reopen and binds GM authority to ea
         createdAt: at(),
       });
     const [bugA, bugB] = await Promise.all([makeBug(a), makeBug(b)]);
+    const secondBugA = await makeBug(a);
+    const bugListQuery = { ...a, limit: 1 } as const;
+    const bugListFirst = await worker.listMobileBugs(bugListQuery);
+    assert.equal(bugListFirst.items.length, 1);
+    assert.ok(bugListFirst.nextCursor);
+    const bugListPageQuery = { ...bugListQuery, cursor: bugListFirst.nextCursor! };
+    const bugListSecond = await worker.listMobileBugs(bugListPageQuery);
+    assert.equal(bugListSecond.items.length, 1);
+    assert.equal(bugListSecond.nextCursor, null);
+    assert.equal(bugListSecond.snapshotSequence, bugListFirst.snapshotSequence);
+    assert.deepEqual(
+      new Set([...bugListFirst.items, ...bugListSecond.items].map((bug) => bug.id)),
+      new Set([bugA.bug.id, secondBugA.bug.id]),
+    );
     // Add local typed occurrence facts before requesting any snapshot; no live database is used.
     const seed = new DatabaseSync(databaseFile);
     try {
@@ -86,6 +105,7 @@ test("registered worker freezes pages across reopen and binds GM authority to ea
     await worker.close();
     worker = new SqliteStorageWorker(options);
     await worker.initialization;
+    assert.deepEqual(await worker.listMobileBugs(bugListPageQuery), bugListSecond);
     assert.deepEqual(await worker.getBugWorkflowProjection(pageQuery), second);
     const gmA = { ...a, actorId: gm.actorId };
     const authorized = <T>(work: () => T) => worker.runWithRequestAuthorization({ gm: gmA }, work);
@@ -193,7 +213,7 @@ test("registered worker freezes pages across reopen and binds GM authority to ea
 });
 
 test(
-  "retained Phase B schema16 archive migrates only its new copy to17 with all prior tables unchanged",
+  "retained Phase B schema16 archive migrates only its new copy through schema20 with all prior tables unchanged",
   { skip: !process.env["QA_WORKFLOW_PHASE_B_ARCHIVE"] },
   async (t) => {
     const original = process.env["QA_WORKFLOW_PHASE_B_ARCHIVE"]!;
@@ -228,14 +248,15 @@ test(
     const worker = new SqliteStorageWorker({
       databaseFile,
       busyTimeoutMs: 5000,
-      backupRoot: join(directory, "before17"),
+      backupRoot: join(directory, "before20"),
     });
     try {
       const init = await worker.initialization;
-      assert.deepEqual(init.migration.appliedVersions, [17]);
+      assert.equal(SQLITE_SCHEMA_VERSION, 20);
+      assert.deepEqual(init.migration.appliedVersions, [17, 18, 19, 20]);
       assert.ok(init.migration.backupPath);
       for (const [path, version] of [
-        [databaseFile, 17],
+        [databaseFile, SQLITE_SCHEMA_VERSION],
         [init.migration.backupPath, 16],
       ] as const) {
         const db = new DatabaseSync(path, { readOnly: true });

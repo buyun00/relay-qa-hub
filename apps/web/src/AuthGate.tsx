@@ -53,6 +53,7 @@ function ProjectWorkspace({
   const [draft, setDraft] = useState<AppDraft | undefined>();
   const [draftError, setDraftError] = useState("");
   const draftKey = projectStorageKey("bug-drafts", projectId, principal.userId);
+  const draftWriteQueue = useRef<Promise<void>>(Promise.resolve());
   useEffect(() => {
     let active = true;
     void readProjectDraft<AppDraft>(draftKey)
@@ -73,11 +74,14 @@ function ProjectWorkspace({
     };
   }, [draftKey]);
   const saveDraft = useCallback(
-    (value: AppDraft) => {
+    (value: AppDraft): Promise<void> => {
       latestDraft.current = value;
-      void writeProjectDraft(draftKey, value).catch(() =>
-        setDraftError("本地保存失败；当前窗口保留输入，请保存文件后再关闭。"),
-      );
+      const write = draftWriteQueue.current.then(() => writeProjectDraft(draftKey, value));
+      draftWriteQueue.current = write.catch(() => undefined);
+      return write.catch((cause: unknown) => {
+        setDraftError("本地保存失败；当前窗口保留输入，请保存文件后再关闭。");
+        throw cause;
+      });
     },
     [draftKey],
   );

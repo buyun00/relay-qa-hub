@@ -442,7 +442,7 @@ test("MCP result catalog is additive, explicit and vendor-only; invalid scope/ke
     args = argsFor(f, r, body),
     before = snapshot(f);
   const catalog = (await rpc(f, "tools/list", {})).tools;
-  assert.equal(catalog.length, 94);
+  assert.equal(catalog.length, 96);
   assert.deepEqual(catalog, AUTOMATION_TOOLS);
   const sharedCatalog = await f.call("/api/v1/mcp/tools");
   assert.deepEqual(sharedCatalog.tools, catalog);
@@ -459,6 +459,8 @@ test("MCP result catalog is additive, explicit and vendor-only; invalid scope/ke
           "qa_get_bug_workflow",
           "qa_fail_repair_attempt",
           "qa_supersede_repair_attempt",
+          "qa_begin_fix",
+          "qa_submit_fix",
         ].includes(x.name),
     ).length,
     90,

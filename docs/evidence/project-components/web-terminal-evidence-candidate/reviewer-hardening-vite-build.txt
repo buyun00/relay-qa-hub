@@ -1,0 +1,18 @@
+CAPTURED_AT=2026-09-09T10:14:20.5126998Z
+COMMAND=QA_HUB_API_BASE_URL=http://127.0.0.1:4999 node ../../node_modules/vite/bin/vite.js build --outDir C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-schema19-sol-0909/builds/web-independent-review-final-20260909T181400Z
+VERIFIED_NEW_TARGET=C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-schema19-sol-0909\builds\web-independent-review-final-20260909T181400Z
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 1886 modules transformed.
+
+(!) outDir C:\Users\lin0\.codex\parallel-runtimes\qa-hub-preview-schema19-sol-0909\builds\web-independent-review-final-20260909T181400Z is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../../../parallel-runtimes/qa-hub-preview-schema19-sol-0909/builds/web-independent-review-final-20260909T181400Z/index.html                   0.70 kB │ gzip:   0.45 kB
+../../../../../parallel-runtimes/qa-hub-preview-schema19-sol-0909/builds/web-independent-review-final-20260909T181400Z/assets/index-BqKaPXcA.css   92.94 kB │ gzip:  19.99 kB
+../../../../../parallel-runtimes/qa-hub-preview-schema19-sol-0909/builds/web-independent-review-final-20260909T181400Z/assets/index-B0_MzKMk.js   495.25 kB │ gzip: 152.98 kB │ map: 1,900.09 kB
+
+✓ built in 253ms
+EXIT_CODE=0

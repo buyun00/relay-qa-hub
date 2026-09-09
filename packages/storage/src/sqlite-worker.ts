@@ -1,4 +1,5 @@
 import { Worker } from "node:worker_threads";
+import { randomBytes } from "node:crypto";
 import type {
   GetRepairAttemptDetailInput,
   RepairAttemptDetail,
@@ -62,9 +63,11 @@ import {
 } from "./mobile-human-workflow-store.js";
 import type {
   CreateMobileCommentInput,
+  ListMobileBugCommentsInput,
   ListMobileBugEventsInput,
   MobileBugEvents,
   MobileCommentCreation,
+  MobileCommentList,
 } from "./mobile-comment-store.js";
 import type {
   CreateMobileCaptureInput,
@@ -72,7 +75,9 @@ import type {
   MobileCaptureCreation,
 } from "./mobile-capture-store.js";
 import type {
+  ListMobileProjectBuildsInput,
   MobileBuildRecord,
+  MobileProjectBuildList,
   RegisterMobileBuildInput,
   RegisterMobileBuildResult,
 } from "./mobile-build-store.js";
@@ -162,6 +167,8 @@ export interface SqliteStorageWorkerOptions {
   readonly relayInstanceId?: string;
   readonly qaInstanceId?: string;
   readonly relayPrincipalId?: string;
+  /** Server-only key for HMAC-protected Bug list cursors; defaults to a fresh key per worker. */
+  readonly mobileBugCursorSigningKey?: Uint8Array;
   /** @internal Enables migration stress-test commands. Never set in an application process. */
   readonly allowUnsafeTestCommands?: boolean;
 }
@@ -233,7 +240,19 @@ export class SqliteStorageWorker {
               ? {}
               : { relayPrincipalId: options.relayPrincipalId }),
           });
-    this.worker = new Worker(workerEntryUrl(), { workerData: options });
+    const mobileBugCursorSigningKey = options.mobileBugCursorSigningKey ?? randomBytes(32);
+    if (
+      !(mobileBugCursorSigningKey instanceof Uint8Array) ||
+      mobileBugCursorSigningKey.byteLength !== 32
+    ) {
+      throw new TypeError("mobileBugCursorSigningKey must contain exactly 32 bytes");
+    }
+    this.worker = new Worker(workerEntryUrl(), {
+      workerData: {
+        ...options,
+        mobileBugCursorSigningKey: Uint8Array.from(mobileBugCursorSigningKey),
+      },
+    });
     this.worker.on("message", (message: WorkerResponse) => this.onMessage(message));
     this.worker.on("error", (error) => this.terminateWithError(error));
     this.worker.on("exit", (code) => {
@@ -502,6 +521,11 @@ export class SqliteStorageWorker {
     return this.request<MobileBugEvents>("listMobileBugEvents", input);
   }
 
+  async listMobileBugComments(input: ListMobileBugCommentsInput): Promise<MobileCommentList> {
+    await this.initialization;
+    return this.request<MobileCommentList>("listMobileBugComments", input);
+  }
+
   async listMobileDuplicateCandidates(
     input: ListMobileDuplicateCandidatesInput,
   ): Promise<MobileDuplicateCandidateList> {
@@ -532,6 +556,13 @@ export class SqliteStorageWorker {
   async registerMobileBuild(input: RegisterMobileBuildInput): Promise<RegisterMobileBuildResult> {
     await this.initialization;
     return this.request<RegisterMobileBuildResult>("registerMobileBuild", input);
+  }
+
+  async listMobileProjectBuilds(
+    input: ListMobileProjectBuildsInput,
+  ): Promise<MobileProjectBuildList> {
+    await this.initialization;
+    return this.request<MobileProjectBuildList>("listMobileProjectBuilds", input);
   }
 
   async getMobileBuild(input: {

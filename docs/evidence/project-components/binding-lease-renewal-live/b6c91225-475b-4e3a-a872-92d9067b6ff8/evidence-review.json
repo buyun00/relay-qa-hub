@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "checks": 35,
+  "files": {
+    "create-proof.json": {
+      "bytes": 3277,
+      "sha256": "820281a216439a0c9b10aa4fb1dba279b6eac5deaa2a13488a1cbaaa3180903e"
+    },
+    "renew-proof.json": {
+      "bytes": 4695,
+      "sha256": "6a48ef0168ffb23b1a24e7273f531ac003ceb110ab5fd96afd4c00feb6bf5164"
+    },
+    "runner.mjs.txt": {
+      "bytes": 12851,
+      "sha256": "d24027e4e1ef7e9b9ed93ddb0cbd2790f166bdc76d3fcaaefa4f7b2720b77d54"
+    },
+    "runner-renew-executed.mjs.txt": {
+      "bytes": 16661,
+      "sha256": "7f48fbf4487054aef9a1ee1e9ae3f76f1d5b908fa6911cd15cbd02b094258140"
+    },
+    "runner-current-after-review.mjs.txt": {
+      "bytes": 16687,
+      "sha256": "811892b8697cfa6c555fc3016c4f904b232accfbc0bdff10f073ffa5843d786b"
+    }
+  },
+  "conclusions": {
+    "naturalWallClockExpiry": true,
+    "sameTupleGenerationTwo": true,
+    "exactReplay": true,
+    "listenerAndSchemaBoundaries": true,
+    "persistedSecretValueMatches": 0,
+    "productionTouched": false,
+    "sharedPreviewTouched": false
+  }
+}

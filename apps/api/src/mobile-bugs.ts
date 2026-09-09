@@ -19,6 +19,7 @@ export type MobileBugState =
 
 export type MobileBugSeverity = "S0" | "S1" | "S2" | "S3" | "S4";
 export type MobileBugPriority = "P0" | "P1" | "P2" | "P3" | "P4";
+export type MobileBugListSort = "updated_desc" | "created_desc" | "priority_desc";
 export type MobileOccurrencePlatform =
   "android" | "ios" | "windows" | "macos" | "linux" | "web" | "other";
 
@@ -145,17 +146,24 @@ export interface MobileBugListQuery {
   readonly actorId: string;
   readonly projectId?: string;
   readonly ownerId?: string;
+  readonly verificationOwnerId?: string;
   readonly ownerState?: "assigned" | "unassigned";
   readonly q?: string;
-  readonly state?: MobileBugState;
+  readonly state?: readonly MobileBugState[];
+  readonly reporterId?: string;
+  readonly moduleId?: string;
   readonly severity?: MobileBugSeverity;
+  readonly priority?: MobileBugPriority;
+  readonly updatedAfter?: string;
+  readonly sort?: MobileBugListSort;
+  readonly cursor?: string;
   readonly limit: number;
 }
 
 export interface MobileBugListResponse {
   readonly snapshotSequence: number;
   readonly items: readonly MobileBug[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface MobileBugStore {
@@ -263,16 +271,68 @@ function queryString(value: Record<string, unknown>, key: string): string | unde
   return candidate;
 }
 
+function queryStrings(value: Record<string, unknown>, key: string): readonly string[] | undefined {
+  const candidate = value[key];
+  if (candidate === undefined) return undefined;
+  const values = Array.isArray(candidate) ? candidate : [candidate];
+  if (
+    values.length < 1 ||
+    values.length > 12 ||
+    values.some((entry) => typeof entry !== "string")
+  ) {
+    throw new TypeError(`${key} must contain from 1 through 12 strings`);
+  }
+  return values as readonly string[];
+}
+
+function isDateTime(value: string): boolean {
+  if (
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value) ||
+    !Number.isFinite(Date.parse(value))
+  ) {
+    return false;
+  }
+  const [datePart, timePart] = value.split("T");
+  const [year, month, day] = datePart!.split("-").map(Number);
+  const [hour, minute, second] = timePart!.slice(0, 8).split(":").map(Number);
+  if (hour! > 23 || minute! > 59 || second! > 59) return false;
+  const calendar = new Date(0);
+  calendar.setUTCHours(0, 0, 0, 0);
+  calendar.setUTCFullYear(year!, month! - 1, day!);
+  return (
+    calendar.getUTCFullYear() === year &&
+    calendar.getUTCMonth() === month! - 1 &&
+    calendar.getUTCDate() === day
+  );
+}
+
 export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery, "actorId"> {
   const query = requireRecord(value, "Bug list query");
   requireOnlyKeys(
     query,
-    new Set(["projectId", "ownerId", "ownerState", "q", "state", "severity", "limit"]),
+    new Set([
+      "projectId",
+      "ownerId",
+      "verificationOwnerId",
+      "ownerState",
+      "q",
+      "state",
+      "reporterId",
+      "moduleId",
+      "severity",
+      "priority",
+      "updatedAfter",
+      "sort",
+      "cursor",
+      "limit",
+    ]),
   );
   const projectId = queryString(query, "projectId");
   if (projectId !== undefined) requireUuid(projectId, "projectId");
   const ownerId = queryString(query, "ownerId");
   if (ownerId !== undefined) requireUuid(ownerId, "ownerId");
+  const verificationOwnerId = queryString(query, "verificationOwnerId");
+  if (verificationOwnerId !== undefined) requireUuid(verificationOwnerId, "verificationOwnerId");
   const ownerStateValue = queryString(query, "ownerState");
   if (
     ownerStateValue !== undefined &&
@@ -294,18 +354,58 @@ export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery
     throw new TypeError("q is invalid");
   }
 
-  const stateValue = queryString(query, "state");
-  if (stateValue !== undefined && !BUG_STATES.has(stateValue as MobileBugState)) {
+  const stateValues = queryStrings(query, "state");
+  if (stateValues?.some((state) => !BUG_STATES.has(state as MobileBugState))) {
     throw new TypeError("state is invalid");
   }
+  const states =
+    stateValues === undefined
+      ? undefined
+      : Object.freeze([...new Set(stateValues as readonly MobileBugState[])].sort());
+
+  const reporterId = queryString(query, "reporterId");
+  if (reporterId !== undefined) requireUuid(reporterId, "reporterId");
+  const moduleId = queryString(query, "moduleId");
+  if (moduleId !== undefined) requireUuid(moduleId, "moduleId");
 
   const severityValue = queryString(query, "severity");
   if (severityValue !== undefined && !SEVERITIES.has(severityValue as MobileBugSeverity)) {
     throw new TypeError("severity is invalid");
   }
 
+  const priorityValue = queryString(query, "priority");
+  if (priorityValue !== undefined && !PRIORITIES.has(priorityValue as MobileBugPriority)) {
+    throw new TypeError("priority is invalid");
+  }
+
+  const updatedAfterValue = queryString(query, "updatedAfter");
+  const updatedAfter =
+    updatedAfterValue === undefined
+      ? undefined
+      : isDateTime(updatedAfterValue)
+        ? new Date(Date.parse(updatedAfterValue)).toISOString()
+        : undefined;
+  if (updatedAfterValue !== undefined && updatedAfter === undefined) {
+    throw new TypeError("updatedAfter is invalid");
+  }
+
+  const sortValue = queryString(query, "sort");
+  if (
+    sortValue !== undefined &&
+    !(["updated_desc", "created_desc", "priority_desc"] as const).includes(
+      sortValue as MobileBugListSort,
+    )
+  ) {
+    throw new TypeError("sort is invalid");
+  }
+
+  const cursor = queryString(query, "cursor");
+  if (cursor !== undefined && !/^[A-Za-z0-9_.-]{1,500}$/u.test(cursor)) {
+    throw new TypeError("cursor is invalid");
+  }
+
   const limitValue = queryString(query, "limit");
-  const limit = limitValue === undefined ? 20 : Number(limitValue);
+  const limit = limitValue === undefined ? 50 : Number(limitValue);
   if (
     (limitValue !== undefined && !/^\d+$/u.test(limitValue)) ||
     !Number.isSafeInteger(limit) ||
@@ -317,12 +417,19 @@ export function parseMobileBugListQuery(value: unknown): Omit<MobileBugListQuery
   return {
     ...(projectId === undefined ? {} : { projectId }),
     ...(ownerId === undefined ? {} : { ownerId }),
+    ...(verificationOwnerId === undefined ? {} : { verificationOwnerId }),
     ...(ownerStateValue === undefined
       ? {}
       : { ownerState: ownerStateValue as "assigned" | "unassigned" }),
     ...(normalizedQuery === undefined ? {} : { q: normalizedQuery }),
-    ...(stateValue === undefined ? {} : { state: stateValue as MobileBugState }),
+    ...(states === undefined ? {} : { state: states }),
+    ...(reporterId === undefined ? {} : { reporterId }),
+    ...(moduleId === undefined ? {} : { moduleId }),
     ...(severityValue === undefined ? {} : { severity: severityValue as MobileBugSeverity }),
+    ...(priorityValue === undefined ? {} : { priority: priorityValue as MobileBugPriority }),
+    ...(updatedAfter === undefined ? {} : { updatedAfter }),
+    ...(sortValue === undefined ? {} : { sort: sortValue as MobileBugListSort }),
+    ...(cursor === undefined ? {} : { cursor }),
     limit,
   };
 }

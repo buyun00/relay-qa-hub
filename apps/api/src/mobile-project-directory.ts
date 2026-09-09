@@ -22,7 +22,7 @@ export interface MobileVisibleProject {
 export interface MobileVisibleProjectList {
   readonly snapshotSequence: number;
   readonly items: readonly MobileVisibleProject[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface MobileProjectMember {
@@ -30,7 +30,6 @@ export interface MobileProjectMember {
   readonly projectId: string;
   readonly displayName: string;
   readonly roles: readonly MobileProjectRole[];
-  readonly linkedUserIds?: readonly string[];
   readonly active: true;
 }
 
@@ -38,7 +37,7 @@ export interface MobileProjectMemberList {
   readonly projectId: string;
   readonly snapshotSequence: number;
   readonly items: readonly MobileProjectMember[];
-  readonly nextCursor: null;
+  readonly nextCursor: string | null;
 }
 
 export interface MobileProjectModule {
@@ -67,11 +66,15 @@ export interface MobileProjectDirectoryStore {
   } | null>;
   readonly listProjects: (query: {
     readonly actorId: string;
+    /** Set only from an authenticated server principal. */
+    readonly isGm?: true;
+    readonly cursor?: string;
     readonly limit: number;
   }) => MobileVisibleProjectList | Promise<MobileVisibleProjectList>;
   readonly listMembers: (query: {
     readonly actorId: string;
     readonly projectId: string;
+    readonly cursor?: string;
     readonly limit: number;
   }) => MobileProjectMemberList | Promise<MobileProjectMemberList>;
   readonly listModules: (query: {
@@ -109,18 +112,22 @@ function queryString(value: Record<string, unknown>, key: string): string | unde
   return candidate;
 }
 
-export function parseMobileProjectDirectoryListQuery(value: unknown): { readonly limit: number } {
+export function parseMobileProjectDirectoryListQuery(value: unknown): {
+  readonly cursor?: string;
+  readonly limit: number;
+} {
   const query = requireRecord(value, "project directory query");
   requireOnlyKeys(query, new Set(["cursor", "limit"]));
-  if (queryString(query, "cursor") !== undefined) {
-    throw new TypeError("cursor is not available in the first project directory slice");
+  const cursor = queryString(query, "cursor");
+  if (cursor !== undefined && (cursor.length < 1 || cursor.length > 500)) {
+    throw new TypeError("cursor is invalid");
   }
   const rawLimit = queryString(query, "limit");
-  if (rawLimit === undefined) return { limit: 50 };
+  if (rawLimit === undefined) return cursor === undefined ? { limit: 50 } : { cursor, limit: 50 };
   if (!/^[1-9][0-9]{0,2}$/u.test(rawLimit)) throw new TypeError("limit is invalid");
   const limit = Number(rawLimit);
   if (!Number.isSafeInteger(limit) || limit > 100) throw new TypeError("limit is invalid");
-  return { limit };
+  return cursor === undefined ? { limit } : { cursor, limit };
 }
 
 export function requireMobileProjectUuid(value: string, label: string): string {

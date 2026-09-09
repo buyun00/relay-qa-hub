@@ -1,0 +1,4 @@
+CAPTURED_AT=2026-09-09T10:13:51.9690888Z
+COMMAND=git diff --check -- apps/web/src
+
+EXIT_CODE=0

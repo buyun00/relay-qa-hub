@@ -1,0 +1,11 @@
+CAPTURED_AT=2026-09-09T10:13:55.2925599Z
+COMMAND=QA_HUB_API_BASE_URL=http://127.0.0.1:4999 node ../../node_modules/vitest/vitest.mjs run src/api.test.ts src/App.test.tsx src/App.detail-loading.test.tsx
+
+ RUN  v4.1.11 C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/web
+
+
+ Test Files  3 passed (3)
+      Tests  57 passed (57)
+   Start at  18:13:52
+   Duration  2.82s (transform 1.82s, setup 0ms, import 3.46s, tests 1.18s, environment 0ms)
+EXIT_CODE=0

@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import type {
   MobileScopeBootstrap,
   LinkMobileBuildRepairInput,
+  ListMobileProjectBuildsInput,
   RegisterMobileBuildInput,
   SqliteStorageWorker,
 } from "@relay-qa-hub/storage";
@@ -31,6 +32,20 @@ export function createSqliteMobileBuildStore(
     }) as const;
 
   return {
+    async listBuilds(query) {
+      if (query.projectId !== options.scope.projectId) {
+        throw new TypeError("projectId does not match the authenticated mobile scope");
+      }
+      const input: ListMobileProjectBuildsInput = {
+        ...actorScope(query.actorId),
+        authorizationProjectId: options.scope.projectId,
+        ...(query.status === undefined ? {} : { status: query.status }),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+        limit: query.limit,
+      };
+      return options.worker.listMobileProjectBuilds(input);
+    },
+
     async registerBuild(command) {
       if (command.projectId !== options.scope.projectId) {
         throw new TypeError("projectId does not match the authenticated mobile scope");

@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import { decodeScopedListCursor, encodeScopedListCursor } from "./scoped-list-cursor.js";
+import { canonicalProjectUserId } from "./project-identity-projection.js";
 
 export const PROJECT_COMPONENT_KEYS = [
   "build",
@@ -533,7 +534,14 @@ export function projectManagement(database: DatabaseSync, input: ProjectManageme
       authorId: string;
       createdAt: string;
     }[];
-    const items = rows.slice(0, limit);
+    const items = rows.slice(0, limit).map((item) => ({
+      ...item,
+      authorId: canonicalProjectUserId(
+        database,
+        { accountId: input.accountId, projectId: selected.id },
+        item.authorId,
+      ),
+    }));
     return {
       projectId: selected.id,
       bugId,
@@ -674,7 +682,15 @@ export function projectManagement(database: DatabaseSync, input: ProjectManageme
         .prepare(
           "SELECT id, actor_id AS actorId, action, subject_id AS subjectId, summary_json AS summaryJson, created_at AS createdAt FROM project_management_events WHERE account_id = ? AND project_id = ? ORDER BY sequence DESC LIMIT 500",
         )
-        .all(input.accountId, selected.id),
+        .all(input.accountId, selected.id)
+        .map((item) => ({
+          ...item,
+          actorId: canonicalProjectUserId(
+            database,
+            { accountId: input.accountId, projectId: selected.id },
+            String(item.actorId),
+          ),
+        })),
     };
   return fail("INVALID_REQUEST", "unknown project operation");
 }

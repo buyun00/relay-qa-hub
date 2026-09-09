@@ -3,6 +3,10 @@ import type { DatabaseSync } from "node:sqlite";
 
 import { insertBugWithNextNumber, SqliteStorageError } from "./sqlite.js";
 import { MobileRelayStorageError } from "./mobile-relay-store.js";
+import {
+  canonicalNullableProjectUserId,
+  canonicalProjectUserId,
+} from "./project-identity-projection.js";
 
 const NOTIFICATION_DESTINATION = "qa-hub.notifications";
 
@@ -43,6 +47,7 @@ export interface CreateMobileBugInput {
   readonly title: string;
   readonly description: string;
   readonly expectedBehavior: string;
+  readonly moduleId?: string | null;
   readonly severity: "S0" | "S1" | "S2" | "S3" | "S4";
   readonly priority: "P0" | "P1" | "P2" | "P3" | "P4";
   readonly ownerId: string | null;
@@ -615,6 +620,22 @@ export function createMobileBug(
     return replay;
   }
 
+  if (input.moduleId != null) {
+    const module = database
+      .prepare(
+        `SELECT 1 AS present
+         FROM modules
+         WHERE account_id = ? AND project_id = ? AND id = ? AND active = 1`,
+      )
+      .get(input.accountId, input.projectId, input.moduleId);
+    if (!module) {
+      throw new MobileRelayStorageError(
+        "INVALID_REQUEST",
+        "moduleId is not an active project module",
+      );
+    }
+  }
+
   assertInitialAssignment(
     database,
     input,
@@ -640,6 +661,7 @@ export function createMobileBug(
     title: input.title,
     description: input.description,
     expectedBehavior: input.expectedBehavior,
+    moduleId: input.moduleId ?? null,
     severity: input.severity,
     priority: input.priority,
     reporterId: input.actorId,
@@ -772,7 +794,14 @@ export function getMobileBug(
   scope: Pick<CreateMobileBugInput, "accountId" | "projectId">,
   bugId: string,
 ): MobileBugRecord | null {
-  return readBug(database, scope.accountId, scope.projectId, bugId);
+  const bug = readBug(database, scope.accountId, scope.projectId, bugId);
+  if (bug === null) return null;
+  return Object.freeze({
+    ...bug,
+    reporterId: canonicalProjectUserId(database, scope, bug.reporterId),
+    ownerId: canonicalNullableProjectUserId(database, scope, bug.ownerId),
+    verificationOwnerId: canonicalNullableProjectUserId(database, scope, bug.verificationOwnerId),
+  });
 }
 
 export function deleteMobileBug(

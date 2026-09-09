@@ -1,0 +1,13 @@
+Captured: 2026-09-09T18:07:10+08:00
+Context: first focused run of the personal owner/verifier cross-stream snapshot mismatch fixture.
+
+COMMAND=QA_HUB_API_BASE_URL=http://127.0.0.1:4999 node ../../node_modules/vitest/vitest.mjs run src/api.test.ts src/App.test.tsx src/App.detail-loading.test.tsx
+
+FAIL src/App.detail-loading.test.tsx > repair and verification actions > keeps the prior personal list when owner and verifier streams have different snapshots
+AssertionError: expected rendered markup to contain the fixture title
+
+Test Files  1 failed | 2 passed (3)
+Tests       1 failed | 54 passed (55)
+EXIT_CODE=1
+
+Resolution: Bug rows display the Bug description rather than its title. The fixture now assigns distinct descriptions and asserts that the prior description remains while neither mismatched-stream description is rendered.

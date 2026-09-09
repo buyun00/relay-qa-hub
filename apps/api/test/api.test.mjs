@@ -452,20 +452,56 @@ test("new Web and Android name login creates backend accounts and rejects the le
   assert.deepEqual(actorMismatch.json(), { code: "NATIVE_ACTOR_MISMATCH" });
 });
 
-test("Bug overview query supports unassigned ownership and a 500-row window", () => {
+test("Bug overview query supports ownership filters, cursors, and a 500-row window", () => {
   const projectId = "10000000-0000-4000-8000-000000000004";
+  const verificationOwnerId = "20000000-0000-4000-8000-000000000004";
+  const reporterId = "20000000-0000-4000-8000-000000000005";
+  const moduleId = "30000000-0000-4000-8000-000000000006";
+  const cursor = "b1.opaque_Bug-list-payload.signature_123";
 
   assert.deepEqual(
     parseMobileBugListQuery({
       projectId,
+      verificationOwnerId,
       ownerState: "unassigned",
+      state: ["ready", "closed", "ready"],
+      reporterId,
+      moduleId,
+      severity: "S1",
+      priority: "P0",
+      updatedAfter: "2026-09-09T08:00:00+08:00",
+      sort: "priority_desc",
+      cursor,
       limit: "500",
     }),
     {
       projectId,
+      verificationOwnerId,
       ownerState: "unassigned",
+      state: ["closed", "ready"],
+      reporterId,
+      moduleId,
+      severity: "S1",
+      priority: "P0",
+      updatedAfter: "2026-09-09T00:00:00.000Z",
+      sort: "priority_desc",
+      cursor,
       limit: 500,
     },
+  );
+  assert.deepEqual(parseMobileBugListQuery({ state: "reported" }), {
+    state: ["reported"],
+    limit: 50,
+  });
+  assert.throws(() => parseMobileBugListQuery({ state: [] }), /1 through 12/u);
+  assert.throws(
+    () => parseMobileBugListQuery({ state: Array.from({ length: 13 }, () => "ready") }),
+    /1 through 12/u,
+  );
+  assert.throws(() => parseMobileBugListQuery({ state: ["ready", "unknown"] }), /state/u);
+  assert.throws(
+    () => parseMobileBugListQuery({ updatedAfter: "2026-02-30T00:00:00Z" }),
+    /updatedAfter/u,
   );
   assert.throws(
     () =>
@@ -477,6 +513,64 @@ test("Bug overview query supports unassigned ownership and a 500-row window", ()
     /ownerId and ownerState cannot be combined/,
   );
   assert.throws(() => parseMobileBugListQuery({ projectId, limit: "501" }), /1 through 500/);
+  assert.throws(() => parseMobileBugListQuery({ projectId, cursor: "not a cursor" }), /cursor/u);
+  assert.throws(
+    () => parseMobileBugListQuery({ projectId, verificationOwnerId: "not-a-uuid" }),
+    /verificationOwnerId must be a UUID/u,
+  );
+});
+
+test("Bug overview route forwards verification ownership and opaque pagination", async (t) => {
+  const projectId = "10000000-0000-4000-8000-000000000004";
+  const actorId = "20000000-0000-4000-8000-000000000003";
+  const verificationOwnerId = "20000000-0000-4000-8000-000000000004";
+  const reporterId = "20000000-0000-4000-8000-000000000005";
+  const moduleId = "30000000-0000-4000-8000-000000000006";
+  const cursor = "b1.opaque_Bug-list-payload.signature_123";
+  const calls = [];
+  const app = createApiApp({
+    logger: false,
+    debugActorId: actorId,
+    debugBearerToken: "bug-list-route-token",
+    mobileBugStore: {
+      async listBugs(query) {
+        calls.push(query);
+        return { snapshotSequence: 17, items: [], nextCursor: null };
+      },
+    },
+  });
+  t.after(async () => app.close());
+
+  const response = await app.inject({
+    method: "GET",
+    url:
+      `/api/v1/bugs?projectId=${projectId}&verificationOwnerId=${verificationOwnerId}` +
+      `&reporterId=${reporterId}&moduleId=${moduleId}&state=ready&state=closed` +
+      `&priority=P0&updatedAfter=2026-09-09T00%3A00%3A00Z&sort=created_desc` +
+      `&cursor=${cursor}&limit=37`,
+    headers: {
+      authorization: "Bearer bug-list-route-token",
+      "x-qa-actor-id": actorId,
+      "x-qa-project-id": projectId,
+    },
+  });
+  assert.equal(response.statusCode, 200, response.body);
+  assert.deepEqual(response.json(), { snapshotSequence: 17, items: [], nextCursor: null });
+  assert.deepEqual(calls, [
+    {
+      actorId,
+      projectId,
+      verificationOwnerId,
+      reporterId,
+      moduleId,
+      state: ["closed", "ready"],
+      priority: "P0",
+      updatedAfter: "2026-09-09T00:00:00.000Z",
+      sort: "created_desc",
+      cursor,
+      limit: 37,
+    },
+  ]);
 });
 
 test("capture metadata records positive Android API values without an admission floor", () => {

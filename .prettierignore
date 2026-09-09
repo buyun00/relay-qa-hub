@@ -3,3 +3,5 @@ node_modules/
 **/dist/
 coverage/
 packages/contracts/
+# Retained evidence snapshots are immutable captures, not maintained source.
+docs/evidence/

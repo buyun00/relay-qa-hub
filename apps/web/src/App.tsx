@@ -23,6 +23,8 @@ import {
   dispatchRelay,
   downloadAttachment,
   downloadCaptureArtifact,
+  failRepairAttempt,
+  freezeVerificationResultRequest,
   getBug,
   getCaptureBundle,
   getHumanWorkflow,
@@ -30,9 +32,10 @@ import {
   getQingyuSession,
   getVerification,
   importOwnQingyuDefects,
+  listAllBugs,
   listBugAttachments,
   listBugEvents,
-  listBugs,
+  listBugRepairAttempts,
   listProjectMembers,
   listProjectModules,
   listOwnQingyuDefects,
@@ -41,16 +44,21 @@ import {
   logoutQingyu,
   pollQingyuLogin,
   QaHubApiError,
-  recordVerificationFailed,
-  recordVerificationPassed,
+  recordFrozenVerificationResult,
+  refreshVerificationAttachmentBinding,
   startHumanRepairAttempt,
   startQingyuLogin,
   startVerification,
+  supersedeRepairAttempt,
   transitionBugReady,
   updateBugAssignments,
   updateBugDetails,
   uploadBugCreateAttachment,
   uploadVerificationAttachment,
+  verificationAttachmentBindingHasRunway,
+  verificationRecordMatchesIdentity,
+  verificationResultReadbackMatches,
+  verificationResultReceiptMatches,
   type BrowserSessionPrincipal,
   type BugDetail,
   type BugEvent,
@@ -59,13 +67,19 @@ import {
   type BugSeverity,
   type BugListState,
   type HumanWorkflowSnapshot,
+  type FrozenVerificationResultRequest,
   type ProjectMember,
   type ProjectModule,
   type QingyuBugLink,
   type QingyuDefect,
   type QingyuProject,
   type QingyuSession,
+  type RepairMode,
+  type RepairAttempt,
+  type UploadCheckpoint,
+  type VerificationOutcome,
   type VerificationRecord,
+  type VerificationResultResponse,
   type VisibleProject,
 } from "./api";
 import PocoContextPanel, { type PocoCaptureContext } from "./PocoContextPanel";
@@ -106,7 +120,7 @@ interface AppProps {
   readonly projectId?: string;
   readonly onProjectChange?: (projectId: string) => void;
   readonly initialDraft?: AppDraft | undefined;
-  readonly onDraftChange?: (draft: AppDraft) => void;
+  readonly onDraftChange: (draft: AppDraft) => Promise<void>;
 }
 
 interface EvidenceImage {
@@ -140,6 +154,30 @@ interface ReturnDraft {
   readonly reason: string;
   readonly files: readonly File[];
   readonly clientSubmissionId: string;
+  readonly captureBundleId?: string | null;
+  readonly uploads?: Readonly<Record<string, VerificationUploadCheckpointState>>;
+  readonly pendingResult?: ScopedFrozenVerificationResult;
+}
+
+export type ScopedFrozenVerificationResult = FrozenVerificationResultRequest & {
+  readonly projectId: string;
+  readonly actorId: string;
+  readonly bugId: string;
+  readonly repairAttemptId: string;
+  readonly draftKey: string;
+};
+
+export interface VerificationUploadCheckpointState {
+  readonly checkpoint: UploadCheckpoint;
+  readonly updatedAt: number;
+}
+
+interface RepairActionDraft {
+  readonly reason: string;
+  readonly successorAttemptId: string;
+  readonly successorMode: RepairMode;
+  readonly successorAssigneeId: string;
+  readonly successorSummary: string;
 }
 export interface AppDraft {
   createReceiptId?: string | undefined;
@@ -158,6 +196,7 @@ export interface AppDraft {
   editingDetail: boolean;
   assignmentDrafts: Readonly<Record<string, AssignmentDraft>>;
   returnDrafts: Readonly<Record<string, ReturnDraft>>;
+  repairActionDrafts?: Readonly<Record<string, RepairActionDraft>>;
 }
 const EMPTY_RETURN_FILES: readonly File[] = [];
 
@@ -165,6 +204,8 @@ const DEFAULT_EXPECTED_BEHAVIOR = "问题修复后不再复现";
 const AUTO_REFRESH_INTERVAL_MS = 5_000;
 const CREATE_BUG_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 const CREATE_BUG_MUTATION_SCOPE = "create-bug";
+const VERIFICATION_UPLOAD_REUSE_MS = 10 * 60_000;
+const VERIFICATION_BINDING_RUNWAY_MS = 2 * 60_000;
 
 function bugMutationScope(bugId: string): string {
   return `bug:${bugId}`;
@@ -282,7 +323,7 @@ function internalBugSummary(content: string): string {
   return content.replace(/\s+/gu, " ").trim().slice(0, 160);
 }
 
-const DEFAULT_RETURN_REASON = "问题仍可复现，请继续处理";
+const DEFAULT_VERIFICATION_REASON = "";
 const VERIFICATION_RETRY_DELAY_MS = 200;
 
 export type VerificationStepReconciliation<T> =
@@ -366,6 +407,46 @@ export function canReturnCompletedBug(
   );
 }
 
+export function canSubmitVerificationOutcome(
+  outcome: VerificationOutcome,
+  reason: string,
+  mutation: string | null,
+): boolean {
+  return mutation === null && (outcome === "passed" || reason.trim().length > 0);
+}
+
+export function canTerminateRepairAttempt(attempt: RepairAttempt | null): boolean {
+  return (
+    attempt !== null &&
+    ["planned", "queued", "running", "needs_input", "blocked"].includes(attempt.status)
+  );
+}
+
+export function repairAttemptAllowsNewWork(attempt: RepairAttempt | null): boolean {
+  return (
+    attempt === null ||
+    ["failed", "verification_failed", "cancelled", "superseded"].includes(attempt.status)
+  );
+}
+
+export function verificationUploadCheckpointForReuse(
+  retained: VerificationUploadCheckpointState | undefined,
+  now = Date.now(),
+  minimumBindingRunwayMs = 0,
+): UploadCheckpoint | undefined {
+  if (retained === undefined) return undefined;
+  if (retained.checkpoint.binding !== undefined || retained.checkpoint.bound === true) {
+    return verificationAttachmentBindingHasRunway(retained.checkpoint, now, minimumBindingRunwayMs)
+      ? retained.checkpoint
+      : undefined;
+  }
+  // Finalization fixes the durable attachment identity; its short reservation
+  // lease begins only after binding near the result submission boundary.
+  if (retained.checkpoint.finalized !== undefined) return retained.checkpoint;
+  const age = now - retained.updatedAt;
+  return age >= 0 && age < VERIFICATION_UPLOAD_REUSE_MS ? retained.checkpoint : undefined;
+}
+
 export function canManuallyCompleteBug(state: BugListState): boolean {
   const status = taskStatusForBugState(state);
   return status === "pending" || status === "inProgress";
@@ -394,15 +475,56 @@ function formatTime(value: string): string {
       }).format(date);
 }
 
-function canonicalProjectMemberId(
-  members: readonly ProjectMember[],
+export function canonicalProjectMemberId(
+  _members: readonly ProjectMember[],
   userId: string | null,
 ): string | null {
-  if (userId === null) return null;
+  return userId;
+}
+
+export interface VerificationAuthoritySnapshot {
+  readonly actorId: string;
+  readonly projectId: string;
+  readonly snapshotSequence: number;
+  readonly bugIds: readonly string[];
+}
+
+export function canActAsVerificationActor(
+  authority: VerificationAuthoritySnapshot | null,
+  actorId: string,
+  bug: Pick<BugDetail, "id" | "projectId"> | null,
+  workbenchSnapshotSequence: number | null,
+  verification: Pick<VerificationRecord, "bugId" | "verifierId"> | null,
+): boolean {
   return (
-    members.find(
-      (member) => member.userId === userId || member.linkedUserIds?.includes(userId) === true,
-    )?.userId ?? userId
+    authority !== null &&
+    bug !== null &&
+    workbenchSnapshotSequence !== null &&
+    authority.actorId === actorId &&
+    authority.projectId === bug.projectId &&
+    authority.snapshotSequence === workbenchSnapshotSequence &&
+    authority.bugIds.includes(bug.id) &&
+    (verification === null ||
+      (verification.bugId === bug.id && verification.verifierId === actorId))
+  );
+}
+
+export function frozenVerificationResultMatchesScope(
+  frozen: ScopedFrozenVerificationResult,
+  scope: {
+    readonly projectId: string;
+    readonly actorId: string;
+    readonly bugId: string;
+    readonly repairAttemptId: string;
+    readonly draftKey: string;
+  },
+): boolean {
+  return (
+    frozen.projectId === scope.projectId &&
+    frozen.actorId === scope.actorId &&
+    frozen.bugId === scope.bugId &&
+    frozen.repairAttemptId === scope.repairAttemptId &&
+    frozen.draftKey === scope.draftKey
   );
 }
 
@@ -452,12 +574,14 @@ function eventCopy(event: BugEvent): string {
     "verification.created": "发起了验收",
     "repair_attempt.created": "建立了处理任务",
     "repair_attempt.started": "开始处理",
+    "repair_attempt.failed": "结束了本轮处理",
     "bug.manual_completion_started": "人工接管并标记完成",
-    "repair_attempt.superseded": "原修复记录已由人工接管",
+    "repair_attempt.superseded": "更换了处理方式",
     "repair_attempt.delivered": "标记修复完成",
     "bug.completed_for_verification": "已完成，等待验收",
     "verification.requested": "修复已完成，等待验收",
     "verification.started": "开始验收",
+    "verification.result_recorded": "记录了验收结果",
     "verification.failed": "验收未通过",
     "verification.passed": "验收通过并关闭 Bug",
     "relay.handoff_queued": "已交给 Relay",
@@ -501,6 +625,9 @@ export default function App({
   const [category, setCategory] = useState<Category>("pending");
   const [query, setQuery] = useState("");
   const [bugs, setBugs] = useState<readonly BugListItem[]>([]);
+  const [workbenchSnapshotSequence, setWorkbenchSnapshotSequence] = useState<number | null>(null);
+  const [verificationAuthority, setVerificationAuthority] =
+    useState<VerificationAuthoritySnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [backendState, setBackendState] = useState<"checking" | "connected" | "offline">(
     "checking",
@@ -549,14 +676,23 @@ export default function App({
   const [returnDrafts, setReturnDrafts] = useState<Readonly<Record<string, ReturnDraft>>>(
     initialDraft?.returnDrafts ?? {},
   );
-  const returnUploads = useRef(
-    new Map<string, WeakMap<File, { id: string; uploadedAt: number }>>(),
+  const defaultReturnDraftKey = `${selectedId}:${workflow?.repairAttempt?.id ?? ""}`;
+  const pendingReturnDraftEntry = Object.entries(returnDrafts).find(
+    ([, draft]) =>
+      draft.pendingResult?.projectId === projectId &&
+      draft.pendingResult.actorId === principal.userId &&
+      draft.pendingResult.bugId === selectedId,
   );
-  const returnDraftKey = `${selectedId}:${workflow?.repairAttempt?.id ?? ""}`;
+  const returnDraftKey = pendingReturnDraftEntry?.[0] ?? defaultReturnDraftKey;
   const returnDraft = returnDrafts[returnDraftKey];
-  const returnReason = returnDraft?.reason ?? DEFAULT_RETURN_REASON;
+  const returnReason = returnDraft?.reason ?? DEFAULT_VERIFICATION_REASON;
   const returnFiles = returnDraft?.files ?? EMPTY_RETURN_FILES;
   const [returnImageError, setReturnImageError] = useState<string | null>(null);
+  const [repairActionDrafts, setRepairActionDrafts] = useState<
+    Readonly<Record<string, RepairActionDraft>>
+  >(initialDraft?.repairActionDrafts ?? {});
+  const repairActionDraftKey = workflow?.repairAttempt?.id ?? "";
+  const repairActionDraft = repairActionDrafts[repairActionDraftKey];
   const [pendingMutationLabels, setPendingMutationLabels] = useState<ReadonlyMap<string, string>>(
     () => new Map(),
   );
@@ -757,17 +893,29 @@ export default function App({
     (id: string | null): string => {
       if (id === null) return "未分配";
       if (id === principal.userId) return principal.displayName;
-      return (
-        members.find(
-          (member) => member.userId === id || member.linkedUserIds?.includes(id) === true,
-        )?.displayName ?? id.slice(0, 8)
-      );
+      return members.find((member) => member.userId === id)?.displayName ?? id.slice(0, 8);
     },
     [members, principal.displayName, principal.userId],
   );
 
   const owners = members;
   const verifiers = members;
+  const canonicalPrincipalId = canonicalProjectMemberId(members, principal.userId);
+  const developers = members.filter((member) => member.roles.includes("developer"));
+  const canAdjustRepairAttempt =
+    principal.isGm === true || currentProject?.roles.includes("developer") === true;
+  const defaultSuccessorAssigneeId =
+    developers.find((member) => member.userId === detail?.ownerId)?.userId ??
+    developers.find((member) => member.userId === principal.userId)?.userId ??
+    developers[0]?.userId ??
+    "";
+  const currentRepairActionDraft: RepairActionDraft = repairActionDraft ?? {
+    reason: "",
+    successorAttemptId: "",
+    successorMode: "human",
+    successorAssigneeId: defaultSuccessorAssigneeId,
+    successorSummary: "",
+  };
 
   useEffect(() => {
     if (
@@ -826,8 +974,8 @@ export default function App({
       setView("workbench");
     if (!enabled("qingyu.sync")) setQingyuOpen(false);
   }, [enabled, view]);
-  useEffect(() => {
-    onDraftChange?.({
+  const appDraftSnapshot = useMemo<AppDraft>(
+    () => ({
       createReceiptId,
       commentReceiptIds,
       newContent,
@@ -844,26 +992,39 @@ export default function App({
       editingDetail,
       assignmentDrafts,
       returnDrafts,
-    });
-  }, [
-    onDraftChange,
-    createReceiptId,
-    commentReceiptIds,
-    newContent,
-    newOwnerId,
-    newVerifierId,
-    newSeverity,
-    newFiles,
-    createOpen,
-    selectedId,
-    comment,
-    detailDraft,
-    detailNewFiles,
-    detailAttachmentIds,
-    editingDetail,
-    assignmentDrafts,
-    returnDrafts,
-  ]);
+      repairActionDrafts,
+    }),
+    [
+      createReceiptId,
+      commentReceiptIds,
+      newContent,
+      newOwnerId,
+      newVerifierId,
+      newSeverity,
+      newFiles,
+      createOpen,
+      selectedId,
+      comment,
+      detailDraft,
+      detailNewFiles,
+      detailAttachmentIds,
+      editingDetail,
+      assignmentDrafts,
+      returnDrafts,
+      repairActionDrafts,
+    ],
+  );
+  useEffect(() => {
+    void onDraftChange(appDraftSnapshot).catch(() => undefined);
+  }, [appDraftSnapshot, onDraftChange]);
+
+  const persistReturnDrafts = useCallback(
+    async (next: Readonly<Record<string, ReturnDraft>>): Promise<void> => {
+      setReturnDrafts(next);
+      await onDraftChange({ ...appDraftSnapshot, returnDrafts: next });
+    },
+    [appDraftSnapshot, onDraftChange],
+  );
 
   const loadWorkbench = useCallback(
     async (quiet = false, indicateRefresh = quiet) => {
@@ -873,13 +1034,49 @@ export default function App({
       else if (!quiet) setLoading(true);
       if (!quiet || indicateRefresh) setError(null);
       try {
-        const [memberResponse, bugResponse] = await Promise.all([
-          listProjectMembers(projectId),
-          listBugs(projectId, scopeId === "team" ? {} : { ownerId: scopeId }),
+        const memberRequest = listProjectMembers(projectId);
+        const displayedRequests =
+          scopeId === "team"
+            ? [listAllBugs(projectId)]
+            : [
+                listAllBugs(projectId, { ownerId: scopeId }),
+                listAllBugs(projectId, { verificationOwnerId: scopeId }),
+              ];
+        const authorityRequest =
+          scopeId === "team"
+            ? (displayedRequests[0] ?? listAllBugs(projectId))
+            : listAllBugs(projectId);
+        const [memberResponse, bugResponses, authorityResponse] = await Promise.all([
+          memberRequest,
+          Promise.all(displayedRequests),
+          authorityRequest,
         ]);
         if (requestId !== workbenchRequestRef.current) return;
+        const snapshotSequence = bugResponses[0]?.snapshotSequence;
+        if (
+          snapshotSequence === undefined ||
+          bugResponses.some((response) => response.snapshotSequence !== snapshotSequence) ||
+          authorityResponse.snapshotSequence !== snapshotSequence
+        ) {
+          throw new QaHubApiError(200, "PERSONAL_BUG_SNAPSHOT_MISMATCH");
+        }
         setMembers(memberResponse.items);
-        setBugs(bugResponse.items);
+        const bugItems = [
+          ...new Map(
+            bugResponses.flatMap((response) => response.items).map((bug) => [bug.id, bug]),
+          ).values(),
+        ].sort(
+          (left, right) =>
+            right.updatedAt.localeCompare(left.updatedAt) || right.id.localeCompare(left.id),
+        );
+        setBugs(bugItems);
+        setWorkbenchSnapshotSequence(snapshotSequence);
+        setVerificationAuthority({
+          actorId: principal.userId,
+          projectId,
+          snapshotSequence,
+          bugIds: authorityResponse.items.map((bug) => bug.id),
+        });
         setBackendState("connected");
         setError(null);
       } catch (cause) {
@@ -894,7 +1091,7 @@ export default function App({
         }
       }
     },
-    [projectId, scopeId],
+    [principal.userId, projectId, scopeId],
   );
 
   const loadQingyuDefects = useCallback(async (externalProjectId: string) => {
@@ -1098,6 +1295,7 @@ export default function App({
           eventResponse,
           attachmentResponse,
           workflowResponse,
+          repairAttempts,
           moduleResponse,
           nextQingyuLink,
           commentResponse,
@@ -1105,6 +1303,7 @@ export default function App({
           listBugEvents(bugId),
           listBugAttachments(bugId),
           getHumanWorkflow(bugId),
+          listBugRepairAttempts(bugId),
           listProjectModules(nextDetail.projectId),
           enabled("qingyu.sync") ? getQingyuBugLink(bugId) : Promise.resolve(null),
           listBugComments(bugId).catch(() => ({ items: [], unavailable: true })),
@@ -1112,9 +1311,17 @@ export default function App({
         if (requestId !== detailRequestRef.current) return;
         setDetail(nextDetail);
         setEvents(eventResponse.items);
-        setComments(commentResponse.items);
+        setComments([...commentResponse.items]);
         setCommentLoadError("unavailable" in commentResponse ? "评论暂时无法读取。" : "");
-        setWorkflow(workflowResponse);
+        const projectedAttempt = repairAttempts.reduce<RepairAttempt | null>(
+          (latest, attempt) =>
+            latest === null || attempt.sequence > latest.sequence ? attempt : latest,
+          null,
+        );
+        setWorkflow({
+          ...workflowResponse,
+          repairAttempt: projectedAttempt ?? workflowResponse.repairAttempt,
+        });
         setQingyuLink(nextQingyuLink);
         setModules(moduleResponse.items.filter((item) => item.active));
         if (!editingDetail)
@@ -1538,8 +1745,23 @@ export default function App({
 
   const ensureVerificationStarted = async () => {
     if (detail === null || repairAttempt === null) return null;
+    if (!canActAsVerifier) throw new QaHubApiError(403, "VERIFICATION_ACTOR_REQUIRED");
+    const expectedOwnership = {
+      bugId: detail.id,
+      repairAttemptId: repairAttempt.id,
+      verifierId: principal.userId,
+    };
     let verificationBug = detail;
     let current = workflow?.verification ?? null;
+    if (
+      current !== null &&
+      !verificationRecordMatchesIdentity(current, {
+        ...expectedOwnership,
+        verificationId: current.id,
+      })
+    ) {
+      throw new QaHubApiError(409, "VERIFICATION_SCOPE_MISMATCH");
+    }
     if (verificationBug.state === "awaiting_build") {
       if (repairAttempt.status !== "delivered") return null;
       let expectedBugVersion = verificationBug.version;
@@ -1570,7 +1792,7 @@ export default function App({
             expectedBugVersion,
             repairAttemptId: repairAttempt.id,
             buildId,
-            verifierId: verificationBug.verificationOwnerId ?? principal.userId,
+            verifierId: principal.userId,
             criteria: verificationBug.expectedBehavior || "关闭人确认问题已解决且未引入回归",
           }),
         async () => {
@@ -1581,15 +1803,19 @@ export default function App({
           const latestVerification = latestWorkflow.verification;
           if (
             latestVerification !== null &&
-            latestVerification.repairAttemptId === repairAttempt.id &&
             (latestVerification.status === "requested" ||
               latestVerification.status === "in_progress" ||
               latestVerification.status === "passed" ||
-              latestVerification.status === "failed")
+              latestVerification.status === "failed" ||
+              latestVerification.status === "blocked")
           ) {
+            if (!verificationRecordMatchesIdentity(latestVerification, expectedOwnership)) {
+              return { status: "conflict" };
+            }
             return { status: "committed", value: latestVerification };
           }
           if (
+            latestWorkflow.bugId === verificationBug.id &&
             latestBug.state === "ready_for_verification" &&
             latestWorkflow.repairAttempt?.id === repairAttempt.id &&
             latestVerification === null
@@ -1603,16 +1829,24 @@ export default function App({
         },
       );
     }
+    if (current.verifierId !== principal.userId) {
+      throw new QaHubApiError(403, "VERIFICATION_ACTOR_REQUIRED");
+    }
+    const expectedIdentity = { ...expectedOwnership, verificationId: current.id };
+    if (!verificationRecordMatchesIdentity(current, expectedIdentity)) {
+      throw new QaHubApiError(409, "VERIFICATION_SCOPE_MISMATCH");
+    }
     if (current.status === "requested") {
       let expectedVerificationVersion = current.version;
       return runRecoverableVerificationStep(
-        () => startVerification(current.id, expectedVerificationVersion),
+        () => startVerification(current.id, expectedVerificationVersion, expectedOwnership),
         async () => {
-          const latest = await getVerification(current.id);
+          const latest = await getVerification(current.id, expectedOwnership);
           if (
             latest.status === "in_progress" ||
             latest.status === "passed" ||
-            latest.status === "failed"
+            latest.status === "failed" ||
+            latest.status === "blocked"
           ) {
             return { status: "committed", value: latest };
           }
@@ -1628,53 +1862,149 @@ export default function App({
   };
 
   const recordVerificationResultReliably = async (
-    verification: VerificationRecord,
-    expectedStatus: "passed" | "failed",
-    action: (expectedVersion: number) => Promise<unknown>,
-  ) => {
-    if (verification.status !== "in_progress") {
-      throw new QaHubApiError(412, "VERSION_CONFLICT");
-    }
-    let expectedVerificationVersion = verification.version;
-    await runRecoverableVerificationStep(
-      async () => {
-        await action(expectedVerificationVersion);
-      },
-      async () => {
-        const latest = await getVerification(verification.id);
-        if (latest.status === expectedStatus) {
-          // Only our exact idempotent submission may count as a recovered success.
-          // A concurrent verifier's result must not discard this user's evidence draft.
-          await action(expectedVerificationVersion);
-          return { status: "committed", value: undefined };
+    frozen: ScopedFrozenVerificationResult,
+    originalDraft: ReturnDraft,
+    originalDrafts: Readonly<Record<string, ReturnDraft>>,
+  ): Promise<{
+    readonly response: VerificationResultResponse;
+    readonly draft: ReturnDraft;
+    readonly drafts: Readonly<Record<string, ReturnDraft>>;
+  }> => {
+    let draft = originalDraft;
+    let drafts = originalDrafts;
+    const expectedOwnership = {
+      bugId: frozen.bugId,
+      repairAttemptId: frozen.repairAttemptId,
+      verifierId: frozen.actorId,
+    };
+    const expectedIdentity = {
+      verificationId: frozen.verificationId,
+      ...expectedOwnership,
+    };
+    const expectedResult = { ...expectedIdentity, projectId: frozen.projectId };
+    const requireFrozenActor = (
+      verification: Pick<VerificationRecord, "id" | "bugId" | "repairAttemptId" | "verifierId">,
+    ): void => {
+      if (!verificationRecordMatchesIdentity(verification, expectedIdentity)) {
+        throw new QaHubApiError(409, "VERIFICATION_SCOPE_MISMATCH");
+      }
+    };
+
+    const frozenAttachmentCheckpoints = (): readonly (readonly [string, UploadCheckpoint])[] => {
+      const uploads = draft.uploads ?? {};
+      return frozen.attachmentIds.map((attachmentId) => {
+        const matches = Object.entries(uploads).filter(
+          ([, upload]) => upload.checkpoint.finalized?.attachmentId === attachmentId,
+        );
+        if (matches.length !== 1) {
+          throw new QaHubApiError(409, "FROZEN_VERIFICATION_ATTACHMENT_CHECKPOINT_MISSING");
         }
-        if (latest.status === "in_progress") {
-          expectedVerificationVersion = latest.version;
+        const match = matches[0];
+        if (match === undefined) {
+          throw new QaHubApiError(409, "FROZEN_VERIFICATION_ATTACHMENT_CHECKPOINT_MISSING");
+        }
+        return [match[0], match[1].checkpoint] as const;
+      });
+    };
+
+    const refreshExpiredFrozenBindings = async (): Promise<void> => {
+      for (const [fileKey, checkpoint] of frozenAttachmentCheckpoints()) {
+        const refreshed = await refreshVerificationAttachmentBinding({
+          projectId: frozen.projectId,
+          bugId: frozen.bugId,
+          clientSubmissionId: frozen.clientSubmissionId,
+          checkpoint,
+          saveCheckpoint: async (nextCheckpoint) => {
+            const uploads = { ...(draft.uploads ?? {}) };
+            uploads[fileKey] = { checkpoint: nextCheckpoint, updatedAt: Date.now() };
+            const nextDraft = { ...draft, uploads };
+            const nextDrafts = await saveReturnDraft(nextDraft, drafts);
+            // Do not let an in-memory receipt outrun its durable write. If this
+            // write fails and the recoverable step retries, it must replay the
+            // same renewal and await persistence again before result POST.
+            draft = nextDraft;
+            drafts = nextDrafts;
+          },
+        });
+        if (
+          !verificationAttachmentBindingHasRunway(refreshed, Date.now(), 0, {
+            projectId: frozen.projectId,
+            clientSubmissionId: frozen.clientSubmissionId,
+            targetQaItemId: frozen.bugId,
+          })
+        ) {
+          throw new QaHubApiError(409, "ATTACHMENT_BINDING_LEASE_TOO_SHORT");
+        }
+      }
+    };
+
+    const hasExpiredFrozenBinding = (): boolean => {
+      try {
+        return frozenAttachmentCheckpoints().some(([, checkpoint]) => {
+          const expiresAt = Date.parse(checkpoint.binding?.expiresAt ?? "");
+          return Number.isFinite(expiresAt) && expiresAt <= Date.now();
+        });
+      } catch {
+        return false;
+      }
+    };
+
+    const sendExactFrozenRequest = async (): Promise<VerificationResultResponse> => {
+      const response = await recordFrozenVerificationResult(frozen);
+      if (!verificationResultReceiptMatches(frozen, response, expectedResult)) {
+        throw new QaHubApiError(502, "VERIFICATION_RESULT_RECEIPT_MISMATCH");
+      }
+      const readback = await getVerification(frozen.verificationId, expectedOwnership);
+      if (!verificationResultReadbackMatches(frozen, readback, expectedIdentity)) {
+        throw new QaHubApiError(502, "VERIFICATION_RESULT_READBACK_MISMATCH");
+      }
+      return response;
+    };
+
+    const prepareAndSendExactFrozenRequest = async (): Promise<VerificationResultResponse> => {
+      const latest = await getVerification(frozen.verificationId, expectedOwnership);
+      requireFrozenActor(latest);
+      if (latest.status === frozen.status) {
+        return sendExactFrozenRequest();
+      }
+      if (latest.status === "in_progress" && latest.version === frozen.expectedVersion) {
+        // A frozen request keeps its attachment IDs and serialized body. Once a
+        // reservation expires, renew that same binding tuple and durably save
+        // generation N+1 before replaying the exact request.
+        await refreshExpiredFrozenBindings();
+        try {
+          return await sendExactFrozenRequest();
+        } catch (cause) {
+          if (
+            cause instanceof QaHubApiError &&
+            (cause.status === 400 || cause.status === 409) &&
+            hasExpiredFrozenBinding()
+          ) {
+            throw new QaHubApiError(503, "VERIFICATION_ATTACHMENT_LEASE_EXPIRED_DURING_RESULT");
+          }
+          throw cause;
+        }
+      }
+      throw new QaHubApiError(412, "VERSION_CONFLICT");
+    };
+
+    const response = await runRecoverableVerificationStep(
+      prepareAndSendExactFrozenRequest,
+      async () => {
+        const latest = await getVerification(frozen.verificationId, expectedOwnership);
+        requireFrozenActor(latest);
+        if (latest.status === frozen.status) {
+          // A terminal status alone is not our receipt. Replay the exact persisted
+          // body and accept only the server's immutable matching response.
+          return { status: "committed", value: await sendExactFrozenRequest() };
+        }
+        if (latest.status === "in_progress" && latest.version === frozen.expectedVersion) {
           return { status: "retry" };
         }
         return { status: "conflict" };
       },
     );
-  };
-
-  const acceptBug = async () => {
-    await runCurrentBugMutation(
-      "Bug 已验收并关闭",
-      async () => {
-        const verification = await ensureVerificationStarted();
-        if (verification === null) return;
-        const clientSubmissionId = crypto.randomUUID();
-        await recordVerificationResultReliably(verification, "passed", (expectedVersion) =>
-          recordVerificationPassed(
-            verification.id,
-            expectedVersion,
-            "关闭人确认修复有效，直接关闭 Bug",
-            clientSubmissionId,
-          ),
-        );
-      },
-      { closeDetailOnSuccess: true },
-    );
+    return { response, draft, drafts };
   };
 
   const updateReturnDraft = (patch: Partial<ReturnDraft>) => {
@@ -1683,9 +2013,10 @@ export default function App({
       ...current,
       [returnDraftKey]: {
         ...(current[returnDraftKey] ?? {
-          reason: DEFAULT_RETURN_REASON,
+          reason: DEFAULT_VERIFICATION_REASON,
           files: EMPTY_RETURN_FILES,
           clientSubmissionId: crypto.randomUUID(),
+          captureBundleId: null,
         }),
         ...patch,
       },
@@ -1695,7 +2026,7 @@ export default function App({
     if (mutation !== null) return;
     const next = mergeCreateBugImages(returnFiles, files);
     if (next.length > 8 || next.reduce((sum, file) => sum + file.size, 0) > 100 * 1024 * 1024) {
-      setReturnImageError("每次打回最多 8 张截图，总计不超过 100 MB。");
+      setReturnImageError("每次验收最多添加 8 张截图，总计不超过 100 MB。");
       return;
     }
     setReturnImageError(null);
@@ -1708,56 +2039,270 @@ export default function App({
     appendReturnImages(images);
   };
 
-  const returnBug = async () => {
+  const verificationDraftSnapshot = (): ReturnDraft => ({
+    reason: returnReason,
+    files: returnFiles,
+    clientSubmissionId: returnDraft?.clientSubmissionId ?? crypto.randomUUID(),
+    captureBundleId: returnDraft?.captureBundleId ?? null,
+    uploads: returnDraft?.uploads ?? {},
+    ...(returnDraft?.pendingResult === undefined
+      ? {}
+      : { pendingResult: returnDraft.pendingResult }),
+  });
+
+  const saveReturnDraft = async (
+    draft: ReturnDraft,
+    drafts: Readonly<Record<string, ReturnDraft>>,
+  ): Promise<Readonly<Record<string, ReturnDraft>>> => {
+    const next = { ...drafts, [returnDraftKey]: draft };
+    await persistReturnDrafts(next);
+    return next;
+  };
+
+  const uploadVerificationEvidence = async (
+    originalDraft: ReturnDraft,
+    originalDrafts: Readonly<Record<string, ReturnDraft>>,
+  ): Promise<{
+    readonly attachmentIds: readonly string[];
+    readonly draft: ReturnDraft;
+    readonly drafts: Readonly<Record<string, ReturnDraft>>;
+  }> => {
+    if (detail === null) return { attachmentIds: [], draft: originalDraft, drafts: originalDrafts };
+    let draft = originalDraft;
+    let drafts = originalDrafts;
+    const uploads = { ...(draft.uploads ?? {}) };
+    const saveCheckpoint = async (fileKey: string, nextCheckpoint: UploadCheckpoint) => {
+      uploads[fileKey] = { checkpoint: nextCheckpoint, updatedAt: Date.now() };
+      draft = { ...draft, uploads: { ...uploads } };
+      drafts = await saveReturnDraft(draft, drafts);
+    };
+
+    // Finish slow byte transfers before starting the short binding leases.
+    for (const file of draft.files) {
+      const fileKey = createBugImageKey(file);
+      const retained = uploads[fileKey];
+      const checkpoint = verificationUploadCheckpointForReuse(retained);
+      await uploadVerificationAttachment({
+        projectId: detail.projectId,
+        bugId: detail.id,
+        clientSubmissionId: draft.clientSubmissionId,
+        file,
+        deferBinding: true,
+        ...(checkpoint === undefined ? {} : { checkpoint }),
+        saveCheckpoint: (nextCheckpoint) => saveCheckpoint(fileKey, nextCheckpoint),
+      });
+    }
+
+    const attachmentIds: string[] = [];
+    for (const file of draft.files) {
+      const fileKey = createBugImageKey(file);
+      const checkpoint = verificationUploadCheckpointForReuse(
+        uploads[fileKey],
+        Date.now(),
+        VERIFICATION_BINDING_RUNWAY_MS,
+      );
+      attachmentIds.push(
+        await uploadVerificationAttachment({
+          projectId: detail.projectId,
+          bugId: detail.id,
+          clientSubmissionId: draft.clientSubmissionId,
+          file,
+          minimumBindingRunwayMs: VERIFICATION_BINDING_RUNWAY_MS,
+          ...(checkpoint === undefined ? {} : { checkpoint }),
+          saveCheckpoint: (nextCheckpoint) => saveCheckpoint(fileKey, nextCheckpoint),
+        }),
+      );
+    }
+    if (
+      draft.files.some((file) => {
+        const checkpoint = uploads[createBugImageKey(file)]?.checkpoint;
+        return (
+          checkpoint === undefined ||
+          !verificationAttachmentBindingHasRunway(checkpoint, Date.now(), 30_000)
+        );
+      })
+    ) {
+      throw new QaHubApiError(409, "ATTACHMENT_BINDING_LEASE_TOO_SHORT");
+    }
+    return { attachmentIds, draft, drafts };
+  };
+
+  const submitVerificationOutcome = async (outcome: VerificationOutcome) => {
     const reason = returnReason.trim();
-    if (reason.length === 0 || detail === null || mutation !== null) return;
-    const clientSubmissionId = returnDraft?.clientSubmissionId ?? crypto.randomUUID();
-    updateReturnDraft({ clientSubmissionId });
+    const verificationRepairAttempt = repairAttempt;
+    if (
+      detail === null ||
+      verificationRepairAttempt === null ||
+      mutation !== null ||
+      !canActAsVerifier ||
+      !canSubmitVerificationOutcome(outcome, reason, mutation)
+    )
+      return;
+    const draft = verificationDraftSnapshot();
+    if (draft.pendingResult !== undefined && draft.pendingResult.status !== outcome) return;
+    const noticeLabel =
+      outcome === "passed"
+        ? "Bug 已验收并关闭"
+        : outcome === "blocked"
+          ? "验收已暂缓，说明和证据已保存"
+          : repairAttempt?.mode === "relay"
+            ? "打回理由已保存，Relay 将自动开始下一轮制作"
+            : "验收未通过，已打回待处理";
     await runCurrentBugMutation(
-      repairAttempt?.mode === "relay"
-        ? "打回理由已保存，Relay 将自动开始下一轮制作"
-        : "验收未通过，已打回待处理",
+      noticeLabel,
       async () => {
+        let durableDrafts = await saveReturnDraft(draft, returnDrafts);
+        if (draft.pendingResult !== undefined) {
+          if (
+            !frozenVerificationResultMatchesScope(draft.pendingResult, {
+              projectId: detail.projectId,
+              actorId: principal.userId,
+              bugId: detail.id,
+              repairAttemptId: verificationRepairAttempt.id,
+              draftKey: returnDraftKey,
+            })
+          ) {
+            throw new QaHubApiError(409, "FROZEN_VERIFICATION_RESULT_SCOPE_MISMATCH");
+          }
+          const result = await recordVerificationResultReliably(
+            draft.pendingResult,
+            draft,
+            durableDrafts,
+          );
+          durableDrafts = result.drafts;
+          const cleared = Object.fromEntries(
+            Object.entries(durableDrafts).filter(([key]) => key !== returnDraftKey),
+          );
+          await persistReturnDrafts(cleared);
+          return;
+        }
         const verification = await ensureVerificationStarted();
         if (verification === null) return;
-        const uploaded =
-          returnUploads.current.get(clientSubmissionId) ??
-          new WeakMap<File, { id: string; uploadedAt: number }>();
-        returnUploads.current.set(clientSubmissionId, uploaded);
-        const attachmentIds: string[] = [];
-        for (const file of returnFiles) {
-          const cached = uploaded.get(file);
-          let attachmentId =
-            cached && Date.now() - cached.uploadedAt < 10 * 60_000 ? cached.id : undefined;
-          if (!attachmentId) {
-            attachmentId = await uploadVerificationAttachment({
-              projectId: detail.projectId,
-              bugId: detail.id,
-              clientSubmissionId,
-              file,
-            });
-            uploaded.set(file, { id: attachmentId, uploadedAt: Date.now() });
-          }
-          attachmentIds.push(attachmentId);
+        if (verification.status !== "in_progress") {
+          throw new QaHubApiError(412, "VERSION_CONFLICT");
         }
-        await recordVerificationResultReliably(verification, "failed", (expectedVersion) =>
-          recordVerificationFailed(
-            verification.id,
-            expectedVersion,
-            reason,
-            reason,
-            clientSubmissionId,
-            attachmentIds,
-          ),
-        );
-        setReturnDrafts((current) => {
-          return Object.fromEntries(
-            Object.entries(current).filter(([key]) => key !== returnDraftKey),
-          );
+        const evidenceResult = await uploadVerificationEvidence(draft, durableDrafts);
+        durableDrafts = evidenceResult.drafts;
+        const resultSummary = reason || "关闭人确认问题已解决，并完成本次验收。";
+        const request =
+          outcome === "passed"
+            ? freezeVerificationResultRequest({
+                verificationId: verification.id,
+                expectedVersion: verification.version,
+                resultSummary,
+                clientSubmissionId: draft.clientSubmissionId,
+                status: "passed",
+                attachmentIds: evidenceResult.attachmentIds,
+                captureBundleId: draft.captureBundleId ?? null,
+              })
+            : outcome === "blocked"
+              ? freezeVerificationResultRequest({
+                  verificationId: verification.id,
+                  expectedVersion: verification.version,
+                  resultSummary,
+                  clientSubmissionId: draft.clientSubmissionId,
+                  status: "blocked",
+                  blockedReason: reason,
+                  attachmentIds: evidenceResult.attachmentIds,
+                  captureBundleId: draft.captureBundleId ?? null,
+                })
+              : freezeVerificationResultRequest({
+                  verificationId: verification.id,
+                  expectedVersion: verification.version,
+                  resultSummary,
+                  clientSubmissionId: draft.clientSubmissionId,
+                  status: "failed",
+                  failureReason: reason,
+                  attachmentIds: evidenceResult.attachmentIds,
+                  captureBundleId: draft.captureBundleId ?? null,
+                });
+        const frozen: ScopedFrozenVerificationResult = Object.freeze({
+          ...request,
+          projectId: detail.projectId,
+          actorId: principal.userId,
+          bugId: detail.id,
+          repairAttemptId: verificationRepairAttempt.id,
+          draftKey: returnDraftKey,
         });
-        returnUploads.current.delete(clientSubmissionId);
+        const frozenDraft: ReturnDraft = { ...evidenceResult.draft, pendingResult: frozen };
+        durableDrafts = await saveReturnDraft(frozenDraft, durableDrafts);
+        const result = await recordVerificationResultReliably(frozen, frozenDraft, durableDrafts);
+        durableDrafts = result.drafts;
+        const cleared = Object.fromEntries(
+          Object.entries(durableDrafts).filter(([key]) => key !== returnDraftKey),
+        );
+        await persistReturnDrafts(cleared);
       },
+      { closeDetailOnSuccess: outcome === "passed" },
     );
+  };
+
+  const acceptBug = async () => submitVerificationOutcome("passed");
+  const returnBug = async () => submitVerificationOutcome("failed");
+  const blockVerification = async () => submitVerificationOutcome("blocked");
+
+  const updateRepairActionDraft = (patch: Partial<RepairActionDraft>) => {
+    if (mutation !== null || repairActionDraftKey.length === 0) return;
+    setRepairActionDrafts((current) => {
+      const stored = current[repairActionDraftKey] ?? currentRepairActionDraft;
+      return {
+        ...current,
+        [repairActionDraftKey]: {
+          ...stored,
+          successorAttemptId: stored.successorAttemptId || crypto.randomUUID(),
+          ...patch,
+        },
+      };
+    });
+  };
+
+  const clearRepairActionDraft = (attemptId: string, successorAttemptId: string) => {
+    setRepairActionDrafts((current) => {
+      if (current[attemptId]?.successorAttemptId !== successorAttemptId) return current;
+      return Object.fromEntries(Object.entries(current).filter(([key]) => key !== attemptId));
+    });
+  };
+
+  const endCurrentRepairAttempt = async () => {
+    if (
+      repairAttempt === null ||
+      !canTerminateRepairAttempt(repairAttempt) ||
+      currentRepairActionDraft.reason.trim().length === 0
+    )
+      return;
+    const submitted = currentRepairActionDraft;
+    await runCurrentBugMutation("本轮处理已结束，Bug 已回到待处理", async () => {
+      await failRepairAttempt(repairAttempt.id, repairAttempt.version, submitted.reason.trim());
+      clearRepairActionDraft(repairAttempt.id, submitted.successorAttemptId);
+    });
+  };
+
+  const replaceCurrentRepairAttempt = async () => {
+    if (
+      repairAttempt === null ||
+      !canTerminateRepairAttempt(repairAttempt) ||
+      currentRepairActionDraft.reason.trim().length === 0 ||
+      currentRepairActionDraft.successorAttemptId.length === 0 ||
+      currentRepairActionDraft.successorAssigneeId.length === 0
+    )
+      return;
+    const submitted = currentRepairActionDraft;
+    await runCurrentBugMutation("已更换处理方式，新一轮处理可以继续", async () => {
+      await supersedeRepairAttempt({
+        attemptId: repairAttempt.id,
+        expectedVersion: repairAttempt.version,
+        reason: submitted.reason.trim(),
+        successor: {
+          id: submitted.successorAttemptId,
+          mode: submitted.successorMode,
+          assigneeId: submitted.successorAssigneeId,
+          ...(submitted.successorSummary.trim().length === 0
+            ? {}
+            : { summary: submitted.successorSummary.trim() }),
+        },
+      });
+      clearRepairActionDraft(repairAttempt.id, submitted.successorAttemptId);
+    });
   };
 
   const deleteSelectedBug = async () => {
@@ -1893,10 +2438,33 @@ export default function App({
   };
 
   const canManageDetail = detail !== null && mutation === null;
-  const isOwner = canonicalProjectMemberId(members, detail?.ownerId ?? null) === principal.userId;
+  const isOwner =
+    canonicalProjectMemberId(members, detail?.ownerId ?? null) === canonicalPrincipalId;
   const repairAttempt = workflow?.repairAttempt ?? null;
   const verification = workflow?.verification ?? null;
-  const previousAttemptFailed = repairAttempt?.status === "verification_failed";
+  const canActAsVerifier = canActAsVerificationActor(
+    verificationAuthority,
+    principal.userId,
+    detail,
+    workbenchSnapshotSequence,
+    verification,
+  );
+  const pendingVerificationResult = returnDraft?.pendingResult;
+  const pendingVerificationResultMatches =
+    detail !== null &&
+    repairAttempt !== null &&
+    pendingVerificationResult !== undefined &&
+    frozenVerificationResultMatchesScope(pendingVerificationResult, {
+      projectId: detail.projectId,
+      actorId: principal.userId,
+      bugId: detail.id,
+      repairAttemptId: repairAttempt.id,
+      draftKey: returnDraftKey,
+    });
+  const isRepairAssignee =
+    canonicalProjectMemberId(members, repairAttempt?.assigneeId ?? null) === canonicalPrincipalId ||
+    principal.isGm === true;
+  const previousAttemptEnded = repairAttempt !== null && repairAttemptAllowsNewWork(repairAttempt);
 
   return (
     <div className="app-shell">
@@ -2206,7 +2774,10 @@ export default function App({
                     <option value={principal.userId}>我 · {principal.displayName}</option>
                     <option value="team">整个团队</option>
                     {members
-                      .filter((member) => member.userId !== principal.userId)
+                      .filter(
+                        (member) =>
+                          canonicalProjectMemberId(members, member.userId) !== canonicalPrincipalId,
+                      )
                       .map((member) => (
                         <option key={member.userId} value={member.userId}>
                           {member.displayName}
@@ -2884,7 +3455,7 @@ export default function App({
                         </p>
                       ) : null}
                       {detail.state !== "closed" &&
-                      (repairAttempt === null || previousAttemptFailed) &&
+                      repairAttemptAllowsNewWork(repairAttempt) &&
                       isOwner ? (
                         <button
                           className="primary-button wide"
@@ -2892,12 +3463,12 @@ export default function App({
                           onClick={() => void beginWork()}
                           type="button"
                         >
-                          {previousAttemptFailed ? "继续处理已打回 Bug" : "开始处理"}
+                          {previousAttemptEnded ? "开始新一轮处理" : "开始处理"}
                         </button>
                       ) : null}
                       {repairAttempt?.mode === "human" &&
                       repairAttempt.status === "planned" &&
-                      isOwner ? (
+                      isRepairAssignee ? (
                         <button
                           className="primary-button wide"
                           disabled={mutation !== null}
@@ -2914,6 +3485,126 @@ export default function App({
                           开始处理
                         </button>
                       ) : null}
+                      {repairAttempt?.mode === "relay" &&
+                      repairAttempt.status === "planned" &&
+                      canAdjustRepairAttempt &&
+                      enabled("relay.production") ? (
+                        <button
+                          className="primary-button wide"
+                          disabled={mutation !== null}
+                          onClick={() =>
+                            void runCurrentBugMutation("已提交给 Relay 继续处理", async () => {
+                              await dispatchRelay(
+                                repairAttempt.id,
+                                repairAttempt.version,
+                                crypto.randomUUID(),
+                              );
+                            })
+                          }
+                          type="button"
+                        >
+                          提交给 Relay
+                        </button>
+                      ) : null}
+                      {canAdjustRepairAttempt && canTerminateRepairAttempt(repairAttempt) ? (
+                        <details className="repair-adjustment">
+                          <summary>调整本轮处理</summary>
+                          <div className="repair-adjustment-body">
+                            <p>说明原因后，可以结束当前处理，或安排另一位处理人继续。</p>
+                            <label className="repair-adjustment-reason">
+                              <span>调整原因</span>
+                              <textarea
+                                disabled={mutation !== null}
+                                maxLength={5000}
+                                onChange={(event) =>
+                                  updateRepairActionDraft({ reason: event.target.value })
+                                }
+                                placeholder="说明为什么结束或更换本轮处理"
+                                rows={2}
+                                value={currentRepairActionDraft.reason}
+                              />
+                            </label>
+                            <button
+                              className="danger-button"
+                              disabled={
+                                mutation !== null ||
+                                currentRepairActionDraft.reason.trim().length === 0
+                              }
+                              onClick={() => void endCurrentRepairAttempt()}
+                              type="button"
+                            >
+                              结束本轮处理
+                            </button>
+                            <fieldset>
+                              <legend>更换处理方式</legend>
+                              <label>
+                                <span>新方式</span>
+                                <select
+                                  disabled={mutation !== null}
+                                  onChange={(event) =>
+                                    updateRepairActionDraft({
+                                      successorMode: event.target.value as RepairMode,
+                                    })
+                                  }
+                                  value={currentRepairActionDraft.successorMode}
+                                >
+                                  <option value="human">人工处理</option>
+                                  {enabled("relay.production") ? (
+                                    <option value="relay">Relay</option>
+                                  ) : null}
+                                  <option value="external">外部协作</option>
+                                </select>
+                              </label>
+                              <label>
+                                <span>接手人</span>
+                                <select
+                                  disabled={mutation !== null}
+                                  onChange={(event) =>
+                                    updateRepairActionDraft({
+                                      successorAssigneeId: event.target.value,
+                                    })
+                                  }
+                                  value={currentRepairActionDraft.successorAssigneeId}
+                                >
+                                  <option value="">选择接手人</option>
+                                  {developers.map((member) => (
+                                    <option key={member.userId} value={member.userId}>
+                                      {member.displayName}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              <label className="repair-adjustment-summary">
+                                <span>新一轮说明（可选）</span>
+                                <input
+                                  disabled={mutation !== null}
+                                  maxLength={10000}
+                                  onChange={(event) =>
+                                    updateRepairActionDraft({
+                                      successorSummary: event.target.value,
+                                    })
+                                  }
+                                  placeholder="写明接手后的处理方向"
+                                  value={currentRepairActionDraft.successorSummary}
+                                />
+                              </label>
+                              <button
+                                className="secondary-button"
+                                disabled={
+                                  mutation !== null ||
+                                  currentRepairActionDraft.reason.trim().length === 0 ||
+                                  currentRepairActionDraft.successorAttemptId.length === 0 ||
+                                  currentRepairActionDraft.successorAssigneeId.length === 0
+                                }
+                                onClick={() => void replaceCurrentRepairAttempt()}
+                                type="button"
+                              >
+                                更换后继续处理
+                              </button>
+                            </fieldset>
+                          </div>
+                        </details>
+                      ) : null}
                       {canManuallyCompleteBug(detail.state) ? (
                         <button
                           className="primary-button wide"
@@ -2924,24 +3615,28 @@ export default function App({
                           人工标记完成
                         </button>
                       ) : null}
-                      {canReturnCompletedBug(
+                      {canActAsVerifier &&
+                      (canReturnCompletedBug(
                         detail.state,
                         repairAttempt !== null,
                         verification?.status ?? null,
-                      ) ? (
+                      ) ||
+                        pendingVerificationResultMatches) ? (
                         <>
                           <section
                             className="return-evidence"
-                            aria-label="打回理由和截图"
+                            aria-label="验收说明和证据"
                             onPaste={pasteReturnImages}
                           >
                             <label className="return-reason">
-                              <span>打回原因</span>
+                              <span>验收说明</span>
                               <textarea
                                 maxLength={5000}
                                 rows={3}
-                                placeholder="说明仍可复现的问题和需要调整的地方，可直接 Ctrl+V 粘贴截图"
-                                disabled={mutation !== null}
+                                placeholder="通过时可选填；不通过或暂缓时请说明原因，可直接 Ctrl+V 粘贴截图"
+                                disabled={
+                                  mutation !== null || pendingVerificationResult !== undefined
+                                }
                                 onChange={(event) =>
                                   updateReturnDraft({ reason: event.target.value })
                                 }
@@ -2949,15 +3644,18 @@ export default function App({
                               />
                             </label>
                             <div className="return-image-tools">
-                              <span>在原因框内 Ctrl+V 粘贴截图 · {returnFiles.length}/8 张</span>
+                              <span>截图、选图或拍照 · {returnFiles.length}/8 张</span>
                               <label>
-                                选择截图
+                                选择截图或拍照
                                 <input
-                                  aria-label="添加打回截图"
+                                  aria-label="添加验收截图或拍照"
                                   type="file"
                                   accept="image/png,image/jpeg,image/webp"
+                                  capture="environment"
                                   multiple
-                                  disabled={mutation !== null}
+                                  disabled={
+                                    mutation !== null || pendingVerificationResult !== undefined
+                                  }
                                   onChange={(event) => {
                                     appendReturnImages([...(event.target.files ?? [])]);
                                     event.target.value = "";
@@ -2970,12 +3668,14 @@ export default function App({
                               <div className="create-image-previews return-image-previews">
                                 {returnFilePreviews.map((preview, index) => (
                                   <figure key={preview.url}>
-                                    <img src={preview.url} alt={`打回截图 ${index + 1}`} />
+                                    <img src={preview.url} alt={`验收截图 ${index + 1}`} />
                                     <figcaption>{preview.file.name}</figcaption>
                                     <button
                                       type="button"
-                                      aria-label={`移除打回截图 ${index + 1}`}
-                                      disabled={mutation !== null}
+                                      aria-label={`移除验收截图 ${index + 1}`}
+                                      disabled={
+                                        mutation !== null || pendingVerificationResult !== undefined
+                                      }
                                       onClick={() => {
                                         updateReturnDraft({
                                           files: returnFiles.filter((_, i) => i !== index),
@@ -2990,32 +3690,69 @@ export default function App({
                               </div>
                             )}
                           </section>
-                          <button
-                            className="secondary-button"
-                            disabled={mutation !== null || returnReason.trim().length === 0}
-                            onClick={() => void returnBug()}
-                            type="button"
-                          >
-                            验收不通过，打回待处理
-                          </button>
+                          {pendingVerificationResult === undefined ? (
+                            <>
+                              <button
+                                className="primary-button wide"
+                                disabled={
+                                  !canSubmitVerificationOutcome("passed", returnReason, mutation)
+                                }
+                                onClick={() => void acceptBug()}
+                                type="button"
+                              >
+                                验收通过并关闭
+                              </button>
+                              <button
+                                className="secondary-button"
+                                disabled={
+                                  !canSubmitVerificationOutcome("blocked", returnReason, mutation)
+                                }
+                                onClick={() => void blockVerification()}
+                                type="button"
+                              >
+                                暂缓验收
+                              </button>
+                              <button
+                                className="secondary-button"
+                                disabled={
+                                  !canSubmitVerificationOutcome("failed", returnReason, mutation)
+                                }
+                                onClick={() => void returnBug()}
+                                type="button"
+                              >
+                                验收不通过，打回待处理
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <p className="action-note action-note-left" role="status">
+                                上次验收请求已冻结并保留。重新提交时会使用完全相同的内容和证据。
+                              </p>
+                              <button
+                                className="primary-button wide"
+                                disabled={mutation !== null || !pendingVerificationResultMatches}
+                                onClick={() =>
+                                  void submitVerificationOutcome(pendingVerificationResult.status)
+                                }
+                                type="button"
+                              >
+                                重新确认验收提交
+                              </button>
+                            </>
+                          )}
                         </>
                       ) : null}
-                      {canDirectCloseBug(
-                        detail.state,
-                        repairAttempt !== null,
-                        verification?.status ?? null,
-                      ) ? (
-                        <button
-                          className="primary-button wide"
-                          disabled={mutation !== null}
-                          onClick={() => void acceptBug()}
-                          type="button"
-                        >
-                          验收通过并关闭
-                        </button>
+                      {taskStatusForBugState(detail.state) === "verification" &&
+                      verification !== null &&
+                      !canActAsVerifier ? (
+                        <p className="action-note action-note-left" role="status">
+                          当前由{" "}
+                          {memberName(verification?.verifierId ?? detail.verificationOwnerId)}
+                          验收；你可以查看详情和证据。
+                        </p>
                       ) : null}
                       {detail.state !== "closed" &&
-                      (repairAttempt === null || previousAttemptFailed) &&
+                      repairAttemptAllowsNewWork(repairAttempt) &&
                       isOwner &&
                       enabled("relay.production") ? (
                         <button

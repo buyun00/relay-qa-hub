@@ -1,0 +1,39 @@
+Runtime:
+C:/Users/lin0/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+
+Working directory for Web commands:
+C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/web
+
+Configuration used only for test/build compilation:
+$env:QA_HUB_API_BASE_URL='http://127.0.0.1:4999'
+
+Focused tests:
+node ../../node_modules/vitest/vitest.mjs run src/api.test.ts src/App.test.tsx src/App.detail-loading.test.tsx
+
+Full Web tests:
+node ../../node_modules/vitest/vitest.mjs run
+
+App typecheck:
+node ../../node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+
+Node-config typecheck:
+node ../../node_modules/typescript/bin/tsc -p tsconfig.node.json --noEmit
+
+Lint:
+node ../../node_modules/eslint/bin/eslint.js . --max-warnings=0
+
+Format check:
+node ../../node_modules/prettier/bin/prettier.cjs --check src/App.tsx src/AuthGate.tsx src/api.ts src/App.test.tsx src/App.detail-loading.test.tsx src/api.test.ts src/app.css
+
+Isolated Vite build (target was verified absent and contained by the authorized builds root before execution):
+node ../../node_modules/vite/bin/vite.js build --outDir C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-schema19-sol-0909/builds/web-independent-review-final-20260909T181400Z
+
+Working directory for source whitespace check:
+C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub
+
+Whitespace check:
+git diff --check -- apps/web/src
+
+Focused pagination coverage includes complete owner/verifier streams, nonnegative snapshot and bounded nonempty cursor validation, exact cross-page `snapshotSequence`, cross-page drift rejection without restart, duplicate Bug-ID rejection, one bounded restart after continuation `INVALID_REQUEST`, second-invalidation fail-closed behavior, repeated-cursor immediate rejection, and cross-stream owner/verifier snapshot equality with prior-UI retention.
+
+Verification recovery coverage includes fresh pre-freeze attachment identity fallback, expired frozen generation-2 renewal with an awaited full receipt, interrupted receipt-persistence replay from the prior durable checkpoint, exact generation-2 body/key replay after a lost renewal response, exact frozen request replay, old-server renewal rejection retention, POST receipt matching, and rich GET reason readback before draft clearing.

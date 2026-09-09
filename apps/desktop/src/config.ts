@@ -8,8 +8,11 @@ export const APP_HOST = "app";
 export const API_PATH = "/api/";
 export const NOTIFICATIONS_PATH = "/api/v1/notifications";
 export const EVENTS_PATH = "/api/v1/notifications/stream";
+const APP_SCHEME_PATTERN = /^qa-hub-preview(?:-[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9]))?$/u;
+const BUG_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 
 export interface DesktopConfig {
+  readonly appScheme: string;
   readonly apiBaseUrl: URL;
   readonly wssUrl: URL;
   readonly csrfOrigin: string;
@@ -136,12 +139,23 @@ export function isAllowedNetworkUrl(url: URL, config: DesktopConfig): boolean {
   return config.allowedOrigins.has(url.origin);
 }
 
-export function isAppUrl(value: string | URL): boolean {
+export function isAppUrl(value: string | URL, appScheme = APP_SCHEME): boolean {
   try {
     const url = typeof value === "string" ? new URL(value) : value;
-    return url.protocol === `${APP_SCHEME}:` && url.hostname === APP_HOST;
+    return url.protocol === `${appScheme}:` && url.hostname === APP_HOST;
   } catch {
     return false;
+  }
+}
+
+export function parseBugDeepLink(value: string, appScheme = APP_SCHEME): string | null {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== `${appScheme}:` || url.hostname !== "bug") return null;
+    const bugId = url.pathname.replace(/^\//u, "");
+    return BUG_ID_PATTERN.test(bugId) ? bugId.toLowerCase() : null;
+  } catch {
+    return null;
   }
 }
 
@@ -149,6 +163,12 @@ export function parseDesktopConfig(
   env: NodeJS.ProcessEnv = process.env,
   defaults: { readonly webAssetsDirectory?: string } = {},
 ): DesktopConfig {
+  const appScheme = envValue(env, "QA_HUB_DESKTOP_APP_SCHEME") ?? APP_SCHEME;
+  if (!APP_SCHEME_PATTERN.test(appScheme) || appScheme.includes("--")) {
+    throw new DesktopConfigError(
+      "QA_HUB_DESKTOP_APP_SCHEME must be qa-hub-preview or a lowercase instance-specific qa-hub-preview-* scheme",
+    );
+  }
   const configuredApiBaseUrl = envValue(env, "QA_HUB_DESKTOP_API_BASE_URL");
   if (configuredApiBaseUrl === null)
     throw new DesktopConfigError("QA_HUB_DESKTOP_API_BASE_URL must be explicitly configured");
@@ -187,6 +207,7 @@ export function parseDesktopConfig(
   }
   const accessToken = envValue(env, "QA_HUB_DESKTOP_ACCESS_TOKEN");
   return {
+    appScheme,
     apiBaseUrl,
     wssUrl,
     csrfOrigin: parseCsrfOrigin(
@@ -216,9 +237,9 @@ export function parseDesktopConfig(
   };
 }
 
-export function appUrl(pathname = "/index.html", hash = ""): string {
+export function appUrl(pathname = "/index.html", hash = "", appScheme = APP_SCHEME): string {
   const url = new URL(
-    `${APP_SCHEME}://${APP_HOST}${pathname.startsWith("/") ? pathname : `/${pathname}`}`,
+    `${appScheme}://${APP_HOST}${pathname.startsWith("/") ? pathname : `/${pathname}`}`,
   );
   url.hash = hash;
   return url.toString();

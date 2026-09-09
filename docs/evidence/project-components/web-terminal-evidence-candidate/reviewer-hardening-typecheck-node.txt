@@ -1,0 +1,4 @@
+CAPTURED_AT=2026-09-09T10:13:53.3661514Z
+COMMAND=node ../../node_modules/typescript/bin/tsc -p tsconfig.node.json --noEmit
+
+EXIT_CODE=0

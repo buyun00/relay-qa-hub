@@ -64,6 +64,8 @@ test("preview requires its own identity and rejects production endpoints without
       apiBaseUrl: "http://127.0.0.1:4419",
       csrfOrigin: "http://127.0.0.1:4274",
       cookieName: `${instanceId}-session`,
+      appScheme: instanceId,
+      appUserModelId: "com.relayqahub.desktop.preview.unit",
       mcpPort: 4420,
       updateManifestUrl: `http://127.0.0.1:4274/downloads/${instanceId}-windows-latest.json`,
       updatePublicKeyPem: publicKey,
@@ -81,8 +83,11 @@ test("preview requires its own identity and rejects production endpoints without
       writeFileSync(configFile, JSON.stringify({ ...value, ...changes }));
     save();
     const identity = loadPreviewDesktopIdentity(source);
+    assert.equal(identity.appScheme, instanceId);
+    assert.equal(identity.appUserModelId, "com.relayqahub.desktop.preview.unit");
     assert.equal(identity.environment["QA_HUB_DESKTOP_ACCESS_TOKEN"], undefined);
     assert.equal(identity.environment["QA_HUB_DESKTOP_API_BASE_URL"], "http://127.0.0.1:4419/");
+    assert.equal(identity.environment["QA_HUB_DESKTOP_APP_SCHEME"], instanceId);
     save({ apiBaseUrl: "http://127.0.0.1:4319" });
     assert.throws(() => loadPreviewDesktopIdentity(source), /ENDPOINT_INVALID/);
     save({ cookieName: "qa_hub_browser_session" });
@@ -91,6 +96,26 @@ test("preview requires its own identity and rejects production endpoints without
     assert.throws(() => loadPreviewDesktopIdentity(source), /PROFILE_ID_MISMATCH/);
     save({ updateManifestUrl: "http://127.0.0.1:4274/downloads/production.json" });
     assert.throws(() => loadPreviewDesktopIdentity(source), /UPDATE_CHANNEL_MISMATCH/);
+    save({ appScheme: "qa-hub-preview-another" });
+    assert.throws(() => loadPreviewDesktopIdentity(source), /APP_SCHEME_MISMATCH/);
+    save({ appUserModelId: "com.relayqahub.desktop.preview.another" });
+    assert.throws(() => loadPreviewDesktopIdentity(source), /APP_USER_MODEL_ID_MISMATCH/);
+    save({ appScheme: undefined });
+    assert.throws(() => loadPreviewDesktopIdentity(source), /PREVIEW_CONFIG_appScheme_INVALID/);
+
+    const legacyInstanceId = "qa-hub-preview-7c86";
+    save({
+      instanceId: legacyInstanceId,
+      profileDirectory: path.join(root, legacyInstanceId, "profile"),
+      cookieName: `${legacyInstanceId}-session`,
+      appScheme: undefined,
+      appUserModelId: undefined,
+      updateManifestUrl: `http://127.0.0.1:4274/downloads/${legacyInstanceId}-windows-latest.json`,
+    });
+    const legacyIdentity = loadPreviewDesktopIdentity(source);
+    assert.equal(legacyIdentity.appScheme, "qa-hub-preview");
+    assert.equal(legacyIdentity.appUserModelId, "com.relayqahub.desktop.preview");
+    assert.equal(legacyIdentity.environment["QA_HUB_DESKTOP_APP_SCHEME"], "qa-hub-preview");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

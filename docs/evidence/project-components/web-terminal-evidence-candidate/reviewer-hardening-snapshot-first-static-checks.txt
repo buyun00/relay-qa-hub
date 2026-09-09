@@ -1,0 +1,16 @@
+Captured: 2026-09-09T18:03:24+08:00
+Context: first final static checks after adding snapshot-drift and lost-renewal-response tests.
+
+COMMAND=node ../../node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+src/api.test.ts(1084,49): error TS6133: 'init' is declared but its value is never read.
+EXIT_CODE=2
+
+COMMAND=node ../../node_modules/eslint/bin/eslint.js . --max-warnings=0
+apps/web/src/api.test.ts
+  1084:34  error  '_path' is defined but never used  @typescript-eslint/no-unused-vars
+  1084:49  error  'init' is defined but never used   @typescript-eslint/no-unused-vars
+
+2 problems (2 errors, 0 warnings)
+EXIT_CODE=1
+
+Resolution: the request parameters are now explicitly consumed by the test double; their recorded values remain available through `fetchMock.mock.calls` for exact body and idempotency-key assertions.

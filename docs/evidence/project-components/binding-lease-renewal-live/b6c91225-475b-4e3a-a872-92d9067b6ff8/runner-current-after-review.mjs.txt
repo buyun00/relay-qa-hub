@@ -1,0 +1,462 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { createHash, randomUUID } from "node:crypto";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { basename, dirname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const sourceFile = fileURLToPath(import.meta.url);
+const sourceRoot = resolve(dirname(sourceFile), "../..");
+const reviewedConfig = resolve(
+  "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-final-sol-0909/instance.json",
+);
+const reviewedRuntime = dirname(reviewedConfig);
+const reviewedConfigSha256 = "1e36dd0cebe27457e04505ca86c87e92335415dc2a970f2338004f778f759503";
+const evidenceRoot = join(
+  sourceRoot,
+  "docs/evidence/project-components/binding-lease-renewal-live",
+);
+const vendorMedia = "application/vnd.relay-qa-hub.v1.1+json";
+const png = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+  "base64",
+);
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+
+function readConfig(configFile) {
+  assert.equal(resolve(configFile), reviewedConfig, "EXACT_REVIEWED_INSTANCE_REQUIRED");
+  const configBytes = readFileSync(configFile);
+  assert.equal(sha256(configBytes), reviewedConfigSha256, "REVIEWED_INSTANCE_CONFIG_CHANGED");
+  const config = JSON.parse(configBytes);
+  assert.equal(resolve(process.cwd()), sourceRoot);
+  assert.equal(
+    realpathSync(config.sourceRoot).toLowerCase(),
+    realpathSync(sourceRoot).toLowerCase(),
+  );
+  assert.equal(config.instanceId, "qa-hub-preview-final-sol-0909");
+  assert.deepEqual(
+    [config.apiHost, config.apiPort, config.webHost, config.webPort, config.mcpPort],
+    ["127.0.0.1", 4539, "127.0.0.1", 4540, 4541],
+  );
+  assert.equal(
+    realpathSync(config.runtimeRoot).toLowerCase(),
+    realpathSync(reviewedRuntime).toLowerCase(),
+  );
+  assert.equal(resolve(configFile), join(resolve(config.runtimeRoot), "instance.json"));
+  for (const [field, leaf] of [
+    ["dataRoot", "data"],
+    ["backupRoot", "backups"],
+    ["downloadsRoot", "downloads"],
+    ["logsRoot", "logs"],
+    ["desktopRoot", "desktop"],
+    ["secretsFile", "secrets.json"],
+    ["peopleFile", "people.json"],
+  ]) {
+    assert.equal(
+      realpathSync(config[field]).toLowerCase(),
+      realpathSync(join(reviewedRuntime, leaf)).toLowerCase(),
+      `${field}_OUTSIDE_REVIEWED_RUNTIME`,
+    );
+  }
+  return { config, configBytes };
+}
+
+function processIdentities(ports) {
+  const command = [
+    `$ports=@(${ports.join(",")})`,
+    "$items=@($ports|ForEach-Object{$port=$_;$listeners=@(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction Stop)",
+    "if($listeners.Count -ne 1 -or $listeners[0].LocalAddress -ne '127.0.0.1'){throw ('Unexpected listener '+$port)}",
+    "$owner=Get-CimInstance Win32_Process -Filter ('ProcessId='+$listeners[0].OwningProcess)",
+    "[pscustomobject]@{port=$port;pid=[int]$owner.ProcessId;startedAt=$owner.CreationDate.ToUniversalTime().ToString('o');path=$owner.ExecutablePath;commandLine=$owner.CommandLine}})",
+    "$items|ConvertTo-Json -Compress",
+  ].join(";");
+  const parsed = JSON.parse(
+    execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", command], {
+      encoding: "utf8",
+      windowsHide: true,
+    }),
+  );
+  return Array.isArray(parsed) ? parsed : [parsed];
+}
+
+async function assertRuntime(config, configFile) {
+  const listeners = processIdentities([config.apiPort, config.mcpPort]);
+  assert.deepEqual(
+    listeners.map(({ port }) => port).sort((a, b) => a - b),
+    [config.apiPort, config.mcpPort].sort((a, b) => a - b),
+  );
+  const normalizedConfig = resolve(configFile).replaceAll("\\", "/").toLowerCase();
+  for (const listener of listeners) {
+    const commandLine = listener.commandLine.replaceAll("\\", "/").toLowerCase();
+    assert.ok(commandLine.includes(normalizedConfig), "LISTENER_INSTANCE_CONFIG_MISMATCH");
+    assert.ok(
+      commandLine.includes("scripts/project-components/run-preview-service.mjs"),
+      "UNGUARDED_PREVIEW_LISTENER",
+    );
+  }
+  const [apiResponse, mcpResponse] = await Promise.all([
+    fetch(`http://127.0.0.1:${config.apiPort}/api/v1/health/ready`, {
+      signal: AbortSignal.timeout(10_000),
+    }),
+    fetch(`http://127.0.0.1:${config.mcpPort}/health`, {
+      signal: AbortSignal.timeout(10_000),
+    }),
+  ]);
+  assert.equal(apiResponse.status, 200);
+  assert.equal(mcpResponse.status, 200);
+  const [api, serverMcp] = await Promise.all([apiResponse.json(), mcpResponse.json()]);
+  assert.equal(api.status, "ready");
+  assert.equal(String(api.schemaVersion), "19");
+  assert.equal(serverMcp.status, "ready");
+  assert.equal(String(serverMcp.schemaVersion), "19");
+  return { listeners, health: { api, serverMcp } };
+}
+
+async function login(config, projectId, name) {
+  const response = await fetch(`http://127.0.0.1:${config.mcpPort}/mcp`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "tools/call",
+      params: { name: "qa_login", arguments: { projectId, name } },
+    }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  assert.equal(response.status, 200);
+  const envelope = await response.json();
+  assert.equal(envelope.result?.isError, false);
+  const session = envelope.result?.structuredContent;
+  assert.equal(session?.projectId, projectId);
+  assert.equal(session?.displayName, name);
+  assert.match(session?.accessToken ?? "", /^[A-Za-z0-9_-]{32,}$/u);
+  return session;
+}
+
+async function requestJson(config, token, ledger, label, path, options, expectedStatus) {
+  const startedAt = new Date().toISOString();
+  const response = await fetch(`http://127.0.0.1:${config.apiPort}${path}`, {
+    ...options,
+    headers: { authorization: `Bearer ${token}`, ...options.headers },
+    signal: AbortSignal.timeout(15_000),
+  });
+  const bytes = Buffer.from(await response.arrayBuffer());
+  const entry = {
+    label,
+    method: options.method,
+    path,
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    status: response.status,
+    responseBytes: bytes.length,
+    responseSha256: sha256(bytes),
+  };
+  ledger.push(entry);
+  assert.equal(response.status, expectedStatus, `${label}: ${bytes.toString("utf8")}`);
+  return bytes.length ? JSON.parse(bytes.toString("utf8")) : null;
+}
+
+async function create(configFile, projectId, bugId, name) {
+  assert.match(projectId, /^[a-f0-9-]{36}$/u);
+  assert.match(bugId, /^[a-f0-9-]{36}$/u);
+  assert.match(name, /^[A-Za-z0-9]{3,80}$/u);
+  const { config, configBytes } = readConfig(configFile);
+  const runtime = await assertRuntime(config, configFile);
+  const session = await login(config, projectId, name);
+  const runId = randomUUID();
+  const output = join(evidenceRoot, runId);
+  const privateRoot = join(config.runtimeRoot, "acceptance", `binding-renewal-${runId}`);
+  mkdirSync(output, { recursive: true });
+  mkdirSync(privateRoot, { recursive: true });
+  const clientSubmissionId = randomUUID();
+  const clientAttachmentId = randomUUID();
+  const digest = sha256(png);
+  const common = {
+    submissionContractVersion: "1.1.0",
+    clientSubmissionId,
+    clientAttachmentId,
+    uploadAttempt: 1,
+  };
+  const key = (suffix) =>
+    `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:upload:1:${suffix}`;
+  const ledger = [];
+  const initialized = await requestJson(
+    config,
+    session.accessToken,
+    ledger,
+    "initialize upload",
+    "/api/v1/uploads/init",
+    {
+      method: "POST",
+      headers: { "content-type": vendorMedia, "idempotency-key": key("init") },
+      body: JSON.stringify({
+        ...common,
+        projectId,
+        filename: `binding-renewal-${runId}.png`,
+        mediaType: "image/png",
+        expectedSize: png.length,
+        sha256: digest,
+      }),
+    },
+    201,
+  );
+  assert.equal(initialized.version, 1);
+  await requestJson(
+    config,
+    session.accessToken,
+    ledger,
+    "put upload chunk",
+    `/api/v1/uploads/${initialized.sessionId}/chunks/0`,
+    {
+      method: "PUT",
+      headers: {
+        "content-type": "application/octet-stream",
+        "content-length": String(png.length),
+        "idempotency-key": key("chunk:0"),
+        "if-match": '"1"',
+        "x-chunk-sha256": digest,
+        "x-client-submission-id": clientSubmissionId,
+        "x-client-attachment-id": clientAttachmentId,
+      },
+      body: png,
+    },
+    204,
+  );
+  const finalized = await requestJson(
+    config,
+    session.accessToken,
+    ledger,
+    "finalize upload",
+    `/api/v1/uploads/${initialized.sessionId}/finalize`,
+    {
+      method: "POST",
+      headers: { "content-type": vendorMedia, "idempotency-key": key("finalize") },
+      body: JSON.stringify({
+        ...common,
+        expectedVersion: 2,
+        expectedSize: png.length,
+        sha256: digest,
+      }),
+    },
+    200,
+  );
+  assert.equal(finalized.version, 3);
+  assert.equal(finalized.sha256, digest);
+  const bindKey = `submission:${clientSubmissionId}:attachment:${clientAttachmentId}:bind:1`;
+  const bound = await requestJson(
+    config,
+    session.accessToken,
+    ledger,
+    "reserve generation one",
+    `/api/v1/attachments/${finalized.attachmentId}/bind`,
+    {
+      method: "POST",
+      headers: { "content-type": vendorMedia, "idempotency-key": bindKey },
+      body: JSON.stringify({
+        submissionContractVersion: "1.1.0",
+        expectedVersion: finalized.version,
+        projectId,
+        clientSubmissionId,
+        clientAttachmentId,
+        leaseGeneration: 1,
+        intent: "verification_result",
+        targetQaItemId: bugId,
+      }),
+    },
+    200,
+  );
+  assert.equal(bound.leaseGeneration, 1);
+  assert.equal(bound.version, 4);
+  assert.equal(bound.replayed, false);
+  assert.ok(Date.parse(bound.expiresAt) - Date.now() > 14 * 60_000);
+  const proof = {
+    schemaVersion: 1,
+    status: "generation_one_reserved_waiting_for_expiry",
+    runId,
+    sourceHead: execFileSync("git.exe", ["rev-parse", "HEAD"], {
+      cwd: sourceRoot,
+      encoding: "utf8",
+      windowsHide: true,
+    }).trim(),
+    runnerSha256: sha256(readFileSync(sourceFile)),
+    instanceConfigSha256: sha256(configBytes),
+    instanceId: config.instanceId,
+    projectId,
+    bugId,
+    actorId: session.userId,
+    actorName: name,
+    clientSubmissionId,
+    clientAttachmentId,
+    attachmentId: finalized.attachmentId,
+    contentSha256: digest,
+    binding: bound,
+    requests: ledger,
+    createdAt: new Date().toISOString(),
+    boundaries: {
+      reviewedConfigSha256,
+      listeners: runtime.listeners,
+      health: runtime.health,
+      directMainHttp: true,
+      loginThroughActualServerMcp: true,
+      bindingUnclaimed: true,
+      systemClockChanged: false,
+      productionTouched: false,
+      sharedPreviewTouched: false,
+      secretsPersisted: false,
+    },
+  };
+  writeFileSync(join(output, "runner.mjs.txt"), readFileSync(sourceFile), { flag: "wx" });
+  writeFileSync(join(output, "create-proof.json"), `${JSON.stringify(proof, null, 2)}\n`, {
+    flag: "wx",
+  });
+  writeFileSync(
+    join(privateRoot, "checkpoint.json"),
+    `${JSON.stringify({ evidenceDirectory: output, ...proof }, null, 2)}\n`,
+    { flag: "wx", mode: 0o600 },
+  );
+  console.log(
+    JSON.stringify({
+      status: proof.status,
+      runId,
+      expiresAt: bound.expiresAt,
+      proof: join(output, "create-proof.json"),
+      privateCheckpoint: join(privateRoot, "checkpoint.json"),
+    }),
+  );
+}
+
+async function renew(configFile, createProofFile) {
+  const { config, configBytes } = readConfig(configFile);
+  const runtime = await assertRuntime(config, configFile);
+  const canonicalProof = resolve(createProofFile);
+  const proofSuffix = relative(evidenceRoot, canonicalProof);
+  assert.ok(
+    proofSuffix &&
+      !proofSuffix.startsWith("..") &&
+      !resolve(proofSuffix).startsWith("..") &&
+      basename(canonicalProof) === "create-proof.json",
+    "CREATE_PROOF_OUTSIDE_REVIEWED_EVIDENCE",
+  );
+  const createProof = JSON.parse(readFileSync(canonicalProof, "utf8"));
+  assert.equal(createProof.status, "generation_one_reserved_waiting_for_expiry");
+  assert.equal(createProof.instanceConfigSha256, sha256(configBytes));
+  assert.ok(Date.now() >= Date.parse(createProof.binding.expiresAt), "BINDING_NOT_YET_EXPIRED");
+  const session = await login(config, createProof.projectId, createProof.actorName);
+  assert.equal(session.userId, createProof.actorId);
+  const idempotencyKey = `submission:${createProof.clientSubmissionId}:attachment:${createProof.clientAttachmentId}:bind:2`;
+  const ledger = [];
+  const renewed = await requestJson(
+    config,
+    session.accessToken,
+    ledger,
+    "reserve generation two after real expiry",
+    `/api/v1/attachments/${createProof.attachmentId}/bind`,
+    {
+      method: "POST",
+      headers: { "content-type": vendorMedia, "idempotency-key": idempotencyKey },
+      body: JSON.stringify({
+        submissionContractVersion: "1.1.0",
+        expectedVersion: createProof.binding.version,
+        projectId: createProof.projectId,
+        clientSubmissionId: createProof.clientSubmissionId,
+        clientAttachmentId: createProof.clientAttachmentId,
+        leaseGeneration: 2,
+        intent: "verification_result",
+        targetQaItemId: createProof.bugId,
+      }),
+    },
+    200,
+  );
+  assert.equal(renewed.bindingId, createProof.binding.bindingId);
+  assert.equal(renewed.attachmentId, createProof.attachmentId);
+  assert.equal(renewed.leaseGeneration, 2);
+  assert.equal(renewed.version, createProof.binding.version + 1);
+  assert.equal(renewed.replayed, false);
+  assert.equal(renewed.status, "reserved");
+  assert.ok(Date.parse(renewed.expiresAt) > Date.parse(createProof.binding.expiresAt));
+  assert.ok(Date.parse(renewed.expiresAt) - Date.now() > 14 * 60_000);
+  const replayed = await requestJson(
+    config,
+    session.accessToken,
+    ledger,
+    "replay generation two",
+    `/api/v1/attachments/${createProof.attachmentId}/bind`,
+    {
+      method: "POST",
+      headers: { "content-type": vendorMedia, "idempotency-key": idempotencyKey },
+      body: JSON.stringify({
+        submissionContractVersion: "1.1.0",
+        expectedVersion: createProof.binding.version,
+        projectId: createProof.projectId,
+        clientSubmissionId: createProof.clientSubmissionId,
+        clientAttachmentId: createProof.clientAttachmentId,
+        leaseGeneration: 2,
+        intent: "verification_result",
+        targetQaItemId: createProof.bugId,
+      }),
+    },
+    200,
+  );
+  assert.equal(replayed.bindingId, renewed.bindingId);
+  assert.equal(replayed.expiresAt, renewed.expiresAt);
+  assert.equal(replayed.version, renewed.version);
+  assert.equal(replayed.replayed, true);
+  assert.equal(replayed.status, "reserved");
+  const proof = {
+    schemaVersion: 1,
+    status: "passed_real_clock_generation_two_and_exact_replay",
+    runId: createProof.runId,
+    sourceHead: execFileSync("git.exe", ["rev-parse", "HEAD"], {
+      cwd: sourceRoot,
+      encoding: "utf8",
+      windowsHide: true,
+    }).trim(),
+    runnerSha256: sha256(readFileSync(sourceFile)),
+    createProofSha256: sha256(readFileSync(canonicalProof)),
+    createdExpiresAt: createProof.binding.expiresAt,
+    renewed,
+    replayed,
+    requests: ledger,
+    completedAt: new Date().toISOString(),
+    boundaries: {
+      reviewedConfigSha256,
+      listeners: runtime.listeners,
+      health: runtime.health,
+      wallClockElapsedNaturally: true,
+      sameBindingAndAttachment: true,
+      exactGenerationReplay: true,
+      bindingRemainsUnclaimed: true,
+      systemClockChanged: false,
+      productionTouched: false,
+      sharedPreviewTouched: false,
+    },
+  };
+  const output = dirname(canonicalProof);
+  writeFileSync(join(output, "renew-proof.json"), `${JSON.stringify(proof, null, 2)}\n`, {
+    flag: "wx",
+  });
+  console.log(
+    JSON.stringify({
+      status: proof.status,
+      runId: proof.runId,
+      generation: renewed.leaseGeneration,
+      replayed: replayed.replayed,
+      proof: join(output, "renew-proof.json"),
+    }),
+  );
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === sourceFile) {
+  if (process.argv[2] === "--create") {
+    assert.equal(process.argv.length, 7);
+    await create(process.argv[3], process.argv[4], process.argv[5], process.argv[6]);
+  } else if (process.argv[2] === "--renew") {
+    assert.equal(process.argv.length, 5);
+    await renew(process.argv[3], process.argv[4]);
+  } else {
+    console.log(
+      "not_run: --create <instance.json> <projectId> <bugId> <actorName> or --renew <instance.json> <create-proof.json>",
+    );
+  }
+}

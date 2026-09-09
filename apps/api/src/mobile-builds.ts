@@ -32,6 +32,14 @@ export interface MobileLinkBuildRepairRequest {
 }
 
 export interface MobileBuildStore {
+  readonly listBuilds: (query: {
+    readonly actorId: string;
+    readonly projectId: string;
+    readonly status?:
+      "registered" | "queued" | "building" | "validating" | "publishing" | "ready" | "failed";
+    readonly cursor?: string;
+    readonly limit: number;
+  }) => unknown | Promise<unknown>;
   readonly registerBuild: (command: {
     readonly actorId: string;
     readonly projectId: string;
@@ -55,6 +63,15 @@ const UUID_PATTERN =
 const COMMIT_SHA_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const PROJECT_KEY_PATTERN = /^[A-Z][A-Z0-9]{1,15}$/u;
+const BUILD_STATUSES = new Set([
+  "registered",
+  "queued",
+  "building",
+  "validating",
+  "publishing",
+  "ready",
+  "failed",
+]);
 
 function record(value: unknown, label = "request body"): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -67,6 +84,49 @@ function onlyKeys(value: Record<string, unknown>, allowed: ReadonlySet<string>):
   for (const key of Object.keys(value)) {
     if (!allowed.has(key)) throw new TypeError(`unexpected property: ${key}`);
   }
+}
+
+function queryString(value: Record<string, unknown>, key: string): string | undefined {
+  const candidate = value[key];
+  if (candidate === undefined) return undefined;
+  if (Array.isArray(candidate)) {
+    if (candidate.length !== 1 || typeof candidate[0] !== "string") {
+      throw new TypeError(`${key} must occur at most once`);
+    }
+    return candidate[0];
+  }
+  if (typeof candidate !== "string") throw new TypeError(`${key} must be a string`);
+  return candidate;
+}
+
+export function parseMobileBuildListQuery(value: unknown): {
+  readonly status?:
+    "registered" | "queued" | "building" | "validating" | "publishing" | "ready" | "failed";
+  readonly cursor?: string;
+  readonly limit: number;
+} {
+  const query = record(value, "Build list query");
+  onlyKeys(query, new Set(["status", "cursor", "limit"]));
+  const status = queryString(query, "status");
+  if (status !== undefined && !BUILD_STATUSES.has(status)) throw new TypeError("status is invalid");
+  const cursor = queryString(query, "cursor");
+  if (cursor !== undefined && (cursor.length < 1 || cursor.length > 500)) {
+    throw new TypeError("cursor is invalid");
+  }
+  const rawLimit = queryString(query, "limit");
+  let limit = 50;
+  if (rawLimit !== undefined) {
+    if (!/^[1-9][0-9]{0,2}$/u.test(rawLimit)) throw new TypeError("limit is invalid");
+    limit = Number(rawLimit);
+    if (!Number.isSafeInteger(limit) || limit > 100) throw new TypeError("limit is invalid");
+  }
+  return {
+    ...(status === undefined
+      ? {}
+      : { status: status as NonNullable<ReturnType<typeof parseMobileBuildListQuery>["status"]> }),
+    ...(cursor === undefined ? {} : { cursor }),
+    limit,
+  };
 }
 
 function boundedString(value: unknown, label: string, minimum: number, maximum: number): string {

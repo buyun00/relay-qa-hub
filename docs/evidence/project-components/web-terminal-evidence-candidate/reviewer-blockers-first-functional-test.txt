@@ -1,0 +1,102 @@
+
+ RUN  v4.1.11 C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/apps/web
+
+ ❯ src/api.test.ts (10 tests | 3 failed) 60ms
+   × keeps one submission identity from a selected file through the Verification result 11ms
+   × resumes a Verification evidence bind with the same attachment and submission identities 6ms
+   × restarts with a new attachment identity when same-metadata file bytes changed 3ms
+ ❯ src/App.test.tsx (18 tests | 1 failed) 38ms
+     × keeps finalized Verification attachment identity while leasing incomplete uploads 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/api.test.ts > keeps one submission identity from a selected file through the Verification result
+QaHubApiError: INVALID_ATTACHMENT_BINDING
+ ❯ uploadSubmissionAttachment src/api.ts:1821:13
+    1819|       typeof binding.replayed !== "boolean"
+    1820|     ) {
+    1821|       throw new QaHubApiError(200, "INVALID_ATTACHMENT_BINDING");
+       |             ^
+    1822|     }
+    1823|     const typedBinding = binding as unknown as AttachmentBindingRespon…
+ ❯ src/api.test.ts:348:24
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/api.test.ts > resumes a Verification evidence bind with the same attachment and submission identities
+AssertionError: promise rejected "QaHubApiError: INVALID_ATTACHMENT_BINDING { …(2) }" instead of resolving
+ ❯ src/api.test.ts:414:25
+    412|   await expect(upload()).rejects.toThrow("connection closed after fina…
+    413|   expect(checkpoint?.finalized?.attachmentId).toBe(ATTACHMENT_ID);
+    414|   await expect(upload()).resolves.toBe(ATTACHMENT_ID);
+       |                         ^
+    415|
+    416|   expect(fetchMock.mock.calls.map(([path]) => path)).toEqual([
+
+Caused by: QaHubApiError: INVALID_ATTACHMENT_BINDING
+ ❯ uploadSubmissionAttachment src/api.ts:1821:13
+ ❯ src/api.test.ts:414:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { status: 200, code: 'INVALID_ATTACHMENT_BINDING' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/api.test.ts > restarts with a new attachment identity when same-metadata file bytes changed
+AssertionError: promise rejected "QaHubApiError: INVALID_ATTACHMENT_BINDING { …(2) }" instead of resolving
+ ❯ src/api.test.ts:478:4
+    476|       },
+    477|     }),
+    478|   ).resolves.toBe(ATTACHMENT_ID);
+       |    ^
+    479|
+    480|   expect(fetchMock.mock.calls.map(([path]) => path)).toEqual([
+
+Caused by: QaHubApiError: INVALID_ATTACHMENT_BINDING
+ ❯ uploadSubmissionAttachment src/api.ts:1821:13
+ ❯ src/api.test.ts:459:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { status: 200, code: 'INVALID_ATTACHMENT_BINDING' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/App.test.tsx > Relay QA Hub browser workbench > keeps finalized Verification attachment identity while leasing incomplete uploads
+AssertionError: expected undefined to be { …(7) } // Object.is equality
+
+- Expected:
+{
+  "bound": true,
+  "clientAttachmentId": "50000000-0000-4000-8000-000000000001",
+  "finalized": {
+    "attachmentId": "50000000-0000-4000-8000-000000000002",
+    "readyToBind": true,
+    "version": 3,
+  },
+  "init": {
+    "chunkSize": 1024,
+    "sessionId": "upload-1",
+    "version": 1,
+  },
+  "nextChunk": 1,
+  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "version": 2,
+}
+
++ Received:
+undefined
+
+ ❯ src/App.test.tsx:252:7
+    250|     expect(
+    251|       verificationUploadCheckpointForReuse({ checkpoint: bound, update…
+    252|     ).toBe(bound);
+       |       ^
+    253|   });
+    254|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  4 failed | 29 passed (33)
+   Start at  16:18:29
+   Duration  1.46s (transform 1.02s, setup 0ms, import 2.11s, tests 401ms, environment 0ms)
+

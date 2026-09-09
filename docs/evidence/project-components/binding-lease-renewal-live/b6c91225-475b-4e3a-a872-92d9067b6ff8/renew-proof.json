@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "status": "passed_real_clock_generation_two_and_exact_replay",
+  "runId": "b6c91225-475b-4e3a-a872-92d9067b6ff8",
+  "sourceHead": "029188ba25df1c3e940437f1e78fa05ba011aed8",
+  "runnerSha256": "7f48fbf4487054aef9a1ee1e9ae3f76f1d5b908fa6911cd15cbd02b094258140",
+  "createProofSha256": "820281a216439a0c9b10aa4fb1dba279b6eac5deaa2a13488a1cbaaa3180903e",
+  "createdExpiresAt": "2026-09-09T09:04:29.338Z",
+  "renewed": {
+    "bindingId": "e15f00f9-763b-4dd4-a759-164d00be8183",
+    "attachmentId": "e84154cf-b536-4cfb-96ce-ce6202d49655",
+    "projectId": "4f804e54-134a-4fce-b312-29cfc77c4a28",
+    "clientSubmissionId": "376a748f-6f92-4d24-84b2-3c262c182b21",
+    "clientAttachmentId": "0d179822-caf3-4ea9-8cf8-e5b318ff3499",
+    "leaseGeneration": 2,
+    "intent": "verification_result",
+    "targetQaItemId": "874e2c2d-4ed5-48cd-8fa8-43fe5208623e",
+    "status": "reserved",
+    "expiresAt": "2026-09-09T09:25:42.555Z",
+    "version": 5,
+    "replayed": false
+  },
+  "replayed": {
+    "bindingId": "e15f00f9-763b-4dd4-a759-164d00be8183",
+    "attachmentId": "e84154cf-b536-4cfb-96ce-ce6202d49655",
+    "projectId": "4f804e54-134a-4fce-b312-29cfc77c4a28",
+    "clientSubmissionId": "376a748f-6f92-4d24-84b2-3c262c182b21",
+    "clientAttachmentId": "0d179822-caf3-4ea9-8cf8-e5b318ff3499",
+    "leaseGeneration": 2,
+    "intent": "verification_result",
+    "targetQaItemId": "874e2c2d-4ed5-48cd-8fa8-43fe5208623e",
+    "status": "reserved",
+    "expiresAt": "2026-09-09T09:25:42.555Z",
+    "version": 5,
+    "replayed": true
+  },
+  "requests": [
+    {
+      "label": "reserve generation two after real expiry",
+      "method": "POST",
+      "path": "/api/v1/attachments/e84154cf-b536-4cfb-96ce-ce6202d49655/bind",
+      "startedAt": "2026-09-09T09:10:42.549Z",
+      "finishedAt": "2026-09-09T09:10:42.558Z",
+      "status": 200,
+      "responseBytes": 472,
+      "responseSha256": "fa1533f15945fdf0e1e59aabec64ca348826d5c88cae3ae4c3b42e7c97b9be0c"
+    },
+    {
+      "label": "replay generation two",
+      "method": "POST",
+      "path": "/api/v1/attachments/e84154cf-b536-4cfb-96ce-ce6202d49655/bind",
+      "startedAt": "2026-09-09T09:10:42.558Z",
+      "finishedAt": "2026-09-09T09:10:42.563Z",
+      "status": 200,
+      "responseBytes": 471,
+      "responseSha256": "5e7280f1a06814e7dd749e40e9150d6e62196987206d7230d4ec000396555c62"
+    }
+  ],
+  "completedAt": "2026-09-09T09:10:42.622Z",
+  "boundaries": {
+    "reviewedConfigSha256": "1e36dd0cebe27457e04505ca86c87e92335415dc2a970f2338004f778f759503",
+    "listeners": [
+      {
+        "port": 4539,
+        "pid": 7724,
+        "startedAt": "2026-09-09T08:43:08.1091400Z",
+        "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" \"C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\run-preview-service.mjs\" \"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-final-sol-0909\\instance.json\" api"
+      },
+      {
+        "port": 4541,
+        "pid": 21724,
+        "startedAt": "2026-09-09T08:43:10.0775800Z",
+        "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" \"C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\run-preview-service.mjs\" \"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-final-sol-0909\\instance.json\" mcp"
+      }
+    ],
+    "health": {
+      "api": {
+        "status": "ready",
+        "schemaVersion": "19",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      },
+      "serverMcp": {
+        "status": "ready",
+        "schemaVersion": "19",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      }
+    },
+    "wallClockElapsedNaturally": true,
+    "sameBindingAndAttachment": true,
+    "exactGenerationReplay": true,
+    "bindingRemainsUnclaimed": true,
+    "systemClockChanged": false,
+    "productionTouched": false,
+    "sharedPreviewTouched": false
+  }
+}

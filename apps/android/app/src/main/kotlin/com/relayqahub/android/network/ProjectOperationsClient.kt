@@ -1,6 +1,8 @@
 package com.relayqahub.android.network
 
 import java.util.UUID
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -17,7 +19,71 @@ data class ManagedPerson(val id: String, val name: String, val active: Boolean, 
 class ProjectOperationsClient(baseUrl: String, private val client: OkHttpClient) {
     private val base = QaHubApiEndpoint.parse(baseUrl, allowPrivateHttp = true)
     suspend fun entry(projectId: String): QaProject = project(request("project-entry/${uuid(projectId)}"))
-    suspend fun projects(token: String): List<QaProject> = request("projects?limit=100", token).objects().map(::project)
+    suspend fun projects(token: String): List<QaProject> {
+        val projects = mutableListOf<QaProject>()
+        val ids = mutableSetOf<String>()
+        val seenCursors = mutableSetOf<String>()
+        var cursor: String? = null
+        var snapshotSequence: Long? = null
+        repeat(MAX_DIRECTORY_PAGES) {
+            val cursorQuery = cursor?.let {
+                "&cursor=${URLEncoder.encode(it, StandardCharsets.UTF_8.name()).replace("+", "%20")}"
+            }.orEmpty()
+            val root = request("projects?limit=100$cursorQuery", token)
+            check(root.keys().asSequence().toSet() == PROJECT_LIST_FIELDS) {
+                "INVALID_PROJECT_LIST_RESPONSE"
+            }
+            val pageSequence = root.strictDirectorySequence()
+            if (snapshotSequence == null) snapshotSequence = pageSequence
+            check(snapshotSequence == pageSequence) { "PROJECT_LIST_SNAPSHOT_CHANGED" }
+            val items = root.getJSONArray("items")
+            check(items.length() <= 100) { "INVALID_PROJECT_LIST_RESPONSE" }
+            for (index in 0 until items.length()) {
+                val item = items.optJSONObject(index) ?: error("INVALID_PROJECT_LIST_RESPONSE")
+                check(item.keys().asSequence().toSet() == PROJECT_ITEM_FIELDS) {
+                    "INVALID_PROJECT_LIST_RESPONSE"
+                }
+                check(item.get("active") is Boolean && item.getBoolean("active")) {
+                    "INVALID_PROJECT_LIST_RESPONSE"
+                }
+                val roles = item.getJSONArray("roles")
+                val seenRoles = mutableSetOf<String>()
+                check(roles.length() > 0) { "INVALID_PROJECT_LIST_RESPONSE" }
+                for (roleIndex in 0 until roles.length()) {
+                    val role = roles.get(roleIndex)
+                    check(role is String && role in DIRECTORY_ROLES && seenRoles.add(role)) {
+                        "INVALID_PROJECT_LIST_RESPONSE"
+                    }
+                }
+                val parsed = QaProject(
+                    uuid(item.strictString("id")),
+                    item.strictString("key").also { value ->
+                        check(PROJECT_KEY_PATTERN.matches(value)) { "INVALID_PROJECT_LIST_RESPONSE" }
+                    },
+                    item.strictString("name").also { value ->
+                        check(value.isNotBlank() && value.length <= 200) {
+                            "INVALID_PROJECT_LIST_RESPONSE"
+                        }
+                    },
+                )
+                check(ids.add(parsed.id)) { "PROJECT_LIST_ITEM_REPEATED" }
+                projects += parsed
+                check(projects.size <= MAX_DIRECTORY_ITEMS) { "PROJECT_LIST_ITEM_LIMIT_EXCEEDED" }
+            }
+            val nextCursor = when {
+                !root.has("nextCursor") -> error("INVALID_PROJECT_LIST_RESPONSE")
+                root.isNull("nextCursor") -> null
+                root.get("nextCursor") is String -> root.getString("nextCursor").also {
+                    check(it.isNotBlank() && it.length <= 500) { "INVALID_PROJECT_LIST_RESPONSE" }
+                }
+                else -> error("INVALID_PROJECT_LIST_RESPONSE")
+            }
+            if (nextCursor == null) return projects
+            check(seenCursors.add(nextCursor)) { "PROJECT_LIST_CURSOR_REPEATED" }
+            cursor = nextCursor
+        }
+        error("PROJECT_LIST_PAGE_LIMIT_EXCEEDED")
+    }
     suspend fun components(projectId: String, token: String): List<ProjectComponent> {
         val root = request("projects/${uuid(projectId)}/components", token)
         check(root.getString("projectId") == projectId)
@@ -92,7 +158,41 @@ class ProjectOperationsClient(baseUrl: String, private val client: OkHttpClient)
         check(value.optBoolean("active", true))
         return QaProject(uuid(value.getString("id")), value.getString("key"), value.getString("name"))
     }
-    private fun uuid(value: String): String = UUID.fromString(value).toString()
+    private fun uuid(value: String): String {
+        require(STRICT_UUID_PATTERN.matches(value)) { "value must be a UUID" }
+        return UUID.fromString(value).toString()
+    }
+
+    private companion object {
+        const val MAX_DIRECTORY_PAGES = 100
+        const val MAX_DIRECTORY_ITEMS = 10_000
+        val STRICT_UUID_PATTERN = Regex(
+            "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        )
+        val PROJECT_KEY_PATTERN = Regex("^[A-Z][A-Z0-9]{1,15}$")
+        val PROJECT_LIST_FIELDS = setOf("snapshotSequence", "items", "nextCursor")
+        val PROJECT_ITEM_FIELDS = setOf("id", "key", "name", "roles", "active")
+        val DIRECTORY_ROLES = setOf(
+            "viewer", "reporter", "developer", "verifier", "triager", "release_manager",
+            "project_admin",
+        )
+    }
+}
+
+private fun JSONObject.strictDirectorySequence(): Long {
+    check(has("snapshotSequence")) { "INVALID_PROJECT_LIST_RESPONSE" }
+    val value = when (val raw = get("snapshotSequence")) {
+        is Int -> raw.toLong()
+        is Long -> raw
+        else -> error("INVALID_PROJECT_LIST_RESPONSE")
+    }
+    check(value in 0..9_007_199_254_740_991L) { "INVALID_PROJECT_LIST_RESPONSE" }
+    return value
+}
+
+private fun JSONObject.strictString(key: String): String {
+    check(has(key) && !isNull(key) && get(key) is String) { "INVALID_PROJECT_LIST_RESPONSE" }
+    return getString(key)
 }
 
 internal fun JSONObject.objects(key: String = "items"): List<JSONObject> {

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "status": "generation_one_reserved_waiting_for_expiry",
+  "runId": "b6c91225-475b-4e3a-a872-92d9067b6ff8",
+  "sourceHead": "029188ba25df1c3e940437f1e78fa05ba011aed8",
+  "runnerSha256": "d24027e4e1ef7e9b9ed93ddb0cbd2790f166bdc76d3fcaaefa4f7b2720b77d54",
+  "instanceConfigSha256": "1e36dd0cebe27457e04505ca86c87e92335415dc2a970f2338004f778f759503",
+  "instanceId": "qa-hub-preview-final-sol-0909",
+  "projectId": "4f804e54-134a-4fce-b312-29cfc77c4a28",
+  "bugId": "874e2c2d-4ed5-48cd-8fa8-43fe5208623e",
+  "actorId": "c9064463-8b41-4e95-8427-4e24f3e2228b",
+  "actorName": "Schema19d1e7984737a5",
+  "clientSubmissionId": "376a748f-6f92-4d24-84b2-3c262c182b21",
+  "clientAttachmentId": "0d179822-caf3-4ea9-8cf8-e5b318ff3499",
+  "attachmentId": "e84154cf-b536-4cfb-96ce-ce6202d49655",
+  "contentSha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+  "binding": {
+    "bindingId": "e15f00f9-763b-4dd4-a759-164d00be8183",
+    "attachmentId": "e84154cf-b536-4cfb-96ce-ce6202d49655",
+    "projectId": "4f804e54-134a-4fce-b312-29cfc77c4a28",
+    "clientSubmissionId": "376a748f-6f92-4d24-84b2-3c262c182b21",
+    "clientAttachmentId": "0d179822-caf3-4ea9-8cf8-e5b318ff3499",
+    "leaseGeneration": 1,
+    "intent": "verification_result",
+    "targetQaItemId": "874e2c2d-4ed5-48cd-8fa8-43fe5208623e",
+    "status": "reserved",
+    "expiresAt": "2026-09-09T09:04:29.338Z",
+    "version": 4,
+    "replayed": false
+  },
+  "requests": [
+    {
+      "label": "initialize upload",
+      "method": "POST",
+      "path": "/api/v1/uploads/init",
+      "startedAt": "2026-09-09T08:49:29.288Z",
+      "finishedAt": "2026-09-09T08:49:29.303Z",
+      "status": 201,
+      "responseBytes": 631,
+      "responseSha256": "c3690523bb697cb65b93a4464bf32faba6cd39b5670abccb421b4a8f2d705575"
+    },
+    {
+      "label": "put upload chunk",
+      "method": "PUT",
+      "path": "/api/v1/uploads/d188d949-3ee1-462e-bbdb-c9013c056462/chunks/0",
+      "startedAt": "2026-09-09T08:49:29.303Z",
+      "finishedAt": "2026-09-09T08:49:29.317Z",
+      "status": 204,
+      "responseBytes": 0,
+      "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "finalize upload",
+      "method": "POST",
+      "path": "/api/v1/uploads/d188d949-3ee1-462e-bbdb-c9013c056462/finalize",
+      "startedAt": "2026-09-09T08:49:29.317Z",
+      "finishedAt": "2026-09-09T08:49:29.332Z",
+      "status": 200,
+      "responseBytes": 587,
+      "responseSha256": "474ac713252f5669bf3a14874769ca431e83efe73b5370a1ce9e0c6727948e07"
+    },
+    {
+      "label": "reserve generation one",
+      "method": "POST",
+      "path": "/api/v1/attachments/e84154cf-b536-4cfb-96ce-ce6202d49655/bind",
+      "startedAt": "2026-09-09T08:49:29.332Z",
+      "finishedAt": "2026-09-09T08:49:29.342Z",
+      "status": 200,
+      "responseBytes": 472,
+      "responseSha256": "a7eff86303906a28123cd5ca2b9c4466b46c4b656cf7c3b38c3fb96e2c9f5cac"
+    }
+  ],
+  "createdAt": "2026-09-09T08:49:29.533Z",
+  "boundaries": {
+    "directMainHttp": true,
+    "loginThroughActualServerMcp": true,
+    "bindingUnclaimed": true,
+    "systemClockChanged": false,
+    "productionTouched": false,
+    "sharedPreviewTouched": false,
+    "secretsPersisted": false
+  }
+}

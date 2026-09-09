@@ -232,24 +232,14 @@ export default function OverviewPage({
     () => members.filter((member) => member.active && member.roles.includes("verifier")),
     [members],
   );
-  const memberId = useCallback(
-    (userId: string | null): string | null => {
-      if (userId === null) return null;
-      return (
-        members.find(
-          (member) => member.userId === userId || member.linkedUserIds?.includes(userId) === true,
-        )?.userId ?? userId
-      );
-    },
-    [members],
-  );
+  const memberId = useCallback((userId: string | null): string | null => {
+    return userId;
+  }, []);
   const memberName = useCallback(
     (userId: string | null) =>
       userId === null
         ? "未分配"
-        : (members.find(
-            (member) => member.userId === userId || member.linkedUserIds?.includes(userId) === true,
-          )?.displayName ?? userId.slice(0, 8)),
+        : (members.find((member) => member.userId === userId)?.displayName ?? userId.slice(0, 8)),
     [members],
   );
 

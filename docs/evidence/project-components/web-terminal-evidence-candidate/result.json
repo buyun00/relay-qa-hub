@@ -1,0 +1,181 @@
+{
+  "schema": "relay-qa-hub.web-terminal-evidence-candidate-result.v5",
+  "observedAt": "2026-09-09T11:25:40.9948352Z",
+  "branch": "codex/project-components-v2-1",
+  "head": "029188ba25df1c3e940437f1e78fa05ba011aed8",
+  "status": "passed_source_candidate",
+  "scope": [
+    "apps/web/src/**",
+    "docs/evidence/project-components/web-terminal-evidence-candidate/**"
+  ],
+  "verificationAuthorization": {
+    "canonicalMemberIdentity": true,
+    "mutationControlsAssignedVerifierOnly": true,
+    "handlerAndWorkflowGuards": true,
+    "nonAssignedReadOnlyVisibility": true,
+    "defaultScopeIsAuthenticatedActor": true
+  },
+  "personalScopePagination": {
+    "ownerStreamPaginatedToNull": true,
+    "verificationOwnerStreamPaginatedToNull": true,
+    "responseSnapshotSequenceNonnegativeSafeInteger": true,
+    "responseCursorNonemptyAndMaxLength": 500,
+    "eachStreamFreezesFirstSnapshotSequence": true,
+    "crossPageSnapshotDriftFailsWithoutRestart": true,
+    "duplicateBugIdFailsInvalidResponse": true,
+    "ownerVerifierSnapshotsMustMatchBeforeUnion": true,
+    "crossStreamMismatchRetainsPreviousUi": true,
+    "unionByBugId": true,
+    "continuationInvalidRequestRestartsFromFirstPageAtMost": 1,
+    "partialInvalidatedItemsDiscarded": true,
+    "secondInvalidationFailsClosed": true,
+    "repeatedOrInvalidCursorFailsWithoutRestart": true,
+    "queryCarriesProjectId": true,
+    "itemProjectIdValidation": "strict_request_project_match"
+  },
+  "verificationDurability": {
+    "checkpointAwaitedBeforeFirstNetwork": true,
+    "indexedDbWritesSerialized": true,
+    "projectActorDraftKey": true,
+    "frozenBeforeResultPost": true,
+    "frozenFields": [
+      "verificationId",
+      "expectedVersion",
+      "status",
+      "resultSummary",
+      "failureReasonOrBlockedReason",
+      "attachmentIds",
+      "captureBundleId",
+      "clientSubmissionId",
+      "requestBody",
+      "projectId",
+      "actorId",
+      "bugId",
+      "repairAttemptId",
+      "draftKey"
+    ],
+    "exactBodyReplay": true,
+    "postReceiptExactMatch": true,
+    "richGetReadbackExactReasonMatch": true,
+    "clearAfterBothMatchesOnly": true
+  },
+  "verificationAttachmentLease": {
+    "serverLeaseMs": 900000,
+    "minimumBindRunwayMs": 120000,
+    "minimumFreezeRunwayMs": 30000,
+    "completeBindingReceiptPersisted": true,
+    "preFreezeFreshClientAttachmentFallback": true,
+    "frozenRenewalSameBindingTuple": true,
+    "frozenRenewalGenerationIncrement": 1,
+    "frozenRenewalExpectedVersionFromPreviousReceipt": true,
+    "frozenRequestBodyUnchangedByRenewal": true,
+    "renewalReceiptAwaitedBeforePost": true,
+    "interruptedReceiptWriteRetriesFromPriorDurableCheckpoint": true,
+    "lostGenerationTwoResponseReplaysSameBodyAndIdempotencyKey": true,
+    "lostGenerationTwoResponseDoesNotAdvanceToGenerationThree": true,
+    "oldServerRejectionRetainsPendingResult": true
+  },
+  "awaitingBuildReview": {
+    "requiresExistingDeliveredRepairAttempt": true,
+    "doesNotMarkRepairAttemptDelivered": true,
+    "assignedVerifierGuardStillRequired": true,
+    "versionAttemptAndConflictRecoveryPreserved": true,
+    "newPrivilegeEscalationFound": false
+  },
+  "repairAttempt": {
+    "modes": ["human", "relay", "external"],
+    "statuses": [
+      "planned",
+      "queued",
+      "running",
+      "needs_input",
+      "blocked",
+      "delivered",
+      "failed",
+      "verification_failed",
+      "cancelled",
+      "superseded"
+    ],
+    "parentAttemptIdModeled": true,
+    "fullWorkflowProjectionPaginated": true,
+    "atomicSupersede": true
+  },
+  "checks": {
+    "focusedTests": {
+      "files": 3,
+      "passed": 60,
+      "failed": 0
+    },
+    "fullTests": {
+      "files": 17,
+      "passed": 140,
+      "failed": 0
+    },
+    "typecheckApp": "passed",
+    "typecheckNode": "passed",
+    "eslint": "passed_zero_warnings",
+    "prettier": "passed",
+    "scopedGitDiffCheck": "passed",
+    "viteBuild": {
+      "status": "passed",
+      "verifiedAbsentBeforeBuild": true,
+      "path": "C:/Users/lin0/.codex/parallel-runtimes/qa-hub-preview-schema19-sol-0909/builds/web-retry-hardening-final-20260909T192500",
+      "modules": 1886,
+      "javascriptBytesDisplay": "500.02 kB",
+      "javascriptGzipBytesDisplay": "154.26 kB",
+      "sourceMapBytesDisplay": "1914.92 kB"
+    }
+  },
+  "sourceManifest": {
+    "format": "sorted relative path, tab, lowercase file SHA-256, joined by LF and SHA-256 hashed as UTF-8",
+    "sha256": "4bfddd371d732bec77b504227f0a036374782a774c23a07cfa2821fd97a53bfc",
+    "files": {
+      "apps/web/src/api.test.ts": "9a43ed64b4d90195cbb3a129a96f69a655cf99bbc95521aadddc2a595fad7ddc",
+      "apps/web/src/api.ts": "45fb2aa8af1f3623ec707cbac104a12258fc8089617a2f40589fbd76443a02db",
+      "apps/web/src/app.css": "652c40aa74b08eb95aca3e5b50f7ced6df70653169d2e790d11e61c1661c20fe",
+      "apps/web/src/App.detail-loading.test.tsx": "7bab6245b0edb10f49355a82031c7761b7040f17bcabf21c124847252e3953e5",
+      "apps/web/src/App.test.tsx": "ef9fe55c95ea02db3f4ed52b9426dca1b1df16412ef69cf3837eb34a0e3c4f42",
+      "apps/web/src/App.tsx": "082e0e0b56634701598d9917f9d2c5b76e553fd056502c1a05e02ec286b92a5a",
+      "apps/web/src/AuthGate.tsx": "3db29389127e4f6a4726fd969bbd8a76ef01bfa087b3dd7be3cc8ccf2b61d6dc",
+      "apps/web/src/OverviewPage.tsx": "cb239eee8556dda5d08c3cba8d93bd0e6282fdd6c5e3d0d0e9f771e148bcb737"
+    }
+  },
+  "initialFailureEvidence": [
+    "reviewer-blockers-first-test.txt",
+    "reviewer-blockers-first-functional-test.txt",
+    "reviewer-blockers-first-static-checks.txt",
+    "reviewer-hardening-cursor-first-static-checks.txt",
+    "reviewer-hardening-renewal-persistence-first-test.txt",
+    "reviewer-hardening-snapshot-first-static-checks.txt",
+    "reviewer-hardening-personal-stream-first-test.txt",
+    "reviewer-hardening-duplicate-first-test.txt"
+  ],
+  "supersededEvidence": [
+    {
+      "file": "reviewer-hardening-pre-independent-review-124-test.txt",
+      "testsPassed": 124,
+      "sha256": "24dd3ad6cca51e4b2fcf7f2507964510e0f741f17ab2f46b367ba328d6d833bd"
+    }
+  ],
+  "remainingGaps": [
+    "The browser cannot mint a Verification capture bundle; it retains a supplied captureBundleId and uses uploaded image attachments in the current UI.",
+    "There is no direct external-work start or delivery action in the existing Web/API lifecycle.",
+    "No live browser/API, installed desktop, preview, production, release, upgrade, or rollback validation was run."
+  ],
+  "listenerStarted": false,
+  "installedClientTouched": false,
+  "previewTouched": false,
+  "productionTouched": false,
+  "committedByWebAgent": false,
+  "directoryPagination": {
+    "visibleProjectsPaginatedToNull": true,
+    "projectMembersPaginatedToNull": true,
+    "responseSnapshotSequenceNonnegativeSafeInteger": true,
+    "eachStreamFreezesFirstSnapshotSequence": true,
+    "snapshotDriftFailsClosed": true,
+    "duplicateIdFailsInvalidResponse": true,
+    "repeatedCursorFailsInvalidResponse": true,
+    "memberProjectIdMustMatchRequest": true,
+    "pageMaxItems": 100
+  }
+}

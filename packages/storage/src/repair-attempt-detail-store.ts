@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 import type { MobileRelayScope } from "./mobile-relay-store.js";
+import { canonicalProjectUserId } from "./project-identity-projection.js";
 
 /** Read-only history, deliberately separate from the human action preconditions. */
 export interface RepairAttemptDetail {
@@ -61,5 +62,10 @@ export function getRepairAttemptDetail(
     )
     .get(input.actorId, input.accountId, input.projectId, input.attemptId) as unknown as
     RepairAttemptDetail | undefined;
-  return row ? Object.freeze({ ...row }) : null;
+  return row
+    ? Object.freeze({
+        ...row,
+        assigneeId: canonicalProjectUserId(database, input, row.assigneeId),
+      })
+    : null;
 }

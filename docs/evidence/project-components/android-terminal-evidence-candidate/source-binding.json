@@ -1,0 +1,102 @@
+{
+  "recordedAt": "2026-09-09T09:21:49.824Z",
+  "sourceHead": "029188ba25df1c3e940437f1e78fa05ba011aed8",
+  "trackedDiff": {
+    "command": "git diff --binary -- apps/android",
+    "sizeBytes": 174516,
+    "sha256": "f282f8805d1c9ef389a753b45d9b8e4bfdfe5ca08670286cff82ca6a80ab328e"
+  },
+  "changedSourceAggregate": {
+    "algorithm": "sha256 over sorted UTF-8 path|status|sizeBytes|sha256 lines",
+    "fileCount": 12,
+    "sha256": "02a4053b7ea86e076d1976561ddda436b4c78ea1bab418bbb9784956fc47e51d"
+  },
+  "untrackedFiles": [
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/network/AttachmentUploadClientTest.kt",
+      "status": "??",
+      "sizeBytes": 24235,
+      "sha256": "47ceb759c979fe0d263fca5f9581c4c5a4cb388ce0377b75df7a54fac7ca86e7"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/ui/BugLifecyclePanelTest.kt",
+      "status": "??",
+      "sizeBytes": 4288,
+      "sha256": "7f66d1cd9e3fa213cf37346940a38e735ad7e3ca2d61697eab06a518d024e5d6"
+    }
+  ],
+  "files": [
+    {
+      "path": "apps/android/app/build.gradle.kts",
+      "status": " M",
+      "sizeBytes": 5231,
+      "sha256": "29735eb7f15b3d11eb16d1e991d21edd93cdfc9b0d11b98bd27327344100f0d0"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/BugDraftPreferences.kt",
+      "status": " M",
+      "sizeBytes": 31948,
+      "sha256": "3bb79ad1377f68ba4dd97ca2bb20db51f6edef2538b055298f7bb5afab4a73dc"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/network/AccountSessionClient.kt",
+      "status": " M",
+      "sizeBytes": 8075,
+      "sha256": "a8147e4a9384a917bb20aced74d12e6f15ac65a01ddd3c28818ea73539c03687"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/network/AttachmentUploadClient.kt",
+      "status": " M",
+      "sizeBytes": 52764,
+      "sha256": "c50770a607783dcde74fb5d7dac9adcc932199a2a98485de17d001b9c4fed362"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/network/BugLifecycleClient.kt",
+      "status": " M",
+      "sizeBytes": 24311,
+      "sha256": "a988b40edbd00596b3a5af9c175802be7c40a4a0c7b9c429c0143028e64f051c"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/BugLifecyclePanel.kt",
+      "status": " M",
+      "sizeBytes": 37374,
+      "sha256": "bc70aaca5b26e0bdaca31e8335ab8f686b13fe484be296af45f7094d7322297a"
+    },
+    {
+      "path": "apps/android/app/src/main/kotlin/com/relayqahub/android/ui/FoundationScreen.kt",
+      "status": " M",
+      "sizeBytes": 104575,
+      "sha256": "9894a10e9bd56110255db1e816a14da797ad111338afa448445e9489b2073481"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/BugDraftPreferencesTest.kt",
+      "status": " M",
+      "sizeBytes": 27608,
+      "sha256": "ca08c862f7ebfb25aa94759aa9022838f6812ff10bab60a6458386e32330dafe"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/network/AccountSessionClientTest.kt",
+      "status": " M",
+      "sizeBytes": 3490,
+      "sha256": "ee3aaa8452699d08f30d8bcc41a2bae06c715c21129d2ab9033f035b41b4638d"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/network/AttachmentUploadClientTest.kt",
+      "status": "??",
+      "sizeBytes": 24235,
+      "sha256": "47ceb759c979fe0d263fca5f9581c4c5a4cb388ce0377b75df7a54fac7ca86e7"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/network/BugLifecycleClientTest.kt",
+      "status": " M",
+      "sizeBytes": 25742,
+      "sha256": "19dd352a9d9dfc5d7626f1868f28d01375c3b952bfd2da1746329b5847ca5813"
+    },
+    {
+      "path": "apps/android/app/src/test/kotlin/com/relayqahub/android/ui/BugLifecyclePanelTest.kt",
+      "status": "??",
+      "sizeBytes": 4288,
+      "sha256": "7f66d1cd9e3fa213cf37346940a38e735ad7e3ca2d61697eab06a518d024e5d6"
+    }
+  ]
+}

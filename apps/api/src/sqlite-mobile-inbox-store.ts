@@ -28,6 +28,10 @@ export function createSqliteMobileInboxStore(
     async listNotifications(query): Promise<MobileNotificationList> {
       const input: ListMobileNotificationsInput = {
         ...actorScope(query.actorId),
+        authorizationProjectId: options.scope.projectId,
+        ...(query.projectId === undefined ? {} : { requestedProjectId: query.projectId }),
+        ...(query.unreadOnly === undefined ? {} : { unreadOnly: query.unreadOnly }),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
         limit: query.limit,
         now: now().toISOString(),
       };

@@ -1,7 +1,10 @@
 package com.relayqahub.android
 
 import com.relayqahub.android.network.QaHubApiContract
+import com.relayqahub.android.network.BugWorkbenchFailure
+import com.relayqahub.android.network.BugWorkbenchResult
 import java.util.UUID
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -146,6 +149,75 @@ class FoundationViewModelContractTest {
             scope.sessionId,
         ).forEach { UUID.fromString(it) }
     }
+
+    @Test
+    fun `personal workbench retries the whole directory and Bug read after snapshot drift`() =
+        runBlocking {
+            var peopleReads = 0
+            var bugReads = 0
+
+            val snapshot = loadConsistentAssignedWorkbench(
+                readPeople = {
+                    peopleReads += 1
+                    QaPeopleConfig(4, "QA", emptyList(), if (peopleReads == 1) 10 else 11)
+                },
+                readBugs = {
+                    bugReads += 1
+                    BugWorkbenchResult(11, emptyList(), null)
+                },
+            )
+
+            assertEquals(2, peopleReads)
+            assertEquals(2, bugReads)
+            assertEquals(11L, snapshot.people.snapshotSequence)
+            assertEquals(11L, snapshot.bugs.snapshotSequence)
+        }
+
+    @Test
+    fun `personal workbench fails closed after two directory snapshot mismatches`() = runBlocking {
+        var peopleReads = 0
+        var bugReads = 0
+
+        val failure = runCatching {
+            loadConsistentAssignedWorkbench(
+                readPeople = {
+                    peopleReads += 1
+                    QaPeopleConfig(4, "QA", emptyList(), 10)
+                },
+                readBugs = {
+                    bugReads += 1
+                    BugWorkbenchResult(11, emptyList(), null)
+                },
+            )
+        }.exceptionOrNull()
+
+        assertEquals("WORKBENCH_DIRECTORY_SNAPSHOT_CHANGED", (failure as BugWorkbenchFailure).code)
+        assertEquals(2, peopleReads)
+        assertEquals(2, bugReads)
+    }
+
+    @Test
+    fun `personal workbench retries an owner verifier stream snapshot race as one group`() =
+        runBlocking {
+            var peopleReads = 0
+            var bugReads = 0
+
+            val snapshot = loadConsistentAssignedWorkbench(
+                readPeople = {
+                    peopleReads += 1
+                    QaPeopleConfig(4, "QA", emptyList(), 11)
+                },
+                readBugs = {
+                    bugReads += 1
+                    if (bugReads == 1) throw BugWorkbenchFailure("WORKBENCH_SNAPSHOT_CHANGED")
+                    BugWorkbenchResult(11, emptyList(), null)
+                },
+            )
+
+            assertEquals(2, peopleReads)
+            assertEquals(2, bugReads)
+            assertEquals(11L, snapshot.bugs.snapshotSequence)
+        }
 
     private fun request() = FoundationCreateBugContract.buildRequest(
         projectId = PROJECT_ID,

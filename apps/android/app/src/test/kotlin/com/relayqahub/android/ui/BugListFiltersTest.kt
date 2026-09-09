@@ -1,7 +1,12 @@
 package com.relayqahub.android.ui
 
+import com.relayqahub.android.QaPerson
+import com.relayqahub.android.QaPersonRole
+import com.relayqahub.android.network.WorkbenchAssignmentProof
 import com.relayqahub.android.network.WorkbenchBug
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BugListFiltersTest {
@@ -105,6 +110,95 @@ class BugListFiltersTest {
                 ),
             ).map { it.id },
         )
+    }
+
+    @Test
+    fun `canonical owner filter accepts only an exact server assignment proof`() {
+        val projectId = "10000000-0000-4000-8000-000000000001"
+        val actorId = "20000000-0000-4000-8000-000000000001"
+        val sourceId = "30000000-0000-4000-8000-000000000001"
+        val assigned = bugs.first().copy(
+            projectId = projectId,
+            ownerId = sourceId,
+            ownerAssignmentProof = WorkbenchAssignmentProof(projectId, actorId, 42),
+        )
+
+        assertEquals(
+            listOf(assigned.id),
+            filterBugs(
+                listOf(assigned),
+                BugListFilters(ownerId = actorId),
+                assignmentSnapshotSequence = 42,
+            ).map { it.id },
+        )
+        assertTrue(
+            filterBugs(
+                listOf(assigned),
+                BugListFilters(ownerId = actorId),
+                assignmentSnapshotSequence = 41,
+            ).isEmpty(),
+        )
+        assertTrue(
+            filterBugs(
+                listOf(
+                    assigned.copy(
+                        ownerAssignmentProof = WorkbenchAssignmentProof(
+                            "10000000-0000-4000-8000-000000000099",
+                            actorId,
+                            42,
+                        ),
+                    ),
+                ),
+                BugListFilters(ownerId = actorId),
+                assignmentSnapshotSequence = 42,
+            ).isEmpty(),
+        )
+    }
+
+    @Test
+    fun `historical assignment labels and picker aliases require matching authority`() {
+        val projectId = "10000000-0000-4000-8000-000000000001"
+        val actorId = "20000000-0000-4000-8000-000000000001"
+        val ownerSourceId = "30000000-0000-4000-8000-000000000001"
+        val verifierSourceId = "30000000-0000-4000-8000-000000000002"
+        val people = listOf(
+            QaPerson(
+                id = actorId,
+                displayName = "Canonical teammate",
+                roles = setOf(QaPersonRole.FIXER, QaPersonRole.VERIFIER),
+                active = true,
+            ),
+        )
+        val assigned = bugs.first().copy(
+            projectId = projectId,
+            ownerId = ownerSourceId,
+            verificationOwnerId = verifierSourceId,
+            ownerAssignmentProof = WorkbenchAssignmentProof(projectId, actorId, 42),
+            verifierAssignmentProof = WorkbenchAssignmentProof(projectId, actorId, 42),
+        )
+
+        assertEquals(
+            "Canonical teammate",
+            assignmentPersonName(people, assigned, BugAssignment.OWNER, 42, "待分配"),
+        )
+        assertEquals(
+            "Canonical teammate",
+            assignmentPersonName(people, assigned, BugAssignment.VERIFIER, 42, "待分配"),
+        )
+        assertTrue(
+            assignmentPersonName(people, assigned, BugAssignment.OWNER, 41, "待分配")
+                .startsWith("历史人员 · "),
+        )
+        val projected = assignmentPeopleForBug(people, assigned, 42)
+        assertEquals(
+            "Canonical teammate（历史身份）",
+            projected.single { it.id == ownerSourceId }.displayName,
+        )
+        assertEquals(
+            "Canonical teammate（历史身份）",
+            projected.single { it.id == verifierSourceId }.displayName,
+        )
+        assertFalse(assignmentPeopleForBug(people, assigned, 41).any { it.id == ownerSourceId })
     }
 
     private fun bug(

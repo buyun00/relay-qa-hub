@@ -12,12 +12,12 @@ interface QaIdentityDirectory {
     readonly id: string;
     readonly displayName: string;
   };
-  readonly linkedUserIds?: (canonicalUserId: string) => readonly string[];
 }
 
 export interface SqliteMobileProjectDirectoryStoreOptions {
   readonly worker: SqliteStorageWorker;
   readonly scope: MobileScopeBootstrap;
+  readonly gmUserId?: string;
   readonly identityDirectory?: QaIdentityDirectory;
 }
 
@@ -54,10 +54,6 @@ export function canonicalizeMobileProjectMembers(
           projectId: input.projectId,
           displayName: member.displayName,
           roles: Object.freeze([...member.roles].sort()),
-          ...(directory.linkedUserIds === undefined ||
-          directory.linkedUserIds(member.userId).length === 0
-            ? {}
-            : { linkedUserIds: directory.linkedUserIds(member.userId) }),
           active: true as const,
         }),
       )
@@ -82,9 +78,19 @@ export function createSqliteMobileProjectDirectoryStore(
       });
     },
     async listProjects(query) {
+      if (
+        query.isGm === true &&
+        (options.gmUserId === undefined || query.actorId !== options.gmUserId)
+      ) {
+        throw Object.assign(new Error("authenticated GM authority is required"), {
+          code: "FORBIDDEN",
+        });
+      }
       return options.worker.listMobileVisibleProjects({
         accountId: options.scope.accountId,
         actorId: query.actorId,
+        ...(query.isGm === true ? { isGm: true as const } : {}),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
         limit: query.limit,
       });
     },
@@ -93,12 +99,12 @@ export function createSqliteMobileProjectDirectoryStore(
       const result = await options.worker.listMobileProjectMembers({
         accountId: options.scope.accountId,
         actorId: query.actorId,
+        authorizationProjectId: options.scope.projectId,
         projectId: query.projectId,
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
         limit: query.limit,
       });
-      return options.identityDirectory === undefined
-        ? result
-        : canonicalizeMobileProjectMembers(result, options.identityDirectory);
+      return result;
     },
 
     async listModules(query) {

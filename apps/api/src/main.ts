@@ -54,6 +54,7 @@ import {
   qaUserId,
 } from "./people-config.js";
 import { parseRelayEndpoint, type MobileRelayOutboxPump } from "./mobile-relay-outbox.js";
+import { deriveMobileReadCursorSigningKey } from "./mobile-read-cursor-key.js";
 
 const MOBILE_SCOPE: MobileScopeBootstrap = Object.freeze({
   accountId: "10000000-0000-4000-8000-000000000020",
@@ -262,6 +263,7 @@ async function run(): Promise<void> {
   const worker = new SqliteStorageWorker({
     databaseFile: storage.databaseFile,
     busyTimeoutMs: storage.busyTimeoutMs,
+    mobileBugCursorSigningKey: deriveMobileReadCursorSigningKey(debugBearerToken),
     executionHoldFile: join(storage.dataRoot, ".qa-hub-import-hold.json"),
     ...(backupConfig.enabled ? { backupRoot: join(backupConfig.backupRoot, "migration") } : {}),
     evidenceRoot: storage.evidenceRoot,
@@ -431,7 +433,13 @@ async function run(): Promise<void> {
             }),
           ),
           attachments: forActor(createSqliteMobileAttachmentStore({ worker, scope })),
-          projects: forActor(createSqliteMobileProjectDirectoryStore({ worker, scope })),
+          projects: forActor(
+            createSqliteMobileProjectDirectoryStore({
+              worker,
+              scope,
+              gmUserId: parallelInstance.gmUserId,
+            }),
+          ),
           qingyuLinks,
         };
       },
@@ -484,6 +492,7 @@ async function run(): Promise<void> {
       mobileProjectDirectoryStore: createSqliteMobileProjectDirectoryStore({
         worker,
         scope: requestScope,
+        gmUserId: parallelInstance.gmUserId,
       }),
       mobileUserManagementStore: createSqliteMobileUserManagementStore({
         worker,

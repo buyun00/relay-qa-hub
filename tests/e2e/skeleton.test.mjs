@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import { SQLITE_SCHEMA_VERSION } from "../../packages/storage/dist/sqlite-migrations.js";
 
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const apiEntryPoint = path.join(repositoryRoot, "apps", "api", "dist", "main.js");
@@ -185,7 +186,7 @@ test("built API process starts healthy and can be restarted on the same port", a
     r.json(),
   );
   assert.equal(firstReady.status, "ready");
-  assert.equal(firstReady.schemaVersion, "14");
+  assert.equal(firstReady.schemaVersion, String(SQLITE_SCHEMA_VERSION));
   await stopChild(first.child);
 
   const second = startApi(configFile);

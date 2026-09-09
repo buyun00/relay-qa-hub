@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "status": "failed_retained",
+  "runId": "17c75a82-de8e-40a3-98d0-e11a37dec631",
+  "startedAt": "2026-09-09T08:44:38.837Z",
+  "instanceId": "qa-hub-preview-final-sol-0909",
+  "projectId": "a64d95fc-528c-442f-8ac0-71c60cb28aa4",
+  "sourceHead": "029188ba25df1c3e940437f1e78fa05ba011aed8",
+  "sourceSha256": "40f265d454a2e46647326df518875058ae81a22215b5c2407bfc8a60e69e7c68",
+  "instanceConfigSha256": "1e36dd0cebe27457e04505ca86c87e92335415dc2a970f2338004f778f759503",
+  "checks": [
+    {
+      "label": "exact isolated listeners",
+      "actual": [
+        4539,
+        4541
+      ],
+      "expected": [
+        4539,
+        4541
+      ],
+      "at": "2026-09-09T08:44:41.025Z",
+      "passed": true
+    },
+    {
+      "label": "listener 4539 uses configured runtime",
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-09T08:44:41.025Z",
+      "passed": true
+    },
+    {
+      "label": "listener 4539 uses guarded preview launcher",
+      "actual": false,
+      "expected": true,
+      "at": "2026-09-09T08:44:41.025Z",
+      "passed": false
+    }
+  ],
+  "requests": [],
+  "fixtures": {},
+  "boundaries": {
+    "isolatedRuntimeOnly": true,
+    "actualMainApi": true,
+    "actualServerMcpProxy": true,
+    "syntheticCaptureFixture": true,
+    "physicalDeviceUsed": false,
+    "localMcpCalled": false,
+    "browserUiOperated": false,
+    "externalComponentsEnabled": false,
+    "externalCalls": 0,
+    "productionTouched": false,
+    "existingPreview4419Touched": false,
+    "cleanupDeletes": false
+  },
+  "hostBefore": [
+    {
+      "port": 4539,
+      "pid": 7724,
+      "startedAt": "2026-09-09T08:43:08.1091400Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" \"C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\run-preview-service.mjs\" \"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-final-sol-0909\\instance.json\" api"
+    },
+    {
+      "port": 4541,
+      "pid": 21724,
+      "startedAt": "2026-09-09T08:43:10.0775800Z",
+      "path": "C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "commandLine": "\"C:\\Users\\lin0\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe\" \"C:\\Users\\lin0\\.codex\\worktrees\\7c86\\Relay-QA-Hub\\scripts\\project-components\\run-preview-service.mjs\" \"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-final-sol-0909\\instance.json\" mcp"
+    }
+  ],
+  "failure": "AssertionError [ERR_ASSERTION]: listener 4539 uses guarded preview launcher\n\nfalse !== true\n\n    at check (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live.mjs:194:12)\n    at checkTrue (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live.mjs:197:40)\n    at run (file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live.mjs:314:7)\n    at file:///C:/Users/lin0/.codex/worktrees/7c86/Relay-QA-Hub/scripts/project-components/schema19-main-live.mjs:1058:11\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)",
+  "finishedAt": "2026-09-09T08:44:41.026Z"
+}

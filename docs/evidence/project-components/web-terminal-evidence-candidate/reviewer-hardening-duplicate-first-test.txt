@@ -1,0 +1,14 @@
+Captured: 2026-09-09T18:12:14+08:00
+Context: first focused run after rejecting duplicate Bug IDs across pages.
+
+COMMAND=QA_HUB_API_BASE_URL=http://127.0.0.1:4999 node ../../node_modules/vitest/vitest.mjs run src/api.test.ts src/App.test.tsx src/App.detail-loading.test.tsx
+
+FAIL src/api.test.ts > rejects a repeated Bug-list cursor immediately without restarting
+Expected code: INVALID_BUG_LIST_CURSOR
+Received code: INVALID_RESPONSE
+
+Test Files  1 failed | 2 passed (3)
+Tests       1 failed | 56 passed (57)
+EXIT_CODE=1
+
+Resolution: the old repeated-cursor fixture also repeated the same Bug ID, so the new duplicate-item invariant correctly failed first. Its second page now carries a distinct Bug ID; duplicate ID and repeated cursor each have an isolated fail-closed test.

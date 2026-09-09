@@ -52,7 +52,30 @@ export function isInstancePathWithin(candidate: string, root: string): boolean {
   );
 }
 
-function rejectRuntimeLinks(root: string): void {
+function instancePathsEqual(first: string, second: string): boolean {
+  const left = resolve(first);
+  const right = resolve(second);
+  return process.platform === "win32"
+    ? left.toLocaleLowerCase("en-US") === right.toLocaleLowerCase("en-US")
+    : left === right;
+}
+
+function canonicalConfiguredPath(value: string, field: string): string {
+  const requested = resolve(value);
+  const canonical = canonicalInstancePath(value);
+  let info;
+  try {
+    info = lstatSync(requested);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
+  if (info?.isSymbolicLink() || !instancePathsEqual(requested, canonical)) {
+    throw new Error(`INSTANCE_CONFIGURED_PATH_LINK_REFUSED: ${field}`);
+  }
+  return canonical;
+}
+
+function rejectRuntimeLinks(root: string, backupRoot: string): void {
   if (!existsSync(root)) return;
   const pending = [root];
   while (pending.length > 0) {
@@ -62,7 +85,7 @@ function rejectRuntimeLinks(root: string): void {
       if (entry.isSymbolicLink() || !isInstancePathWithin(canonicalInstancePath(target), root)) {
         throw new Error("INSTANCE_RUNTIME_LINK_REFUSED");
       }
-      if (entry.isDirectory()) pending.push(target);
+      if (entry.isDirectory() && !instancePathsEqual(target, backupRoot)) pending.push(target);
     }
   }
 }
@@ -86,7 +109,7 @@ function textField(record: Record<string, unknown>, key: string): string {
 export function readParallelInstanceConfig(configFile: string | undefined): ParallelInstanceConfig {
   if (!configFile)
     throw new Error("QA_HUB_INSTANCE_CONFIG_FILE is required; production defaults are disabled");
-  const configPath = canonicalInstancePath(configFile);
+  const configPath = canonicalConfiguredPath(configFile, "configFile");
   const raw: unknown = JSON.parse(readFileSync(configPath, "utf8").replace(/^\uFEFF/u, ""));
   return validateParallelInstanceConfig(raw, configPath);
 }
@@ -97,13 +120,14 @@ export function validateParallelInstanceConfig(
 ): ParallelInstanceConfig {
   if (raw === null || typeof raw !== "object" || Array.isArray(raw))
     throw new Error("INSTANCE_CONFIG_INVALID");
+  const verifiedConfigPath = canonicalConfiguredPath(configPath, "configFile");
   const record = raw as Record<string, unknown>;
   if (record["schemaVersion"] !== 1) throw new Error("INSTANCE_CONFIG_SCHEMA_INVALID");
   const instanceId = textField(record, "instanceId");
   if (!/^qa-hub-preview-[a-z0-9-]{3,40}$/u.test(instanceId))
     throw new Error("INSTANCE_ID_MUST_BE_PREVIEW");
-  const sourceRoot = canonicalInstancePath(textField(record, "sourceRoot"));
-  const runtimeRoot = canonicalInstancePath(textField(record, "runtimeRoot"));
+  const sourceRoot = canonicalConfiguredPath(textField(record, "sourceRoot"), "sourceRoot");
+  const runtimeRoot = canonicalConfiguredPath(textField(record, "runtimeRoot"), "runtimeRoot");
   if (
     isInstancePathWithin(runtimeRoot, sourceRoot) ||
     isInstancePathWithin(sourceRoot, runtimeRoot)
@@ -122,9 +146,8 @@ export function validateParallelInstanceConfig(
       }
     }
   }
-  if (!isInstancePathWithin(configPath, runtimeRoot))
+  if (!isInstancePathWithin(verifiedConfigPath, runtimeRoot))
     throw new Error("INSTANCE_CONFIG_OUTSIDE_RUNTIME");
-  rejectRuntimeLinks(runtimeRoot);
   const paths: Record<string, string> = {};
   for (const field of [
     "dataRoot",
@@ -135,12 +158,17 @@ export function validateParallelInstanceConfig(
     "secretsFile",
     "peopleFile",
   ]) {
-    const candidate = canonicalInstancePath(textField(record, field));
+    const candidate = canonicalConfiguredPath(textField(record, field), field);
     if (candidate === runtimeRoot || !isInstancePathWithin(candidate, runtimeRoot)) {
       throw new Error(`INSTANCE_PATH_OUTSIDE_RUNTIME: ${field}`);
     }
     paths[field] = candidate;
   }
+  // A sealed rollback bundle may contain dependency links. The backup root is
+  // validated as an ordinary in-runtime directory above, while its retained
+  // descendants are outside live service I/O and have their own validators.
+  // Every other runtime descendant keeps the original recursive link guard.
+  rejectRuntimeLinks(runtimeRoot, paths["backupRoot"]!);
   const dataPaths = ["dataRoot", "backupRoot", "downloadsRoot", "logsRoot", "desktopRoot"];
   for (const [index, first] of dataPaths.entries()) {
     for (const second of dataPaths.slice(index + 1)) {

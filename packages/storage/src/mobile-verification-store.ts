@@ -15,6 +15,10 @@ import {
   type MobileManualRepairAttemptRecord,
   type MobileRelayScope,
 } from "./mobile-relay-store.js";
+import {
+  canonicalNullableProjectUserId,
+  canonicalProjectUserId,
+} from "./project-identity-projection.js";
 
 const UUID_PATTERN =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
@@ -256,6 +260,55 @@ function hasProjectMembership(
   return row !== undefined;
 }
 
+function activeProjectIdentityRoot(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  userId: string,
+): string | null {
+  const row = database
+    .prepare(
+      `SELECT COALESCE(link.canonical_user_id, user.id) AS root_user_id
+       FROM users AS user
+       JOIN command_project_memberships AS membership
+         ON membership.account_id = user.account_id
+        AND membership.project_id = ?
+        AND membership.user_id = user.id
+        AND membership.status = 'active'
+       LEFT JOIN project_identity_links AS link
+         ON link.account_id = user.account_id
+        AND link.project_id = membership.project_id
+        AND link.source_user_id = user.id
+        AND link.status = 'active'
+       WHERE user.account_id = ? AND user.id = ? AND user.status = 'active'
+         AND (
+           link.id IS NULL OR EXISTS (
+             SELECT 1
+             FROM users AS canonical
+             JOIN command_project_memberships AS canonical_membership
+               ON canonical_membership.account_id = canonical.account_id
+              AND canonical_membership.project_id = membership.project_id
+              AND canonical_membership.user_id = canonical.id
+              AND canonical_membership.status = 'active'
+             WHERE canonical.account_id = user.account_id
+               AND canonical.id = link.canonical_user_id
+               AND canonical.status = 'active'
+           )
+         )`,
+    )
+    .get(input.projectId, input.accountId, userId) as { readonly root_user_id: string } | undefined;
+  return row?.root_user_id ?? null;
+}
+
+function sameActiveProjectIdentity(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  leftUserId: string,
+  rightUserId: string,
+): boolean {
+  const left = activeProjectIdentityRoot(database, input, leftUserId);
+  return left !== null && left === activeProjectIdentityRoot(database, input, rightUserId);
+}
+
 function requireVerificationCreatorRole(database: DatabaseSync, input: MobileRelayScope): void {
   if (!hasProjectMembership(database, input, input.actorId)) {
     throw new MobileRelayStorageError(
@@ -270,12 +323,40 @@ function requireVerifierRole(
   input: MobileRelayScope,
   verifierId = input.actorId,
 ): void {
-  if (!hasProjectMembership(database, input, verifierId)) {
+  const rootUserId = activeProjectIdentityRoot(database, input, verifierId);
+  if (rootUserId === null) {
     throw new MobileRelayStorageError("FORBIDDEN", "assigned user is not an active project member");
+  }
+  const role = database
+    .prepare(
+      `SELECT 1 AS present
+       FROM users AS candidate
+       JOIN command_project_memberships AS membership
+         ON membership.account_id = candidate.account_id
+        AND membership.project_id = ?
+        AND membership.user_id = candidate.id
+        AND membership.status = 'active'
+       JOIN command_project_roles AS role
+         ON role.account_id = membership.account_id
+        AND role.project_id = membership.project_id
+        AND role.membership_id = membership.id
+        AND role.role IN ('verifier', 'project_admin')
+       LEFT JOIN project_identity_links AS link
+         ON link.account_id = candidate.account_id
+        AND link.project_id = membership.project_id
+        AND link.source_user_id = candidate.id
+        AND link.status = 'active'
+       WHERE candidate.account_id = ? AND candidate.status = 'active'
+         AND COALESCE(link.canonical_user_id, candidate.id) = ?
+       LIMIT 1`,
+    )
+    .get(input.projectId, input.accountId, rootUserId);
+  if (!role) {
+    throw new MobileRelayStorageError("FORBIDDEN", "assigned user lacks the verifier role");
   }
 }
 
-function toBug(row: BugRow): MobileBugRecord {
+function toStoredBug(row: BugRow): MobileBugRecord {
   return Object.freeze({
     id: row.id,
     projectId: row.project_id,
@@ -301,7 +382,27 @@ function toBug(row: BugRow): MobileBugRecord {
   });
 }
 
-function toVerification(row: VerificationRow): MobileVerificationRecord {
+function toVerification(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  row: VerificationRow,
+): MobileVerificationRecord {
+  return Object.freeze({
+    id: row.id,
+    bugId: row.bug_id,
+    repairAttemptId: row.repair_attempt_id,
+    buildId: row.build_id,
+    status: row.status,
+    verifierId: canonicalProjectUserId(database, input, row.verifier_id),
+    criteriaSnapshot: row.criteria_snapshot,
+    resultSummary: row.result_summary,
+    failureReason: row.failure_reason,
+    blockedReason: row.blocked_reason,
+    version: row.version,
+  });
+}
+
+function toStoredVerification(row: VerificationRow): MobileVerificationRecord {
   return Object.freeze({
     id: row.id,
     bugId: row.bug_id,
@@ -317,7 +418,7 @@ function toVerification(row: VerificationRow): MobileVerificationRecord {
   });
 }
 
-function toAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
+function toStoredAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
   if (
     (row.mode !== "human" && row.mode !== "relay") ||
     (row.status !== "delivered" && row.status !== "verification_failed")
@@ -344,6 +445,38 @@ function toAttempt(row: AttemptRow): MobileManualRepairAttemptRecord {
     failureReason: row.failure_reason,
     targetBuildId: row.target_build_id,
     version: row.version,
+  });
+}
+
+function projectResultResponse(
+  database: DatabaseSync,
+  input: MobileRelayScope,
+  response: MobileVerificationResultResponse,
+  replayed: boolean,
+): MobileVerificationResultResponse {
+  return Object.freeze({
+    ...response,
+    qaItem: Object.freeze({ ...response.qaItem }),
+    verification: Object.freeze({
+      ...response.verification,
+      verifierId: canonicalProjectUserId(database, input, response.verification.verifierId),
+    }),
+    repairAttempt: Object.freeze({
+      ...response.repairAttempt,
+      assigneeId: canonicalProjectUserId(database, input, response.repairAttempt.assigneeId),
+    }),
+    bug: Object.freeze({
+      ...response.bug,
+      reporterId: canonicalProjectUserId(database, input, response.bug.reporterId),
+      ownerId: canonicalNullableProjectUserId(database, input, response.bug.ownerId),
+      verificationOwnerId: canonicalNullableProjectUserId(
+        database,
+        input,
+        response.bug.verificationOwnerId,
+      ),
+    }),
+    attachmentIds: Object.freeze([...response.attachmentIds]),
+    replayed,
   });
 }
 
@@ -615,9 +748,9 @@ function loadResultResponse(
   return Object.freeze({
     clientSubmissionId: input.clientSubmissionId,
     qaItem: Object.freeze({ type: "bug" as const, id: bug.id, key: bug.key }),
-    verification: toVerification(verification),
-    repairAttempt: toAttempt(attempt),
-    bug: toBug(bug),
+    verification: toStoredVerification(verification),
+    repairAttempt: toStoredAttempt(attempt),
+    bug: toStoredBug(bug),
     attachmentIds: Object.freeze(
       database
         .prepare(
@@ -781,7 +914,7 @@ export function createMobileVerification(
   }
   const row = readVerification(database, input, verificationId);
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not created");
-  return receipt.commit(toVerification(row), eventId);
+  return receipt.commit(toVerification(database, input, row), eventId);
 }
 
 export function getMobileVerification(
@@ -798,7 +931,7 @@ export function getMobileVerification(
       .get(input.accountId, input.projectId, row.bug_id)
   )
     return null;
-  return row ? toVerification(row) : null;
+  return row ? toVerification(database, input, row) : null;
 }
 
 export function startMobileVerification(
@@ -811,13 +944,19 @@ export function startMobileVerification(
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
   requireVerifierRole(database, input);
+  const current = readVerification(database, input, input.verificationId);
+  if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
+  if (!sameActiveProjectIdentity(database, input, current.verifier_id, input.actorId)) {
+    throw new MobileRelayStorageError(
+      "FORBIDDEN",
+      "Only the assigned verifier may start or replay this Verification",
+    );
+  }
   const receipt = workflowReceipt<MobileVerificationRecord>(database, input, "startVerification", {
     type: "verification",
     id: input.verificationId,
   });
   if (receipt.replay) return receipt.replay;
-  const current = readVerification(database, input, input.verificationId);
-  if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
   if (current.status !== "requested" || current.version !== input.expectedVersion) {
     throw new MobileRelayStorageError(
       "VERSION_CONFLICT",
@@ -865,7 +1004,7 @@ export function startMobileVerification(
   }
   const row = readVerification(database, input, current.id);
   if (!row) throw new MobileRelayStorageError("NOT_FOUND", "Verification disappeared after start");
-  return receipt.commit(toVerification(row), eventId);
+  return receipt.commit(toVerification(database, input, row), eventId);
 }
 
 function resultAuditText(value: string, maximumBytes: number): string {
@@ -904,6 +1043,7 @@ export function recordMobileVerificationResult(
   requireDigest(input.requestDigest);
   requireTimestamp(input.createdAt);
   validateVerificationResultEvidence(input);
+  requireVerifierRole(database, input);
   const operation =
     input.clientSubmissionId === null
       ? "recordLegacyVerificationResult"
@@ -914,7 +1054,10 @@ export function recordMobileVerificationResult(
   });
   const current = readVerification(database, input, input.verificationId);
   if (!current) throw new MobileRelayStorageError("NOT_FOUND", "Verification was not found");
-  if (input.requireAssignedVerifier && current.verifier_id !== input.actorId) {
+  if (
+    input.requireAssignedVerifier &&
+    !sameActiveProjectIdentity(database, input, current.verifier_id, input.actorId)
+  ) {
     throw new MobileRelayStorageError(
       "FORBIDDEN",
       "Only the assigned verifier may record or replay this result",
@@ -964,10 +1107,12 @@ export function recordMobileVerificationResult(
         "VERSION_CONFLICT",
         "Original Verification result snapshot is unavailable; inspect preserved history",
       );
-    return Object.freeze({
-      ...(JSON.parse(snapshot.response_json) as MobileVerificationResultResponse),
-      replayed: true,
-    });
+    return projectResultResponse(
+      database,
+      input,
+      JSON.parse(snapshot.response_json) as MobileVerificationResultResponse,
+      true,
+    );
   }
   const prior = readVerificationSubmission(database, input);
   if (prior) {
@@ -1211,5 +1356,5 @@ export function recordMobileVerificationResult(
     });
   }
   receipt.commit(snapshot, eventId);
-  return result;
+  return projectResultResponse(database, input, result, false);
 }

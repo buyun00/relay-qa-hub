@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import { SQLITE_MIGRATIONS } from "../src/sqlite-migrations.ts";
+import { insertBugWithNextNumber } from "../src/sqlite.ts";
 import { ensureMobileScope, createMobileBug } from "../src/mobile-bug-store.ts";
 import { createBrowserSession, resolveBrowserSession } from "../src/browser-auth-store.ts";
 import {
@@ -18,6 +19,7 @@ import {
   listManagedUsers,
 } from "../src/user-management-store.ts";
 import { listMobileBugs } from "../src/mobile-bug-list-store.ts";
+import { createMobileComment } from "../src/mobile-comment-store.ts";
 
 const accountId = "77000000-0000-4000-8000-000000000001";
 const gmId = "77000000-0000-4000-8000-000000000002";
@@ -223,6 +225,49 @@ test("project links affect only matching login, directory and historical owner f
     login(bId);
     login(aId, canonicalId, "负责人");
     login(bId, canonicalId, "负责人");
+    const createHistoricalComment = (projectId: string, suffix: string) => {
+      const bug = transaction(database, () =>
+        createMobileBug(database, {
+          accountId,
+          projectId,
+          actorId: userId,
+          clientSubmissionId: randomUUID(),
+          payloadDigest: suffix.repeat(64),
+          title: `Historical comment ${suffix}`,
+          description: "Read models project linked identities",
+          expectedBehavior: "Canonical author labels remain project-scoped",
+          severity: "S2",
+          priority: "P2",
+          ownerId: userId,
+          verificationOwnerId: userId,
+          occurrence: {
+            observedAt: timestamp,
+            platform: "web",
+            steps: ["Read project comment"],
+            actualBehavior: "Historical author",
+          },
+          attachmentIds: [],
+          captureBundleId: null,
+          createdAt: timestamp,
+        }),
+      );
+      const input = {
+        accountId,
+        projectId,
+        actorId: userId,
+        bugId: bug.bug.id,
+        clientSubmissionId: randomUUID(),
+        body: `Historical project ${suffix}`,
+        payloadDigest: suffix.repeat(64),
+        correlationId: randomUUID(),
+        idempotencyKey: randomUUID(),
+        createdAt: timestamp,
+      };
+      transaction(database, () => createMobileComment(database, input));
+      return { bugId: bug.bug.id, input };
+    };
+    const commentA = createHistoricalComment(aId, "a");
+    const commentB = createHistoricalComment(bId, "b");
     transaction(database, () =>
       linkManagedUser(database, {
         accountId,
@@ -233,6 +278,40 @@ test("project links affect only matching login, directory and historical owner f
         protectedUserIds: [],
         createdAt: timestamp,
       }),
+    );
+    assert.equal(
+      transaction(database, () => createMobileComment(database, commentA.input)).comment.authorId,
+      canonicalId,
+    );
+    assert.equal(
+      execute<{ items: { authorId: string }[] }>({
+        operation: "comments",
+        projectId: aId,
+        bugId: commentA.bugId,
+      }).items[0]?.authorId,
+      canonicalId,
+    );
+    assert.equal(
+      execute<{ items: { authorId: string }[] }>({
+        operation: "comments",
+        projectId: bId,
+        bugId: commentB.bugId,
+      }).items[0]?.authorId,
+      userId,
+    );
+    assert.ok(
+      execute<{ items: { actorId: string }[] }>({
+        operation: "audit",
+        projectId: aId,
+        isGm: true,
+      }).items.some((item) => item.actorId === canonicalId),
+    );
+    assert.ok(
+      execute<{ items: { actorId: string }[] }>({
+        operation: "audit",
+        projectId: bId,
+        isGm: true,
+      }).items.some((item) => item.actorId === userId),
     );
     assert.equal(login(aId).userId, canonicalId);
     assert.equal(login(bId).userId, userId);
@@ -253,6 +332,31 @@ test("project links affect only matching login, directory and historical owner f
       execute<{ items: unknown[] }>({ operation: "audit", projectId: aId, isGm: true }).items
         .length >= 2,
       true,
+    );
+    transaction(database, () =>
+      disableManagedUser(database, {
+        accountId,
+        actorId: gmId,
+        projectId: aId,
+        userId: canonicalId,
+        protectedUserIds: [],
+        createdAt: timestamp,
+      }),
+    );
+    assert.equal(
+      execute<{ items: { authorId: string }[] }>({
+        operation: "comments",
+        projectId: aId,
+        bugId: commentA.bugId,
+      }).items[0]?.authorId,
+      userId,
+    );
+    assert.ok(
+      execute<{ items: { actorId: string }[] }>({
+        operation: "audit",
+        projectId: aId,
+        isGm: true,
+      }).items.some((item) => item.actorId === userId),
     );
   } finally {
     database.close();
@@ -425,9 +529,171 @@ test("record project guard rejects wrong project while same employee can work in
       { code: "NOT_FOUND" },
     );
     assert.equal(
-      listMobileBugs(database, { accountId, projectId: aId, actorId: userId, limit: 20 }).items
-        .length,
+      listMobileBugs(
+        database,
+        { accountId, projectId: aId, actorId: userId, limit: 20 },
+        new Uint8Array(32).fill(7),
+      ).items.length,
       0,
+    );
+  } finally {
+    database.close();
+  }
+});
+
+test("Bug listing spans the exact authorized project set and caps vendor pages at 100", () => {
+  const { database, login } = fixture();
+  const signingKey = new Uint8Array(32).fill(13);
+  try {
+    login(aId);
+    login(bId);
+    const bugIds: string[] = [];
+    transaction(database, () => {
+      for (let index = 0; index < 102; index += 1) {
+        const id = randomUUID();
+        bugIds.push(id);
+        insertBugWithNextNumber(database, {
+          id,
+          accountId,
+          projectId: index === 101 ? bId : aId,
+          title: `Paged Bug ${index}`,
+          description: "Authorized project pagination",
+          expectedBehavior: "Every authorized row is returned exactly once",
+          severity: "S2",
+          priority: (["P4", "P0", "P2", "P1", "P3"] as const)[index % 5]!,
+          reporterId: userId,
+          ownerId: userId,
+          verificationOwnerId: userId,
+          createdAt: timestamp,
+        });
+      }
+    });
+
+    const query = {
+      accountId,
+      authorizationProjectId: aId,
+      actorId: userId,
+      sort: "priority_desc" as const,
+      limit: 500,
+    };
+    const first = listMobileBugs(database, query, signingKey);
+    assert.equal(first.items.length, 100);
+    assert.ok(first.nextCursor);
+    const second = listMobileBugs(database, { ...query, cursor: first.nextCursor! }, signingKey);
+    assert.equal(second.items.length, 2);
+    assert.equal(second.nextCursor, null);
+    const all = [...first.items, ...second.items];
+    assert.deepEqual(new Set(all.map((bug) => bug.id)), new Set(bugIds));
+    assert.deepEqual(new Set(all.map((bug) => bug.projectId)), new Set([aId, bId]));
+    assert.deepEqual(
+      all.map((bug) => bug.priority),
+      [...all.map((bug) => bug.priority)].sort(),
+    );
+    assert.equal(
+      listMobileBugs(database, { ...query, projectId: aId }, signingKey).items.length,
+      100,
+    );
+
+    const gmItems = transaction(database, () => {
+      database
+        .prepare(
+          "INSERT INTO storage_command_authorizations(account_id, project_id, actor_id) VALUES (?, ?, ?)",
+        )
+        .run(accountId, aId, gmId);
+      try {
+        const firstPage = listMobileBugs(
+          database,
+          { accountId, authorizationProjectId: aId, actorId: gmId, limit: 500 },
+          signingKey,
+        );
+        const secondPage = listMobileBugs(
+          database,
+          {
+            accountId,
+            authorizationProjectId: aId,
+            actorId: gmId,
+            limit: 500,
+            cursor: firstPage.nextCursor!,
+          },
+          signingKey,
+        );
+        return [...firstPage.items, ...secondPage.items];
+      } finally {
+        database
+          .prepare(
+            "DELETE FROM storage_command_authorizations WHERE account_id = ? AND project_id = ? AND actor_id = ?",
+          )
+          .run(accountId, aId, gmId);
+      }
+    });
+    assert.equal(gmItems.length, 102);
+    assert.ok(gmItems.some((bug) => bug.projectId === bId));
+  } finally {
+    database.close();
+  }
+});
+
+test("Bug creation accepts only an active module from the same account and project", () => {
+  const { database, login } = fixture();
+  try {
+    login(aId);
+    const activeModuleId = randomUUID();
+    const inactiveModuleId = randomUUID();
+    const otherProjectModuleId = randomUUID();
+    database
+      .prepare(
+        `INSERT INTO modules(id, account_id, project_id, name, active, created_at, updated_at, version)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+      )
+      .run(activeModuleId, accountId, aId, "Active module", 1, timestamp, timestamp);
+    database
+      .prepare(
+        `INSERT INTO modules(id, account_id, project_id, name, active, created_at, updated_at, version)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+      )
+      .run(inactiveModuleId, accountId, aId, "Inactive module", 0, timestamp, timestamp);
+    database
+      .prepare(
+        `INSERT INTO modules(id, account_id, project_id, name, active, created_at, updated_at, version)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+      )
+      .run(otherProjectModuleId, accountId, bId, "Other module", 1, timestamp, timestamp);
+    const create = (moduleId: string, suffix: string) =>
+      transaction(database, () =>
+        createMobileBug(database, {
+          accountId,
+          projectId: aId,
+          actorId: userId,
+          clientSubmissionId: suffix,
+          payloadDigest: suffix.replaceAll("-", "").padEnd(64, "a").slice(0, 64),
+          title: "Categorized Bug",
+          description: "Module scope is validated",
+          expectedBehavior: "Only a current module is accepted",
+          moduleId,
+          severity: "S2",
+          priority: "P2",
+          ownerId: userId,
+          verificationOwnerId: userId,
+          occurrence: {
+            observedAt: timestamp,
+            platform: "web",
+            steps: ["Create the Bug"],
+            actualBehavior: "Module is selected",
+          },
+          attachmentIds: [],
+          captureBundleId: null,
+          createdAt: timestamp,
+        }),
+      );
+    const created = create(activeModuleId, "77000000-0000-4000-8000-000000000101");
+    assert.equal(created.bug.moduleId, activeModuleId);
+    assert.throws(
+      () => create(inactiveModuleId, "77000000-0000-4000-8000-000000000102"),
+      /active project module/u,
+    );
+    assert.throws(
+      () => create(otherProjectModuleId, "77000000-0000-4000-8000-000000000103"),
+      /active project module/u,
     );
   } finally {
     database.close();

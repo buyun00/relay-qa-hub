@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync, renameSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -105,6 +105,79 @@ test("nested junction cannot redirect database or evidence to another directory"
     process.platform === "win32" ? "junction" : "dir",
   );
   assert.throws(() => readParallelInstanceConfig(f.configFile), /INSTANCE_RUNTIME_LINK_REFUSED/);
+});
+test("sealed history junction below backup root does not block status validation", (t) => {
+  const f = fixture(t);
+  mkdirSync(f.config.backupRoot);
+  const sealedHistory = join(f.root, "sealed-history");
+  mkdirSync(sealedHistory);
+  symlinkSync(
+    sealedHistory,
+    join(f.config.backupRoot, "schema19-runnable-sealed"),
+    process.platform === "win32" ? "junction" : "dir",
+  );
+
+  assert.equal(readParallelInstanceConfig(f.configFile).instanceId, f.config.instanceId);
+});
+test("configured runtime resource roots cannot themselves be junctions", (t) => {
+  for (const field of ["dataRoot", "backupRoot", "downloadsRoot", "logsRoot", "desktopRoot"]) {
+    const f = fixture(t);
+    const target = join(f.config.runtimeRoot, `plain-${field}`);
+    mkdirSync(target);
+    symlinkSync(target, f.config[field], process.platform === "win32" ? "junction" : "dir");
+    assert.throws(
+      () => readParallelInstanceConfig(f.configFile),
+      /INSTANCE_CONFIGURED_PATH_LINK_REFUSED/,
+      field,
+    );
+  }
+});
+test("configured secret and people files cannot themselves be links", (t) => {
+  for (const field of ["secretsFile", "peopleFile"]) {
+    const f = fixture(t);
+    const target = join(f.config.runtimeRoot, `plain-${field}`);
+    mkdirSync(target);
+    rmSync(f.config[field], { force: true });
+    symlinkSync(target, f.config[field], process.platform === "win32" ? "junction" : "dir");
+    assert.throws(
+      () => readParallelInstanceConfig(f.configFile),
+      /INSTANCE_CONFIGURED_PATH_LINK_REFUSED/,
+      field,
+    );
+  }
+});
+test("the runtime and config path cannot traverse a junction", (t) => {
+  const f = fixture(t);
+  const realRuntime = join(f.root, "runtime-real");
+  renameSync(f.config.runtimeRoot, realRuntime);
+  symlinkSync(realRuntime, f.config.runtimeRoot, process.platform === "win32" ? "junction" : "dir");
+  assert.throws(
+    () => readParallelInstanceConfig(f.configFile),
+    /INSTANCE_CONFIGURED_PATH_LINK_REFUSED/,
+  );
+});
+test("links outside retained backup descendants remain rejected", (t) => {
+  const f = fixture(t);
+  const acceptanceRoot = join(f.config.runtimeRoot, "acceptance");
+  const external = join(f.root, "external-acceptance");
+  mkdirSync(acceptanceRoot);
+  mkdirSync(external);
+  symlinkSync(
+    external,
+    join(acceptanceRoot, "unexpected-link"),
+    process.platform === "win32" ? "junction" : "dir",
+  );
+  assert.throws(() => readParallelInstanceConfig(f.configFile), /INSTANCE_RUNTIME_LINK_REFUSED/);
+});
+test("dangling configured paths remain rejected", (t) => {
+  const f = fixture(t);
+  rmSync(f.config.secretsFile);
+  symlinkSync(
+    join(f.root, "missing-secret"),
+    f.config.secretsFile,
+    process.platform === "win32" ? "junction" : "dir",
+  );
+  assert.throws(() => readParallelInstanceConfig(f.configFile), /INSTANCE_DANGLING_LINK/);
 });
 test("overlapping data and backup paths are rejected", (t) => {
   const f = fixture(t);

@@ -28,11 +28,13 @@ import com.relayqahub.android.network.QaHubApiContract
 import com.relayqahub.android.network.BuildProjectionFailure
 import com.relayqahub.android.network.BuildProjectionResult
 import com.relayqahub.android.network.BugWorkbenchFailure
+import com.relayqahub.android.network.BugWorkbenchResult
 import com.relayqahub.android.network.WorkbenchBug
 import com.relayqahub.android.network.WorkbenchBugAttachmentMetadata
 import com.relayqahub.android.network.WorkbenchBugImage
 import com.relayqahub.android.network.WorkbenchBugUpdate
 import com.relayqahub.android.network.WorkbenchProjectModule
+import com.relayqahub.android.network.inheritAssignmentProofIfSameProjection
 import com.relayqahub.android.network.CommentTimelineFailure
 import com.relayqahub.android.network.DuplicateCandidateFailure
 import com.relayqahub.android.network.InboxFailure
@@ -240,6 +242,30 @@ data class BugWorkbenchUiState(
     val errorCode: String? = null,
     val items: List<com.relayqahub.android.network.WorkbenchBug> = emptyList(),
 )
+
+internal data class AssignedWorkbenchSnapshot(
+    val people: QaPeopleConfig,
+    val bugs: BugWorkbenchResult,
+)
+
+internal suspend fun loadConsistentAssignedWorkbench(
+    readPeople: suspend () -> QaPeopleConfig,
+    readBugs: suspend () -> BugWorkbenchResult,
+): AssignedWorkbenchSnapshot {
+    repeat(2) { attempt ->
+        val people = readPeople()
+        val bugs = try {
+            readBugs()
+        } catch (failure: BugWorkbenchFailure) {
+            if (attempt == 0 && failure.code == "WORKBENCH_SNAPSHOT_CHANGED") return@repeat
+            throw failure
+        }
+        if (people.snapshotSequence == bugs.snapshotSequence) {
+            return AssignedWorkbenchSnapshot(people, bugs)
+        }
+    }
+    throw BugWorkbenchFailure("WORKBENCH_DIRECTORY_SNAPSHOT_CHANGED")
+}
 
 data class BugDetailUiState(
     val phase: String = "idle",
@@ -1310,13 +1336,26 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
             bugWorkbench.value = BugWorkbenchUiState(phase = "loading")
             lastAction.value = "Reading project Bugs from the QA Hub…"
             runCatching {
-                appContainer.bugWorkbenchClient.listBugs(
-                    projectId = scope.projectId,
-                    state = null,
-                    limit = WORKBENCH_MVP_LIMIT,
-                    accessToken = accessToken,
+                loadConsistentAssignedWorkbench(
+                    readPeople = {
+                        appContainer.accountSessionClient.listPeople(
+                            projectId = scope.projectId,
+                            projectKey = selectedProjectKey,
+                            accessToken = accessToken,
+                        )
+                    },
+                    readBugs = {
+                        appContainer.bugWorkbenchClient.listAssignedBugs(
+                            projectId = scope.projectId,
+                            actorId = scope.actorId,
+                            limitPerPage = WORKBENCH_MVP_LIMIT,
+                            accessToken = accessToken,
+                        )
+                    },
                 )
-            }.onSuccess { result ->
+            }.onSuccess { snapshot ->
+                people.value = snapshot.people
+                val result = snapshot.bugs
                 val first = result.items.firstOrNull()
                 bugWorkbench.value = BugWorkbenchUiState(
                     phase = "loaded",
@@ -1328,7 +1367,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                     items = result.items,
                 )
                 lastAction.value =
-                    "QA Hub read back ${result.items.size} project Bug(s)."
+                    "QA Hub read back ${result.items.size} assigned Bug(s)."
             }.onFailure { failure ->
                 setBugWorkbenchFailure(
                     if (failure is BugWorkbenchFailure) {
@@ -1350,6 +1389,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun openBugDetail(bugId: String) {
+        val assignmentSource = bugWorkbench.value.items.singleOrNull { it.id == bugId }
         bugDetail.value = BugDetailUiState(phase = "loading", bugId = bugId)
         viewModelScope.launch {
             val accessToken = currentAccessToken()
@@ -1371,7 +1411,7 @@ class FoundationViewModel(application: Application) : AndroidViewModel(applicati
                 bugDetail.value = BugDetailUiState(
                     phase = "loaded",
                     bugId = bugId,
-                    bug = detail.bug,
+                    bug = detail.bug.inheritAssignmentProofIfSameProjection(assignmentSource),
                     attachments = detail.attachments,
                     images = detail.images,
                     modules = detail.modules,

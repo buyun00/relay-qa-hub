@@ -16,7 +16,7 @@ import {
   Tray,
 } from "electron";
 
-import { APP_HOST, APP_SCHEME, appUrl, isAppUrl, parseDesktopConfig } from "./config.js";
+import { APP_HOST, appUrl, isAppUrl, parseBugDeepLink, parseDesktopConfig } from "./config.js";
 import { isPackageDownloadUrl } from "./package-downloads.js";
 import { parsePackagingNotice } from "./packaging-notifications.js";
 import type { DesktopBugChange, DesktopConnectionStatus } from "./bridge-types.js";
@@ -43,7 +43,6 @@ import { createAuthenticatedWssClient, createBrowserSessionWssClient } from "./w
 import { PortableUpdater, type DesktopUpdateState } from "./portable-updater.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
-const APP_PROTOCOL = `${APP_SCHEME}:`;
 const MAX_ASSET_BYTES = 50 * 1024 * 1024;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 const FALLBACK_TRAY_ICON =
@@ -232,7 +231,7 @@ async function chooseAssetsDirectory(): Promise<void> {
 }
 
 function isTrustedRendererUrl(value: string): boolean {
-  if (isAppUrl(value)) return true;
+  if (isAppUrl(value, config.appScheme)) return true;
   if (config.developmentUrl === null) return false;
   try {
     return new URL(value).origin === config.developmentUrl.origin;
@@ -299,20 +298,10 @@ function routeToBug(bugId: string): void {
   }
 }
 
-function parseBugDeepLink(value: string): string | null {
-  try {
-    const url = new URL(value);
-    if (url.protocol !== APP_PROTOCOL || url.hostname !== "bug") return null;
-    return normalizeBugId(url.pathname.replace(/^\//u, ""));
-  } catch {
-    return null;
-  }
-}
-
 function handleSecondInstanceArguments(args: readonly unknown[]): void {
   for (const value of args) {
     if (typeof value !== "string") continue;
-    const bugId = parseBugDeepLink(value);
+    const bugId = parseBugDeepLink(value, config.appScheme);
     if (bugId !== null) {
       process.stdout.write(
         `${JSON.stringify({ event: "desktop.second-instance.deep-link", bugId })}\n`,
@@ -730,14 +719,14 @@ async function createUpdater(): Promise<PortableUpdater> {
 
 async function registerAppProtocol(): Promise<void> {
   await chooseAssetsDirectory();
-  protocol.handle(APP_SCHEME, async (request) => {
+  protocol.handle(config.appScheme, async (request) => {
     let url: URL;
     try {
       url = new URL(request.url);
     } catch {
       return responseJson({ code: "APP_URL_INVALID" }, 400);
     }
-    if (url.protocol !== APP_PROTOCOL || url.hostname !== APP_HOST) {
+    if (url.protocol !== `${config.appScheme}:` || url.hostname !== APP_HOST) {
       return responseJson({ code: "APP_ORIGIN_NOT_ALLOWED" }, 403);
     }
     if (url.pathname.startsWith("/api/")) {
@@ -807,7 +796,7 @@ function createTransport(): NotificationTransport {
 
 async function startApplication(): Promise<void> {
   Menu.setApplicationMenu(null);
-  if (process.platform === "win32") app.setAppUserModelId("com.relayqahub.desktop.preview");
+  if (process.platform === "win32") app.setAppUserModelId(previewIdentity.appUserModelId);
   await loadRememberedLoginName();
   await registerAppProtocol();
   transport = createTransport();
@@ -863,7 +852,7 @@ async function startApplication(): Promise<void> {
   const target =
     useDevelopmentUrl && config.developmentUrl !== null
       ? config.developmentUrl.toString()
-      : appUrl();
+      : appUrl("/index.html", "", config.appScheme);
   await mainWindow.loadURL(target);
   if (!(config.startupHidden || process.argv.includes("--hidden"))) openMainWindow();
   transport.start();
@@ -879,7 +868,7 @@ if (!hasLock) {
 } else {
   protocol.registerSchemesAsPrivileged([
     {
-      scheme: APP_SCHEME,
+      scheme: config.appScheme,
       privileges: {
         standard: true,
         secure: true,

@@ -120,6 +120,74 @@ const TERMINAL_REPAIR_ATTEMPT_TOOLS: readonly ToolDefinition[] = [
     annotations: terminalWriteAnnotations,
   },
 ];
+const repairCompatibilityProperties = {
+  projectId: uuidSchema,
+  bugId: uuidSchema,
+  attemptId: uuidSchema,
+  summary: { type: "string", minLength: 1, maxLength: 7_000 },
+  validation: {
+    type: "array",
+    minItems: 1,
+    maxItems: 20,
+    items: { type: "string", minLength: 1, maxLength: 500 },
+  },
+  branch: { type: "string", minLength: 1, maxLength: 300 },
+  commitSha: { type: "string", pattern: "^[0-9a-f]{40}$" },
+  mergeRequestUrl: { type: "string", minLength: 1, maxLength: 4_000, format: "uri" },
+  patchUrl: { type: "string", minLength: 1, maxLength: 4_000, format: "uri" },
+  idempotencyKey: { type: "string", minLength: 1, maxLength: 200 },
+};
+const REPAIR_COMPATIBILITY_TOOLS: readonly ToolDefinition[] = [
+  {
+    name: "qa_begin_fix",
+    title: "领取并开始人工修复",
+    description:
+      "兼容本地MCP人工修复入口。使用当前登录身份领取未分配Bug，推进ready，建立并启动唯一人工RepairAttempt；已有同一身份的planned或running轮次时从持久状态安全续接。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        projectId: repairCompatibilityProperties.projectId,
+        bugId: repairCompatibilityProperties.bugId,
+        summary: { type: "string", minLength: 1, maxLength: 5_000 },
+        idempotencyKey: repairCompatibilityProperties.idempotencyKey,
+      },
+      required: ["projectId", "bugId", "summary", "idempotencyKey"],
+      additionalProperties: false,
+    },
+    annotations: terminalWriteAnnotations,
+  },
+  {
+    name: "qa_submit_fix",
+    title: "提交人工修复交付",
+    description:
+      "兼容本地MCP修复交付入口。仅当前登录的RepairAttempt assignee可提交分支、完整Git SHA、修复摘要及真实验证记录，并调用正式Bug动作业务。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        projectId: repairCompatibilityProperties.projectId,
+        attemptId: repairCompatibilityProperties.attemptId,
+        summary: repairCompatibilityProperties.summary,
+        validation: repairCompatibilityProperties.validation,
+        branch: repairCompatibilityProperties.branch,
+        commitSha: repairCompatibilityProperties.commitSha,
+        mergeRequestUrl: repairCompatibilityProperties.mergeRequestUrl,
+        patchUrl: repairCompatibilityProperties.patchUrl,
+        idempotencyKey: repairCompatibilityProperties.idempotencyKey,
+      },
+      required: [
+        "projectId",
+        "attemptId",
+        "summary",
+        "validation",
+        "branch",
+        "commitSha",
+        "idempotencyKey",
+      ],
+      additionalProperties: false,
+    },
+    annotations: terminalWriteAnnotations,
+  },
+];
 export const AUTOMATION_TOOLS: readonly ToolDefinition[] = [
   VERIFICATION_RESULT_AUTOMATION_TOOL,
   ...AUTOMATION_HTTP_ROUTES.map(([name, title, method, path]) => {
@@ -143,6 +211,7 @@ export const AUTOMATION_TOOLS: readonly ToolDefinition[] = [
       )
     );
   }),
+  ...REPAIR_COMPATIBILITY_TOOLS,
   definition(
     "qa_put_upload_chunk",
     "上传一个附件分块并校验SHA256",
@@ -243,6 +312,119 @@ function uuidField(input: Values, key: string): string {
   return value;
 }
 
+function positiveVersion(input: Values, key: string): number {
+  const value = input[key];
+  if (!Number.isSafeInteger(value) || Number(value) < 1)
+    throw new AutomationError("INVALID_RESPONSE", 502);
+  return Number(value);
+}
+
+function responseObject(value: unknown): Values {
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new AutomationError("INVALID_RESPONSE", 502);
+  return value as Values;
+}
+
+function responseUuid(input: Values, key: string): string {
+  const value = input[key];
+  if (typeof value !== "string" || !new RegExp(UUID_PATTERN, "u").test(value))
+    throw new AutomationError("INVALID_RESPONSE", 502);
+  return value;
+}
+
+function optionalHttpUrl(input: Values, key: string): string | undefined {
+  if (input[key] === undefined) return undefined;
+  const value = boundedText(input, key, 4_000);
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new AutomationError("INVALID_REQUEST", 400);
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:")
+    throw new AutomationError("INVALID_REQUEST", 400);
+  return value;
+}
+
+function repairCompatibilityStageKey(
+  name: "qa_begin_fix" | "qa_submit_fix",
+  callerKey: string,
+  stage: "claim" | "ready" | "plan" | "start" | "deliver",
+): string {
+  const digest = createHash("sha256").update(`${name}\0${callerKey}`, "utf8").digest("hex");
+  return `mcp:${name}:${stage}:${digest}`;
+}
+
+function repairCompatibilityRequest(
+  input: Values,
+  name: "qa_begin_fix" | "qa_submit_fix",
+):
+  | {
+      readonly name: "qa_begin_fix";
+      readonly projectId: string;
+      readonly bugId: string;
+      readonly summary: string;
+      readonly idempotencyKey: string;
+    }
+  | {
+      readonly name: "qa_submit_fix";
+      readonly projectId: string;
+      readonly attemptId: string;
+      readonly summary: string;
+      readonly validation: readonly string[];
+      readonly branch: string;
+      readonly commitSha: string;
+      readonly mergeRequestUrl?: string;
+      readonly patchUrl?: string;
+      readonly idempotencyKey: string;
+      readonly deliverySummary: string;
+    } {
+  const projectId = uuidField(input, "projectId");
+  const idempotencyKey = boundedText(input, "idempotencyKey", 200);
+  if (name === "qa_begin_fix") {
+    return {
+      name,
+      projectId,
+      bugId: uuidField(input, "bugId"),
+      summary: boundedText(input, "summary", 5_000),
+      idempotencyKey,
+    };
+  }
+  const summary = boundedText(input, "summary", 7_000);
+  const validationValue = input["validation"];
+  if (!Array.isArray(validationValue) || validationValue.length < 1 || validationValue.length > 20)
+    throw new AutomationError("INVALID_REQUEST", 400);
+  const validation = validationValue.map((value) => {
+    if (typeof value !== "string" || !value.trim() || value.length > 500)
+      throw new AutomationError("INVALID_REQUEST", 400);
+    return value.trim();
+  });
+  const commitSha = boundedText(input, "commitSha", 40);
+  if (!/^[0-9a-f]{40}$/u.test(commitSha)) throw new AutomationError("INVALID_REQUEST", 400);
+  const mergeRequestUrl = optionalHttpUrl(input, "mergeRequestUrl");
+  const patchUrl = optionalHttpUrl(input, "patchUrl");
+  const deliverySummary = [
+    summary,
+    "",
+    "验证（由本地 AI 编辑器报告，QA Hub 未独立复验）：",
+    ...validation.map((value) => `- ${value}`),
+  ].join("\n");
+  if (deliverySummary.length > 10_000) throw new AutomationError("INVALID_REQUEST", 400);
+  return {
+    name,
+    projectId,
+    attemptId: uuidField(input, "attemptId"),
+    summary,
+    validation,
+    branch: boundedText(input, "branch", 300),
+    commitSha,
+    ...(mergeRequestUrl === undefined ? {} : { mergeRequestUrl }),
+    ...(patchUrl === undefined ? {} : { patchUrl }),
+    idempotencyKey,
+    deliverySummary,
+  };
+}
+
 function terminalRepairAttemptAutomationRequest(
   input: Values,
   operation: "failRepairAttempt" | "supersedeRepairAttempt",
@@ -335,7 +517,10 @@ export function registerAutomationRoutes(
     for (const required of tool.inputSchema["required"] as string[])
       if (input[required] === undefined) throw new AutomationError("INVALID_REQUEST", 400);
     const allowedProperties =
-      name === "qa_fail_repair_attempt" || name === "qa_supersede_repair_attempt"
+      name === "qa_fail_repair_attempt" ||
+      name === "qa_supersede_repair_attempt" ||
+      name === "qa_begin_fix" ||
+      name === "qa_submit_fix"
         ? object(tool.inputSchema["properties"])
         : properties;
     for (const key of Object.keys(input))
@@ -431,6 +616,53 @@ export function registerAutomationRoutes(
       }
       return query.size ? `${path}?${query}` : path;
     };
+    const currentPrincipal = async (expectedProjectId: string): Promise<Values> => {
+      const principal = responseObject(await send("GET", "/api/v1/auth/me"));
+      responseUuid(principal, "accountId");
+      responseUuid(principal, "userId");
+      if (typeof principal["displayName"] !== "string" || !principal["displayName"])
+        throw new AutomationError("INVALID_RESPONSE", 502);
+      const projectId = responseUuid(principal, "projectId");
+      if (projectId !== expectedProjectId) throw new AutomationError("PROJECT_MISMATCH", 403);
+      return principal;
+    };
+    const principalSummary = (principal: Values): Values => ({
+      accountId: principal["accountId"],
+      userId: principal["userId"],
+      displayName: principal["displayName"],
+    });
+    const scopedBug = (
+      value: unknown,
+      expectedProjectId: string,
+      expectedBugId: string,
+    ): Values => {
+      const bug = responseObject(value);
+      if (bug["projectId"] !== expectedProjectId || bug["id"] !== expectedBugId)
+        throw new AutomationError("PROJECT_MISMATCH", 403);
+      positiveVersion(bug, "version");
+      return bug;
+    };
+    const bugAction = async (
+      expectedProjectId: string,
+      expectedBugId: string,
+      body: Values,
+      idempotencyKey: string,
+    ): Promise<{ readonly result: Values; readonly bug: Values }> => {
+      const result = responseObject(
+        await send(
+          "POST",
+          `/api/v1/projects/${encodeURIComponent(expectedProjectId)}/bugs/${encodeURIComponent(expectedBugId)}/actions`,
+          body,
+          idempotencyKey,
+        ),
+      );
+      if (result["projectId"] !== expectedProjectId || result["bugId"] !== expectedBugId)
+        throw new AutomationError("INVALID_RESPONSE", 502);
+      return {
+        result: responseObject(result["result"]),
+        bug: scopedBug(result["bug"], expectedProjectId, expectedBugId),
+      };
+    };
     switch (name) {
       case "qa_record_verification_result": {
         let command: ReturnType<typeof verificationResultAutomationRequest>;
@@ -489,6 +721,204 @@ export function registerAutomationRoutes(
           etag: response.headers["etag"],
         };
       }
+      case "qa_begin_fix": {
+        const command = repairCompatibilityRequest(input, "qa_begin_fix");
+        if (command.name !== "qa_begin_fix") throw new AutomationError("INVALID_REQUEST", 400);
+        const principal = await currentPrincipal(command.projectId);
+        const userId = responseUuid(principal, "userId");
+        const expectedSummary = `[MCP] ${command.summary}`;
+        let bug = scopedBug(
+          await send("GET", `/api/v1/bugs/${encodeURIComponent(command.bugId)}`),
+          command.projectId,
+          command.bugId,
+        );
+        let workflow = responseObject(
+          await send("GET", `/api/v1/bugs/${encodeURIComponent(command.bugId)}/human-workflow`),
+        );
+        const activeValue = workflow["repairAttempt"];
+        if (activeValue !== null && activeValue !== undefined) {
+          const active = responseObject(activeValue);
+          if (bug["ownerId"] !== null && bug["ownerId"] !== userId)
+            throw new AutomationError("BUG_ASSIGNED_TO_OTHER_USER", 409);
+          if (active["mode"] !== "human" || active["assigneeId"] !== userId)
+            throw new AutomationError("BUG_ASSIGNED_TO_OTHER_USER", 409);
+          if (active["summary"] !== expectedSummary)
+            throw new AutomationError("IDEMPOTENCY_PAYLOAD_MISMATCH", 409);
+          if (active["status"] === "running") {
+            return {
+              principal: principalSummary(principal),
+              bug,
+              repairAttempt: active,
+              workflow,
+              resumed: true,
+            };
+          }
+          if (active["status"] === "planned") {
+            const activeId = responseUuid(active, "id");
+            const started = await bugAction(
+              command.projectId,
+              command.bugId,
+              {
+                action: "begin_fix",
+                expectedVersion: positiveVersion(active, "version"),
+                attemptId: activeId,
+                request: { reason: expectedSummary },
+              },
+              repairCompatibilityStageKey(command.name, command.idempotencyKey, "start"),
+            );
+            bug = started.bug;
+            workflow = responseObject(
+              await send("GET", `/api/v1/bugs/${encodeURIComponent(command.bugId)}/human-workflow`),
+            );
+            return {
+              principal: principalSummary(principal),
+              bug,
+              repairAttempt: started.result,
+              workflow,
+              resumed: true,
+            };
+          }
+          throw new AutomationError("BUG_NOT_AVAILABLE_FOR_FIX", 409);
+        }
+        const state = bug["state"];
+        if (typeof state !== "string" || !["reported", "needs_info", "ready"].includes(state))
+          throw new AutomationError("BUG_NOT_AVAILABLE_FOR_FIX", 409);
+        if (bug["ownerId"] !== null && bug["ownerId"] !== userId)
+          throw new AutomationError("BUG_ASSIGNED_TO_OTHER_USER", 409);
+        if (bug["ownerId"] === null) {
+          bug = scopedBug(
+            await send(
+              "PATCH",
+              `/api/v1/bugs/${encodeURIComponent(command.bugId)}`,
+              { expectedVersion: positiveVersion(bug, "version"), ownerId: userId },
+              repairCompatibilityStageKey(command.name, command.idempotencyKey, "claim"),
+            ),
+            command.projectId,
+            command.bugId,
+          );
+        }
+        if (bug["state"] !== "ready") {
+          bug = (
+            await bugAction(
+              command.projectId,
+              command.bugId,
+              { action: "ready", expectedVersion: positiveVersion(bug, "version") },
+              repairCompatibilityStageKey(command.name, command.idempotencyKey, "ready"),
+            )
+          ).bug;
+        }
+        const planned = await bugAction(
+          command.projectId,
+          command.bugId,
+          {
+            action: "plan_fix",
+            expectedVersion: positiveVersion(bug, "version"),
+            request: { assigneeId: userId, summary: expectedSummary },
+          },
+          repairCompatibilityStageKey(command.name, command.idempotencyKey, "plan"),
+        );
+        const attemptId = responseUuid(planned.result, "id");
+        const started = await bugAction(
+          command.projectId,
+          command.bugId,
+          {
+            action: "begin_fix",
+            expectedVersion: positiveVersion(planned.result, "version"),
+            attemptId,
+            request: { reason: expectedSummary },
+          },
+          repairCompatibilityStageKey(command.name, command.idempotencyKey, "start"),
+        );
+        workflow = responseObject(
+          await send("GET", `/api/v1/bugs/${encodeURIComponent(command.bugId)}/human-workflow`),
+        );
+        return {
+          principal: principalSummary(principal),
+          bug: started.bug,
+          repairAttempt: started.result,
+          workflow,
+          resumed: false,
+          nextAction:
+            "Inspect the repository, make the narrow fix, run real validation, commit, then call qa_submit_fix.",
+        };
+      }
+      case "qa_submit_fix": {
+        const command = repairCompatibilityRequest(input, "qa_submit_fix");
+        if (command.name !== "qa_submit_fix") throw new AutomationError("INVALID_REQUEST", 400);
+        const principal = await currentPrincipal(command.projectId);
+        const userId = responseUuid(principal, "userId");
+        let attempt = responseObject(
+          await send("GET", `/api/v1/repair-attempts/${encodeURIComponent(command.attemptId)}`),
+        );
+        if (responseUuid(attempt, "id") !== command.attemptId)
+          throw new AutomationError("INVALID_RESPONSE", 502);
+        const bugId = responseUuid(attempt, "bugId");
+        let bug = scopedBug(
+          await send("GET", `/api/v1/bugs/${encodeURIComponent(bugId)}`),
+          command.projectId,
+          bugId,
+        );
+        if (attempt["mode"] !== "human" || attempt["assigneeId"] !== userId)
+          throw new AutomationError("REPAIR_ASSIGNED_TO_OTHER_USER", 403);
+        if (attempt["status"] === "delivered") {
+          if (attempt["commitSha"] !== command.commitSha)
+            throw new AutomationError("REPAIR_ALREADY_DELIVERED", 409);
+          if (
+            attempt["summary"] !== command.deliverySummary ||
+            attempt["branch"] !== command.branch ||
+            (attempt["mergeRequestUrl"] ?? null) !== (command.mergeRequestUrl ?? null) ||
+            (attempt["patchUrl"] ?? null) !== (command.patchUrl ?? null)
+          )
+            throw new AutomationError("IDEMPOTENCY_PAYLOAD_MISMATCH", 409);
+          const workflow = responseObject(
+            await send("GET", `/api/v1/bugs/${encodeURIComponent(bugId)}/human-workflow`),
+          );
+          return {
+            principal: principalSummary(principal),
+            repairAttempt: attempt,
+            bug,
+            workflow,
+            replayed: true,
+            reporterConfirmationRequired: false,
+          };
+        }
+        if (attempt["status"] !== "running") throw new AutomationError("REPAIR_NOT_RUNNING", 409);
+        const submitted = await bugAction(
+          command.projectId,
+          bugId,
+          {
+            action: "submit_fix",
+            expectedVersion: positiveVersion(attempt, "version"),
+            attemptId: command.attemptId,
+            request: {
+              summary: command.deliverySummary,
+              deliveryKind: "code",
+              branch: command.branch,
+              commitSha: command.commitSha,
+              ...(command.mergeRequestUrl === undefined
+                ? {}
+                : { mergeRequestUrl: command.mergeRequestUrl }),
+              ...(command.patchUrl === undefined ? {} : { patchUrl: command.patchUrl }),
+            },
+          },
+          repairCompatibilityStageKey(command.name, command.idempotencyKey, "deliver"),
+        );
+        attempt = submitted.result;
+        bug = submitted.bug;
+        const workflow = responseObject(
+          await send("GET", `/api/v1/bugs/${encodeURIComponent(bugId)}/human-workflow`),
+        );
+        return {
+          principal: principalSummary(principal),
+          repairAttempt: attempt,
+          bug,
+          workflow,
+          replayed: false,
+          reporterConfirmationRequired: false,
+          nextAction:
+            "The code delivery now waits for an exact-commit Build. After it reaches ready_for_verification, an active member of the same project must complete the formal Verification workflow; the recorded verification owner remains attribution, not an authorization role.",
+        };
+      }
       case "qa_login_gm": {
         const body = payload();
         const selected = input["projectId"] === undefined ? undefined : field(input, "projectId");
@@ -518,7 +948,16 @@ export function registerAutomationRoutes(
           input["filters"] === undefined ? {} : object(input["filters"]),
         )) {
           if (
-            !["q", "state", "severity", "ownerId", "ownerState", "limit"].includes(key) ||
+            ![
+              "q",
+              "state",
+              "severity",
+              "ownerId",
+              "verificationOwnerId",
+              "ownerState",
+              "cursor",
+              "limit",
+            ].includes(key) ||
             !["string", "number"].includes(typeof value)
           )
             throw new AutomationError("INVALID_REQUEST", 400);

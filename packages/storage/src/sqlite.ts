@@ -497,6 +497,7 @@ export interface NewBugStorageRecord {
   readonly title: string;
   readonly description: string;
   readonly expectedBehavior: string;
+  readonly moduleId?: string | null;
   readonly severity: "S0" | "S1" | "S2" | "S3" | "S4";
   readonly priority: "P0" | "P1" | "P2" | "P3" | "P4";
   readonly reporterId: string;
@@ -539,10 +540,10 @@ export function insertBugWithNextNumber(
     .prepare(
       `INSERT INTO bugs(
         id, account_id, project_id, number, key, title, description,
-        expected_behavior, state, severity, priority, reporter_id,
+        expected_behavior, module_id, state, severity, priority, reporter_id,
         owner_id, verification_owner_id, occurrence_count, reopen_count,
         created_at, updated_at, version
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'reported', ?, ?, ?, ?, ?, 1, 0, ?, ?, 1)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'reported', ?, ?, ?, ?, ?, 1, 0, ?, ?, 1)`,
     )
     .run(
       record.id,
@@ -553,6 +554,7 @@ export function insertBugWithNextNumber(
       record.title,
       record.description,
       record.expectedBehavior,
+      record.moduleId ?? null,
       record.severity,
       record.priority,
       record.reporterId,

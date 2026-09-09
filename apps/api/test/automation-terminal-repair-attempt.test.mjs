@@ -132,7 +132,7 @@ test("shared catalogs expose closed terminal schemas and retain Verification cap
     .tools;
   assert.deepEqual(rpcCatalog, AUTOMATION_TOOLS);
   assert.deepEqual(httpCatalog, rpcCatalog);
-  assert.equal(rpcCatalog.length, 94);
+  assert.equal(rpcCatalog.length, 96);
   const fail = rpcCatalog.find((tool) => tool.name === "qa_fail_repair_attempt");
   const supersede = rpcCatalog.find((tool) => tool.name === "qa_supersede_repair_attempt");
   assert.deepEqual(fail.inputSchema.required, [

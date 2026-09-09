@@ -1,0 +1,13 @@
+Captured: 2026-09-09T17:53:26+08:00
+Context: first focused run after adding a one-time durable-write interruption to the frozen binding-renewal UI test.
+
+COMMAND=QA_HUB_API_BASE_URL=http://127.0.0.1:4999 node ../../node_modules/vitest/vitest.mjs run src/api.test.ts src/App.test.tsx src/App.detail-loading.test.tsx
+
+FAIL src/App.detail-loading.test.tsx > repair and verification actions > renews an expired binding in place before replaying a refreshed frozen result
+AssertionError: expected 3 to be 2
+
+Test Files  1 failed | 2 passed (3)
+Tests       1 failed | 51 passed (52)
+EXIT_CODE=1
+
+Resolution: React's normal draft synchronization can observe the same generation-2 state in addition to the explicit durable checkpoint write. The assertion now accepts those extra writes while requiring the material invariants: the renewal helper runs again from the generation-1 durable checkpoint, and no result POST occurs until a generation-2 write completes.

@@ -300,6 +300,8 @@ export {
 export { createApiServer } from "./server.js";
 export type { ApiListenOptions, ApiServer } from "./server.js";
 
+export { deriveMobileReadCursorSigningKey } from "./mobile-read-cursor-key.js";
+
 export {
   BROWSER_CSRF_HEADER,
   BROWSER_LOGIN_PATH,

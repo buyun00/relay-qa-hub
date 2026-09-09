@@ -1,13 +1,34 @@
 Unicode true
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
-Name "QA Hub Project Preview"
+!ifndef INSTANCE_ID
+  !error "INSTANCE_ID is required"
+!endif
+!ifndef INSTALL_DIRECTORY_NAME
+  !error "INSTALL_DIRECTORY_NAME is required"
+!endif
+!ifndef EXECUTABLE_BASENAME
+  !error "EXECUTABLE_BASENAME is required"
+!endif
+!ifndef UNINSTALL_REGISTRY_KEY
+  !error "UNINSTALL_REGISTRY_KEY is required"
+!endif
+!ifndef SHORTCUT_NAME
+  !error "SHORTCUT_NAME is required"
+!endif
+!ifndef PROTOCOL_SCHEME
+  !error "PROTOCOL_SCHEME is required"
+!endif
+!ifndef DISPLAY_NAME
+  !error "DISPLAY_NAME is required"
+!endif
+Name "${DISPLAY_NAME}"
 OutFile "${OUTPUT_FILE}"
-InstallDir "$LOCALAPPDATA\Programs\RelayQaHubPreview"
+InstallDir "$LOCALAPPDATA\Programs\${INSTALL_DIRECTORY_NAME}"
 Icon "${ICON_FILE}"
 VIProductVersion "0.2.0.${BUILD_NUMBER}"
-VIAddVersionKey /LANG=1033 "ProductName" "QA Hub Project Preview"
-VIAddVersionKey /LANG=1033 "FileDescription" "Independent QA Hub preview installer"
+VIAddVersionKey /LANG=1033 "ProductName" "${DISPLAY_NAME}"
+VIAddVersionKey /LANG=1033 "FileDescription" "${DISPLAY_NAME} installer"
 VIAddVersionKey /LANG=1033 "FileVersion" "${APP_VERSION}"
 Page instfiles
 UninstPage uninstConfirm
@@ -19,7 +40,7 @@ Var OperationSuffix
 
 Function .onInit
   SetShellVarContext current
-  StrCmp $INSTDIR "$LOCALAPPDATA\Programs\RelayQaHubPreview" +3
+  StrCmp $INSTDIR "$LOCALAPPDATA\Programs\${INSTALL_DIRECTORY_NAME}" +3
     SetErrorLevel 10
     Quit
   ClearErrors
@@ -78,16 +99,16 @@ write_registration:
   FileWrite $0 "${INSTANCE_ID}"
   FileClose $0
   WriteUninstaller "$INSTDIR\Uninstall-Preview.exe"
-  CreateShortCut "$DESKTOP\QA Hub Project Preview.lnk" "$INSTDIR\RelayQaHubPreview.exe"
-  CreateDirectory "$SMPROGRAMS\QA Hub Project Preview"
-  CreateShortCut "$SMPROGRAMS\QA Hub Project Preview\QA Hub Project Preview.lnk" "$INSTDIR\RelayQaHubPreview.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHubPreview" "DisplayName" "QA Hub Project Preview"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHubPreview" "DisplayVersion" "${APP_VERSION}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHubPreview" "InstallLocation" "$INSTDIR"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHubPreview" "UninstallString" '$\"$INSTDIR\Uninstall-Preview.exe$\"'
-  WriteRegStr HKCU "Software\Classes\qa-hub-preview" "" "URL:QA Hub Preview"
-  WriteRegStr HKCU "Software\Classes\qa-hub-preview" "URL Protocol" ""
-  WriteRegStr HKCU "Software\Classes\qa-hub-preview\shell\open\command" "" '$\"$INSTDIR\RelayQaHubPreview.exe$\" $\"%1$\"'
+  CreateShortCut "$DESKTOP\${SHORTCUT_NAME}.lnk" "$INSTDIR\${EXECUTABLE_BASENAME}.exe"
+  CreateDirectory "$SMPROGRAMS\${SHORTCUT_NAME}"
+  CreateShortCut "$SMPROGRAMS\${SHORTCUT_NAME}\${SHORTCUT_NAME}.lnk" "$INSTDIR\${EXECUTABLE_BASENAME}.exe"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_REGISTRY_KEY}" "DisplayName" "${DISPLAY_NAME}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_REGISTRY_KEY}" "DisplayVersion" "${APP_VERSION}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_REGISTRY_KEY}" "InstallLocation" "$INSTDIR"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_REGISTRY_KEY}" "UninstallString" '$\"$INSTDIR\Uninstall-Preview.exe$\"'
+  WriteRegStr HKCU "Software\Classes\${PROTOCOL_SCHEME}" "" "URL:${DISPLAY_NAME}"
+  WriteRegStr HKCU "Software\Classes\${PROTOCOL_SCHEME}" "URL Protocol" ""
+  WriteRegStr HKCU "Software\Classes\${PROTOCOL_SCHEME}\shell\open\command" "" '$\"$INSTDIR\${EXECUTABLE_BASENAME}.exe$\" $\"%1$\"'
   SetErrorLevel 0
   Goto finished
 install_failed:
@@ -104,7 +125,7 @@ SectionEnd
 
 Section "Uninstall"
   SetShellVarContext current
-  StrCmp $INSTDIR "$LOCALAPPDATA\Programs\RelayQaHubPreview" +3
+  StrCmp $INSTDIR "$LOCALAPPDATA\Programs\${INSTALL_DIRECTORY_NAME}" +3
     SetErrorLevel 30
     Quit
   System::Call 'kernel32::GetFileAttributesW(w "$INSTDIR") i.r0'
@@ -134,11 +155,11 @@ uninstall_backup_ready:
   ClearErrors
   Rename "$INSTDIR" "$BackupDirectory"
   IfErrors uninstall_failed
-  Delete "$DESKTOP\QA Hub Project Preview.lnk"
-  Delete "$SMPROGRAMS\QA Hub Project Preview\QA Hub Project Preview.lnk"
-  RMDir "$SMPROGRAMS\QA Hub Project Preview"
-  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\RelayQaHubPreview"
-  DeleteRegKey HKCU "Software\Classes\qa-hub-preview"
+  Delete "$DESKTOP\${SHORTCUT_NAME}.lnk"
+  Delete "$SMPROGRAMS\${SHORTCUT_NAME}\${SHORTCUT_NAME}.lnk"
+  RMDir "$SMPROGRAMS\${SHORTCUT_NAME}"
+  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_REGISTRY_KEY}"
+  DeleteRegKey HKCU "Software\Classes\${PROTOCOL_SCHEME}"
   SetErrorLevel 0
   Goto uninstall_finished
 uninstall_failed:

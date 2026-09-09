@@ -12,6 +12,7 @@ import type {
   MobileVerificationRecord,
   MobileVerificationStatus,
 } from "./mobile-verification-store.js";
+import { canonicalProjectUserId } from "./project-identity-projection.js";
 
 const UUID_PATTERN =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/u;
@@ -368,7 +369,7 @@ function readHumanRepairAttempt(
     sequence: row.sequence,
     mode: row.mode as "human" | "relay",
     status: row.status,
-    assigneeId: row.assignee_id,
+    assigneeId: canonicalProjectUserId(database, input, row.assignee_id),
     parentAttemptId: null,
     summary: row.summary,
     branch: row.branch,
@@ -528,7 +529,7 @@ function readActiveVerification(
     repairAttemptId: row.repair_attempt_id,
     buildId: row.build_id,
     status: row.status,
-    verifierId: row.verifier_id,
+    verifierId: canonicalProjectUserId(database, input, row.verifier_id),
     criteriaSnapshot: row.criteria_snapshot,
     resultSummary: row.result_summary,
     failureReason: row.failure_reason,

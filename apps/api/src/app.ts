@@ -61,6 +61,7 @@ import {
   MOBILE_BUILD_COLLECTION_PATH,
   MOBILE_BUILD_ITEM_PATH,
   MOBILE_BUILD_LINK_REPAIR_PATH,
+  parseMobileBuildListQuery,
   parseMobileLinkBuildRepairRequest,
   parseMobileRegisterBuildRequest,
   requireBuildIdempotencyKey,
@@ -95,14 +96,15 @@ import {
   MOBILE_BUG_COMMENTS_PATH,
   MOBILE_BUG_EVENTS_PATH,
   parseMobileAddBugCommentRequest,
-  parseMobileBugEventsLimit,
+  parseMobileBugCommentsQuery,
+  parseMobileBugEventsQuery,
   requireMobileCommentCorrelationId,
   requireMobileCommentIdempotencyKey,
   type MobileCommentStore,
 } from "./mobile-comments.js";
 import {
   MOBILE_NOTIFICATION_LIST_PATH,
-  parseMobileNotificationLimit,
+  parseMobileNotificationListQuery,
   type MobileNotificationStore,
 } from "./mobile-inbox.js";
 import {
@@ -430,6 +432,9 @@ const unconfiguredMobileRelayStore: MobileRelayStore = {
 };
 
 const unconfiguredMobileBuildStore: MobileBuildStore = {
+  listBuilds: () => {
+    throw new Error("MobileBuildStore is not configured");
+  },
   registerBuild: () => {
     throw new Error("MobileBuildStore is not configured");
   },
@@ -469,6 +474,9 @@ const unconfiguredMobileHumanWorkflowStore: MobileHumanWorkflowStore = {
 };
 
 const unconfiguredMobileCommentStore: MobileCommentStore = {
+  listComments: () => {
+    throw new Error("MobileCommentStore is not configured");
+  },
   addComment: () => {
     throw new Error("MobileCommentStore is not configured");
   },
@@ -654,13 +662,13 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       relay: mobileRelayStore,
       verification: mobileVerificationStore,
     });
-    for (const path of [
-      "/api/v1/projects/:projectId/bugs/:bugId/comments",
-      "/api/v1/bugs/:bugId/comments",
-    ]) {
+    for (const path of ["/api/v1/projects/:projectId/bugs/:bugId/comments"]) {
       app.get<{
         Params: { projectId?: string; bugId: string };
-        Querystring: { limit?: string; cursor?: string };
+        Querystring: {
+          limit?: string | readonly string[];
+          cursor?: string | readonly string[];
+        };
       }>(path, async (request, reply) => {
         const actor = getBrowserPrincipal(request);
         if (!actor) return reply.code(401).send({ code: "UNAUTHENTICATED" });
@@ -674,22 +682,20 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           },
         );
         try {
-          if (
-            request.query.limit !== undefined &&
-            (typeof request.query.limit !== "string" || !/^[1-9][0-9]*$/u.test(request.query.limit))
-          )
-            return reply.code(400).send({ code: "INVALID_REQUEST" });
+          const query = parseMobileBugCommentsQuery(request.query);
           return await options.projectManagementService!.execute(actor, {
             operation: "comments",
             projectId: context.projectId,
             bugId: request.params.bugId,
-            limit: request.query.limit === undefined ? 100 : Number(request.query.limit),
-            ...(request.query.cursor === undefined ? {} : { cursor: request.query.cursor }),
+            limit: query.limit,
+            ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
           });
         } catch (error) {
           const code = (error as { code?: string }).code;
-          if (code === "INVALID_CURSOR" || code === "INVALID_REQUEST")
-            return reply.code(400).send({ code });
+          if (error instanceof TypeError || code === "INVALID_CURSOR" || code === "INVALID_REQUEST")
+            return reply
+              .code(400)
+              .send({ code: code === "INVALID_CURSOR" ? code : "INVALID_REQUEST" });
           if (code === "NOT_FOUND") return reply.code(404).send({ code });
           throw error;
         }
@@ -1022,8 +1028,11 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     try {
       const query = parseMobileProjectDirectoryListQuery(request.query);
+      const principal = getBrowserPrincipal(request);
       const result = await mobileProjectDirectoryStore.listProjects({
         actorId: authenticatedActorId(request, debugActorId),
+        ...(principal?.isGm === true ? { isGm: true as const } : {}),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
         limit: query.limit,
       });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
@@ -1031,6 +1040,13 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       const code = (error as { code?: unknown })?.code;
       if (code === "FORBIDDEN") {
         return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "RATE_LIMITED") {
+        return reply
+          .code(429)
+          .header("retry-after", "60")
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code });
       }
       if (error instanceof TypeError || code === "INVALID_REQUEST") {
         return reply
@@ -1058,6 +1074,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       const result = await mobileProjectDirectoryStore.listMembers({
         actorId: authenticatedActorId(request, debugActorId),
         projectId,
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
         limit: query.limit,
       });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
@@ -1068,6 +1085,13 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       }
       if (code === "FORBIDDEN") {
         return reply.code(403).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
+      }
+      if (code === "RATE_LIMITED") {
+        return reply
+          .code(429)
+          .header("retry-after", "60")
+          .header("content-type", MOBILE_API_CONTENT_TYPE)
+          .send({ code });
       }
       if (error instanceof TypeError || code === "INVALID_REQUEST") {
         return reply
@@ -1439,10 +1463,17 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     Querystring: {
       readonly projectId?: string | readonly string[];
       readonly ownerId?: string | readonly string[];
+      readonly verificationOwnerId?: string | readonly string[];
       readonly ownerState?: string | readonly string[];
       readonly q?: string | readonly string[];
       readonly state?: string | readonly string[];
+      readonly reporterId?: string | readonly string[];
+      readonly moduleId?: string | readonly string[];
       readonly severity?: string | readonly string[];
+      readonly priority?: string | readonly string[];
+      readonly updatedAfter?: string | readonly string[];
+      readonly sort?: string | readonly string[];
+      readonly cursor?: string | readonly string[];
       readonly limit?: string | readonly string[];
     };
   }>(MOBILE_BUG_COLLECTION_PATH, async (request, reply) => {
@@ -1451,9 +1482,11 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
     try {
       const query = parseMobileBugListQuery(request.query);
+      const projectId = options.projectRequestContext?.currentProjectId();
       const result = await mobileBugStore.listBugs({
         actorId: authenticatedActorId(request, debugActorId),
         ...query,
+        ...(projectId === undefined ? {} : { projectId }),
       });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
     } catch (error: unknown) {
@@ -1778,6 +1811,13 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   const relayErrorReply = (error: unknown, reply: FastifyReply) => {
     const code = (error as { code?: unknown })?.code;
+    if (code === "RATE_LIMITED") {
+      return reply
+        .code(429)
+        .header("retry-after", "60")
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code });
+    }
     if (code === "RELAY_INTEGRATION_NOT_CONFIGURED") {
       return reply.code(503).header("content-type", MOBILE_API_CONTENT_TYPE).send({ code });
     }
@@ -2226,6 +2266,13 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   const buildErrorReply = (error: unknown, reply: FastifyReply) => {
     const code = (error as { code?: unknown })?.code;
+    if (code === "RATE_LIMITED") {
+      return reply
+        .code(429)
+        .header("retry-after", "60")
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code });
+    }
     if (code === "NOT_ACCEPTABLE" || code === "UNSUPPORTED_MEDIA_TYPE") {
       return reply.code(code === "NOT_ACCEPTABLE" ? 406 : 415).send({ code });
     }
@@ -2328,6 +2375,28 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     }
   });
 
+  app.get<{
+    Params: { bugId: string };
+    Querystring: { cursor?: string | string[]; limit?: string | string[] };
+  }>(MOBILE_BUG_COMMENTS_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const query = parseMobileBugCommentsQuery(request.query);
+      const result = await mobileCommentStore.listComments({
+        actorId: authenticatedActorId(request, debugActorId),
+        bugId,
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+        limit: query.limit,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      return relayErrorReply(error, reply);
+    }
+  });
+
   app.post<{ Params: { bugId: string } }>(MOBILE_BUG_COMMENTS_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
       return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
@@ -2373,21 +2442,55 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
 
   app.get<{
     Params: { bugId: string };
-    Querystring: { limit?: string | string[] };
+    Querystring: {
+      afterSequence?: string | string[];
+      cursor?: string | string[];
+      limit?: string | string[];
+    };
   }>(MOBILE_BUG_EVENTS_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
       return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
     }
     try {
       const bugId = requireRelayUuid(request.params.bugId, "bugId");
+      const query = parseMobileBugEventsQuery(request.query);
       const result = await mobileCommentStore.listEvents({
         actorId: authenticatedActorId(request, debugActorId),
         bugId,
-        limit: parseMobileBugEventsLimit(request.query.limit),
+        ...(query.afterSequence === undefined ? {} : { afterSequence: query.afterSequence }),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+        limit: query.limit,
       });
       return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
     } catch (error: unknown) {
       return relayErrorReply(error, reply);
+    }
+  });
+
+  app.get<{
+    Params: { projectId: string };
+    Querystring: {
+      status?: string | string[];
+      cursor?: string | string[];
+      limit?: string | string[];
+    };
+  }>(MOBILE_BUILD_COLLECTION_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+    }
+    try {
+      const projectId = requireBuildUuid(request.params.projectId, "projectId");
+      const query = parseMobileBuildListQuery(request.query);
+      const result = await mobileBuildStore.listBuilds({
+        actorId: authenticatedActorId(request, debugActorId),
+        projectId,
+        ...(query.status === undefined ? {} : { status: query.status }),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+        limit: query.limit,
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send(result);
+    } catch (error: unknown) {
+      return buildErrorReply(error, reply);
     }
   });
 
@@ -2623,49 +2726,51 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     },
   );
 
-  app.get<{ Querystring: { limit?: string | string[] } }>(
-    MOBILE_NOTIFICATION_LIST_PATH,
-    async (request, reply) => {
-      if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
-        return reply
-          .code(401)
-          .header("content-type", MOBILE_API_CONTENT_TYPE)
-          .send({ code: "UNAUTHENTICATED" });
-      }
-      try {
-        const result = await mobileNotificationStore.listNotifications({
-          actorId: authenticatedActorId(request, debugActorId),
-          limit: parseMobileNotificationLimit(request.query.limit),
-          now: (options.now ?? (() => new Date()))().toISOString(),
-        });
-        return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send({
-          items: result.items.map((item) => ({
-            id: item.id,
-            projectId: item.projectId,
-            userId: item.userId,
-            type: item.type,
-            title: item.title,
-            body: item.body,
-            bugId: item.bugId,
-            createdAt: item.createdAt,
-            readAt: item.readAt,
-            version: item.version,
-          })),
-          nextCursor: result.nextCursor,
-          unreadCount: result.unreadCount,
-        });
-      } catch (error: unknown) {
-        const code = (error as { code?: unknown })?.code;
-        if (error instanceof TypeError || code === "INVALID_REQUEST") {
-          return reply
-            .code(400)
-            .header("content-type", MOBILE_API_CONTENT_TYPE)
-            .send({ code: "INVALID_REQUEST" });
-        }
-        throw error;
-      }
-    },
-  );
+  app.get<{
+    Querystring: {
+      projectId?: string | string[];
+      unreadOnly?: string | string[];
+      cursor?: string | string[];
+      limit?: string | string[];
+    };
+  }>(MOBILE_NOTIFICATION_LIST_PATH, async (request, reply) => {
+    if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+      return reply
+        .code(401)
+        .header("content-type", MOBILE_API_CONTENT_TYPE)
+        .send({ code: "UNAUTHENTICATED" });
+    }
+    try {
+      const query = parseMobileNotificationListQuery(request.query);
+      const result = await mobileNotificationStore.listNotifications({
+        actorId: authenticatedActorId(request, debugActorId),
+        ...(query.projectId === undefined ? {} : { projectId: query.projectId }),
+        unreadOnly: query.unreadOnly,
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+        limit: query.limit,
+        now: (options.now ?? (() => new Date()))().toISOString(),
+      });
+      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send({
+        snapshotSequence: result.snapshotSequence,
+        items: result.items.map((item) => ({
+          id: item.id,
+          accountId: item.accountId,
+          projectId: item.projectId,
+          userId: item.userId,
+          type: item.type,
+          title: item.title,
+          bugId: item.bugId,
+          createdAt: item.createdAt,
+          readAt: item.readAt,
+          version: item.version,
+        })),
+        nextCursor: result.nextCursor,
+        unreadCount: result.unreadCount,
+      });
+    } catch (error: unknown) {
+      return relayErrorReply(error, reply);
+    }
+  });
 
   app.post(MOBILE_CAPTURE_COLLECTION_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {

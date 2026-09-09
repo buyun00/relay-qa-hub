@@ -45,15 +45,12 @@ function occurrenceInput(occurrence: MobileOccurrenceDraft): MobileOccurrenceInp
   };
 }
 
-function requireFirstSliceRequest(
+function requireScopedCreateRequest(
   request: MobileCreateBugRequest,
   scope: MobileScopeBootstrap,
 ): void {
   if (request.projectId !== scope.projectId) {
     throw new TypeError("projectId does not match the authenticated mobile scope");
-  }
-  if (request.moduleId != null) {
-    throw new TypeError("moduleId is not available in the first mobile slice");
   }
 }
 
@@ -62,7 +59,7 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
 
   return {
     async createBug(command): Promise<MobileCreateBugResponse> {
-      requireFirstSliceRequest(command.request, options.scope);
+      requireScopedCreateRequest(command.request, options.scope);
       const input: CreateMobileBugInput = {
         accountId: options.scope.accountId,
         projectId: options.scope.projectId,
@@ -72,6 +69,7 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
         title: command.request.title,
         description: command.request.description,
         expectedBehavior: command.request.expectedBehavior,
+        moduleId: command.request.moduleId ?? null,
         severity: command.request.severity,
         priority: command.request.priority,
         ownerId: command.request.ownerId ?? null,
@@ -102,13 +100,23 @@ export function createSqliteMobileBugStore(options: SqliteMobileBugStoreOptions)
     async listBugs(query: MobileBugListQuery): Promise<MobileBugListResponse> {
       return options.worker.listMobileBugs({
         accountId: options.scope.accountId,
-        projectId: query.projectId ?? options.scope.projectId,
+        authorizationProjectId: options.scope.projectId,
+        ...(query.projectId === undefined ? {} : { projectId: query.projectId }),
         actorId: query.actorId,
         ...(query.ownerId === undefined ? {} : { ownerId: query.ownerId }),
+        ...(query.verificationOwnerId === undefined
+          ? {}
+          : { verificationOwnerId: query.verificationOwnerId }),
         ...(query.ownerState === undefined ? {} : { ownerState: query.ownerState }),
         ...(query.q === undefined ? {} : { q: query.q }),
         ...(query.state === undefined ? {} : { state: query.state }),
+        ...(query.reporterId === undefined ? {} : { reporterId: query.reporterId }),
+        ...(query.moduleId === undefined ? {} : { moduleId: query.moduleId }),
         ...(query.severity === undefined ? {} : { severity: query.severity }),
+        ...(query.priority === undefined ? {} : { priority: query.priority }),
+        ...(query.updatedAfter === undefined ? {} : { updatedAfter: query.updatedAfter }),
+        ...(query.sort === undefined ? {} : { sort: query.sort }),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
         limit: query.limit,
       });
     },

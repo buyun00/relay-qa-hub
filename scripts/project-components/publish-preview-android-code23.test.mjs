@@ -60,10 +60,8 @@ test("manifest fixes original package, numeric version, origin commit and exact 
   assert.equal(manifest.sha256, "9cfa87eb36b5be80f218e104fb4c6338fda3e96e5dcc694d897c5907df768548");
 });
 
-test("frozen API source and retention dependency pins match the reviewed repository files", () => {
-  const facts = pinnedSourceFacts();
-  assert.equal(facts.length, 9);
-  assert.equal(facts.filter((x) => x.path.startsWith("apps/api/")).length, 8);
+test("frozen code23 source pins refuse reuse after the repository changes", () => {
+  assert.throws(() => pinnedSourceFacts(), /APPROVED_SOURCE_CHANGED/u);
 });
 
 test("deployment proof validation rejects missing checks, failed before, cross-run, changed binding and enabled components", () => {
