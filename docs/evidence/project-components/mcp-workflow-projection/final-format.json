@@ -1,0 +1,17 @@
+{
+  "startedAt": "2026-09-09T04:16:46.031Z",
+  "finishedAt": "2026-09-09T04:16:46.517Z",
+  "args": [
+    "node_modules/prettier/bin/prettier.cjs",
+    "--check",
+    "apps/api/src/automation.ts",
+    "apps/api/src/automation-routes.ts",
+    "apps/api/test/automation-protocol.test.mjs",
+    "apps/api/test/automation-verification-result.test.mjs",
+    "apps/api/test/automation-workflow-projection.test.ts"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs/evidence/project-components/mcp-workflow-projection/final-format.txt",
+  "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+}

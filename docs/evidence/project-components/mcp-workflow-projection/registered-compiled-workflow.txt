@@ -1,0 +1,10 @@
+✔ workflow MCP preserves actual HTTP pages and current project authority (1067.3813ms)
+ℹ retained C:\Users\lin0\AppData\Local\Temp\qa-mcp-workflow-DY62s5; schema 17; 27 real loopback HTTP requests; registered compiled MCP, app and worker
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1606.9189

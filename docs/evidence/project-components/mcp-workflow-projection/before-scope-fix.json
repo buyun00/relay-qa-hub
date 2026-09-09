@@ -1,0 +1,14 @@
+{
+  "startedAt": "2026-09-09T04:14:58.570Z",
+  "finishedAt": "2026-09-09T04:14:59.884Z",
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "apps/api/test/automation-workflow-projection.test.ts"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "file": "docs/evidence/project-components/mcp-workflow-projection/before-scope-fix.txt",
+  "sha256": "cd9fdad4ee382997ecece74c1bed44626b0c4830b387c1f19a42da81d1b4afb2"
+}

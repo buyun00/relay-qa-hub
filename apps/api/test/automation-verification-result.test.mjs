@@ -442,7 +442,7 @@ test("MCP result catalog is additive, explicit and vendor-only; invalid scope/ke
     args = argsFor(f, r, body),
     before = snapshot(f);
   const catalog = (await rpc(f, "tools/list", {})).tools;
-  assert.equal(catalog.length, 91);
+  assert.equal(catalog.length, 92);
   assert.deepEqual(catalog, AUTOMATION_TOOLS);
   const sharedCatalog = await f.call("/api/v1/mcp/tools");
   assert.deepEqual(sharedCatalog.tools, catalog);
@@ -451,7 +451,10 @@ test("MCP result catalog is additive, explicit and vendor-only; invalid scope/ke
   assert.equal(definition.inputSchema.additionalProperties, false);
   assert.equal(definition.inputSchema.properties.request.additionalProperties, false);
   assert.equal(definition.annotations.idempotentHint, true);
-  assert.equal(catalog.filter((x) => x.name !== definition.name).length, 90);
+  assert.equal(
+    catalog.filter((x) => ![definition.name, "qa_get_bug_workflow"].includes(x.name)).length,
+    90,
+  );
   for (const patch of [
     { idempotencyKey: "not-canonical" },
     { idempotencyKey: r.key.replace(":v2", ":v1") },

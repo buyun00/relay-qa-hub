@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-09-09T04:12:36.161Z",
+  "finishedAt": "2026-09-09T04:12:42.812Z",
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "apps/api/test/automation-protocol.test.mjs",
+    "apps/api/test/automation-verification-result.test.mjs",
+    "apps/api/test/automation-workflow-projection.test.ts"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs/evidence/project-components/mcp-workflow-projection/compiled-regression.txt",
+  "sha256": "5a8f5ef26df348fa99d82a8465b7c27db2310ef2660499afcb8e08122bc27f28"
+}

@@ -1,0 +1,119 @@
+{
+  "createdAt": "2026-09-09T04:39:18.1993171Z",
+  "status": "passed_isolated_registered_app_candidate",
+  "parentCommit": "4eece8e",
+  "catalogTools": 92,
+  "tests": {
+    "normalMjs": "13/13",
+    "workflowTs": "1/1",
+    "realLoopbackRequests": 31,
+    "resultWorkerRequests": 137,
+    "lint": 0,
+    "format": 0
+  },
+  "scope": {
+    "schemaVersion": 17,
+    "fullMain": false,
+    "deployedPreview": false,
+    "installedClient": false,
+    "productionTouched": false,
+    "externalExecution": false
+  },
+  "artifacts": [
+    {
+      "path": "apps/api/src/automation-routes.ts",
+      "bytes": 7447,
+      "sha256": "87f6744b0ddf0e5119aefdd93e55f7a53b9cf8f85b8c16debc92f72bc54b0fb9"
+    },
+    {
+      "path": "apps/api/src/automation.ts",
+      "bytes": 31084,
+      "sha256": "fddad457c13cba6d748c5839f076dfd27912870e4966f57c0a3e6285e37a37a1"
+    },
+    {
+      "path": "apps/api/test/automation-workflow-projection.test.ts",
+      "bytes": 12426,
+      "sha256": "0b53bd24bcce83bae5f62ade2ef846164fab353f6aae1442aff47cee25311536"
+    },
+    {
+      "path": "apps/api/test/automation-protocol.test.mjs",
+      "bytes": 16203,
+      "sha256": "846ae6b43bd123b2dcfcb288b9fdc1ea72fc9528b9544a585e65991df26443aa"
+    },
+    {
+      "path": "apps/api/test/automation-verification-result.test.mjs",
+      "bytes": 23825,
+      "sha256": "dbce8d867f6be9886f3e9d52c20477fe20c3c6d24d2d7c11bdb2c66e38898826"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.js",
+      "bytes": 7923,
+      "sha256": "27746e7be8f46a6ccee9a7eb3b8eba628b2f2bd3269e9053000c3ef0f9ea10b1"
+    },
+    {
+      "path": "apps/api/dist/automation.js",
+      "bytes": 32964,
+      "sha256": "dd21fad54174ece90ec5cad51ba8ec53780ccf4eefa66934dc4eeffd7f61c4b2"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/README.md",
+      "bytes": 3534,
+      "sha256": "de267aa13d7d24ebed2ec18dd6a7bb9dbb603a31bf021f7c26391d674e08de18"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/source-review.json",
+      "bytes": 77050,
+      "sha256": "b6b0a5ce508a1839e03d8040abccfc649ae44b8ab034fca10a57badb3607b873"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-review-current.json",
+      "bytes": 4051,
+      "sha256": "2036d46dcf6952d458273fc296a00281a3119c002d61e507a04c59f78db376df"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/before-scope-fix.json",
+      "bytes": 413,
+      "sha256": "0456f25d4cab9c98d11ffa707059eb73a37f9866be262f01f3a3c27a46dcdd24"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/before-scope-fix.txt",
+      "bytes": 1281,
+      "sha256": "cd9fdad4ee382997ecece74c1bed44626b0c4830b387c1f19a42da81d1b4afb2"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-normal-mjs.json",
+      "bytes": 274,
+      "sha256": "57c1ff6e466e8269fabbe7774070e4432af8390929be2cfcf917d438a14b81b8"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-normal-mjs.txt",
+      "bytes": 2472,
+      "sha256": "46f4b37655549fe9b959f0ceeaf55eba0dfaa65c987fe3defdd6baedc1544274"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-workflow-ts.json",
+      "bytes": 243,
+      "sha256": "1e79a481086d3fc79dd9a619564174361d7062149353ecf9178c74031b732309"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-workflow-ts.txt",
+      "bytes": 366,
+      "sha256": "8cd92b68df3f0ae61b71c213ff0e5ca187bb89d8e40fe7178798d121e8d11bd2"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-style.json",
+      "bytes": 425,
+      "sha256": "d08baf16a984471b79032079a85b378e1c82ff242af4c691b1f82acd6a29c0e5"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-lint.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-format.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    }
+  ]
+}

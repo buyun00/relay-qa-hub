@@ -1,0 +1,15 @@
+{
+  "startedAt": "2026-09-09T04:12:36.185Z",
+  "finishedAt": "2026-09-09T04:12:37.736Z",
+  "args": [
+    "node_modules/eslint/bin/eslint.js",
+    "apps/api/src/automation-routes.ts",
+    "apps/api/test/automation-protocol.test.mjs",
+    "apps/api/test/automation-verification-result.test.mjs",
+    "apps/api/test/automation-workflow-projection.test.ts"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs/evidence/project-components/mcp-workflow-projection/source-lint.txt",
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

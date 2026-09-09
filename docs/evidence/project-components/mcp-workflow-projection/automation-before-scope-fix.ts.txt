@@ -210,11 +210,7 @@ export function registerAutomationRoutes(
       if (input[required] === undefined) throw new AutomationError("INVALID_REQUEST", 400);
     for (const key of Object.keys(input))
       if (!(key in properties)) throw new AutomationError("INVALID_REQUEST", 400);
-    const projectId = (tool.inputSchema["required"] as string[]).includes("projectId")
-      ? field(input, "projectId")
-      : typeof input["projectId"] === "string"
-        ? input["projectId"]
-        : undefined;
+    const projectId = typeof input["projectId"] === "string" ? input["projectId"] : undefined;
     const send = async (
       method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
       path: string,

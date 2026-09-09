@@ -1,0 +1,6 @@
+{
+  "at": "2026-09-09T04:34:46.4792014Z",
+  "command": "node --test apps/api/test/automation-protocol.test.mjs apps/api/test/automation-verification-result.test.mjs",
+  "exitCode": 0,
+  "logSha256": "46f4b37655549fe9b959f0ceeaf55eba0dfaa65c987fe3defdd6baedc1544274"
+}

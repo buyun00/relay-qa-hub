@@ -1,0 +1,2661 @@
+{
+  "startedAt": "2026-09-09T04:12:14.907Z",
+  "finishedAt": "2026-09-09T04:12:16.155Z",
+  "args": [
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    ".tools/tsconfig-mcp-workflow.json",
+    "--listEmittedFiles"
+  ],
+  "exitCode": 0,
+  "before": [
+    {
+      "path": "apps/api/dist/android-updates.d.ts",
+      "bytes": 664,
+      "sha256": "cfbb9f420f4d359aff6a2c81a1b288f01feea0c400192787c8f66016f6759a8f"
+    },
+    {
+      "path": "apps/api/dist/android-updates.d.ts.map",
+      "bytes": 515,
+      "sha256": "8cdc40b7969bb06cb7d2ca896904c241d4a4daca5b1759589229b0a7820dc690"
+    },
+    {
+      "path": "apps/api/dist/android-updates.js",
+      "bytes": 7189,
+      "sha256": "95c2b0fd1a898c07d62a9fccad00abfe2d0dd4da85b9bdd8cf665c79c430e556"
+    },
+    {
+      "path": "apps/api/dist/android-updates.js.map",
+      "bytes": 7018,
+      "sha256": "e1aed46dee097af6b32f3fb639313790a9d5c695fbdd16c8aba21738d9278ae6"
+    },
+    {
+      "path": "apps/api/dist/app.d.ts",
+      "bytes": 5241,
+      "sha256": "68309f50a085cd12c4bcd2ae4bd04e57eceb40d8cebb3cea86b32197562c2118"
+    },
+    {
+      "path": "apps/api/dist/app.d.ts.map",
+      "bytes": 4236,
+      "sha256": "a5d26549e89e1c46b72ef0ffedca912202320a0a94fb5fa304ac76b8dad9f937"
+    },
+    {
+      "path": "apps/api/dist/app.js",
+      "bytes": 108578,
+      "sha256": "a5759102f7f9480eddc4f234e6e150281f0fd6f0ec4a50511f99f7249a68dc3b"
+    },
+    {
+      "path": "apps/api/dist/app.js.map",
+      "bytes": 90680,
+      "sha256": "62204afb2bcc158d263553750286f3cd8746b8f3018d3e4ff2c8db8e50140a90"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.d.ts",
+      "bytes": 7465,
+      "sha256": "0361f0f7dd3187abd7ee12d9f62cafee65b49b1ea011cea0be7ccf217b416657"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.d.ts.map",
+      "bytes": 176,
+      "sha256": "e5daf449c94f5504ef3b05655155dd9f0b1f130f0fd2b8810df44d247454a8ab"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.js",
+      "bytes": 7744,
+      "sha256": "7481b9a79c4f4c5403d50091557e48d63be71bf04a7c15c0844fa826715afebe"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.js.map",
+      "bytes": 3846,
+      "sha256": "1be4f8b48e688f98686dbedc468e8527591408353dde63db72b46a4d5ff0bf91"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.d.ts",
+      "bytes": 5579,
+      "sha256": "255f5164c83047bab225bc0d746650efb2e7ef565fe3a13ccfa896f0855045f8"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.d.ts.map",
+      "bytes": 544,
+      "sha256": "360f81d6eed05f3a0317332801e161d0d4c841022db40571e766a3718bb7f0fd"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.js",
+      "bytes": 4433,
+      "sha256": "18de9f1cbe96656f8aec5d5d097a69401570b243f434444979bb6e5fa6b91fa3"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.js.map",
+      "bytes": 3080,
+      "sha256": "929fda4e5e472ec2718ef5d1fcdb93fdabd8ca52e327a45b576b2e9790657b9f"
+    },
+    {
+      "path": "apps/api/dist/automation.d.ts",
+      "bytes": 625,
+      "sha256": "25dbe8c5293100831e8e0112b05aae9b6327738af8513e2666c26b4b0776424f"
+    },
+    {
+      "path": "apps/api/dist/automation.d.ts.map",
+      "bytes": 591,
+      "sha256": "62e2f864cd1ab988a5c334f5494b619bc8681b74a885e767cc3e584ab2764af1"
+    },
+    {
+      "path": "apps/api/dist/automation.js",
+      "bytes": 32827,
+      "sha256": "da3c0a6bdea56ba204e838d2deab29f57a1a626d8da9834cbe3d2ca6796b61b9"
+    },
+    {
+      "path": "apps/api/dist/automation.js.map",
+      "bytes": 29139,
+      "sha256": "84ee1ebbf636dc6eb1ecd4f7ae26f9cc4a6b2f91f6d46f2952a60812f9f5f506"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.d.ts",
+      "bytes": 1469,
+      "sha256": "53e2cb0f970043f8297c0b3a1fe1bdba3e58886f088a29a3bba73d4d515adc2e"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.d.ts.map",
+      "bytes": 1031,
+      "sha256": "1e4a8dd0cc49cd54ce18da2f5eb991913dd4df68a21949f8d6c999ffa5d2462a"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.js",
+      "bytes": 2822,
+      "sha256": "9975eff17059dbdbc2055b6d328994ed385506a4068ebad30cc35fb0e05268df"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.js.map",
+      "bytes": 2786,
+      "sha256": "5a1927c75e97d942b9d9707c6c16f7cf669332a27c7652151752702615a72cf1"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.d.ts",
+      "bytes": 62,
+      "sha256": "8e3d0d1bf0341589dad0c188909e83e2ddde78ae1a3f8b905b33933a24a9f159"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.d.ts.map",
+      "bytes": 136,
+      "sha256": "174466436d94c62a3ba583ecad2b21aa3fc6bebeebb983ad929baea283955fe6"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.js",
+      "bytes": 1865,
+      "sha256": "153867f54ab2fe279d5b600a137dc4432a8befff02541434b2ede3b105716229"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.js.map",
+      "bytes": 1803,
+      "sha256": "cab4fe697a72669a9f529c20317515531ac8308f53b5a5ffaa00f1ca86e037e7"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.d.ts",
+      "bytes": 1376,
+      "sha256": "d170f9be81eee89631e921fbaf8b6e202e17941d88b21f2b5faa01437cba21e6"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.d.ts.map",
+      "bytes": 1162,
+      "sha256": "ded781ea049d5d92679f3b6fa663073f7da089d011f73db827d4625ef125ddcb"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.js",
+      "bytes": 11621,
+      "sha256": "d18feffb90ace42b39f26be1128f95dace91a8851f8d48a5151dbeef0de01075"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.js.map",
+      "bytes": 11809,
+      "sha256": "fd1e4fcd4e18892e7b8f5734864efd9a29e21911706ace1a1fee66427121aab7"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.d.ts",
+      "bytes": 1620,
+      "sha256": "7ed29aef897b4ca654b39fccc80a5880ace9b451c8fe76d9489440761e09dadd"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.d.ts.map",
+      "bytes": 1574,
+      "sha256": "f869dd05633e6a2ecbaa7ae93bbd67b173460db148ad15bef0bee0d9f27f4a59"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.js",
+      "bytes": 19676,
+      "sha256": "3f3f4bbda6da312157008cfa47b3c46c643926c5a26ddee2b1eb7839ceb2884b"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.js.map",
+      "bytes": 15961,
+      "sha256": "962a018dc4dbffcb82a0d819f42a21fbee95f5027433a9a57034d6177be6fa31"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.d.ts",
+      "bytes": 5842,
+      "sha256": "706e5257cad9b505ac0e998ff4526eebff3a9f031a540abe42ea8c17d4ca2ca3"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.d.ts.map",
+      "bytes": 5486,
+      "sha256": "62b7fc11b1051616c3d1ab2c1280387d70b298f4cd9018954eac07aac122099a"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.js",
+      "bytes": 16110,
+      "sha256": "4172d4ef25d5e33073749c5fcbfc4959c23f7396309b25cf586c1aa4587ae8ae"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.js.map",
+      "bytes": 15081,
+      "sha256": "03d041ae8bd9d9aabbd953ea04c8a15e6a457f5a5fec3b8243ca3200ef4f90e3"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.d.ts",
+      "bytes": 1141,
+      "sha256": "7ec5b0bd1a22603c301fdf8862296ae266233ef42fa2cb5df97b904a931df371"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.d.ts.map",
+      "bytes": 844,
+      "sha256": "11413a7ad958a76688a68472ee50af9b19a6a854c0bf129696c1f7437183e6b9"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.js",
+      "bytes": 7728,
+      "sha256": "053f926d726b33ff7aec699c1ed0445419a55c6bf4d462d13031c1d124a3ffcb"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.js.map",
+      "bytes": 6157,
+      "sha256": "c33b6e39a8ff4b52368bad0e08f33bde36511e72e80bba808f583cfb6969b7ba"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.d.ts",
+      "bytes": 1379,
+      "sha256": "1f5ab50ff4d2f6fea12515e7606f8d8663109534563a5ea377b8fecb30bf39fe"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.d.ts.map",
+      "bytes": 1508,
+      "sha256": "50d37e119c7395b076d3f7ff7908ea513939b86ce6b325ed9337cca00c8be288"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.js",
+      "bytes": 14124,
+      "sha256": "e35f320ebdfe3881eab3d07a75b539fd8f27aec4e5c46ca6b7da5e3cf5faba40"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.js.map",
+      "bytes": 14254,
+      "sha256": "06106ab519fd3577d51fa29e009052e4e16e3f54524d93bb3363a66065408fa6"
+    },
+    {
+      "path": "apps/api/dist/config.d.ts",
+      "bytes": 927,
+      "sha256": "1865c6a4f20fce7f0f687059bb76ee95b692bd43b0d2d31ad4e86cc8b7cb3630"
+    },
+    {
+      "path": "apps/api/dist/config.d.ts.map",
+      "bytes": 775,
+      "sha256": "8c06a7214c38fb575fae937510ca860a9c20af1874297d3bb3f0ae2a5e6da880"
+    },
+    {
+      "path": "apps/api/dist/config.js",
+      "bytes": 3195,
+      "sha256": "3cadc54e64bbc2f903700537053412eada37ef161dab8585c0c5f826393001c9"
+    },
+    {
+      "path": "apps/api/dist/config.js.map",
+      "bytes": 3112,
+      "sha256": "98e73a48104c625b0d5df5c0d4668762b1f8287c258a097924037be6ba3f19ad"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.d.ts",
+      "bytes": 2763,
+      "sha256": "67dec1c9e4066848f943a9f39d4e4ff6e995f30e6bc3273b095a08967c95c006"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.d.ts.map",
+      "bytes": 613,
+      "sha256": "2274dc9ec91b1aec11c007d164d4e9960e86034cc46856c4c2f19ad094e08645"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.js",
+      "bytes": 4178,
+      "sha256": "107f237afaebaf77618756aacbaef60d6aa88148bd4ee210faaf93458a58da75"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.js.map",
+      "bytes": 4224,
+      "sha256": "06d3a597def29bcdbb0840c5bd405821b88e7ca53f91d8122d17540f12b28eb0"
+    },
+    {
+      "path": "apps/api/dist/health.d.ts",
+      "bytes": 1100,
+      "sha256": "bc5a2d2412af6928075412f329ac7770ef2ec967c5fd222d27a44d370b15a9b2"
+    },
+    {
+      "path": "apps/api/dist/health.d.ts.map",
+      "bytes": 971,
+      "sha256": "900973a69d69ce9cabd315cb3d743a5a9e04954e572bdc569b94195e4e729b8b"
+    },
+    {
+      "path": "apps/api/dist/health.js",
+      "bytes": 4513,
+      "sha256": "66f6718a863ff3811f39da1bd5a7acaa48d0a2c9114e18bb3ee4eabd8b7356ce"
+    },
+    {
+      "path": "apps/api/dist/health.js.map",
+      "bytes": 4551,
+      "sha256": "02c27e7e0d4a8c6e20fcd93829e7ce008e2835631eab32207eb5f181ca09f102"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.d.ts",
+      "bytes": 212,
+      "sha256": "322fc1ecd6fe8b2ec24d4576da619ffb6d9a81f4d5937ca384c67accc663a0c5"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.d.ts.map",
+      "bytes": 203,
+      "sha256": "47edb48c94ddc17a8148a6077d029e8d97cb9e5d0f7da5dec50544580ebb321b"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.js",
+      "bytes": 363,
+      "sha256": "517cb650d129ba1dc53d4f7d18fc3c62da86425b8cc346240d012297bc3a06a7"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.js.map",
+      "bytes": 341,
+      "sha256": "8f3a3f80869ed963713ca9f5960cb469ba95cef9bd46f6b65c579cbe2e4e044f"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.d.ts",
+      "bytes": 2745,
+      "sha256": "3fa07499af912a33f2512ebdad59fedde9fff8444dfc4995f716b047e31060c2"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.d.ts.map",
+      "bytes": 2654,
+      "sha256": "e0b6a4c43511374a4becc9619e16b0ece6a3e4b0c6af9c83d11d4c6f0cd1a81d"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.js",
+      "bytes": 33340,
+      "sha256": "6adab2bd4aa0287082c9ca48d8117cfebd02d40ad0edbcdda49d0ff0a9ce230a"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.js.map",
+      "bytes": 34528,
+      "sha256": "c7e09702063f46e5a3e466f921b7f8f452243cc34fe1adaa48c21f9b7112d1bb"
+    },
+    {
+      "path": "apps/api/dist/index.d.ts",
+      "bytes": 8848,
+      "sha256": "cbf5444a991aefaad82e123d4626c88edce33362cf1fbf9fbc87bdc6a99c5968"
+    },
+    {
+      "path": "apps/api/dist/index.d.ts.map",
+      "bytes": 4882,
+      "sha256": "0a5534059723c6a7e2706c15cd790d62dfe59169314fbb93b4cf4c837a4f306c"
+    },
+    {
+      "path": "apps/api/dist/index.js",
+      "bytes": 5093,
+      "sha256": "aa519aac73b9cff64ef42bac6c267645b327f14fd2278a75fbe1099989cf58cb"
+    },
+    {
+      "path": "apps/api/dist/index.js.map",
+      "bytes": 2770,
+      "sha256": "990c61dbb9e639df7e21a90fbc761aed62e3413d36372120c4610c1be0dc5420"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.d.ts",
+      "bytes": 3388,
+      "sha256": "4a25ce733920ba98fd0d7f428cd854dae56926b3dac16e52eb995d8067235e7d"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.d.ts.map",
+      "bytes": 3108,
+      "sha256": "4f038863a664a06e8f772d8ff2b25606ee1a3adb150a97dfd43186496931da76"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.js",
+      "bytes": 23015,
+      "sha256": "e4a2672511dbadb03044634e7c4f0b8e97d004919c6e1794af47506b868d585e"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.js.map",
+      "bytes": 23494,
+      "sha256": "4b0a2ced8509eb25b770ec1726d3b3f77c35d76b43bc3e42caba813994cb3f07"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.d.ts",
+      "bytes": 3912,
+      "sha256": "521a7e3295c29c0386a63c08dd7d9489acc66638475707c5af79e51bee81e3fc"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.d.ts.map",
+      "bytes": 2956,
+      "sha256": "a93b82eb7f4510aa89db33be2030d4649fa4387bd4a57a650dd379f06e9d34e4"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.js",
+      "bytes": 11777,
+      "sha256": "e926bce1d79296c50207fd75b9c55f2df02e585fdc585e33e131a432d9527a4c"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.js.map",
+      "bytes": 12052,
+      "sha256": "c5a07b4317c4955440c0da99e7249b8c6df3454d332e3431fc24320015271417"
+    },
+    {
+      "path": "apps/api/dist/main.d.ts",
+      "bytes": 45,
+      "sha256": "a9190fb43abc43193e152369c49f856ec6ba0e4f55d8ed9ae205ccaba9d505ef"
+    },
+    {
+      "path": "apps/api/dist/main.d.ts.map",
+      "bytes": 102,
+      "sha256": "05dd0e05e844679dc599a77a2204852c52aab78f810f41d2cd7541907611ad0d"
+    },
+    {
+      "path": "apps/api/dist/main.js",
+      "bytes": 27044,
+      "sha256": "291757639d7f4d50fb024a6616c2344b40aa699e7f2d6371fc067ec0e0a528f1"
+    },
+    {
+      "path": "apps/api/dist/main.js.map",
+      "bytes": 19690,
+      "sha256": "f5b6bfb05fe648de37634b94cbdf0539b920e19bd23e98b450eb6171304548a2"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.d.ts",
+      "bytes": 8900,
+      "sha256": "a93c4a8087259fb9ce537bc10b4271ec87d2959304491239a1de29483fe35508"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.d.ts.map",
+      "bytes": 7747,
+      "sha256": "696328b4beafc12e1b6aaf824bfa5748ea64ec847f26d540975f060711b3259d"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.js",
+      "bytes": 9133,
+      "sha256": "4753fdefe40dfd72bdfa08170c5d11ae004acb3cbd9208af28ce981ee8af39cf"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.js.map",
+      "bytes": 8041,
+      "sha256": "fac17e91fbf87867af3c2ad0c36575aa7e5ab60e78610a4c2e2f51eee2f3c067"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.d.ts",
+      "bytes": 6092,
+      "sha256": "a51dad6f774790ae8307be7376af8aceae87e90cfc14c6cdd2152bd9a81a718d"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.d.ts.map",
+      "bytes": 5799,
+      "sha256": "8fc6ce384908e65edb9c2b1834c5972245311d4937978282da185fb509217d78"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.js",
+      "bytes": 15140,
+      "sha256": "0d37ac039e24cb65446a556a718352a5b05bfc8a60606e4ecceb870340674dd5"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.js.map",
+      "bytes": 14766,
+      "sha256": "64d04eb2406e81d7e81ef94c5b7403fdf6d7bca7d1c4c511b4b932836234a279"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.d.ts",
+      "bytes": 2267,
+      "sha256": "04e66151e9ba05152002faacb118792f5fe37af45c067acdae605a4d39bec5c3"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.d.ts.map",
+      "bytes": 2070,
+      "sha256": "efd490c29a1339d6597ad2242050a8c7459e26ec1d46f7264138804aa4396513"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.js",
+      "bytes": 7073,
+      "sha256": "3cf97f45b36ed024da5354750ef251a71b00d9e354d7ad029ff4a5a461a9b9d5"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.js.map",
+      "bytes": 6495,
+      "sha256": "e894bc9718c0db01bcf2f01f2cef21035783fa23edb2513d1d87b75e98502e13"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.d.ts",
+      "bytes": 2784,
+      "sha256": "2b1f5d987ae130577d5588546a446591decba5155a7ef87b7a9535c18d993e1e"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.d.ts.map",
+      "bytes": 2236,
+      "sha256": "852c4a9867fafbfe5da6b3a0a44016f2562dd11737beef3856dbd305db583ed5"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.js",
+      "bytes": 17707,
+      "sha256": "9707f87605dee8b0571e604015ffaa9d46c7db4f0a6bb1e96f148b934de8167b"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.js.map",
+      "bytes": 14698,
+      "sha256": "533ba6a6c7084afec209a8de170536393b52d45b9d80930e13f5249c5df089f5"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.d.ts",
+      "bytes": 1367,
+      "sha256": "2159ed56fab06318d11c8e9d7146165c107c48add49aa154c007e83d2ea0b2f9"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.d.ts.map",
+      "bytes": 1172,
+      "sha256": "e74ed3980eed11fdc8f139ce725d13d92b57d5305476f56cc8b2d06d54d8b4cf"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.js",
+      "bytes": 2843,
+      "sha256": "d5c6af2e7eace6c8a9bcb75963bbde77b384ab1fd610187c2f8b75f18ff8bd4f"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.js.map",
+      "bytes": 2761,
+      "sha256": "c48fb935649c4576b4141568fda8ba3be0c6ffe1509d636d0c675b78014be8f7"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.d.ts",
+      "bytes": 1445,
+      "sha256": "161bb37d2bc1b64b0ec0f2f44ea0934824179aafa601de0d2e2ed426d0ab33b7"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.d.ts.map",
+      "bytes": 1243,
+      "sha256": "8af1ac92e6c50d6bf7e5f8eeab578f8aa624ac97c31313f387345c40e0eeff61"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.js",
+      "bytes": 1896,
+      "sha256": "feb16006daf68ded2ee42a2ff0b570fbafead9512f95eda5f691af702350c0ce"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.js.map",
+      "bytes": 1768,
+      "sha256": "d9800e9866566c4fa2f82b7a328f84f8878d3453e81e34a7e2a168b67d0739ee"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.d.ts",
+      "bytes": 806,
+      "sha256": "bc3d5d45fddf0187c6520227ae6b8824bb6b6e07ba31dd01297956cb15ef573c"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.d.ts.map",
+      "bytes": 656,
+      "sha256": "76604fa714b65faf95a036dc488f910c00a49afaed0f253198ab4b55164850f1"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.js",
+      "bytes": 237,
+      "sha256": "e111c366f79d348bdf6456ad5d54c963cb853e1f8aecd5323a813a3dfaaecfbc"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.js.map",
+      "bytes": 225,
+      "sha256": "6ff712934f1e5782f8260a9f53565b5b072b7f80a5caee01267953168b64f40d"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.d.ts",
+      "bytes": 517,
+      "sha256": "fdeac2473aa7a7dd6ec33c6271ac5b1aa543a4e59158d7dd0ef330a2c888daf1"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.d.ts.map",
+      "bytes": 491,
+      "sha256": "bab9f9e81a0ac79001e16f2909346e87f78e67e128fb5a09501102158ba35242"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.js",
+      "bytes": 603,
+      "sha256": "4cb636e0a9a1897a8e48d8a90c7890a6ae925d82eadfcfd75c29052882bcd4e0"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.js.map",
+      "bytes": 709,
+      "sha256": "6d98253253569b828e003f412f273eaa23132f49133ad04ae0e10dea6f5c9cf1"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.d.ts",
+      "bytes": 921,
+      "sha256": "3e44459372e3bd98b592f969e6d79d3aee24b477456d855ea5dcddfd93c7049a"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.d.ts.map",
+      "bytes": 726,
+      "sha256": "ae73a4c8d91c0fed2e7b0d8a961b4bbb0c7e988a767b0b4f1e43da06bcdeb4a3"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.js",
+      "bytes": 2110,
+      "sha256": "87e33c22d35e73b1b61f7b8f55f3b147f0ed2ae1b2901006c319bd60a0a24040"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.js.map",
+      "bytes": 2123,
+      "sha256": "75a346f52e5c6bf0df68e7531667c688a680c52fbb4fb40dad5ac7e108890eb1"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.d.ts",
+      "bytes": 1403,
+      "sha256": "6b486ab07d8c73260e3da2854ce088892f2fb58e842ff3eb06bbeb67774b17a4"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.d.ts.map",
+      "bytes": 1309,
+      "sha256": "2971bbf8d16b08d922b6ba186ce9887f0e4847de70eb9dc7bbdbc33f3aebce8b"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.js",
+      "bytes": 13510,
+      "sha256": "e6ba099b406b3dcaed1c10c13e924266ebd2906ea88bc736ffb944640ead9339"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.js.map",
+      "bytes": 12919,
+      "sha256": "75cccb4ef2cc12217d61830b9cfbc78a6eaed450a99e932c2ebeea4a509cfd06"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.d.ts",
+      "bytes": 2791,
+      "sha256": "64cf3feae2bf142518c4333b0ae6db1540fddaa5bd517a647e07f2810ce32607"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.d.ts.map",
+      "bytes": 2563,
+      "sha256": "c6e6ddfbea3d649560f3cca5e17e0904d1fb1497905030f9930074bd8dc9dd72"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.js",
+      "bytes": 2138,
+      "sha256": "41508697ced33e565e84db386e6b611dc6066502a5143eb9c80ac4ee5ce5e60c"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.js.map",
+      "bytes": 2127,
+      "sha256": "830e7d987df7b3a0dcd7ace97d62807864296607ad6cdf1f83e6befece1ddbb8"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.d.ts",
+      "bytes": 4279,
+      "sha256": "6c1128b3cce2a034c435fa02b90b0abd7eff42ed54722aaecd81904df8754394"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.d.ts.map",
+      "bytes": 3664,
+      "sha256": "c06e5cf63a983cf4eea229f0c50be4fb1486162b7bd81ab1a973f47e99af0ab4"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.js",
+      "bytes": 27143,
+      "sha256": "f64ee784813b5cf70233d05f873d01d493945eaeeb9c6ac770b2f30a24b9c62d"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.js.map",
+      "bytes": 23904,
+      "sha256": "73c713e2d11c85018002e38c3a4f9f3ddd3a99859b1a90567bf7f8c7772702b1"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.d.ts",
+      "bytes": 6006,
+      "sha256": "0716f526c243d81242a1f9a850119dbc1a3a8b26cb0ad0571b0edf5a91079d13"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.d.ts.map",
+      "bytes": 4167,
+      "sha256": "836f701ed52e431833cf1a22ad8cf6e680ebd3431f7e4f6b09028e5856264387"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.js",
+      "bytes": 14663,
+      "sha256": "184d22ab2739aa5795ffd8811a5521a6734aaec8ec2f6e4484639948650eb0bc"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.js.map",
+      "bytes": 12953,
+      "sha256": "09bcce7c7bf741529a723c69e528504c80ef48786413b8fa905d8d704c99d3ee"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.d.ts",
+      "bytes": 7417,
+      "sha256": "2f4e366ee13291a9d5eb4813533fb7b2fb5acb0da4bf395d183d54992ff81a28"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.d.ts.map",
+      "bytes": 5737,
+      "sha256": "63f27e816d685186c6f77e843bd1c04b1206b23d27f8178dcbcabb94f35d8249"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.js",
+      "bytes": 10086,
+      "sha256": "21c1ebf6e5cdd9a9c48f37040e3e3e6b66e85582ff68548e22b6b8655715b1bf"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.js.map",
+      "bytes": 9247,
+      "sha256": "acf08de16d3070ffe6f0350136849f8541f53cd147be7330f1b0b97e892ab928"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.d.ts",
+      "bytes": 2343,
+      "sha256": "8cf9087a85babf64017e20aac01ebc81f139cd984b224400864919b5f04f6f6f"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.d.ts.map",
+      "bytes": 2101,
+      "sha256": "6c40f01d04bbc0fcdfe4639f414bd56a15f4f7b30e228c67a861df6ac176facb"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.js",
+      "bytes": 1866,
+      "sha256": "75a03e3e3571a5e15a8eadd1ab5eb33632423d7dcfd10248c500734baf4224f5"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.js.map",
+      "bytes": 1720,
+      "sha256": "7a390caf5ad404edc28be597e9d2384e5ec8c6b09f194cb9378469bdaa4aec78"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.d.ts",
+      "bytes": 4239,
+      "sha256": "6279784aea73460ca4c31403e1aaae60403820f7f9d09d05466237b99beaf983"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.d.ts.map",
+      "bytes": 3068,
+      "sha256": "cd6f273e7a0ae66968ae748d68f158eccf700eb9e76b87e3e8b07a497dcf3259"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.js",
+      "bytes": 6392,
+      "sha256": "27a1ba6b8503b23fc5e1bce00648418e2f81e9cc117ee69bba66084e3a1667a9"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.js.map",
+      "bytes": 5820,
+      "sha256": "1be706582503b8c18a41ac8447a25b28ac6019851b10a6603822244c4d3a3db9"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.d.ts",
+      "bytes": 1337,
+      "sha256": "c9e13fca9382ce638f3a770f635c254ac98bb81fdb2dd3a7a2f694864f2d5345"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.d.ts.map",
+      "bytes": 1306,
+      "sha256": "1ea2fc41c439d364ed67f094fe78c8e81ca23e9707a3b96db11c083db7a95d74"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.js",
+      "bytes": 9044,
+      "sha256": "a11d170d9c72987e311cc163a41aa8e4ca9f9dbeb29acc76f8bb45dcd6b7a904"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.js.map",
+      "bytes": 7985,
+      "sha256": "3ff8313d7677fd7509269ff81ce5e57facb8dbce1f7c971558963cccd30cb735"
+    },
+    {
+      "path": "apps/api/dist/people-config.d.ts",
+      "bytes": 1804,
+      "sha256": "a0bebe25073e3f04fd784fd54314a488eed81495004f5af020f1c24172d1b338"
+    },
+    {
+      "path": "apps/api/dist/people-config.d.ts.map",
+      "bytes": 1512,
+      "sha256": "41b5a70b363e2e31bcd4a2a242d558f06c57f44a520bb23cc627f119210c2688"
+    },
+    {
+      "path": "apps/api/dist/people-config.js",
+      "bytes": 10477,
+      "sha256": "5141a758f2f384b393f9fe82c3ede76029d0df6eb5d08f8f4650cf589d9c7d15"
+    },
+    {
+      "path": "apps/api/dist/people-config.js.map",
+      "bytes": 11141,
+      "sha256": "f2f75ea2bfe69214bedfffc912d507aca5fd637e3c2384c1e19d308461a95e7a"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.d.ts",
+      "bytes": 3261,
+      "sha256": "dad7670788daff0ba1af47ac90b57ca8c67009cc581f4956b4ba70617f1e9cc7"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.d.ts.map",
+      "bytes": 3202,
+      "sha256": "c3bf9bb491711040a2744f7c3719fa5b27496642e7a84b2a057e8772764c0b9f"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.js",
+      "bytes": 34409,
+      "sha256": "da7a821d30d0286a8ef7124cd0649245c5daff481be52aa2bcb6406c6b631d90"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.js.map",
+      "bytes": 34879,
+      "sha256": "3c9dd3ba659244bdbef6bea2be0a50a6fa17519133c6582794fcfd328df2ff76"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.d.ts",
+      "bytes": 4667,
+      "sha256": "7ee4a3a996977f31b8d8d7304b9d4cfa34e92d492625ba0d87d6bcc849d97321"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.d.ts.map",
+      "bytes": 4260,
+      "sha256": "db5236e801a8b7dc8d5221e462cc3307667d90237f664b301cc2aa77c7c66e3f"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.js",
+      "bytes": 61977,
+      "sha256": "9b31674992d43aecf95476be3d727772deb0634626214f3130f9f20979d21451"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.js.map",
+      "bytes": 58106,
+      "sha256": "f557bd4664219c5616bcd12957e571e9d56d49c21d702f8c9cb66a2f0906a7e3"
+    },
+    {
+      "path": "apps/api/dist/project-management.d.ts",
+      "bytes": 1701,
+      "sha256": "b13559734c0635f785ca91cd01a87ba0536f3eb93ee6629003735c70d9427a53"
+    },
+    {
+      "path": "apps/api/dist/project-management.d.ts.map",
+      "bytes": 1580,
+      "sha256": "793873b09bf52043c2dc8271763fbbcf6f699ceda30861889413b5aa30a8c72c"
+    },
+    {
+      "path": "apps/api/dist/project-management.js",
+      "bytes": 9505,
+      "sha256": "9ab9dda4526d99fce6b72ecc54430f46cca5800e938b912facf29fa3a5c1cfb9"
+    },
+    {
+      "path": "apps/api/dist/project-management.js.map",
+      "bytes": 9819,
+      "sha256": "42edc62cc174a5d472aa3225e9729628788e8672f6e45deb0db61d45b37e35b3"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.d.ts",
+      "bytes": 655,
+      "sha256": "3f9ab38d9910f72225f7b538ef24d562fa7e263ff787284d7500822ec04c2e55"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.d.ts.map",
+      "bytes": 580,
+      "sha256": "6a7a12efc5a4c8990cfc3c38ba7c74223ddcabd0b9f7330bd139fccd27705cf3"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.js",
+      "bytes": 5740,
+      "sha256": "92b3a17b74fc9d6fd89ca9d3a097b01ec327de217aed730c3847408cea0265f2"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.js.map",
+      "bytes": 5085,
+      "sha256": "a0f45354febf9ff58cd8bca74fd0e2bce31da605018f42d02133b610809488b9"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.d.ts",
+      "bytes": 3577,
+      "sha256": "967d1444414ac685e16c0a3adbbd8a43ffda9e3fabc20622e4b88fa943ff60b3"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.d.ts.map",
+      "bytes": 3629,
+      "sha256": "d0f2ee4c8b5e1b27c81fc4a445bda9b48c8d962f13483c41064f34e25a6019fe"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.js",
+      "bytes": 31506,
+      "sha256": "d1e278bf830808b6d1da8d003368894f5771a2a66283d35f82a1e343c0de9abd"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.js.map",
+      "bytes": 31573,
+      "sha256": "deb4fd4362a89e328225de50fef9635795066ac036e2f5bcedd7577fb1fe5580"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.d.ts",
+      "bytes": 4771,
+      "sha256": "4fc565090ecef6510c7d08bfd44dce6b23689d4f235034f5eaa759b5c93aa00e"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.d.ts.map",
+      "bytes": 4365,
+      "sha256": "8fb65c957873802c16d60a1363681a0ef1464498a70888205058e07f49c3e812"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.js",
+      "bytes": 25200,
+      "sha256": "40228250cf3ba8f051517b8ddb3402ccf98c0cd807e1d0eca6ab6a90bb108b52"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.js.map",
+      "bytes": 21536,
+      "sha256": "0266b4746c52e27ed333681ef6dd988a59e0dc5c5b1641a30da2c59d28bab7c9"
+    },
+    {
+      "path": "apps/api/dist/server.d.ts",
+      "bytes": 951,
+      "sha256": "68dfa08d1c06c282bd9a2f4769b7453857054e6d4525b9862bb53801a44f8960"
+    },
+    {
+      "path": "apps/api/dist/server.d.ts.map",
+      "bytes": 992,
+      "sha256": "c2cf3026a6f1403c5840bbc360e86ac4de23328bf998bb67b7fcbb5ea43b2706"
+    },
+    {
+      "path": "apps/api/dist/server.js",
+      "bytes": 3769,
+      "sha256": "3d470054060258bbb1335ad93ee160c9ed8f9fa9e296856b1709e35b39680ec5"
+    },
+    {
+      "path": "apps/api/dist/server.js.map",
+      "bytes": 3151,
+      "sha256": "b069c2e657b2383415111deb23bb84011737ffc341309a5712b07777a0e3e836"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.d.ts",
+      "bytes": 516,
+      "sha256": "6972331144774b4b3efa7fc4b29ee9fd2a36e58dd3a53b0bc9eb8bae453acc89"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.d.ts.map",
+      "bytes": 477,
+      "sha256": "2c16f6472d741728577a79cec7960e6a4d2c85a1e4e4efa771832443ba7195b9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.js",
+      "bytes": 6106,
+      "sha256": "667632a45dc6c703d8169ddfda923b919870bc3420591de688e7b1d4c84736fc"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.js.map",
+      "bytes": 4791,
+      "sha256": "1c9778c72d9d5c8d43b023c957891f5bcac952445c195ce2e4e19d9856a92cbb"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.d.ts",
+      "bytes": 467,
+      "sha256": "80d9dbe3303fbdb6e4487c838d71e83c6270e695d56ad19bd7a541d0e86d49a0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.d.ts.map",
+      "bytes": 460,
+      "sha256": "0a96f7c1b1177f0489b849327550f83995e8fa92cdb7d65022fed446c3fba4f9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.js",
+      "bytes": 6963,
+      "sha256": "92641035c93607aa6384f9cc29d8392f8155431708ff39981c74ce71649c06d3"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.js.map",
+      "bytes": 6653,
+      "sha256": "0fc7408409a733573bc563caddd77a08f9819dc3bc243c0bfbe3a2abc27c93e7"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.d.ts",
+      "bytes": 481,
+      "sha256": "b8f6371f56dbe7895916654c4ee0e07f52fcbd7c956c58367187fe5105422e51"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.d.ts.map",
+      "bytes": 469,
+      "sha256": "bed861fe4020c438925cb9020092f8d77cc3272d2f0f2dd2fa15f31062d00815"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.js",
+      "bytes": 3191,
+      "sha256": "984739ee92d47ed09c7958a5c5ed2a250596e5694b185d2bb6f09142137bd29f"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.js.map",
+      "bytes": 2756,
+      "sha256": "e9a9dd31c0df1a57d46b5a5aa9db7993fb97e255261f91c44ae30a17503a839c"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.d.ts",
+      "bytes": 495,
+      "sha256": "ef2d4f6dde53f7429a97274858b33fd03628ab66421c456a5cb37e68664ed4de"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.d.ts.map",
+      "bytes": 473,
+      "sha256": "aafd60910755c1a201351d3d098209dfff410b749f7ff3b475702526e3dd42fa"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.js",
+      "bytes": 1761,
+      "sha256": "021f979a10bb57114b4713d1abf41a59ea398f544b2e0e11b03a1d098d60aa6a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.js.map",
+      "bytes": 1500,
+      "sha256": "6aca680da99e1ca2b85c3568a0942c88658470861dc19e03e79ebe04caf1b8c9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.d.ts",
+      "bytes": 567,
+      "sha256": "1d522b4c1f441cbbdf01f03116bf62cd496e17db862c5ba844f1d681f4c98c71"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.d.ts.map",
+      "bytes": 517,
+      "sha256": "1a758d932e8e715cbc4fd1a5d2e53a9d7afdd9f2b884f0afdbe3714a9533c174"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.js",
+      "bytes": 1322,
+      "sha256": "80b14a0e932f6316023da940b03f611afe0e45649104d1f07005edf12dc9bcd0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.js.map",
+      "bytes": 1344,
+      "sha256": "1e8862e3cdf29da7e7a6a69a42650ae7ca4f0b6dbdcaf4b5d4271d5174f99780"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.d.ts",
+      "bytes": 509,
+      "sha256": "0472dcc657cb15a2fef6ea6f2775887354f60b205b48116a9a03de39debda1c9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.d.ts.map",
+      "bytes": 478,
+      "sha256": "0d37d6e6e5de12bf35036cc90354d55ad8ac0fccd60707bceda1541435b854e3"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.js",
+      "bytes": 1263,
+      "sha256": "903469e3b773e0895f9f34a8a6a79ef7baf089ff2a838ba0bd3237532c651fe0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.js.map",
+      "bytes": 1232,
+      "sha256": "0ec42f500789c3b356aeba12ad7aaff8ce92a67d819b1e4845e205e0aafe3635"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.d.ts",
+      "bytes": 508,
+      "sha256": "756d800662c1e60539551b3ea8a5727a095a00419de472f2cac22f5e43dc9076"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.d.ts.map",
+      "bytes": 439,
+      "sha256": "d8a81d3da29aa9cc5ab6d068f2a3e4dbd00366e82b3708c5f919f950e6f5372b"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.js",
+      "bytes": 714,
+      "sha256": "e8ab10d65f337ab713ae84d197aa7fcb1448ee57632c23925937bfc98bcf2334"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.js.map",
+      "bytes": 676,
+      "sha256": "f9ea283d5a13f75dc47791b2e48a2331a010e457e17d7111a2a76531f8a823d4"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.d.ts",
+      "bytes": 494,
+      "sha256": "4b9e6ee725f34b8871bbe6c4e06a1bd65b2379bbab03f8b293d79a52d30fc8d9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.d.ts.map",
+      "bytes": 469,
+      "sha256": "4a9f0ba748fc51749c74e3528b1eb89dfbc7c37ecc7d458ce5e6d98bf60365a8"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.js",
+      "bytes": 626,
+      "sha256": "5298d29da471aec0ab20070dde8357e85666ba19a9b7f817d33c3a6737cf42ca"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.js.map",
+      "bytes": 699,
+      "sha256": "dd46b2e2886905760adff3dce774671c3e86a966a387df3b586cffe5ab9fb14c"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.d.ts",
+      "bytes": 463,
+      "sha256": "4068743f6420def5e84f0e88949470216d02e7eeab382f12b85cad27c0e33bfc"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.d.ts.map",
+      "bytes": 426,
+      "sha256": "acd9b08ebb3885e80f3fca7e8f7ecded78b93e9d9e04d6aa587308cca05c14dd"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.js",
+      "bytes": 491,
+      "sha256": "c8e25919c431ee7bca16ccd4144575e68689b73e9eda892aea4b04199254226f"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.js.map",
+      "bytes": 510,
+      "sha256": "9c54f98eb1c7f90f232a02203e383f6c7eab1cb625788111bfdf7a43b0583573"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.d.ts",
+      "bytes": 1069,
+      "sha256": "68c84bbead3dc6ba726702f89893298fc4fa89592464dbe67559af78c04ed5a1"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.d.ts.map",
+      "bytes": 891,
+      "sha256": "07619eabec0d95a2eed670318caad6069474eae8bcc1c8078edd6fac4916646f"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.js",
+      "bytes": 2683,
+      "sha256": "4e157795e65135909747d0064cf956a527edf0fa04ef62cb1c22157eb42e55fd"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.js.map",
+      "bytes": 2638,
+      "sha256": "3e49ea3231e5f865f302c3d1f26a9c4de9ecc6b39b3111f60e09a6c8d1a69fbe"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.d.ts",
+      "bytes": 821,
+      "sha256": "bc43289285c808712daaad182ec833f17a2bb677b1f6a3dfbc650f0b498c621e"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.d.ts.map",
+      "bytes": 725,
+      "sha256": "c56b01cbaddb043ec5a04711fb6c7de22d6d38eb9d743c79d4346fa16d3427fe"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.js",
+      "bytes": 8261,
+      "sha256": "395f02b8b715b97372ade5e1d0705e187b4b0c90a84d36e167f31d1541e906fe"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.js.map",
+      "bytes": 6732,
+      "sha256": "6c7c9b36e6fa2353bb83a683ea595c3c713a1882b97c6d2487e2e473fef0e50a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.d.ts",
+      "bytes": 500,
+      "sha256": "cbc878dbe77f74d2fa9c6b2bcab3b82a98b23506ca06e0ead816e161c6c6b0cc"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.d.ts.map",
+      "bytes": 436,
+      "sha256": "e2d9b8431e3c7fda07afbe197e063cd4058f9bd03547915726d35d29390435a9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.js",
+      "bytes": 406,
+      "sha256": "874b33bbe36af7ba40f803aa55eb8156091b4106b2aeb5c315c631534af87361"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.js.map",
+      "bytes": 413,
+      "sha256": "fef393688b5fcc6b508eafeca15f9fc78474aa6940a9dd1bd8b8aabcbc202534"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.d.ts",
+      "bytes": 968,
+      "sha256": "4c3267ea94a997cbc1c8bdb5c99ef81821fd27dc8284afbc67c87bb050d0f93d"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.d.ts.map",
+      "bytes": 883,
+      "sha256": "c9417b55b80da5f0fb240398873c1da89ab7d3b7a6eaf3b51fd594f14acf1801"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.js",
+      "bytes": 2661,
+      "sha256": "e2ca7a7ca6ef6ecb9decc5712e585a41267406d1f570ba366d4873dfba06e169"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.js.map",
+      "bytes": 2568,
+      "sha256": "cfd8cb71e364ca769d5f2b87c9302cbd7876ab118f4515be4d203ce89fd4437a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.d.ts",
+      "bytes": 529,
+      "sha256": "de95cc6ae58f1758536ebd09737806b6f31f7776f4027a397f4e9b3c7397e025"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.d.ts.map",
+      "bytes": 484,
+      "sha256": "6a69d564da812b8bb33d216ffebab11ea78b45943c733bc0010bec56bf2adcb3"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.js",
+      "bytes": 3553,
+      "sha256": "31cb5de1b94feab674e722d36df671e5f88c889d96b71e5f093b9130600cb3ed"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.js.map",
+      "bytes": 2928,
+      "sha256": "9f66d45944c7b44957d85f6e8134daa2feb5f1c41705014f402ea290b2f89db0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.d.ts",
+      "bytes": 728,
+      "sha256": "5298297f64749a8048ac989a78097921766028360ddc766580a4f240cd293ce9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.d.ts.map",
+      "bytes": 626,
+      "sha256": "4026aa6abf2f0a43d7a75ca7bd52047d9b065f510ecc72d07b2b19f8fa2c3c4a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.js",
+      "bytes": 543,
+      "sha256": "ce003282cf860f9bba7d81f091b1d326d0e138d91d8c87e21c1e2d593b046246"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.js.map",
+      "bytes": 486,
+      "sha256": "d56f51b5c3e6fd0d89b3df59da55a32a8d0e699f56390a8de1c42e608eab0fdf"
+    },
+    {
+      "path": "apps/api/dist/upload-source.d.ts",
+      "bytes": 367,
+      "sha256": "aad51b9f97a12dea85b4fe7ef55b6577cc840fb7a67d305d84ccb2004b5f0f57"
+    },
+    {
+      "path": "apps/api/dist/upload-source.d.ts.map",
+      "bytes": 383,
+      "sha256": "21452a7bb25b557b91a6c520f1ddc0bcdf0058c93ec417cca2b408b9a5a3f6d6"
+    },
+    {
+      "path": "apps/api/dist/upload-source.js",
+      "bytes": 3178,
+      "sha256": "e4c7bad72053d4c5bf59a90fa4b57775e92166aff8ab6f72a0b11c0ab72f12d1"
+    },
+    {
+      "path": "apps/api/dist/upload-source.js.map",
+      "bytes": 3232,
+      "sha256": "8b5a44fd0e571eeb553c9c5919ebf4e00ce7428f610bb5b967d7cc07e784427e"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.d.ts",
+      "bytes": 2589,
+      "sha256": "2ad89bdc7deb51e5b64e18b66476a4ed1189c4c0b6f3e2940a3f538e8e7b8044"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.d.ts.map",
+      "bytes": 2432,
+      "sha256": "b2d686bba9a14a1c2c6bc11cb8a21f4bd2632de6f0323699289685141d54b4f8"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.js",
+      "bytes": 26426,
+      "sha256": "ebe9ce315f47ba912b1749393a9550881cf8845f7b13577b899e8c38083d0f3a"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.js.map",
+      "bytes": 26918,
+      "sha256": "82ea264a7d1396d0866e61d073cceb47ef0d38284664a181513e82d74c0f3ff4"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.d.ts",
+      "bytes": 56,
+      "sha256": "df2236fd00d986861615eb9c5f5031f690cb000656c4a3674f00a13db3997308"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.d.ts.map",
+      "bytes": 124,
+      "sha256": "4dea8091bf88be380b67c5582c01079c76f39dad936c6d4c33637a40b4d9aa78"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.js",
+      "bytes": 2635,
+      "sha256": "5a690701057f7cd479ce06eb0513520379e947f56454b18aab36b81dabb7cd90"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.js.map",
+      "bytes": 2810,
+      "sha256": "9021383ced1a3337d78d2b5323e3f70089543d2b1240a8a4103bf03ae38d5f4a"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.d.ts",
+      "bytes": 91,
+      "sha256": "dffef891da6fd8f8875f55a7c536dcc3402ccd8709b7e40e0d0c349a74cffd4e"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.d.ts.map",
+      "bytes": 143,
+      "sha256": "18bc2f57a10b9ff6e403d7851c4f08cfc7408b8d48497a086d8ea12fb92cac48"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.js",
+      "bytes": 89,
+      "sha256": "564dae8fd314c10e858b3b92bd89ed2c840cff78024374a73a0c30e1178122a3"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.js.map",
+      "bytes": 141,
+      "sha256": "37a2036da521c71b9a33aba2aa12d41dfa8361cf76e05995c727a5f4c6480e18"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.d.ts",
+      "bytes": 740,
+      "sha256": "2d34554bd07b14c754d549f38be2457d4144d001df3a094e8677dc23d05db823"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.d.ts.map",
+      "bytes": 665,
+      "sha256": "feea0b0b66b2aa0436cf25864085273ee241aa1e22c5219cd68a0d8e9c832bbe"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.js",
+      "bytes": 3934,
+      "sha256": "302f5006db834c6cc3a9407168ba4b3e6e4dd1771d6e8657a9c3ce5a6c80a055"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.js.map",
+      "bytes": 3871,
+      "sha256": "2fc3aa05c63f3f94121e01af4508957d7bd604e6b704f5c3940b833ddeb94928"
+    }
+  ],
+  "after": [
+    {
+      "path": "apps/api/dist/android-updates.d.ts",
+      "bytes": 664,
+      "sha256": "cfbb9f420f4d359aff6a2c81a1b288f01feea0c400192787c8f66016f6759a8f"
+    },
+    {
+      "path": "apps/api/dist/android-updates.d.ts.map",
+      "bytes": 515,
+      "sha256": "8cdc40b7969bb06cb7d2ca896904c241d4a4daca5b1759589229b0a7820dc690"
+    },
+    {
+      "path": "apps/api/dist/android-updates.js",
+      "bytes": 7189,
+      "sha256": "95c2b0fd1a898c07d62a9fccad00abfe2d0dd4da85b9bdd8cf665c79c430e556"
+    },
+    {
+      "path": "apps/api/dist/android-updates.js.map",
+      "bytes": 7018,
+      "sha256": "e1aed46dee097af6b32f3fb639313790a9d5c695fbdd16c8aba21738d9278ae6"
+    },
+    {
+      "path": "apps/api/dist/app.d.ts",
+      "bytes": 5241,
+      "sha256": "68309f50a085cd12c4bcd2ae4bd04e57eceb40d8cebb3cea86b32197562c2118"
+    },
+    {
+      "path": "apps/api/dist/app.d.ts.map",
+      "bytes": 4236,
+      "sha256": "a5d26549e89e1c46b72ef0ffedca912202320a0a94fb5fa304ac76b8dad9f937"
+    },
+    {
+      "path": "apps/api/dist/app.js",
+      "bytes": 108578,
+      "sha256": "a5759102f7f9480eddc4f234e6e150281f0fd6f0ec4a50511f99f7249a68dc3b"
+    },
+    {
+      "path": "apps/api/dist/app.js.map",
+      "bytes": 90680,
+      "sha256": "62204afb2bcc158d263553750286f3cd8746b8f3018d3e4ff2c8db8e50140a90"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.d.ts",
+      "bytes": 7610,
+      "sha256": "f8fc0c303001f6eeedeb2f0cb0da01de8d5dabce63b184d287ce26fb971c9d12"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.d.ts.map",
+      "bytes": 176,
+      "sha256": "566302180e32f48e156c51ed05cb56d201cc2e52cca0a440f6e50a6042689cde"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.js",
+      "bytes": 7923,
+      "sha256": "27746e7be8f46a6ccee9a7eb3b8eba628b2f2bd3269e9053000c3ef0f9ea10b1"
+    },
+    {
+      "path": "apps/api/dist/automation-routes.js.map",
+      "bytes": 3905,
+      "sha256": "ee660002c8123e35343a97edf8d5dbedb9b6f0c0bb5d0437c4d4a71121acd8d8"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.d.ts",
+      "bytes": 5579,
+      "sha256": "255f5164c83047bab225bc0d746650efb2e7ef565fe3a13ccfa896f0855045f8"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.d.ts.map",
+      "bytes": 544,
+      "sha256": "360f81d6eed05f3a0317332801e161d0d4c841022db40571e766a3718bb7f0fd"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.js",
+      "bytes": 4433,
+      "sha256": "18de9f1cbe96656f8aec5d5d097a69401570b243f434444979bb6e5fa6b91fa3"
+    },
+    {
+      "path": "apps/api/dist/automation-verification-result.js.map",
+      "bytes": 3080,
+      "sha256": "929fda4e5e472ec2718ef5d1fcdb93fdabd8ca52e327a45b576b2e9790657b9f"
+    },
+    {
+      "path": "apps/api/dist/automation.d.ts",
+      "bytes": 625,
+      "sha256": "25dbe8c5293100831e8e0112b05aae9b6327738af8513e2666c26b4b0776424f"
+    },
+    {
+      "path": "apps/api/dist/automation.d.ts.map",
+      "bytes": 591,
+      "sha256": "62e2f864cd1ab988a5c334f5494b619bc8681b74a885e767cc3e584ab2764af1"
+    },
+    {
+      "path": "apps/api/dist/automation.js",
+      "bytes": 32827,
+      "sha256": "da3c0a6bdea56ba204e838d2deab29f57a1a626d8da9834cbe3d2ca6796b61b9"
+    },
+    {
+      "path": "apps/api/dist/automation.js.map",
+      "bytes": 29139,
+      "sha256": "84ee1ebbf636dc6eb1ecd4f7ae26f9cc4a6b2f91f6d46f2952a60812f9f5f506"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.d.ts",
+      "bytes": 1469,
+      "sha256": "53e2cb0f970043f8297c0b3a1fe1bdba3e58886f088a29a3bba73d4d515adc2e"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.d.ts.map",
+      "bytes": 1031,
+      "sha256": "1e4a8dd0cc49cd54ce18da2f5eb991913dd4df68a21949f8d6c999ffa5d2462a"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.js",
+      "bytes": 2822,
+      "sha256": "9975eff17059dbdbc2055b6d328994ed385506a4068ebad30cc35fb0e05268df"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker-client.js.map",
+      "bytes": 2786,
+      "sha256": "5a1927c75e97d942b9d9707c6c16f7cf669332a27c7652151752702615a72cf1"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.d.ts",
+      "bytes": 62,
+      "sha256": "8e3d0d1bf0341589dad0c188909e83e2ddde78ae1a3f8b905b33933a24a9f159"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.d.ts.map",
+      "bytes": 136,
+      "sha256": "174466436d94c62a3ba583ecad2b21aa3fc6bebeebb983ad929baea283955fe6"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.js",
+      "bytes": 1865,
+      "sha256": "153867f54ab2fe279d5b600a137dc4432a8befff02541434b2ede3b105716229"
+    },
+    {
+      "path": "apps/api/dist/backup-archive-worker.js.map",
+      "bytes": 1803,
+      "sha256": "cab4fe697a72669a9f529c20317515531ac8308f53b5a5ffaa00f1ca86e037e7"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.d.ts",
+      "bytes": 1376,
+      "sha256": "d170f9be81eee89631e921fbaf8b6e202e17941d88b21f2b5faa01437cba21e6"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.d.ts.map",
+      "bytes": 1162,
+      "sha256": "ded781ea049d5d92679f3b6fa663073f7da089d011f73db827d4625ef125ddcb"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.js",
+      "bytes": 11621,
+      "sha256": "d18feffb90ace42b39f26be1128f95dace91a8851f8d48a5151dbeef0de01075"
+    },
+    {
+      "path": "apps/api/dist/backup-retention.js.map",
+      "bytes": 11809,
+      "sha256": "fd1e4fcd4e18892e7b8f5734864efd9a29e21911706ace1a1fee66427121aab7"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.d.ts",
+      "bytes": 1620,
+      "sha256": "7ed29aef897b4ca654b39fccc80a5880ace9b451c8fe76d9489440761e09dadd"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.d.ts.map",
+      "bytes": 1574,
+      "sha256": "f869dd05633e6a2ecbaa7ae93bbd67b173460db148ad15bef0bee0d9f27f4a59"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.js",
+      "bytes": 19676,
+      "sha256": "3f3f4bbda6da312157008cfa47b3c46c643926c5a26ddee2b1eb7839ceb2884b"
+    },
+    {
+      "path": "apps/api/dist/backup-runner.js.map",
+      "bytes": 15961,
+      "sha256": "962a018dc4dbffcb82a0d819f42a21fbee95f5027433a9a57034d6177be6fa31"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.d.ts",
+      "bytes": 5842,
+      "sha256": "706e5257cad9b505ac0e998ff4526eebff3a9f031a540abe42ea8c17d4ca2ca3"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.d.ts.map",
+      "bytes": 5486,
+      "sha256": "62b7fc11b1051616c3d1ab2c1280387d70b298f4cd9018954eac07aac122099a"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.js",
+      "bytes": 16110,
+      "sha256": "4172d4ef25d5e33073749c5fcbfc4959c23f7396309b25cf586c1aa4587ae8ae"
+    },
+    {
+      "path": "apps/api/dist/browser-auth.js.map",
+      "bytes": 15081,
+      "sha256": "03d041ae8bd9d9aabbd953ea04c8a15e6a457f5a5fec3b8243ca3200ef4f90e3"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.d.ts",
+      "bytes": 1141,
+      "sha256": "7ec5b0bd1a22603c301fdf8862296ae266233ef42fa2cb5df97b904a931df371"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.d.ts.map",
+      "bytes": 844,
+      "sha256": "11413a7ad958a76688a68472ee50af9b19a6a854c0bf129696c1f7437183e6b9"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.js",
+      "bytes": 7728,
+      "sha256": "053f926d726b33ff7aec699c1ed0445419a55c6bf4d462d13031c1d124a3ffcb"
+    },
+    {
+      "path": "apps/api/dist/bug-actions.js.map",
+      "bytes": 6157,
+      "sha256": "c33b6e39a8ff4b52368bad0e08f33bde36511e72e80bba808f583cfb6969b7ba"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.d.ts",
+      "bytes": 1379,
+      "sha256": "1f5ab50ff4d2f6fea12515e7606f8d8663109534563a5ea377b8fecb30bf39fe"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.d.ts.map",
+      "bytes": 1508,
+      "sha256": "50d37e119c7395b076d3f7ff7908ea513939b86ce6b325ed9337cca00c8be288"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.js",
+      "bytes": 14124,
+      "sha256": "e35f320ebdfe3881eab3d07a75b539fd8f27aec4e5c46ca6b7da5e3cf5faba40"
+    },
+    {
+      "path": "apps/api/dist/build-upload-host.js.map",
+      "bytes": 14254,
+      "sha256": "06106ab519fd3577d51fa29e009052e4e16e3f54524d93bb3363a66065408fa6"
+    },
+    {
+      "path": "apps/api/dist/config.d.ts",
+      "bytes": 927,
+      "sha256": "1865c6a4f20fce7f0f687059bb76ee95b692bd43b0d2d31ad4e86cc8b7cb3630"
+    },
+    {
+      "path": "apps/api/dist/config.d.ts.map",
+      "bytes": 775,
+      "sha256": "8c06a7214c38fb575fae937510ca860a9c20af1874297d3bb3f0ae2a5e6da880"
+    },
+    {
+      "path": "apps/api/dist/config.js",
+      "bytes": 3195,
+      "sha256": "3cadc54e64bbc2f903700537053412eada37ef161dab8585c0c5f826393001c9"
+    },
+    {
+      "path": "apps/api/dist/config.js.map",
+      "bytes": 3112,
+      "sha256": "98e73a48104c625b0d5df5c0d4668762b1f8287c258a097924037be6ba3f19ad"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.d.ts",
+      "bytes": 2763,
+      "sha256": "67dec1c9e4066848f943a9f39d4e4ff6e995f30e6bc3273b095a08967c95c006"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.d.ts.map",
+      "bytes": 613,
+      "sha256": "2274dc9ec91b1aec11c007d164d4e9960e86034cc46856c4c2f19ad094e08645"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.js",
+      "bytes": 4178,
+      "sha256": "107f237afaebaf77618756aacbaef60d6aa88148bd4ee210faaf93458a58da75"
+    },
+    {
+      "path": "apps/api/dist/frozen-workflow-response.js.map",
+      "bytes": 4224,
+      "sha256": "06d3a597def29bcdbb0840c5bd405821b88e7ca53f91d8122d17540f12b28eb0"
+    },
+    {
+      "path": "apps/api/dist/health.d.ts",
+      "bytes": 1100,
+      "sha256": "bc5a2d2412af6928075412f329ac7770ef2ec967c5fd222d27a44d370b15a9b2"
+    },
+    {
+      "path": "apps/api/dist/health.d.ts.map",
+      "bytes": 971,
+      "sha256": "900973a69d69ce9cabd315cb3d743a5a9e04954e572bdc569b94195e4e729b8b"
+    },
+    {
+      "path": "apps/api/dist/health.js",
+      "bytes": 4513,
+      "sha256": "66f6718a863ff3811f39da1bd5a7acaa48d0a2c9114e18bb3ee4eabd8b7356ce"
+    },
+    {
+      "path": "apps/api/dist/health.js.map",
+      "bytes": 4551,
+      "sha256": "02c27e7e0d4a8c6e20fcd93829e7ce008e2835631eab32207eb5f181ca09f102"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.d.ts",
+      "bytes": 212,
+      "sha256": "322fc1ecd6fe8b2ec24d4576da619ffb6d9a81f4d5937ca384c67accc663a0c5"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.d.ts.map",
+      "bytes": 203,
+      "sha256": "47edb48c94ddc17a8148a6077d029e8d97cb9e5d0f7da5dec50544580ebb321b"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.js",
+      "bytes": 363,
+      "sha256": "517cb650d129ba1dc53d4f7d18fc3c62da86425b8cc346240d012297bc3a06a7"
+    },
+    {
+      "path": "apps/api/dist/import-execution-hold.js.map",
+      "bytes": 341,
+      "sha256": "8f3a3f80869ed963713ca9f5960cb469ba95cef9bd46f6b65c579cbe2e4e044f"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.d.ts",
+      "bytes": 2745,
+      "sha256": "3fa07499af912a33f2512ebdad59fedde9fff8444dfc4995f716b047e31060c2"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.d.ts.map",
+      "bytes": 2654,
+      "sha256": "e0b6a4c43511374a4becc9619e16b0ece6a3e4b0c6af9c83d11d4c6f0cd1a81d"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.js",
+      "bytes": 33340,
+      "sha256": "6adab2bd4aa0287082c9ca48d8117cfebd02d40ad0edbcdda49d0ff0a9ce230a"
+    },
+    {
+      "path": "apps/api/dist/increment-upload.js.map",
+      "bytes": 34528,
+      "sha256": "c7e09702063f46e5a3e466f921b7f8f452243cc34fe1adaa48c21f9b7112d1bb"
+    },
+    {
+      "path": "apps/api/dist/index.d.ts",
+      "bytes": 8848,
+      "sha256": "cbf5444a991aefaad82e123d4626c88edce33362cf1fbf9fbc87bdc6a99c5968"
+    },
+    {
+      "path": "apps/api/dist/index.d.ts.map",
+      "bytes": 4882,
+      "sha256": "0a5534059723c6a7e2706c15cd790d62dfe59169314fbb93b4cf4c837a4f306c"
+    },
+    {
+      "path": "apps/api/dist/index.js",
+      "bytes": 5093,
+      "sha256": "aa519aac73b9cff64ef42bac6c267645b327f14fd2278a75fbe1099989cf58cb"
+    },
+    {
+      "path": "apps/api/dist/index.js.map",
+      "bytes": 2770,
+      "sha256": "990c61dbb9e639df7e21a90fbc761aed62e3413d36372120c4610c1be0dc5420"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.d.ts",
+      "bytes": 3388,
+      "sha256": "4a25ce733920ba98fd0d7f428cd854dae56926b3dac16e52eb995d8067235e7d"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.d.ts.map",
+      "bytes": 3108,
+      "sha256": "4f038863a664a06e8f772d8ff2b25606ee1a3adb150a97dfd43186496931da76"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.js",
+      "bytes": 23015,
+      "sha256": "e4a2672511dbadb03044634e7c4f0b8e97d004919c6e1794af47506b868d585e"
+    },
+    {
+      "path": "apps/api/dist/jenkins-builds.js.map",
+      "bytes": 23494,
+      "sha256": "4b0a2ced8509eb25b770ec1726d3b3f77c35d76b43bc3e42caba813994cb3f07"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.d.ts",
+      "bytes": 3912,
+      "sha256": "521a7e3295c29c0386a63c08dd7d9489acc66638475707c5af79e51bee81e3fc"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.d.ts.map",
+      "bytes": 2956,
+      "sha256": "a93b82eb7f4510aa89db33be2030d4649fa4387bd4a57a650dd379f06e9d34e4"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.js",
+      "bytes": 11777,
+      "sha256": "e926bce1d79296c50207fd75b9c55f2df02e585fdc585e33e131a432d9527a4c"
+    },
+    {
+      "path": "apps/api/dist/jenkins-progress.js.map",
+      "bytes": 12052,
+      "sha256": "c5a07b4317c4955440c0da99e7249b8c6df3454d332e3431fc24320015271417"
+    },
+    {
+      "path": "apps/api/dist/main.d.ts",
+      "bytes": 45,
+      "sha256": "a9190fb43abc43193e152369c49f856ec6ba0e4f55d8ed9ae205ccaba9d505ef"
+    },
+    {
+      "path": "apps/api/dist/main.d.ts.map",
+      "bytes": 102,
+      "sha256": "05dd0e05e844679dc599a77a2204852c52aab78f810f41d2cd7541907611ad0d"
+    },
+    {
+      "path": "apps/api/dist/main.js",
+      "bytes": 27044,
+      "sha256": "291757639d7f4d50fb024a6616c2344b40aa699e7f2d6371fc067ec0e0a528f1"
+    },
+    {
+      "path": "apps/api/dist/main.js.map",
+      "bytes": 19690,
+      "sha256": "f5b6bfb05fe648de37634b94cbdf0539b920e19bd23e98b450eb6171304548a2"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.d.ts",
+      "bytes": 8900,
+      "sha256": "a93c4a8087259fb9ce537bc10b4271ec87d2959304491239a1de29483fe35508"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.d.ts.map",
+      "bytes": 7747,
+      "sha256": "696328b4beafc12e1b6aaf824bfa5748ea64ec847f26d540975f060711b3259d"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.js",
+      "bytes": 9133,
+      "sha256": "4753fdefe40dfd72bdfa08170c5d11ae004acb3cbd9208af28ce981ee8af39cf"
+    },
+    {
+      "path": "apps/api/dist/mobile-attachments.js.map",
+      "bytes": 8041,
+      "sha256": "fac17e91fbf87867af3c2ad0c36575aa7e5ab60e78610a4c2e2f51eee2f3c067"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.d.ts",
+      "bytes": 6092,
+      "sha256": "a51dad6f774790ae8307be7376af8aceae87e90cfc14c6cdd2152bd9a81a718d"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.d.ts.map",
+      "bytes": 5799,
+      "sha256": "8fc6ce384908e65edb9c2b1834c5972245311d4937978282da185fb509217d78"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.js",
+      "bytes": 15140,
+      "sha256": "0d37ac039e24cb65446a556a718352a5b05bfc8a60606e4ecceb870340674dd5"
+    },
+    {
+      "path": "apps/api/dist/mobile-bugs.js.map",
+      "bytes": 14766,
+      "sha256": "64d04eb2406e81d7e81ef94c5b7403fdf6d7bca7d1c4c511b4b932836234a279"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.d.ts",
+      "bytes": 2267,
+      "sha256": "04e66151e9ba05152002faacb118792f5fe37af45c067acdae605a4d39bec5c3"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.d.ts.map",
+      "bytes": 2070,
+      "sha256": "efd490c29a1339d6597ad2242050a8c7459e26ec1d46f7264138804aa4396513"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.js",
+      "bytes": 7073,
+      "sha256": "3cf97f45b36ed024da5354750ef251a71b00d9e354d7ad029ff4a5a461a9b9d5"
+    },
+    {
+      "path": "apps/api/dist/mobile-builds.js.map",
+      "bytes": 6495,
+      "sha256": "e894bc9718c0db01bcf2f01f2cef21035783fa23edb2513d1d87b75e98502e13"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.d.ts",
+      "bytes": 2784,
+      "sha256": "2b1f5d987ae130577d5588546a446591decba5155a7ef87b7a9535c18d993e1e"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.d.ts.map",
+      "bytes": 2236,
+      "sha256": "852c4a9867fafbfe5da6b3a0a44016f2562dd11737beef3856dbd305db583ed5"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.js",
+      "bytes": 17707,
+      "sha256": "9707f87605dee8b0571e604015ffaa9d46c7db4f0a6bb1e96f148b934de8167b"
+    },
+    {
+      "path": "apps/api/dist/mobile-captures.js.map",
+      "bytes": 14698,
+      "sha256": "533ba6a6c7084afec209a8de170536393b52d45b9d80930e13f5249c5df089f5"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.d.ts",
+      "bytes": 1367,
+      "sha256": "2159ed56fab06318d11c8e9d7146165c107c48add49aa154c007e83d2ea0b2f9"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.d.ts.map",
+      "bytes": 1172,
+      "sha256": "e74ed3980eed11fdc8f139ce725d13d92b57d5305476f56cc8b2d06d54d8b4cf"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.js",
+      "bytes": 2843,
+      "sha256": "d5c6af2e7eace6c8a9bcb75963bbde77b384ab1fd610187c2f8b75f18ff8bd4f"
+    },
+    {
+      "path": "apps/api/dist/mobile-comments.js.map",
+      "bytes": 2761,
+      "sha256": "c48fb935649c4576b4141568fda8ba3be0c6ffe1509d636d0c675b78014be8f7"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.d.ts",
+      "bytes": 1445,
+      "sha256": "161bb37d2bc1b64b0ec0f2f44ea0934824179aafa601de0d2e2ed426d0ab33b7"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.d.ts.map",
+      "bytes": 1243,
+      "sha256": "8af1ac92e6c50d6bf7e5f8eeab578f8aa624ac97c31313f387345c40e0eeff61"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.js",
+      "bytes": 1896,
+      "sha256": "feb16006daf68ded2ee42a2ff0b570fbafead9512f95eda5f691af702350c0ce"
+    },
+    {
+      "path": "apps/api/dist/mobile-duplicates.js.map",
+      "bytes": 1768,
+      "sha256": "d9800e9866566c4fa2f82b7a328f84f8878d3453e81e34a7e2a168b67d0739ee"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.d.ts",
+      "bytes": 806,
+      "sha256": "bc3d5d45fddf0187c6520227ae6b8824bb6b6e07ba31dd01297956cb15ef573c"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.d.ts.map",
+      "bytes": 656,
+      "sha256": "76604fa714b65faf95a036dc488f910c00a49afaed0f253198ab4b55164850f1"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.js",
+      "bytes": 237,
+      "sha256": "e111c366f79d348bdf6456ad5d54c963cb853e1f8aecd5323a813a3dfaaecfbc"
+    },
+    {
+      "path": "apps/api/dist/mobile-human-workflows.js.map",
+      "bytes": 225,
+      "sha256": "6ff712934f1e5782f8260a9f53565b5b072b7f80a5caee01267953168b64f40d"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.d.ts",
+      "bytes": 517,
+      "sha256": "fdeac2473aa7a7dd6ec33c6271ac5b1aa543a4e59158d7dd0ef330a2c888daf1"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.d.ts.map",
+      "bytes": 491,
+      "sha256": "bab9f9e81a0ac79001e16f2909346e87f78e67e128fb5a09501102158ba35242"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.js",
+      "bytes": 603,
+      "sha256": "4cb636e0a9a1897a8e48d8a90c7890a6ae925d82eadfcfd75c29052882bcd4e0"
+    },
+    {
+      "path": "apps/api/dist/mobile-inbox.js.map",
+      "bytes": 709,
+      "sha256": "6d98253253569b828e003f412f273eaa23132f49133ad04ae0e10dea6f5c9cf1"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.d.ts",
+      "bytes": 921,
+      "sha256": "3e44459372e3bd98b592f969e6d79d3aee24b477456d855ea5dcddfd93c7049a"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.d.ts.map",
+      "bytes": 726,
+      "sha256": "ae73a4c8d91c0fed2e7b0d8a961b4bbb0c7e988a767b0b4f1e43da06bcdeb4a3"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.js",
+      "bytes": 2110,
+      "sha256": "87e33c22d35e73b1b61f7b8f55f3b147f0ed2ae1b2901006c319bd60a0a24040"
+    },
+    {
+      "path": "apps/api/dist/mobile-metrics.js.map",
+      "bytes": 2123,
+      "sha256": "75a346f52e5c6bf0df68e7531667c688a680c52fbb4fb40dad5ac7e108890eb1"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.d.ts",
+      "bytes": 1403,
+      "sha256": "6b486ab07d8c73260e3da2854ce088892f2fb58e842ff3eb06bbeb67774b17a4"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.d.ts.map",
+      "bytes": 1309,
+      "sha256": "2971bbf8d16b08d922b6ba186ce9887f0e4847de70eb9dc7bbdbc33f3aebce8b"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.js",
+      "bytes": 13510,
+      "sha256": "e6ba099b406b3dcaed1c10c13e924266ebd2906ea88bc736ffb944640ead9339"
+    },
+    {
+      "path": "apps/api/dist/mobile-notification-hints.js.map",
+      "bytes": 12919,
+      "sha256": "75cccb4ef2cc12217d61830b9cfbc78a6eaed450a99e932c2ebeea4a509cfd06"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.d.ts",
+      "bytes": 2791,
+      "sha256": "64cf3feae2bf142518c4333b0ae6db1540fddaa5bd517a647e07f2810ce32607"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.d.ts.map",
+      "bytes": 2563,
+      "sha256": "c6e6ddfbea3d649560f3cca5e17e0904d1fb1497905030f9930074bd8dc9dd72"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.js",
+      "bytes": 2138,
+      "sha256": "41508697ced33e565e84db386e6b611dc6066502a5143eb9c80ac4ee5ce5e60c"
+    },
+    {
+      "path": "apps/api/dist/mobile-project-directory.js.map",
+      "bytes": 2127,
+      "sha256": "830e7d987df7b3a0dcd7ace97d62807864296607ad6cdf1f83e6befece1ddbb8"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.d.ts",
+      "bytes": 4279,
+      "sha256": "6c1128b3cce2a034c435fa02b90b0abd7eff42ed54722aaecd81904df8754394"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.d.ts.map",
+      "bytes": 3664,
+      "sha256": "c06e5cf63a983cf4eea229f0c50be4fb1486162b7bd81ab1a973f47e99af0ab4"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.js",
+      "bytes": 27143,
+      "sha256": "f64ee784813b5cf70233d05f873d01d493945eaeeb9c6ac770b2f30a24b9c62d"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-outbox.js.map",
+      "bytes": 23904,
+      "sha256": "73c713e2d11c85018002e38c3a4f9f3ddd3a99859b1a90567bf7f8c7772702b1"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.d.ts",
+      "bytes": 6006,
+      "sha256": "0716f526c243d81242a1f9a850119dbc1a3a8b26cb0ad0571b0edf5a91079d13"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.d.ts.map",
+      "bytes": 4167,
+      "sha256": "836f701ed52e431833cf1a22ad8cf6e680ebd3431f7e4f6b09028e5856264387"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.js",
+      "bytes": 14663,
+      "sha256": "184d22ab2739aa5795ffd8811a5521a6734aaec8ec2f6e4484639948650eb0bc"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay-webhook.js.map",
+      "bytes": 12953,
+      "sha256": "09bcce7c7bf741529a723c69e528504c80ef48786413b8fa905d8d704c99d3ee"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.d.ts",
+      "bytes": 7417,
+      "sha256": "2f4e366ee13291a9d5eb4813533fb7b2fb5acb0da4bf395d183d54992ff81a28"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.d.ts.map",
+      "bytes": 5737,
+      "sha256": "63f27e816d685186c6f77e843bd1c04b1206b23d27f8178dcbcabb94f35d8249"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.js",
+      "bytes": 10086,
+      "sha256": "21c1ebf6e5cdd9a9c48f37040e3e3e6b66e85582ff68548e22b6b8655715b1bf"
+    },
+    {
+      "path": "apps/api/dist/mobile-relay.js.map",
+      "bytes": 9247,
+      "sha256": "acf08de16d3070ffe6f0350136849f8541f53cd147be7330f1b0b97e892ab928"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.d.ts",
+      "bytes": 2343,
+      "sha256": "8cf9087a85babf64017e20aac01ebc81f139cd984b224400864919b5f04f6f6f"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.d.ts.map",
+      "bytes": 2101,
+      "sha256": "6c40f01d04bbc0fcdfe4639f414bd56a15f4f7b30e228c67a861df6ac176facb"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.js",
+      "bytes": 1866,
+      "sha256": "75a03e3e3571a5e15a8eadd1ab5eb33632423d7dcfd10248c500734baf4224f5"
+    },
+    {
+      "path": "apps/api/dist/mobile-user-management.js.map",
+      "bytes": 1720,
+      "sha256": "7a390caf5ad404edc28be597e9d2384e5ec8c6b09f194cb9378469bdaa4aec78"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.d.ts",
+      "bytes": 4239,
+      "sha256": "6279784aea73460ca4c31403e1aaae60403820f7f9d09d05466237b99beaf983"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.d.ts.map",
+      "bytes": 3068,
+      "sha256": "cd6f273e7a0ae66968ae748d68f158eccf700eb9e76b87e3e8b07a497dcf3259"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.js",
+      "bytes": 6392,
+      "sha256": "27a1ba6b8503b23fc5e1bce00648418e2f81e9cc117ee69bba66084e3a1667a9"
+    },
+    {
+      "path": "apps/api/dist/mobile-verification.js.map",
+      "bytes": 5820,
+      "sha256": "1be706582503b8c18a41ac8447a25b28ac6019851b10a6603822244c4d3a3db9"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.d.ts",
+      "bytes": 1337,
+      "sha256": "c9e13fca9382ce638f3a770f635c254ac98bb81fdb2dd3a7a2f694864f2d5345"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.d.ts.map",
+      "bytes": 1306,
+      "sha256": "1ea2fc41c439d364ed67f094fe78c8e81ca23e9707a3b96db11c083db7a95d74"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.js",
+      "bytes": 9044,
+      "sha256": "a11d170d9c72987e311cc163a41aa8e4ca9f9dbeb29acc76f8bb45dcd6b7a904"
+    },
+    {
+      "path": "apps/api/dist/parallel-instance.js.map",
+      "bytes": 7985,
+      "sha256": "3ff8313d7677fd7509269ff81ce5e57facb8dbce1f7c971558963cccd30cb735"
+    },
+    {
+      "path": "apps/api/dist/people-config.d.ts",
+      "bytes": 1804,
+      "sha256": "a0bebe25073e3f04fd784fd54314a488eed81495004f5af020f1c24172d1b338"
+    },
+    {
+      "path": "apps/api/dist/people-config.d.ts.map",
+      "bytes": 1512,
+      "sha256": "41b5a70b363e2e31bcd4a2a242d558f06c57f44a520bb23cc627f119210c2688"
+    },
+    {
+      "path": "apps/api/dist/people-config.js",
+      "bytes": 10477,
+      "sha256": "5141a758f2f384b393f9fe82c3ede76029d0df6eb5d08f8f4650cf589d9c7d15"
+    },
+    {
+      "path": "apps/api/dist/people-config.js.map",
+      "bytes": 11141,
+      "sha256": "f2f75ea2bfe69214bedfffc912d507aca5fd637e3c2384c1e19d308461a95e7a"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.d.ts",
+      "bytes": 3261,
+      "sha256": "dad7670788daff0ba1af47ac90b57ca8c67009cc581f4956b4ba70617f1e9cc7"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.d.ts.map",
+      "bytes": 3202,
+      "sha256": "c3bf9bb491711040a2744f7c3719fa5b27496642e7a84b2a057e8772764c0b9f"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.js",
+      "bytes": 34409,
+      "sha256": "da7a821d30d0286a8ef7124cd0649245c5daff481be52aa2bcb6406c6b631d90"
+    },
+    {
+      "path": "apps/api/dist/production-tasks.js.map",
+      "bytes": 34879,
+      "sha256": "3c9dd3ba659244bdbef6bea2be0a50a6fa17519133c6582794fcfd328df2ff76"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.d.ts",
+      "bytes": 4667,
+      "sha256": "7ee4a3a996977f31b8d8d7304b9d4cfa34e92d492625ba0d87d6bcc849d97321"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.d.ts.map",
+      "bytes": 4260,
+      "sha256": "db5236e801a8b7dc8d5221e462cc3307667d90237f664b301cc2aa77c7c66e3f"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.js",
+      "bytes": 61977,
+      "sha256": "9b31674992d43aecf95476be3d727772deb0634626214f3130f9f20979d21451"
+    },
+    {
+      "path": "apps/api/dist/project-components-runtime.js.map",
+      "bytes": 58106,
+      "sha256": "f557bd4664219c5616bcd12957e571e9d56d49c21d702f8c9cb66a2f0906a7e3"
+    },
+    {
+      "path": "apps/api/dist/project-management.d.ts",
+      "bytes": 1701,
+      "sha256": "b13559734c0635f785ca91cd01a87ba0536f3eb93ee6629003735c70d9427a53"
+    },
+    {
+      "path": "apps/api/dist/project-management.d.ts.map",
+      "bytes": 1580,
+      "sha256": "793873b09bf52043c2dc8271763fbbcf6f699ceda30861889413b5aa30a8c72c"
+    },
+    {
+      "path": "apps/api/dist/project-management.js",
+      "bytes": 9505,
+      "sha256": "9ab9dda4526d99fce6b72ecc54430f46cca5800e938b912facf29fa3a5c1cfb9"
+    },
+    {
+      "path": "apps/api/dist/project-management.js.map",
+      "bytes": 9819,
+      "sha256": "42edc62cc174a5d472aa3225e9729628788e8672f6e45deb0db61d45b37e35b3"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.d.ts",
+      "bytes": 655,
+      "sha256": "3f9ab38d9910f72225f7b538ef24d562fa7e263ff787284d7500822ec04c2e55"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.d.ts.map",
+      "bytes": 580,
+      "sha256": "6a7a12efc5a4c8990cfc3c38ba7c74223ddcabd0b9f7330bd139fccd27705cf3"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.js",
+      "bytes": 5740,
+      "sha256": "92b3a17b74fc9d6fd89ca9d3a097b01ec327de217aed730c3847408cea0265f2"
+    },
+    {
+      "path": "apps/api/dist/project-request-context.js.map",
+      "bytes": 5085,
+      "sha256": "a0f45354febf9ff58cd8bca74fd0e2bce31da605018f42d02133b610809488b9"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.d.ts",
+      "bytes": 3577,
+      "sha256": "967d1444414ac685e16c0a3adbbd8a43ffda9e3fabc20622e4b88fa943ff60b3"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.d.ts.map",
+      "bytes": 3629,
+      "sha256": "d0f2ee4c8b5e1b27c81fc4a445bda9b48c8d962f13483c41064f34e25a6019fe"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.js",
+      "bytes": 31506,
+      "sha256": "d1e278bf830808b6d1da8d003368894f5771a2a66283d35f82a1e343c0de9abd"
+    },
+    {
+      "path": "apps/api/dist/qingyu-client.js.map",
+      "bytes": 31573,
+      "sha256": "deb4fd4362a89e328225de50fef9635795066ac036e2f5bcedd7577fb1fe5580"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.d.ts",
+      "bytes": 4771,
+      "sha256": "4fc565090ecef6510c7d08bfd44dce6b23689d4f235034f5eaa759b5c93aa00e"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.d.ts.map",
+      "bytes": 4365,
+      "sha256": "8fb65c957873802c16d60a1363681a0ef1464498a70888205058e07f49c3e812"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.js",
+      "bytes": 25200,
+      "sha256": "40228250cf3ba8f051517b8ddb3402ccf98c0cd807e1d0eca6ab6a90bb108b52"
+    },
+    {
+      "path": "apps/api/dist/qingyu-integration.js.map",
+      "bytes": 21536,
+      "sha256": "0266b4746c52e27ed333681ef6dd988a59e0dc5c5b1641a30da2c59d28bab7c9"
+    },
+    {
+      "path": "apps/api/dist/server.d.ts",
+      "bytes": 951,
+      "sha256": "68dfa08d1c06c282bd9a2f4769b7453857054e6d4525b9862bb53801a44f8960"
+    },
+    {
+      "path": "apps/api/dist/server.d.ts.map",
+      "bytes": 992,
+      "sha256": "c2cf3026a6f1403c5840bbc360e86ac4de23328bf998bb67b7fcbb5ea43b2706"
+    },
+    {
+      "path": "apps/api/dist/server.js",
+      "bytes": 3769,
+      "sha256": "3d470054060258bbb1335ad93ee160c9ed8f9fa9e296856b1709e35b39680ec5"
+    },
+    {
+      "path": "apps/api/dist/server.js.map",
+      "bytes": 3151,
+      "sha256": "b069c2e657b2383415111deb23bb84011737ffc341309a5712b07777a0e3e836"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.d.ts",
+      "bytes": 516,
+      "sha256": "6972331144774b4b3efa7fc4b29ee9fd2a36e58dd3a53b0bc9eb8bae453acc89"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.d.ts.map",
+      "bytes": 477,
+      "sha256": "2c16f6472d741728577a79cec7960e6a4d2c85a1e4e4efa771832443ba7195b9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.js",
+      "bytes": 6106,
+      "sha256": "667632a45dc6c703d8169ddfda923b919870bc3420591de688e7b1d4c84736fc"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-attachment-store.js.map",
+      "bytes": 4791,
+      "sha256": "1c9778c72d9d5c8d43b023c957891f5bcac952445c195ce2e4e19d9856a92cbb"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.d.ts",
+      "bytes": 467,
+      "sha256": "80d9dbe3303fbdb6e4487c838d71e83c6270e695d56ad19bd7a541d0e86d49a0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.d.ts.map",
+      "bytes": 460,
+      "sha256": "0a96f7c1b1177f0489b849327550f83995e8fa92cdb7d65022fed446c3fba4f9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.js",
+      "bytes": 6963,
+      "sha256": "92641035c93607aa6384f9cc29d8392f8155431708ff39981c74ce71649c06d3"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-bug-store.js.map",
+      "bytes": 6653,
+      "sha256": "0fc7408409a733573bc563caddd77a08f9819dc3bc243c0bfbe3a2abc27c93e7"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.d.ts",
+      "bytes": 481,
+      "sha256": "b8f6371f56dbe7895916654c4ee0e07f52fcbd7c956c58367187fe5105422e51"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.d.ts.map",
+      "bytes": 469,
+      "sha256": "bed861fe4020c438925cb9020092f8d77cc3272d2f0f2dd2fa15f31062d00815"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.js",
+      "bytes": 3191,
+      "sha256": "984739ee92d47ed09c7958a5c5ed2a250596e5694b185d2bb6f09142137bd29f"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-build-store.js.map",
+      "bytes": 2756,
+      "sha256": "e9a9dd31c0df1a57d46b5a5aa9db7993fb97e255261f91c44ae30a17503a839c"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.d.ts",
+      "bytes": 495,
+      "sha256": "ef2d4f6dde53f7429a97274858b33fd03628ab66421c456a5cb37e68664ed4de"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.d.ts.map",
+      "bytes": 473,
+      "sha256": "aafd60910755c1a201351d3d098209dfff410b749f7ff3b475702526e3dd42fa"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.js",
+      "bytes": 1761,
+      "sha256": "021f979a10bb57114b4713d1abf41a59ea398f544b2e0e11b03a1d098d60aa6a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-capture-store.js.map",
+      "bytes": 1500,
+      "sha256": "6aca680da99e1ca2b85c3568a0942c88658470861dc19e03e79ebe04caf1b8c9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.d.ts",
+      "bytes": 567,
+      "sha256": "1d522b4c1f441cbbdf01f03116bf62cd496e17db862c5ba844f1d681f4c98c71"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.d.ts.map",
+      "bytes": 517,
+      "sha256": "1a758d932e8e715cbc4fd1a5d2e53a9d7afdd9f2b884f0afdbe3714a9533c174"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.js",
+      "bytes": 1322,
+      "sha256": "80b14a0e932f6316023da940b03f611afe0e45649104d1f07005edf12dc9bcd0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-comment-store.js.map",
+      "bytes": 1344,
+      "sha256": "1e8862e3cdf29da7e7a6a69a42650ae7ca4f0b6dbdcaf4b5d4271d5174f99780"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.d.ts",
+      "bytes": 509,
+      "sha256": "0472dcc657cb15a2fef6ea6f2775887354f60b205b48116a9a03de39debda1c9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.d.ts.map",
+      "bytes": 478,
+      "sha256": "0d37d6e6e5de12bf35036cc90354d55ad8ac0fccd60707bceda1541435b854e3"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.js",
+      "bytes": 1263,
+      "sha256": "903469e3b773e0895f9f34a8a6a79ef7baf089ff2a838ba0bd3237532c651fe0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-duplicate-store.js.map",
+      "bytes": 1232,
+      "sha256": "0ec42f500789c3b356aeba12ad7aaff8ce92a67d819b1e4845e205e0aafe3635"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.d.ts",
+      "bytes": 508,
+      "sha256": "756d800662c1e60539551b3ea8a5727a095a00419de472f2cac22f5e43dc9076"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.d.ts.map",
+      "bytes": 439,
+      "sha256": "d8a81d3da29aa9cc5ab6d068f2a3e4dbd00366e82b3708c5f919f950e6f5372b"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.js",
+      "bytes": 714,
+      "sha256": "e8ab10d65f337ab713ae84d197aa7fcb1448ee57632c23925937bfc98bcf2334"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-human-workflow-store.js.map",
+      "bytes": 676,
+      "sha256": "f9ea283d5a13f75dc47791b2e48a2331a010e457e17d7111a2a76531f8a823d4"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.d.ts",
+      "bytes": 494,
+      "sha256": "4b9e6ee725f34b8871bbe6c4e06a1bd65b2379bbab03f8b293d79a52d30fc8d9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.d.ts.map",
+      "bytes": 469,
+      "sha256": "4a9f0ba748fc51749c74e3528b1eb89dfbc7c37ecc7d458ce5e6d98bf60365a8"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.js",
+      "bytes": 626,
+      "sha256": "5298d29da471aec0ab20070dde8357e85666ba19a9b7f817d33c3a6737cf42ca"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-inbox-store.js.map",
+      "bytes": 699,
+      "sha256": "dd46b2e2886905760adff3dce774671c3e86a966a387df3b586cffe5ab9fb14c"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.d.ts",
+      "bytes": 463,
+      "sha256": "4068743f6420def5e84f0e88949470216d02e7eeab382f12b85cad27c0e33bfc"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.d.ts.map",
+      "bytes": 426,
+      "sha256": "acd9b08ebb3885e80f3fca7e8f7ecded78b93e9d9e04d6aa587308cca05c14dd"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.js",
+      "bytes": 491,
+      "sha256": "c8e25919c431ee7bca16ccd4144575e68689b73e9eda892aea4b04199254226f"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-metrics-store.js.map",
+      "bytes": 510,
+      "sha256": "9c54f98eb1c7f90f232a02203e383f6c7eab1cb625788111bfdf7a43b0583573"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.d.ts",
+      "bytes": 1069,
+      "sha256": "68c84bbead3dc6ba726702f89893298fc4fa89592464dbe67559af78c04ed5a1"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.d.ts.map",
+      "bytes": 891,
+      "sha256": "07619eabec0d95a2eed670318caad6069474eae8bcc1c8078edd6fac4916646f"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.js",
+      "bytes": 2683,
+      "sha256": "4e157795e65135909747d0064cf956a527edf0fa04ef62cb1c22157eb42e55fd"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-project-directory-store.js.map",
+      "bytes": 2638,
+      "sha256": "3e49ea3231e5f865f302c3d1f26a9c4de9ecc6b39b3111f60e09a6c8d1a69fbe"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.d.ts",
+      "bytes": 821,
+      "sha256": "bc43289285c808712daaad182ec833f17a2bb677b1f6a3dfbc650f0b498c621e"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.d.ts.map",
+      "bytes": 725,
+      "sha256": "c56b01cbaddb043ec5a04711fb6c7de22d6d38eb9d743c79d4346fa16d3427fe"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.js",
+      "bytes": 8261,
+      "sha256": "395f02b8b715b97372ade5e1d0705e187b4b0c90a84d36e167f31d1541e906fe"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-store.js.map",
+      "bytes": 6732,
+      "sha256": "6c7c9b36e6fa2353bb83a683ea595c3c713a1882b97c6d2487e2e473fef0e50a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.d.ts",
+      "bytes": 500,
+      "sha256": "cbc878dbe77f74d2fa9c6b2bcab3b82a98b23506ca06e0ead816e161c6c6b0cc"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.d.ts.map",
+      "bytes": 436,
+      "sha256": "e2d9b8431e3c7fda07afbe197e063cd4058f9bd03547915726d35d29390435a9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.js",
+      "bytes": 406,
+      "sha256": "874b33bbe36af7ba40f803aa55eb8156091b4106b2aeb5c315c631534af87361"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-relay-webhook-store.js.map",
+      "bytes": 413,
+      "sha256": "fef393688b5fcc6b508eafeca15f9fc78474aa6940a9dd1bd8b8aabcbc202534"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.d.ts",
+      "bytes": 968,
+      "sha256": "4c3267ea94a997cbc1c8bdb5c99ef81821fd27dc8284afbc67c87bb050d0f93d"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.d.ts.map",
+      "bytes": 883,
+      "sha256": "c9417b55b80da5f0fb240398873c1da89ab7d3b7a6eaf3b51fd594f14acf1801"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.js",
+      "bytes": 2661,
+      "sha256": "e2ca7a7ca6ef6ecb9decc5712e585a41267406d1f570ba366d4873dfba06e169"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-user-management-store.js.map",
+      "bytes": 2568,
+      "sha256": "cfd8cb71e364ca769d5f2b87c9302cbd7876ab118f4515be4d203ce89fd4437a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.d.ts",
+      "bytes": 529,
+      "sha256": "de95cc6ae58f1758536ebd09737806b6f31f7776f4027a397f4e9b3c7397e025"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.d.ts.map",
+      "bytes": 484,
+      "sha256": "6a69d564da812b8bb33d216ffebab11ea78b45943c733bc0010bec56bf2adcb3"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.js",
+      "bytes": 3553,
+      "sha256": "31cb5de1b94feab674e722d36df671e5f88c889d96b71e5f093b9130600cb3ed"
+    },
+    {
+      "path": "apps/api/dist/sqlite-mobile-verification-store.js.map",
+      "bytes": 2928,
+      "sha256": "9f66d45944c7b44957d85f6e8134daa2feb5f1c41705014f402ea290b2f89db0"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.d.ts",
+      "bytes": 728,
+      "sha256": "5298297f64749a8048ac989a78097921766028360ddc766580a4f240cd293ce9"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.d.ts.map",
+      "bytes": 626,
+      "sha256": "4026aa6abf2f0a43d7a75ca7bd52047d9b065f510ecc72d07b2b19f8fa2c3c4a"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.js",
+      "bytes": 543,
+      "sha256": "ce003282cf860f9bba7d81f091b1d326d0e138d91d8c87e21c1e2d593b046246"
+    },
+    {
+      "path": "apps/api/dist/sqlite-workflow-projection-store.js.map",
+      "bytes": 486,
+      "sha256": "d56f51b5c3e6fd0d89b3df59da55a32a8d0e699f56390a8de1c42e608eab0fdf"
+    },
+    {
+      "path": "apps/api/dist/upload-source.d.ts",
+      "bytes": 367,
+      "sha256": "aad51b9f97a12dea85b4fe7ef55b6577cc840fb7a67d305d84ccb2004b5f0f57"
+    },
+    {
+      "path": "apps/api/dist/upload-source.d.ts.map",
+      "bytes": 383,
+      "sha256": "21452a7bb25b557b91a6c520f1ddc0bcdf0058c93ec417cca2b408b9a5a3f6d6"
+    },
+    {
+      "path": "apps/api/dist/upload-source.js",
+      "bytes": 3178,
+      "sha256": "e4c7bad72053d4c5bf59a90fa4b57775e92166aff8ab6f72a0b11c0ab72f12d1"
+    },
+    {
+      "path": "apps/api/dist/upload-source.js.map",
+      "bytes": 3232,
+      "sha256": "8b5a44fd0e571eeb553c9c5919ebf4e00ce7428f610bb5b967d7cc07e784427e"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.d.ts",
+      "bytes": 2589,
+      "sha256": "2ad89bdc7deb51e5b64e18b66476a4ed1189c4c0b6f3e2940a3f538e8e7b8044"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.d.ts.map",
+      "bytes": 2432,
+      "sha256": "b2d686bba9a14a1c2c6bc11cb8a21f4bd2632de6f0323699289685141d54b4f8"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.js",
+      "bytes": 26426,
+      "sha256": "ebe9ce315f47ba912b1749393a9550881cf8845f7b13577b899e8c38083d0f3a"
+    },
+    {
+      "path": "apps/api/dist/uploader-host.js.map",
+      "bytes": 26918,
+      "sha256": "82ea264a7d1396d0866e61d073cceb47ef0d38284664a181513e82d74c0f3ff4"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.d.ts",
+      "bytes": 56,
+      "sha256": "df2236fd00d986861615eb9c5f5031f690cb000656c4a3674f00a13db3997308"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.d.ts.map",
+      "bytes": 124,
+      "sha256": "4dea8091bf88be380b67c5582c01079c76f39dad936c6d4c33637a40b4d9aa78"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.js",
+      "bytes": 2635,
+      "sha256": "5a690701057f7cd479ce06eb0513520379e947f56454b18aab36b81dabb7cd90"
+    },
+    {
+      "path": "apps/api/dist/uploader-runner.js.map",
+      "bytes": 2810,
+      "sha256": "9021383ced1a3337d78d2b5323e3f70089543d2b1240a8a4103bf03ae38d5f4a"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.d.ts",
+      "bytes": 91,
+      "sha256": "dffef891da6fd8f8875f55a7c536dcc3402ccd8709b7e40e0d0c349a74cffd4e"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.d.ts.map",
+      "bytes": 143,
+      "sha256": "18bc2f57a10b9ff6e403d7851c4f08cfc7408b8d48497a086d8ea12fb92cac48"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.js",
+      "bytes": 89,
+      "sha256": "564dae8fd314c10e858b3b92bd89ed2c840cff78024374a73a0c30e1178122a3"
+    },
+    {
+      "path": "apps/api/dist/uploader-types.js.map",
+      "bytes": 141,
+      "sha256": "37a2036da521c71b9a33aba2aa12d41dfa8361cf76e05995c727a5f4c6480e18"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.d.ts",
+      "bytes": 740,
+      "sha256": "2d34554bd07b14c754d549f38be2457d4144d001df3a094e8677dc23d05db823"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.d.ts.map",
+      "bytes": 665,
+      "sha256": "feea0b0b66b2aa0436cf25864085273ee241aa1e22c5219cd68a0d8e9c832bbe"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.js",
+      "bytes": 3934,
+      "sha256": "302f5006db834c6cc3a9407168ba4b3e6e4dd1771d6e8657a9c3ce5a6c80a055"
+    },
+    {
+      "path": "apps/api/dist/workflow-projection.js.map",
+      "bytes": 3871,
+      "sha256": "2fc3aa05c63f3f94121e01af4508957d7bd604e6b704f5c3940b833ddeb94928"
+    }
+  ],
+  "allowed": [
+    "apps/api/dist/automation-routes.js",
+    "apps/api/dist/automation-routes.js.map",
+    "apps/api/dist/automation-routes.d.ts",
+    "apps/api/dist/automation-routes.d.ts.map"
+  ]
+}

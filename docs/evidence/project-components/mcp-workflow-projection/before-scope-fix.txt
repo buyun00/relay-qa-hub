@@ -1,0 +1,31 @@
+✖ workflow MCP preserves actual HTTP pages and current project authority (694.9343ms)
+ℹ retained C:\Users\lin0\AppData\Local\Temp\qa-mcp-workflow-XwBS7n; schema 17; 12 real loopback HTTP requests; registered compiled MCP, app and worker
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1239.4568
+
+✖ failing tests:
+
+test at apps\api\test\automation-workflow-projection.test.ts:1:783
+✖ workflow MCP preserves actual HTTP pages and current project authority (694.9343ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at page (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\automation-workflow-projection.test.ts:211:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\lin0\.codex\worktrees\7c86\Relay-QA-Hub\apps\api\test\automation-workflow-projection.test.ts:271:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

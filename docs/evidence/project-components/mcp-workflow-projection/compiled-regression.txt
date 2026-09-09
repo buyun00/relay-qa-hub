@@ -1,0 +1,30 @@
+✔ actual MCP HTTP negotiates supported versions and validates initialize params (289.5383ms)
+✔ actual MCP HTTP distinguishes parse errors, invalid envelopes and valid request IDs (101.5031ms)
+✔ actual MCP HTTP accepts notifications and responses without executing tools or replying (39.5526ms)
+✔ actual MCP HTTP reports protocol errors separately and retains 90 tools plus frozen workflow tools (106.3435ms)
+✔ actual MCP HTTP rejects unsupported transport methods, origins and protocol headers (112.318ms)
+✔ actual MCP HTTP stops attachment materialization when an upstream page repeats its cursor (17.0826ms)
+✔ actual MCP HTTP and SQLite GM login persists the selected project and rejects conflicting scopes (644.7075ms)
+✔ actual worker MCP passed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (1476.1365ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-aoGHh9; 18 real HTTP requests; schema 17
+✔ actual worker MCP failed: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (901.1605ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-hRos0C; 18 real HTTP requests; schema 17
+✔ actual worker MCP blocked: canonical first receipt, direct HTTP/shared endpoint parity and immutable replay (860.1319ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-tZoqC2; 23 real HTTP requests; schema 17
+✔ MCP result catalog is additive, explicit and vendor-only; invalid scope/key/body never writes (763.7521ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-cSzWY2; 29 real HTTP requests; schema 17
+✔ MCP result enforces current assigned verifier, Cookie CSRF, revocation and deletion on first write and replay (1342.7886ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-QmNuhI; 21 real HTTP requests; schema 17
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-SbYr9F; 13 real HTTP requests; schema 17
+✔ ordinary MCP human closure retains employee permissions and does not reinterpret blocked as an old action (641.4127ms)
+ℹ retained fixture C:\Users\lin0\AppData\Local\Temp\qa-result-automation-result-i6KCrB; 15 real HTTP requests; schema 17
+✔ workflow MCP preserves actual HTTP pages and current project authority (1651.0925ms)
+ℹ retained C:\Users\lin0\AppData\Local\Temp\qa-mcp-workflow-1BGQA9; schema 17; 27 real loopback HTTP requests; source MCP adapter with real compiled app and worker
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6572.9833

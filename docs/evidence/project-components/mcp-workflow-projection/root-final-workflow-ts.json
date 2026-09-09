@@ -1,0 +1,6 @@
+{
+  "at": "2026-09-09T04:35:00.7673872Z",
+  "command": "node --import tsx --test apps/api/test/automation-workflow-projection.test.ts",
+  "exitCode": 0,
+  "logSha256": "8cd92b68df3f0ae61b71c213ff0e5ca187bb89d8e40fe7178798d121e8d11bd2"
+}

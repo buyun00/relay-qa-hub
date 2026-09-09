@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-09T04:38:51.4387867Z",
+  "reviewer": "root post-handoff rerun and source boundary review",
+  "status": "passed_isolated_registered_app_candidate",
+  "parentCommit": "4eece8e",
+  "sources": [
+    {
+      "path": "apps/api/src/automation-routes.ts",
+      "bytes": 7447,
+      "sha256": "87f6744b0ddf0e5119aefdd93e55f7a53b9cf8f85b8c16debc92f72bc54b0fb9"
+    },
+    {
+      "path": "apps/api/src/automation.ts",
+      "bytes": 31084,
+      "sha256": "fddad457c13cba6d748c5839f076dfd27912870e4966f57c0a3e6285e37a37a1"
+    },
+    {
+      "path": "apps/api/test/automation-workflow-projection.test.ts",
+      "bytes": 12426,
+      "sha256": "0b53bd24bcce83bae5f62ade2ef846164fab353f6aae1442aff47cee25311536"
+    },
+    {
+      "path": "apps/api/test/automation-protocol.test.mjs",
+      "bytes": 16203,
+      "sha256": "846ae6b43bd123b2dcfcb288b9fdc1ea72fc9528b9544a585e65991df26443aa"
+    },
+    {
+      "path": "apps/api/test/automation-verification-result.test.mjs",
+      "bytes": 23825,
+      "sha256": "dbce8d867f6be9886f3e9d52c20477fe20c3c6d24d2d7c11bdb2c66e38898826"
+    }
+  ],
+  "checks": {
+    "sourceReviewHashesMatch": true,
+    "compiledAutomationMatchesRetained": true,
+    "compiledRouteMatchesRetained": true,
+    "normalMjs": {
+      "tests": 13,
+      "passed": 13,
+      "realWorkerHttpRequests": 137,
+      "descriptor": {
+        "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-normal-mjs.json",
+        "bytes": 274,
+        "sha256": "57c1ff6e466e8269fabbe7774070e4432af8390929be2cfcf917d438a14b81b8"
+      },
+      "log": {
+        "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-normal-mjs.txt",
+        "bytes": 2472,
+        "sha256": "46f4b37655549fe9b959f0ceeaf55eba0dfaa65c987fe3defdd6baedc1544274"
+      }
+    },
+    "workflowTs": {
+      "tests": 1,
+      "passed": 1,
+      "realLoopbackHttpRequests": 31,
+      "schemaVersion": 17,
+      "descriptor": {
+        "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-workflow-ts.json",
+        "bytes": 243,
+        "sha256": "1e79a481086d3fc79dd9a619564174361d7062149353ecf9178c74031b732309"
+      },
+      "log": {
+        "path": "docs/evidence/project-components/mcp-workflow-projection/root-final-workflow-ts.txt",
+        "bytes": 366,
+        "sha256": "8cd92b68df3f0ae61b71c213ff0e5ca187bb89d8e40fe7178798d121e8d11bd2"
+      }
+    },
+    "lintExitCode": 0,
+    "formatExitCode": 0
+  },
+  "finding": {
+    "original": "required projectId values that were null, numeric, false or empty were omitted before forwarding",
+    "impact": "explicit project validation could be bypassed and a record route could infer the Bug project; no unauthorized data leak was proven because membership checks remained active",
+    "fix": "validate every schema-required projectId as a nonempty string before any internal request",
+    "negativeValues": [
+      null,
+      123,
+      false,
+      ""
+    ],
+    "postFix": "all four return 400 INVALID_REQUEST with business and projection fingerprints unchanged"
+  },
+  "verified": {
+    "catalogTools": 92,
+    "baseTools": 90,
+    "added": [
+      "qa_record_verification_result",
+      "qa_get_bug_workflow"
+    ],
+    "route": "GET /api/v1/bugs/:bugId/workflow",
+    "collectionsObserved": {
+      "occurrences": 3,
+      "repairAttempts": 0,
+      "verifications": 0,
+      "builds": 0,
+      "relayReceipts": 0
+    },
+    "transport": "actual loopback HTTP through registered createApiApp and compiled adapter",
+    "storage": "real schema17 SQLite worker"
+  },
+  "boundaries": [
+    "not full main or server MCP forwarding process",
+    "not deployed to 4419/4421/4420",
+    "not installed in EXE/APK/Web",
+    "nonempty evidence only for occurrences; other four workflow collections empty",
+    "frozen contract 400 enumeration gap remains",
+    "no production or external execution"
+  ]
+}

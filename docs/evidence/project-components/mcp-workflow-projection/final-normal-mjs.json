@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-09-09T04:16:44.694Z",
+  "finishedAt": "2026-09-09T04:16:49.693Z",
+  "args": [
+    "--test",
+    "apps/api/test/automation-protocol.test.mjs",
+    "apps/api/test/automation-verification-result.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs/evidence/project-components/mcp-workflow-projection/final-normal-mjs.txt",
+  "sha256": "69ba08c90f11b734c466f87d5a5d396b371d0c3d6da12c73a7e84dbc24482e16"
+}

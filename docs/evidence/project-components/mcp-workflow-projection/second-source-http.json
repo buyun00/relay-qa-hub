@@ -1,0 +1,14 @@
+{
+  "startedAt": "2026-09-09T04:09:15.841Z",
+  "finishedAt": "2026-09-09T04:09:17.495Z",
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "apps/api/test/automation-workflow-projection.test.ts"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "file": "docs/evidence/project-components/mcp-workflow-projection/second-source-http.txt",
+  "sha256": "d37c44468f43ca4118f9ad8cc1cf3e1805dc023b0f4daf8a5ccdaacda46b7c36"
+}
