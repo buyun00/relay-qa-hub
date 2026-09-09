@@ -1,0 +1,7 @@
+{
+  "exitCode": 0,
+  "startedAt": "2026-09-09T14:35:13.1772378+08:00",
+  "command": "node --test test/*.test.mjs",
+  "finishedAt": "2026-09-09T14:35:32.0201316+08:00",
+  "cwd": "apps/api"
+}

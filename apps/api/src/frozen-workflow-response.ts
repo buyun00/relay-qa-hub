@@ -2,6 +2,7 @@ import type {
   MobileBugRecord,
   MobileManualRepairAttemptRecord,
   MobileRepairAttemptRecord,
+  RepairAttemptDetail,
   MobileVerificationRecord,
   MobileVerificationResultResponse,
 } from "@relay-qa-hub/storage";
@@ -13,7 +14,7 @@ function pick<T extends object, K extends keyof T>(value: T, keys: readonly K[])
 
 /** The frozen mutation DTOs are distinct from the richer, unfrozen read models. */
 export function frozenRepairAttempt(
-  value: MobileManualRepairAttemptRecord | MobileRepairAttemptRecord,
+  value: MobileManualRepairAttemptRecord | MobileRepairAttemptRecord | RepairAttemptDetail,
 ) {
   return pick(value, [
     "id",

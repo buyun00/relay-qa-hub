@@ -40,6 +40,7 @@ import { createSqliteMobileRelayStore } from "./sqlite-mobile-relay-store.js";
 import { createSqliteMobileRelayWebhookStore } from "./sqlite-mobile-relay-webhook-store.js";
 import { createSqliteMobileVerificationStore } from "./sqlite-mobile-verification-store.js";
 import { createSqliteWorkflowProjectionStore } from "./sqlite-workflow-projection-store.js";
+import { createSqliteRepairAttemptTerminalStore } from "./sqlite-repair-attempt-terminal-store.js";
 import { createSqliteMobileHumanWorkflowStore } from "./sqlite-mobile-human-workflow-store.js";
 import { createSqliteMobileCommentStore } from "./sqlite-mobile-comment-store.js";
 import { createSqliteMobileMetricsStore } from "./sqlite-mobile-metrics-store.js";
@@ -471,6 +472,7 @@ async function run(): Promise<void> {
       mobileBuildStore: createSqliteMobileBuildStore({ worker, scope: requestScope }),
       mobileVerificationStore: createSqliteMobileVerificationStore({ worker, scope: requestScope }),
       workflowProjectionStore: createSqliteWorkflowProjectionStore({ worker, scope: requestScope }),
+      terminalAttemptStore: createSqliteRepairAttemptTerminalStore({ worker }),
       mobileHumanWorkflowStore: createSqliteMobileHumanWorkflowStore({
         worker,
         scope: requestScope,

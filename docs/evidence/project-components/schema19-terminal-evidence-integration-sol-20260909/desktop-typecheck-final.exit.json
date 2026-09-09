@@ -1,0 +1,7 @@
+{
+  "startedAt": "2026-09-09T14:37:25.2994504+08:00",
+  "finishedAt": "2026-09-09T14:37:27.3335228+08:00",
+  "exitCode": 0,
+  "cwd": ".",
+  "command": "node node_modules/typescript/bin/tsc -p apps/desktop/tsconfig.json --noEmit"
+}

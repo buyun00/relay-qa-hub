@@ -97,7 +97,7 @@ async function fixture(t: test.TestContext) {
   t.diagnostic(`retained isolated fixture ${directory}`);
   const file = join(directory, "main.sqlite");
   const db = openSqliteDatabaseForWorker({ databaseFile: file, busyTimeoutMs: 5000 });
-  await migrateSqliteDatabase(db, file);
+  await migrateSqliteDatabase(db, file, { targetVersion: 17 });
   db.exec(REPAIR_ATTEMPT_TERMINAL_SNAPSHOT_SQL);
   const scope = { accountId: randomUUID(), projectId: randomUUID(), actorId: randomUUID() };
   const tx = <T>(fn: () => T): T => {

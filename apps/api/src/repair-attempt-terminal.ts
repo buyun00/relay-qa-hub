@@ -24,13 +24,13 @@ export interface TerminalAttemptCommand extends TerminalAttemptRequest {
   readonly attemptId: string;
   readonly operation: Operation;
   readonly representation: Representation;
-  readonly responseMedia: ResponseMedia;
+  readonly responseMedia: TerminalResponseMedia;
   readonly idempotencyKey: string;
   readonly createdAt: string;
 }
 export interface TerminalAttemptResult {
   readonly representation: Representation;
-  readonly responseMedia: ResponseMedia;
+  readonly responseMedia: TerminalResponseMedia;
   readonly reason: string;
   readonly attempt: RepairAttemptDetail;
   readonly successor: RepairAttemptDetail | null;
@@ -42,12 +42,12 @@ export interface TerminalAttemptStore {
   readonly execute: (
     command: TerminalAttemptCommand,
   ) => TerminalAttemptResult | Promise<TerminalAttemptResult>;
-  /** Optional candidate fixture branch. Integrators attach this to the existing create route. */
+  /** Optional legacy two-step branch attached to the existing create route. */
   readonly createAfterLegacy?: (
     command: CreateAfterLegacyCommand,
   ) => CreateAfterLegacyResult | Promise<CreateAfterLegacyResult>;
 }
-type ResponseMedia = "application/json" | typeof MOBILE_API_MEDIA_TYPE;
+export type TerminalResponseMedia = "application/json" | typeof MOBILE_API_MEDIA_TYPE;
 export interface CreateAfterLegacyRequest {
   readonly parentAttemptId: string;
   readonly expectedVersion: number;
@@ -61,13 +61,13 @@ export interface CreateAfterLegacyCommand extends CreateAfterLegacyRequest {
   readonly actorId: string;
   readonly isGm: boolean;
   readonly bugId: string;
-  readonly responseMedia: ResponseMedia;
+  readonly responseMedia: TerminalResponseMedia;
   readonly idempotencyKey: string;
   readonly createdAt: string;
 }
 export interface CreateAfterLegacyResult {
   readonly attempt: RepairAttemptDetail;
-  readonly responseMedia: ResponseMedia;
+  readonly responseMedia: TerminalResponseMedia;
 }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 function reject(code: string): never {
@@ -162,12 +162,12 @@ function errorResponse(error: unknown) {
     ? { status: statuses[code]!, code }
     : { status: 500, code: "INTERNAL_ERROR" };
 }
-function responseMedia(
+export function negotiateTerminalResponseMedia(
   accept: string | undefined,
   representation: Representation,
   operation: Operation,
-): ResponseMedia {
-  const available: readonly ResponseMedia[] =
+): TerminalResponseMedia {
+  const available: readonly TerminalResponseMedia[] =
     representation === "legacy-1.0" && operation === "supersedeRepairAttempt"
       ? ["application/json"]
       : representation === "legacy-1.0"
@@ -231,7 +231,7 @@ export function projectTerminalAttemptResult(value: TerminalAttemptResult, media
   };
 }
 
-/** Candidate routes. Register only after real human-session authentication and project scoping. */
+/** Standalone contract fixture; createApiApp integrates these parsers behind its shared hooks. */
 export function registerTerminalRepairAttemptRoutes(
   app: FastifyInstance,
   store: TerminalAttemptStore,
@@ -266,7 +266,11 @@ export function registerTerminalRepairAttemptRoutes(
             idempotencyKey !== `workflow:${operation}:attempt:${attemptId}:v${body.expectedVersion}`
           )
             reject("INVALID_REQUEST");
-          const media = responseMedia(request.headers.accept, representation, operation);
+          const media = negotiateTerminalResponseMedia(
+            request.headers.accept,
+            representation,
+            operation,
+          );
           const result = await store.execute({
             ...body,
             operation,
@@ -312,7 +316,11 @@ export function registerTerminalRepairAttemptRoutes(
           )
             reject("INVALID_REQUEST");
           const representation = contentType === "application/json" ? "legacy-1.0" : "vendor-1.1";
-          const media = responseMedia(request.headers.accept, representation, "failRepairAttempt");
+          const media = negotiateTerminalResponseMedia(
+            request.headers.accept,
+            representation,
+            "failRepairAttempt",
+          );
           const result = await store.createAfterLegacy!({
             ...body,
             bugId,

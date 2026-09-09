@@ -1,0 +1,31 @@
+{
+  "observedAt": "2026-09-09T06:38:37.300Z",
+  "schema": 19,
+  "migrations": [
+    {
+      "version": 15,
+      "name": "immutable_verification_result_snapshots",
+      "checksum": "5a6d8ed5b7ff4815d20ff613a2ad0c841512a919eb7e1cfa0adb72aa3c26fe6d"
+    },
+    {
+      "version": 16,
+      "name": "blocked_verification_result_receipts",
+      "checksum": "7297cf8cda0470ad0606b7ec6ded7766aa79f7de46e6521e9205332e735ea49c"
+    },
+    {
+      "version": 17,
+      "name": "immutable_workflow_projection_pages",
+      "checksum": "d193e8763af1525014a572b899cbe20fae32660f8847025ce6b1675c23f6566f"
+    },
+    {
+      "version": 18,
+      "name": "repair_attempt_terminal_receipts",
+      "checksum": "638ab6f023b5edfed26613858e287df1afdcac4a55304c773074a09f39d4d5ad"
+    },
+    {
+      "version": 19,
+      "name": "verification_result_evidence",
+      "checksum": "6d08cdbe6b8957a1719e241d133e6c450ed6daa6d95b84582eb8efbaaf228af3"
+    }
+  ]
+}

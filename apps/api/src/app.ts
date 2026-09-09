@@ -4,6 +4,13 @@ import {
   registerWorkflowProjectionRoutes,
   type WorkflowProjectionStore,
 } from "./workflow-projection.js";
+import {
+  negotiateTerminalResponseMedia,
+  parseCreateAfterLegacyRequest,
+  parseTerminalAttemptRequest,
+  projectTerminalAttemptResult,
+  type TerminalAttemptStore,
+} from "./repair-attempt-terminal.js";
 
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 
@@ -267,6 +274,7 @@ export interface CreateApiAppOptions {
   readonly mobileDuplicateStore?: MobileDuplicateStore;
   readonly mobileVerificationStore?: MobileVerificationStore;
   readonly workflowProjectionStore?: WorkflowProjectionStore;
+  readonly terminalAttemptStore?: TerminalAttemptStore;
   readonly mobileHumanWorkflowStore?: MobileHumanWorkflowStore;
   readonly mobileCommentStore?: MobileCommentStore;
   readonly mobileNotificationStore?: MobileNotificationStore;
@@ -575,6 +583,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
   const mobileDuplicateStore = options.mobileDuplicateStore ?? unconfiguredMobileDuplicateStore;
   const mobileVerificationStore =
     options.mobileVerificationStore ?? unconfiguredMobileVerificationStore;
+  const terminalAttemptStore = options.terminalAttemptStore;
   const mobileHumanWorkflowStore =
     options.mobileHumanWorkflowStore ?? unconfiguredMobileHumanWorkflowStore;
   const mobileCommentStore = options.mobileCommentStore ?? unconfiguredMobileCommentStore;
@@ -693,6 +702,12 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       throw new Error("Workflow projection requires browser authentication and project context");
     }
     registerWorkflowProjectionRoutes(app, options.workflowProjectionStore);
+  }
+  if (
+    terminalAttemptStore &&
+    (!browserAuth || !options.projectManagementService || !options.projectRequestContext)
+  ) {
+    throw new Error("Terminal RepairAttempt routes require authenticated project context");
   }
   app.addHook("preHandler", async (request, reply) => {
     const nativeActorId = readHeader(request.headers[NATIVE_ACTOR_ID_HEADER]);
@@ -1789,6 +1804,92 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
     throw error;
   };
 
+  const terminalErrorReply = (error: unknown, reply: FastifyReply) => {
+    const code = (error as { code?: unknown })?.code;
+    if (code === "NOT_ACCEPTABLE") {
+      return reply.code(406).send({ code });
+    }
+    if (code === "UNSUPPORTED_MEDIA_TYPE") {
+      return reply.code(415).send({ code });
+    }
+    if (code === "VERSION_CONFLICT") {
+      return reply.code(412).send({ code });
+    }
+    if (code === "IDEMPOTENCY_PAYLOAD_MISMATCH" || code === "INVALID_TRANSITION") {
+      return reply.code(409).send({ code });
+    }
+    return relayErrorReply(error, reply);
+  };
+
+  if (terminalAttemptStore) {
+    for (const [suffix, operation] of [
+      ["fail", "failRepairAttempt"],
+      ["supersede", "supersedeRepairAttempt"],
+    ] as const) {
+      app.post<{ Params: { attemptId: string } }>(
+        `/api/v1/repair-attempts/:attemptId/${suffix}`,
+        async (request, reply) => {
+          if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
+            return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
+          }
+          const principal = getBrowserPrincipal(request);
+          if (!principal) return reply.code(401).send({ code: "UNAUTHENTICATED" });
+          try {
+            const contentType = readHeader(request.headers["content-type"])
+              ?.split(";")[0]
+              ?.trim()
+              .toLowerCase();
+            if (contentType !== "application/json" && contentType !== MOBILE_API_MEDIA_TYPE) {
+              throw Object.assign(new Error("Unsupported terminal command media"), {
+                code: "UNSUPPORTED_MEDIA_TYPE",
+              });
+            }
+            const representation =
+              contentType === MOBILE_API_MEDIA_TYPE ? "vendor-1.1" : "legacy-1.0";
+            const body = parseTerminalAttemptRequest(request.body, operation, representation);
+            const attemptId = requireRelayUuid(request.params.attemptId, "attemptId");
+            const projectId = options.projectRequestContext!.currentProjectId();
+            const idempotencyKey = requireRelayIdempotencyKey(
+              readHeader(request.headers["idempotency-key"]),
+            );
+            if (idempotencyKey.length > 200) throw new TypeError("Idempotency-Key is too long");
+            if (
+              representation === "vendor-1.1" &&
+              idempotencyKey !==
+                `workflow:${operation}:attempt:${attemptId}:v${body.expectedVersion}`
+            ) {
+              throw new TypeError("Idempotency-Key does not match terminal RepairAttempt action");
+            }
+            const media = negotiateTerminalResponseMedia(
+              readHeader(request.headers.accept),
+              representation,
+              operation,
+            );
+            const result = await terminalAttemptStore.execute({
+              ...body,
+              accountId: principal.accountId,
+              projectId,
+              actorId: principal.actorId,
+              isGm: principal.isGm === true,
+              attemptId,
+              operation,
+              representation,
+              responseMedia: media,
+              idempotencyKey,
+              createdAt: (options.now ?? (() => new Date()))().toISOString(),
+            });
+            return reply
+              .header("cache-control", "no-store")
+              .type(`${result.responseMedia}; charset=utf-8`)
+              .send(projectTerminalAttemptResult(result, result.responseMedia));
+          } catch (error: unknown) {
+            return terminalErrorReply(error, reply);
+          }
+        },
+      );
+    }
+  }
+
   app.post<{ Params: { bugId: string } }>(MOBILE_BUG_TRANSITION_PATH, async (request, reply) => {
     if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
       return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
@@ -1873,8 +1974,64 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
       if (readHeader(request.headers.authorization) !== `Bearer ${debugBearerToken}`) {
         return reply.code(401).send({ code: "NATIVE_SESSION_INVALID" });
       }
+      let parented = false;
       try {
         const bugId = requireRelayUuid(request.params.bugId, "bugId");
+        parented =
+          typeof request.body === "object" &&
+          request.body !== null &&
+          !Array.isArray(request.body) &&
+          Object.hasOwn(request.body, "parentAttemptId");
+        if (parented) {
+          if (!terminalAttemptStore?.createAfterLegacy)
+            throw new TypeError("Parented RepairAttempt is unavailable");
+          const principal = getBrowserPrincipal(request);
+          if (!principal) return reply.code(401).send({ code: "UNAUTHENTICATED" });
+          const body = parseCreateAfterLegacyRequest(request.body);
+          const idempotencyKey = requireRelayIdempotencyKey(
+            readHeader(request.headers["idempotency-key"]),
+          );
+          if (idempotencyKey.length > 200) throw new TypeError("Idempotency-Key is too long");
+          const contentType = readHeader(request.headers["content-type"])
+            ?.split(";")[0]
+            ?.trim()
+            .toLowerCase();
+          if (contentType !== "application/json" && contentType !== MOBILE_API_MEDIA_TYPE) {
+            throw Object.assign(new Error("Unsupported parented RepairAttempt media"), {
+              code: "UNSUPPORTED_MEDIA_TYPE",
+            });
+          }
+          const representation =
+            contentType === MOBILE_API_MEDIA_TYPE ? "vendor-1.1" : "legacy-1.0";
+          if (
+            representation === "vendor-1.1" &&
+            idempotencyKey !== `workflow:createRepairAttempt:bug:${bugId}:v${body.expectedVersion}`
+          ) {
+            throw new TypeError("Idempotency-Key does not match RepairAttempt creation");
+          }
+          const projectId = options.projectRequestContext!.currentProjectId();
+          const media = negotiateTerminalResponseMedia(
+            readHeader(request.headers.accept),
+            representation,
+            "failRepairAttempt",
+          );
+          const result = await terminalAttemptStore.createAfterLegacy({
+            ...body,
+            accountId: principal.accountId,
+            projectId,
+            actorId: principal.actorId,
+            isGm: principal.isGm === true,
+            bugId,
+            responseMedia: media,
+            idempotencyKey,
+            createdAt: (options.now ?? (() => new Date()))().toISOString(),
+          });
+          return reply
+            .code(201)
+            .header("cache-control", "no-store")
+            .type(`${result.responseMedia}; charset=utf-8`)
+            .send(frozenRepairAttempt(result.attempt));
+        }
         const body = parseMobileRepairAttemptRequest(request.body);
         const idempotencyKey = requireRelayIdempotencyKey(
           readHeader(request.headers["idempotency-key"]),
@@ -1903,7 +2060,7 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
           .header("content-type", workflowResponseMedia(readHeader(request.headers.accept)))
           .send(frozenRepairAttempt(result));
       } catch (error: unknown) {
-        return relayErrorReply(error, reply);
+        return parented ? terminalErrorReply(error, reply) : relayErrorReply(error, reply);
       }
     },
   );

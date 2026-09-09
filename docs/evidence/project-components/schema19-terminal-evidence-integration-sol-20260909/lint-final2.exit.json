@@ -1,0 +1,7 @@
+{
+  "finishedAt": "2026-09-09T14:45:26.2628113+08:00",
+  "startedAt": "2026-09-09T14:45:24.0960884+08:00",
+  "cwd": ".",
+  "exitCode": 0,
+  "command": "eslint changed runtime files"
+}

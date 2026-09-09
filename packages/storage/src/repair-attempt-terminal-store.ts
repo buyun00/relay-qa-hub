@@ -342,7 +342,7 @@ export function terminateRepairAttempt(
   return result;
 }
 
-/** Candidate read helper only; existing HTTP/history/page adapters are not changed here. */
+/** Read helper for the retained terminal reason; richer workflow pages stay separately frozen. */
 export function getTerminalRepairAttemptHistory(
   database: DatabaseSync,
   input: MobileRelayScope & { readonly attemptId: string },
@@ -378,7 +378,7 @@ export interface CreateAfterLegacySupersedeResult {
   readonly responseMedia: CreateAfterLegacySupersedeInput["responseMedia"];
 }
 
-/** Candidate branch of the existing create URI; it never dispatches a planned executor. */
+/** Legacy branch of the existing create URI; it never dispatches a planned executor. */
 export function createRepairAttemptAfterLegacySupersede(
   database: DatabaseSync,
   input: CreateAfterLegacySupersedeInput,

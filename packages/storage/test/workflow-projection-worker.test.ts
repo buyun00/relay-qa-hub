@@ -24,7 +24,7 @@ test("registered worker freezes pages across reopen and binds GM authority to ea
   const b = { accountId, projectId: randomUUID(), actorId: randomUUID() };
   const gm = { accountId, projectId: randomUUID(), actorId: randomUUID() };
   try {
-    assert.equal((await worker.initialization).migration.toVersion, 17);
+    assert.equal((await worker.initialization).migration.toVersion, 19);
     for (const [index, scope] of [a, b, gm].entries()) {
       await worker.ensureMobileScope({
         ...scope,
@@ -185,7 +185,7 @@ test("registered worker freezes pages across reopen and binds GM authority to ea
     );
     assert.deepEqual(counts(), beforeError);
     t.diagnostic(
-      "schema17 real worker: reopen, concurrent GM/member scope, rollback, revocation, restoration and soft deletion verified; auth rows and GM membership remain zero",
+      "current-schema real worker: reopen, concurrent GM/member scope, rollback, revocation, restoration and soft deletion verified; auth rows and GM membership remain zero",
     );
   } finally {
     await worker.close();

@@ -1,0 +1,7 @@
+{
+  "cwd": ".",
+  "finishedAt": "2026-09-09T14:36:59.5449227+08:00",
+  "startedAt": "2026-09-09T14:36:58.8514807+08:00",
+  "exitCode": 0,
+  "command": "tsc -p packages/storage/tsconfig.json"
+}

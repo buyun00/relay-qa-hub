@@ -1,0 +1,515 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T14:46:40.3341476+08:00",
+  "status": "passed_isolated_runtime_integration",
+  "headAtObservation": "a7e2927f61e896e5e8fbc0161313473adb6f4dad",
+  "scope": {
+    "storageSchema": 19,
+    "previewDeployed": false,
+    "previewRestarted": false,
+    "productionAccess": false,
+    "clientOperation": false,
+    "externalOperation": false
+  },
+  "migrations": [
+    {
+      "version": 15,
+      "name": "immutable_verification_result_snapshots",
+      "checksum": "5a6d8ed5b7ff4815d20ff613a2ad0c841512a919eb7e1cfa0adb72aa3c26fe6d"
+    },
+    {
+      "version": 16,
+      "name": "blocked_verification_result_receipts",
+      "checksum": "7297cf8cda0470ad0606b7ec6ded7766aa79f7de46e6521e9205332e735ea49c"
+    },
+    {
+      "version": 17,
+      "name": "immutable_workflow_projection_pages",
+      "checksum": "d193e8763af1525014a572b899cbe20fae32660f8847025ce6b1675c23f6566f"
+    },
+    {
+      "version": 18,
+      "name": "repair_attempt_terminal_receipts",
+      "checksum": "638ab6f023b5edfed26613858e287df1afdcac4a55304c773074a09f39d4d5ad"
+    },
+    {
+      "version": 19,
+      "name": "verification_result_evidence",
+      "checksum": "6d08cdbe6b8957a1719e241d133e6c450ed6daa6d95b84582eb8efbaaf228af3"
+    }
+  ],
+  "runtimeWiring": {
+    "terminalStore": "createSqliteRepairAttemptTerminalStore -> SqliteStorageWorker message operations",
+    "registeredOperations": [
+      "terminateRepairAttempt",
+      "createRepairAttemptAfterLegacySupersede"
+    ],
+    "appRoutes": [
+      "POST /api/v1/repair-attempts/:attemptId/fail",
+      "POST /api/v1/repair-attempts/:attemptId/supersede",
+      "POST /api/v1/bugs/:bugId/repair-attempts parentAttemptId branch"
+    ],
+    "startupGuard": [
+      "browserAuth",
+      "projectManagementService",
+      "projectRequestContext"
+    ],
+    "authenticatedProjectSource": "ProjectRequestContext.currentProjectId()",
+    "gmSource": "authenticated BrowserAuth principal; adapter removes isGm before worker dispatch",
+    "optionalLegacyStoreGuard": "missing createAfterLegacy returns a bounded invalid request instead of invoking an absent function"
+  },
+  "validation": {
+    "passedTests": 429,
+    "failedTests": 0,
+    "skippedTests": 1,
+    "storage": {
+      "tests": 135,
+      "passed": 134,
+      "failed": 0,
+      "skipped": 1,
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/storage-full.txt",
+        "bytes": 16360,
+        "sha256": "25db247cd686aec799ca553743053489690363885b0982c79419f9a1ac3beffb"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/storage-full.exit.json",
+        "bytes": 217,
+        "sha256": "55a6a8f63f54564792c7c9798dc18dcec89820ad022d62b4baa8b755108b4b79"
+      }
+    },
+    "apiMjs": {
+      "tests": 248,
+      "passed": 248,
+      "failed": 0,
+      "skipped": 0,
+      "cwd": "apps/api",
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-mjs-final2.txt",
+        "bytes": 37758,
+        "sha256": "b180c1ba4931ce4fcee8c6121fb9ae71fb40c350dfd443d13912754ec564ee5c"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-mjs-final2.exit.json",
+        "bytes": 197,
+        "sha256": "a88988cd445ca05be672d5b7c878ddaca2a52f1a0a8e7bc7946041ce16c25417"
+      }
+    },
+    "apiTs": {
+      "tests": 47,
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0,
+      "cwd": "apps/api",
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-ts-final2.txt",
+        "bytes": 7620,
+        "sha256": "35af5a53df0502589040ff1479f2644726bc97609644485d6bbec1b68983bb4f"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-ts-final2.exit.json",
+        "bytes": 209,
+        "sha256": "0d654466126f033a92f9343c5de3e782e719fbbaba4e2f07af64cb9c0a8aeeeb"
+      }
+    },
+    "storageBuild": {
+      "exitCode": 0,
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/storage-build.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/storage-build.exit.json",
+        "bytes": 200,
+        "sha256": "99085b2ea45f19849915bae1a39cdba05bc329a1289eaad93b6eb234884f6eab"
+      }
+    },
+    "apiBuild": {
+      "exitCode": 0,
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-build-final2.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-build-final2.exit.json",
+        "bytes": 192,
+        "sha256": "a03e469914711f95aef7b2968866835fef3d203decf8ad12c2057f61d2f40cea"
+      }
+    },
+    "desktopTypecheck": {
+      "exitCode": 0,
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/desktop-typecheck-final.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/desktop-typecheck-final.exit.json",
+        "bytes": 238,
+        "sha256": "96a8a67ecbe5ce90304da3348c76e970392946aa9fba90adbab2d60c93f33b94"
+      }
+    },
+    "lint": {
+      "exitCode": 0,
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/lint-final2.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/lint-final2.exit.json",
+        "bytes": 191,
+        "sha256": "2e2f99720ef7835acc3fb868ff98740c6fd370e5553bd980d8286f56a77c1297"
+      }
+    },
+    "format": {
+      "exitCode": 0,
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/format-final2.txt",
+        "bytes": 68,
+        "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/format-final2.exit.json",
+        "bytes": 201,
+        "sha256": "266bc303d8927457b653b56d0226f013960aefd32ea170c296ed88166df428d5"
+      }
+    },
+    "diffCheck": {
+      "exitCode": 0,
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/git-diff-check.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/git-diff-check.exit.json",
+        "bytes": 204,
+        "sha256": "128d2a23feb851508bb8c9e427fc374dbf3cbb7ffe463944f85eac33337967ef"
+      }
+    }
+  },
+  "migrationProof": {
+    "upgrade": "registered v17 to v19 applies exactly 18 and 19",
+    "rollback": "late v18 trigger conflict leaves schema17, zero version>17 history and no terminal snapshot table",
+    "backup": "nonempty SHA256-addressed schema17 backup opens read-only with retained Bug and versions 15-17",
+    "history": "version/name/checksum rows 15-17 remain exactly equal before and after upgrade",
+    "integrity": "verified after failed migration, successful upgrade and reopen",
+    "restart": "schema19 reopen applies no migration and creates no backup"
+  },
+  "terminalHttp": {
+    "requests": 35,
+    "implementation": "createApiApp + BrowserAuth + ProjectRequestContext + real SqliteStorageWorker on random loopback port",
+    "covers": [
+      "employee fail",
+      "legacy supersede then parented successor and replay",
+      "GM vendor atomic supersede with external successor and replay",
+      "persisted terminal and parent-plan snapshots",
+      "zero leaked storage command authorizations",
+      "startup refuses an unregistered project context"
+    ]
+  },
+  "verificationEvidence": {
+    "mcpAndHttpCalls": 20,
+    "implementation": "registered server MCP over loopback HTTP + createApiApp + real SqliteStorageWorker",
+    "covers": [
+      "two uploaded PNG attachments",
+      "system and Poco capture artifacts",
+      "one capture bundle",
+      "passed Verification result with attachmentIds and captureBundleId",
+      "idempotent replay",
+      "raw database link and snapshot readback",
+      "zero leaked storage command authorizations"
+    ]
+  },
+  "failuresRetained": [
+    {
+      "classification": "The first full API MJS run exposed a test assertion that treated attachment response order as stable. The assertion now compares sorted identity sets; the focused case passed three consecutive runs and the canonical full MJS suite passes 248/248."
+    },
+    {
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-ts-full.txt",
+        "bytes": 7602,
+        "sha256": "8c9755490db48aba7541a39dd2659f4c1d4a1b172580ebd00f5fee6e68aee217"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/api-ts-full.exit.json",
+        "bytes": 209,
+        "sha256": "ba827d63aedc20b1bc69cf5bde1a6cbedd859e6b8c336db6c31b9afcae74680f"
+      },
+      "classification": "A first API TS run from the repository root produced six UPLOADER_MISSING fixture failures because uploader-host tests resolve their fixture from the package cwd. This retained log is the canonical apps/api rerun that passes 47/47; no product guard was relaxed."
+    },
+    {
+      "classification": "The first evidence logger used unsupported New-Item -LiteralPath, so neither test command executed and no result file was created. The directory was then created with -Path and both full suites ran normally."
+    },
+    {
+      "artifact": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/desktop-typecheck.txt",
+        "bytes": 826,
+        "sha256": "3f5659104bb407464d477349fe8de08b9628ce5366b655974ccc26adbb5fa22d"
+      },
+      "exit": {
+        "path": "docs/evidence/project-components/schema19-terminal-evidence-integration-sol-20260909/desktop-typecheck.exit.json",
+        "bytes": 205,
+        "sha256": "beb0e04dcdb58d5829e672d677d1771e101cb99781e77d80894414aa4f47175c"
+      },
+      "classification": "The first desktop typecheck command pointed at an absent package-local TypeScript binary. The unchanged command arguments were rerun through the repository TypeScript binary and passed."
+    }
+  ],
+  "limitations": [
+    "Isolated source, migration, worker, HTTP and server MCP evidence only; preview API/Web/server MCP/local MCP/EXE/APK were not deployed or operated in this run.",
+    "External Jenkins/upload/Relay/Qingyu resources and a physical Android device remain unavailable, so those required E2E rows remain not_run.",
+    "Production API 4319, Web 4174, daily EXE/local MCP 4320, data, processes and clients were not accessed or changed."
+  ],
+  "sourcePins": [
+    {
+      "path": "packages/storage/src/index.ts",
+      "bytes": 17300,
+      "sha256": "d7f0c0c07f512ff9497f0916f17437209229378f4d3a478a18978d8d33c8d5fb"
+    },
+    {
+      "path": "packages/storage/src/repair-attempt-terminal-migration.ts",
+      "bytes": 15706,
+      "sha256": "9cc0fb5ae535118cd8e96d929442b6f67c7d45ec95505b54211b02ce7993988b"
+    },
+    {
+      "path": "packages/storage/src/repair-attempt-terminal-store.ts",
+      "bytes": 21978,
+      "sha256": "e5e8217848978b950f20f1ac7670eff47730a58e434be523411228e2b88626a9"
+    },
+    {
+      "path": "packages/storage/src/sqlite-migrations.ts",
+      "bytes": 327841,
+      "sha256": "b0342137b3fade37619da673f56508b35f2fd7ff2c4020d7dfec6b28caf3185b"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker-entry.ts",
+      "bytes": 29132,
+      "sha256": "0f685f5d11a02426029ee6a782bd1c317330107b5f121a07eb55b186a930cbb5"
+    },
+    {
+      "path": "packages/storage/src/sqlite-worker.ts",
+      "bytes": 30008,
+      "sha256": "bf21972d96487ec3f090efbb5eca7f24ff214601e3b9a45197f904d45f2cb838"
+    },
+    {
+      "path": "packages/storage/src/verification-result-evidence-migration.ts",
+      "bytes": 7156,
+      "sha256": "df17b893a87e06c00f6d15186ad5d27f2d4fdd0455f7df2867f62b71ef2ca121"
+    },
+    {
+      "path": "packages/storage/test/sqlite-migrations.test.ts",
+      "bytes": 40740,
+      "sha256": "8f8beb2dd38f01a7dbaebed89ddbc2144351da063d06a13a3cdc0fa0f044154a"
+    },
+    {
+      "path": "packages/storage/test/workflow-projection-worker.test.ts",
+      "bytes": 10833,
+      "sha256": "c51228c500f53a71f90a6da7968ce3753d9907f6fceb22d5ec3ffd94cc385487"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 115061,
+      "sha256": "15e42cdd05e3328fed70e8d921172c13689afd08e89e417fbf84adcfd3b4b488"
+    },
+    {
+      "path": "apps/api/src/frozen-workflow-response.ts",
+      "bytes": 4376,
+      "sha256": "e5b33cb0bc92f558112c00139dc2eb08929ee8a57f0c80b844e065eb9fa1fbd4"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "bytes": 25744,
+      "sha256": "8db5d8bd6cbf505e54a0a68768c6bef0afa9718fa502f797bbee353553716a4e"
+    },
+    {
+      "path": "apps/api/src/repair-attempt-terminal.ts",
+      "bytes": 13474,
+      "sha256": "dbdee43e11a0cca65cee4a6d488436054b412ac84c098630cdf14b050d5b2929"
+    },
+    {
+      "path": "apps/api/src/sqlite-repair-attempt-terminal-store.ts",
+      "bytes": 756,
+      "sha256": "35925b917778ace332ca155ddbd109e5064eccac14c620dfebb46c46c20041c9"
+    },
+    {
+      "path": "apps/api/test/repair-attempt-terminal.test.ts",
+      "bytes": 39245,
+      "sha256": "fb86640c8013a735d728e03e12c4476e5f093f5b1e26734dd0d5df52fe9d6abb"
+    },
+    {
+      "path": "apps/api/test/verification-result-evidence-integration.test.mjs",
+      "bytes": 14693,
+      "sha256": "88891a94cb63e3dfb4e8a575a27f164d9e24ba0d5e02f615a29e855c2b65f2aa"
+    },
+    {
+      "path": "apps/api/test/workflow-projection-integration.test.mjs",
+      "bytes": 19456,
+      "sha256": "2e7a28ee53ec398dc67a3db24809121093d5c229fce8a45a89d488cd2ecd2310"
+    }
+  ],
+  "artifactPins": [
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-build-final2.exit.json",
+      "bytes": 192,
+      "sha256": "a03e469914711f95aef7b2968866835fef3d203decf8ad12c2057f61d2f40cea"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-build-final2.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-build.exit.json",
+      "bytes": 192,
+      "sha256": "e5b762672d781f1fb7bec72f0b49bb53e3ab8d86591aa3a2eb7642f927c10b50"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-build.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-mjs-final2.exit.json",
+      "bytes": 197,
+      "sha256": "a88988cd445ca05be672d5b7c878ddaca2a52f1a0a8e7bc7946041ce16c25417"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-mjs-final2.txt",
+      "bytes": 37758,
+      "sha256": "b180c1ba4931ce4fcee8c6121fb9ae71fb40c350dfd443d13912754ec564ee5c"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-mjs-full.exit.json",
+      "bytes": 197,
+      "sha256": "b238d53f99b1d2dfce0d4e19dcf87415dafe458dce3651c7e37fed2582f42921"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-mjs-full.txt",
+      "bytes": 37778,
+      "sha256": "0beb4c5378f74a9f8567443a9ae539ff05d1ad07547ea0d436e9e2a0acd296c4"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-ts-final2.exit.json",
+      "bytes": 209,
+      "sha256": "0d654466126f033a92f9343c5de3e782e719fbbaba4e2f07af64cb9c0a8aeeeb"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-ts-final2.txt",
+      "bytes": 7620,
+      "sha256": "35af5a53df0502589040ff1479f2644726bc97609644485d6bbec1b68983bb4f"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-ts-full.exit.json",
+      "bytes": 209,
+      "sha256": "ba827d63aedc20b1bc69cf5bde1a6cbedd859e6b8c336db6c31b9afcae74680f"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\api-ts-full.txt",
+      "bytes": 7602,
+      "sha256": "8c9755490db48aba7541a39dd2659f4c1d4a1b172580ebd00f5fee6e68aee217"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\desktop-typecheck-final.exit.json",
+      "bytes": 238,
+      "sha256": "96a8a67ecbe5ce90304da3348c76e970392946aa9fba90adbab2d60c93f33b94"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\desktop-typecheck-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\desktop-typecheck.exit.json",
+      "bytes": 205,
+      "sha256": "beb0e04dcdb58d5829e672d677d1771e101cb99781e77d80894414aa4f47175c"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\desktop-typecheck.txt",
+      "bytes": 826,
+      "sha256": "3f5659104bb407464d477349fe8de08b9628ce5366b655974ccc26adbb5fa22d"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\format-final2.exit.json",
+      "bytes": 201,
+      "sha256": "266bc303d8927457b653b56d0226f013960aefd32ea170c296ed88166df428d5"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\format-final2.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\format.exit.json",
+      "bytes": 201,
+      "sha256": "38575a3f1a26097a6552bc97a780fe8d852ddc1ff45ec8e619bbfc1b9f6733a2"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\format.txt",
+      "bytes": 68,
+      "sha256": "f20510a9da4717c51c4cffee6d0dd88d6c9a723d0a83711d01216f5b48961283"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\git-diff-check.exit.json",
+      "bytes": 204,
+      "sha256": "128d2a23feb851508bb8c9e427fc374dbf3cbb7ffe463944f85eac33337967ef"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\git-diff-check.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\lint-final2.exit.json",
+      "bytes": 191,
+      "sha256": "2e2f99720ef7835acc3fb868ff98740c6fd370e5553bd980d8286f56a77c1297"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\lint-final2.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\lint.exit.json",
+      "bytes": 191,
+      "sha256": "50bde905f3927dffaed3d61034c6827197013b51d37fd46ebe1ad0d9e66849da"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\lint.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\migration-checksums.json",
+      "bytes": 971,
+      "sha256": "0c49af6d1762cdd64e1245eb281d14929da05d4fa9df3c0900a2fd7dce5b07e5"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\README.md",
+      "bytes": 2846,
+      "sha256": "7de2c0c389aa8917a3ee021b0f47e3c0c75d10c4878ec3951fbe32128c50bc39"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\storage-build.exit.json",
+      "bytes": 200,
+      "sha256": "99085b2ea45f19849915bae1a39cdba05bc329a1289eaad93b6eb234884f6eab"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\storage-build.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\storage-full.exit.json",
+      "bytes": 217,
+      "sha256": "55a6a8f63f54564792c7c9798dc18dcec89820ad022d62b4baa8b755108b4b79"
+    },
+    {
+      "path": "docs\\evidence\\project-components\\schema19-terminal-evidence-integration-sol-20260909\\storage-full.txt",
+      "bytes": 16360,
+      "sha256": "25db247cd686aec799ca553743053489690363885b0982c79419f9a1ac3beffb"
+    }
+  ]
+}

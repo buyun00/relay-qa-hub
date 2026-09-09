@@ -1,0 +1,7 @@
+{
+  "command": "node --import tsx --test test/*.test.ts",
+  "exitCode": 0,
+  "startedAt": "2026-09-09T14:36:07.4740436+08:00",
+  "cwd": "apps/api",
+  "finishedAt": "2026-09-09T14:36:12.6050511+08:00"
+}

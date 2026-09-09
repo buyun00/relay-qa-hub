@@ -553,6 +553,17 @@ export type {
   GetRepairAttemptDetailInput,
   RepairAttemptDetail,
 } from "./repair-attempt-detail-store.js";
+export {
+  createRepairAttemptAfterLegacySupersede,
+  getTerminalRepairAttemptHistory,
+  terminateRepairAttempt,
+} from "./repair-attempt-terminal-store.js";
+export type {
+  CreateAfterLegacySupersedeInput,
+  CreateAfterLegacySupersedeResult,
+  TerminalRepairAttemptInput,
+  TerminalRepairAttemptResult,
+} from "./repair-attempt-terminal-store.js";
 export { getBugWorkflowProjection } from "./workflow-projection-store.js";
 export {
   WorkflowProjectionError,

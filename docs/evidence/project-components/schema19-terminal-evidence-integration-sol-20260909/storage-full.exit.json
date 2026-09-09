@@ -1,0 +1,7 @@
+{
+  "startedAt": "2026-09-09T14:35:13.1677949+08:00",
+  "command": "node --import tsx --test test/*.test.ts",
+  "exitCode": 0,
+  "cwd": "packages/storage",
+  "finishedAt": "2026-09-09T14:35:44.1619434+08:00"
+}

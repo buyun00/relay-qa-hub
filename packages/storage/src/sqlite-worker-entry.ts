@@ -5,6 +5,12 @@ import {
   getRepairAttemptDetail,
   type GetRepairAttemptDetailInput,
 } from "./repair-attempt-detail-store.js";
+import {
+  createRepairAttemptAfterLegacySupersede,
+  terminateRepairAttempt,
+  type CreateAfterLegacySupersedeInput,
+  type TerminalRepairAttemptInput,
+} from "./repair-attempt-terminal-store.js";
 import { isImportExecutionHeld } from "./import-execution-hold.js";
 import { projectRelayQueue, type ProjectRelayQueueInput } from "./project-relay-queue.js";
 import type { DatabaseSync } from "node:sqlite";
@@ -238,6 +244,8 @@ interface WorkerRequest {
     | "createMobileManualRepairAttempt"
     | "getMobileManualRepairAttempt"
     | "getRepairAttemptDetail"
+    | "terminateRepairAttempt"
+    | "createRepairAttemptAfterLegacySupersede"
     | "startMobileRepairAttempt"
     | "deliverMobileRepairAttempt"
     | "completeMobileBugForVerification"
@@ -681,6 +689,21 @@ async function execute(request: WorkerRequest): Promise<unknown> {
     return getRepairAttemptDetail(
       requireDatabase(),
       request.payload as GetRepairAttemptDetailInput,
+    );
+  }
+
+  if (request.operation === "terminateRepairAttempt") {
+    return inWriteTransaction((current) =>
+      terminateRepairAttempt(current, request.payload as TerminalRepairAttemptInput),
+    );
+  }
+
+  if (request.operation === "createRepairAttemptAfterLegacySupersede") {
+    return inWriteTransaction((current) =>
+      createRepairAttemptAfterLegacySupersede(
+        current,
+        request.payload as CreateAfterLegacySupersedeInput,
+      ),
     );
   }
 

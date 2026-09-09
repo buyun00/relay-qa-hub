@@ -1,0 +1,7 @@
+{
+  "cwd": ".",
+  "exitCode": 0,
+  "startedAt": "2026-09-09T14:36:58.9102125+08:00",
+  "command": "prettier --check changed runtime files",
+  "finishedAt": "2026-09-09T14:37:00.4769772+08:00"
+}

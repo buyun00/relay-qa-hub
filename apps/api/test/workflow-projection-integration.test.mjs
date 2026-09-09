@@ -12,12 +12,15 @@ import { ProjectRequestContext } from "../dist/project-request-context.js";
 import { createSqliteBrowserAuthStore } from "../dist/browser-auth.js";
 import { createSqliteWorkflowProjectionStore } from "../dist/sqlite-workflow-projection-store.js";
 import { createSqliteMobileHumanWorkflowStore } from "../dist/sqlite-mobile-human-workflow-store.js";
+import { createSqliteMobileBugStore } from "../dist/sqlite-mobile-bug-store.js";
+import { createSqliteMobileRelayStore } from "../dist/sqlite-mobile-relay-store.js";
+import { createSqliteRepairAttemptTerminalStore } from "../dist/sqlite-repair-attempt-terminal-store.js";
 import { MOBILE_API_MEDIA_TYPE } from "../dist/mobile-bugs.js";
 
 const now = () => new Date().toISOString();
 const digest = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 
-test("createApiApp requires authenticated project wiring for the new workflow endpoint", () => {
+test("createApiApp requires authenticated project wiring for workflow and terminal endpoints", () => {
   assert.throws(
     () =>
       createApiApp({
@@ -26,6 +29,37 @@ test("createApiApp requires authenticated project wiring for the new workflow en
         workflowProjectionStore: { getPage: async () => ({}) },
       }),
     /requires browser authentication and project context/,
+  );
+  const identity = randomUUID();
+  assert.throws(
+    () =>
+      createApiApp({
+        logger: false,
+        isolateLegacyComponents: true,
+        terminalAttemptStore: {
+          execute: async () => {
+            throw new Error("unused");
+          },
+        },
+        projectRequestContext: new ProjectRequestContext(),
+        browserAuth: {
+          store: {
+            ensureBrowserAdmin: async () => {},
+            loginBrowserSession: async () => null,
+            createBrowserSession: async () => null,
+            resolveBrowserSession: async () => null,
+            revokeBrowserSession: async () => false,
+          },
+          accountId: identity,
+          userId: identity,
+          actorId: identity,
+          adminEmail: "unused@example.invalid",
+          passwordlessLogin: async () => ({ userId: identity }),
+          sessionSecret: "terminal-config-test-only",
+          webOrigins: [],
+        },
+      }),
+    /require authenticated project context/,
   );
 });
 
@@ -54,7 +88,7 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
   const ledger = [];
   try {
     await worker.ensureMobileScope(bootstrap);
-    assert.equal((await worker.initialization).migration.toVersion, 17);
+    assert.equal((await worker.initialization).migration.toVersion, 19);
     const bCreatorId = randomUUID();
     await worker.ensureMobileScope({
       ...bootstrap,
@@ -73,7 +107,14 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
       projectManagementService: service,
       projectRequestContext: context,
       workflowProjectionStore: createSqliteWorkflowProjectionStore({ worker, scope }),
+      mobileBugStore: createSqliteMobileBugStore({ worker, scope }),
       mobileHumanWorkflowStore: createSqliteMobileHumanWorkflowStore({ worker, scope }),
+      mobileRelayStore: createSqliteMobileRelayStore({
+        worker,
+        scope,
+        relayDispatchEnabled: false,
+      }),
+      terminalAttemptStore: createSqliteRepairAttemptTerminalStore({ worker }),
       browserAuth: {
         store: createSqliteBrowserAuthStore({ worker }),
         accountId,
@@ -151,6 +192,150 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
       });
     const bugA = await create(a),
       bugB = await create(b);
+
+    const runningAttempt = async (scope, token) => {
+      const created = await create(scope);
+      const ready = await request(`/api/v1/bugs/${created.bug.id}/transitions`, {
+        token,
+        projectId: scope.projectId,
+        body: { expectedVersion: created.bug.version, toState: "ready" },
+        headers: {
+          "idempotency-key": `workflow:transitionBug:bug:${created.bug.id}:v${created.bug.version}:ready`,
+        },
+      });
+      assert.equal(ready.status, 200, JSON.stringify(ready.data));
+      const planned = await request(`/api/v1/bugs/${created.bug.id}/repair-attempts`, {
+        token,
+        projectId: scope.projectId,
+        body: {
+          expectedVersion: ready.data.version,
+          mode: "human",
+          assigneeId: scope.actorId,
+          summary: "Integrated terminal fixture",
+        },
+        headers: {
+          "idempotency-key": `workflow:createRepairAttempt:bug:${created.bug.id}:v${ready.data.version}`,
+        },
+      });
+      assert.equal(planned.status, 201);
+      const running = await request(`/api/v1/repair-attempts/${planned.data.id}/start`, {
+        token,
+        projectId: scope.projectId,
+        body: { expectedVersion: planned.data.version },
+        headers: {
+          "idempotency-key": `workflow:startRepairAttempt:attempt:${planned.data.id}:v${planned.data.version}`,
+        },
+      });
+      assert.equal(running.status, 200);
+      return { bug: created.bug, attempt: running.data };
+    };
+
+    const failedFixture = await runningAttempt(a, alice.data.accessToken);
+    const failed = await request(`/api/v1/repair-attempts/${failedFixture.attempt.id}/fail`, {
+      token: alice.data.accessToken,
+      projectId: aId,
+      body: { expectedVersion: failedFixture.attempt.version, reason: "Local worker failure" },
+      headers: { accept: "application/json", "idempotency-key": randomUUID() },
+    });
+    assert.equal(failed.status, 200);
+    assert.equal(failed.data.status, "failed");
+    assert.equal(failed.data.summary, "Local worker failure");
+
+    const legacyFixture = await runningAttempt(a, alice.data.accessToken);
+    const legacySupersede = await request(
+      `/api/v1/repair-attempts/${legacyFixture.attempt.id}/supersede`,
+      {
+        token: alice.data.accessToken,
+        projectId: aId,
+        body: {
+          expectedVersion: legacyFixture.attempt.version,
+          reason: "Finish legacy attempt before planning its successor",
+        },
+        headers: { accept: "application/json", "idempotency-key": randomUUID() },
+      },
+    );
+    assert.equal(legacySupersede.status, 200);
+    assert.equal(legacySupersede.data.status, "superseded");
+    const legacyBug = await request(`/api/v1/bugs/${legacyFixture.bug.id}`, {
+      token: alice.data.accessToken,
+      projectId: aId,
+    });
+    assert.equal(legacyBug.status, 200);
+    assert.equal(legacyBug.data.state, "ready");
+    const parentKey = randomUUID();
+    const parentBody = {
+      parentAttemptId: legacyFixture.attempt.id,
+      expectedVersion: legacyBug.data.version,
+      mode: "relay",
+      assigneeId: a.actorId,
+      summary: "Legacy two-step successor",
+    };
+    const parented = await request(`/api/v1/bugs/${legacyFixture.bug.id}/repair-attempts`, {
+      token: alice.data.accessToken,
+      projectId: aId,
+      body: parentBody,
+      headers: { accept: "application/json", "idempotency-key": parentKey },
+    });
+    assert.equal(parented.status, 201);
+    assert.equal(parented.data.parentAttemptId, legacyFixture.attempt.id);
+    assert.equal(parented.data.mode, "relay");
+    const parentReplay = await request(`/api/v1/bugs/${legacyFixture.bug.id}/repair-attempts`, {
+      token: alice.data.accessToken,
+      projectId: aId,
+      body: parentBody,
+      headers: { "idempotency-key": parentKey },
+    });
+    assert.equal(parentReplay.status, 201);
+    assert.deepEqual(parentReplay.data, parented.data);
+
+    const supersedeFixture = await runningAttempt(b, bob.data.accessToken);
+    const successorId = randomUUID();
+    const supersedeBody = {
+      expectedVersion: supersedeFixture.attempt.version,
+      reason: "Replace atomically",
+      successor: {
+        id: successorId,
+        mode: "external",
+        assigneeId: b.actorId,
+        summary: "External successor",
+      },
+    };
+    const supersedeKey = `workflow:supersedeRepairAttempt:attempt:${supersedeFixture.attempt.id}:v${supersedeFixture.attempt.version}`;
+    const superseded = await request(
+      `/api/v1/repair-attempts/${supersedeFixture.attempt.id}/supersede`,
+      {
+        token: gm.data.accessToken,
+        projectId: bId,
+        body: supersedeBody,
+        headers: {
+          "content-type": MOBILE_API_MEDIA_TYPE,
+          "idempotency-key": supersedeKey,
+        },
+      },
+    );
+    assert.equal(superseded.status, 200);
+    assert.equal(superseded.data.supersededAttempt.status, "superseded");
+    assert.equal(superseded.data.successorAttempt.id, successorId);
+    assert.equal(superseded.data.successorAttempt.mode, "external");
+    assert.equal(superseded.data.bug.state, "in_progress");
+    assert.equal(superseded.data.replayed, false);
+    const replayed = await request(
+      `/api/v1/repair-attempts/${supersedeFixture.attempt.id}/supersede`,
+      {
+        token: gm.data.accessToken,
+        projectId: bId,
+        body: supersedeBody,
+        headers: {
+          accept: "application/json",
+          "content-type": MOBILE_API_MEDIA_TYPE,
+          "idempotency-key": supersedeKey,
+        },
+      },
+    );
+    assert.equal(replayed.status, 200);
+    assert.equal(replayed.headers.get("content-type"), `${MOBILE_API_MEDIA_TYPE}; charset=utf-8`);
+    assert.equal(replayed.data.eventId, superseded.data.eventId);
+    assert.equal(replayed.data.replayed, true);
     const db = new DatabaseSync(databaseFile);
     try {
       db.exec("BEGIN IMMEDIATE");
@@ -269,6 +454,30 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
         0,
       );
       assert.equal(
+        readback.prepare("SELECT count(*) AS n FROM repair_attempt_terminal_snapshots").get().n,
+        3,
+      );
+      assert.equal(
+        readback.prepare("SELECT count(*) AS n FROM repair_attempt_parent_plan_snapshots").get().n,
+        1,
+      );
+      assert.deepEqual(
+        readback
+          .prepare("SELECT id,status FROM repair_attempts WHERE id IN (?,?) ORDER BY id")
+          .all(failedFixture.attempt.id, supersedeFixture.attempt.id)
+          .map((row) => ({ id: String(row.id), status: String(row.status) })),
+        [
+          { id: failedFixture.attempt.id, status: "failed" },
+          { id: supersedeFixture.attempt.id, status: "superseded" },
+        ].sort((left, right) => left.id.localeCompare(right.id)),
+      );
+      assert.equal(
+        readback
+          .prepare("SELECT active_repair_attempt_id FROM bugs WHERE id=?")
+          .get(supersedeFixture.bug.id).active_repair_attempt_id,
+        successorId,
+      );
+      assert.equal(
         readback
           .prepare("SELECT count(*) AS n FROM memberships WHERE project_id=? AND user_id=?")
           .get(bId, gmUserId).n,
@@ -293,7 +502,7 @@ test("registered workflow HTTP uses real worker GM scope, durable pagination and
         actualHttpRequests: ledger.length,
         ledger,
         realWorker: true,
-        schema: 17,
+        schema: 19,
         externalRequests: 0,
       }),
     );

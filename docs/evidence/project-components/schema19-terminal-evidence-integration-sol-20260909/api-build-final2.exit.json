@@ -1,0 +1,7 @@
+{
+  "exitCode": 0,
+  "startedAt": "2026-09-09T14:45:24.0743187+08:00",
+  "command": "tsc -p apps/api/tsconfig.json",
+  "cwd": ".",
+  "finishedAt": "2026-09-09T14:45:25.0376715+08:00"
+}

@@ -1,7 +1,7 @@
 import { VERIFICATION_RESULT_SNAPSHOT_SQL } from "./verification-result-snapshot-migration.js";
 import { VERIFICATION_BLOCKED_RESULT_SQL } from "./verification-blocked-result-migration.js";
 
-// Additive candidate; the integrator assigns its migration number. Never rewrite 15/16/17.
+// Additive schema 19 payload. Never rewrite frozen migrations 15, 16, or 17.
 function replaceOnce(source: string, before: string, after: string): string {
   if (source.split(before).length !== 2)
     throw new Error("Reviewed Verification evidence trigger anchor changed");

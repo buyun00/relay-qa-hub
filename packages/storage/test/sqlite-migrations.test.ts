@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
@@ -531,7 +532,7 @@ test("v6 through current schema preserves existing Bugs and adds management, GM 
     const completed = await migrateSqliteDatabase(database, databaseFile, {
       backupRoot: join(root, "backups"),
     });
-    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+    assert.deepEqual(completed.appliedVersions, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
     assert.equal(completed.fromVersion, 7);
     assert.equal(completed.toVersion, SQLITE_SCHEMA_VERSION);
     assert.equal(currentSqliteSchemaVersion(database), SQLITE_SCHEMA_VERSION);
@@ -556,6 +557,159 @@ test("v6 through current schema preserves existing Bugs and adds management, GM 
       1,
     );
     assert.equal(verifySqliteIntegrity(database).ok, true);
+  });
+});
+
+test("v17 upgrades through registered v18 and v19 with backup, immutable history, restart, and late-failure rollback", async () => {
+  await withDatabase(async ({ database, databaseFile, root }) => {
+    await migrateSqliteDatabase(database, databaseFile, { targetVersion: 17 });
+    const tenant = seedTenant(database, 82, "V19");
+    const bugId = identifier(85);
+    createBug(database, tenant, bugId, "Retained across terminal and evidence migrations");
+    const frozenHistory = database
+      .prepare(
+        `SELECT version,name,checksum FROM schema_migrations
+         WHERE version BETWEEN 15 AND 17 ORDER BY version`,
+      )
+      .all()
+      .map((row) => ({
+        version: Number(row.version),
+        name: String(row.name),
+        checksum: String(row.checksum),
+      }));
+
+    database.exec(`CREATE TRIGGER repair_attempt_terminal_snapshot_no_delete
+      BEFORE DELETE ON bugs BEGIN SELECT 1; END;`);
+    await assert.rejects(
+      migrateSqliteDatabase(database, databaseFile, {
+        backupRoot: join(root, "failed-v18-backups"),
+        targetVersion: 18,
+      }),
+      /trigger repair_attempt_terminal_snapshot_no_delete already exists/i,
+    );
+    assert.equal(currentSqliteSchemaVersion(database), 17);
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM schema_migrations WHERE version > 17",
+        "count",
+      ),
+      0,
+    );
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM sqlite_schema WHERE type='table' AND name='repair_attempt_terminal_snapshots'",
+        "count",
+      ),
+      0,
+    );
+    assert.equal(
+      numberColumn(
+        database,
+        "SELECT count(*) AS count FROM sqlite_schema WHERE type='trigger' AND name='repair_attempt_terminal_snapshot_no_delete'",
+        "count",
+      ),
+      1,
+    );
+    assert.equal(verifySqliteIntegrity(database).ok, true);
+
+    database.exec("DROP TRIGGER repair_attempt_terminal_snapshot_no_delete");
+    const upgrade = await migrateSqliteDatabase(database, databaseFile, {
+      backupRoot: join(root, "v17-backups"),
+    });
+    assert.deepEqual(upgrade.appliedVersions, [18, 19]);
+    assert.equal(upgrade.fromVersion, 17);
+    assert.equal(upgrade.toVersion, 19);
+    assert.ok(upgrade.backupPath);
+    assert.ok(existsSync(upgrade.backupPath));
+    assert.ok(statSync(upgrade.backupPath).size > 0);
+    assert.match(
+      createHash("sha256").update(readFileSync(upgrade.backupPath)).digest("hex"),
+      /^[0-9a-f]{64}$/u,
+    );
+    assert.deepEqual(
+      database
+        .prepare(
+          `SELECT version,name,checksum FROM schema_migrations
+           WHERE version BETWEEN 15 AND 17 ORDER BY version`,
+        )
+        .all()
+        .map((row) => ({
+          version: Number(row.version),
+          name: String(row.name),
+          checksum: String(row.checksum),
+        })),
+      frozenHistory,
+    );
+    assert.equal(
+      numberColumn(
+        database,
+        `SELECT count(*) AS count FROM sqlite_schema WHERE type='table'
+         AND name IN ('repair_attempt_terminal_snapshots','repair_attempt_parent_plan_snapshots')`,
+        "count",
+      ),
+      2,
+    );
+    assert.equal(
+      numberColumn(database, "SELECT count(*) AS count FROM bugs WHERE id=?", "count", bugId),
+      1,
+    );
+    assert.equal(verifySqliteIntegrity(database).ok, true);
+
+    const backup = new DatabaseSync(upgrade.backupPath, { readOnly: true });
+    try {
+      assert.equal(numberColumn(backup, "PRAGMA user_version", "user_version"), 17);
+      assert.deepEqual(
+        backup
+          .prepare(
+            `SELECT version,name,checksum FROM schema_migrations
+             WHERE version BETWEEN 15 AND 17 ORDER BY version`,
+          )
+          .all()
+          .map((row) => ({
+            version: Number(row.version),
+            name: String(row.name),
+            checksum: String(row.checksum),
+          })),
+        frozenHistory,
+      );
+      assert.equal(
+        numberColumn(backup, "SELECT count(*) AS count FROM bugs WHERE id=?", "count", bugId),
+        1,
+      );
+      assert.equal(
+        numberColumn(
+          backup,
+          "SELECT count(*) AS count FROM sqlite_schema WHERE name='repair_attempt_terminal_snapshots'",
+          "count",
+        ),
+        0,
+      );
+    } finally {
+      backup.close();
+    }
+
+    database.close();
+    const reopened = openSqliteDatabaseForWorker({ databaseFile, busyTimeoutMs: 2_000 });
+    try {
+      const repeat = await migrateSqliteDatabase(reopened, databaseFile, {
+        backupRoot: join(root, "reopen-backups"),
+      });
+      assert.deepEqual(repeat, {
+        fromVersion: 19,
+        toVersion: 19,
+        appliedVersions: [],
+        backupPath: null,
+      });
+      assert.equal(verifySqliteIntegrity(reopened).ok, true);
+      assert.equal(
+        numberColumn(reopened, "SELECT count(*) AS count FROM bugs WHERE id=?", "count", bugId),
+        1,
+      );
+    } finally {
+      reopened.close();
+    }
   });
 });
 

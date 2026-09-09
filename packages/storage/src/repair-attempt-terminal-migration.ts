@@ -1,4 +1,4 @@
-/** Candidate additive migration; registration/version assignment belongs to the integrator. */
+/** Additive schema 18 payload. Frozen migrations 15 through 17 remain unchanged. */
 const bugFields = {
   id: "id",
   projectId: "project_id",

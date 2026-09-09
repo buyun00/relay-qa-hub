@@ -1,0 +1,7 @@
+{
+  "startedAt": "2026-09-09T14:45:24.6737825+08:00",
+  "command": "git diff --check -- changed runtime files",
+  "finishedAt": "2026-09-09T14:45:25.0198891+08:00",
+  "exitCode": 0,
+  "cwd": "."
+}
