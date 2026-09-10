@@ -41,6 +41,7 @@ import {
 } from "./remembered-identity.js";
 import { createAuthenticatedWssClient, createBrowserSessionWssClient } from "./wss-client.js";
 import { PortableUpdater, type DesktopUpdateState } from "./portable-updater.js";
+import { acknowledgeUpdateRelaunch } from "./update-relaunch.js";
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const MAX_ASSET_BYTES = 50 * 1024 * 1024;
@@ -856,6 +857,20 @@ async function startApplication(): Promise<void> {
   await mainWindow.loadURL(target);
   if (!(config.startupHidden || process.argv.includes("--hidden"))) openMainWindow();
   transport.start();
+  try {
+    await acknowledgeUpdateRelaunch({
+      argv: process.argv,
+      updatesDirectory: path.join(app.getPath("userData"), "updates"),
+      version: app.getVersion(),
+    });
+  } catch (error) {
+    process.stderr.write(
+      `${JSON.stringify({
+        event: "desktop.update.relaunch-acknowledgement.failed",
+        code: error instanceof Error ? error.name : "UNKNOWN_ERROR",
+      })}\n`,
+    );
+  }
   const initialUpdateTimer = setTimeout(() => void updater?.check(), 5_000);
   initialUpdateTimer.unref();
   const recurringUpdateTimer = setInterval(() => void updater?.check(), 30 * 60 * 1_000);

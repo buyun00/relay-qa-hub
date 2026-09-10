@@ -26,6 +26,9 @@ Var LogPath
 Var InstallerExitCode
 Var FailureCode
 Var InstallRoot
+Var RelaunchMarker
+Var RelaunchParameters
+Var RelaunchAttempts
 
 Function AppendLog
   Exch $9
@@ -109,18 +112,49 @@ install_succeeded:
   StrCpy $FailureCode "UPDATE_APP_MISSING_AFTER_INSTALL"
   Goto update_failed
 app_installed:
-  Push "installed"
-  Call WriteResult
   Push "update installed; relaunching application"
   Call AppendLog
+  StrCpy $RelaunchMarker "$EXEDIR\relaunched.flag"
+  Delete "$RelaunchMarker"
   StrCmp $UserDataPath "" relaunch_default_profile
-  Exec '$\"$AppPath$\" --updated --user-data-dir=$\"$UserDataPath$\"'
-  Goto relaunch_finished
+  StrCpy $RelaunchParameters '--updated --user-data-dir=$\"$UserDataPath$\" --update-relaunch-marker=$\"$RelaunchMarker$\"'
+  Goto relaunch_primary
 relaunch_default_profile:
-  Exec '$\"$AppPath$\" --updated'
-relaunch_finished:
+  StrCpy $RelaunchParameters '--updated --update-relaunch-marker=$\"$RelaunchMarker$\"'
+relaunch_primary:
+  SetOutPath "$InstallRoot"
+  ClearErrors
+  ExecShell "" "$AppPath" "$RelaunchParameters" SW_SHOWNORMAL
+  IfErrors relaunch_fallback
+  StrCpy $RelaunchAttempts 0
+relaunch_primary_wait:
+  IfFileExists "$RelaunchMarker" relaunch_confirmed
+  Sleep 250
+  IntOp $RelaunchAttempts $RelaunchAttempts + 1
+  IntCmp $RelaunchAttempts 40 relaunch_fallback relaunch_primary_wait relaunch_fallback
+relaunch_fallback:
+  Push "primary relaunch unconfirmed; retrying with direct execution"
+  Call AppendLog
+  ClearErrors
+  Exec '$\"$AppPath$\" $RelaunchParameters'
+  IfErrors relaunch_failed
+  StrCpy $RelaunchAttempts 0
+relaunch_fallback_wait:
+  IfFileExists "$RelaunchMarker" relaunch_confirmed
+  Sleep 250
+  IntOp $RelaunchAttempts $RelaunchAttempts + 1
+  IntCmp $RelaunchAttempts 80 relaunch_failed relaunch_fallback_wait relaunch_failed
+relaunch_confirmed:
+  Push "application relaunch acknowledged"
+  Call AppendLog
+  Push "installed"
+  Call WriteResult
   SetErrorLevel 0
   Quit
+
+relaunch_failed:
+  StrCpy $FailureCode "UPDATE_RELAUNCH_UNCONFIRMED"
+  Goto update_failed
 
 install_failed:
   StrCpy $FailureCode "UPDATE_INSTALLER_FAILED_$InstallerExitCode"
@@ -143,10 +177,10 @@ skip_failure_result:
   IfFileExists "$AppPath" relaunch_previous_app updater_exit_failed
 relaunch_previous_app:
   StrCmp $UserDataPath "" relaunch_previous_default_profile
-  Exec '$\"$AppPath$\" --update-failed --user-data-dir=$\"$UserDataPath$\"'
+  ExecShell "" "$AppPath" '--update-failed --user-data-dir=$\"$UserDataPath$\"' SW_SHOWNORMAL
   Goto updater_exit_failed
 relaunch_previous_default_profile:
-  Exec '$\"$AppPath$\" --update-failed'
+  ExecShell "" "$AppPath" "--update-failed" SW_SHOWNORMAL
 updater_exit_failed:
   SetErrorLevel 1
 SectionEnd
