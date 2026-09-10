@@ -12,11 +12,14 @@ import {
   type ProjectComponent,
 } from "./project-api";
 
-function errorMessage(error: unknown): string {
-  if (error instanceof QaHubApiError)
-    return error.status === 409
+export function projectManagementErrorMessage(error: unknown): string {
+  if (error instanceof QaHubApiError) {
+    if (error.code === "COMPONENT_DEPENDENCY_REQUIRED")
+      return "请先启用打包和增量上传，再启用单次打包上传；当前输入仍保留。";
+    return error.code === "VERSION_CONFLICT" || error.status === 412
       ? "记录已变化，请刷新后重试；未保存的输入仍保留。"
       : `请求未完成：${error.code ?? error.status}`;
+  }
   return error instanceof Error ? error.message : "请求未完成。";
 }
 const fields: Record<string, { key: string; label: string }[]> = {
@@ -90,7 +93,7 @@ function ComponentEditor({
       await saveComponent(projectId, component, enabled, next);
       onSaved();
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(projectManagementErrorMessage(cause));
     } finally {
       setBusy(false);
     }
@@ -200,7 +203,7 @@ export default function ProjectManagementPage({
     let mounted = true;
     const revisionRef = revision;
     void refresh().catch((cause) => {
-      if (mounted) setError(errorMessage(cause));
+      if (mounted) setError(projectManagementErrorMessage(cause));
     });
     return () => {
       mounted = false;
@@ -217,7 +220,7 @@ export default function ProjectManagementPage({
       onChanged?.();
       setNotice(message);
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(projectManagementErrorMessage(cause));
     } finally {
       setBusy(false);
     }
@@ -232,7 +235,9 @@ export default function ProjectManagementPage({
         </div>
         <button
           className="secondary-button"
-          onClick={() => void refresh().catch((cause) => setError(errorMessage(cause)))}
+          onClick={() =>
+            void refresh().catch((cause) => setError(projectManagementErrorMessage(cause)))
+          }
         >
           刷新
         </button>
@@ -363,7 +368,7 @@ export default function ProjectManagementPage({
                     onSaved={() =>
                       void refresh()
                         .then(() => onChanged?.())
-                        .catch((cause) => setError(errorMessage(cause)))
+                        .catch((cause) => setError(projectManagementErrorMessage(cause)))
                     }
                   />
                 ))}
