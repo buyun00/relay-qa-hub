@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T13:05:44.0470125Z",
+  "sourceCommit": "bb035c4239f57b11a4cef730427f5e8cb45c62ee",
+  "release": {
+    "releaseId": "20260910T122343731Z",
+    "version": "0.2.0-preview.16"
+  },
+  "process": {
+    "pid": 17308,
+    "parentPid": 12636,
+    "creationDate": "09/10/2026 20:59:45",
+    "executablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --hidden --remote-debugging-port=9433 --user-data-dir=C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile"
+  },
+  "installed": {
+    "fileVersion": "0.2.0.16",
+    "exeSha256": "15974f3d818980bc0b1a341ecbe2636b9018c3ad4958a60ba2367648a64511c5",
+    "asarSha256": "4d47c054aa4aa62fb23c99a5c437213663228003277ea0a58276252df0c75203",
+    "previewConfigSha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c",
+    "rememberedIdentitySha256": "e004fe7fb4a8f9da43546be1cd53cc2894549eaacda5f578a00c304af20d98ff"
+  },
+  "mcp": {
+    "health": {
+      "status": "ready",
+      "service": "relay-qa-hub-desktop-mcp",
+      "endpoint": "/mcp",
+      "transport": "streamable-http"
+    },
+    "initialize": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2025-06-18",
+        "capabilities": {
+          "tools": {
+            "listChanged": false
+          },
+          "resources": {
+            "subscribe": false,
+            "listChanged": false
+          }
+        },
+        "serverInfo": {
+          "name": "qa-hub-desktop-preview",
+          "version": "0.2.0-preview.16"
+        },
+        "instructions": "先用项目姓名登录，再列出自己的项目。每个工具必须使用明确项目；本地 MCP 与独立服务端 MCP 共用 HTTP 业务。Bug 人工完成、验收通过、退回和关闭独立于五项可选组件。代码交付和第三方同步不代表验收关闭。附件 materialize 在本地校验后返回作用域隔离的文件。不要报告未执行的验证。"
+      }
+    }
+  },
+  "previewApi": {
+    "status": "ready",
+    "schemaVersion": "20",
+    "checks": [
+      {
+        "name": "database",
+        "status": "ok"
+      },
+      {
+        "name": "evidence",
+        "status": "ok"
+      },
+      {
+        "name": "worker",
+        "status": "ok"
+      }
+    ]
+  },
+  "pageReloadEvidence": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\windows-build16-upgrade\\build16-postupgrade-readonly.json",
+    "passed": true,
+    "primaryDraftHash": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c",
+    "primaryRecordHash": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c",
+    "fallbackRecordHash": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166",
+    "reloadEventCount": 0
+  },
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "address": "0.0.0.0",
+      "port": 4319,
+      "pid": 14044
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4639,
+      "pid": 1940
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 4642,
+      "pid": 17308
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 9333,
+      "pid": 26828
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 9433,
+      "pid": 17308
+    }
+  ],
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false,
+    "api": {
+      "ownerPid": 14044,
+      "statusCode": 200,
+      "health": {
+        "status": "ready",
+        "schemaVersion": "12",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      },
+      "priorObservedOwnerPid": 9488,
+      "ownerDriftDetected": true,
+      "note": "4319 owner changed during a separate concurrent production workflow; this preview operation never targeted production paths or ports."
+    },
+    "webOwnerPid": 7420,
+    "desktopMcpOwnerPid": 17160,
+    "foreignCdpOwnerPid": 26828
+  },
+  "checks": {
+    "oneMainProcess": true,
+    "mainPathExact": true,
+    "mainProfileExact": true,
+    "mainCdpExact": true,
+    "mcpOwnedByMain": true,
+    "cdpOwnedByMain": true,
+    "mcpReady": true,
+    "mcpRuntime16": true,
+    "previewApiSchema20": true,
+    "installedVersion16": true,
+    "installedExeHashExact": true,
+    "installedAsarHashExact": true,
+    "previewConfigHashExact": true,
+    "rememberedIdentityHashExact": true,
+    "pageReloadAndDraftEvidencePassed": true,
+    "productionApiReady": true,
+    "productionWebListenerPresent": true,
+    "productionDesktopMcpListenerPresent": true,
+    "foreign9333Preserved": true,
+    "previewDoesNotOwnProductionOrForeignPorts": true
+  },
+  "passed": true
+}

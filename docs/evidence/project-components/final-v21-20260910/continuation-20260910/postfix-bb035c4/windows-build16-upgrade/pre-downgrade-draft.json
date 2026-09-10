@@ -1,0 +1,9 @@
+{
+  "action": "verify",
+  "createdTestDraft": false,
+  "valueLength": 25,
+  "valueSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166",
+  "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+  "runtime": null,
+  "matchesExpected": true
+}

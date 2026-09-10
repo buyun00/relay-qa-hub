@@ -203,10 +203,12 @@ test("tokenless desktop Inbox uses the remembered browser session", async () => 
   const originalFetch = globalThis.fetch;
   let authorization: string | null = "not-observed";
   let cookie: string | null = null;
+  let accept: string | null = null;
   globalThis.fetch = async (_input, init) => {
     const headers = new Headers(init?.headers);
     authorization = headers.get("authorization");
     cookie = headers.get("cookie");
+    accept = headers.get("accept");
     return new Response(JSON.stringify({ items: [], nextCursor: null, unreadCount: 0 }), {
       status: 200,
       headers: { "content-type": "application/json" },
@@ -221,6 +223,7 @@ test("tokenless desktop Inbox uses the remembered browser session", async () => 
     assert.deepEqual(items, []);
     assert.equal(authorization, null);
     assert.equal(cookie, `qa_hub_browser_session=${TEST_BROWSER_SESSION_TOKEN}`);
+    assert.equal(accept, "application/json");
   } finally {
     globalThis.fetch = originalFetch;
   }

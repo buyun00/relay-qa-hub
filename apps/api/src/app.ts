@@ -2767,7 +2767,26 @@ export function createApiApp(options: CreateApiAppOptions = {}): FastifyInstance
         limit: query.limit,
         now: (options.now ?? (() => new Date()))().toISOString(),
       });
-      return reply.header("content-type", MOBILE_API_CONTENT_TYPE).send({
+      const media = workflowResponseMedia(readHeader(request.headers.accept));
+      if (media.startsWith("application/json")) {
+        return reply.header("content-type", media).send({
+          items: result.items.map((item) => ({
+            id: item.id,
+            projectId: item.projectId,
+            userId: item.userId,
+            type: item.type,
+            title: item.title,
+            body: item.body,
+            bugId: item.bugId,
+            createdAt: item.createdAt,
+            readAt: item.readAt,
+            version: item.version,
+          })),
+          nextCursor: result.nextCursor,
+          unreadCount: result.unreadCount,
+        });
+      }
+      return reply.header("content-type", media).send({
         snapshotSequence: result.snapshotSequence,
         items: result.items.map((item) => ({
           id: item.id,

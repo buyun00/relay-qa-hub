@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-10T13:07:47.1230549Z",
+  "sourceCommit": "bb035c4239f57b11a4cef730427f5e8cb45c62ee",
+  "releaseId": "20260910T122343731Z",
+  "version": "0.2.0-preview.16",
+  "files": [
+    {
+      "path": "windows-build16-package/package-verification.json",
+      "bytes": 3930,
+      "sha256": "61f2498d0f41103d27cd274d11c058697acb21e531b6d263f5fecaf309e3b891"
+    },
+    {
+      "path": "windows-build16-package/package.stdout.log",
+      "bytes": 1977,
+      "sha256": "d2218deed34af5447c7845983e2fe151435d7cc5146e330e65e8850b2a396060"
+    },
+    {
+      "path": "windows-build16-package/prepackage.json",
+      "bytes": 408,
+      "sha256": "67eab8cd73637dd0da2a5ba02b28e80c79615094a2b1a9be586d38fdfcac2ef4"
+    },
+    {
+      "path": "windows-build16-package/previous-windows-latest.json",
+      "bytes": 480,
+      "sha256": "ae6027e51f973669fe652a2733a5f2b46691dd30daf0f86771ca3a8d8739c124"
+    },
+    {
+      "path": "windows-build16-portable-smoke/bridge-mcp.json",
+      "bytes": 2387,
+      "sha256": "d217980372226b8e2ffa4a2d1453816c6106e7f1d20eb48770ca182e90909fba"
+    },
+    {
+      "path": "windows-build16-portable-smoke/desktop-16-portable.log",
+      "bytes": 556,
+      "sha256": "88ab1978096133a0643fa45e23f2bea1913b619a745881063b271cfc5b2fa56e"
+    },
+    {
+      "path": "windows-build16-portable-smoke/prelaunch.json",
+      "bytes": 1442,
+      "sha256": "7819340075266c94cef4b6b0f43bc5d7fe0075ecd2f9384b3fa5b16ace7d2f14"
+    },
+    {
+      "path": "windows-build16-portable-smoke/preload-diagnostic.json",
+      "bytes": 697,
+      "sha256": "17971f30f95a44bb37b1d779b236355ba10e2e07fec3ce3be517199092010169"
+    },
+    {
+      "path": "windows-build16-portable-smoke/preview-instance.package.json",
+      "bytes": 742,
+      "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+    },
+    {
+      "path": "windows-build16-portable-smoke/result.json",
+      "bytes": 7328,
+      "sha256": "7d8b2908b7c4a9639715cbe5b44bf9ba8265d4c26d0d312290167a2f5a4aac1a"
+    },
+    {
+      "path": "windows-build16-portable-smoke/snapshot.json",
+      "bytes": 1630,
+      "sha256": "7bf9a22d9761fb168c5e90a6bfcf2fb055f56ea8624ceb8f0a1b73ca679df359"
+    },
+    {
+      "path": "windows-build16-portable-smoke/stopped.json",
+      "bytes": 152,
+      "sha256": "6f65b8679da95147b48ac9926b10695b9f23642a8b58fecc2a304003c24e977b"
+    },
+    {
+      "path": "windows-build16-upgrade/auto-relaunch.json",
+      "bytes": 6579,
+      "sha256": "a38c148a56458450b6dc7b3c0478008057e334a7c43832680e7c279c1f6e7128"
+    },
+    {
+      "path": "windows-build16-upgrade/auto-relaunch-initial-owner-sample.json",
+      "bytes": 6128,
+      "sha256": "15cb8427cc2c96843b3f6abbbd8e70b5e473470b8d229bbdd759317a596443dc"
+    },
+    {
+      "path": "windows-build16-upgrade/auto-relaunch-stop.json",
+      "bytes": 1833,
+      "sha256": "0fa6486ef69d7583f6749fc6bc3dad154cc1f72420bbddc26070d547e6dbb8e0"
+    },
+    {
+      "path": "windows-build16-upgrade/build13-after-restart.json",
+      "bytes": 3736,
+      "sha256": "dbc34fbfa502ba647a789253cba42f7e423d5257e1748d4bc4933a922ae32055"
+    },
+    {
+      "path": "windows-build16-upgrade/build13-before-restart-draft.json",
+      "bytes": 526,
+      "sha256": "989ac9ae936f96125d5231192398d9d4de52736c114e4c249005f936c8f58352"
+    },
+    {
+      "path": "windows-build16-upgrade/build13-before-restart-snapshot.json",
+      "bytes": 2227,
+      "sha256": "7219972e5274d14bca3340ba08b86480113376dbf1ba37337d914c98c705f990"
+    },
+    {
+      "path": "windows-build16-upgrade/build13-restart-stop.json",
+      "bytes": 793,
+      "sha256": "9f5b92c2bef6024f9ef1104f7302b80c82a9da9519cfcf71aab790258efbfd0b"
+    },
+    {
+      "path": "windows-build16-upgrade/build16-before-page-reload-draft.json",
+      "bytes": 413,
+      "sha256": "bef880f02e631be874628ebea63e9bc1601732a3815e3ba138149e02d8f21527"
+    },
+    {
+      "path": "windows-build16-upgrade/build16-before-page-reload-snapshot.json",
+      "bytes": 1696,
+      "sha256": "b961f2c9054e3b35a591f08571b3172f17da0aa07e9fd198b6f792862e9fd966"
+    },
+    {
+      "path": "windows-build16-upgrade/build16-postupgrade-readonly.json",
+      "bytes": 6327,
+      "sha256": "ca4fa9fa695b174b3c69bcb775efc7ab44b2eb373e519e9bf7f431fc10c84e9f"
+    },
+    {
+      "path": "windows-build16-upgrade/build16-postupgrade-readonly.mjs",
+      "bytes": 9293,
+      "sha256": "09f5908e21c8d6064e73e3fbb4a134565d61ef4d2b7a7f9de2d723f76fd73d76"
+    },
+    {
+      "path": "windows-build16-upgrade/cold-profile-after-downgrade.json",
+      "bytes": 20948,
+      "sha256": "2d654187df909ab27e840b7e2e6bbe8ece61cf19612c0a1b998f2b584b87e32f"
+    },
+    {
+      "path": "windows-build16-upgrade/cold-profile-before-downgrade.json",
+      "bytes": 21446,
+      "sha256": "20f5916a9d00d8949a1c93ff7294367a376db016024ad18e4e163813eeb61931"
+    },
+    {
+      "path": "windows-build16-upgrade/controlled-relaunch.json",
+      "bytes": 5533,
+      "sha256": "b4c732b23f472d21df232650dcdf2d8834543471b97db0b8858611c340f51f28"
+    },
+    {
+      "path": "windows-build16-upgrade/desktop-13-cdp9433.log",
+      "bytes": 556,
+      "sha256": "bdd48dfc13887723b2d16d530f86e01c81f850d602a20f31c04a3d50b42dbb32"
+    },
+    {
+      "path": "windows-build16-upgrade/desktop-13-relaunch-cdp9433.log",
+      "bytes": 688,
+      "sha256": "32a1a077b89c51829f24dd23cb7805459a3f47251765886be45cda2840351728"
+    },
+    {
+      "path": "windows-build16-upgrade/downgrade-installer-process.json",
+      "bytes": 324,
+      "sha256": "2986780a217170b70de2c9ce2bc14a6df93f1804102d78ea05358aa4659c910a"
+    },
+    {
+      "path": "windows-build16-upgrade/downgrade-to-13.json",
+      "bytes": 2301,
+      "sha256": "9fd0f8d311213d1ee2dac02b779cb2723c0e0090f424bde554a7b063611fb0a6"
+    },
+    {
+      "path": "windows-build16-upgrade/draft-records-build13.json",
+      "bytes": 5867,
+      "sha256": "faf9d2dcc59f64dd13da0445848b4e99329132e02ac156bdd6bd79936c369c99"
+    },
+    {
+      "path": "windows-build16-upgrade/install-request.json",
+      "bytes": 45,
+      "sha256": "4e11fa6450938e00a9d78695e70831671ff0c5085f8c0b45264ec54ada8c5eb3"
+    },
+    {
+      "path": "windows-build16-upgrade/pre-downgrade-draft.json",
+      "bytes": 270,
+      "sha256": "5d4a625af91e9b49e324807efe8886f7c8247afe7bff895948df53181f8495d8"
+    },
+    {
+      "path": "windows-build16-upgrade/pre-downgrade.json",
+      "bytes": 9178,
+      "sha256": "1b23d9857c7eaba30eeb5e97fcffab9cb143637ee9cf81fbb47352d821c8e0e1"
+    },
+    {
+      "path": "windows-build16-upgrade/update-ready.json",
+      "bytes": 2236,
+      "sha256": "85bdc6ad9a73f41841f18afa0970492e66330dabf14fc805a74e168ae0fc2b48"
+    },
+    {
+      "path": "windows-build16-upgrade/updater-directories-before.json",
+      "bytes": 390,
+      "sha256": "a80247ca4883d18136eee2111966f837cebae5364f98fd14e63810e3c05afdc8"
+    }
+  ]
+}

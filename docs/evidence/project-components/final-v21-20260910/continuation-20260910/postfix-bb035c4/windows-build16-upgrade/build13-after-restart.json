@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T12:46:55.6108250Z",
+  "draft": {
+    "action": "verify",
+    "createdTestDraft": false,
+    "valueLength": 21,
+    "valueSha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c",
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "runtime": {
+      "apiBaseUrl": "http://127.0.0.1:4639",
+      "notificationsEnabled": true,
+      "version": "0.2.0-preview.13",
+      "mcp": {
+        "state": "listening",
+        "port": 4642,
+        "url": "http://127.0.0.1:4642/mcp",
+        "lastError": null
+      }
+    },
+    "matchesExpected": true
+  },
+  "snapshot": {
+    "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html",
+    "title": "Relay QA Hub",
+    "appReady": true,
+    "loginVisible": false,
+    "authUnavailable": false,
+    "bugRowCount": 0,
+    "workbenchLoading": false,
+    "workbenchEmpty": true,
+    "workbenchErrorText": null,
+    "detailOpen": false,
+    "detailLoadingVisible": false,
+    "detailErrorText": null,
+    "detailEditTriggerVisible": false,
+    "detailDeleteTriggerVisible": false,
+    "detailEditorVisible": false,
+    "detailEditorImageInputVisible": false,
+    "detailEditorFieldCount": 0,
+    "qingyuModalVisible": false,
+    "qingyuQrVisible": false,
+    "qingyuWorkspaceVisible": false,
+    "qingyuErrorText": null,
+    "evidenceImageCount": 0,
+    "evidenceLoadedCount": 0,
+    "summaryLabels": [
+      "待处理",
+      "处理中",
+      "已完成待验收",
+      "关闭"
+    ],
+    "pocoRegionVisible": false,
+    "pocoRegionText": null,
+    "overviewVisible": false,
+    "overviewLoading": false,
+    "overviewErrorText": null,
+    "overviewRowCount": 0,
+    "overviewOwnerSelectCount": 0,
+    "overviewVerifierSelectCount": 0,
+    "overviewPrioritySelectCount": 0,
+    "overviewPriorityLabelCount": 0,
+    "overviewDisplayedKeys": [],
+    "overviewTitleSupplementCount": 0,
+    "overviewWrappedTitleCount": 0,
+    "overviewLargeTitleCount": 0,
+    "overviewColumnResizerCount": 0,
+    "overviewHeaders": [],
+    "overviewUnassignedFilterAvailable": false,
+    "overviewDateNavVisible": false,
+    "overviewDatePageCount": 0,
+    "overviewDatePickerVisible": false,
+    "overviewSelectedDate": "",
+    "overviewActiveDatePageLabel": null,
+    "overviewAllDateCount": 0,
+    "overviewRowDateKeys": [],
+    "markerVisible": false,
+    "desktopConnection": {
+      "state": "connected",
+      "reconnectAttempt": 0,
+      "lastError": "INBOX_READ_FAILED"
+    },
+    "desktopPackagingBridgeAvailable": true,
+    "desktopUpdate": {
+      "status": "ready",
+      "releaseId": "20260910T122343731Z",
+      "version": "0.2.0-preview.16",
+      "publishedAt": "2026-09-10T12:26:38.164Z"
+    },
+    "visibilityState": "visible"
+  },
+  "process": {
+    "ProcessId": 10488,
+    "ParentProcessId": 18464,
+    "CreationDate": "2026-09-10T20:46:03.964587+08:00",
+    "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+    "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --hidden --remote-debugging-port=9433 --user-data-dir=C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile"
+  },
+  "checks": {
+    "draftHashExact": true,
+    "runtime13": true,
+    "bridgeAvailable": true,
+    "signedIn": true,
+    "update16Ready": true,
+    "mainCount": 1,
+    "mainPid": 10488,
+    "mcpOwnedByMain": true,
+    "cdpOwnedByMain": true,
+    "identityHashExact": true
+  },
+  "passed": true
+}

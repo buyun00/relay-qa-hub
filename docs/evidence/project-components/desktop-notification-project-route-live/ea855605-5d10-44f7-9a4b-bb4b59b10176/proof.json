@@ -1,0 +1,1024 @@
+{
+  "schemaVersion": 1,
+  "runId": "ea855605-5d10-44f7-9a4b-bb4b59b10176",
+  "startedAt": "2026-09-10T13:15:39.144Z",
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "passed": false,
+  "checks": [
+    {
+      "label": "copied EXE hash",
+      "passed": true,
+      "actual": "15974f3d818980bc0b1a341ecbe2636b9018c3ad4958a60ba2367648a64511c5",
+      "expected": "15974f3d818980bc0b1a341ecbe2636b9018c3ad4958a60ba2367648a64511c5",
+      "at": "2026-09-10T13:15:39.787Z"
+    },
+    {
+      "label": "copied ASAR hash",
+      "passed": true,
+      "actual": "4d47c054aa4aa62fb23c99a5c437213663228003277ea0a58276252df0c75203",
+      "expected": "4d47c054aa4aa62fb23c99a5c437213663228003277ea0a58276252df0c75203",
+      "at": "2026-09-10T13:15:39.799Z"
+    },
+    {
+      "label": "interactive desktop session",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T13:15:45.052Z"
+    },
+    {
+      "label": "input preview has no running process",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:45.052Z"
+    },
+    {
+      "label": "same instance has no running process",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:45.052Z"
+    },
+    {
+      "label": "new port 52398 vacant",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:45.052Z"
+    },
+    {
+      "label": "new port 52399 vacant",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:45.052Z"
+    },
+    {
+      "label": "new port 52400 vacant",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:45.052Z"
+    },
+    {
+      "label": "read-only readiness before any business write status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T13:15:45.098Z"
+    },
+    {
+      "label": "isolated API ready",
+      "passed": true,
+      "actual": "ready",
+      "expected": "ready",
+      "at": "2026-09-10T13:15:45.098Z"
+    },
+    {
+      "label": "quit-probe exact PID",
+      "passed": true,
+      "actual": 17652,
+      "expected": 17652,
+      "at": "2026-09-10T13:15:45.616Z"
+    },
+    {
+      "label": "quit-probe exact copied EXE",
+      "passed": true,
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\ea855605-5d10-44f7-9a4b-bb4b59b10176\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\ea855605-5d10-44f7-9a4b-bb4b59b10176\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "at": "2026-09-10T13:15:45.616Z"
+    },
+    {
+      "label": "quit-probe exact isolated profile",
+      "passed": true,
+      "actual": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\ea855605-5d10-44f7-9a4b-bb4b59b10176\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\quit-probe",
+      "expected": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\ea855605-5d10-44f7-9a4b-bb4b59b10176\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\quit-probe",
+      "at": "2026-09-10T13:15:45.616Z"
+    },
+    {
+      "label": "quit-probe graceful quit acknowledged",
+      "passed": true,
+      "actual": "OWN_APP_QUIT_SCHEDULED",
+      "expected": "OWN_APP_QUIT_SCHEDULED",
+      "at": "2026-09-10T13:15:45.872Z"
+    },
+    {
+      "label": "quit-probe exact child exited",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T13:15:46.076Z"
+    },
+    {
+      "label": "quit-probe exit code",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:46.076Z"
+    },
+    {
+      "label": "foreign processes unchanged by quit probe",
+      "passed": true,
+      "actual": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "expected": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "at": "2026-09-10T13:15:51.084Z"
+    },
+    {
+      "label": "probe port 52398 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:51.084Z"
+    },
+    {
+      "label": "probe port 52399 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:51.084Z"
+    },
+    {
+      "label": "probe port 52400 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:51.084Z"
+    },
+    {
+      "label": "GM login status",
+      "passed": true,
+      "actual": 200,
+      "expected": 200,
+      "at": "2026-09-10T13:15:51.091Z"
+    },
+    {
+      "label": "GM identity",
+      "passed": true,
+      "actual": true,
+      "expected": true,
+      "at": "2026-09-10T13:15:51.091Z"
+    },
+    {
+      "label": "create project A status",
+      "passed": false,
+      "actual": 400,
+      "expected": 200,
+      "at": "2026-09-10T13:15:51.095Z"
+    },
+    {
+      "label": "daily and foreign QA Hub processes unchanged",
+      "passed": true,
+      "actual": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "expected": [
+        {
+          "pid": 164,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6454770Z",
+          "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2"
+        },
+        {
+          "pid": 3452,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.7633970Z",
+          "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9"
+        },
+        {
+          "pid": 8632,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.8187730Z",
+          "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef"
+        },
+        {
+          "pid": 10744,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6574810Z",
+          "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549"
+        },
+        {
+          "pid": 13564,
+          "parentPid": 9232,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.4163170Z",
+          "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59"
+        },
+        {
+          "pid": 17160,
+          "parentPid": 24088,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.5269520Z",
+          "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77"
+        },
+        {
+          "pid": 20984,
+          "parentPid": 13564,
+          "name": "RelayQaHubPreview.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+          "startedAt": "2026-09-09T01:44:08.6727490Z",
+          "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637"
+        },
+        {
+          "pid": 23112,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4786740Z",
+          "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374"
+        },
+        {
+          "pid": 23528,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.5454310Z",
+          "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450"
+        },
+        {
+          "pid": 23944,
+          "parentPid": 17160,
+          "name": "RelayQaHub.exe",
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+          "startedAt": "2026-09-08T10:24:12.6985200Z",
+          "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0"
+        },
+        {
+          "pid": 26660,
+          "parentPid": 26828,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.4690790Z",
+          "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32"
+        },
+        {
+          "pid": 26828,
+          "parentPid": 19820,
+          "name": "RelayQaHub.exe",
+          "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+          "startedAt": "2026-09-10T10:48:47.3434440Z",
+          "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9"
+        }
+      ],
+      "at": "2026-09-10T13:15:56.083Z"
+    },
+    {
+      "label": "configured and production listeners unchanged",
+      "passed": true,
+      "actual": [
+        {
+          "port": 4174,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 7420
+        },
+        {
+          "port": 4319,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 14044
+        },
+        {
+          "port": 4320,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 17160
+        },
+        {
+          "port": 4639,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 1940
+        },
+        {
+          "port": 4640,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 20452
+        },
+        {
+          "port": 4641,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 19112
+        },
+        {
+          "port": 4642,
+          "listening": false,
+          "address": null,
+          "pid": null
+        }
+      ],
+      "expected": [
+        {
+          "port": 4174,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 7420
+        },
+        {
+          "port": 4319,
+          "listening": true,
+          "address": "0.0.0.0",
+          "pid": 14044
+        },
+        {
+          "port": 4320,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 17160
+        },
+        {
+          "port": 4639,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 1940
+        },
+        {
+          "port": 4640,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 20452
+        },
+        {
+          "port": 4641,
+          "listening": true,
+          "address": "127.0.0.1",
+          "pid": 19112
+        },
+        {
+          "port": 4642,
+          "listening": false,
+          "address": null,
+          "pid": null
+        }
+      ],
+      "at": "2026-09-10T13:15:56.084Z"
+    },
+    {
+      "label": "final own port 52398 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:56.084Z"
+    },
+    {
+      "label": "final own port 52399 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:56.084Z"
+    },
+    {
+      "label": "final own port 52400 released",
+      "passed": true,
+      "actual": 0,
+      "expected": 0,
+      "at": "2026-09-10T13:15:56.084Z"
+    },
+    {
+      "label": "instance and installed preview inputs unchanged",
+      "passed": true,
+      "actual": [
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\instance.json",
+          "bytes": 1327,
+          "sha256": "cf92bad26060bbcddcfc37d620320e8bac15e09104088944e456a3b9205257db"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+          "bytes": 235871744,
+          "sha256": "15974f3d818980bc0b1a341ecbe2636b9018c3ad4958a60ba2367648a64511c5"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar",
+          "bytes": 3442832,
+          "sha256": "4d47c054aa4aa62fb23c99a5c437213663228003277ea0a58276252df0c75203"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\preview-instance.json",
+          "bytes": 742,
+          "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\secrets.json",
+          "bytes": 242,
+          "sha256": "fcf0173d2eaac6c6a7d6fa56a990870796a80fac34bee3de696a7fdd094c4468"
+        }
+      ],
+      "expected": [
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\instance.json",
+          "bytes": 1327,
+          "sha256": "cf92bad26060bbcddcfc37d620320e8bac15e09104088944e456a3b9205257db"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+          "bytes": 235871744,
+          "sha256": "15974f3d818980bc0b1a341ecbe2636b9018c3ad4958a60ba2367648a64511c5"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar",
+          "bytes": 3442832,
+          "sha256": "4d47c054aa4aa62fb23c99a5c437213663228003277ea0a58276252df0c75203"
+        },
+        {
+          "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\preview-instance.json",
+          "bytes": 742,
+          "sha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+        },
+        {
+          "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\secrets.json",
+          "bytes": 242,
+          "sha256": "fcf0173d2eaac6c6a7d6fa56a990870796a80fac34bee3de696a7fdd094c4468"
+        }
+      ],
+      "at": "2026-09-10T13:15:56.287Z"
+    }
+  ],
+  "fixtures": {},
+  "requests": [
+    {
+      "label": "read-only readiness before any business write",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "projectId": null,
+      "request": null,
+      "at": "2026-09-10T13:15:45.052Z",
+      "status": 200,
+      "responseSha256": "eef9b88c73d906a5ee60e088d5ac06472b255a8962c86e47b6b77d6c2787262f",
+      "response": {
+        "status": "ready",
+        "schemaVersion": "20",
+        "checks": [
+          {
+            "name": "database",
+            "status": "ok"
+          },
+          {
+            "name": "evidence",
+            "status": "ok"
+          },
+          {
+            "name": "worker",
+            "status": "ok"
+          }
+        ]
+      }
+    },
+    {
+      "label": "GM login",
+      "method": "POST",
+      "path": "/api/v1/auth/gm/login",
+      "projectId": null,
+      "request": {
+        "password": "[REDACTED]",
+        "client": "android"
+      },
+      "at": "2026-09-10T13:15:51.084Z",
+      "status": 200,
+      "responseSha256": "502583d4710bc2f1ed20d3a5f0350cdccc04658a7722e4b34f231126ec567079",
+      "response": {
+        "accountId": "10000000-0000-4000-8000-000000000020",
+        "userId": "eb15d62a-f9d2-4015-a5f3-c95f1a729e23",
+        "email": "qa-b92dcb64da744e5245c8ad99ceeca75c6d719402fc65e323ea07fff842e5d657@local.invalid",
+        "displayName": "Preview GM",
+        "csrfToken": "[REDACTED]",
+        "isGm": true,
+        "accessToken": "[REDACTED]",
+        "expiresAt": "2094-09-28T16:29:58.089Z"
+      }
+    },
+    {
+      "label": "create project A",
+      "method": "POST",
+      "path": "/api/v1/gm/projects",
+      "projectId": null,
+      "request": {
+        "id": "5fca49d6-31bb-4328-9428-4e2fd7624fbc",
+        "key": "Nea8556055dA",
+        "name": "通知路由A-ea855605"
+      },
+      "at": "2026-09-10T13:15:51.091Z",
+      "status": 400,
+      "responseSha256": "e87ad5cced8ae7f94d192313fcf7ac966e90bafde8e3a828d498aca7c5121893",
+      "response": {
+        "code": "INVALID_REQUEST",
+        "message": "project key or name is invalid"
+      }
+    }
+  ],
+  "processes": [
+    {
+      "phase": "quit-probe_launch",
+      "pid": 17652,
+      "executable": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\ea855605-5d10-44f7-9a4b-bb4b59b10176\\installed-copy\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+      "profile": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\acceptance\\desktop-notification-project-route-live\\ea855605-5d10-44f7-9a4b-bb4b59b10176\\profiles\\qa-hub-preview-v21-e2e-fresh-0910\\quit-probe",
+      "at": "2026-09-10T13:15:45.490Z"
+    },
+    {
+      "phase": "quit-probe_quit",
+      "pid": 17652,
+      "exitCode": 0,
+      "at": "2026-09-10T13:15:46.077Z"
+    }
+  ],
+  "network": [],
+  "guarantees": {
+    "productionRootsRejected": [
+      "D:\\Relay-QA-Hub",
+      "D:\\Relay-QA-Hub-Data",
+      "D:\\Relay-QA-Hub-Config",
+      "E:\\Relay-QA-Hub-Archives",
+      "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub",
+      "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview",
+      "C:\\Users\\lin0\\AppData\\Local\\Relay QA Hub",
+      "C:\\Users\\lin0\\AppData\\Roaming\\Relay QA Hub"
+    ],
+    "productionPortsRejected": [
+      4319,
+      4174,
+      4320
+    ],
+    "foreignProcessesAreNeverSignaled": true,
+    "noForceKillFallback": true,
+    "fixturesAreRetained": true
+  },
+  "ports": {
+    "mcp": 52398,
+    "cdp": 52399,
+    "inspector": 52400
+  },
+  "error": {
+    "name": "AssertionError",
+    "message": "create project A status"
+  },
+  "hostAfter": {
+    "capturedAt": "2026-09-10T13:15:56.0495448Z",
+    "sessionId": 2,
+    "processes": [
+      {
+        "pid": 17160,
+        "parentPid": 24088,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.5269520Z",
+        "commandLineSha256": "0877b43443e2a4cfbe1a0e676912b9dfcfc812ceeb1ad371fd9ef0a516221a77",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --updated"
+      },
+      {
+        "pid": 10744,
+        "parentPid": 17160,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.6574810Z",
+        "commandLineSha256": "ef640b5d223baafb1b55652982938f69285aaaf8d37daab258238ff681f63549",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop\" --gpu-preferences --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:2"
+      },
+      {
+        "pid": 23944,
+        "parentPid": 17160,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.6985200Z",
+        "commandLineSha256": "31089bf64ff57bae2d8a04a0d4764c67d65e9fe3dc103454afc41dbffa1502f0",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --type --utility-sub-type --lang --service-sandbox-type --user-data-dir=\"C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:11"
+      },
+      {
+        "pid": 3452,
+        "parentPid": 17160,
+        "name": "RelayQaHub.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe",
+        "startedAt": "2026-09-08T10:24:12.7633970Z",
+        "commandLineSha256": "f18fb4fa9486f1e9e4b0de71a49ba0c15cd9d686f5a69872fa123342d582adb9",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHub\\RelayQaHub.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\AppData\\Roaming\\@relay-qa-hub\\desktop\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --app-user-model-id --app-path --enable-sandbox --lang --device-scale-factor --num-raster-threads --enable-main-frame-before-activation --time-ticks-at-unix-epoch --launch-time-ticks --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:1"
+      },
+      {
+        "pid": 13564,
+        "parentPid": 9232,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.4163170Z",
+        "commandLineSha256": "893a817c34861eedfa3a3a0a968755ae0746e6cbe6a400c55df28550c877eb59",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --updated"
+      },
+      {
+        "pid": 164,
+        "parentPid": 13564,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.6454770Z",
+        "commandLineSha256": "57b7c73ac644856fa52c597b0ae3a1cdbb6def14950fa6845de3e80102886da2",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\" --gpu-preferences --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:2"
+      },
+      {
+        "pid": 20984,
+        "parentPid": 13564,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.6727490Z",
+        "commandLineSha256": "a23cf06b5604dbe8e8c40e1c2f0b94ffdb26c37f59df36401fca0a0d3b7a3637",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --type --utility-sub-type --lang --service-sandbox-type --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:11"
+      },
+      {
+        "pid": 8632,
+        "parentPid": 13564,
+        "name": "RelayQaHubPreview.exe",
+        "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe",
+        "startedAt": "2026-09-09T01:44:08.8187730Z",
+        "commandLineSha256": "1a58dc2a01b4e2cc7e586856e1f6f3cdfb30eb54c9b3c39238a4fb738a528aef",
+        "commandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview\\RelayQaHubPreview.exe\" --type --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-7c86\\desktop\\profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --app-user-model-id --app-path --enable-sandbox --lang --device-scale-factor --num-raster-threads --enable-main-frame-before-activation --time-ticks-at-unix-epoch --launch-time-ticks --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:1"
+      },
+      {
+        "pid": 26828,
+        "parentPid": 19820,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.3434440Z",
+        "commandLineSha256": "2caedf0420c6bfbf2a720702a5a12356aee3cbb941872c0b76c0692e187dedf9",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --hidden --user-data-dir=D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile"
+      },
+      {
+        "pid": 26660,
+        "parentPid": 26828,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.4690790Z",
+        "commandLineSha256": "fa4cbc206d6a98847d7e60470bfd9fb0fcea17531e11c1adc21247ef20201c32",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --type --user-data-dir=\"D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile\" --gpu-preferences --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:2"
+      },
+      {
+        "pid": 23112,
+        "parentPid": 26828,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.4786740Z",
+        "commandLineSha256": "d4be73d72d5d2b6268634ec9c55de800a9afdd8bec2f594031ac217cdd728374",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --type --utility-sub-type --lang --service-sandbox-type --user-data-dir=\"D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:11"
+      },
+      {
+        "pid": 23528,
+        "parentPid": 26828,
+        "name": "RelayQaHub.exe",
+        "path": "D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe",
+        "startedAt": "2026-09-10T10:48:47.5454310Z",
+        "commandLineSha256": "5527caeb78b30015a746e441c1162e7fb72302c669a8a04a9262a6ea92aba450",
+        "commandLine": "\"D:\\Relay-QA-Hub\\apps\\desktop\\release\\RelayQaHub-win32-x64\\RelayQaHub.exe\" --type --user-data-dir=\"D:\\Relay-QA-Hub\\work\\eight-build-acceptance\\client-profile\" --standard-schemes --secure-schemes --cors-schemes --fetch-schemes --streaming-schemes --app-user-model-id --app-path --enable-sandbox --video-capture-use-gpu-memory-buffer --device-scale-factor --num-raster-threads --enable-main-frame-before-activation --time-ticks-at-unix-epoch --launch-time-ticks --field-trial-handle --enable-features --disable-features --variations-seed-version --trace-process-track-uuid --mojo-platform-channel-handle /prefetch:1"
+      }
+    ],
+    "listeners": [
+      {
+        "port": 4319,
+        "listening": true,
+        "address": "0.0.0.0",
+        "pid": 14044
+      },
+      {
+        "port": 4174,
+        "listening": true,
+        "address": "0.0.0.0",
+        "pid": 7420
+      },
+      {
+        "port": 4320,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 17160
+      },
+      {
+        "port": 4639,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 1940
+      },
+      {
+        "port": 4640,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 20452
+      },
+      {
+        "port": 4641,
+        "listening": true,
+        "address": "127.0.0.1",
+        "pid": 19112
+      },
+      {
+        "port": 4642,
+        "listening": false
+      },
+      {
+        "port": 52398,
+        "listening": false
+      },
+      {
+        "port": 52399,
+        "listening": false
+      },
+      {
+        "port": 52400,
+        "listening": false
+      }
+    ]
+  },
+  "finishedAt": "2026-09-10T13:15:56.287Z"
+}

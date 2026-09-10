@@ -1,0 +1,19 @@
+{
+  "action": "verify",
+  "createdTestDraft": false,
+  "valueLength": 21,
+  "valueSha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c",
+  "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+  "runtime": {
+    "apiBaseUrl": "http://127.0.0.1:4639",
+    "notificationsEnabled": true,
+    "version": "0.2.0-preview.13",
+    "mcp": {
+      "state": "listening",
+      "port": 4642,
+      "url": "http://127.0.0.1:4642/mcp",
+      "lastError": null
+    }
+  },
+  "matchesExpected": true
+}

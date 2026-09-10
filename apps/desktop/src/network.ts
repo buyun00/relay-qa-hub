@@ -281,7 +281,7 @@ export async function fetchDurableInbox(
   if (!isAllowedNetworkUrl(endpoint, config)) throw new Error("INBOX_ORIGIN_NOT_ALLOWED");
   let response: Response;
   try {
-    const headers = new Headers({ Accept: "application/vnd.relay-qa-hub.v1.1+json" });
+    const headers = new Headers({ Accept: "application/json" });
     if (config.accessToken !== null) headers.set("Authorization", `Bearer ${config.accessToken}`);
     else if (browserSessionCookie !== null) headers.set("Cookie", browserSessionCookie);
     response = await fetch(endpoint, {

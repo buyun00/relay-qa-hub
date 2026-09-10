@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-09-10T12:30:53.647Z",
+  "state": {
+    "bridgeType": "object",
+    "readyState": "complete",
+    "url": "qa-hub-preview-v21-e2e-fresh-0910://app/index.html",
+    "appReady": false
+  },
+  "events": [
+    {
+      "method": "Log.entryAdded",
+      "level": "error",
+      "source": "network",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    },
+    {
+      "method": "Page.loadEventFired"
+    },
+    {
+      "method": "Log.entryAdded",
+      "level": "error",
+      "source": "network",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    }
+  ]
+}

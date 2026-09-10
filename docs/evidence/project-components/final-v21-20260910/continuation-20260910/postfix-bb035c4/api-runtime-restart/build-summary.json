@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "bb035c4239f57b11a4cef730427f5e8cb45c62ee",
+  "builtAt": "2026-09-10T13:13:27.893Z",
+  "roots": [
+    "apps/api/dist",
+    "packages/storage/dist"
+  ],
+  "fileCount": 492,
+  "totalBytes": 3727078,
+  "aggregateSha256": "3007ebcbf59730b4701f9f1487b72613cdd50ec8964289090828d18ba70944e6",
+  "aggregateFormat": "path\\0bytes\\0sha256\\n sorted by repository-relative path",
+  "storageExitCode": 0,
+  "apiExitCode": 0,
+  "buildCommands": [
+    "node packages/storage/node_modules/typescript/bin/tsc -p packages/storage/tsconfig.json",
+    "node apps/api/node_modules/typescript/bin/tsc -p apps/api/tsconfig.json"
+  ],
+  "liveRuntime": {
+    "apiProcessStartedAt": "2026-09-10T18:35:29+08:00",
+    "latestApiStorageCommit": "0de8fb7a9df93de6c7d485fce675abbf8ae16de6",
+    "laterApiStorageChanges": [],
+    "sourceUnchangedSinceRuntimeStart": true
+  }
+}

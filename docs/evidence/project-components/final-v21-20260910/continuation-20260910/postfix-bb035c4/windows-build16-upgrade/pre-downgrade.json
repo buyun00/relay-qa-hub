@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T12:36:16.2564144Z",
+  "target": {
+    "releaseId": "20260910T122343731Z",
+    "version": "0.2.0-preview.16",
+    "sourceCommit": "bb035c4239f57b11a4cef730427f5e8cb45c62ee"
+  },
+  "installedBefore": {
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910",
+    "version": "0.2.0-preview.15",
+    "fileVersion": "0.2.0.15",
+    "exeSha256": "6bace18984ac54f25dbec28fa19ac7f45450aff3bc23c5a850c87bde682cc722",
+    "previewInstanceSha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c",
+    "processes": [
+      {
+        "ProcessId": 17344,
+        "ParentProcessId": 16820,
+        "CreationDate": "2026-09-10T19:38:27.209667+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --hidden --remote-debugging-port=9433 --user-data-dir=C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile"
+      },
+      {
+        "ProcessId": 10340,
+        "ParentProcessId": 17344,
+        "CreationDate": "2026-09-10T19:38:27.33804+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=gpu-process --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --gpu-preferences=UAAAAAAAAADgAAAEAAAAAAAAAAAAAGAAOAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAACAAAAAAAAAA= --field-trial-handle=1892,i,9763445679431219420,7368279742843007206,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1900,i,15956598640559385341,12451768297418721350,4 --trace-process-track-uuid=3190708988185955192 --mojo-platform-channel-handle=1884 /prefetch:2"
+      },
+      {
+        "ProcessId": 14756,
+        "ParentProcessId": 17344,
+        "CreationDate": "2026-09-10T19:38:27.359911+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=utility --utility-sub-type=network.mojom.NetworkService --lang=zh-CN --service-sandbox-type=none --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --standard-schemes=qa-hub-preview-v21-e2e-fresh-0910 --secure-schemes=qa-hub-preview-v21-e2e-fresh-0910 --cors-schemes=qa-hub-preview-v21-e2e-fresh-0910 --fetch-schemes=qa-hub-preview-v21-e2e-fresh-0910 --streaming-schemes=qa-hub-preview-v21-e2e-fresh-0910 --field-trial-handle=1892,i,9763445679431219420,7368279742843007206,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1900,i,15956598640559385341,12451768297418721350,4 --trace-process-track-uuid=3190708989122997041 --mojo-platform-channel-handle=2180 /prefetch:11"
+      },
+      {
+        "ProcessId": 23160,
+        "ParentProcessId": 17344,
+        "CreationDate": "2026-09-10T19:38:27.450299+08:00",
+        "ExecutablePath": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe",
+        "CommandLine": "\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\RelayQaHubPreview-v21-e2e-fresh-0910.exe\" --type=renderer --user-data-dir=\"C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile\" --standard-schemes=qa-hub-preview-v21-e2e-fresh-0910 --secure-schemes=qa-hub-preview-v21-e2e-fresh-0910 --cors-schemes=qa-hub-preview-v21-e2e-fresh-0910 --fetch-schemes=qa-hub-preview-v21-e2e-fresh-0910 --streaming-schemes=qa-hub-preview-v21-e2e-fresh-0910 --app-user-model-id=com.relayqahub.desktop.preview.v21.e2e.fresh.0910 --app-path=\"C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910\\resources\\app.asar\" --enable-sandbox --remote-debugging-port=9433 --video-capture-use-gpu-memory-buffer --lang=zh-CN --device-scale-factor=1.75 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=4 --time-ticks-at-unix-epoch=-1788773729538061 --launch-time-ticks=266577906421 --field-trial-handle=1892,i,9763445679431219420,7368279742843007206,262144 --enable-features=PdfUseShowSaveFilePicker --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1900,i,15956598640559385341,12451768297418721350,4 --trace-process-track-uuid=3190708990060038890 --mojo-platform-channel-handle=3332 /prefetch:1"
+      }
+    ]
+  },
+  "draft": {
+    "action": "verify",
+    "createdTestDraft": false,
+    "valueLength": 25,
+    "valueSha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166",
+    "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+    "runtime": null,
+    "matchesExpected": true
+  },
+  "rememberedIdentity": {
+    "value": {
+      "schemaVersion": 2,
+      "serviceOrigin": "http://127.0.0.1:4639",
+      "loginName": "Luna Worker 246",
+      "projectId": "305b4def-ae7e-4a2d-ae96-a05d616390bf",
+      "userId": "0ddff48b-536c-4c30-8b42-511741010610",
+      "identity": "employee"
+    },
+    "bytes": 211,
+    "sha256": "e004fe7fb4a8f9da43546be1cd53cc2894549eaacda5f578a00c304af20d98ff"
+  },
+  "downgradeInstaller": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.13-20260910T044149231Z.exe",
+    "manifest": {
+      "releaseId": "20260910T044149231Z",
+      "version": "0.2.0-preview.13",
+      "bytes": 108296156,
+      "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0",
+      "signatureValid": true
+    }
+  },
+  "backupsBefore": [
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T025617451Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T025617451Z",
+      "lastWriteTimeUtc": "2026-09-10T02:44:28.9452552Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T033745832Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T033745832Z",
+      "lastWriteTimeUtc": "2026-09-10T03:00:16.3712284Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z",
+      "lastWriteTimeUtc": "2026-09-10T03:41:36.8117496Z"
+    },
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T112450576Z",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T112450576Z",
+      "lastWriteTimeUtc": "2026-09-10T04:59:51.9055152Z"
+    }
+  ],
+  "listeners": [
+    {
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "port": 4319,
+      "pid": 9488
+    },
+    {
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "port": 4639,
+      "pid": 1940
+    },
+    {
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "port": 4642,
+      "pid": 17344
+    },
+    {
+      "port": 9333,
+      "pid": 26828
+    },
+    {
+      "port": 9433,
+      "pid": 17344
+    }
+  ],
+  "checks": {
+    "draftHashExact": true,
+    "installedVersion15": true,
+    "mainExact": true,
+    "desktopMcpOwnedByMain": true,
+    "cdpOwnedByMain": true,
+    "identityHashExact": true,
+    "installer13SizeExact": true,
+    "installer13HashExact": true,
+    "installer13SignatureValid": true,
+    "production4319Preserved": true,
+    "production4174Preserved": true,
+    "production4320Preserved": true,
+    "foreign9333Preserved": true
+  },
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false
+  },
+  "passed": true
+}

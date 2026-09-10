@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T12:40:07.2634718Z",
+  "installer": {
+    "startedAt": "2026-09-10T12:38:35.7736775Z",
+    "finishedAt": "2026-09-10T12:38:47.1431691Z",
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.13-20260910T044149231Z.exe",
+    "pid": 23624,
+    "exitCode": 0
+  },
+  "installed": {
+    "path": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910",
+    "version": "0.2.0-preview.13",
+    "fileVersion": "0.2.0.13",
+    "exeSha256": "2bd7ee601175b06e433746babe6da4a826bf5eaa4ba15db807fff9b74b5d2e32",
+    "instanceIdentity": "qa-hub-preview-v21-e2e-fresh-0910",
+    "previewInstanceSha256": "dbde6a7d32476ed526bce22af042fd5eab0e7abf1cd4b871513688edc534a71c"
+  },
+  "profile": {
+    "fileCount": 102,
+    "aggregateSha256": "4f2a219799fd5ce974cfb3c390d284448a68ef9c67e5184d187c2d73b8aa8927"
+  },
+  "newBackups": [
+    {
+      "name": "RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z-1",
+      "fullName": "C:\\Users\\lin0\\AppData\\Local\\Programs\\RelayQaHubPreview-v21-e2e-fresh-0910.backup-20260910T044149231Z-1",
+      "exeVersion": "0.2.0-preview.15",
+      "exeSha256": "6bace18984ac54f25dbec28fa19ac7f45450aff3bc23c5a850c87bde682cc722"
+    }
+  ],
+  "listeners": [
+    {
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "port": 4319,
+      "pid": 9488
+    },
+    {
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "port": 4639,
+      "pid": 1940
+    },
+    {
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "port": 9333,
+      "pid": 26828
+    }
+  ],
+  "checks": {
+    "installerExitZero": true,
+    "installedVersion13": true,
+    "instanceIdentityExact": true,
+    "previewInstancePreserved": true,
+    "coldProfileByteExact": true,
+    "newBackupCount": 1,
+    "newBackupContains15": true,
+    "production4319Preserved": true,
+    "production4174Preserved": true,
+    "production4320Preserved": true,
+    "foreign9333Preserved": true
+  },
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false
+  },
+  "passed": true
+}

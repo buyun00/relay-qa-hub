@@ -1,0 +1,526 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T12:39:11.6216734Z",
+  "profile": {
+    "root": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\desktop\\profile",
+    "fileCount": 102,
+    "aggregateSha256": "4f2a219799fd5ce974cfb3c390d284448a68ef9c67e5184d187c2d73b8aa8927",
+    "files": [
+      {
+        "path": "Cache\\Cache_Data\\data_0",
+        "bytes": 45056,
+        "sha256": "38026f67d7140e53db45e567366c24022880dfca225f159ea9236f6d8c49e3db"
+      },
+      {
+        "path": "Cache\\Cache_Data\\data_1",
+        "bytes": 270336,
+        "sha256": "c1dc00f4893803450ed0bd07f032234e68fb5ba4a14acf05e4d6190d2780cc76"
+      },
+      {
+        "path": "Cache\\Cache_Data\\data_2",
+        "bytes": 1056768,
+        "sha256": "7e4d92ccca93753b9c147c08904ee3d85dcbf4445dcb3302f2c0edafb4d19cba"
+      },
+      {
+        "path": "Cache\\Cache_Data\\data_3",
+        "bytes": 4202496,
+        "sha256": "be8aa00a799639f2cf632b5f16bc4acfd6bf470ee8688c9833c80d05b0d82f4a"
+      },
+      {
+        "path": "Cache\\Cache_Data\\f_000001",
+        "bytes": 451968,
+        "sha256": "a075b01d9b015c616511a9e87da77da3d9881621db32f584e4606ddabf1c1100"
+      },
+      {
+        "path": "Cache\\Cache_Data\\index",
+        "bytes": 524656,
+        "sha256": "dbd759ebfbe7a65735b4aee83223c27959befcfe078c2882b8b7d9e9924a4d9c"
+      },
+      {
+        "path": "Cache\\No_Vary_Search\\journal.baj",
+        "bytes": 4,
+        "sha256": "9c169428d852e25bd59b27652ed533d2a1f09f96e4c329fa5e06f47e16731543"
+      },
+      {
+        "path": "Cache\\No_Vary_Search\\snapshot.baf",
+        "bytes": 20,
+        "sha256": "0c2dd377ed0cc66161e9db8f89f7d8bcb3ad8c06c4a054bdcba214ab05f58c9a"
+      },
+      {
+        "path": "Code Cache\\electron-preload\\3989A96127B7BEC169AE97C8CD25A73C28F7C7D3F34EFE59AE4E6D7F700F4228.cache",
+        "bytes": 6892,
+        "sha256": "b4056154a6805d478b0e1762fecff441ee22553b778a0f6ee4317e766e919b23"
+      },
+      {
+        "path": "Code Cache\\js\\index",
+        "bytes": 24,
+        "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+      },
+      {
+        "path": "Code Cache\\js\\index-dir\\the-real-index",
+        "bytes": 48,
+        "sha256": "0cafd4b93c40b1fa2073f4b0a4157e52640cd0540a75405e7196c78be6445310"
+      },
+      {
+        "path": "Code Cache\\wasm\\index",
+        "bytes": 24,
+        "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+      },
+      {
+        "path": "Code Cache\\wasm\\index-dir\\the-real-index",
+        "bytes": 48,
+        "sha256": "0cafd4b93c40b1fa2073f4b0a4157e52640cd0540a75405e7196c78be6445310"
+      },
+      {
+        "path": "DawnGraphiteCache\\data_0",
+        "bytes": 8192,
+        "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+      },
+      {
+        "path": "DawnGraphiteCache\\data_1",
+        "bytes": 270336,
+        "sha256": "feb287cec39d49fe0f4b53e70b772d136d8837910cf53c6d97ac98adf500b821"
+      },
+      {
+        "path": "DawnGraphiteCache\\data_2",
+        "bytes": 8192,
+        "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+      },
+      {
+        "path": "DawnGraphiteCache\\data_3",
+        "bytes": 8192,
+        "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+      },
+      {
+        "path": "DawnGraphiteCache\\index",
+        "bytes": 262512,
+        "sha256": "2769d1d201563955c30856d5d47819007b196dad53875286d9d46c133f739447"
+      },
+      {
+        "path": "DawnWebGPUCache\\data_0",
+        "bytes": 8192,
+        "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+      },
+      {
+        "path": "DawnWebGPUCache\\data_1",
+        "bytes": 270336,
+        "sha256": "ecd02a9bcc4f65460d73fd96c079f3bf7b2ac51519936763be38f31dc9e35642"
+      },
+      {
+        "path": "DawnWebGPUCache\\data_2",
+        "bytes": 8192,
+        "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+      },
+      {
+        "path": "DawnWebGPUCache\\data_3",
+        "bytes": 8192,
+        "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+      },
+      {
+        "path": "DawnWebGPUCache\\index",
+        "bytes": 262512,
+        "sha256": "392e3c8f782867e59efd6449f0a0c858b9c7d867875dd767c480dbfa40df5169"
+      },
+      {
+        "path": "DevToolsActivePort",
+        "bytes": 59,
+        "sha256": "717e1817a900b53105e59622933ac5e4692ab2175252bd25936ef28281c5711f"
+      },
+      {
+        "path": "Dictionaries\\en-US-10-1.bdic",
+        "bytes": 451968,
+        "sha256": "a075b01d9b015c616511a9e87da77da3d9881621db32f584e4606ddabf1c1100"
+      },
+      {
+        "path": "DIPS",
+        "bytes": 36864,
+        "sha256": "dd88acd6a082daf565a37cec6035f805a55dd79e17856ad0388492e761697dc4"
+      },
+      {
+        "path": "DIPS-wal",
+        "bytes": 8272,
+        "sha256": "3c7a83915512a32b60aa0dff881fd8828dd93e7b039b8e8307c0b70fb7c65a32"
+      },
+      {
+        "path": "GPUCache\\data_0",
+        "bytes": 45056,
+        "sha256": "93f840a64a86e04427b221e0bb5ab770d23a423f34118852743abb2acbf8c0dd"
+      },
+      {
+        "path": "GPUCache\\data_1",
+        "bytes": 270336,
+        "sha256": "009de12798212776103a72d38b1a19b1a3a682b79bed83d5629fb89e77eee040"
+      },
+      {
+        "path": "GPUCache\\data_2",
+        "bytes": 1056768,
+        "sha256": "8b09d89c7f64aee2302d63dce818084844a1d22ee40aeacb8359d37a92829202"
+      },
+      {
+        "path": "GPUCache\\data_3",
+        "bytes": 8192,
+        "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+      },
+      {
+        "path": "GPUCache\\index",
+        "bytes": 262512,
+        "sha256": "1b3ef9d5925d9a86c29038b72f3f657eb24b688536e05100c449f6aefc32b28f"
+      },
+      {
+        "path": "IndexedDB\\qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.blob\\1\\00\\6",
+        "bytes": 123784,
+        "sha256": "99e40cfcf19b47a1d083bcdb774d32e6d2dd0ee3f53071aee31ac70f0de7977f"
+      },
+      {
+        "path": "IndexedDB\\qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb\\000003.log",
+        "bytes": 123557,
+        "sha256": "de4b49800e7b0320a2b14626930b03ea4e39b295f52f7f4daa169082438388b6"
+      },
+      {
+        "path": "IndexedDB\\qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb\\CURRENT",
+        "bytes": 16,
+        "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+      },
+      {
+        "path": "IndexedDB\\qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb\\LOCK",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "IndexedDB\\qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb\\LOG",
+        "bytes": 480,
+        "sha256": "8eeb3635444cd93a22ddc9261c7f03cf86681406e6caffe60e30079222209cda"
+      },
+      {
+        "path": "IndexedDB\\qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb\\LOG.old",
+        "bytes": 480,
+        "sha256": "1867bd7f54a0084dea5889210e14af124e738803babab51bc7ce011ac9b8fa04"
+      },
+      {
+        "path": "IndexedDB\\qa-hub-preview-v21-e2e-fresh-0910_app_0.indexeddb.leveldb\\MANIFEST-000001",
+        "bytes": 23,
+        "sha256": "720a78803b84cbcc8eb204d5cf8ea6ee2f693be0ab2124ddf2b81455de02a3ed"
+      },
+      {
+        "path": "Local State",
+        "bytes": 490,
+        "sha256": "06f290fb5ddaefcf9139073641b1c810e30214bc1ac372b2afa809ff2ab26d36"
+      },
+      {
+        "path": "Local Storage\\leveldb\\000003.log",
+        "bytes": 1092,
+        "sha256": "0c06dcf8e3aad00c56c231adb36069e91edede4de8575501ab13a0ec85c0e902"
+      },
+      {
+        "path": "Local Storage\\leveldb\\CURRENT",
+        "bytes": 16,
+        "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+      },
+      {
+        "path": "Local Storage\\leveldb\\LOCK",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "Local Storage\\leveldb\\LOG",
+        "bytes": 385,
+        "sha256": "8958760fbdf91b282fcb14f55c8309412320abfa58c3ed5656897e27608e152d"
+      },
+      {
+        "path": "Local Storage\\leveldb\\LOG.old",
+        "bytes": 388,
+        "sha256": "bd58238078b7c3c292e892da74d7cff82c16bd234712de8be8042d8c6b9102a7"
+      },
+      {
+        "path": "Local Storage\\leveldb\\MANIFEST-000001",
+        "bytes": 41,
+        "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+      },
+      {
+        "path": "mcp-attachments\\435da0f754ff79351cf97b2b470f9e4ba0537dcecad9fd170591f26d15e4aa96\\185d3fe0-f5f0-4b9c-ad59-be9f7ec75b9a\\11a5f2ca-eb45-4306-8666-b6552db0cb9d-6b1048f8a6d4-v21-http-mcp-parity-20260910094136.png",
+        "bytes": 68,
+        "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+      },
+      {
+        "path": "mcp-attachments\\435da0f754ff79351cf97b2b470f9e4ba0537dcecad9fd170591f26d15e4aa96\\3e161670-d343-4bf8-b228-fc8f3d681018\\9da39cd0-1101-44ca-9efb-00661a13f080-6b1048f8a6d4-v21-http-mcp-parity-20260910094201.png",
+        "bytes": 68,
+        "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+      },
+      {
+        "path": "Network\\Network Persistent State",
+        "bytes": 111,
+        "sha256": "5dfc321417fc31359f23320ea68014ebfd793c5bbed55f77dab4180bbd4a2026"
+      },
+      {
+        "path": "Network\\NetworkDataMigrated",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "Network\\Trust Tokens",
+        "bytes": 36864,
+        "sha256": "8b5a62a399e316009e0c0ee1727ede327893d7f82f38a136e795422b3f9c333c"
+      },
+      {
+        "path": "Network\\Trust Tokens-journal",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "Preferences",
+        "bytes": 57,
+        "sha256": "be4b8924ab38e8acf350e6e3b9f1f63a1a94952d8002759acd6946c4d5d0b5de"
+      },
+      {
+        "path": "remembered-login-name.json",
+        "bytes": 211,
+        "sha256": "e004fe7fb4a8f9da43546be1cd53cc2894549eaacda5f578a00c304af20d98ff"
+      },
+      {
+        "path": "Session Storage\\000003.log",
+        "bytes": 5646,
+        "sha256": "7cd8b36dccb05184d37ef1f48115f1bf7e3efe3cdb639a159f932d46c6210398"
+      },
+      {
+        "path": "Session Storage\\CURRENT",
+        "bytes": 16,
+        "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+      },
+      {
+        "path": "Session Storage\\LOCK",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "Session Storage\\LOG",
+        "bytes": 376,
+        "sha256": "5ff6e4b333e1dacd7d84ab15ab89cd1d6fbb71f8c6442410a0914667a7e308a2"
+      },
+      {
+        "path": "Session Storage\\LOG.old",
+        "bytes": 376,
+        "sha256": "0b01c393c59227de14099b492c01f3a597680b5ee6872cfd3e746cab545e50e9"
+      },
+      {
+        "path": "Session Storage\\MANIFEST-000001",
+        "bytes": 41,
+        "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+      },
+      {
+        "path": "Shared Dictionary\\cache\\index",
+        "bytes": 24,
+        "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+      },
+      {
+        "path": "Shared Dictionary\\cache\\index-dir\\the-real-index",
+        "bytes": 48,
+        "sha256": "621f508233c01cd1ed1fdbc9d6372e07c289b3ea4c003898363ae96239f7ecc0"
+      },
+      {
+        "path": "Shared Dictionary\\db",
+        "bytes": 45056,
+        "sha256": "fbb86c665b2fed35c372ce8996eb1c4e31082aedd6ad5fc6086cfac889c3471b"
+      },
+      {
+        "path": "Shared Dictionary\\db-journal",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "SharedStorage",
+        "bytes": 4096,
+        "sha256": "0ab48b25cba617ed3a4acca0161813b314c095ef63544bb4af60769eb1012977"
+      },
+      {
+        "path": "SharedStorage-wal",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "updates\\20260910T025617451Z.exe",
+        "bytes": 108446872,
+        "sha256": "068eec9ba2c5c4331e8de75b1dc5f362f4e022f0c6e7f80f2bd9ffde640183c9"
+      },
+      {
+        "path": "updates\\20260910T033745832Z.exe",
+        "bytes": 108326967,
+        "sha256": "65ebb6e51737ab58403b0a7ba5f0fc34c704ead059deaac45a0a544e42e02c9a"
+      },
+      {
+        "path": "updates\\20260910T044149231Z.exe",
+        "bytes": 108296156,
+        "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0"
+      },
+      {
+        "path": "updates\\20260910T044149231Z.exe.retained-d7aa2b55-e263-477b-af22-33ab5eba1327",
+        "bytes": 108296156,
+        "sha256": "7610c92fd39d4485d78e3d8ee7618d79d5e8ed9f3d6ce096c2922c72e5388ab0"
+      },
+      {
+        "path": "updates\\20260910T102940665Z.exe",
+        "bytes": 108356331,
+        "sha256": "b5926614efeb54029058d271270ce300b9df9e7b0f3051efdc3936945078e998"
+      },
+      {
+        "path": "updates\\20260910T102940665Z.exe.retained-583abf85-007d-49e4-ba3f-791ccab8ae85",
+        "bytes": 108356331,
+        "sha256": "b5926614efeb54029058d271270ce300b9df9e7b0f3051efdc3936945078e998"
+      },
+      {
+        "path": "updates\\20260910T112450576Z.exe",
+        "bytes": 108335814,
+        "sha256": "dbb04e29aaa042665548e610a00106eb382bebec6fa2299f56a0ed9c8ee4b971"
+      },
+      {
+        "path": "updates\\last-update-result.json",
+        "bytes": 290,
+        "sha256": "e42f5b8a4e48d0b888960bb93e887f702ea905561f64821c0bfeff9e4e61e45b"
+      },
+      {
+        "path": "updates\\retained-update-result-4cddb0c3-a209-4046-bfbf-4a38649b6c2a.json",
+        "bytes": 290,
+        "sha256": "b4483c0566230bde18443614d8a3010ca95e1b8868da69d10573b1e933c8c9be"
+      },
+      {
+        "path": "updates\\retained-update-result-b26b0fa7-1055-4809-b92b-bab7601463bd.json",
+        "bytes": 290,
+        "sha256": "ede7f5931a78bd1e134d0b0e32a74a50fa96ec86784f6fa3b03c312e03feb803"
+      },
+      {
+        "path": "updates\\retained-update-result-d1c64e53-751c-4d04-b3b4-890e105d262d.json",
+        "bytes": 284,
+        "sha256": "391905b678ad9bd92869f41e38b48693bf92ae7455247ecc04947df34e52ef91"
+      },
+      {
+        "path": "updates\\retained-update-result-dab81b31-3917-44ed-90c7-1bb74dd6be5c.json",
+        "bytes": 290,
+        "sha256": "793e21319a3d7b411810f129eacf179d241c58ddb67fa7e530ff2c00cce77226"
+      },
+      {
+        "path": "updates\\updater-20260910T025617451Z-11304-d9cd3aad-338c-4b9b-b78f-963923e077e9\\ready.flag",
+        "bytes": 50,
+        "sha256": "d171a5f5cfc3554b7dc064ca61bae4665031c4ce270e27872737fbf782d70c37"
+      },
+      {
+        "path": "updates\\updater-20260910T025617451Z-11304-d9cd3aad-338c-4b9b-b78f-963923e077e9\\RelayQaHubUpdater.exe",
+        "bytes": 421999,
+        "sha256": "43a03966f66144fa7a462d937f797af9cad303b7089cb974e57930bcd23e141b"
+      },
+      {
+        "path": "updates\\updater-20260910T025617451Z-11304-d9cd3aad-338c-4b9b-b78f-963923e077e9\\update.ini",
+        "bytes": 1158,
+        "sha256": "b63876163efd2eec3e251e680c3ebeaf9d5b763f56bef1e434e76aba3af72cd2"
+      },
+      {
+        "path": "updates\\updater-20260910T025617451Z-11304-d9cd3aad-338c-4b9b-b78f-963923e077e9\\update.log",
+        "bytes": 254,
+        "sha256": "959a0d791d3fe03edf8b80bb725d192c2393c09586ee3cb550bbe6f032ef5a61"
+      },
+      {
+        "path": "updates\\updater-20260910T033745832Z-27284-1f810ee5-757f-4bbf-b364-ea1e665d454c\\ready.flag",
+        "bytes": 50,
+        "sha256": "6988530a65412eb787dbb1b299750cb39c9856c77eb596f8df5340a926232b13"
+      },
+      {
+        "path": "updates\\updater-20260910T033745832Z-27284-1f810ee5-757f-4bbf-b364-ea1e665d454c\\RelayQaHubUpdater.exe",
+        "bytes": 421999,
+        "sha256": "43a03966f66144fa7a462d937f797af9cad303b7089cb974e57930bcd23e141b"
+      },
+      {
+        "path": "updates\\updater-20260910T033745832Z-27284-1f810ee5-757f-4bbf-b364-ea1e665d454c\\update.ini",
+        "bytes": 1158,
+        "sha256": "d4fb5410e43639b7720064398dcd4707929a66b4ddaeb592a9c49b4677b5101b"
+      },
+      {
+        "path": "updates\\updater-20260910T033745832Z-27284-1f810ee5-757f-4bbf-b364-ea1e665d454c\\update.log",
+        "bytes": 254,
+        "sha256": "959a0d791d3fe03edf8b80bb725d192c2393c09586ee3cb550bbe6f032ef5a61"
+      },
+      {
+        "path": "updates\\updater-20260910T044149231Z-25508-e1211c76-e8c1-45f7-a3bc-d6a85a085e0d\\ready.flag",
+        "bytes": 50,
+        "sha256": "1a4bdd150d8b3500f189667abc78e71f8a2b4bc775705b5759c6eaf24af707e3"
+      },
+      {
+        "path": "updates\\updater-20260910T044149231Z-25508-e1211c76-e8c1-45f7-a3bc-d6a85a085e0d\\relaunched.flag",
+        "bytes": 118,
+        "sha256": "97d1e082561c65c0d4b848082c60ef2ff2ca770a081167aef895c2327d44fed1"
+      },
+      {
+        "path": "updates\\updater-20260910T044149231Z-25508-e1211c76-e8c1-45f7-a3bc-d6a85a085e0d\\RelayQaHubUpdater.exe",
+        "bytes": 422277,
+        "sha256": "d65db1382e2f47b947fb128e063e62c5b853a1b188c1ca6e5e9f50493a2fadd9"
+      },
+      {
+        "path": "updates\\updater-20260910T044149231Z-25508-e1211c76-e8c1-45f7-a3bc-d6a85a085e0d\\update.ini",
+        "bytes": 1158,
+        "sha256": "3ca509c7948f31c8f93ce9fa643018c0c7e77df49a335b3c97ef7b1a6e788605"
+      },
+      {
+        "path": "updates\\updater-20260910T044149231Z-25508-e1211c76-e8c1-45f7-a3bc-d6a85a085e0d\\update.log",
+        "bytes": 324,
+        "sha256": "b4173896d1b812480873008aaf4dd0b63ba3fa40b44c7664bcd8677ef80476fa"
+      },
+      {
+        "path": "updates\\updater-20260910T102940665Z-26928-95c2444d-f87a-4e2c-a63b-c9cc4360cd56\\ready.flag",
+        "bytes": 50,
+        "sha256": "203619340e03fe49a974ec6e335096a9cfc26447763e0426ed58048f006aa80e"
+      },
+      {
+        "path": "updates\\updater-20260910T102940665Z-26928-95c2444d-f87a-4e2c-a63b-c9cc4360cd56\\RelayQaHubUpdater.exe",
+        "bytes": 422277,
+        "sha256": "d65db1382e2f47b947fb128e063e62c5b853a1b188c1ca6e5e9f50493a2fadd9"
+      },
+      {
+        "path": "updates\\updater-20260910T102940665Z-26928-95c2444d-f87a-4e2c-a63b-c9cc4360cd56\\update.ini",
+        "bytes": 1158,
+        "sha256": "82285b1aa83caff871a511b3e7c9e7ba39e5240fbcdd624c1a1030a819e11cee"
+      },
+      {
+        "path": "updates\\updater-20260910T102940665Z-26928-95c2444d-f87a-4e2c-a63b-c9cc4360cd56\\update.log",
+        "bytes": 224,
+        "sha256": "9b76d510b9ecc01348fc5a4a482a1e323d4e2cf9d29b57fa7f820f0c7c0050e4"
+      },
+      {
+        "path": "updates\\updater-20260910T112450576Z-24124-6644c08a-1730-4954-a56f-f87144c62a3b\\ready.flag",
+        "bytes": 50,
+        "sha256": "02c8914a691b6b87f4937c7abd877a9a5b012171c7e34c59eec656b07bb76ba0"
+      },
+      {
+        "path": "updates\\updater-20260910T112450576Z-24124-6644c08a-1730-4954-a56f-f87144c62a3b\\relaunched.flag",
+        "bytes": 118,
+        "sha256": "8e062b0d70adc423758b19c23bfdcf2b6d87be9cb9036602a45967cedd1d1591"
+      },
+      {
+        "path": "updates\\updater-20260910T112450576Z-24124-6644c08a-1730-4954-a56f-f87144c62a3b\\RelayQaHubUpdater.exe",
+        "bytes": 422277,
+        "sha256": "d65db1382e2f47b947fb128e063e62c5b853a1b188c1ca6e5e9f50493a2fadd9"
+      },
+      {
+        "path": "updates\\updater-20260910T112450576Z-24124-6644c08a-1730-4954-a56f-f87144c62a3b\\update.ini",
+        "bytes": 1158,
+        "sha256": "093a4cb5a1a2a429293cea42e8d730bd5006169867a05fa63bf184833c5c4a7b"
+      },
+      {
+        "path": "updates\\updater-20260910T112450576Z-24124-6644c08a-1730-4954-a56f-f87144c62a3b\\update.log",
+        "bytes": 324,
+        "sha256": "b4173896d1b812480873008aaf4dd0b63ba3fa40b44c7664bcd8677ef80476fa"
+      },
+      {
+        "path": "WebStorage\\QuotaManager",
+        "bytes": 40960,
+        "sha256": "2fa0c6ca035789d3181108ad308329d82fecea460e3287c100a21e6828c63663"
+      },
+      {
+        "path": "WebStorage\\QuotaManager-journal",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "checks": {
+    "fileCountExact": true,
+    "aggregateSha256Exact": true
+  },
+  "passed": true
+}

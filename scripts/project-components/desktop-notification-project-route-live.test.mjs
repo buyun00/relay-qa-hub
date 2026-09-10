@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 import {
   TOAST_UIA_PS,
   classifyBugDetailRequest,
+  durableToastBody,
+  notificationProjectKey,
   parseArguments,
   redactEvidence,
 } from "./desktop-notification-project-route-live.mjs";
@@ -41,6 +43,15 @@ test("CLI is inert without --run and requires both explicit absolute inputs", ()
   );
 });
 
+test("toast body follows the frozen v1.1 Inbox shape and accepts a future explicit body", () => {
+  assert.equal(durableToastBody({ type: "occurrence.appended" }), "occurrence.appended");
+  assert.equal(
+    durableToastBody({ type: "occurrence.appended", body: "QA-12 · Login failure" }),
+    "QA-12 · Login failure",
+  );
+  assert.throws(() => durableToastBody({ type: "" }), /INVALID_TOAST_BODY/u);
+});
+
 test("detail classifier requires an exact GET path and preserves the project header", () => {
   const bugId = "10000000-0000-4000-8000-000000000001";
   const projectId = "20000000-0000-4000-8000-000000000001";
@@ -72,6 +83,19 @@ test("detail classifier requires an exact GET path and preserves the project hea
   );
 });
 
+test("notification fixture project keys satisfy the API uppercase key contract", () => {
+  assert.equal(notificationProjectKey("ea8556055d1044f79a4bbb4b59b10176", "A"), "NEA8556055DA");
+  assert.match(
+    notificationProjectKey("0123456789abcdef0123456789abcdef", "B"),
+    /^[A-Z][A-Z0-9]{1,15}$/u,
+  );
+  assert.throws(() => notificationProjectKey("too-short", "A"), /RUN_ID_INVALID/u);
+  assert.throws(
+    () => notificationProjectKey("0123456789abcdef0123456789abcdef", "C"),
+    /PROJECT_SUFFIX_INVALID/u,
+  );
+});
+
 test("evidence redaction removes auth material from keys and free text", () => {
   const secret = "gm-secret-value";
   const value = redactEvidence(
@@ -89,12 +113,19 @@ test("evidence redaction removes auth material from keys and free text", () => {
 });
 
 test("toast helper performs exact title/body lookup and only invokes through InvokePattern", () => {
+  assert.match(TOAST_UIA_PS, /Get-Content[^\n]+-Encoding utf8/u);
   assert.match(TOAST_UIA_PS, /AutomationElement\]::NameProperty/u);
   assert.match(TOAST_UIA_PS, /\$inputData\.title/u);
   assert.match(TOAST_UIA_PS, /\$inputData\.body/u);
   assert.match(TOAST_UIA_PS, /InvokePattern\]::Pattern/u);
   assert.match(TOAST_UIA_PS, /AMBIGUOUS_EXACT_TOAST/u);
   assert.doesNotMatch(TOAST_UIA_PS, /SendKeys|mouse_event|SetCursorPos/iu);
+});
+
+test("toast watcher handles early PowerShell rejection before delayed invocation", () => {
+  assert.match(runnerSource, /let watcherOutcome = null/u);
+  assert.match(runnerSource, /watcherOutcome = \{ error \}/u);
+  assert.match(runnerSource, /if \(watcherOutcome\?\.error\) throw watcherOutcome\.error/u);
 });
 
 test("second A notification is observed in A and only then clicked from B", () => {

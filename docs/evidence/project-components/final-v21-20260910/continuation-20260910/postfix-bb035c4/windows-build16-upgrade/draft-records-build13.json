@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T12:44:35.098Z",
+  "readOnly": true,
+  "locationOrigin": "qa-hub-preview-v21-e2e-fresh-0910://app",
+  "database": "qa-hub-preview-project-drafts-v1",
+  "store": "drafts",
+  "entryCount": 6,
+  "entries": [
+    {
+      "key": "qa-hub:preview:v2:[\"http://127.0.0.1:4639\",\"305b4def-ae7e-4a2d-ae96-a05d616390bf\",\"0ddff48b-536c-4c30-8b42-511741010610\",\"[\\\"pending-submission-v1\\\",\\\"10000000-0000-4000-8000-000000000020\\\",\\\"bug\\\"]\"]",
+      "topLevelKeys": [
+        "entries"
+      ],
+      "stringLeaves": []
+    },
+    {
+      "key": "qa-hub:preview:v2:[\"http://127.0.0.1:4639\",\"305b4def-ae7e-4a2d-ae96-a05d616390bf\",\"0ddff48b-536c-4c30-8b42-511741010610\",\"bug-drafts\"]",
+      "topLevelKeys": [
+        "assignmentDrafts",
+        "comment",
+        "commentReceiptIds",
+        "createOpen",
+        "createReceiptId",
+        "detailAttachmentIds",
+        "detailDraft",
+        "detailNewFiles",
+        "editingDetail",
+        "newContent",
+        "newFiles",
+        "newOwnerId",
+        "newSeverity",
+        "newVerifierId",
+        "repairActionDrafts",
+        "returnDrafts",
+        "selectedId"
+      ],
+      "stringLeaves": [
+        {
+          "path": "comment",
+          "length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "newContent",
+          "length": 21,
+          "sha256": "125cf35171bf74f353b590141b55f8b51d8c03f6bf9b7a66bb4da317832ac56c"
+        },
+        {
+          "path": "newOwnerId",
+          "length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "newSeverity",
+          "length": 2,
+          "sha256": "adfa2b24c2d924fe6383d8804be55afb98ea3eb0e14c3470ac3a0f651b9a422e"
+        },
+        {
+          "path": "newVerifierId",
+          "length": 36,
+          "sha256": "460e8be11168bf22b3d1474593ee69e0e047455568cfdda94697d81f09ceddb4"
+        }
+      ]
+    },
+    {
+      "key": "qa-hub:preview:v2:[\"http://127.0.0.1:4639\",\"305b4def-ae7e-4a2d-ae96-a05d616390bf\",\"eb15d62a-f9d2-4015-a5f3-c95f1a729e23\",\"[\\\"pending-submission-v1\\\",\\\"10000000-0000-4000-8000-000000000020\\\",\\\"bug\\\"]\"]",
+      "topLevelKeys": [
+        "entries"
+      ],
+      "stringLeaves": []
+    },
+    {
+      "key": "qa-hub:preview:v2:[\"http://127.0.0.1:4639\",\"305b4def-ae7e-4a2d-ae96-a05d616390bf\",\"eb15d62a-f9d2-4015-a5f3-c95f1a729e23\",\"bug-drafts\"]",
+      "topLevelKeys": [
+        "assignmentDrafts",
+        "comment",
+        "commentReceiptIds",
+        "createOpen",
+        "createReceiptId",
+        "detailAttachmentIds",
+        "detailDraft",
+        "detailNewFiles",
+        "editingDetail",
+        "newContent",
+        "newFiles",
+        "newOwnerId",
+        "newSeverity",
+        "newVerifierId",
+        "repairActionDrafts",
+        "returnDrafts",
+        "selectedId"
+      ],
+      "stringLeaves": [
+        {
+          "path": "comment",
+          "length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "newContent",
+          "length": 73,
+          "sha256": "f4b903da91a5bd83b6d354d2feef1e8a40efd6b092c348a2bf5b20e1f4657d59"
+        },
+        {
+          "path": "newOwnerId",
+          "length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "newSeverity",
+          "length": 2,
+          "sha256": "adfa2b24c2d924fe6383d8804be55afb98ea3eb0e14c3470ac3a0f651b9a422e"
+        },
+        {
+          "path": "newVerifierId",
+          "length": 36,
+          "sha256": "d04aca78d713e6626e0907cbef469b6e3fb0c71ec76282c695aefe25db6351ed"
+        }
+      ]
+    },
+    {
+      "key": "qa-hub:preview:v2:[\"qa-hub-preview-v21-e2e-fresh-0910://app\",\"305b4def-ae7e-4a2d-ae96-a05d616390bf\",\"0ddff48b-536c-4c30-8b42-511741010610\",\"[\\\"pending-submission-v1\\\",\\\"10000000-0000-4000-8000-000000000020\\\",\\\"bug\\\"]\"]",
+      "topLevelKeys": [
+        "entries"
+      ],
+      "stringLeaves": []
+    },
+    {
+      "key": "qa-hub:preview:v2:[\"qa-hub-preview-v21-e2e-fresh-0910://app\",\"305b4def-ae7e-4a2d-ae96-a05d616390bf\",\"0ddff48b-536c-4c30-8b42-511741010610\",\"bug-drafts\"]",
+      "topLevelKeys": [
+        "assignmentDrafts",
+        "comment",
+        "commentReceiptIds",
+        "createOpen",
+        "createReceiptId",
+        "detailAttachmentIds",
+        "detailDraft",
+        "detailNewFiles",
+        "editingDetail",
+        "newContent",
+        "newFiles",
+        "newOwnerId",
+        "newSeverity",
+        "newVerifierId",
+        "repairActionDrafts",
+        "returnDrafts",
+        "selectedId"
+      ],
+      "stringLeaves": [
+        {
+          "path": "comment",
+          "length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "newContent",
+          "length": 25,
+          "sha256": "4633cd88dc0b379c68827d385575105a4e24f407314a2c4ca3638a62918d0166"
+        },
+        {
+          "path": "newOwnerId",
+          "length": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "newSeverity",
+          "length": 2,
+          "sha256": "adfa2b24c2d924fe6383d8804be55afb98ea3eb0e14c3470ac3a0f651b9a422e"
+        },
+        {
+          "path": "newVerifierId",
+          "length": 36,
+          "sha256": "460e8be11168bf22b3d1474593ee69e0e047455568cfdda94697d81f09ceddb4"
+        }
+      ]
+    }
+  ]
+}

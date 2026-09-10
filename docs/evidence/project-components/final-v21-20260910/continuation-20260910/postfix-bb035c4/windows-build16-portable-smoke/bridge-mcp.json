@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T12:32:27.727Z",
+  "bridge": {
+    "bridgeType": "object",
+    "bridgeMethods": [
+      "checkForUpdate",
+      "getConnectionStatus",
+      "getNotificationsPaused",
+      "getRuntimeInfo",
+      "getUpdateState",
+      "getWindowState",
+      "installUpdate",
+      "notifyPackaging",
+      "onBugChanged",
+      "onConnectionStatus",
+      "onOpenBug",
+      "onOpenPackaging",
+      "onUpdateState",
+      "onWindowState",
+      "uploader",
+      "windowAction",
+      "windowControlsOverlay"
+    ],
+    "runtime": {
+      "apiBaseUrl": "http://127.0.0.1:4639",
+      "notificationsEnabled": false,
+      "version": "0.2.0-preview.16",
+      "mcp": {
+        "state": "listening",
+        "port": 4662,
+        "url": "http://127.0.0.1:4662/mcp",
+        "lastError": null
+      }
+    },
+    "update": {
+      "status": "up-to-date",
+      "currentReleaseId": "20260910T122343731Z",
+      "version": "0.2.0-preview.16"
+    }
+  },
+  "health": {
+    "status": "ready",
+    "service": "relay-qa-hub-desktop-mcp",
+    "endpoint": "/mcp",
+    "transport": "streamable-http"
+  },
+  "initialize": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "protocolVersion": "2025-06-18",
+      "capabilities": {
+        "tools": {
+          "listChanged": false
+        },
+        "resources": {
+          "subscribe": false,
+          "listChanged": false
+        }
+      },
+      "serverInfo": {
+        "name": "qa-hub-desktop-preview",
+        "version": "0.2.0-preview.16"
+      },
+      "instructions": "先用项目姓名登录，再列出自己的项目。每个工具必须使用明确项目；本地 MCP 与独立服务端 MCP 共用 HTTP 业务。Bug 人工完成、验收通过、退回和关闭独立于五项可选组件。代码交付和第三方同步不代表验收关闭。附件 materialize 在本地校验后返回作用域隔离的文件。不要报告未执行的验证。"
+    }
+  },
+  "checks": {
+    "bridgeObject": true,
+    "runtimeVersionExact": true,
+    "runtimeMcpPortExact": true,
+    "runtimeMcpListening": true,
+    "updateCurrent": true,
+    "healthStatus": 200,
+    "healthReady": true,
+    "initializeStatus": 200,
+    "initializeVersion": "0.2.0-preview.16",
+    "initializeVersionExact": true
+  },
+  "passed": true
+}

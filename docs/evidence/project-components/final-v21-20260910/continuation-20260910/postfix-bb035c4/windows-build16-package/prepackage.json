@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-10T12:23:42.3278277Z",
+  "head": "bb035c4239f57b11a4cef730427f5e8cb45c62ee",
+  "sourceClean": true,
+  "previousManifestSha256": "ae6027e51f973669fe652a2733a5f2b46691dd30daf0f86771ca3a8d8739c124",
+  "preloadSha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+  "productionAction": "read_only",
+  "productionTouched": false
+}

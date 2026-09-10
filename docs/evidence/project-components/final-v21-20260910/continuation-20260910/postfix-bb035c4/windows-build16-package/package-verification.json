@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-10T12:28:10.554Z",
+  "instanceId": "qa-hub-preview-v21-e2e-fresh-0910",
+  "releaseId": "20260910T122343731Z",
+  "version": "0.2.0-preview.16",
+  "sourceCommit": "bb035c4239f57b11a4cef730427f5e8cb45c62ee",
+  "installer": {
+    "path": "C:\\Users\\lin0\\.codex\\parallel-runtimes\\qa-hub-preview-v21-e2e-fresh-0910\\downloads\\qa-hub-preview-v21-e2e-fresh-0910-windows-0.2.0-preview.16-20260910T122343731Z.exe",
+    "bytes": 108471890,
+    "sha256": "38277378fc86b25c4838eeabe88fe9b1b0fd0d9350800e03c7c133eba336b83c"
+  },
+  "preload": {
+    "source": {
+      "bytes": 11689,
+      "sha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+      "modules": [
+        "electron"
+      ]
+    },
+    "staged": {
+      "bytes": 11689,
+      "sha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+      "modules": [
+        "electron"
+      ]
+    },
+    "packaged": {
+      "bytes": 11689,
+      "sha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+      "modules": [
+        "electron"
+      ]
+    },
+    "finalPackaged": {
+      "bytes": 11689,
+      "sha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+      "modules": [
+        "electron"
+      ]
+    },
+    "finalSource": {
+      "bytes": 11689,
+      "sha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+      "modules": [
+        "electron"
+      ]
+    }
+  },
+  "checks": {
+    "receiptVersionExact": true,
+    "receiptSourceExact": true,
+    "sourceClean": true,
+    "signedManifestMatchesReceipt": true,
+    "signatureValid": true,
+    "localManifestByteExact": true,
+    "localInstallerSizeExact": true,
+    "localInstallerSha256": "38277378fc86b25c4838eeabe88fe9b1b0fd0d9350800e03c7c133eba336b83c",
+    "localInstallerHashExact": true,
+    "httpManifestStatus": 200,
+    "httpManifestByteExact": true,
+    "httpInstallerStatus": 200,
+    "httpInstallerSize": 108471890,
+    "httpInstallerSizeExact": true,
+    "httpInstallerSha256": "38277378fc86b25c4838eeabe88fe9b1b0fd0d9350800e03c7c133eba336b83c",
+    "httpInstallerHashExact": true,
+    "sourcePreloadSha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+    "packagedPreloadSha256": "5a415be366a8326e1e618beffc7037d1b6b7cd661716a44787a8fd0d49b2cf6d",
+    "packagedPreloadByteExact": true,
+    "receiptPreloadAllExact": true,
+    "productionReadyStatus": 200,
+    "productionReady": {
+      "status": "ready",
+      "schemaVersion": "12",
+      "checks": [
+        {
+          "name": "database",
+          "status": "ok"
+        },
+        {
+          "name": "evidence",
+          "status": "ok"
+        },
+        {
+          "name": "worker",
+          "status": "ok"
+        }
+      ]
+    },
+    "listenerOwners": {
+      "production4319Preserved": true,
+      "production4174Preserved": true,
+      "production4320Preserved": true,
+      "foreign9333Preserved": true,
+      "previewApi4639Preserved": true,
+      "previewWeb4640Preserved": true,
+      "previewServerMcp4641Preserved": true,
+      "installedPreview4642Preserved": true,
+      "installedPreviewCdp9433Preserved": true
+    }
+  },
+  "productionObservation": {
+    "action": "read_only",
+    "touched": false
+  },
+  "passed": true,
+  "listeners": [
+    {
+      "port": 4174,
+      "pid": 7420
+    },
+    {
+      "port": 4319,
+      "pid": 9488
+    },
+    {
+      "port": 4320,
+      "pid": 17160
+    },
+    {
+      "port": 4639,
+      "pid": 1940
+    },
+    {
+      "port": 4640,
+      "pid": 20452
+    },
+    {
+      "port": 4641,
+      "pid": 19112
+    },
+    {
+      "port": 4642,
+      "pid": 17344
+    },
+    {
+      "port": 9333,
+      "pid": 26828
+    },
+    {
+      "port": 9433,
+      "pid": 17344
+    }
+  ]
+}

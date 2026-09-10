@@ -87,6 +87,19 @@ export function parseArguments(argv) {
   return result;
 }
 
+export function durableToastBody(notification) {
+  assert.ok(notification && typeof notification === "object", "INVALID_NOTIFICATION");
+  const body =
+    typeof notification.body === "string" && notification.body.length > 0
+      ? notification.body
+      : notification.type;
+  assert.ok(
+    typeof body === "string" && body.length > 0 && body.length <= 500,
+    "INVALID_TOAST_BODY",
+  );
+  return body;
+}
+
 function assertLoopbackUrl(value, port, label) {
   const url = new URL(value);
   assert.equal(url.protocol, "http:", `${label}_HTTP_REQUIRED`);
@@ -226,6 +239,12 @@ export function classifyBugDetailRequest(entry, bugId) {
   return { projectId: headers["x-qa-project-id"] ?? null, requestId: entry.requestId ?? null };
 }
 
+export function notificationProjectKey(compactRunId, suffix) {
+  assert.match(compactRunId, /^[0-9a-f]{32}$/iu, "RUN_ID_INVALID");
+  assert.match(suffix, /^[AB]$/u, "PROJECT_SUFFIX_INVALID");
+  return `N${compactRunId.slice(0, 10).toUpperCase()}${suffix}`;
+}
+
 function writeExclusive(file, value) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(
@@ -284,7 +303,7 @@ async function allocatePorts(instance) {
 const HOST_SNAPSHOT_PS = String.raw`
 param([Parameter(Mandatory=$true)][string]$InputPath)
 $ErrorActionPreference = 'Stop'
-$inputData = Get-Content -LiteralPath $InputPath -Raw | ConvertFrom-Json
+$inputData = Get-Content -LiteralPath $InputPath -Raw -Encoding utf8 | ConvertFrom-Json
 $processes = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'RelayQaHub*.exe' } | ForEach-Object {
   $created = try { ([datetime]$_.CreationDate).ToUniversalTime().ToString('o') } catch { [string]$_.CreationDate }
   [pscustomobject]@{ pid=[int]$_.ProcessId; parentPid=[int]$_.ParentProcessId; name=[string]$_.Name; path=[string]$_.ExecutablePath; commandLine=[string]$_.CommandLine; startedAt=$created }
@@ -303,7 +322,7 @@ param([Parameter(Mandatory=$true)][string]$InputPath)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
-$inputData = Get-Content -LiteralPath $InputPath -Raw | ConvertFrom-Json
+$inputData = Get-Content -LiteralPath $InputPath -Raw -Encoding utf8 | ConvertFrom-Json
 $root = [System.Windows.Automation.AutomationElement]::RootElement
 $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
 function Ancestors($element) {
@@ -972,6 +991,7 @@ async function runLive(scope) {
       observedPath,
       signalPath,
     });
+    let watcherOutcome = null;
     const promise = execFileAsync(
       "powershell.exe",
       [
@@ -985,9 +1005,17 @@ async function runLive(scope) {
         input,
       ],
       { windowsHide: true, timeout: 55_000, maxBuffer: 1024 * 1024 },
+    ).then(
+      (value) => (watcherOutcome = { value }),
+      (error) => (watcherOutcome = { error }),
     );
-    for (let attempt = 0; attempt < 300 && !fs.existsSync(observedPath); attempt += 1)
+    for (
+      let attempt = 0;
+      attempt < 300 && !fs.existsSync(observedPath) && !watcherOutcome?.error;
+      attempt += 1
+    )
       await delay(100);
+    if (watcherOutcome?.error) throw watcherOutcome.error;
     assert.ok(fs.existsSync(observedPath), `${label}_REAL_TOAST_NOT_OBSERVED`);
     const observed = readJson(observedPath);
     check(`${label} exact toast title`, observed.title, TOAST_TITLE);
@@ -999,7 +1027,9 @@ async function runLive(scope) {
       observed,
       invoke: async () => {
         writeExclusive(signalPath, `${new Date().toISOString()}\n`);
-        const { stdout } = await promise;
+        const outcome = await promise;
+        if (outcome.error) throw outcome.error;
+        const { stdout } = outcome.value;
         const result = JSON.parse(stdout);
         check(`${label} UIAutomation Invoke`, result.invoked, true);
         writeExclusive(path.join(evidence, "raw", `${label}-toast-invoked.json`), result);
@@ -1097,7 +1127,7 @@ async function runLive(scope) {
           token: gm.accessToken,
           body: {
             id: randomUUID(),
-            key: `N${compact.slice(0, 10)}${suffix}`,
+            key: notificationProjectKey(compact, suffix),
             name: `通知路由${suffix}-${compact.slice(0, 8)}`,
           },
         }),
@@ -1136,8 +1166,6 @@ async function runLive(scope) {
       body: bug1Input.body,
       status: 201,
     });
-    const body1 = `${created1.bug.key} · ${description1}`;
-    const watcher1 = await toastWatcher("a1", body1);
     const notices1 = await api(
       "target reads durable A1 notification",
       "GET",
@@ -1146,6 +1174,9 @@ async function runLive(scope) {
     );
     const notice1 = notices1.items.find((item) => item.bugId === created1.bug.id);
     check("durable A1 notification exists", Boolean(notice1), true);
+    const body1 = durableToastBody(notice1);
+    check("durable A1 notification body", body1, `${created1.bug.key} · ${description1}`);
+    const watcher1 = await toastWatcher("a1", body1);
     await eventFor(
       (item) => item.event === "desktop.notification.shown" && item.notificationId === notice1.id,
       "A1_SHOWN",
@@ -1192,7 +1223,6 @@ async function runLive(scope) {
       body: bug2Input.body,
       status: 201,
     });
-    const watcher2 = await toastWatcher("a2", `${created2.bug.key} · ${description2}`);
     const notices2 = await api(
       "target reads durable A2 notification",
       "GET",
@@ -1201,6 +1231,9 @@ async function runLive(scope) {
     );
     const notice2 = notices2.items.find((item) => item.bugId === created2.bug.id);
     check("durable A2 notification exists", Boolean(notice2), true);
+    const body2 = durableToastBody(notice2);
+    check("durable A2 notification body", body2, `${created2.bug.key} · ${description2}`);
+    const watcher2 = await toastWatcher("a2", body2);
     await eventFor(
       (item) => item.event === "desktop.notification.shown" && item.notificationId === notice2.id,
       "A2_SHOWN",
@@ -1257,7 +1290,6 @@ async function runLive(scope) {
       body: bug3Input.body,
       status: 201,
     });
-    await observeToast("b3", `${created3.bug.key} · ${description3}`);
     const notices3 = await api(
       "target reads durable unread B3 notification",
       "GET",
@@ -1270,6 +1302,9 @@ async function runLive(scope) {
       Boolean(notice3) && notice3.readAt === null,
       true,
     );
+    const body3 = durableToastBody(notice3);
+    check("durable B3 notification body", body3, `${created3.bug.key} · ${description3}`);
+    await observeToast("b3", body3);
     await eventFor(
       (item) => item.event === "desktop.notification.shown" && item.notificationId === notice3.id,
       "B3_SHOWN",

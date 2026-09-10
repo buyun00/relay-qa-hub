@@ -132,8 +132,33 @@ test("frozen read routes pass strict normalized pagination and project filters t
   ]);
   const notification = responses.at(-1);
   assert.equal(notification.snapshotSequence, 7);
+  assert.equal("body" in notification.items[0], false);
   assert.deepEqual(Object.keys(notification.items[0]).sort(), [
     "accountId",
+    "bugId",
+    "createdAt",
+    "id",
+    "projectId",
+    "readAt",
+    "title",
+    "type",
+    "userId",
+    "version",
+  ]);
+
+  const jsonResponse = await app.inject({
+    method: "GET",
+    url: `/api/v1/notifications?projectId=${projectId}&unreadOnly=true&limit=8`,
+    headers: { ...authorization, accept: "application/json" },
+  });
+  assert.equal(jsonResponse.statusCode, 200, jsonResponse.body);
+  assert.match(jsonResponse.headers["content-type"], /^application\/json/u);
+  const jsonNotification = jsonResponse.json();
+  assert.equal("snapshotSequence" in jsonNotification, false);
+  assert.equal(jsonNotification.items[0].body, "internal body");
+  assert.equal("accountId" in jsonNotification.items[0], false);
+  assert.deepEqual(Object.keys(jsonNotification.items[0]).sort(), [
+    "body",
     "bugId",
     "createdAt",
     "id",
